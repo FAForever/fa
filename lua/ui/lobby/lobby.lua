@@ -45,11 +45,19 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
+
+local Emojis =  import('/lua/ui/lobby/emojis.lua')
+local Packages =  Emojis.Packages
+local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
+local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
+
+local lineHeight = 30
+
 
 function GetAITypes()
     AIKeys = {}
@@ -3017,14 +3025,14 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-	-- curated Maps
-	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-	LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
+    -- curated Maps
+    GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
+    Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
+    LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-	GUI.curatedmapsButton.OnClick = function()
-		OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
-	end
+    GUI.curatedmapsButton.OnClick = function()
+        OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
+    end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -3706,11 +3714,35 @@ function setupChatEdit(chatPanel)
 
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
-        if charcode == UIUtil.VK_TAB then
+        -- 58 is ':' code
+        if charcode == 58  then
+            if GUI.EmojiSelector  then
+                GUI.EmojiSelector:Destroy()
+                GUI.EmojiSelector = nil
+            else
+                CreateEmojiSelector()
+                GUI.EmojiSelector.BeginPos = self:GetCaretPosition() + 1
+            end
+        end
+        --
+
+        local charLim = self:GetMaxChars()
+        if charcode ==  UIUtil.VK_TAB then--tab code
+            if table.empty(GUI.EmojiSelector.FoundEmojis) then return true end
+            local text =        self:GetText()
+            local CaretPos =    self:GetCaretPosition()
+
+            local emojiname =  GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].pack..'/'.. GUI.EmojiSelector.FoundEmojis[GUI.EmojiSelector.selectionIndex].emoji
+
+            self:SetText(STR_Utf8SubString(text, 1, GUI.EmojiSelector.BeginPos)..emojiname..':'..STR_Utf8SubString(text,CaretPos + 1, string.len(text)))
+            self:SetCaretPosition(string.len(emojiname) + GUI.EmojiSelector.BeginPos + 1)
+            GUI.EmojiSelector:Destroy()
+            GUI.EmojiSelector = nil
+
             return true
         end
 
-        local charLim = self:GetMaxChars()
+
         if STR_Utf8Len(self:GetText()) >= charLim then
             local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
             PlaySound(sound)
@@ -3727,6 +3759,10 @@ function setupChatEdit(chatPanel)
     local commandQueueIndex = 0
     local commandQueue = {}
     GUI.chatEdit.OnEnterPressed = function(self, text)
+        if GUI.EmojiSelector then
+            GUI.EmojiSelector:Destroy()
+            GUI.EmojiSelector = nil
+        end
         if text:gsub("%s+", "") == '' then  -- If the text, trimmed of all space, is equal to ''
             return
         end
@@ -3745,6 +3781,21 @@ function setupChatEdit(chatPanel)
             commandFunc(params)
         else
             PublicChat(text)
+        end
+    end
+
+    GUI.chatEdit.OnTextChanged = function(self, newText, oldText)
+        if   GUI.EmojiSelector and GUI.EmojiSelector.BeginPos then
+            if  GUI.EmojiSelector.BeginPos > self:GetCaretPosition() then
+                GUI.EmojiSelector:Destroy()
+                GUI.EmojiSelector = nil
+                return
+            end
+            local EmojiText = ''
+            if GUI.EmojiSelector.BeginPos < self:GetCaretPosition() then
+                EmojiText = STR_Utf8SubString(newText, GUI.EmojiSelector.BeginPos + 1, self:GetCaretPosition() - GUI.EmojiSelector.BeginPos)
+            end
+            UpdateEmojiSelector(EmojiText)
         end
     end
 
@@ -3768,14 +3819,20 @@ function setupChatEdit(chatPanel)
         if AddUnicodeCharToEditText(self, keyCode) then
             return
         end
-        if commandQueue and not table.empty(commandQueue) then
-            if keyCode == 38 then
+        if GUI.EmojiSelector then
+            if keyCode == UIUtil.VK_UP  then
+                    GUI.EmojiSelector:Highlight(true)
+            elseif keyCode == UIUtil.VK_DOWN then
+                    GUI.EmojiSelector:Highlight(false)
+            end
+        elseif commandQueue and not table.empty(commandQueue) then
+            if keyCode == UIUtil.VK_UP  then
                 if commandQueue[commandQueueIndex + 1] then
                     commandQueueIndex = commandQueueIndex + 1
                     self:SetText(commandQueue[commandQueueIndex])
                 end
             end
-            if keyCode == 40 then
+            if keyCode == UIUtil.VK_DOWN then
                 if commandQueueIndex ~= 1 then
                     if commandQueue[commandQueueIndex - 1] then
                         commandQueueIndex = commandQueueIndex - 1
@@ -5122,7 +5179,6 @@ function CreateBigPreview(parent)
     if scenarioInfo.hidePreviewMarkers then
         return
     end
-
     if LrgMap then
         LrgMap.isHidden = false
         RefreshLargeMap()
@@ -5236,6 +5292,7 @@ function CPUBenchmark()
     local countTime = 0
     --Make everything a local variable
     --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+
     local TableInsert = table.insert
     local TableRemove = table.remove
     local h
@@ -5632,7 +5689,7 @@ end
 
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 420, 260)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 300)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
@@ -5670,7 +5727,7 @@ function ShowLobbyOptionsDialog()
     -- label for displaying chat font size
     local currentFontSize = Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 14
     local slider_Chat_SizeFont_TEXT = UIUtil.CreateText(dialogContent, LOC("<LOC lobui_0404> ").. currentFontSize, 14, 'Arial', true)
-    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 162)
+    LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont_TEXT, dialogContent, 27, 180)
 
     -- slider for changing chat font size
     local slider_Chat_SizeFont = Slider(dialogContent, false, 9, 20,
@@ -5678,7 +5735,7 @@ function ShowLobbyOptionsDialog()
         UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
         UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
         UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
-        LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 182)
+        LayoutHelpers.AtRightTopIn(slider_Chat_SizeFont, dialogContent, 20, 200)
     slider_Chat_SizeFont:SetValue(currentFontSize)
     slider_Chat_SizeFont.OnValueChanged = function(self, newValue)
         local isScrolledDown = GUI.chatPanel:IsScrolledToBottom()
@@ -5743,12 +5800,32 @@ function ShowLobbyOptionsDialog()
         end
     end
 
+    local cbox_ChatEmojis = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', "Emojis in lobby")
+    LayoutHelpers.AtRightTopIn(cbox_ChatEmojis, dialogContent, 20, 146)
+    cbox_ChatEmojis.OnCheck = function(self, checked)
+        if checked then
+            Prefs.SetToCurrentProfile('ChatLobbyEmojis', true)
+        else
+            Prefs.SetToCurrentProfile('ChatLobbyEmojis', false)
+        end
+        GUI.chatDisplay:ReflowLines()
+    end
+
     -- Quit button
     local QuitButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
     LayoutHelpers.AtHorizontalCenterIn(QuitButton, dialogContent, 0)
     LayoutHelpers.AtBottomIn(QuitButton, dialogContent, 10)
 
     QuitButton.OnClick = function(self)
+        dialog:Hide()
+    end
+
+    local PMButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Emojis")
+    LayoutHelpers.CenteredLeftOf(PMButton, QuitButton, 20)
+    LayoutHelpers.AtBottomIn(PMButton, dialogContent, 10)
+
+    PMButton.OnClick = function(self)
+        CreatePackageManagerWindow()
         dialog:Hide()
     end
     --
@@ -5767,6 +5844,193 @@ function ShowLobbyOptionsDialog()
 
     local chatPlayerColor = Prefs.GetFromCurrentProfile('ChatPlayerColor')
     cbox_ChatPlayerColor:SetCheck(chatPlayerColor == true or chatPlayerColor == nil, true)
+
+    local ChatLobbyEmojis = Prefs.GetFromCurrentProfile('ChatLobbyEmojis')
+    cbox_ChatEmojis:SetCheck(ChatLobbyEmojis == true or ChatLobbyEmojis == nil, true)
+end
+
+
+function CreatePackageManagerWindow()
+
+    GUI.PackageManager = Group(GetFrame(0))
+    LayoutHelpers.SetDimensions(GUI.PackageManager,500,500)
+    LayoutHelpers.AtCenterIn(GUI.PackageManager, GetFrame(0))
+
+    GUI.PackageManager.popup = Popup(GetFrame(0),GUI.PackageManager)
+    LayoutHelpers.DepthOverParent(GUI.PackageManager,GUI.PackageManager.popup, 10)
+
+    GUI.PackageManager.TopLine = 1
+    GUI.PackageManager.SizeLine = table.getsize(Packages)
+
+    GUI.PackageManager.Title = UIUtil.CreateText(GUI.PackageManager, 'Package Manager', 16, UIUtil.titleFont,true)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.PackageManager.Title,GUI.PackageManager)
+    LayoutHelpers.AtTopIn(GUI.PackageManager.Title,GUI.PackageManager,5)
+
+    GUI.PackageManager.scroll = UIUtil.CreateLobbyVertScrollbar(GUI.PackageManager, -20,10,25) -- scroller
+    LayoutHelpers.DepthOverParent(GUI.PackageManager.scroll , GUI.PackageManager, 10)
+
+    GUI.PackageManager.QuitButton = UIUtil.CreateButtonWithDropshadow(GUI.PackageManager, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
+    LayoutHelpers.AtHorizontalCenterIn(GUI.PackageManager.QuitButton, GUI.PackageManager, 0)
+    LayoutHelpers.AtBottomIn(GUI.PackageManager.QuitButton, GUI.PackageManager, 5)
+    LayoutHelpers.DepthOverParent(GUI.PackageManager.QuitButton , GUI.PackageManager, 50)
+
+    GUI.PackageManager.QuitButton.OnClick = function(self)
+        GUI.PackageManager.popup:Destroy()
+        GUI.PackageManager = nil
+    end
+
+    -- called when the scrollbar for the control requires data to size itself
+    -- GetScrollValues must return 4 values in this order:
+    -- rangeMin, rangeMax, visibleMin, visibleMax
+    -- aixs can be "Vert" or "Horz"
+    GUI.PackageManager.GetScrollValues = function(self, axis)
+        --LOG( 1 ..' '.. self.SizeLine..' '..self.TopLine.. ' '.. math.min(self.TopLine + self.numLines, self.SizeLine))
+        return 1, self.SizeLine ,self.TopLine , math.min(self.TopLine + self.numLines, self.SizeLine)
+    end
+
+    -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
+    GUI.PackageManager.ScrollLines = function(self, axis, delta)
+        -- LOG(delta)
+        -- LOG(self.TopLine)
+        self:ScrollSetTop(axis, self.TopLine + delta)
+    end
+
+    -- called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
+    GUI.PackageManager.ScrollPages = function(self, axis, delta)
+        self:ScrollSetTop(axis, self.TopLine + math.floor(delta) * self.numLines )
+    end
+
+    -- called when the scrollbar wants to set a new visible top line
+    GUI.PackageManager.ScrollSetTop = function(self, axis, top)
+        --top = math.floor(top)
+        if top == self.TopLine then return end
+        self.TopLine = math.max(math.min(self.SizeLine - self.numLines + 1, top), 1)
+        self:CalcVisible()
+    end
+
+    GUI.PackageManager.ScrollToBottom = function(self)
+        GUI.chatContainer:ScrollSetTop(nil, self.numLines)
+    end
+
+    -- determines what controls should be visible or not
+    GUI.PackageManager.CalcVisible = function(self)
+        local packIndex = 1
+        local lineIndex = 1
+        local dorender = false
+        for id,pack in Packages do
+            if packIndex == self.TopLine then  dorender = true end
+            if dorender then
+                self.LineGroup.Lines[lineIndex]:render(pack.info,id)
+                if self.numLines == lineIndex then return end
+                lineIndex = lineIndex + 1
+            end
+            packIndex = packIndex + 1
+        end
+        for ind = lineIndex, self.numLines do self.LineGroup.Lines[ind]:render() end
+    end
+
+      -- called to determine if the control is scrollable on a particular access. Must return true or false.
+    GUI.PackageManager.IsScrollable = function(self, axis)
+        return true
+    end
+
+    --scrolling
+    GUI.PackageManager.HandleEvent = function(self, event)
+        if event.Type == 'WheelRotation' then
+            if event.WheelRotation > 0 then
+                self:ScrollLines(nil, -1)
+            else
+                self:ScrollLines(nil, 1)
+            end
+            return true
+        end
+        return false
+    end
+
+    GUI.PackageManager.LineGroup = Group(GUI.PackageManager) --group that contains PM data lines
+    LayoutHelpers.AtLeftIn(GUI.PackageManager.LineGroup, GUI.PackageManager, 5)
+    LayoutHelpers.LeftOf(GUI.PackageManager.LineGroup, GUI.PackageManager.scroll, 5)
+    LayoutHelpers.AtTopIn(GUI.PackageManager.LineGroup, GUI.PackageManager, 25)
+    LayoutHelpers.AtBottomIn(GUI.PackageManager.LineGroup, GUI.PackageManager, 5)
+    LayoutHelpers.DepthOverParent(GUI.PackageManager.LineGroup,GUI.PackageManager,10)
+    GUI.PackageManager.LineGroup.Lines = {}
+
+    local function CreatePackageManagerLines()
+        local function CreatePackageManagerLine()
+            local line = Group(GUI.PackageManager.LineGroup)
+            LayoutHelpers.DepthOverParent(line,GUI.PackageManager.LineGroup,1)
+            line.bg = CheckBox(line,
+                        UIUtil.SkinnableFile('/MODS/blank.dds'),
+                        UIUtil.SkinnableFile('/MODS/single.dds'),
+                        UIUtil.SkinnableFile('/MODS/single.dds'),
+                        UIUtil.SkinnableFile('/MODS/double.dds'),
+                        UIUtil.SkinnableFile('/MODS/disabled.dds'),
+                        UIUtil.SkinnableFile('/MODS/disabled.dds'),
+                            'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+            LayoutHelpers.SetDimensions(line,80,80)
+            LayoutHelpers.FillParent(line.bg, line)
+            LayoutHelpers.DepthOverParent(line.bg,line,1)
+            line.bg:Disable()
+
+
+            line.name = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont,true)
+            line.name:SetColor('FFE9ECE9')
+            line.name:DisableHitTest()
+            LayoutHelpers.AtLeftTopIn(line.name, line, 5, 5)
+
+            line.author = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont,true)
+            line.author:DisableHitTest()
+            line.author:SetColor('FFE9ECE9')
+            LayoutHelpers.Below(line.author, line.name,5)
+
+            line.desc = MultiLineText(line, UIUtil.bodyFont, 12, 'FFA2A5A2')
+            line.desc:SetDropShadow(true)
+            line.desc:DisableHitTest()
+            LayoutHelpers.Below(line.desc, line.author,5)
+            line.desc.Width:Set(line.Width() - 10)
+
+            line.render = function(self, data, id)
+                if data then
+                    self.bg.id = id
+                    self.name:SetText(data.name)
+                    self.author:SetText(data.author)
+                    self.desc:SetText(data.description)
+                    self.bg:Enable()
+                    self.bg:SetCheck(data.isEnabled,true)
+                else
+                    self.name:SetText('')
+                    self.author:SetText('')
+                    self.desc:Clear()
+                    self.bg:Disable()
+                end
+
+            end
+
+            line.bg.OnCheck = function(self, checked)
+                Emojis.UpdatePacks(self.id, checked)
+                GUI.chatDisplay:ReflowLines()
+            end
+            return line
+        end
+
+        local index = 1
+        GUI.PackageManager.LineGroup.Lines[index]  = CreatePackageManagerLine()
+        local parent = GUI.PackageManager.LineGroup.Lines[index]
+        LayoutHelpers.AtLeftTopIn( parent,GUI.PackageManager.LineGroup,5,5)
+        LayoutHelpers.AtRightIn(parent,GUI.PackageManager.LineGroup,5)
+        while GUI.PackageManager.LineGroup.Bottom() -  parent.Bottom() > 85 do
+            index = index + 1
+            GUI.PackageManager.LineGroup.Lines[index] = CreatePackageManagerLine()
+            LayoutHelpers.Below(GUI.PackageManager.LineGroup.Lines[index] ,parent ,5)
+            LayoutHelpers.AtRightIn(GUI.PackageManager.LineGroup.Lines[index],parent)
+            parent = GUI.PackageManager.LineGroup.Lines[index]
+        end
+        GUI.PackageManager.numLines = index
+    end
+    CreatePackageManagerLines()
+    GUI.PackageManager:CalcVisible()
+
+
 end
 
 -- Load and return the current list of presets from persistent storage.
@@ -6766,3 +7030,167 @@ function InitHostUtils()
         end
     }
 end
+
+
+
+function CreateEmojiSelector()
+    GUI.EmojiSelector = Bitmap(GUI.chatPanel)
+    GUI.EmojiSelector:SetSolidColor('ff000000')
+
+    LayoutHelpers.Above(GUI.EmojiSelector, GUI.chatEdit, 2)
+    LayoutHelpers.AtLeftIn(GUI.EmojiSelector, GUI.chatPanel)
+    LayoutHelpers.AtTopIn(GUI.EmojiSelector,GUI.chatPanel)
+    LayoutHelpers.AtRightIn(GUI.EmojiSelector,GUI.chatPanel)
+    LayoutHelpers.DepthOverParent(GUI.EmojiSelector,GUI.chatPanel,100)
+    GUI.EmojiSelector.curIndex = 1
+    GUI.EmojiSelector.MaxSize = 0
+    GUI.EmojiSelector.selectionIndex = 1
+    GUI.EmojiSelector.Highlight = function (self,up)
+
+        self.emojiLines.lines[self.selectionIndex].bg:SetSolidColor('ff000000')
+        if up == true then
+            if self.selectionIndex ~= table.getn(self.FoundEmojis) then
+                if self.selectionIndex - self.curIndex == self.MaxSize - 1  then
+                    self.curIndex = self.curIndex + 1
+                    UpdateEmojiSelector()
+                end
+                self.selectionIndex = self.selectionIndex + 1
+            end
+        elseif up == false then
+            if self.selectionIndex > 1 then
+                if self.selectionIndex == self.curIndex then
+                    self.curIndex = self.curIndex - 1
+                    UpdateEmojiSelector()
+                end
+                self.selectionIndex = self.selectionIndex - 1
+            end
+        end
+        self.emojiLines.lines[self.selectionIndex].bg:SetSolidColor('ff202020')
+    end
+    GUI.EmojiSelector.HandleEvent = function(self,event)
+        if event.WheelRotation ~= 0 then
+            if event.WheelRotation > 0 then
+                if GUI.EmojiSelector.MaxSize + GUI.EmojiSelector.curIndex <= table.getn(self.FoundEmojis) then
+                    GUI.EmojiSelector.curIndex = GUI.EmojiSelector.curIndex + 1
+                    GUI.EmojiSelector.selectionIndex = GUI.EmojiSelector.curIndex
+                    UpdateEmojiSelector()
+                end
+            else
+                if GUI.EmojiSelector.curIndex ~= 1 then
+                    GUI.EmojiSelector.curIndex = GUI.EmojiSelector.curIndex - 1
+                    GUI.EmojiSelector.selectionIndex = GUI.EmojiSelector.curIndex
+                    UpdateEmojiSelector()
+                end
+            end
+        end
+    end
+end
+
+
+
+
+
+function UpdateEmojiSelector(emojiText)
+    if GUI.EmojiSelector == nil then return end
+    if emojiText then
+        GUI.EmojiSelector.curIndex = 1
+        GUI.EmojiSelector.emojiText = emojiText
+        GUI.EmojiSelector.FoundEmojis = Emojis.processInput(emojiText)
+        GUI.EmojiSelector.selectionIndex = 1
+    end
+    local FoundEmojis = GUI.EmojiSelector.FoundEmojis
+    if GUI.EmojiSelector.emojiLines then
+        GUI.EmojiSelector.emojiLines:Destroy()
+    end
+    GUI.EmojiSelector.emojiLines = Group(GUI.EmojiSelector)
+    LayoutHelpers.FillParentFixedBorder(GUI.EmojiSelector.emojiLines, GUI.EmojiSelector)
+    GUI.EmojiSelector.emojiLines.lines = {}
+    LayoutHelpers.DepthOverParent(GUI.EmojiSelector.emojiLines,GUI.EmojiSelector,10)
+    if not table.empty(FoundEmojis) then
+        local index = GUI.EmojiSelector.curIndex
+        while index <= table.getn(FoundEmojis) do
+            local emojiname = FoundEmojis[index].pack .. '/' .. FoundEmojis[index].emoji
+            local path = UIUtil.UIFile(Emojis.emojis_textures .. emojiname .. '.dds')
+            GUI.EmojiSelector.emojiLines.lines[index] = Group(GUI.EmojiSelector.emojiLines)
+            local emojiLine = GUI.EmojiSelector.emojiLines.lines[index]
+
+            emojiLine.HandleEvent = function(self, event)
+                if event.Type == 'ButtonPress' then
+                    local text =        GUI.chatEdit:GetText()
+                    local CaretPos =    GUI.chatEdit:GetCaretPosition()
+
+                    local newtext = STR_Utf8SubString(text, 1, GUI.EmojiSelector.BeginPos - 1)..self.emoji..STR_Utf8SubString(text,CaretPos + 1, string.len(text))
+                    local oldtext = GUI.EmojiSelector.emojiText or ''
+                    GUI.EmojiSelector:Destroy()
+                    GUI.EmojiSelector = nil
+                    GUI.chatEdit:SetText(newtext)
+                    GUI.chatEdit:SetCaretPosition(CaretPos + string.len(self.emoji) - 1 - string.len(oldtext))
+                    GUI.chatEdit:AcquireFocus()
+
+                elseif event.Type == 'MouseEnter' then
+                    for _,line in GUI.EmojiSelector.emojiLines.lines do
+                        line.bg:SetSolidColor('ff000000')
+                    end
+                    self.bg:SetSolidColor('ff202020')
+                elseif event.Type == 'MouseExit' then
+                    self.bg:SetSolidColor('ff000000')
+                    GUI.EmojiSelector:Highlight()
+                end
+            end
+
+            LayoutHelpers.DepthOverParent(emojiLine,GUI.EmojiSelector.emojiLines)
+
+            if index == GUI.EmojiSelector.curIndex then
+                LayoutHelpers.AtLeftBottomIn(emojiLine, GUI.EmojiSelector,2,2)
+            else
+                LayoutHelpers.Above(emojiLine, GUI.EmojiSelector.emojiLines.lines[index - 1], 2)
+            end
+            LayoutHelpers.SetHeight(emojiLine,lineHeight)
+            LayoutHelpers.AtRightIn(emojiLine,GUI.EmojiSelector.emojiLines,2)
+
+
+            emojiLine.bg = Bitmap(emojiLine)
+            emojiLine.bg:DisableHitTest()
+            LayoutHelpers.FillParent( emojiLine.bg ,emojiLine)
+            emojiLine.bg:SetSolidColor('ff000000')
+
+
+            emojiLine.icon = Bitmap(emojiLine,path)
+            emojiLine.icon:DisableHitTest()
+
+            emojiLine.icon.Height:Set(emojiLine.Height)
+            emojiLine.icon.Width:Set(emojiLine.Height)
+            LayoutHelpers.AtLeftTopIn(emojiLine.icon, emojiLine)
+
+            emojiLine.text = UIUtil.CreateText(emojiLine, '', 20, "Arial",true)
+            emojiLine.text:DisableHitTest()
+            LayoutHelpers.RightOf(emojiLine.text, emojiLine.icon, 2)
+            emojiLine.text:SetText(':'..FoundEmojis[index].emoji ..':')
+
+            emojiLine.emoji =':'.. emojiname..':'
+
+            emojiLine.pack = UIUtil.CreateText(emojiLine, '', 20, "Arial",true)
+            emojiLine.pack:DisableHitTest()
+            LayoutHelpers.AtRightIn(emojiLine.pack,GUI.EmojiSelector.emojiLines, 5)
+            LayoutHelpers.AtTopIn(emojiLine.pack,emojiLine )
+            emojiLine.pack:SetText(FoundEmojis[index].pack)
+            emojiLine.pack:SetColor('FF808080')
+            index = index + 1
+            if  emojiLine:Top() - GUI.chatPanel.Top() < lineHeight then
+                LayoutHelpers.AtTopIn(GUI.EmojiSelector,GUI.chatPanel)
+                GUI.EmojiSelector.MaxSize = index - GUI.EmojiSelector.curIndex
+                if emojiText then GUI.EmojiSelector:Highlight() end
+
+                return
+            end
+        end
+        GUI.EmojiSelector.Top:Set(function()return GUI.EmojiSelector.emojiLines.lines[index - 1].Top() - 2 end)
+        GUI.EmojiSelector.MaxSize = index - GUI.EmojiSelector.curIndex
+        if emojiText then GUI.EmojiSelector:Highlight() end
+    else
+        GUI.EmojiSelector.Top:Set(GUI.EmojiSelector.Bottom)
+    end
+
+end
+
+
