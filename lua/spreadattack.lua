@@ -405,7 +405,7 @@ function GiveOrders(Data)
     if not IssueOrderFunctions then
         IssueOrderFunctions = {
          ["Attack"]             = IssueAttack,
-         ["Move"]               = IssueMove,
+         -- ["Move"]               = IssueMove,
          ["Guard"]              = IssueGuard,
          ["Tactical"]           = IssueTactical,
          --["AggressiveMove"]     = IssueAggressiveMove,
