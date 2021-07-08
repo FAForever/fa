@@ -882,7 +882,7 @@ Unit = Class(moho.unit_methods) {
     -- It will be possible for both or neither of these consumption methods to be
     -- in operation at the same time.  Here are the functions to turn them off and on.
     SetMaintenanceConsumptionActive = function(self)
-        self.MaintenanceConsumption = true
+        self.MaintenanceConsumption = self:GetFractionComplete() == 1
         self:UpdateConsumptionValues()
     end,
 
@@ -892,7 +892,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetActiveConsumptionActive = function(self)
-        self.ActiveConsumption = true
+        self.ActiveConsumption = self:GetFractionComplete() == 1
         self:UpdateConsumptionValues()
     end,
 
