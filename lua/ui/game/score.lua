@@ -90,8 +90,10 @@ local function SaveFork()
 					end
 				
 					--A - army, R - resources, U - units
-					if index ~= svd["A"] then svd = {["A"] = index, ["R"] = {}, ["U"] = {}} end
-					args = {["A"] = index}
+					if index ~= svd["A"] then 
+                        svd = {["A"] = index, ["R"] = {}, ["U"] = {}}
+                    end
+					args = {}
 
 					resources = scoreData["resources"]
 					if resources ~= nil then
@@ -211,9 +213,10 @@ local function SaveFork()
 						SetData(svd, args, general["lost"], "count",  "LC")
 					end
 					
-					--LOG(repr(args))
-					SimCallback({ Func = "SaveData", Args = args })
-					
+                    if next(args) ~= nil then
+						args["A"] = index
+					    SimCallback({ Func = "SaveData", Args = args })
+					end
 				end
 			end
 		end
