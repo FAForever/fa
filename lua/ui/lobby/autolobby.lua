@@ -49,6 +49,10 @@ local gameInfo = {
     GameMods = {},
 }
 
+function GetGameInfo()
+    return gameInfo
+end
+
 local Strings = LobbyComm.Strings
 
 local lobbyComm = false
@@ -271,7 +275,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
 
     lobbyComm.DataReceived = function(self,data)
         LOG('DATA RECEIVED: ', repr(data))
-
+        gameInfo = data.GameInfo
         if lobbyComm:IsHost() then
             # Host Messages
             if data.Type == 'AddPlayer' then

@@ -352,6 +352,18 @@ options = {
                 },
             },
             {
+                title = "Display Loading Additional Information",
+                key = 'loading_more_information',
+                type = 'toggle',
+                default = true,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
                 title = "<LOC OPTIONS_0076>Economy Warnings",
                 key = 'econ_warnings',
                 type = 'toggle',

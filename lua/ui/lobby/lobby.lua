@@ -239,6 +239,10 @@ local lastKickMessage = Prefs.GetFromCurrentProfile('lastKickMessage') or ""
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
 local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
 
+function GetGameInfo()
+    return gameInfo
+end
+
 function SetWindowedLobby(windowed)
     -- Dont change resolution if user already using windowed mode
     if windowed == windowedMode or defaultMode == 'windowed' then
@@ -3017,14 +3021,14 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-	-- curated Maps
-	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-	LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
+    -- curated Maps
+    GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
+    Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
+    LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-	GUI.curatedmapsButton.OnClick = function()
-		OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
-	end
+    GUI.curatedmapsButton.OnClick = function()
+        OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
+    end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -4679,7 +4683,7 @@ local MessageHandlers = {
             local info = data.GameInfo
             info.GameMods = Mods.GetGameMods(info.GameMods)
             SetWindowedLobby(false)
-
+            gameInfo = data.GameInfo
             -- Evil hack to correct the skin for randomfaction players before launch.
             for index, player in info.PlayerOptions do
                 -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
