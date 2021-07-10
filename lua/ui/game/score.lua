@@ -50,6 +50,177 @@ function armyGroupHeight()
     return height
 end
 
+local function SetData(saved, target, data, index, codifier)
+	tmp = data[index]
+	if tmp ~= nil and saved[codifier] ~= tmp then
+		saved[codifier] = tmp
+		target[codifier] = tmp
+	end
+end
+
+--stackoverflow says it make it more perfomance
+local next = next 
+
+local function SaveFork()
+	gameTick = GameTick()
+	WaitSeconds(2)
+	svd = {["A"] = -2}
+    unitsInvokeDelay = 0
+
+	while true do
+		tmpCurrentScores = currentScores
+		if tmpCurrentScores == false then
+            -- for work with mods wich destroy OnBeat function (like SSB)
+			tmpCurrentScores = ScoresCache
+		end
+
+		newGameTick = GameTick()
+		if newGameTick ~= gameTick and tmpCurrentScores then
+			gameTick = newGameTick
+			for index, scoreData in tmpCurrentScores do
+				focusArmy = GetFocusArmy()
+				if index == focusArmy then
+					if scoreData["Defeated"] then
+						ta = { ["A"] = index, ["Defeated"] = scoreData["Defeated"] }
+						if scoreData["general"]["score"] then
+							ta["S"] = scoreData["general"]["score"]
+						end
+						SimCallback({ Func = "SaveData", Args = ta})
+						return
+					end
+				
+					--A - army, R - resources, U - units
+					if index ~= svd["A"] then svd = {["A"] = index, ["R"] = {}, ["U"] = {}} end
+					args = {["A"] = index}
+
+					resources = scoreData["resources"]
+					if resources ~= nil then
+						tmpRersources = {}
+						--using single codes since it will be most stored date
+                        --T - total, TR - total reclaimed, RR - reclaim rate, R - rate
+						SetData(svd["R"], tmpRersources, resources["massin"], "total", "MIT")
+						SetData(svd["R"], tmpRersources, resources["massin"], "reclaimed", "MITR")
+						SetData(svd["R"], tmpRersources, resources["massin"], "reclaimRate", "MIRR")
+						SetData(svd["R"], tmpRersources, resources["massin"], "rate", "MIR")
+						
+						SetData(svd["R"], tmpRersources, resources["massout"], "total", "MOT")
+						SetData(svd["R"], tmpRersources, resources["massout"], "rate", "MOR")
+						SetData(svd["R"], tmpRersources, resources["massout"], "excess", "MOE")
+						
+						SetData(svd["R"], tmpRersources, resources["energyin"], "total", "EIT")
+						SetData(svd["R"], tmpRersources, resources["energyin"], "reclaimed", "EITR")
+						SetData(svd["R"], tmpRersources, resources["energyin"], "reclaimRate", "EIRR")
+						SetData(svd["R"], tmpRersources, resources["energyin"], "rate", "EIR")
+						
+						SetData(svd["R"], tmpRersources, resources["energyout"], "total", "EOT")
+						SetData(svd["R"], tmpRersources, resources["energyout"], "rate", "EOR")
+						SetData(svd["R"], tmpRersources, resources["energyout"], "excess", "EOE")
+						
+						SetData(svd["R"], tmpRersources, resources["storage"], "storedEnergy", "SE")
+						SetData(svd["R"], tmpRersources, resources["storage"], "maxEnergy", "ME")
+						SetData(svd["R"], tmpRersources, resources["storage"], "storedMass", "SM")
+						SetData(svd["R"], tmpRersources, resources["storage"], "maxMass", "MM")
+						
+						if next(tmpRersources) ~= nil then
+						   args["R"] = tmpRersources
+						end
+					end
+					
+                    unitsInvokeDelay = unitsInvokeDelay - 1
+					units = scoreData["units"]
+					if unitsInvokeDelay <= 0 and units ~= nil then
+						unitsInvokeDelay = 4
+						tempUnits = {}
+						SetData(svd["U"], tempUnits, units["air"], "lost", "AL")
+						SetData(svd["U"], tempUnits, units["air"], "kills", "AK")
+						SetData(svd["U"], tempUnits, units["air"], "built", "AB")
+						
+						SetData(svd["U"], tempUnits, units["tech3"], "lost",  "3L")
+						SetData(svd["U"], tempUnits, units["tech3"], "kills", "3K")
+						SetData(svd["U"], tempUnits, units["tech3"], "built", "3B")
+						
+						SetData(svd["U"], tempUnits, units["tech2"], "lost",  "2L")
+						SetData(svd["U"], tempUnits, units["tech2"], "kills", "2K")
+						SetData(svd["U"], tempUnits, units["tech2"], "built", "2B")
+						
+						SetData(svd["U"], tempUnits, units["tech1"], "lost",  "1L")
+						SetData(svd["U"], tempUnits, units["tech1"], "kills", "1K")
+						SetData(svd["U"], tempUnits, units["tech1"], "built", "1B")
+						
+						SetData(svd["U"], tempUnits, units["cdr"], "lost",  "CL")
+						SetData(svd["U"], tempUnits, units["cdr"], "kills", "CK")
+						SetData(svd["U"], tempUnits, units["cdr"], "built", "CB")
+						
+						SetData(svd["U"], tempUnits, units["transportation"], "lost",  "TL")
+						SetData(svd["U"], tempUnits, units["transportation"], "kills", "TK")
+						SetData(svd["U"], tempUnits, units["transportation"], "built", "TB")
+						
+						SetData(svd["U"], tempUnits, units["land"], "lost",  "LL")
+						SetData(svd["U"], tempUnits, units["land"], "kills", "LK")
+						SetData(svd["U"], tempUnits, units["land"], "built", "LB")
+						
+						SetData(svd["U"], tempUnits, units["sacu"], "lost",  "SL")
+						SetData(svd["U"], tempUnits, units["sacu"], "kills", "SK")
+						SetData(svd["U"], tempUnits, units["sacu"], "built", "SB")
+						
+                        --B - buildings
+						SetData(svd["U"], tempUnits, units["structures"], "lost",  "BL")
+						SetData(svd["U"], tempUnits, units["structures"], "kills", "BK")
+						SetData(svd["U"], tempUnits, units["structures"], "built", "BB")
+						
+                        --W - workers
+						SetData(svd["U"], tempUnits, units["engineer"], "lost",  "WL")
+						SetData(svd["U"], tempUnits, units["engineer"], "kills", "WK")
+						SetData(svd["U"], tempUnits, units["engineer"], "built", "WB")
+						
+						SetData(svd["U"], tempUnits, units["naval"], "lost",  "NL")
+						SetData(svd["U"], tempUnits, units["naval"], "kills", "NK")
+						SetData(svd["U"], tempUnits, units["naval"], "built", "NB")
+						
+						SetData(svd["U"], tempUnits, units["experimental"], "lost",  "EL")
+						SetData(svd["U"], tempUnits, units["experimental"], "kills", "EK")
+						SetData(svd["U"], tempUnits, units["experimental"], "built", "EB")
+						
+						if next(tempUnits) ~= nil then
+						   args["U"] = tempUnits
+						end
+					end
+					
+					general = scoreData["general"]
+					if general ~= nil then
+						
+						tmpScore = general["score"]
+						if(tmpScore > 0 and tmpScore ~= svd["S"]) then
+							svd["S"] = tmpScore
+							args["S"] = tmpScore
+						end
+						
+						SetData(svd, args, general, "currentcap", "CC")
+						SetData(svd, args, general, "currentunits", "CU")
+						
+						SetData(svd, args, general["built"], "mass",   "BM")
+						SetData(svd, args, general["built"], "energy", "BE")
+						SetData(svd, args, general["built"], "count",  "BC")
+						
+						SetData(svd, args, general["kills"], "mass",   "KM")
+						SetData(svd, args, general["kills"], "energy", "KE")
+						SetData(svd, args, general["kills"], "count",  "KC")
+						
+						SetData(svd, args, general["lost"], "mass",   "LM")
+						SetData(svd, args, general["lost"], "energy", "LE")
+						SetData(svd, args, general["lost"], "count",  "LC")
+					end
+					
+					--LOG(repr(args))
+					SimCallback({ Func = "SaveData", Args = args })
+					
+				end
+			end
+		end
+		WaitSeconds(1)
+	end
+end
+
 function CreateScoreUI(parent)
     savedParent = GetFrame(0)
 
@@ -133,6 +304,7 @@ function CreateScoreUI(parent)
         end
     end
     controls.collapseArrow:SetCheck(true, true)
+    ForkThread(SaveFork)
 end
 
 local function blockOnHide(self, hidden)
