@@ -1,14 +1,14 @@
 name: Build
 on: [push]
-env:
-  LUAC: luac5.2
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    container: faforever/lua:v5.0-0
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install lua
-        run: "sudo apt-get install lua5.2"
+      - name: Install bash
+        run: apk add bash findutils
       - name: Run lua tests
         run: "bash ./run_lua_tests.sh"
