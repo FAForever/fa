@@ -809,7 +809,7 @@ Tooltips = {
     },
     options_automex = {
         title = "<LOC OPTIONS_0285>Automatic extractor selection",
-        description = "<LOC OPTIONS_0286>After selecting a engineer, hover the mouse over a mass extractor spot to autopreselect a mass extractor for building",
+        description = "<LOC OPTIONS_0286>After selecting an engineer, hover the mouse over a mass extractor spot to autopreselect a mass extractor for building",
     },
     options_show_attached_unit_lifebars = {
         title = "<LOC OPTIONS_0222>Show Lifebars of Attached Units",
