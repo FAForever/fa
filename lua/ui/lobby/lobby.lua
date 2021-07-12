@@ -5846,7 +5846,7 @@ function ShowLobbyOptionsDialog()
     cbox_ChatPlayerColor:SetCheck(chatPlayerColor == true or chatPlayerColor == nil, true)
 
     local ChatLobbyEmojis = Prefs.GetFromCurrentProfile('ChatLobbyEmojis')
-    cbox_ChatEmojis:SetCheck(ChatLobbyEmojis == true or ChatLobbyEmojis == nil, true)
+    cbox_ChatEmojis:SetCheck(ChatLobbyEmojis == true, true)
 end
 
 
