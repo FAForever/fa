@@ -75,7 +75,7 @@ UAL0307 = Class(AShieldHoverLandUnit) {
             WaitSeconds(1)
 
             -- break if we're a gooner
-            if IsDestroyed(self) then 
+            if IsDestroyed(self) or IsDestroyed(self.TargetPointer) then 
                 break 
             end
 
