@@ -80,6 +80,7 @@ UnitBlueprint {
         'NUKE',
         'SILO',
         'SUBMERSIBLE',
+        'NUKESUB',
         'TECH3',
         'VISIBLETORECON',
         'RECLAIMABLE',
