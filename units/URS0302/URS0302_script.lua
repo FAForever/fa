@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Cybran Battleship Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')
@@ -22,8 +22,8 @@ URS0302 = Class(CSeaUnit) {
         Torpedo02 = Class(CANNaniteTorpedoWeapon) {},
         AAGun01 = Class(CAAAutocannon) {},
         AAGun02 = Class(CAAAutocannon) {},
-        LeftZapper = Class(CAMZapperWeapon02) {},
-        RightZapper = Class(CAMZapperWeapon02) {},
+        LeftZapper = Class(CAMZapperWeapon03) {},
+        RightZapper = Class(CAMZapperWeapon03) {},
     },
 }
 TypeClass = URS0302
