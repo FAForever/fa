@@ -81,8 +81,8 @@ Button = Class(Bitmap) {
                 if self.mMouseOver then
                     self:SetTexture(self.mHighlight)
                     self:OnRolloverEvent('exit')
-                    self:Play()
                     self:OnClick(event.Modifiers)
+                    self:Play()
                 end
             end
             dragger.OnCancel = function(dragger)
