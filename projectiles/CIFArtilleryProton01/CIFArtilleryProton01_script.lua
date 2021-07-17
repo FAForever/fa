@@ -21,7 +21,7 @@ CIFArtilleryProton01 = Class(CArtilleryProtonProjectile) {
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local radius = self.DamageData.DamageRadius
+            local army = self.Army
             
             CreateDecal( pos, RandomFloat(0.0,6.28), 'scorch_011_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 150, army )
         end
