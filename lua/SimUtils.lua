@@ -619,3 +619,7 @@ function GiveResourcesToPlayer(data)
         toBrain:GiveResource('Energy',energyTaken)
     end
 end
+
+function SaveData(data)
+    --LOG(repr(data))
+end

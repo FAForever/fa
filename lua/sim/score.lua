@@ -251,7 +251,7 @@ local function ScoreThread()
                     end
                 end
 
-                if scoreOption ~= 'no' then
+                if index == myArmyIndex or scoreOption ~= 'no' then
                     Sync.Score[index].general.score = ArmyScore[index].general.score
                 else
                     Sync.Score[index].general.score = -1

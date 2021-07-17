@@ -145,6 +145,8 @@ Callbacks.RequestAlliedVictory = SimUtils.RequestAlliedVictory
 
 Callbacks.SetOfferDraw = SimUtils.SetOfferDraw
 
+Callbacks.SaveData = SimUtils.SaveData
+
 Callbacks.SpawnPing = SimPing.SpawnPing
 
 --Nuke Ping
