@@ -3518,7 +3518,13 @@ Platoon = Class(moho.platoon_methods) {
             unit.ProcessBuild = nil
         end
         if not unit.ProcessBuild then
-            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, true)  --DUNCAN - changed to true
+            --LOG("*AI DEBUG: Failed to build" .. unit.Sync.id)
+            --Azraeel - Changed to False
+            --Within the Engine Code, this callback is completely busted there is no way to fix this.
+            --Instead Duncan decided in his wisdom to change this to way a build would not be repeated which 99% of the time fixed the issue.
+            --When True we would not attempt to repeat the job, When False would attempt to repeat the job again in case it had accidently failed.
+            --This as stated fixes the Engine Issue.
+            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false) 
         end
     end,
 
