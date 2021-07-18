@@ -80,7 +80,6 @@ UnitBlueprint {
         'SUBMERSIBLE',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'NUKESUB',
         'OVERLAYSONAR',
         'OVERLAYANTIAIR',
         'OVERLAYDEFENSE',
