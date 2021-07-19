@@ -695,7 +695,7 @@ UnitBlueprint {
             TurretPitchRange = 90,
             TurretPitchSpeed = 180,
             TurretYaw = 0,
-            TurretYawRange = 0,
+            TurretYawRange = 95,
             TurretYawSpeed = 720,
             Turreted = true,
             WeaponCategory = 'Defense',
