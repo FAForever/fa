@@ -536,7 +536,7 @@ UnitBlueprint {
             TargetType = 'RULEWTT_Projectile',
             TrackingRadius = 1.5,
             TurretBoneMuzzle = 'Zapper_Muzzle',
-            TurretBonePitch = 'zapper',
+            TurretBonePitch = 'Zapper_Muzzle',
             TurretBoneYaw = 'zapper',
             TurretDualManipulators = false,
             TurretPitch = 0,
