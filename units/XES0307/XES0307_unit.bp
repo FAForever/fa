@@ -57,6 +57,7 @@ UnitBlueprint {
         'DIRECTFIRE',
         'ANTIMISSILE',
         'VISIBLETORECON',
+        'T3SUBMARINE',
         'RECLAIMABLE',
         'BATTLESHIP',
         'OVERLAYRADAR',

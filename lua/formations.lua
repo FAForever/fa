@@ -441,7 +441,7 @@ local GrowthChevronBlock = {
 
 local LightAttackNaval = categories.LIGHTBOAT
 local FrigateNaval = categories.FRIGATE
-local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + (categories.NUKESUB * categories.ANTINAVY - categories.NUKE)
+local SubNaval = categories.T1SUBMARINE + categories.T2SUBMARINE + categories.T3SUBMARINE +(categories.NUKESUB * categories.ANTINAVY - categories.NUKE)
 local DestroyerNaval = categories.DESTROYER
 local CruiserNaval = categories.CRUISER
 local BattleshipNaval = categories.BATTLESHIP
