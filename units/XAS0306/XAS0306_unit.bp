@@ -56,7 +56,7 @@ UnitBlueprint {
         'INDIRECTFIRE',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'MISSILESHIP',
+        'BATTLESHIP',
         'SHOWATTACKRETICLE',
         'OVERLAYRADAR',
         'OVERLAYSONAR',
