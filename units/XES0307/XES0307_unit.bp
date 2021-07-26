@@ -58,7 +58,6 @@ UnitBlueprint {
         'ANTIMISSILE',
         'VISIBLETORECON',
         'RECLAIMABLE',
-        'BATTLECRUISER',
         'BATTLESHIP',
         'OVERLAYRADAR',
         'OVERLAYSONAR',
