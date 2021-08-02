@@ -1,6 +1,5 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 50, --RadarRadius
     },
     Audio = {
         AmbientMove = Sound {
