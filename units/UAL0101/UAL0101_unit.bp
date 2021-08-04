@@ -1,6 +1,4 @@
 UnitBlueprint {
-    AI = {
-    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'UAL',
