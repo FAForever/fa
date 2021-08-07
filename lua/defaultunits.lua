@@ -31,6 +31,7 @@ DummyUnit = Class(Unit) {
     end,
 }
 
+-- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
@@ -120,7 +121,6 @@ StructureUnit = Class(Unit) {
 
         -- some buildings can only take 90 degree angles
         if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
-            LOG("THIS GUY!")
             degrees = math.floor((degrees + 45) / 90) * 90
         end
 
