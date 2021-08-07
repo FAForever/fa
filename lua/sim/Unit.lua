@@ -26,6 +26,8 @@ local Wreckage = import('/lua/wreckage.lua')
 local Set = import('/lua/system/setutils.lua')
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
+local DeprecatedWarnings = { }
+
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
 -- Deprecated function warning flags
@@ -387,10 +389,29 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    -- Deprecation / refactored warning for mods.
+    updateBuildRestrictions = function(self)
+        if not DeprecatedWarnings.updateBuildRestrictions then 
+            WARN("updateBuildRestrictions is refactored since PR #3319. Call UpdateBuildRestrictions instead.")
+            DeprecatedWarnings.updateBuildRestrictions = true 
+        end
+
+        -- call the old function
+        self.UpdateBuildRestrictions(self)
+    end
+
+    -- Deprecation warning for mods.
+    FindHQType = function(aiBrain, category)
+        if not DeprecatedWarnings.FindHQType then 
+            WARN("FindHQType is deprecated since PR #3319.")
+            DeprecatedWarnings.FindHQType = true 
+        end
+    end
+
     -------------------------------------------------------------------------------------------
     ---- TOGGLES
     -------------------------------------------------------------------------------------------
-     OnScriptBitSet = function(self, bit)
+    OnScriptBitSet = function(self, bit)
         if bit == 0 then -- Shield toggle
             self:PlayUnitAmbientSound('ActiveLoop')
             self:EnableShield()
