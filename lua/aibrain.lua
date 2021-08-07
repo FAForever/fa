@@ -165,19 +165,23 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
     -- @param layer The layer (LAND / AIR / NAVY) as a string
     SetHQSupportFactoryRestrictions = function (self, faction, layer)
+
+        -- localize for performance
+        local army = self:GetArmyIndex()
+
         -- the pessimists we are, restrict everything!
-        AddBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-        AddBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
+        AddBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
+        AddBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
 
         -- lift t2 / t3 support factory restrictions
         if self.HQs[faction][layer]["TECH3"] > 0 then 
-            RemoveBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
-            RemoveBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
+            RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
+            RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
         end
 
         -- lift t2 support factory restrictions
         if self.HQs[faction][layer]["TECH2"] > 0 then 
-            RemoveBuildRestriction(self:GetArmyIndex(), categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
+            RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
         end
     end,
 
