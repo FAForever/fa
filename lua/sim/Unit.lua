@@ -398,7 +398,7 @@ Unit = Class(moho.unit_methods) {
 
         -- call the old function
         self.UpdateBuildRestrictions(self)
-    end
+    end,
 
     -- Deprecation warning for mods.
     FindHQType = function(aiBrain, category)
@@ -406,7 +406,7 @@ Unit = Class(moho.unit_methods) {
             WARN("FindHQType is deprecated since PR #3319.")
             DeprecatedWarnings.FindHQType = true 
         end
-    end
+    end,
 
     -------------------------------------------------------------------------------------------
     ---- TOGGLES
