@@ -31,6 +31,10 @@ DummyUnit = Class(Unit) {
     end,
 }
 
+local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
+local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
+
 -- STRUCTURE UNITS
 StructureUnit = Class(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
@@ -53,15 +57,6 @@ StructureUnit = Class(Unit) {
 
     RotateTowardsEnemy = function(self)
 
-        --- constructs a piece of data that we can compare
-        local function MakeTarget(location, distance, threat)
-            local data = { }
-            data.location = location
-            data.distance = distance
-            data.threat = threat
-            return data
-        end
-
         -- retrieve information we may need
         local bp = self:GetBlueprint()
         local brain = self:GetAIBrain()
@@ -69,11 +64,15 @@ StructureUnit = Class(Unit) {
 
         -- determine default threat that aims at center of the map
         local x, z = GetMapSize()
-        local target = MakeTarget({0.5 * x, 0, 0.5 * z}, -1, -1)
+        local target = {
+            location = {0.5 * x, 0, 0.5 * z},
+            distance = -1,
+            threat = -1,
+        }
 
         -- retrieve units of certain type
         local radius = 2 * (bp.AI.GuardScanRadius or 50)
-        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.STRUCTURE + categories.LAND + categories.NAVAL)
+        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
         local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
 
         -- for each unit found
@@ -99,11 +98,15 @@ StructureUnit = Class(Unit) {
 
                         -- if threat is bigger, then we don't need to compare distance
                         if threat > target.threat then 
-                            target = MakeTarget(epos, distance, threat)
+                            target.location = epos
+                            target.distance = distance
+                            target.threat = threat
                         else 
                             -- threat is equal, therefore compare distance - closer wins
                             if distance < target.distance then 
-                                target = MakeTarget(epos, distance, threat)
+                                target.location = epos
+                                target.distance = distance
+                                target.threat = threat
                             end
                         end
                     end
@@ -116,7 +119,8 @@ StructureUnit = Class(Unit) {
         local degrees = rad * (180 / math.pi)
 
         -- some buildings can only take 90 degree angles
-        if EntityCategoryContains(categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL), self) then
+        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
+            LOG("THIS GUY!")
             degrees = math.floor((degrees + 45) / 90) * 90
         end
 
@@ -124,7 +128,7 @@ StructureUnit = Class(Unit) {
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
-        if EntityCategoryContains(categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY), self) then
+        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
 
