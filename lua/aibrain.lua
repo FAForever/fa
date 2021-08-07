@@ -207,7 +207,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
     CreateBrainShared = function(self, planName)
 
-        -- for the engi mod
+        -- start of engi mod
+        
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
@@ -227,6 +228,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- restrict all support factories by default
         AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)
+
+        -- end of engi mod
 
         self.Result = nil -- No-op, just to be explicit it starts as nil
         self.StatsSent = false
