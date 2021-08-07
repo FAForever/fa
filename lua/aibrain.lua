@@ -146,17 +146,15 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param layer The layer (LAND / AIR / NAVY) as a string
     -- @param tech The tech (TECH2 / TECH3) as a string
     AddHQ = function (self, faction, layer, tech)
-        LOG("Adding: " .. self:GetArmyIndex() .. ", " .. faction .. ", " .. layer .. ", " .. tech)
         self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
     end,
 
-    --- Removes an HQ so that the engi mod knows we lost it
+    --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
     -- @param self The brain itself
     -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
     -- @param layer The layer (LAND / AIR / NAVY) as a string
     -- @param tech The tech (TECH2 / TECH3) as a string
     RemoveHQ = function (self, faction, layer, tech)
-        LOG("Removing: " .. self:GetArmyIndex() .. ", " .. faction .. ", " .. layer .. ", " .. tech)
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
     end,
 
@@ -185,7 +183,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    --- Counts all HQs of specific faction, layer and tech
+    --- Counts all HQs of specific faction, layer and tech for the engi mod.
     -- @param self The brain itself
     -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
     -- @param layer The layer (LAND / AIR / NAVY) as a string
@@ -208,7 +206,7 @@ AIBrain = Class(moho.aibrain_methods) {
     CreateBrainShared = function(self, planName)
 
         -- start of engi mod
-        
+
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
