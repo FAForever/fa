@@ -1,39 +1,58 @@
-local getn = table.getn
+local assert = assert
 
-#
-# TrashBag is a class to help manage objects that need destruction. You add objects to it with Add().
-# When TrashBag:Destroy() is called, it calls Destroy() in turn on all its contained objects.
-#
-# If an object in a TrashBag is destroyed through other means, it automatically disappears from the TrashBag.
-# This doesn't necessarily happen instantly, so it's possible in this case that Destroy() will be called twice.
-# So Destroy() should always be idempotent.
-#
+--
+-- TrashBag is a class to help manage objects that need destruction. You add objects to it with Add().
+-- When TrashBag:Destroy() is called, it calls Destroy() in turn on all its contained objects.
+--
+-- If an object in a TrashBag is destroyed through other means, it automatically disappears from the TrashBag.
+-- This doesn't necessarily happen instantly, so it's possible in this case that Destroy() will be called twice.
+-- So Destroy() should always be idempotent.
+--
 TrashBag = Class {
 
+    -- tell the garbage collector that we're a weak table. If an element is destroyed pre-maturely then
+    -- we're not a reason for it to remain alive. E.g., we don't care if it got cleaned up before.
+    -- http://lua-users.org/wiki/GarbageCollectionTutorial
+    -- http://lua-users.org/wiki/WeakTablesTutorial
     __mode = 'v',
 
-    #
-    # Add an object to the TrashBag.
-    #
-    Add = function(self, obj)
-        if obj == nil then return end
+    -- keep track of the number of elements in the trash bag
+    Count = 1,
 
-        assert(obj.Destroy, 'Attempted to add an object with no Destroy() method to a TrashBag')
+    --- Add an entity to the trash bag.
+    Add = function(self, entity)
 
-        local i = getn(self)+1
-        self[i] = obj
+        -- -- uncomment for performance testing
+        -- if entity == nil then 
+        --     WARN("Attempted to add a nil to a TrashBag: " .. repr(debug.getinfo(2)))
+        --     return 
+        -- end
+
+        -- -- uncomment for performance testing
+        -- if not entity.Destroy then 
+        --     WARN("Attempted to add an entity with no Destroy() method to a TrashBag: "  .. repr(debug.getinfo(2)))
+        --     return 
+        -- end
+
+        self[self.Count] = entity
+        self.Count = self.Count + 1
     end,
 
-    #
-    # Call Destroy() for all objects in this bag.
-    #
+    --- Destroy all (remaining) entities in the trash bag.
     Destroy = function(self)
-        # loop over all values in self. ipairs() won't work correctly because we may have holes in our ordering.
-        for i,v in self do
-            if type(i)=='number' then
-                self[i]:Destroy()
-                self[i] = nil
+
+        -- -- uncomment for performance testing
+        -- if not self then 
+        --     WARN("Attempted to trash non-existing trash bag: "  .. repr(debug.getinfo(2)))
+        --     return 
+        -- end
+
+        -- check if values are still relevant
+        for k = 1, self.Count - 1 do 
+            if self[k] then 
+                self[k]:Destroy()
+                self[k] = nil
             end
-        end
+        end 
     end
 }
