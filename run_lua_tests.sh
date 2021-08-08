@@ -4,6 +4,7 @@
 # Assumes that FAF lua is installed as `luac`
 
 had_error=0
+files_checked=0
 check_file() {
   file="$1"
 
@@ -20,6 +21,7 @@ check_file() {
 # output from `find` is split by line.
 while read file; do
   check_file "$file"
+  (( files_checked++ ))
 done < <(find . -type d \( -path ./testmaps -o -path ./engine \) -prune -false -o -name '*.lua' -o -name '*.bp')
 
 if [[ $had_error != 0 ]]; then
@@ -27,5 +29,7 @@ if [[ $had_error != 0 ]]; then
 else
   echo "Syntax OK."
 fi
+
+echo "Checked $files_checked files"
 
 exit $had_error
