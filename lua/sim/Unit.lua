@@ -1558,7 +1558,6 @@ Unit = Class(moho.unit_methods) {
             end
             if animBlock.Animation and (self:ShallSink() or not EntityCategoryContains(categories.NAVAL, self)) then
                 local sinkAnim = CreateAnimator(self)
-                self:StopRocking()
                 self.DeathAnimManip = sinkAnim
                 sinkAnim:PlayAnim(animBlock.Animation)
                 rate = rate or 1
@@ -2174,7 +2173,6 @@ Unit = Class(moho.unit_methods) {
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self:GetCurrentLayer() == 'Water' then
-            self:StartRocking()
             local surfaceAnim = bp.Display.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
                 self.SurfaceAnimator = CreateAnimator(self)
@@ -3131,18 +3129,12 @@ Unit = Class(moho.unit_methods) {
                 self:PlayUnitAmbientSound('AmbientMove')
             end
 
-            self:StopRocking()
         end
 
         if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StopMove' .. layer) then
                 self:PlayUnitSound('StopMove')
-            end
-
-            -- Units in the water will rock back and forth a bit
-            if layer == 'Water' then
-                self:StartRocking()
             end
         end
 
@@ -4231,18 +4223,28 @@ Unit = Class(moho.unit_methods) {
     -- ROCKING
     -------------------------------------------------------------------------------------------
     -- Causes units to rock from side to side on water
-    StartRocking = function(self)
-        KillThread(self.StopRockThread)
-        self.StartRockThread = self:ForkThread(self.RockingThread)
-    end,
 
-    StopRocking = function(self)
-        if self.StartRockThread then
-            KillThread(self.StartRockThread)
-            self.StopRockThread = self:ForkThread(self.EndRockingThread)
+    --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
+    StartRocking = function(self)
+        if bypassDeprecation then 
+            KillThread(self.StopRockThread)
+            self.StartRockThread = self:ForkThread(self.RockingThread)
         end
     end,
 
+    --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
+    StopRocking = function(self)
+        if bypassDeprecation then 
+            if self.StartRockThread then
+                KillThread(self.StartRockThread)
+                self.StopRockThread = self:ForkThread(self.EndRockingThread)
+            end
+        end
+    end,
+
+    --- Rocking thread to move a unit when it is on the water.
     RockingThread = function(self)
         local bp = self:GetBlueprint().Display
         if not self.RockManip and not self.Dead and bp.MaxRockSpeed and bp.MaxRockSpeed > 0 then
@@ -4265,6 +4267,8 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
+    -- warping to the original position.
     EndRockingThread = function(self)
         local bp = self:GetBlueprint().Display
         if self.RockManip then
