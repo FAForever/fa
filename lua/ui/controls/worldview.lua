@@ -178,7 +178,7 @@ WorldView = Class(moho.UIWorldView, Control) {
         elseif event.Type == 'WheelRotation' then
             self.zoomed = true
         end
-        if (event.Type == 'MouseMotion') and (not CommandMode.GetCommandMode()[1] or AutoBuild) then
+        if (event.Type == 'MouseMotion') and (not CommandMode.GetCommandMode()[1] or self.AutoBuild) then
             local option = Prefs.GetFromCurrentProfile('options')['automex']
             if option ~= 'off' then
                 local Units = GetSelectedUnits()
@@ -194,8 +194,8 @@ WorldView = Class(moho.UIWorldView, Control) {
                         end
                     end
                     if BuildType then
-                        if AutoBuild and CommandMode.GetCommandMode()[2].name ~= AutoBuild then
-                            AutoBuild = false
+                        if self.AutoBuild and CommandMode.GetCommandMode()[2].name ~= self.AutoBuild then
+                            self.AutoBuild = false
                         else
                             local _, _, BuildableCategories = GetUnitCommandData(Units)
                             BuildableCategories = BuildableCategories * BuildType
@@ -213,12 +213,12 @@ WorldView = Class(moho.UIWorldView, Control) {
                             local BuildBP = EntityCategoryGetUnitList(BuildableCategories)[1]
                             if BuildBP then
                                 CommandMode.StartCommandMode('build', { name = BuildBP })
-                                AutoBuild = BuildBP
+                                self.AutoBuild = BuildBP
                             end
                         end
                     else
                         CommandMode.EndCommandMode(true)
-                        AutoBuild = false
+                        self.AutoBuild = false
                     end
                 end
             end
