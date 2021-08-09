@@ -28,7 +28,7 @@ TrashBag = Class {
     __mode = 'v',
 
     -- Keep track of the number of elements in the trash bag
-    Count = 1,
+    Next = 1,
 
     --- Add an entity to the trash bag.
     Add = function(self, entity)
@@ -49,8 +49,8 @@ TrashBag = Class {
         -- counter is updated _after_ the table has been set, this is faster because the table
         -- operation depends on the counter value and doesn't have to wait for it in this case.
 
-        self[self.Count] = entity
-        self.Count = self.Count + 1
+        self[self.Next] = entity
+        self.Next = self.Next + 1
     end,
 
     --- Destroy all (remaining) entities in the trash bag.
@@ -63,7 +63,7 @@ TrashBag = Class {
         -- end
 
         -- Check if values are still relevant
-        for k = 1, self.Count - 1 do 
+        for k = 1, self.Next - 1 do 
             if self[k] then 
                 self[k]:Destroy()
                 self[k] = nil
