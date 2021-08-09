@@ -3513,12 +3513,20 @@ Platoon = Class(moho.platoon_methods) {
     EngineerFailedToBuild = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAI' then return end
+        if unit.UnitBeingBuiltBehavior then
+            if unit.ProcessBuild then
+                KillThread(unit.ProcessBuild)
+                unit.ProcessBuild = nil
+            end
+            return
+        end
         if unit.ProcessBuildDone and unit.ProcessBuild then
             KillThread(unit.ProcessBuild)
             unit.ProcessBuild = nil
         end
         if not unit.ProcessBuild then
-            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, true)  --DUNCAN - changed to true
+            --LOG("*AI DEBUG: Failed to build" .. unit.Sync.id)
+            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false) 
         end
     end,
 
