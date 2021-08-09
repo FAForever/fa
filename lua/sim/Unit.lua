@@ -4227,20 +4227,16 @@ Unit = Class(moho.unit_methods) {
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StartRocking = function(self)
-        if bypassDeprecation then 
-            KillThread(self.StopRockThread)
-            self.StartRockThread = self:ForkThread(self.RockingThread)
-        end
+        KillThread(self.StopRockThread)
+        self.StartRockThread = self:ForkThread(self.RockingThread)
     end,
 
     --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StopRocking = function(self)
-        if bypassDeprecation then 
-            if self.StartRockThread then
-                KillThread(self.StartRockThread)
-                self.StopRockThread = self:ForkThread(self.EndRockingThread)
-            end
+        if self.StartRockThread then
+            KillThread(self.StartRockThread)
+            self.StopRockThread = self:ForkThread(self.EndRockingThread)
         end
     end,
 
