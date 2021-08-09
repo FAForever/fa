@@ -21,7 +21,15 @@ FactoryBuilderManager = Class(BuilderManager) {
             return false
         end
 
-        local builderTypes = { 'Air', 'Land', 'Sea', 'Gate', }
+        local builderTypes = { 
+        -- Old BuilderTypes preserved for all AIs
+        -- So we do not break any AIs
+        'Air', 'Land', 'Sea',
+        -- New BuilderTypes
+        'AirT1', 'AirT2', 'AirT3', 
+        'LandT1', 'LandT2', 'LandT3',
+        'SeaT1', 'SeaT2', 'SeaT3',
+        'Gate' }
         for k,v in builderTypes do
             self:AddBuilderType(v)
         end
@@ -167,15 +175,47 @@ FactoryBuilderManager = Class(BuilderManager) {
         if not self:FactoryAlreadyExists(unit) then
             table.insert(self.FactoryList, unit)
             unit.DesiresAssist = true
+           
             if EntityCategoryContains(categories.LAND, unit) then
                 self:SetupNewFactory(unit, 'Land')
+
+            elseif EntityCategoryContains(categories.LAND * categories.TECH1, unit) then
+                self:SetupNewFactory(unit, 'LandT1')
+
+            elseif EntityCategoryContains(categories.LAND * categories.TECH2, unit) then
+                self:SetupNewFactory(unit, 'LandT2')
+
+            elseif EntityCategoryContains(categories.LAND * categories.TECH3, unit) then
+                self:SetupNewFactory(unit, 'LandT3')
+
             elseif EntityCategoryContains(categories.AIR, unit) then
                 self:SetupNewFactory(unit, 'Air')
+
+            elseif EntityCategoryContains(categories.AIR * categories.TECH1, unit) then
+                self:SetupNewFactory(unit, 'AirT1')
+
+            elseif EntityCategoryContains(categories.AIR * categories.TECH2, unit) then
+                self:SetupNewFactory(unit, 'AirT2')
+
+            elseif EntityCategoryContains(categories.AIR * categories.TECH3, unit) then
+                self:SetupNewFactory(unit, 'AirT3')
+
             elseif EntityCategoryContains(categories.NAVAL, unit) then
                 self:SetupNewFactory(unit, 'Sea')
+
+            elseif EntityCategoryContains(categories.NAVAL * categories.TECH1, unit) then
+                self:SetupNewFactory(unit, 'SeaT1')
+
+            elseif EntityCategoryContains(categories.NAVAL * categories.TECH2, unit) then
+                self:SetupNewFactory(unit, 'SeaT2')
+
+            elseif EntityCategoryContains(categories.NAVAL * categories.TECH3, unit) then
+                self:SetupNewFactory(unit, 'SeaT3')
+
             else
                 self:SetupNewFactory(unit, 'Gate')
             end
+
             self.LocationActive = true
         end
     end,
