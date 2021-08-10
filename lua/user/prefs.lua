@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Access to preferences that are used in the UI
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local optionsLogic = import('/lua/options/optionsLogic.lua')
@@ -70,24 +70,16 @@ function CreateProfile(name)
 end
 
 function GetCurrentProfile()
-    local current = nil
-    local profile = GetPreference('profile')
-    if profile then
-        if profile.current then
-            current = profile.profiles[profile.current]
-        end
-    end
-    return current
+    local current = GetPreference('profile.current')
+    if not current then return nil end
+    return GetPreference('profile.profiles.'..current)
 end
 
 -- Get the map last requested by the player
 function GetFromCurrentProfile(fieldName)
-    local scenario = nil
-    local profile = GetCurrentProfile()
-    if profile then
-        scenario = profile[fieldName]
-    end
-    return scenario
+    local current = GetPreference('profile.current')
+    if not current then return nil end
+    return GetPreference('profile.profiles.'..current..'.'..fieldName)
 end
 
 -- set the map
