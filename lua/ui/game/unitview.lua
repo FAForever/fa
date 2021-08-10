@@ -635,7 +635,7 @@ function UpdateEnhancementIcons(info)
             continue
         end
 
-        local bp = unit.Blueprint
+        local bp = unit:GetBlueprint()
         local bpId = bp.BlueprintId
         local enhancementBp = bp.Enhancements[existingEnhancements[slot]]
         local texture = GetEnhancementPrefix(bpId, enhancementBp.Icon) .. '_btn_up.dds'

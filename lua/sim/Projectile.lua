@@ -413,7 +413,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
                         target = self.Launcher
                     end
                     -- Check for target validity
-                    if target and IsUnit(target) then
+                    if target and not target:BeenDestroyed() and IsUnit(target) then
                         if v.Radius and v.Radius > 0 then
                             -- This is a radius buff
                             -- get the position of the projectile
