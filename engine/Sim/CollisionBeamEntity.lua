@@ -7,8 +7,8 @@ function CollisionBeamEntity:Enable()
 end
 
 ---
---  CollisionBeamEntity:GetLauncher()
-function CollisionBeamEntity:GetLauncher()
+--  CollisionBeamEntity.Launcher
+function CollisionBeamEntity.Launcher
 end
 
 ---

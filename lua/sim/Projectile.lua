@@ -121,6 +121,10 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCreate = function(self, inWater)
+
+        --- Cache common (engine-related) values that are static
+        self.Launcher = self:GetLauncher()
+
         self.DamageData = {
             DamageRadius = nil,
             DamageAmount = nil,
@@ -290,7 +294,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     OnImpact = function(self, targetType, targetEntity)
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
-        local instigator = self:GetLauncher()
+        local instigator = self.Launcher
         if instigator == nil then
             instigator = self
         end
@@ -402,7 +406,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
             for k, v in data.Buffs do
                 if v.Add.OnImpact == true then
                     if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
-                        target = self:GetLauncher()
+                        target = self.Launcher
                     end
                     -- Check for target validity
                     if target and IsUnit(target) then

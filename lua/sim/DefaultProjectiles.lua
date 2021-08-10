@@ -62,7 +62,7 @@ MultiBeamProjectile = Class(EmitterProjectile) {
 -- Nukes
 NukeProjectile = Class(NullShell) {
     MovementThread = function(self)
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
 		self.Nuke = true
         self.CreateEffects(self, self.InitialEffects, self.Army, 1)
         self:TrackTarget(false)
@@ -141,7 +141,7 @@ NukeProjectile = Class(NullShell) {
     end,
 
     LauncherCallbacks = function(self)
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
         if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
             self.ProjectileDamaged = {}
             for k,v in launcher.EventCallbacks.ProjectileDamaged do
@@ -329,7 +329,7 @@ OverchargeProjectile = Class() {
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
 
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
         if not launcher then return end
 
         local wep = launcher:GetWeaponByLabel('OverCharge')
@@ -447,7 +447,7 @@ OverchargeProjectile = Class() {
 
     UnitsDetection = function(self, targetType, targetEntity)
      -- looking for units around target which are in splash range
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
         local maxHP = 0
 
         for _, unit in UnitsInSphere(launcher, self:GetPosition(), 2.7, categories.MOBILE -categories.COMMAND) or {} do

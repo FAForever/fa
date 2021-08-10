@@ -21,7 +21,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
     
     PassDamageData = function(self, damageData)
         CLOATacticalMissileProjectile.PassDamageData(self,damageData)
-        local launcherbp = self:GetLauncher():GetBlueprint()  
+        local launcherbp = self.Launcher:GetBlueprint()  
         self.ChildDamageData = table.copy(self.DamageData)
         self.ChildDamageData.DamageAmount = launcherbp.SplitDamage.DamageAmount or 0
         self.ChildDamageData.DamageRadius = launcherbp.SplitDamage.DamageRadius or 1   

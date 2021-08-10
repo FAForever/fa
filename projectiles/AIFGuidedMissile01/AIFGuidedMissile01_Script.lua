@@ -14,7 +14,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 AIFGuidedMissile = Class(AGuidedMissileProjectile) {
     OnCreate = function(self)
 		AGuidedMissileProjectile.OnCreate(self)
-        local launcher = self:GetLauncher()
+        local launcher = self.Launcher
         if launcher and not launcher:IsDead() then
             launcher:ProjectileFired()
         end		

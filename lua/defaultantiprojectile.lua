@@ -80,7 +80,7 @@ MissileRedirect = Class(Entity) {
             OnCollisionCheck = function(self, other)
                 if EntityCategoryContains(categories.MISSILE, other) and not EntityCategoryContains(categories.STRATEGIC, other) and
                    other ~= self.EnemyProj and IsEnemy(self.Army, other.Army) then
-                    self.Enemy = other:GetLauncher()
+                    self.Enemy = other.Launcher
                     self.EnemyProj = other
 
                     ChangeState(self, self.RedirectingState)

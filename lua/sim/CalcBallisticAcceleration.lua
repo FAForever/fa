@@ -9,7 +9,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local MuzzleSalvoSize = bp.MuzzleSalvoSize
     local MuzzleSalvoDelay = bp.MuzzleSalvoDelay
     local acc = 4.75
-    local launcher = projectile:GetLauncher()
+    local launcher = projectile.Launcher
     if not launcher then return acc end
     local id = launcher.EntityId
 

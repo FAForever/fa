@@ -19,6 +19,10 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnCreate = function(self)
+
+        -- Common accessed (engine-related) values cached
+
+
         self.EventCallbacks = {
             OnKilled = {},
             OnReclaimed = {},
