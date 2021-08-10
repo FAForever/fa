@@ -767,8 +767,8 @@ TTorpedoSubProjectile = Class(EmitterProjectile) {
     FxImpactUnderWater = EffectTemplate.TTorpedoHitUnit01,
     FxImpactNone = {},
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 

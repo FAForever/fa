@@ -485,6 +485,7 @@ OverchargeProjectile = Class() {
 
     OnCreate = function(self)
         self.Army = self:GetArmy()
+        self.Blueprint = self:GetBlueprint()
 
         if not OCProjectiles[self.Army] then
             OCProjectiles[self.Army] = 0

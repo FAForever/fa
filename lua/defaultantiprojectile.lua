@@ -13,6 +13,7 @@ local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 Flare = Class(Entity){
         OnCreate = function(self, spec)
             self.Owner = spec.Owner
+            self.Army = self.Owner.Army
             self.Radius = spec.Radius or 5
             self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
             self:SetDrawScale(self.Radius)
@@ -33,6 +34,7 @@ Flare = Class(Entity){
 DepthCharge = Class(Entity){
     OnCreate = function(self, spec)
         self.Owner = spec.Owner
+        self.Army = self.Owner.Army
         self.Radius = spec.Radius
         self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
         self:SetDrawScale(self.Radius)
@@ -56,6 +58,7 @@ MissileRedirect = Class(Entity) {
         OnCreate = function(self, spec)
             Entity.OnCreate(self, spec)
             self.Owner = spec.Owner
+            self.Army = self.Owner.Army
             self.Radius = spec.Radius
             self.RedirectRateOfFire = spec.RedirectRateOfFire or 1
             self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)

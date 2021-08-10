@@ -39,8 +39,6 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     TerrainImpactScale = 1,
 
     OnCreate = function(self)
-
-        self.Army = self:GetArmy()
         self.Trash = TrashBag()
 
         self.LastTerrainType = nil

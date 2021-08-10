@@ -776,8 +776,8 @@ CMissileAAProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactUnderWater = {},
 
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SingleBeamProjectile.OnCreate(self)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 
@@ -971,8 +971,8 @@ CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
     FxOnKilledScale = 0.375,
 
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SingleBeamProjectile.OnCreate(self)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 
     OnImpact = function(self, targetType, targetEntity)

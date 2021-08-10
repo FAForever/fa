@@ -16,6 +16,8 @@ BuffField = Class(Entity) {
 
     -- EVENTS
     OnCreated = function(self)
+        self.Blueprint = self:GetBlueprint()
+
         -- Fires when the field is initalised
         local bp = self.Blueprint
         if bp.InitiallyEnabled then
@@ -66,6 +68,12 @@ BuffField = Class(Entity) {
     end,
 
     OnCreate = function(self)
+
+        self.Blueprint = self:GetBlueprint()
+
+        -- Event stuff
+        Entity.OnCreate(self)
+
         local Owner = self:GetOwner()
         local bp = self.Blueprint
 
@@ -140,9 +148,6 @@ BuffField = Class(Entity) {
                 return table.subtract(allied, mine)
             end
         end
-
-        -- Event stuff
-        Entity.OnCreate(self)
 
         if bp.DisableInTransport then
             Owner:AddUnitCallback(self.DisableInTransport, 'OnAttachedToTransport')

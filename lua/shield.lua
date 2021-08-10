@@ -41,6 +41,8 @@ Shield = Class(moho.shield_methods, Entity) {
     OnCreate = function(self, spec)
         self.Trash = TrashBag()
         self.Owner = spec.Owner
+        self.Army = self.Owner.Army
+
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
@@ -758,6 +760,7 @@ PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
         self.Trash = TrashBag()
         self.Owner = spec.Owner
+        self.Army = self.Owner.Army
 
         self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         self.CollisionSizeX = spec.CollisionSizeX or 1
@@ -893,6 +896,8 @@ CzarShield = Class(PersonalShield) {
     OnCreate = function(self, spec)
         self.Trash = TrashBag()
         self.Owner = spec.Owner
+        self.Army = self.Owner.Army 
+        
         self.MeshBp = spec.Mesh
         self.ImpactMeshBp = spec.ImpactMesh
         self.ImpactMeshBigBp = spec.ImpactMeshBig

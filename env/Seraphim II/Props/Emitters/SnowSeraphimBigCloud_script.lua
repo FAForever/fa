@@ -1,9 +1,12 @@
 --
 -- LavaSteam01
 --
-BlowingSnow01 = Class(import('/lua/sim/Prop.lua').Prop) {
+
+local Prop = import('/lua/sim/Prop.lua').Prop
+BlowingSnow01 = Class(Prop) {
 
     OnCreate = function(self)
+        Prop.OnCreate(self)
         CreateEmitterAtBone(self, -2, -1, '/effects/emitters/weather_snowseraphim_03_emit.bp')
     end,
 

@@ -5,7 +5,7 @@
 --
 --  Summary  : Seraphim projectile base class definitions
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 --------------------------------------------------------------------------
@@ -665,8 +665,8 @@ SAnaitTorpedo = Class(MultiPolyTrailProjectile) {
     PolyTrailOffset =		{0,0},
 
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         MultiPolyTrailProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 
@@ -685,8 +685,8 @@ SHeavyCavitationTorpedo = Class(MultiPolyTrailProjectile) {
     PolyTrailOffset =		{0,0},
 
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         MultiPolyTrailProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 
@@ -706,8 +706,8 @@ SUallCavitationTorpedo = Class(SinglePolyTrailProjectile) {
     PolyTrail =				EffectTemplate.SUallTorpedoPolyTrail,
 
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
         SinglePolyTrailProjectile.OnCreate(self, inWater)
+        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
     end,
 }
 
