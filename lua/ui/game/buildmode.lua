@@ -57,7 +57,7 @@ local function HandleCommand(key, modifiers)
     -- make sure the units are all of the same type
     local types = {}
     for index, unit in selection do
-        local bpid = unit.Blueprint.BlueprintId
+        local bpid = unit:GetBlueprint().BlueprintId
         if not types[bpid] then
             types[bpid] = true
         end

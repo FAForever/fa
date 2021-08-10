@@ -924,8 +924,8 @@ end
 function EnterOverchargeMode()
     local unit = currentSelection[1]
     if not unit or unit.Dead or unit:IsOverchargePaused() then return end
-    local bp = unit.Blueprint
-    local weapon = FindOCWeapon(unit.Blueprint)
+    local bp = unit:GetBlueprint()
+    local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then return end
 
     local econData = GetEconomyTotals()
@@ -937,7 +937,7 @@ end
 local function OverchargeFrame(self, deltaTime)
     local unit = currentSelection[1]
     if not unit or unit.Dead then return end
-    local weapon = FindOCWeapon(unit.Blueprint)
+    local weapon = FindOCWeapon(unit:GetBlueprint())
     if not weapon then
         self:SetNeedsFrameUpdate(false)
         return

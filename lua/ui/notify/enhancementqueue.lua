@@ -7,7 +7,7 @@ local enhancementQueue = {}
 function enqueueEnhancement(units, enhancement)
     if not units[1] then return end
 
-    local enhancements = units[1].Blueprint.Enhancements
+    local enhancements = units[1]:GetBlueprint().Enhancements
 
     if enhancements[enhancement] then
         for _, unit in units do

@@ -429,7 +429,7 @@ function CreateTabs(type)
         defaultTabOrder = {t3 = 1, t2 = 2, t1 = 3, t4 = 4} -- T4 is last because only the Novax can build T4 but not T3
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
-        local enhancements = selection[1].Blueprint.Enhancements
+        local enhancements = selection[1]:GetBlueprint().Enhancements
         local enhCommon = import('/lua/enhancementcommon.lua')
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
@@ -446,7 +446,7 @@ function CreateTabs(type)
                         if existing[slotName] then
                             local enhancement = enhancements[existing[slotName]]
                             local icon = enhancements[existing[slotName]].Icon
-                            local bpID = selection[1].Blueprint.BlueprintId
+                            local bpID = selection[1]:GetBlueprint().BlueprintId
                             local enhName = existing[slotName]
                             local texture = "/textures/ui/common" .. GetEnhancementPrefix(bpID, enhancementPrefixes[slotName] .. icon)
                             UnitViewDetail.ShowEnhancement(enhancement, bpID, icon, texture, sortedOptions.selection[1])

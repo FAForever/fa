@@ -510,7 +510,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         end
 
         -- This bit is for the Hotbuild labels
-        local bp = newSelection[1].Blueprint
+        local bp = newSelection[1]:GetBlueprint()
         local upgradesTo = nil
         local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
         if potentialUpgrades then

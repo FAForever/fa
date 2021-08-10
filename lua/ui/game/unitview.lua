@@ -35,14 +35,14 @@ function OverchargeCanKill()
         local bp
 
         for _, unit in selected do
-            if unit.Blueprint.CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
+            if unit:GetBlueprint().CategoriesHash.COMMAND or EntityCategoryContains(categories.SUBCOMMANDER * categories.SERAPHIM, unit) then
                 ACU = unit
                 break
             end
         end
 
         if ACU then
-            ACUBp = ACU.Blueprint
+            ACUBp = ACU:GetBlueprint()
 
             if ACUBp.Weapon[2].Overcharge then
                 bp = ACUBp.Weapon[2].Overcharge

@@ -668,7 +668,7 @@ function Show(bp, builderUnit, bpID)
     if builderUnit ~= nil then
         -- Differential upgrading. Check to see if building this would be an upgrade
         local targetBp = bp
-        local builderBp = builderUnit.Blueprint
+        local builderBp = builderUnit:GetBlueprint()
 
         local performUpgrade = false
 
