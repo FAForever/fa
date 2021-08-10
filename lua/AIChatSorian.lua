@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/modules/AIChatSorian.lua
-#**  Author(s): Mike Robbins aka Sorian
-#**
-#**  Summary  : AI Chat Functions
-#**  Version  : 0.1
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/modules/AIChatSorian.lua
+--**  Author(s): Mike Robbins aka Sorian
+--**
+--**  Summary  : AI Chat Functions
+--**  Version  : 0.1
+--****************************************************************************
 local Chat = import('/lua/ui/game/chat.lua')
 local ChatTo = import('/lua/lazyvar.lua').Create()
 

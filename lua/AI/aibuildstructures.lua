@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/aibuildstructures.lua
-#**  Author(s): John Comes
-#**
-#**  Summary  : Foundation script for all structure building in the AI.
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AI/aibuildstructures.lua
+--**  Author(s): John Comes
+--**
+--**  Summary  : Foundation script for all structure building in the AI.
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local BaseTmplFile = import('/lua/basetemplates.lua')
 local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
@@ -24,20 +24,20 @@ local allowedMassStorageRatio = 0.6
 local TriggerFile = import('/lua/scenariotriggers.lua')
 
 function AISetEconomyNumbers(aiBrain)
-    #LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
+    --LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     aiEconomy = econ
 end
 
 function AIModEconomyNumbers(aiBrain, unitBP)
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGY USE OF UNIT = ', repr(aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy * 0.1))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGY USE OF UNIT = ', repr(aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy * 0.1))
     aiEconomy.MassTrend = aiEconomy.MassTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
     aiEconomy.MassIncome = aiEconomy.MassIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
     aiEconomy.EnergyTrend = aiEconomy.EnergyTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
     aiEconomy.EnergyIncome = aiEconomy.EnergyIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
 end
 
 function AIGetBuilder(aiBrain, techLevel)
@@ -49,9 +49,9 @@ function AIGetBuilder(aiBrain, techLevel)
     elseif techLevel == 0 then
         builderTechLevel = categories.COMMAND
     end
-    #LOG('*AI DEBUG: AIGETBUILDER FINDING TECH LEVEL ', repr(techLevel))
+    --LOG('*AI DEBUG: AIGETBUILDER FINDING TECH LEVEL ', repr(techLevel))
     local builder = aiBrain:FindUnit(builderTechLevel, true)
-    #LOG('*AI DEBUG: AIGETBUILDER RETURNING ', repr(builder))
+    --LOG('*AI DEBUG: AIGETBUILDER RETURNING ', repr(builder))
     return builder
 end
 
@@ -77,7 +77,7 @@ function AddToBuildQueue(aiBrain, builder, whatToBuild, buildLocation, relative)
     if not builder.EngineerBuildQueue then
         builder.EngineerBuildQueue = {}
     end
-    # put in build queue.. but will be removed afterwards... just so that it can iteratively find new spots to build
+    -- put in build queue.. but will be removed afterwards... just so that it can iteratively find new spots to build
     if aiBrain.Sorian then
         AIUtils.EngineerTryReclaimCaptureAreaSorian(aiBrain, builder, BuildToNormalLocation(buildLocation))
     else
@@ -91,8 +91,8 @@ function AddToBuildQueue(aiBrain, builder, whatToBuild, buildLocation, relative)
     table.insert(builder.EngineerBuildQueue, newEntry)
 end
 
-# Build locations (from FindPlaceToBuild) come in as {x,z,dist},
-# so we need to convert those to an actual 2D location format
+-- Build locations (from FindPlaceToBuild) come in as {x,z,dist},
+-- so we need to convert those to an actual 2D location format
 function BuildToNormalLocation(location)
     return {location[1], 0, location[2]}
 end
@@ -269,7 +269,7 @@ function AIBuildBaseTemplate(aiBrain, builder, buildingType , closeToBuilder, re
     end
 end
 
-#Per-unit AI logic for buildings defined in constructiondata
+--Per-unit AI logic for buildings defined in constructiondata
 function DoHackyLogic(buildingType, builder)
     if buildingType == 'T2StrategicMissile' then
         local unitInstance = false
@@ -310,15 +310,15 @@ function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuil
                             if n > 1 and aiBrain:CanBuildStructureAt(whatToBuild, BuildToNormalLocation(position)) then
                                  AddToBuildQueue(aiBrain, builder, whatToBuild, position, false)
                                  return DoHackyLogic(buildingType, builder)
-                            end # if n > 1 and can build structure at
-                        end # for loop
+                            end -- if n > 1 and can build structure at
+                        end -- for loop
                         break
-                    end # if bString == builderType
-                end # for loop
-            end # for loop
-        end # end else
-    end # if what to build
-    return # unsuccessful build
+                    end -- if bString == builderType
+                end -- for loop
+            end -- for loop
+        end -- end else
+    end -- if what to build
+    return -- unsuccessful build
 end
 
 function AIBuildBaseTemplateFromLocation(baseTemplate, location)
@@ -326,7 +326,7 @@ function AIBuildBaseTemplateFromLocation(baseTemplate, location)
     if location and baseTemplate then
         for templateNum, template in baseTemplate do
             baseT[templateNum] = {}
-            for rowNum,rowData in template do # rowNum, rowData in template do
+            for rowNum,rowData in template do -- rowNum, rowData in template do
                 if type(rowData[1]) == 'number' then
                     baseT[templateNum][rowNum] = {}
                     baseT[templateNum][rowNum][1] = math.floor(rowData[1] + location[1]) + 0.5
@@ -400,15 +400,15 @@ end
 
 function AINewExpansionBase(aiBrain, baseName, position, builder, constructionData)
     local radius = constructionData.ExpansionRadius or 100
-    # PBM Style expansion bases here
+    -- PBM Style expansion bases here
     if aiBrain.HasPlatoonList then
-    # Figure out what type of builders to import
+    -- Figure out what type of builders to import
         local expansionTypes = constructionData.ExpansionTypes
     if not expansionTypes then
         expansionTypes = { 'Air', 'Land', 'Sea', 'Gate' }
     end
 
-    # Check if it already exists
+    -- Check if it already exists
         for k,v in aiBrain.PBM.Locations do
             if v.LocationType == baseName then
                 return
@@ -439,7 +439,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
 
     else
         if not aiBrain.BuilderManagers or aiBrain.BuilderManagers[baseName] or not builder.BuilderManagerData then
-            #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': New Engineer for expansion base - ' .. baseName)
+            --LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': New Engineer for expansion base - ' .. baseName)
             builder.BuilderManagerData.EngineerManager:RemoveUnit(builder)
             aiBrain.BuilderManagers[baseName].EngineerManager:AddUnit(builder, true)
             return
@@ -447,11 +447,11 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
 
         aiBrain:AddBuilderManagers(position, radius, baseName, true)
 
-        # Move the engineer to the new base managers
+        -- Move the engineer to the new base managers
         builder.BuilderManagerData.EngineerManager:RemoveUnit(builder)
         aiBrain.BuilderManagers[baseName].EngineerManager:AddUnit(builder, true)
 
-        # Iterate through bases finding the value of each expansion
+        -- Iterate through bases finding the value of each expansion
         local baseValues = {}
         local highPri = false
         for templateName, baseData in BaseBuilderTemplates do
@@ -464,7 +464,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
             end
         end
 
-        # Random to get any picks of same value
+        -- Random to get any picks of same value
         local validNames = {}
         for k,v in baseValues do
             if v.Value == highPri then
@@ -474,20 +474,20 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
         --SPEW('*AI DEBUG: AINewExpansionBase(): validNames for Expansions ' .. repr(validNames))
         local pick = validNames[ Random(1, table.getn(validNames)) ]
 
-        # Error if no pick
+        -- Error if no pick
         if not pick then
             LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Layer Preference - ' .. per .. ' - yielded no base types at - ' .. locationType)
         end
 
-        # Setup base
+        -- Setup base
         --SPEW('*AI DEBUG: AINewExpansionBase(): ARMY ' .. aiBrain:GetArmyIndex() .. ': Expanding using - ' .. pick .. ' at location ' .. baseName)
         import('/lua/ai/AIAddBuilderTable.lua').AddGlobalBaseTemplate(aiBrain, baseName, pick)
 
-        # If air base switch to building an air factory rather than land
+        -- If air base switch to building an air factory rather than land
         if (string.find(pick, 'Air') or string.find(pick, 'Water')) then
-            #if constructionData.BuildStructures[1] == 'T1LandFactory' then
-            #    constructionData.BuildStructures[1] = 'T1AirFactory'
-            #end
+            --if constructionData.BuildStructures[1] == 'T1LandFactory' then
+            --    constructionData.BuildStructures[1] = 'T1AirFactory'
+            --end
             local numToChange = BaseBuilderTemplates[pick].BaseSettings.FactoryCount.Land
             for k,v in constructionData.BuildStructures do
                 if constructionData.BuildStructures[k] == 'T1LandFactory' and numToChange <= 0 then
@@ -532,7 +532,7 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
     while i <= table.getn(points) do
         local point1 = FindNearestIntegers(points[i-1])
         local point2 = FindNearestIntegers(points[i])
-        #### Horizontal line
+        -------- Horizontal line
         local buildTable = {}
         if point1[2] == point2[2] then
             local xDir = -1
@@ -542,7 +542,7 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
             for j = 1, math.abs(point1[1] - point2[1]) do
                 table.insert(buildTable, { point1[1] + (j * xDir) + .5, point1[2] + .5, 0 })
             end
-        #### Vertical line
+        -------- Vertical line
         elseif point1[1] == point2[1] then
             local yDir = -1
             if point1[2] < point2[2] then
@@ -551,7 +551,7 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
             for j = 1, math.abs(point1[2] - point2[2]) do
                 table.insert(buildTable, { point1[1] + .5, point1[2] + (j * yDir) + .5, 0 })
             end
-        #### Angled line
+        -------- Angled line
         else
             local angle = (point1[1] - point2[1]) / (point1[2] - point2[2])
             if angle == 0 then
@@ -570,7 +570,7 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
         local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
         for k,v in buildTable do
             if aiBrain:CanBuildStructureAt(whatToBuild, BuildToNormalLocation(v)) then
-                #aiBrain:BuildStructure(builder, whatToBuild, v, false)
+                --aiBrain:BuildStructure(builder, whatToBuild, v, false)
                 AddToBuildQueue(aiBrain, builder, whatToBuild, v, false)
             end
         end
@@ -627,11 +627,11 @@ end
 
 
 
-### OPERATION STUFF BELOW ###
+------ OPERATION STUFF BELOW ------
 
-### Takes a group of <name> from <army> in the save file.
-### Populates a base template from this save file.
-### Stores the template naming it <name> in the brain.
+------ Takes a group of <name> from <army> in the save file.
+------ Populates a base template from this save file.
+------ Stores the template naming it <name> in the brain.
 function CreateBuildingTemplate(brain, army, name)
     local list = {}
     local template = {}
@@ -676,9 +676,9 @@ function CreateBuildingTemplate(brain, army, name)
     end
 end
 
-### Takes a group of <name> from <army> in the save file.
-### Populates a base template from this save file.
-### Appends the template named <templateName> in the brain with new data
+------ Takes a group of <name> from <army> in the save file.
+------ Populates a base template from this save file.
+------ Appends the template named <templateName> in the brain with new data
 function AppendBuildingTemplate(brain, army, name, templateName)
     local tblUnit = ScenarioUtils.AssembleArmyGroup(army, name)
     local factionIndex = brain:GetFactionIndex()
@@ -690,7 +690,7 @@ function AppendBuildingTemplate(brain, army, name, templateName)
     if not tblUnit then
         LOG('*ERROR AIBUILDSTRUCTURES - Group: ', repr(name), ' not found for Army: ', repr(army))
     else
-        # Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
+        -- Convert building to the proper type to be built if needed (ex: T2 and T3 factories to T1)
         for i,unit in tblUnit do
             for k, unitId in RebuildStructuresTemplate[factionIndex] do
                 if unit.type == unitId[1] then
@@ -703,21 +703,21 @@ function AppendBuildingTemplate(brain, army, name, templateName)
             end
         end
         for i, unit in tblUnit do
-            for j,buildList in BuildingTemplates[factionIndex] do # buildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
+            for j,buildList in BuildingTemplates[factionIndex] do -- buildList[1] is type ("T1LandFactory"); buildList[2] is unitId (ueb0101)
                 local unitPos = { unit.Position[1], unit.Position[3], 0 }
-                if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then # if unit to be built is the same id as the buildList unit it needs to be added
+                if unit.buildtype == buildList[2] and buildList[1] ~= 'T3Sonar' then -- if unit to be built is the same id as the buildList unit it needs to be added
                     local inserted = false
-                    for k,section in template do # check each section of the template for the right type
+                    for k,section in template do -- check each section of the template for the right type
                         if section[1][1] == buildList[1] then
-                            table.insert(section, unitPos) # add position of new unit if found
-                            list[unit.buildtype].AmountWanted = list[unit.buildtype].AmountWanted + 1 # increment num wanted if found
+                            table.insert(section, unitPos) -- add position of new unit if found
+                            list[unit.buildtype].AmountWanted = list[unit.buildtype].AmountWanted + 1 -- increment num wanted if found
                             inserted = true
                             break
                         end
                     end
-                    if not inserted then # if section doesn't exist create new one
-                        table.insert(template, { {buildList[1]}, unitPos }) # add new build type to list with new unit
-                        list[unit.buildtype] =  { StructureType = buildList[1], StructureCategory = unit.buildtype, AmountNeeded = 0, AmountWanted = 1, CloseToBuilder = nil } # add new section of build list with new unit type information
+                    if not inserted then -- if section doesn't exist create new one
+                        table.insert(template, { {buildList[1]}, unitPos }) -- add new build type to list with new unit
+                        list[unit.buildtype] =  { StructureType = buildList[1], StructureCategory = unit.buildtype, AmountNeeded = 0, AmountWanted = 1, CloseToBuilder = nil } -- add new section of build list with new unit type information
                     end
                     break
                 end

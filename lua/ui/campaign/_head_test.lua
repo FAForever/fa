@@ -3,7 +3,7 @@
 --* Author: Evan Pongress
 --* Summary: temp internal screen to view all head anims w/ sound
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -24,13 +24,13 @@ function CreateUI()
 	local currentOp = nil
 	local movTable = {}
 
-	# parent/background
+	-- parent/background
 	local parent = UIUtil.CreateScreenGroup(GetFrame(0), "head test group")
 	local background = Bitmap(parent)
 	background:SetSolidColor('black')
 	LayoutHelpers.FillParent(background, parent)
 
-	# BACK BUTTON
+	-- BACK BUTTON
 	local exitButton = MenuCommon.CreateExitMenuButton(parent, background, "<LOC _Back>")
 	LayoutHelpers.AtLeftIn(exitButton, parent, 10)
 	LayoutHelpers.AtBottomIn(exitButton, parent, 10)
@@ -40,7 +40,7 @@ function CreateUI()
         import('../menus/main.lua').CreateUI()
     end
 
-	# STOP MOVIE BUTTON
+	-- STOP MOVIE BUTTON
 	local stopButton = UIUtil.CreateButtonStd(parent, '/widgets/small', "Stop Movie", 15)
 	LayoutHelpers.AtRightIn(stopButton, parent, 10)
 	LayoutHelpers.AtBottomIn(stopButton, parent, 10)
@@ -49,7 +49,7 @@ function CreateUI()
     	StopMovie()
     end
 
-	# OPERATION LIST
+	-- OPERATION LIST
 	local opList = ItemList(background, "opList")
 	opList.Width:Set(100)
 	opList.Height:Set(function() return parent.Height() - 70 end)
@@ -65,10 +65,10 @@ function CreateUI()
 		self:SetSelection(row)
 		currentOp = opList:GetItem(row)
 		AddMovies(currentOp)
-		#LOG('currentOp = ' , currentOp)
+		--LOG('currentOp = ' , currentOp)
 	end
 
-	# MOVIE LIST
+	-- MOVIE LIST
 	local movList = ItemList(background, 'movList')
 	movList.Width:Set(250)
 	movList.Height:Set(opList.Height)
@@ -107,7 +107,7 @@ function CreateUI()
 		end
 	end
 
-	# movie control
+	-- movie control
 	local movieBack = Bitmap(background)
 	movieBack.Width:Set(1)
 	movieBack.Height:Set(1)
@@ -123,7 +123,7 @@ function CreateUI()
 		StopMovie()
 	end
 
-	# play movie
+	-- play movie
 	movList.OnClick = function(self, row)
 		self:SetSelection(row)
 		StopMovie()
@@ -141,7 +141,7 @@ function CreateUI()
 		end
 	end
 
-	# FUNCTIONS
+	-- FUNCTIONS
 	function StopMovie()
 		movie:Stop()
 		movie:Hide()

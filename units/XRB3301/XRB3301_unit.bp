@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
 
-        # this AI block is only added to make the construction preview work for the unit's vision range.
+        -- this AI block is only added to make the construction preview work for the unit's vision range.
         GuardScanRadius = 200,
         StagingPlatformScanRadius = 200,
     },
@@ -94,7 +94,7 @@ UnitBlueprint {
         BuildTime = 1195,
         MaintenanceConsumptionPerSecondEnergy = 3000,
         RebuildBonusIds = {
-            'xrb3301',       # fix for this unit doesn't have rebuild bonus [150]
+            'xrb3301',       -- fix for this unit doesn't have rebuild bonus [150]
         },
     },
     Footprint = {

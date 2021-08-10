@@ -1,63 +1,63 @@
---#################################################
---#   Generic Window Class
---#################################################
---#  In order for this class to work, you MUST hook in a styles table in your product.
---#  Here is an example:
---#local styles = {
---#    backgrounds = {
---#        notitle = {
---#            tl = '/game/mini-map-brd01/mini-map_brd_ul.dds',
---#            tr = '/game/mini-map-brd01/mini-map_brd_ur.dds',
---#            tm = '/game/mini-map-brd01/mini-map_brd_horz_um.dds',
---#            ml = '/game/mini-map-brd01/mini-map_brd_vert_l.dds',
---#            m = '/game/mini-map-brd01/mini-map_brd_m.dds',
---#            mr = '/game/mini-map-brd01/mini-map_brd_vert_r.dds',
---#            bl = '/game/mini-map-brd01/mini-map_brd_ll.dds',
---#            bm = '/game/mini-map-brd01/mini-map_brd_lm.dds',
---#            br = '/game/mini-map-brd01/mini-map_brd_lr.dds',
---#            borderColor = 'ff415055',
---#        },
---#        title = {
---#            tl = '/game/options_brd/options_brd_ul.dds',
---#            tr = '/game/options_brd/options_brd_ur.dds',
---#            tm = '/game/options_brd/options_brd_horz_um.dds',
---#            ml = '/game/options_brd/options_brd_vert_l.dds',
---#            m = '/game/options_brd/options_brd_m.dds',
---#            mr = '/game/options_brd/options_brd_vert_r.dds',
---#            bl = '/game/options_brd/options_brd_ll.dds',
---#            bm = '/game/options_brd/options_brd_lm.dds',
---#            br = '/game/options_brd/options_brd_lr.dds',
---#            borderColor = 'ff415055',
---#        },
---#    },
---#    closeButton = {
---#        up = '/dialogs/close_btn/close_btn_up.dds',
---#        down = '/dialogs/close_btn/close_btn_down.dds',
---#        over = '/dialogs/close_btn/close_btn_over.dds',
---#        dis = '/dialogs/close_btn/close_btn_dis.dds',
---#    },
---#    pinButton = {
---#        up = '/dialogs/pin/pin_up.dds',
---#        upSel = '/dialogs/pin/pinned_up.dds',
---#        over = '/dialogs/pin/pin_over.dds',
---#        overSel = '/dialogs/pin/pinned_over.dds',
---#        dis = '/dialogs/pin/pin_dis.dds',
---#        disSel = '/dialogs/pin/pinned_dis.dds',
---#    },
---#    configButton = {
---#        up = '/dialogs/config_btn/config_btn_up.dds',
---#        down = '/dialogs/config_btn/config_btn_down.dds',
---#        over = '/dialogs/config_btn/config_btn_over.dds',
---#        dis = '/dialogs/config_btn/config_btn_dis.dds',
---#    },
---#    title = {
---#        font = UIUtil.titleFont,
---#        color = UIUtil.fontColor,
---#        size = 14,
---#    },
---#    cursorFunc = UIUtil.GetCursor,
---#}
---#################################################
+----------------------------------------------------------------------------------------------------
+----   Generic Window Class
+----------------------------------------------------------------------------------------------------
+----  In order for this class to work, you MUST hook in a styles table in your product.
+----  Here is an example:
+----local styles = {
+----    backgrounds = {
+----        notitle = {
+----            tl = '/game/mini-map-brd01/mini-map_brd_ul.dds',
+----            tr = '/game/mini-map-brd01/mini-map_brd_ur.dds',
+----            tm = '/game/mini-map-brd01/mini-map_brd_horz_um.dds',
+----            ml = '/game/mini-map-brd01/mini-map_brd_vert_l.dds',
+----            m = '/game/mini-map-brd01/mini-map_brd_m.dds',
+----            mr = '/game/mini-map-brd01/mini-map_brd_vert_r.dds',
+----            bl = '/game/mini-map-brd01/mini-map_brd_ll.dds',
+----            bm = '/game/mini-map-brd01/mini-map_brd_lm.dds',
+----            br = '/game/mini-map-brd01/mini-map_brd_lr.dds',
+----            borderColor = 'ff415055',
+----        },
+----        title = {
+----            tl = '/game/options_brd/options_brd_ul.dds',
+----            tr = '/game/options_brd/options_brd_ur.dds',
+----            tm = '/game/options_brd/options_brd_horz_um.dds',
+----            ml = '/game/options_brd/options_brd_vert_l.dds',
+----            m = '/game/options_brd/options_brd_m.dds',
+----            mr = '/game/options_brd/options_brd_vert_r.dds',
+----            bl = '/game/options_brd/options_brd_ll.dds',
+----            bm = '/game/options_brd/options_brd_lm.dds',
+----            br = '/game/options_brd/options_brd_lr.dds',
+----            borderColor = 'ff415055',
+----        },
+----    },
+----    closeButton = {
+----        up = '/dialogs/close_btn/close_btn_up.dds',
+----        down = '/dialogs/close_btn/close_btn_down.dds',
+----        over = '/dialogs/close_btn/close_btn_over.dds',
+----        dis = '/dialogs/close_btn/close_btn_dis.dds',
+----    },
+----    pinButton = {
+----        up = '/dialogs/pin/pin_up.dds',
+----        upSel = '/dialogs/pin/pinned_up.dds',
+----        over = '/dialogs/pin/pin_over.dds',
+----        overSel = '/dialogs/pin/pinned_over.dds',
+----        dis = '/dialogs/pin/pin_dis.dds',
+----        disSel = '/dialogs/pin/pinned_dis.dds',
+----    },
+----    configButton = {
+----        up = '/dialogs/config_btn/config_btn_up.dds',
+----        down = '/dialogs/config_btn/config_btn_down.dds',
+----        over = '/dialogs/config_btn/config_btn_over.dds',
+----        dis = '/dialogs/config_btn/config_btn_dis.dds',
+----    },
+----    title = {
+----        font = UIUtil.titleFont,
+----        color = UIUtil.fontColor,
+----        size = 14,
+----    },
+----    cursorFunc = UIUtil.GetCursor,
+----}
+----------------------------------------------------------------------------------------------------
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import('/lua/maui/text.lua').Text

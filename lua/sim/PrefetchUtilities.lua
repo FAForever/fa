@@ -1,10 +1,10 @@
-#--                                                                             
-#--  File     : PrefetchUtilities.lua                                           
-#--  Author(s): Robert Oates                                                    
-#--                                                                             
-#--  Summary  : Functions to simplify prefetching by base, unit, etc...                  
-#--                                                                             
-#--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.          
+----                                                                             
+----  File     : PrefetchUtilities.lua                                           
+----  Author(s): Robert Oates                                                    
+----                                                                             
+----  Summary  : Functions to simplify prefetching by base, unit, etc...                  
+----                                                                             
+----  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.          
 
 function CreatePrefetchSetFromArmy(armyName)
     local BPList = {}

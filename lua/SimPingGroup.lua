@@ -1,11 +1,11 @@
 
-# Add a ping chicklet for the user to click on
-# This function returns an ID of the ping group for use if you need to delete it later.
+-- Add a ping chicklet for the user to click on
+-- This function returns an ID of the ping group for use if you need to delete it later.
 
-# callback    - function to be executed when the ping is issued by the user
-# name        - string that appears on the tooltip
-# blueprintID - used to create the unit icon
-# type        - type of ping, can be "move", "alert", or "attack"
+-- callback    - function to be executed when the ping is issued by the user
+-- name        - string that appears on the tooltip
+-- blueprintID - used to create the unit icon
+-- type        - type of ping, can be "move", "alert", or "attack"
 
 local PingGroups = {}
 local idNum = 1
@@ -39,7 +39,7 @@ function AddPingGroup(name, blueprintID, type, description)
 end
 
 function OnClickCallback(data)
-    # Check to make sure all of the pings are numbers (happens if the user clicks off the map somewhere)
+    -- Check to make sure all of the pings are numbers (happens if the user clicks off the map somewhere)
     for i, v in data.Location do
         if v != v then
             return

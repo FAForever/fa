@@ -104,7 +104,7 @@ UnitBlueprint {
         ProductionPerSecondMass = 6,
         RebuildBonusIds = {
             'urb1202',
-        ##    'urb1302',
+        ----    'urb1302',
         },
     },
     General = {

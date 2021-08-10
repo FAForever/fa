@@ -248,7 +248,7 @@ UnitBlueprint {
             TurretBoneYaw = 'Turret',
             TurretDualManipulators = false,
             TurretPitch = -20,
-            TurretPitchRange = 60, #from 35, to enable shooting directly beneath it
+            TurretPitchRange = 60, --from 35, to enable shooting directly beneath it
             TurretPitchSpeed = 35,
             TurretYaw = 0,
             TurretYawRange = 180,
@@ -266,9 +266,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

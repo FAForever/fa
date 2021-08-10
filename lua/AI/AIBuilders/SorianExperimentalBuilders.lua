@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/SorianExperimentalBuilders.lua
-#**
-#**  Summary  : Default experimental builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/SorianExperimentalBuilders.lua
+--**
+--**  Summary  : Default experimental builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -40,11 +40,11 @@ function T4LandAttackCondition(aiBrain, locationType, targetNumber)
     if aiBrain:GetCurrentEnemy() then
         local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
         local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
-        #local enemyTML = aiBrain:GetNumUnitsAroundPoint(categories.TECH2 * categories.TACTICALMISSILEPLATFORM * categories.STRUCTURE, {estartX, 0, estartZ}, 100, 'Enemy')
+        --local enemyTML = aiBrain:GetNumUnitsAroundPoint(categories.TECH2 * categories.TACTICALMISSILEPLATFORM * categories.STRUCTURE, {estartX, 0, estartZ}, 100, 'Enemy')
         local enemyT3PD = aiBrain:GetNumUnitsAroundPoint(categories.TECH3 * categories.DEFENSE * categories.DIRECTFIRE, {estartX, 0, estartZ}, 100, 'Enemy')
         --targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSurface')
         targetNumber = SUtils.GetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
-        targetNumber = targetNumber + (enemyT3PD * 54)# + (enemyTML * 54)
+        targetNumber = targetNumber + (enemyT3PD * 54)-- + (enemyTML * 54)
     end
 
     local position = engineerManager:GetLocationCoords()
@@ -76,7 +76,7 @@ function T4AirAttackCondition(aiBrain, locationType, targetNumber)
         local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
         local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
         targetNumber = SUtils.GetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiAir', {'Air'}, enemyIndex)
-        #targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiAir')
+        --targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiAir')
     end
 
     local position = engineerManager:GetLocationCoords()
@@ -104,7 +104,7 @@ BuilderGroup {
         Priority = 952,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
@@ -112,7 +112,7 @@ BuilderGroup {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, categories.EXPERIMENTAL * categories.LAND } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -120,7 +120,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -136,7 +136,7 @@ BuilderGroup {
         Priority = 952,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -145,7 +145,7 @@ BuilderGroup {
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -153,7 +153,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -169,14 +169,14 @@ BuilderGroup {
         Priority = 952,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2} },
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, categories.EXPERIMENTAL * categories.AIR } },
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 2, categories.EXPERIMENTAL * categories.MOBILE * (categories.LAND + categories.AIR) - categories.SATELLITE}},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -184,7 +184,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 NearMarkerType = 'Protected Experimental Construction',
                 BuildStructures = {
                     'T4AirExperimental1',
@@ -198,21 +198,21 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianMobileLandExperimentalEngineers',
     BuildersType = 'EngineerBuilder',
-    #Land T4 builders for 10x10 and smaller maps
+    --Land T4 builders for 10x10 and smaller maps
     Builder {
         BuilderName = 'Sorian T3 Land Exp1 Engineer 1',
         PlatoonTemplate = 'T3EngineerBuilderSorian',
         Priority = 950,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapLessThan', { 1000, 1000 }},
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -220,7 +220,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -236,7 +236,7 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -244,7 +244,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapLessThan', { 1000, 1000 }},
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { MIBC, 'FactionIndex', {1, 2, 4} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
@@ -253,7 +253,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -269,14 +269,14 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapLessThan', { 1000, 1000 }},
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -284,7 +284,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -294,21 +294,21 @@ BuilderGroup {
             }
         }
     },
-    #Land T4 builders for 20x20 and larger maps
+    --Land T4 builders for 20x20 and larger maps
     Builder {
         BuilderName = 'Sorian T3 Land Exp1 Engineer 1 - Large Map',
         PlatoonTemplate = 'T3EngineerBuilderSorian',
         Priority = 949,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapGreaterThan', { 1000, 1000 }},
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -316,7 +316,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -332,7 +332,7 @@ BuilderGroup {
         Priority = 949,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
@@ -340,7 +340,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapGreaterThan', { 1000, 1000 }},
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { MIBC, 'FactionIndex', {1, 2, 4} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
@@ -349,7 +349,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -365,14 +365,14 @@ BuilderGroup {
         Priority = 949,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapGreaterThan', { 1000, 1000 }},
             { SBC, 'MarkerLessThan', { 'LocationType', {'Amphibious Path Node', 'Land Path Node'}, 100, true } },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -380,7 +380,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 BaseTemplate = ExBaseTmpl,
                 NearMarkerType = 'Rally Point',
                 BuildStructures = {
@@ -447,8 +447,8 @@ BuilderGroup {
         InstanceCount = 50,
         BuilderType = 'Any',
         BuilderConditions = {
-            #{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
-            #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
+            --{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
+            --{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
             { T4LandAttackCondition, { 'LocationType', 250 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -458,7 +458,7 @@ BuilderGroup {
                 TargetThreatType = 'Commander',
             },
             UseMoveOrder = true,
-            PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'MASSFABRICATION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE ANTIAIR', 'STRUCTURE DEFENSE DIRECTFIRE', 'FACTORY AIR', 'FACTORY LAND' }, # list in order
+            PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'MASSFABRICATION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE ANTIAIR', 'STRUCTURE DEFENSE DIRECTFIRE', 'FACTORY AIR', 'FACTORY LAND' }, -- list in order
         },
     },
     Builder {
@@ -470,9 +470,9 @@ BuilderGroup {
         InstanceCount = 50,
         BuilderType = 'Any',
         BuilderConditions = {
-            #{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
-            #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
-            #{ T4LandAttackCondition, { 'LocationType', 250 } },
+            --{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
+            --{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
+            --{ T4LandAttackCondition, { 'LocationType', 250 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderData = {
@@ -481,7 +481,7 @@ BuilderGroup {
                 TargetThreatType = 'Commander',
             },
             UseMoveOrder = true,
-            PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'MASSFABRICATION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE ANTIAIR', 'STRUCTURE DEFENSE DIRECTFIRE', 'FACTORY AIR', 'FACTORY LAND' }, # list in order
+            PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'MASSFABRICATION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE ANTIAIR', 'STRUCTURE DEFENSE DIRECTFIRE', 'FACTORY AIR', 'FACTORY LAND' }, -- list in order
         },
     },
     Builder {
@@ -493,8 +493,8 @@ BuilderGroup {
         InstanceCount = 50,
         BuilderType = 'Any',
         BuilderConditions = {
-            #{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
-            #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
+            --{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
+            --{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
             { UCBC, 'UnitCapCheckGreater', { .95 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -504,7 +504,7 @@ BuilderGroup {
                 TargetThreatType = 'Commander',
             },
             UseMoveOrder = true,
-            PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'MASSFABRICATION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE ANTIAIR', 'STRUCTURE DEFENSE DIRECTFIRE', 'FACTORY AIR', 'FACTORY LAND' }, # list in order
+            PrioritizedCategories = { 'EXPERIMENTAL LAND', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'MASSFABRICATION', 'ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE ANTIAIR', 'STRUCTURE DEFENSE DIRECTFIRE', 'FACTORY AIR', 'FACTORY LAND' }, -- list in order
         },
     },
 }
@@ -512,20 +512,20 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'SorianMobileAirExperimentalEngineers',
     BuildersType = 'EngineerBuilder',
-    #Air T4 builders for 20x20 and larger maps
+    --Air T4 builders for 20x20 and larger maps
     Builder {
         BuilderName = 'Sorian T3 Air Exp1 Engineer 1',
         PlatoonTemplate = 'T3EngineerBuilderSorian',
         Priority = 950,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2} },
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapGreaterThan', { 1000, 1000 }},
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -533,7 +533,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 NearMarkerType = 'Protected Experimental Construction',
                 BuildStructures = {
                     'T4AirExperimental1',
@@ -542,20 +542,20 @@ BuilderGroup {
             }
         }
     },
-    #Air T4 builders for 10x10 and smaller maps
+    --Air T4 builders for 10x10 and smaller maps
     Builder {
         BuilderName = 'Sorian T3 Air Exp1 Engineer 1 - Small Map',
         PlatoonTemplate = 'T3EngineerBuilderSorian',
         Priority = 949,
         BuilderConditions = {
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.FACTORY * categories.TECH3 } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2} },
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'MapLessThan', { 1000, 1000 }},
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -563,7 +563,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 NearMarkerType = 'Protected Experimental Construction',
                 BuildStructures = {
                     'T4AirExperimental1',
@@ -630,8 +630,8 @@ BuilderGroup {
         FormRadius = 250,
         BuilderType = 'Any',
         BuilderConditions = {
-            #{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
-            #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
+            --{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
+            --{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
             { T4AirAttackCondition, { 'LocationType', 250 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -641,7 +641,7 @@ BuilderGroup {
                 TargetThreatType = 'Commander',
             },
             UseMoveOrder = true,
-            PrioritizedCategories = { 'EXPERIMENTAL', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'ENERGYPRODUCTION', 'MASSFABRICATION', 'STRUCTURE' }, # list in order
+            PrioritizedCategories = { 'EXPERIMENTAL', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'ENERGYPRODUCTION', 'MASSFABRICATION', 'STRUCTURE' }, -- list in order
         },
     },
     Builder {
@@ -653,8 +653,8 @@ BuilderGroup {
         FormRadius = 250,
         BuilderType = 'Any',
         BuilderConditions = {
-            #{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
-            #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
+            --{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
+            --{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
             { UCBC, 'UnitCapCheckGreater', { .95 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -664,7 +664,7 @@ BuilderGroup {
                 TargetThreatType = 'Commander',
             },
             UseMoveOrder = true,
-            PrioritizedCategories = { 'EXPERIMENTAL', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'ENERGYPRODUCTION', 'MASSFABRICATION', 'STRUCTURE' }, # list in order
+            PrioritizedCategories = { 'EXPERIMENTAL', 'COMMAND', 'STRUCTURE ARTILLERY EXPERIMENTAL', 'TECH3 STRATEGIC STRUCTURE', 'ENERGYPRODUCTION', 'MASSFABRICATION', 'STRUCTURE' }, -- list in order
         },
     },
 }
@@ -678,13 +678,13 @@ BuilderGroup {
         Priority = 949,
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
             { UCBC, 'HaveLessThanUnitsWithCategory', { 2, categories.EXPERIMENTAL * categories.NAVAL}},
             { MABC, 'MarkerLessThanDistance',  { 'Naval Area', 400}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -692,7 +692,7 @@ BuilderGroup {
             MinNumAssistees = 2,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 NearMarkerType = 'Naval Area',
                 BuildStructures = {
                     'T4SeaExperimental1',
@@ -751,9 +751,9 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T4 Exp Sea',
         PlatoonTemplate = 'T4ExperimentalSeaSorian',
-        #PlatoonAddBehaviors = { 'TempestBehaviorSorian' },
+        --PlatoonAddBehaviors = { 'TempestBehaviorSorian' },
         PlatoonAddPlans = {'NameUnitsSorian', 'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
-        #PlatoonAIPlan = 'AttackForceAI',
+        --PlatoonAIPlan = 'AttackForceAI',
         Priority = 1300,
         BuilderConditions = {
             { SBC, 'NoRushTimeCheck', { 0 }},
@@ -766,7 +766,7 @@ BuilderGroup {
             ThreatWeights = {
                 TargetThreatType = 'Commander',
             },
-            PrioritizedCategories = { 'COMMAND', 'FACTORY -NAVAL','EXPERIMENTAL', 'MASSPRODUCTION', 'STRUCTURE' }, # list in order
+            PrioritizedCategories = { 'COMMAND', 'FACTORY -NAVAL','EXPERIMENTAL', 'MASSPRODUCTION', 'STRUCTURE' }, -- list in order
         },
     },
 }
@@ -781,14 +781,14 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
             { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-            #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+            --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL * categories.ORBITALSYSTEM }},
             { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.EXPERIMENTAL * categories.ORBITALSYSTEM }},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2 }},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -796,7 +796,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = true,
-                #T4 = true,
+                --T4 = true,
                 AdjacencyCategory = 'SHIELD STRUCTURE',
                 BuildStructures = {
                     'T4SatelliteExperimental',
@@ -865,7 +865,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderData = {
             SearchRadius = 6000,
-            PrioritizedCategories = { 'STRUCTURE STRATEGIC EXPERIMENTAL', 'EXPERIMENTAL ARTILLERY OVERLAYINDIRECTFIRE', 'STRUCTURE STRATEGIC TECH3', 'STRUCTURE NUKE TECH3', 'EXPERIMENTAL ORBITALSYSTEM', 'EXPERIMENTAL ENERGYPRODUCTION STRUCTURE', 'STRUCTURE ANTIMISSILE TECH3', 'TECH3 MASSFABRICATION', 'TECH3 ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE TECH3 ANTIAIR', 'COMMAND', 'STRUCTURE DEFENSE TECH3 DIRECTFIRE', 'STRUCTURE DEFENSE TECH3 SHIELD', 'STRUCTURE DEFENSE TECH2', 'STRUCTURE' }, # list in order
+            PrioritizedCategories = { 'STRUCTURE STRATEGIC EXPERIMENTAL', 'EXPERIMENTAL ARTILLERY OVERLAYINDIRECTFIRE', 'STRUCTURE STRATEGIC TECH3', 'STRUCTURE NUKE TECH3', 'EXPERIMENTAL ORBITALSYSTEM', 'EXPERIMENTAL ENERGYPRODUCTION STRUCTURE', 'STRUCTURE ANTIMISSILE TECH3', 'TECH3 MASSFABRICATION', 'TECH3 ENERGYPRODUCTION', 'STRUCTURE STRATEGIC', 'STRUCTURE DEFENSE TECH3 ANTIAIR', 'COMMAND', 'STRUCTURE DEFENSE TECH3 DIRECTFIRE', 'STRUCTURE DEFENSE TECH3 SHIELD', 'STRUCTURE DEFENSE TECH2', 'STRUCTURE' }, -- list in order
         },
     },
 }
@@ -880,14 +880,14 @@ BuilderGroup {
         InstanceCount = 1,
         BuilderConditions = {
         { SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH3}},
-        #{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
+        --{ SIBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MASSPRODUCTION * categories.TECH3}},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL * categories.ECONOMIC }},
             { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.EXPERIMENTAL * categories.ECONOMIC}},
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.EXPERIMENTAL}},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.2}},
             { SIBC, 'EngineerNeedsAssistance', { false, 'LocationType', {'EXPERIMENTAL', 'NUKE STRUCTURE', 'TECH3 ARTILLERY STRUCTURE'} }},
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ SIBC, 'T4BuildingCheck', {} },
+            --{ SIBC, 'T4BuildingCheck', {} },
             { SBC, 'EnemyThreatLessThanValueAtBase', { 'LocationType', 1, 'Air', 2 } },
         },
         BuilderType = 'Any',
@@ -895,7 +895,7 @@ BuilderGroup {
             MinNumAssistees = 6,
             Construction = {
                 BuildClose = false,
-                #T4 = true,
+                --T4 = true,
                 AdjacencyCategory = 'SHIELD STRUCTURE',
                 BuildStructures = {
                     'T4EconExperimental',

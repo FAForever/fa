@@ -1,6 +1,6 @@
-# testutils.lua
-#
-# Contains simple unit test support.
+-- testutils.lua
+--
+-- Contains simple unit test support.
 
 require '../system/repr.lua'
 
@@ -9,10 +9,10 @@ local getn = table.getn
 local setn = table.setn
 local concat = table.concat
 
-#==============================================================================
-# expect_equal(a,b) raises an error if its args are not equal, with equality
-# defined by having the same type and repr() representation.
-#------------------------------------------------------------------------------
+--==============================================================================
+-- expect_equal(a,b) raises an error if its args are not equal, with equality
+-- defined by having the same type and repr() representation.
+--------------------------------------------------------------------------------
 function expect_equal(a,b)
     assert(type(a) == type(b), 'different types: '..type(a)..' != '..type(b)..'\na='..repr(a)..'\nb='..repr(b))
     if a!=b then
@@ -23,9 +23,9 @@ function expect_equal(a,b)
 end
 
 
-#==============================================================================
-# expect_identical(a,b) raises an error if its args are not the same.
-#------------------------------------------------------------------------------
+--==============================================================================
+-- expect_identical(a,b) raises an error if its args are not the same.
+--------------------------------------------------------------------------------
 function expect_identical(a,b)
     if a!=b then
         local ra = repr(a)
@@ -35,11 +35,11 @@ function expect_identical(a,b)
 end
 
 
-#==============================================================================
-# expect_error(wantmsg, fun, ...) calls fun(...), expecting it to raise an
-# error containing 'wantmsg'. If it does not, expect_error raises its own
-# error.
-#------------------------------------------------------------------------------
+--==============================================================================
+-- expect_error(wantmsg, fun, ...) calls fun(...), expecting it to raise an
+-- error containing 'wantmsg'. If it does not, expect_error raises its own
+-- error.
+--------------------------------------------------------------------------------
 function expect_error(wantmsg, fun, ...)
     local ok,msg = pcall(fun, unpack(arg))
     if ok then
@@ -52,10 +52,10 @@ function expect_error(wantmsg, fun, ...)
 end
 
 
-#==============================================================================
-# dir_recursive(path) -> list
-#   return a list of files under path
-#------------------------------------------------------------------------------
+--==============================================================================
+-- dir_recursive(path) -> list
+--   return a list of files under path
+--------------------------------------------------------------------------------
 function dir_recursive(path, result)
     local r = result or {}
     for i,f in io.dir(path.."/*") do
@@ -68,22 +68,22 @@ function dir_recursive(path, result)
 end
 
 
-#==============================================================================
-# The LogBuffer class provides a simple stream buffer idiom. A complicated
-# test can create a LogBuffer and append text to it like this:
-#       log = LogBuffer(' ',';') # args are field separator and line separator
-#       log('foo',100)
-#       log(1,2,3)
-#       log()
-#       log('the end')
-#
-# now log:Get() will return
-#       "foo 100;1 2 3;;the end;"
-#
-# Which you can compare to an expected result string. This is a handy way to
-# create tests that involve the timing of interacting calls, e.g. coroutines
-# etc.
-#------------------------------------------------------------------------------
+--==============================================================================
+-- The LogBuffer class provides a simple stream buffer idiom. A complicated
+-- test can create a LogBuffer and append text to it like this:
+--       log = LogBuffer(' ',';') -- args are field separator and line separator
+--       log('foo',100)
+--       log(1,2,3)
+--       log()
+--       log('the end')
+--
+-- now log:Get() will return
+--       "foo 100;1 2 3;;the end;"
+--
+-- Which you can compare to an expected result string. This is a handy way to
+-- create tests that involve the timing of interacting calls, e.g. coroutines
+-- etc.
+--------------------------------------------------------------------------------
 local LogBufferMeta = { }
 LogBufferMeta.__index=LogBufferMeta
 
@@ -125,22 +125,22 @@ function LogBufferMeta:Get()
 end
 
 
-#==============================================================================
-# auto_run_unit_tests()
-#
-# Looks inside its calling module for any functions starting with "test_",
-# then calls them in alphabetical order and reports on the results.
-#
-# Test functions should throw an error to fail, or just return to succeed.
-# The return value, if any, is ignored. Typically a test will set up a bit
-# of data, then call assert(), expect_equal(), and expect_error() to perform
-# the tests.
-#------------------------------------------------------------------------------
+--==============================================================================
+-- auto_run_unit_tests()
+--
+-- Looks inside its calling module for any functions starting with "test_",
+-- then calls them in alphabetical order and reports on the results.
+--
+-- Test functions should throw an error to fail, or just return to succeed.
+-- The return value, if any, is ignored. Typically a test will set up a bit
+-- of data, then call assert(), expect_equal(), and expect_error() to perform
+-- the tests.
+--------------------------------------------------------------------------------
 function auto_run_unit_tests()
-    # Check LuaPlus cmd line for verbose option
+    -- Check LuaPlus cmd line for verbose option
     local verbose = (arg[1] == "-v")
 
-    # Get our caller's environment to look for tests in
+    -- Get our caller's environment to look for tests in
     local env = getfenv(2)
     local t = {}
     for name,fun in env do

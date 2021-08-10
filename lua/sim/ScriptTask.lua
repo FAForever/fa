@@ -1,69 +1,69 @@
-#*****************************************************************************
-#* File: lua/modules/ScriptTask.lua
-#*
-#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ScriptTask.lua
+--*
+--* Copyright ï¿½ 2008 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 
-# Task status values returned from TaskTick(). Note that an integer cast to
-# ETaskStatus means to wait that many ticks before returning. TASKSTATUS_Repeat
-# is equivalent to waiting 0 ticks. Do not modify this as this is a reflection of
-# the internal task codes used by the engine.
+-- Task status values returned from TaskTick(). Note that an integer cast to
+-- ETaskStatus means to wait that many ticks before returning. TASKSTATUS_Repeat
+-- is equivalent to waiting 0 ticks. Do not modify this as this is a reflection of
+-- the internal task codes used by the engine.
 TASKSTATUS = {
-    # Task has completed and can be removed from the task stack; it will be
-    # popped and deleted automatically. Execution will immediately continue
-    # with the task's parent.
-    # You can also use TASKSTATUS_Done to do a tail call, by first pushing
-    # the task to switch to and then returning TASKSTATUS_Done.
+    -- Task has completed and can be removed from the task stack; it will be
+    -- popped and deleted automatically. Execution will immediately continue
+    -- with the task's parent.
+    -- You can also use TASKSTATUS_Done to do a tail call, by first pushing
+    -- the task to switch to and then returning TASKSTATUS_Done.
     Done = -1,
 
-    # move task's thread onto >ed list; some external event will
-    # reactivate it.
+    -- move task's thread onto >ed list; some external event will
+    -- reactivate it.
     Suspend = -2,
 
-    # kill all tasks on this thread
+    -- kill all tasks on this thread
     Abort = -3,
 
-    # reschedule the ticking of this task until the rest of the tasks have been
-    # ticked (puts it at the end of the list)
+    -- reschedule the ticking of this task until the rest of the tasks have been
+    -- ticked (puts it at the end of the list)
     Delay = -4,
 
-    # task needs to repeat execution immediately, usually caused by a change
-    # in the task stack
+    -- task needs to repeat execution immediately, usually caused by a change
+    -- in the task stack
     Repeat = 0,
 
-    # Task is done with its execution for this tick, but should be called back
-    # on the next tick.
+    -- Task is done with its execution for this tick, but should be called back
+    -- on the next tick.
     Wait = 1,
     
-    # Returning a number greater than TASKSTATUS_Wait incdicates an additional
-    # number of ticks to wait. For example:
-    #    return TASKSTATUS_Wait + 3
-    # This indicates a wait of 4 ticks.
+    -- Returning a number greater than TASKSTATUS_Wait incdicates an additional
+    -- number of ticks to wait. For example:
+    --    return TASKSTATUS_Wait + 3
+    -- This indicates a wait of 4 ticks.
 }
 
 AIRESULT = {
-    # Command in progress; result has not been set yet
+    -- Command in progress; result has not been set yet
     Unknown=0,
 
-    # Successfully carried out the order.
+    -- Successfully carried out the order.
     Success=1,
 
-    # Failed to carry out the order.
+    -- Failed to carry out the order.
     Fail=2,
 
-    # The order made no sense for this type of unit, and was ignored.
+    -- The order made no sense for this type of unit, and was ignored.
     Ignored=3,
 }
 
 ScriptTask = Class(moho.ScriptTask_Methods) {
 
-    # Called immediately when task is created
+    -- Called immediately when task is created
     OnCreate = function(self,commandData)
         self.CommandData = commandData
     end,
     
-    # Called by the engine every tick. Function must return a value in
-    # TaskStatus
+    -- Called by the engine every tick. Function must return a value in
+    -- TaskStatus
     TaskTick = function(self)
         LOG('tick')
         self:SetAIResult(AIRESULT.Fail)
@@ -71,19 +71,19 @@ ScriptTask = Class(moho.ScriptTask_Methods) {
         return TASKSTATUS.Done
     end,
     
-    # Called by the engine when the task is destroyed. This could be it naturally
-    # going away after completion or because it was cancelled by another task.
+    -- Called by the engine when the task is destroyed. This could be it naturally
+    -- going away after completion or because it was cancelled by another task.
     OnDestroy = function(self)
     end,
     
-    #
-    # Native method reference
-    #
-    # ScriptTask.SetAIResult(bool)  # Set the AI result, success or fail
-    # ScriptTask.GetUnit()          # Get the unit that is executing this task
+    --
+    -- Native method reference
+    --
+    -- ScriptTask.SetAIResult(bool)  -- Set the AI result, success or fail
+    -- ScriptTask.GetUnit()          -- Get the unit that is executing this task
     
-    #
-    # Native support functions reference
-    #
-    # LUnitMove - Latent move
+    --
+    -- Native support functions reference
+    --
+    -- LUnitMove - Latent move
 }

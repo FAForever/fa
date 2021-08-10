@@ -1,9 +1,9 @@
-#
-# UserCamera
-#
-# Provides direct control over a specific game camera. Also listens to request from the Sim and manipulates
-# the cameras as instructed.
-#
+--
+-- UserCamera
+--
+-- Provides direct control over a specific game camera. Also listens to request from the Sim and manipulates
+-- the cameras as instructed.
+--
 
 function ProcessCameraRequests(reqs)
     for k,v in Sync.CameraRequests do
@@ -59,13 +59,13 @@ function WaitForCamera(req)
     elseif req.Type == 'CAMERA_SET_ZOOM' then
         cam:SetZoom(req.Zoom, req.Time)
     elseif req.Type == 'CAMERA_MOVE' then
-        # Move to specified marker
+        -- Move to specified marker
         if req.Marker then
             local position = req.Marker.position
             local hpr = req.Marker.orientation
             local zoom = req.Marker.zoom
             cam:MoveTo(position,hpr,zoom,req.Time)
-        # Move to specified region (make region visible)
+        -- Move to specified region (make region visible)
         elseif req.Region then
             cam:MoveToRegion(req.Region,req.Time)
         else

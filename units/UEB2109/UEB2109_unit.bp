@@ -249,7 +249,7 @@ UnitBlueprint {
             TurretBoneYaw = 'Turret',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 60, #from 0
+            TurretPitchRange = 60, --from 0
             TurretPitchSpeed = 35,
             TurretYaw = 0,
             TurretYawRange = 180,
@@ -269,9 +269,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = false,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

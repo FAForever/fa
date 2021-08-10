@@ -66,5 +66,5 @@ function UpdateDialog(beatNumber, strings)
             dialog.diagnosticBox:AppendLine(v)
         end
     end
-    dialog.diagnosticBox:AppendLine(LOC("<LOC desync_0001>Beat# ") .. tostring(beatNumber))
+    dialog.diagnosticBox:AppendLine(LOC(HASHTAGREPLACE) .. tostring(beatNumber))
 end

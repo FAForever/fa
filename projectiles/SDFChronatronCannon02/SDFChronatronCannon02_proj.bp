@@ -42,7 +42,7 @@ ProjectileBlueprint {
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,
         LeadTarget = false,
-        TrackTarget = true,  # bugfix for overcharge shot not leading target - by brute51 [149]
+        TrackTarget = true,  -- bugfix for overcharge shot not leading target - by brute51 [149]
         RotationalVelocity = 9000,
         TurnRate = 360,
         VelocityAlign = true,

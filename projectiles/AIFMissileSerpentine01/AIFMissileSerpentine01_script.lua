@@ -1,6 +1,6 @@
-#
-# Aeon Serpentine Missile
-#
+--
+-- Aeon Serpentine Missile
+--
 local AMissileSerpentineProjectile = import('/lua/aeonprojectiles.lua').AMissileSerpentineProjectile
 
 AIFMissileSerpentine01 = Class(AMissileSerpentineProjectile) {
@@ -30,7 +30,7 @@ AIFMissileSerpentine01 = Class(AMissileSerpentineProjectile) {
         	self.Distance = self:GetDistanceToTarget()
         end
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            --Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then

@@ -1,6 +1,6 @@
-#
-# Ship-based Anti-Torpedo Script
-#
+--
+-- Ship-based Anti-Torpedo Script
+--
 local TTorpedoSubProjectile = import('/lua/terranprojectiles.lua').TTorpedoSubProjectile
 TorpedoSubTerran03 = Class(TTorpedoSubProjectile) {}
 

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1301/UAB1301_script.lua
-#**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Power Generator Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1301/UAB1301_script.lua
+--**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Power Generator Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AEnergyCreationUnit = import('/lua/aeonunits.lua').AEnergyCreationUnit
 
 UAB1301 = Class(AEnergyCreationUnit) {

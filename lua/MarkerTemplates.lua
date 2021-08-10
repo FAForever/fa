@@ -1,6 +1,6 @@
 MarkerTemplates = {
 
-# // Pre-existing marker types, ported to the template definition file
+-- // Pre-existing marker types, ported to the template definition file
 
     ['Blank Marker'] = {
 		prop = "/env/common/props/markers/M_Blank_prop.bp",

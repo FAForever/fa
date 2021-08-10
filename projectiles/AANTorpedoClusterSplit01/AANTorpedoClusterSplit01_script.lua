@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_script.lua
+--**  Author(s):  Gordon Duclos
+--**
+--**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
@@ -37,18 +37,18 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
     OnEnterWater = function(self)
         ATorpedoCluster.OnEnterWater(self)
         local army = self:GetArmy()
-        for i in self.FxEnterWater do #splash
+        for i in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
         self:ForkThread(self.EnterWaterMovementThread)
     end,
     
     EnterWaterMovementThread = function(self)
-        #self:SetMaxSpeed(20)
-        #self:SetVelocity(1)
-        #WaitSeconds(0.1)
+        --self:SetMaxSpeed(20)
+        --self:SetVelocity(1)
+        --WaitSeconds(0.1)
         self:SetAcceleration(2.5)
-		    #self:SetVelocity(2)
+		    --self:SetVelocity(2)
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(180)

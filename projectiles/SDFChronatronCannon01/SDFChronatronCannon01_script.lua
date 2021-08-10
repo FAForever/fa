@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SDFChronatronCannon01/SDFChronatronCannon01_script.lua
-#**  Author(s):  Gordon Duclos, Greg Kohne
-#**
-#**  Summary  :  Chronatron Cannon Projectile script, XSL0001
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SDFChronatronCannon01/SDFChronatronCannon01_script.lua
+--**  Author(s):  Gordon Duclos, Greg Kohne
+--**
+--**  Summary  :  Chronatron Cannon Projectile script, XSL0001
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SChronatronCannon = import('/lua/seraphimprojectiles.lua').SChronatronCannon
 local ChronatronBlastAttackAOE = import('/lua/EffectTemplates.lua').SChronatronCannonBlastAttackAOE 
 

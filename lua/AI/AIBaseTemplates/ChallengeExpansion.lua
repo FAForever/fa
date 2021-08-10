@@ -1,28 +1,28 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/ChallengeExpansion.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/ChallengeExpansion.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'ChallengeExpansion',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1SlowUpgradeBuilders',
         'T2SlowUpgradeBuilders',
         
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerFactoryConstruction',
         
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
@@ -34,7 +34,7 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',

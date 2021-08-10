@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/RushExpansionNaval.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/RushExpansionNaval.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'RushExpansionNaval',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
         'T1BalancedUpgradeBuildersExpansion',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -23,26 +23,26 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstructionAirHigherPriority',
 
-        # Build Mass high pri at this base
+        -- Build Mass high pri at this base
         'EngineerMassBuildersLowerPri',
 
-        # Extractors
+        -- Extractors
         'Time Exempt Extractor Upgrades Expansion',
 
-        # ==== EXPANSION ==== #
-        #DUNCAN - expansions dont build more expansions!
-        #'EngineerExpansionBuildersFull - Naval',
+        -- ==== EXPANSION ==== --
+        --DUNCAN - expansions dont build more expansions!
+        --'EngineerExpansionBuildersFull - Naval',
 
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'T2MissileDefenses',
         'T3NukeDefenses',
         'T3NukeDefenseBehaviors',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders HighPri',
 
-        # ==== LAND UNIT BUILDERS ==== #
-        'T2LandFactoryAmphibiousBuilders', #DUNCAN - added
+        -- ==== LAND UNIT BUILDERS ==== --
+        'T2LandFactoryAmphibiousBuilders', --DUNCAN - added
         'T3LandFactoryBuilders',
 
         'FrequentLandAttackFormBuilders',
@@ -58,12 +58,12 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
-        #'T1AirFactoryBuilders',
-        #'T2AirFactoryBuilders',
-        #'T3AirFactoryBuilders',
-        #'FrequentAirAttackFormBuilders',
-        #'MassHunterAirFormBuilders',
+        -- ==== AIR UNIT BUILDERS ==== --
+        --'T1AirFactoryBuilders',
+        --'T2AirFactoryBuilders',
+        --'T3AirFactoryBuilders',
+        --'FrequentAirAttackFormBuilders',
+        --'MassHunterAirFormBuilders',
 
         'UnitCapAirAttackFormBuilders',
         'ACUHunterAirFormBuilders',
@@ -75,7 +75,7 @@ BaseBuilderTemplate {
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuildersNaval',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'MobileAirExperimentalEngineers',
         'MobileAirExperimentalForm',
     },
@@ -124,7 +124,7 @@ BaseBuilderTemplate {
             return 100
         end
 
-        local threatCutoff = 10 # value of overall threat that determines where enemy bases are
+        local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 75
@@ -132,7 +132,7 @@ BaseBuilderTemplate {
             return 100
         elseif distance > 250 then
             return 50
-        else # within 250
+        else -- within 250
             return 10
         end
 

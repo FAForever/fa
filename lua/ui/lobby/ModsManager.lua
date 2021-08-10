@@ -849,19 +849,19 @@ function CreateListElement(parent, mod, Pos)
     LayoutHelpers.AtVerticalCenterIn(group.icon, group)
 
     group.name = UIUtil.CreateText(group, mod.title, 14, UIUtil.bodyFont)
-    group.name:SetColor('FFE9ECE9') -- #FFE9ECE9
+    group.name:SetColor('FFE9ECE9') -- --FFE9ECE9
     group.name:DisableHitTest()
     LayoutHelpers.AtLeftTopIn(group.name, group, modInfoPosition, 7)
 
     group.createdBy = UIUtil.CreateText(group, ' created by ', 14, UIUtil.bodyFont)
     group.createdBy:DisableHitTest()
-    group.createdBy:SetColor('FFA2A5A2') -- #FFA2A5A2
+    group.createdBy:SetColor('FFA2A5A2') -- --FFA2A5A2
     LayoutHelpers.AtTopIn(group.createdBy, group, 7)
     LayoutHelpers.RightOf(group.createdBy, group.name, 2)
 
     group.author = UIUtil.CreateText(group, GetModAuthor(mod.uid), 14, UIUtil.bodyFont)
     group.author:DisableHitTest()
-    group.author:SetColor('FFE9ECE9') -- #FFE9ECE9
+    group.author:SetColor('FFE9ECE9') -- --FFE9ECE9
     LayoutHelpers.AtTopIn(group.author, group, 7)
     LayoutHelpers.RightOf(group.author, group.createdBy, 2)
 
@@ -875,10 +875,10 @@ function CreateListElement(parent, mod, Pos)
     group.type:DisableHitTest()
     if mod.status then
         group.type:SetText(mod.status)
-        group.type:SetColor('FFB9BFB9') --#FFB9BFB9
+        group.type:SetColor('FFB9BFB9') ----FFB9BFB9
     else
         group.type:SetText('Unknown Mod')
-        group.type:SetColor('FFE94C16') --#FFE94C16
+        group.type:SetColor('FFE94C16') ----FFE94C16
     end
 
     group.ui = mod.ui_only

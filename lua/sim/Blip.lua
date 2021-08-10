@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/blip.lua
-#**  Author(s):
-#**
-#**  Summary  : The recon blip lua module
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/blip.lua
+--**  Author(s):
+--**
+--**  Summary  : The recon blip lua module
+--**
+--**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 Blip = Class(moho.blip_methods) {
 

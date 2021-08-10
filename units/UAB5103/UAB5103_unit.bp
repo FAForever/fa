@@ -3,7 +3,7 @@ UnitBlueprint {
         'PRODUCTSC1',
         'AEON',
 
-        #        'BUILTBYTIER3ENGINEER',
+        --        'BUILTBYTIER3ENGINEER',
         'STRUCTURE',
         'TECH3',
         'SIZE4',

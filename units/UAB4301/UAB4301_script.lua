@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UAB4301/UAB4301_script.lua
---#**  Author(s):  David Tomandl, Jessica St. Croix
---#**
---#**  Summary  :  Aeon Heavy Shield Generator Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UAB4301/UAB4301_script.lua
+----**  Author(s):  David Tomandl, Jessica St. Croix
+----**
+----**  Summary  :  Aeon Heavy Shield Generator Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
 
 UAB4301 = Class(AShieldStructureUnit) {

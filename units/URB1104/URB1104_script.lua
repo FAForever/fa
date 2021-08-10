@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB1104/URB1104_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl
-#**
-#**  Summary  :  Cybran Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB1104/URB1104_script.lua
+--**  Author(s):  Jessica St. Croix, David Tomandl
+--**
+--**  Summary  :  Cybran Mass Fabricator
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CMassFabricationUnit = import('/lua/cybranunits.lua').CMassFabricationUnit
 
 URB1104 = Class(CMassFabricationUnit) {

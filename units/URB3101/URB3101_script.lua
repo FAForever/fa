@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB3101/URB3101_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Cybran Light Radar Tower Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB3101/URB3101_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Cybran Light Radar Tower Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
 

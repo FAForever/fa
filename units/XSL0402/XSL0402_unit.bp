@@ -154,7 +154,7 @@ UnitBlueprint {
     LifeBarOffset = 0.3,
     LifeBarSize = 0.5,
 
-    # This is energy ball stuff
+    -- This is energy ball stuff
     Lifetime = 30,
     MaxMoveRange = 5,
     Physics = {

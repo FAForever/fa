@@ -34,7 +34,7 @@ UnitBlueprint {
         MaxHealth = 1000,
         RegenRate = 0,
     },
-    Description = '<LOC xec1908_desc>UEF Blacksun Remains #1',
+    Description = '<LOC xec1908_desc>UEF Blacksun Remains --1',
     Display = {
         DamageEffects = {
             {
@@ -118,7 +118,7 @@ UnitBlueprint {
         UnitWeight = 1,
     },
     Interface = {
-        HelpText = '<LOC xec1908_help>UEF Blacksun Remains #1',
+        HelpText = '<LOC xec1908_help>UEF Blacksun Remains --1',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 1.3,

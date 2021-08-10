@@ -179,9 +179,9 @@ UnitBlueprint {
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
     SelectionThickness = 1.2,
-    SizeX = 0.7, #from 0.5
-    SizeY = 0.6, #from0.3
-    SizeZ = 1, # #from 0.5
+    SizeX = 0.7, --from 0.5
+    SizeY = 0.6, --from0.3
+    SizeZ = 1, -- --from 0.5
     StrategicIconName = 'icon_land1_intel',
     StrategicIconSortPriority = 135,
     Weapon = {

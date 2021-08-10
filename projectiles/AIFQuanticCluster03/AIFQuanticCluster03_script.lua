@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/AIFQuanticCluster03/AIFQuanticCluster03_script.lua
-#**  Author(s):  Drew Staltman, Gordon Duclos
-#**
-#**  Summary  :  Quantic Cluster Projectile script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/AIFQuanticCluster03/AIFQuanticCluster03_script.lua
+--**  Author(s):  Drew Staltman, Gordon Duclos
+--**
+--**  Summary  :  Quantic Cluster Projectile script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 

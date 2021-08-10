@@ -180,7 +180,7 @@ UnitBlueprint {
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 144000,#105000
+        BuildCostEnergy = 144000,--105000
         BuildCostMass = 2100,
         BuildTime = 9600,
     },
@@ -288,8 +288,8 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
             },
             FiringRandomness = 0,
-            FiringTolerance = 6, # [102]
-            FixBombTrajectory = true, # [152]
+            FiringTolerance = 6, -- [102]
+            FixBombTrajectory = true, -- [152]
             Label = 'Bomb',
             MaxRadius = 90,
             MuzzleSalvoDelay = 0,

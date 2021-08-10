@@ -1,23 +1,23 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/ScenarioStrings.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Strings for use in scenarios
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/ScenarioStrings.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Strings for use in scenarios
+--**
+--**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-# -------------
-# Map Expansion
-# -------------
+-- -------------
+-- Map Expansion
+-- -------------
 MapExpansion = {
     {text = '<LOC ScenStr_0000>Operation area expanded',},
 }
 
-# --------------
-# New Objectives
-# --------------
+-- --------------
+-- New Objectives
+-- --------------
 NewObj = {
     {text = '<LOC ScenStr_0001>New objective',},
 }
@@ -28,9 +28,9 @@ NewSObj = {
     {text = '<LOC ScenStr_0003>New secondary objective',},
 }
 
-# --------------------
-# Completed Objectives
-# --------------------
+-- --------------------
+-- Completed Objectives
+-- --------------------
 ObjComp = {
     {text = '<LOC ScenStr_0004>Objective completed',},
 }
@@ -47,9 +47,9 @@ BObjComp = {
     {text = '<LOC ScenStr_0008>Bonus objective completed',},
 }
 
-# -----------------
-# Failed Objectives
-# -----------------
+-- -----------------
+-- Failed Objectives
+-- -----------------
 ObjFail = {
     {text = '<LOC ScenStr_0009>Objective failed',},
 }
@@ -59,13 +59,13 @@ PObjFail = {
 SObjFail = {
     {text = '<LOC ScenStr_0011>Secondary objective failed',},
 }
-# -----------------------
-# Operation Progress
-# -----------------------
+-- -----------------------
+-- Operation Progress
+-- -----------------------
 ObjProgress = '(%s/%s)'
-# ------------------
-# Updated Objectives
-# ------------------
+-- ------------------
+-- Updated Objectives
+-- ------------------
 ObjUpdate = {
     {text = '<LOC ScenStr_0012>Objective updated',},
 }
@@ -76,9 +76,9 @@ SObjUpdate = {
     {text = '<LOC ScenStr_0014>Secondary objective updated',},
 }
 
-# -----------------------------------
-# Mission Complete/Operation Complete
-# -----------------------------------
+-- -----------------------------------
+-- Mission Complete/Operation Complete
+-- -----------------------------------
 MissionSuccessDialogue = {
     {text = '<LOC ScenStr_0015>All Primary Objectives Completed. Mission Successful.',},
 }
@@ -86,9 +86,9 @@ OperationSuccessDialogue = {
     {text = '<LOC ScenStr_0016>All Primary Objectives Completed. Operation Successful.',},
 }
 
-# -----------------------
-# Operation Complete/Fail
-# -----------------------
+-- -----------------------
+-- Operation Complete/Fail
+-- -----------------------
 OpComp = {
     {text = '<LOC ScenStr_0017>Operation completed',},
 }
@@ -97,16 +97,16 @@ OpFail = {
 }
 
 
-# -----------------------
-# Commander Killed
-# -----------------------
+-- -----------------------
+-- Commander Killed
+-- -----------------------
 CDRKilled = {
     {text = '<LOC ScenStr_0019>Commander Destroyed. Mission Failed.',},
 }
 
-#-------------------------
-# Needed aliases for player
-#-------------------------
+---------------------------
+-- Needed aliases for player
+---------------------------
 
-# '<LOC PlayerName>{g PlayerName}'
-# '<LOC CDR_Player>CDR {g PlayerName}'
+-- '<LOC PlayerName>{g PlayerName}'
+-- '<LOC CDR_Player>CDR {g PlayerName}'

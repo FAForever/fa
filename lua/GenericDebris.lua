@@ -1,10 +1,10 @@
-#****************************************************************************
-#**
-#**  File     : /lua/GenericDebris.lua
-#**  Summary  : Supreme Commander specific debris
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     : /lua/GenericDebris.lua
+--**  Summary  : Supreme Commander specific debris
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local BaseGenericDebris = import('/lua/sim/DefaultProjectiles.lua').BaseGenericDebris
 local EffectTemplates = import('/lua/EffectTemplates.lua')
 

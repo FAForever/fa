@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIFactoryConstructionBuilders.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIFactoryConstructionBuilders.lua
+--**
+--**  Summary  : Default economic builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -28,15 +28,15 @@ local ExtractorToFactoryRatio = 2.2
 BuilderGroup {
     BuilderGroupName = 'LandInitialFactoryConstruction',
     BuildersType = 'EngineerBuilder',
-    # =======================================
-    #     Land Factory Builders - Initial
-    # =======================================
+    -- =======================================
+    --     Land Factory Builders - Initial
+    -- =======================================
     Builder {
         BuilderName = 'T1 Land Factory Builder - Initial',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 1500,  #DUNCAN - was 1000
+        Priority = 1500,  --DUNCAN - was 1000
         BuilderConditions = {
-            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'LAND' } }, #DUNCAN - added
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'LAND' } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -56,15 +56,15 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'AirInitialFactoryConstruction',
     BuildersType = 'EngineerBuilder',
-    # ======================================
-    #     Air Factory Builders - Initial
-    # ======================================
+    -- ======================================
+    --     Air Factory Builders - Initial
+    -- ======================================
     Builder {
         BuilderName = 'T1 Air Factory Builder - Initial',
         PlatoonTemplate = 'EngineerBuilder',
-        Priority = 1500, #DUNCAN - was 1000
+        Priority = 1500, --DUNCAN - was 1000
         BuilderConditions = {
-            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'AIR' } }, #DUNCAN - added
+            { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'AIR' } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
             { EBC, 'MassToFactoryRatioBaseCheck', { 'LocationType' } },
@@ -84,9 +84,9 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'EngineerFactoryConstructionAirHigherPriority',
     BuildersType = 'EngineerBuilder',
-    # ============================
-    #     Air Factory Builders
-    # ============================
+    -- ============================
+    --     Air Factory Builders
+    -- ============================
     Builder {
         BuilderName = 'T2 Air Factory Builder Higher Pri',
         PlatoonTemplate = 'T2EngineerBuilder',
@@ -139,7 +139,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR T1 Air Factory Higher Pri',
         PlatoonTemplate = 'CommanderBuilder',
-        Priority = 905, #DUNCAN - was 900
+        Priority = 905, --DUNCAN - was 900
         BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.0} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Air' } },
@@ -211,7 +211,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'CDR T1 Land Factory Higher Pri',
         PlatoonTemplate = 'CommanderBuilder',
-        Priority = 905, #DUNCAN - was 900
+        Priority = 905, --DUNCAN - was 900
         BuilderConditions = {
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.0} },
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Land' } },
@@ -233,9 +233,9 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'EngineerFactoryConstruction Balance',
     BuildersType = 'EngineerBuilder',
-    # =============================
-    #     Land Factory Builders
-    # =============================
+    -- =============================
+    --     Land Factory Builders
+    -- =============================
     Builder {
         BuilderName = 'T1 Land Factory Builder Balance',
         PlatoonTemplate = 'EngineerBuilder',
@@ -281,9 +281,9 @@ BuilderGroup {
         }
     },
 
-    # ============================
-    #     Air Factory Builders
-    # ============================
+    -- ============================
+    --     Air Factory Builders
+    -- ============================
     Builder {
         BuilderName = 'T1 Air Factory Builder Balance',
         PlatoonTemplate = 'EngineerBuilder',
@@ -334,9 +334,9 @@ BuilderGroup {
 BuilderGroup {
     BuilderGroupName = 'EngineerFactoryConstruction',
     BuildersType = 'EngineerBuilder',
-    # =============================
-    #     Land Factory Builders
-    # =============================
+    -- =============================
+    --     Land Factory Builders
+    -- =============================
     Builder {
         BuilderName = 'T1 Land Factory Builder',
         PlatoonTemplate = 'EngineerBuilder',
@@ -380,9 +380,9 @@ BuilderGroup {
         }
     },
 
-    # ============================
-    #     Air Factory Builders
-    # ============================
+    -- ============================
+    --     Air Factory Builders
+    -- ============================
     Builder {
         BuilderName = 'T1 Air Factory Builder',
         PlatoonTemplate = 'EngineerBuilder',
@@ -427,9 +427,9 @@ BuilderGroup {
         }
     },
 
-    # ====================================== #
-    #     Air Factories + Transport Need
-    # ====================================== #
+    -- ====================================== --
+    --     Air Factories + Transport Need
+    -- ====================================== --
     Builder {
         BuilderName = 'T1 Air Factory Transport Needed',
         PlatoonTemplate = 'EngineerBuilder',
@@ -456,16 +456,16 @@ BuilderGroup {
         }
     },
 
-    # =============================
-    #     Quantum Gate Builders
-    # =============================
+    -- =============================
+    --     Quantum Gate Builders
+    -- =============================
     Builder {
         BuilderName = 'T3 Gate Engineer',
         PlatoonTemplate = 'T3EngineerBuilder',
         Priority = 850,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, #DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}}, #DUNCAN - Added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 1, categories.EXPERIMENTAL } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, categories.EXPERIMENTAL}}, --DUNCAN - Added
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 2, 'ENERGYPRODUCTION TECH3' }},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'GATE TECH3 STRUCTURE' }},
             { UCBC, 'FactoryCapCheck', { 'LocationType', 'Gate' } },

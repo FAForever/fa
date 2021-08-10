@@ -267,7 +267,7 @@ UnitBlueprint {
     SelectionThickness = 0.95,
     SizeX = 0.7,
     SizeY = 0.8,
-    SizeZ = 0.9, #from0.6
+    SizeZ = 0.9, --from0.6
     StrategicIconName = 'icon_land1_engineer',
     StrategicIconSortPriority = 105,
     Wreckage = {
@@ -279,9 +279,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

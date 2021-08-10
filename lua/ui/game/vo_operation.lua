@@ -17,12 +17,12 @@
 
 
 
-# ------------------------------
-# Opnode ID: Choir
-# Choir VO
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Choir
+-- Choir VO
+-- ------------------------------
 
-# Choir
+-- Choir
 Ops_Choir_Choir_02424 = {text = '<LOC Ops_Choir_010_010>[{i Choir}]: Civilian buildings under attack!', bank = 'Ops_VO', cue = 'Ops_Choir_Choir_02424'}
 Ops_Choir_Choir_02425 = {text = '<LOC Ops_Choir_010_020>[{i Choir}]: Convoy lost!', bank = 'Ops_VO', cue = 'Ops_Choir_Choir_02425'}
 Ops_Choir_Choir_02426 = {text = '<LOC Ops_Choir_010_030>[{i Choir}]: Mission-critical building under attack!', bank = 'Ops_VO', cue = 'Ops_Choir_Choir_02426'}
@@ -54,12 +54,12 @@ Ops_Choir_Choir_01591 = {text = '<LOC Ops_Choir_010_270>[{i Choir}]: Enemy artil
 Ops_Choir_Choir_01592 = {text = '<LOC Ops_Choir_010_280>[{i Choir}]: Unidentified missile launch detected, Commander.', bank = 'Ops_VO', cue = 'Ops_Choir_Choir_01592'}
 
 
-# ------------------------------
-# Opnode ID: EarthCom
-# EarthCom VO
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: EarthCom
+-- EarthCom VO
+-- ------------------------------
 
-# General Ops
+-- General Ops
 Ops_EarthCom_EarthCom_01165 = {text = '<LOC Ops_EarthCom_010_010>[{i EarthCom}]: Civilian buildings are under attack!', bank = 'Ops_VO', cue = 'Ops_EarthCom_EarthCom_01165'}
 Ops_EarthCom_EarthCom_01409 = {text = '<LOC Ops_EarthCom_010_020>[{i EarthCom}]: Convoy lost!', bank = 'Ops_VO', cue = 'Ops_EarthCom_EarthCom_01409'}
 Ops_EarthCom_EarthCom_01410 = {text = '<LOC Ops_EarthCom_010_030>[{i EarthCom}]: Mission-critical building under attack!', bank = 'Ops_VO', cue = 'Ops_EarthCom_EarthCom_01410'}
@@ -91,12 +91,12 @@ Ops_EarthCom_EarthCom_01581 = {text = '<LOC Ops_EarthCom_010_270>[{i EarthCom}]:
 Ops_EarthCom_EarthCom_01582 = {text = '<LOC Ops_EarthCom_010_280>[{i EarthCom}]: Unidentified missile launch detected, Commander.', bank = 'Ops_VO', cue = 'Ops_EarthCom_EarthCom_01582'}
 
 
-# ------------------------------
-# Opnode ID: Ops
-# Ops VO
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Ops
+-- Ops VO
+-- ------------------------------
 
-# General Ops
+-- General Ops
 Ops_Ops_Ops_02400 = {text = '<LOC Ops_Ops_010_010>[{i Ops}]: Civilian buildings under attack!', bank = 'Ops_VO', cue = 'Ops_Ops_Ops_02400'}
 Ops_Ops_Ops_02401 = {text = '<LOC Ops_Ops_010_020>[{i Ops}]: Convoy lost!', bank = 'Ops_VO', cue = 'Ops_Ops_Ops_02401'}
 Ops_Ops_Ops_02402 = {text = '<LOC Ops_Ops_010_030>[{i Ops}]: Mission-critical building under attack!', bank = 'Ops_VO', cue = 'Ops_Ops_Ops_02402'}

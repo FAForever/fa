@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URL0304/URL0304_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Cybran Heavy Mobile Artillery Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URL0304/URL0304_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Cybran Heavy Mobile Artillery Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
 local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon
@@ -31,14 +31,14 @@ URL0401 = Class(CLandUnit) {
             end,
             
             OnLostTarget = function(self)
-                #Mark target lost 
+                --Mark target lost 
                 CIFArtilleryWeapon.OnLostTarget(self)
                 self.losttarget = true                
             end,
             
             PlayFxWeaponPackSequence = function(self)
                 if self.PitchRotators then
-                    #We repacked the unit lets delete the rotators
+                    --We repacked the unit lets delete the rotators
                     for k, v in barrelBones do
                         if self.PitchRotators[k] then
                             self.PitchRotators[k]:Destroy()
@@ -49,11 +49,11 @@ URL0401 = Class(CLandUnit) {
                 self.losttarget = false      
                 self.initialaim = true
                 CIFArtilleryWeapon.PlayFxWeaponPackSequence(self)
-                #self.currentbarrel = 1
+                --self.currentbarrel = 1
             end, 
             
 			LaunchEffects = function(self)   
-				###LOG ("launch effects") 
+				------LOG ("launch effects") 
 				local FxLaunch = EffectTemplate.CArtilleryFlash02 
 
 				for k, v in FxLaunch do
@@ -63,10 +63,10 @@ URL0401 = Class(CLandUnit) {
             
             CreateProjectileAtMuzzle = function(self, muzzle)
                 if self.initialaim then
-                    #CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
+                    --CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
                     self.Rotator = CreateRotator(self.unit, 'Turret_Fake', 'y')
                     self.unit.Trash:Add(self.Rotator)
-                    #make pich rotators for each bone of the fake barrels
+                    --make pich rotators for each bone of the fake barrels
                     for k, v in barrelBones do
                         local tmprotator = CreateRotator(self.unit, v, 'x')
                         tmprotator:SetSpeed(30)
@@ -76,7 +76,7 @@ URL0401 = Class(CLandUnit) {
                     end
                     self.Goal = 0
                 
-                    #Get the initial position after unpacking
+                    --Get the initial position after unpacking
                     local barrel = self.currentbarrel
                     self.restdirvector.x, self.restdirvector.y, self.restdirvector.z = self.unit:GetBoneDirection( barrelBones[barrel] )
                     local basedirvector = {}
@@ -84,18 +84,18 @@ URL0401 = Class(CLandUnit) {
                     self.basediftorest = Util.GetAngleInBetween(self.restdirvector, basedirvector)
                 end
                 if self.losttarget or self.initialaim then
-                    #Setting pitch to aim barrel
+                    --Setting pitch to aim barrel
                     local dirvector = {}
                     dirvector.x, dirvector.y, dirvector.z  = self.unit:GetBoneDirection('Turret_Aim_Barrel')
                     local basedirvector = {}
                     basedirvector.x, basedirvector.y, basedirvector.z  = self.unit:GetBoneDirection('Turret_Aim')
                     local basediftoaim = Util.GetAngleInBetween(dirvector, basedirvector)
                     self.pitchdif = self.basediftorest - basediftoaim
-                    #Set all the barrels to the pitch of the aim barrel
+                    --Set all the barrels to the pitch of the aim barrel
                     for k, v in barrelBones do
                         self.PitchRotators[k]:SetGoal(self.pitchdif)
                     end
-                    #Wait for pitch to finish before firing
+                    --Wait for pitch to finish before firing
                     WaitFor(self.PitchRotators[1])
                     WaitSeconds(0.2)
                     if self.losttarget then

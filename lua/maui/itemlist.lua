@@ -120,11 +120,11 @@ ItemList = Class(moho.item_list_methods, Control) {
         self:OnClick(row)
     end,
 
-    # The selection changed via keyboard (up,down,pageup,pagedown,home,end etc)
+    -- The selection changed via keyboard (up,down,pageup,pagedown,home,end etc)
     OnKeySelect = function(self, row)
     end,
 
-    # updated when mouseover item changes, -1 when no mouseover
+    -- updated when mouseover item changes, -1 when no mouseover
     OnMouseoverItem = function(self, row)
     end,
 }

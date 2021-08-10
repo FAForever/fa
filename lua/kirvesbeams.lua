@@ -6,7 +6,7 @@ local Util = import('/lua/utilities.lua')
 
 EmptyCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = {},
-    FxImpactLand = {},#EffectTemplate.DefaultProjectileLandImpact,
+    FxImpactLand = {},--EffectTemplate.DefaultProjectileLandImpact,
     FxImpactWater = EffectTemplate.DefaultProjectileWaterImpact,
     FxImpactUnderWater = EffectTemplate.DefaultProjectileUnderWaterImpact,
     FxImpactAirUnit = {},

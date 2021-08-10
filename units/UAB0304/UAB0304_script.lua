@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UAB0304/UAB0304_script.lua
---#**  Author(s):  John Comes, David Tomandl
---#**
---#**  Summary  :  Aeon Unit Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UAB0304/UAB0304_script.lua
+----**  Author(s):  John Comes, David Tomandl
+----**
+----**  Summary  :  Aeon Unit Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local AQuantumGateUnit = import('/lua/aeonunits.lua').AQuantumGateUnit
 local AQuantumGateAmbient = import('/lua/EffectTemplates.lua').AQuantumGateAmbient
 

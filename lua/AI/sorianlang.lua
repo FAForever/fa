@@ -1,14 +1,14 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/sorianlang.lua
-#**  Author(s): Michael Robbins aka Sorian
-#**
-#**  Summary  : Language File for the Sorian AIs
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AI/sorianlang.lua
+--**  Author(s): Michael Robbins aka Sorian
+--**
+--**  Summary  : Language File for the Sorian AIs
+--**
+--****************************************************************************
 
 AINames = {
-    #Czar
+    --Czar
     uaa0310 = {
         'Donut of Doom',
         'Chariot of Fire',
@@ -46,7 +46,7 @@ AINames = {
         'Volumna',
         'Voluptas',
     },
-    #Colossus
+    --Colossus
     ual0401 = {
         'Golem',
         'Cyclops',
@@ -71,7 +71,7 @@ AINames = {
         'Jentilak',
         'Angrboda',
     },
-    #Tempest
+    --Tempest
     uas0401 = {
         'Sea Cleanser',
         'Purifier',
@@ -86,7 +86,7 @@ AINames = {
         'Faith',
         'Purity',
     },
-    #Soul Ripper
+    --Soul Ripper
     ura0401 = {
         'Beast',
         'Ogre',
@@ -99,7 +99,7 @@ AINames = {
         'Imp',
         'Meffit',
     },
-    #Scathis
+    --Scathis
     url0401 = {
         'Base Pounder',
         'Aconite',
@@ -113,7 +113,7 @@ AINames = {
         'Hemlock',
         'Toloache',
     },
-    #Monkeylord
+    --Monkeylord
     url0402 = {
         'Gorilla King',
         'Berserker',
@@ -134,7 +134,7 @@ AINames = {
         'Six Eyes',
         'Bolas',
     },
-    #Megalith
+    --Megalith
     xrl0403 = {
         'Fiddler',
         'Soldier',
@@ -143,7 +143,7 @@ AINames = {
         'Opilio',
         'Tanner',
     },
-    #Fatboy
+    --Fatboy
     uel0401 = {
         'Fort Knox',
         'Bertha',
@@ -166,7 +166,7 @@ AINames = {
         'Bradley',
         'Stryker',
     },
-    #Novax Satellite
+    --Novax Satellite
     xea0002 = {
         'Skynet',
         'Death from Above',
@@ -175,14 +175,14 @@ AINames = {
         'UEF Defense Net',
         'Solar Bean',
     },
-    #Atlantis
+    --Atlantis
     ues0401 = {
         'Sword of the Ocean',
         'Great White',
         'Kraken',
         'Deep One',
     },
-    #Mavor
+    --Mavor
     ueb2401 = {
         'Longshot',
         'Pride of the UEF',
@@ -197,7 +197,7 @@ AINames = {
         'Bad Neighbor',
         'Gods Slingshot',
     },
-    #Ahwassa
+    --Ahwassa
     xsa0402 = {
         'Chariot of Doom',
         'Wrath',
@@ -207,7 +207,7 @@ AINames = {
         'Fury',
         'Avenger',
     },
-    #Ythotha
+    --Ythotha
     xsl0401 = {
         'Bolthorn',
         'Grid',

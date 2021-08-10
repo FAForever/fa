@@ -1,11 +1,11 @@
-#****************************************************************************
-#**  File     :  /lua/enhancementcommon.lua
-#**  Author(s): Ted Snook
-#**
-#**  Summary  : Common enhancement functions for sim / user sides
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**  File     :  /lua/enhancementcommon.lua
+--**  Author(s): Ted Snook
+--**
+--**  Summary  : Common enhancement functions for sim / user sides
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local enhancementTable = {}
 local restrictedList = {}

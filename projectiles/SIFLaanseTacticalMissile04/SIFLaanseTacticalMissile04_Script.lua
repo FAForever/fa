@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFLaanseTacticalMissile04/SIFLaanseTacticalMissile04_script.lua
-#**  Author(s):  Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Laanse Tactical Missile Projectile script, XSB2108
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SIFLaanseTacticalMissile04/SIFLaanseTacticalMissile04_script.lua
+--**  Author(s):  Gordon Duclos, Aaron Lundquist
+--**
+--**  Summary  :  Laanse Tactical Missile Projectile script, XSB2108
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SLaanseTacticalMissile = import('/lua/seraphimprojectiles.lua').SLaanseTacticalMissile
 
@@ -30,22 +30,22 @@ SIFLaanseTacticalMissile04 = Class(SLaanseTacticalMissile) {
 
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
-        #Get the nuke as close to 90 deg as possible
+        --Get the nuke as close to 90 deg as possible
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            --Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
-						# Increase check intervals
+						-- Increase check intervals
 						self:SetTurnRate(30)
 						WaitSeconds(1.5)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 107 then
-						# Further increase check intervals
+						-- Further increase check intervals
             WaitSeconds(0.3)
             self:SetTurnRate(50)
 				elseif dist > 0 and dist <= 43 then
-						# Further increase check intervals            
+						-- Further increase check intervals            
             self:SetTurnRate(100)   
             KillThread(self.MoveThread)         
         end

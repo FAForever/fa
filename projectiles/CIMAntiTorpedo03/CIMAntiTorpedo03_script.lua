@@ -1,6 +1,6 @@
-#
-# Ship-based Anti-Torpedo Script
-#
+--
+-- Ship-based Anti-Torpedo Script
+--
 local CDepthChargeProjectile = import('/lua/cybranprojectiles.lua').CDepthChargeProjectile
 CIMAntiTorpedo02 = Class(CDepthChargeProjectile) {
 

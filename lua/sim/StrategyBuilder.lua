@@ -1,23 +1,23 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/StrategyBuilder.lua
-#**
-#**  Summary  : Strategy Builder class
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/sim/StrategyBuilder.lua
+--**
+--**  Summary  : Strategy Builder class
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua').Builder
 
 
-# StrategyBuilderSpec
-# This is the spec to have analyzed by the StrategyManager
-#{
-#   BuilderData = {
-#       Some stuff could go here, eventually.
-#   }
-#}
+-- StrategyBuilderSpec
+-- This is the spec to have analyzed by the StrategyManager
+--{
+--   BuilderData = {
+--       Some stuff could go here, eventually.
+--   }
+--}
 
 StrategyBuilder = Class(Builder) {
     Create = function(self,brain,data,locationType)
@@ -81,7 +81,7 @@ StrategyBuilder = Class(Builder) {
 
     CalculatePriority = function(self, builderManager)
         self.PriorityAltered = false
-        # Builders can have a function to update the priority
+        -- Builders can have a function to update the priority
         if Builders[self.BuilderName].PriorityFunction then
             local newPri = Builders[self.BuilderName]:PriorityFunction(self.Brain)
             if newPri > 100 then
@@ -96,7 +96,7 @@ StrategyBuilder = Class(Builder) {
             end
         end
 
-        # Returns true if a priority change happened
+        -- Returns true if a priority change happened
         local returnVal = self.PriorityAltered
         return returnVal
     end,

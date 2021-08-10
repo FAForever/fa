@@ -1,23 +1,23 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/userScriptCommand.lua
-#* Summary: User layer ability handling
-#*
-#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/game/userScriptCommand.lua
+--* Summary: User layer ability handling
+--*
+--* Copyright ï¿½ 2008 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 local CM = import('/lua/ui/game/commandmode.lua')
 
-# The user wants to issue an ability order in the current command mode. This
-# function validates the request. If the request is valid we set 
-# UserValidated to allow the order to be issued. If it's not valid we end the 
-# commandmode or do nothing depending on the context.
-#
-# VerifyAbility should return a result table of the following format:
-# result = {
-#    string AbilityName - What ability to execute
-#    string TaskName - Which task class to execute (e.g. AbilityTask, SkillTask)
-#    bool UserValidated - Whether or not this request has been validated
-#    table AuthorizedUnits - List of units to issue the command to
-# }
+-- The user wants to issue an ability order in the current command mode. This
+-- function validates the request. If the request is valid we set 
+-- UserValidated to allow the order to be issued. If it's not valid we end the 
+-- commandmode or do nothing depending on the context.
+--
+-- VerifyAbility should return a result table of the following format:
+-- result = {
+--    string AbilityName - What ability to execute
+--    string TaskName - Which task class to execute (e.g. AbilityTask, SkillTask)
+--    bool UserValidated - Whether or not this request has been validated
+--    table AuthorizedUnits - List of units to issue the command to
+-- }
 function VerifyScriptCommand(data)
     local mode = CM.GetCommandMode()
    

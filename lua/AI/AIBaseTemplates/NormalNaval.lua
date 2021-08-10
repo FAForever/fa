@@ -1,31 +1,31 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/NormalNaval.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/NormalNaval.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'NormalNaval',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1SlowUpgradeBuilders',
         'T2SlowUpgradeBuilders',
         
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
         'T3EngineerBuilders',
         'EngineerNavalFactoryBuilder',
         
-        # Mass
+        -- Mass
         'EngineerMassBuildersLowerPri',
         
-        # ==== ATTACKS ==== #
+        -- ==== ATTACKS ==== --
         'T1SeaFactoryBuilders',
         'T2SeaFactoryBuilders',
         'T3SeaFactoryBuilders',

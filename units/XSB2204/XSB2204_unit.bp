@@ -223,9 +223,9 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 50,				#53
+            Damage = 50,				--53
             DamageFriendly = false,
-            DamageRadius = 4,				#4
+            DamageRadius = 4,				--4
             DamageType = 'Normal',
             DetonatesAtTargetHeight = true,
             DisplayName = 'Olaris AA Artillery Cannon',
@@ -240,7 +240,7 @@ UnitBlueprint {
             MaxRadius = 44,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 2,
-            MuzzleVelocity = 35,			#20
+            MuzzleVelocity = 35,			--20
             ProjectileId = '/projectiles/SAAOlarisAAArtillery06/SAAOlarisAAArtillery06_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 2,
@@ -262,7 +262,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1.5,				#1.25
+            RateOfFire = 1.5,				--1.25
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'AIR MOBILE HIGHPRIAIR',
@@ -300,9 +300,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false,
-            Water = true, #from false,
+            Seabed = true, --from false
+            Sub = true, --from false,
+            Water = true, --from false,
         },
     },
 }

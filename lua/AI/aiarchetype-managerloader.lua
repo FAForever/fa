@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/aiarchetype-rushland.lua
-#**
-#**  Summary  : Rush AI
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AI/aiarchetype-rushland.lua
+--**
+--**  Summary  : Rush AI
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -22,7 +22,7 @@ function GetHighestBuilder(aiBrain)
     for k,v in BaseBuilderTemplates do
         if v.FirstBaseFunction then
             local baseVal, baseType = v.FirstBaseFunction(aiBrain)
-            #LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
+            --LOG('*DEBUG: testing ' .. k .. ' - Val ' .. baseVal)
             if baseVal > returnVal then
                 returnVal = baseVal
                 base = k
@@ -62,7 +62,7 @@ function ExecutePlan(aiBrain)
 
         SetupMainBase(aiBrain)
 
-        # Get units out of pool and assign them to the managers
+        -- Get units out of pool and assign them to the managers
         local mainManagers = aiBrain.BuilderManagers.MAIN
 
         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
@@ -100,11 +100,11 @@ function SetupMainBase(aiBrain)
     aiBrain:ForceManagerSort()
 end
 
-#Modeled after GPGs LowMass and LowEnergy functions.
-#Runs the whole game and kills off units when the AI hits unit cap.
+--Modeled after GPGs LowMass and LowEnergy functions.
+--Runs the whole game and kills off units when the AI hits unit cap.
 
 function UnitCapWatchThread(aiBrain)
-    #DUNCAN - Added T1 kill and check every 30 seconds and within 10 of the unit cap
+    --DUNCAN - Added T1 kill and check every 30 seconds and within 10 of the unit cap
     KillPD = false
     KillT1 = false
     while true do
@@ -127,11 +127,11 @@ function UnitCapWatchThread(aiBrain)
                 end
                 KillPD = true
             else
-                #DUNCAN - dont kill power, it kills the econ, will now be reclaimed
-                #local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.ENERGYPRODUCTION * categories.STRUCTURE, true)
-                #for k, v in units do
-                #    v:Kill()
-                #end
+                --DUNCAN - dont kill power, it kills the econ, will now be reclaimed
+                --local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.ENERGYPRODUCTION * categories.STRUCTURE, true)
+                --for k, v in units do
+                --    v:Kill()
+                --end
                 KillPD = false
                 KillT1 = false
             end
@@ -140,41 +140,41 @@ function UnitCapWatchThread(aiBrain)
 end
 
 function UnitCapWatchThreadSorian(aiBrain)
-    #LOG('*AI DEBUG: UnitCapWatchThreadSorian started')
+    --LOG('*AI DEBUG: UnitCapWatchThreadSorian started')
     while true do
         WaitSeconds(30)
         if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) > (GetArmyUnitCap(aiBrain:GetArmyIndex()) - 20) then
             local underCap = false
 
-            # More than 1 T3 Power	  ##(aiBrain, number of units to check for, category of units to check for, category of units to kill off)
+            -- More than 1 T3 Power	  ----(aiBrain, number of units to check for, category of units to check for, category of units to kill off)
             underCap = GetAIUnderUnitCap(aiBrain, 1, categories.TECH3 * categories.ENERGYPRODUCTION * categories.STRUCTURE, categories.TECH1 * categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.DRAGBUILD)
 
-            # More than 9 T2/T3 Defense - shields
+            -- More than 9 T2/T3 Defense - shields
             if underCap ~= true then
                 underCap = GetAIUnderUnitCap(aiBrain, 9, (categories.TECH2 + categories.TECH3) * categories.DEFENSE * categories.STRUCTURE - categories.SHIELD, categories.TECH1 * categories.DEFENSE * categories.STRUCTURE)
             end
 
-            # More than 6 T2/T3 Engineers
+            -- More than 6 T2/T3 Engineers
             if underCap ~= true then
                 underCap = GetAIUnderUnitCap(aiBrain, 6, categories.ENGINEER * (categories.TECH2 + categories.TECH3), categories.TECH1 * categories.ENGINEER - categories.POD)
             end
 
-            # More than 9 T3 Engineers/SCUs
+            -- More than 9 T3 Engineers/SCUs
             if underCap ~= true then
                 underCap = GetAIUnderUnitCap(aiBrain, 9, categories.ENGINEER * categories.TECH3 + categories.SUBCOMMANDER, categories.TECH2 * categories.ENGINEER - categories.ENGINEERSTATION)
             end
 
-            # More than 24 T3 Land Units minus Engineers
+            -- More than 24 T3 Land Units minus Engineers
             if underCap ~= true then
                 underCap = GetAIUnderUnitCap(aiBrain, 24, categories.TECH3 * categories.MOBILE * categories.LAND - categories.ENGINEER, categories.TECH1 * categories.MOBILE * categories.LAND)
             end
 
-            # More than 9 T3 Air Units minus Scouts
+            -- More than 9 T3 Air Units minus Scouts
             if underCap ~= true then
                 underCap = GetAIUnderUnitCap(aiBrain, 9, categories.TECH3 * categories.MOBILE * categories.AIR - categories.INTELLIGENCE, categories.TECH1 * categories.MOBILE * categories.AIR - categories.SCOUT - categories.POD)
             end
 
-            # More than 9 T3 AntiAir
+            -- More than 9 T3 AntiAir
             if underCap ~= true then
                 underCap = GetAIUnderUnitCap(aiBrain, 9, categories.TECH3 * categories.DEFENSE * categories.ANTIAIR, categories.TECH2 * categories.DEFENSE * categories.ANTIAIR)
             end
@@ -189,11 +189,11 @@ function GetAIUnderUnitCap(aiBrain, num, checkCat, killCat)
             v:Kill()
         end
     end
-    #If AI under 90% of units cap, return true
+    --If AI under 90% of units cap, return true
     if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) <= (GetArmyUnitCap(aiBrain:GetArmyIndex()) * .10) then
         return true
     end
-    #If not, wait a tick to prevent lag and return false
+    --If not, wait a tick to prevent lag and return false
     WaitTicks(1)
     return false
 end

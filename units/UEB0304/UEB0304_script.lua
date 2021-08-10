@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UEB0304/UEB0304_script.lua
---#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
---#**
---#**  Summary  :  UEF Quantum Gate Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UEB0304/UEB0304_script.lua
+----**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+----**
+----**  Summary  :  UEF Quantum Gate Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local TQuantumGateUnit = import('/lua/terranunits.lua').TQuantumGateUnit
 
 UEB0304 = Class(TQuantumGateUnit) {

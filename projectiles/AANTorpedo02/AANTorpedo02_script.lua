@@ -1,6 +1,6 @@
-#
-# Aeon Torpedo Bomb
-#
+--
+-- Aeon Torpedo Bomb
+--
 local ATorpedoShipProjectile= import('/lua/aeonprojectiles.lua').ATorpedoShipProjectile
 
 AANTorpedo02 = Class(ATorpedoShipProjectile) {
@@ -12,7 +12,7 @@ AANTorpedo02 = Class(ATorpedoShipProjectile) {
     OnEnterWater = function(self)
         ATorpedoShipProjectile.OnEnterWater(self)
         local army = self:GetArmy()
-        for k, v in self.FxEnterWater do #splash
+        for k, v in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self, army, v):ScaleEmitter(self.FxSplashScale)
         end
     end,

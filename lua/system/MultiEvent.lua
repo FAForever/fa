@@ -1,19 +1,19 @@
-#
-# Call MultiEvent:AddCallback(fun,arg) to set a trigger function which is called when the event is set.
-# You can add as many callbacks as you want.
-#
-# You can't remove a callback once you've added it.
-#
+--
+-- Call MultiEvent:AddCallback(fun,arg) to set a trigger function which is called when the event is set.
+-- You can add as many callbacks as you want.
+--
+-- You can't remove a callback once you've added it.
+--
 MultiEvent = Class {
     __init = function(self)
         self.EventCallbacks = {&1&1 n=0}
         self.EventIsSet = false
     end,
 
-    #
-    # Add a function to be called when this event is set. If the event is already set, the function is called
-    # immediately.
-    #
+    --
+    -- Add a function to be called when this event is set. If the event is already set, the function is called
+    -- immediately.
+    --
     AddCallback = function(self, fn, arg)
         if not fn then
             return
@@ -28,11 +28,11 @@ MultiEvent = Class {
         self.EventCallbacks.n = n+2
     end,
 
-    #
-    # Set the event, calling all triggers waiting on it
-    #
+    --
+    -- Set the event, calling all triggers waiting on it
+    --
     EventSet = function(self)
-        #LOG('*DEBUG: *** EVENT SET ***')
+        --LOG('*DEBUG: *** EVENT SET ***')
         self.EventIsSet = true
 
         local cb = self.EventCallbacks
@@ -48,17 +48,17 @@ MultiEvent = Class {
         cb.n = 0
     end,
 
-    #
-    # Reset the event
-    #
+    --
+    -- Reset the event
+    --
     EventReset = function(self)
-        #LOG('*DEBUG: ..EventReset..')
+        --LOG('*DEBUG: ..EventReset..')
         self.EventIsSet = false
     end,
 
-    #
-    # Destroy the event. Any triggers waiting for it are abandoned.
-    #
+    --
+    -- Destroy the event. Any triggers waiting for it are abandoned.
+    --
     Destroy = function(self)
         local cb = self.EventCallbacks
         for i = 1,cb.n do
@@ -69,11 +69,11 @@ MultiEvent = Class {
 
     WaitFor = function(self)
         if not self.EventIsSet then
-            #LOG('*DEBUG: me AddCallback ',ResumeThread,CurrentThread())
+            --LOG('*DEBUG: me AddCallback ',ResumeThread,CurrentThread())
             self:AddCallback(ResumeThread, CurrentThread())
             SuspendCurrentThread()
-#        else
-#            LOG('*DEBUG: No WaitFor For You')
+--        else
+--            LOG('*DEBUG: No WaitFor For You')
         end
     end,
 }

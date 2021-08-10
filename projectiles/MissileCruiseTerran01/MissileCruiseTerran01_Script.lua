@@ -1,32 +1,32 @@
-#
-# script for projectile Missile
-#
+--
+-- script for projectile Missile
+--
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 
 MissileCruiseTerran01 = Class(Projectile) {
     MissileExhaust = {},
 
-# LAUNCH BEAM
+-- LAUNCH BEAM
     FxLaunchBeamTexture = '/textures/particles/beam_missile_exhaust_01.dds',
-    FxLaunchBeamSize = {-0.5, 0.015}, #Length, Width
-    FxLaunchBeamColor = {1, 1, 0.75}, #R,G,B
+    FxLaunchBeamSize = {-0.5, 0.015}, --Length, Width
+    FxLaunchBeamColor = {1, 1, 0.75}, --R,G,B
     FxLaunchBeamGlow = 0.0,
-# LAUNCH TRAILS
+-- LAUNCH TRAILS
     FxLaunchTrails = {'/effects/emitters/missile_cruise_munition_launch_trail_01_emit.bp',},
     FxLaunchTrailScale = 1,
     FxLaunchTrailOffset = -0.5,
 
-# BEAM
+-- BEAM
     FxBeamTexture = '/textures/particles/beam_missile_exhaust_02.dds',
-    FxBeamSize = {-1, 0.5}, #Length, Width
-    FxBeamColor = {1, 1, 0.75}, #R,G,B
+    FxBeamSize = {-1, 0.5}, --Length, Width
+    FxBeamColor = {1, 1, 0.75}, --R,G,B
     FxBeamGlow = 0.0,
-# TRAILS
+-- TRAILS
     FxTrails = {'/effects/emitters/missile_cruise_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
     FxTrailOffset = -0.5,
 
-# Hit Effects
+-- Hit Effects
     FxUnitHitScale = 1,
     FxImpactUnit = {'/effects/emitters/missile_hit_flash_01_emit.bp',
         '/effects/emitters/missile_hit_fire_01_emit.bp',},
@@ -34,11 +34,11 @@ MissileCruiseTerran01 = Class(Projectile) {
     FxImpactLand = {'/effects/emitters/missile_hit_flash_01_emit.bp',
         '/effects/emitters/missile_hit_fire_01_emit.bp',
         '/effects/emitters/destruction_scorch_01_emit.bp',},
-#    FxWaterHitScale = 2,
-#    FxImpactWater = {'missile_hit_flash_01','missile_hit_fire_01',},
-#    FxUnderWaterHitScale = 1,
+--    FxWaterHitScale = 2,
+--    FxImpactWater = {'missile_hit_flash_01','missile_hit_fire_01',},
+--    FxUnderWaterHitScale = 1,
     FxImpactUnderWater = {},
-#    FxNoneHitScale = 1,
+--    FxNoneHitScale = 1,
     FxImpactNone = {'/effects/emitters/missile_hit_flash_01_emit.bp',
         '/effects/emitters/missile_hit_fire_01_emit.bp',},
 
@@ -61,9 +61,9 @@ MissileCruiseTerran01 = Class(Projectile) {
 
     CruiseMissileThread = function(self)
         self:TrackTarget(false)
-        WaitSeconds(4) #Straight Up
+        WaitSeconds(4) --Straight Up
         self:TrackTarget(true)
-        WaitSeconds(1) #Start Tracking
+        WaitSeconds(1) --Start Tracking
         self:TrackTarget(false)
         self:SetMaxSpeed(2)
         self:SetBallisticAcceleration()
@@ -71,7 +71,7 @@ MissileCruiseTerran01 = Class(Projectile) {
             self.trails[i]:Destroy()
         end
         self.MissileExhaust:Destroy()
-        WaitSeconds(0.5) #Falling
+        WaitSeconds(0.5) --Falling
         local army = self:GetArmy()
 
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_02_emit.bp', army)

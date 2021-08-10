@@ -1,10 +1,10 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/XEC8002/XEC8002_script.lua 
-#** 
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/XEC8002/XEC8002_script.lua 
+--** 
+--** 
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TCivilianStructureUnit = import('/lua/terranunits.lua').TCivilianStructureUnit
 
 XEC8002 = Class(TCivilianStructureUnit) {

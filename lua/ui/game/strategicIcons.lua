@@ -1,4 +1,4 @@
-# Entity- and Joudoki, you agitatin' my dots?
+-- Entity- and Joudoki, you agitatin' my dots?
 GenericIcons = {
     Land        = "/textures/ui/common/game/strategicicons/icon_land_generic_rest.dds",
     LandHL      = "/textures/ui/common/game/strategicicons/icon_land_generic_over.dds",

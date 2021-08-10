@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/xss0304/xss0304_script.lua
-#**  Author(s):  Greg Kohne, Dru Staltman, Gordon DUclos
-#**
-#**  Summary  :  Seaphim Submarine Hunter Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/xss0304/xss0304_script.lua
+--**  Author(s):  Greg Kohne, Dru Staltman, Gordon DUclos
+--**
+--**  Summary  :  Seaphim Submarine Hunter Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
 local SANUallCavitationTorpedo = import('/lua/seraphimweapons.lua').SANUallCavitationTorpedo
 local SDFAjelluAntiTorpedoDefense = import('/lua/seraphimweapons.lua').SDFAjelluAntiTorpedoDefense

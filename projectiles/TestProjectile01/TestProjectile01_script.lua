@@ -1,6 +1,6 @@
-#
-# TestProjectile
-#
+--
+-- TestProjectile
+--
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 
 TestProjectile01 = Class(Projectile)
@@ -17,15 +17,15 @@ TestProjectile01 = Class(Projectile)
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
-        #Polytrail
+        --Polytrail
         CreateTrail(self, -1, self:GetArmy(),self.PolyTrail )
 
-        #Emitter trail
+        --Emitter trail
         for i in self.FxTrails do
             CreateEmitterOnEntity(self,self:GetArmy(),self.FxTrails[i])
         end
 
-        #Beam Trail
+        --Beam Trail
         local beam = CreateBeamEmitter(self.BeamName,self:GetArmy())
         AttachBeamToEntity(beam, self, -1, self:GetArmy())
 

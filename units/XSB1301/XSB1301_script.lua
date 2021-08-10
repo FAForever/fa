@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XSB1301/XSB1301_script.lua
-#**  Author(s):  Jessica St. Croix, Greg Kohne
-#**
-#**  Summary  :  Seraphim T3 Power Generator Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XSB1301/XSB1301_script.lua
+--**  Author(s):  Jessica St. Croix, Greg Kohne
+--**
+--**  Summary  :  Seraphim T3 Power Generator Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
 
 XSB1301 = Class(SEnergyCreationUnit) {

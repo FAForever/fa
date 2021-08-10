@@ -254,7 +254,7 @@ UnitBlueprint {
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 10,
 
-            # must be set to 1/RateOfFire to work
+            -- must be set to 1/RateOfFire to work
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',

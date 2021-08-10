@@ -259,7 +259,7 @@ UnitBlueprint {
         MotionType = 'RULEUMT_None',
         OccupyRects = {
 
-            # offsetX offsetZ  sizeX sizeZ, offset from center of unit
+            -- offsetX offsetZ  sizeX sizeZ, offset from center of unit
             -3,
             0,
             1,
@@ -271,126 +271,126 @@ UnitBlueprint {
         },
         RaisedPlatforms = {
 
-            # The main ramp
-            # TopLeft Offset From Center
+            -- The main ramp
+            -- TopLeft Offset From Center
             -1.5,
 
-            # x
+            -- x
             -1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             1.5,
 
-            # x
+            -- x
             -1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -1.5,
 
-            # x
+            -- x
             1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             1.5,
 
-            # x
+            -- x
             1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # North side
-            # TopLeft Offset From Center
+            -- height
+            -- North side
+            -- TopLeft Offset From Center
             -1.5,
 
-            # x
+            -- x
             -3.4,
 
-            # z
+            -- z
             0,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             1.5,
 
-            # x
+            -- x
             -3.4,
 
-            # z
+            -- z
             0,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -1.5,
 
-            # x
+            -- x
             -1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             1.5,
 
-            # x
+            -- x
             -1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # South side
-            # TopLeft Offset From Center
+            -- height
+            -- South side
+            -- TopLeft Offset From Center
             -1.5,
 
-            # x
+            -- x
             1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             1.5,
 
-            # x
+            -- x
             1.5,
 
-            # z
+            -- z
             0.3,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -1.5,
 
-            # x
+            -- x
             3.4,
 
-            # z
+            -- z
             0,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             1.5,
 
-            # x
+            -- x
             3.4,
 
-            # z
+            -- z
             0,
         },
         RollOffPoints = {

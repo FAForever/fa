@@ -1,10 +1,10 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/UEC1101/UEC1101_script.lua 
-#** 
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/UEC1101/UEC1101_script.lua 
+--** 
+--** 
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TCivilianStructureUnit = import('/lua/terranunits.lua').TCivilianStructureUnit
 
 UEC1101 = Class(TCivilianStructureUnit) {

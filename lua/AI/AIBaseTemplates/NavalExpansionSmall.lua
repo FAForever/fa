@@ -1,47 +1,47 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/NavalExpansionSmall.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/NavalExpansionSmall.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'NavalExpansionSmall',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuilders',
         'T2BalancedUpgradeBuilders',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
-        #DUNCAN - Commented out
-        #'T2EngineerBuilders',
-        #'T3EngineerBuilders',
+        --DUNCAN - Commented out
+        --'T2EngineerBuilders',
+        --'T3EngineerBuilders',
         'EngineerNavalFactoryBuilder',
 
-        # Mass
+        -- Mass
         'EngineerMassBuildersLowerPri',
 
-        # ==== EXPANSION ==== #
+        -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
 
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'T1NavalDefenses',
         'T2NavalDefenses',
         'T3NavalDefenses',
 
-        # ==== ATTACKS ==== #
+        -- ==== ATTACKS ==== --
         'T1SeaFactoryBuilders',
         'T2SeaFactoryBuilders',
         'T3SeaFactoryBuilders',
         'FrequentSeaAttackFormBuilders',
         'MassHunterSeaFormBuilders',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
     },
     NonCheatBuilders = {
@@ -50,9 +50,9 @@ BaseBuilderTemplate {
     },
     BaseSettings = {
         EngineerCount = {
-            Tech1 = 2, #DUNCAN - was 5
-            Tech2 = 1, #DUNCAN - was 5
-            Tech3 = 1, #DUNCAN - was 5
+            Tech1 = 2, --DUNCAN - was 5
+            Tech2 = 1, --DUNCAN - was 5
+            Tech3 = 1, --DUNCAN - was 5
             SCU = 0,
         },
         FactoryCount = {

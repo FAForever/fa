@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSS0203/XSS0203_script.lua
-#**
-#**  Summary  :  Seraphim Attack Sub Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XSS0203/XSS0203_script.lua
+--**
+--**  Summary  :  Seraphim Attack Sub Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
 local SWeapons = import('/lua/seraphimweapons.lua')
 
@@ -32,13 +32,13 @@ XSS0203 = Class(SSubUnit) {
     
     OnLayerChange = function(self, new, old)
 		SSubUnit.OnLayerChange(self, new, old)
-		#if self.WeaponsEnabled then
+		--if self.WeaponsEnabled then
     		if new == 'Sub' then
                 ChangeState( self, self.CannonDisabled )
     		elseif new == 'Water' then
                 ChangeState( self, self.CannonEnabled )
     		end
-    	#end
+    	--end
     end,
     
     CannonEnabled = State() {

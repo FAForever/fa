@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/RushExpansionAirSmall.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/RushExpansionAirSmall.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'RushExpansionAirSmall',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
         'T2BalancedUpgradeBuildersExpansion',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -24,14 +24,14 @@ BaseBuilderTemplate {
         'EngineerFactoryConstructionAirHigherPriority',
         'AirInitialFactoryConstruction',
 
-        # Build Mass low pri at this base
+        -- Build Mass low pri at this base
         'EngineerMassBuildersLowerPri',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
@@ -54,8 +54,8 @@ BaseBuilderTemplate {
         },
 
         FactoryCount = {
-            Land = 0, #DUNCAN - was 0
-            Air = 3, #DUNCAN - was 5
+            Land = 0, --DUNCAN - was 0
+            Air = 3, --DUNCAN - was 5
             Sea = 0,
             Gate = 0,
         },
@@ -78,7 +78,7 @@ BaseBuilderTemplate {
             return 0
         end
 
-        local threatCutoff = 10 # value of overall threat that determines where enemy bases are
+        local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 75
@@ -86,7 +86,7 @@ BaseBuilderTemplate {
             return 100
         elseif distance > 250 then
             return 50
-        else # within 250
+        else -- within 250
             return 10
         end
 

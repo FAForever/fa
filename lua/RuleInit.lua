@@ -1,8 +1,8 @@
-# Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#
-# This is the minimal setup required to load the game rules.
+-- Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
+--
+-- This is the minimal setup required to load the game rules.
 
-# Do global init
+-- Do global init
 __blueprints = {}
 
 doscript '/lua/system/config.lua'

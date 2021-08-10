@@ -18,11 +18,11 @@ ObjectiveArrow = Class(Entity) {
             spec.AttachTo.Trash:Add(self)
             self:AttachBoneTo(-1,spec.AttachTo,-1)
 
-            # Position at the top of the parent's collision box
+            -- Position at the top of the parent's collision box
             local yOff = 0
             local extents = spec.AttachTo:GetCollisionExtents()
             if extents then
-                # scale up arrow based on unit's size
+                -- scale up arrow based on unit's size
                 unitScale = math.min( extents.Max.x - extents.Min.x, extents.Max.z - extents.Min.z)
                 unitScale = math.max( unitScale, 1.0 )
 
@@ -37,7 +37,7 @@ ObjectiveArrow = Class(Entity) {
             ForkThread(self.BounceThread,self)
         end
 
-        # magic 0.4 scaling so spec.Size can be specified in OGrid units
+        -- magic 0.4 scaling so spec.Size can be specified in OGrid units
         self:SetDrawScale(0.4 * self.Size * unitScale)
     end,
 
@@ -47,7 +47,7 @@ ObjectiveArrow = Class(Entity) {
                 return
             end
 
-            #LOG('sin =',math.sin(self.BounceTime))
+            --LOG('sin =',math.sin(self.BounceTime))
             local yOff = self.SavedOffset + math.sin(self.BounceTime) / 4
 
             self:SetParentOffset( Vector(0,yOff,0) )

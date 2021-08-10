@@ -273,84 +273,84 @@ UnitBlueprint {
         MotionType = 'RULEUMT_None',
         RaisedPlatforms = {
 
-            # Platform 1
-            # TopLeft Offset From Center
+            -- Platform 1
+            -- TopLeft Offset From Center
             -0.8,
 
-            # x
+            -- x
             -0.5,
 
-            # z
+            -- z
             0.15,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             0.8,
 
-            # x
+            -- x
             -0.5,
 
-            # z
+            -- z
             0.15,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -0.8,
 
-            # x
+            -- x
             1.1,
 
-            # z
+            -- z
             0.15,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             0.8,
 
-            # x
+            -- x
             1.1,
 
-            # z
+            -- z
             0.15,
 
-            # Platform 2
-            # TopLeft Offset From Center
+            -- Platform 2
+            -- TopLeft Offset From Center
             -2.25,
 
-            # x
+            -- x
             -2.25,
 
-            # z
+            -- z
             0.05,
 
-            # height
-            # TopRight Offset From Center
+            -- height
+            -- TopRight Offset From Center
             2.25,
 
-            # x
+            -- x
             -2.25,
 
-            # z
+            -- z
             0.05,
 
-            # height
-            # BottomLeft Offset From Center
+            -- height
+            -- BottomLeft Offset From Center
             -2.25,
 
-            # x
+            -- x
             2.25,
 
-            # z
+            -- z
             0.05,
 
-            # height
-            # BottomRight Offset From Center
+            -- height
+            -- BottomRight Offset From Center
             2.25,
 
-            # x
+            -- x
             2.25,
 
-            # z
+            -- z
             0.05,
         },
         RollOffPoints = {

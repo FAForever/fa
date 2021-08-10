@@ -1,6 +1,6 @@
-#
-# UEF Small Yield Nuclear Bomb
-#
+--
+-- UEF Small Yield Nuclear Bomb
+--
 local CIFProtonBombProjectile = import('/lua/cybranprojectiles.lua').CIFProtonBombProjectile
 
 CIFProtonBomb01 = Class(CIFProtonBombProjectile) {

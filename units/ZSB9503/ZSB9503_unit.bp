@@ -247,7 +247,7 @@ UnitBlueprint {
     SelectionSizeZ = 8,
     SelectionThickness = 0.21,
     SizeX = 4,
-    SizeY = 3, #from 2, for beam weapons
+    SizeY = 3, --from 2, for beam weapons
     SizeZ = 10,
     StrategicIconName = 'icon_factory2_naval',
     StrategicIconSortPriority = 215,

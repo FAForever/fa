@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Cybran Neutron Cluster bomb
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02.lua
+--**  Author(s):  Gordon Duclos
+--**
+--**  Summary  :  Cybran Neutron Cluster bomb
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 CIFNeutronClusterBomb02 = Class(import('/lua/cybranprojectiles.lua').CNeutronClusterBombChildProjectile) {
 

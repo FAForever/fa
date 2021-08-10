@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XAC1401/XAC1401_script.lua
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#**
-#**  Summary  :  Aeon Agricultural Building, Ver1
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XAC1401/XAC1401_script.lua
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+--**
+--**  Summary  :  Aeon Agricultural Building, Ver1
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
 
 XAC1401 = Class(ACivilianStructureUnit) {

@@ -1,6 +1,6 @@
-# /mods/CampaignBranch/ExtractMPBlueprints.lua
-#
-# Run this script with ExtractMPBlueprints.bat
+-- /mods/CampaignBranch/ExtractMPBlueprints.lua
+--
+-- Run this script with ExtractMPBlueprints.bat
 
 local datadir = '../../'
 local outfile = 'QAVChecklist.txt'
@@ -16,9 +16,9 @@ function LOC(s)
     return (string.gsub(s, '^<[^>]*>', ''))
 end
 
-#===================================================================
-# Define constructors that get called from the Blueprint files
-#-------------------------------------------------------------------
+--===================================================================
+-- Define constructors that get called from the Blueprint files
+---------------------------------------------------------------------
 function Sound(t)
     return t
 end
@@ -33,9 +33,9 @@ function UnitBlueprint(bp)
 end
 
 
-#===================================================================
-# Generate the partial blueprint file
-#-------------------------------------------------------------------
+--===================================================================
+-- Generate the partial blueprint file
+---------------------------------------------------------------------
 function LoadAllBlueprints()
     for i,d in io.dir(datadir .. 'units/*.*') do
         current_id = string.lower(d)
@@ -55,14 +55,14 @@ function dump(bp, file)
     file:write('  Strategic: ', bp.StrategicIconName or 'none            ', '                    In-game icon.                                                         Selected unit will display this icon when fully zoomed out and on the Unit View UI.\n')
 
     if bp.Audio then
-#-------file:write('  Sounds:\n')
+---------file:write('  Sounds:\n')
         for name, t in sortedpairs(bp.Audio) do
             file:write('    ',name,'                                          Sound is present.                                             Selected unit will play sound when used.  \n')
         end
     end
 
      if bp.General.CommandCaps then
-#--------file:write('  Command capabilities:\n')
+----------file:write('  Command capabilities:\n')
          for name,flag in sortedpairs(bp.General.CommandCaps) do
              if flag then
                  local cap = string.gsub(name,'RULEUCC_','')
@@ -85,12 +85,12 @@ function dump(bp, file)
      end
 
     if bp.Defense and bp.Defense.Shield then
-#-------file:write("  Defense:\n")
+---------file:write("  Defense:\n")
         file:write("    shield                                       Unit has a shield.                                        Selected unit has a shield that plays appropriate sounds, effects, and protects against enemy attacks.\n");
     end
 
     if bp.Display then
-#-------file:write("  Display:\n")
+---------file:write("  Display:\n")
         for k,v in sortedpairs(bp.Display) do
             if string.find(k, "^Animation") then
                 file:write("    ",k,'                                        Animations are present.                                             Selected unit plays appropriate animations in game when engaged to do so.        \n')
@@ -113,27 +113,27 @@ function dump(bp, file)
     end
  
     if bp.Enhancements then
-#-------file:write("  Enhancments:\n")
+---------file:write("  Enhancments:\n")
         for k,v in sortedpairs(bp.Enhancements) do
             file:write("    ",k,'                                         Enhancement behavior.                                             Selected unit can enable\disable\use enhancment in game.        \n')
         end  
     end
     if bp.Physics then
-#-------file:write("  Physics\n")
+---------file:write("  Physics\n")
         file:write("    Motion type: ", string.gsub(bp.Physics.MotionType or 'None', 'RULEUMT_', ''), '                             Movement type.                                                        Selected unit will use this form of movement. \n')
     end
 
     if bp.Wreckage and bp.Wreckage.WreckageLayers then
         file:write("  Wreakage when unit destroyed                    Wreckage behavior.                                                   Selected unit will have sound, effects and leave a wreckage when it is destroyed.\n")
-#        for k,v in sortedpairs(bp.Wreckage.WreckageLayers) do
-#            if v then
-#                file:write("    ",k,"                                          Wreckage behavior.                                                   Selected unit will have sound, effects and leave a wreckage when it is destroyed.\n")
-#            end
-#        end
+--        for k,v in sortedpairs(bp.Wreckage.WreckageLayers) do
+--            if v then
+--                file:write("    ",k,"                                          Wreckage behavior.                                                   Selected unit will have sound, effects and leave a wreckage when it is destroyed.\n")
+--            end
+--        end
     end
     
     if bp.Adjacency then
-#-------file:write("  Adjacency:\n")
+---------file:write("  Adjacency:\n")
         for name, t in sortedpairs(bp.Adjacency) do
              file:write('    ',name,'                                Adjancency behavior.                                        Selected unit will give bonus when built next to other units.\n')
         end
@@ -141,7 +141,7 @@ function dump(bp, file)
     
     
     if bp.Weapon then
-#-------file:write('  Weapon Type, Category and Sounds:\n')
+---------file:write('  Weapon Type, Category and Sounds:\n')
         for i,weapon in bp.Weapon do
             file:write('    ',weapon.Label,'   ',weapon.WeaponCategory,'                            ',weapon.DisplayName,' is present.                                             Selected unit will fire this weapon.\n')
             if weapon.Audio then
@@ -155,14 +155,14 @@ function dump(bp, file)
     end
 
 
-#---file:write('\n')
+-----file:write('\n')
 end
 
 
 function WriteAllBlueprints()
     local n = 0
     local file = io.open(outfile, "w")
-    file:write("# Generated by ExtractMPBlueprints.lua (", os.date(), " ", os.getenv "USERNAME", ")\n")
+    file:write(HASHTAGREPLACE)
 
     for id,bp in sortedpairs(all_blueprints) do
 

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /units/XSA0402/XSA0402_script.lua
-#**  Author(s):  Greg Kohne, Gordon Duclos
-#**
-#**  Summary  :  Seraphim Experimental Strategic Bomber Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /units/XSA0402/XSA0402_script.lua
+--**  Author(s):  Greg Kohne, Gordon Duclos
+--**
+--**  Summary  :  Seraphim Experimental Strategic Bomber Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')

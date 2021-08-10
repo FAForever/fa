@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UAS0305/UAS0305_script.lua
---#**  Author(s):  David Tomandl
---#**
---#**  Summary  :  Aeon T3 Sonar
---#**
---#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UAS0305/UAS0305_script.lua
+----**  Author(s):  David Tomandl
+----**
+----**  Summary  :  Aeon T3 Sonar
+----**
+----**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
 local AIFQuasarAntiTorpedoWeapon = import('/lua/aeonweapons.lua').AIFQuasarAntiTorpedoWeapon
 

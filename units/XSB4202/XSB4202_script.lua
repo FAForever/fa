@@ -1,11 +1,11 @@
---#****************************************************************************
---#**
---#**  File     :  /units/XSB4202/XSB4202_script.lua
---#**
---#**  Summary  :  Seraphim Shield Generator Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /units/XSB4202/XSB4202_script.lua
+----**
+----**  Summary  :  Seraphim Shield Generator Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local SShieldStructureUnit = import('/lua/seraphimunits.lua').SShieldStructureUnit
 
 XSB4202 = Class(SShieldStructureUnit) {

@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URB3202/URB3202_script.lua
---#**  Author(s):  John Comes
---#**
---#**  Summary  :  Cybran Long Range Sonar Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URB3202/URB3202_script.lua
+----**  Author(s):  John Comes
+----**
+----**  Summary  :  Cybran Long Range Sonar Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
 
 URB3302 = Class(CSeaUnit) {

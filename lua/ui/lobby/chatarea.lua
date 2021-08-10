@@ -56,7 +56,7 @@ ChatArea = Class(Group){
     GetDefaultStyle = function(self)
         return {
             -- storing style values in a flat table for easy access
-            fontColor = 'FFFFFFFF', --#FFFFFFFF
+            fontColor = 'FFFFFFFF', ----FFFFFFFF
             fontFamily = UIUtil.bodyFont,
             fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14,
 

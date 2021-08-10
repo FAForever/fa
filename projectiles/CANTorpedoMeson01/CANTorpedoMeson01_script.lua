@@ -1,6 +1,6 @@
-#
-# Cybran Non-guided Torpedo, Made to be fired from above the water
-#
+--
+-- Cybran Non-guided Torpedo, Made to be fired from above the water
+--
 local CTorpedoShipProjectile = import('/lua/cybranprojectiles.lua').CTorpedoShipProjectile
 
 CANTorpedoMeson01 = Class(CTorpedoShipProjectile) {
@@ -16,7 +16,7 @@ CANTorpedoMeson01 = Class(CTorpedoShipProjectile) {
         CTorpedoShipProjectile.OnEnterWater(self)
         local army = self:GetArmy()
 
-        for i in self.FxExitWaterEmitter do #splash
+        for i in self.FxExitWaterEmitter do --splash
             CreateEmitterAtEntity(self,army,self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
         end
 

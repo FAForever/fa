@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Play campaign movies on demand
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -25,13 +25,13 @@ local subtitleThread = false
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(
         function()
-            # Display subtitles
+            -- Display subtitles
             local lastOff = 0
             for k,v in captions do
                 WaitSeconds(v.offset - lastOff)
                 textControl:DeleteAllItems()
                 locText = LOC(v.text)
-                #LOG("Wrap: ",locText)
+                --LOG("Wrap: ",locText)
                 local lines = WrapText(locText, textControl.Width(), function(text) return textControl:GetStringAdvance(text) end)
                 for i,line in lines do
                     textControl:AddItem(line)
@@ -69,7 +69,7 @@ function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
 
     movie:DisableHitTest()    -- get clicks to parent group
     
-    # black background for subtitles (only impacts 16:9 ratio slightly)
+    -- black background for subtitles (only impacts 16:9 ratio slightly)
     local subtitleBG = Bitmap(movie)
 
     local textArea = ItemList(subtitleBG)

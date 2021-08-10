@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XAA0305/XAA0305_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Aeon AA Gunship Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XAA0305/XAA0305_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Aeon AA Gunship Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
 local ADFQuadLaserLightWeapon = import('/lua/aeonweapons.lua').ADFQuadLaserLightWeapon

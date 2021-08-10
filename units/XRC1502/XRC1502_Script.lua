@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XRC1502/XRC1502_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Cybran Manufacturing Center, Ver1
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XRC1502/XRC1502_script.lua
+--**  Author(s):  John Comes, David Tomandl
+--**
+--**  Summary  :  Cybran Manufacturing Center, Ver1
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
 
 XRC1502 = Class(CCivilianStructureUnit) {

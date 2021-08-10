@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1105/UAB1105_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Aeon Energy Storage
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1105/UAB1105_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Aeon Energy Storage
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local SEnergyStorageUnit = import('/lua/seraphimunits.lua').SEnergyStorageUnit
 
 XSB1105 = Class(SEnergyStorageUnit) {

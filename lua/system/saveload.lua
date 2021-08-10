@@ -1,11 +1,11 @@
-# Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-# 
-# This is the code that registers the things that need to be
-# serialized by name instead of by value.  Any C functions need to be
-# in here because they cannot be serialized by value.  Also, any other
-# tables (or whatever) that are created by the C code need to be
-# serialized by name.
-# 
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+-- 
+-- This is the code that registers the things that need to be
+-- serialized by name instead of by value.  Any C functions need to be
+-- in here because they cannot be serialized by value.  Also, any other
+-- tables (or whatever) that are created by the C code need to be
+-- serialized by name.
+-- 
 
 __serialize_name_for_object = {}
 __serialize_object_for_name = {}

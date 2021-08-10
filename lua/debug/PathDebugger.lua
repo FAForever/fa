@@ -3,7 +3,7 @@
 --* Author: Bob Berry
 --* Summary: Pathfinder debugger
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -94,9 +94,9 @@ function CreateUI()
 
     local debugger = PathDebugger()
 
-    #
-    # LOD Level
-    #
+    --
+    -- LOD Level
+    --
     local lodBtnLft = PDButton(backdrop,"<")
     LayoutHelpers.AtTopIn(lodBtnLft,backdrop,1)
     lodBtnLft.Left:Set( backdrop.Left )
@@ -116,9 +116,9 @@ function CreateUI()
         ExecLuaInSim('pathdebug_LodMinus',nil)
     end
 
-    #
-    # CellGroup
-    #
+    --
+    -- CellGroup
+    --
     local grpBtnLft = PDButton(backdrop,"<")
     LayoutHelpers.Below(grpBtnLft,lodBtnLft,3)
     grpBtnLft.Left:Set( backdrop.Left )
@@ -138,9 +138,9 @@ function CreateUI()
         ExecLuaInSim('pathdebug_GroupMinus',nil)
     end
 
-    #
-    # Boolean options
-    #
+    --
+    -- Boolean options
+    --
     local gridBox = PDCheckBox(backdrop,"Grid","pathdebug_ShowGrid")
     LayoutHelpers.Below(gridBox,grpBtnLft,3)
     gridBox.Left:Set(backdrop.Left)
@@ -165,9 +165,9 @@ function CreateUI()
     LayoutHelpers.Below(dirtyBox,occBox,1)
     dirtyBox.Left:Set(backdrop.Left)
 
-    #
-    # Start / Step path finder
-    #
+    --
+    -- Start / Step path finder
+    --
     local startFind = PDButton(backdrop,"Start")
     startFind.Top:Set( function() return dirtyBox.Bottom() + 3 end )
     startFind.Left:Set( dialog.Left )
@@ -188,9 +188,9 @@ function CreateUI()
         end
     end
 
-    #
-    # Set up our event handler to eat input from the WorldView when necessary
-    #
+    --
+    -- Set up our event handler to eat input from the WorldView when necessary
+    --
     worldView.EventRedirect = function(self,event)
         if bStartFindMode then
             if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then

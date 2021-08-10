@@ -923,7 +923,7 @@ end
 --  CompareOp=<op>,   -- op is one of: '<=', '>=', '<', '>', or '=='
 --  Value=<value>,
 --  [Category=<category>], -- optional to compare to a blueprint stat
---  ShowProgress, optional: shows #/#. may not make sense for all compare types
+--  ShowProgress, optional: shows --/--. may not make sense for all compare types
 -- }
 -- Note: Be careful when using '==' as the stat is only checked every 5 ticks.
 function ArmyStatCompare(Type, Complete, Title, Description, Action, Target)
@@ -1090,12 +1090,12 @@ function CategoryStatCompare(Type, Complete, Title, Description, Action, Target)
 end
 
 -- Protect
--- Fails if # of units in list falls below NumRequired before the timer expires
+-- Fails if -- of units in list falls below NumRequired before the timer expires
 -- or, in the case of no timer, the objective is manually update to complete.
 -- Target = {
 --  Units = {},
 --  Timer = <seconds> or nil,   -- if nil, requires manual completion
---  NumRequired = <#>,          -- how many must survive
+--  NumRequired = <-->,          -- how many must survive
 -- }
 function Protect(Type, Complete, Title, Description, Target)
 

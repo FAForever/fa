@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URB2302/URB2302_script.lua
---#**  Author(s):  John Comes, David Tomandl
---#**
---#**  Summary  :  Cybran Long Range Artillery Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URB2302/URB2302_script.lua
+----**  Author(s):  John Comes, David Tomandl
+----**
+----**  Summary  :  Cybran Long Range Artillery Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon

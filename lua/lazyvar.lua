@@ -1,6 +1,6 @@
-#
-# LazyVar module
-#
+--
+-- LazyVar module
+--
 
 
 local EvalContext = nil
@@ -11,8 +11,8 @@ LazyVarMetaTable.__index = LazyVarMetaTable
 
 local WeakKeyMeta = { __mode = 'k' }
 
-# Set this true to get tracebacks in error messages. It slows down lazyvars a lot,
-# so don't use except when debugging.
+-- Set this true to get tracebacks in error messages. It slows down lazyvars a lot,
+-- so don't use except when debugging.
 ExtendedErrorMessages = false
 
 function LazyVarMetaTable:__call()
@@ -77,7 +77,7 @@ function LazyVarMetaTable:SetValue(value)
     self.compute = nil
     self.trace = nil
     self[1] = value
-    # Now remove us from the used_by lists for any lazy vars we used to use.
+    -- Now remove us from the used_by lists for any lazy vars we used to use.
     for u in self.uses do
         u.used_by[self] = nil
     end

@@ -1,30 +1,30 @@
---#****************************************************************************
---#**
---#**  File     :  /lua/sim/buff.lua
---#**
---#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /lua/sim/buff.lua
+----**
+----**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 
---# The Unit's BuffTable for applied buffs looks like this:
---#
---# Unit.Buffs = {
---#    Affects = {
---#        <AffectType (Regen/MaxHealth/etc)> = {
---#            BuffName = {
---#                Count = i,
---#                Add = X,
---#                Mult = X,
---#            }
---#        }
---#    }
---#    BuffTable = {
---#        <BuffType (LEVEL/CATEGORY)> = {
---#            BuffName = {
---#                Count = i,
---#                Trash = trashbag,
---#            }
---#        }
---#    }
+---- The Unit's BuffTable for applied buffs looks like this:
+----
+---- Unit.Buffs = {
+----    Affects = {
+----        <AffectType (Regen/MaxHealth/etc)> = {
+----            BuffName = {
+----                Count = i,
+----                Add = X,
+----                Mult = X,
+----            }
+----        }
+----    }
+----    BuffTable = {
+----        <BuffType (LEVEL/CATEGORY)> = {
+----            BuffName = {
+----                Count = i,
+----                Trash = trashbag,
+----            }
+----        }
+----    }
 
 --Function to apply a buff to a unit.
 --This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.

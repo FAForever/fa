@@ -200,7 +200,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 2.0, #from 0.4
+        Elevation = 2.0, --from 0.4
         GroundCollisionOffset = 0.2,
         MaxAcceleration = 10,
         MaxSpeed = 10,

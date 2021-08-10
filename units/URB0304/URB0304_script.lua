@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URB0304/URB0304_script.lua
---#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
---#**
---#**  Summary  :  Cybran Quantum Gate
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URB0304/URB0304_script.lua
+----**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+----**
+----**  Summary  :  Cybran Quantum Gate
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CQuantumGateUnit = import('/lua/cybranunits.lua').CQuantumGateUnit
 local EffectUtil = import('/lua/EffectUtilities.lua')
 

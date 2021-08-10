@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/TurtleMain.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/TurtleMain.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'TurtleMain',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuilders',
         'T2BalancedUpgradeBuilders',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -23,38 +23,38 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstructionAirHigherPriority',
 
-        # Engineer Support buildings
+        -- Engineer Support buildings
         'EngineeringSupportBuilder',
 
-        # Build energy at this base
+        -- Build energy at this base
         'EngineerEnergyBuilders',
 
-        # Build Mass high pri at this base
+        -- Build Mass high pri at this base
         'EngineerMassBuildersHighPri',
 
-        # Extractors
+        -- Extractors
         'Time Exempt Extractor Upgrades',
 
-        # ACU Builders
+        -- ACU Builders
         'Default Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
         'ACUUpgrades - Tech 2 Engineering',
         'ACUUpgrades - Shields',
 
-        # ACU Defense
+        -- ACU Defense
         'T1ACUDefenses',
         'T2ACUDefenses',
         'T2ACUShields',
         'T3ACUShields',
         'T3ACUNukeDefenses',
 
-        # ==== EXPANSION ==== #
+        -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
         'EngineerFirebaseBuilders',
 
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
@@ -83,10 +83,10 @@ BaseBuilderTemplate {
 
         'MiscDefensesEngineerBuilders',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
 
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
@@ -102,7 +102,7 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
@@ -118,11 +118,11 @@ BaseBuilderTemplate {
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== ARTILLERY BUILDERS ==== #
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
         'T3ArtilleryFormBuilders',
 
@@ -131,7 +131,7 @@ BaseBuilderTemplate {
         'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
 
@@ -166,16 +166,16 @@ BaseBuilderTemplate {
             SCU = 3,
         },
         FactoryCount = {
-            #DUNCAN - was 3,1,0,1
+            --DUNCAN - was 3,1,0,1
             Land = 7,
             Air = 4,
             Sea = 0,
             Gate = 1,
         },
         MassToFactoryValues = {
-            T1Value = 6, #10
-            T2Value = 15, #25
-            T3Value = 22.5, #37.5
+            T1Value = 6, --10
+            T2Value = 15, --25
+            T3Value = 22.5, --37.5
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
@@ -199,16 +199,16 @@ BaseBuilderTemplate {
         if islandMarker then
             isIsland = true
         end
-        #If we're playing on an island map,  use this plan
+        --If we're playing on an island map,  use this plan
         if isIsland then
             return Random(50, 100), 'turtle'
-        #If we're playing on a 256 map, do not turtle
+        --If we're playing on a 256 map, do not turtle
         elseif mapSizeX < 500 and mapSizeZ < 500 then
             return 10, 'turtle'
-        #If we're playing on a 512 map, possibly go rush, possibly go turtle
+        --If we're playing on a 512 map, possibly go rush, possibly go turtle
         elseif mapSizeX > 500 and mapSizeZ > 500 and mapSizeX < 1000 and mapSizeZ < 1000 then
             return 50, 'turtle'
-        #If we're playing on a 1024 or bigger, turtling is best.
+        --If we're playing on a 1024 or bigger, turtling is best.
         elseif mapSizeX > 1000 and mapSizeZ > 1000 then
             return Random(60, 100), 'turtle'
         elseif mapSizeX > 2000 and mapSizeZ > 2000 then

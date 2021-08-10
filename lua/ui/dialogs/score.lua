@@ -40,8 +40,8 @@ local campaignScore = ''
 
 scoreScreenActive = false
 
-# '<LOC SCORE_0058>Debrief'
-# '<LOC SCORE_0059>Combat Report'
+-- '<LOC SCORE_0058>Debrief'
+-- '<LOC SCORE_0059>Combat Report'
 
 local tabs = {
     {
@@ -1135,13 +1135,13 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
 
         local curButton = UIUtil.CreateButtonStd(bg, '/scx_menu/tab_btn/tab', value.title, 16, nil, nil, "UI_Tab_Click_02", "UI_Tab_Rollover_02")
         if prev then
-            #curButton.Left:Set(function() return prev.Right() + 0 end)
-            #curButton.Bottom:Set(function() return prev.Bottom() end)
+            --curButton.Left:Set(function() return prev.Right() + 0 end)
+            --curButton.Bottom:Set(function() return prev.Bottom() end)
             LayoutHelpers.RightOf(curButton, prev, -5)
         else
-            #LayoutHelpers.RelativeTo(curButton, bg,
-            #    UIUtil.SkinnableFile('/dialogs/score-victory-defeat/score-victory-defeat_layout.lua'),
-            #    'l_general_btn', 'panel_bmp', -10)
+            --LayoutHelpers.RelativeTo(curButton, bg,
+            --    UIUtil.SkinnableFile('/dialogs/score-victory-defeat/score-victory-defeat_layout.lua'),
+            --    'l_general_btn', 'panel_bmp', -10)
             LayoutHelpers.AtLeftTopIn(curButton, bg, 17, 57)
             defaultTab = curButton
         end

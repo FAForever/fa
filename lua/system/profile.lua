@@ -40,8 +40,8 @@ function diff_checkpoints(check1, check2)
     local t1 = checkpoint_to_table(check1)
     local t2 = checkpoint_to_table(check2)
 
-    # t1 can be nil, which means to use the total time up to t2.
-    # (t2 being nil doesn't make sense here.)
+    -- t1 can be nil, which means to use the total time up to t2.
+    -- (t2 being nil doesn't make sense here.)
     if t1==nil then
         return t2
     end
@@ -70,12 +70,12 @@ end
 function dumptimes(t)
     LOG(' ')
     LOG(repr(t.func,nil,0), ' (', t.ncalls,' calls):')
-    #LOG('    clocked:         ' .. strtime(t.clocked))
+    --LOG('    clocked:         ' .. strtime(t.clocked))
     LOG('    total:           ' .. strtime(t.total))
     LOG('    here:            ' .. strtime(t.here))
     LOG('    in c children:   ' .. strtime(t.in_c_children))
     LOG('    in lua children: ' .. strtime(t.in_lua_children))
-    #LOG('    yielded:         ' .. strtime(t.yielded))
+    --LOG('    yielded:         ' .. strtime(t.yielded))
 end
 
 
@@ -92,7 +92,7 @@ function report(check1, check2, key)
         sum_here = sum_here + t.here
     end
 
-    # Print only functions responsible for the first 99% of time spent. This cuts off a lot of noise.
+    -- Print only functions responsible for the first 99% of time spent. This cuts off a lot of noise.
     sum_report = 0
     for i,t in ipairs(dt) do
         sum_report = sum_report + t[key]
@@ -112,7 +112,7 @@ end
 function memreport()
     local all = table.copy(debug.allocinfo())
 
-    # Sum up totals by stacktrace
+    -- Sum up totals by stacktrace
     local rt = {}
     for obj,trace in all do
         local sum = rt[trace] or { objects=0, bytes=0, trace=trace }
@@ -125,7 +125,7 @@ function memreport()
     rt = table.values(rt)
     table.sort(rt, sort_down_by 'bytes')
 
-    # Dump report
+    -- Dump report
     local n = 0
     for i,sum in rt do
         LOG(sum.bytes,' bytes in ',sum.objects,' objects of type ',sum.trace)

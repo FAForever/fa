@@ -4,10 +4,10 @@ UnitBlueprint {
         TargetBones = {
             'Torso',
             'Head',
-#            'Right_Arm01',
-#            'Left_Arm01',
-#            'Left_Thigh',
-#            'Right_Thigh',
+--            'Right_Arm01',
+--            'Left_Arm01',
+--            'Left_Thigh',
+--            'Right_Thigh',
         },
     },
     Audio = {

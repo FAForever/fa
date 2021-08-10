@@ -110,7 +110,7 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'ASF', # Light
+        ArmorType = 'ASF', -- Light
         EconomyThreatLevel = 0,
         Health = 1725,
         MaxHealth = 1725,
@@ -286,7 +286,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200, # 100
+            Damage = 200, -- 100
             DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
@@ -297,12 +297,12 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Missiles1',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 2
+            MuzzleSalvoDelay = 0, -- 0.1
+            MuzzleSalvoSize = 1, -- 2
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp',
             ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 1, # 2
+            ProjectilesPerOnFire = 1, -- 2
             RackBones = {
                 {
                     MuzzleBones = {
@@ -322,7 +322,7 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
+            TargetCheckInterval = 0.5, -- 0.3
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -357,7 +357,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200, # 100
+            Damage = 200, -- 100
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = 'Normal',
@@ -369,13 +369,13 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Missiles2',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 2
+            MuzzleSalvoDelay = 0, -- 0.1
+            MuzzleSalvoSize = 1, -- 2
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp',
             ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 1, #2
+            ProjectilesPerOnFire = 1, --2
             RackBones = {
                 {
                     MuzzleBones = {
@@ -395,7 +395,7 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
+            TargetCheckInterval = 0.5, -- 0.3
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',

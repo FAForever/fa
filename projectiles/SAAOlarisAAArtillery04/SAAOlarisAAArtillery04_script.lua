@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SAAOlarisAAArtillery04/SAAOlarisAAArtillery04_script.lua
-#**  Author(s):  Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Olaris AA Artillery Projectile script, XSS0202
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SAAOlarisAAArtillery04/SAAOlarisAAArtillery04_script.lua
+--**  Author(s):  Gordon Duclos, Aaron Lundquist
+--**
+--**  Summary  :  Olaris AA Artillery Projectile script, XSS0202
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 SAAOlarisAAArtillery04 = Class(import('/lua/seraphimprojectiles.lua').SOlarisAAArtillery) {
 }

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/ZEB9503/ZEB9503_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  UEF Tier 2 Naval Factory Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/ZEB9503/ZEB9503_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  UEF Tier 2 Naval Factory Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
 

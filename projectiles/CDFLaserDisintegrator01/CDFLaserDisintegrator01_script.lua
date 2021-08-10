@@ -1,6 +1,6 @@
-#
-# Cybran disintegrator laser
-#
+--
+-- Cybran disintegrator laser
+--
 local CDisintegratorLaserProjectile = import('/lua/cybranprojectiles.lua').CDisintegratorLaserProjectile02
 CDFLaserDisintegrator01 = Class(CDisintegratorLaserProjectile) {}
 

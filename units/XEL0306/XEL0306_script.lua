@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XEL0306/XEL0306_script.lua
-#**  Author(s):  Jessica St. Croix, Dru Staltman
-#**
-#**  Summary  :  UEF Mobile Missile Platform Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XEL0306/XEL0306_script.lua
+--**  Author(s):  Jessica St. Croix, Dru Staltman
+--**
+--**  Summary  :  UEF Mobile Missile Platform Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TIFCruiseMissileUnpackingLauncher = import('/lua/terranweapons.lua').TIFCruiseMissileUnpackingLauncher

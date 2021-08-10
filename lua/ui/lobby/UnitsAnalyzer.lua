@@ -200,12 +200,12 @@ CategoriesHidden  = {
 }
 
 Factions = {
-    { Name = 'AEON',     Color = 'FF238C00' }, --#FF238C00
-    { Name = 'UEF',      Color = 'FF006CD9' }, --#FF006CD9
-    { Name = 'CYBRAN',   Color = 'FFB32D00' }, --#FFB32D00
-    { Name = 'SERAPHIM', Color = 'FFFFBF00' }, --#FFFFBF00
-    { Name = 'NOMADS',   Color = 'FFFF7200' }, --#FFFF7200
-    { Name = 'UNKNOWN',  Color = 'FFD619CE' }, --#FFD619CE
+    { Name = 'AEON',     Color = 'FF238C00' }, ----FF238C00
+    { Name = 'UEF',      Color = 'FF006CD9' }, ----FF006CD9
+    { Name = 'CYBRAN',   Color = 'FFB32D00' }, ----FFB32D00
+    { Name = 'SERAPHIM', Color = 'FFFFBF00' }, ----FFFFBF00
+    { Name = 'NOMADS',   Color = 'FFFF7200' }, ----FFFF7200
+    { Name = 'UNKNOWN',  Color = 'FFD619CE' }, ----FFD619CE
 }
 
 -- Gets unit's color based on faction of given blueprint

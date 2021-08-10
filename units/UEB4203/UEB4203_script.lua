@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB4203/UEB4203_script.lua
-#**  Author(s):  David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  UEF Radar Jammer Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEB4203/UEB4203_script.lua
+--**  Author(s):  David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  UEF Radar Jammer Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TRadarJammerUnit = import('/lua/terranunits.lua').TRadarJammerUnit
 

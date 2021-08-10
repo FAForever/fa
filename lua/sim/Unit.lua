@@ -392,7 +392,7 @@ Unit = Class(moho.unit_methods) {
     -- Deprecation / refactored warning for mods.
     updateBuildRestrictions = function(self)
         if not DeprecatedWarnings.updateBuildRestrictions then 
-            WARN("updateBuildRestrictions is refactored since PR #3319. Call UpdateBuildRestrictions instead.")
+            WARN("updateBuildRestrictions is refactored since PR 3319. Call UpdateBuildRestrictions instead.")
             DeprecatedWarnings.updateBuildRestrictions = true 
         end
 
@@ -403,7 +403,7 @@ Unit = Class(moho.unit_methods) {
     -- Deprecation warning for mods.
     FindHQType = function(aiBrain, category)
         if not DeprecatedWarnings.FindHQType then 
-            WARN("FindHQType is deprecated since PR #3319.")
+            WARN("FindHQType is deprecated since PR 3319.")
             DeprecatedWarnings.FindHQType = true 
         end
     end,

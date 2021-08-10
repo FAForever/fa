@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB1105/URB1105_script.lua
-#**  Author(s):  David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Cybran Energy Storage
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB1105/URB1105_script.lua
+--**  Author(s):  David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Cybran Energy Storage
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CEnergyStorageUnit= import('/lua/cybranunits.lua').CEnergyStorageUnit
 
@@ -19,7 +19,7 @@ URB1105 = Class(CEnergyStorageUnit) {
     end,
 
     AnimThread = function(self)
-        # Play the "activate" sound
+        -- Play the "activate" sound
         local myBlueprint = self:GetBlueprint()
         if myBlueprint.Audio.Activate then
             self:PlaySound(myBlueprint.Audio.Activate)

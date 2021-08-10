@@ -1,6 +1,6 @@
-#
-# Fire Plume Test Projectile Script
-#
+--
+-- Fire Plume Test Projectile Script
+--
 local EmitterProjectile = import('/lua/sim/defaultprojectiles.lua').EmitterProjectile
 
 CIFEMPFluxWarhead03 = Class(EmitterProjectile) {

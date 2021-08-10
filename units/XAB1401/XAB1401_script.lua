@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XAB1401/XAB1401_script.lua
-#**  Author(s):  Jessica St. Croix, Dru Staltman
-#**
-#**  Summary  :  Aeon Quantum Resource Generator
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XAB1401/XAB1401_script.lua
+--**  Author(s):  Jessica St. Croix, Dru Staltman
+--**
+--**  Summary  :  Aeon Quantum Resource Generator
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local FxAmbient = import('/lua/effecttemplates.lua').AResourceGenAmbient
 local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon

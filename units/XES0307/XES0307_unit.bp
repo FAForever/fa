@@ -276,7 +276,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,				#2
+            FiringTolerance = 0,				--2
             Label = 'HiroCannonFront',
             MaxRadius = 80,
             MuzzleChargeDelay = 0,
@@ -303,7 +303,7 @@ UnitBlueprint {
             RateOfFire = 0.15,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 0.8,				#1
+            TargetCheckInterval = 0.8,				--1
             TargetPriorities = {
                 'NAVAL MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
@@ -321,7 +321,7 @@ UnitBlueprint {
             TurretYawRange = 140,
             TurretYawSpeed = 90,
             Turreted = true,
-        UseFiringSolutionInsteadOfAimBone = true,		#Added
+        UseFiringSolutionInsteadOfAimBone = true,		--Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,
@@ -351,7 +351,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,				#2
+            FiringTolerance = 0,				--2
             Label = 'HiroCannonBack',
             MaxRadius = 80,
             MuzzleChargeDelay = 0,
@@ -378,7 +378,7 @@ UnitBlueprint {
             RateOfFire = 0.15,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 0.8,				#1
+            TargetCheckInterval = 0.8,				--1
             TargetPriorities = {
                 'NAVAL MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
@@ -396,7 +396,7 @@ UnitBlueprint {
             TurretYawRange = 140,
             TurretYawSpeed = 90,
             Turreted = true,
-        UseFiringSolutionInsteadOfAimBone = true,		#Added
+        UseFiringSolutionInsteadOfAimBone = true,		--Added
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 2,
             WeaponUnpacks = false,

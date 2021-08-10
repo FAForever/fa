@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/RushExpansionAirFull.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/RushExpansionAirFull.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'RushExpansionAirFull',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuildersExpansion',
         'T2BalancedUpgradeBuildersExpansion',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -24,18 +24,18 @@ BaseBuilderTemplate {
         'EngineerFactoryConstructionAirHigherPriority',
         'AirInitialFactoryConstruction',
 
-        # Build Mass low pri at this base
+        -- Build Mass low pri at this base
         'EngineerMassBuildersLowerPri',
 
-        # Build some power, but not much
+        -- Build some power, but not much
         'EngineerEnergyBuildersExpansions',
 
-        # ==== EXPANSION ==== #
-        #DUNCAN - expansions dont build more expansions!
-        #'EngineerExpansionBuildersFull',
-        #'EngineerExpansionBuildersSmall',
+        -- ==== EXPANSION ==== --
+        --DUNCAN - expansions dont build more expansions!
+        --'EngineerExpansionBuildersFull',
+        --'EngineerExpansionBuildersSmall',
 
-        # ==== DEFENSES ==== #
+        -- ==== DEFENSES ==== --
         'T1LightDefenses',
         'T2LightDefenses',
         'T3LightDefenses',
@@ -46,10 +46,10 @@ BaseBuilderTemplate {
 
         'MiscDefensesEngineerBuilders',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
 
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
@@ -65,11 +65,11 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
@@ -78,7 +78,7 @@ BaseBuilderTemplate {
 
         'ACUHunterAirFormBuilders',
 
-        #'TransportFactoryBuilders', #DUNCAN - taked out
+        --'TransportFactoryBuilders', --DUNCAN - taked out
 
         'T1AntiAirBuilders',
         'T2AntiAirBuilders',
@@ -102,8 +102,8 @@ BaseBuilderTemplate {
     },
     BaseSettings = {
         FactoryCount = {
-            Land = 1, #DUNCAN - was 1
-            Air = 3, #DUNCAN - was 4
+            Land = 1, --DUNCAN - was 1
+            Air = 3, --DUNCAN - was 4
             Sea = 0,
             Gate = 0,
         },
@@ -129,7 +129,7 @@ BaseBuilderTemplate {
             return 0
         end
 
-        local threatCutoff = 10 # value of overall threat that determines where enemy bases are
+        local threatCutoff = 10 -- value of overall threat that determines where enemy bases are
         local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 75
@@ -137,7 +137,7 @@ BaseBuilderTemplate {
             return 100
         elseif distance > 250 then
             return 50
-        else # within 250
+        else -- within 250
             return 10
         end
 

@@ -79,14 +79,14 @@ function SaveCameraPos()
     PlaySound(sound)
 end
 
-# Focus={ <metatable=table: 17D498C0>
-#    146.80799865723,
-#    20.548700332642,
-#    347.08599853516
-#  },
-#  Heading=-3.1415901184082,
-#  Pitch=1.0239499807358,
-#  Zoom=39.889518737793
+-- Focus={ <metatable=table: 17D498C0>
+--    146.80799865723,
+--    20.548700332642,
+--    347.08599853516
+--  },
+--  Heading=-3.1415901184082,
+--  Pitch=1.0239499807358,
+--  Zoom=39.889518737793
 
 function RemoveCamPos()
     if cameraPositions[currentCamSetting] then

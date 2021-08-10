@@ -1,8 +1,8 @@
-#--[                                                                             ]--
-#--[  File     : HypsometricPresets.lua                                          ]--
-#--[  Author(s):						                                         ]--
-#--[                                                                             ]--
-#--[  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.             ]--
+----[                                                                             ]--
+----[  File     : HypsometricPresets.lua                                          ]--
+----[  Author(s):						                                         ]--
+----[                                                                             ]--
+----[  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.             ]--
 
 Presets = {
 	{

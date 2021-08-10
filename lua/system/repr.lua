@@ -36,10 +36,10 @@ end
 local global_names = get_names(_G,2,{},'')
 
 
-#
-# Convert obj to an expanded string form. Returns two results. The first has obj expanded on a single line; the
-# second may have obj in multiline form.
-#
+--
+-- Convert obj to an expanded string form. Returns two results. The first has obj expanded on a single line; the
+-- second may have obj in multiline form.
+--
 local function _repr(obj, indent, width, mindepth, objectstack)
 
     if mindepth<=0 and global_names[obj] then
@@ -58,7 +58,7 @@ local function _repr(obj, indent, width, mindepth, objectstack)
     local level = 1
     while s do
         if obj==s[1] then
-            # Recursive backreference - return a special marker
+            -- Recursive backreference - return a special marker
             local r = '*'..level
             return r,r
         end
@@ -105,13 +105,13 @@ local function _repr(obj, indent, width, mindepth, objectstack)
 
         local v1,v2 = _repr(obj[k], subindent, width, mindepth-1, objectstack)
 
-        # format the single-line result
+        -- format the single-line result
         insert(r1, sep1)
         insert(r1, prefix)
         insert(r1, v1)
         sep1 = ', '
 
-        # format the multi-line result
+        -- format the multi-line result
         insert(r2, sep2)
         insert(r2, prefix)
         if len(subindent) + len(prefix) + len(v1) < width then
@@ -132,11 +132,11 @@ local function _repr(obj, indent, width, mindepth, objectstack)
 end
 
 
-#
-# Convert obj to an expanded string form, which can be checked for equality. The optional second
-# arg gives a maximum width; if the repr is wider than this, it will be split into a multi-line
-# form if possible.
-#
+--
+-- Convert obj to an expanded string form, which can be checked for equality. The optional second
+-- arg gives a maximum width; if the repr is wider than this, it will be split into a multi-line
+-- form if possible.
+--
 function repr(obj, maxwidth, mindepth)
     maxwidth = maxwidth or 80
     local r1,r2 = _repr(obj, '', maxwidth, mindepth or 1, nil)

@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: UI for the multifunction display
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -178,7 +178,7 @@ function CreateMinimap(parent)
 end
 
 function ToggleMinimap()
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end

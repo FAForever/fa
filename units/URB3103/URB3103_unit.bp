@@ -26,9 +26,9 @@ UnitBlueprint {
     Display = {
         AnimationOpen = '/units/URL0101/URL0101_Aagro.sca',
 
-        #        Mesh = {
-        #            IconFadeInZoom = 200,
-        #        },
+        --        Mesh = {
+        --            IconFadeInZoom = 200,
+        --        },
         MeshBlueprint = '/Units/URL0101/URL0101_mesh.bp',
         PlaceholderMeshName = 'UXB0000',
         SpawnRandomRotation = true,

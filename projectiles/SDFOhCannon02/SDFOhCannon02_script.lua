@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SDFOhCannon02/SDFOhCannon02_script.lua
-#**  Author(s):  Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Oh Spectra Cannon Projectile script, XSS0203
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SDFOhCannon02/SDFOhCannon02_script.lua
+--**  Author(s):  Gordon Duclos, Aaron Lundquist
+--**
+--**  Summary  :  Oh Spectra Cannon Projectile script, XSS0203
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 SDFOhCannon02 = Class(import('/lua/seraphimprojectiles.lua').SOhCannon02) {
 }

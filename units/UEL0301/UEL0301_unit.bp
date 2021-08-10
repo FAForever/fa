@@ -3,8 +3,8 @@ UnitBlueprint {
         TargetBones = {
             'UEL0301',
             'Head',
-#            'Leg_Left_B02',
-#            'Leg_Right_B02',
+--            'Leg_Left_B02',
+--            'Leg_Right_B02',
         },
     },
     Audio = {
@@ -499,7 +499,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 26000,#32000
+            ShieldMaxHealth = 26000,--32000
             ShieldRechargeTime = 170,
             ShieldRegenRate = 50,
             ShieldRegenStartTime = 1,

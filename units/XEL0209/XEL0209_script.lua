@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /units/XEL0209/XEL0209_script.lua
-#**
-#**  Summary  :  UEF Combat Engineer T2
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /units/XEL0209/XEL0209_script.lua
+--**
+--**  Summary  :  UEF Combat Engineer T2
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit

@@ -1,27 +1,27 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/Builder.lua
-#**
-#**  Summary  : Builder class
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/sim/Builder.lua
+--**
+--**  Summary  : Builder class
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
-## Root builder class
-# Builder Sped
-# {
-#        Priority = integer,
-#        BuilderName = string,
-#        BuilderType = string,
-#        BuilderData = table,
-#        BuilderConditions = list of functions that return true/false, list of args,  { < function>, {<args>}}
-# }
+---- Root builder class
+-- Builder Sped
+-- {
+--        Priority = integer,
+--        BuilderName = string,
+--        BuilderType = string,
+--        BuilderData = table,
+--        BuilderConditions = list of functions that return true/false, list of args,  { < function>, {<args>}}
+-- }
 
 Builder = Class {
     Create = function(self, brain, data, locationType)
-        # make sure the table of strings exist, they are required for the builder
+        -- make sure the table of strings exist, they are required for the builder
         local verifyDictionary = { 'Priority', 'BuilderName' }
         for k,v in verifyDictionary do
             if not self:VerifyDataName(v, data) then return false end
@@ -94,7 +94,7 @@ Builder = Class {
     end,
 
     GetBuilderData = function(self, locationType, builderData)
-        # Get builder data out of the globals and convert data here
+        -- Get builder data out of the globals and convert data here
         local returnData = {}
         builderData = builderData or Builders[self.BuilderName].BuilderData
         for k,v in builderData do
@@ -186,7 +186,7 @@ Builder = Class {
     SetupBuilderConditions = function(self, data, locationType)
         local tempConditions = {}
         if data.BuilderConditions then
-            # Convert location type here
+            -- Convert location type here
             for k,v in data.BuilderConditions do
                 local bCond = table.deepcopy(v)
                 if type(bCond[1]) == 'function' then
@@ -232,13 +232,13 @@ function CreateBuilder(brain, data, locationType)
     return false
 end
 
-# FactoryBuilderSpec
-# This is the spec to have built by a factory
-#{
-#   PlatoonTemplate = platoon template,
-#   RequiresConstruction = true/false do I need to build this from a factory or should I just try to form it?,
-#   PlatoonBuildCallbacks = {FunctionsToCallBack when the platoon starts to build}
-#}
+-- FactoryBuilderSpec
+-- This is the spec to have built by a factory
+--{
+--   PlatoonTemplate = platoon template,
+--   RequiresConstruction = true/false do I need to build this from a factory or should I just try to form it?,
+--   PlatoonBuildCallbacks = {FunctionsToCallBack when the platoon starts to build}
+--}
 
 FactoryBuilder = Class(Builder) {
     Create = function(self,brain,data,locationType)
@@ -260,14 +260,14 @@ function CreateFactoryBuilder(brain, data, locationType)
     return false
 end
 
-# PlatoonBuilderSpec
-#{
-#   PlatoonTemplate = platoon template,
-#   InstanceCount = number of active platoons available,
-#   PlatoonBuildCallbacks = { functions to call when platoon is formed }
-#   PlatoonAIFunction = function the platoon uses when formed,
-#   PlatoonAddFunctions = { other functions to run when platoon is formed }
-#}
+-- PlatoonBuilderSpec
+--{
+--   PlatoonTemplate = platoon template,
+--   InstanceCount = number of active platoons available,
+--   PlatoonBuildCallbacks = { functions to call when platoon is formed }
+--   PlatoonAIFunction = function the platoon uses when formed,
+--   PlatoonAddFunctions = { other functions to run when platoon is formed }
+--}
 
 PlatoonBuilder = Class(Builder) {
     Create = function(self,brain,data,locationType)
@@ -278,7 +278,7 @@ PlatoonBuilder = Class(Builder) {
             if not self:VerifyDataName(v, data) then return false end
         end
 
-        # Setup for instances to be stored inside a table rather than creating new
+        -- Setup for instances to be stored inside a table rather than creating new
         self.InstanceCount = {}
         local num = 1
         while num <= (data.InstanceCount or 1) do
@@ -344,20 +344,20 @@ function CreatePlatoonBuilder(brain, data, locationType)
     return false
 end
 
-# EngineerBuilderSpec
-# This is the spec to have built by a factory
-#{
-#   PlatoonBuildCallbacks = {FunctionsToCallBack when the platoon starts to build}
-#   BuilderData = {
-#       Construction = {
-#           BaseTemplate = basetemplates, must contain templates for all 3 factions it will be viewed by faction index,
-#           BuildingTemplate = building templates, contain templates for all 3 factions it will be viewed by faction index,
-#           BuildClose = true/false do I follow the table order or do build the best spot near me?
-#           BuildRelative = true/false are the build coordinates relative to the starting location or absolute coords?,
-#           BuildStructures = { List of structure types and the order to build them.}
-#       }
-#   }
-#}
+-- EngineerBuilderSpec
+-- This is the spec to have built by a factory
+--{
+--   PlatoonBuildCallbacks = {FunctionsToCallBack when the platoon starts to build}
+--   BuilderData = {
+--       Construction = {
+--           BaseTemplate = basetemplates, must contain templates for all 3 factions it will be viewed by faction index,
+--           BuildingTemplate = building templates, contain templates for all 3 factions it will be viewed by faction index,
+--           BuildClose = true/false do I follow the table order or do build the best spot near me?
+--           BuildRelative = true/false are the build coordinates relative to the starting location or absolute coords?,
+--           BuildStructures = { List of structure types and the order to build them.}
+--       }
+--   }
+--}
 
 EngineerBuilder = Class(PlatoonBuilder) {
     Create = function(self,brain,data, locationType)

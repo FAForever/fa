@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XSB3101/XSB3101_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Seraphim T1 Radar Tower Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XSB3101/XSB3101_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Seraphim T1 Radar Tower Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SRadarUnit = import('/lua/seraphimunits.lua').SRadarUnit
 

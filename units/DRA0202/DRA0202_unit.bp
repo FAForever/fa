@@ -367,7 +367,7 @@ UnitBlueprint {
             MaxRadius = 40,
             MuzzleSalvoDelay = 0.05,
             MuzzleSalvoSize = 4,
-            MuzzleVelocity = 30,#35
+            MuzzleVelocity = 30,--35
             ProjectileId = '/projectiles/CIFCorsairMissile01/CIFCorsairMissile01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 6,

@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Help Text Popup
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -149,7 +149,7 @@ function CreateControls()
     controls.helpList.Width:Set(352)
     controls.helpList.Height:Set(280)
     LayoutHelpers.AtLeftTopIn(controls.helpList, controls.mainWindowBG, 60, 150)
-    #controls.helpList.Depth:Set(200)
+    --controls.helpList.Depth:Set(200)
 
     UIUtil.CreateVertScrollbarFor(controls.helpList)
     controls.helpList.OnKeySelect = function(self, row, noSound)

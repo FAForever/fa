@@ -1,9 +1,9 @@
 all_blueprints = {}
 current_filename = nil
 
-#
-# Strip localization crud from a string
-#
+--
+-- Strip localization crud from a string
+--
 local function LOC(s)
     if string.sub(s, 1, 4)=='<LOC' then
         local i = string.find(s,">")
@@ -15,9 +15,9 @@ local function LOC(s)
 end
 
 
-#
-# Escape problematic XML entities in a string
-#
+--
+-- Escape problematic XML entities in a string
+--
 local function ESCAPE(s)
     s = string.gsub(s, '&', '&amp;')
     s = string.gsub(s, '<', '&lt;')
@@ -26,9 +26,9 @@ local function ESCAPE(s)
 end
 
 
-#
-# Define 'UnitBlueprint' func, which will get called with the blueprint data
-#
+--
+-- Define 'UnitBlueprint' func, which will get called with the blueprint data
+--
 function UnitBlueprint(spec)
     spec._xml_tag = "UnitBlueprint"
     spec._xml_attrs = { id=string.gsub(string.lower(current_filename), "^.*/([^/]+)_[a-z]+%.bp$", "%1") }
@@ -46,7 +46,7 @@ function RPCSound(t)
     return t
 end
 
-# Load in all the blueprints
+-- Load in all the blueprints
 function dir_recursive(path, result)
     local r = result or {}
     for i,f in io.dir(path.."/*") do
@@ -58,9 +58,9 @@ function dir_recursive(path, result)
     return r
 end
 
-#
-# Load all the blueprints
-#
+--
+-- Load all the blueprints
+--
 for i,f in dir_recursive("../../") do
     if string.find(f, "_unit.bp$") then
         current_filename = f
@@ -68,13 +68,13 @@ for i,f in dir_recursive("../../") do
     end
 end
 
-#
-# Dump them in XML
-#
-# stuff = { a,b,c } becomes <stuff><li>a</li><li>b</li><li>c</li></stuff>
-#
-# { x=this, y=that } becomes <x>this</x><y>that</y>
-#
+--
+-- Dump them in XML
+--
+-- stuff = { a,b,c } becomes <stuff><li>a</li><li>b</li><li>c</li></stuff>
+--
+-- { x=this, y=that } becomes <x>this</x><y>that</y>
+--
 function xml_tags(defaulttag, name, value)
     local tag = value._xml_tag or defaulttag
     local close = '</' .. tag .. '>'
@@ -102,13 +102,13 @@ function auto_xml(file,tag,name,value,indent)
         local subindent = indent..'  '
         file:write(open,'\n')
         if table.getn(value)>0 then
-            # numerically indexed table
+            -- numerically indexed table
             for i,v in ipairs(value) do
                 file:write(subindent)
                 auto_xml(file,'li',nil,v,subindent)
             end
         else
-            # key=value table
+            -- key=value table
             for k,v in value do
                 if string.sub(k,1,1)!='_' then
                     file:write(subindent)

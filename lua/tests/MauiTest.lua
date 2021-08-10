@@ -1,6 +1,6 @@
-#
-# These tests are run via 'ScalpD MauiTestOne', etc.
-#
+--
+-- These tests are run via 'ScalpD MauiTestOne', etc.
+--
 
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import('/lua/maui/text.lua').Text

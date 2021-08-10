@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AI/aibuildunits.lua
-#**  Author(s): John Comes
-#**
-#**  Summary  :
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AI/aibuildunits.lua
+--**  Author(s): John Comes
+--**
+--**  Summary  :
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local Utils = import('/lua/utilities.lua')
@@ -16,26 +16,26 @@ local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemp
 local aiEconomy
 
 function AISetEconomyNumbers(aiBrain)
-    #LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
+    --LOG('*AI DEBUG: SETTING ECONOMY NUMBERS FROM AIBRAIN ', repr(aiBrain))
     local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
     aiEconomy = econ
 end
 
 function AIModEconomyNumbers(aiBrain, unitBP)
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGY USE OF UNIT = ', repr(aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy * 0.1))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGY USE OF UNIT = ', repr(aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy * 0.1))
     aiEconomy.MassTrend = aiEconomy.MassTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
     aiEconomy.MassIncome = aiEconomy.MassIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
     aiEconomy.EnergyTrend = aiEconomy.EnergyTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
     aiEconomy.EnergyIncome = aiEconomy.EnergyIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
-    #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
+    --LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
 end
 
 
 function AIExecutePlanUnitList(aiBrain, unitPlan, aIPlatoonTemplates)
     for k, v in unitPlan do
-        #Convert the name of the platoonTemplate to the actual platoon template
+        --Convert the name of the platoonTemplate to the actual platoon template
         local pltnTemplate = AIGetPlatoonTemplate(aiBrain, aIPlatoonTemplates, v.PlatoonTemplate)
         local spec = {}
         for ks, vs in v do
@@ -73,8 +73,8 @@ end
 
 function AIExecutePlanUnitListTwo(aiBrain, unitPlan)
     for k, v in unitPlan do
-        #Convert the name of the platoonTemplate to the actual platoon template
-        #local pltnTemplate = AIGetPlatoonTemplate(aiBrain, aIPlatoonTemplates, v.PlatoonTemplate)
+        --Convert the name of the platoonTemplate to the actual platoon template
+        --local pltnTemplate = AIGetPlatoonTemplate(aiBrain, aIPlatoonTemplates, v.PlatoonTemplate)
         local pltnTemplate = v.PlatoonTemplate
         local spec = {}
         for ks, vs in v do

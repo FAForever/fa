@@ -1,10 +1,10 @@
-#*****************************************************************************
-#* File: lua/modules/ui/game/construction.lua
-#* Author: Chris Blackwell / Ted Snook
-#* Summary: Construction management UI
-#*
-#* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/game/construction.lua
+--* Author: Chris Blackwell / Ted Snook
+--* Summary: Construction management UI
+--*
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')

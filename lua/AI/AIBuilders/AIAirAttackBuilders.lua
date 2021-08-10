@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIAirAttackBuilders.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIAirAttackBuilders.lua
+--**
+--**  Summary  : Default economic builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
@@ -57,7 +57,7 @@ BuilderGroup {
         PlatoonTemplate = 'T1AirFighter',
         Priority = 500,
         BuilderConditions = {
-            #{ UCBC, 'UnitsLessAtLocation', { 'LocationType', 15, categories.AIR * categories.ANTIAIR } },
+            --{ UCBC, 'UnitsLessAtLocation', { 'LocationType', 15, categories.AIR * categories.ANTIAIR } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
@@ -103,40 +103,40 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Interceptors',
         PlatoonTemplate = 'T1AirFighter',
-        Priority = 555, #DUNCAN - was 500
+        Priority = 555, --DUNCAN - was 500
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.AIR * categories.ANTIAIR * categories.TECH1 } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
+            --{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
         },
         BuilderType = 'Air',
     },
     Builder {
-        #DUNCAN - added builder
+        --DUNCAN - added builder
         BuilderName = 'T1 Interceptors - Enemy air',
         PlatoonTemplate = 'T1AirFighter',
         Priority = 560,
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 15, categories.AIR * categories.ANTIAIR * categories.TECH1 } },
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 4, categories.MOBILE * categories.AIR - categories.SCOUT, 'Enemy'}},
-            #{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
+            --{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
+            --{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
         },
         BuilderType = 'Air',
     },
     Builder {
-        #DUNCAN - added builder
+        --DUNCAN - added builder
         BuilderName = 'T1 Interceptors - Extra Enemy air',
         PlatoonTemplate = 'T1AirFighter',
         Priority = 560,
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 30, categories.AIR * categories.ANTIAIR * categories.TECH1 } },
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 9, categories.MOBILE * categories.AIR - categories.SCOUT, 'Enemy'}},
-            #{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
+            --{ UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            #{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
+            --{ EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
         },
         BuilderType = 'Air',
     },
@@ -146,7 +146,7 @@ BuilderGroup {
         Priority = 500,
         BuilderConditions = {
             { UCBC, 'HaveLessThanUnitsWithCategory', { 30, categories.AIR * categories.ANTIAIR * categories.TECH1 } },
-            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, categories.FACTORY * categories.AIR * categories.TECH1 } }, #DUNCAN - added
+            { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, categories.FACTORY * categories.AIR * categories.TECH1 } }, --DUNCAN - added
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
@@ -315,12 +315,12 @@ BuilderGroup {
     Builder {
         BuilderName = 'T3AntiAirPlanes Initial',
         PlatoonTemplate = 'T3AirFighter',
-        Priority = 755, #DUNCAN - was 700
+        Priority = 755, --DUNCAN - was 700
         BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.AIR * categories.ANTIAIR * categories.TECH3 } },  #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.AIR * categories.ANTIAIR * categories.TECH3 } },  --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
-            #{ UCBC, 'UnitsLessAtLocation', { 'LocationType', 3, categories.AIR * categories.ANTIAIR } },
+            --{ UCBC, 'UnitsLessAtLocation', { 'LocationType', 3, categories.AIR * categories.ANTIAIR } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
         },
         BuilderType = 'Air',
@@ -330,11 +330,11 @@ BuilderGroup {
         PlatoonTemplate = 'T3AirFighter',
         Priority = 700,
         BuilderConditions = {
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 30, categories.AIR * categories.ANTIAIR * categories.TECH3 } }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 30, categories.AIR * categories.ANTIAIR * categories.TECH3 } }, --DUNCAN - added
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 2, 'AIR' } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, categories.ANTIAIR * categories.AIR - categories.BOMBER } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.05 }}, #DUNCAN - was 0.8
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.7, 1.05 }}, --DUNCAN - was 0.8
         },
         BuilderType = 'Air',
     },
@@ -344,7 +344,7 @@ BuilderGroup {
     BuilderGroupName = 'TransportFactoryBuilders',
     BuildersType = 'FactoryBuilder',
     Builder {
-        BuilderName = 'T1 Air Transport - Early', #DUNCAN - added
+        BuilderName = 'T1 Air Transport - Early', --DUNCAN - added
         PlatoonTemplate = 'T1AirTransport',
         Priority = 850,
         BuilderConditions = {
@@ -362,15 +362,15 @@ BuilderGroup {
     Builder {
         BuilderName = 'T1 Air Transport',
         PlatoonTemplate = 'T1AirTransport',
-        Priority = 560, #DUNCAN - was 550
+        Priority = 560, --DUNCAN - was 550
         BuilderConditions = {
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS' } }, #DUNCAN - was 25
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS' } }, --DUNCAN - was 25
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
         BuilderType = 'Air',
     },
@@ -380,13 +380,13 @@ BuilderGroup {
         Priority = 650,
         BuilderConditions = {
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, #DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS TECH2' } }, #DUNCAN - was 25
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS TECH2' } }, --DUNCAN - was 25
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
         BuilderType = 'Air',
     },
@@ -396,11 +396,11 @@ BuilderGroup {
         Priority = 750,
         BuilderConditions = {
             { MIBC, 'ArmyNeedsTransports', {} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 2, 'TRANSPORTFOCUS' } },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'TRANSPORTFOCUS TECH3' } }, #DUNCAN - was 25
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'TRANSPORTFOCUS TECH3' } }, --DUNCAN - was 25
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
@@ -413,12 +413,12 @@ BuilderGroup {
         PlatoonTemplate = 'T1AirTransport',
         Priority = 500,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsWithCategory', { 5 , 'TRANSPORTFOCUS'} },
             { MIBC, 'ArmyNeedsTransports', {} },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
         BuilderType = 'Air',
     },
@@ -427,13 +427,13 @@ BuilderGroup {
         PlatoonTemplate = 'T2AirTransport',
         Priority = 600,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, 'LAND TECH2, LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
             { UCBC, 'HaveLessThanUnitsWithCategory', { 3 , 'TRANSPORTFOCUS TECH2'} },
             { MIBC, 'ArmyNeedsTransports', {} },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
         },
         BuilderType = 'Air',
     },
@@ -442,10 +442,10 @@ BuilderGroup {
         PlatoonTemplate = 'T3AirTransport',
         Priority = 700,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } }, #DUNCAN - Added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } }, --DUNCAN - Added
             { UCBC, 'HaveLessThanUnitsWithCategory', { 2 , 'TRANSPORTFOCUS TECH3'} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
             { MIBC, 'ArmyNeedsTransports', {} },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'TRANSPORTFOCUS' } },
             { IBC, 'BrainNotLowPowerMode', {} },
@@ -459,11 +459,11 @@ BuilderGroup {
         PlatoonTemplate = 'T1AirTransport',
         Priority = 700,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
             { MIBC, 'TransportNeedGreater', { 7 } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 7, 'TRANSPORTFOCUS TECH1' } }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 7, 'TRANSPORTFOCUS TECH1' } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
         },
         BuilderType = 'Air',
@@ -473,12 +473,12 @@ BuilderGroup {
         PlatoonTemplate = 'T2AirTransport',
         Priority = 800,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
             { MIBC, 'TransportNeedGreater', { 7 } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS TECH2' } }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 3, 'TRANSPORTFOCUS TECH2' } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
-            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  #DUNCAN - was 0.9
+            { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},  --DUNCAN - was 0.9
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
         },
         BuilderType = 'Air',
@@ -488,11 +488,11 @@ BuilderGroup {
         PlatoonTemplate = 'T3AirTransport',
         Priority = 900,
         BuilderConditions = {
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, #DUNCAN - added
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 5, categories.AIR * categories.ANTIAIR } }, --DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
             { MIBC, 'TransportNeedGreater', { 7 } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } },
-            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'TRANSPORTFOCUS TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveLessThanUnitsWithCategory', { 1, 'TRANSPORTFOCUS TECH3' } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.05 }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
@@ -522,7 +522,7 @@ BuilderGroup {
             { MIBC, 'IsIsland', { true } },
             { MIBC, 'ArmyNeedsTransports', {} },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 3 , 'TRANSPORTFOCUS TECH2'} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH2, LAND TECH3' } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
@@ -538,7 +538,7 @@ BuilderGroup {
             { MIBC, 'ArmyNeedsTransports', {} },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 4, 'TRANSPORTFOCUS TECH2' } },
             { UCBC, 'HaveLessThanUnitsWithCategory', { 2 , 'TRANSPORTFOCUS TECH3'} },
-            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, #DUNCAN - added
+            { UCBC, 'HaveGreaterThanUnitsWithCategory', { 10, 'LAND TECH3' } }, --DUNCAN - added
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
             { UCBC, 'HaveLessThanUnitsInCategoryBeingBuilt', { 1, 'TRANSPORTFOCUS' } },
@@ -598,7 +598,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-            SearchRadius = 100, #DUNCAN - was 60?
+            SearchRadius = 100, --DUNCAN - was 60?
             PrioritizedCategories = {
                 'ANTIAIR STRUCTURE',
                 'SHIELD',
@@ -635,7 +635,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-            SearchRadius = 100, #DUNCAN - was 60?
+            SearchRadius = 100, --DUNCAN - was 60?
             PrioritizedCategories = {
                 'ANTIAIR STRUCTURE',
                 'SHIELD',
@@ -672,7 +672,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-            SearchRadius = 100, #DUNCAN - was 60?
+            SearchRadius = 100, --DUNCAN - was 60?
             PrioritizedCategories = {
                 'COMMAND',
                 'ANTIAIR STRUCTURE',
@@ -726,7 +726,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-            SearchRadius = 100, #DUNCAN - was 60?
+            SearchRadius = 100, --DUNCAN - was 60?
             PrioritizedCategories = {
                 'ANTIAIR STRUCTURE',
                 'SHIELD',
@@ -763,7 +763,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-            SearchRadius = 100, #DUNCAN - was 60?
+            SearchRadius = 100, --DUNCAN - was 60?
             PrioritizedCategories = {
                 'ANTIAIR STRUCTURE',
                 'SHIELD',
@@ -800,7 +800,7 @@ BuilderGroup {
         InstanceCount = 5,
         BuilderType = 'Any',
         BuilderData = {
-            SearchRadius = 100, #DUNCAN - was 60?
+            SearchRadius = 100, --DUNCAN - was 60?
             PrioritizedCategories = {
                 'COMMAND',
                 'ANTIAIR STRUCTURE',
@@ -854,7 +854,7 @@ BuilderGroup {
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {
-            SearchRadius = 100, #DUNCAN - was 60?
+            SearchRadius = 100, --DUNCAN - was 60?
             PrioritizedCategories = {
                 'ANTIAIR STRUCTURE',
                 'SHIELD',
@@ -876,21 +876,21 @@ BuilderGroup {
     Builder {
         BuilderName = 'Mass Hunter Gunships',
         PlatoonTemplate = 'GunshipMassHunter',
-        # Commented out as the platoon doesn't exist in AILandAttackBuilders.lua
-        #PlatoonTemplate = 'EarlyGameMassHuntersCategory',
+        -- Commented out as the platoon doesn't exist in AILandAttackBuilders.lua
+        --PlatoonTemplate = 'EarlyGameMassHuntersCategory',
         Priority = 950,
         BuilderConditions = {
-                #{ MIBC, 'LessThanGameTime', { 600 } },
-                #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
+                --{ MIBC, 'LessThanGameTime', { 600 } },
+                --{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
             MarkerType = 'Mass',
             MoveFirst = 'Random',
-            MoveNext = 'GunshipHuntAI', 	#DUNCAN - was guardbase
-            ThreatType = 'Economy', 		    # Type of threat to use for gauging attacks
-            FindHighestThreat = false, 		# Don't find high threat targets
-            MaxThreatThreshold = 2900, 		# If threat is higher than this, do not attack
-            MinThreatThreshold = 1000, 		# If threat is lower than this, do not attack
+            MoveNext = 'GunshipHuntAI', 	--DUNCAN - was guardbase
+            ThreatType = 'Economy', 		    -- Type of threat to use for gauging attacks
+            FindHighestThreat = false, 		-- Don't find high threat targets
+            MaxThreatThreshold = 2900, 		-- If threat is higher than this, do not attack
+            MinThreatThreshold = 1000, 		-- If threat is lower than this, do not attack
             AvoidBases = true,
             AvoidBasesRadius = 75,
             AggressiveMove = true,
@@ -902,7 +902,7 @@ BuilderGroup {
     },
 }
 
-# NAVAL RUSH AIR GUARD
+-- NAVAL RUSH AIR GUARD
 BuilderGroup {
     BuilderGroupName = 'BaseGuardAirFormBuildersNaval',
     BuildersType = 'PlatoonFormBuilder',
@@ -930,14 +930,14 @@ BuilderGroup {
         PlatoonTemplate = 'AntiAirHunt',
         PlatoonAddBehaviors = { 'AirUnitRefit' },
         Priority = 1,
-        InstanceCount = 2, #DUNCAN - was 5
+        InstanceCount = 2, --DUNCAN - was 5
         BuilderType = 'Any',
         BuilderData = {
             Location = 'LocationType',
             NeverGuardEngineers = true,
         },
         BuilderConditions = {
-            #DUNCAN - was 1
+            --DUNCAN - was 1
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 4, categories.AIR * categories.MOBILE * (categories.TECH1 + categories.TECH2 + categories.TECH3) * categories.ANTIAIR } },
         },
     },
@@ -946,7 +946,7 @@ BuilderGroup {
         PlatoonTemplate = 'AntiAirBaseGuard',
         PlatoonAddBehaviors = { 'AirUnitRefit' },
         Priority = 1,
-        InstanceCount = 5, #DUNCAN - was 2
+        InstanceCount = 5, --DUNCAN - was 2
         BuilderType = 'Any',
         BuilderData = {
             NeverGuardEngineers = true,
@@ -954,14 +954,14 @@ BuilderGroup {
             HomeRadius = 50,
         },
         BuilderConditions = {
-            #DUNCAN - was 2
+            --DUNCAN - was 2
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 4, categories.AIR * categories.MOBILE * (categories.TECH1 + categories.TECH2) * categories.ANTIAIR } },
         },
     },
     Builder {
         BuilderName = 'GunshipBaseGuard',
         PlatoonTemplate = 'GunshipBaseGuard',
-        Priority = 0, #DUNCAN - was 10
+        Priority = 0, --DUNCAN - was 10
         InstanceCount = 2,
         BuilderType = 'Any',
         BuilderData = {

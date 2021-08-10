@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sc/TauntManager.lua
-#**  Author(s): Drew Staltman
-#**
-#**  Summary  : Functions for use in the Operations.
-#**
-#**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/sc/TauntManager.lua
+--**  Author(s): Drew Staltman
+--**
+--**  Summary  : Functions for use in the Operations.
+--**
+--**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TriggerFile = import('/lua/scenariotriggers.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
@@ -36,7 +36,7 @@ function CreateTauntManager(name, fileName)
 
 
 
-        ##### CONFIRMED WORKING TAUNTS #####
+        ---------- CONFIRMED WORKING TAUNTS ----------
         AddAttackTaunt = function(self,diagData,opAI,attacks)
             local currNum, callback = self:TauntBasics(diagData)
             if not attacks then
@@ -213,7 +213,7 @@ function CreateTauntManager(name, fileName)
 
 
 
-        ###### MISC FUNCTIONS ######
+        ------------ MISC FUNCTIONS ------------
         TauntingCharacterCheck = function(self)
             if not self.TauntingCharacter or not self.TauntingCharacter:IsDead() then
                 return true

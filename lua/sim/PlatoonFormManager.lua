@@ -1,11 +1,11 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/BuilderManager.lua
-#**
-#**  Summary  : Manage builders
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/sim/BuilderManager.lua
+--**
+--**  Summary  : Manage builders
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -69,30 +69,30 @@ PlatoonFormManager = Class(BuilderManager) {
 
         for k,v in filterUnits do
 
-            # Make sure the unit is building or upgrading
+            -- Make sure the unit is building or upgrading
             if not v:IsUnitState('Building') and not v:IsUnitState('Upgrading') then
                 continue
             end
 
-            # Engineer doesn't want to be assisted
+            -- Engineer doesn't want to be assisted
             if v.DesiresAssist == false then
                 continue
             end
 
-            # Check for unit being built compatibility
+            -- Check for unit being built compatibility
             local beingBuiltUnit = v.UnitBeingBuilt
             if not beingBuiltUnit or not EntityCategoryContains(buildingCategory, beingBuiltUnit) then
                 continue
             end
 
-            # Engineer doesn't want any more assistance
+            -- Engineer doesn't want any more assistance
             if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
                 continue
             end
 
-            # Check if valid economy exists for this assist
+            -- Check if valid economy exists for this assist
 
-            # Unit had not problems; add to possible list
+            -- Unit had not problems; add to possible list
             table.insert(retUnits, v)
         end
 
@@ -101,7 +101,7 @@ PlatoonFormManager = Class(BuilderManager) {
 
     ManagerLoopBody = function(self,builder,bType)
         BuilderManager.ManagerLoopBody(self,builder,bType)
-        # Try to form all builders that pass
+        -- Try to form all builders that pass
         if self.Brain.BuilderManagers[self.LocationType] and builder.Priority >= 1 and builder:CheckInstanceCount() then
             local personality = self.Brain:GetPersonality()
             local poolPlatoon = self.Brain:GetPlatoonUniquelyNamed('ArmyPool')
@@ -121,11 +121,11 @@ PlatoonFormManager = Class(BuilderManager) {
             if formIt and builder:GetBuilderStatus() then
                 local hndl = poolPlatoon:FormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
 
-                #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager Forming - ',repr(builder.BuilderName),': Location = ',self.LocationType)
-                #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager - Platoon Size = ', table.getn(hndl:GetPlatoonUnits()))
+                --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager Forming - ',repr(builder.BuilderName),': Location = ',self.LocationType)
+                --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager - Platoon Size = ', table.getn(hndl:GetPlatoonUnits()))
                 hndl.PlanName = template[2]
 
-                #If we have specific AI, fork that AI thread
+                --If we have specific AI, fork that AI thread
                 if builder:GetPlatoonAIFunction() then
                     hndl:StopAI()
                     local aiFunc = builder:GetPlatoonAIFunction()
@@ -136,7 +136,7 @@ PlatoonFormManager = Class(BuilderManager) {
                     hndl:SetAIPlan(hndl.PlanName)
                 end
 
-                #If we have additional threads to fork on the platoon, do that as well.
+                --If we have additional threads to fork on the platoon, do that as well.
                 if builder:GetPlatoonAddPlans() then
                     for papk, papv in builder:GetPlatoonAddPlans() do
                         hndl:ForkThread(hndl[papv])

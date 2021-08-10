@@ -165,8 +165,8 @@ UnitBlueprint {
             },
         },
 
-        # PitchBone = 'Attachpoint01',
-        # YawBone = 'Turret',
+        -- PitchBone = 'Attachpoint01',
+        -- YawBone = 'Turret',
         Category = 'Construction',
         Classification = 'RULEUC_Engineer',
         CommandCaps = {

@@ -1,6 +1,6 @@
-#
-# script for projectile Missile
-#
+--
+-- script for projectile Missile
+--
 local TMissileCruiseSubProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseSubProjectile
 
 MissileCruiseSubTerran01 = Class(TMissileCruiseSubProjectile) {
@@ -17,17 +17,17 @@ MissileCruiseSubTerran01 = Class(TMissileCruiseSubProjectile) {
         local posY = 1
         self:TrackTarget(false)
 
-        for i in self.FxInitialAtEntityEmitter do #old way of firing muzzle fx
+        for i in self.FxInitialAtEntityEmitter do --old way of firing muzzle fx
             CreateEmitterAtEntity(self,self:GetArmy(),self.FxInitialAtEntityEmitter[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0,0,self.FxTrailOffset)
         end
         WaitTicks(1)
         local emitter = {}
-        for i in self.FxUnderWaterTrail do #underwater trail
+        for i in self.FxUnderWaterTrail do --underwater trail
             table.insert(emitter, CreateEmitterOnEntity(self,self:GetArmy(),self.FxUnderWaterTrail[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0,0,self.FxTrailOffset))
         end
 
         WaitTicks(45)
-        for i in self.FxExitWaterEmitter do #splash
+        for i in self.FxExitWaterEmitter do --splash
             CreateEmitterAtEntity(self,self:GetArmy(),self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
         end
         for i in emitter do
@@ -35,20 +35,20 @@ MissileCruiseSubTerran01 = Class(TMissileCruiseSubProjectile) {
         end
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_01_emit.bp',self:GetArmy())
         AttachBeamToEntity(self.MissileExhaust, self, -1, self:GetArmy())
-        for i in self.FxLaunchTrails do #launch trails
+        for i in self.FxLaunchTrails do --launch trails
             CreateEmitterOnEntity(self,self:GetArmy(),self.FxLaunchTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0,0,self.FxTrailOffset)
         end
-        WaitTicks(30) #Straight Up
+        WaitTicks(30) --Straight Up
         self:TrackTarget(true)
-        WaitTicks(10) #Start Tracking
+        WaitTicks(10) --Start Tracking
         self:TrackTarget(false)
         self:SetMaxSpeed(2)
         self:SetBallisticAcceleration()
         self.MissileExhaust:Destroy()
-        WaitTicks(10) #Falling
+        WaitTicks(10) --Falling
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_02_emit.bp',self:GetArmy())
         AttachBeamToEntity(self.MissileExhaust, self, -1, self:GetArmy())
-        for i in self.FxTrails do #flight trails
+        for i in self.FxTrails do --flight trails
             CreateEmitterOnEntity(self,self:GetArmy(),self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0,0,self.FxTrailOffset)
         end
         self:SetTurnRate(10)
