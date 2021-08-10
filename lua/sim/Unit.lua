@@ -4227,39 +4227,49 @@ Unit = Class(moho.unit_methods) {
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StartRocking = function(self)
-        KillThread(self.StopRockThread)
-        self.StartRockThread = self:ForkThread(self.RockingThread)
+        local bp = self:GetBlueprint().Display
+        local speed = bp.MaxRockSpeed
+        if (not self.RockManip) and (not self.Dead) and speed and speed > 0 then 
+
+            -- clear it so that GC can take it, if it exists
+            if self.StopRockThread then 
+                KillThread(self.StopRockThread)
+                self.StopRockThread = nil 
+            end
+
+            self.StartRockThread = self:ForkThread(self.RockingThread, speed)
+        end
     end,
 
     --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StopRocking = function(self)
         if self.StartRockThread then
+            -- clear it so that GC can take it
             KillThread(self.StartRockThread)
+            self.StartRockThread = nil
+
             self.StopRockThread = self:ForkThread(self.EndRockingThread)
         end
     end,
 
     --- Rocking thread to move a unit when it is on the water.
-    RockingThread = function(self)
-        local bp = self:GetBlueprint().Display
-        if not self.RockManip and not self.Dead and bp.MaxRockSpeed and bp.MaxRockSpeed > 0 then
-            self.RockManip = CreateRotator(self, 0, 'z', nil, 0, (bp.MaxRockSpeed or 1.5) / 5, (bp.MaxRockSpeed or 1.5) * 3 / 5)
-            self.Trash:Add(self.RockManip)
-            self.RockManip:SetPrecedence(0)
+    RockingThread = function(self, speed)
+        self.RockManip = CreateRotator(self, 0, 'z', nil, 0, (speed or 1.5) / 5, (speed or 1.5) * 3 / 5)
+        self.Trash:Add(self.RockManip)
+        self.RockManip:SetPrecedence(0)
 
-            while true do
-                WaitFor(self.RockManip)
+        while true do
+            WaitFor(self.RockManip)
 
-                if self.Dead then break end -- Abort if the unit died
+            if self.Dead then break end -- Abort if the unit died
 
-                self.RockManip:SetTargetSpeed(- (bp.MaxRockSpeed or 1.5)) 
-                WaitFor(self.RockManip)
+            self.RockManip:SetTargetSpeed(-speed) 
+            WaitFor(self.RockManip)
 
-                if self.Dead then break end -- Abort if the unit died
+            if self.Dead then break end -- Abort if the unit died
 
-                self.RockManip:SetTargetSpeed(bp.MaxRockSpeed or 1.5)
-            end
+            self.RockManip:SetTargetSpeed(speed)
         end
     end,
 
