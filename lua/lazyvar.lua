@@ -105,7 +105,7 @@ function LazyVarMetaTable:Destroy()
 end
 
 function Create(initial)
-    result = {&1&4}
+    result = { }
     setmetatable(result, LazyVarMetaTable)
     result[1] = initial or 0
     result.used_by = {}

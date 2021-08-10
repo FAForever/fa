@@ -6,7 +6,7 @@
 --
 MultiEvent = Class {
     __init = function(self)
-        self.EventCallbacks = {&1&1 n=0}
+        self.EventCallbacks = { n=0 }
         self.EventIsSet = false
     end,
 
