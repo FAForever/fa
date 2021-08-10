@@ -1,0 +1,51 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'SERAPHIM',
+        'PROJECTILE',
+        'ANTIAIR',
+    },
+    Display = {
+        ImpactEffects = {
+            Type = 'Small01',
+        },
+        StrategicIconSize = 1,
+    },
+    General = {
+        Category = 'Anti Air',
+        Faction = 'Seraphim',
+        TechLevel = 1,
+        Weapon = 'Olaris AA Artilery',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        CollideEntity = true,
+        CollideSurface = true,
+        DestroyOnWater = true,
+        DetonateAboveHeight = 10,
+        InitialSpeed = 20,
+        LeadTarget = false,
+        RotationalVelocity = 0,
+        StayUpright = true,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

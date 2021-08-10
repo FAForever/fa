@@ -1,0 +1,40 @@
+ProjectileBlueprint {
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    Display = {
+        CameraFollowsProjectile = true,
+        Mesh = {
+            LODs = {
+                {
+                    LODCutoff = 150,
+                    ShaderName = 'TMeshNoLighting',
+                },
+            },
+        },
+        StrategicIconSize = 2,
+        UniformScale = 0.15,
+    },
+    General = {
+        Category = 'Artillery',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'INDIRECTFIRE',
+        },
+        Faction = 'Cybran',
+        Weapon = 'Resonance Artillery',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 34,
+        InitialSpeedReduceDistance = 0,
+        LeadTarget = false,
+        VelocityAlign = true,
+    },
+}

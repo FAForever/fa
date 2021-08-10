@@ -1,0 +1,57 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'UEF',
+        'PROJECTILE',
+        'DIRECTFIRE',
+    },
+    Display = {
+        ImpactEffects = {
+            Type = 'Medium02',
+        },
+        MeshBlueprint = '/projectiles/TDFGauss01/TDFGauss01_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.3,
+    },
+    General = {
+        Category = 'Direct Fire',
+        EntityCategory = {
+            'UEF',
+            'PROJECTILE',
+            'DIRECTFIRE',
+        },
+        Faction = 'UEF',
+        Weapon = 'Gauss Cannon',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 0,
+        DestroyOnWater = true,
+        InitialSpeed = 28,
+        InitialSpeedRange = 0,
+        LeadTarget = false,
+        MaxSpeed = 0,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        TurnRate = 360,
+        VelocityAlign = true,
+    },
+}

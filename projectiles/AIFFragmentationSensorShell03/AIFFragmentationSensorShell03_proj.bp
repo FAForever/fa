@@ -1,0 +1,35 @@
+ProjectileBlueprint {
+    Categories = {
+        'UEF',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    Display = {
+        CameraFollowsProjectile = true,
+        ImpactEffects = {
+            Type = 'Medium02',
+        },
+        MeshBlueprint = '/projectiles/TIFMortar01/TIFMortar01_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.05,
+    },
+    General = {
+        Category = 'Artillery',
+        EntityCategory = {
+            'UEF',
+            'PROJECTILE',
+            'INDIRECTFIRE',
+        },
+        Faction = 'UEF',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 34,
+        InitialSpeedReduceDistance = 200,
+        LeadTarget = false,
+        VelocityAlign = true,
+    },
+}

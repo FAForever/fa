@@ -1,0 +1,26 @@
+ProjectileBlueprint {
+    Audio = {
+        ImpactTerrain = Sound {
+            Bank = 'Explosions',
+            Cue = 'Cybran_Nuke_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Explosions',
+            Cue = 'Cybran_Nuke_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        NukeExplosion = Sound {
+            Bank = 'Explosions',
+            Cue = 'Cybran_Nuke_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Physics = {
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        InitialSpeed = 2,
+        UseGravity = false,
+    },
+}

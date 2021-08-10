@@ -1,0 +1,58 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'UEF_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_UEF',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'SERAPHIM',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    Display = {
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/projectiles/CAANanoDart01/CAANanoDart01_albedo.dds',
+                    LODCutoff = 150,
+                    MeshName = '/projectiles/CAANanoDart01/CAANanoDart01_lod0.scm',
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 1.35,
+    },
+    General = {
+        Category = 'Artillery',
+        Faction = 'Seraphim',
+        TechLevel = 1,
+        Weapon = 'Brackman Hack-Peg Pod',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        DetonateBelowHeight = 15,
+        InitialSpeed = 36.9,
+        InitialSpeedRange = 3,
+        InitialSpeedReduceDistance = 30,
+        LeadTarget = false,
+        RotationalVelocity = 300,
+        TurnRate = 360,
+        VelocityAlign = true,
+    },
+}

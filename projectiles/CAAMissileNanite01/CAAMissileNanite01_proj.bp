@@ -1,0 +1,68 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'CYB_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'ANTIAIR',
+        'MISSILE',
+    },
+    Display = {
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/projectiles/CAAMissileNanite01/CAAMissileNanite01_albedo.dds',
+                    LODCutoff = 150,
+                    MeshName = '/projectiles/CAAMissileNanite01/CAAMissileNanite01_lod0.scm',
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.25,
+    },
+    General = {
+        Category = 'Anti Air',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'ANTIAIR',
+            'MISSILE',
+        },
+        Faction = 'Cybran',
+        TechLevel = 3,
+        Weapon = 'Nanite Missile System',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 5,
+        DestroyOnWater = true,
+        InitialSpeed = 30,
+        LeadTarget = false,
+        Lifetime = 3,
+        MaxSpeed = 35,
+        MaxZigZag = 5,
+        TrackTarget = true,
+        TurnRate = 400,
+        UseGravity = false,
+        VelocityAlign = true,
+        ZigZagFrequency = 0.5,
+    },
+}

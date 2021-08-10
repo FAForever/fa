@@ -1,0 +1,32 @@
+ProjectileBlueprint {
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'DIRECTFIRE',
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/missile_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.5,
+    },
+    General = {
+        Category = 'Direct Fire',
+        EntityCategory = {
+            'AEON',
+            'PROJECTILE',
+            'DIRECTFIRE',
+        },
+        Faction = 'Aeon',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 2,
+        DestroyOnWater = true,
+        MaxSpeed = 5,
+        TrackTarget = true,
+        TurnRate = 2,
+        VelocityAlign = true,
+    },
+}

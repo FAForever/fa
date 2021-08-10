@@ -1,0 +1,33 @@
+ProjectileBlueprint {
+    Categories = {
+        'UEF',
+        'PROJECTILE',
+        'ANTIMISSILE',
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/missile_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.5,
+    },
+    General = {
+        Category = 'Defense',
+        EntityCategory = {
+            'UEF',
+            'PROJECTILE',
+            'ANTIMISSILE',
+        },
+        Faction = 'UEF',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 600,
+        DestroyOnWater = false,
+        MaxSpeed = 600,
+        TrackTarget = true,
+        TurnRate = 360,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

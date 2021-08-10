@@ -1,0 +1,30 @@
+ProjectileBlueprint {
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    Display = {
+        StrategicIconSize = 2,
+    },
+    General = {
+        Category = 'Artillery',
+        EntityCategory = {
+            'AEON',
+            'PROJECTILE',
+            'INDIRECTFIRE',
+        },
+        Faction = 'Aeon',
+        TechLevel = 2,
+        Weapon = 'Miasma Artillery',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        LeadTarget = false,
+        StayUpright = false,
+        VelocityAlign = false,
+    },
+}

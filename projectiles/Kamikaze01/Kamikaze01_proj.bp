@@ -1,0 +1,10 @@
+ProjectileBlueprint {
+    Physics = {
+        Acceleration = 500,
+        DestroyOnWater = true,
+        MaxSpeed = 500,
+        TrackTarget = true,
+        TurnRate = 720,
+        VelocityAlign = true,
+    },
+}

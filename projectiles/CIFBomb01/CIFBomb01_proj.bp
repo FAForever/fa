@@ -1,0 +1,34 @@
+ProjectileBlueprint {
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    Display = {
+        CameraFollowsProjectile = true,
+        MeshBlueprint = '/meshes/projectiles/bomb_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.3,
+    },
+    General = {
+        Category = 'Bomb',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'INDIRECTFIRE',
+        },
+        Faction = 'Cybran',
+        Weapon = 'Neutron Bomb',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 500,
+        DestroyOnWater = true,
+        MaxSpeed = 15,
+        TrackTarget = true,
+        TurnRate = 40,
+        VelocityAlign = true,
+    },
+}

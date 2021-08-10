@@ -1,0 +1,40 @@
+ProjectileBlueprint {
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'MISSILE',
+    },
+    Display = {
+        CameraFollowsProjectile = true,
+
+        # ##MeshBlueprint = '/units/DAA0206/DAA0206_mesh.bp',
+        StrategicIconSize = 2,
+        UniformScale = 0.09,
+    },
+    General = {
+        Category = 'Anti Air',
+        EntityCategory = {
+            'AEON',
+            'PROJECTILE',
+            'MISSILE',
+        },
+        Faction = 'Aeon',
+        TechLevel = 3,
+        Weapon = 'Guided Missile',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 5,
+        DestroyOnWater = true,
+        InitialSpeed = 15,
+        LeadTarget = false,
+        Lifetime = 10,
+        MaxSpeed = 35,
+        TrackTarget = true,
+        TurnRate = 150,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

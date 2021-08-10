@@ -1,0 +1,67 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'CYB_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'DIRECTFIRE',
+    },
+    Display = {
+        ImpactEffects = {
+            Scale = 0.5,
+            Type = 'Medium03',
+        },
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/projectiles/CIFCorsairMissile01/CIFCorsairMissile01_albedo.dds',
+                    LODCutoff = 150,
+                    MeshName = '/projectiles/CIFCorsairMissile01/CIFCorsairMissile01_lod0.scm',
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.5,
+    },
+    General = {
+        Category = 'Direct Fire',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'DIRECTFIRE',
+        },
+        Faction = 'Cybran',
+        Weapon = 'Corsair Missile',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 0,
+        DestroyOnWater = true,
+        InitialSpeed = 35,
+        MaxSpeed = 35,
+        MaxZigZag = 0,
+        OnLostTargetLifetime = 0.7,
+        TrackTarget = false,
+        TurnRate = 45,
+        VelocityAlign = true,
+        ZigZagFrequency = 0,
+    },
+}

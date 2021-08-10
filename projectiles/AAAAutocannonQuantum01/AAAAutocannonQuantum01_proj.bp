@@ -1,0 +1,48 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'AEON_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'ANTIAIR',
+    },
+    Display = {
+        StrategicIconSize = 2,
+    },
+    General = {
+        Category = 'Anti Air',
+        EntityCategory = {
+            'AEON',
+            'PROJECTILE',
+            'ANTIAIR',
+        },
+        Faction = 'Aeon',
+        TechLevel = 3,
+        Weapon = 'Displacement Cannon',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 30,
+        Lifetime = 1,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

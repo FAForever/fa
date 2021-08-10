@@ -1,0 +1,32 @@
+ProjectileBlueprint {
+    Categories = {
+        'UEF',
+        'PROJECTILE',
+        'ANTIAIR',
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/missile_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.5,
+    },
+    General = {
+        Category = 'Anti Air',
+        EntityCategory = {
+            'UEF',
+            'PROJECTILE',
+            'ANTIAIR',
+        },
+        Faction = 'UEF',
+        TechLevel = 3,
+        Weapon = 'Ginsu Pulse Beam',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        Lifetime = 1,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

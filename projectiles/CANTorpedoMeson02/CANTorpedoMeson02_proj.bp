@@ -1,0 +1,55 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_CYBRAN',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'ANTINAVY',
+        'TORPEDO',
+        'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 1,
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/torpedo_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.1,
+    },
+    General = {
+        Category = 'Anti Navy',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'ANTINAVY',
+            'TORPEDO',
+            'NOSPLASHDAMAGE',
+        },
+        Faction = 'Cybran',
+        Weapon = 'Meson Torpedo',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 5,
+        DestroyOnWater = false,
+        InitialSpeed = 3,
+        Lifetime = 7,
+        MaxSpeed = 18,
+        StayUnderwater = true,
+        TrackTarget = true,
+        TurnRate = 230,
+        VelocityAlign = true,
+    },
+}

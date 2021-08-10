@@ -1,0 +1,28 @@
+ProjectileBlueprint {
+    Categories = {
+        'UNTARGETABLE',
+    },
+    Display = {
+        MeshBlueprint = '/env/devtest/props/sphere01_mesh.bp',
+        UniformScale = 0.005,
+    },
+    General = {
+        EntityCategory = {
+            'UNTARGETABLE',
+        },
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        Lifetime = 1000,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        TrackTarget = true,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}
