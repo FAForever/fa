@@ -56,7 +56,7 @@ function ModifyBuildablesForACU(originalBuildables, selection)
 
     for unitIndex, unit in selection do
         local currentBuildableCategories
-        local bp = unit.Blueprint
+        local bp = unit:GetBlueprint()
 
         if unit:IsInCategory('COMMAND') then
             local techUpgrading = 0

@@ -2260,10 +2260,10 @@ CommandUnit = Class(WalkingLandUnit) {
     end,
 
     OnCreate = function(self)
+        WalkingLandUnit.OnCreate(self)
+
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
-
-        WalkingLandUnit.OnCreate(self)
     end,
 
     ResetRightArm = function(self)

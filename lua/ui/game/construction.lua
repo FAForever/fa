@@ -1382,7 +1382,7 @@ function OnClickHandler(button, modifiers)
             else
                 for i, v in sortedOptions.selection do
                     if v then -- Its possible that your unit will have died by the time this gets to it
-                        local unitBp = v.Blueprint
+                        local unitBp = v:GetBlueprint()
                         if itembp.General.UpgradesFrom == unitBp.BlueprintId then
                             performUpgrade = true
                         elseif itembp.General.UpgradesFrom == unitBp.General.UpgradesTo then
@@ -2053,7 +2053,7 @@ function FormatData(unitData, type)
         local idleConsUnits = {}
 
         for _, unit in unitData do
-            local id = unit.Blueprint.BlueprintId
+            local id = unit:GetBlueprint().BlueprintId
 
             if unit:IsInCategory('AIR') and unit:GetFuelRatio() < .2 and unit:GetFuelRatio() > -1 then
                 if not lowFuelUnits[id] then
@@ -2412,7 +2412,7 @@ function SetSecondaryDisplay(type)
             local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(sortedOptions.selection))
             if attachedUnits and not table.empty(attachedUnits) then
                 for _, v in attachedUnits do
-                    table.insert(data, {type = 'attachedunit', id = v.Blueprint.BlueprintId, unit = v})
+                    table.insert(data, {type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v})
                 end
             end
             controls.secondaryProgress:SetAlpha(0, true)
@@ -2568,10 +2568,10 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             if allMobile and not v:IsInCategory('MOBILE') then
                 allMobile = false
             end
-            if allSameUnit and bpID and bpID ~= v.Blueprint.BlueprintId then
+            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
                 allSameUnit = false
             else
-                bpID = v.Blueprint.BlueprintId
+                bpID = v:GetBlueprint().BlueprintId
             end
             if not allMobile and not allSameUnit then
                 break
@@ -2644,10 +2644,10 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             if allMobile and not v:IsInCategory('MOBILE') then
                 allMobile = false
             end
-            if allSameUnit and bpID and bpID ~= v.Blueprint.BlueprintId then
+            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
                 allSameUnit = false
             else
-                bpID = v.Blueprint.BlueprintId
+                bpID = v:GetBlueprint().BlueprintId
             end
             if not allMobile and not allSameUnit then
                 break

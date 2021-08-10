@@ -1414,7 +1414,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     --  },
     local orderDiffs
     for index, unit in newSelection do
-        local overrideTable = unit.Blueprint.General.OrderOverrides
+        local overrideTable = unit:GetBlueprint().General.OrderOverrides
         if overrideTable then
             for orderKey, override in overrideTable do
                 if orderDiffs == nil then

@@ -584,14 +584,14 @@ function UpdateWindow(info)
             controls.shieldText:Hide()
 
             if info.userUnit ~= nil then
-                local bp = info.userUnit.Blueprint
+                local bp = info.userUnit:GetBlueprint()
                 local regen = UnitData[info.entityId].regen or bp.Defense.RegenRate
                 controls.health:SetText(string.format("%d / %d +%d/s", info.health, info.maxHealth, regen))
             end
 
             if info.shieldRatio > 0 then
                 local getEnh = import('/lua/enhancementcommon.lua')
-                local unitBp = info.userUnit.Blueprint
+                local unitBp = info.userUnit:GetBlueprint()
                 local shield = unitBp.Defense.Shield
                 if not shield.ShieldMaxHealth then
                     shield = unitBp.Enhancements[getEnh.GetEnhancements(info.entityId).Back]

@@ -1072,6 +1072,8 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
     OnCreate = function(self)
+        DefaultProjectileWeapon.OnCreate(self)
+        
         self.Beams = {}
 
         -- Ensure that the weapon blueprint is set up properly for beams
@@ -1104,8 +1106,6 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                 beam:Disable()
             end
         end
-
-        DefaultProjectileWeapon.OnCreate(self)
     end,
 
     -- This entirely overrides the default

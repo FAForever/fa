@@ -1577,7 +1577,7 @@ function CategorizeUnits(formationUnits)
         for type, table in categoryTables do
             for cat, _ in table do
                 if EntityCategoryContains(table[cat], u) then
-                    local bp = u.Blueprint
+                    local bp = u:GetBlueprint()
                     local fs = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
                     local id = bp.BlueprintId
 
