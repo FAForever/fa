@@ -1,0 +1,148 @@
+UnitBlueprint {
+    Audio = {
+        AmbientMove = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0111_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartMove = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0111_Move_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StopMove = Sound {
+            Bank = 'UEL',
+            Cue = 'UEL0111_Move_Stop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'Interface',
+            Cue = 'UEF_Select_Vehicle',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    Categories = {
+        'SELECTABLE',
+        'CYBRAN',
+        'CIVILIAN',
+        'OPERATION',
+        'SPECIALHIGHPRI',
+        'MOBILE',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+    },
+    Defense = {
+        ArmorType = 'Normal',
+        Health = 128,
+        MaxHealth = 128,
+        RegenRate = 0,
+    },
+    Description = '<LOC opc1002_desc>OpC1 Symbiont Vehicle',
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    AlbedoName = '/Units/UEL0111/UEL0111_Albedo.dds',
+                    LODCutoff = 215,
+                    MeshName = '/Units/UEL0111/UEL0111_LOD0.scm',
+                },
+            },
+        },
+        MovementEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            'Kickup_R',
+                            'Kickup_L',
+                        },
+                        Type = 'GroundKickup01',
+                    },
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXL0010',
+        SpawnRandomRotation = false,
+        UniformScale = 0.08,
+    },
+    Economy = {
+        BuildCostEnergy = 0,
+        BuildCostMass = 158,
+    },
+    General = {
+        Category = 'Research Truck',
+        Classification = 'RULEUC_MilitaryVehicle',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'Cybran',
+        TechLevel = 'RULEUTL_Advanced',
+        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 18,
+    },
+    Interface = {
+        HelpText = '<LOC opc1002_help>OpC1 Symbiont Vehicle',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.3,
+    LifeBarSize = 0.5,
+    Physics = {
+        BackUpDistance = 4,
+        BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        MaxAcceleration = 0.459,
+        MaxBrake = 2.8,
+        MaxSpeed = 2.8,
+        MaxSpeedReverse = 2.5,
+        MaxSteerForce = 5,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_Land',
+        TurnRadius = 0,
+        TurnRate = 27,
+    },
+    SelectionThickness = 0.2,
+    SizeX = 0.45,
+    SizeY = 0.4,
+    SizeZ = 0.9,
+    StrategicIconName = 'icon_land_generic',
+    StrategicIconSortPriority = 207,
+    Transport = {
+        TransportClass = 2,
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
+    },
+}

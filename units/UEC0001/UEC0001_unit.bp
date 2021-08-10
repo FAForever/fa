@@ -1,0 +1,177 @@
+UnitBlueprint {
+    Audio = {
+        AmbientMove = Sound {
+            Bank = 'UEL',
+            Cue = 'UEC0001_Move_Loop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Destroyed = Sound {
+            Bank = 'UELDestroy',
+            Cue = 'UEL_Destroy_Sml_Land',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StartMove = Sound {
+            Bank = 'UEL',
+            Cue = 'UEC0001_Move_Start',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        StopMove = Sound {
+            Bank = 'UEL',
+            Cue = 'UEC0001_Move_Stop',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        UISelection = Sound {
+            Bank = 'Interface',
+            Cue = 'UEF_Select_Vehicle',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+    },
+    Categories = {
+        'SELECTABLE',
+        'OPERATION',
+        'SPECIALHIGHPRI',
+        'TECH1',
+        'VISIBLETORECON',
+        'RECLAIMABLE',
+        'LAND',
+        'MOBILE',
+    },
+    Defense = {
+        ArmorType = 'Normal',
+        Health = 264,
+        MaxHealth = 264,
+        RegenRate = 0,
+    },
+    Description = '<LOC uec0001_desc>UEF Civilian Truck',
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 130,
+            LODs = {
+                {
+                    LODCutoff = 70,
+                    Scrolling = true,
+                    ShaderName = 'Unit',
+                },
+                {
+                    AlbedoName = 'uec0001_lod1_albedo.dds',
+                    LODCutoff = 215,
+                    ShaderName = 'Unit',
+                    SpecularName = 'uec0001_lod1_specteam.dds',
+                },
+            },
+        },
+        MovementEffects = {
+            Land = {
+                Effects = {
+                    {
+                        Bones = {
+                            0,
+                        },
+                        Type = 'GroundKickup01',
+                    },
+                },
+                Treads = {
+                    ScrollMultiplier = 0.5,
+                    ScrollTreads = true,
+                    TreadMarks = {
+                        {
+                            BoneName = 0,
+                            TreadMarks = 'tank_treads_albedo',
+                            TreadMarksInterval = 0.3,
+                            TreadMarksSizeX = 0.5,
+                            TreadMarksSizeZ = 0.5,
+                            TreadOffset = {
+                                0,
+                                0,
+                                0,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        PlaceholderMeshName = 'UXL0010',
+        SpawnRandomRotation = false,
+        UniformScale = 0.175,
+    },
+    Economy = {
+        BuildCostEnergy = 0,
+        BuildCostMass = 158,
+    },
+    General = {
+        Category = 'Civilian Truck',
+        Classification = 'RULEUC_MilitaryVehicle',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = true,
+            RULEUCC_Reclaim = false,
+            RULEUCC_Repair = false,
+            RULEUCC_RetaliateToggle = false,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'UEF',
+        SelectionPriority = 5,
+        TechLevel = 'RULEUTL_Advanced',
+        UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 18,
+    },
+    Interface = {
+        HelpText = '<LOC uec0001_help>UEF Civilian Truck',
+    },
+    LifeBarHeight = 0.075,
+    LifeBarOffset = 0.35,
+    LifeBarSize = 0.5,
+    Physics = {
+        BankingSlope = 0,
+        BuildOnLayerCaps = {
+            LAYER_Air = false,
+            LAYER_Land = true,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        MaxAcceleration = 1.2,
+        MaxSpeed = 2.5,
+        MaxSpeedReverse = 0,
+        MaxSteerForce = 10,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_Land',
+        TurnRadius = 0,
+        TurnRate = 60,
+    },
+    SelectionSizeX = 0.35,
+    SelectionSizeZ = 0.65,
+    SelectionThickness = 0.58,
+    SizeX = 0.45,
+    SizeY = 0.4,
+    SizeZ = 0.9,
+    StrategicIconName = 'icon_land_generic',
+    StrategicIconSortPriority = 125,
+    Transport = {
+        TransportClass = 2,
+    },
+    Wreckage = {
+        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+        EnergyMult = 0,
+        HealthMult = 0.9,
+        MassMult = 0.9,
+        ReclaimTimeMultiplier = 1,
+        WreckageLayers = {
+            Air = false,
+            Land = true,
+            Seabed = false,
+            Sub = false,
+            Water = false,
+        },
+    },
+}
