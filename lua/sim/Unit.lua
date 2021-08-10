@@ -4249,13 +4249,19 @@ Unit = Class(moho.unit_methods) {
             KillThread(self.StartRockThread)
             self.StartRockThread = nil
 
-            self.StopRockThread = self:ForkThread(self.EndRockingThread)
+            local bp = self:GetBlueprint().Display
+            local speed = bp.MaxRockSpeed
+
+            self.StopRockThread = self:ForkThread(self.EndRockingThread, speed)
         end
     end,
 
     --- Rocking thread to move a unit when it is on the water.
     RockingThread = function(self, speed)
-        self.RockManip = CreateRotator(self, 0, 'z', nil, 0, (speed or 1.5) / 5, (speed or 1.5) * 3 / 5)
+        -- default value
+        speed = speed or 1.5
+
+        self.RockManip = CreateRotator(self, 0, 'z', nil, 0, speed * 0.2, speed * 0.6)
         self.Trash:Add(self.RockManip)
         self.RockManip:SetPrecedence(0)
 
@@ -4275,11 +4281,14 @@ Unit = Class(moho.unit_methods) {
 
     --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
     -- warping to the original position.
-    EndRockingThread = function(self)
-        local bp = self:GetBlueprint().Display
+    EndRockingThread = function(self, speed)
         if self.RockManip then
+
+            -- default value
+            speed = speed or 1.5
+
             self.RockManip:SetGoal(0)
-            self.RockManip:SetSpeed((bp.MaxRockSpeed or 1.5) / 4)
+            self.RockManip:SetSpeed(speed / 4)
             WaitFor(self.RockManip)
 
             if self.RockManip then
