@@ -33,7 +33,7 @@ end
 
 ---
 --  Get who launched this projectile
-function Projectile.Launcher
+function Projectile:GetLauncher()
 end
 
 ---

@@ -67,8 +67,8 @@ function UnitWeapon:FireWeapon()
 end
 
 ---
---  blueprint = UnitWeapon.Blueprint
-function UnitWeapon.Blueprint
+--  blueprint = UnitWeapon:GetBlueprint()
+function UnitWeapon:GetBlueprint()
 end
 
 ---
