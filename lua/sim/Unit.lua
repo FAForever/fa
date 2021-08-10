@@ -4253,7 +4253,7 @@ Unit = Class(moho.unit_methods) {
 
                 if self.Dead then break end -- Abort if the unit died
 
-                self.RockManip:SetTargetSpeed(- bp.MaxRockSpeed or 1.5)
+                self.RockManip:SetTargetSpeed(- (bp.MaxRockSpeed or 1.5)) 
                 WaitFor(self.RockManip)
 
                 if self.Dead then break end -- Abort if the unit died
