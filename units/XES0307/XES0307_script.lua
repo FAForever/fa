@@ -5,7 +5,7 @@
 --
 --  Summary  :  UEF Battleship Script
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local WeaponsFile = import('/lua/terranweapons.lua')
@@ -47,7 +47,7 @@ UES0302 = Class(TSeaUnit) {
         OnKilled = function(self, instigator, type, overkillRatio)
             if not self.Dead then
                 local wep1 = self:GetWeaponByLabel('HiroCannonFront')
-                local bp1 = wep1:GetBlueprint()
+                local bp1 = wep1.Blueprint
                 if bp1.Audio.BeamStop then
                     wep1:PlaySound(bp1.Audio.BeamStop)
                 end
@@ -59,7 +59,7 @@ UES0302 = Class(TSeaUnit) {
                 end
 
                 local wep2 = self:GetWeaponByLabel('HiroCannonBack')
-                local bp2 = wep2:GetBlueprint()
+                local bp2 = wep2.Blueprint
                 if bp2.Audio.BeamStop then
                     wep2:PlaySound(bp2.Audio.BeamStop)
                 end

@@ -22,7 +22,7 @@ end
 -- Energy Build Bonus - Energy Active Consumption
 
 EnergyBuildBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.BuildableCategory and table.getn(bp.Economy.BuildableCategory) > 0 then
         return true
     end
@@ -45,7 +45,7 @@ end
 -- Mass Build Bonus - Mass Active Consumption
 
 MassBuildBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.BuildableCategory and table.getn(bp.Economy.BuildableCategory) > 0 then
         return true
     end
@@ -68,7 +68,7 @@ end
 -- Energy Maintenance Bonus
 
 EnergyMaintenanceBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.MaintenanceConsumptionPerSecondEnergy or unit.EnergyMaintenanceConsumptionOverride then
         return true
     end
@@ -129,7 +129,7 @@ end
 -- Energy Production
 
 EnergyProductionBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.ProductionPerSecondEnergy and bp.Economy.ProductionPerSecondEnergy > 0 then
         return true
     end
@@ -149,7 +149,7 @@ end
 -- Mass Production
 
 MassProductionBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.ProductionPerSecondMass and bp.Economy.ProductionPerSecondMass > 0 then
         return true
     end

@@ -70,7 +70,7 @@ XRB2308 = Class(CStructureUnit) {
     end,
     
     DeathThread = function(self, overkillRatio, instigator) --dummy HARMS needs this death thread in case it dies during CreateNewHarmsWithDelay()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- Add an initial death explosion
         local army = self.Army

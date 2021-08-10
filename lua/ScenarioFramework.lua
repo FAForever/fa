@@ -180,7 +180,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     end
     self.Dead = true
 
-    local bp = self:GetBlueprint()
+    local bp = self.Blueprint
     if self:GetCurrentLayer() == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
         self:PlayUnitSound('HoverKilledOnWater')
     end
@@ -863,7 +863,7 @@ end
 
 function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, enhancements)
     local ACU = ScenarioUtils.CreateArmyUnit(brain, unit)
-    local bp = ACU:GetBlueprint()
+    local bp = ACU.Blueprint
     local bonesToHide = bp.WarpInEffect.HideBones
     local delay = 0
 
@@ -948,7 +948,7 @@ function FakeTeleportUnit(unit, killUnit)
 end
 
 function FakeGateInUnit(unit, callbackFunction, bonesToHide)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
 
     if EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit) then
         unit:HideBone(0, true)
@@ -999,7 +999,7 @@ end
 -- Upgrades unit - for use with engineers, factories, radar, and other single upgrade path units.
 -- Commander upgrades are too complicated for this
 function UpgradeUnit(unit)
-    local upgradeBP = unit:GetBlueprint().General.UpgradesTo
+    local upgradeBP = unit.Blueprint.General.UpgradesTo
     IssueStop({unit})
     IssueClearCommands({unit})
     IssueUpgrade({unit}, upgradeBP)
@@ -1439,7 +1439,7 @@ function AttachUnitsToTransports(units, transports)
         local highest = 0
         local key, value
         for k, v in locUnits do
-            local bp = v:GetBlueprint()
+            local bp = v.Blueprint
             if not bp.Transport.TransportClass then
                 if 1 > highest then
                     highest = 1
@@ -1461,7 +1461,7 @@ function AttachUnitsToTransports(units, transports)
     for _, v in locUnits do
         if not v:IsUnitState('Attached') then
             -- Attach locUnits and remove bones when locUnits attached
-            local bp = v:GetBlueprint()
+            local bp = v.Blueprint
             local notInserted = true
             local attachBone = -1
             if v:IsValidBone('AttachPoint', false) then
@@ -1666,7 +1666,7 @@ end
 function EndOperationCamera(unit, track)
     local faction = false
     if EntityCategoryContains(categories.COMMAND, unit) then
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         if bp.CategoriesHash.UEF then
             faction = 1
         elseif bp.CategoriesHash.AEON then
@@ -2181,7 +2181,7 @@ function IAmABadUnit(self)
 end
 
 function GetTimeIAmAllowedToBeOffMap(self)
-    local airspeed = self:GetBlueprint().Air.MaxAirspeed
+    local airspeed = self.Blueprint.Air.MaxAirspeed
     local value = airspeed
 
     if EntityCategoryContains(categories.BOMBER, self) then

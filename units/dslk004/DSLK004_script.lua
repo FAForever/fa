@@ -135,7 +135,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             end
 
             -- collide on start if it's a continuous beam
-            local weaponBlueprint = self.Weapon:GetBlueprint()
+            local weaponBlueprint = self.Weapon.Blueprint
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
             self:SetBeamFx(fxBeam, bCollideOnStart)
 

@@ -689,7 +689,7 @@ BaseManager = Class {
             return false
         end
 
-        local allEnhancements = unit:GetBlueprint().Enhancements
+        local allEnhancements = unit.Blueprint.Enhancements
         if not allEnhancements then
             return false
         end

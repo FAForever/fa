@@ -12,7 +12,7 @@ local SSeaFactoryUnit = import('/lua/seraphimunits.lua').SSeaFactoryUnit
 ZSB9503 = Class(SSeaFactoryUnit) {
     OnCreate = function(self)
         SSeaFactoryUnit.OnCreate(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Rotator1 = CreateRotator(self, 'Pod01', 'y', nil, 5, 0, 0)
         self.Trash:Add(self.Rotator1)
 

@@ -5,7 +5,7 @@
 --
 --  Summary  :  Default definitions collision beams
 --
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
@@ -110,7 +110,7 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 3.5 + (Random() * 3.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -181,7 +181,7 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -243,7 +243,7 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -310,7 +310,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 4.0 + (Random() * 1.0) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -337,11 +337,11 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
     CreateBeamEffects = function(self)
         SCCollisionBeam.CreateBeamEffects(self)
         for k, v in EffectTemplate.SExperimentalPhasonLaserBeam do
-			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), v )
+			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self.Army, v )
 			table.insert( self.BeamEffectsBag, fxBeam )
 			self.Trash:Add(fxBeam)
         end
-        -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
+        -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self.Army, '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
 
     end, 
 }
@@ -377,7 +377,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -434,7 +434,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1 + (Random() * 1) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -496,7 +496,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 1.5 + (Random() * 1.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)
@@ -571,7 +571,7 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         local size = 3.5 + (Random() * 3.5) 
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0,0,0)

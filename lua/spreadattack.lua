@@ -425,7 +425,7 @@ function GiveOrders(Data)
             return
         end
 
-        if unit:GetBlueprint().CategoriesHash.BOMBER then
+        if unit.Blueprint.CategoriesHash.BOMBER then
             for key, order in Data.unit_orders or {} do
                 if order.CommandType == "Move" then
                     local bomberPosition = unit:GetPosition()

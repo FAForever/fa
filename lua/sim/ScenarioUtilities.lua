@@ -205,7 +205,7 @@ function CreateArmyUnit(strArmy,strUnit)
             tblUnit.Position[1], tblUnit.Position[2], tblUnit.Position[3],
             tblUnit.Orientation[1], tblUnit.Orientation[2], tblUnit.Orientation[3]
         )
-        if unit:GetBlueprint().Physics.FlattenSkirt then
+        if unit.Blueprint.Physics.FlattenSkirt then
             unit:CreateTarmac(true, true, true, false, false)
         end
         local platoon
@@ -484,7 +484,7 @@ function AnimateDeathThread(unit, deathAnim)
 end
 
 function CreateWreckageUnit(unit)
-	local bp = unit:GetBlueprint()
+	local bp = unit.Blueprint
 
 	local isStructure = bp.CategoriesHash.STRUCTURE
 	local isAir = bp.CategoriesHash.AIR
@@ -818,7 +818,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                                  tblData.Position[1], tblData.Position[2], tblData.Position[3],
                                  tblData.Orientation[1], tblData.Orientation[2], tblData.Orientation[3]
                              )
-            if unit:GetBlueprint().Physics.FlattenSkirt then
+            if unit.Blueprint.Physics.FlattenSkirt then
                 unit:CreateTarmac(true, true, true, false, false)
             end
             table.insert(tblResult, unit)
@@ -971,7 +971,7 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
                                  tblData.Position[1], tblData.Position[2], tblData.Position[3],
                                  tblData.Orientation[1], tblData.Orientation[2], tblData.Orientation[3]
                              )
-            if unit:GetBlueprint().Physics.FlattenSkirt then
+            if unit.Blueprint.Physics.FlattenSkirt then
                 unit:CreateTarmac(true, true, true, false, false)
             end
             if ScenarioInfo.UnitNames[armyIndex] then

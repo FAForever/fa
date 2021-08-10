@@ -12,7 +12,7 @@ local selectionOverlay = {
 function GetUnitRolloverInfo(unit)
     local info = {}
 
-    info.blueprintId = unit:GetBlueprint().BlueprintId
+    info.blueprintId = unit.Blueprint.BlueprintId
 
     local econData = unit:GetEconData()
 
@@ -48,7 +48,7 @@ function GetUnitRolloverInfo(unit)
 
     info.customName = unit:GetCustomName(unit)
     info.userUnit = unit
-    info.armyIndex = unit:GetArmy() - 1
+    info.armyIndex = unit.Army - 1
 
     return info
 end

@@ -1097,7 +1097,7 @@ function BaseManagerTMLAI(platoon)
     if not unit then return end
 
     platoon:Stop()
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local weapon = bp.Weapon[1]
     local maxRadius = weapon.MaxRadius
     local minRadius = weapon.MinRadius

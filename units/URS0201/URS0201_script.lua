@@ -37,7 +37,7 @@ URS0201 = Class(CSeaUnit) {
                 if old == 'Stopped' then
                     if self.SwitchAnims then
                         self.SwitchAnims = false
-                        self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationWalk, true):SetRate(self:GetBlueprint().Display.AnimationWalkRate or 1.1)
+                        self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationWalk, true):SetRate(self.Blueprint.Display.AnimationWalkRate or 1.1)
                     else
                         self.AnimManip:SetRate(2.8)
                     end
@@ -54,7 +54,7 @@ URS0201 = Class(CSeaUnit) {
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         -- Enable sonar on water only, apply speed multiplier on land
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
@@ -79,11 +79,11 @@ URS0201 = Class(CSeaUnit) {
             self.AnimManip = CreateAnimator(self)
         end
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local scale = bp.Display.UniformScale or 1
         if land then
             self:SetImmobile(true)
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
+            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationTransform)
             self.AnimManip:SetRate(2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
@@ -95,7 +95,7 @@ URS0201 = Class(CSeaUnit) {
             self.Trash:Add(self.AnimManip)
         else
             self:SetImmobile(true)
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
+            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationTransform)
             self.AnimManip:SetAnimationFraction(1)
             self.AnimManip:SetRate(-2)
             self.IsWaiting = true
@@ -113,9 +113,9 @@ URS0201 = Class(CSeaUnit) {
         self.Trash:Destroy()
         self.Trash = TrashBag()
         if self:GetCurrentLayer() ~= 'Water' and not self.IsWaiting then
-            self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
+            self.Blueprint.Display.AnimationDeath = self.Blueprint.Display.LandAnimationDeath
         else
-            self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.WaterAnimationDeath
+            self.Blueprint.Display.AnimationDeath = self.Blueprint.Display.WaterAnimationDeath
         end
 
         CSeaUnit.OnKilled(self, instigator, type, overkillRatio)

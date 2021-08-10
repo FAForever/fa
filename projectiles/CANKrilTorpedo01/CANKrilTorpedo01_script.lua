@@ -22,7 +22,7 @@ CANKrilTorpedo01 = Class(CKrilTorpedo) {
     
     OnEnterWater = function(self)
         CKrilTorpedo.OnEnterWater(self)
-        local army = self:GetArmy()
+        local army = self.Army
         for i in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end

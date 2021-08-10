@@ -19,7 +19,7 @@ XSB4302 = Class(SStructureUnit) {
         
             IdleState = State(SIFHuAntiNukeWeapon.IdleState) {
                 OnGotTarget = function(self)
-                    local bp = self:GetBlueprint()
+                    local bp = self.Blueprint
                     --only say we've fired if the parent fire conditions are met
                     if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
                         if (bp.CountedProjectile == false) or self:CanFire() then
@@ -37,7 +37,7 @@ XSB4302 = Class(SStructureUnit) {
                     
                     self:ForkThread(function()
                         self.unit:SetBusy(true)
-                        WaitSeconds(1/self.unit:GetBlueprint().Weapon[1].RateOfFire + .2)
+                        WaitSeconds(1/self.unit.Blueprint.Weapon[1].RateOfFire + .2)
                         self.unit:SetBusy(false)
                     end)
                 end,

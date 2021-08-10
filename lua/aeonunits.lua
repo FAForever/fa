@@ -295,7 +295,7 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationOpen
         if not bpAnim then return end
         if not self.OpenAnim then

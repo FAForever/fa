@@ -843,7 +843,7 @@ function AdjacencyCheck(aiBrain, locationType, category, radius, testUnit)
     local unitSize = aiBrain:GetUnitBlueprint(testUnit).Physics
     for k,v in reference do
         if not v.Dead then
-            local targetSize = v:GetBlueprint().Physics
+            local targetSize = v.Blueprint.Physics
             local targetPos = v:GetPosition()
             targetPos[1] = targetPos[1] - (targetSize.SkirtSizeX/2)
             targetPos[3] = targetPos[3] - (targetSize.SkirtSizeZ/2)
@@ -1123,7 +1123,7 @@ end
 function GetGuards(aiBrain, Unit)
     local engs = aiBrain:GetUnitsAroundPoint(categories.ENGINEER, Unit:GetPosition(), 10, 'Ally')
     local count = 0
-    local UpgradesFrom = Unit:GetBlueprint().General.UpgradesFrom
+    local UpgradesFrom = Unit.Blueprint.General.UpgradesFrom
     for k,v in engs do
         if v.UnitBeingBuilt == Unit then
             count = count + 1

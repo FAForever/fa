@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/UEL0401/UEL0401_script.lua
 -- Author(s):  John Comes, David Tomandl, Gordon Duclos
 -- Summary  :  UEF Mobile Factory Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local TMobileFactoryUnit = import('/lua/terranunits.lua').TMobileFactoryUnit
@@ -41,7 +41,7 @@ UEL0401 = Class(TMobileFactoryUnit) {
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         self.EffectsBag = {}
         self.PrepareToBuildManipulator = CreateAnimator(self)
-        self.PrepareToBuildManipulator:PlayAnim(self:GetBlueprint().Display.AnimationBuild, false):SetRate(0)
+        self.PrepareToBuildManipulator:PlayAnim(self.Blueprint.Display.AnimationBuild, false):SetRate(0)
         self.ReleaseEffectsBag = {}
         self.AttachmentSliderManip = CreateSlider(self, self.BuildAttachBone)
         ChangeState(self, self.IdleState)
@@ -88,7 +88,7 @@ UEL0401 = Class(TMobileFactoryUnit) {
             self:DetachAll(bone)
             if not self.UnitBeingBuilt.Dead then
                 unitBuilding:AttachBoneTo(-2, self, bone)
-                local unitHeight = unitBuilding:GetBlueprint().SizeY
+                local unitHeight = unitBuilding.Blueprint.SizeY
                 self.AttachmentSliderManip:SetGoal(0, unitHeight, 0)
                 self.AttachmentSliderManip:SetSpeed(-1)
                 unitBuilding:HideBone(0, true)

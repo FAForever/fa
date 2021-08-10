@@ -19,7 +19,7 @@ URB1101 = Class(CEnergyCreationUnit) {
 
     ActiveState = State {
         Main = function(self)
-            local myBlueprint = self:GetBlueprint()
+            local myBlueprint = self.Blueprint
             if myBlueprint.Audio.Activate then
                 self:PlaySound(myBlueprint.Audio.Activate)
             end

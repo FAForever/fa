@@ -16,7 +16,7 @@ XEB0204 = Class(TPodTowerUnit) {
             self.OpenAnim = CreateAnimator(self)
             self.Trash:Add(self.OpenAnim)
         end
-        self.OpenAnim:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.4)
+        self.OpenAnim:PlayAnim(self.Blueprint.Display.AnimationOpen, false):SetRate(0.4)
     end,
 }
 

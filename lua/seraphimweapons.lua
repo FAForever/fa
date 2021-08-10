@@ -211,7 +211,7 @@ SDFExperimentalPhasonLaser = Class(DefaultBeamWeapon) {
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -240,7 +240,7 @@ SDFUltraChromaticBeamGenerator = Class(DefaultBeamWeapon) {
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)

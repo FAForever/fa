@@ -16,7 +16,7 @@ local EMPDeathWeapon = Class(Weapon) {
     end,
 
     Fire = function(self)
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
                    blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
@@ -65,7 +65,7 @@ XRL0302 = Class(CWalkingLandUnit) {
     
     EmitPeriodicEffects = function(self)
         while not self.Dead do
-            local army = self:GetArmy()
+            local army = self.Army
 
             for kE, vE in self.AmbientLandExhaustEffects do
                 for kB, vB in self.AmbientExhaustBones do
@@ -103,7 +103,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         -- Now handle our special buff
         local bp
-        for k, v in self:GetBlueprint().Buffs do
+        for k, v in self.Blueprint.Buffs do
             if v.Add.OnDeath then
                 bp = v
             end

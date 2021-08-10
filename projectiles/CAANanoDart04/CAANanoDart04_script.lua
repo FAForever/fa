@@ -38,7 +38,7 @@ CAANanoDart04 = Class(CAANanoDartProjectile) {
         WaitSeconds(0.25)                   --Wait for a small amount of time
         
         self:SetBallisticAcceleration(-0.5) --Accelerate the projectile forward (negative is forward for this one).
-        local army = self:GetArmy()         --Set the army affiliation for this projectile.
+        local army = self.Army         --Set the army affiliation for this projectile.
 
         --Place fx-emitter trails coming from this projectile for its exhaust trail.
         for i in self.FxTrails do

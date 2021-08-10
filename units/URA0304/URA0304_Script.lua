@@ -2,7 +2,7 @@
 --  File     :  /cdimage/units/URA0304/URA0304_script.lua
 --  Author(s):  John Comes, David Tomandl
 --  Summary  :  Cybran Strategic Bomber Script
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
@@ -24,7 +24,7 @@ URA0304 = Class(CAirUnit) {
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
+        if instigator and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return
         end
         

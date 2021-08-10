@@ -67,7 +67,7 @@ XRL0403 = Class(CWalkingLandUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, false):SetRate(0)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
@@ -101,7 +101,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         elseif new == 'Seabed' then
             self:EnableUnitIntel('Layer', 'Sonar')
             -- Increase speed while in water
-            self:SetSpeedMult(self:GetBlueprint().Physics.WaterSpeedMultiplier)
+            self:SetSpeedMult(self.Blueprint.Physics.WaterSpeedMultiplier)
         end
     end,
 
@@ -180,7 +180,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         WaitSeconds(0.4)
         self:CreateDeathExplosionDustRing()
         
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local position = self:GetPosition()
         local qx, qy, qz, qw = unpack(self:GetOrientation())
         local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
@@ -246,7 +246,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
 
         if (old == 'Stopped') then
-            local bpDisplay = self:GetBlueprint().Display
+            local bpDisplay = self.Blueprint.Display
             if bpDisplay.AnimationWalk and self.Animator then
                 self.Animator:SetDirectionalAnim(true)
                 self.Animator:SetRate(bpDisplay.AnimationWalkRate)

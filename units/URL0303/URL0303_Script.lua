@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/URL0303/URL0303_script.lua
 -- Author(s):  John Comes, David Tomandl, Jessica St. Croix
 -- Summary  :  Cybran Siege Assault Bot Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
@@ -19,7 +19,7 @@ local EMPDeathWeapon = Class(Weapon) {
     end,
 
     Fire = function(self)
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
                    blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
@@ -36,7 +36,7 @@ URL0303 = Class(CWalkingLandUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint().Defense.AntiMissile
+        local bp = self.Blueprint.Defense.AntiMissile
         local antiMissile = MissileRedirect {
             Owner = self,
             Radius = bp.Radius,
@@ -52,7 +52,7 @@ URL0303 = Class(CWalkingLandUnit) {
         if self.ChargingInitiated then return end
 
         self.ChargingInitiated = true
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local bufffx3 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_03_emit.bp')
         self.Trash:Add(bufffx3)
         WaitSeconds(blueprint.SecondsBeforeChargeKicksIn)
@@ -85,7 +85,7 @@ URL0303 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
 
         -- Now handle our special buff and FX
-        local original_bp = table.deepcopy(self:GetBlueprint().Buffs)
+        local original_bp = table.deepcopy(self.Blueprint.Buffs)
         local bp
         for k, v in original_bp do
             if v.Add.OnDeath then

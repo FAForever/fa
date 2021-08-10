@@ -63,7 +63,7 @@ function AICheckForWeakEnemyBase(aiBrain)
         local bomberThreat = 0
         local bombers = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), {x,0,z}, 10000)
         for k, unit in bombers do
-            bomberThreat = bomberThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
+            bomberThreat = bomberThreat + unit.Blueprint.Defense.SurfaceThreatLevel
         end
         if bomberThreat > enemyBaseThreat then
             table.insert(aiBrain.AirAttackPoints,
@@ -193,7 +193,7 @@ function AIHandleACUIntel(aiBrain, intel)
         local bomberThreat = 0
         local bombers = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), intel.Position, 500)
         for k, unit in bombers do
-            bomberThreat = bomberThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
+            bomberThreat = bomberThreat + unit.Blueprint.Defense.SurfaceThreatLevel
         end
         -- If AntiAir threat level is less than our bomber threat around the ACU
         if aiBrain:GetThreatAtPosition(intel.Position, 1, true, 'AntiAir') < bomberThreat then
@@ -365,7 +365,7 @@ function ThreatBugcheck(aiBrain)
     local units = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.ALLUNITS, {myStartX, 0, myStartZ}, 200)
     for k,v in units do
         if not v.Dead then
-            unitThreat = (v:GetBlueprint().Defense.SurfaceThreatLevel or 0) + (v:GetBlueprint().Defense.AirThreatLevel or 0) + (v:GetBlueprint().Defense.SubThreatLevel or 0) + (v:GetBlueprint().Defense.EconomyThreatLevel or 0)
+            unitThreat = (v.Blueprint.Defense.SurfaceThreatLevel or 0) + (v.Blueprint.Defense.AirThreatLevel or 0) + (v.Blueprint.Defense.SubThreatLevel or 0) + (v.Blueprint.Defense.EconomyThreatLevel or 0)
             myThreat = myThreat + unitThreat
         end
     end
@@ -899,7 +899,7 @@ function LeadTarget(platoon, target)
     -- Adjust for targets CollisionOffsetY. If the hitbox of the unit is above the ground
     -- we nedd to fire "behind" the target, so we hit the unit in midair.
     local TargetCollisionBoxAdjust = 0
-    local TargetBluePrint = target:GetBlueprint()
+    local TargetBluePrint = target.Blueprint
     if TargetBluePrint.CollisionOffsetY and TargetBluePrint.CollisionOffsetY > 0 then
         -- if the unit is far away we need to target farther behind the target because of the projectile flight angel
         local DistanceOffset = (100 / 256 * dist2) * 0.06
@@ -1039,7 +1039,7 @@ end
 function GetGuards(aiBrain, Unit)
     local engs = aiBrain:GetUnitsAroundPoint(categories.ENGINEER - categories.POD, Unit:GetPosition(), 10, 'Ally')
     local count = 0
-    local UpgradesFrom = Unit:GetBlueprint().General.UpgradesFrom
+    local UpgradesFrom = Unit.Blueprint.General.UpgradesFrom
     for k,v in engs do
         if v.UnitBeingBuilt == Unit then
             count = count + 1
@@ -1099,7 +1099,7 @@ function Nuke(aiBrain)
     local fired = {}
     for k, v in Nukes do
         if not maxFire then
-            bp = v:GetBlueprint()
+            bp = v.Blueprint
             weapon = bp.Weapon[1]
             maxRadius = weapon.MaxRadius
             launcher = v
@@ -1171,7 +1171,7 @@ function CheckCost(aiBrain, pos, massCost)
     local massValue = 0
     for k,v in units do
         if not v.Dead then
-            local unitValue = (v:GetBlueprint().Economy.BuildCostMass * v:GetFractionComplete())
+            local unitValue = (v.Blueprint.Economy.BuildCostMass * v:GetFractionComplete())
             massValue = massValue + unitValue
         end
         if massValue > massCost then return true end

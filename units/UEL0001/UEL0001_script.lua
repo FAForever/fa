@@ -48,7 +48,7 @@ UEL0001 = Class(ACUUnit) {
         self.Animator = CreateAnimator(self)
         self.Animator:SetPrecedence(0)
         if self.IdleAnim then
-            self.Animator:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true)
+            self.Animator:PlayAnim(self.Blueprint.Display.AnimationIdle, true)
             for k, v in self.DisabledBones do
                 self.Animator:SetBoneEnabled(v, false)
             end
@@ -138,7 +138,7 @@ UEL0001 = Class(ACUUnit) {
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
 
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         if enh == 'LeftPod' then
             local location = self:GetPosition('AttachSpecial02')
@@ -219,7 +219,7 @@ UEL0001 = Class(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -235,7 +235,7 @@ UEL0001 = Class(ACUUnit) {
             end
             Buff.ApplyBuff(self, 'UEFACUT2BuildRate')
         elseif enh =='AdvancedEngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
+            local bp = self.Blueprint.Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
@@ -255,7 +255,7 @@ UEL0001 = Class(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -271,7 +271,7 @@ UEL0001 = Class(ACUUnit) {
             end
             Buff.ApplyBuff(self, 'UEFACUT3BuildRate')
         elseif enh =='T3EngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
+            local bp = self.Blueprint.Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
@@ -312,24 +312,24 @@ UEL0001 = Class(ACUUnit) {
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh =='HeavyAntiMatterCannonRemove' then
-            local bp = self:GetBlueprint().Enhancements['HeavyAntiMatterCannon']
+            local bp = self.Blueprint.Enhancements['HeavyAntiMatterCannon']
             if not bp then return end
             local wep = self:GetWeaponByLabel('RightZephyr')
             wep:AddDamageMod(-bp.ZephyrDamageMod)
-            local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+            local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bpDisrupt or 22)
         elseif enh == 'ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
             if not bp then return end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh =='TacticalMissile' then

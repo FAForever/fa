@@ -370,7 +370,7 @@ Platoon = Class(moho.platoon_methods) {
 
         if not unit then return end
 
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local weapon = bp.Weapon[1]
         local maxRadius = weapon.MaxRadius
         local minRadius = weapon.MinRadius
@@ -1143,7 +1143,7 @@ Platoon = Class(moho.platoon_methods) {
         --Get negative reciprocal vector, make length of vision radius
         local dir = math.pow(-1, Random(1,2))
 
-        local visRad = scout:GetBlueprint().Intel.VisionRadius
+        local visRad = scout.Blueprint.Intel.VisionRadius
         local orthogonal = {norm[3]*visRad*dir, 0, -norm[1]*visRad*dir}
 
         --Offset the target location with an orthogonal vector and a flyby vector.
@@ -1809,7 +1809,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 -- stop if our target is finished
                 if guardedUnit:GetFractionComplete() == 1 and not guardedUnit:IsUnitState('Upgrading') then
-                    --LOG('* ManagerEngineerAssistAI: Engineer Builder ['..self.BuilderName..'] - ['..self.PlatoonData.Assist.AssisteeType..'] - Target unit ['..guardedUnit:GetBlueprint().BlueprintId..'] ('..guardedUnit:GetBlueprint().Description..') is finished')
+                    --LOG('* ManagerEngineerAssistAI: Engineer Builder ['..self.BuilderName..'] - ['..self.PlatoonData.Assist.AssisteeType..'] - Target unit ['..guardedUnit.Blueprint.BlueprintId..'] ('..guardedUnit.Blueprint.Description..') is finished')
                     break
                 end
                 -- wait 1.5 seconds until we loop again
@@ -1864,7 +1864,7 @@ Platoon = Class(moho.platoon_methods) {
             self:Stop()
             eng.AssistSet = true
             eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
-            --LOG('* EconUnfinishedBody: Assisting now: ['..eng.UnitBeingBuilt:GetBlueprint().BlueprintId..'] ('..eng.UnitBeingBuilt:GetBlueprint().Description..')')
+            --LOG('* EconUnfinishedBody: Assisting now: ['..eng.UnitBeingBuilt.Blueprint.BlueprintId..'] ('..eng.UnitBeingBuilt.Blueprint.Description..')')
             IssueGuard({eng}, assistee)
         else
             self.AssistPlatoon = nil
@@ -1894,7 +1894,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
                 -- stop if our target is finished
                 if guardedUnit:GetFractionComplete() == 1 and not guardedUnit:IsUnitState('Upgrading') then
-                    --LOG('* ManagerEngineerAssistAI: Engineer Builder ['..self.BuilderName..'] - ['..self.PlatoonData.Assist.AssisteeType..'] - Target unit ['..guardedUnit:GetBlueprint().BlueprintId..'] ('..guardedUnit:GetBlueprint().Description..') is finished')
+                    --LOG('* ManagerEngineerAssistAI: Engineer Builder ['..self.BuilderName..'] - ['..self.PlatoonData.Assist.AssisteeType..'] - Target unit ['..guardedUnit.Blueprint.BlueprintId..'] ('..guardedUnit.Blueprint.Description..') is finished')
                     break
                 end
                 -- wait 1.5 seconds until we loop again
@@ -1975,7 +1975,7 @@ Platoon = Class(moho.platoon_methods) {
             self:Stop()
             eng.AssistSet = true
             eng.UnitBeingAssist = assistee.UnitBeingBuilt or assistee.UnitBeingAssist or assistee
-            --LOG('* EconAssistBody: Assisting now: ['..eng.UnitBeingAssist:GetBlueprint().BlueprintId..'] ('..eng.UnitBeingAssist:GetBlueprint().Description..')')
+            --LOG('* EconAssistBody: Assisting now: ['..eng.UnitBeingAssist.Blueprint.BlueprintId..'] ('..eng.UnitBeingAssist.Blueprint.Description..')')
             IssueGuard({eng}, eng.UnitBeingAssist)
         else
             self.AssistPlatoon = nil
@@ -2848,7 +2848,7 @@ Platoon = Class(moho.platoon_methods) {
             return
         end
         unit:SetTargetPriorities(atkPriTable)
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local weapon = bp.Weapon[1]
         local maxRadius = weapon.MaxRadius
 
@@ -3404,7 +3404,7 @@ Platoon = Class(moho.platoon_methods) {
         local units = self:GetPlatoonUnits()
         if units and not table.empty(units) then
             for k, v in units do
-                local bp = v:GetBlueprint().Display
+                local bp = v.Blueprint.Display
                 if bp.AINames then
                     local num = Random(1, table.getn(bp.AINames))
                     v:SetCustomName(bp.AINames[num])
@@ -3423,7 +3423,7 @@ Platoon = Class(moho.platoon_methods) {
         }
 
         for i,unit in self:GetPlatoonUnits() do
-            local bpd = unit:GetBlueprint().Defense
+            local bpd = unit.Blueprint.Defense
 
             threat.AirThreatLevel = threat.AirThreatLevel + (bpd.AirThreatLevel or 0)
             threat.EconomyThreatLevel = threat.EconomyThreatLevel + (bpd.EconomyThreatLevel or 0)
@@ -3777,7 +3777,7 @@ Platoon = Class(moho.platoon_methods) {
         end
 
         if unit then
-            local bp = unit:GetBlueprint()
+            local bp = unit.Blueprint
             local weapon = bp.Weapon[1]
             local maxRadius = weapon.MaxRadius
             local nukePos, oldTargetLocation
@@ -4101,7 +4101,7 @@ Platoon = Class(moho.platoon_methods) {
         if not unit then
             return
         end
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local weapon = bp.Weapon[1]
         local maxRadius = weapon.MaxRadius
         local attacking = false
@@ -4178,7 +4178,7 @@ Platoon = Class(moho.platoon_methods) {
 
         if not unit then return end
 
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local weapon = bp.Weapon[1]
         local maxRadius = weapon.MaxRadius
         local minRadius = weapon.MinRadius
@@ -5400,7 +5400,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         local leashRange = eng.Mult * 100
-        local weapBPs = eng:GetBlueprint().Weapon
+        local weapBPs = eng.Blueprint.Weapon
         local weapon
         eng.Fighting = true
         for k,v in weapBPs do
@@ -5413,7 +5413,7 @@ Platoon = Class(moho.platoon_methods) {
         local movingToScout = false
         local initialMove = true
         while aiBrain:PlatoonExists(self) do
-            local mySurfaceThreat = eng:GetBlueprint().Defense.SurfaceThreatLevel or 75
+            local mySurfaceThreat = eng.Blueprint.Defense.SurfaceThreatLevel or 75
             local pos = self:GetPlatoonPosition()
             local target = self:FindClosestUnit('support', 'Enemy', true, categories.ALLUNITS - categories.AIR - categories.NAVAL - categories.SCOUT)
             if target and not target.Dead and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), eng.CDRHome) < (leashRange * leashRange) and

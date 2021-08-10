@@ -20,7 +20,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
         ATorpedoCluster.OnCreate(self)
         self.HasImpacted = false
 
-		CreateTrail(self, -1, self:GetArmy(), import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01)
+		CreateTrail(self, -1, self.Army, import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01)
         
     end,
 
@@ -56,7 +56,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
             LifeTime = 10,
             Omni = false,
             Vision = false,
-            Army = self:GetArmy(),
+            Army = self.Army,
         }
         local vizEntity = VizMarker(spec)
         ATorpedoCluster.OnEnterWater(self)

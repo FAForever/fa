@@ -83,7 +83,7 @@ end
 
 function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
     unitBeingBuilt.BuildingCube = true
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local mul = 1.15
     local xPos, yPos, zPos = unpack(unitBeingBuilt:GetPosition())
     local proj = nil
@@ -153,13 +153,13 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
 end
 
 function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, BuildEffectsBag)
-    local buildAttachBone = builder:GetBlueprint().Display.BuildAttachBone
+    local buildAttachBone = builder.Blueprint.Display.BuildAttachBone
     BuildEffectsBag:Add(CreateAttachedEmitter(builder, buildAttachBone, builder.Army, '/effects/emitters/uef_mobile_unit_build_01_emit.bp'))
 end
 
 function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
-    local buildbp = unitBeingBuilt:GetBlueprint()
+    local buildbp = unitBeingBuilt.Blueprint
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
     y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)
 
@@ -228,7 +228,7 @@ end
 
 function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
-    local buildbp = unitBeingBuilt:GetBlueprint()
+    local buildbp = unitBeingBuilt.Blueprint
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
     y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)
 
@@ -333,7 +333,7 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Buil
 end
 
 function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
     local mul = 0.5
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
@@ -433,7 +433,7 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
             local angleInitial = 180
             local VecMul = 0.5
             local xVec = 0
-            local yVec = builder:GetBlueprint().SizeY * 0.5
+            local yVec = builder.Blueprint.SizeY * 0.5
             local zVec = 0
 
             local angle = (2 * math.pi) / numUnits
@@ -550,7 +550,7 @@ function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, BuildEffect
 end
 
 function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local x, y, z = unpack(builder:GetPosition(BuildBone))
     local mul = 1
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
@@ -630,7 +630,7 @@ function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, Buil
 end
 
 function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local x, y, z = unpack(builder:GetPosition(BuildBone))
     local mul = 1
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
@@ -692,7 +692,7 @@ function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, Bu
 end
 
 function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local x, y, z = unpack(builder:GetPosition(BuildBone))
     local mul = 1
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
@@ -766,7 +766,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffe
 end
 
 function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFactor)
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
     local mul = 0.5
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
@@ -841,8 +841,8 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
 
     table.insert(AdjacencyBeamsBag, info)
 
-    local uBp = unit:GetBlueprint()
-    local aBp = adjacentUnit:GetBlueprint()
+    local uBp = unit.Blueprint
+    local aBp = adjacentUnit.Blueprint
     local faction = uBp.General.FactionName
 
     -- Determine which effects we will be using
@@ -1190,7 +1190,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
 end
 
 function PlaySacrificingEffects(unit, target_unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local faction = bp.General.FactionName
 
     if faction == 'Aeon' then
@@ -1201,7 +1201,7 @@ function PlaySacrificingEffects(unit, target_unit)
 end
 
 function PlaySacrificeEffects(unit, target_unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local faction = bp.General.FactionName
 
     if faction == 'Aeon' then
@@ -1390,7 +1390,7 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, tele
         return
     end
 
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local faction = bp.General.FactionName
     local Yoffset = TeleportGetUnitYOffset(unit)
 
@@ -1512,13 +1512,13 @@ end
 
 function TeleportGetUnitYOffset(unit)
     -- Returns how high to create effects to make the effects appear in the center of the unit
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return bp.Display.TeleportEffects.FxChargeAtDestOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) / 2)
 end
 
 function TeleportGetUnitSizes(unit)
     -- Returns the sizes of the unit, to be used for teleportation effects
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return (bp.Display.TeleportEffects.FxSizeX or bp.Physics.MeshExtentsX or bp.SizeX or 1),
            (bp.Display.TeleportEffects.FxSizeY or bp.Physics.MeshExtentsY or bp.SizeY or 1),
            (bp.Display.TeleportEffects.FxSizeZ or bp.Physics.MeshExtentsZ or bp.SizeZ or 1),
@@ -1536,7 +1536,7 @@ end
 
 function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
     -- Creates charge up effects at the unit
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or {Bone = 0, Offset = {0, 0.25, 0}, }
     local bone, ox, oy, oz
     local emitters = {}
@@ -1557,7 +1557,7 @@ end
 
 function TeleportCreateCybranSphere(unit, location, initialScale)
     -- Creates the sphere used by Cybran teleportation effects
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local scale = 1
 
     local sx, sy, sz = TeleportGetUnitSizes(unit)
@@ -1580,7 +1580,7 @@ function TeleportCreateCybranSphere(unit, location, initialScale)
 end
 
 function TeleportChargingProgress(unit, fraction)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
 
     if bp.Display.TeleportEffects.PlayChargeFxAtDestination ~= false then
         fraction = math.min(math.max(fraction, 0.01), 1)
@@ -1625,7 +1625,7 @@ end
 
 function PlayTeleportOutEffects(unit, EffectsBag)
     -- Fired when the unit is being teleported, just before the unit is taken from its original location
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local faction = bp.General.FactionName
     local Yoffset = TeleportGetUnitYOffset(unit)
 
@@ -1666,7 +1666,7 @@ end
 
 function DoTeleportInDamage(unit)
     -- Check for teleport dummy weapon and deal the specified damage. Also show fx.
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local Yoffset = TeleportGetUnitYOffset(unit)
 
     local dmg = 0
@@ -1720,7 +1720,7 @@ end
 
 function PlayTeleportInEffects(unit, EffectsBag)
     -- Fired when the unit is being teleported, just after the unit is taken from its original location
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local faction = bp.General.FactionName
     local Yoffset = TeleportGetUnitYOffset(unit)
     local decalOrient = RandomFloat(0, 2 * math.pi)
@@ -1738,7 +1738,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
             CreateDecal(unit:GetPosition(), decalOrient, 'Scorch_generic_002_albedo', '', 'Albedo', 7, 7, 200, 300, unit.Army)
 
             local fn = function(unit)
-                local bp = unit:GetBlueprint()
+                local bp = unit.Blueprint
                 local MeshExtentsY = (bp.Physics.MeshExtentsY or 1)
 
                 CreateLightParticle(unit, -1, unit.Army, 4, 10, 'glow_03', 'ramp_yellow_01')
@@ -1797,7 +1797,7 @@ function PlayTeleportInEffects(unit, EffectsBag)
         elseif faction == 'Seraphim' then
             local fn = function(unit)
 
-                local bp = unit:GetBlueprint()
+                local bp = unit.Blueprint
                 local Yoffset = TeleportGetUnitYOffset(unit)
 
                 unit.TeleportFx_IsInvisible = true

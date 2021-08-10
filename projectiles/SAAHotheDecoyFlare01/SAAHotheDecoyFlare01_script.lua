@@ -15,7 +15,7 @@ SAAHotheDecoyFlare01 = Class(SAAHotheFlareProjectile) {
         SAAHotheFlareProjectile.OnCreate(self)
         self.MyShield = Flare {
             Owner = self,
-            Radius = self:GetBlueprint().Physics.FlareRadius,
+            Radius = self.Blueprint.Physics.FlareRadius,
         }
         self.Trash:Add(self.MyShield)
         self:TrackTarget(false)

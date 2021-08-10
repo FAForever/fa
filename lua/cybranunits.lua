@@ -32,7 +32,7 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
@@ -41,7 +41,7 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            self.BuildAnimManip:PlayAnim(self.Blueprint.Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
         self.BuildAnimManip:SetRate(1)
@@ -86,7 +86,7 @@ CConstructionUnit = Class(ConstructionUnit){
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self:GetBlueprint().Display.AnimationWater then
+        if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -104,7 +104,7 @@ CConstructionUnit = Class(ConstructionUnit){
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self:GetBlueprint().Display.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.Blueprint.Display.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else
@@ -142,7 +142,7 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
@@ -153,7 +153,7 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            self.BuildAnimManip:PlayAnim(self.Blueprint.Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
 
@@ -295,7 +295,7 @@ CRadarJammerUnit = Class(RadarJammerUnit) {}
 CConstructionEggUnit = Class(CStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()
         local aiBrain = self:GetAIBrain()
@@ -309,7 +309,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
         self:ForkThread(function()
                 self.OpenAnimManip = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnimManip)
-                self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
+                self.OpenAnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen, false):SetRate(0.1)
                 self:PlaySound(bp.Audio['EggOpen'])
 
                 WaitFor(self.OpenAnimManip)
@@ -339,7 +339,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         -- Structure stuff
         CStructureUnit.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- Construction stuff
         self.EffectsBag = {}
@@ -445,7 +445,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         if self.StoppedBuilding then
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
-            self.BuildingOpenAnimManip:SetRate(-(self:GetBlueprint().Display.AnimationBuildRate or 1))
+            self.BuildingOpenAnimManip:SetRate(-(self.Blueprint.Display.AnimationBuildRate or 1))
         end
     end,
 

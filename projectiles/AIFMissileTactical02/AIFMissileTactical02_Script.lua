@@ -12,7 +12,7 @@ AIFMissileTactical02 = Class(AMissileSerpentineProjectile) {
     end,
 
     MovementThread = function(self)
-        local army = self:GetArmy()
+        local army = self.Army
         self:TrackTarget(false)
         self:SetCollision(true)
         WaitSeconds(2)

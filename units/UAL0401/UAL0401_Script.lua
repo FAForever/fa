@@ -23,7 +23,7 @@ UAL0401 = Class(AWalkingLandUnit) {
         AWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
 
         local wep = self:GetWeaponByLabel('EyeWeapon')
-        local bp = wep:GetBlueprint()
+        local bp = wep.Blueprint
         if bp.Audio.BeamStop then
             wep:PlaySound(bp.Audio.BeamStop)
         end
@@ -58,7 +58,7 @@ UAL0401 = Class(AWalkingLandUnit) {
             WaitFor(self.DeathAnimManip)
         end
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local position = self:GetPosition()
         local qx, qy, qz, qw = unpack(self:GetOrientation())
         local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)

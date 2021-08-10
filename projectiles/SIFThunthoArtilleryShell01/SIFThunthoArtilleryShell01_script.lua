@@ -18,11 +18,11 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
     OnImpact = function(self, TargetType, TargetEntity) 
         
         local FxFragEffect = EffectTemplate.SThunderStormCannonProjectileSplitFx 
-        local bp = self:GetBlueprint().Physics
+        local bp = self.Blueprint.Physics
               
         ------ Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity( self, self:GetArmy(), v )
+            CreateEmitterAtEntity( self, self.Army, v )
         end
         
         local vx, vy, vz = self:GetVelocity()

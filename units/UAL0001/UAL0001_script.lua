@@ -54,26 +54,26 @@ UAL0001 = Class(ACUUnit) {
 
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         -- Resource Allocation
         if enh == 'ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
             if not bp then return end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationAdvanced' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
             if not bp then return end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationAdvancedRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         -- Shields
@@ -124,7 +124,7 @@ UAL0001 = Class(ACUUnit) {
             self:SetWeaponEnabledByLabel('ChronoDampener', false)
         -- T2 Engineering
         elseif enh =='AdvancedEngineering' then
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -138,7 +138,7 @@ UAL0001 = Class(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -154,7 +154,7 @@ UAL0001 = Class(ACUUnit) {
             end
             Buff.ApplyBuff(self, 'AeonACUT2BuildRate')
         elseif enh =='AdvancedEngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
+            local bp = self.Blueprint.Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
@@ -163,7 +163,7 @@ UAL0001 = Class(ACUUnit) {
          end
         -- T3 Engineering
         elseif enh =='T3Engineering' then
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -176,7 +176,7 @@ UAL0001 = Class(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -192,7 +192,7 @@ UAL0001 = Class(ACUUnit) {
             end
             Buff.ApplyBuff(self, 'AeonACUT3BuildRate')
         elseif enh =='T3EngineeringRemove' then
-            local bp = self:GetBlueprint().Economy.BuildRate
+            local bp = self.Blueprint.Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
@@ -209,7 +209,7 @@ UAL0001 = Class(ACUUnit) {
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 44)
         elseif enh == 'CrysalisBeamRemove' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
-            local bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
+            local bpDisrupt = self.Blueprint.Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bpDisrupt or 22)
@@ -221,14 +221,14 @@ UAL0001 = Class(ACUUnit) {
             wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
         elseif enh == 'HeatSinkRemove' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
-            local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
+            local bpDisrupt = self.Blueprint.Weapon[1].RateOfFire
             wep:ChangeRateOfFire(bpDisrupt or 1)
         -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
         elseif enh == 'EnhancedSensorsRemove' then
-            local bpIntel = self:GetBlueprint().Intel
+            local bpIntel = self.Blueprint.Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
       end

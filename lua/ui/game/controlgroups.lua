@@ -112,7 +112,7 @@ function OnSelectionSetChanged(name, units, applied)
                 local iconID = ''
                 for _, unitTable in sortedUnits do
                     if not table.empty(unitTable) then
-                        iconID = unitTable[1]:GetBlueprint().BlueprintId
+                        iconID = unitTable[1].Blueprint.BlueprintId
                         break
                     end
                 end

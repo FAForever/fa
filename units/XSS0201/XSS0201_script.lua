@@ -24,7 +24,7 @@ XSS0201 = Class(SSubUnit) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         local wep1 = self:GetWeaponByLabel('FrontTurret')
-        local bp1 = wep1:GetBlueprint()
+        local bp1 = wep1.Blueprint
         if bp1.Audio.BeamStop then
             wep1:PlaySound(bp1.Audio.BeamStop)
         end
@@ -36,7 +36,7 @@ XSS0201 = Class(SSubUnit) {
         end
 
         local wep2 = self:GetWeaponByLabel('BackTurret')
-        local bp2 = wep2:GetBlueprint()
+        local bp2 = wep2.Blueprint
         if bp2.Audio.BeamStop then
             wep2:PlaySound(bp2.Audio.BeamStop)
         end

@@ -21,7 +21,7 @@ UEB2401 = Class(TStructureUnit) {
                     TIFArtilleryWeapon.IdleState.OnGotTarget(self)
                     if not self.ArtyAnim then
                         self.ArtyAnim = CreateAnimator(self.unit)
-                        self.ArtyAnim:PlayAnim(self.unit:GetBlueprint().Display.AnimationOpen)
+                        self.ArtyAnim:PlayAnim(self.unit.Blueprint.Display.AnimationOpen)
                         self.unit.Trash:Add(self.ArtyAnim)
                     end
                 end,

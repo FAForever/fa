@@ -184,7 +184,7 @@ function AssistMex(command)
     if not mex or IsDestroyed(mex) then return end
 
     local eco = mex:GetEconData()
-    local bp = mex:GetBlueprint()
+    local bp = mex.Blueprint
     local is_capped = eco.massProduced == bp.Economy.ProductionPerSecondMass * 1.5
     if is_capped then return end
 

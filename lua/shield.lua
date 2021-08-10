@@ -79,7 +79,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
         self.PassOverkillDamage = spec.PassOverkillDamage
 
-        local ownerCategories = self.Owner:GetBlueprint().CategoriesHash
+        local ownerCategories = self.Owner.Blueprint.CategoriesHash
         if ownerCategories.STRUCTURE then
             self.StaticShield = true
         elseif ownerCategories.COMMAND then
@@ -135,12 +135,12 @@ Shield = Class(moho.shield_methods, Entity) {
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
+        amount = amount * (1.0 - ArmyGetHandicap(self.Army))
         return math.min(self:GetHealth(), amount)
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        local weaponBP = firingWeapon:GetBlueprint()
+        local weaponBP = firingWeapon.Blueprint
         local collide = weaponBP.CollideFriendly
         if collide == false then
             if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
@@ -163,7 +163,7 @@ Shield = Class(moho.shield_methods, Entity) {
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
+        amount = amount * (1.0 - ArmyGetHandicap(self.Army))
         local finalVal =  amount - self:GetHealth()
         if finalVal < 0 then
             finalVal = 0
@@ -184,10 +184,10 @@ Shield = Class(moho.shield_methods, Entity) {
         if dmgType == 'Overcharge' and instigator.UnitId then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
-                amount = wep:GetBlueprint().Overcharge.structureDamage * 2
+                amount = wep.Blueprint.Overcharge.structureDamage * 2
                 -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
             elseif self.CommandShield then --fixed damage for all ACU shields
-                amount = wep:GetBlueprint().Overcharge.commandDamage
+                amount = wep.Blueprint.Overcharge.commandDamage
             end
         end
         if self.Owner ~= instigator then
@@ -243,7 +243,7 @@ Shield = Class(moho.shield_methods, Entity) {
     --Fix "free" shield regen. Assist efficiency never drops, no matter what mass income you have
     --We have to compensate it in this thread.
     ValidateAssistersThread = function(self)
-        local shieldBP = self.Owner:GetBlueprint().Defense.Shield
+        local shieldBP = self.Owner.Blueprint.Defense.Shield
         local RegenPerBR = shieldBP.ShieldRegenRate / shieldBP.RegenAssistMult / 10 --amount of hp per 1 buildrate (for 1 tick). Weird formula
 
         local previousTickTotalBR
@@ -353,7 +353,7 @@ Shield = Class(moho.shield_methods, Entity) {
             return false
         end
 
-        if other:GetBlueprint().Physics.CollideFriendlyShield then
+        if other.Blueprint.Physics.CollideFriendlyShield then
             return true
         end
 
@@ -618,7 +618,7 @@ PersonalBubble = Class(Shield) {
         Shield.OnCreate(self, spec)
 
         -- Store off useful values from the blueprint
-        local OwnerBp = self.Owner:GetBlueprint()
+        local OwnerBp = self.Owner.Blueprint
 
         self.SizeX = OwnerBp.SizeX
         self.SizeY = OwnerBp.SizeY
@@ -832,12 +832,12 @@ PersonalShield = Class(Shield){
 
     RemoveShield = function(self)
         self:SetCollisionShape('None')
-        self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
+        self.Owner:SetMesh(self.Owner.Blueprint.Display.MeshBlueprint, true)
     end,
 
     OnDestroy = function(self)
         if not self.Owner.MyShield or self.Owner.MyShield.EntityId == self.EntityId then
-            self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
+            self.Owner:SetMesh(self.Owner.Blueprint.Display.MeshBlueprint, true)
         end
         self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
@@ -851,7 +851,7 @@ AntiArtilleryShield = Class(Shield) {
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        local bp = firingWeapon:GetBlueprint()
+        local bp = firingWeapon.Blueprint
         if bp.CollideFriendly == false then
             if self.Army == firingWeapon.unit.Army then
                 return false
@@ -877,7 +877,7 @@ AntiArtilleryShield = Class(Shield) {
             return false
         end
 
-        if other:GetBlueprint().Physics.CollideFriendlyShield and other.DamageData.ArtilleryShieldBlocks then
+        if other.Blueprint.Physics.CollideFriendlyShield and other.DamageData.ArtilleryShieldBlocks then
             return true
         end
 
@@ -936,7 +936,7 @@ CzarShield = Class(PersonalShield) {
 
     CreateImpactEffect = function(self, vector)
         if not self or self.Owner.Dead then return end
-        local army = self:GetArmy()
+        local army = self.Army
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
         local pos = self:GetPosition()

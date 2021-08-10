@@ -373,7 +373,7 @@ function GetArmyUnitCostTotal(strArmy)
 end
 
 --- Returns entity's blueprint.
--- Can be used as local bp = entity:GetBlueprint().
+-- Can be used as local bp = entity.Blueprint.
 function GetBlueprint(entity)
 end
 

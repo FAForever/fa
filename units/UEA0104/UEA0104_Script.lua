@@ -53,7 +53,7 @@ UEA0104 = Class(AirTransport) {
         self.LandingAnimManip = CreateAnimator(self)
         self.LandingAnimManip:SetPrecedence(0)
         self.Trash:Add(self.LandingAnimManip)
-        self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
+        self.LandingAnimManip:PlayAnim(self.Blueprint.Display.AnimationLand):SetRate(1)
         self:ForkThread(self.ExpandThread)
     end,
 
@@ -111,7 +111,7 @@ UEA0104 = Class(AirTransport) {
     end,
 
     GetUnitSizes = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if self:GetFractionComplete() < 1.0 then
             return bp.SizeX, bp.SizeY, bp.SizeZ * 0.5
         else

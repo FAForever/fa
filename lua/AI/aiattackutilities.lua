@@ -47,15 +47,15 @@ function GetThreatOfUnits(platoon)
     for _,u in units do
         if not u.Dead then
             if platoon.MovementLayer == 'Land' then
-                bpThreat = u:GetBlueprint().Defense.SurfaceThreatLevel
+                bpThreat = u.Blueprint.Defense.SurfaceThreatLevel
             elseif platoon.MovementLayer == 'Water' then
-                bpThreat = u:GetBlueprint().Defense.SurfaceThreatLevel
+                bpThreat = u.Blueprint.Defense.SurfaceThreatLevel
             elseif platoon.MovementLayer == 'Amphibious' then
-                bpThreat = u:GetBlueprint().Defense.SurfaceThreatLevel
+                bpThreat = u.Blueprint.Defense.SurfaceThreatLevel
             elseif platoon.MovementLayer == 'Air' then
-                bpThreat = u:GetBlueprint().Defense.SurfaceThreatLevel
-                if u:GetBlueprint().Defense.AirThreatLevel then
-                    bpThreat = bpThreat + u:GetBlueprint().Defense.AirThreatLevel
+                bpThreat = u.Blueprint.Defense.SurfaceThreatLevel
+                if u.Blueprint.Defense.AirThreatLevel then
+                    bpThreat = bpThreat + u.Blueprint.Defense.AirThreatLevel
                 end
             end
         end
@@ -81,7 +81,7 @@ function GetSurfaceThreatOfUnits(platoon)
     GetMostRestrictiveLayer(platoon)
     local units = platoon:GetPlatoonUnits()
     for _,u in units do
-        bpThreat = u:GetBlueprint().Defense.SurfaceThreatLevel or 0
+        bpThreat = u.Blueprint.Defense.SurfaceThreatLevel or 0
         totalThreat = totalThreat + bpThreat
     end
 
@@ -105,7 +105,7 @@ function GetAirThreatOfUnits(platoon)
     GetMostRestrictiveLayer(platoon)
     local units = platoon:GetPlatoonUnits()
     for _,u in units do
-        bpThreat = u:GetBlueprint().Defense.AirThreatLevel or 0
+        bpThreat = u.Blueprint.Defense.AirThreatLevel or 0
         totalThreat = totalThreat + bpThreat
     end
 
@@ -505,7 +505,7 @@ function GetNavalPlatoonMaxRange(aiBrain, platoon)
             continue
         end
 
-        for _,weapon in unit:GetBlueprint().Weapon do
+        for _,weapon in unit.Blueprint.Weapon do
             if not weapon.FireTargetLayerCapsTable or not weapon.FireTargetLayerCapsTable.Water then
                 continue
             end
@@ -1237,7 +1237,7 @@ function GetMostRestrictiveLayer(platoon)
     platoon.MovementLayer = 'Air'
     for k,v in platoon:GetPlatoonUnits() do
         if not v.Dead then
-            local mType = v:GetBlueprint().Physics.MotionType
+            local mType = v.Blueprint.Physics.MotionType
             if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (platoon.MovementLayer == 'Air' or platoon.MovementLayer == 'Water') then
                 platoon.MovementLayer = 'Amphibious'
                 unit = v
@@ -1860,7 +1860,7 @@ function GetNavalPlatoonMaxRangeSorian(aiBrain, platoon)
             continue
         end
 
-        for _,weapon in unit:GetBlueprint().Weapon do
+        for _,weapon in unit.Blueprint.Weapon do
             if not weapon.FireTargetLayerCapsTable or not weapon.FireTargetLayerCapsTable.Water then
                 continue
             end
@@ -1906,7 +1906,7 @@ function GetLandPlatoonMaxRangeSorian(aiBrain, platoon)
             continue
         end
 
-        for _,weapon in unit:GetBlueprint().Weapon do
+        for _,weapon in unit.Blueprint.Weapon do
             if not weapon.FireTargetLayerCapsTable or not weapon.FireTargetLayerCapsTable.Land then
                 continue
             end

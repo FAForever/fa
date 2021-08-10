@@ -18,7 +18,7 @@ UEB1303 = Class(TMassFabricationUnit) {
         self.Rotator:SetAccel(10)
         self.Rotator:SetTargetSpeed(40)
         self.Trash:Add(self.Rotator)
-		self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
+		self.AmbientEffects = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
 		self.Trash:Add(self.AmbientEffects)        
     
     end,
@@ -36,7 +36,7 @@ UEB1303 = Class(TMassFabricationUnit) {
         TMassFabricationUnit.OnProductionUnpaused(self)
         self.Rotator:SetTargetSpeed(40)
         self.Rotator:SetSpinDown(false)
-		self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
+		self.AmbientEffects = CreateEmitterAtEntity(self, self.Army, '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
 		self.Trash:Add(self.AmbientEffects)          
     end,
 }

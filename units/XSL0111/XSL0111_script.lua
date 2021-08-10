@@ -32,7 +32,7 @@ XSL0111 = Class(SLandUnit) {
                     return
                 end
                 
-                local bp = self:GetBlueprint()
+                local bp = self.Blueprint
 
                 if bp.WeaponUnpacks then
                     ChangeState(self, self.WeaponPackingState)

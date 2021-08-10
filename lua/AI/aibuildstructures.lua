@@ -150,7 +150,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
             SPEW('*AIExecuteBuildStructure: Need engineer with Techlevel ('..NeedTech..') for BuildUnitWithID: '..repr(BuildUnitWithID))
         end
         -- get the actual tech level from the builder
-        local BC = builder:GetBlueprint().CategoriesHash
+        local BC = builder.Blueprint.CategoriesHash
         if BC.TECH1 or BC.COMMAND then
             HasTech = 1
         elseif BC.TECH2 then
@@ -160,10 +160,10 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
         -- If we can't find a techlevel for the building we  want to build, return
         if not HasTech then
-            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for engineer: '..repr(builder:GetBlueprint().BlueprintId))
+            WARN('*AIExecuteBuildStructure: Can\'t find techlevel for engineer: '..repr(builder.Blueprint.BlueprintId))
             return false
         else
-            SPEW('*AIExecuteBuildStructure: Engineer ('..repr(builder:GetBlueprint().BlueprintId)..') has Techlevel ('..HasTech..')')
+            SPEW('*AIExecuteBuildStructure: Engineer ('..repr(builder.Blueprint.BlueprintId)..') has Techlevel ('..HasTech..')')
         end
 
         if HasTech < NeedTech then
@@ -350,7 +350,7 @@ function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relat
         table.insert(template[1], { buildingType })
         for k,v in reference do
             if not v.Dead then
-                local targetSize = v:GetBlueprint().Physics
+                local targetSize = v.Blueprint.Physics
                 local targetPos = v:GetPosition()
                 targetPos[1] = targetPos[1] - (targetSize.SkirtSizeX/2)
                 targetPos[3] = targetPos[3] - (targetSize.SkirtSizeZ/2)

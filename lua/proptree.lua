@@ -29,7 +29,7 @@ Tree = Class(Prop) {
         if type == 'Force' then
             self.Motor = self.Motor or self:FallDown()
             self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self:SetMesh(bp.Display.MeshBlueprintWrecked)
             ChangeState(self, self.FallingState)
         elseif type == 'Nuke' then
@@ -82,7 +82,7 @@ Tree = Class(Prop) {
         Main = function(self)
             local effects = {}
             local fx
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in FireEffects do
                 fx = CreateEmitterAtEntity(self, -1, v ):OffsetEmitter(0, 0.5, 0):ScaleEmitter(4)
                 table.insert(effects, fx)
@@ -137,7 +137,7 @@ Tree = Class(Prop) {
         OnCollision = function(self, other, nx, ny, nz, depth)
             self.Motor = self.Motor or self:FallDown()
 
-            local otherbp = other:GetBlueprint()
+            local otherbp = other.Blueprint
             local is_big = (otherbp.SizeX * otherbp.SizeZ) > 0.2
             if is_big then
                 self.Motor:Whack(nx, ny, nz, depth, true)
@@ -160,7 +160,7 @@ Tree = Class(Prop) {
     FallingState = State {
 
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             WaitSeconds(30)
             self:SinkAway(-.1)
             self.Motor = nil
@@ -223,11 +223,11 @@ TreeGroup = Class(Prop) {
 
         -- If the blueprint defines a SingleTreeBlueprint, we turn every bone into
         -- a copy of that blueprint
-        if self:GetBlueprint().SingleTreeBlueprint then
-            return SplitProp(self, self:GetBlueprint().SingleTreeBlueprint)
+        if self.Blueprint.SingleTreeBlueprint then
+            return SplitProp(self, self.Blueprint.SingleTreeBlueprint)
         end
 
         -- Otherwise, we use the bone names to create a different prop for each bone
-        return self:SplitOnBonesByName(self:GetBlueprint().SingleTreeDir)
+        return self:SplitOnBonesByName(self.Blueprint.SingleTreeDir)
     end,
 }

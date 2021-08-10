@@ -37,7 +37,7 @@ XEL0306 = Class(TLandUnit) {
                     return
                 end
                 
-                local bp = self:GetBlueprint()
+                local bp = self.Blueprint
 
                 if bp.WeaponUnpacks then
                     ChangeState(self, self.WeaponPackingState)

@@ -25,7 +25,7 @@ SIFHuAntiNuke01 = Class(SIFHuAntiNuke) {
        
         ------Play the hit effect for the core explosion on the anti nuke.
         for k, v in FxHitEffect do
-            CreateEmitterAtEntity( self, self:GetArmy(), v )
+            CreateEmitterAtEntity( self, self.Army, v )
         end
     
         local vx, vy, vz = self:GetVelocity()

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Terran-specific weapon definitions
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
@@ -93,7 +93,7 @@ TDFHiroPlasmaCannon = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -110,7 +110,7 @@ TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = blueprint.DoTDamage,
@@ -173,7 +173,7 @@ TANTorpedoAngler = Class(DefaultProjectileWeapon) {
 TIFSmartCharge = Class(DefaultProjectileWeapon) {
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = self.Blueprint.DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
@@ -190,7 +190,7 @@ TIFCarpetBombWeapon = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local projectile = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = blueprint.DoTDamage,
@@ -240,7 +240,7 @@ TAMPhalanxWeapon = Class(DefaultProjectileWeapon) {
     PlayFxMuzzleSequence = function(self, muzzle)
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         for k, v in self.FxShellEject do
-            CreateAttachedEmitter(self.unit, self:GetBlueprint().TurretBonePitch, self.unit.Army, v)
+            CreateAttachedEmitter(self.unit, self.Blueprint.TurretBonePitch, self.unit.Army, v)
         end
     end,
 }
@@ -251,7 +251,7 @@ TOrbitalDeathLaserBeamWeapon = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)

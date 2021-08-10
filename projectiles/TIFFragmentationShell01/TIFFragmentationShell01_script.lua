@@ -17,11 +17,11 @@ TIFFragmentationShell01 = Class(TArtilleryProjectile) {
     
     --OnCreate = function(self)
     --    TArtilleryProjectile.OnCreate(self)
-    --    --local army = self:GetArmy()
+    --    --local army = self.Army
     --    --for i in self.FxTrails do
     --    --    CreateEmitterOnEntity(self, army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
     --    --end
-    --    CreateEmitterAtBone( self, -1, self:GetArmy(), '/effects/emitters/mortar_munition_02_flare_emit.bp')
+    --    CreateEmitterAtBone( self, -1, self.Army, '/effects/emitters/mortar_munition_02_flare_emit.bp')
     --end,
 }
 TypeClass = TIFFragmentationShell01

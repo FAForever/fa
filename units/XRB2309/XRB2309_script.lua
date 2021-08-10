@@ -77,7 +77,7 @@ XRB2309 = Class(CStructureUnit) {
 
     -- Do the deploy animation
     FinalAnimation = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationDeploy
 
         self.OpenAnim = CreateAnimator(self)
@@ -93,7 +93,7 @@ XRB2309 = Class(CStructureUnit) {
     end,
 
     DeathThread = function(self, overkillRatio, instigator)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- Add an initial death explosion
         local army = self.Army

@@ -11,7 +11,7 @@ AANTorpedo02 = Class(ATorpedoShipProjectile) {
 
     OnEnterWater = function(self)
         ATorpedoShipProjectile.OnEnterWater(self)
-        local army = self:GetArmy()
+        local army = self.Army
         for k, v in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self, army, v):ScaleEmitter(self.FxSplashScale)
         end

@@ -107,7 +107,7 @@ XRB3301 = Class(CRadarUnit) {
                     self:OnIntelDisabled()
                 end
                 local curRadius = self:GetIntelRadius('vision')
-                local targetRadius = self:GetBlueprint().Intel.MaxVisionRadius
+                local targetRadius = self.Blueprint.Intel.MaxVisionRadius
                 if curRadius < targetRadius then
                     curRadius = curRadius + 1
                     if curRadius >= targetRadius then
@@ -133,7 +133,7 @@ XRB3301 = Class(CRadarUnit) {
                     end
                 end
                 local curRadius = self:GetIntelRadius('vision')
-                local targetRadius = self:GetBlueprint().Intel.MinVisionRadius
+                local targetRadius = self.Blueprint.Intel.MinVisionRadius
                 if curRadius > targetRadius then
                     curRadius = curRadius - 1
                     if curRadius <= targetRadius then

@@ -46,7 +46,7 @@ UAL0301 = Class(CommandUnit) {
 
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         -- Teleporter
         if enh == 'Teleporter' then
@@ -71,13 +71,13 @@ UAL0301 = Class(CommandUnit) {
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
         -- ResourceAllocation
         elseif enh =='ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
             if not bp then return end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         -- Engineering Focus Module
@@ -91,7 +91,7 @@ UAL0301 = Class(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                     },
@@ -114,7 +114,7 @@ UAL0301 = Class(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         Regen = {
-                            Add =  bp.NewRegenRate - self:GetBlueprint().Defense.RegenRate,
+                            Add =  bp.NewRegenRate - self.Blueprint.Defense.RegenRate,
                             Mult = 1,
                         },
                     },
@@ -138,7 +138,7 @@ UAL0301 = Class(CommandUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 40)
         elseif enh =='StabilitySuppressantRemove' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')
-            wep:AddDamageMod(-self:GetBlueprint().Enhancements['RightReactonCannon'].NewDamageMod)
+            wep:AddDamageMod(-self.Blueprint.Enhancements['RightReactonCannon'].NewDamageMod)
             wep:AddDamageRadiusMod(bp.NewDamageRadiusMod or 0)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
         end

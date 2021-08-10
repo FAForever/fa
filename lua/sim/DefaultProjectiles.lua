@@ -128,7 +128,7 @@ NukeProjectile = Class(NullShell) {
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_THREE, TargetEntity) then
             -- Play the explosion sound
-            local myBlueprint = self:GetBlueprint()
+            local myBlueprint = self.Blueprint
             if myBlueprint.Audio.NukeExplosion then
                 self:PlaySound(myBlueprint.Audio.NukeExplosion)
             end
@@ -162,7 +162,7 @@ NukeProjectile = Class(NullShell) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-		local bp = self:GetBlueprint().Defense.MaxHealth
+		local bp = self.Blueprint.Defense.MaxHealth
 			if bp then
 			self:DoTakeDamage(instigator, amount, vector, damageType)
 		else
@@ -344,7 +344,7 @@ OverchargeProjectile = Class() {
         --      minDamage = _,
         --  },
 
-        local data = wep:GetBlueprint().Overcharge
+        local data = wep.Blueprint.Overcharge
         if not data then return end
 
         -- Set the damage dealt by the projectile for hitting the floor or an ACUUnit
@@ -383,7 +383,7 @@ OverchargeProjectile = Class() {
 
                 idealDamage = maxHP or data.minDamage
 
-                targetCats = targetEntity:GetBlueprint().CategoriesHash
+                targetCats = targetEntity.Blueprint.CategoriesHash
 
                       -----SHIELDS------
                 if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
@@ -463,7 +463,7 @@ OverchargeProjectile = Class() {
             if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and unit.MyShield:GetMaxHealth() > maxHP then
                 maxHP = unit.MyShield:GetMaxHealth()
             elseif unit:GetHealth() > maxHP then
-                local distance = math.min(unit:GetBlueprint().SizeX, unit:GetBlueprint().SizeZ)
+                local distance = math.min(unit.Blueprint.SizeX, unit.Blueprint.SizeZ)
                 if GetDistanceBetweenTwoEntities(unit, self) < distance + self.DamageData.DamageRadius then
                     maxHP = unit:GetHealth()
                 end

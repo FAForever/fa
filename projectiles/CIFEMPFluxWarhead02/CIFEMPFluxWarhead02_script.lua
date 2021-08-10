@@ -28,15 +28,15 @@ CIFEMPFluxWarhead02 = Class(NullShell) {
 
         -- Mesh effects
         self.Plumeproj = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect01_proj.bp')
-        self:ForkThread(self.PlumeThread, self.Plumeproj, self.Plumeproj:GetBlueprint().Display.UniformScale)
+        self:ForkThread(self.PlumeThread, self.Plumeproj, self.Plumeproj.Blueprint.Display.UniformScale)
         self:ForkThread(self.PlumeVelocityThread, self.Plumeproj)
 
         self.Plumeproj2 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect02_proj.bp')
-        self:ForkThread(self.PlumeThread, self.Plumeproj2, self.Plumeproj2:GetBlueprint().Display.UniformScale)
+        self:ForkThread(self.PlumeThread, self.Plumeproj2, self.Plumeproj2.Blueprint.Display.UniformScale)
         self:ForkThread(self.PlumeVelocityThread, self.Plumeproj2)
 
         self.Plumeproj3 = self:CreateProjectile('/effects/EMPFluxWarhead/EMPFluxWarheadEffect03_proj.bp')
-        self:ForkThread(self.PlumeThread, self.Plumeproj3, self.Plumeproj3:GetBlueprint().Display.UniformScale)
+        self:ForkThread(self.PlumeThread, self.Plumeproj3, self.Plumeproj3.Blueprint.Display.UniformScale)
         self:ForkThread(self.PlumeVelocityThread, self.Plumeproj3)
 
         CreateDecal(self:GetPosition(), RandomFloat(0,2*math.pi), 'nuke_scorch_001_albedo', '', 'Albedo', 28, 28, 500, 0, self.Army)

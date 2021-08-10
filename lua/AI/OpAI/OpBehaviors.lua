@@ -40,7 +40,7 @@ end
 
 function CDROverChargeThread( cdr )
     local aiBrain = cdr:GetAIBrain()
-    local weapBPs = cdr:GetBlueprint().Weapon
+    local weapBPs = cdr.Blueprint.Weapon
     local weapon
     for k,v in weapBPs do
         if v.Label == 'OverCharge' then

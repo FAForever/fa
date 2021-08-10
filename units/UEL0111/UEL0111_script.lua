@@ -24,7 +24,7 @@ UEL0111 = Class(TLandUnit) {
         TLandUnit.OnCreate(self)
         if not self.OpenAnim then
             self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0)
+            self.OpenAnim:PlayAnim(self.Blueprint.Display.AnimationOpen, false):SetRate(0)
             self.Trash:Add(self.OpenAnim)
         end
     end,
@@ -35,7 +35,7 @@ UEL0111 = Class(TLandUnit) {
             self.OpenAnim = CreateAnimator(self)
             self.Trash:Add(self.AnimManip)
         end
-        self.OpenAnim:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.5)
+        self.OpenAnim:PlayAnim(self.Blueprint.Display.AnimationOpen, false):SetRate(0.5)
     end,
     ]]--
 }

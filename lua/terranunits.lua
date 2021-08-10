@@ -130,7 +130,7 @@ TConstructionUnit = Class(ConstructionUnit) {
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self:GetBlueprint().Display.AnimationWater then
+        if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -148,7 +148,7 @@ TConstructionUnit = Class(ConstructionUnit) {
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self:GetBlueprint().Display.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.Blueprint.Display.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else
@@ -214,8 +214,8 @@ TMassStorageUnit = Class(MassStorageUnit) {}
 --------------------------------------------------------------
 TMobileFactoryUnit = Class(LandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
+        self:SetMesh(self.Blueprint.Display.BuildMeshBlueprint, true)
+        if self.Blueprint.General.UpgradesFrom  ~= builder.UnitId then
             self:HideBone(0, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
@@ -428,7 +428,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         TStructureUnit.OnStartBuild(self,unitBeingBuilt,order)
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = self.Blueprint.General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             self.NowUpgrading = true
             ChangeState(self, self.UpgradingState)
@@ -440,7 +440,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
 
     SetPodConsumptionRebuildRate = function(self, podData)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         -- Get build rate of tower
         local buildRate = bp.Economy.BuildRate
 
@@ -475,7 +475,7 @@ TPodTowerUnit = Class(TStructureUnit) {
             PodAttached = PodAttached + 1
         end
         if PodAttached == PodPresent and self.OpeningAnimationStarted then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if not self.OpenAnim then return end
             self.OpenAnim:SetRate(1.5)
             self.OpeningAnimationStarted = false
@@ -488,7 +488,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         self:RequestRefreshUI()
         if not self.OpeningAnimationStarted then
             self.OpeningAnimationStarted = true
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if not self.OpenAnim then
                 self.OpenAnim = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnim)
@@ -511,7 +511,7 @@ TPodTowerUnit = Class(TStructureUnit) {
             -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
             -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
             self.TowerCaptured = nil
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for _, v in bp.Economy.EngineeringPods do
                 if v.CreateWithUnit and not self.PodData[v.PodName].Active then
                     if not self.PodData then
@@ -533,7 +533,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                 self:SetPodConsumptionRebuildRate(self.PodData[ self.Rebuilding ])
                 ChangeState(self, self.RebuildingPodState)
             end
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             while true and not self.Rebuilding do
                 for _, v in bp.Economy.EngineeringPods do
                     -- Check if all the pods are active
@@ -620,7 +620,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     UpgradingState = State {
         Main = function(self)
             self:StopRocking()
-            local bp = self:GetBlueprint().Display
+            local bp = self.Blueprint.Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()

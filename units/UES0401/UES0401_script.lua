@@ -47,8 +47,8 @@ UES0401 = Class(AircraftCarrier) {
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
+        self:SetMesh(self.Blueprint.Display.BuildMeshBlueprint, true)
+        if self.Blueprint.General.UpgradesFrom ~= builder.UnitId then
             self:HideBone(0, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end

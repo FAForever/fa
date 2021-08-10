@@ -18,7 +18,7 @@ URC1501 = Class(CCivilianStructureUnit) {
 
     OnCreate = function(self)
 		CCivilianStructureUnit.OnCreate(self)
-		local army = self:GetArmy()
+		local army = self.Army
         for k, v in self.EffectBones01 do
             CreateAttachedEmitter(self,v,army,'/effects/emitters/urc1501_ambient_01_emit.bp')
             CreateAttachedEmitter(self,v,army,'/effects/emitters/urc1501_ambient_02_emit.bp')

@@ -21,7 +21,7 @@ Prop = Class(moho.prop_methods, Entity) {
     OnCreate = function(self)
 
         -- Common accessed (engine-related) values cached
-
+        self.Blueprint = self:GetBlueprint()
 
         self.EventCallbacks = {
             OnKilled = {},
@@ -29,7 +29,7 @@ Prop = Class(moho.prop_methods, Entity) {
         }
         Entity.OnCreate(self)
         self.Trash = TrashBag()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local economy = bp.Economy
 
         -- These values are used in world props like rocks / stones / trees
@@ -256,7 +256,7 @@ Prop = Class(moho.prop_methods, Entity) {
     -- You can pass an optional 'dirprefix' arg saying where to look for the child props.
     -- If not given, it defaults to one directory up from this prop's blueprint location.
     SplitOnBonesByName = function(self, dirprefix)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         if not dirprefix then
             -- default dirprefix to parent dir of our own blueprint
@@ -299,7 +299,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     PlayPropSound = function(self, sound)
-        local bp = self:GetBlueprint().Audio
+        local bp = self.Blueprint.Audio
         if bp and bp[sound] then
             self:PlaySound(bp[sound])
             return true
@@ -315,7 +315,7 @@ Prop = Class(moho.prop_methods, Entity) {
             self:SetAmbientSound(nil, nil)
             return true
         else
-            local bp = self:GetBlueprint().Audio
+            local bp = self.Blueprint.Audio
             if bp and bp[sound] then
                 if bp.Audio['AmbientRumble'] then
                     self:SetAmbientSound(bp[sound], bp.Audio['AmbientRumble'])

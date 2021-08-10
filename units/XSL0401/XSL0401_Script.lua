@@ -2,7 +2,7 @@
 -- File     :  /data/units/XSL0401/XSL0401_script.lua
 -- Author(s):  Jessica St. Croix, Dru Staltman, Aaron Lundquist
 -- Summary  :  Seraphim Experimental Assault Bot
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
@@ -63,7 +63,7 @@ XSL0401 = Class(SWalkingLandUnit) {
                 SDFSinnuntheWeapon.PlayFxMuzzleChargeSequence(self, muzzle)
 
                 self:ForkThread(function()
-                    WaitSeconds(self.unit:GetBlueprint().Weapon[3].MuzzleChargeDelay)
+                    WaitSeconds(self.unit.Blueprint.Weapon[3].MuzzleChargeDelay)
 
                     self.ClawTopRotator:SetGoal(0):SetSpeed(50)
                     self.ClawBottomRotator:SetGoal(0):SetSpeed(50)
@@ -98,7 +98,7 @@ XSL0401 = Class(SWalkingLandUnit) {
             WaitTicks(Random(1, 4))
         end
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for i, numWeapons in bp.Weapon do
             if bp.Weapon[i].Label == 'CollossusDeath' then
                 DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)

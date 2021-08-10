@@ -8,7 +8,7 @@ UEFNukeEffect01 = Class(NullShell) {
     end,
     
     EffectThread = function(self)
-        local scale = self:GetBlueprint().Display.UniformScale
+        local scale = self.Blueprint.Display.UniformScale
         local scaleChange = 0.30 * scale
         
         self:SetScaleVelocity(scaleChange,scaleChange,scaleChange)

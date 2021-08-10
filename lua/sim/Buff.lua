@@ -204,7 +204,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             -- The DoNotFill flag is set when we want to adjust the max ONLY and not have the
             --     rest of the unit's HP affected to match. If it's not flagged, the unit's HP
             --     will be adjusted by the same amount and direction as the max
-            local unitbphealth = unit:GetBlueprint().Defense.MaxHealth or 1
+            local unitbphealth = unit.Blueprint.Defense.MaxHealth or 1
             local val = BuffCalculate(unit, buffName, 'MaxHealth', unitbphealth)
 
             local oldmax = unit:GetMaxHealth()
@@ -218,7 +218,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         elseif atype == 'Regen' then
             -- Adjusted to use a special case of adding mults and calculating the final value
             -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
-            local bpRegen = unit:GetBlueprint().Defense.RegenRate or 0
+            local bpRegen = unit.Blueprint.Defense.RegenRate or 0
             local val = BuffCalculate(unit, nil, 'Regen', bpRegen)
 
             unit:SetRegen(val)
@@ -226,7 +226,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             for i = 1, unit:GetWeaponCount() do
                 local wep = unit:GetWeapon(i)
                 if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
-                    local wepbp = wep:GetBlueprint()
+                    local wepbp = wep.Blueprint
                     local wepdam = wepbp.Damage
                     local val = BuffCalculate(unit, buffName, 'Damage', wepdam)
 
@@ -243,7 +243,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             for i = 1, unit:GetWeaponCount() do
 
                 local wep = unit:GetWeapon(i)
-                local wepbp = wep:GetBlueprint()
+                local wepbp = wep.Blueprint
                 local weprad = wepbp.DamageRadius
                 local val = BuffCalculate(unit, buffName, 'DamageRadius', weprad)
 
@@ -253,7 +253,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             for i = 1, unit:GetWeaponCount() do
 
                 local wep = unit:GetWeapon(i)
-                local wepbp = wep:GetBlueprint()
+                local wepbp = wep.Blueprint
                 local weprad = wepbp.MaxRadius
                 local val = BuffCalculate(unit, buffName, 'MaxRadius', weprad)
 
@@ -278,11 +278,11 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 wep:SetWeaponEnabled(bool)
             end
         elseif atype == 'VisionRadius' then
-            local val = BuffCalculate(unit, buffName, 'VisionRadius', unit:GetBlueprint().Intel.VisionRadius or 0)
+            local val = BuffCalculate(unit, buffName, 'VisionRadius', unit.Blueprint.Intel.VisionRadius or 0)
             unit:SetIntelRadius('Vision', val)
 
         elseif atype == 'RadarRadius' then
-            local val = BuffCalculate(unit, buffName, 'RadarRadius', unit:GetBlueprint().Intel.RadarRadius or 0)
+            local val = BuffCalculate(unit, buffName, 'RadarRadius', unit.Blueprint.Intel.RadarRadius or 0)
             if not unit:IsIntelEnabled('Radar') then
                 unit:InitIntel(unit.Army,'Radar', val)
                 unit:EnableIntel('Radar')
@@ -295,7 +295,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 unit:DisableIntel('Radar')
             end
         elseif atype == 'OmniRadius' then
-            local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.OmniRadius or 0)
+            local val = BuffCalculate(unit, buffName, 'OmniRadius', unit.Blueprint.Intel.OmniRadius or 0)
             if not unit:IsIntelEnabled('Omni') then
                 unit:InitIntel(unit.Army,'Omni', val)
                 unit:EnableIntel('Omni')
@@ -308,7 +308,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
                 unit:DisableIntel('Omni')
             end
         elseif atype == 'BuildRate' then
-            local val = BuffCalculate(unit, buffName, 'BuildRate', unit:GetBlueprint().Economy.BuildRate or 1)
+            local val = BuffCalculate(unit, buffName, 'BuildRate', unit.Blueprint.Economy.BuildRate or 1)
             unit:SetBuildRate(val)
         -------- ADJACENCY BELOW --------
         elseif atype == 'EnergyActive' then
@@ -348,7 +348,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 
             for i = 1, unit:GetWeaponCount() do
                 local wep = unit:GetWeapon(i)
-                local bp = wep:GetBlueprint()
+                local bp = wep.Blueprint
                 -- Set new rate of fire based on blueprint rate of fire
                 wep:ChangeRateOfFire(bp.RateOfFire / val)
                 wep.AdjRoFMod = val
@@ -409,7 +409,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
                 -- GPG default for mult is 1. To avoid changing loads of scripts for now, let's do this
                 if v.Mult ~= 1 then
-                    local maxHealth = unit:GetBlueprint().Defense.MaxHealth
+                    local maxHealth = unit.Blueprint.Defense.MaxHealth
                     for i=1,v.Count do
                         multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
                     end

@@ -101,7 +101,7 @@ end
 UnitsAreInArmy = function(units, army)
     local ua
     for _, unit in units do
-        ua = unit:GetArmy()
+        ua = unit.Army
         if not army == ua then
             return false, ua
         end

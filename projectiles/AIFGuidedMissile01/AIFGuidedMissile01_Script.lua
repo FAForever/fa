@@ -25,7 +25,7 @@ AIFGuidedMissile = Class(AGuidedMissileProjectile) {
 		
         ------Create/play the split effects.
 		for k,v in EffectTemplate.AMercyGuidedMissileSplit do
-            CreateEmitterOnEntity(self,self:GetArmy(),v)
+            CreateEmitterOnEntity(self,self.Army,v)
         end
         
         

@@ -152,7 +152,7 @@ UAS0401 = Class(ASeaUnit) {
 
     OnKilled = function(self, instigator, type, overkillRatio)
         local nrofBones = self:GetBoneCount() -1
-        local watchBone = self:GetBlueprint().WatchBone or 0
+        local watchBone = self.Blueprint.WatchBone or 0
 
         self:ForkThread(function()
             local pos = self:GetPosition()

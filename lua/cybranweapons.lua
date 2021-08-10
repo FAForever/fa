@@ -54,7 +54,7 @@ CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self:EconomySupportsBeam() then return end
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -105,7 +105,7 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -138,7 +138,7 @@ CIFSmartCharge = Class(DefaultProjectileWeapon) {
         if not proj or proj:BeenDestroyed() then
             return proj
         end
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = self.Blueprint.DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
@@ -156,7 +156,7 @@ CANNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local projectile = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = bp.DoTDamage,
@@ -261,7 +261,7 @@ CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local projectile = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = blueprint.DoTDamage,
@@ -312,7 +312,7 @@ CIFNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = bp.DoTDamage,
@@ -354,7 +354,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)

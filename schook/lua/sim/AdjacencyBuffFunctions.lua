@@ -1,5 +1,5 @@
 MassActiveBuffCheck = function(buff, unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     if bp.Economy.BuildableCategory and not table.empty(bp.Economy.BuildableCategory) then
         return true
     end

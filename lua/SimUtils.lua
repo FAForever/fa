@@ -68,7 +68,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         shareUpgrades = true
     end
 
-    table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
+    table.sort(units, function (a, b) return a.Blueprint.Economy.BuildCostMass > b.Blueprint.Economy.BuildCostMass end)
 
     local newUnits = {}
     local upUnits = {}
@@ -89,7 +89,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         end
 
         local unit = v
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local unitId = unit.UnitId
 
         -- B E F O R E
@@ -349,7 +349,7 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
             local builders = {}
 
             for ID, unit in unfinishedUnits do
-                local bp = unit:GetBlueprint()
+                local bp = unit.Blueprint
                 local bplueprintID = bp.BlueprintId
                 local buildTime = bp.Economy.BuildTime
                 local health = unit:GetHealth()

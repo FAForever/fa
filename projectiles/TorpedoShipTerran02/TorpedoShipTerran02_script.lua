@@ -21,7 +21,7 @@ TorpedoShipTerran02 = Class(TTorpedoShipProjectile) {
         TTorpedoShipProjectile.OnEnterWater(self)
 
         for i in self.FxExitWaterEmitter do --splash
-            CreateEmitterAtEntity(self,self:GetArmy(),self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+            CreateEmitterAtEntity(self,self.Army,self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
         end
 
         self:TrackTarget(true)

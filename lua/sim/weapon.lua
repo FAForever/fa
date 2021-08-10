@@ -42,11 +42,16 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnCreate = function(self)
+
+        -- Common accessed (engine-related) values cached
+        self.Blueprint = self:GetBlueprint()
+        self.Army = self.unit:GetArmy()
+
         if not self.unit.Trash then
             self.unit.Trash = TrashBag()
         end
         self:SetValidTargetsForCurrentLayer(self.unit:GetCurrentLayer())
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if bp.Turreted == true then
             self:SetupTurret()
         end
@@ -80,7 +85,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     SetupTurret = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local yawBone = bp.TurretBoneYaw
         local pitchBone = bp.TurretBonePitch
         local muzzleBone = bp.TurretBoneMuzzle
@@ -207,25 +212,25 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     GetTurretYawMinMax = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local turretyawmin = bp.TurretYaw - bp.TurretYawRange
         local turretyawmax = bp.TurretYaw + bp.TurretYawRange
         return turretyawmin, turretyawmax
     end,
 
     GetTurretYawSpeed = function(self)
-        return self:GetBlueprint().TurretYawSpeed
+        return self.Blueprint.TurretYawSpeed
     end,
 
     GetTurretPitchMinMax = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local turretpitchmin = bp.TurretPitch - bp.TurretPitchRange
         local turretpitchmax = bp.TurretPitch + bp.TurretPitchRange
         return turretpitchmin, turretpitchmax
     end,
 
     GetTurretPitchSpeed = function(self)
-        return self:GetBlueprint().TurretPitchSpeed
+        return self.Blueprint.TurretPitchSpeed
     end,
 
     OnFire = function(self)
@@ -273,13 +278,13 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     PlayWeaponSound = function(self, sound)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if not bp.Audio[sound] then return end
         self:PlaySound(bp.Audio[sound])
     end,
 
     PlayWeaponAmbientSound = function(self, sound)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if not bp.Audio[sound] then return end
         if not self.AmbientSounds then
             self.AmbientSounds = {}
@@ -296,7 +301,7 @@ Weapon = Class(moho.weapon_methods) {
     StopWeaponAmbientSound = function(self, sound)
         if not self.AmbientSounds then return end
         if not self.AmbientSounds[sound] then return end
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if not bp.Audio[sound] then return end
         self.AmbientSounds[sound]:Destroy()
         self.AmbientSounds[sound] = nil
@@ -306,7 +311,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     GetDamageTableInternal = function(self)
-        local weaponBlueprint = self:GetBlueprint()
+        local weaponBlueprint = self.Blueprint
         local damageTable = {}
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + (self.DamageRadiusMod or 0)
@@ -347,7 +352,7 @@ Weapon = Class(moho.weapon_methods) {
 
         if proj and not proj:BeenDestroyed() then
             proj:PassDamageData(damageTable)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
 
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
                 bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
@@ -367,7 +372,7 @@ Weapon = Class(moho.weapon_methods) {
 
     SetValidTargetsForCurrentLayer = function(self, newLayer)
         -- LOG('SetValidTargetsForCurrentLayer, layer = ', newLayer)
-        local weaponBlueprint = self:GetBlueprint()
+        local weaponBlueprint = self.Blueprint
         if weaponBlueprint.FireTargetLayerCapsTable then
             if weaponBlueprint.FireTargetLayerCapsTable[newLayer] then
                 -- LOG('Setting Target Layer Caps to ', weaponBlueprint.FireTargetLayerCapsTable[newLayer])
@@ -389,7 +394,7 @@ Weapon = Class(moho.weapon_methods) {
         end
 
         if not priTable then
-            local bp = self:GetBlueprint().TargetPriorities
+            local bp = self.Blueprint.TargetPriorities
             if bp then
                 local priorityTable = {}
                 for k, v in bp do
@@ -421,7 +426,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     WeaponUsesEnergy = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if bp.EnergyRequired and bp.EnergyRequired > 0 then
             return true
         end
@@ -439,7 +444,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnVeteranLevel = function(self, old, new)
-        local bp = self:GetBlueprint().Buffs
+        local bp = self.Blueprint.Buffs
         if not bp then return end
 
         local lvlkey = 'VeteranLevel' .. new
@@ -465,7 +470,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     DoOnFireBuffs = function(self)
-        local data = self:GetBlueprint()
+        local data = self.Blueprint
         if data.Buffs then
             for k, v in data.Buffs do
                 if v.Add.OnFire == true then
@@ -503,7 +508,7 @@ Weapon = Class(moho.weapon_methods) {
             self:OnLostTarget()
         end
         -- Disable weapon if on transport and not allowed to fire from it
-        if not self.unit:GetBlueprint().Transport.CanFireFromTransport then
+        if not self.unit.Blueprint.Transport.CanFireFromTransport then
             if transportstate then
                 self.WeaponDisabledOnTransport = true
                 self:SetWeaponEnabled(false)
@@ -527,7 +532,7 @@ Weapon = Class(moho.weapon_methods) {
             self:SetEnabled(enable)
             return
         end
-        local bp = self:GetBlueprint().EnabledByEnhancement
+        local bp = self.Blueprint.EnabledByEnhancement
         if bp then
             for k, v in SimUnitEnhancements[self.unit.EntityId] or {} do
                 if v == bp then

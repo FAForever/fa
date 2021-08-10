@@ -72,7 +72,7 @@ function CreatePrefetchSetFromUnits(unitList)
     local BPs = {}
     
     for i,unit in unitList do
-        table.insert(BPs, unit:GetBlueprint())
+        table.insert(BPs, unit.Blueprint)
     end
     
     return CreatePrefetchSetFromBlueprints(BPs)

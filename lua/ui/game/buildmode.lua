@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Build key mode logic
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -57,7 +57,7 @@ local function HandleCommand(key, modifiers)
     -- make sure the units are all of the same type
     local types = {}
     for index, unit in selection do
-        local bpid = unit:GetBlueprint().BlueprintId
+        local bpid = unit.Blueprint.BlueprintId
         if not types[bpid] then
             types[bpid] = true
         end
@@ -87,7 +87,7 @@ local function HandleCommand(key, modifiers)
     end
 
     local bmdata = import('/lua/ui/game/buildmodedata.lua').buildModeKeys
-    local bp = selection[1]:GetBlueprint()
+    local bp = selection[1].Blueprint
     local bpid = bp.BlueprintId
     
     if not bmdata[bpid] then

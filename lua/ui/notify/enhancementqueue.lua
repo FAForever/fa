@@ -7,7 +7,7 @@ local enhancementQueue = {}
 function enqueueEnhancement(units, enhancement)
     if not units[1] then return end
 
-    local enhancements = units[1]:GetBlueprint().Enhancements
+    local enhancements = units[1].Blueprint.Enhancements
 
     if enhancements[enhancement] then
         for _, unit in units do
@@ -56,7 +56,7 @@ function ModifyBuildablesForACU(originalBuildables, selection)
 
     for unitIndex, unit in selection do
         local currentBuildableCategories
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
 
         if unit:IsInCategory('COMMAND') then
             local techUpgrading = 0

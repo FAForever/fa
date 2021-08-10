@@ -14,7 +14,7 @@ ZSB9601 = Class(SLandFactoryUnit) {
 
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Rotator1 = CreateRotator(self, 'Pod01', 'y', nil, 5, 0, 0)
         self.Trash:Add(self.Rotator1)
 

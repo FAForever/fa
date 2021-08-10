@@ -18,7 +18,7 @@ AANDepthCharge01 = Class(ADepthChargeProjectile) {
             LifeTime = 10,
             Omni = false,
             Vision = false,
-            Army = self:GetArmy(),
+            Army = self.Army,
         }
         local vizEntity = VizMarker(spec)
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)

@@ -83,7 +83,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
         self:SetBlockCommandQueue(true)
         if unitBeingBuilt and not unitBeingBuilt.Dead and EntityCategoryContains(categories.AIR, unitBeingBuilt) then
             unitBeingBuilt:DetachFrom(true)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self:DetachAll(bp.Display.BuildAttachBone or 0)
         end
         self:DestroyBuildRotator()
@@ -135,7 +135,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
             AirFactoryUnit.RolloffBody(self)
         else
             -- Engineers need to be slid off the factory
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if not self.AttachmentSliderManip then
                 self.AttachmentSliderManip = CreateSlider(self, bp.Display.BuildAttachBone or 0)
             end
@@ -166,7 +166,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = self.Blueprint.General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
@@ -264,7 +264,7 @@ SConstructionUnit = Class(ConstructionUnit) {
     SetupBuildBones = function(self)
         ConstructionUnit.SetupBuildBones(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local buildbones = bp.General.BuildBones
         if self.BuildArmManipulator then
             self.BuildArmManipulator:SetAimingArc(buildbones.YawMin or -180, buildbones.YawMax or 180, buildbones.YawSlew or 360, buildbones.PitchMin or -90, buildbones.PitchMax or 90, buildbones.PitchSlew or 360)
@@ -347,7 +347,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = self.Blueprint.General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
@@ -444,7 +444,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = self.Blueprint.General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
@@ -528,7 +528,7 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
-            self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false)
+            self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationActivate, false)
         end
         self.AnimationManipulator:SetRate(1)
     end,
@@ -582,12 +582,12 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     KillingState = State {
         LifeThread = function(self)
-            WaitSeconds(self:GetBlueprint().Lifetime)
+            WaitSeconds(self.Blueprint.Lifetime)
             ChangeState(self, self.DeathState)
         end,
 
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             local aiBrain = self:GetAIBrain()
 
             -- Queue up random moves
@@ -632,7 +632,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
         end,
 
         ComputeWaitTime = function(self)
-            local timeLeft = self:GetBlueprint().Lifetime - self.timeAlive
+            local timeLeft = self.Blueprint.Lifetime - self.timeAlive
 
             local maxWait = 75
             if timeLeft < 7.5 and timeLeft > 2.5 then

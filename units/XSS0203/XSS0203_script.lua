@@ -47,7 +47,7 @@ XSS0203 = Class(SSubUnit) {
                 self.CannonAnim = CreateAnimator(self)
                 self.Trash:Add(self.CannonAnim)
             end
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self.CannonAnim:PlayAnim(bp.Display.CannonOpenAnimation)
             self.CannonAnim:SetRate(bp.Display.CannonOpenRate or 1)
             WaitFor(self.CannonAnim)
@@ -59,7 +59,7 @@ XSS0203 = Class(SSubUnit) {
         Main = function(self)
             self:SetWeaponEnabledByLabel('Cannon', false)
             if self.CannonAnim then
-                local bp = self:GetBlueprint()
+                local bp = self.Blueprint
                 self.CannonAnim:SetRate( -1 * ( bp.Display.CannonOpenRate or 1 ) )
                 WaitFor(self.CannonAnim)
             end

@@ -12,8 +12,8 @@ function UserUnit:GetArmy()
 end
 
 ---
---  blueprint = UserUnit:GetBlueprint()
-function UserUnit:GetBlueprint()
+--  blueprint = UserUnit.Blueprint
+function UserUnit.Blueprint
 end
 
 ---

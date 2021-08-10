@@ -72,7 +72,7 @@ AIFQuantumWarhead02 = Class(NullShell) {
 
     DistortionField = function(self)
         local proj = self:CreateProjectile('/effects/QuantumWarhead/QuantumWarheadEffect01_proj.bp')
-        local scale = proj:GetBlueprint().Display.UniformScale
+        local scale = proj.Blueprint.Display.UniformScale
 
         proj:SetScaleVelocity(0.123 * scale,0.123 * scale,0.123 * scale)
         WaitSeconds(17.0)

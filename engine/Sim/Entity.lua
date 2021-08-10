@@ -107,8 +107,8 @@ function Entity:GetArmy(self)
 end
 
 ---
---  blueprint = Entity:GetBlueprint()
-function Entity:GetBlueprint()
+--  blueprint = Entity.Blueprint
+function Entity.Blueprint
 end
 
 ---

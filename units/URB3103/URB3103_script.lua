@@ -23,7 +23,7 @@ URB3103 = Class(CStructureUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CStructureUnit.OnStopBeingBuilt(self,builder,layer)
         self.Animator = CreateAnimator(self)
-        self.Animator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false)
+        self.Animator:PlayAnim(self.Blueprint.Display.AnimationOpen, false)
         self.Trash:Add(self.Animator)
         self.SpinThread = ForkThread(self.SpinnerThread, self)
     end,

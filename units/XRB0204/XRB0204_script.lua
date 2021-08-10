@@ -10,7 +10,7 @@ XRB0204 = Class(CConstructionStructureUnit) {
     OnStartBeingBuilt = function(self, builder, layer)
         CConstructionStructureUnit.OnStartBeingBuilt(self, builder, layer)
 
-        local target = self:GetBlueprint().General.UpgradesFrom
+        local target = self.Blueprint.General.UpgradesFrom
 
         -- Check if we're really being built on top of another unit (as an upgrade).
         -- We might be being rebuild by the slightly bugtacular SCU REBUILDER behaviour, in which
@@ -18,7 +18,7 @@ XRB0204 = Class(CConstructionStructureUnit) {
         local upos = self:GetPosition()
         local candidates = GetUnitsInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
         for k, v in candidates do
-            if target == v:GetBlueprint().BlueprintId then
+            if target == v.Blueprint.BlueprintId then
                 self:HideBone('xrb0304', true)
                 self:ShowBone('TurretT2', true)
                 self:ShowBone('Door2_B02', true)

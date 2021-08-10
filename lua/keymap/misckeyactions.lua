@@ -169,7 +169,7 @@ function GetSimilarUnits()
         local curUnitEnhancements = enhance.GetEnhancements(curUnitId)
 
         -- Select all similar units by category
-        local bp = curSelection[1]:GetBlueprint()
+        local bp = curSelection[1].Blueprint
         local catString = table.concatkeys(bp.CategoriesHash, " * ")
         UISelectionByCategory(catString, false, false, false, false)
 

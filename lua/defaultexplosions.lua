@@ -29,7 +29,7 @@ local ScaleEmittersParam = EfctUtil.ScaleEmittersParam
 -- UTILITY FUNCTION --
 ----------------------
 function GetUnitSizes(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
 end
 
@@ -39,12 +39,12 @@ function GetUnitVolume(unit)
 end
 
 function GetAverageBoundingXZRadius(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
 end
 
 function GetAverageBoundingXYZRadius(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     return ((bp.SizeX or 0 + bp.SizeY or 0 + bp.SizeZ or 0) * 0.333)
 end
 

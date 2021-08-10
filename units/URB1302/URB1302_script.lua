@@ -16,7 +16,7 @@ URB1302 = Class(CMassCollectionUnit) {
         CMassCollectionUnit.OnStopBeingBuilt(self,builder,layer)
         self.AnimationManipulator = CreateAnimator(self)
         self.Trash:Add(self.AnimationManipulator)
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, true)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
     end,
     
     OnStartBuild = function(self, unitBeingBuilt, order)

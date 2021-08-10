@@ -2,7 +2,7 @@
 -- File     :  /projectiles/ShieldCollider_script.lua
 -- Author(s):  Exotic_Retard, made for Equilibrium Balance Mod
 -- Summary  : Companion projectile enabling air units to hit shields
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
 
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
@@ -122,7 +122,7 @@ ShieldCollider = Class(Projectile) {
 
     -- Lets do some maths that will make the units bounce off shields
     ShieldBounce = function(self, shield, vector)
-        local bp = self.Plane:GetBlueprint()
+        local bp = self.Plane.Blueprint
         local volume = bp.SizeX * bp.SizeY * bp.SizeZ -- We will use this to *guess* how much force to apply
 
         local spin = math.min (4 / volume, 2) -- Less for larger planes; also 2 is a nice number

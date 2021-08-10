@@ -18,7 +18,7 @@ DefaultBuffField = Class(BuffField) {
     FieldVisualEmitter = '/effects/emitters/seraphim_regenerative_aura_01_emit.bp',
 
     OnCreate = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         if bp.EnabledOnCreate then
             -- a warning of obsoleteness. delete this in v5
             WARN('BuffField: obsolete blueprint variable "EnabledOnCreate" used in '..repr(self.Name)..'. Use "InitiallyEnabled" instead.')

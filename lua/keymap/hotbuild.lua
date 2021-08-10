@@ -433,7 +433,7 @@ function buildActionTemplate(modifier)
     local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
 
     -- Allow all races to build other races templates
-    local currentFaction = selection[1]:GetBlueprint().General.FactionName
+    local currentFaction = selection[1].Blueprint.General.FactionName
     if options.gui_all_race_templates ~= 0 and currentFaction then
         local function ConvertID(BPID)
             local prefixes = {
@@ -578,7 +578,7 @@ function buildActionUpgrade()
     local result = true
 
     for index, unit in selectedUnits do
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local cmd = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
 
         SelectUnits({unit})

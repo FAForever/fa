@@ -75,7 +75,7 @@ function CDRRunAway(aiBrain, cdr)
 end
 
 function CDROverCharge(aiBrain, cdr)
-    local weapBPs = cdr:GetBlueprint().Weapon
+    local weapBPs = cdr.Blueprint.Weapon
     local weapon
 
     for k, v in weapBPs do
@@ -148,7 +148,7 @@ function CDROverCharge(aiBrain, cdr)
         local target
         local continueFighting = true
         local counter = 0
-        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 75
+        local cdrThreat = cdr.Blueprint.Defense.SurfaceThreatLevel or 75
         local enemyThreat
         repeat
             overCharging = false
@@ -487,7 +487,7 @@ function AirLandToggle(platoon)
 end
 
 function AirLandToggleThread(unit)
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local weapons = bp.Weapon
     local antiAirRange
     local landRange
@@ -589,7 +589,7 @@ CommanderOverrideCheck = function(self)
     local experimental = self:GetPlatoonUnits()[1]
 
     local mainWeapon = experimental:GetWeapon(1)
-    local weaponRange = mainWeapon:GetBlueprint().MaxRadius + 50 -- Look outside range.
+    local weaponRange = mainWeapon.Blueprint.MaxRadius + 50 -- Look outside range.
 
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
     if table.empty(commanders) or commanders[1].Dead then
@@ -818,7 +818,7 @@ end
 -- The square of the shield's radius at the surface.
 -------------------------------------------------------
 function GetShieldRadiusAboveGroundSquared(shield)
-    local BP = shield:GetBlueprint().Defense.Shield
+    local BP = shield.Blueprint.Defense.Shield
     local width = BP.ShieldSize
     local height = BP.ShieldVerticalOffset
 
@@ -897,7 +897,7 @@ function FatBoyBehavior(self)
     local lastBase = false
 
     local mainWeapon = experimental:GetWeapon(1)
-    local weaponRange = mainWeapon:GetBlueprint().MaxRadius
+    local weaponRange = mainWeapon.Blueprint.MaxRadius
 
     experimental.Platoons = experimental.Platoons or {}
 
@@ -1466,7 +1466,7 @@ end
 
 function AirLandToggleThreadSorian(unit)
 
-    local bp = unit:GetBlueprint()
+    local bp = unit.Blueprint
     local weapons = bp.Weapon
     local antiAirRange
     local landRange
@@ -1696,7 +1696,7 @@ function CDRRunAwaySorian(aiBrain, cdr)
 end
 
 function CDROverChargeSorian(aiBrain, cdr)
-    local weapBPs = cdr:GetBlueprint().Weapon
+    local weapBPs = cdr.Blueprint.Weapon
     local weapon
     for k, v in weapBPs do
         if v.Label == 'OverCharge' then
@@ -1780,7 +1780,7 @@ function CDROverChargeSorian(aiBrain, cdr)
         local target
         local continueFighting = true
         local counter = 0
-        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 75
+        local cdrThreat = cdr.Blueprint.Defense.SurfaceThreatLevel or 75
         local enemyThreat
         repeat
             overCharging = false
@@ -2186,11 +2186,11 @@ SetLandTargetPrioritiesSorian = function(self, priTable)
     for i = 1, self:GetWeaponCount() do
         local wep = self:GetWeapon(i)
 
-        if wep:GetBlueprint().CannotAttackGround then
+        if wep.Blueprint.CannotAttackGround then
             continue
         end
 
-        for onLayer, targetLayers in wep:GetBlueprint().FireTargetLayerCapsTable do
+        for onLayer, targetLayers in wep.Blueprint.FireTargetLayerCapsTable do
             if string.find(targetLayers, 'Land') then
                 wep:SetWeaponPriorities(priTable)
                 break
@@ -2285,7 +2285,7 @@ CommanderOverrideCheckSorian = function(self)
     end
 
     local mainWeapon = experimental:GetWeapon(1)
-    local weaponRange = mainWeapon:GetBlueprint().MaxRadius
+    local weaponRange = mainWeapon.Blueprint.MaxRadius
 
     local aiBrain = self:GetBrain()
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')

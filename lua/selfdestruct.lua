@@ -39,7 +39,7 @@ function ToggleSelfDestruct(data)
                         -- Unit and weapon bp flags can be used to control behaviour on SelfDestruct
                         -- Instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
                         -- Fires weapons with FireOnSelfDestruct = true in units weapon table
-                        local bp = unit:GetBlueprint()
+                        local bp = unit.Blueprint
                         if bp.General.InstantDeathOnSelfDestruct then
                             FireSelfdestructWeapons(unit)
                             unit.SelfDestructed = true
@@ -66,7 +66,7 @@ function FireSelfdestructWeapons(unit)
     local wepCount = unit:GetWeaponCount()
     for i = 1, wepCount do
         local wep = unit:GetWeapon(i)
-        local wepBP = wep:GetBlueprint()
+        local wepBP = wep.Blueprint
         if wepBP.FireOnSelfDestruct then
             if wep.Fire then
                 wep.Fire()

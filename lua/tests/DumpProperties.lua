@@ -108,7 +108,7 @@ end
 function WriteAllBlueprints()
     local n = 0
     local file = io.open(outfile, "w")
-    file:write(HASHTAGREPLACE)
+    file:write("#")
 
     for id,bp in sortedpairs(all_blueprints) do
 

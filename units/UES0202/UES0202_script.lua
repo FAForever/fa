@@ -49,7 +49,7 @@ UES0202 = Class(TSeaUnit) {
                 
                 --taken out because all this waiting causes broken rate of fire clock issues
                 --PlayFxMuzzleSequence = function(self, muzzle)
-                    --local bp = self:GetBlueprint()
+                    --local bp = self.Blueprint
                     --self.Rotator = CreateRotator(self.unit, bp.RackBones[self.CurrentRack].RackBone, 'y', nil, 90, 90, 90)
                     --muzzle = bp.RackBones[self.CurrentRack].MuzzleBones[1]
                     --self.Rotator:SetGoal(90)
@@ -59,7 +59,7 @@ UES0202 = Class(TSeaUnit) {
                 --end,
                 
                 CreateProjectileAtMuzzle = function(self, muzzle)
-                    muzzle = self:GetBlueprint().RackBones[self.CurrentRack].MuzzleBones[1]
+                    muzzle = self.Blueprint.RackBones[self.CurrentRack].MuzzleBones[1]
                     if self.CurrentRack >= 8 then
                         self.CurrentRack = 1
                     else

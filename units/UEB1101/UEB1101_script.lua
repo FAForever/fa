@@ -49,7 +49,7 @@ UEB1101 = Class(TEnergyCreationUnit) {
 
     OpeningState = State {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if bp.Audio.Activate then
                 self:PlaySound(bp.Audio.Activate)
             end

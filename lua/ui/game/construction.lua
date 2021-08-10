@@ -429,7 +429,7 @@ function CreateTabs(type)
         defaultTabOrder = {t3 = 1, t2 = 2, t1 = 3, t4 = 4} -- T4 is last because only the Novax can build T4 but not T3
     elseif type == 'enhancement' then
         local selection = sortedOptions.selection
-        local enhancements = selection[1]:GetBlueprint().Enhancements
+        local enhancements = selection[1].Blueprint.Enhancements
         local enhCommon = import('/lua/enhancementcommon.lua')
         local enhancementPrefixes = {Back = 'b-', LCH = 'la-', RCH = 'ra-'}
         local newTabs = {}
@@ -446,7 +446,7 @@ function CreateTabs(type)
                         if existing[slotName] then
                             local enhancement = enhancements[existing[slotName]]
                             local icon = enhancements[existing[slotName]].Icon
-                            local bpID = selection[1]:GetBlueprint().BlueprintId
+                            local bpID = selection[1].Blueprint.BlueprintId
                             local enhName = existing[slotName]
                             local texture = "/textures/ui/common" .. GetEnhancementPrefix(bpID, enhancementPrefixes[slotName] .. icon)
                             UnitViewDetail.ShowEnhancement(enhancement, bpID, icon, texture, sortedOptions.selection[1])
@@ -465,7 +465,7 @@ function CreateTabs(type)
                 for enhName, enhTable in enhancements do
                     if enhTable.Slot == slotName then
                         enhTable.ID = enhName
-                        enhTable.UnitID = selection[1]:GetBlueprint().BlueprintId
+                        enhTable.UnitID = selection[1].Blueprint.BlueprintId
                         table.insert(sortedOptions[slotName], enhTable)
                     end
                 end
@@ -907,7 +907,7 @@ function CommonLogic()
             control.Icon.Depth:Set(function() return control.Depth() + 1 end)
             control.BuildKey = nil
             if showBuildIcons then
-                local unitBuildKeys = BuildMode.GetUnitKeys(sortedOptions.selection[1]:GetBlueprint().BlueprintId, GetCurrentTechTab())
+                local unitBuildKeys = BuildMode.GetUnitKeys(sortedOptions.selection[1].Blueprint.BlueprintId, GetCurrentTechTab())
                 control.Count:SetText(unitBuildKeys[id] or '')
                 control.Count:SetColor('ffff9000')
             else
@@ -1382,7 +1382,7 @@ function OnClickHandler(button, modifiers)
             else
                 for i, v in sortedOptions.selection do
                     if v then -- Its possible that your unit will have died by the time this gets to it
-                        local unitBp = v:GetBlueprint()
+                        local unitBp = v.Blueprint
                         if itembp.General.UpgradesFrom == unitBp.BlueprintId then
                             performUpgrade = true
                         elseif itembp.General.UpgradesFrom == unitBp.General.UpgradesTo then
@@ -2053,7 +2053,7 @@ function FormatData(unitData, type)
         local idleConsUnits = {}
 
         for _, unit in unitData do
-            local id = unit:GetBlueprint().BlueprintId
+            local id = unit.Blueprint.BlueprintId
 
             if unit:IsInCategory('AIR') and unit:GetFuelRatio() < .2 and unit:GetFuelRatio() > -1 then
                 if not lowFuelUnits[id] then
@@ -2412,7 +2412,7 @@ function SetSecondaryDisplay(type)
             local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(sortedOptions.selection))
             if attachedUnits and not table.empty(attachedUnits) then
                 for _, v in attachedUnits do
-                    table.insert(data, {type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v})
+                    table.insert(data, {type = 'attachedunit', id = v.Blueprint.BlueprintId, unit = v})
                 end
             end
             controls.secondaryProgress:SetAlpha(0, true)
@@ -2503,7 +2503,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             end
 
 
-            local bpid = __blueprints[selection[1]:GetBlueprint().BlueprintId].General.UpgradesTo
+            local bpid = __blueprints[selection[1].Blueprint.BlueprintId].General.UpgradesTo
             if bpid then
                 while bpid and bpid ~= '' do -- UpgradesTo is sometimes ''??
                     if not inQueue[bpid] then
@@ -2568,17 +2568,17 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             if allMobile and not v:IsInCategory('MOBILE') then
                 allMobile = false
             end
-            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
+            if allSameUnit and bpID and bpID ~= v.Blueprint.BlueprintId then
                 allSameUnit = false
             else
-                bpID = v:GetBlueprint().BlueprintId
+                bpID = v.Blueprint.BlueprintId
             end
             if not allMobile and not allSameUnit then
                 break
             end
         end
 
-        if table.getn(selection) == 1 and selection[1]:GetBlueprint().Enhancements then
+        if table.getn(selection) == 1 and selection[1].Blueprint.Enhancements then
             controls.enhancementTab:Enable()
         else
             controls.enhancementTab:Disable()
@@ -2644,10 +2644,10 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             if allMobile and not v:IsInCategory('MOBILE') then
                 allMobile = false
             end
-            if allSameUnit and bpID and bpID ~= v:GetBlueprint().BlueprintId then
+            if allSameUnit and bpID and bpID ~= v.Blueprint.BlueprintId then
                 allSameUnit = false
             else
-                bpID = v:GetBlueprint().BlueprintId
+                bpID = v.Blueprint.BlueprintId
             end
             if not allMobile and not allSameUnit then
                 break
@@ -2655,7 +2655,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         -- Upgrade multiple SCU at once
-        if selection[1]:GetBlueprint().Enhancements and allSameUnit then
+        if selection[1].Blueprint.Enhancements and allSameUnit then
             controls.enhancementTab:Enable()
         end
 
@@ -2665,7 +2665,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
             if allMobile and templates and not table.empty(templates) then
 
-                local unitFactionName = selection[1]:GetBlueprint().General.FactionName
+                local unitFactionName = selection[1].Blueprint.General.FactionName
                 local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
 
                 if currentFaction then

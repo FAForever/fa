@@ -2,7 +2,7 @@
 --  File     :  /cdimage/units/UEA0304/UEA0304_script.lua
 --  Author(s):  John Comes, David Tomandl, Jessica St. Croix
 --  Summary  :  UEF Strategic Bomber Script
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
@@ -17,7 +17,7 @@ UEA0304 = Class(TAirUnit) {
     },
     
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
+        if instigator and instigator.Blueprint.CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return
         end
         

@@ -94,7 +94,7 @@ Callbacks.CapMex = function(data, units)
     local builder
 
     for _, unit in units do
-        msid = LetterArray[unit:GetBlueprint().General.FactionName]..'b1106' -- The identity of the storage we'll build
+        msid = LetterArray[unit.Blueprint.General.FactionName]..'b1106' -- The identity of the storage we'll build
         if unit:CanBuild(msid) then
             builder = unit
             break

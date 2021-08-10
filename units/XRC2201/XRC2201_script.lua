@@ -75,7 +75,7 @@ XRC2201 = Class(CCivilianStructureUnit) {
     
 DeathThread = function(self)
         self:PlayUnitSound('Destroyed')
-        local army = self:GetArmy()
+        local army = self.Army
 
         -- Create Initial explosion effects
         explosion.CreateFlash( self, 'XRC2201', 6.0, army )

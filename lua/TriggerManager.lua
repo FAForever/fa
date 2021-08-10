@@ -956,7 +956,7 @@ Manager = {
             end
         else
             for numUnit, unit in params.Group do
-                local health = unit:GetBlueprint().Defense.MaxHealth
+                local health = unit.Blueprint.Defense.MaxHealth
                 unit:AdjustHealth(unit, Random(params.DamagePercentMin * health, params.DamagePercentMax * health))
             end
         end

@@ -281,7 +281,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place resource structures down
             for k, v in resourceStructures do
                 local unit = self:CreateResourceBuildingNearest(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
+                if unit ~= nil and unit.Blueprint.Physics.FlattenSkirt then
                     unit:CreateTarmac(true, true, true, false, false)
                 end
             end
@@ -291,7 +291,7 @@ AIBrain = Class(moho.aibrain_methods) {
             -- Place initial units down
             for k, v in initialUnits do
                 local unit = self:CreateUnitNearSpot(v, posX, posY)
-                if unit ~= nil and unit:GetBlueprint().Physics.FlattenSkirt then
+                if unit ~= nil and unit.Blueprint.Physics.FlattenSkirt then
                     unit:CreateTarmac(true, true, true, false, false)
                 end
             end
@@ -479,7 +479,7 @@ AIBrain = Class(moho.aibrain_methods) {
     OnIntelChange = function(self, blip, reconType, val)
         if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
-                if EntityCategoryContains(v.Category, blip:GetBlueprint().BlueprintId)
+                if EntityCategoryContains(v.Category, blip.Blueprint.BlueprintId)
                     and v.Type == reconType and (not v.Blip or v.Blip == blip:GetSource())
                     and v.Value == val and v.TargetAIBrain == blip:GetAIBrain() then
                     v.CallbackFunction(blip)
@@ -4091,7 +4091,7 @@ AIBrain = Class(moho.aibrain_methods) {
             overallThreat = self:GetThreatAtPosition(pos, 1, true, 'Overall', enemy:GetArmyIndex())
             local bombers = AIUtils.GetOwnUnitsAroundPoint(self, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK), pos, 10000)
             for _, unit in bombers do
-                myThreat = myThreat + unit:GetBlueprint().Defense.SurfaceThreatLevel
+                myThreat = myThreat + unit.Blueprint.Defense.SurfaceThreatLevel
             end
         until threat > myThreat or overallThreat <= 0
 

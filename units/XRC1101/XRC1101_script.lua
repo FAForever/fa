@@ -15,7 +15,7 @@ XRC1101 = Class(CCivilianStructureUnit)
    OnCreate = function(self, builder, layer)
         ------Place emitters on certain light bones on the mesh.
         for k, v in SSQuantumJammerTowerAmbient do
-            CreateAttachedEmitter(self, 'Jammer', self:GetArmy(), v)
+            CreateAttachedEmitter(self, 'Jammer', self.Army, v)
         end
                
         self:ForkThread(self.LandBlipThread)
@@ -29,7 +29,7 @@ XRC1101 = Class(CCivilianStructureUnit)
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationIdle, true)
     end,
         
 }

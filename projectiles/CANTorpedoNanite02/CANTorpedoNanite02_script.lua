@@ -40,7 +40,7 @@ CANTorpedoNanite02 = Class(CTorpedoShipProjectile) {
 
     OnEnterWater = function(self)
         CTorpedoShipProjectile.OnEnterWater(self)
-        self.CreateImpactEffects( self, self:GetArmy(), self.FxEnterWater, self.FxSplashScale )
+        self.CreateImpactEffects( self, self.Army, self.FxEnterWater, self.FxSplashScale )
         self:StayUnderwater(true)
         self:TrackTarget(true)
         self:SetTurnRate(120)

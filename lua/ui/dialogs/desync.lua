@@ -66,5 +66,5 @@ function UpdateDialog(beatNumber, strings)
             dialog.diagnosticBox:AppendLine(v)
         end
     end
-    dialog.diagnosticBox:AppendLine(LOC(HASHTAGREPLACE) .. tostring(beatNumber))
+    dialog.diagnosticBox:AppendLine(LOC("Beat #") .. tostring(beatNumber))
 end

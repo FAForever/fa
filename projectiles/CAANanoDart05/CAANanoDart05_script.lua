@@ -9,7 +9,7 @@ CAANanoDart02 = Class(CAANanoDartProjectile) {
    OnCreate = function(self)
         CAANanoDartProjectile.OnCreate(self)
         for k, v in self.FxTrails do
-            CreateEmitterOnEntity(self,self:GetArmy(),v )
+            CreateEmitterOnEntity(self,self.Army,v )
         end
    end,
 }

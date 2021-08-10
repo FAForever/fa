@@ -48,7 +48,7 @@ MissileCruiseTerran01 = Class(Projectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
 
         self.trails = {}
-        local army = self:GetArmy()
+        local army = self.Army
 
         for i in self.FxTrails do
             table.insert(self.trails, CreateEmitterOnEntity(self, army,self.FxLaunchTrails[i]):ScaleEmitter(self.FxLaunchTrailScale):OffsetEmitter(0, 0, self.FxLaunchTrailOffset))
@@ -72,10 +72,10 @@ MissileCruiseTerran01 = Class(Projectile) {
         end
         self.MissileExhaust:Destroy()
         WaitSeconds(0.5) --Falling
-        local army = self:GetArmy()
+        local army = self.Army
 
         self.MissileExhaust = CreateBeamEmitter('/effects/emitters/missile_cruise_munition_exhaust_beam_02_emit.bp', army)
-        AttachBeamToEntity(self.MissileExhaust, self, -1, self:GetArmy())
+        AttachBeamToEntity(self.MissileExhaust, self, -1, self.Army)
 
         self.trails = {}
         for i in self.FxTrails do

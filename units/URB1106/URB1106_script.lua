@@ -14,7 +14,7 @@ URB1106 = Class(CMassStorageUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CMassStorageUnit.OnStopBeingBuilt(self,builder,layer)
         self:ForkThread(self.AnimThread)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = self.Blueprint
         if myBlueprint.Audio.Activate then
             self:PlaySound(myBlueprint.Audio.Activate)
         end

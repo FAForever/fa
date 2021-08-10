@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/UAB2305/UAB2305_script.lua
 -- Author(s):  John Comes, David Tomandl
 -- Summary  :  Aeon Tactical Missile Launcher Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
@@ -26,13 +26,13 @@ UAB2305 = Class(AStructureUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         AStructureUnit.OnStopBeingBuilt(self,builder,layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
         self:ForkThread(self.PlayArmSounds)
     end,
 
     PlayArmSounds = function(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = self.Blueprint
         if myBlueprint.Audio.Open and myBlueprint.Audio.Activate then
             WaitSeconds(4.75)
             self:PlaySound(myBlueprint.Audio.Activate)

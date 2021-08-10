@@ -1,6 +1,6 @@
 function PlaySelectionSound(newSelection)
     for k, v in newSelection do
-        local bp = v:GetBlueprint()
+        local bp = v.Blueprint
         if bp.Audio.UISelection then
             PlaySound(bp.Audio.UISelection)
             return

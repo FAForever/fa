@@ -30,7 +30,7 @@ XES0205 = Class(TShieldSeaUnit) {
             self.ShieldEffectsBag = {}
         end
         for _, v in self.ShieldEffects do
-            local emitter = CreateAttachedEmitter(self, 'XES0205', self:GetArmy(), v)
+            local emitter = CreateAttachedEmitter(self, 'XES0205', self.Army, v)
             emitter:OffsetEmitter(0, -0.15, 0.35)
             table.insert(self.ShieldEffectsBag, emitter)
         end

@@ -82,7 +82,7 @@ function SetWeaponPriorities(data)
     local preparedPrioTables = {}
 
     for _, unit in units do
-        local bp = unit:GetBlueprint()
+        local bp = unit.Blueprint
         local blueprintId = bp.BlueprintId
         local weaponCount = unit:GetWeaponCount()
         local finalPriorities = editedPrioritiesLimited

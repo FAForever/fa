@@ -15,7 +15,7 @@ CDFRocketMeson01 = Class(CRocketProjectile) {
     UpdateThread = function(self)
         WaitSeconds(0.15)
         self:SetMesh('/projectiles/CDFRocketMeson01/CDFRocketMesonUnPacked01_mesh')
-        local army = self:GetArmy()
+        local army = self.Army
 
         -- Polytrails offset to wing tips
         CreateTrail(self, -1, army, self.PolyTrail ):OffsetEmitter(0.075, -0.05, 0.25)

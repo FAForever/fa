@@ -22,7 +22,7 @@ UEC1501 = Class(TCivilianStructureUnit) {
 
     OnCreate = function(self)
 		TCivilianStructureUnit.OnCreate(self)
-		local army = self:GetArmy()
+		local army = self.Army
         for k, v in self.EffectBones01 do
             CreateAttachedEmitter(self,v,army,'/effects/emitters/uec1501_smoke_01_emit.bp')
         end		

@@ -36,7 +36,7 @@ function CanBuildInSpot(originUnit, unitId, pos)
 
     for _, struct in units do
         if struct ~= originUnit then
-            local structPhysics = struct:GetBlueprint().Physics
+            local structPhysics = struct.Blueprint.Physics
             local structPos = struct:GetPosition()
 
             -- These can be positive or negative, so we need to make them positive using math.abs

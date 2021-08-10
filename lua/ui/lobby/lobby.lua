@@ -2450,7 +2450,7 @@ function CreateSlotsUI(makeLabel)
     LayoutHelpers.SetDimensions(labelGroup, 791, 21)
     LayoutHelpers.AtLeftTopIn(labelGroup, GUI.playerPanel, 5, 5)
 
-    local slotLabel = makeLabel(HASHTAGREPLACE, 14)
+    local slotLabel = makeLabel("#", 14)
     labelGroup:AddChild(slotLabel)
 
     -- No label required for the second column (flag), so skip it. (Even eviler hack)

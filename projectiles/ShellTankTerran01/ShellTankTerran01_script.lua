@@ -41,7 +41,7 @@ ShellTankTerran01 = Class(Projectile) {
             --local offsetx = Random(1.0, 2.0) - 1
             --x = x + offsetx
             MetaImpact(self, Vector(x, y, z), 2, 2)
-            local army = self:GetArmy()
+            local army = self.Army
             for k, v in self.FxMeta do
                 CreateEmitterAtEntity(self,army,v):ScaleEmitter(0.4)--:OffsetEmitter(0, 0, offsetx)
             end

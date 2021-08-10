@@ -1834,11 +1834,11 @@ function GetLoadTransports(platoon)
     for num, unit in platoon:GetPlatoonUnits() do
         if EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
             table.insert(shields, unit)
-        elseif unit:GetBlueprint().Transport.TransportClass == 3 then
+        elseif unit.Blueprint.Transport.TransportClass == 3 then
             table.insert(remainingSize3, unit)
-        elseif unit:GetBlueprint().Transport.TransportClass == 2 then
+        elseif unit.Blueprint.Transport.TransportClass == 2 then
             table.insert(remainingSize2, unit)
-        elseif unit:GetBlueprint().Transport.TransportClass == 1 then
+        elseif unit.Blueprint.Transport.TransportClass == 1 then
             table.insert(remainingSize1, unit)
         else
             table.insert(remainingSize1, unit)
@@ -1946,17 +1946,17 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
             end
             if transSlotNum > 0 then
                 table.insert(transportTable[transSlotNum].Units, unit)
-                if unit:GetBlueprint().Transport.TransportClass == 3 and remainingLarge >= 1 then
+                if unit.Blueprint.Transport.TransportClass == 3 and remainingLarge >= 1 then
                     transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - 1
                     transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 2
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 4
-                elseif unit:GetBlueprint().Transport.TransportClass == 2 and remainingMed > 0 then
+                elseif unit.Blueprint.Transport.TransportClass == 2 and remainingMed > 0 then
                     if transportTable[transSlotNum].LargeSlots > 0 then
                         transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - .5
                     end
                     transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 1
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 2
-                elseif unit:GetBlueprint().Transport.TransportClass == 1 and remainingSml > 0 then
+                elseif unit.Blueprint.Transport.TransportClass == 1 and remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
                 elseif remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
@@ -2284,7 +2284,7 @@ function GetNumTransports(platoon)
     }
     local transportClass
     for _, v in platoon:GetPlatoonUnits() do
-        transportClass = v:GetBlueprint().Transport.TransportClass
+        transportClass = v.Blueprint.Transport.TransportClass
         if transportClass == 1 then
             transportNeeded.Small = transportNeeded.Small + 1
         elseif transportClass == 2 then
