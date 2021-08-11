@@ -232,9 +232,12 @@ function CreateUI(isReplay)
         AddBeatFunction(UiBeat)
     else
         local clients = GetSessionClients()
-        if table.getsize(clients) <= 1 then
-            -- No need for unnecessary lag when playing alone
-            ConExecute('net_lag 0')
+        local option = Prefs.GetFromCurrentProfile('options')['no_singleplayer_netlag']
+        if option then 
+            if table.getsize(clients) <= 1 then
+                -- No need for unnecessary lag when playing alone
+                ConExecute('net_lag 0')
+            end
         end
     end
 

@@ -280,18 +280,18 @@ options = {
                         {text = "<LOC _MaxTech>", key = 'maxTech'},
                     },
                 },
-            }
+            },
             {
-                title = "<LOC OPTIONS_0300>Remove command delay in single player",
-                key = 'no-singleplayer-netlag',
+                title = "<LOC OPTIONS_0287>Remove command delay in single player",
+                key = 'no_singleplayer_netlag',
                 type = 'toggle',
                 default = 'yes',
                 set = function(key,value,startup)
                 end,
                 custom = {
                     states = {
-                        {text = "<LOC _On>", key = 'yes' },
-                        {text = "<LOC _Off>", key = 'no' },
+                        {text = "<LOC _On>", key = true },
+                        {text = "<LOC _Off>", key = false },
                     },
                 },
             },

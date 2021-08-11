@@ -811,6 +811,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0285>Automatic extractor selection",
         description = "<LOC OPTIONS_0286>After selecting an engineer, hover the mouse over a mass extractor spot to autopreselect a mass extractor for building",
     },
+    options_no_singleplayer_netlag = {
+        title = "<LOC OPTIONS_0287>Remove command delay in single player",
+        description = "<LOC OPTIONS_0288>Removes the 500 ms delay on your input when playing alone. Prevents the console command wld_RunWithTheWind from functioning properly.",
+    },
     options_show_attached_unit_lifebars = {
         title = "<LOC OPTIONS_0222>Show Lifebars of Attached Units",
         description = "<LOC OPTIONS_0219>Toggle the visibility of lifebars of on screen units (lifebars will still show in tooltip information)",

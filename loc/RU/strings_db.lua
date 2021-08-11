@@ -8630,6 +8630,8 @@ OPTIONS_0283="Масштаб пользовательского интерфей
 OPTIONS_0284="Изменяет размер всех элементов пользовательского интерфейса. (Требуется перезагрузка игры)"
 OPTIONS_0285="Автоматический выбор экстрактора"
 OPTIONS_0286="После выбора инженера при наведии курсора мыши на экстрактор, будет автоматически выбран экстрактор для строительства"
+OPTIONS_0287="Remove command delay in single player"
+OPTIONS_0288="Removes the 500 ms delay on your input when playing alone. Prevents the console command wld_RunWithTheWind from functioning properly."
 
 restricted_units_data_0016 = "Боевые единицы на воздушной подушке недоступны"
 restricted_units_data_0030 = "Воздушные боевые единицы Т3 недоступны"
