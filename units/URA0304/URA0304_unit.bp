@@ -208,7 +208,7 @@ UnitBlueprint {
         BuildCostEnergy = 144000,#105000
         BuildCostMass = 2100,
         BuildTime = 9600,
-        MaintenanceConsumptionPerSecondEnergy = 60,
+        MaintenanceConsumptionPerSecondEnergy = 150,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -318,7 +318,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 2750,
             DamageFriendly = true,
-            DamageRadius = 7,
+            DamageRadius = 6.5,
             DamageType = 'Normal',
             DisplayName = 'Neutron Bomb',
             EffectiveRadius = 25,
