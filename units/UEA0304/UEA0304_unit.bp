@@ -126,6 +126,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
             '<LOC ability_radar>Radar',
+            '<LOC ability_jamming>Jamming',
         },
         LayerChangeEffects = {
             AirLand = {
@@ -202,6 +203,7 @@ UnitBlueprint {
         BuildCostEnergy = 144000,#105000
         BuildCostMass = 2100,
         BuildTime = 9600,
+        MaintenanceConsumptionPerSecondEnergy = 25,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -228,11 +230,25 @@ UnitBlueprint {
         },
         FactionName = 'UEF',
         Icon = 'air',
+        OrderOverrides = {
+            RULEUTC_JammingToggle = {
+                bitmapId = 'jamming',
+                helpText = 'toggle_jamming',
+            },
+        },
         TechLevel = 'RULEUTL_Secret',
+        ToggleCaps = {
+            RULEUTC_JammingToggle = true,
+        },
         UnitName = '<LOC uea0304_name>Ambassador',
         UnitWeight = 1,
     },
     Intel = {
+        JamRadius = {
+            Max = 40,
+            Min = 10,
+        },
+        JammerBlips = 4,
         RadarRadius = 65,
         VisionRadius = 32,
     },
@@ -302,7 +318,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
             CollideFriendly = false,
-            Damage = 3000,
+            Damage = 2900,
             DamageFriendly = true,
             DamageRadius = 6,
             DamageType = 'Normal',

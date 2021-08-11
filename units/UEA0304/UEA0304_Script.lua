@@ -15,7 +15,11 @@ UEA0304 = Class(TAirUnit) {
         LinkedRailGun1 = Class(TAirToAirLinkedRailgun) {},
         LinkedRailGun2 = Class(TAirToAirLinkedRailgun) {},
     },
-    
+    OnStopBeingBuilt = function(self,builder,layer)
+        TAirUnit.OnStopBeingBuilt(self,builder,layer)
+        self:SetMaintenanceConsumptionActive()
+    end,
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return

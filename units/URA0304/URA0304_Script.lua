@@ -20,7 +20,9 @@ URA0304 = Class(CAirUnit) {
     
     OnStopBeingBuilt = function(self,builder,layer)
         CAirUnit.OnStopBeingBuilt(self,builder,layer)
+        Turns Stealth off when unit is built
         self:SetScriptBit('RULEUTC_StealthToggle', true)
+        
     end,
     
     OnDamage = function(self, instigator, amount, vector, damageType)
