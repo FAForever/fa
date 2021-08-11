@@ -294,7 +294,7 @@
             FixedSpreadRadius = 80,
             Label = 'Gun01',
             LeadTarget = true,
-            MaxRadius = 2000,
+            MaxRadius = 4000,
             MinRadius = 150,
             MuzzleSalvoDelay = 0.25,
             MuzzleSalvoSize = 20,
