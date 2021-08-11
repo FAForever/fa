@@ -281,6 +281,20 @@ options = {
                     },
                 },
             }
+            {
+                title = "<LOC OPTIONS_0300>Remove command delay in single player",
+                key = 'no-singleplayer-netlag',
+                type = 'toggle',
+                default = 'yes',
+                set = function(key,value,startup)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _On>", key = 'yes' },
+                        {text = "<LOC _Off>", key = 'no' },
+                    },
+                },
+            },
         },
     },
     ui = {
