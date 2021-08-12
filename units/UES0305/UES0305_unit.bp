@@ -84,6 +84,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
+            '<LOC ability_jamming>Jamming',
         },
         IdleEffects = {
             Water = {
@@ -132,7 +133,7 @@ UnitBlueprint {
         BuildCostEnergy = 12000,
         BuildCostMass = 1000,
         BuildTime = 750,
-        MaintenanceConsumptionPerSecondEnergy = 500,
+        MaintenanceConsumptionPerSecondEnergy = 550,
     },
     Footprint = {
         MinWaterDepth = 1.5,
@@ -164,10 +165,15 @@ UnitBlueprint {
                 bitmapId = 'sonar',
                 helpText = 'toggle_sonar',
             },
+            RULEUTC_JammingToggle = {
+                bitmapId = 'jamming',
+                helpText = 'toggle_jamming',
+            },
         },
         TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_IntelToggle = true,
+            RULEUTC_JammingToggle = true,
         },
         UnitName = '<LOC ues0305_name>SP3 - 3000',
         UnitWeight = 1,
@@ -179,6 +185,11 @@ UnitBlueprint {
         SonarRadius = 450,
         VisionRadius = 32,
         WaterVisionRadius = 24,
+        JamRadius = {
+            Max = 70,
+            Min = 70,
+        },
+        JammerBlips = 20,
     },
     Interface = {
         HelpText = '<LOC ues0305_help>Sonar Platform',
