@@ -301,6 +301,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.23,
+            RenderFireClock = true,
             TargetCheckInterval = 0.23,
             TargetPriorities = {
                 'TECH3 MOBILE',
