@@ -2,7 +2,7 @@
 --* File: lua/modules/ui/game/commandgraph.lua
 --* Summary: Command graph display funcs
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -50,6 +50,8 @@ function OnCommandGraphShow(show)
 #
 #        end
 #    end
+
+    import('/lua/ui/game/reclaim.lua').OnCommandGraphShow(show)
 end
 
 function OnCommandDragBegin()
