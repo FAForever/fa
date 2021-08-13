@@ -297,8 +297,6 @@ XSL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT2BuildRate')
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
 
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
@@ -308,8 +306,6 @@ XSL0001 = Class(ACUUnit) {
             if Buff.HasBuff(self, 'SeraphimACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimACUT2BuildRate')
          end
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
 
         --T3 Engineering
         elseif enh =='T3Engineering' then
@@ -341,8 +337,6 @@ XSL0001 = Class(ACUUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'SeraphimACUT3BuildRate')
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -351,8 +345,6 @@ XSL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff(self, 'SeraphimACUT3BuildRate')
             end
             self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        -- Engymod addition: After fiddling with build restrictions, update engymod build restrictions
-        self:updateBuildRestrictions()
         --Blast Attack
         elseif enh == 'BlastAttack' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')

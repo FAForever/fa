@@ -3513,12 +3513,20 @@ Platoon = Class(moho.platoon_methods) {
     EngineerFailedToBuild = function(unit, params)
         if not unit.PlatoonHandle then return end
         if not unit.PlatoonHandle.PlanName == 'EngineerBuildAI' then return end
+        if unit.UnitBeingBuiltBehavior then
+            if unit.ProcessBuild then
+                KillThread(unit.ProcessBuild)
+                unit.ProcessBuild = nil
+            end
+            return
+        end
         if unit.ProcessBuildDone and unit.ProcessBuild then
             KillThread(unit.ProcessBuild)
             unit.ProcessBuild = nil
         end
         if not unit.ProcessBuild then
-            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, true)  --DUNCAN - changed to true
+            --LOG("*AI DEBUG: Failed to build" .. unit.Sync.id)
+            unit.ProcessBuild = unit:ForkThread(unit.PlatoonHandle.ProcessBuildCommand, false) 
         end
     end,
 
@@ -6534,7 +6542,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         for k,v in ArmyBrains do
-            if not v.Result == "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+            if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
                 local startX, startZ = v:GetArmyStartPos()
                 if VDist2Sq(markerPos[1], markerPos[3], startX, startZ) < baseRadius * baseRadius then
                     return false

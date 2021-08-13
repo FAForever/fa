@@ -17,6 +17,7 @@ local UserDecal = import('/lua/user/UserDecal.lua').UserDecal
 local WorldViewMgr = import('/lua/ui/game/worldview.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local OverchargeCanKill = import('/lua/ui/game/unitview.lua').OverchargeCanKill
+local CommandMode = import('/lua/ui/game/commandmode.lua')
 
 WorldViewParams = {
     ui_SelectTolerance = 7.0,
@@ -153,6 +154,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     EventRedirect = nil,
     _pingAnimationThreads = {},
     Decals = {},
+    AutoBuild = false,
 
     HandleEvent = function(self, event)
         if self.EventRedirect then
@@ -176,7 +178,51 @@ WorldView = Class(moho.UIWorldView, Control) {
         elseif event.Type == 'WheelRotation' then
             self.zoomed = true
         end
-
+        if (event.Type == 'MouseMotion') and (not CommandMode.GetCommandMode()[1] or self.AutoBuild) then
+            local option = Prefs.GetFromCurrentProfile('options.automex')
+            if option ~= 'off' then
+                local Units = GetSelectedUnits()
+                if Units and not GetRolloverInfo() then
+                    local BuildType = false
+                    local MWP = GetMouseWorldPos()
+                    local Deposits = GetDepositsAroundPoint(MWP.x, MWP.z, 0.8, 0)
+                    if not table.empty(Deposits) then
+                        if Deposits[1].Type == 1 then
+                            BuildType = categories.MASSEXTRACTION
+                        else
+                            BuildType = categories.HYDROCARBON
+                        end
+                    end
+                    if BuildType then
+                        if self.AutoBuild and CommandMode.GetCommandMode()[2].name ~= self.AutoBuild then
+                            self.AutoBuild = false
+                        else
+                            local _, _, BuildableCategories = GetUnitCommandData(Units)
+                            BuildableCategories = BuildableCategories * BuildType
+                            if option == 'onlyT1' then
+                                BuildableCategories = BuildableCategories * categories.TECH1
+                            else
+                                local Techs = {categories.EXPERIMENTAL, categories.TECH3, categories.TECH2}
+                                for _, Tech in Techs do
+                                    if not EntityCategoryEmpty(BuildableCategories * Tech) then
+                                        BuildableCategories = BuildableCategories * Tech
+                                        break
+                                    end
+                                end
+                            end
+                            local BuildBP = EntityCategoryGetUnitList(BuildableCategories)[1]
+                            if BuildBP then
+                                CommandMode.StartCommandMode('build', { name = BuildBP })
+                                self.AutoBuild = BuildBP
+                            end
+                        end
+                    else
+                        CommandMode.EndCommandMode(true)
+                        self.AutoBuild = false
+                    end
+                end
+            end
+        end
         return false
     end,
 
@@ -189,7 +235,7 @@ WorldView = Class(moho.UIWorldView, Control) {
 
     OnUpdateCursor = function(self)
         local oldCursor = self.Cursor
-        local command_mode, command_data = unpack(import('/lua/ui/game/commandmode.lua').GetCommandMode())
+        local command_mode, command_data = unpack(CommandMode.GetCommandMode())
 
         if not command_mode then
             local units = GetSelectedUnits()

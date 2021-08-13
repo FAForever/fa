@@ -87,7 +87,7 @@ function DoOverspill(source, instigator, amount, dmgType, dmgMod)
                 local targetId = v.EntityId
                 if v:IsUp() and not DidTakeDamageAlready(targetId, instigatorId, amount) then
                     local direction = Util.GetDirectionVector(source.Owner:GetCachePosition(), v.Owner:GetCachePosition())
-                    v:ApplyDamage(source, (amount * dmgMod), direction, dmgType, false)
+                    v:ApplyDamage(instigator, (amount * dmgMod), direction, dmgType, false)
                     RegisterDamage(targetId, instigatorId, amount)
                 end
             end

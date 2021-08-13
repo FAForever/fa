@@ -126,7 +126,7 @@ NukeProjectile = Class(NullShell) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
-        if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
+        if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_THREE, TargetEntity) then
             -- Play the explosion sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.NukeExplosion then
@@ -426,7 +426,7 @@ OverchargeProjectile = Class() {
                 OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
                 -- if oc depletes a mobile shield it kills the generator, vet counted, no wreck left
-                if targetCats.DIESTOOCDEPLETINGSHIELD and not targetEntity.MyShield:IsUp() then
+                if targetCats.DIESTOOCDEPLETINGSHIELD and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
                     targetEntity:Kill(launcher, 'Overcharge', 2)
                     launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
                 end

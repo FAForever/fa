@@ -31,6 +31,11 @@ DummyUnit = Class(Unit) {
     end,
 }
 
+-- compute once and store as upvalue for performance
+local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
+local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL)
+local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
+
 -- STRUCTURE UNITS
 StructureUnit = Class(Unit) {
     LandBuiltHiddenBones = {'Floatation'},
@@ -52,41 +57,70 @@ StructureUnit = Class(Unit) {
     end,
 
     RotateTowardsEnemy = function(self)
+
+        -- retrieve information we may need
         local bp = self:GetBlueprint()
         local brain = self:GetAIBrain()
         local pos = self:GetPosition()
-        local x, y = GetMapSize()
-        local threats = {{pos = {x / 2, 0, y / 2}, dist = VDist2(pos[1], pos[3], x, y), threat = -1}}
-        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (categories.STRUCTURE + categories.LAND + categories.NAVAL)
-        local units = brain:GetUnitsAroundPoint(cats, pos, 2 * (bp.AI.GuardScanRadius or 100), 'Enemy')
+
+        -- determine default threat that aims at center of the map
+        local x, z = GetMapSize()
+        local target = {
+            location = {0.5 * x, 0, 0.5 * z},
+            distance = -1,
+            threat = -1,
+        }
+
+        -- retrieve units of certain type
+        local radius = 2 * (bp.AI.GuardScanRadius or 50)
+        local cats = EntityCategoryContains(categories.ANTIAIR, self) and categories.AIR or (StructureUnitRotateTowardsEnemiesLand)
+        local units = brain:GetUnitsAroundPoint(cats, pos, radius, 'Enemy')
+
+        -- for each unit found
+        local threats = { }
         for _, u in units do
+
+            -- find its blip
             local blip = u:GetBlip(self.Army)
             if blip then
-                local on_radar = blip:IsOnRadar(self.Army)
-                local seen = blip:IsSeenEver(self.Army)
 
-                if on_radar or seen then
-                    local epos = u:GetPosition()
-                    local threat = seen and (u:GetBlueprint().Defense.SurfaceThreatLevel or 0) or 1
+                -- check if we've got it on radar and whether it is identified by army in question
+                local radar = blip:IsOnRadar(self.Army)
+                local identified = blip:IsSeenEver(self.Army)
+                if radar or identified then
 
-                    table.insert(threats, {pos = epos, threat = threat, dist = VDist2(pos[1], pos[3], epos[1], epos[3])})
+                    -- if we've identified the blip then we can use the threat of the unit, otherwise default to 1.
+                    local threat = (identified and u:GetBlueprint().Defense.SurfaceThreatLevel) or 1
+
+                    -- if this is more of a threat than what we have, compute distance
+                    if threat >= target.threat then
+                        local epos = u:GetPosition()
+                        local distance = VDist2Sq(pos[1], pos[3], epos[1], epos[3])
+
+                        -- if threat is bigger, then we don't need to compare distance
+                        if threat > target.threat then 
+                            target.location = epos
+                            target.distance = distance
+                            target.threat = threat
+                        else 
+                            -- threat is equal, therefore compare distance - closer wins
+                            if distance < target.distance then 
+                                target.location = epos
+                                target.distance = distance
+                                target.threat = threat
+                            end
+                        end
+                    end
                 end
             end
         end
 
-        table.sort(threats, function(a, b)
-            if a.threat <= 0 and b.threat <= 0 then
-                return a.threat == b.threat and a.dist < b.dist or a.threat > b.threat
-            elseif a.threat <= 0 then return false
-            elseif b.threat <= 0 then return true
-            else return a.dist < b.dist end
-        end)
-
-        local t = threats[1]
-        local rad = math.atan2(t.pos[1]-pos[1], t.pos[3]-pos[3])
+        -- get direction vector, atanify it for angle
+        local rad = math.atan2(target.location[1] - pos[1], target.location[3] - pos[3])
         local degrees = rad * (180 / math.pi)
 
-        if EntityCategoryContains(categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL), self) then
+        -- some buildings can only take 90 degree angles
+        if EntityCategoryContains(StructureUnitRotateTowardsEnemiesArtillery, self) then
             degrees = math.floor((degrees + 45) / 90) * 90
         end
 
@@ -94,7 +128,7 @@ StructureUnit = Class(Unit) {
     end,
 
     OnStartBeingBuilt = function(self, builder, layer)
-        if EntityCategoryContains(categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY), self) then
+        if EntityCategoryContains(StructureUnitOnStartBeingBuiltRotateBuildings, self) then
             self:RotateTowardsEnemy()
         end
 
@@ -586,17 +620,101 @@ StructureUnit = Class(Unit) {
 -- FACTORY UNITS
 FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
-        -- Engymod addition: If a normal factory is created, we should check for research stations
-        if EntityCategoryContains(categories.FACTORY, self) then
-           self:updateBuildRestrictions()
-        end
-
         StructureUnit.OnCreate(self)
+
+        -- keeps track of what HQs are available
+        if EntityCategoryContains(categories.RESEARCH, self) then
+
+            -- is called when:
+            -- - structure is being upgraded
+            self:AddUnitCallback(
+                function(self, unitBeingBuilt)
+                    if EntityCategoryContains(categories.RESEARCH, self) then
+                        unitBeingBuilt.UpgradedHQFromTech = self.techCategory
+                    end
+                end,
+                "OnStartBuild"
+            )
+
+            -- is called when:
+            --  - unit is built
+            --  - unit is captured (for the new army)
+            --  - unit is given (for the new army)
+            self:AddUnitCallback(
+                function(self) 
+                    local brain = ArmyBrains[self.Army]
+
+                    -- if we're an upgrade then remove the HQ we came from
+                    if self.UpgradedHQFromTech then
+                        brain:RemoveHQ(self.factionCategory, self.layerCategory, self.UpgradedHQFromTech)
+                    end
+
+                    -- update internal state
+                    brain:AddHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
+                end, "OnStopBeingBuilt")
+
+            -- is called when:
+            --  - unit is killed
+            self:AddUnitCallback(
+                function(self) 
+                    local brain = ArmyBrains[self.Army]
+
+                    -- update internal state
+                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
+                end, "OnKilled")
+
+            -- is called when:
+            --  - unit is given (used for the old army)
+            --  - unit is captured (used for the old army)
+            self:AddUnitCallback(
+                function(self, newUnit) 
+                    local brain = ArmyBrains[self.Army]
+
+                    -- update internal state
+                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
+                end, "OnGiven")
+
+            -- is called when:
+            --  - unit is reclaimed
+            self:AddUnitCallback(
+                function(self) 
+                    local brain = ArmyBrains[self.Army]
+
+                    -- update internal state
+                    brain:RemoveHQ(self.factionCategory, self.layerCategory, self.techCategory)
+                    brain:SetHQSupportFactoryRestrictions(self.factionCategory, self.layerCategory)
+
+                    -- update all units affected by this
+                    local affected = brain:GetListOfUnits(categories.SUPPORTFACTORY - categories.EXPERIMENTAL, false)
+                    for id, unit in affected do
+                        unit:UpdateBuildRestrictions()
+                    end
+                end, "OnReclaimed")
+        end
 
         -- Save build effect bones for faster access when creating build effects
         self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
-
-
         self.BuildingUnit = false
         self:SetFireState(FireState.GROUND_FIRE)
     end,
@@ -612,39 +730,32 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnDestroy = function(self)
-        -- Figure out if we're a research station
-        if EntityCategoryContains(categories.RESEARCH, self) then
-            local aiBrain = self:GetAIBrain()
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
-
-            for id, unit in buildRestrictionVictims do
-                unit:updateBuildRestrictions()
-            end
-        end
-
         StructureUnit.OnDestroy(self)
 
         self.DestroyUnitBeingBuilt(self)
     end,
 
     OnPaused = function(self)
+        StructureUnit.OnPaused(self)
+
         -- When factory is paused take some action
         if self:IsUnitState('Building') then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         end
-        StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
+        StructureUnit.OnUnpaused(self)
         if self:IsUnitState('Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             StructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
         end
-        StructureUnit.OnUnpaused(self)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
+        StructureUnit.OnStopBeingBuilt(self, builder, layer)
+
         local aiBrain = GetArmyBrain(self.Army)
         aiBrain:ESRegisterUnitMassStorage(self)
         aiBrain:ESRegisterUnitEnergyStorage(self)
@@ -657,16 +768,6 @@ FactoryUnit = Class(StructureUnit) {
             self:CreateBlinkingLights('Red')
             self.BlinkingLightsState = 'Red'
         end
-
-        -- If we're a HQ, update build restrictions for all factories
-        if EntityCategoryContains(categories.RESEARCH, self) then
-            local buildRestrictionVictims = aiBrain:GetListOfUnits(categories.FACTORY + categories.ENGINEER, false)
-            for id, unit in buildRestrictionVictims do
-                unit:updateBuildRestrictions()
-            end
-        end
-
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
     end,
 
     ChangeBlinkingLights = function(self, state)
@@ -807,8 +908,8 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     OnFailedToBuild = function(self)
-        self.FactoryBuildFailed = true
         StructureUnit.OnFailedToBuild(self)
+        self.FactoryBuildFailed = true
         self:DestroyBuildRotator()
         self:StopBuildFx()
         ChangeState(self, self.IdleState)
@@ -1349,10 +1450,10 @@ SonarUnit = Class(StructureUnit) {
     end,
 
     DestroyIdleEffects = function(self)
+        StructureUnit.DestroyIdleEffects(self)
         if self.TimedSonarEffectsThread then
             self.TimedSonarEffectsThread:Destroy()
         end
-        StructureUnit.DestroyIdleEffects(self)
     end,
 
     OnIntelDisabled = function(self)
@@ -1433,13 +1534,11 @@ MobileUnit = Class(Unit) {
     -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
     CreateEnhancement = function(self, enh)
         Unit.CreateEnhancement(self, enh)
-        self:updateBuildRestrictions()
     end,
 
     -- Added for engymod. When created, units must re-check their build restrictions
     OnCreate = function(self)
         Unit.OnCreate(self)
-        self:updateBuildRestrictions()
         self:SetFireState(FireState.GROUND_FIRE)
     end,
 
