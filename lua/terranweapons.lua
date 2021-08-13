@@ -5,10 +5,11 @@
 --**
 --**  Summary  :  Terran-specific weapon definitions
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
 local CollisionBeams = import('defaultcollisionbeams.lua')
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
 local DefaultProjectileWeapon = WeaponFile.DefaultProjectileWeapon
@@ -45,9 +46,11 @@ TDFHeavyPlasmaGatlingCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.THeavyPlasmaGatlingCannonMuzzleFlash,
 }
 
-TDFOverchargeWeapon = Class(DefaultProjectileWeapon) {
+TDFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.TCommanderOverchargeFlash01,
+    DesiredWeaponLabel = 'RightZephyr'
 }
+
 
 TDFMachineGunWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {
@@ -260,3 +263,4 @@ TOrbitalDeathLaserBeamWeapon = Class(DefaultBeamWeapon) {
         DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
     end,
 }
+
