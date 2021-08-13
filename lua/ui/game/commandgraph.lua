@@ -23,54 +23,54 @@ function OnCommandGraphShow(show)
             v:ShowPings(show)
         end
     end
-#    if not show then
-#        if trashBtn then
-#            trashBtn:Destroy()
-#            trashBtn = nil
-#        end
-#    else
-#        if not trashBtn then
-#            local worldView = import('/lua/ui/game/borders.lua').GetMapGroup()
-#            trashBtn = Button(worldView,
-#                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_up.dds'),
-#                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_down.dds'),
-#                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_over.dds'),
-#                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_dis.dds'))
-#            trashBtn.Width:Set(64)
-#            trashBtn.Height:Set(64)
-#            LayoutHelpers.AtBottomIn(trashBtn, worldView, 16)
-#            LayoutHelpers.AtRightIn(trashBtn, worldView, 16)
-#            trashBtn.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
-#
-#            trashBtn.HandleEvent = function(self, event)
-#                if dragging then
-#                    Button.HandleEvent(self,event)
-#                end
-#            end
-#
-#        end
-#    end
+--    if not show then
+--        if trashBtn then
+--            trashBtn:Destroy()
+--            trashBtn = nil
+--        end
+--    else
+--        if not trashBtn then
+--            local worldView = import('/lua/ui/game/borders.lua').GetMapGroup()
+--            trashBtn = Button(worldView,
+--                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_up.dds'),
+--                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_down.dds'),
+--                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_over.dds'),
+--                              UIUtil.UIFile('/game/icons/icon-trash-lg_btn_dis.dds'))
+--            trashBtn.Width:Set(64)
+--            trashBtn.Height:Set(64)
+--            LayoutHelpers.AtBottomIn(trashBtn, worldView, 16)
+--            LayoutHelpers.AtRightIn(trashBtn, worldView, 16)
+--            trashBtn.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
+--
+--            trashBtn.HandleEvent = function(self, event)
+--                if dragging then
+--                    Button.HandleEvent(self,event)
+--                end
+--            end
+--
+--        end
+--    end
 
     import('/lua/ui/game/reclaim.lua').OnCommandGraphShow(show)
 end
 
 function OnCommandDragBegin()
-#    local worldView = import('/lua/ui/game/worldview.lua').view
-#    worldView:OnCommandDragBegin()
-#
-#    dragging = true
+--    local worldView = import('/lua/ui/game/worldview.lua').view
+--    worldView:OnCommandDragBegin()
+--
+--    dragging = true
 end
 
 function OnCommandDragEnd(event,cmdId)
-#    local worldView = import('/lua/ui/game/worldview.lua').view
-#    worldView:OnCommandDragEnd()
-#
-#    if trashBtn then
-#        if (event.MouseX > trashBtn.Left() and event.MouseX < trashBtn.Right() and
-#            event.MouseY > trashBtn.Top() and event.MouseY < trashBtn.Bottom()) then
-#            DeleteCommand(cmdId)
-#            trashBtn:SetTexture(trashBtn.mNormal)
-#        end
-#    end
-#    dragging = false
+--    local worldView = import('/lua/ui/game/worldview.lua').view
+--    worldView:OnCommandDragEnd()
+--
+--    if trashBtn then
+--        if (event.MouseX > trashBtn.Left() and event.MouseX < trashBtn.Right() and
+--            event.MouseY > trashBtn.Top() and event.MouseY < trashBtn.Bottom()) then
+--            DeleteCommand(cmdId)
+--            trashBtn:SetTexture(trashBtn.mNormal)
+--        end
+--    end
+--    dragging = false
 end
