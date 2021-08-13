@@ -23,7 +23,7 @@ ResetSyncTable = function()
     -- It's the user layer's job to determine if any UI needs to be shown
     -- for the focus army.
     Sync.GameResult = {}
-    Sync.OperationComplete = nil,
+    Sync.OperationComplete = nil
 
     -- Player to player queries that can affect the Sim
     Sync.PlayerQueries = {}
