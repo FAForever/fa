@@ -7,8 +7,23 @@
 -- the Sim init, the engine sets __language for us.
 __language = GetPreference('options_overrides.language', '')
 
+-- Build language select options
+__installedlanguages = DiskFindFiles("/loc/", '*strings_db.lua')
+for index, language in __installedlanguages do
+    language =  string.upper(string.gsub(language, ".*/(.*)/.*","%1"))
+    __installedlanguages[index] = {text = language, key = language}
+end
+
 -- Do global init
 doscript '/lua/globalInit.lua'
+
+-- Do we have an custom language set inside user-options ?
+local selectedlanguage = import('/lua/user/prefs.lua').GetFromCurrentProfile('options').selectedlanguage
+if selectedlanguage ~= nil then
+    __language = selectedlanguage
+    SetPreference('options_overrides.language', __language)
+    doscript '/lua/system/Localization.lua'
+end
 
 WaitFrames = coroutine.yield
 
@@ -25,6 +40,23 @@ FrontEndData = {}
 
 -- Prefetch user side data
 Prefetcher = CreatePrefetchSet()
+
+-- cache file access
+local FileCache =  {}
+local oldDiskGetFileInfo = DiskGetFileInfo
+function DiskGetFileInfo(file)
+    if FileCache[file] == nil then
+        FileCache[file] = oldDiskGetFileInfo(file) or false
+    end
+    return FileCache[file]
+end
+
+-- prevent error on nil
+local oldEntityCategoryFilterOut = EntityCategoryFilterOut
+function EntityCategoryFilterOut(categories, units)
+    return oldEntityCategoryFilterOut(categories, units or {})
+end
+
 
 function PrintText(textData)
     if textData then

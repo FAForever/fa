@@ -19,7 +19,8 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+-- Set up the sync table and some globals for use by scenario functions
+doscript '/lua/SimSync.lua'
 
 WaitTicks = coroutine.yield
 
@@ -30,9 +31,6 @@ function WaitSeconds(n)
     end
     WaitTicks(ticks)
 end
-
--- Set up the sync table and some globals for use by scenario functions
-doscript '/lua/SimSync.lua'
 
 local syncStartPositions = false -- This is held here because the Sync table is cleared between SetupSession() and BeginSession()
 
@@ -195,6 +193,8 @@ function SetupSession()
 
     ResetSyncTable()
 end
+
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 -- OnCreateArmyBrain() is called by then engine as the brains are created, and we
 -- use it to store off various useful bits of info.
