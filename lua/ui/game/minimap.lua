@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: UI for the multifunction display
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -91,6 +91,9 @@ function CommonLogic()
     end
 end
 
+-- from schooked
+local minimap_resources = Prefs.GetFromCurrentProfile('MiniMap_resource_icons') or false
+
 function CreateMinimap(parent)
     controls.savedParent = parent
 
@@ -175,6 +178,20 @@ function CreateMinimap(parent)
     controls.displayGroup.ClientGroup:DisableHitTest()
     controls.miniMap:EnableHitTest()
     CommonLogic()
+
+    -- from schooked version
+    controls.miniMap:EnableResourceRendering(minimap_resources)
+    local frameCount = 0
+    -- This is hooked to remove a call to EnableResourceRendering inside.
+    -- FIXME: Is there a reason we're not just spawning a thread using WaitSeconds instead of this hack?
+    controls.miniMap.OnFrame = function(self, elapsedTime)
+        if frameCount == 1 then
+            controls.miniMap:CameraReset()
+            GetCamera(controls.miniMap._cameraName):SetMaxZoomMult(1.0)
+            controls.miniMap.OnFrame = nil
+        end
+        frameCount = frameCount + 1
+    end
 end
 
 function ToggleMinimap()
