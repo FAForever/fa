@@ -874,6 +874,9 @@ function CreateUI(over, exitBehavior)
 end
 
 -- from schook gameselect.lua
+-- note from schooking: keeping the function hook in-place as it provides a third argument
+-- and that isn't used in the code (as the function only has two), but regardless
+-- I'm leaving it in because it is part of a PR of seven years ago and it doesn't hurt.
 
 --- A noop for the purpose of the FAF binary not containing this definition
 --
