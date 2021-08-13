@@ -1,13 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sim/AdjacencyBuffFunctions.lua
-#**
-#**  Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/sim/AdjacencyBuffFunctions.lua
+--**
+--**  Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-##################################################################
-## DEFAULT FUNCTIONS FOR ADJACENCY
-##################################################################
+------------------------------------------------------------------------------------------------------------------------------------
+---- DEFAULT FUNCTIONS FOR ADJACENCY
+------------------------------------------------------------------------------------------------------------------------------------
 
 DefaultBuffRemove = function(buff, unit, instigator)
     unit:DestroyAdjacentEffects(instigator)
@@ -19,7 +19,7 @@ end
 
 
 
-# Energy Build Bonus - Energy Active Consumption
+-- Energy Build Bonus - Energy Active Consumption
 
 EnergyBuildBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
@@ -42,7 +42,7 @@ end
 
 
 
-# Mass Build Bonus - Mass Active Consumption
+-- Mass Build Bonus - Mass Active Consumption
 
 MassBuildBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
@@ -65,7 +65,7 @@ end
 
 
 
-# Energy Maintenance Bonus
+-- Energy Maintenance Bonus
 
 EnergyMaintenanceBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
@@ -85,7 +85,7 @@ end
 
 
 
-# Energy Weapon Bonus
+-- Energy Weapon Bonus
 
 EnergyWeaponBuffCheck = function(buff, unit)
     for i = 1, unit:GetWeaponCount() do
@@ -107,7 +107,7 @@ end
 
 
 
-# Weapon Rate of Fire
+-- Weapon Rate of Fire
 
 RateOfFireBuffCheck = function(buff, unit)
     if unit:GetWeaponCount() > 0 then
@@ -126,7 +126,7 @@ end
 
 
 
-# Energy Production
+-- Energy Production
 
 EnergyProductionBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
@@ -146,7 +146,7 @@ end
 
 
 
-# Mass Production
+-- Mass Production
 
 MassProductionBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
@@ -163,8 +163,6 @@ end
 MassProductionBuffAffect = function(buff, unit, instigator)
     DefaultBuffAffect(buff, unit, instigator)
 end
-
-
 
 MassActiveBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
