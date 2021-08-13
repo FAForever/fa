@@ -1,4 +1,17 @@
 
+-- ForGetn: 259 ms
+-- ForPairs: 372 ms
+-- Foreach: 370 ms
+-- ForiPairs: 405 ms
+-- WhileGetNCached: 293 ms
+-- WhileGetn: 8.14
+
+-- Whenever table.insert is used for a table then you can use the cheaper
+-- looping structure. However, when typical hashes are involved this cheaper
+-- version will not reach all the elements of the table.
+
+local outerLoop = 100000
+
 -- prepare data
 local data = { }
 
@@ -6,15 +19,11 @@ for k = 1, 100 do
     data[k] = k
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.21369934082031
-
 function ForGetn()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
         local x = 0
         for k = 1, table.getn(data) do 
             x = x + data[k]
@@ -27,14 +36,10 @@ function ForGetn()
 
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.37042236328125
-
 function ForPairs()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
         local x = 0
         for k, v in pairs(data) do 
             x = x + v
@@ -46,14 +51,10 @@ function ForPairs()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.39227294921875
-
 function ForiPairs()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
         local x = 0
         for k, v in ipairs(data) do 
             x = x + v
@@ -65,14 +66,10 @@ function ForiPairs()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.3626708984375
-
 function Foreach()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
         local x = 0
         for k, v in data do 
             x = x + v
@@ -84,37 +81,29 @@ function Foreach()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 8.1476287841797 
+function WhileGetn()
 
--- function WhileGetn()
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
 
---     local start = GetSystemTimeSecondsOnlyForProfileUse()
+    for k = 1, outerLoop do 
+        local k = 1
+        local x = 0
+        while k < table.getn(data) do 
+            x = x + data[k]
+            k = k + 1
+        end
+    end
 
---     for k = 1, 100000 do 
---         local k = 1
---         local x = 0
---         while k < table.getn(data) do 
---             x = x + data[k]
---             k = k + 1
---         end
---     end
+    local final = GetSystemTimeSecondsOnlyForProfileUse()
 
---     local final = GetSystemTimeSecondsOnlyForProfileUse()
-
---     return final - start
--- end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.257568359375
+    return final - start
+end
 
 function WhileGetnCached()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
         local k = 1
         local x = 0
         local n = table.getn(data)

@@ -4,6 +4,8 @@
 -- hardware: AMD Ryzen 3600 6-core
 -- time: 0.00229492187
 
+local outerLoop = 10000000
+
 ProfilerA = 10
 ProfilerB = 20
 ProfilerC = 0
@@ -12,7 +14,7 @@ function AddGlobal()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
         ProfilerC = ProfilerA + ProfilerB
     end
 
@@ -34,7 +36,7 @@ function AddUpval()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
         ProfilerC = ProfilerA + ProfilerB
     end
 
@@ -47,15 +49,14 @@ end
 -- hardware: AMD Ryzen 3600 6-core
 -- time: 0.00063476562
 
-function Add3Local()
-
-    local ProfilerA = ProfilerA 
-    local ProfilerB = ProfilerB
-    local ProfilerC = ProfilerC
+function AddLocal()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, 100000 do 
+    for k = 1, outerLoop do 
+        local ProfilerA = ProfilerA 
+        local ProfilerB = ProfilerB
+        local ProfilerC = ProfilerC
         ProfilerC = ProfilerA + ProfilerB
     end
 

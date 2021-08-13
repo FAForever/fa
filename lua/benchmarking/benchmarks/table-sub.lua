@@ -4,14 +4,14 @@ function BlueprintSubTables2()
 
     -- create a dummy unit
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-    local blueprint = unit.Blueprint
+    local blueprint = unit:GetBlueprint()
     unit:Destroy()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 1
     for k = 1, 100000 do 
-        sum = sum + blueprint.Defense.AirThreatLevel
+        sum = sum + blueprint.Defense.MaxHealth
     end
 
     local final = GetSystemTimeSecondsOnlyForProfileUse()
@@ -24,15 +24,15 @@ function BlueprintSubTables1()
 
     -- create a dummy unit
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-    local blueprint = unit.Blueprint
-    local test = { DefenseAirThreatLevel = blueprint.Defense.AirThreatLevel }
+    local blueprint = unit:GetBlueprint()
+    local test = { DefenseMaxHealth = blueprint.Defense.MaxHealth }
     unit:Destroy()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 1
     for k = 1, 100000 do 
-        sum = sum + test.DefenseAirThreatLevel
+        sum = sum + test.DefenseMaxHealth
     end
 
     local final = GetSystemTimeSecondsOnlyForProfileUse()
