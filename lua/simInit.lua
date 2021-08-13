@@ -19,6 +19,8 @@
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
 
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+
 WaitTicks = coroutine.yield
 
 function WaitSeconds(n)
@@ -69,6 +71,10 @@ end
 --SetupSession will be called by the engine after ScenarioInfo is set
 --but before any armies are created.
 function SetupSession()
+
+    -- from schook
+    ScenarioInfo.TriggerManager = import('/lua/TriggerManager.lua').Manager
+    TriggerManager = ScenarioInfo.TriggerManager
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
 
@@ -212,6 +218,10 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     --brain:InitializePlatoonBuildManager()
     --ScenarioUtils.LoadArmyPBMBuilders(name)
     --LOG('*SCENARIO DEBUG: ON POP, ARMY BRAINS = ', repr(ArmyBrains))
+
+    -- from schook
+    ScenarioUtils.InitializeStartLocation(name)
+    ScenarioUtils.SetPlans(name)
 end
 
 function InitializePrebuiltUnits(name)
@@ -222,6 +232,11 @@ end
 -- any units yet) and we're ready to start the game. It's responsible for setting up
 -- the initial units and any other gameplay state we need.
 function BeginSession()
+
+    -- from schook
+    ScenarioUtils.CreateProps()
+    ScenarioUtils.CreateResources()
+
     LOG('BeginSession...')
     SPEW('Active mods in sim: ', repr(__active_mods))
 
@@ -300,6 +315,12 @@ function BeginSession()
     if syncStartPositions then
         Sync.StartPositions = syncStartPositions
     end
+
+    -- from schook
+    import('/lua/sim/score.lua').init()
+
+    --start watching for victory conditions
+    ForkThread(import('/lua/victory.lua').CheckVictory, ScenarioInfo)
 end
 
 function GameTimeLogger()
@@ -323,6 +344,18 @@ end
 
 -- OnPostLoad called after loading a saved game
 function OnPostLoad()
+
+    -- from schook
+    import('/lua/ScenarioFramework.lua').OnPostLoad()
+    import('/lua/SimObjectives.lua').OnPostLoad()
+    import('/lua/sim/SimUIState.lua').OnPostLoad()
+    import('/lua/SimPing.lua').OnArmyChange()
+    import('/lua/SimPingGroup.lua').OnPostLoad()
+    import('/lua/SimDialogue.lua').OnPostLoad()
+    import('/lua/SimSync.lua').OnPostLoad()
+    if GetFocusArmy() ~= -1 then
+        Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
+    end
 end
 
 -- Set up list of files to prefetch
@@ -363,4 +396,17 @@ function AIModTemplatesPreloader()
             end
         end
     end
+end
+
+-- from schook
+for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
+    import(file)
+end
+
+for k,file in DiskFindFiles('/lua/AI/AIBuilders', '*.lua') do
+    import(file)
+end
+
+for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
+    import(file)
 end
