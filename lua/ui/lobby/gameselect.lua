@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Game selection UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -871,4 +871,21 @@ function CreateUI(over, exitBehavior)
     ForkThread(function()
         gameList._tabs[2]:OnClick()
     end)
+end
+
+-- from schook gameselect.lua
+
+--- A noop for the purpose of the FAF binary not containing this definition
+--
+InternalStartSteamDiscoveryService = function() end
+
+local oldCreateUI = CreateUI
+--- Overridden so that useSteam == false rather than nil
+--  since the steam implementation contains a direct comparison
+-- @param over
+-- @param exitBehavior
+-- @param useSteam always false
+--
+function CreateUI(over, exitBehavior, useSteam)
+    oldCreateUI(over, exitBehavior, false)
 end
