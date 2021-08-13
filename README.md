@@ -4,8 +4,6 @@ master|develop
  ------------ | -------------
 [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=master)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=develop)](https://travis-ci.org/FAForever/fa)
 
-Current patch is: 3656
-
 Changelog can be found [here](changelog.md).
 
 
@@ -16,10 +14,16 @@ See guidelines for contributing [here](CONTRIBUTING.md).
 
 See git branch model for the repository and how it relates to FAF client game modes [here](branchmodel.png).
 
-Actual exe patches are [here](https://github.com/FAETHER/FA-Binary-Patches)
+Actual exe patcher are [here](https://github.com/FAForever/FA_Patcher)
+
+Actual exe patches are [here](https://github.com/FAForever/FA-Binary-Patches)
+
+Actual FAF profiler [here](https://github.com/FAForever/FAFProfiler)
 
 Running the game with your changes
 ----------------------------------
+
+The easiest way to running the game with your changes is to create a DevData directory nested in FAForever and put all the modified files there.
 
 When FA starts without any command line arguments, it looks for a file called `SupComDataPath.lua`.
 
