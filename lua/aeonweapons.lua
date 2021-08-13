@@ -6,6 +6,7 @@
 -------------------------------------------------------------------
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
+local OverchargeWeapon = WeaponFile.OverchargeWeapon
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
 local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGeneratorCollisionBeam
@@ -36,8 +37,9 @@ ADFReactonCannon = Class(DefaultProjectileWeapon) {
     },
 }
 
-ADFOverchargeWeapon = Class(DefaultProjectileWeapon) {
+ADFOverchargeWeapon = Class(OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.ACommanderOverchargeFlash01,
+    DesiredWeaponLabel = 'RightDisruptor'
 }
 
 ADFTractorClaw = Class(DefaultBeamWeapon) {
