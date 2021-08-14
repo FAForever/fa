@@ -80,7 +80,7 @@ function xml_tags(defaulttag, name, value)
     local close = '</' .. tag .. '>'
 
     local open = '<' .. tag
-    if name and name!=tag then
+    if name and name~=tag then
         open = open .. ' name="' .. name .. '"'
     end
     if value._xml_attrs then
@@ -110,7 +110,7 @@ function auto_xml(file,tag,name,value,indent)
         else
             -- key=value table
             for k,v in value do
-                if string.sub(k,1,1)!='_' then
+                if string.sub(k,1,1)~='_' then
                     file:write(subindent)
                     auto_xml(file,k,k,v,subindent)
                 end

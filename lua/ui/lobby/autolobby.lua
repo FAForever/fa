@@ -187,7 +187,7 @@ end
 
 local function CreateUI()
 
-    if (connectdialog != false) then
+    if (connectdialog ~= false) then
         MenuCommon.MenuCleanup()
         connectdialog:Destroy()
         connectdialog = false

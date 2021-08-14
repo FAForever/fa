@@ -34,7 +34,7 @@ end
 --
 all_footprints = {}
 for i,bp in all_blueprints do
-    if bp.Physics.MotionType!=nil and bp.Physics.MotionType!='RULEUMT_None' then
+    if bp.Physics.MotionType~=nil and bp.Physics.MotionType~='RULEUMT_None' then
         local x = math.ceil(math.max(bp.SizeX or 0, bp.SizeZ or 0))
         local str = bp.Physics.MotionType .. string.format("%3d",x)
         all_footprints[str] = 1

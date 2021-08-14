@@ -87,7 +87,7 @@ BaseBuilderTemplate {
         if not aiBrain.Sorian then
             return -1
         end
-        if markerType != 'Naval Area' then
+        if markerType ~= 'Naval Area' then
             return 0
         end
 

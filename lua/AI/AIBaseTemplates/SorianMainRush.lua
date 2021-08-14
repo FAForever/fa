@@ -233,7 +233,7 @@ BaseBuilderTemplate {
             return 1, 'sorianrush'
         end
 
-        if per != 'sorianrush' and per != 'sorianadaptive' and per != '' then
+        if per ~= 'sorianrush' and per ~= 'sorianadaptive' and per ~= '' then
             return 1, 'sorianrush'
         end
 

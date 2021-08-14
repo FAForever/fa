@@ -186,7 +186,7 @@ BaseBuilderTemplate {
         if not per then return 1 end
         if per == 'random' then
             return Random(1, 100), 'turtle'
-        elseif per != 'turtle' and per != 'adaptive' and per != '' then
+        elseif per ~= 'turtle' and per ~= 'adaptive' and per ~= '' then
             return 1, 'turtle'
         elseif per == 'turtle' then
             return 150, 'turtle'

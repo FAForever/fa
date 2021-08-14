@@ -105,7 +105,7 @@ We can use a custom init file to ease the development process. The following fil
     local function mount_contents(dir, mountpoint)
         LOG('checking ' .. dir)
         for _,entry in io.dir(dir .. '\\*') do
-            if entry != '.' and entry != '..' then
+            if entry ~= '.' and entry ~= '..' then
                 local mp = string.lower(entry)
                 mp = string.gsub(mp, '[.]scd$', '')
                 mp = string.gsub(mp, '[.]zip$', '')

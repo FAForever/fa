@@ -1129,7 +1129,7 @@ function GetGuards(aiBrain, Unit)
             count = count + 1
         end
     end
-    if UpgradesFrom and UpgradesFrom != 'none' then -- Used to filter out upgrading units
+    if UpgradesFrom and UpgradesFrom ~= 'none' then -- Used to filter out upgrading units
         local oldCat = ParseEntityCategory(UpgradesFrom)
         local oldUnit = aiBrain:GetUnitsAroundPoint(oldCat, Unit:GetPosition(), 0, 'Ally')
         if oldUnit then

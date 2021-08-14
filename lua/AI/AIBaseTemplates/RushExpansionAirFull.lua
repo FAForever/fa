@@ -120,7 +120,7 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if markerType != 'Start Location' then
+        if markerType ~= 'Start Location' then
             return 0
         end
 

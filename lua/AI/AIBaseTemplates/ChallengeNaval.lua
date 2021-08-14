@@ -61,7 +61,7 @@ BaseBuilderTemplate {
         },
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if markerType != 'Naval Area' then
+        if markerType ~= 'Naval Area' then
             return 0
         end
         

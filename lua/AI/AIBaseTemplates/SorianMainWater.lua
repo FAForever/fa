@@ -231,7 +231,7 @@ BaseBuilderTemplate {
             return 1, 'sorianwater'
         end
 
-        if per != 'sorianwater' and per != 'sorianadaptive' and per != '' then
+        if per ~= 'sorianwater' and per ~= 'sorianadaptive' and per ~= '' then
             return 1, 'sorianwater'
         end
 

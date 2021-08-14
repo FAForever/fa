@@ -51,7 +51,7 @@ function AddPingGroups(groupData)
                 local position = GetMouseWorldPos()
                 for _, v in position do
                     local var = v
-                    if var != v then
+                    if var ~= v then
                         return
                     end
                 end

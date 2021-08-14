@@ -60,7 +60,7 @@ Slider = Class(Group)
                     value = self:_Constrain(value)
                     local curVal = self:GetValue()
                     self._thumb:SetTexture(self.mThumbDown)
-                    if value != curVal then
+                    if value ~= curVal then
                         self:SetValue(value)
                         self:OnScrub(value)
                     end

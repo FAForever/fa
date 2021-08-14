@@ -48,7 +48,7 @@ function RequestPlayerFaction()
         buttons[index].OnClick = function(self, modifiers)
             GetCursor():Hide()
             PlaySound(Sound({Bank = 'Interface', Cue = 'UI_Menu_MouseDown'}))
-            if Prefs.GetOption('skin_change_on_start') != 'no' then
+            if Prefs.GetOption('skin_change_on_start') ~= 'no' then
                 local factions = import('/lua/factions.lua')
                 if factions.Factions[factions.FactionIndexMap[key]].DefaultSkin then
                     UIUtil.SetCurrentSkin(factions.Factions[factions.FactionIndexMap[key]].DefaultSkin)

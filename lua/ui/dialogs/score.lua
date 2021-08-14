@@ -1106,7 +1106,7 @@ function CreateSkirmishScreen(victory, showCampaign, operationVictoryTable)
                 victoryString = "<LOC SCORE_0056>Operation Failed"
             end
         else
-            if victory != nil then
+            if victory ~= nil then
                 if victory then
                     victoryString = "<LOC SCORE_0046>Victory"
                 else

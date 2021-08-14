@@ -227,7 +227,7 @@ BaseBuilderTemplate {
             return 1, 'sorianair'
         end
 
-        if per != 'sorianair' and per != 'sorianadaptive' and per != '' then
+        if per ~= 'sorianair' and per ~= 'sorianadaptive' and per ~= '' then
             return 1, 'sorianair'
         end
 

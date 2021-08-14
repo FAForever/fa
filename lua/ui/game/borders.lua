@@ -98,7 +98,7 @@ function GetMapGroup(NeedPrimary)
 end
 
 function SplitMapGroup(splitState, forceSplit)
-    if GetCurrentUIState() != "game" then 
+    if GetCurrentUIState() ~= "game" then 
         return 
     end
     

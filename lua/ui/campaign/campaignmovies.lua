@@ -107,8 +107,8 @@ function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
     end
 
     movie:Set("/movies/" .. movieName .. ".sfd",
-          cue != nil and Sound( {Cue = cue, Bank = 'FMV_BG'} ),
-          voice != nil and Sound( {Cue = voice, Bank = 'X_FMV'} ))
+          cue ~= nil and Sound( {Cue = cue, Bank = 'FMV_BG'} ),
+          voice ~= nil and Sound( {Cue = voice, Bank = 'X_FMV'} ))
 
     local function LeaveMovie()
         GetCursor():Show()
@@ -120,7 +120,7 @@ function PlayCampaignMovie(movieName, over, exitBehavior, cue, voice)
         movie:Stop()
         movie.OnLoaded = nil
         parent:Destroy()
-        if exitBehavior != nil then
+        if exitBehavior ~= nil then
             exitBehavior()
         end
     end

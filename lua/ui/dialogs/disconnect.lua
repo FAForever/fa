@@ -163,7 +163,7 @@ local function CreateDialog(clients)
 
             local ejectedBy = ''
             for k, v in client.ejectedBy do
-                if ejectedBy != '' then
+                if ejectedBy ~= '' then
                     ejectedBy = ejectedBy .. ', ' .. tostring(v)
                 else
                     ejectedBy = LOC('<LOC UI_Disco0006>Ejected by')..': '..tostring(v)

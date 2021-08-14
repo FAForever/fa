@@ -35,7 +35,7 @@ AANTorpedoChronoPack01 = Class(ATorpedoShipProjectile) {
         local TrackingTarget = self:GetTrackingTarget()
         local SplitWaitTime = 1.0
 
-        if( TrackingTarget != nil ) then
+        if( TrackingTarget ~= nil ) then
             SplitWaitTime = (VDist3( self:GetPosition(), TrackingTarget:GetPosition() ) * self.DistanceBeforeSplitRatio) / self.VelocityOnEnterWater
         end
 

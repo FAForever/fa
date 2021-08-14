@@ -4886,7 +4886,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             self.desiredScenario = Prefs.GetFromCurrentProfile("LastScenario")
         end
         local scenarioInfo = MapUtil.LoadScenario(self.desiredScenario)
-        if not scenarioInfo or scenarioInfo.type != UIUtil.requiredType then
+        if not scenarioInfo or scenarioInfo.type ~= UIUtil.requiredType then
             self.desiredScenario = UIUtil.defaultScenario
         end
         SetGameOption('ScenarioFile', self.desiredScenario, true)

@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Announcement UI for sending general messages to the user
 --*
---* Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -107,9 +107,9 @@ function CreateAnnouncement(text, goalControl, secondaryText, onFinished)
             self.Width:Set(textGroup.Width)
         end
 
-        if self.time > 3 and textGroup:GetAlpha() != 0 then
+        if self.time > 3 and textGroup:GetAlpha() ~= 0 then
             textGroup:SetAlpha(math.max(textGroup:GetAlpha()-(delta*2), 0), true)
-        elseif self.time > .2 and self.time < 3 and text:GetAlpha() != 1 then
+        elseif self.time > .2 and self.time < 3 and text:GetAlpha() ~= 1 then
             textGroup:SetAlpha(math.min(text:GetAlpha()+(delta*2), 1), true)
         end
         if goalControl == textGroup then

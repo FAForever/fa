@@ -55,7 +55,7 @@ RadioButtons = Class(Group)
                 if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
                     for button in self.mButtons do
                         if control == self.mButtons[button].checkbox then
-                            if self.mCurSelection != button then
+                            if self.mCurSelection ~= button then
                                 self.mButtons[self.mCurSelection].checkbox:SetCheck(false)
                                 self.mCurSelection = button
                                 control:SetCheck(true)

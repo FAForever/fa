@@ -30,7 +30,7 @@ function import(name)
 
         -- Define a new 'import' function customized for the module, to track import dependencies.
         import = function(name2)
-            if string.sub(name2,1,1)!='/' then
+            if string.sub(name2,1,1)~='/' then
                 name2 = FileCollapsePath(name .. '/../' .. name2)
             end
             local m2 = import(name2) -- this will use the global import

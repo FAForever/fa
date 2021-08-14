@@ -106,7 +106,7 @@ function AIType(aiBrain, aitype, bool)
     local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
     if aitype == per and bool then
         return true
-    elseif aitype != per and not bool then
+    elseif aitype ~= per and not bool then
         return true
     end
     return false
@@ -477,7 +477,7 @@ function ShieldDamaged(aiBrain, locationType)
 end
 
 function NoRushTimeCheck(aiBrain, timeLeft)
-    if ScenarioInfo.Options.NoRushOption and ScenarioInfo.Options.NoRushOption != 'Off' then
+    if ScenarioInfo.Options.NoRushOption and ScenarioInfo.Options.NoRushOption ~= 'Off' then
         if tonumber(ScenarioInfo.Options.NoRushOption) * 60 < GetGameTimeSeconds() + timeLeft then
             return true
         else
@@ -490,7 +490,7 @@ function NoRushTimeCheck(aiBrain, timeLeft)
 end
 
 function NoRush(aiBrain)
-    if ScenarioInfo.Options.NoRushOption and ScenarioInfo.Options.NoRushOption != 'Off' then
+    if ScenarioInfo.Options.NoRushOption and ScenarioInfo.Options.NoRushOption ~= 'Off' then
         if tonumber(ScenarioInfo.Options.NoRushOption) * 60 > GetGameTimeSeconds() then
             return true
         else

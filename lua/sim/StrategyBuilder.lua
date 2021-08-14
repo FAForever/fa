@@ -89,7 +89,7 @@ StrategyBuilder = Class(Builder) {
             elseif newPri < 0 then
                 newPri = 0
             end
-            if newPri != self.Priority then
+            if newPri ~= self.Priority then
                 self.Priority = newPri
                 self.SetByStrat = true
                 self.PriorityAltered = true

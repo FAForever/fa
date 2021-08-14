@@ -15,7 +15,7 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjectile) {
                
     OnImpact = function(self, TargetType, TargetEntity) 
-        if TargetType != 'Shield' then
+        if TargetType ~= 'Shield' then
 	        local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag02 
             local bp = self.Blueprint.Physics
 	        

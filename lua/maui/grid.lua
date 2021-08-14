@@ -40,8 +40,8 @@ Grid = Class(Group) {
 
     OnFrame = function(self, elapsedTime)
 --TODO get rid of this frame function and use the OnDirty of the lazy vars
-        if (self._lastVisible["Horz"] != self._visible["Horz"]()) or
-           (self._lastVisible["Vert"] != self._visible["Vert"]()) then
+        if (self._lastVisible["Horz"] ~= self._visible["Horz"]()) or
+           (self._lastVisible["Vert"] ~= self._visible["Vert"]()) then
             self:_CalculateVisible()
             self._lastVisible["Horz"] = self._visible["Horz"]()
             self._lastVisible["Vert"] = self._visible["Vert"]()
@@ -151,7 +151,7 @@ Grid = Class(Group) {
     RemoveItem = function(self, col, row, batch)
         if not self:_CheckRow(row) then return end
         if not self:_CheckCol(col) then return end
-        if self._items[row][col] != nil then
+        if self._items[row][col] ~= nil then
             if self._items[row][col] then self._items[row][col]:Hide() end
             self._items[row][col] = nil
         end
@@ -174,7 +174,7 @@ Grid = Class(Group) {
     DestroyItem = function(self, col, row, batch)
         if not self:_CheckRow(row) then return end
         if not self:_CheckCol(col) then return end
-        if self._items[row][col] != nil then
+        if self._items[row][col] ~= nil then
             self._items[row][col]:Destroy()
             self._items[row][col] = nil
         end
@@ -254,7 +254,7 @@ Grid = Class(Group) {
         for row = 1, self._lines["Vert"] do
             for col = 1, self._lines["Horz"] do
                 local control = self._items[row][col]
-                if control != nil then
+                if control ~= nil then
                     if  (col >= self._top["Horz"]) and (col < self._top["Horz"] + self._visible["Horz"]()) and
                         (row >= self._top["Vert"]) and (row < self._top["Vert"] + self._visible["Vert"]()) then
                         control:SetHidden(false)

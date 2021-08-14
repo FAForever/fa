@@ -84,12 +84,12 @@ function GetLastCompletedOperation(campaign, difficulty)
             local lastID = false
             for _, opID in campaignSequence[campaign] do
                 if difficulty then
-                    if campTable[campaign][opID][difficulty].allPrimary != nil then
+                    if campTable[campaign][opID][difficulty].allPrimary ~= nil then
                         lastID = opID
                     end
                 else
                     for _, diff in diffKeyToDiffInt do
-                        if campTable[campaign][opID][diff].allPrimary != nil then
+                        if campTable[campaign][opID][diff].allPrimary ~= nil then
                             lastID = opID
                             break
                         end

@@ -60,7 +60,7 @@ function mySkinnableFile(file)
 end
 
 function modcontrols_tooltips(parent,help_tips)
-    if help_tips != nil and help_tips != false then
+    if help_tips ~= nil and help_tips ~= false then
         local oldHandleEvent = parent.HandleEvent
         parent.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
@@ -212,7 +212,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
     local m=0
     for k, v in armiesInfo.armiesTable do
         m=m+1
-        if not v.civilian and v.nickname != nil then
+        if not v.civilian and v.nickname ~= nil then
             player_nbr=player_nbr+1
             player[player_nbr]={}
             player[player_nbr].name=v.nickname
@@ -288,10 +288,10 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                 value[columns_num][play.index][part_num].value=return_value(0,play.index,part.path)
                 value[columns_num][play.index].columns_value=value[columns_num][play.index].columns_value+ value[columns_num][play.index][part_num].value
             end
-            if value[columns_num][play.index].columns_value != nil and math.floor(value[columns_num][play.index].columns_value) != 0 and value[columns_num][play.index].columns_value>=value[columns_num].max_columns_value then
+            if value[columns_num][play.index].columns_value ~= nil and math.floor(value[columns_num][play.index].columns_value) ~= 0 and value[columns_num][play.index].columns_value>=value[columns_num].max_columns_value then
                 if value[columns_num][play.index].columns_value>value[columns_num].max_columns_value then
                     for k2, play2 in player do
-                        if value[columns_num][play2.index].winner != nil then value[columns_num][play2.index].winner=false end
+                        if value[columns_num][play2.index].winner ~= nil then value[columns_num][play2.index].winner=false end
                     end
                 end
                 value[columns_num].max_columns_value=value[columns_num][play.index].columns_value
@@ -328,12 +328,12 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                 graphic[play.index][columns_num].icon_glow.Left:Set(value[columns_num].left+columns_width/2-graphic[play.index][columns_num].icon.BitmapWidth()/2)
                 EffectHelpers.Pulse(graphic[play.index][columns_num].icon_glow,1,.5,1)
                 modcontrols_tooltips(graphic[play.index][columns_num].icon,"<LOC SCORE_0064>Winner")
-            elseif (columns.icon != "" and columns.icon != nil) then
+            elseif (columns.icon ~= "" and columns.icon ~= nil) then
                 graphic[play.index][columns_num].icon = Bitmap(graphic[play.index][columns_num].grp)
                 graphic[play.index][columns_num].icon:SetTexture(columns.icon)
                 graphic[play.index][columns_num].icon.Top:Set(value[columns_num].bottom+16/player_nbr_by_row)
                 graphic[play.index][columns_num].icon.Left:Set(value[columns_num].left+columns_width/2-graphic[play.index][columns_num].icon.BitmapWidth()/2)
-                if columns.Tooltip != "" and columns.Tooltip != nil then modcontrols_tooltips(graphic[play.index][columns_num].icon,columns.Tooltip) end
+                if columns.Tooltip ~= "" and columns.Tooltip ~= nil then modcontrols_tooltips(graphic[play.index][columns_num].icon,columns.Tooltip) end
             end
             for k,part in columns.data do
                 part_num=part_num+1
@@ -352,7 +352,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                 graphic[play.index][columns_num][part_num].bmp2:SetTexture(mySkinnableFile(UIUtil.UIFile('/hotstats/fond.dds')))
                 graphic[play.index][columns_num][part_num].bmp.Depth:Set(GetFrame(0):GetTopmostDepth())
                 graphic[play.index][columns_num][part_num].bmp2.Depth:Set(GetFrame(0):GetTopmostDepth())
-                if columns.link != "" and columns.link != nil then
+                if columns.link ~= "" and columns.link ~= nil then
                     local oldHandleEvent = parent.HandleEvent
                     local tmp=columns.link
                     local player = play.index
@@ -361,7 +361,7 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                         --show value under mouse
                         local posX = function() return event.MouseX end -- - bg.Left() end
                         local posY = function() return event.MouseY  end-- - bg.Top() end
-                        if chartInfoText != false then
+                        if chartInfoText ~= false then
                             chartInfoText:Destroy()
                             chartInfoText = false
                         end
@@ -397,8 +397,8 @@ function create_graph_bar(parent,name,x1,y1,x2,y2,data_previous)
                         return
                     end
                 end
-                if part.Tooltip != "" and part.Tooltip != nil then modcontrols_tooltips(graphic[play.index][columns_num][part_num].bmp,part.Tooltip) end
-                if (part.icon != "") then
+                if part.Tooltip ~= "" and part.Tooltip ~= nil then modcontrols_tooltips(graphic[play.index][columns_num][part_num].bmp,part.Tooltip) end
+                if (part.icon ~= "") then
                     graphic[play.index][columns_num][part_num].icon = Bitmap(graphic[play.index][columns_num][part_num].bmp)
                     graphic[play.index][columns_num][part_num].icon:SetTexture(part.icon)
                     FillParentPreserveAspectRatioNoExpand(graphic[play.index][columns_num][part_num].icon,graphic[play.index][columns_num][part_num].bmp,0,0)
@@ -449,7 +449,7 @@ function tps_format(val)
     if val<60 then return math.floor(val).."s" end
     m=math.floor(val/60)
     if m<60 then
-        if math.floor(val-60*m) != 0 then return m.."m"..math.floor(val-60*m) else return m.."m" end
+        if math.floor(val-60*m) ~= 0 then return m.."m"..math.floor(val-60*m) else return m.."m" end
     end
     h=math.floor(val/3600)
     if math.floor((val-3600*h)/60)==0 then return h.."h" end
@@ -489,7 +489,7 @@ function return_value(periode,player,path)
         else val=scoreData.history[periode][player][path[1]][path[2]][path[3]] end
     end
     if val==nil then val=0 end
-    if path.fac_mul != nil then val=val*path.fac_mul end
+    if path.fac_mul ~= nil then val=val*path.fac_mul end
     return val
 end
 
@@ -598,10 +598,10 @@ end
 
 function clean_view()
     if noData then noData:Destroy() noData = nil end
-    if create_anime_graph != nil and create_anime_graph then KillThread(create_anime_graph) end
-    if page_active != nil and page_active then page_active:Destroy() page_active=false end
-    if page_active_graph != nil and page_active_graph then page_active_graph:Destroy() page_active_graph=false end
-    if page_active_graph2 != nil and page_active_graph2 then page_active_graph2:Destroy() page_active_graph2=false end
+    if create_anime_graph ~= nil and create_anime_graph then KillThread(create_anime_graph) end
+    if page_active ~= nil and page_active then page_active:Destroy() page_active=false end
+    if page_active_graph ~= nil and page_active_graph then page_active_graph:Destroy() page_active_graph=false end
+    if page_active_graph2 ~= nil and page_active_graph2 then page_active_graph2:Destroy() page_active_graph2=false end
 end
 
 -- path is where is data is stored in scoredata
@@ -633,7 +633,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
     local m=0
     for k, v in armiesInfo.armiesTable do
         m=m+1
-        if not v.civilian and v.nickname != nil then
+        if not v.civilian and v.nickname ~= nil then
             player[i]={}
             player[i].name=v.nickname
             player[i].color=v.color
@@ -735,7 +735,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         local delta_refresh=(x2-x1)/(6*size) -- the distance in time between the smallest halt possible to make a refresh
         local delta=0 -- counter for refresh and small halt
         local line={} -- containe for the actual periode of time all the data to be draw
-        --if graph != nil and graph then graph:Destroy() graph=false end
+        --if graph ~= nil and graph then graph:Destroy() graph=false end
         graph={} -- will containt a table for each line and each line will be a table of bitmap
         for index, dat in player do     graph[dat.index]={}     end -- init the different line
         local current_player_index=0  -- if 0 we are in replay, otherwise will show the graph to emphasize
@@ -772,7 +772,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
                 for name,data in line do
                     graph[data.index][x-x1]=Bitmap(grp)
                     graph[data.index][x-x1].Left:Set(parent.Left() +x)
-                    if data.y_factor != 0 then
+                    if data.y_factor ~= 0 then
                     local yn=parent.Top() +data.y+data.y_factor/math.abs(data.y_factor)*size*((math.abs(data.y_factor)+1))
                         if data.y_factor<0 and (yn+size)<data.yb then yn=data.yb-size end
                         if data.y_factor>0 and (yn-size)>data.yb then yn=data.yb-size end
@@ -797,7 +797,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         for index, data in player do
             graph[data.index][x2]=Bitmap(grp)
             graph[data.index][x2].Left:Set(x2)
-            if data.y_factor != 0 then
+            if data.y_factor ~= 0 then
                 val=return_value(math.floor((nbr-1)*inc_periode),data.index,path)
                 --LOG("1st:",val)
                 ya=parent.Top() +y2 - val*factor
@@ -835,7 +835,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
             value_graph_label[dat.index].title_label:SetDropShadow(true)
         end
         -- pulse the player graph if not in replay  TODO: fix the bug that we are nil when recreating the graph
-        if current_player_index != 0 and current_player_index != nil and graph[current_player_index][1] != nil then
+        if current_player_index ~= 0 and current_player_index ~= nil and graph[current_player_index][1] ~= nil then
             for i,bmp in graph[current_player_index] do
                 EffectHelpers.Pulse(bmp,1,.65,1)
             end
@@ -846,7 +846,7 @@ function create_graph(parent,path,x1,y1,x2,y2)
         bg.HandleEvent = function(self, event)
             local posX = function() return event.MouseX end -- - bg.Left() end
             local posY = function() return event.MouseY  end-- - bg.Top() end
-            if infoText != false then
+            if infoText ~= false then
                 infoText:Destroy()
                 infoText = false
             end
@@ -886,7 +886,7 @@ end
         local delta_refresh=(x2-x1)/(6*size) -- the distance in time between the smallest halt possible to make a refresh
         local delta=0 -- counter for refresh and small halt
         local line={} -- containe for the actual periode of time all the data to be draw
-        --if graph != nil and graph then graph:Destroy() graph=false end
+        --if graph ~= nil and graph then graph:Destroy() graph=false end
         graph2={} -- will containt a table for each line and each line will be a table of bitmap
         for index, dat in player do     graph2[dat.index]={}    end -- init the different line
         local current_player_index=0  -- if 0 we are in replay, otherwise will show the graph to emphasize
@@ -929,7 +929,7 @@ end
                     --data.ya*(1-data.yb*(x/sav_x)/data.ya)
                 end
                 local factor=0
-                if totaux != 0 then  factor=(y2-y1)/totaux end
+                if totaux ~= 0 then  factor=(y2-y1)/totaux end
                 local ya_draw=y2
                 local yb_draw=0
                 for name,data in line do

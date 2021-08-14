@@ -131,7 +131,7 @@ BaseBuilderTemplate {
         if not aiBrain.Sorian then
             return -1
         end
-        if markerType != 'Start Location' and markerType != 'Expansion Area' then
+        if markerType ~= 'Start Location' and markerType ~= 'Expansion Area' then
             return 0
         end
 

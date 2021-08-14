@@ -14,7 +14,7 @@ function ProcessAIChat(to, from, text)
                 local testtext = string.gsub(text, '%s(.*)', '')
                 local aftertext = string.gsub(text, '^%a+%s', '')
                 aftertext = trim(aftertext)
-                if string.lower(testtext) == 'target' and aftertext != '' then
+                if string.lower(testtext) == 'target' and aftertext ~= '' then
                     if string.lower(aftertext) == 'at will' then
                         SimCallback({Func = 'AIChat', Args = {Army = i, NewTarget = 'at will'}})
                     else
@@ -24,7 +24,7 @@ function ProcessAIChat(to, from, text)
                             end
                         end
                     end
-                elseif string.lower(testtext) == 'focus' and aftertext != '' then
+                elseif string.lower(testtext) == 'focus' and aftertext ~= '' then
                     local focus = trim(string.lower(aftertext))
                     SimCallback({Func = 'AIChat', Args = {Army = i, NewFocus = focus}})
                 elseif string.lower(testtext) == 'current' and aftertext == 'focus' then

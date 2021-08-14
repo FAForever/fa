@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Manages windows in game
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local windows = {}
@@ -15,7 +15,7 @@ end
 function OpenWindow(id)
     for i, val in windows do
         if id then
-            if i != id then
+            if i ~= id then
                 --val.closeFunc()
                 val.isOpen = false
             else

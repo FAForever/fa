@@ -37,7 +37,7 @@ function DiplomacyHandler(action)
             return
         end
         SyncAction(action)
-    elseif GetFocusArmy() != action.From then
+    elseif GetFocusArmy() ~= action.From then
         if action.Action == 'accept' or action.Action == 'break' then
             SyncAnnouncement(action)
         end

@@ -89,7 +89,7 @@ BaseBuilderTemplate {
         NoGuards = true,
     },
     ExpansionFunction = function(aiBrain, location, markerType)
-        if markerType != 'Expansion Area' then --DUNCAN - was Start Location
+        if markerType ~= 'Expansion Area' then --DUNCAN - was Start Location
             return 0
         end
 

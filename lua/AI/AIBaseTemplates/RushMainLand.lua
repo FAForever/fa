@@ -197,7 +197,7 @@ BaseBuilderTemplate {
 
         if per == 'random' then
             return Random(1,100), 'rushland'
-        elseif per != 'rush' and per != 'adaptive' and per != '' then
+        elseif per ~= 'rush' and per ~= 'adaptive' and per ~= '' then
             return 1, 'rushland'
         end
 

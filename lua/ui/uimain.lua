@@ -117,7 +117,7 @@ end
 
 -- called by the engine when escape is pressed but there's no specific handler for it
 function EscapeHandler()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog ~= true) then
         if escapeHandler then
             escapeHandler()
         else
@@ -130,7 +130,7 @@ end
 local prevDisconnectModule
 function UpdateDisconnectDialog()
     local module = import('/lua/ui/dialogs/disconnect.lua')
-    if prevDisconnectModule and prevDisconnectModule != module then
+    if prevDisconnectModule and prevDisconnectModule ~= module then
         pcall(prevDisconnectModule.DestroyDialog)
     end
     prevDisconnectModule = module
@@ -247,13 +247,13 @@ function StopCursorText()
 end
 
 function IncreaseGameSpeed()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog ~= true) then
         ConExecute('WLD_IncreaseSimRate')
     end    
 end
 
 function DecreaseGameSpeed()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog ~= true) then
         ConExecute('WLD_DecreaseSimRate')
     end    
 end

@@ -89,7 +89,7 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         end
         
         -- if it collide with terrain dont split
-        if targetType != 'Projectile' then
+        if targetType ~= 'Projectile' then
             self.Split = true
         end
         

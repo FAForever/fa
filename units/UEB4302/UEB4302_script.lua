@@ -19,7 +19,7 @@ UEB4302 = Class(TStructureUnit) {
                 OnGotTarget = function(self)
                     local bp = self.Blueprint
                     --only say we've fired if the parent fire conditions are met
-                    if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
+                    if (bp.WeaponUnpackLockMotion ~= true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
                         if (bp.CountedProjectile == false) or self:CanFire() then
                              nukeFiredOnGotTarget = true
                         end

@@ -27,7 +27,7 @@ Cursor = Class(moho.cursor_methods) {
         self._hotspotY = hotspotY
 
         KillThread(self._animThread)
-        if numFrames and numFrames != 1 then
+        if numFrames and numFrames ~= 1 then
             local curFrame = 1
             local extPos = string.find(filename, ".dds")
             filename = string.sub(filename, 1, extPos - 1)

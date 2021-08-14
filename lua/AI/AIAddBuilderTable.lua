@@ -59,8 +59,8 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
     end
 
     for k,v in builderTable do
-        if k != 'BuildersType' and k != 'BuilderGroupName' then
-            if type(v) != 'string' then
+        if k ~= 'BuildersType' and k ~= 'BuilderGroupName' then
+            if type(v) ~= 'string' then
                 error('*AI ERROR: Invalid builder type in BuilderGroup - ' .. tableName)
             end
             if not Builders[v] then

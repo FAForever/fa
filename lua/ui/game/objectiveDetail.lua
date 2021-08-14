@@ -120,12 +120,12 @@ function Create()
                 if v.bg.id and v.bg.id == self.id then
                     v.bg:SetCheck(true, true)
                     ObjectiveLogData[v.bg.id].isChecked = true
-                elseif v.bg.id and v.bg.id != self.id then
+                elseif v.bg.id and v.bg.id ~= self.id then
                     v.bg:SetCheck(false, true)
                 end
             end
             for i, v in ObjectiveLogData do
-                if i != self.id then
+                if i ~= self.id then
                     v.isChecked = false
                 end
             end

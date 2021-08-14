@@ -27,12 +27,12 @@ function VerifyScriptCommand(data)
         Location = data.Target.Position
     }
     
-    if mode[1] != "order" then
+    if mode[1] ~= "order" then
         WARN('VerifyScriptCommand() called when command mode is not "order"')
         return result
     end
     
-    if mode[2].name != "RULEUCC_Script" then
+    if mode[2].name ~= "RULEUCC_Script" then
         WARN('VerifyScriptCommand() called when command name is not "Script"')
         return result
     end

@@ -28,19 +28,19 @@ VizMarker = Class(Entity) {
         Entity.OnCreate(self)
         --LOG('VizMarker OnCreate')
         Warp(self, Vector(self.X, 0, self.Z))
-        if self.Omni != false then
+        if self.Omni ~= false then
             self:InitIntel(self.Army, 'Omni', self.Radius)
             self:EnableIntel('Omni')
         end
-        if self.Radar != false then
+        if self.Radar ~= false then
             self:InitIntel(self.Army, 'Radar', self.Radius)
             self:EnableIntel('Radar')
         end        
-        if self.Vision != false then
+        if self.Vision ~= false then
             self:InitIntel(self.Army, 'Vision', self.Radius)
             self:EnableIntel('Vision')
         end
-        if self.WaterVision != false then
+        if self.WaterVision ~= false then
             self:InitIntel(self.Army, 'WaterVision', self.Radius)
             self:EnableIntel('WaterVision')
         end

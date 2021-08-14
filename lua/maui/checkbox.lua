@@ -59,14 +59,14 @@ Checkbox = Class(Bitmap)
     end,
 
     OnDisable = function(self)
-        if self._controlState != "disabled" then
+        if self._controlState ~= "disabled" then
             self._controlState = "disabled"
             self:SetTexture(self._states[self._controlState][self._checkState])
         end
     end,
 
     OnEnable = function(self)
-        if self._controlState != "enabled" then
+        if self._controlState ~= "enabled" then
             self._controlState = "normal"
             self:SetTexture(self._states[self._controlState][self._checkState])
         end
@@ -75,10 +75,10 @@ Checkbox = Class(Bitmap)
     HandleEvent = function(self, event)
         local eventHandled = false
         if event.Type == 'MouseEnter' then
-            if self._controlState != "disabled" then
+            if self._controlState ~= "disabled" then
                 self._controlState = "over"
                 self:SetTexture(self._states[self._controlState][self._checkState])
-                if self.mRolloverCue != "NO_SOUND" then
+                if self.mRolloverCue ~= "NO_SOUND" then
                     if self.mRolloverCue then
                         local sound = Sound({Cue = self.mRolloverCue, Bank = "Interface",})
                         PlaySound(sound)
@@ -87,14 +87,14 @@ Checkbox = Class(Bitmap)
                 eventHandled = true
             end
         elseif event.Type == 'MouseExit' then
-            if self._controlState != "disabled" then
+            if self._controlState ~= "disabled" then
                 self._controlState = "normal"
                 self:SetTexture(self._states[self._controlState][self._checkState])
                 eventHandled = true
             end
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             self:OnClick(event.Modifiers)
-            if self.mClickCue != "NO_SOUND" then
+            if self.mClickCue ~= "NO_SOUND" then
                 if self.mClickCue then
                     local sound = Sound({Cue = self.mClickCue, Bank = "Interface",})
                     PlaySound(sound)

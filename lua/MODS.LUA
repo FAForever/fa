@@ -300,7 +300,7 @@ function AllMods()
         local r = {}
         for i,file in DiskFindFiles('/mods', '*mod_info.lua') do
             local mod = LoadModInfo(file)
-            if mod and (mod.enabled != false) and (mod.name != "Hotstats") then
+            if mod and (mod.enabled ~= false) and (mod.name ~= "Hotstats") then
                 r[mod.uid] = mod
             end
         end
@@ -454,7 +454,7 @@ function GetDependencies(uid)
 
         -- check if any other mods list this mod as a conflict
         for id, info in allMods do
-            if id != uid then
+            if id ~= uid then
                 if allMods[id].conflicts then
                     for i, conflict in allMods[id].conflicts do
                         if uid == conflict then

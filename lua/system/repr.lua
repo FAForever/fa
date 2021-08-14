@@ -18,7 +18,7 @@ end
 
 local function get_names(t,maxdepth,result,prefix)
     for k,v in t do
-        if type(k)=='string' and type(v)!='string' and type(v)!='number' and type(v)!='boolean' then
+        if type(k)=='string' and type(v)~='string' and type(v)~='number' and type(v)~='boolean' then
             local name = prefix .. k
             if result[v]==nil or string.len(name) < string.len(result[v]) then
                 result[v] = name

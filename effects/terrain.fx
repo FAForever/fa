@@ -1086,7 +1086,7 @@ float4 DecalsPSWaterAlbedo( VS_OUTPUT inV, uniform bool inShadows) : COLOR
     if ( inShadows && ( 1 == ShadowsEnabled ))
     {
 //        float4 sid = tex2Dproj( ShadowSampler, inV.mTexShadow );
-//        if ( dot( sid, float4(1,1,1,1) ) != 0 )
+//        if ( dot( sid, float4(1,1,1,1) ) ~= 0 )
 //            color *= ShadowFillColor;
     }
 

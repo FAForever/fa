@@ -41,7 +41,7 @@ end
 function OnClickCallback(data)
     -- Check to make sure all of the pings are numbers (happens if the user clicks off the map somewhere)
     for i, v in data.Location do
-        if v != v then
+        if v ~= v then
             return
         end
     end

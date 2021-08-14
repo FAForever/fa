@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Various utility functions that will assist UI creation
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local Checkbox = import('checkbox.lua').Checkbox
@@ -45,7 +45,7 @@ RadioGroup = Class
                 end
                 if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
                     local curIndex = control._radioGroupIndex
-                    if self.current != curIndex then
+                    if self.current ~= curIndex then
                         self._items[self.current].checkbox:SetCheck(false)
                         self.current = curIndex
                         control:SetCheck(true)
@@ -67,7 +67,7 @@ RadioGroup = Class
         if index < 1 or index > table.getn(self._items) then
             return
         end
-        if index != self.current then
+        if index ~= self.current then
             self._items[self.current].checkbox:SetCheck(false)
             self.current = index
             self._items[index].checkbox:SetCheck(true)

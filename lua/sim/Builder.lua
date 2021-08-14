@@ -63,7 +63,7 @@ Builder = Class {
                 self.SetByStrat = true
             end
         end
-        if val != self.Priority then
+        if val ~= self.Priority then
             self.PriorityAltered = true
         end
         self.Priority = val
@@ -80,7 +80,7 @@ Builder = Class {
         if Builders[self.BuilderName].PriorityFunction then
             --LOG('Calculate new Priority '..self.BuilderName..' - '..self.Priority)
             local newPri = Builders[self.BuilderName]:PriorityFunction(self.Brain)
-            if newPri != self.Priority then
+            if newPri ~= self.Priority then
                 self.Priority = newPri
                 self.PriorityAltered = true
             end

@@ -192,7 +192,7 @@ function ToggleBuildMode()
             Tabs.RemoveModeText(modeID)
             modeID = false
         end
-    elseif GetFocusArmy() != -1 and GetSelectedUnits()[1] and Construction.IsConstructionEnabled() then
+    elseif GetFocusArmy() ~= -1 and GetSelectedUnits()[1] and Construction.IsConstructionEnabled() then
         Initialize()
         if not modeID then
             modeID = Tabs.AddModeText("<LOC buildmode_0000>Build Mode")
@@ -206,7 +206,7 @@ function KeyboardBHandler()
 end
 
 function IsInBuildMode()
-    return (trackingMasterControl != nil)
+    return (trackingMasterControl ~= nil)
 end
 
 -- given a builder unit and tech level, returns the units there are keys for

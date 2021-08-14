@@ -26,7 +26,7 @@ function GetHelpFiles()
     for i, v in helpFiles do
         local temptablename = string.upper(Basename(v, true))
         local tempfile = import(v)
-        if tempfile[temptablename] != nil then
+        if tempfile[temptablename] ~= nil then
             local temptable = tempfile[temptablename]
             temptable['HelpID'] = temptablename
             table.insert(retTable, temptable)
@@ -283,7 +283,7 @@ function PopulateHelpList()
     for i, v in HelpTextStrings do
         local validhelp = false
         local index = i
-        if v.sequence.category != nil and v.sequence.category == currentCat then
+        if v.sequence.category ~= nil and v.sequence.category == currentCat then
             validhelp = true
         elseif v.sequence.category == nil and currentCat == 'Uncategorized' then
             validhelp = true
@@ -306,7 +306,7 @@ end
 function GetCategories()
     local temptable = {}
     for i, v in HelpTextStrings do
-        if v.sequence.category != nil then
+        if v.sequence.category ~= nil then
             local newEntry = true
             for h, x in temptable do
                 if x == v.sequence.category then

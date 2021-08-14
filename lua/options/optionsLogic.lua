@@ -104,17 +104,17 @@ function SetCurrent(newOptions, compareOptions)
                 newOptions[item.key] = item.ignore(curOptions[item.key]) or curOptions[item.key]
             else
                 if item.restart == true then
-                    if newOptions[item.key] != curOptions[item.key] then
+                    if newOptions[item.key] ~= curOptions[item.key] then
                         table.insert(needsRestart, item)
                     end
                 end
                 if item.verify == true then
-                    if newOptions[item.key] != curOptions[item.key] then
+                    if newOptions[item.key] ~= curOptions[item.key] then
                         table.insert(needsVerify, item)
                     end
                 end
                 if item.set then    -- only run set if it exists in this item
-                    if newOptions[item.key] != curOptions[item.key] then
+                    if newOptions[item.key] ~= curOptions[item.key] then
                         table.insert(itemsToSet, item)
                     end
                 end
@@ -134,7 +134,7 @@ function SetCurrent(newOptions, compareOptions)
 
     local setAndSaveOnExitFunction = true
     -- do restarts first, then do verifies
-    if table.getn(needsRestart) != 0 then
+    if table.getn(needsRestart) ~= 0 then
         if summonRestartDialogCallback then
             setAndSaveOnExitFunction = false
             summonRestartDialogCallback(
@@ -155,7 +155,7 @@ function SetCurrent(newOptions, compareOptions)
                 end
             )
         end
-    elseif table.getn(needsVerify) != 0 then
+    elseif table.getn(needsVerify) ~= 0 then
         if summonVerifyDialogCallback then
             summonVerifyDialogCallback(
                 function() -- undo
@@ -255,7 +255,7 @@ function SetCustomData(optionKey, newCustomData, newDefault)
     overrides[optionKey].custom = newCustomData;
     SetPreference('options_overrides', overrides)
 
-    if nil != customDataChangedCallback then
+    if nil ~= customDataChangedCallback then
         customDataChangedCallback(optionKey, newCustomData, newDefault)
     end
 end

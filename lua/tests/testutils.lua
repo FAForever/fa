@@ -14,8 +14,8 @@ local concat = table.concat
 -- defined by having the same type and repr() representation.
 --------------------------------------------------------------------------------
 function expect_equal(a,b)
-    assert(type(a) == type(b), 'different types: '..type(a)..' != '..type(b)..'\na='..repr(a)..'\nb='..repr(b))
-    if a!=b then
+    assert(type(a) == type(b), 'different types: '..type(a)..' ~= '..type(b)..'\na='..repr(a)..'\nb='..repr(b))
+    if a~=b then
         local ra = repr(a)
         local rb = repr(b)
         assert(ra==rb, ra..' == '..rb)
@@ -27,7 +27,7 @@ end
 -- expect_identical(a,b) raises an error if its args are not the same.
 --------------------------------------------------------------------------------
 function expect_identical(a,b)
-    if a!=b then
+    if a~=b then
         local ra = repr(a)
         local rb = repr(b)
         error('objects should be identical:\n' .. repr(a) .. '\n' .. repr(b))

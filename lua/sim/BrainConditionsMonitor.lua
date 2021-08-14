@@ -48,7 +48,7 @@ BrainConditionsMonitor = Class {
 
     -- Gets result for the keyed condition
     CheckKeyedCondition = function(self, conditionKey, reportFailure)
-        if self.ResultTable[conditionKey] != nil then
+        if self.ResultTable[conditionKey] ~= nil then
             return self.ResultTable[conditionKey]:GetStatus(reportFailure)
         end
         WARN('*WARNING: No Condition found with condition key: ' .. conditionKey)
@@ -73,7 +73,7 @@ BrainConditionsMonitor = Class {
     GetConditionKey = function(self, cFilename, cFunctionName, cData)
         if not cFunctionName then
             error('*BUILD CONDITION MONITOR: Invalid BuilderCondition - Missing function name')
-        elseif not cData or type(cData) != 'table' then
+        elseif not cData or type(cData) ~= 'table' then
             error('*BUILD CONDITION MONITOR: Invalid BuilderCondition - Missing data table')
         end
 
@@ -94,7 +94,7 @@ BrainConditionsMonitor = Class {
                 local match = true
                 -- Check each piece of data to make sure it matches
                 for k,v in data.ConditionParameters do
-                    if v != cData[k] then
+                    if v ~= cData[k] then
                         match = false
                         break
                     end
@@ -134,7 +134,7 @@ BrainConditionsMonitor = Class {
             if v.Function == func then
                 local found = true
                 for num,data in v.ConditionParameters do
-                    if data != parameters[num] then
+                    if data ~= parameters[num] then
                         found = false
                         break
                     end
@@ -250,7 +250,7 @@ ImportCondition = Class(Condition) {
     end,
 
     CheckCondition = function(self)
-        if self.CheckTime != GetGameTimeSeconds() then
+        if self.CheckTime ~= GetGameTimeSeconds() then
             self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
             self.CheckTime = GetGameTimeSeconds()
         end
@@ -293,7 +293,7 @@ InstantImportCondition = Class(Condition) {
 
     -- This class doesn't change when CheckCondition is called; Only changed when requested
     CheckCondition = function(self)
-        --if self.CheckTime != GetGameTimeSeconds() then
+        --if self.CheckTime ~= GetGameTimeSeconds() then
             --self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
             --self.CheckTime = GetGameTimeSeconds()
         --end
@@ -302,7 +302,7 @@ InstantImportCondition = Class(Condition) {
 
     -- This class always performs the check when getting status (basically for stat checks)
     GetStatus = function(self, reportFailure)
-        if self.CheckTime != GetGameTimeSeconds() then
+        if self.CheckTime ~= GetGameTimeSeconds() then
             self.Status = import(self.Filename)[self.FunctionName](self.Brain, unpack(self.FunctionData))
             self.CheckTime = GetGameTimeSeconds()
             --LOG('*AI LOG: Instant Check')

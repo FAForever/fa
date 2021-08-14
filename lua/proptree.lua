@@ -68,7 +68,7 @@ Tree = Class(Prop) {
 			TerrainType = GetTerrainType( -1, -1 )
 		end
 
-		if TerrainType.FXOther.Land.TreeRootDirt01 != nil then
+		if TerrainType.FXOther.Land.TreeRootDirt01 ~= nil then
 			for k, v in TerrainType.FXOther.Land.TreeRootDirt01 do
 				CreateEmitterAtEntity( self, army, v )
 			end
@@ -207,7 +207,7 @@ TreeGroup = Class(Prop) {
     end,
 
     OnDamage = function(self, instigator, armormod, direction, type)
-        if type != 'Force' then
+        if type ~= 'Force' then
             if Random(1, 10) <= 1 then
                 self:Breakup()
             end

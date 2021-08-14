@@ -41,7 +41,7 @@ function ScalableRadiusAreaDoT(entity)
     local radius = spec.StartRadius or 0
     local freq = spec.Frequency or 1
     local dur = spec.Duration or 1
-    if dur != freq then
+    if dur ~= freq then
         local reductionScalar = (radius - (spec.EndRadius or 1) ) * freq / (dur - freq)
         local duration = math.floor(dur / freq)
 

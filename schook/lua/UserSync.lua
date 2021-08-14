@@ -30,7 +30,7 @@ OnSync = function()
     end
 
     if Sync.ObjectiveTimer then
-        if Sync.ObjectiveTimer != false then
+        if Sync.ObjectiveTimer ~= false then
             import('/lua/ui/game/timer.lua').SetTimer(Sync.ObjectiveTimer)
         else
             import('/lua/ui/game/timer.lua').ResetTimer()
@@ -115,7 +115,7 @@ OnSync = function()
         end
     end
 
-    if Sync.Paused != PreviousSync.Paused then
+    if Sync.Paused ~= PreviousSync.Paused then
         import("/lua/ui/game/gamemain.lua").OnPause(Sync.Paused);
     end
 
@@ -140,7 +140,7 @@ OnSync = function()
         local isare = LOC('<LOC cheating_fragment_0000>is')
         local srcs = SessionGetCommandSourceNames()
         for k,v in ipairs(Sync.Cheaters) do
-            if names != '' then
+            if names ~= '' then
                 names = names .. ', '
                 isare = LOC('<LOC cheating_fragment_0001>are')
             end
@@ -215,7 +215,7 @@ OnSync = function()
         import('/lua/ui/game/objectives2.lua').RemovePingGroups(Sync.RemovePingGroups)
     end
 
-    if Sync.SetAlliedVictory != nil then
+    if Sync.SetAlliedVictory ~= nil then
         import('/lua/ui/game/diplomacy.lua').SetAlliedVictory(Sync.SetAlliedVictory)
     end
 
@@ -263,7 +263,7 @@ OnSync = function()
         import('/lua/ui/game/gamemain.lua').IsSavedGame = true
     end
 
-    if Sync.ChangeCameraZoom != nil then
+    if Sync.ChangeCameraZoom ~= nil then
         import('/lua/ui/game/gamemain.lua').SimChangeCameraZoom(Sync.ChangeCameraZoom)
     end
 end

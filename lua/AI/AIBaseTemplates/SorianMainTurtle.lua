@@ -229,7 +229,7 @@ BaseBuilderTemplate {
             return 1, 'sorianturtle'
         end
 
-        if per != 'sorianturtle' and per != 'sorianadaptive' and per != '' then
+        if per ~= 'sorianturtle' and per ~= 'sorianadaptive' and per ~= '' then
             return 1, 'sorianturtle'
         end
 
