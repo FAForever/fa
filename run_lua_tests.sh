@@ -11,7 +11,7 @@ check_file() {
   output="$(luac -p "$file" 2>&1 \
     | sed "s:/dev/fd/[0-9]\+:$file:g")"
 
-  if [[ $output ~= "" ]]; then
+  if [[ $output != "" ]]; then
     echo "$output" > /dev/fd/2
     had_error=1
   fi
@@ -24,7 +24,7 @@ while read file; do
   (( files_checked++ ))
 done < <(find . -type d \( -path ./testmaps -o -path ./engine \) -prune -false -o -name '*.lua' -o -name '*.bp')
 
-if [[ $had_error ~= 0 ]]; then
+if [[ $had_error != 0 ]]; then
   echo "Syntax errors detected."
 else
   echo "Syntax OK."
