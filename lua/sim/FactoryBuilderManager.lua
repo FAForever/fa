@@ -192,7 +192,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                         or ECC(categories.TECH3, unit) and 'T3'
                         or ''
                     )
-                ) or layer or 'gate'
+                ) or layer or 'Gate'
             )
             
             self.LocationActive = true
