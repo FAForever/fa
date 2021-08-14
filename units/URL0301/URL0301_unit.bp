@@ -112,6 +112,7 @@ UnitBlueprint {
         },
     },
     BuildIconSortPriority = 10,
+    BuildDroneCount = 3,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
