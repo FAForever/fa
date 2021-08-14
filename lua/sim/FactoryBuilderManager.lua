@@ -40,7 +40,8 @@ FactoryBuilderManager = Class(BuilderManager) {
         self.RallyPoint = false
 
         self.FactoryList = {}
-
+        
+        self.HasLayerTBuilders = nil
         self.LocationActive = false
 
         self.RandomSamePriority = true
@@ -171,51 +172,29 @@ FactoryBuilderManager = Class(BuilderManager) {
         return retUnits
     end,
 
-    AddFactory = function(self,unit)
+    AddFactory = function(self, unit)
         if not self:FactoryAlreadyExists(unit) then
             table.insert(self.FactoryList, unit)
             unit.DesiresAssist = true
-           
-            if EntityCategoryContains(categories.LAND, unit) then
-                self:SetupNewFactory(unit, 'Land')
-
-            elseif EntityCategoryContains(categories.LAND * categories.TECH1, unit) then
-                self:SetupNewFactory(unit, 'LandT1')
-
-            elseif EntityCategoryContains(categories.LAND * categories.TECH2, unit) then
-                self:SetupNewFactory(unit, 'LandT2')
-
-            elseif EntityCategoryContains(categories.LAND * categories.TECH3, unit) then
-                self:SetupNewFactory(unit, 'LandT3')
-
-            elseif EntityCategoryContains(categories.AIR, unit) then
-                self:SetupNewFactory(unit, 'Air')
-
-            elseif EntityCategoryContains(categories.AIR * categories.TECH1, unit) then
-                self:SetupNewFactory(unit, 'AirT1')
-
-            elseif EntityCategoryContains(categories.AIR * categories.TECH2, unit) then
-                self:SetupNewFactory(unit, 'AirT2')
-
-            elseif EntityCategoryContains(categories.AIR * categories.TECH3, unit) then
-                self:SetupNewFactory(unit, 'AirT3')
-
-            elseif EntityCategoryContains(categories.NAVAL, unit) then
-                self:SetupNewFactory(unit, 'Sea')
-
-            elseif EntityCategoryContains(categories.NAVAL * categories.TECH1, unit) then
-                self:SetupNewFactory(unit, 'SeaT1')
-
-            elseif EntityCategoryContains(categories.NAVAL * categories.TECH2, unit) then
-                self:SetupNewFactory(unit, 'SeaT2')
-
-            elseif EntityCategoryContains(categories.NAVAL * categories.TECH3, unit) then
-                self:SetupNewFactory(unit, 'SeaT3')
-
-            else
-                self:SetupNewFactory(unit, 'Gate')
-            end
-
+            
+            local ECC = EntityCategoryContains
+            
+            local layer = ECC(categories.LAND, unit) and 'Land'
+            or ECC(categories.AIR, unit) and 'Air'
+            or ECC(categories.NAVAL, unit) and 'Sea'   
+            
+            self:SetupNewFactory(
+                unit,
+                self.Brain.HasLayerTBuilders and layer and (
+                    layer..(
+                        ECC(categories.TECH1, unit) and 'T1'
+                        or ECC(categories.TECH2, unit) and 'T2'
+                        or ECC(categories.TECH3, unit) and 'T3'
+                        or ''
+                    )
+                ) or layer or 'gate'
+            )
+            
             self.LocationActive = true
         end
     end,
