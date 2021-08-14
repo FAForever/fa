@@ -114,7 +114,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    BuildDroneCount = 2,
+    BuildDroneTotal = 2,
     Buffs = {
         Regen = {
             Level1 = 4,

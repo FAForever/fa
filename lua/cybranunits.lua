@@ -77,6 +77,14 @@ CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
 -- CONSTRUCTION UNITS
 CConstructionUnit = Class(ConstructionUnit){
+
+    OnCreate = function(self)
+        ConstructionUnit.OnCreate(self)
+
+        -- cache the total amount of drones
+        self.BuildDroneTotal = self:GetBlueprint().BuildDroneTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
+    end
+
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
         -- If created with F2 on land, then play the transform anim.
