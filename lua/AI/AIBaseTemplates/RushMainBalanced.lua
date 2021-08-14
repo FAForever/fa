@@ -1,4 +1,4 @@
---***************************************************************************
+    --***************************************************************************
 --*
 --**  File     :  /lua/ai/AIBaseTemplates/RushMainBalanced.lua
 --**
@@ -200,10 +200,6 @@ BaseBuilderTemplate {
         local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
-        end
-
-        if true then
-            --return 1000, 'rushbalanced'
         end
 
         --If we're playing on an island map, do not use this plan often
