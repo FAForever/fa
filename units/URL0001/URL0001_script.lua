@@ -50,6 +50,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     -- Creation
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
+        CCommandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)

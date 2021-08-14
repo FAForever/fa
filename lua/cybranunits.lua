@@ -83,7 +83,9 @@ CConstructionUnit = Class(ConstructionUnit){
 
         -- cache the total amount of drones
         self.BuildDroneTotal = self:GetBlueprint().BuildDroneTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
-    end
+
+
+    end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
@@ -481,6 +483,16 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 -- CCommandUnit
 -- Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
 CCommandUnit = Class(CommandUnit) {
+
+    OnCreate = function(self)
+
+        CommandUnit.OnCreate(self)
+
+        -- cache the total amount of drones
+        self.BuildDroneTotal = self:GetBlueprint().BuildDroneTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
+
+    end,
+
     OnScriptBitSet = function(self, bit)
         if bit == 8 then -- Cloak toggle
             self:StopUnitAmbientSound('ActiveLoop')
