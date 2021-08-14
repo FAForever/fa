@@ -12,6 +12,10 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
+local FAFInsert = table.insert
+
+local EntityCategoryCount = EntityCategoryCount
+
 FactoryBuilderManager = Class(BuilderManager) {
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain)
@@ -86,7 +90,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                     end
                 end
             end
-            WaitSeconds(300)
+            coroutine.yield(300)
         end
     end,
 
@@ -144,7 +148,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            FAFInsert(units, v)
         end
         return units
     end,
@@ -162,7 +166,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(retUnits, v)
+            FAFInsert(retUnits, v)
         end
         return retUnits
     end,
@@ -174,22 +178,20 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     AddFactory = function(self, unit)
         if not self:FactoryAlreadyExists(unit) then
-            table.insert(self.FactoryList, unit)
+            FAFInsert(self.FactoryList, unit)
             unit.DesiresAssist = true
             
-            local ECC = EntityCategoryContains
-            
-            local layer = ECC(categories.LAND, unit) and 'Land'
-            or ECC(categories.AIR, unit) and 'Air'
-            or ECC(categories.NAVAL, unit) and 'Sea'   
+            local layer = EntityCategoryCount(categories.LAND, unit) and 'Land'
+            or EntityCategoryCount(categories.AIR, unit) and 'Air'
+            or EntityCategoryCount(categories.NAVAL, unit) and 'Sea'   
             
             self:SetupNewFactory(
                 unit,
                 self.Brain.HasLayerTBuilders and layer and (
                     layer..(
-                        ECC(categories.TECH1, unit) and 'T1'
-                        or ECC(categories.TECH2, unit) and 'T2'
-                        or ECC(categories.TECH3, unit) and 'T3'
+                        EntityCategoryCount(categories.TECH1, unit) and 'T1'
+                        or EntityCategoryCount(categories.TECH2, unit) and 'T2'
+                        or EntityCategoryCount(categories.TECH3, unit) and 'T3'
                         or ''
                     )
                 ) or layer or 'Gate'
@@ -285,7 +287,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             return
         end
         factory.DelayThread = true
-        WaitSeconds(time)
+        coroutine.yield(time)
         factory.DelayThread = false
         self:AssignBuildOrder(factory,bType)
     end,
@@ -337,12 +339,12 @@ FactoryBuilderManager = Class(BuilderManager) {
                     -- LOG('*AI DEBUG: Replacement unit found!')
                     local replacement = self:GetCustomReplacement(v, templateName, faction)
                     if replacement then
-                        table.insert(template, replacement)
+                        FAFInsert(template, replacement)
                     else
-                        table.insert(template, v)
+                        FAFInsert(template, v)
                     end
                 else
-                    table.insert(template, v)
+                    FAFInsert(template, v)
                 end
             end
         elseif faction and customData and customData[faction] then
@@ -366,7 +368,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
             local replacement = self:GetCustomReplacement(Squad, templateName, faction)
             if replacement then
-                table.insert(template, replacement)
+                FAFInsert(template, replacement)
             end
         end
         return template
@@ -382,7 +384,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             for k,v in templateData[faction] do
                 if rand <= v[2] or template[1] == 'NoOriginalUnit' then
                     -- LOG('*AI DEBUG: Insert possibility.')
-                    table.insert(possibles, v[1])
+                    FAFInsert(possibles, v[1])
                 end
             end
             if not table.empty(possibles) then
@@ -442,7 +444,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     DelayRallyPoint = function(self, factory)
-        WaitSeconds(1)
+        coroutine.yield(1)
         if not factory.Dead then
             self:SetRallyPoint(factory)
         end
