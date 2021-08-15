@@ -63,7 +63,7 @@ UnitBlueprint {
         },
     },
     BuildIconSortPriority = 200,
-    BuildDroneTotal = 3,
+    BuildBotTotal = 3,
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',

@@ -5,28 +5,113 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBuildBeams
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
+-- upvalue globals for performance
+local CreateBuilderArmController = CreateBuilderArmController
+
+-- upvalue moho functions for performance
+local BuilderArmManipulator = _G.moho.BuilderArmManipulator 
+local BuilderArmManipulatorSetAimingArc = BuilderArmManipulator.SetAimingArc
+local BuilderArmManipulatorSetPrecedence = BuilderArmManipulator.SetPrecedence
+BuilderArmManipulator = nil 
+
+local EntityFunctions = _G.moho.entity_methods 
+local EntitySetCollisionShape = EntityFunctions.SetCollisionShape
+EntityFunctions = nil
+
+local UnitFunctions = _G.moho.unit_methods 
+local UnitSetConsumptionActive = UnitFunctions.SetConsumptionActive
+UnitFunctions = nil 
+
+local TrashBag = _G.TrashBag
+local TrashBagAdd = TrashBag.Add
+
 URA0001 = Class(CAirUnit) {
-    spawnedBy = nil,
+    SpawnedBy = false,
 
+    -- do not perform the logic of these functions                      
+    OnMotionHorzEventChange = function(self, new, old) end,                     -- called a million times, keep it simple
+    OnMotionVertEventChange = function(self, new, old) end,                 
+    OnLayerChange = function(self, new, old) end,
+
+    CreateBuildEffects = function(self, unitBeingBuilt, order) end,             -- do not make build effects (engineer / builder takes care of that)
+    StartBuildingEffects = function(self, built, order) end,
+    CreateBuildEffects = function(self, built, order) end,
+    StopBuildingEffects = function(self, built) end,
+
+    OnBuildProgress = function(self, unit, oldProg, newProg) end,               -- do not keep track of progress
+    OnStopBuild = function(self, unitBeingBuilt) end,
+
+    EnableUnitIntel = function(self, disabler, intel) end,                      -- do not bother doing intel
+    DisableUnitIntel = function(self, disabler, intel) end,
+    OnIntelEnabled = function(self) end,
+    OnIntelDisabled = function(self) end,
+    ShouldWatchIntel = function(self) end,
+    IntelWatchThread = function(self) end,
+
+    AddDetectedByHook = function(self, hook) end,                               -- do not bother keeping track of collision beams
+    RemoveDetectedByHook = function(self, hook) end,
+    OnDetectedBy = function(self, index) end,
+
+    CreateWreckage = function (self, overkillRatio) end,                        -- don't make wreckage
+    UpdateConsumptionValues = function(self) end,                               -- avoids junk in resource overlay
+    ShouldUseVetSystem = function(self) return false end,                       -- never use vet
+    OnStopBeingBuilt = function(self, builder, layer) end,                      -- do not perform this logic when being made
+    OnStartRepair = function(self, unit) end,                                   -- do not run this logic
+    OnKilled = function(self) end,                                              -- just fall out of the sky
+
+    OnCollisionCheck = function(self, other, firingWeapon) return false end,    -- we never collide
+    OnCollisionCheckWeapon = function(self, firingWeapon) return false end,
+
+    OnPrepareArmToBuild = function(self) end,
+
+    OnStartBuilderTracking = function(self) end,                                -- don't track anything
+    OnStopBuilderTracking = function(self) end,
+
+    DestroyUnit = function(self) end,                                           -- prevent misscalls
+    DestroyAllTrashBags = function(self) end,
+
+    OnStartSacrifice = function(self, target_unit) end,
+    OnStopSacrifice = function(self, target_unit) end,
+
+    -- only initialise what we need
+    OnPreCreate = function(self) 
+        self.Trash = TrashBag()
+    end,             
+
+    -- only initialise what we need
     OnCreate = function(self)
-        CAirUnit.OnCreate(self)
-        self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
-        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-        self.BuildArmManipulator:SetPrecedence(5)
-        self.Trash:Add(self.BuildArmManipulator)
-        self:SetConsumptionActive(false)
+        -- make the drone aim for the target
+        local BuildArmManipulator = CreateBuilderArmController(self, 'URA0003' , 'URA0003', 0)
+        BuilderArmManipulatorSetAimingArc(BuildArmManipulator, -180, 180, 360, -90, 90, 360)
+        BuilderArmManipulatorSetPrecedence(BuildArmManipulator, 5)
+        TrashBagAdd(self.Trash, BuildArmManipulator)
+
+        -- prevent drone from consuming anything and remove collision shape
+        UnitSetConsumptionActive(self, false)
+
+        -- self:SetCollisionShape('None')   -- this causes an engine crash after ~ 10 seconds
     end,
 
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
-        self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
-        CreateCybranBuildBeams(self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag)
+    -- short-cut when being destroyed
+    OnDestroy = function(self) 
+        self.Dead = true 
+        self.Trash:Destroy()
+        self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
     end,
 
+    Kill = function(self)
+        -- make it go boom
+        if self.PlayDestructionEffects then
+            self:CreateDestructionEffects(1.0)
+        end
+
+        self:Destroy()
+    end,
+
+    -- prevent this type of operations
     OnStartCapture = function(self, target)
         IssueStop({self}) -- You can't capture!
     end,
@@ -35,82 +120,22 @@ URA0001 = Class(CAirUnit) {
         IssueStop({self}) -- You can't reclaim!
     end,
 
-    -- We never want to waste effort sinking these
-    ShallSink = function(self)
-        return false
-    end,
-
-    -- Removed all collider related stuff
+    -- short cut - just get destroyed
     OnImpact = function(self, with)
-        if with == 'Water' then
-            self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
+
+        -- make it go boom
+        if self.PlayDestructionEffects then
+            self:CreateDestructionEffects(1.0)
         end
 
-        self:ForkThread(self.DeathThread, self.OverKillRatio)
+        -- make it sound boom
+        self:PlayUnitSound('Destroyed')
+
+        -- make it gone
+        self:Destroy()
     end,
 
-    OnStopBuild = function(self, unitBeingBuilt)
-        CAirUnit.OnStopBuild(self, unitBeingBuilt)
-        ChangeState(self, self.IdleState)
-    end,
 
-    -- Don't explode when killed, merely fall out of the sky.
-    OnKilled = function(self)
-        self:StopBuildingEffects()
-    end,
-
-    -- Don't cycle intel!
-    EnableUnitIntel = function(self, disabler, intel)
-    end,
-
-    -- Don't make wreckage
-    CreateWreckage = function (self, overkillRatio)
-        overkillRatio = 1.1
-        CAirUnit.CreateWreckage(self, overkillRatio)
-    end,
-
-    -- Prevent the unit from reporting consumption values (avoids junk in the resource overlay)
-    UpdateConsumptionValues = function(self) end,
-
-    IdleState = State {
-        Main = function(self)
-            IssueClearCommands({self})
-            IssueMove({self}, self:GetPosition())
-            WaitSeconds(0.5)
-            IssueMove({self}, self.spawnedBy:GetPosition())
-
-            local delay = 0.1
-            local wait = 0
-
-            while wait < 4 do
-                local pos = self:GetPosition()
-                local bpos = self.spawnedBy:GetPosition()
-
-                if VDist2(pos[1], pos[3], bpos[1], bpos[3]) < 1 then
-                    break
-                end
-
-                wait = wait + delay
-                WaitSeconds(delay)
-            end
-
-            self:Destroy()
-        end,
-    },
-
-    BuildState = State {
-        Main = function(self)
-            local focus = self.spawnedBy:GetFocusUnit()
-
-            if not focus or focus:BeenDestroyed() or focus.Dead then
-                ChangeState(self, self.IdleState)
-            end
-
-            IssueClearCommands({self})
-            IssueGuard({self}, focus)
-        end,
-    },
 }
 
 TypeClass = URA0001

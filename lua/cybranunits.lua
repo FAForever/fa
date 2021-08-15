@@ -25,7 +25,9 @@ local CommandUnit = DefaultUnitsFile.CommandUnit
 local Util = import('utilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('EffectUtilities.lua')
-local CreateCybranBuildBeams = EffectUtil.CreateCybranBuildBeams
+local CreateCybranBuildBeams = false
+
+local WaitTicks = coroutine.yield
 
 -- AIR FACTORY STRUCTURES
 CAirFactoryUnit = Class(AirFactoryUnit) {
@@ -82,9 +84,7 @@ CConstructionUnit = Class(ConstructionUnit){
         ConstructionUnit.OnCreate(self)
 
         -- cache the total amount of drones
-        self.BuildDroneTotal = self:GetBlueprint().BuildDroneTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
-
-
+        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -92,6 +92,141 @@ CConstructionUnit = Class(ConstructionUnit){
         -- If created with F2 on land, then play the transform anim.
         if self.Layer == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
+        end
+    end,
+
+    DestroyBotsThread = function(self, bots, count)
+
+        -- kill potential return thread
+        if self.ReturnBotsThreadInstance then 
+            KillThread(self.ReturnBotsThreadInstance)
+            self.ReturnBotsThreadInstance = nil
+        end
+
+        -- slowly kill the drones
+        for k = 1, count do 
+            local bot = bots[k]
+            if bot and not bot.Dead then
+                WaitTicks(Random(1, 10))
+                if bot and not bot.Dead then
+                    bot:Kill()
+                end
+            end
+        end
+    end,
+
+    ReturnBotsThread = function(self, delay)
+
+        -- hold up a bit in case we just switch target
+        WaitSeconds(delay)
+
+        -- cache for speed
+        local bots = self.BuildBots 
+        local buildBotTotal = self.BuildBotTotal
+        local threshold = delay
+
+        -- lower bot elevation
+        for k = 1, buildBotTotal do 
+            local bot = bots[k]
+            if bot and not bot.Dead then
+                bot:SetElevation(1)
+            end
+        end
+
+        -- keep sending drones back
+        while self.BuildBotsNext > 1 do 
+
+            -- instruct bots to move back
+            IssueClearCommands(bots)
+            IssueMove(bots, self:GetPosition())
+
+            -- check if they're there yet
+            for l = 1, 4 do 
+                WaitSeconds(0.2)
+
+                local tx, ty, tz = self:GetPositionXYZ()
+                for k = 1, buildBotTotal do 
+                    local bot = bots[k]
+                    if bot and not bot.Dead then
+                        local bx, by, bz = bot:GetPositionXYZ()
+                        local distance = VDist2Sq(tx, tz, bx, bz)
+
+                        -- if close enough, just remove it
+                        threshold = threshold + 0.1
+                        if distance < threshold then 
+                            -- destroy bot
+                            bot:Destroy()
+
+                            -- move destroyed bots up
+                            for m = k, buildBotTotal do 
+                                bots[m] = bots[m + 1]
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        -- clean up state
+        self.ReturnBotsThreadInstance = nil
+        self.BeamEndBuilder = nil 
+        self.BeamEndBots = nil
+    end,
+
+    DestroyAllBuildEffects = function(self)
+        ConstructionUnit.DestroyAllBuildEffects(self)
+
+        -- make sure we're not dead (then bots are destroyed)
+        if not self.Dead then 
+
+            -- check if we ever had bots
+            local bots = self.BuildBots 
+            if bots then
+                -- check if we still have active bots
+                local buildBotCount = self.BuildBotsNext - 1
+                if buildBotCount > 0 then 
+                    -- return the active bots
+                    -- self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                    -- self.Trash:Add(self.ReturnBotsThreadInstance)
+                end
+            end
+        end
+    end,
+
+    StopBuildingEffects = function(self, built)
+        ConstructionUnit.StopBuildingEffects(self, built)
+
+        -- make sure we're not dead (then bots are destroyed)
+        if not self.Dead then 
+
+            -- check if we had bots
+            local bots = self.BuildBots 
+            if bots then
+
+                -- check if we still have active bots
+                local buildBotCount = self.BuildBotsNext - 1
+                if buildBotCount > 0 then 
+                    -- return the active bots
+                    -- self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                    -- self.Trash:Add(self.ReturnBotsThreadInstance)
+                end
+            end
+        end
+    end,
+
+    OnPaused = function(self)
+        ConstructionUnit.OnPaused(self)
+
+        -- thread is not already running
+        if not self.ReturnBotsThreadInstance then 
+
+            -- check if we have bots
+            local bots = self.BuildBots 
+            if bots and self.BuildBotsNext > 1 then
+                -- return the active bots
+                self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.5 + Random())
+                self.Trash:Add(self.ReturnBotsThreadInstance)
+            end
         end
     end,
 
@@ -127,8 +262,19 @@ CConstructionUnit = Class(ConstructionUnit){
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        self.UnitBeingBuilt = unitBeingBuilt
+        EffectUtil.CreateCybranEngineerBuildDrones(self)
+        EffectUtil.CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag)
+    end,
+
+    OnDestroy = function(self) 
+
+        -- destroy bots if we have them
+        if self.BuildBotsNext > 1 then 
+            ForkThread(self.DestroyBotsThread, self, self.BuildBots, self.BuildBotTotal)
+        end
+
+        ConstructionUnit.OnDestroy(self)
     end,
 }
 
@@ -489,7 +635,7 @@ CCommandUnit = Class(CommandUnit) {
         CommandUnit.OnCreate(self)
 
         -- cache the total amount of drones
-        self.BuildDroneTotal = self:GetBlueprint().BuildDroneTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
+        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
 
     end,
 
