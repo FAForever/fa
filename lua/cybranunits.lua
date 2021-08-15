@@ -31,7 +31,7 @@ local WaitTicks = coroutine.yield
 
 CConstructionTemplate = Class() {
 
-    --- Prepares the default build bot total
+    --- Prepares the values required to support bots
     OnCreate = function(self)
         -- cache the total amount of drones
         self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
@@ -39,7 +39,6 @@ CConstructionTemplate = Class() {
 
     --- When dying, destroy everything.
     DestroyAllBuildEffects = function(self)
-
         -- make sure we're not dead (then bots are destroyed)
         if not self.Dead then 
 
@@ -59,7 +58,6 @@ CConstructionTemplate = Class() {
 
     --- When stopping to build, send the bots back after a bit.
     StopBuildingEffects = function(self, built)
-
         -- make sure we're not dead (then bots are destroyed)
         if not self.Dead then 
 
@@ -79,25 +77,29 @@ CConstructionTemplate = Class() {
     end,
 
     --- When pausing, send the bots back after a bit.
-    OnPaused = function(self)
+    OnPaused = function(self, delay)
+        -- delay until they move back
+        delay = delay or 0.5 + 2 * Random()
 
         -- thread is not already running
         if not self.ReturnBotsThreadInstance then 
-
             -- check if we have bots
             local bots = self.BuildBots 
             if bots and self.BuildBotsNext > 1 then
                 -- return the active bots
-                self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.5 + 2 * Random())
+                self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, delay)
                 self.Trash:Add(self.ReturnBotsThreadInstance)
             end
         end
     end,
 
     --- When making build effects, try and make the bots.
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
+    CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
         EffectUtil.CreateCybranEngineerBuildDrones(self)
-        EffectUtil.CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag)
+        if stationary then 
+            EffectUtil.CreateCybranBuildBotTrackers(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+        end
+        EffectUtil.CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
     end,
 
     --- When destroyed, destroy the bots too.
@@ -526,10 +528,12 @@ CConstructionEggUnit = Class(CStructureUnit) {
 
 -- TODO: This should be made more general and put in defaultunits.lua in case other factions get similar buildings
 -- CConstructionStructureUnit
-CConstructionStructureUnit = Class(CStructureUnit) {
+CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
     OnCreate = function(self)
-        -- Structure stuff
+
+        -- Initialize the class
         CStructureUnit.OnCreate(self)
+        CConstructionTemplate.OnCreate(self)
 
         local bp = self:GetBlueprint()
 
@@ -553,14 +557,50 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         self.BuildingUnit = false
     end,
 
+    DestroyAllBuildEffects = function(self)
+        CStructureUnit.DestroyAllBuildEffects(self)
+        CConstructionTemplate.DestroyAllBuildEffects(self)
+    end,
+
+    StopBuildingEffects = function(self, built)
+        CStructureUnit.StopBuildingEffects(self, built)
+        CConstructionTemplate.StopBuildingEffects(self, built)
+    end,
+
+    OnPaused = function(self)
+        CStructureUnit.OnPaused(self)
+        CStructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
+        CConstructionTemplate.OnPaused(self, 0)
+
+        self.AnimationManipulator:SetRate(-0.25)
+    end,
+
+    OnUnpaused = function(self)
+        CStructureUnit.OnUnpaused(self)
+        CStructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
+
+        self.AnimationManipulator:SetRate(1)
+    end,
+
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        CConstructionTemplate.CreateBuildEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder, true)
+    end,
+
+    OnDestroy = function(self) 
+        CStructureUnit.OnDestroy(self)
+        CConstructionTemplate.OnDestroy(self)
+    end,
+
     OnStartBuild = function(self, unitBeingBuilt, order)
+        CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
+
+        -- play animation of the hive opening
+        self.AnimationManipulator:PlayAnim(self.BuildingOpenAnim, false):SetRate(1)
+
+        -- keep track of who we are building
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
-
-        self.AnimationManipulator:PlayAnim(self.BuildingOpenAnim, false):SetRate(1)
-
-        CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -572,41 +612,17 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         end
     end,
 
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local buildbots = EffectUtil.SpawnBuildBots(self, unitBeingBuilt, table.getn(self.BuildEffectBones), self.BuildEffectsBag)
-        if buildbots then
-            EffectUtil.CreateCybranEngineerBuildEffects(self, self.BuildEffectBones, buildbots, self.BuildEffectsBag)
-        else
-            EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
-        end
-    end,
-
     -- This will only be called if not in StructureUnit's upgrade state
     OnStopBuild = function(self, unitBeingBuilt)
         CStructureUnit.OnStopBuild(self, unitBeingBuilt)
 
+        -- revert animation
+        self.AnimationManipulator:SetRate(-0.25)
+
+        -- lose track of who we are building
         self.UnitBeingBuilt = nil
         self.UnitBuildOrder = nil
         self.BuildingUnit = false
-
-        self.AnimationManipulator:SetRate(-1)
-    end,
-
-    OnPaused = function(self)
-        -- When factory is paused take some action
-        self:StopUnitAmbientSound('ConstructLoop')
-        CStructureUnit.OnPaused(self)
-        if self.BuildingUnit then
-            CStructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-        end
-    end,
-
-    OnUnpaused = function(self)
-        if self.BuildingUnit then
-            self:PlayUnitAmbientSound('ConstructLoop')
-            CStructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
-        end
-        CStructureUnit.OnUnpaused(self)
     end,
 
     OnProductionPaused = function(self)
@@ -621,14 +637,6 @@ CConstructionStructureUnit = Class(CStructureUnit) {
             self:SetMaintenanceConsumptionActive()
         end
         self:SetProductionActive(true)
-    end,
-
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        CStructureUnit.StartBuildingEffects(self, unitBeingBuilt, order)
-    end,
-
-    StopBuildingEffects = function(self, unitBeingBuilt)
-        CStructureUnit.StopBuildingEffects(self, unitBeingBuilt)
     end,
 
     OnStopBuilderTracking = function(self)

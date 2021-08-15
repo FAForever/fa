@@ -530,22 +530,27 @@ local CreateEmitterOnEntity = CreateEmitterOnEntity
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 
 --- A cybran engineer will share the 'welding point' with its bots.
-function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag)
+function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, stationary)
 
     -- delay slightly for dramatic effect
-    WaitSeconds(0.2)
+    WaitTicks(2 + Random(1, 4))
 
     -- initialise   
     local army = builder.Army
     local origin = EntityGetPosition(unitBeingBuilt)
 
     -- create beam entities and their emiters
-    local beamEndBuilder = builder.BeamEndBuilder or Entity()
-    builder.BeamEndBuilder = beamEndBuilder
-    Warp(beamEndBuilder, origin)
-    buildEffectsBag:Add(CreateEmitterOnEntity(beamEndBuilder, army, CybranBuildSparks01))
-    buildEffectsBag:Add(CreateEmitterOnEntity(beamEndBuilder, army, CybranBuildFlash01))
-    builder.Trash:Add(beamEndBuilder)
+    local beamEndBuilder
+
+    -- hives do not have beams from builders
+    if not stationary then 
+        beamEndBuilder = builder.BeamEndBuilder or Entity()
+        builder.BeamEndBuilder = beamEndBuilder
+        Warp(beamEndBuilder, origin)
+        buildEffectsBag:Add(CreateEmitterOnEntity(beamEndBuilder, army, CybranBuildSparks01))
+        buildEffectsBag:Add(CreateEmitterOnEntity(beamEndBuilder, army, CybranBuildFlash01))
+        builder.Trash:Add(beamEndBuilder)
+    end
 
     local beamEndBots = builder.BeamEndBots or Entity()
     builder.BeamEndBots = beamEndBots
@@ -555,9 +560,11 @@ function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffe
     builder.Trash:Add(beamEndBots)
 
     -- create a beam from each build effect bone of the builder
-    if builder.BuildEffectBones then 
-        for k, bone in builder.BuildEffectBones do 
-            buildEffectsBag:Add(AttachBeamEntityToEntity(builder, bone, beamEndBuilder, -1, army, BeamBuildEmtBp))
+    if not stationary then 
+        if builder.BuildEffectBones then 
+            for k, bone in builder.BuildEffectBones do 
+                buildEffectsBag:Add(AttachBeamEntityToEntity(builder, bone, beamEndBuilder, -1, army, BeamBuildEmtBp))
+            end
         end
     end
 
@@ -577,16 +584,25 @@ function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffe
         WaitSeconds(0.4)
 
         -- get a new location for both
-        local x, y, z = RandomOffset(unitBeingBuilt, 1)
-        Warp(beamEndBuilder, Vector(ox + x, oy + y, oz + z))
+        if not stationary then 
+            local x, y, z = RandomOffset(unitBeingBuilt, 1)
+            Warp(beamEndBuilder, Vector(ox + x, oy + y, oz + z))
+        end
 
         local x, y, z = RandomOffset(unitBeingBuilt, 1)
         Warp(beamEndBots, Vector(ox + x, oy + y, oz + z))
     end
 end
 
-function CreateCybranBuildBotTrackers(builder, BuildBones, BuildBots, BuildEffectsBag)
-
+function CreateCybranBuildBotTrackers(builder, buildBones, buildBots, total, buildEffectsBag)
+    local army = builder.Army
+    for k = 1, total do 
+        local bone = buildBones[k]
+        local bot = buildBots[k]
+        if bone and bot then 
+            bot.Trash:Add(AttachBeamEntityToEntity(builder, bone, bot, -1, army, '/effects/emitters/build_beam_03_emit.bp'))
+        end
+    end
 end
 
 -- --- Beams between hive / drones
@@ -610,7 +626,7 @@ end
 --                 continue
 --             end
 
---             BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBones[i], vBot, -1, builder.Army, '/effects/emitters/build_beam_03_emit.bp'))
+--             BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBones[i], vBot, -1, builder.Army, ))
 --             i = i + 1
 --         end
 --     end
