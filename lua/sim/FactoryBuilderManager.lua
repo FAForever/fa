@@ -61,8 +61,8 @@ FactoryBuilderManager = Class(BuilderManager) {
         self:ForkThread(self.RallyPointMonitor)
     end,
 
-    AddBuilder = function(self, aiBrain, builderData, locationType)
-        local newBuilder = Builder.CreateFactoryBuilder(aiBrain, builderData, locationType)
+    AddBuilder = function(self, builderData, locationType)
+        local newBuilder = Builder.CreateFactoryBuilder(self.Brain, builderData, locationType)
         local BT = Builders[newBuilder.BuilderName].BuilderType 
         if type(BT) == 'string' then BT = {BT} end
 
