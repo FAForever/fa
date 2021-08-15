@@ -1081,9 +1081,18 @@ AIBrain = Class(moho.aibrain_methods) {
     ForceManagerSort = function(self)
         for _, v in self.BuilderManagers do
             v.EngineerManager:SortBuilderList('Any')
-            v.FactoryManager:SortBuilderList('Land')
-            v.FactoryManager:SortBuilderList('Air')
-            v.FactoryManager:SortBuilderList('Sea')
+            ---Not Sure Exactly why this does, but it sorts the list/IKnowGameErrors Out if not here 
+            v.FactoryManager:SortBuilderList('LandT1')
+            v.FactoryManager:SortBuilderList('AirT1')
+            v.FactoryManager:SortBuilderList('SeaT1')
+            v.FactoryManager:SortBuilderList('LandT2')
+            v.FactoryManager:SortBuilderList('AirT2')
+            v.FactoryManager:SortBuilderList('SeaT2')
+            v.FactoryManager:SortBuilderList('LandT3')
+            v.FactoryManager:SortBuilderList('AirT3')
+            v.FactoryManager:SortBuilderList('SeaT3')
+            ----IDon'tKnowWhyGate is not sorted innately
+            v.FactoryManager:SortBuilderList('Gate')
             v.PlatoonFormManager:SortBuilderList('Any')
         end
     end,

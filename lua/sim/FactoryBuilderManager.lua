@@ -21,7 +21,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             return false
         end
 
-        local builderTypes = { 'Air', 'Land', 'Sea', 'Gate', }
+        local builderTypes = {'AirT1', 'AirT2', 'AirT3', 'LandT1', 'LandT2', 'LandT3', 'SeaT1', 'SeaT2', 'SeaT3', 'Gate', }
         for k,v in builderTypes do
             self:AddBuilderType(v)
         end
@@ -87,6 +87,33 @@ FactoryBuilderManager = Class(BuilderManager) {
             for k,v in self.BuilderData do
                 self:AddInstancedBuilder(newBuilder, k)
             end
+        elseif newBuilder:GetBuilderType() == 'Land' then
+            ---If a Builder is Assigned Btype Land that means it creates 3x Number of Instances for Builder Type
+            ---We Could further subdivide this down in the future if desired 
+                self:AddInstancedBuilder(newBuilder, 'LandT1')
+                self:AddInstancedBuilder(newBuilder, 'LandT2')
+                self:AddInstancedBuilder(newBuilder, 'LandT3')
+            --end
+        elseif newBuilder:GetBuilderType() == 'Air' then
+            --for __,v in self.BuilderData do
+                self:AddInstancedBuilder(newBuilder, 'AirT1')
+                self:AddInstancedBuilder(newBuilder, 'AirT2')
+                self:AddInstancedBuilder(newBuilder, 'AirT3')
+            --end
+        elseif newBuilder:GetBuilderType() == 'Sea' then
+            --for __,v in self.BuilderData do
+                self:AddInstancedBuilder(newBuilder, 'SeaT1')
+                self:AddInstancedBuilder(newBuilder, 'SeaT2')
+                self:AddInstancedBuilder(newBuilder, 'SeaT3')
+            --end
+        --[[elseif newBuilder:GetBuilderType() == 'TECH3' then
+            --for __,v in self.BuilderData do
+            ---This is an example of further subdivision if we wished to do so 
+            ---This would basically say all T3 Types build this. Be relavent for engineers for example. 
+                self:AddInstancedBuilder(newBuilder, 'LandT3')
+                self:AddInstancedBuilder(newBuilder, 'AirT3')
+                self:AddInstancedBuilder(newBuilder, 'SeaT3')]]
+            --end
         else
             self:AddInstancedBuilder(newBuilder)
         end
@@ -168,12 +195,38 @@ FactoryBuilderManager = Class(BuilderManager) {
             table.insert(self.FactoryList, unit)
             unit.DesiresAssist = true
             if EntityCategoryContains(categories.LAND, unit) then
-                self:SetupNewFactory(unit, 'Land')
+                ---Checking TechLevel 
+                if EntityCategoryContains(categories.TECH1, unit) then
+                self:SetupNewFactory(unit, 'LandT1')
+                elseif EntityCategoryContains(categories.TECH2, unit) then
+                self:SetupNewFactory(unit, 'LandT2')
+                else
+                self:SetupNewFactory(unit, 'LandT3')
+                ---If Experimentals get added or become factories or treated as AI by factories they become
+                ---the else BuilderType. Note by default the game can only find categories.FACTORY * categories.STRUCTURE
+                end
             elseif EntityCategoryContains(categories.AIR, unit) then
-                self:SetupNewFactory(unit, 'Air')
+                if EntityCategoryContains(categories.TECH1, unit) then
+                    self:SetupNewFactory(unit, 'AirT1')
+                    elseif EntityCategoryContains(categories.TECH2, unit) then
+                    self:SetupNewFactory(unit, 'AirT2')
+                    else
+                    ---This is Checked Before Naval so that AirCrafter Carriers can be added here before. 
+                    ---AIRCRAFT Carrier currently lack AIR category so this won't happen. But it is avaliable or it can be switched to AIR or CARRIER
+                    self:SetupNewFactory(unit, 'AirT3')
+                end
             elseif EntityCategoryContains(categories.NAVAL, unit) then
-                self:SetupNewFactory(unit, 'Sea')
+                if EntityCategoryContains(categories.TECH1, unit) then
+                    self:SetupNewFactory(unit, 'SeaT1')
+                    elseif EntityCategoryContains(categories.TECH2, unit) then
+                    self:SetupNewFactory(unit, 'SeaT2')
+                    else
+                    ---Here is where AirCraft Carriers if MOBILE check in AIArchtypes is removed would be. You'd need to add a secondary category like CARRIER to stop
+                    ---That in the above check
+                    self:SetupNewFactory(unit, 'SeaT3')
+                end
             else
+                ---QGateways don't have LAND or other LAYER Categories 
                 self:SetupNewFactory(unit, 'Gate')
             end
             self.LocationActive = true
