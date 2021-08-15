@@ -124,7 +124,9 @@ Unit = Class(moho.unit_methods) {
             Jammer = {NotInitialized = true},
         }
 
+        --[[
         self.EventCallbacks = {
+
             OnKilled = {},
             OnUnitBuilt = {},
             OnStartBuild = {},
@@ -151,6 +153,7 @@ Unit = Class(moho.unit_methods) {
             OnAttachedToTransport = {}, -- Returns self, transport, bone
             OnDetachedFromTransport = {}, -- Returns self, transport, bone
         }
+        ]]
     end,
 
     OnCreate = function(self)
@@ -521,25 +524,27 @@ Unit = Class(moho.unit_methods) {
     end,
 
     EnableSpecialToggle = function(self)
-        if self.EventCallbacks.SpecialToggleEnableFunction then
+        if self.EventCallbacks and self.EventCallbacks.SpecialToggleEnableFunction then
             self.EventCallbacks.SpecialToggleEnableFunction(self)
         end
     end,
 
     DisableSpecialToggle = function(self)
-        if self.EventCallbacks.SpecialToggleDisableFunction then
+        if self.EventCallbacks and self.EventCallbacks.SpecialToggleDisableFunction then
             self.EventCallbacks.SpecialToggleDisableFunction(self)
         end
     end,
 
     AddSpecialToggleEnable = function(self, fn)
         if fn then
+            if not self.EventCallbacks then self.EventCallbacks = {} end
             self.EventCallbacks.SpecialToggleEnableFunction = fn
         end
     end,
 
     AddSpecialToggleDisable = function(self, fn)
         if fn then
+            if not self.EventCallbacks then self.EventCallbacks = {} end
             self.EventCallbacks.SpecialToggleDisableFunction = fn
         end
     end,
@@ -772,7 +777,7 @@ Unit = Class(moho.unit_methods) {
 
             self:DoUnitCallbacks('OnCaptured', captor)
             local newUnitCallbacks = {}
-            if self.EventCallbacks.OnCapturedNewUnit then
+            if self.EventCallbacks and self.EventCallbacks.OnCapturedNewUnit then
                 newUnitCallbacks = self.EventCallbacks.OnCapturedNewUnit
             end
 
@@ -3747,11 +3752,15 @@ Unit = Class(moho.unit_methods) {
             error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
             return
         end
+
+        if not self.EventCallbacks then self.EventCallbacks = {} end
+        if not self.EventCallbacks[type] then self.EventCallbacks[type] = {} end
+
         table.insert(self.EventCallbacks[type], fn)
     end,
 
     DoUnitCallbacks = function(self, type, param)
-        if self.EventCallbacks[type] then
+        if self.EventCallbacks and self.EventCallbacks[type] then
             for num, cb in self.EventCallbacks[type] do
                 cb(self, param)
             end
@@ -3790,10 +3799,12 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnUnitBuiltCallback = function(self, fn, category)
-        table.insert(self.EventCallbacks['OnUnitBuilt'], {category=category, cb=fn})
+        AddUnitCallback({category=category, cb=fn}, 'OnUnitBuilt')
     end,
 
     DoOnUnitBuiltCallbacks = function(self, unit)
+        if not self.EventCallbacks or not self.EventCallbacks['OnUnitBuild'] then return end
+
         for _, v in self.EventCallbacks['OnUnitBuilt'] or {} do
             if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
                 v.cb(self, unit)
@@ -3810,7 +3821,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     RemoveCallback = function(self, fn)
-        for k, v in self.EventCallbacks do
+        for k, v in self.EventCallbacks or {} do
             if type(v) == "table" then
                 for kcb, vcb in v do
                     if vcb == fn then
@@ -3828,11 +3839,13 @@ Unit = Class(moho.unit_methods) {
         end
         local num = amount or -1
         repeatNum = repeatNum or 1
-        table.insert(self.EventCallbacks.OnDamaged, {Func = fn, Amount=num, Called=0, Repeat = repeatNum})
+
+
+        AddUnitCallback({Func = fn, Amount=num, Called=0, Repeat = repeatNum}, 'OnDamaged')
     end,
 
     DoOnDamagedCallbacks = function(self, instigator)
-        if self.EventCallbacks.OnDamaged then
+        if self.EventCallbacks and self.EventCallbacks.OnDamaged then
             for num, callback in self.EventCallbacks.OnDamaged do
                 if (callback.Called < callback.Repeat or callback.Repeat == -1) and (callback.Amount == -1 or (1 - self:GetHealthPercent() > callback.Amount)) then
                     callback.Called = callback.Called + 1

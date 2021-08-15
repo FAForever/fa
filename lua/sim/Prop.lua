@@ -19,10 +19,12 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnCreate = function(self)
+        --[[
         self.EventCallbacks = {
             OnKilled = {},
             OnReclaimed = {},
         }
+        ]]
         Entity.OnCreate(self)
         self.Trash = TrashBag()
         local bp = self:GetBlueprint()
@@ -61,11 +63,15 @@ Prop = Class(moho.prop_methods, Entity) {
             error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
             return
         end
+
+        if not self.EventCallbacks then self.EventCallbacks = {[type] = {}}
+        elseif not self.EventCallbacks[type] then self.EventCallbacks[type] = {} end
+
         table.insert(self.EventCallbacks[type], fn)
     end,
 
     DoPropCallbacks = function(self, type, param)
-        if self.EventCallbacks[type] then
+        if self.EventCallbacks and self.EventCallbacks[type] then
             for num, cb in self.EventCallbacks[type] do
                 cb(self, param)
             end
@@ -73,6 +79,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     RemoveCallback = function(self, fn)
+        if not self.EventCallbacks then return end
         for k, v in self.EventCallbacks do
             if type(v) == "table" then
                 for kcb, vcb in v do
