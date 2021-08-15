@@ -547,3 +547,42 @@ AIOpts = {
         },
    },
 }
+
+netOpts = {
+    {
+        default = 1,
+        label = 'Net lag',
+        help = 'Set the command delay for the game',
+        key = 'NetLag',
+        values = {
+            {
+                text = "500 ms",
+                help = "500 ms",
+                key = '500'
+            },
+            {
+                text = "Adaptive",
+                help = "Measures ping between players and set the net_lag accordingly",
+                key = 'adaptive'
+            }
+        }
+    },
+    {
+        default = 1,
+        label = 'Network settings',
+        help = 'Set the network limits of the game',
+        key = 'NetworkLimits',
+        values = {
+            {
+                text = "Standard",
+                help = "Standard network settings",
+                key = "default"
+            },
+            {
+                text = "Experimental",
+                help = "More aggressive networking",
+                key = "experimental"
+            }
+        }
+    }
+}

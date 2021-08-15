@@ -712,8 +712,9 @@ function RefreshOptions(skipRefresh)
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
         OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
         OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+        OptionSource[4] = {title = "<LOC uilobby_0004>Network Options", options = import('/lua/ui/lobby/lobbyOptions.lua').netOpts}
     end
-    OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+    OptionSource[5] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
 
     Options = {}
 
@@ -743,7 +744,7 @@ function RefreshOptions(skipRefresh)
     if not skipRefresh then
         -- Remove all info about advancedOptions in changedOptions
         -- So we have a clean slate regarding the advanced options each map switch
-        for _,optionData in OptionSource[4].options do
+        for _,optionData in OptionSource[5].options do
             changedOptions[optionData.key] = nil
         end
 
@@ -860,7 +861,7 @@ function SetupOptionsPanel(parent, curOptions)
                     return true
                 end
                 -- otherwise, don't use saved data for advanced options
-                local advancedOptions = OptionSource[4].options
+                local advancedOptions = OptionSource[5].options
                 for _,option in advancedOptions do
                     if option.key == data.key then
                         return false

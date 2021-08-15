@@ -45,6 +45,7 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
+
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
@@ -79,6 +80,7 @@ end
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
+local netOpts = import('/lua/ui/lobby/lobbyOptions.lua').netOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
@@ -622,7 +624,6 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
     local Prefs = import('/lua/user/prefs.lua')
     local windowed = Prefs.GetFromCurrentProfile('WindowedLobby') or 'false'
     SetWindowedLobby(windowed == 'true')
-
 end
 
 -- A map from message types to functions that process particular message types.
@@ -2067,6 +2068,10 @@ local function TryLaunch(skipNoObserversCheck)
 
         HostUtils.SendArmySettingsToServer()
 
+        if not singlePlayer then
+            import('/lua/ui/netlag.lua').UpdateNetworkSettings(gameInfo.GameOptions)
+        end
+
         -- Tell everyone else to launch and then launch ourselves.
         -- TODO: Sending gamedata here isn't necessary unless lobbyComm is fucking stupid and allows
         -- out-of-order message delivery.
@@ -2083,6 +2088,7 @@ local function TryLaunch(skipNoObserversCheck)
 
         PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
         SetPreference('PreGameData',PreGameData)
+
         lobbyComm:LaunchGame(gameInfo)
     end
 
@@ -2333,6 +2339,10 @@ local OptionUtils = {
         end
 
         for index, option in AIOpts do
+            options[option.key] = option.values[option.default].key or option.values[option.default]
+        end
+
+        for index, option in netOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
 
@@ -3668,6 +3678,8 @@ function CreateUI(maxPlayers)
     -- get ping times
     GUI.pingThread = ForkThread(
     function()
+        local NetLag = import('/lua/ui/netlag.lua')
+
         while lobbyComm do
             for slot, player in gameInfo.PlayerOptions:pairs() do
                 if player.Human and player.OwnerID ~= localPlayerID then
@@ -3691,6 +3703,10 @@ function CreateUI(maxPlayers)
                     end
                 end
             end
+
+            local peers = lobbyComm:GetPeers()
+            NetLag.UpdateClientPings(peers)
+
             WaitSeconds(1)
         end
     end)
@@ -3799,6 +3815,7 @@ function RefreshOptionDisplayData(scenarioInfo)
     local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
     local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
+    local netOpts = import('/lua/ui/lobby/lobbyOptions.lua').netOpts
     if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     end
@@ -3921,6 +3938,7 @@ function RefreshOptionDisplayData(scenarioInfo)
     addOptionsFrom(globalOpts)
     addOptionsFrom(teamOptions)
     addOptionsFrom(AIOpts)
+    addOptionsFrom(netOpts)
 
     -- Add options from the scenario object, if any are provided.
     if scenarioInfo.options then
@@ -4694,7 +4712,9 @@ local MessageHandlers = {
                 end
              end
 
+            import('/lua/ui/netlag.lua').UpdateNetworkSettings(info.GameOptions)
             SavePresetToName(LAST_GAME_PRESET_NAME)
+
             lobbyComm:LaunchGame(info)
         end
     },
@@ -4885,6 +4905,11 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
         for index, option in AIOpts do
             setOptionsFromPref(option)
         end
+
+        for index, option in netOpts do
+            setOptionsFromPref(option)
+        end
+
 
         -- The key, LastScenario, is referred to from GPG code we don't hook.
         if not self.desiredScenario or self.desiredScenario == "" then
