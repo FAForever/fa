@@ -1,8 +1,5 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 27, --MaxRadius of the dummy gun instead of 
-        -- the radar range because no point to aggro on units outside the
-        -- shooting range as the gun isn't real
     },
     Audio = {
         AmbientMove = Sound {
@@ -196,7 +193,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 25, -- Tweaked so it stops a bit behind mantis using GuardScanRadius
+            MaxRadius = 19,
             RateOfFire = 0.1,
             ReTargetOnMiss = false,
             TargetCheckInterval = 0.1,
