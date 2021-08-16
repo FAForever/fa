@@ -154,6 +154,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCreate = function(self)
+
+        LOG("Creating!")
+
         Entity.OnCreate(self)
         -- Turn off land bones if this unit has them.
         self:HideLandBones()
@@ -3064,7 +3067,17 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- LAYER EVENTS
     -------------------------------------------------------------------------------------------
+
     OnLayerChange = function(self, new, old)
+
+        -- This function is called when:
+        -- - A unit changes layer (heh)
+        -- - For all units part of a transport, when the transport changes layer (e.g., land units can become 'Air')
+        -- - When a jet lands, it changes to land (from Air)
+
+        -- Store latest layer for performance, preventing :GetCurrentLayer() engine calls.
+        self.Layer = new 
+
         -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
