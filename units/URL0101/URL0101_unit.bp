@@ -1,6 +1,4 @@
 UnitBlueprint {
-    AI = {
-    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'URL',
@@ -109,7 +107,7 @@ UnitBlueprint {
         BuildCostEnergy = 80,
         BuildCostMass = 8,
         BuildTime = 80,
-        MaintenanceConsumptionPerSecondEnergy = 5,
+        MaintenanceConsumptionPerSecondEnergy = 1,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -193,7 +191,7 @@ UnitBlueprint {
                 Land = 'Land|Water',
                 Water = 'Land|Water',
             },
-            MaxRadius = 19,
+            MaxRadius = 20,
             RateOfFire = 0.1,
             ReTargetOnMiss = false,
             TargetCheckInterval = 0.1,
