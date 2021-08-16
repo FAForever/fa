@@ -54,7 +54,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         self.EffectsBag = {}
         self.AmbientExhaustEffectsBag = {}
-        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.EffectsBag)
+        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
 

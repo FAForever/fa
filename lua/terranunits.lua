@@ -673,7 +673,7 @@ TPodTowerUnit = Class(TStructureUnit) {
             TStructureUnit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
             self.AnimatorUpgradeManip:Destroy()
-            if self:GetCurrentLayer() == 'Water' then
+            if self.Layer == 'Water' then
                 self:StartRocking()
             end
             self:PlayUnitSound('UpgradeFailed')

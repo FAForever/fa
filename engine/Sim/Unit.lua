@@ -130,7 +130,8 @@ end
 function Unit:GetConsumptionPerSecondMass()
 end
 
---- Return the name of the layer the unit is currently in.
+--- Return the name of the layer the unit is currently in. This value is cached inside
+-- unit.Layer each time a layer changes (when OnLayerChanged is called).
 -- @return layer String, name of the layer, types: 'Air','Land', 'Orbital', 'Seabed', 'Sub', 'Water'.
 function Unit:GetCurrentLayer()
 end
