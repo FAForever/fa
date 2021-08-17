@@ -1562,7 +1562,6 @@ Unit = Class(moho.unit_methods) {
             end
             if animBlock.Animation and (self:ShallSink() or not EntityCategoryContains(categories.NAVAL, self)) then
                 local sinkAnim = CreateAnimator(self)
-                self:StopRocking()
                 self.DeathAnimManip = sinkAnim
                 sinkAnim:PlayAnim(animBlock.Animation)
                 rate = rate or 1
@@ -2178,7 +2177,6 @@ Unit = Class(moho.unit_methods) {
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self.Layer == 'Water' then
-            self:StartRocking()
             local surfaceAnim = bp.Display.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
                 self.SurfaceAnimator = CreateAnimator(self)
@@ -3145,18 +3143,12 @@ Unit = Class(moho.unit_methods) {
                 self:PlayUnitAmbientSound('AmbientMove')
             end
 
-            self:StopRocking()
         end
 
         if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StopMove' .. layer) then
                 self:PlayUnitSound('StopMove')
-            end
-
-            -- Units in the water will rock back and forth a bit
-            if layer == 'Water' then
-                self:StartRocking()
             end
         end
 
@@ -4245,45 +4237,72 @@ Unit = Class(moho.unit_methods) {
     -- ROCKING
     -------------------------------------------------------------------------------------------
     -- Causes units to rock from side to side on water
+
+    --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
     StartRocking = function(self)
-        KillThread(self.StopRockThread)
-        self.StartRockThread = self:ForkThread(self.RockingThread)
+        local bp = self:GetBlueprint().Display
+        local speed = bp.MaxRockSpeed
+        if (not self.RockManip) and (not self.Dead) and speed and speed > 0 then 
+
+            -- clear it so that GC can take it, if it exists
+            if self.StopRockThread then 
+                KillThread(self.StopRockThread)
+                self.StopRockThread = nil 
+            end
+
+            self.StartRockThread = self:ForkThread(self.RockingThread, speed)
+        end
     end,
 
+    --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
     StopRocking = function(self)
         if self.StartRockThread then
+            -- clear it so that GC can take it
             KillThread(self.StartRockThread)
-            self.StopRockThread = self:ForkThread(self.EndRockingThread)
+            self.StartRockThread = nil
+
+            local bp = self:GetBlueprint().Display
+            local speed = bp.MaxRockSpeed
+
+            self.StopRockThread = self:ForkThread(self.EndRockingThread, speed)
         end
     end,
 
-    RockingThread = function(self)
-        local bp = self:GetBlueprint().Display
-        if not self.RockManip and not self.Dead and bp.MaxRockSpeed and bp.MaxRockSpeed > 0 then
-            self.RockManip = CreateRotator(self, 0, 'z', nil, 0, (bp.MaxRockSpeed or 1.5) / 5, (bp.MaxRockSpeed or 1.5) * 3 / 5)
-            self.Trash:Add(self.RockManip)
-            self.RockManip:SetPrecedence(0)
+    --- Rocking thread to move a unit when it is on the water.
+    RockingThread = function(self, speed)
+        -- default value
+        speed = speed or 1.5
 
-            while true do
-                WaitFor(self.RockManip)
+        self.RockManip = CreateRotator(self, 0, 'z', nil, 0, speed * 0.2, speed * 0.6)
+        self.Trash:Add(self.RockManip)
+        self.RockManip:SetPrecedence(0)
 
-                if self.Dead then break end -- Abort if the unit died
+        while true do
+            WaitFor(self.RockManip)
 
-                self.RockManip:SetTargetSpeed(- bp.MaxRockSpeed or 1.5)
-                WaitFor(self.RockManip)
+            if self.Dead then break end -- Abort if the unit died
 
-                if self.Dead then break end -- Abort if the unit died
+            self.RockManip:SetTargetSpeed(-speed) 
+            WaitFor(self.RockManip)
 
-                self.RockManip:SetTargetSpeed(bp.MaxRockSpeed or 1.5)
-            end
+            if self.Dead then break end -- Abort if the unit died
+
+            self.RockManip:SetTargetSpeed(speed)
         end
     end,
 
-    EndRockingThread = function(self)
-        local bp = self:GetBlueprint().Display
+    --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
+    -- warping to the original position.
+    EndRockingThread = function(self, speed)
         if self.RockManip then
+
+            -- default value
+            speed = speed or 1.5
+
             self.RockManip:SetGoal(0)
-            self.RockManip:SetSpeed((bp.MaxRockSpeed or 1.5) / 4)
+            self.RockManip:SetSpeed(speed / 4)
             WaitFor(self.RockManip)
 
             if self.RockManip then

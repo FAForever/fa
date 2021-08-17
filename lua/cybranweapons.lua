@@ -391,6 +391,51 @@ CAMZapperWeapon02 = Class(DefaultBeamWeapon) {
     FxMuzzleFlash = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',},
 }
 
+CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
+
+    BeamType = CollisionBeamFile.ZapperCollisionBeam,
+    FxMuzzleFlash = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',},
+
+    SphereEffectIdleMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere01_mesh',
+    SphereEffectActiveMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere02_mesh',
+    SphereEffectBp = '/effects/emitters/zapper_electricity_01_emit.bp',
+    SphereEffectBone = 'Turret_Muzzle',
+
+    OnCreate = function(self)
+        DefaultBeamWeapon.OnCreate(self)
+
+        local bp = self:GetBlueprint()
+        self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
+        self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
+        self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
+        self.SphereEffectEntity:SetDrawScale(0.28)
+        self.SphereEffectEntity:SetVizToAllies('Intel')
+        self.SphereEffectEntity:SetVizToNeutrals('Intel')
+        self.SphereEffectEntity:SetVizToEnemies('Intel')
+
+        local emit = CreateAttachedEmitter(self.unit, bp.RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
+
+        self.unit.Trash:Add(self.SphereEffectEntity)
+        self.unit.Trash:Add(emit)
+    end,
+
+    IdleState = State (DefaultBeamWeapon.IdleState) {
+        Main = function(self)
+            DefaultBeamWeapon.IdleState.Main(self)
+        end,
+
+        OnGotTarget = function(self)
+            DefaultBeamWeapon.IdleState.OnGotTarget(self)
+            self.SphereEffectEntity:SetMesh(self.SphereEffectActiveMesh)
+        end,
+    },
+
+    OnLostTarget = function(self)
+        DefaultBeamWeapon.OnLostTarget(self)
+        self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
+    end,
+}
+
 CCannonMolecularWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.CMolecularRipperFlash01,
 }

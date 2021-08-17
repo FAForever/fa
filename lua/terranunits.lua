@@ -673,9 +673,6 @@ TPodTowerUnit = Class(TStructureUnit) {
             TStructureUnit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
             self.AnimatorUpgradeManip:Destroy()
-            if self.Layer == 'Water' then
-                self:StartRocking()
-            end
             self:PlayUnitSound('UpgradeFailed')
             self:PlayActiveAnimation()
             self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
