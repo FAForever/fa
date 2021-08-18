@@ -176,7 +176,7 @@ UnitBlueprint {
                 helpText = 'drone_station',
             },
         },
-        SelectionPriority = 6,
+        SelectionPriority = 3,
         TechLevel = 'RULEUTL_Basic',
         UnitName = '<LOC xea3204_name>C-D2 "Rover-2"',
         UnitWeight = 1,
