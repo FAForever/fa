@@ -43,16 +43,16 @@ UnitBlueprint {
         Mesh = {
             LODs = {
                 {
-                    AlbedoName = '/Units/URA0001/URA0001_Albedo.dds',
+                    AlbedoName = '/Units/URA0004/URA0004_Albedo.dds',
                     LODCutoff = 200,
-                    MeshName = '/Units/URA0001/URA0001_LOD0.scm',
-                    NormalsName = '/UNITS/URA0001/URA0001_NormalsTS.dds',
+                    MeshName = '/Units/URA0004/URA0004_LOD0.scm',
+                    NormalsName = '/UNITS/URA0004/URA0004_NormalsTS.dds',
                     ShaderName = 'Insect',
-                    SpecularName = '/Units/URA0001/URA0001_SpecTeam.dds',
+                    SpecularName = '/Units/URA0004/URA0004_SpecTeam.dds',
                 },
             },
         },
-        PlaceholderMeshName = 'URA0001',
+        PlaceholderMeshName = 'URA0004',
         SpawnRandomRotation = true,
         UniformScale = 0.12,
     },
