@@ -1,0 +1,205 @@
+
+-- imports for functionality
+local Entity = import('/lua/sim/Entity.lua').Entity
+local EffectTemplate = import('/lua/EffectTemplates.lua')
+
+-- globals as upvalues for performance
+local Warp = Warp
+local Vector = Vector
+local CreateUnit = CreateUnit
+local KillThread = KillThread 
+local setmetatable = setmetatable
+local WaitTicks = coroutine.yield
+
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+
+local IssueClearCommands = IssueClearCommands
+local IssueGuard = IssueGuard
+
+-- moho functions as upvalues for performance
+local EntityGetPosition = moho.entity_methods.GetPosition
+local EntityBeenDestroyed = moho.entity_methods.BeenDestroyed
+local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
+local EntityGetOrientation = moho.entity_methods.GetOrientation
+
+local UnitRevertElevation = moho.unit_methods.RevertElevation
+
+-- math functions as upvalues for performance
+local MathPi = math.pi
+local MathSin = math.sin 
+local MathCos = math.cos
+
+-- upvalued trashbag functions for performance
+local TrashBag = _G.TrashBag
+local TrashBagAdd = TrashBag.Add
+
+--- Creates the build drones for the (cybran) builder in question. Expects  
+-- the builder.BuildBotTotal value to be set.
+-- @param builder A cybran builder such as an engineer, hive or commander.
+-- @param botBlueprint The blueprint to use for the bot.
+function CreateCybranEngineerBuildDrones(builder, botBlueprint)
+
+    botBlueprint = botBlueprint or 'ura0001'
+
+    -- kill potential return thread
+    if builder.ReturnBotsThreadInstance then 
+        KillThread(builder.ReturnBotsThreadInstance)
+        builder.ReturnBotsThreadInstance = nil
+    end
+
+    -- initialisation block
+    -- if there have been no bots before then prepare data to have bots
+    local bots = builder.BuildBots
+    if not bots then 
+        builder.BuildBotsNext = 1
+        builder.BuildBots = { }
+
+        -- make it weak so that the garbage collection can clean up the table when the unit is destroyed
+        setmetatable(builder.BuildBots, { __mode = "v" })
+
+        bots = builder.BuildBots
+    end
+
+    -- -- prevent capturing of units 
+    -- local unitBeingBuiltArmy = unitBeingBuilt.Army or nil
+    -- if not (builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) ) then     -- TODO: why is there an IsHumanUnit check?
+    --     return
+    -- end
+
+    -- get information about the builder
+    local x, y, z = EntityGetPositionXYZ(builder)
+    local q = EntityGetOrientation(builder)
+    local qx, qy, qz, qw = q[1], q[2], q[3], q[4]
+
+    -- prepare information required to make bots
+    local angleInitial = 180
+    local VecMul = 0.5
+    local xVec = 0
+    local yVec = 0.1
+    local zVec = 0
+    local angle = (2 * MathPi) / builder.BuildBotTotal
+
+    -- go over all the bots and see which ones we're missing
+    local builderArmy = builder.Army
+    for k = 1, builder.BuildBotTotal do 
+
+        -- check if the bot stil exists
+        local bot = bots[k]
+        if not bot or EntityBeenDestroyed(bot) then 
+
+            -- get a random direction for the bot
+            xVec = MathSin(angleInitial + (k * angle)) * VecMul
+            zVec = MathCos(angleInitial + (k * angle)) * VecMul
+
+            -- make the bot
+            bot = CreateUnit(botBlueprint, builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air')
+
+            -- make build bots unkillable
+            bot.SpawnedBy = builder
+
+            -- store the bot
+            bots[k] = bot 
+            builder.BuildBotsNext = builder.BuildBotsNext + 1
+        end
+    end
+
+    -- make the drones focus
+    local focus = builder:GetFocusUnit()
+    for k = 1, builder.BuildBotTotal do 
+        -- make the drones guard / assist it
+        local bot = bots[k]
+        UnitRevertElevation(bot)
+        IssueClearCommands(bots)
+        IssueGuard(bots, focus)
+    end
+end
+
+-- add as upvalue for performance for CreateCybranEngineerBuildBeams
+local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
+local CybranBuildSparks01 = EffectTemplate.CybranBuildSparks01
+local CybranBuildFlash01 = EffectTemplate.CybranBuildFlash01
+
+--- A cybran engineer will share the 'welding point' with its bots.
+function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, stationary)
+
+    -- delay slightly for dramatic effect
+    WaitTicks(2 + Random(1, 4))
+
+    -- initialise   
+    local army = builder.Army
+    local trash = builder.Trash 
+    local origin = EntityGetPosition(unitBeingBuilt)
+
+    -- create beam entities and their emiters
+    local beamEndBuilder
+
+    -- hives do not have beams from builders
+    if not stationary then 
+        beamEndBuilder = builder.BeamEndBuilder or Entity()
+        builder.BeamEndBuilder = beamEndBuilder
+        Warp(beamEndBuilder, origin)
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, CybranBuildSparks01))
+        TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, CybranBuildFlash01))
+        TrashBagAdd(trash, beamEndBuilder)
+    end
+
+    local beamEndBots = builder.BeamEndBots or Entity()
+    builder.BeamEndBots = beamEndBots
+    Warp(beamEndBots, origin)
+    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBots, army, CybranBuildSparks01))
+    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBots, army, CybranBuildFlash01))
+    TrashBagAdd(trash, beamEndBots)
+
+    -- create a beam from each build effect bone of the builder
+    if not stationary then 
+        if builder.BuildEffectBones then 
+            for k, bone in builder.BuildEffectBones do 
+                TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, bone, beamEndBuilder, -1, army, BeamBuildEmtBp))
+            end
+        end
+    end
+
+    -- create a beam from each bot of the builder
+    if bots then 
+        for k, bot in bots do 
+            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(bot, "Muzzle_01", beamEndBots, -1, army, BeamBuildEmtBp))
+        end
+    end
+
+    -- make the end entity move around
+    local ox, oy, oz = origin[1], origin[2], origin[3]
+    local RandomOffset = builder.GetRandomOffset
+    while not (builder.Dead or unitBeingBuilt.Dead) do
+
+        -- skip a few ticks to make the effect work better
+        WaitTicks(0.3)
+
+        -- get a new location for both
+        if not stationary then 
+            local x, y, z = RandomOffset(unitBeingBuilt, 1)
+            Warp(beamEndBuilder, Vector(ox + x, oy + y, oz + z))
+        end
+
+        local x, y, z = RandomOffset(unitBeingBuilt, 1)
+        Warp(beamEndBots, Vector(ox + x, oy + y, oz + z))
+    end
+end
+
+--- Creates tracker beams between the builder and its build bots. The
+-- bots keep the tracker in their trashbag.
+-- @param builder The builder / tracking entity of the build bots.
+-- @param buildBones The bones to use as the origin of the beams.
+-- @param buildBots The build bots that we're tracking.
+-- @param total The number of build bots / bones. The 1st bone will track the 1st bot, etc.
+function CreateCybranBuildBotTrackers(builder, buildBones, buildBots, total)
+    local army = builder.Army
+    for k = 1, total do 
+        local bone = buildBones[k]
+        local bot = buildBots[k]
+        if bone and bot and not bot.Tracked then 
+            bot.Tracked = true
+            TrashBagAdd(bot.Trash, AttachBeamEntityToEntity(builder, bone, bot, -1, army, '/effects/emitters/build_beam_03_emit.bp'))
+        end
+    end
+end
