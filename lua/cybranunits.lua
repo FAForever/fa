@@ -27,14 +27,42 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local CreateCybranBuildBeams = false
 
+-- upvalued effect utility functions for performance
+local CreateCybranEngineerBuildDrones = EffectUtil.CreateCybranEngineerBuildDrones
+local CreateCybranBuildBotTrackers = EffectUtil.CreateCybranBuildBotTrackers
+local CreateCybranEngineerBuildBeams = EffectUtil.CreateCybranEngineerBuildBeams
+
+-- upvalued globals for performance
+local Random = Random
+local VDist2Sq = VDist2Sq
+local KillThread = KillThread
+local ForkThread = ForkThread
 local WaitTicks = coroutine.yield
 
+local IssueMove = IssueMove
+local IssueClearCommands = IssueClearCommands
+
+-- upvalued moho functions for performance
+local EntityFunctions = _G.moho.entity_methods 
+local EntityDestroy = EntityFunctions.Destroy
+local EntityGetPositionXYZ = EntityFunctions.GetPositionXYZ
+EntityFunctions = nil
+
+local UnitFunctions = _G.moho.unit_methods 
+local UnitSetConsumptionActive = UnitFunctions.SetConsumptionActive
+UnitFunctions = nil 
+
+-- upvalued trashbag functions for performance
+local TrashBag = _G.TrashBag
+local TrashBagAdd = TrashBag.Add
+
+--- A class to managing the build bots. Make sure to call all the relevant functions.
 CConstructionTemplate = Class() {
 
     --- Prepares the values required to support bots
     OnCreate = function(self)
         -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
+        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
     end,
 
     --- When dying, destroy everything.
@@ -49,8 +77,11 @@ CConstructionTemplate = Class() {
                 local buildBotCount = self.BuildBotsNext - 1
                 if buildBotCount > 0 then 
                     -- return the active bots
-                    self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                    self.Trash:Add(self.ReturnBotsThreadInstance)
+                    local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                    TrashBagAdd(self.Trash, returnBotsThreadInstance)
+
+                    -- save thread so that we can kill it if the bots suddenly get an additional task.
+                    self.ReturnBotsThreadInstance = returnBotsThreadInstance
                 end
             end
         end
@@ -69,8 +100,11 @@ CConstructionTemplate = Class() {
                 local buildBotCount = self.BuildBotsNext - 1
                 if buildBotCount > 0 then 
                     -- return the active bots
-                    self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                    self.Trash:Add(self.ReturnBotsThreadInstance)
+                    local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                    TrashBagAdd(self.Trash, returnBotsThreadInstance)
+
+                    -- save thread so that we can kill it if the bots suddenly get an additional task.
+                    self.ReturnBotsThreadInstance = returnBotsThreadInstance
                 end
             end
         end
@@ -85,27 +119,36 @@ CConstructionTemplate = Class() {
         if not self.ReturnBotsThreadInstance then 
             -- check if we have bots
             local bots = self.BuildBots 
-            if bots and self.BuildBotsNext > 1 then
-                -- return the active bots
-                self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, delay)
-                self.Trash:Add(self.ReturnBotsThreadInstance)
+            if bots then
+
+                local buildBotCount = self.BuildBotsNext - 1
+                if buildBotCount > 0 then
+                    -- return the active bots
+                    local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                    TrashBagAdd(self.Trash, returnBotsThreadInstance)
+
+                    -- save thread so that we can kill it if the bots suddenly get an additional task.
+                    self.ReturnBotsThreadInstance = returnBotsThreadInstance
+                end
             end
         end
     end,
 
     --- When making build effects, try and make the bots.
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
-        EffectUtil.CreateCybranEngineerBuildDrones(self)
+        CreateCybranEngineerBuildDrones(self)
         if stationary then 
-            EffectUtil.CreateCybranBuildBotTrackers(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+            CreateCybranBuildBotTrackers(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
         end
-        EffectUtil.CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
+        CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
     end,
 
     --- When destroyed, destroy the bots too.
     OnDestroy = function(self) 
         -- destroy bots if we have them
         if self.BuildBotsNext > 1 then 
+
+            -- doesn't need to trashbag: threads that are not infinite and stop get found by the garbage collector
             ForkThread(self.DestroyBotsThread, self, self.BuildBots, self.BuildBotTotal)
         end
     end,
@@ -126,7 +169,7 @@ CConstructionTemplate = Class() {
         for k = 1, count do 
             local bot = bots[k]
             if bot and not bot.Dead then
-                WaitTicks(Random(1, 10))
+                WaitTicks(Random(1, 10) + 1)
                 if bot and not bot.Dead then
                     bot:Kill()
                 end
@@ -164,20 +207,20 @@ CConstructionTemplate = Class() {
 
             -- check if they're there yet
             for l = 1, 4 do 
-                WaitSeconds(0.2)
+                WaitTicks(3)
 
-                local tx, ty, tz = self:GetPositionXYZ()
+                local tx, ty, tz = EntityGetPositionXYZ(self)
                 for k = 1, buildBotTotal do 
                     local bot = bots[k]
                     if bot and not bot.Dead then
-                        local bx, by, bz = bot:GetPositionXYZ()
+                        local bx, by, bz = EntityGetPositionXYZ(bot)
                         local distance = VDist2Sq(tx, tz, bx, bz)
 
                         -- if close enough, just remove it
                         threshold = threshold + 0.1
                         if distance < threshold then 
-                            -- destroy bot
-                            bot:Destroy()
+                            -- destroy bot without effects
+                            EntityDestroy(bot)
 
                             -- move destroyed bots up
                             for m = k, buildBotTotal do 
@@ -196,11 +239,115 @@ CConstructionTemplate = Class() {
     end,
 }
 
+--- The build bot class for drones. It removes a lot of
+-- the basic functionality of a unit to save on performance.
+CBuildBotUnit = Class(AirUnit) {
+
+    -- Keep track of the builder that made the bot
+    SpawnedBy = false,
+
+    -- do not perform the logic of these functions                      
+    OnMotionHorzEventChange = function(self, new, old) end,                     -- called a million times, keep it simple
+    OnMotionVertEventChange = function(self, new, old) end,                 
+    OnLayerChange = function(self, new, old) end,
+
+    CreateBuildEffects = function(self, unitBeingBuilt, order) end,             -- do not make build effects (engineer / builder takes care of that)
+    StartBuildingEffects = function(self, built, order) end,
+    CreateBuildEffects = function(self, built, order) end,
+    StopBuildingEffects = function(self, built) end,
+
+    OnBuildProgress = function(self, unit, oldProg, newProg) end,               -- do not keep track of progress
+    OnStopBuild = function(self, unitBeingBuilt) end,
+
+    EnableUnitIntel = function(self, disabler, intel) end,                      -- do not bother doing intel
+    DisableUnitIntel = function(self, disabler, intel) end,
+    OnIntelEnabled = function(self) end,
+    OnIntelDisabled = function(self) end,
+    ShouldWatchIntel = function(self) end,
+    IntelWatchThread = function(self) end,
+
+    AddDetectedByHook = function(self, hook) end,                               -- do not bother keeping track of collision beams
+    RemoveDetectedByHook = function(self, hook) end,
+    OnDetectedBy = function(self, index) end,
+
+    CreateWreckage = function (self, overkillRatio) end,                        -- don't make wreckage
+    UpdateConsumptionValues = function(self) end,                               -- avoids junk in resource overlay
+    ShouldUseVetSystem = function(self) return false end,                       -- never use vet
+    OnStopBeingBuilt = function(self, builder, layer) end,                      -- do not perform this logic when being made
+    OnStartRepair = function(self, unit) end,                                   -- do not run this logic
+    OnKilled = function(self) end,                                              -- just fall out of the sky
+
+    OnCollisionCheck = function(self, other, firingWeapon) return false end,    -- we never collide
+    OnCollisionCheckWeapon = function(self, firingWeapon) return false end,
+
+    OnPrepareArmToBuild = function(self) end,
+
+    OnStartBuilderTracking = function(self) end,                                -- don't track anything
+    OnStopBuilderTracking = function(self) end,
+
+    DestroyUnit = function(self) end,                                           -- prevent misscalls
+    DestroyAllTrashBags = function(self) end,
+
+    OnStartSacrifice = function(self, target_unit) end,
+    OnStopSacrifice = function(self, target_unit) end,
+
+    -- only initialise what we need
+    OnPreCreate = function(self) 
+        self.Trash = TrashBag()
+    end,             
+
+    -- only initialise what we need
+    OnCreate = function(self)
+        -- prevent drone from consuming anything and remove collision shape
+        UnitSetConsumptionActive(self, false)
+    end,
+
+    -- short-cut when being destroyed
+    OnDestroy = function(self) 
+        self.Dead = true 
+        self.Trash:Destroy()
+        self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+    end,
+
+    Kill = function(self)
+        -- make it go boom
+        if self.PlayDestructionEffects then
+            self:CreateDestructionEffects(1.0)
+        end
+
+        self:Destroy()
+    end,
+
+    -- prevent this type of operations
+    OnStartCapture = function(self, target)
+        IssueStop({self}) -- You can't capture!
+    end,
+
+    OnStartReclaim = function(self, target)
+        IssueStop({self}) -- You can't reclaim!
+    end,
+
+    -- short cut - just get destroyed
+    OnImpact = function(self, with)
+
+        -- make it go boom
+        if self.PlayDestructionEffects then
+            self:CreateDestructionEffects(1.0)
+        end
+
+        -- make it sound boom
+        self:PlayUnitSound('Destroyed')
+
+        -- make it gone
+        self:Destroy()
+    end,
+}
+
 -- AIR FACTORY STRUCTURES
 CAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
-        WaitSeconds(0.1)
+        WaitTicks(2)
         EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
     end,
 
