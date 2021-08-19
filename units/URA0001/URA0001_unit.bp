@@ -16,8 +16,8 @@ UnitBlueprint {
         KTurn = 4,
         KTurnDamping = 2,
         LiftFactor = 7,
-        MaxAirspeed = 6,
-        MinAirspeed = 5,
+        MaxAirspeed = 8,
+        MinAirspeed = 8,
         StartTurnDistance = 5,
         Winged = false,
     },
@@ -41,10 +41,11 @@ UnitBlueprint {
     },
     Display = {
         Mesh = {
+            IconFadeInZoom = 2000,
             LODs = {
                 {
                     AlbedoName = '/Units/URA0001/URA0001_Albedo.dds',
-                    LODCutoff = 200,
+                    LODCutoff = 215,
                     MeshName = '/Units/URA0001/URA0001_LOD0.scm',
                     NormalsName = '/UNITS/URA0001/URA0001_NormalsTS.dds',
                     ShaderName = 'Insect',
@@ -54,16 +55,24 @@ UnitBlueprint {
         },
         PlaceholderMeshName = 'URA0001',
         SpawnRandomRotation = true,
-        UniformScale = 0.12,
+        UniformScale = 0.14,
     },
     Economy = {
-        BuildRate = 0.00001,
+        BuildCostEnergy = 0,
+        BuildCostMass = 0,
+        BuildRate = 0.0001,
+        BuildTime = 0,
+        BuildableCategory = {
+            'BUILTBYTIER1ENGINEER CYBRAN',
+        },
+        ConsumptionPerSecondEnergy = 0,
+        ConsumptionPerSecondMass = 0,
         MaxBuildDistance = 100,
     },
-
-    Intel = {
-        VisionRadius = 0,
-        WaterVisionRadius = 0,
+    Footprint = {
+        MaxSlope = 0.25,
+        SizeX = 1,
+        SizeZ = 1,
     },
     General = {
         CapCost = 0,
@@ -88,6 +97,9 @@ UnitBlueprint {
         SelectionPriority = 3,
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
+    },
+    Intel = {
+        VisionRadius = 0,
     },
     Physics = {
         BankingSlope = 0.5,
