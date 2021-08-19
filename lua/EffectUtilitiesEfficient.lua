@@ -120,7 +120,14 @@ local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
 local CybranBuildSparks01 = EffectTemplate.CybranBuildSparks01
 local CybranBuildFlash01 = EffectTemplate.CybranBuildFlash01
 
---- A cybran engineer will share the 'welding point' with its bots.
+--- Creates the beams and welding points of the builder and its bots. The
+-- bots share the welding point which each other, as does the builder with
+-- itself.
+-- @param builder A builder with builder.BuildEffectBones set. 
+-- @param bots The bots of the builder.
+-- @param unitBeingBuilt The unit that we're building.
+-- @param buildEffectsBag The bag that we use to store / trash all effects.
+-- @param stationary Whether or not the builder is a building.
 function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, stationary)
 
     -- delay slightly for dramatic effect

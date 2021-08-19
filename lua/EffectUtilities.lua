@@ -1881,3 +1881,31 @@ function DestroyRemainingTeleportChargingEffects(unit, EffectsBag)
         unit.TeleportCybranSphere:Destroy()
     end
 end
+
+--- Optimized functions --
+
+local EffectUtilitiesOpti = import('/lua/EffectUtilitiesEfficient.lua')
+
+--- Creates tracker beams between the builder and its build bots. The
+-- bots keep the tracker in their trashbag.
+-- @param builder The builder / tracking entity of the build bots.
+-- @param buildBones The bones to use as the origin of the beams.
+-- @param buildBots The build bots that we're tracking.
+-- @param total The number of build bots / bones. The 1st bone will track the 1st bot, etc.
+CreateCybranBuildBotTrackers = EffectUtilitiesOpti.CreateCybranBuildBotTrackers
+
+--- Creates the beams and welding points of the builder and its bots. The
+-- bots share the welding point which each other, as does the builder with
+-- itself.
+-- @param builder A builder with builder.BuildEffectBones set. 
+-- @param bots The bots of the builder.
+-- @param unitBeingBuilt The unit that we're building.
+-- @param buildEffectsBag The bag that we use to store / trash all effects.
+-- @param stationary Whether or not the builder is a building.
+CreateCybranEngineerBuildBeams = EffectUtilitiesOpti.CreateCybranEngineerBuildBeams
+
+--- Creates the build drones for the (cybran) builder in question. Expects  
+-- the builder.BuildBotTotal value to be set.
+-- @param builder A cybran builder such as an engineer, hive or commander.
+-- @param botBlueprint The blueprint to use for the bot.
+CreateCybranEngineerBuildDrones = EffectUtilitiesOpti.CreateCybranEngineerBuildDrones
