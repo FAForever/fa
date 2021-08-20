@@ -1,7 +1,7 @@
 
--- EngineCall: 146 ms
--- LuaCall: 54 ms
--- CachedCall: 8.5 ms
+-- EngineCall:  146 ms
+-- LuaCall:     54 ms
+-- CachedCall:  8.5 ms
 
 -- Performing engine calls are expensive and should be prevented in critical code. Calling getters
 -- or setters should also be prevented - it is better to just get the member variable directly instead.

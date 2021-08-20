@@ -1,10 +1,10 @@
 
--- ForGetn: 259 ms
--- ForPairs: 372 ms
--- Foreach: 370 ms
--- ForiPairs: 405 ms
+-- ForGetn:         259 ms
+-- ForPairs:        372 ms
+-- Foreach:         370 ms
+-- ForiPairs:       405 ms
 -- WhileGetNCached: 293 ms
--- WhileGetn: 8.14
+-- WhileGetn:       8140 ms
 
 -- Whenever table.insert is used for a table then you can use the cheaper
 -- looping structure. However, when typical hashes are involved this cheaper
@@ -15,7 +15,7 @@ local outerLoop = 100000
 -- prepare data
 local data = { }
 
-for k = 1, 100 do 
+for k = 1, 20 do 
     data[k] = k
 end
 

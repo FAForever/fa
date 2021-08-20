@@ -1,6 +1,4 @@
 
--- summary of the results
-
 -- Array01       = 0.00512
 -- Array02       = 0.00830
 -- Array04       = 0.01464
@@ -22,9 +20,7 @@
 -- elements in succession. This may be just the cacheline of the CPU, but we see a similar 
 -- behavior with the hashed part of a table.
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00512
+local loopCount = 1000000
 
 function Array01()
 
@@ -33,7 +29,7 @@ function Array01()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
         sum = sum + element[1]
         sum = sum + element[2]
         sum = sum + element[3]
@@ -45,10 +41,6 @@ function Array01()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00830
 
 function Array02()
 
@@ -57,7 +49,7 @@ function Array02()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
         sum = sum + element[1]
         sum = sum + element[2]
         sum = sum + element[3]
@@ -74,10 +66,6 @@ function Array02()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.01464
 
 function Array04()
 
@@ -86,7 +74,7 @@ function Array04()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
         sum = sum + element[1]
         sum = sum + element[2]
         sum = sum + element[3]
@@ -113,10 +101,6 @@ function Array04()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.02685
 
 function Array08()
 
@@ -125,7 +109,7 @@ function Array08()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
         sum = sum + element[1]
         sum = sum + element[2]
         sum = sum + element[3]
@@ -172,10 +156,6 @@ function Array08()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.0512
 
 function Array16()
 
@@ -184,7 +164,7 @@ function Array16()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
         sum = sum + element[1]
         sum = sum + element[2]
         sum = sum + element[3]
@@ -271,10 +251,6 @@ function Array16()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00341
 
 function ArrayCached01()
 
@@ -283,7 +259,7 @@ function ArrayCached01()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
 
         local el1 = element[1]
         local el2 = element[2]
@@ -301,10 +277,6 @@ function ArrayCached01()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00610
 
 function ArrayCached02()
 
@@ -313,7 +285,7 @@ function ArrayCached02()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
 
         local el1 = element[1]
         local el2 = element[2]
@@ -336,10 +308,6 @@ function ArrayCached02()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.008300
 
 function ArrayCached04()
 
@@ -348,7 +316,7 @@ function ArrayCached04()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
 
         local el1 = element[1]
         local el2 = element[2]
@@ -381,10 +349,6 @@ function ArrayCached04()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.012939
 
 function ArrayCached08()
 
@@ -393,7 +357,7 @@ function ArrayCached08()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
 
         local el1 = element[1]
         local el2 = element[2]
@@ -447,10 +411,6 @@ function ArrayCached08()
 
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.02099
-
 function ArrayCached16()
 
     local element = { 1, 2, 3, 4 }
@@ -458,7 +418,7 @@ function ArrayCached16()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     local sum = 0
-    for k = 1, 100000 do 
+    for k = 1, loopCount do 
 
         local el1 = element[1]
         local el2 = element[2]

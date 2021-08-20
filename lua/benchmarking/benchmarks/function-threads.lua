@@ -1,12 +1,16 @@
 
--- FunctionCall: 0.00332
--- ThreadCall: 0.12336
--- NoCall: 0.00054
+-- FunctionCall:    3.32 ms
+-- ThreadCall:      123.36 ms
+-- NoCall:          0.54 ms
 
 -- A disclaimer to these results is that the fork thread doesn't actually do the work, the call only 
 -- allocates a new thread and that starts doing the work after the current thread is finished. Therefore 
 -- the real work is not part of the benchmark. All that we are seeing here are the costs to launch 
 -- a new thread.
+
+-- A conclusion that we can draw here is that conditions that may terminate the thread before it starts
+-- doing work should be done before we initialize the thread, instead of at the start of it. This is 
+-- commonly done in unit.lua and we can optimize that for sure.
 
 function FunctionCall()
 

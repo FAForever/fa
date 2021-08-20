@@ -1,10 +1,15 @@
 
--- EngineCall: 146 ms
--- LuaCall: 54 ms
--- CachedCall: 8.5 ms
+-- Call1:   0.2828 ms
+-- Call2:   0.0532 ms
+-- Call3:   0.0856 ms
 
--- Performing engine calls are expensive and should be prevented in critical code. Calling getters
--- or setters should also be prevented - it is better to just get the member variable directly instead.
+-- Inline1: 0.2250 ms
+-- Inline2: 0.0107 ms
+-- Inline3: 0.0644 ms
+
+-- Conclusion: there is an overhead for performing a function call and this matters when the logic
+-- that is performed in the function is small. Call1 / Inline1 are from /lua/defaultexplosions.lua and
+-- call3 / inline3 are from /lua/utilities.lua.
 
 local outerLoop = 1000000
 
@@ -48,7 +53,7 @@ function Inline1()
     local size = false
     for k = 1, outerLoop do 
         local blueprint = unit:GetBlueprint()
-        local sx, sy, sz = blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ
+        local sx, sy, sz = blueprint.SizeX or 0, blueprint.SizeY or 0, blueprint.SizeZ or 0
         size = sx * sy * sz
     end
 

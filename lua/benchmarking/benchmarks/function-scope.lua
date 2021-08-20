@@ -1,27 +1,27 @@
 
--- GetPositionLocal01:      0.0185
--- GetPositionLocal02:      0.0371
--- GetPositionLocal04:      0.0683
--- GetPositionLocal08:      0.1347
--- GetPositionLocal16:      0.2626
+-- GetPositionLocal01:       18 ms
+-- GetPositionLocal02:       37 ms
+-- GetPositionLocal04:       68 ms
+-- GetPositionLocal08:      134 ms
+-- GetPositionLocal16:      262 ms
 
--- GetPositionUpvalue01:    0.0161
--- GetPositionUpvalue02:    0.0346
--- GetPositionUpvalue04:    0.0664
--- GetPositionUpvalue08:    0.1293
--- GetPositionUpvalue16:    0.2597
+-- GetPositionUpvalue01:     16 ms
+-- GetPositionUpvalue02:     34 ms
+-- GetPositionUpvalue04:     66 ms
+-- GetPositionUpvalue08:    129 ms
+-- GetPositionUpvalue16:    259 ms
 
--- GetPositionSelf01:       0.0180
--- GetPositionSelf02:       0.0375
--- GetPositionSelf04:       0.0722
--- GetPositionSelf08:       0.1416
--- GetPositionSelf16:       0.2797
+-- GetPositionSelf01:       018 ms
+-- GetPositionSelf02:       037 ms
+-- GetPositionSelf04:       072 ms
+-- GetPositionSelf08:       141 ms
+-- GetPositionSelf16:       279 ms
 
--- GetPositionSelfManual01: 0.0175
--- GetPositionSelfManual02: 0.0356
--- GetPositionSelfManual04: 0.0693
--- GetPositionSelfManual08: 0.1376
--- GetPositionSelfManual16: 0.2744
+-- GetPositionSelfManual01:  17 ms
+-- GetPositionSelfManual02:  35 ms
+-- GetPositionSelfManual04:  69 ms
+-- GetPositionSelfManual08: 137 ms
+-- GetPositionSelfManual16: 274 ms
 
 -- Using the self version of a function is the slowest approach. Having it as an upvalue 
 -- (and manually adding in the self) has a significant difference: a 10% improvement.

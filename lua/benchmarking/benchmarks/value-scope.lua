@@ -1,8 +1,13 @@
 
+-- AddGlobal:               2.29 ms
+-- AddUpval:                1.22 ms
+-- AddLocal:                0.63 ms
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00229492187
+-- CircleGlobal:            2391.11 ms
+-- CircleUpval:             2020.50 ms
+-- CircleLocal:             2042.96 ms
+-- CircleLocalPreCompute:   1985.35 ms
+-- CircleOptimal:           1288.08 ms
 
 local outerLoop = 10000000
 
@@ -28,10 +33,6 @@ local ProfilerA = ProfilerA
 local ProfilerB = ProfilerB
 local ProfilerC = ProfilerC
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time:  0.00122070312
-
 function AddUpval()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
@@ -45,9 +46,6 @@ function AddUpval()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00063476562
 
 function AddLocal()
 
@@ -64,10 +62,6 @@ function AddLocal()
 
     return final - start
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 2.39111328125
 
 -- in global scope
 function ComputePoint(center, radius, radians)
@@ -104,11 +98,6 @@ function CircleGlobal()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time 2.0205078125
-
--- in 'up value' scope
 local GetSurfaceHeight = GetSurfaceHeight
 local TableInsert = table.insert
 local MathCos = math.cos 
@@ -148,10 +137,6 @@ function CircleUpval()
 
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 2.04296875
-
 function CircleLocal()
 
     -- parameters
@@ -190,10 +175,6 @@ function CircleLocal()
 
     return final - start
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 1.9853515625
 
 function CircleLocalPreCompute()
 
@@ -236,10 +217,6 @@ function CircleLocalPreCompute()
 
     return final - start
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 1.2880859375 
 
 function CircleOptimal()
 
