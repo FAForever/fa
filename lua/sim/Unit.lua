@@ -155,6 +155,10 @@ Unit = Class(moho.unit_methods) {
 
     OnCreate = function(self)
         Entity.OnCreate(self)
+
+        -- cache commonly used values from the engine
+        -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
+
         -- Turn off land bones if this unit has them.
         self:HideLandBones()
 
@@ -1153,7 +1157,7 @@ Unit = Class(moho.unit_methods) {
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     OnKilled = function(self, instigator, type, overkillRatio)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         self.Dead = true
 
         -- Units killed while being invisible because they're teleporting should show when they're killed
@@ -1595,7 +1599,7 @@ Unit = Class(moho.unit_methods) {
         local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
 
         -- Reduce the mass value of submerged wrecks
         if layer == 'Water' or layer == 'Sub' then
@@ -1758,7 +1762,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ShallSink = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local shallSink = (
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
             not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
@@ -1969,7 +1973,7 @@ Unit = Class(moho.unit_methods) {
 
     HideLandBones = function(self)
         -- Hide the bones for buildings built on land
-        if self.LandBuiltHiddenBones and self:GetCurrentLayer() == 'Land' then
+        if self.LandBuiltHiddenBones and self.Layer == 'Land' then
             for _, v in self.LandBuiltHiddenBones do
                 if self:IsValidBone(v) then
                     self:HideBone(v, true)
@@ -2172,7 +2176,7 @@ Unit = Class(moho.unit_methods) {
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
-        if self:GetCurrentLayer() == 'Water' then
+        if self.Layer == 'Water' then
             local surfaceAnim = bp.Display.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
                 self.SurfaceAnimator = CreateAnimator(self)
@@ -3063,6 +3067,15 @@ Unit = Class(moho.unit_methods) {
     -- LAYER EVENTS
     -------------------------------------------------------------------------------------------
     OnLayerChange = function(self, new, old)
+
+        -- This function is called when:
+        -- - A unit changes layer (heh)
+        -- - For all units part of a transport, when the transport changes layer (e.g., land units can become 'Air')
+        -- - When a jet lands, it changes to land (from Air)
+
+        -- Store latest layer for performance, preventing .Layer engine calls.
+        self.Layer = new 
+
         -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
@@ -3109,7 +3122,7 @@ Unit = Class(moho.unit_methods) {
         if self.Dead then
             return
         end
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
 
         if old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed')) then
             -- Try the specialised sound, fall back to the general one.
@@ -3184,7 +3197,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Surfacing and sinking, landing and take off idle effects
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         if (new == 'Up' and old == 'Bottom') or (new == 'Down' and old == 'Top') then
             self:DestroyIdleEffects()
 
@@ -3231,7 +3244,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAnimCollision = function(self, bone, x, y, z)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpTable = self:GetBlueprint().Display.MovementEffects
 
         if bpTable[layer].Footfall then
@@ -3301,7 +3314,7 @@ Unit = Class(moho.unit_methods) {
             self:DestroyTopSpeedEffects()
         end
 
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpMTable = self:GetBlueprint().Display.MovementEffects
         if new == 'TopSpeed' and self.HasFuel then
             if bpMTable[layer].Contrails and self.ContrailEffects then
@@ -3379,7 +3392,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.empty(vTypeGroup.Bones))) then
-                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
+                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
             else
                 for kb, vBone in vTypeGroup.Bones do
                     for ke, vEffect in effects do
@@ -3397,7 +3410,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateIdleEffects = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpTable = self:GetBlueprint().Display.IdleEffects
         if bpTable[layer] and bpTable[layer].Effects then
             self:CreateTerrainTypeEffects(bpTable[layer].Effects, 'FXIdle',  layer, nil, self.IdleEffectsBag)
@@ -3405,7 +3418,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpTable = self:GetBlueprint().Display.MovementEffects
 
         if bpTable[layer] then
@@ -3443,7 +3456,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateMotionChangeEffects = function(self, new, old)
-        local key = self:GetCurrentLayer()..old..new
+        local key = self.Layer..old..new
         local bpTable = self:GetBlueprint().Display.MotionChangeEffects[key]
 
         if bpTable then
@@ -3456,7 +3469,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Clean up any camera shake going on.
         local bpTable = self:GetBlueprint().Display.MovementEffects
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         if self.CamShakeT1 then
             KillThread(self.CamShakeT1)
 
@@ -3897,7 +3910,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Exclude things currently flying around
             for _, target in targets or {} do
-                if target:GetCurrentLayer() ~= 'Air' then
+                if target.Layer ~= 'Air' then
                     target:SetStunned(buffTable.Duration or 1)
                 end
             end

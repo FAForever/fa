@@ -181,11 +181,11 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self.Dead = true
 
     local bp = self:GetBlueprint()
-    if self:GetCurrentLayer() == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
+    if self.Layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
         self:PlayUnitSound('HoverKilledOnWater')
     end
 
-    if self:GetCurrentLayer() == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
+    if self.Layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
         self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
     else
         self:PlayUnitSound('Killed')

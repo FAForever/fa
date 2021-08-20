@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Aeon T3 Sonar
 --#**
---#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
 local AIFQuasarAntiTorpedoWeapon = import('/lua/aeonweapons.lua').AIFQuasarAntiTorpedoWeapon
@@ -30,7 +30,7 @@ UAS0305 = Class(ASeaUnit) {
     end,
 
     TimedIdleSonarEffects = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then
