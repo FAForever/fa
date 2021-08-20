@@ -651,7 +651,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
     DeathState = State {
         Main = function(self)
             self:SetCanBeKilled(true)
-            if self:GetCurrentLayer() == 'Water' then
+            if self.Layer == 'Water' then
                 self:PlayUnitSound('HoverKilledOnWater')
             end
             self:PlayUnitSound('Destroyed')

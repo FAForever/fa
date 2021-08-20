@@ -51,7 +51,7 @@ StructureUnit = Class(Unit) {
         Unit.OnCreate(self)
         self.WeaponMod = {}
         self.FxBlinkingLightsBag = {}
-        if self:GetCurrentLayer() == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
+        if self.Layer == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
     end,
@@ -165,7 +165,7 @@ StructureUnit = Class(Unit) {
     end,
 
     CreateTarmac = function(self, albedo, normal, glow, orientation, specTarmac, lifeTime)
-        if self:GetCurrentLayer() ~= 'Land' then return end
+        if self.Layer ~= 'Land' then return end
         local tarmac
         local bp = self:GetBlueprint().Display.Tarmacs
         if not specTarmac then
@@ -1398,7 +1398,7 @@ RadarJammerUnit = Class(StructureUnit) {
         StructureUnit.OnIntelEnabled(self)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
-            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             self.IntelFxOn = true
         end
     end,
@@ -1425,7 +1425,7 @@ SonarUnit = Class(StructureUnit) {
     end,
 
     TimedIdleSonarEffects = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then
@@ -1545,7 +1545,7 @@ MobileUnit = Class(Unit) {
         -- Add unit's threat to our influence map
         local threat = 5
         local decay = 0.1
-        local currentLayer = self:GetCurrentLayer()
+        local currentLayer = self.Layer
         if instigator then
             local unit = false
             if IsUnit(instigator) then
@@ -1817,7 +1817,7 @@ AirUnit = Class(MobileUnit) {
     end,
 
     ShallSink = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local shallSink = (
             self.shallSink or -- Only the case when a bounced plane hits water. Overrides the fact that the layer is 'Air'
             ((layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
@@ -1843,7 +1843,7 @@ AirUnit = Class(MobileUnit) {
 
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
-        if self:GetFractionComplete() == 1 and (self:GetCurrentLayer() == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
+        if self:GetFractionComplete() == 1 and (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
             self.CreateUnitAirDestructionEffects(self, 1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
@@ -2222,7 +2222,10 @@ HoverLandUnit = Class(MobileUnit) {}
 
 SlowHoverLandUnit = Class(HoverLandUnit) {
     OnLayerChange = function(self, new, old)
+
+        -- call base class to make sure self.layer is set
         HoverLandUnit.OnLayerChange(self, new, old)
+
         -- Slow these units down when they transition from land to water
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
@@ -2241,6 +2244,10 @@ AmphibiousLandUnit = Class(MobileUnit) {}
 
 SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
     OnLayerChange = function(self, new, old)
+
+        -- call base class to make sure self.layer is set
+        HoverLandUnit.OnLayerChange(self, new, old)
+
         local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
         if new == 'Seabed'  then
             self:SetSpeedMult(mult)

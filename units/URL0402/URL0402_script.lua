@@ -42,7 +42,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self:CreateUnitAmbientEffect(self:GetCurrentLayer())
+        self:CreateUnitAmbientEffect(self.Layer)
         if self.AnimationManipulator then
             self:SetUnSelectable(true)
             self.AnimationManipulator:SetRate(1)
