@@ -34,13 +34,25 @@ local MathCos = math.cos
 local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
+-- all possible bot blueprint values
+local CybranBuildBotBlueprints = {
+    'ura0001',
+    'ura0002',
+    'ura0003',
+    -- 'ura0004'
+}
+
+local CybranBuildBotBeams = { 
+    '/effects/emitters/build_bot_beam_01_emit.bp',
+    '/effects/emitters/build_bot_beam_02_emit.bp',
+    '/effects/emitters/build_bot_beam_03_emit.bp',
+}
+
 --- Creates the build drones for the (cybran) builder in question. Expects  
 -- the builder.BuildBotTotal value to be set.
 -- @param builder A cybran builder such as an engineer, hive or commander.
 -- @param botBlueprint The blueprint to use for the bot.
-function CreateCybranEngineerBuildDrones(builder, botBlueprint)
-
-    botBlueprint = botBlueprint or 'ura0001'
+function CreateCybranEngineerBuildDrones(builder)
 
     -- kill potential return thread
     if builder.ReturnBotsThreadInstance then 
@@ -93,6 +105,7 @@ function CreateCybranEngineerBuildDrones(builder, botBlueprint)
             zVec = MathCos(angleInitial + (k * angle)) * VecMul
 
             -- make the bot
+            local botBlueprint = CybranBuildBotBlueprints[k] or 'ura0001'
             bot = CreateUnit(botBlueprint, builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air')
 
             -- make build bots unkillable
@@ -170,7 +183,8 @@ function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffe
     -- create a beam from each bot of the builder
     if bots then 
         for k, bot in bots do 
-            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(bot, "Muzzle_01", beamEndBots, -1, army, BeamBuildEmtBp))
+            local beam = CybranBuildBotBeams[k] or BeamBuildEmtBp
+            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(bot, "Muzzle_01", beamEndBots, -1, army, beam))
         end
     end
 
@@ -180,7 +194,7 @@ function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffe
     while not (builder.Dead or unitBeingBuilt.Dead) do
 
         -- skip a few ticks to make the effect work better
-        WaitTicks(0.3)
+        WaitTicks(3)
 
         -- get a new location for both
         if not stationary then 

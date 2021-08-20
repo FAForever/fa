@@ -16,8 +16,8 @@ UnitBlueprint {
         KTurn = 4,
         KTurnDamping = 2,
         LiftFactor = 7,
-        MaxAirspeed = 6,
-        MinAirspeed = 5,
+        MaxAirspeed = 8,
+        MinAirspeed = 8,
         StartTurnDistance = 5,
         Winged = false,
     },
@@ -41,29 +41,39 @@ UnitBlueprint {
     },
     Display = {
         Mesh = {
+            IconFadeInZoom = 2000,
             LODs = {
                 {
-                    AlbedoName = '/Units/URA0003/URA0003_Albedo.dds',
-                    LODCutoff = 200,
+                    AlbedoName = '/Units/URA0001/URA0001_Albedo.dds',
+                    LODCutoff = 215,
                     MeshName = '/Units/URA0003/URA0003_LOD0.scm',
-                    NormalsName = '/UNITS/URA0003/URA0003_NormalsTS.dds',
+                    NormalsName = '/UNITS/URA0001/URA0001_NormalsTS.dds',
                     ShaderName = 'Insect',
-                    SpecularName = '/Units/URA0003/URA0003_SpecTeam.dds',
+                    SpecularName = '/Units/URA0001/URA0001_SpecTeam.dds',
                 },
             },
         },
-        PlaceholderMeshName = 'URA0003',
+        AnimationLoop = '/units/URA0003/URA0003_lod0_Spin.sca',
+        PlaceholderMeshName = 'URA0001',
         SpawnRandomRotation = true,
-        UniformScale = 0.12,
+        UniformScale = 0.14,
     },
     Economy = {
-        BuildRate = 0.00001,
+        BuildCostEnergy = 0,
+        BuildCostMass = 0,
+        BuildRate = 0.0001,
+        BuildTime = 0,
+        BuildableCategory = {
+            'BUILTBYTIER1ENGINEER CYBRAN',
+        },
+        ConsumptionPerSecondEnergy = 0,
+        ConsumptionPerSecondMass = 0,
         MaxBuildDistance = 100,
     },
-
-    Intel = {
-        VisionRadius = 0,
-        WaterVisionRadius = 0,
+    Footprint = {
+        MaxSlope = 0.25,
+        SizeX = 1,
+        SizeZ = 1,
     },
     General = {
         CapCost = 0,
@@ -89,6 +99,9 @@ UnitBlueprint {
         TechLevel = 'RULEUTL_Basic',
         UnitWeight = 1,
     },
+    Intel = {
+        VisionRadius = 0,
+    },
     Physics = {
         BankingSlope = 0.5,
         BuildOnLayerCaps = {
@@ -100,9 +113,9 @@ UnitBlueprint {
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        Elevation = 5,
+        Elevation = 7,
         MaxAcceleration = 10.5,
-        MaxSpeed = 20.5,
+        MaxSpeed = 10.5,
         MaxSpeedReverse = 0,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,

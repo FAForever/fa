@@ -10,6 +10,8 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
+local DeprecatedWarnings = { }
+
 function CreateEffects(obj, army, EffectTable)
     local emitters = {}
     for _, v in EffectTable do
@@ -377,6 +379,13 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
 end
 
 function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.CreateCybranBuildBeams then 
+        DeprecatedWarnings.CreateCybranBuildBeams = true 
+        WARN("CreateCybranBuildBeams is deprecated: use CreateCybranEngineerBuildBeams instead.")
+    end
+
     WaitSeconds(0.2)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
     local BeamEndEntities = {}
@@ -407,6 +416,13 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Build
 end
 
 function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.SpawnBuildBots then 
+        DeprecatedWarnings.SpawnBuildBots = true 
+        WARN("SpawnBuildBots is deprecated: use CreateCybranEngineerBuildDrones instead.")
+    end
+
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
     -- clamped to a max of 10 to avoid insane FPS drop
     -- with mods that modify BP
@@ -464,6 +480,13 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
 end
 
 function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
+        DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
+        WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranBuildBotTrackers instead.")
+    end
+
     -- Create build constant build effect for each build effect bone defined
     if BuildBones and BuildBots then
         for _, vBone in BuildBones do
