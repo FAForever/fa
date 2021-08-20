@@ -52,7 +52,7 @@ local CybranBuildBotBeams = {
 -- the builder.BuildBotTotal value to be set.
 -- @param builder A cybran builder such as an engineer, hive or commander.
 -- @param botBlueprint The blueprint to use for the bot.
-function CreateCybranEngineerBuildDrones(builder)
+function SpawnBuildBots(builder)
 
     -- kill potential return thread
     if builder.ReturnBotsThreadInstance then 
@@ -128,7 +128,7 @@ function CreateCybranEngineerBuildDrones(builder)
     end
 end
 
--- add as upvalue for performance for CreateCybranEngineerBuildBeams
+-- add as upvalue for performance for CreateCybranBuildBeamsOpti
 local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
 local CybranBuildSparks01 = EffectTemplate.CybranBuildSparks01
 local CybranBuildFlash01 = EffectTemplate.CybranBuildFlash01
@@ -141,7 +141,7 @@ local CybranBuildFlash01 = EffectTemplate.CybranBuildFlash01
 -- @param unitBeingBuilt The unit that we're building.
 -- @param buildEffectsBag The bag that we use to store / trash all effects.
 -- @param stationary Whether or not the builder is a building.
-function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, stationary)
+function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, stationary)
 
     -- delay slightly for dramatic effect
     WaitTicks(2 + Random(1, 4))
@@ -213,7 +213,7 @@ end
 -- @param buildBones The bones to use as the origin of the beams.
 -- @param buildBots The build bots that we're tracking.
 -- @param total The number of build bots / bones. The 1st bone will track the 1st bot, etc.
-function CreateCybranBuildBotTrackers(builder, buildBones, buildBots, total)
+function CreateCybranEngineerBuildEffects(builder, buildBones, buildBots, total)
     local army = builder.Army
     for k = 1, total do 
         local bone = buildBones[k]

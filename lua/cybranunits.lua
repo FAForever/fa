@@ -28,9 +28,9 @@ local EffectUtil = import('EffectUtilities.lua')
 local CreateCybranBuildBeams = false
 
 -- upvalued effect utility functions for performance
-local CreateCybranEngineerBuildDrones = EffectUtil.CreateCybranEngineerBuildDrones
-local CreateCybranBuildBotTrackers = EffectUtil.CreateCybranBuildBotTrackers
-local CreateCybranEngineerBuildBeams = EffectUtil.CreateCybranEngineerBuildBeams
+local SpawnBuildBotsOpti = EffectUtil.SpawnBuildBotsOpti
+local CreateCybranEngineerBuildEffectsOpti = EffectUtil.CreateCybranEngineerBuildEffectsOpti
+local CreateCybranBuildBeamsOpti = EffectUtil.CreateCybranBuildBeamsOpti
 
 -- upvalued globals for performance
 local Random = Random
@@ -136,11 +136,11 @@ CConstructionTemplate = Class() {
 
     --- When making build effects, try and make the bots.
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
-        CreateCybranEngineerBuildDrones(self)
+        SpawnBuildBotsOpti(self)
         if stationary then 
-            CreateCybranBuildBotTrackers(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+            CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
         end
-        CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
+        CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
     end,
 
     --- When destroyed, destroy the bots too.

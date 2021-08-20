@@ -383,7 +383,7 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Build
     -- deprecation warning for more effcient alternative
     if not DeprecatedWarnings.CreateCybranBuildBeams then 
         DeprecatedWarnings.CreateCybranBuildBeams = true 
-        WARN("CreateCybranBuildBeams is deprecated: use CreateCybranEngineerBuildBeams instead.")
+        WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
     end
 
     WaitSeconds(0.2)
@@ -420,7 +420,7 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
     -- deprecation warning for more effcient alternative
     if not DeprecatedWarnings.SpawnBuildBots then 
         DeprecatedWarnings.SpawnBuildBots = true 
-        WARN("SpawnBuildBots is deprecated: use CreateCybranEngineerBuildDrones instead.")
+        WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
     end
 
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
@@ -484,7 +484,7 @@ function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildE
     -- deprecation warning for more effcient alternative
     if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
         DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
-        WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranBuildBotTrackers instead.")
+        WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
     end
 
     -- Create build constant build effect for each build effect bone defined
@@ -1907,7 +1907,7 @@ end
 
 --- Optimized functions --
 
-local EffectUtilitiesOpti = import('/lua/EffectUtilitiesEfficient.lua')
+local EffectUtilitiesOpti = import('/lua/EffectUtilitiesOpti.lua')
 
 --- Creates tracker beams between the builder and its build bots. The
 -- bots keep the tracker in their trashbag.
@@ -1915,7 +1915,8 @@ local EffectUtilitiesOpti = import('/lua/EffectUtilitiesEfficient.lua')
 -- @param buildBones The bones to use as the origin of the beams.
 -- @param buildBots The build bots that we're tracking.
 -- @param total The number of build bots / bones. The 1st bone will track the 1st bot, etc.
-CreateCybranBuildBotTrackers = EffectUtilitiesOpti.CreateCybranBuildBotTrackers
+CreateCybranEngineerBuildEffectsOpti = EffectUtilitiesOpti.CreateCybranEngineerBuildEffects
+-- original: CreateCybranEngineerBuildEffects
 
 --- Creates the beams and welding points of the builder and its bots. The
 -- bots share the welding point which each other, as does the builder with
@@ -1925,10 +1926,12 @@ CreateCybranBuildBotTrackers = EffectUtilitiesOpti.CreateCybranBuildBotTrackers
 -- @param unitBeingBuilt The unit that we're building.
 -- @param buildEffectsBag The bag that we use to store / trash all effects.
 -- @param stationary Whether or not the builder is a building.
-CreateCybranEngineerBuildBeams = EffectUtilitiesOpti.CreateCybranEngineerBuildBeams
+CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
+-- original: CreateCybranBuildBeams
 
 --- Creates the build drones for the (cybran) builder in question. Expects  
 -- the builder.BuildBotTotal value to be set.
 -- @param builder A cybran builder such as an engineer, hive or commander.
 -- @param botBlueprint The blueprint to use for the bot.
-CreateCybranEngineerBuildDrones = EffectUtilitiesOpti.CreateCybranEngineerBuildDrones
+SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
+-- original: SpawnBuildBots
