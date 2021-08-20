@@ -1,5 +1,9 @@
 
--- 0.001663
+-- BlueprintSubTables2: 1.663 ms
+-- BlueprintSubTables2: 1.113 ms
+
+-- Conclusion: preventing table operations (the '.') is quite the benefit in practice.
+
 function BlueprintSubTables2()
 
     -- create a dummy unit
@@ -19,7 +23,6 @@ function BlueprintSubTables2()
     return final - start
 end
 
--- 0.001113
 function BlueprintSubTables1()
 
     -- create a dummy unit

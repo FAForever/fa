@@ -1,10 +1,10 @@
 
--- EntriesBracketShort: 0.00109
--- EntriesBracketLong:  0.00109
--- EntriesDotShort:     0.00109
--- EntriesDotLong:      0.00109
+-- EntriesBracketShort: 1.09 ms
+-- EntriesBracketLong:  1.09 ms
+-- EntriesDotShort:     1.09 ms
+-- EntriesDotLong:      1.09 ms
 
--- conclusion: there is no difference.
+-- Conclusion: there is no difference.
 
 function EntriesBracketShort()
 

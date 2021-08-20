@@ -1,13 +1,15 @@
 
--- AbsGlobal: 440 ms
--- AbsLocal: 263 ms
--- AbsLocalPerIteration: 476 ms
--- AbsUpvalue: 277 ms
+-- AbsGlobal:               440 ms
+-- AbsLocal:                263 ms
+-- AbsLocalPerIteration:    476 ms
+-- AbsUpvalue:              277 ms
 
--- CeilGlobal: 1747 ms
--- CeilLocal: 1563 ms
--- CeilLocalPerIteration: 1781 ms
--- CeilUpvalue: 1572 ms
+-- CeilGlobal:              1747 ms
+-- CeilLocal:               1563 ms
+-- CeilLocalPerIteration:   1781 ms
+-- CeilUpvalue:             1572 ms
+
+-- Conclusion: we should uplift these functions whenever possible.
 
 local outerLoop = 10000000
 

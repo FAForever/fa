@@ -38,10 +38,6 @@
 -- that may have been optmized. This may be just the cacheline of the CPU, but we see a similar 
 -- behavior with the array part of a table.
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00512
-
 function Hash01()
 
     local element = { x = 1, y = 2, z = 3, w = 4 }

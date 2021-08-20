@@ -1,10 +1,21 @@
 
--- core findings:
--- These functions are _cheap_, very _cheap_. I suspect they use a lookup table on the C side.
+-- CosGlobal:               41.25 ms
+-- CosUpvalue:              38.35 ms
+-- CosLocal:                37.35 ms
+-- CosLocalPerIteration:    39.50 ms
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00720
+-- SinGlobal:               39.30 ms
+-- SinUpvalue:              38.33 ms
+-- SinLocal:                38.52 ms
+-- SinLocalPerIteration:    40.28 ms
+
+-- TanGlobal:               38.88 ms
+-- TanUpvalue:              37.55 ms
+-- TanLocal:                37.59 ms
+-- TanLocalPerIteration:    40.03 ms
+
+-- Conclusion: these functions are very cheap to use and are likely a lookup table
+-- on the C-side.
 
 function SinGlobal()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
@@ -18,10 +29,6 @@ function SinGlobal()
 
     return final - start
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00573
 
 local MathSin = math.sin
 
@@ -38,10 +45,6 @@ function SinUpvalue()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00585
-
 function SinLocal()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -57,10 +60,6 @@ function SinLocal()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00732
-
 function SinLocalPerIteration()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -75,10 +74,6 @@ function SinLocalPerIteration()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00708
-
 function CosGlobal()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -91,10 +86,6 @@ function CosGlobal()
 
     return final - start
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00585
 
 local MathCos = math.cos
 
@@ -111,10 +102,6 @@ function CosUpvalue()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00573
-
 function CosLocal()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -130,10 +117,6 @@ function CosLocal()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00720
-
 function CosLocalPerIteration()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -148,10 +131,6 @@ function CosLocalPerIteration()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00659
-
 function TanGlobal()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -164,10 +143,6 @@ function TanGlobal()
 
     return final - start
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00524
 
 local MathTan = math.tan
 
@@ -184,10 +159,6 @@ function TanUpvalue()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00524
-
 function TanLocal()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
@@ -202,10 +173,6 @@ function TanLocal()
 
     return final - start
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.00683
 
 function TanLocalPerIteration()
     local start = GetSystemTimeSecondsOnlyForProfileUse()

@@ -1,7 +1,24 @@
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.046
+-- AddInsertGlobal:     46 ms
+-- AddInsertLocal:      16.35 ms
+-- AddIndex:            2.19 ms
+-- AddGetnLocal:        34699.70 ms
+-- AddGetnGlobal:       34751.95 ms
+-- AddCount:            2.68 ms
+-- AddCountAlt:         2.19 ms
+
+-- Conclusion: avoiding the table operations is always a benefit, especially when
+-- you cache the function call directly to prevent the table operation. 
+
+-- The difference between AddCount and AddCountAlt can be explained by understanding
+-- how the processor works. Internally the processor is one large pipeline, where
+-- an instructions keep being fed on one side. It passes through various phases,
+-- such as decoding and executing. However - if there is a functional dependency
+-- then an instruction has to wait (stall the pipeline) because it needs the result
+-- of the previous instruction to know what to do. 
+
+-- That is what happens when we first add and then use the value, instead of using 
+-- the value and then adding to it.
 
 function AddInsertGlobal()
 
@@ -17,9 +34,6 @@ function AddInsertGlobal()
     return final - start
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.016357421875
 
 function AddInsertLocal()
 
@@ -39,10 +53,6 @@ function AddInsertLocal()
 
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.002197265625
-
 function AddIndex()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
@@ -58,51 +68,39 @@ function AddIndex()
 
 end
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 34.69970703125
+-- function AddGetnLocal()
 
-function AddGetnLocal()
+--     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+--     local TableGetn = table.getn
 
-    local TableGetn = table.getn
+--     local a = { }
+--     for k = 1, 100000 do
+--         a[TableGetn(a) + 1] = k
+--     end
 
-    local a = { }
-    for k = 1, 100000 do
-        a[TableGetn(a) + 1] = k
-    end
+--     local final = GetSystemTimeSecondsOnlyForProfileUse()
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
+--     return final - start
 
-    return final - start
+-- end
 
-end
+-- function AddGetnGlobal()
 
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 34.751953125
+--     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-function AddGetnGlobal()
+--     local TableGetn = table.getn
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+--     local a = { }
+--     for k = 1, 100000 do
+--         a[table.getn(a) + 1] = k 
+--     end
 
-    local TableGetn = table.getn
+--     local final = GetSystemTimeSecondsOnlyForProfileUse()
 
-    local a = { }
-    for k = 1, 100000 do
-        a[table.getn(a) + 1] = k 
-    end
+--     return final - start
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    return final - start
-
-end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.002685546875
+-- end
 
 function AddCount()
 
@@ -121,10 +119,6 @@ function AddCount()
     return final - start
 
 end
-
--- ran by: (Jip) Willem Wijnia
--- hardware: AMD Ryzen 3600 6-core
--- time: 0.002197265625
 
 function AddCountAlt()
 
