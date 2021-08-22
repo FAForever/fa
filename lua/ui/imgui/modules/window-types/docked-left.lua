@@ -14,7 +14,6 @@ local pixelScaleFactor = Prefs.GetFromCurrentProfile('options').ui_scale or 1
 -- - scale to the right via dragger
 -- - scale down via dragger
 
-
 local function CreateStructure(interface, identifier)
 
     -- Create arrow checkbox

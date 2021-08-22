@@ -23,8 +23,16 @@ local Conversion = import('/lua/ui/imgui//modules/conversion.lua')
 local ToLabel = Conversion.ToLabel
 
 -- construction methods
-local WindowConstructFloating = import('/lua/ui/imgui//modules/window-floating.lua').WindowConstructFloating
-local WindowConstructDockedLeft = import('/lua/ui/imgui//modules/window-docked-left.lua').WindowConstructDockedLeft
+local WindowConstructFloating = import('/lua/ui/imgui/modules/window-types/floating.lua').WindowConstructFloating
+local WindowConstructDockedLeft = import('/lua/ui/imgui/modules/window-types/docked-left.lua').WindowConstructDockedLeft
+
+local WindowText = import('/lua/ui/imgui/modules/ui-elements/text.lua')
+local TextOnBegin = WindowText.OnBegin
+local TextOnEnd = WindowText.OnEnd
+local AllocateText = WindowText.AllocateText
+local CreateText = WindowText.CreateText
+local SetTextColor = WindowText.SetTextColor
+local TextWithLabel = WindowText.TextWithLabel
 
 -- Every element needs to expose / use the following data:
 -- - height: determines the height of the element, used for lists
@@ -228,6 +236,28 @@ function mWindow:Hide()
     self.main:Hide()
 end
 
+--- Adds a text entry.
+-- @param identifier The identifier of this element.
+-- @param value The text of this element.
+mWindow.Text = CreateText
+mWindow.CreateText = CreateText 
+
+--- Adds a text entry.
+-- @param identifier The identifier of this element.
+-- @param value The text of this element.
+mWindow.AllocateText = AllocateText
+
+--- Sets the text color of the upcoming text element. Initial value is 'ffffffff'.
+-- @param color The color to set the text to.
+mWindow.SetTextColor = SetTextColor
+
+--- Adds two text entries, as if they are two columns.
+-- @param left The left text value.
+-- @param right The right text value.
+-- @param size The size of the text.
+-- @param perc The percentage (in width) when the right column starts
+mWindow.TextWithLabel = TextWithLabel
+
 --- Allocates a generic bitmap.
 -- @param color The color of the bitmap.
 function mWindow:AllocateBitmap(color)
@@ -302,58 +332,6 @@ function mWindow:AllocateDivider()
     end
 
     return element
-end
-
---- Retrieves a text element. Returns a cached element if possible, allocates a 
--- new one if no cached element is available.
-function mWindow:AllocateText()
-
-    -- check if one is free
-    local element = self.textElements[self.textElementIndex]
-    if not element then 
-        -- allocate it
-        element = UIUtil.CreateText(self.main, "Placeholder", 12, UIUtil.bodyFont)
-        LayoutHelpers.DepthOverParent(element, self.main, 2)
-    
-        -- keep track of it
-        table.insert(self.textElements, element)
-    end
-
-    -- keep track that it is used
-    element.used = true
-
-    -- check if the element was previously hidden
-    if element:IsHidden() then 
-        element:Show()
-    end
-
-    -- update index that represents what text element we've used so far
-    self.textElementIndex = self.textElementIndex + 1 
-
-    return element
-end
-
---- Adds a text entry.
--- @param identifier The identifier of this element.
--- @param value The text of this element.
-function mWindow:Text(value)
-
-    if self:HasSufficientSpace(12) then 
-
-        -- retrieve a text element
-        local element = self:AllocateText()
-
-        -- update text content
-        element:SetText(value)
-        element:SetColor(self.textColor)
-
-        -- position it
-        LayoutHelpers.AtLeftTopIn(element, self.main, self.outline, self.offset)
-
-    end
-
-    -- update internal state
-    self:UpdateOffset(12 + 1)
 end
 
 local _checkboxTextures = { }
