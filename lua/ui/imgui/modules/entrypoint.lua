@@ -8,5 +8,6 @@ function Entrypoint(isReplay)
     _G.WindowDeconstruct = Window.WindowDeconstruct
     _G.WindowGet = Window.WindowGet
     _G.DearWindow = true
+    _G.DearWindowVersion = "FAFRepository"
 
 end
