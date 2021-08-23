@@ -164,18 +164,39 @@ FactoryBuilderManager = Class(BuilderManager) {
             or EntityCategoryContains(categories.NAVAL, unit) and 'Sea'   
             
             --LOG('The Layer is ' .. repr(layer) .. ' and I am ' .. self.Brain.Nickname)
-            self:SetupNewFactory(
-                unit,
-                self.Brain.HasLayerTBuilders and layer and (
-                    layer..(
-                        (EntityCategoryContains(categories.TECH1, unit) and 'T1') 
-                        or (EntityCategoryContains(categories.TECH2, unit) and 'T2')
-                        or (EntityCategoryContains(categories.TECH3, unit) and 'T3')
-                        or ''
-                    )
-                ) or layer or 'Gate'
-            )
-            
+            if self.Brain.HasLayerTBuilders and layer then 
+                if EntityCategoryContains(categories.TECH1, unit) and layer == 'Land' then
+                    self:SetupNewFactory(unit, 'LandT1')
+                elseif EntityCategoryContains(categories.TECH2, unit) and layer == 'Land' then
+                    self:SetupNewFactory(unit, 'LandT2')
+                elseif EntityCategoryContains(categories.TECH3, unit) and layer == 'Land' then
+                    self:SetupNewFactory(unit, 'LandT3')
+                elseif EntityCategoryContains(categories.TECH1, unit) and layer == 'Air' then
+                    self:SetupNewFactory(unit, 'AirT1')
+                elseif EntityCategoryContains(categories.TECH2, unit) and layer == 'Air' then
+                    self:SetupNewFactory(unit, 'AirT2')
+                elseif EntityCategoryContains(categories.TECH3, unit) and layer == 'Air' then
+                    self:SetupNewFactory(unit, 'AirT3')
+                elseif EntityCategoryContains(categories.TECH1, unit) and layer == 'Sea' then
+                    self:SetupNewFactory(unit, 'SeaT1')
+                elseif EntityCategoryContains(categories.TECH2, unit) and layer == 'Sea' then
+                    self:SetupNewFactory(unit, 'SeaT2')
+                elseif EntityCategoryContains(categories.TECH3, unit) and layer == 'Sea' then
+                    self:SetupNewFactory(unit, 'SeaT3')
+                else
+                    self:SetupNewFactory(unit, 'Gate') 
+                end
+            end 
+
+            if layer and not self.Brain.HasLayerTBuilders then
+                if EntityCategoryContains(categories.LAND, unit) then
+                    self:SetupNewFactory(unit, 'Land')
+                elseif EntityCategoryContains(categories.AIR, unit) then
+                    self:SetupNewFactory(unit, 'Air')
+                elseif EntityCategoryContains(categories.NAVAL, unit) then
+                    self:SetupNewFactory(unit, 'Sea')
+                end
+            end
             self.LocationActive = true
         end
     end,
