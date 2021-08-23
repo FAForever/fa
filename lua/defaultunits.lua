@@ -381,11 +381,10 @@ StructureUnit = Class(Unit) {
             Unit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
-            if self.AnimatorUpgradeManip then self.AnimatorUpgradeManip:Destroy() end
-
-            if self:GetCurrentLayer() == 'Water' then
-                self:StartRocking()
+            if self.AnimatorUpgradeManip then 
+                self.AnimatorUpgradeManip:Destroy() 
             end
+            
             self:PlayUnitSound('UpgradeFailed')
             self:PlayActiveAnimation()
             self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
