@@ -4,11 +4,36 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+local import = import
+
+local TableInsert = table.insert
+local TableGetn = table.getn
+local TableRemove = table.remove
+local TableEmpty = table.empty
+local WaitTicks = coroutine.yield
+
+local EntityCategoryContains = EntityCategoryContains
+local VDist3 = VDist3
+local ForkThread = ForkThread
+local KillThread = KillThread
+
+local GetPosition = moho.entity_methods.GetPosition
+local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local MakePlatoon = moho.aibrain_methods.MakePlatoon
+local PlatoonExists = moho.aibrain_methods.PlatoonExists
+local IsUnitState = moho.unit_methods.IsUnitState
+
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+
+function CreateEngineerManager(brain, lType, location, radius)
+    local em = EngineerManager()
+    em:Create(brain, lType, location, radius)
+    return em
+end
 
 EngineerManager = Class(BuilderManager) {
     Create = function(self, brain, lType, location, radius)
@@ -134,7 +159,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     LowMassRepeatThread = function(self)
-        coroutine.yield(30)
+        WaitTicks(30)
         if self.Brain.LowMassMode then
             self:LowMass()
         end
@@ -241,7 +266,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     LowEnergyRepeatThread = function(self)
-        coroutine.yield(30)
+        WaitTicks(30)
         if self.Brain.LowEnergyMode then
             self:LowEnergy()
         end
@@ -284,8 +309,8 @@ EngineerManager = Class(BuilderManager) {
         --LOG('+ AddUnit')
         for k,v in self.ConsumptionUnits do
             if EntityCategoryContains(v.Category, unit) then
-                table.insert(v.Units, { Unit = unit, Status = true })
-                table.insert(v.UnitsList, unit)
+                TableInsert(v.Units, { Unit = unit, Status = true })
+                TableInsert(v.UnitsList, unit)
                 v.Count = v.Count + 1
 
                 if not unit.BuilderManagerData then
@@ -354,12 +379,14 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     GetNumCategoryBeingBuilt = function(self, category, engCategory)
-        return table.getn(self:GetEngineersBuildingCategory(category, engCategory))
+        return TableGetn(self:GetEngineersBuildingCategory(category, engCategory))
     end,
 
     GetEngineersBuildingCategory = function(self, category, engCategory)
         local engs = self:GetUnits('Engineers', engCategory)
         local units = {}
+        local counter = 1
+
         for k,v in engs do
             if v.Dead then
                 continue
@@ -378,7 +405,8 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            units[counter] = v
+            counter = counter + 1
         end
         return units
     end,
@@ -423,12 +451,13 @@ EngineerManager = Class(BuilderManager) {
     GetEngineersQueued = function(self, buildingType)
         local engs = self:GetUnits('Engineers', categories.ALLUNITS)
         local units = {}
+        local counter = 1
         for k,v in engs do
             if v.Dead then
                 continue
             end
 
-            if not v.EngineerBuildQueue or table.empty(v.EngineerBuildQueue) then
+            if not v.EngineerBuildQueue or TableEmpty(v.EngineerBuildQueue) then
                 continue
             end
 
@@ -445,7 +474,8 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            units[counter] = v
+            counter = counter + 1
         end
         return units
     end,
@@ -453,12 +483,13 @@ EngineerManager = Class(BuilderManager) {
     GetEngineersBuildQueue = function(self, buildingType)
         local engs = self:GetUnits('Engineers', categories.ALLUNITS)
         local units = {}
+        local counter = 1
         for k,v in engs do
             if v.Dead then
                 continue
             end
 
-            if not v.EngineerBuildQueue or table.empty(v.EngineerBuildQueue) then
+            if not v.EngineerBuildQueue or TableEmpty(v.EngineerBuildQueue) then
                 continue
             end
             local buildName = v.EngineerBuildQueue[1][1]
@@ -470,7 +501,7 @@ EngineerManager = Class(BuilderManager) {
                 if buildBp.CategoriesHash[z] then
                     count = count + 1
                 end
-                if table.getn(buildingTypes) == count then found = true end
+                if TableGetn(buildingTypes) == count then found = true end
                 if found then break end
             end
 
@@ -478,7 +509,8 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            units[counter] = v
+            counter = counter + 1
         end
         return units
     end,
@@ -487,16 +519,18 @@ EngineerManager = Class(BuilderManager) {
         local testUnits = self:GetEngineersBuildingCategory(category, engCategory)
 
         local retUnits = {}
+        local counter = 1
         for k,v in testUnits do
             if v.DesiresAssist == false then
                 continue
             end
 
-            if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
+            if v.NumAssistees and TableGetn(v:GetGuards()) >= v.NumAssistees then
                 continue
             end
 
-            table.insert(retUnits, v)
+            retUnits[counter] = v
+            counter = counter + 1
         end
         return retUnits
     end,
@@ -527,8 +561,8 @@ EngineerManager = Class(BuilderManager) {
             if EntityCategoryContains(v.Category, unit) then
                 for num,sUnit in v.Units do
                     if sUnit.Unit == unit then
-                        table.remove(v.Units, num)
-                        table.remove(v.UnitsList, num)
+                        TableRemove(v.Units, num)
+                        TableRemove(v.UnitsList, num)
                         v.Count = v.Count - 1
                         found = true
                         break
@@ -633,14 +667,14 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     Wait = function(unit, manager, ticks)
-        coroutine.yield(ticks)
+        WaitTicks(ticks)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
     end,
 
     EngineerWaiting = function(manager, unit)
-        coroutine.yield(50)
+        WaitTicks(50)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
@@ -751,9 +785,3 @@ EngineerManager = Class(BuilderManager) {
         return false
     end,
 }
-
-function CreateEngineerManager(brain, lType, location, radius)
-    local em = EngineerManager()
-    em:Create(brain, lType, location, radius)
-    return em
-end

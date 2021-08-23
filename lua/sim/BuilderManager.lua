@@ -1,11 +1,22 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/BuilderManager.lua
-#**
-#**  Summary  : Manage builders
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/sim/BuilderManager.lua
+--**
+--**  Summary  : Manage builders
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+
+local import = import
+
+local TableGetn = table.getn
+local TableRemove = table.remove
+local TableInsert = table.insert
+local MathCeil = math.ceil
+local WaitTicks = coroutine.yield
+
+local ForkThread = ForkThread
+local KillThread = KillThread
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
@@ -34,7 +45,7 @@ BuilderManager = Class {
         self.Trash:Destroy()
     end,
 
-    # forking and storing a thread on the monitor
+    -- forking and storing a thread on the monitor
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -57,14 +68,14 @@ BuilderManager = Class {
     end,
 
     SortBuilderList = function(self, bType)
-        # Make sure there is a type
+        -- Make sure there is a type
         if not self.BuilderData[bType] then
             error('*BUILDMANAGER ERROR: Trying to sort platoons of invalid builder type - ' .. bType)
             return false
         end
         local sortedList = {}
-        #Simple selection sort, this can be made faster later if we decide we need it.
-        for i = 1, table.getn(self.BuilderData[bType].Builders) do
+        --Simple selection sort, this can be made faster later if we decide we need it.
+        for i = 1, TableGetn(self.BuilderData[bType].Builders) do
             local highest = -1
             local key, value
             for k, v in self.BuilderData[bType].Builders do
@@ -75,7 +86,7 @@ BuilderManager = Class {
                 end
             end
             sortedList[i] = value
-            table.remove(self.BuilderData[bType].Builders, key)
+            TableRemove(self.BuilderData[bType].Builders, key)
         end
         self.BuilderData[bType].Builders = sortedList
         self.BuilderData[bType].NeedSort = false
@@ -118,7 +129,7 @@ BuilderManager = Class {
                 WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
                 return
             end
-            table.insert(self.BuilderData[builderType].Builders, newBuilder)
+            TableInsert(self.BuilderData[builderType].Builders, newBuilder)
             self.BuilderData[builderType].NeedSort = true
             self.BuilderList = true
         end
@@ -211,8 +222,8 @@ BuilderManager = Class {
         return self.BuilderList
     end,
 
-    # Function that is run in GetHighestBuilder; allows us to test if the builder is valid
-    # within a certain type of builder mananger (ie: can factories build the builder)
+    -- Function that is run in GetHighestBuilder; allows us to test if the builder is valid
+    -- within a certain type of builder mananger (ie: can factories build the builder)
     BuilderParamCheck = function(self,builder,params)
         return true
     end,
@@ -258,20 +269,20 @@ BuilderManager = Class {
             if v.Priority >= 1 and self:BuilderParamCheck(v,params) and (not found or v.Priority == found) and v:GetBuilderStatus() then
                 if not self:IsPlattonBuildDelayed(v.DelayEqualBuildPlattons) then
                     found = v.Priority
-                    table.insert(possibleBuilders, k)
+                    TableInsert(possibleBuilders, k)
                 end
             elseif found and v.Priority < found then
                 break
             end
         end
         if found and found > 0 then
-            local whichBuilder = Random(1,table.getn(possibleBuilders))
+            local whichBuilder = Random(1,TableGetn(possibleBuilders))
             return self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ]
         end
         return false
     end,
 
-    # Called every 13 seconds to perform any cleanup; Provides better inheritance
+    -- Called every 13 seconds to perform any cleanup; Provides better inheritance
     ManagerThreadCleanup = function(self)
         for bType,bTypeData in self.BuilderData do
             if bTypeData.NeedSort then
@@ -284,13 +295,13 @@ BuilderManager = Class {
         if builder:CalculatePriority(self) then
             self.BuilderData[bType].NeedSort = true
         end
-        #builder:CheckBuilderConditions(self.Brain)
+        --builder:CheckBuilderConditions(self.Brain)
     end,
 
     ManagerThread = function(self)
         while self.Active do
             self:ManagerThreadCleanup()
-            local numPerTick = math.ceil(self.NumBuilders / (self.BuilderCheckInterval * 10))
+            local numPerTick = MathCeil(self.NumBuilders / (self.BuilderCheckInterval * 10))
             local numTicks = 0
             local numTested = 0
             for bType,bTypeData in self.BuilderData do
@@ -299,7 +310,7 @@ BuilderManager = Class {
                     if numTested >= numPerTick then
                         WaitTicks(1)
                         if self.NumGet > 1 then
-                            #LOG('*AI STAT: NumGet = ' .. self.NumGet)
+                            --LOG('*AI STAT: NumGet = ' .. self.NumGet)
                         end
                         self.NumGet = 0
                         numTicks = numTicks + 1
