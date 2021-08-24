@@ -11,6 +11,7 @@ CIFArtilleryProton02 = Class(CArtilleryProtonProjectile) {
     FxUnitHitScale = 1.1,
     
     OnImpact = function(self, targetType, targetEntity)
+        local army = self.Army
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
