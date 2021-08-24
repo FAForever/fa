@@ -7,6 +7,8 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+local import = import 
+
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
@@ -19,6 +21,11 @@ local WaitTicks = coroutine.yield
 
 local EntityCategoryContains = EntityCategoryContains
 local VDist2 = VDist2
+local ForkThread = ForkThread
+
+local GetPosition = moho.entity_methods.GetPosition
+local IsUnitState = moho.unit_methods.IsUnitState
+local GetAIBrain = moho.unit_methods.GetAIBrain
 
 function CreateFactoryBuilderManager(brain, lType, location, radius, useCenterPoint)
     local fbm = FactoryBuilderManager()
@@ -230,7 +237,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 import('/lua/ScenarioTriggers.lua').CreateUnitDestroyedTrigger(factoryDestroyed, v)
 
                 local factoryNewlyCaptured = function(unit, captor)
-                                            local aiBrain = captor:GetAIBrain()
+                                            local aiBrain = GetAIBrain(captor)
                                             -- LOG('*AI DEBUG: FACTORY: I was Captured by '..aiBrain.Nickname..'!')
                                             if aiBrain.BuilderManagers then
                                                 local facManager = aiBrain.BuilderManagers[captor.BuilderManagerData.LocationType].FactoryManager
