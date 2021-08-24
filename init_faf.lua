@@ -177,6 +177,8 @@ end
 if custom_vault_path then
 	LOG('Loading custom vault path' .. custom_vault_path)
 	load_vault(custom_vault_path)
+else
+    LOG("No custom vault path defined.")
 end
 
 -- load in files from backup vault location
