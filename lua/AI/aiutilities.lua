@@ -23,7 +23,7 @@ local TableInsert = table.insert
 local TableRemove = table.remove 
 local TableEmpty = table.empty
 local TableGetSize = table.getsize
-local TableDestructiveCat = table.destructiveCat
+local TableCat = table.cat
 local MathMin = math.min
 local MathFloor = math.floor
 local MathCeil = math.ceil
@@ -91,30 +91,6 @@ function AIGetEconomyNumbers(aiBrain)
     return econ
 end
 
-function AIGetStructureUnitId(aiBrain, structureType)
-    local unitId
-    for _, v in BuildingTemplates[aiBrain:GetFactionIndex()] do
-        if v[1] == structureType then
-            unitId = v[2]
-            break
-        end
-    end
-
-    return unitId
-end
-
-function AIGetMobileUnitId(aiBrain, unitType)
-    local unitId
-    for _, v in UnitTemplates[aiBrain:GetFactionIndex()] do
-        if v[1] == unitType then
-            unitId = v[2]
-            break
-        end
-    end
-
-    return unitId
-end
-
 function AIGetStartLocations(aiBrain)
     local markerList = {}
     for i = 1, 16 do
@@ -136,10 +112,10 @@ function AIGetSortedScoutingLocations(aiBrain, maxNum)
     end
 
     local expansionMarkers = AIGetMarkerLocations(aiBrain, 'Expansion Area')
-    markerList = TableDestructiveCat(markerList, expansionMarkers)
+    markerList = TableCat(markerList, expansionMarkers)
 
     local navalMarkers = AIGetMarkerLocations(aiBrain, 'Naval Area')
-    markerList = TableDestructiveCat(markerList, navalMarkers)
+    markerList = TableCat(markerList, navalMarkers)
 
     local markers = AISortMarkersFromStartPos(aiBrain, markerList, maxNum or 1000)
     local retMarkers = {}
@@ -161,6 +137,7 @@ end
 function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, position)
     local markerList = AIGetMarkerLocations(aiBrain, 'Mass')
     local newList = {}
+    local counter = 0
     for _, v in markerList do
         -- check distance to map border. (game engine can't build mass closer then 8 mapunits to the map border.)
         if v.Position[1] <= 8 or v.Position[1] >= ScenarioInfo.size[1] - 8 or v.Position[3] <= 8 or v.Position[3] >= ScenarioInfo.size[2] - 8 then
@@ -168,7 +145,8 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
             continue
         end
         if aiBrain:CanBuildStructureAt('ueb1103', v.Position) then
-            TableInsert(newList, v)
+            counter = counter + 1
+            newList[counter] = v
         end
     end
     return AISortMarkersFromLastPos(aiBrain, newList, maxNum, tMin, tMax, tRings, tType, position)
@@ -1392,24 +1370,29 @@ function GetTransports(platoon, units)
     if not TableEmpty(transports) then
         local sortedList = {}
         -- Sort distances
-        for k = 1, table.getn(transports) do
+        for k = 1, TableGetn(transports) do
             local lowest = -1
             local key, value
             for j, u in transports do
-                if lowest == -1 or u.Distance < lowest then
-                    lowest = u.Distance
-                    value = u
-                    key = j
+                if not u.Dead then
+                    if lowest == -1 or u.Distance < lowest then
+                        lowest = u.Distance
+                        value = u
+                        key = j
+                    end
                 end
             end
-            sortedList[k] = value
-            -- Remove from unsorted table
-            TableInsert(transports, key)
+            if value then
+                sortedList[k] = value
+                -- Remove from unsorted table
+                TableInsert(transports, key)
+            end
         end
 
         -- Take transports as needed
         for i = 1, TableGetn(sortedList) do
-            if transportsNeeded and table.empty(sortedList[i].Unit:GetCargo()) and not sortedList[i].Unit:IsUnitState('TransportLoading') then
+            --LOG("Return SortedList is " .. repr(sortedList[i].Unit.Dead))
+            if transportsNeeded and sortedList[i].Unit and TableEmpty(sortedList[i].Unit:GetCargo()) and not sortedList[i].Unit:IsUnitState('TransportLoading') then
                 local id = sortedList[i].Id
                 aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
                 numTransports = numTransports + 1
@@ -2993,3 +2976,27 @@ function AIFindFurthestExpansionAreaNeedsEngineer(aiBrain, locationType, radius,
 
     return retPos, retName
 end
+ 
+--[[ function AIGetStructureUnitId(aiBrain, structureType)
+    local unitId
+    for _, v in BuildingTemplates[aiBrain:GetFactionIndex()] do
+        if v[1] == structureType then
+            unitId = v[2]
+            break
+        end
+    end
+
+    return unitId
+end
+
+function AIGetMobileUnitId(aiBrain, unitType)
+    local unitId
+    for _, v in UnitTemplates[aiBrain:GetFactionIndex()] do
+        if v[1] == unitType then
+            unitId = v[2]
+            break
+        end
+    end
+
+    return unitId
+end ]]--
