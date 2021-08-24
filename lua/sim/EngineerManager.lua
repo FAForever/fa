@@ -17,6 +17,7 @@ local VDist3 = VDist3
 local ForkThread = ForkThread
 local KillThread = KillThread
 
+local GetAIBrain = moho.unit_methods.GetAIBrain
 local GetPosition = moho.entity_methods.GetPosition
 local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
 local MakePlatoon = moho.aibrain_methods.MakePlatoon
@@ -329,7 +330,7 @@ EngineerManager = Class(BuilderManager) {
                     import('/lua/scenariotriggers.lua').CreateUnitDestroyedTrigger(deathFunction, unit)
 
                     local newlyCapturedFunction = function(unit, captor)
-                        local aiBrain = captor:GetAIBrain()
+                        local aiBrain = GetAIBrain(captor)
                         --LOG('*AI DEBUG: ENGINEER: I was Captured by '..aiBrain.Nickname..'!')
                         if aiBrain.BuilderManagers then
                             local engManager = aiBrain.BuilderManagers[captor.BuilderManagerData.LocationType].EngineerManager
@@ -344,7 +345,7 @@ EngineerManager = Class(BuilderManager) {
                     if EntityCategoryContains(categories.ENGINEER - categories.STATIONASSISTPOD, unit) then
                         local unitConstructionFinished = function(unit, finishedUnit)
                                                     -- Call function on builder manager; let it handle the finish of work
-                                                    local aiBrain = unit:GetAIBrain()
+                                                    local aiBrain = GetAIBrain(unit)
                                                     local engManager = aiBrain.BuilderManagers[unit.BuilderManagerData.LocationType].EngineerManager
                                                     if engManager then
                                                         engManager:UnitConstructionFinished(unit, finishedUnit)
@@ -543,19 +544,6 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     RemoveUnit = function(self, unit)
-        local guards = unit:GetGuards()
-        for k,v in guards do
-            if not v.Dead and v.AssistPlatoon then
-                if self.Brain.Sorian and self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
-                elseif self.Brain:PlatoonExists(v.AssistPlatoon) then
-                    v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
-                else
-                    v.AssistPlatoon = nil
-                end
-            end
-        end
-
         local found = false
         for k,v in self.ConsumptionUnits do
             if EntityCategoryContains(v.Category, unit) then
@@ -604,10 +592,10 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     UnitConstructionFinished = function(self, unit, finishedUnit)
-        if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
+        if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and GetAIBrain(finishedUnit):GetArmyIndex() == self.Brain:GetArmyIndex() then
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
-        if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
+        if GetAIBrain(finishedUnit):GetArmyIndex() == self.Brain:GetArmyIndex() then
             self:AddUnit(finishedUnit)
         end
         local guards = unit:GetGuards()
