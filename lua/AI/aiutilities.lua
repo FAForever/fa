@@ -5,6 +5,9 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- --------------------------------------------------------------
 
+local import = import
+local type = type
+
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -13,6 +16,34 @@ local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
+
+local TableGetn = table.getn
+local TableCopy = table.copy
+local TableInsert = table.insert
+local TableRemove = table.remove 
+local TableEmpty = table.empty
+local TableGetSize = table.getsize
+local TableDestructiveCat = table.destructiveCat
+local MathMin = math.min
+local MathFloor = math.floor
+local MathCeil = math.ceil
+local WaitTicks = coroutine.yield
+
+local ForkThread = ForkThread
+local KillThread = KillThread
+
+local EntityCategoryContains = EntityCategoryContains
+local ParseEntityCategory = ParseEntityCategory
+local VDist2 = VDist2
+local VDist2Sq = VDist2Sq
+local VDist3 = VDist3
+
+local GetThreatsAroundPosition = moho.aibrain_methods.GetThreatsAroundPosition
+local IsUnitState = moho.unit_methods.IsUnitState
+local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local GetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local GetFractionComplete = moho.entity_methods.GetFractionComplete
+local GetAIBrain = moho.unit_methods.GetAIBrain
 
 function AIGetEconomyNumbers(aiBrain)
     local econ = {}
@@ -26,8 +57,8 @@ function AIGetEconomyNumbers(aiBrain)
     econ.MassUsage = aiBrain:GetEconomyUsage('MASS')
     econ.EnergyRequested = aiBrain:GetEconomyRequested('ENERGY')
     econ.MassRequested = aiBrain:GetEconomyRequested('MASS')
-    econ.EnergyEfficiency = math.min(econ.EnergyIncome / econ.EnergyRequested, 2)
-    econ.MassEfficiency = math.min(econ.MassIncome / econ.MassRequested, 2)
+    econ.EnergyEfficiency = MathMin(econ.EnergyIncome / econ.EnergyRequested, 2)
+    econ.MassEfficiency = MathMin(econ.MassIncome / econ.MassRequested, 2)
     econ.MassRequested = aiBrain:GetEconomyRequested('MASS')
     econ.EnergyStorage = aiBrain:GetEconomyStored('ENERGY')
     econ.MassStorage = aiBrain:GetEconomyStored('MASS')
@@ -41,8 +72,8 @@ function AIGetEconomyNumbers(aiBrain)
         econ.EnergyIncomeOverTime = SUtils.Round(econTime.EnergyIncome, 2)
         econ.MassIncomeOverTime = SUtils.Round(econTime.MassIncome, 2)
 
-        econ.EnergyEfficiencyOverTime = math.min(econTime.EnergyIncome / econTime.EnergyRequested, 2)
-        econ.MassEfficiencyOverTime = math.min(econTime.MassIncome / econTime.MassRequested, 2)
+        econ.EnergyEfficiencyOverTime = MathMin(econTime.EnergyIncome / econTime.EnergyRequested, 2)
+        econ.MassEfficiencyOverTime = MathMin(econTime.MassIncome / econTime.MassRequested, 2)
     end
 
     if econ.MassStorageRatio ~= 0 then
@@ -88,7 +119,7 @@ function AIGetStartLocations(aiBrain)
     local markerList = {}
     for i = 1, 16 do
         if Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i] then
-            table.insert(markerList, Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i].position)
+            TableInsert(markerList, Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i].position)
         end
     end
 
@@ -97,26 +128,26 @@ end
 
 function AIGetSortedScoutingLocations(aiBrain, maxNum)
     local markerList = AIGetMarkerLocations(aiBrain, 'Combat Zone')
-    for i = 1, table.getn(ArmyBrains) do
+    for i = 1, TableGetn(ArmyBrains) do
         local tmpLoc = ScenarioUtils.GetMarker('ARMY_' .. i)
         if tmpLoc then
-            table.insert(markerList, {Position = tmpLoc.position, Name = 'ARMY_' .. i})
+            TableInsert(markerList, {Position = tmpLoc.position, Name = 'ARMY_' .. i})
         end
     end
 
     local expansionMarkers = AIGetMarkerLocations(aiBrain, 'Expansion Area')
-    markerList = table.destructiveCat(markerList, expansionMarkers)
+    markerList = TableDestructiveCat(markerList, expansionMarkers)
 
     local navalMarkers = AIGetMarkerLocations(aiBrain, 'Naval Area')
-    markerList = table.destructiveCat(markerList, navalMarkers)
+    markerList = TableDestructiveCat(markerList, navalMarkers)
 
     local markers = AISortMarkersFromStartPos(aiBrain, markerList, maxNum or 1000)
     local retMarkers = {}
-    local numMarkers = table.getn(markers)
+    local numMarkers = TableGetn(markers)
     for i = 1, numMarkers do
         rand = Random(1, numMarkers + 1 - i)
-        table.insert(retMarkers, markers[rand])
-        table.remove(markers, rand)
+        TableInsert(retMarkers, markers[rand])
+        TableRemove(markers, rand)
     end
 
     return retMarkers
@@ -137,7 +168,7 @@ function AIGetSortedMassLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, po
             continue
         end
         if aiBrain:CanBuildStructureAt('ueb1103', v.Position) then
-            table.insert(newList, v)
+            TableInsert(newList, v)
         end
     end
     return AISortMarkersFromLastPos(aiBrain, newList, maxNum, tMin, tMax, tRings, tType, position)
@@ -159,7 +190,7 @@ function SortLocationsClosestToDefensivePoints(aiBrain, points)
     defPoints = AISortMarkersFromLastPos(aiBrain, defPoints, 5, nil, nil, nil, nil, points[1])
 
     local sortedList = {}
-    for i = 1, table.getn(points) do
+    for i = 1, TableGetn(points) do
         local shortest = 320000
         local key, value
         for k, v in points do
@@ -179,7 +210,7 @@ function SortLocationsClosestToDefensivePoints(aiBrain, points)
             end
         end
         sortedList[i] = value
-        table.remove(points, key)
+        TableRemove(points, key)
     end
 
     return sortedList
@@ -198,9 +229,9 @@ function AISortMarkersFromStartPos(aiBrain, markerList, maxNumber, tMin, tMax, t
     end
 
     -- Simple selection sort, this can be made faster later if we decide we need it.
-    if table.empty(markerList) then return {} end
+    if TableEmpty(markerList) then return {} end
 
-    local num = table.getsize(markerList)
+    local num = TableGetSize(markerList)
     if maxNumber < num then
         num = maxNumber
     end
@@ -229,7 +260,7 @@ function AISortMarkersFromStartPos(aiBrain, markerList, maxNumber, tMin, tMax, t
         end
         if pos then
             sortedMarkerList[i] = pos
-            table.remove(markerList, key)
+            TableRemove(markerList, key)
         end
     end
 
@@ -249,9 +280,9 @@ function AISortMarkersFromLastPos(aiBrain, markerList, maxNumber, tMin, tMax, tR
     end
 
     -- Simple selection sort, this can be made faster later if we decide we need it.
-    if table.empty(markerList) then return {} end
+    if TableEmpty(markerList) then return {} end
 
-    local num = table.getsize(markerList)
+    local num = TableGetSize(markerList)
     if maxNumber < num then
         num = maxNumber
     end
@@ -280,7 +311,7 @@ function AISortMarkersFromLastPos(aiBrain, markerList, maxNumber, tMin, tMax, tR
             sortedMarkerList[i] = pos
             lastX = pos[1]
             lastZ = pos[3]
-            table.remove(markerList, key)
+            TableRemove(markerList, key)
         end
     end
 
@@ -294,7 +325,7 @@ function AIGetMarkerLocations(aiBrain, markerType)
         local tempMarkers = AIGetMarkerLocations(aiBrain, 'Blank Marker')
         for k, v in tempMarkers do
             if string.sub(v.Name, 1, 5) == 'ARMY_' then
-                table.insert(markerList, {Position = v.Position, Name = v.Name})
+                TableInsert(markerList, {Position = v.Position, Name = v.Name})
             end
         end
     else
@@ -302,7 +333,7 @@ function AIGetMarkerLocations(aiBrain, markerType)
         if markers then
             for k, v in markers do
                 if v.type == markerType then
-                    table.insert(markerList, {Position = v.position, Name = k})
+                    TableInsert(markerList, {Position = v.position, Name = k})
                 end
             end
         end
@@ -316,12 +347,12 @@ function AIGetMarkerLocationsEx(aiBrain, markerType)
     local markers = ScenarioUtils.GetMarkers()
     if markers then
         markerList = GenerateMarkerList(markerList,markers,markerType)
-        LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType)
+        LOG('AIGetMarkerLocationsEx '..TableGetn(markerList)..' markers for '..markerType)
         -- If we have no Amphibious Path Nodes, generate them from Land and Water Nodes
-        if markerType == 'Amphibious Path Node' and table.empty(markerList) then
+        if markerType == 'Amphibious Path Node' and TableEmpty(markerList) then
             markerList = GenerateAmphibiousMarkerList(markerList,markers,'Land Path Node')
             markerList = GenerateAmphibiousMarkerList(markerList,markers,'Water Path Node')
-            LOG('AIGetMarkerLocationsEx '..table.getn(markerList)..' markers for '..markerType..' (generated from Land/Water markers).')
+            LOG('AIGetMarkerLocationsEx '..TableGetn(markerList)..' markers for '..markerType..' (generated from Land/Water markers).')
             -- Inject the new amphibious marker to the MasterChain
             for k, v in markerList do
                 if v.type == 'Amphibious Path Node' then
@@ -338,13 +369,13 @@ function GenerateMarkerList(markerList,markers,markerType)
     for k, v in markers do
         if v.type == markerType then
             -- copy the marker to a local variable. We don't want to change values inside the original markers array
-            local marker = table.copy(v)
+            local marker = TableCopy(v)
             marker.name = k
             -- insert the (default)graph if missing.
             if not marker.graph then
                 marker.graph = 'Default'..markerType
             end
-            table.insert(markerList, marker)
+            TableInsert(markerList, marker)
         end
     end
     return markerList
@@ -352,7 +383,7 @@ end
 
 function GenerateAmphibiousMarkerList(markerList,markers,markerType)
     for k, v in markers do
-        local marker = table.copy(v)
+        local marker = TableCopy(v)
         if marker.type == markerType then
             if marker.adjacentTo and marker.adjacentTo ~= '' then
                 -- transform adjacentTo to Amphibious marker names
@@ -370,7 +401,7 @@ function GenerateAmphibiousMarkerList(markerList,markers,markerType)
                 marker.graph = 'DefaultAmphibious'
                 marker.type = 'Amphibious Path Node'
                 marker.color = 'ff00FFFF'
-                table.insert(markerList, marker)
+                TableInsert(markerList, marker)
             end
         end
     end
@@ -381,7 +412,7 @@ function AIGetMarkerPositionsAroundLocation(aiBrain, markerType, pos, radius, th
     local markers = AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
     local retMarkers = {}
     for _, v in markers do
-        table.insert(markers, v.Position)
+        TableInsert(markers, v.Position)
     end
 
     return retMarkers
@@ -394,11 +425,11 @@ function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin,
         local dist = VDist2(pos[1], pos[3], v.Position[1], v.Position[3])
         if dist < radius then
             if not threatMin then
-                table.insert(returnMarkers, v)
+                TableInsert(returnMarkers, v)
             else
                 local threat = aiBrain:GetThreatAtPosition(v.Position, threatRings, true, threatType or 'Overall')
                 if threat >= threatMin and threat <= threatMax then
-                    table.insert(returnMarkers, v)
+                    TableInsert(returnMarkers, v)
                 end
             end
         end
@@ -414,7 +445,7 @@ function AIGetMarkerLeastUnits(aiBrain, markerType, markerRadius, pos, posRad, u
         local startX, startZ = aiBrain:GetArmyStartPos()
         for k, v in tempMarkers do
             if string.sub(v.Name, 1, 5) == 'ARMY_' and VDist2(startX, startZ, v.Position[1], v.Position[3]) > 20 then
-                table.insert(markers, v)
+                TableInsert(markers, v)
             end
         end
     else
@@ -425,7 +456,7 @@ function AIGetMarkerLeastUnits(aiBrain, markerType, markerRadius, pos, posRad, u
     local retPos = false
     local retName = false
     for k, v in markers do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, unitCat, v.Position, markerRadius, tMin, tMax, tRings, tType))
+        local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, unitCat, v.Position, markerRadius, tMin, tMax, tRings, tType))
         if (not retPos and numUnits < unitCount) or (numUnits < lowest and numUnits < unitCount) then
             lowest = numUnits
             retPos = v.Position
@@ -454,7 +485,7 @@ function AIFilterAlliedBases(aiBrain, positions)
     for _, v in positions do
         local threat = GetAlliesThreat(aiBrain, v, 2, 'StructuresNotMex')
         if threat == 0 then
-            table.insert(retPositions, v)
+            TableInsert(retPositions, v)
         end
     end
 
@@ -501,7 +532,7 @@ function AIFindStartLocationNeedsEngineer(aiBrain, locationType, radius, tMin, t
     for _, v in positions do
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
             if startX ~= v.Position[1] and startZ ~= v.Position[3] then
-                table.insert(validPos, v)
+                TableInsert(validPos, v)
             end
         end
     end
@@ -559,7 +590,7 @@ function AIFindNavalDefensivePointNeedsStructure(aiBrain, locationType, radius, 
 
     local retPos, retName, lowest
     for k, v in positions do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
+        local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
         if numUnits < unitMax then
             if not retPos or numUnits < lowest then
                 lowest = numUnits
@@ -581,7 +612,7 @@ function AIFindDefensivePointNeedsStructure(aiBrain, locationType, radius, categ
 
     local retPos, retName, lowest
     for k, v in positions do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
+        local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
         if numUnits < unitMax then
             if not retPos or numUnits < lowest then
                 lowest = numUnits
@@ -608,7 +639,7 @@ function AIFindFirebaseLocation(aiBrain, locationType, radius, markerType, tMin,
         local distSq = VDist2Sq(marker.Position[1], marker.Position[3], threatPos[1], threatPos[3])
 
         if distSq < radius * radius  then
-            table.insert(inRangeList, marker)
+            TableInsert(inRangeList, marker)
         end
     end
 
@@ -623,7 +654,7 @@ function AIFindFirebaseLocation(aiBrain, locationType, radius, markerType, tMin,
     for _, marker in inRangeList do
         local threat = aiBrain:GetThreatAtPosition(marker.Position, 1, true, 'AntiSurface')
         if threat < maxThreat then
-            local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, catCheck, marker.Position, markerRadius or 20))
+            local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, catCheck, marker.Position, markerRadius or 20))
             if numUnits < maxUnits then
                 if threat < bestThreat and threat < maxThreat then
                     bestDistSq = VDist2Sq(threatPos[1], threatPos[3], marker.Position[1], marker.Position[3])
@@ -653,7 +684,7 @@ function AIGetMarkerMostUnits(aiBrain, markerType, markerRadius, pos, posRad, un
     local retPos = false
     local retName = false
     for _, v in markers do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, unitCat, v.Position, markerRadius, tMin, tMax, tRings, tType))
+        local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, unitCat, v.Position, markerRadius, tMin, tMax, tRings, tType))
         if not retPos or numUnits > lowest then
             lowest = numUnits
             retPos = v.Position
@@ -669,9 +700,9 @@ function AIGetClosestMarkerLocation(aiBrain, markerType, startX, startZ, extraTy
     if extraTypes then
         for num, pType in extraTypes do
             local moreMarkers = AIGetMarkerLocations(aiBrain, pType)
-            if not table.empty(moreMarkers) then
+            if not TableEmpty(moreMarkers) then
                 for _, v in moreMarkers do
-                    table.insert(markerList, {Position = v.Position, Name = v.Name})
+                    TableInsert(markerList, {Position = v.Position, Name = v.Name})
                 end
             end
         end
@@ -782,11 +813,11 @@ function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMa
     if aiBrain.HasPlatoonList then
         for k, v in aiBrain.PBM.Locations do
             if v.LocationType ~= 'MAIN' then
-                table.insert(positions, v.Location)
+                TableInsert(positions, v.Location)
             end
         end
     elseif aiBrain.BuilderManagers['MAIN'] then
-        table.insert(positions, aiBrain.BuilderManagers['MAIN'].FactoryManager:GetLocationCoords())
+        TableInsert(positions, aiBrain.BuilderManagers['MAIN'].FactoryManager:GetLocationCoords())
     end
 
     local bestFit
@@ -794,12 +825,12 @@ function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMa
     local mainPos = aiBrain:PBMGetLocationCoords('MAIN')
     local otherPos = AIGetMarkersAroundLocation(aiBrain, 'Defensive Point', mainPos, radius, tMin, tMax, tRings, tType)
     for _, v in otherPos do
-        table.insert(positions, v.Position)
+        TableInsert(positions, v.Position)
     end
     for _, v in positions do
         if Utils.XZDistanceTwoVectors(v, mainPos) < radius then
-            local tempUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(unitCategory), v, 30))
-            local numWalls = table.getn(GetOwnUnitsAroundPoint(aiBrain, categories.WALL, v, 40))
+            local tempUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(unitCategory), v, 30))
+            local numWalls = TableGetn(GetOwnUnitsAroundPoint(aiBrain, categories.WALL, v, 40))
             if tempUnits > count and numWalls < 10 and (not bestFit or tempUnits > mostUnits) then
                 bestFit = v
                 mostUnits = tempUnits
@@ -875,7 +906,7 @@ function AIEngineersAssistFactories(aiBrain, engineers, factories)
     end
 
     -- Sort Factories based on number of guards
-    for i = 1, table.getn(factories) do
+    for i = 1, TableGetn(factories) do
         lowNum = false
         key = -1
         value = false
@@ -902,7 +933,7 @@ function AIEngineersAssistFactories(aiBrain, engineers, factories)
                     setVal = true
                 end
                 if setVal then
-                    lowNum = table.getn(v:GetGuards())
+                    lowNum = TableGetn(v:GetGuards())
                     value = v
                     key = j
                 end
@@ -910,7 +941,7 @@ function AIEngineersAssistFactories(aiBrain, engineers, factories)
         end
         if key > 0 then
             factoryData[i] = {Factory = value, NumGuards = lowNum}
-            table.remove(factories, key)
+            TableRemove(factories, key)
         end
     end
 
@@ -940,10 +971,10 @@ end
 function AIReturnAssistingFactories(factory)
     local guards = factory:GetGuards()
     local guardFacs = {}
-    table.insert(guardFacs, factory)
+    TableInsert(guardFacs, factory)
     for k, v in guards do
         if not v.Dead and EntityCategoryContains(categories.FACTORY, v) then
-            table.insert(guardFacs, v)
+            TableInsert(guardFacs, v)
         end
     end
 
@@ -981,17 +1012,17 @@ function GetBasePatrolPoints(aiBrain, location, radius, layer)
     local locList = {}
     for k, v in vecs do
         if LayerCheckPosition(v, layer) and VDist2(v[1], v[3], location[1], location[3]) < radius then
-            table.insert(locList, v)
+            TableInsert(locList, v)
         end
     end
 
-    if table.empty(locList) then return {} end
+    if TableEmpty(locList) then return {} end
 
     -- Sort the locations from point to closest point, that way it  makes a nice patrol path
     local sortedList = {}
     local lastX = location[1]
     local lastZ = location[3]
-    local num = table.getsize(locList)
+    local num = TableGetSize(locList)
     for i = 1, num do
         local lowest
         local czX, czZ, pos, distance, key
@@ -1009,7 +1040,7 @@ function GetBasePatrolPoints(aiBrain, location, radius, layer)
         sortedList[i] = pos
         lastX = pos[1]
         lastZ = pos[3]
-        table.remove(locList, key)
+        TableRemove(locList, key)
     end
 
     return sortedList
@@ -1020,8 +1051,8 @@ function GetUnitBaseStructureVector(unit)
         local pos = unit:GetPosition()
         pos[1] = pos[1] + 16
         pos[3] = pos[3] + 16
-        local x = math.floor(pos[1] / 32) - 1
-        local z = math.floor(pos[3] / 32) - 1
+        local x = MathFloor(pos[1] / 32) - 1
+        local z = MathFloor(pos[3] / 32) - 1
         local height = GetTerrainHeight(x, z)
         if GetSurfaceHeight(x, z) > height then
             height = GetSurfaceHeight(x, z)
@@ -1045,10 +1076,10 @@ function GetOwnUnitsAroundPoint(aiBrain, category, location, radius, min, max, r
             if checkThreat then
                 local threat = aiBrain:GetThreatAtPosition(v:GetPosition(), rings, true, tType or 'Overall')
                 if threat >= min and threat <= max then
-                    table.insert(retUnits, v)
+                    TableInsert(retUnits, v)
                 end
             else
-                table.insert(retUnits, v)
+                TableInsert(retUnits, v)
             end
         end
     end
@@ -1062,7 +1093,7 @@ function GetBrainUnitsAroundPoint(aiBrain, category, location, radius, tBrain)
     local retTable = {}
     for _, v in units do
         if not v.Dead and v:GetAIBrain():GetArmyIndex() == tIndex then
-            table.insert(retTable, v)
+            TableInsert(retTable, v)
         end
     end
 
@@ -1091,8 +1122,8 @@ function GetNearestPathingPoint(position)
     if not position then
         return false
     end
-    local x = math.floor(position[1] / 8)
-    local z = math.floor(position[3] / 8)
+    local x = MathFloor(position[1] / 8)
+    local z = MathFloor(position[3] / 8)
     retPos = {(x * 8) , 0,  (z * 8)}
     if retPos[1] == 0 then
         retPos[1] = 1
@@ -1238,11 +1269,11 @@ end
 
 function FindIdleGates(aiBrain)
     local gates = aiBrain:GetListOfUnits(categories.GATE, true)
-    if gates and not table.empty(gates) then
+    if gates and not TableEmpty(gates) then
         local retGates = {}
         for _, v in gates do
             if not v:IsUnitState('Building') and not v:IsUnitState('TransportLoading') then
-                table.insert(retGates, v)
+                TableInsert(retGates, v)
             end
         end
         return retGates
@@ -1315,7 +1346,7 @@ function GetTransports(platoon, units)
     end
 
     -- Check for empty platoon
-    if table.empty(units) then
+    if TableEmpty(units) then
         return 0
     end
 
@@ -1352,13 +1383,13 @@ function GetTransports(platoon, units)
             local unitPos = unit:GetPosition()
             local curr = {Unit = unit, Distance = VDist2(unitPos[1], unitPos[3], location[1], location[3]),
                            Id = unit.UnitId}
-            table.insert(transports, curr)
+            TableInsert(transports, curr)
         end
     end
 
     local numTransports = 0
     local transSlotTable = {}
-    if not table.empty(transports) then
+    if not TableEmpty(transports) then
         local sortedList = {}
         -- Sort distances
         for k = 1, table.getn(transports) do
@@ -1373,11 +1404,11 @@ function GetTransports(platoon, units)
             end
             sortedList[k] = value
             -- Remove from unsorted table
-            table.remove(transports, key)
+            TableInsert(transports, key)
         end
 
         -- Take transports as needed
-        for i = 1, table.getn(sortedList) do
+        for i = 1, TableGetn(sortedList) do
             if transportsNeeded and table.empty(sortedList[i].Unit:GetCargo()) and not sortedList[i].Unit:IsUnitState('TransportLoading') then
                 local id = sortedList[i].Id
                 aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
@@ -1452,7 +1483,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         if not transSlotTable[id] then
             transSlotTable[id] = GetNumTransportSlots(unit)
         end
-        table.insert(transportTable,
+        TableInsert(transportTable,
             {
                 Transport = unit,
                 LargeSlots = transSlotTable[id].Large,
@@ -1473,15 +1504,15 @@ function UseTransports(units, transports, location, transportPlatoon)
             if unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             elseif EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
-                table.insert(shields, unit)
+                TableInsert(shields, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
-                table.insert(remainingSize3, unit)
+                TableInsert(remainingSize3, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 2 then
-                table.insert(remainingSize2, unit)
+                TableInsert(remainingSize2, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 1 then
-                table.insert(remainingSize1, unit)
+                TableInsert(remainingSize1, unit)
             else
-                table.insert(remainingSize1, unit)
+                TableInsert(remainingSize1, unit)
             end
         end
     end
@@ -1501,13 +1532,13 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, leftoverShields, -1)
 
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, remainingSize2, -1)
 
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, remainingSize1, -1)
 
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
     aiBrain:AssignUnitsToPlatoon(pool, currLeftovers, 'Unassigned', 'None')
@@ -1520,13 +1551,13 @@ function UseTransports(units, transports, location, transportPlatoon)
         if not table.empty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
-            for k, v in data.Units do table.insert(monitorUnits, v) end
+            for k, v in data.Units do TableInsert(monitorUnits, v) end
         end
     end
 
     local attached = true
     repeat
-        coroutine.yield(20)
+        WaitTicks(20)
         local allDead = true
         local transDead = true
         for k, v in units do
@@ -1557,21 +1588,21 @@ function UseTransports(units, transports, location, transportPlatoon)
             if not unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             end
-        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.empty(unit:GetCargo()) then
+        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and TableEmpty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)
-            table.remove(transports, k)
+            TableRemove(transports, k)
         end
     end
 
     -- If some transports have no units return to pool
     for k, t in transports do
-        if not t.Dead and table.empty(t:GetCargo()) then
+        if not t.Dead and TableEmpty(t:GetCargo()) then
             aiBrain:AssignUnitsToPlatoon('ArmyPool', {t}, 'Scout', 'None')
-            table.remove(transports, k)
+            TableRemove(transports, k)
         end
     end
 
-    if not table.empty(transports) then
+    if not TableEmpty(transports) then
         -- If no location then we have loaded transports then return true
         if location then
             -- Adding Surface Height, so the transporter get not confused, because the target is under the map (reduces unload time)
@@ -1597,7 +1628,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local attached = true
     while attached do
-        coroutine.yield(20)
+        WaitTicks(20)
         local allDead = true
         for _, v in transports do
             if not v.Dead then
@@ -1659,7 +1690,7 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
                 end
             end
             if transSlotNum > 0 then
-                table.insert(transportTable[transSlotNum].Units, unit)
+                TableInsert(transportTable[transSlotNum].Units, unit)
                 if unit:GetBlueprint().Transport.TransportClass == 3 and remainingLarge >= 1 then
                     transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - 1
                     transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 2
@@ -1675,10 +1706,10 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
                 elseif remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
                 else
-                    table.insert(leftoverUnits, unit)
+                    TableInsert(leftoverUnits, unit)
                 end
             else
-                table.insert(leftoverUnits, unit)
+                TableInsert(leftoverUnits, unit)
             end
         end
     end
@@ -1735,7 +1766,7 @@ end
 function SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
     local leftovers = {}
     local goodUnits = {}
-    local numUnits = table.getn(units)
+    local numUnits = TableGetn(units)
     if numUnits == overflowSm+overflowMd+overflowLg then
         return goodUnits, units
     end
@@ -1743,19 +1774,19 @@ function SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
         if overflowSm + overflowMd+overflowLg > 0 then
             local transportClass = unit:GetBlueprint().Transport.TransportClass
             if transportClass == 2 and overflowMd > 0 then
-                table.insert(leftovers, unit)
+                TableInsert(leftovers, unit)
                 overflowMd = overflowMd - 1
             elseif transportClass == 3 and overflowLg > 0 then
-                table.insert(leftovers, unit)
+                TableInsert(leftovers, unit)
                 overflowLg = overflowLg - 1
             elseif overflowSm > 0 then
-                table.insert(leftovers, unit)
+                TableInsert(leftovers, unit)
                 overflowSm = overflowSm - 1
             else
-                table.insert(goodUnits, unit)
+                TableInsert(goodUnits, unit)
             end
         else
-            table.insert(goodUnits, unit)
+            TableInsert(goodUnits, unit)
         end
     end
 
@@ -1798,7 +1829,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
     if result then
         local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
         if path then
-            local pathSize = table.getn(path)
+            local pathSize = TableGetn(path)
             -- Move to way points (but not to destination... leave that for the final command)
             for widx, waypointPath in path do
                 if pathSize ~= widx then
@@ -1822,7 +1853,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     -- Check if enemy units are at location
     local checkUnits = aiBrain:GetUnitsAroundPoint( (categories.STRUCTURE + categories.MOBILE) - categories.AIR, pos, 10, 'Enemy')
     -- reclaim units near our building place.
-    if checkUnits and not table.empty(checkUnits) then
+    if checkUnits and not TableEmpty(checkUnits) then
         for num, unit in checkUnits do
             if unit.Dead or unit:BeenDestroyed() then
                 continue
@@ -1844,7 +1875,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
     end
     -- reclaim rocks etc or we can't build mexes or hydros
     local Reclaimables = GetReclaimablesInRect(Rect(pos[1], pos[3], pos[1], pos[3]))
-    if Reclaimables and not table.empty( Reclaimables ) then
+    if Reclaimables and not TableEmpty( Reclaimables ) then
         for k,v in Reclaimables do
             if v.MaxMassReclaim > 0 or v.MaxEnergyReclaim > 0 then
                 IssueReclaim({eng}, v)
@@ -1862,7 +1893,7 @@ function EngineerTryRepair(aiBrain, eng, whatToBuild, pos)
 
     local structureCat = ParseEntityCategory(whatToBuild)
     local checkUnits = aiBrain:GetUnitsAroundPoint(structureCat, pos, 1, 'Ally')
-    if checkUnits and not table.empty(checkUnits) then
+    if checkUnits and not TableEmpty(checkUnits) then
         for num, unit in checkUnits do
             IssueRepair({eng}, unit)
         end
@@ -1978,7 +2009,7 @@ function GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
     local retUnits = {}
     for k, v in filterUnits do
         if v:IsUnitState('Building') or v:IsUnitState('Upgrading') then
-            table.insert(retUnits, v)
+            TableInsert(retUnits, v)
         end
     end
 
@@ -2015,16 +2046,16 @@ function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
     local locList = {}
     for _, v in vecs do
         if LayerCheckPosition(v, layer) and VDist2(v[1], v[3], location[1], location[3]) < radius then
-            table.insert(locList, v)
+            TableInsert(locList, v)
         end
     end
     local sortedList = {}
     local lastX = location[1]
     local lastZ = location[3]
 
-    if table.empty(locList) then return {} end
+    if TableEmpty(locList) then return {} end
 
-    local num = table.getsize(locList)
+    local num = TableGetSize(locList)
     local startX, startZ = aiBrain:GetArmyStartPos()
     local tempdistance = false
     local edistance
@@ -2062,7 +2093,7 @@ function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
         sortedList[i] = pos
         lastX = pos[1]
         lastZ = pos[3]
-        table.remove(locList, key)
+        TableRemove(locList, key)
     end
 
     return sortedList
@@ -2085,7 +2116,7 @@ function AIGetSortedHydroLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, p
     local newList = {}
     for _, v in markerList do
         if aiBrain:CanBuildStructureAt('ueb1102', v.Position) then
-            table.insert(newList, v)
+            TableInsert(newList, v)
         end
     end
 
@@ -2128,7 +2159,7 @@ function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
     if result then
         local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination, 10)
         if path then
-            local pathSize = table.getn(path)
+            local pathSize = TableGetn(path)
             -- Move to way points (but not to destination... leave that for the final command)
             for widx, waypointPath in path do
                 if pathSize ~= widx then
@@ -2156,7 +2187,7 @@ function EngineerTryRepairSorian(aiBrain, eng, whatToBuild, pos)
 
     local structureCat = ParseEntityCategory(whatToBuild)
     local checkUnits = aiBrain:GetUnitsAroundPoint(structureCat, pos, checkRange, 'Ally')
-    if checkUnits and not table.empty(checkUnits) then
+    if checkUnits and not TableEmpty(checkUnits) then
         for num, unit in checkUnits do
             if unit:IsBeingBuilt() then
                 IssueRepair({eng}, unit)
@@ -2282,21 +2313,21 @@ function AIFindStartLocationNeedsEngineerSorian(aiBrain, locationType, radius, t
     for _, v in positions do
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
             if startX ~= v.Position[1] and startZ ~= v.Position[3] then
-                table.insert(validStartPos, v)
+                TableInsert(validStartPos, v)
             end
         end
     end
 
     local retPos, retName
     if eng then
-        if not table.empty(validStartPos) then
+        if not TableEmpty(validStartPos) then
             retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, validStartPos)
         end
         if not retPos then
             retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, eng:GetPosition(), radius, tMin, tMax, tRings, tType, validPos)
         end
     else
-        if not table.empty(validStartPos) then
+        if not TableEmpty(validStartPos) then
             retPos, retName = AIFindMarkerNeedsEngineer(aiBrain, pos, radius, tMin, tMax, tRings, tType, validStartPos)
         end
         if not retPos then
@@ -2313,7 +2344,7 @@ function AIGetAttackPointsAroundLocation(aiBrain, pos, maxRange)
         for k, v in aiBrain.AttackPoints do
             local dist = VDist2(pos[1], pos[3], v.Position[1], v.Position[3])
             if dist < maxRange then
-                table.insert(markerList, {Position = v.Position})
+                TableInsert(markerList, {Position = v.Position})
             end
         end
     end
@@ -2381,8 +2412,8 @@ function AIFindUndefendedBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRa
         return false
     end
 
-    local numUnits = table.getn(platoon:GetPlatoonUnits())
-    local maxShields = math.ceil(numUnits / 7)
+    local numUnits = TableGetn(platoon:GetPlatoonUnits())
+    local maxShields = MathCeil(numUnits / 7)
     local targetUnits = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, maxRange, 'Enemy')
     for _, v in atkPri do
         local category = ParseEntityCategory(v)
@@ -2503,10 +2534,10 @@ function GetOwnUnitsAroundPointSorian(aiBrain, category, location, radius, min, 
                 if checkThreat then
                     local threat = aiBrain:GetThreatAtPosition(v:GetPosition(), rings, true, tType or 'Overall')
                     if threat >= min and threat <= max then
-                        table.insert(retUnits, v)
+                        TableInsert(retUnits, v)
                     end
                 else
-                    table.insert(retUnits, v)
+                    TableInsert(retUnits, v)
                 end
             end
         end
@@ -2523,7 +2554,7 @@ function FindUnclutteredArea(aiBrain, category, location, radius, maxUnits, maxR
         if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
             local nearby = aiBrain:GetNumUnitsAroundPoint(avoidCat, v:GetPosition(), maxRadius, 'Ally')
             if nearby < maxUnits then
-                table.insert(retUnits, v)
+                TableInsert(retUnits, v)
             end
         end
     end
@@ -2540,7 +2571,7 @@ function AIFindExpansionPointNeedsStructure(aiBrain, locationType, radius, categ
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Expansion Area', pos, radius, tMin, tMax, tRings, tType)
     local retPos, retName, lowest
     for _, v in positions do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
+        local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
         if numUnits < unitMax then
             if not retPos or numUnits < lowest then
                 lowest = numUnits
@@ -2624,11 +2655,11 @@ function AIGetPingMarkersAroundLocation(aiBrain, threatMin, threatMax, threatRin
     if aiBrain.TacticalBases then
         for k, v in aiBrain.TacticalBases do
             if not threatMin then
-                table.insert(returnMarkers, v)
+                TableInsert(returnMarkers, v)
             else
                 local threat = aiBrain:GetThreatAtPosition(v.Position, threatRings, true, threatType or 'Overall')
                 if threat >= threatMin and threat <= threatMax then
-                    table.insert(returnMarkers, v)
+                    TableInsert(returnMarkers, v)
                 end
             end
         end
@@ -2641,14 +2672,14 @@ function AIGetMarkerLocationsSorian(aiBrain, markerType)
     local markerList = {}
     if aiBrain.TacticalBases then
         for k, v in aiBrain.TacticalBases do
-            table.insert(markerList, {Position = v.Position, Name = k})
+            TableInsert(markerList, {Position = v.Position, Name = k})
         end
     end
     local markers = ScenarioUtils.GetMarkers()
     if markers then
         for k, v in markers do
             if v.type == markerType then
-                table.insert(markerList, {Position = v.position, Name = k})
+                TableInsert(markerList, {Position = v.position, Name = k})
             end
         end
     end
@@ -2666,7 +2697,7 @@ function AIFindDefensivePointNeedsStructureSorian(aiBrain, locationType, radius,
     local positions = AIGetMarkersAroundLocation(aiBrain, 'Defensive Point', pos, radius, tMin, tMax, tRings, tType)
     local retPos, retName, lowest
     for _, v in primarkers do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
+        local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
         if numUnits < unitMax then
             if not retPos or numUnits < lowest then
                 lowest = numUnits
@@ -2679,7 +2710,7 @@ function AIFindDefensivePointNeedsStructureSorian(aiBrain, locationType, radius,
         return retPos, retName
     end
     for _, v in positions do
-        local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
+        local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(category), v.Position, markerRadius))
         if numUnits < unitMax then
             if not retPos or numUnits < lowest then
                 lowest = numUnits
@@ -2705,7 +2736,7 @@ function AIFindFirebaseLocationSorian(aiBrain, locationType, radius, markerType,
     for _, marker in markerList do
         local distSq = VDist2Sq(marker.Position[1], marker.Position[3], threatPos[1], threatPos[3])
         if distSq < radius * radius  then
-            table.insert(inRangeList, marker)
+            TableInsert(inRangeList, marker)
         end
     end
 
@@ -2720,7 +2751,7 @@ function AIFindFirebaseLocationSorian(aiBrain, locationType, radius, markerType,
     for _, marker in inRangeList do
         local threat = aiBrain:GetThreatAtPosition(marker.Position, 1, true, 'AntiSurface')
         if threat < maxThreat then
-            local numUnits = table.getn(GetOwnUnitsAroundPoint(aiBrain, catCheck, marker.Position, markerRadius or 20))
+            local numUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, catCheck, marker.Position, markerRadius or 20))
             if numUnits < maxUnits then
                 if threat < bestThreat and threat < maxThreat then
                     bestDistSq = VDist2Sq(threatPos[1], threatPos[3], marker.Position[1], marker.Position[3])
@@ -2769,7 +2800,7 @@ function UseTransportsGhetto(units, transports)
         if not transSlotTable[id] then
             transSlotTable[id] = GetNumTransportSlots(unit)
         end
-        table.insert(transportTable,
+        TableInsert(transportTable,
             {
                 Transport = unit,
                 LargeSlots = transSlotTable[id].Large,
@@ -2790,15 +2821,15 @@ function UseTransportsGhetto(units, transports)
             if unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             elseif EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
-                table.insert(shields, unit)
+                TableInsert(shields, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
-                table.insert(remainingSize3, unit)
+                TableInsert(remainingSize3, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 2 then
-                table.insert(remainingSize2, unit)
+                TableInsert(remainingSize2, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 1 then
-                table.insert(remainingSize1, unit)
+                TableInsert(remainingSize1, unit)
             else
-                table.insert(remainingSize1, unit)
+                TableInsert(remainingSize1, unit)
             end
         end
     end
@@ -2817,13 +2848,13 @@ function UseTransportsGhetto(units, transports)
 
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, leftoverShields, -1)
 
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, remainingSize2, -1)
 
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, remainingSize1, -1)
 
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
     aiBrain:AssignUnitsToPlatoon(pool, currLeftovers, 'Unassigned', 'None')
@@ -2838,13 +2869,13 @@ function UseTransportsGhetto(units, transports)
         if not table.empty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
-            for _, v in data.Units do table.insert(monitorUnits, v) end
+            for _, v in data.Units do TableInsert(monitorUnits, v) end
         end
     end
 
     local attached = true
     repeat
-        WaitSeconds(2)
+        WaitTicks(2)
         local allDead = true
         local transDead = true
         for _, v in units do
@@ -2875,17 +2906,17 @@ function UseTransportsGhetto(units, transports)
             if not unit:IsUnitState('Attached') then
                 aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             end
-        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and table.empty(unit:GetCargo()) then
+        elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and TableEmpty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)
-            table.remove(transports, k)
+            TableRemove(transports, k)
         end
     end
 
     -- Return empty transports to base
     for k, v in transports do
-        if not v.Dead and EntityCategoryContains(categories.TRANSPORTATION, v) and table.empty(v:GetCargo()) then
+        if not v.Dead and EntityCategoryContains(categories.TRANSPORTATION, v) and TableEmpty(v:GetCargo()) then
             ReturnTransportsToPool({v}, true)
-            table.remove(transports, k)
+            TableRemove(transports, k)
         end
     end
 
@@ -2931,7 +2962,7 @@ function AIFindFurthestStartLocationNeedsEngineer(aiBrain, locationType, radius,
     for _, v in positions do
         if string.sub(v.Name, 1, 5) == 'ARMY_' then
             if startX ~= v.Position[1] and startZ ~= v.Position[3] then
-                table.insert(validPos, v)
+                TableInsert(validPos, v)
             end
         end
     end
