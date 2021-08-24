@@ -104,6 +104,7 @@ local function mount_dir_with_whitelist(dir, glob, mountpoint)
     table.sort(sorted)
     table.foreach(sorted, function(k,v) mount_dir(v,'/') end)
 end
+
 local function mount_dir_with_blacklist(dir, glob, mountpoint)
     sorted = {}
     LOG('checking ' .. dir .. glob)
@@ -124,6 +125,7 @@ local function mount_dir_with_blacklist(dir, glob, mountpoint)
     table.sort(sorted)
     table.foreach(sorted, function(k,v) mount_dir(v,'/') end)
 end
+
 -- Begin map mounting section
 -- This section mounts movies and sounds from maps, essential for custom missions and scripted maps
 local function mount_map_dir(dir, glob, mountpoint)
@@ -141,6 +143,7 @@ local function mount_map_dir(dir, glob, mountpoint)
         end
     end
 end
+
 -- Begin mod mounting section
 -- This section mounts sounds from the mods directory to allow mods to add custom sounds to the game
 function mount_mod_sounds(MODFOLDER)
@@ -182,15 +185,13 @@ load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Comm
 -- load in files from default vault location
 load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
 
-
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
  
 -- these are using the newly generated path from the dofile() statement at the beginning of this script
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
 mount_dir(fa_path, '/')
- 
- 
+
 hook = {
     '/schook'
 }
