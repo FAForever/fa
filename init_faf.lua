@@ -169,12 +169,13 @@ local function load_vault(vault_path)
 	mount_contents(vault_path .. '\\maps', '/maps')
 end
 
+
+if custom_vault_path ~= nil then
+    LOG('Loading custom vault path' .. custom_vault_path)
+    load_vault(custom_vault_path)
+end
 load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
 load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
-if custom_vault_path ~= nil then
-	LOG('Loading custom vault path' .. custom_vault_path)
-	load_vault(custom_vault_path)
-end
 
 
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
