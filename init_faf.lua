@@ -161,6 +161,7 @@ function mount_mod_sounds(MODFOLDER)
     end
 end
 
+-- adds maps / mods to keep track of for the game
 local function load_vault(vault_path)
 	mount_map_dir(vault_path .. '\\maps\\', '**', '/maps')
 	mount_mod_sounds(vault_path .. '\\mods')
@@ -169,12 +170,16 @@ local function load_vault(vault_path)
 	mount_contents(vault_path .. '\\maps', '/maps')
 end
 
-
-if custom_vault_path ~= nil then
-    LOG('Loading custom vault path' .. custom_vault_path)
-    load_vault(custom_vault_path)
+-- load in custom vault location first so that it takes precendence
+if custom_vault_path then
+	LOG('Loading custom vault path' .. custom_vault_path)
+	load_vault(custom_vault_path)
 end
+
+-- load in files from backup vault location
 load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+
+-- load in files from default vault location
 load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
 
 
