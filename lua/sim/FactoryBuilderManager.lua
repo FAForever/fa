@@ -195,6 +195,8 @@ FactoryBuilderManager = Class(BuilderManager) {
                     self:SetupNewFactory(unit, 'Air')
                 elseif EntityCategoryContains(categories.NAVAL, unit) then
                     self:SetupNewFactory(unit, 'Sea')
+                else
+                    self:SetupNewFactory(unit, 'Gate') 
                 end
             end
             self.LocationActive = true
