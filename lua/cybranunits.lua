@@ -141,6 +141,8 @@ CConstructionTemplate = Class() {
 
     --- When making build effects, try and make the bots.
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
+
+        -- Prevent an AI from (ab)using the bots for other purposes than building
         local builderArmy = self.Army
         local unitBeingBuiltArmy = unitBeingBuilt.Army
         if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
