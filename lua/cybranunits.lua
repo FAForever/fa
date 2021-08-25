@@ -35,6 +35,7 @@ local CreateCybranBuildBeamsOpti = EffectUtil.CreateCybranBuildBeamsOpti
 -- upvalued globals for performance
 local Random = Random
 local VDist2Sq = VDist2Sq
+local ArmyBrains = ArmyBrains
 local KillThread = KillThread
 local ForkThread = ForkThread
 local WaitTicks = coroutine.yield
@@ -45,6 +46,7 @@ local IssueClearCommands = IssueClearCommands
 -- upvalued moho functions for performance
 local EntityFunctions = _G.moho.entity_methods 
 local EntityDestroy = EntityFunctions.Destroy
+local EntityGetPosition = EntityFunctions.GetPosition
 local EntityGetPositionXYZ = EntityFunctions.GetPositionXYZ
 EntityFunctions = nil
 
@@ -139,11 +141,15 @@ CConstructionTemplate = Class() {
 
     --- When making build effects, try and make the bots.
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
-        SpawnBuildBotsOpti(self)
-        if stationary then 
-            CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+        local builderArmy = self.Army
+        local unitBeingBuiltArmy = unitBeingBuilt.Army
+        if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
+            SpawnBuildBotsOpti(self)
+            if stationary then 
+                CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+            end
+            CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
         end
-        CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
     end,
 
     --- When destroyed, destroy the bots too.
@@ -206,7 +212,7 @@ CConstructionTemplate = Class() {
 
             -- instruct bots to move back
             IssueClearCommands(bots)
-            IssueMove(bots, self:GetPosition())
+            IssueMove(bots, EntityGetPosition(self))
 
             -- check if they're there yet
             for l = 1, 4 do 

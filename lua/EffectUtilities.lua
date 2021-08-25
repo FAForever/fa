@@ -384,6 +384,7 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Build
     if not DeprecatedWarnings.CreateCybranBuildBeams then 
         DeprecatedWarnings.CreateCybranBuildBeams = true 
         WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
     end
 
     WaitSeconds(0.2)
@@ -421,6 +422,7 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
     if not DeprecatedWarnings.SpawnBuildBots then 
         DeprecatedWarnings.SpawnBuildBots = true 
         WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
     end
 
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
@@ -485,6 +487,7 @@ function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildE
     if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
         DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
         WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
     end
 
     -- Create build constant build effect for each build effect bone defined
@@ -512,15 +515,16 @@ function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildE
     end
 end
 
+local BuildEffects = {
+    '/effects/emitters/sparks_03_emit.bp',
+    '/effects/emitters/flashes_01_emit.bp',
+}
+local UnitBuildEffects = {
+    '/effects/emitters/build_cybran_spark_flash_04_emit.bp',
+    '/effects/emitters/build_sparks_blue_02_emit.bp',
+}
+
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, BuildEffectsBag)
-    local BuildEffects = {
-        '/effects/emitters/sparks_03_emit.bp',
-        '/effects/emitters/flashes_01_emit.bp',
-    }
-    local UnitBuildEffects = {
-        '/effects/emitters/build_cybran_spark_flash_04_emit.bp',
-        '/effects/emitters/build_sparks_blue_02_emit.bp',
-    }
 
     CreateCybranBuildBeams(builder, unitBeingBuilt, BuildBones.BuildEffectBones, BuildEffectsBag)
 

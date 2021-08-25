@@ -10,6 +10,7 @@ local VectorCached = Vector(0, 0, 0)
 local Warp = Warp
 local Vector = Vector
 local Random = Random
+local ArmyBrains = ArmyBrains
 local CreateUnit = CreateUnit
 local KillThread = KillThread 
 local setmetatable = setmetatable
@@ -78,12 +79,6 @@ function SpawnBuildBots(builder)
 
         bots = builder.BuildBots
     end
-
-    -- -- prevent capturing of units 
-    -- local unitBeingBuiltArmy = unitBeingBuilt.Army or nil
-    -- if not (builderArmy == unitBeingBuiltArmy or IsHumanUnit(unitBeingBuilt) ) then     -- TODO: why is there an IsHumanUnit check?
-    --     return
-    -- end
 
     -- get information about the builder
     local x, y, z = EntityGetPositionXYZ(builder)
