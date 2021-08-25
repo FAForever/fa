@@ -91,17 +91,6 @@ function AIGetEconomyNumbers(aiBrain)
     return econ
 end
 
-function AIGetStartLocations(aiBrain)
-    local markerList = {}
-    for i = 1, 16 do
-        if Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i] then
-            TableInsert(markerList, Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i].position)
-        end
-    end
-
-    return markerList
-end
-
 function AIGetSortedScoutingLocations(aiBrain, maxNum)
     local markerList = AIGetMarkerLocations(aiBrain, 'Combat Zone')
     for i = 1, TableGetn(ArmyBrains) do
@@ -298,31 +287,39 @@ end
 
 
 function AIGetMarkerLocations(aiBrain, markerType)
+    if ScenarioInfo.Env.Scenario.MasterChain[markerType] then
+        --LOG("Hey I've already done it so I'm getting the cached version " .. repr(markerType))
+		return ScenarioInfo.Env.Scenario.MasterChain[markerType]
+	end
     local markerList = {}
+    local counter = 0 
     if markerType == 'Start Location' then
         local tempMarkers = AIGetMarkerLocations(aiBrain, 'Blank Marker')
         for k, v in tempMarkers do
             if string.sub(v.Name, 1, 5) == 'ARMY_' then
-                TableInsert(markerList, {Position = v.Position, Name = v.Name})
+                counter = counter + 1
+                markerList[counter] = {Position = v.Position, Name = v.Name}
             end
         end
     else
-        local markers = ScenarioUtils.GetMarkers()
+        local markers = Scenario.MasterChain._MASTERCHAIN_.Markers
         if markers then
             for k, v in markers do
                 if v.type == markerType then
-                    TableInsert(markerList, {Position = v.position, Name = k})
+                    counter = counter + 1
+                    markerList[counter] = {Position = v.position, Name = k}
                 end
             end
         end
     end
-
+    --LOG("Im saving a cached version of markerType " .. repr(markerType))
+    ScenarioInfo.Env.Scenario.MasterChain[markerType] = markerList
     return markerList
 end
 
 function AIGetMarkerLocationsEx(aiBrain, markerType)
     local markerList = {}
-    local markers = ScenarioUtils.GetMarkers()
+    local markers = Scenario.MasterChain._MASTERCHAIN_.Markers
     if markers then
         markerList = GenerateMarkerList(markerList,markers,markerType)
         LOG('AIGetMarkerLocationsEx '..TableGetn(markerList)..' markers for '..markerType)
@@ -389,8 +386,10 @@ end
 function AIGetMarkerPositionsAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
     local markers = AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
     local retMarkers = {}
+    local counter = 0
     for _, v in markers do
-        TableInsert(markers, v.Position)
+        counter = counter + 1 
+        retMarkers[counter] = v.Position
     end
 
     return retMarkers
@@ -398,24 +397,28 @@ end
 
 function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin, threatMax, threatRings, threatType)
     local markers = AIGetMarkerLocations(aiBrain, markerType)
-    local returnMarkers = {}
+    local retMarkers = {}
+    local counter = 0
     for _, v in markers do
         local dist = VDist2(pos[1], pos[3], v.Position[1], v.Position[3])
         if dist < radius then
             if not threatMin then
-                TableInsert(returnMarkers, v)
+                counter = counter + 1
+                retMarkers[counter] = v
             else
                 local threat = aiBrain:GetThreatAtPosition(v.Position, threatRings, true, threatType or 'Overall')
                 if threat >= threatMin and threat <= threatMax then
-                    TableInsert(returnMarkers, v)
+                    counter = counter + 1
+                    retMarkers[counter] = v
                 end
             end
         end
     end
 
-    return returnMarkers
+    return retMarkers
 end
 
+-- For Tomorrow Start Here @Azraeel --
 function AIGetMarkerLeastUnits(aiBrain, markerType, markerRadius, pos, posRad, unitCount, unitCat, tMin, tMax, tRings, tType)
     local markers = {}
     if markerType == 'Start Location' then
@@ -1531,7 +1534,7 @@ function UseTransports(units, transports, location, transportPlatoon)
 
     local monitorUnits = {}
     for num, data in transportTable do
-        if not table.empty(data.Units) then
+        if not TableEmpty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
             for k, v in data.Units do TableInsert(monitorUnits, v) end
@@ -2849,7 +2852,7 @@ function UseTransportsGhetto(units, transports)
 
     local monitorUnits = {}
     for num, data in transportTable do
-        if not table.empty(data.Units) then
+        if not TableEmpty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
             for _, v in data.Units do TableInsert(monitorUnits, v) end
@@ -2977,6 +2980,7 @@ function AIFindFurthestExpansionAreaNeedsEngineer(aiBrain, locationType, radius,
     return retPos, retName
 end
  
+-- Unused Functions --
 --[[ function AIGetStructureUnitId(aiBrain, structureType)
     local unitId
     for _, v in BuildingTemplates[aiBrain:GetFactionIndex()] do
@@ -2999,4 +3003,15 @@ function AIGetMobileUnitId(aiBrain, unitType)
     end
 
     return unitId
+end 
+
+function AIGetStartLocations(aiBrain)
+    local markerList = {}
+    for i = 1, 16 do
+        if Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i] then
+            TableInsert(markerList, Scenario.MasterChain._MASTERCHAIN_.Markers['ARMY_'..i].position)
+        end
+    end
+
+    return markerList
 end ]]--
