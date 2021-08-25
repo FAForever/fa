@@ -80,7 +80,7 @@ CConstructionUnit = Class(ConstructionUnit){
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
         -- If created with F2 on land, then play the transform anim.
-        if self:GetCurrentLayer() == 'Water' then
+        if self.Layer == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
     end,
@@ -375,7 +375,7 @@ CConstructionStructureUnit = Class(CStructureUnit) {
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
         -- If created with F2 on land, then play the transform anim.
-        if self:GetCurrentLayer() == 'Water' then
+        if self.Layer == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
     end,

@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  UEF T3 Mobile Sonar
 --#**
---#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
@@ -36,7 +36,7 @@ UES0305 = Class(TSeaUnit) {
     end,
 
     TimedIdleSonarEffects = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then

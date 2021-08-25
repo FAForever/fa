@@ -492,7 +492,7 @@ function CreateWreckageUnit(unit)
 	local isExperimental = bp.CategoriesHash.EXPERIMENTAL
 	local isNaval = bp.CategoriesHash.NAVAL
 
-	local layer = unit:GetCurrentLayer()
+	local layer = unit.Layer
 	local unitPos = unit:GetPosition()
 	local deep = (GetSurfaceHeight(unitPos[1],unitPos[3]) - GetTerrainHeight(unitPos[1],unitPos[3]))
 	local deathAnim = bp.Display['AnimationDeath']
