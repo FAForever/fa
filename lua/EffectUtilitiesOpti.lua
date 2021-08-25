@@ -3,9 +3,13 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
+-- upvalued cache - do not use after waiting
+local VectorCached = Vector(0, 0, 0)
+
 -- globals as upvalues for performance
 local Warp = Warp
 local Vector = Vector
+local Random = Random
 local CreateUnit = CreateUnit
 local KillThread = KillThread 
 local setmetatable = setmetatable
@@ -33,6 +37,8 @@ local MathCos = math.cos
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
+
+-- CYBRAN SPECIFICS --
 
 -- all possible bot blueprint values
 local CybranBuildBotBlueprints = {
@@ -117,14 +123,18 @@ function SpawnBuildBots(builder)
         end
     end
 
-    -- make the drones focus
+    -- make the drones focus builder target
     local focus = builder:GetFocusUnit()
-    for k = 1, builder.BuildBotTotal do 
-        -- make the drones guard / assist it
-        local bot = bots[k]
-        UnitRevertElevation(bot)
-        IssueClearCommands(bots)
-        IssueGuard(bots, focus)
+
+    -- focus may be nil if we got paused and building is finished
+    if focus then 
+        for k = 1, builder.BuildBotTotal do 
+            -- make the drones guard / assist it
+            local bot = bots[k]
+            UnitRevertElevation(bot)
+            IssueClearCommands(bots)
+            IssueGuard(bots, focus)
+        end
     end
 end
 
@@ -145,6 +155,11 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
 
     -- delay slightly for dramatic effect
     WaitTicks(2 + Random(1, 4))
+
+    -- early out - make sure everything is still alive
+    if builder.Dead or unitBeingBuilt.Dead then 
+        return 
+    end
 
     -- initialise   
     local army = builder.Army
@@ -190,20 +205,35 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
 
     -- make the end entity move around
     local ox, oy, oz = origin[1], origin[2], origin[3]
-    local RandomOffset = builder.GetRandomOffset
+    local blueprint = unitBeingBuilt:GetBlueprint()
+
+    -- cache values for computing random offsets
+    local vc = VectorCached
+    local cy = blueprint.CollisionOffsetY or 0
+    local sx, sy, sz = blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ
+
+    -- perform the build animation
     while not (builder.Dead or unitBeingBuilt.Dead) do
+
+        -- get a few random numbers
+        local r1, r2, r3 = Random(), Random(), Random()
+
+        -- get a new location for builder
+        if not stationary then 
+            vc[1] = ox + r1 * sx - (sx * 0.5)
+            vc[2] = oy + r2 * sy + cy
+            vc[3] = oz + r3 * sz - (sz * 0.5)
+            Warp(beamEndBuilder, vc)
+        end
+
+        -- get a new location for bots
+        vc[1] = ox + r2 * sx - (sx * 0.5)
+        vc[2] = oy + r3 * sy + cy
+        vc[3] = oz + (1 - r1) * sz - (sz * 0.5)
+        Warp(beamEndBots, vc)
 
         -- skip a few ticks to make the effect work better
         WaitTicks(3)
-
-        -- get a new location for both
-        if not stationary then 
-            local x, y, z = RandomOffset(unitBeingBuilt, 1)
-            Warp(beamEndBuilder, Vector(ox + x, oy + y, oz + z))
-        end
-
-        local x, y, z = RandomOffset(unitBeingBuilt, 1)
-        Warp(beamEndBots, Vector(ox + x, oy + y, oz + z))
     end
 end
 
