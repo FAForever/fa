@@ -31,12 +31,6 @@ URA0003 = Class(CBuildBotUnit) {
         BuilderArmManipulatorSetAimingArc(BuildArmManipulator, -180, 180, 360, -90, 90, 360)
         BuilderArmManipulatorSetPrecedence(BuildArmManipulator, 5)
         TrashBagAdd(trash, BuildArmManipulator)
-
-        -- play 'dem animation
-        local animator = CreateAnimator(self)
-        animator:PlayAnim(self:GetBlueprint().Display.AnimationLoop, true)
-        animator:SetRate(1.25)
-        TrashBagAdd(trash, animator)
     end,
 
 }

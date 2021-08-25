@@ -211,12 +211,13 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
     local vc = VectorCached
     local cy = blueprint.CollisionOffsetY or 0
     local sx, sy, sz = blueprint.SizeX, blueprint.SizeY, blueprint.SizeZ
+    local r1, r2, r3 
 
     -- perform the build animation
     while not (builder.Dead or unitBeingBuilt.Dead) do
 
         -- get a few random numbers
-        local r1, r2, r3 = Random(), Random(), Random()
+        r1, r2, r3 = Random(), Random(), Random()
 
         -- get a new location for builder
         if not stationary then 
