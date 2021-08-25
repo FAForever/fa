@@ -39,6 +39,7 @@ local VDist2Sq = VDist2Sq
 local VDist3 = VDist3
 
 local GetThreatsAroundPosition = moho.aibrain_methods.GetThreatsAroundPosition
+local GetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
 local IsUnitState = moho.unit_methods.IsUnitState
 local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
 local GetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
@@ -401,7 +402,7 @@ function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin,
     local counter = 0
     for _, v in markers do
         local dist = VDist2(pos[1], pos[3], v.Position[1], v.Position[3])
-        if dist < radius then
+        if dist <= radius then
             if not threatMin then
                 counter = counter + 1
                 retMarkers[counter] = v
@@ -418,7 +419,6 @@ function AIGetMarkersAroundLocation(aiBrain, markerType, pos, radius, threatMin,
     return retMarkers
 end
 
--- For Tomorrow Start Here @Azraeel --
 function AIGetMarkerLeastUnits(aiBrain, markerType, markerRadius, pos, posRad, unitCount, unitCat, tMin, tMax, tRings, tType)
     local markers = {}
     if markerType == 'Start Location' then
@@ -463,10 +463,12 @@ end
 
 function AIFilterAlliedBases(aiBrain, positions)
     local retPositions = {}
+    local counter = 0
     for _, v in positions do
         local threat = GetAlliesThreat(aiBrain, v, 2, 'StructuresNotMex')
         if threat == 0 then
-            TableInsert(retPositions, v)
+            counter = counter + 1
+            retPositions[counter] = v
         end
     end
 
@@ -791,14 +793,17 @@ end
 
 function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMax, tRings, tType)
     local positions = {}
+    local counter = 0
     if aiBrain.HasPlatoonList then
         for k, v in aiBrain.PBM.Locations do
             if v.LocationType ~= 'MAIN' then
-                TableInsert(positions, v.Location)
+                counter = counter + 1
+                positions[counter] = v.Location
             end
         end
     elseif aiBrain.BuilderManagers['MAIN'] then
-        TableInsert(positions, aiBrain.BuilderManagers['MAIN'].FactoryManager:GetLocationCoords())
+        counter = counter + 1
+        positions[counter] = aiBrain.BuilderManagers['MAIN'].FactoryManager:GetLocationCoords()
     end
 
     local bestFit
@@ -806,7 +811,8 @@ function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMa
     local mainPos = aiBrain:PBMGetLocationCoords('MAIN')
     local otherPos = AIGetMarkersAroundLocation(aiBrain, 'Defensive Point', mainPos, radius, tMin, tMax, tRings, tType)
     for _, v in otherPos do
-        TableInsert(positions, v.Position)
+        counter = counter + 1
+        positions[counter] = v.Position
     end
     for _, v in positions do
         if Utils.XZDistanceTwoVectors(v, mainPos) < radius then
@@ -991,9 +997,11 @@ function GetBasePatrolPoints(aiBrain, location, radius, layer)
 
     local vecs = aiBrain:GetBaseVectors()
     local locList = {}
+    local counter = 0
     for k, v in vecs do
         if LayerCheckPosition(v, layer) and VDist2(v[1], v[3], location[1], location[3]) < radius then
-            TableInsert(locList, v)
+            counter = counter + 1
+            locList[counter] = v
         end
     end
 
@@ -1048,6 +1056,7 @@ function GetOwnUnitsAroundPoint(aiBrain, category, location, radius, min, max, r
     local units = aiBrain:GetUnitsAroundPoint(category, location, radius, 'Ally')
     local index = aiBrain:GetArmyIndex()
     local retUnits = {}
+    local counter = 0
     local checkThreat = false
     if min and max and rings then
         checkThreat = true
@@ -1057,10 +1066,12 @@ function GetOwnUnitsAroundPoint(aiBrain, category, location, radius, min, max, r
             if checkThreat then
                 local threat = aiBrain:GetThreatAtPosition(v:GetPosition(), rings, true, tType or 'Overall')
                 if threat >= min and threat <= max then
-                    TableInsert(retUnits, v)
+                    counter = counter + 1
+                    retUnits[counter] = v
                 end
             else
-                TableInsert(retUnits, v)
+                counter = counter + 1
+                retUnits[counter] = v
             end
         end
     end
@@ -1072,9 +1083,11 @@ function GetBrainUnitsAroundPoint(aiBrain, category, location, radius, tBrain)
     local units = aiBrain:GetUnitsAroundPoint(category, location, radius)
     local tIndex = tBrain:GetArmyIndex()
     local retTable = {}
+    local counter = 0
     for _, v in units do
         if not v.Dead and v:GetAIBrain():GetArmyIndex() == tIndex then
-            TableInsert(retTable, v)
+            counter = counter + 1
+            retTable[counter] = v
         end
     end
 
@@ -1171,7 +1184,7 @@ function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, ene
     end
 
     local enemyIndex = enemyBrain:GetArmyIndex()
-    local targetUnits = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, maxRange, 'Enemy')
+    local targetUnits = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS - categories.WALL, position, maxRange, 'Enemy')
     for _, v in atkPri do
         local category = v
         if type(category) == 'string' then
@@ -1252,9 +1265,11 @@ function FindIdleGates(aiBrain)
     local gates = aiBrain:GetListOfUnits(categories.GATE, true)
     if gates and not TableEmpty(gates) then
         local retGates = {}
+        local counter = 0
         for _, v in gates do
             if not v:IsUnitState('Building') and not v:IsUnitState('TransportLoading') then
-                TableInsert(retGates, v)
+                counter = counter + 1
+                retGates[counter] = v
             end
         end
         return retGates
@@ -1267,6 +1282,8 @@ end
 -- Utility Function
 -- Returns the number of slots the transport has available
 ----------------------------------------------------------
+-- Return to later --
+-- Transport Code is severely broken --
 function GetNumTransportSlots(unit)
     local bones = {
         Large = 0,
@@ -1363,7 +1380,7 @@ function GetTransports(platoon, units)
         if not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION - categories.uea0203, unit) and not unit:IsUnitState('Busy') and not unit:IsUnitState('TransportLoading') and table.empty(unit:GetCargo()) and unit:GetFractionComplete() == 1 then
             local unitPos = unit:GetPosition()
             local curr = {Unit = unit, Distance = VDist2(unitPos[1], unitPos[3], location[1], location[3]),
-                           Id = unit.UnitId}
+            Id = unit.UnitId}
             TableInsert(transports, curr)
         end
     end
@@ -1993,9 +2010,11 @@ function GetUnitsBeingBuilt(aiBrain, locationType, assisteeCategory)
 
     local filterUnits = GetOwnUnitsAroundPoint(aiBrain, assisteeCategory, manager:GetLocationCoords(), manager.Radius)
     local retUnits = {}
+    local counter = 0
     for k, v in filterUnits do
         if v:IsUnitState('Building') or v:IsUnitState('Upgrading') then
-            TableInsert(retUnits, v)
+            counter = counter + 1
+            retUnits[counter] = v
         end
     end
 
@@ -2030,9 +2049,11 @@ function GetBasePatrolPointsSorian(aiBrain, location, radius, layer)
 
     local vecs = aiBrain:GetBaseVectors()
     local locList = {}
+    local counter = 0
     for _, v in vecs do
         if LayerCheckPosition(v, layer) and VDist2(v[1], v[3], location[1], location[3]) < radius then
-            TableInsert(locList, v)
+            counter = counter + 1
+            locList[counter] = v
         end
     end
     local sortedList = {}
@@ -2100,9 +2121,11 @@ end
 function AIGetSortedHydroLocations(aiBrain, maxNum, tMin, tMax, tRings, tType, position)
     local markerList = AIGetMarkerLocations(aiBrain, 'Hydrocarbon')
     local newList = {}
+    local counter = 0
     for _, v in markerList do
         if aiBrain:CanBuildStructureAt('ueb1102', v.Position) then
-            TableInsert(newList, v)
+            counter = counter + 1
+            newList[counter] = v
         end
     end
 
