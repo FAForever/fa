@@ -87,7 +87,7 @@ Callbacks.CapMex = function(data, units)
     local mex = GetEntityById(data.target)
     if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
 
-    if mex:GetCurrentLayer() == 'Seabed' then return end
+    if mex.Layer == 'Seabed' then return end
 
     local pos = mex:GetPosition()
     local msid

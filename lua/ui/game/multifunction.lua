@@ -1093,7 +1093,7 @@ end
 
 function FocusArmyChanged()
     for i, control in controls.pingBtns do
-        if GetFocusArmy() == -1 then
+        if GetFocusArmy() == -1 or GetArmiesTable().armiesTable[GetFocusArmy()].outOfGame then
             control:Disable()
         else
             control:Enable()

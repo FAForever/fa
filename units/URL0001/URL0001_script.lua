@@ -256,7 +256,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            if not (self:GetCurrentLayer() == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+            if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
         elseif enh == 'CoolingUpgradeRemove' then
@@ -271,7 +271,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self.normalRange = v.MaxRadius or 22
-                    if not (self:GetCurrentLayer() == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+                    if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
                         self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
                     end
                     break
@@ -286,7 +286,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetWeaponEnabledByLabel('Torpedo', true)
             self:SetIntelRadius('Sonar', bp.NewSonarRadius or 60)
             self:EnableUnitIntel('Enhancement', 'Sonar')
-            if self:GetCurrentLayer() == 'Seabed' then
+            if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
             end
         elseif enh == 'NaniteTorpedoTubeRemove' then
@@ -294,7 +294,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetWeaponEnabledByLabel('Torpedo', false)
             self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 26)
             self:DisableUnitIntel('Enhancement', 'Sonar')
-            if self:GetCurrentLayer() == 'Seabed' then
+            if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
         end
@@ -353,14 +353,14 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         end
     end,
