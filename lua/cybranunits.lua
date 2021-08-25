@@ -67,45 +67,47 @@ CConstructionTemplate = Class() {
 
     --- When dying, destroy everything.
     DestroyAllBuildEffects = function(self)
-        -- make sure we're not dead (then bots are destroyed)
-        if not self.Dead then 
+        -- make sure we're not dead (then bots are destroyed by trashbag)
+        if self.Dead then 
+            return 
+        end
 
-            -- check if we ever had bots
-            local bots = self.BuildBots 
-            if bots then
-                -- check if we still have active bots
-                local buildBotCount = self.BuildBotsNext - 1
-                if buildBotCount > 0 then 
-                    -- return the active bots
-                    local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                    TrashBagAdd(self.Trash, returnBotsThreadInstance)
+        -- check if we ever had bots
+        local bots = self.BuildBots 
+        if bots then
+            -- check if we still have active bots
+            local buildBotCount = self.BuildBotsNext - 1
+            if buildBotCount > 0 then 
+                -- return the active bots
+                local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                TrashBagAdd(self.Trash, returnBotsThreadInstance)
 
-                    -- save thread so that we can kill it if the bots suddenly get an additional task.
-                    self.ReturnBotsThreadInstance = returnBotsThreadInstance
-                end
+                -- save thread so that we can kill it if the bots suddenly get an additional task.
+                self.ReturnBotsThreadInstance = returnBotsThreadInstance
             end
         end
     end,
 
     --- When stopping to build, send the bots back after a bit.
     StopBuildingEffects = function(self, built)
-        -- make sure we're not dead (then bots are destroyed)
-        if not self.Dead then 
+        -- make sure we're not dead (then bots are destroyed by trashbag)
+        if self.Dead then 
+            return 
+        end
 
-            -- check if we had bots
-            local bots = self.BuildBots 
-            if bots then
+        -- check if we had bots
+        local bots = self.BuildBots 
+        if bots then
 
-                -- check if we still have active bots
-                local buildBotCount = self.BuildBotsNext - 1
-                if buildBotCount > 0 then 
-                    -- return the active bots
-                    local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                    TrashBagAdd(self.Trash, returnBotsThreadInstance)
+            -- check if we still have active bots
+            local buildBotCount = self.BuildBotsNext - 1
+            if buildBotCount > 0 then 
+                -- return the active bots
+                local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                TrashBagAdd(self.Trash, returnBotsThreadInstance)
 
-                    -- save thread so that we can kill it if the bots suddenly get an additional task.
-                    self.ReturnBotsThreadInstance = returnBotsThreadInstance
-                end
+                -- save thread so that we can kill it if the bots suddenly get an additional task.
+                self.ReturnBotsThreadInstance = returnBotsThreadInstance
             end
         end
     end,
@@ -115,21 +117,22 @@ CConstructionTemplate = Class() {
         -- delay until they move back
         delay = delay or 0.5 + 2 * Random()
 
-        -- thread is not already running
-        if not self.ReturnBotsThreadInstance then 
-            -- check if we have bots
-            local bots = self.BuildBots 
-            if bots then
+        -- make sure thread is not running already
+        if self.ReturnBotsThreadInstance then 
+            return 
+        end
 
-                local buildBotCount = self.BuildBotsNext - 1
-                if buildBotCount > 0 then
-                    -- return the active bots
-                    local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                    TrashBagAdd(self.Trash, returnBotsThreadInstance)
+        -- check if we have bots
+        local bots = self.BuildBots 
+        if bots then
+            local buildBotCount = self.BuildBotsNext - 1
+            if buildBotCount > 0 then
+                -- return the active bots
+                local returnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                TrashBagAdd(self.Trash, returnBotsThreadInstance)
 
-                    -- save thread so that we can kill it if the bots suddenly get an additional task.
-                    self.ReturnBotsThreadInstance = returnBotsThreadInstance
-                end
+                -- save thread so that we can kill it if the bots suddenly get an additional task.
+                self.ReturnBotsThreadInstance = returnBotsThreadInstance
             end
         end
     end,

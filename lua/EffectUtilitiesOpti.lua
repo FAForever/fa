@@ -129,12 +129,14 @@ function SpawnBuildBots(builder)
     -- focus may be nil if we got paused and building is finished
     if focus then 
         for k = 1, builder.BuildBotTotal do 
-            -- make the drones guard / assist it
+            -- revert drone elevation to blueprint value
             local bot = bots[k]
             UnitRevertElevation(bot)
-            IssueClearCommands(bots)
-            IssueGuard(bots, focus)
         end
+
+        -- clear up commands and guard (assist) structure
+        IssueClearCommands(bots)
+        IssueGuard(bots, focus)
     end
 end
 
