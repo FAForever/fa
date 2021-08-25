@@ -10,7 +10,7 @@ UnitBlueprint {
         CirclingRadiusVsAirMult = 0.66,
         CirclingTurnMult = 3,
         KLift = 3,
-        KLiftDamping = 1,
+        KLiftDamping = 2,
         KMove = 4,
         KMoveDamping = 1,
         KTurn = 4,

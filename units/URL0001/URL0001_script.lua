@@ -95,12 +95,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         self.BuildingUnit = true
     end,
 
-    -- Build/Upgrade
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
-    end,
-
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
         if enh == 'Teleporter' then

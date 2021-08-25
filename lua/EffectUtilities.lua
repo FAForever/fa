@@ -571,7 +571,7 @@ function CreateCybranEngineerBuildBeams(builder, bots, unitBeingBuilt, buildEffe
     -- make the end entity move around
     local ox, oy, oz = origin[1], origin[2], origin[3]
     local RandomOffset = builder.GetRandomOffset
-    while not (EntityBeenDestroyed(builder) or EntityBeenDestroyed(unitBeingBuilt)) do
+    while not (builder.Dead or unitBeingBuilt.Dead) do
 
         -- skip a few ticks to make the effect work better
         WaitSeconds(0.4)

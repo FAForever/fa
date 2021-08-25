@@ -5,7 +5,9 @@
 -- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local CCommandUnit = import('/lua/cybranunits.lua').CCommandUnit
+local CybranUnits = import('/lua/cybranunits.lua')
+local CCommandUnit = CybranUnits.CCommandUnit
+
 local CWeapons = import('/lua/cybranweapons.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -47,12 +49,6 @@ URL0301 = Class(CCommandUnit) {
 
     __init = function(self)
         CCommandUnit.__init(self, 'RightDisintegrator')
-    end,
-
-    -- Engineering effects
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-       EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-       EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -161,6 +157,7 @@ URL0301 = Class(CCommandUnit) {
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh =='Switchback' then
+            self.BuildBotTotal = 4
             if not Buffs['CybranSCUBuildRate'] then
                 BuffBlueprint {
                     Name = 'CybranSCUBuildRate',
@@ -178,6 +175,7 @@ URL0301 = Class(CCommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranSCUBuildRate')
         elseif enh == 'SwitchbackRemove' then
+            self.BuildBotTotal = 3
             if Buff.HasBuff(self, 'CybranSCUBuildRate') then
                 Buff.RemoveBuff(self, 'CybranSCUBuildRate')
             end

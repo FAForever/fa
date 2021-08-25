@@ -29,72 +29,89 @@ local CreateCybranBuildBeams = false
 
 local WaitTicks = coroutine.yield
 
--- AIR FACTORY STRUCTURES
-CAirFactoryUnit = Class(AirFactoryUnit) {
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        if not unitBeingBuilt then return end
-        WaitSeconds(0.1)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
-    end,
+CConstructionTemplate = Class() {
 
-    StartBuildFx = function(self, unitBeingBuilt)
-        if not unitBeingBuilt then return end
-
-        -- Start build process
-        if not self.BuildAnimManip then
-            self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
-            self.Trash:Add(self.BuildAnimManip)
-        end
-        self.BuildAnimManip:SetRate(1)
-    end,
-
-    StopBuildFx = function(self)
-        if self.BuildAnimManip then
-            self.BuildAnimManip:SetRate(0)
-        end
-    end,
-
-    OnPaused = function(self)
-        AirFactoryUnit.OnPaused(self)
-        self:StopBuildFx()
-    end,
-
-    OnUnpaused = function(self)
-        AirFactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') then
-            self:StartBuildFx(self:GetFocusUnit())
-        end
-    end,
-}
-
--- AIR STAGING STRUCTURES
-CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
-
--- AIR UNITS
-CAirUnit = Class(AirUnit) {}
-
--- WALL STRUCTURES
-CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
-
--- CONSTRUCTION UNITS
-CConstructionUnit = Class(ConstructionUnit){
-
+    --- Prepares the default build bot total
     OnCreate = function(self)
-        ConstructionUnit.OnCreate(self)
-
         -- cache the total amount of drones
         self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
     end,
 
-    OnStopBeingBuilt = function(self, builder, layer)
-        ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
-        -- If created with F2 on land, then play the transform anim.
-        if self.Layer == 'Water' then
-            self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
+    --- When dying, destroy everything.
+    DestroyAllBuildEffects = function(self)
+
+        -- make sure we're not dead (then bots are destroyed)
+        if not self.Dead then 
+
+            -- check if we ever had bots
+            local bots = self.BuildBots 
+            if bots then
+                -- check if we still have active bots
+                local buildBotCount = self.BuildBotsNext - 1
+                if buildBotCount > 0 then 
+                    -- return the active bots
+                    self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                    self.Trash:Add(self.ReturnBotsThreadInstance)
+                end
+            end
         end
     end,
 
+    --- When stopping to build, send the bots back after a bit.
+    StopBuildingEffects = function(self, built)
+
+        -- make sure we're not dead (then bots are destroyed)
+        if not self.Dead then 
+
+            -- check if we had bots
+            local bots = self.BuildBots 
+            if bots then
+
+                -- check if we still have active bots
+                local buildBotCount = self.BuildBotsNext - 1
+                if buildBotCount > 0 then 
+                    -- return the active bots
+                    self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
+                    self.Trash:Add(self.ReturnBotsThreadInstance)
+                end
+            end
+        end
+    end,
+
+    --- When pausing, send the bots back after a bit.
+    OnPaused = function(self)
+
+        -- thread is not already running
+        if not self.ReturnBotsThreadInstance then 
+
+            -- check if we have bots
+            local bots = self.BuildBots 
+            if bots and self.BuildBotsNext > 1 then
+                -- return the active bots
+                self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.5 + 2 * Random())
+                self.Trash:Add(self.ReturnBotsThreadInstance)
+            end
+        end
+    end,
+
+    --- When making build effects, try and make the bots.
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        EffectUtil.CreateCybranEngineerBuildDrones(self)
+        EffectUtil.CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag)
+    end,
+
+    --- When destroyed, destroy the bots too.
+    OnDestroy = function(self) 
+        -- destroy bots if we have them
+        if self.BuildBotsNext > 1 then 
+            ForkThread(self.DestroyBotsThread, self, self.BuildBots, self.BuildBotTotal)
+        end
+    end,
+
+    --- Destroys all the bots of a builder. Assumes the bots exist.
+    -- @param self The builder in question.
+    -- @param bots The bots of the builder.
+    -- @param count The maximum number of bots.
     DestroyBotsThread = function(self, bots, count)
 
         -- kill potential return thread
@@ -115,6 +132,9 @@ CConstructionUnit = Class(ConstructionUnit){
         end
     end,
 
+    --- Destroys all the bots of a builder. Assumes the bots exist.
+    -- @param self The builder in question.
+    -- @param delay The delay until the bots decide to return.
     ReturnBotsThread = function(self, delay)
 
         -- hold up a bit in case we just switch target
@@ -172,62 +192,94 @@ CConstructionUnit = Class(ConstructionUnit){
         self.BeamEndBuilder = nil 
         self.BeamEndBots = nil
     end,
+}
 
-    DestroyAllBuildEffects = function(self)
-        ConstructionUnit.DestroyAllBuildEffects(self)
-
-        -- make sure we're not dead (then bots are destroyed)
-        if not self.Dead then 
-
-            -- check if we ever had bots
-            local bots = self.BuildBots 
-            if bots then
-                -- check if we still have active bots
-                local buildBotCount = self.BuildBotsNext - 1
-                if buildBotCount > 0 then 
-                    -- return the active bots
-                    -- self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                    -- self.Trash:Add(self.ReturnBotsThreadInstance)
-                end
-            end
-        end
+-- AIR FACTORY STRUCTURES
+CAirFactoryUnit = Class(AirFactoryUnit) {
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        if not unitBeingBuilt then return end
+        WaitSeconds(0.1)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
     end,
 
-    StopBuildingEffects = function(self, built)
-        ConstructionUnit.StopBuildingEffects(self, built)
+    StartBuildFx = function(self, unitBeingBuilt)
+        if not unitBeingBuilt then return end
 
-        -- make sure we're not dead (then bots are destroyed)
-        if not self.Dead then 
+        -- Start build process
+        if not self.BuildAnimManip then
+            self.BuildAnimManip = CreateAnimator(self)
+            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            self.Trash:Add(self.BuildAnimManip)
+        end
+        self.BuildAnimManip:SetRate(1)
+    end,
 
-            -- check if we had bots
-            local bots = self.BuildBots 
-            if bots then
-
-                -- check if we still have active bots
-                local buildBotCount = self.BuildBotsNext - 1
-                if buildBotCount > 0 then 
-                    -- return the active bots
-                    -- self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.2)
-                    -- self.Trash:Add(self.ReturnBotsThreadInstance)
-                end
-            end
+    StopBuildFx = function(self)
+        if self.BuildAnimManip then
+            self.BuildAnimManip:SetRate(0)
         end
     end,
 
     OnPaused = function(self)
-        ConstructionUnit.OnPaused(self)
+        AirFactoryUnit.OnPaused(self)
+        self:StopBuildFx()
+    end,
 
-        -- thread is not already running
-        if not self.ReturnBotsThreadInstance then 
-
-            -- check if we have bots
-            local bots = self.BuildBots 
-            if bots and self.BuildBotsNext > 1 then
-                -- return the active bots
-                self.ReturnBotsThreadInstance = ForkThread(self.ReturnBotsThread, self, 0.5 + Random())
-                self.Trash:Add(self.ReturnBotsThreadInstance)
-            end
+    OnUnpaused = function(self)
+        AirFactoryUnit.OnUnpaused(self)
+        if self:IsUnitState('Building') then
+            self:StartBuildFx(self:GetFocusUnit())
         end
+    end,
+}
+
+-- AIR STAGING STRUCTURES
+CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
+
+-- AIR UNITS
+CAirUnit = Class(AirUnit) {}
+
+-- WALL STRUCTURES
+CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
+
+-- CONSTRUCTION UNITS
+CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
+
+    OnCreate = function(self)
+        ConstructionUnit.OnCreate(self)
+        CConstructionTemplate.OnCreate(self)
+    end,
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
+        -- If created with F2 on land, then play the transform anim.
+        if self.Layer == 'Water' then
+            self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
+        end
+    end,
+
+    DestroyAllBuildEffects = function(self)
+        ConstructionUnit.DestroyAllBuildEffects(self)
+        CConstructionTemplate.DestroyAllBuildEffects(self)
+    end,
+
+    StopBuildingEffects = function(self, built)
+        ConstructionUnit.StopBuildingEffects(self, built)
+        CConstructionTemplate.StopBuildingEffects(self, built)
+    end,
+
+    OnPaused = function(self)
+        ConstructionUnit.OnPaused(self)
+        CConstructionTemplate.OnPaused(self)
+    end,
+
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order)
+    end,
+
+    OnDestroy = function(self) 
+        ConstructionUnit.OnDestroy(self)
+        CConstructionTemplate.OnDestroy(self)
     end,
 
     LayerChangeTrigger = function(self, new, old)
@@ -259,22 +311,6 @@ CConstructionUnit = Class(ConstructionUnit){
             self.TransformManipulator:Destroy()
             self.TransformManipulator = nil
         end
-    end,
-
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        self.UnitBeingBuilt = unitBeingBuilt
-        EffectUtil.CreateCybranEngineerBuildDrones(self)
-        EffectUtil.CreateCybranEngineerBuildBeams(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag)
-    end,
-
-    OnDestroy = function(self) 
-
-        -- destroy bots if we have them
-        if self.BuildBotsNext > 1 then 
-            ForkThread(self.DestroyBotsThread, self, self.BuildBots, self.BuildBotTotal)
-        end
-
-        ConstructionUnit.OnDestroy(self)
     end,
 }
 
@@ -628,15 +664,35 @@ CConstructionStructureUnit = Class(CStructureUnit) {
 
 -- CCommandUnit
 -- Cybran Command Units (ACU and SCU) have stealth and cloak enhancements, toggles can be handled in one class
-CCommandUnit = Class(CommandUnit) {
+CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
 
     OnCreate = function(self)
-
         CommandUnit.OnCreate(self)
+        CConstructionTemplate.OnCreate(self)
+    end,
 
-        -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or  math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
+    DestroyAllBuildEffects = function(self)
+        CommandUnit.DestroyAllBuildEffects(self)
+        CConstructionTemplate.DestroyAllBuildEffects(self)
+    end,
 
+    StopBuildingEffects = function(self, built)
+        CommandUnit.StopBuildingEffects(self, built)
+        CConstructionTemplate.StopBuildingEffects(self, built)
+    end,
+
+    OnPaused = function(self)
+        CommandUnit.OnPaused(self)
+        CConstructionTemplate.OnPaused(self)
+    end,
+
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        CConstructionTemplate.CreateBuildEffects(self, unitBeingBuilt, order)
+    end,
+
+    OnDestroy = function(self) 
+        CommandUnit.OnDestroy(self)
+        CConstructionTemplate.OnDestroy(self)
     end,
 
     OnScriptBitSet = function(self, bit)
