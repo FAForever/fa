@@ -311,6 +311,9 @@ CBuildBotUnit = Class(AirUnit) {
     OnCreate = function(self)
         -- prevent drone from consuming anything and remove collision shape
         UnitSetConsumptionActive(self, false)
+
+        -- store the army in case AOE damage tries to hit the drone
+        self.Army = self:GetArmy()
     end,
 
     -- short-cut when being destroyed
