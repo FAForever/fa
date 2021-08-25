@@ -50,6 +50,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     -- Creation
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
+        CCommandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
@@ -92,12 +93,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
-    end,
-
-    -- Build/Upgrade
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     CreateEnhancement = function(self, enh)
