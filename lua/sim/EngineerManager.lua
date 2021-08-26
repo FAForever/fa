@@ -30,6 +30,9 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
+-- add support for builderType (ie. Any, Commander)	-- so now we can specify as follows;
+local builderTypes = { 'Any','T1','T2','T3','SubCommander','Commander' }
+
 function CreateEngineerManager(brain, lType, location, radius)
     local em = EngineerManager()
     em:Create(brain, lType, location, radius)
@@ -58,7 +61,9 @@ EngineerManager = Class(BuilderManager) {
             MobileIntel = { Category = categories.MOBILE - categories.ENGINEER - categories.SHIELD, Units = {}, UnitsList = {}, Count = 0, },
         }
 
-        self:AddBuilderType('Any')
+        for _,v in builderTypes do
+			self:AddBuilderType(v)
+		end
     end,
 
     -- ================================== --
@@ -300,9 +305,30 @@ EngineerManager = Class(BuilderManager) {
     -- =============================== --
     --     Builder based functions
     -- =============================== --
+    -- Documentation Requested by relent0r#3559
+    -- The New Reworked AddBuilder does 2 things.
+    -- One is it allows Multiple BuilderTypes by converting strings into {}.
+    -- Two it allows smaller searches for engineers when looking for a job. 
+    -- Which results and.... you know it results in faster engineer responsiveness.
     AddBuilder = function(self, builderData, locationType, builderType)
         local newBuilder = Builder.CreateEngineerBuilder(self.Brain, builderData, locationType)
-        self:AddInstancedBuilder(newBuilder, builderType)
+        local BT = Builders[newBuilder.BuilderName].BuilderType 
+        if type(BT) == 'string' then BT = {BT} end
+    
+        if newBuilder then
+			for _,EngineerType in BT do
+				if EngineerType == 'All'  then
+					for k,v in self.builderData do
+						-- filter out any Commander tasks
+						if not k == 'Commander' then
+							self:AddInstancedBuilder( newBuilder, k)
+						end
+					end
+				else
+					self:AddInstancedBuilder(newBuilder, EngineerType)
+				end
+			end
+		end
         return newBuilder
     end,
 
@@ -313,6 +339,18 @@ EngineerManager = Class(BuilderManager) {
                 TableInsert(v.Units, { Unit = unit, Status = true })
                 TableInsert(v.UnitsList, unit)
                 v.Count = v.Count + 1
+
+                if EntityCategoryContains(categories.COMMAND, unit) then
+                    unit.builderType = 'Commander'
+                elseif EntityCategoryContains(categories.TECH1, unit) then
+                    unit.builderType = 'T1'
+                elseif EntityCategoryContains(categories.TECH2, unit) then
+                    unit.builderType = 'T2'
+                elseif EntityCategoryContains(categories.TECH3 - categories.SUBCOMMANDER, unit) then
+                    unit.builderType = 'T3'
+                elseif EntityCategoryContains(categories.SUBCOMMANDER, unit) then
+                    unit.builderType = 'SubCommander'
+                end
 
                 if not unit.BuilderManagerData then
                     unit.BuilderManagerData = {}
