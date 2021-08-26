@@ -8,6 +8,9 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+local import = import
+local type = type
+
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -16,6 +19,35 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 --for sorian ai
 local SUtils = import('/lua/AI/sorianutilities.lua')
 --end sorian ai import
+
+local TableSort = table.sort
+local TableEmpty = table.empty
+local TableInsert = table.insert
+local TableRemove = table.remove
+local TableGetn = table.getn
+local MathCeil = math.ceil
+local MathSqrt = math.sqrt
+
+local EntityCategoryContains = EntityCategoryContains
+local EntityCategoryCount = EntityCategoryCount
+local ParseEntityCategory = ParseEntityCategory
+
+local VDist2 = VDist2
+local VDist2Sq = VDist2Sq
+
+local WaitTicks = coroutine.yield
+
+local IsUnitState = moho.unit_methods.IsUnitState
+local GetPlatoonPosition = moho.platoon_methods.GetPlatoonPosition
+local GetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local GetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local PlatoonExists = moho.aibrain_methods.PlatoonExists	
+local GetPosition = moho.entity_methods.GetPosition
+local GetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local GetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local GetThreatsAroundPosition = moho.aibrain_methods.GetThreatsAroundPosition
+
 
 -- types of threat to look at based on composition of platoon
 local ThreatTable =
@@ -254,7 +286,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
 
     local threatTable = aiBrain:GetThreatsAroundPosition(platoonPosition, 16, true, 'Overall', enemyIndex)
 
-    if table.empty(threatTable) then
+    if TableEmpty(threatTable) then
         return false
     end
 
@@ -270,7 +302,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
     local foundPathableThreat = false
     local mapSizeX = ScenarioInfo.size[1]
     local mapSizeZ = ScenarioInfo.size[2]
-    local maxMapLengthSq = math.sqrt((mapSizeX * mapSizeX) + (mapSizeZ * mapSizeZ))
+    local maxMapLengthSq = MathSqrt((mapSizeX * mapSizeX) + (mapSizeZ * mapSizeZ))
     local logCount = 0
 
     local unitCapRatio = GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) / GetArmyUnitCap(aiBrain:GetArmyIndex())
@@ -373,7 +405,7 @@ function GetBestThreatTarget(aiBrain, platoon, bSkipPathability)
         -- only add distance if there's a threat at all
         local threatDistNorm = -1
         if targetThreat > 0 then
-            threatDist = math.sqrt(VDist2Sq(threat[1], threat[2], platoonPosition[1], platoonPosition[3]))
+            threatDist = MathSqrt(VDist2Sq(threat[1], threat[2], platoonPosition[1], platoonPosition[3]))
             --distance is 1-100 of the max map length, distance function weights are split by the distance radius
 
             threatDistNorm = 100 * threatDist / maxMapLengthSq
@@ -452,7 +484,7 @@ function CheckNavalPathingSorian(aiBrain, platoon, location, maxRange, selectedW
         }
 
         --Sort the vectors by their distance to us.
-        table.sort(vectors, function(a,b)
+        TableSort(vectors, function(a,b)
             local distA = VDist2Sq(platoonPosition[1], platoonPosition[3], a[1], a[3])
             local distB = VDist2Sq(platoonPosition[1], platoonPosition[3], b[1], b[3])
 
@@ -585,7 +617,7 @@ function CheckNavalPathing(aiBrain, platoon, location, maxRange, selectedWeaponA
         }
 
         --Sort the vectors by their distance to us.
-        table.sort(vectors, function(a,b)
+        TableSort(vectors, function(a,b)
             local distA = VDist2Sq(platoonPosition[1], platoonPosition[3], a[1], a[3])
             local distB = VDist2Sq(platoonPosition[1], platoonPosition[3], b[1], b[3])
 
@@ -674,7 +706,7 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     --    return {}
     --end
 
-    local oldPathSize = table.getn(platoon.LastAttackDestination)
+    local oldPathSize = TableGetn(platoon.LastAttackDestination)
     local path, reason
 
     -- if we don't have an old path or our old destination and new destination are different
@@ -694,7 +726,7 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
     end
 
     if path then
-        local pathSize = table.getn(path)
+        local pathSize = TableGetn(path)
         -- store path
         platoon.LastAttackDestination = path
         -- move to new location
@@ -715,7 +747,7 @@ function AIPlatoonNavalAttackVector(aiBrain, platoon)
         if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
-                table.insert(cmd, cmdVal)
+                TableInsert(cmd, cmdVal)
                 break
             end
         end
@@ -764,7 +796,7 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
         -- if we're land
         if attackPosHeight >= GetSurfaceHeight(attackPos[1], attackPos[3]) then
             local lookAroundTable = {1,0,-2,-1,2}
-            local squareRadius = (ScenarioInfo.size[1] / 16) / table.getn(lookAroundTable)
+            local squareRadius = (ScenarioInfo.size[1] / 16) / TableGetn(lookAroundTable)
             for ix, offsetX in lookAroundTable do
                 for iz, offsetZ in lookAroundTable do
                     local surf = GetSurfaceHeight(bestPos[1]+offsetX, bestPos[3]+offsetZ)
@@ -781,7 +813,7 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
         attackPos = bestPos
     end
 
-    local oldPathSize = table.getn(platoon.LastAttackDestination)
+    local oldPathSize = TableGetn(platoon.LastAttackDestination)
 
     -- if we don't have an old path or our old destination and new destination are different
     if oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
@@ -815,7 +847,7 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
-                local pathSize = table.getn(path)
+                local pathSize = TableGetn(path)
                 -- store path
                 platoon.LastAttackDestination = path
                 -- move to new location
@@ -836,7 +868,7 @@ function AIPlatoonSquadAttackVector(aiBrain, platoon, bAggro)
         if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
-                table.insert(cmd, cmdVal)
+                TableInsert(cmd, cmdVal)
                 break
             end
         end
@@ -892,7 +924,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                 counter = -6
             end
             local transportsNeeded = AIUtils.GetNumTransports(units)
-            local numTransportsNeeded = math.ceil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
+            local numTransportsNeeded = MathCeil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
             if not aiBrain.NeedTransports then
                 aiBrain.NeedTransports = 0
             end
@@ -905,8 +937,8 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                 -- if we have overflow, dump the overflow and just send what we can
                 if not bUsedTransports and overflowSm + overflowMd + overflowLg > 0 then
                     local goodunits, overflow = AIUtils.SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
-                    local numOverflow = table.getn(overflow)
-                    if table.getn(goodunits) > numOverflow and numOverflow > 0 then
+                    local numOverflow = TableGetn(overflow)
+                    if TableGetn(goodunits) > numOverflow and numOverflow > 0 then
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
@@ -921,7 +953,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                     break
                 end
                 counter = counter + 1
-                WaitSeconds(10)
+                WaitTicks(10)
                 if not aiBrain:PlatoonExists(platoon) then
                     aiBrain.NeedTransports = aiBrain.NeedTransports - numTransportsNeeded
                     if aiBrain.NeedTransports < 0 then
@@ -931,9 +963,11 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                 end
 
                 local survivors = {}
+                local counter = 0
                 for _,v in units do
                     if not v.Dead then
-                        table.insert(survivors, v)
+                        counter = counter + 1
+                        survivors[counter] = v
                     end
                 end
                 units = survivors
@@ -990,7 +1024,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
         for _,v in units do
             if not v.Dead then
                 if v:IsUnitState('Attached') then
-                   WaitSeconds(2)
+                    WaitTicks(3)
                 end
             end
         end
@@ -1012,7 +1046,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
             -- store path for future comparison
             platoon.LastAttackDestination = path
 
-            local pathSize = table.getn(path)
+            local pathSize = TableGetn(path)
             --move to destination afterwards
             for wpidx,waypointPath in path do
                 if wpidx == pathSize then
@@ -1064,7 +1098,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
             -- ask for a transport every 10 seconds
             local counter = 0
             local transportsNeeded = AIUtils.GetNumTransports(units)
-            local numTransportsNeeded = math.ceil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
+            local numTransportsNeeded = MathCeil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
             if not aiBrain.NeedTransports then
                 aiBrain.NeedTransports = 0
             end
@@ -1077,8 +1111,8 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                 -- if we have overflow, dump the overflow and just send what we can
                 if not bUsedTransports and overflowSm+overflowMd+overflowLg > 0 then
                     local goodunits, overflow = AIUtils.SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
-                    local numOverflow = table.getn(overflow)
-                    if table.getn(goodunits) > numOverflow and numOverflow > 0 then
+                    local numOverflow = TableGetn(overflow)
+                    if TableGetn(goodunits) > numOverflow and numOverflow > 0 then
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
@@ -1093,7 +1127,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                     break
                 end
                 counter = counter + 1
-                WaitSeconds(10)
+                WaitTicks(10)
                 if not aiBrain:PlatoonExists(platoon) then
                     aiBrain.NeedTransports = aiBrain.NeedTransports - numTransportsNeeded
                     if aiBrain.NeedTransports < 0 then
@@ -1103,9 +1137,11 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                 end
 
                 local survivors = {}
+                local counter = 0
                 for _,v in units do
                     if not v.Dead then
-                        table.insert(survivors, v)
+                        counter = counter + 1
+                        survivors[counter] = v
                     end
                 end
                 units = survivors
@@ -1174,7 +1210,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         for _,v in units do
             if not v.Dead then
                 if v:IsUnitState('Attached') then
-                   WaitSeconds(2)
+                    WaitTicks(3)
                 end
             end
         end
@@ -1196,7 +1232,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
             -- store path for future comparison
             platoon.LastAttackDestination = path
 
-            local pathSize = table.getn(path)
+            local pathSize = TableGetn(path)
             --move to destination afterwards
             for wpidx,waypointPath in path do
                 if wpidx == pathSize then
@@ -1229,15 +1265,18 @@ end
 -------------------------------------------------------
 
 function GetMostRestrictiveLayer(platoon)
-    -- in case the platoon is already destroyed return false.
-    if not platoon then
-        return false
+    if platoon.Movementlayer then
+        for _,v in GetPlatoonUnits(platoon) do
+            if not v.Dead then
+                return
+            end
+        end
     end
     local unit = false
     platoon.MovementLayer = 'Air'
     for k,v in platoon:GetPlatoonUnits() do
         if not v.Dead then
-            local mType = v:GetBlueprint().Physics.MotionType
+            local mType = __blueprints[v.BlueprintID].Physics.MotionType
             if (mType == 'RULEUMT_AmphibiousFloating' or mType == 'RULEUMT_Hover' or mType == 'RULEUMT_Amphibious') and (platoon.MovementLayer == 'Air' or platoon.MovementLayer == 'Water') then
                 platoon.MovementLayer = 'Amphibious'
                 unit = v
@@ -1284,11 +1323,13 @@ function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, op
     optMaxMarkerDist = optMaxMarkerDist or 250
     optThreatWeight = optThreatWeight or 1
     local finalPath = {}
+    local counter = 0 
 
     --If we are within 100 units of the destination, don't bother pathing. (Sorian and Duncan AI)
     if (aiBrain.Sorian or aiBrain.Duncan) and (VDist2(start[1], start[3], destination[1], destination[3]) <= 100
     or (testPathDist and VDist2Sq(start[1], start[3], destination[1], destination[3]) <= testPathDist)) then
-        table.insert(finalPath, destination)
+        counter = counter + 1
+        finalPath[counter] = destination
         return finalPath
     end
 
@@ -1323,12 +1364,14 @@ function PlatoonGenerateSafePathTo(aiBrain, platoonLayer, start, destination, op
 
     -- Insert the path nodes (minus the start node and end nodes, which are close enough to our start and destination) into our command queue.
     for i,node in path.path do
-        if i > 1 and i < table.getn(path.path) then
-            table.insert(finalPath, node.position)
+        if i > 1 and i < TableGetn(path.path) then
+            counter = counter + 1
+            finalPath[counter] = node.position
         end
     end
 
-    table.insert(finalPath, destination)
+    counter = counter + 1
+    finalPath[counter] = destination
 
     return finalPath
 end
@@ -1566,11 +1609,11 @@ function GeneratePathSorian(aiBrain, startNode, endNode, threatType, threatWeigh
                 return queue
             end
 
-            --local dist = math.sqrt(VDist2Sq(newNode.position[1], newNode.position[3], endNode.position[1], endNode.position[3]))
+            --local dist = MathSqrt(VDist2Sq(newNode.position[1], newNode.position[3], endNode.position[1], endNode.position[3]))
             local dist = VDist2Sq(newNode.position[1], newNode.position[3], endNode.position[1], endNode.position[3])
 
             -- this brings the dist value from 0 to 100% of the maximum length with can travel on a map
-            --dist = 100 * dist / math.sqrt((mapSizeX * mapSizeX) + (mapSizeZ * mapSizeZ))
+            --dist = 100 * dist / MathSqrt((mapSizeX * mapSizeX) + (mapSizeZ * mapSizeZ))
             dist = 100 * dist / (mapSizeX + mapSizeZ)
 
             --get threat from current node to adjacent node
@@ -1587,7 +1630,7 @@ function GeneratePathSorian(aiBrain, startNode, endNode, threatType, threatWeigh
             lowCost = cost
         end
         if bestNode then
-            table.insert(queue.path,bestNode)
+            TableInsert(queue.path,bestNode)
             lastNode = bestNode
         end
     until lastNode == endNode
@@ -1673,10 +1716,10 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, end
         -- remove the table (shortest path) from the queue table and store the removed table in curPath
         -- (We remove the path from the queue here because if we don't find a adjacent marker and we
         --  have not reached the destination, then we no longer need this path. It's a dead end.)
-        curPath = table.remove(queue,lowestpathkey)
+        curPath = TableRemove(queue,lowestpathkey)
         if not curPath then break end
         -- get the last node from the path, so we can check adjacent waypoints
-        lastNode = curPath.path[table.getn(curPath.path)]
+        lastNode = curPath.path[TableGetn(curPath.path)]
         -- Have we already checked this node for adjacenties ? then continue to the next node.
         if not AlreadyChecked[lastNode] then
             -- Check every node (marker) inside lastNode.adjacent
@@ -1700,7 +1743,7 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, end
                     -- add as cost for the path the distance and threat to the overall cost from the whole path
                     fork.cost = fork.cost + dist + threat * threatWeight
                     -- add the newNode at the end of the path
-                    table.insert(fork.path, newNode)
+                    TableInsert(fork.path, newNode)
                     -- check if we have reached our destination
                     if newNode.name == endNode.name then
                         -- store the path inside the path cache
@@ -1709,7 +1752,7 @@ function GeneratePath(aiBrain, startNode, endNode, threatType, threatWeight, end
                         return fork
                     end
                     -- add the path to the queue, so we can check the adjacent nodes on the last added newNode
-                    table.insert(queue,fork)
+                    TableInsert(queue,fork)
                 end
             end
             -- Mark this node as checked
@@ -1796,15 +1839,15 @@ function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, t
     local catTable = {}
     local unitTable = {}
     for k,v in priTable do
-        table.insert(catTable, ParseEntityCategory(v))
-        table.insert(unitTable, {})
+        TableInsert(catTable, ParseEntityCategory(v))
+        TableInsert(unitTable, {})
     end
 
     local units = aiBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, radius, alliance) or {}
     for num, unit in units do
         for tNum, catType in catTable do
             if EntityCategoryContains(catType, unit) then
-                table.insert(unitTable[tNum], unit)
+                TableInsert(unitTable[tNum], unit)
                 break
             end
         end
@@ -1823,7 +1866,7 @@ function AIFindUnitRadiusThreat(aiBrain, alliance, priTable, position, radius, t
                 local unitPos = unit:GetPosition()
                 local useUnit = true
                 if checkThreat then
-                    WaitSeconds(0.1)
+                    WaitTicks(1)
                     local threat = aiBrain:GetThreatAtPosition(unitPos, tRing, true)
                     if not (threat >= tMin and threat <= tMax) then
                         useUnit = false
@@ -2007,7 +2050,7 @@ function AIPlatoonSquadAttackVectorSorian(aiBrain, platoon, bAggro)
 --        attackPos = bestPos
 --    end
 
-    local oldPathSize = table.getn(platoon.LastAttackDestination)
+    local oldPathSize = TableGetn(platoon.LastAttackDestination)
 
     -- if we don't have an old path or our old destination and new destination are different
     if oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
@@ -2051,7 +2094,7 @@ function AIPlatoonSquadAttackVectorSorian(aiBrain, platoon, bAggro)
                 -- force reevaluation
                 platoon.LastAttackDestination = {attackPos}
             else
-                local pathSize = table.getn(path)
+                local pathSize = TableGetn(path)
                 -- store path
                 platoon.LastAttackDestination = path
                 -- move to new location
@@ -2072,7 +2115,7 @@ function AIPlatoonSquadAttackVectorSorian(aiBrain, platoon, bAggro)
         if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
-                table.insert(cmd, cmdVal)
+                TableInsert(cmd, cmdVal)
                 break
             end
         end
@@ -2091,7 +2134,7 @@ function AIPlatoonNavalAttackVectorSorian(aiBrain, platoon)
         return {}
     end
 
-    local oldPathSize = table.getn(platoon.LastAttackDestination)
+    local oldPathSize = TableGetn(platoon.LastAttackDestination)
 
     -- if we don't have an old path or our old destination and new destination are different
     if oldPathSize == 0 or attackPos[1] != platoon.LastAttackDestination[oldPathSize][1] or
@@ -2108,7 +2151,7 @@ function AIPlatoonNavalAttackVectorSorian(aiBrain, platoon)
         end
 
         if path then
-            local pathSize = table.getn(path)
+            local pathSize = TableGetn(path)
             -- store path
             platoon.LastAttackDestination = path
             -- move to new location
@@ -2130,7 +2173,7 @@ function AIPlatoonNavalAttackVectorSorian(aiBrain, platoon)
         if not v.Dead then
             local unitCmdQ = v:GetCommandQueue()
             for cmdIdx,cmdVal in unitCmdQ do
-                table.insert(cmd, cmdVal)
+                TableInsert(cmd, cmdVal)
                 break
             end
         end
@@ -2172,7 +2215,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                 counter = 6
             end
             local transportsNeeded = AIUtils.GetNumTransports(units)
-            local numTransportsNeeded = math.ceil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
+            local numTransportsNeeded = MathCeil((transportsNeeded.Small + (transportsNeeded.Medium * 2) + (transportsNeeded.Large * 4)) / 10)
             if not aiBrain.NeedTransports then
                 aiBrain.NeedTransports = 0
             end
@@ -2185,8 +2228,8 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                 -- if we have overflow, dump the overflow and just send what we can
                 if not bUsedTransports and overflowSm + overflowMd + overflowLg > 0 then
                     local goodunits, overflow = AIUtils.SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
-                    local numOverflow = table.getn(overflow)
-                    if table.getn(goodunits) > numOverflow * 2 and numOverflow > 0 then
+                    local numOverflow = TableGetn(overflow)
+                    if TableGetn(goodunits) > numOverflow * 2 and numOverflow > 0 then
                         local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
@@ -2201,7 +2244,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                     break
                 end
                 counter = counter + 1
-                WaitSeconds(Random(10,15))
+                WaitTicks(10)
                 if not aiBrain:PlatoonExists(platoon) then
                     aiBrain.NeedTransports = aiBrain.NeedTransports - numTransportsNeeded
                     if aiBrain.NeedTransports < 0 then
@@ -2211,9 +2254,11 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                 end
 
                 local survivors = {}
+                local counter = 0 
                 for _,v in units do
                     if not v.Dead then
-                        table.insert(survivors, v)
+                        counter = counter + 1
+                        survivors[counter] = v
                     end
                 end
                 units = survivors
@@ -2305,7 +2350,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
         for _,v in units do
             if not v.Dead then
                 if v:IsUnitState('Attached') then
-                   WaitSeconds(2)
+                    WaitTicks(3)
                 end
             end
         end
@@ -2327,7 +2372,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
             -- store path for future comparison
             platoon.LastAttackDestination = path
 
-            local pathSize = table.getn(path)
+            local pathSize = TableGetn(path)
             --move to destination afterwards
             for wpidx,waypointPath in path do
                 if wpidx == pathSize then
