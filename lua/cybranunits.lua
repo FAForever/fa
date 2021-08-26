@@ -260,7 +260,7 @@ CBuildBotUnit = Class(AirUnit) {
     -- do not perform the logic of these functions                      
     OnMotionHorzEventChange = function(self, new, old) end,                     -- called a million times, keep it simple
     OnMotionVertEventChange = function(self, new, old) end,                 
-    OnLayerChange = function(self, new, old) end,
+    OnLayerChange = function(self, new, old) self.Layer = new end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order) end,             -- do not make build effects (engineer / builder takes care of that)
     StartBuildingEffects = function(self, built, order) end,
