@@ -5,6 +5,38 @@
 local TMissileCruiseProjectile = import('/lua/terranprojectiles.lua').TMissileCruiseProjectile
 local Explosion = import('/lua/defaultexplosions.lua')
 
+
+local ForkThread = ForkThread
+local WaitTicks = coroutine.yield
+
+local MathPi = math.pi
+
+local EntityGetPosition = _G.moho.entity_methods.GetPosition
+local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
+local EntitySetCollisionShape = _G.moho.entity_methods.SetCollisionShape
+
+local ProjectileSetTurnRate = _G.moho.projectile_methods.SetTurnRate
+local ProjectileGetCurrentTargetPosition = _G.moho.projectile_methods.GetCurrentTargetPosition
+
+local function arc(projectile)
+
+    -- compute distance
+    local tpos = ProjectileGetCurrentTargetPosition(projectile)
+    local px, _, pz = EntityGetPositionXYZ(projectile)
+    local dist = VDist2(px, pz, tpos[1], tpos[3])
+
+    -- compute multiplier
+    local multiplier = 200 / dist
+    if multiplier < 1.0 then 
+        multiplier = 1.0
+    end
+
+    -- set turn rate accordingly
+    ProjectileSetTurnRate(projectile, 0) 
+    WaitTicks(6)
+    ProjectileSetTurnRate(projectile, multiplier * 10)
+end
+
 TIFMissileCruise04 = Class(TMissileCruiseProjectile) {
 
     FxAirUnitHitScale = 1.5,
@@ -21,69 +53,50 @@ TIFMissileCruise04 = Class(TMissileCruiseProjectile) {
 
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
-        self.MovementTurnLevel = 1
-        self:ForkThread( self.MovementThread )
-    end,
-
-    MovementThread = function(self)        
-        self.WaitTime = 0.1
-        self:SetTurnRate(8)
-        WaitSeconds(0.3)        
-        while not self:BeenDestroyed() do
-            self:SetTurnRateByDist()
-            WaitSeconds(self.WaitTime)
-        end
-    end,
-
-    SetTurnRateByDist = function(self)
-        local dist = self:GetDistanceToTarget()
-        -- Get the nuke as close to 90 deg as possible
-        if dist > 50 then        
-            -- Freeze the turn rate as to prevent steep angles at long distance targets
-            WaitSeconds(2)
-            self:SetTurnRate(20)
-        elseif dist > 64 and dist <= 107 then
-						-- Increase check intervals
-						self:SetTurnRate(30)
-						WaitSeconds(1.5)
-            self:SetTurnRate(30)
-        elseif dist > 21 and dist <= 53 then
-						-- Further increase check intervals
-            WaitSeconds(0.3)
-            self:SetTurnRate(50)
-				elseif dist > 0 and dist <= 21 then
-						-- Further increase check intervals            
-            self:SetTurnRate(100)   
-            KillThread(self.MoveThread)         
-        end
-    end,        
-
-    GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
-        local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
-        return dist
-    end,
+        EntitySetCollisionShape(self, 'Sphere', 0, 0, 0, 2.0)
+        ForkThread(arc, self)
+    end,    
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+
+        -- retrieve for damage and decal
+        local damageData = self.DamageData
+        local radius = damageData.DamageRadius
+        local FriendlyFire = damageData.DamageFriendly
+        local pos = EntityGetPosition(self)
         
+        -- make trees hop over
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
 
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        -- adjust damage
+        damageData.DamageAmount = damageData.DamageAmount - 2
         
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
+        -- skip decal if not applicable
+        if targetType == 'Shield' or targetType == 'Water' or targetType == 'Air' or targetType == 'UnitAir' or targetType == 'Projectile' then
 
-            CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius, radius, 180, 40, army)
+            -- perform typical logic
+            TMissileCruiseProjectile.OnImpact(self, targetType, targetEntity)
+
+            -- get out of here
+            return
         end
-        
+
+        -- make decal
+        CreateDecal(
+            pos,                        -- position
+            2 * MathPi * Random(),      -- orientation
+            'nuke_scorch_002_albedo',   -- decal 1
+            '',                         -- decal 2 (for spec)
+            'Albedo',                   -- decal type
+            radius,                     -- sx
+            radius,                     -- sy
+            180,                        -- level of detail
+            40,                         -- duration
+            self.Army                   -- army that the decal belongs to
+        )
+
+        -- perform typical logic
         TMissileCruiseProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }

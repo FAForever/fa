@@ -1333,3 +1333,6 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
         myProjectile:PassDamageData(self:GetDamageTable())
     end,
 }
+
+-- Tactical missile threads --
+
