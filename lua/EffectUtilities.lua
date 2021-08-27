@@ -335,6 +335,7 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Buil
 end
 
 function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
+    LOG("Called: CreateAeonBuildBaseThread")
     local bp = unitBeingBuilt:GetBlueprint()
     local x, y, z = unpack(unitBeingBuilt:GetPosition())
     local mul = 0.5

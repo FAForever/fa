@@ -64,7 +64,7 @@ CConstructionTemplate = Class() {
     --- Prepares the values required to support bots
     OnCreate = function(self)
         -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
+        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
     end,
 
     --- When dying, destroy everything.
