@@ -107,9 +107,7 @@ function SpawnBuildBots(builder)
 
             -- make the bot
             local botBlueprint = CybranBuildBotBlueprints[k] or 'ura0001o'
-            LOG(botBlueprint)
             bot = CreateUnit(botBlueprint, builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air')
-            LOG(bot:GetBlueprint().BlueprintId)
 
             -- make build bots unkillable
             bot.SpawnedBy = builder

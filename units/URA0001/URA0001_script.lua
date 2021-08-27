@@ -9,16 +9,28 @@ local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBu
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
+local DeprecatedWarnings = { }
+
+-- Kept after #3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
+
 URA0001 = Class(CAirUnit) {
     spawnedBy = nil,
 
     OnCreate = function(self)
-        CAirUnit.OnCreate(self)
-        self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
-        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-        self.BuildArmManipulator:SetPrecedence(5)
-        self.Trash:Add(self.BuildArmManipulator)
-        self:SetConsumptionActive(false)
+
+      -- add deprecation warning
+      if not DeprecatedWarnings.URA0001 then 
+        DeprecatedWarnings.URA0001 = true 
+        WARN("URA0001 is deprecated: use URA0001O, URA0002O or URA0003O instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
+      end
+
+      CAirUnit.OnCreate(self)
+      self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
+      self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
+      self.BuildArmManipulator:SetPrecedence(5)
+      self.Trash:Add(self.BuildArmManipulator)
+      self:SetConsumptionActive(false)
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
