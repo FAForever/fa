@@ -889,17 +889,24 @@ Unit = Class(moho.unit_methods) {
 
     UpdateAssistersConsumption = function(self)
         local units = {}
+        local counter = 0
         -- We need to check all the units assisting.
         for _, v in self:GetGuards() do
             if not v.Dead and (v:IsUnitState('Building') or v:IsUnitState('Repairing')) then
-                table.insert(units, v)
+                counter = counter + 1
+                units[counter] = v
             end
         end
 
-        local workers = self:GetAIBrain():GetUnitsAroundPoint(categories.REPAIR, self:GetPosition(), 50, 'Ally')
+        -- Categories.UNTARGETABLE is added due to this Function picking up Cybran Build Drones.
+        -- Which was getting added to units table which with into the UpdateConsumptionValues Function.
+        -- You do not want to process these for Updated Consume Values. 
+        local workers = self:GetAIBrain():GetUnitsAroundPoint(categories.REPAIR - categories.UNTARGETABLE, self:GetPosition(), 50, 'Ally')
         for _, v in workers do
+            --LOG("Unit is " .. self.UnitId .. " " .. repr(v:GetBlueprint().Description))
             if not v.Dead and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
-                table.insert(units, v)
+                counter = counter + 1
+                units[counter] = v
             end
         end
 

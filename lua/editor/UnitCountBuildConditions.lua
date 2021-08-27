@@ -323,7 +323,7 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
         category = ParseEntityCategory(category)
     end
 
-    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
+    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION - categories.UNTARGETABLE, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
         if not unit:BeenDestroyed() and unit:IsUnitState('Building') then

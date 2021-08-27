@@ -381,7 +381,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         if factory.Dead then
             return
         end
-        local builder = self:GetHighestBuilder(bType,{factory})
+        local builder = self:GetHighestBuilder(self.Brain,bType,{factory})
         if builder then
             local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), factory)
             -- LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Factory Builder Manager Building - ',repr(builder.BuilderName))

@@ -131,7 +131,7 @@ PlatoonFormManager = Class(BuilderManager) {
                 return
             end
             local formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
-            if formIt and builder:GetBuilderStatus() then
+            if formIt and builder:GetBuilderStatus(self.Brain) then
                 local hndl = poolPlatoon:FormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
 
                 --LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager Forming - ',repr(builder.BuilderName),': Location = ',self.LocationType)

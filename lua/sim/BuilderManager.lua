@@ -15,6 +15,7 @@ local TableInsert = table.insert
 local MathCeil = math.ceil
 local WaitTicks = coroutine.yield
 
+local Random = Random
 local ForkThread = ForkThread
 local KillThread = KillThread
 
@@ -109,7 +110,8 @@ BuilderManager = Class {
     end,
 
     AddBuilder = function(self, builderData, locationType, builderType)
-        local newBuilder = Builder.CreateBuilder(self.Brain, builderData, locationType)
+        --LOG("What is Builder Data " .. repr(builderType))
+        local newBuilder = Builder.CreateBuilder(self.Brain, builderData, locationType, builderType)
         self:AddInstancedBuilder(newBuilder, builderType)
     end,
 
@@ -123,6 +125,7 @@ BuilderManager = Class {
             return
         end
         if newBuilder then
+            --LOG("New Engineer Builder Type is " .. repr(newBuilder))
             if not self.BuilderData[builderType] then
                 -- Warn the programmer that something is wrong here. Same here, we can continue.
                 -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
@@ -255,26 +258,30 @@ BuilderManager = Class {
         end
     end,
 
-    GetHighestBuilder = function(self,bType,params)
+    GetHighestBuilder = function(self,brain,bType,params)
         if not self.BuilderData[bType] then
             error('*BUILDERMANAGER ERROR: Invalid builder type - ' .. bType)
         end
-        if not self.Brain.BuilderManagers[self.LocationType] then
+        if not brain.BuilderManagers[self.LocationType] then
             return false
         end
         self.NumGet = self.NumGet + 1
         local found = false
         local possibleBuilders = {}
+        local counter = 0
+
         for k,v in self.BuilderData[bType].Builders do
-            if v.Priority >= 1 and self:BuilderParamCheck(v,params) and (not found or v.Priority == found) and v:GetBuilderStatus() then
+            if v.Priority >= 1 and self:BuilderParamCheck(v,params) and (not found or v.Priority == found) and v:GetBuilderStatus(brain) then
                 if not self:IsPlattonBuildDelayed(v.DelayEqualBuildPlattons) then
                     found = v.Priority
-                    TableInsert(possibleBuilders, k)
+                    counter = counter + 1
+                    possibleBuilders[counter] = k
                 end
             elseif found and v.Priority < found then
                 break
             end
         end
+
         if found and found > 0 then
             local whichBuilder = Random(1,TableGetn(possibleBuilders))
             return self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ]

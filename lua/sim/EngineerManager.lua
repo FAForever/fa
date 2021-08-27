@@ -311,10 +311,11 @@ EngineerManager = Class(BuilderManager) {
     -- Two it allows smaller searches for engineers when looking for a job. 
     -- Which results and.... you know it results in faster engineer responsiveness.
     AddBuilder = function(self, builderData, locationType, builderType)
-        local newBuilder = Builder.CreateEngineerBuilder(self.Brain, builderData, locationType)
+        --LOG("Creating Builder " .. repr(builderType))
+        local newBuilder = Builder.CreateEngineerBuilder(self.Brain, builderData, locationType, builderType)
         local BT = Builders[newBuilder.BuilderName].BuilderType 
         if type(BT) == 'string' then BT = {BT} end
-    
+        
         if newBuilder then
 			for _,EngineerType in BT do
 				if EngineerType == 'All'  then
@@ -351,6 +352,7 @@ EngineerManager = Class(BuilderManager) {
                 elseif EntityCategoryContains(categories.SUBCOMMANDER, unit) then
                     unit.builderType = 'SubCommander'
                 end
+                --LOG("The builderType " .. repr(unit.builderType) .. " and I am " .. self.Brain.Nickname)
 
                 if not unit.BuilderManagerData then
                     unit.BuilderManagerData = {}
@@ -724,7 +726,17 @@ EngineerManager = Class(BuilderManager) {
             self.AssigningTask = true
         end
 
-        local builder = self:GetHighestBuilder('Any', {unit})
+        --LOG("The builderType " .. repr(unit.builderType) .. " and I am " .. self.Brain.Nickname)
+        local builder = false
+        builder = self:GetHighestBuilder(self.Brain, unit.builderType, {unit})
+
+        -- This is for backwards Compability with 'Any' builderType
+        -- So all AI Developers and Old AI including Sorian and Vanilla
+        -- Can run the new form of the AddBuilder and builderTypes
+        if not builder and unit.builderType != 'Any' then 
+            builder = self:GetHighestBuilder(self.Brain, 'Any', {unit})
+        end
+
         if builder then
             -- Fork off the platoon here
             local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
