@@ -163,7 +163,7 @@ UnitBlueprint {
         OrderOverrides = {
             RULEUTC_IntelToggle = {
                 bitmapId = 'sonar',
-                helpText = 'toggle_sonar',
+                helpText = 'Toggle Sonar and Jamming on/off',
             },
             RULEUTC_JammingToggle = {
                 bitmapId = 'jamming',
