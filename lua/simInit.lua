@@ -241,6 +241,9 @@ function BeginSession()
         LocGlobals.PlayerName = ArmyBrains[focusarmy].Nickname
     end
 
+    -- make sure the hook happens before scripts start working
+    import ("/lua/sim/MarkerUtilities.lua")
+
     -- Pass ScenarioInfo into OnPopulate() and OnStart() for backwards compatibility
     ScenarioInfo.Env.OnPopulate(ScenarioInfo)
     ScenarioInfo.Env.OnStart(ScenarioInfo)
