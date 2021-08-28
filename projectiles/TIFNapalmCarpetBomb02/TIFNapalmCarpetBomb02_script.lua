@@ -30,7 +30,6 @@ TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) {
             local army = self.Army
 
             DamageRing(self, pos, 0.1, 5/4 * radius, 10, 'Fire', FriendlyFire, false)
-            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
             
             CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 50, army)
         end
