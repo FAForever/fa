@@ -364,6 +364,12 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
+    for option in gameInfo.GameOptions do
+        local arg = "/" .. option
+        if HasCommandLineArg(arg) then
+            gameInfo.GameOptions[option] = GetCommandLineArg(arg, 1)[1]
+        end
+    end
 
     -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
     lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
