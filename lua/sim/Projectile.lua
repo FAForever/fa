@@ -372,6 +372,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local TerrainEffects = self:GetTerrainEffects(targetType, bp.Display.ImpactEffects.Type)
         self:CreateImpactEffects(self.Army, ImpactEffects, ImpactEffectScale)
         self:CreateTerrainEffects(self.Army, TerrainEffects, bp.Display.ImpactEffects.Scale or 1)
+        LOG(targetType)
+        LOG(bp.Display.ImpactEffects.Type)
+        LOG(repr(TerrainEffects))
 
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
@@ -485,3 +488,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
     end,
 }
+
+-- Optimized projectile --
+
+ProjectileOpti = import("/lua/sim/ProjectileOpti.lua").Projectile

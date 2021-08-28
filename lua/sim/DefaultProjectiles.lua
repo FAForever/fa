@@ -493,3 +493,10 @@ OverchargeProjectile = Class() {
         OCProjectiles[self.Army] = OCProjectiles[self.Army] + 1
     end,
 }
+
+-- Optimized default projectiles --
+
+local DefaultProjectilesOpti = import("/lua/sim/DefaultProjectilesOpti.lua")
+
+EmitterProjectileOpti = DefaultProjectilesOpti.EmitterProjectile
+SingleBeamProjectileOpti = DefaultProjectilesOpti.SingleBeamProjectile

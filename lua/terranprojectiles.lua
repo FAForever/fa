@@ -892,3 +892,8 @@ THiroLaser = Class(SinglePolyTrailProjectile) {
 }
 
 
+-- Optimized projectiles --
+
+local TerranProjectilesOpti = import("/lua/TerranProjectilesOpti.lua")
+
+TMissileCruiseProjectileOpti = TerranProjectilesOpti.TMissileCruiseProjectile
