@@ -165,15 +165,10 @@ UnitBlueprint {
                 bitmapId = 'sonar',
                 helpText = 'Toggle Sonar and Jamming on/off',
             },
-            RULEUTC_JammingToggle = {
-                bitmapId = 'jamming',
-                helpText = 'toggle_jamming',
-            },
         },
         TechLevel = 'RULEUTL_Secret',
         ToggleCaps = {
             RULEUTC_IntelToggle = true,
-            RULEUTC_JammingToggle = true,
         },
         UnitName = '<LOC ues0305_name>SP3 - 3000',
         UnitWeight = 1,
