@@ -324,56 +324,50 @@ end
 
 -- HOOKING --
 
-ForkThread(
-    function()
+do
 
-        -- wait a few ticks to ensure all markers are loaded 
+    -- hook to cache markers created on the fly by crazy rush type of games
+    local OldCreateResourceDeposit = _G.CreateResourceDeposit
+    _G.CreateResourceDeposit = function (type, x, y, z, size)
 
-        WaitTicks(11) -- one second
+        -- fix to terrain height for debugging purposes
+        y = GetTerrainHeight(x, z)
+        OldCreateResourceDeposit(type, x, y, z, size)
 
-        -- hook to cache markers created on the fly by crazy rush type of games
-        local OldCreateResourceDeposit = _G.CreateResourceDeposit
-        _G.CreateResourceDeposit = function (type, x, y, z, size)
-
-            -- fix to terrain height for debugging purposes
-            y = GetTerrainHeight(x, z)
-            OldCreateResourceDeposit(type, x, y, z, size)
-
-            -- commented values are used by the editor and not by the game
-            local marker = false 
-            if type == 'Mass' then 
-                marker = {
-                    size = size,
-                    resource = true,
-                    -- amount = 100,
-                    color = 'ff808080',
-                    -- editorIcon = '/textures/editor/marker_mass.bmp',
-                    type = type,
-                    -- prop = '/env/common/props/markers/M_Mass_prop.bp',
-                    orientation = Vector(0, -0, 0),
-                    position = Vector(x, y, z),
-                }
-            else 
-                marker = {
-                    size = size,
-                    resource = true,
-                    -- amount = 100,
-                    color = 'ff008000',
-                    -- editorIcon = '/textures/editor/marker_mass.bmp',
-                    type = type,
-                    -- prop = '/env/common/props/markers/M_Mass_prop.bp',
-                    orientation = Vector(0, -0, 0),
-                    position = Vector(x, y, z),
-                }
-            end
-
-            -- add it to global table (on the array part of the table)
-            table.insert(AllMarkers, marker)
-
-            -- make sure cache exists
-            local markers, count = GetMarkersByType(type)
-            MarkerCache[type].Count = count + 1
-            MarkerCache[type].Markers[count + 1] = marker
+        -- commented values are used by the editor and not by the game
+        local marker = false 
+        if type == 'Mass' then 
+            marker = {
+                size = size,
+                resource = true,
+                -- amount = 100,
+                color = 'ff808080',
+                -- editorIcon = '/textures/editor/marker_mass.bmp',
+                type = type,
+                -- prop = '/env/common/props/markers/M_Mass_prop.bp',
+                orientation = Vector(0, -0, 0),
+                position = Vector(x, y, z),
+            }
+        else 
+            marker = {
+                size = size,
+                resource = true,
+                -- amount = 100,
+                color = 'ff008000',
+                -- editorIcon = '/textures/editor/marker_mass.bmp',
+                type = type,
+                -- prop = '/env/common/props/markers/M_Mass_prop.bp',
+                orientation = Vector(0, -0, 0),
+                position = Vector(x, y, z),
+            }
         end
+
+        -- add it to global table (on the array part of the table)
+        table.insert(AllMarkers, marker)
+
+        -- make sure cache exists
+        local markers, count = GetMarkersByType(type)
+        MarkerCache[type].Count = count + 1
+        MarkerCache[type].Markers[count + 1] = marker
     end
-)
+end
