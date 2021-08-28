@@ -94,6 +94,9 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -346,6 +349,9 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) { -- strategic bom
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -387,6 +393,7 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
             DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         else
+            local FriendlyFire = false
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
         end
@@ -516,12 +523,14 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        LOG(radius)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
@@ -564,6 +573,9 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -823,7 +835,11 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- percival
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
+        local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
@@ -859,6 +875,9 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )

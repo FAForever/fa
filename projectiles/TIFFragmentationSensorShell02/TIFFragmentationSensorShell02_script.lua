@@ -9,6 +9,9 @@ TIFFragmentationSensorShell02 = Class(TArtilleryProjectile) {
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )

@@ -73,6 +73,9 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
         local FriendlyFire = self.DamageData.DamageFriendly
+        if radius == 0 then
+            local FriendlyFire = false
+        end
         
         CreateLightParticle( self, -1, army, 3, 7, 'glow_03', 'ramp_fire_11' )
             

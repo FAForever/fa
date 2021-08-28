@@ -16,6 +16,7 @@ CDFRocketIridium01 = Class(CIridiumRocketProjectile) {
             DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
         else
+            local FriendlyFire = false
             DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
             DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
         end
