@@ -93,10 +93,7 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
         -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
-        if radius == 0 then
-            local FriendlyFire = false
-        end
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -348,10 +345,7 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) { -- strategic bom
         -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
-        if radius == 0 then
-            local FriendlyFire = false
-        end
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -385,7 +379,7 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2 -- doesn't work when OCing structure/ACU
         
@@ -393,7 +387,6 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
             DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         else
-            local FriendlyFire = false
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
         end
@@ -522,10 +515,7 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
-        if radius == 0 then
-            local FriendlyFire = false
-        end
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -572,10 +562,7 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
-        if radius == 0 then
-            local FriendlyFire = false
-        end
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -836,10 +823,7 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- percival
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
-        if radius == 0 then
-            local FriendlyFire = false
-        end
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
@@ -874,10 +858,7 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
-        if radius == 0 then
-            local FriendlyFire = false
-        end
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
