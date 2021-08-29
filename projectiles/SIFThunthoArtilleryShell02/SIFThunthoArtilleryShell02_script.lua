@@ -6,26 +6,38 @@
 --  Summary  :  Thuntho Artillery Shell Projectile script
 --              Seraphim T1 Artillery : XSL0103
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
-local SThunthoArtilleryShell2 = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell2
+
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+local SThunthoArtilleryShell2 = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell2Opti
+
+-- globals as upvalues for performance 
+local DamageArea = DamageArea
+local CreateDecal = CreateDecal
+
+-- moho functions as upvalue for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityGetPosition = EntityMethods.GetPosition
+
+-- attach for CTRL + SHIFT F replacement
 
 SIFThunthoArtilleryShell02 = Class(SThunthoArtilleryShell2) {
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local pos = EntityGetPosition(self)
+
+        local army = self.Army
+        local data = self.DamageData
+        local radius = data.DamageRadius
+        local FriendlyFire = data.DamageFriendly
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        data.DamageAmount = data.DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
+            local rotation = Random() * 2 * 3.141592
             CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius-1, radius-1, 100, 10, army)
         end
         

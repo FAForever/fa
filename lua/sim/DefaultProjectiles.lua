@@ -500,3 +500,4 @@ local DefaultProjectilesOpti = import("/lua/sim/DefaultProjectilesOpti.lua")
 
 EmitterProjectileOpti = DefaultProjectilesOpti.EmitterProjectile
 SingleBeamProjectileOpti = DefaultProjectilesOpti.SingleBeamProjectile
+MultiPolyTrailProjectileOpti = DefaultProjectilesOpti.MultiPolyTrailProjectile

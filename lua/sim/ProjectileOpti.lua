@@ -37,9 +37,8 @@ local EntityGetHealth = EntityMethods.GetHealth
 local EntitySetHealth = EntityMethods.SetHealth
 local EntityAdjustHealth = EntityMethods.AdjustHealth
 local EntitySetMaxHealth = EntityMethods.SetMaxHealth
-local EntitySetAmbientSound = EntityMethods.SetAmbientSound
-local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 local EntityGetPosition = EntityMethods.GetPosition
+local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 
 local ProjectileMethods = _G.moho.projectile_methods
 local ProjectileGetLauncher = ProjectileMethods.GetLauncher
@@ -85,7 +84,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     -- FxWaterHitScale = 1,
     -- FxOnKilledScale = 1,
 
-    -- this is always false
+    -- this is always false: legacy code from SC1
     -- FxImpactLandScorch = false,
     -- FxImpactLandScorchScale = 1.0,
 
@@ -118,32 +117,32 @@ Projectile = Class(moho.projectile_methods, Entity) {
             local radius = DamageData.DamageRadius
             if radius and radius > 0 then
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    DamageArea(instigator, self:GetPosition(), radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                    DamageArea(instigator, EntityGetPosition(self), radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
                 else
                     -- DoT damage - check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
                         if radius > 0 then
-                            DamageArea(instigator, self:GetPosition(), radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                            DamageArea(instigator, EntityGetPosition(self), radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
                         elseif targetEntity then
-                            Damage(instigator, self:GetPosition(), targetEntity, initialDmg, DamageData.DamageType)
+                            Damage(instigator, EntityGetPosition(self), targetEntity, initialDmg, DamageData.DamageType)
                         end
                     end
 
-                    ForkThread(DefaultDamage.AreaDoTThread, instigator, self:GetPosition(), DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), radius, damage, DamageData.DamageType, DamageData.DamageFriendly)
+                    ForkThread(DefaultDamage.AreaDoTThread, instigator, EntityGetPosition(self), DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), radius, damage, DamageData.DamageType, DamageData.DamageFriendly)
                 end
             -- ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
             elseif DamageData.DamageAmount and targetEntity then
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    Damage(instigator, self:GetPosition(), targetEntity, DamageData.DamageAmount, DamageData.DamageType)
+                    Damage(instigator, EntityGetPosition(self), targetEntity, DamageData.DamageAmount, DamageData.DamageType)
                 else
                     -- DoT damage - check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
                         if radius > 0 then
-                            DamageArea(instigator, self:GetPosition(), radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                            DamageArea(instigator, EntityGetPosition(self), radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
                         elseif targetEntity then
-                            Damage(instigator, self:GetPosition(), targetEntity, initialDmg, DamageData.DamageType)
+                            Damage(instigator, EntityGetPosition(self), targetEntity, initialDmg, DamageData.DamageType)
                         end
                     end
 
@@ -152,7 +151,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
             end
         end
         if self.InnerRing and self.OuterRing then
-            local pos = self:GetPosition()
+            local pos = EntityGetPosition(self)
             self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
             self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
         end

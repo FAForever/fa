@@ -5,7 +5,7 @@
 --
 --  Summary  : Seraphim projectile base class definitions
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 --------------------------------------------------------------------------
@@ -1000,3 +1000,10 @@ SDFAireauProjectile = Class(MultiPolyTrailProjectile) { -- ythotha
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
     end,
 }
+
+-- Optimized versions -- 
+
+local SeraphimProjectilesOpti = import("/lua/SeraphimProjectilesOpti.lua")
+
+SThunthoArtilleryShellOpti = SeraphimProjectilesOpti.SThunthoArtilleryShell
+SThunthoArtilleryShell2Opti = SeraphimProjectilesOpti.SThunthoArtilleryShell2
