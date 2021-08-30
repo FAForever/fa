@@ -198,7 +198,7 @@ load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Comm
 load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
 
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
-mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
+mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx5', '/')
 
 -- these are using the newly generated path from the dofile() statement at the beginning of this script
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
