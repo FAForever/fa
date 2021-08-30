@@ -184,7 +184,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         EntitySetHealth(self, self, health)
 
         -- adjust for surface height 
-        if blueprint.Physics.TrackTargetGround and blueprint.Physics.TrackTargetGround == true then
+        if blueprint.Physics.TrackTargetGround then
             local pos = ProjectileGetCurrentTargetPosition(self)
             pos[2] = GetSurfaceHeight(pos[1], pos[3])
             ProjectileSetNewTargetGround(self, pos)
@@ -365,26 +365,15 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local damageData = self.DamageData
         local instigator = self.Launcher or self -- use launcher for army if available
 
-        local ImpactEffects = false
-        local ImpactEffectScale = 1
-
         -- Do Damage
         self.DoDamage(self, instigator, damageData, targetEntity)
 
         -- Meta-Impact
-        self.DoMetaImpact(self, damageData)
+        -- self.DoMetaImpact(self, damageData) -- doens't appear to pass the if statement, ever
 
-        -- Buffs (Stun, etc)
-        self.DoUnitImpactBuffs(self, targetEntity)
-
-        -- try and play specific sound file, or generic as fallback
-        local blueprintAudio = self.Blueprint.Audio
-        local snd = blueprintAudio['Impact' .. targetType]
-        if snd then
-            EntityPlaySound(self, snd)
-            -- Generic Impact Sound
-        elseif blueprintAudio.Impact then
-            EntityPlaySound(self, blueprintAudio.Impact)
+        -- pull-in check for buffs for performance
+        if damageData.Buffs then 
+            self.DoUnitImpactBuffs(self, targetEntity, damageData)
         end
 
         -- Possible targetType values are:
@@ -392,55 +381,81 @@ Projectile = Class(moho.projectile_methods, Entity) {
         --  'Shield', 'UnitAir', 'UnderWater', 'UnitUnderwater'
         --  'Projectile', 'ProjectileUnderWater
 
+        local impactSnd = false
+        local impactEffects = false
+        local impactEffectscale = 1
+
         if targetType == 'Water' then
-            ImpactEffects = self.FxImpactWater
-            ImpactEffectScale = self.FxWaterHitScale
+            impactSnd = "ImpactWater"
+            impactEffects = self.FxImpactWater
+            impactEffectscale = self.FxWaterHitScale
         elseif targetType == 'Terrain' then
-            ImpactEffects = self.FxImpactLand
-            ImpactEffectScale = self.FxLandHitScale
+            impactSnd = "ImpactTerrain"
+            impactEffects = self.FxImpactLand
+            impactEffectscale = self.FxLandHitScale
         elseif targetType == 'Shield' then
-            ImpactEffects = self.FxImpactShield
-            ImpactEffectScale = self.FxShieldHitScale
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactShield
+            impactEffectscale = self.FxShieldHitScale
         elseif targetType == 'Unit' then
-            ImpactEffects = self.FxImpactUnit
-            ImpactEffectScale = self.FxUnitHitScale
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactUnit
+            impactEffectscale = self.FxUnitHitScale
         elseif targetType == 'UnitAir' then
-            ImpactEffects = self.FxImpactAirUnit
-            ImpactEffectScale = self.FxAirUnitHitScale
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactAirUnit
+            impactEffectscale = self.FxAirUnitHitScale
         elseif targetType == 'Air' then
-            ImpactEffects = self.FxImpactNone
-            ImpactEffectScale = self.FxNoneHitScale
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactNone
+            impactEffectscale = self.FxNoneHitScale
         elseif targetType == 'Projectile' then
-            ImpactEffects = self.FxImpactProjectile
-            ImpactEffectScale = self.FxProjectileHitScale
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactProjectile
+            impactEffectscale = self.FxProjectileHitScale
         elseif targetType == 'ProjectileUnderwater' then
-            ImpactEffects = self.FxImpactProjectileUnderWater
-            ImpactEffectScale = self.FxProjectileUnderWaterHitScale
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactProjectileUnderWater
+            impactEffectscale = self.FxProjectileUnderWaterHitScale
         elseif targetType == 'Prop' then
-            ImpactEffects = self.FxImpactProp
-            ImpactEffectScale = self.FxPropHitScale
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactProp
+            impactEffectscale = self.FxPropHitScale
         elseif targetType == 'Underwater' or targetType == 'UnitUnderwater' then
-            ImpactEffects = self.FxImpactUnderWater
-            ImpactEffectScale = self.FxUnderWaterHitScale or 0.25
+            impactSnd = "Impact"
+            impactEffects = self.FxImpactUnderWater
+            impactEffectscale = self.FxUnderWaterHitScale or 0.25
         else
             LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
         end
 
         -- check if they were set and use default values otherwise
-        ImpactEffects = ImpactEffects or false
-        ImpactEffectScale = ImpactEffectScale or self.FxScale or 1
+        impactEffects = impactEffects or false
+        impactEffectscale = impactEffectscale or self.FxScale or 1
 
-        local BlueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
-        local TerrainEffects = self.GetTerrainEffects(self, targetType, BlueprintDisplayImpactEffects.Type)
-        self.CreateImpactEffects(self, army, ImpactEffects, ImpactEffectScale)
-        self.CreateTerrainEffects(self, army, TerrainEffects, BlueprintDisplayImpactEffects.Scale or 1)
-
-        local timeout = blueprint.Physics.ImpactTimeout
-        if timeout and targetType == 'Terrain' then
-            TrashBagAdd(self.Trash, ForkThread(self.ImpactTimeoutThread, self, timeout))
-        else
-            self.OnImpactDestroy(self, targetType, targetEntity)
+        -- play audio
+        local snd = blueprint.Audio[impactSnd]
+        if snd then 
+            EntityPlaySound(self, snd)
         end
+
+        -- do ground effects
+        local BlueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
+        local terrainEffects = self.GetTerrainEffects(self, targetType, BlueprintDisplayImpactEffects.Type)
+        self.CreateImpactEffects(self, army, impactEffects, impactEffectscale)
+        self.CreateTerrainEffects(self, army, terrainEffects, BlueprintDisplayImpactEffects.Scale or 1)
+
+        -- we only have impact details on the terrain
+        if targetType == 'Terrain' then 
+            local timeout = blueprint.Physics.ImpactTimeout
+            if timeout then
+                TrashBagAdd(self.Trash, ForkThread(self.ImpactTimeoutThread, self, timeout))
+                return
+            end
+        end
+            
+        -- typical impact, destroy immediately
+        self.OnImpactDestroy(self, targetType, targetEntity)
     end,
 
     --- What to do when we're destroyed on impact
@@ -459,19 +474,25 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     -- When this projectile impacts with the target, do any buffs that have been passed to it.
-    DoUnitImpactBuffs = function(self, target)
-        local data = self.DamageData
-        -- Check for buff
-        if data.Buffs then
+    DoUnitImpactBuffs = function(self, target, damageData)
+
+        -- backwards compatibility
+        local data = damageData or self.DamageData
+
+        -- check if there are any buffs
+        local buffs = data.Buffs
+        if buffs then
             -- Check for valid target
-            for k, v in data.Buffs do
+            for k, v in buffs do
                 if v.Add.OnImpact == true then
-                    if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
+                    local radius = v.Radius
+                    if v.AppliedToTarget ~= true or (radius and radius > 0) then
                         target = self.Launcher
                     end
                     -- Check for target validity
                     if target and IsUnit(target) then
-                        if v.Radius and v.Radius > 0 then
+                        
+                        if radius and radius > 0 then
                             -- This is a radius buff
                             -- get the position of the projectile
                             target:AddBuff(v, self:GetPosition())

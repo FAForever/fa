@@ -8,10 +8,8 @@
 --**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local SThunderStormCannonProjectileSplitFx = import('/lua/EffectTemplates.lua').SThunderStormCannonProjectileSplitFx
 local SThunthoArtilleryShell = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShellOpti
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local SThunderStormCannonProjectileSplitFx = import('/lua/EffectTemplates.lua').SThunderStormCannonProjectileSplitFx
 
 -- globals as upvalues for performance 
 local Random = Random
@@ -34,22 +32,23 @@ local ProjectileCreateChildProjectile = ProjectileMethods.CreateChildProjectile
 
 SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
                
-    OnImpact = function(self, TargetType, TargetEntity) 
+    OnImpact = function(self, targetType, targetEntity) 
         
+        -- cache for performance
         local army = self.Army
         local bp = self.Blueprint.Physics
         local bpFragments = bp.Fragments
         local bpFragmentId = bp.FragmentId
         local damageData = self.DamageData
-        local FxFragEffect = SThunderStormCannonProjectileSplitFx
+        local fxFragEffect = SThunderStormCannonProjectileSplitFx
               
         -- split effects
-        for k, v in FxFragEffect do
+        for k, v in fxFragEffect do
             CreateEmitterAtEntity( self, army, v )
         end     
 
         -- Randomization of the spread
-        local angle = (2 * 3.141592) / bpFragments
+        local angle = 6.28 / bpFragments
         local angleInitial = Random() * angle
         local angleVariation = angle * 0.8 -- Adjusts angle variance spread     
 
@@ -60,13 +59,14 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
         local zVec = 0
 
         -- Launch projectiles at semi-random angles away from split location
+        local proj = false
         for i = 1, bpFragments do
-            xVec = vx + (MathSin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * 0.15 -- spreadMul
-            zVec = vz + (MathCos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * 0.15 -- spreadMul 
-            local proj = ProjectileCreateChildProjectile(self, bpFragmentId)
+            xVec = vx + 0.15 * (MathSin(angleInitial + (i * angle) + 2 * Random() * angleVariation - angleVariation))  -- spreadMul
+            zVec = vz + 0.15 * (MathCos(angleInitial + (i * angle) + 2 * Random() * angleVariation - angleVariation))  -- spreadMul
+            proj = ProjectileCreateChildProjectile(self, bpFragmentId)
             ProjectileSetVelocity(proj, xVec, yVec, zVec)
             ProjectileSetVelocity(proj, 18) -- velocity
-            proj.PassDamageData(proj, damageData)                        
+            proj.DamageData = damageData
         end
         
         EntityDestroy(self)
