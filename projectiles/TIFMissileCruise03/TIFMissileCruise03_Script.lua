@@ -78,7 +78,7 @@ TIFMissileCruise03 = Class(TMissileCruiseProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )

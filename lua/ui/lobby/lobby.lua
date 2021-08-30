@@ -2148,6 +2148,11 @@ local function UpdateGame()
             GUI.mapView:SetScenario(scenarioInfo)
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
+
+            -- prefetch the session to make loading screen shorter
+            local mods = Mods.GetGameMods(gameInfo.GameMods)
+            PrefetchSession(scenarioInfo.map, mods, true)
+
         else
             AlertHostMapMissing()
             GUI.mapView:Clear()

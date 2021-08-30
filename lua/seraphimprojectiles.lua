@@ -93,7 +93,7 @@ SChronatronCannon = Class(MultiPolyTrailProjectile) { -- ACU
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -136,7 +136,7 @@ SChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- ACU
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -168,7 +168,8 @@ SLightChronatronCannon = Class(MultiPolyTrailProjectile) { -- SACU
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
@@ -199,7 +200,7 @@ SLightChronatronCannonOverCharge = Class(MultiPolyTrailProjectile) { -- SACU
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -248,7 +249,8 @@ SHeavyPhasicAutogun02 = Class(SHeavyPhasicAutogun) {
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 0.7, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 0.7, 1, 'Force', FriendlyFire )
@@ -318,7 +320,8 @@ SAireauBolter = Class(MultiPolyTrailProjectile) { -- T2 bot (Ilshavoh) and T3 ta
 
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
@@ -351,7 +354,7 @@ STauCannon = Class(MultiPolyTrailProjectile) { -- sera T2 hover tank and T3 tank
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
@@ -396,7 +399,7 @@ SHeavyQuarnonCannon = Class(MultiPolyTrailProjectile) { -- Battleship
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -434,7 +437,7 @@ SLaanseTacticalMissile = Class(SinglePolyTrailProjectile) { -- ACU / SACU / TML 
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -475,7 +478,7 @@ SZthuthaamArtilleryShell = Class(MultiPolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -504,7 +507,7 @@ SSuthanusArtilleryShell = Class(EmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -534,7 +537,7 @@ SSuthanusMobileArtilleryShell = Class(SinglePolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -815,7 +818,7 @@ SZhanaseeBombProjectile = Class(EmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -925,7 +928,7 @@ SDFExperimentalPhasonProjectile = Class(EmitterProjectile) { -- ythotha
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
@@ -953,7 +956,7 @@ SDFSinnuntheWeaponProjectile = Class(EmitterProjectile) { -- ythotha
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius-1, 1, 'Force', FriendlyFire )
@@ -984,7 +987,8 @@ SDFAireauProjectile = Class(MultiPolyTrailProjectile) { -- ythotha
 
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )

@@ -155,6 +155,10 @@ Unit = Class(moho.unit_methods) {
 
     OnCreate = function(self)
         Entity.OnCreate(self)
+
+        -- cache commonly used values from the engine
+        -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
+
         -- Turn off land bones if this unit has them.
         self:HideLandBones()
 
@@ -1153,7 +1157,7 @@ Unit = Class(moho.unit_methods) {
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     OnKilled = function(self, instigator, type, overkillRatio)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         self.Dead = true
 
         -- Units killed while being invisible because they're teleporting should show when they're killed
@@ -1558,7 +1562,6 @@ Unit = Class(moho.unit_methods) {
             end
             if animBlock.Animation and (self:ShallSink() or not EntityCategoryContains(categories.NAVAL, self)) then
                 local sinkAnim = CreateAnimator(self)
-                self:StopRocking()
                 self.DeathAnimManip = sinkAnim
                 sinkAnim:PlayAnim(animBlock.Animation)
                 rate = rate or 1
@@ -1596,7 +1599,7 @@ Unit = Class(moho.unit_methods) {
         local energy = bp.Economy.BuildCostEnergy * (bp.Wreckage.EnergyMult or 0)
         local time = (bp.Wreckage.ReclaimTimeMultiplier or 1)
         local pos = self:GetPosition()
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
 
         -- Reduce the mass value of submerged wrecks
         if layer == 'Water' or layer == 'Sub' then
@@ -1759,7 +1762,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     ShallSink = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local shallSink = (
             (layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
             not EntityCategoryContains(categories.STRUCTURE, self)  -- Exclude structures
@@ -1970,7 +1973,7 @@ Unit = Class(moho.unit_methods) {
 
     HideLandBones = function(self)
         -- Hide the bones for buildings built on land
-        if self.LandBuiltHiddenBones and self:GetCurrentLayer() == 'Land' then
+        if self.LandBuiltHiddenBones and self.Layer == 'Land' then
             for _, v in self.LandBuiltHiddenBones do
                 if self:IsValidBone(v) then
                     self:HideBone(v, true)
@@ -2173,8 +2176,7 @@ Unit = Class(moho.unit_methods) {
         self:EnableUnitIntel('NotInitialized', nil)
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
-        if self:GetCurrentLayer() == 'Water' then
-            self:StartRocking()
+        if self.Layer == 'Water' then
             local surfaceAnim = bp.Display.AnimationSurface
             if not self.SurfaceAnimator and surfaceAnim then
                 self.SurfaceAnimator = CreateAnimator(self)
@@ -2627,11 +2629,7 @@ Unit = Class(moho.unit_methods) {
 
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
-        if self.buildBots then
-            for _, b in self.buildBots do
-                ChangeState(b, b.IdleState)
-            end
-        end
+
     end,
 
     OnStartSacrifice = function(self, target_unit)
@@ -3065,6 +3063,15 @@ Unit = Class(moho.unit_methods) {
     -- LAYER EVENTS
     -------------------------------------------------------------------------------------------
     OnLayerChange = function(self, new, old)
+
+        -- This function is called when:
+        -- - A unit changes layer (heh)
+        -- - For all units part of a transport, when the transport changes layer (e.g., land units can become 'Air')
+        -- - When a jet lands, it changes to land (from Air)
+
+        -- Store latest layer for performance, preventing .Layer engine calls.
+        self.Layer = new 
+
         -- Bail out early if dead. The engine calls this function AFTER entity:Destroy() has killed
         -- the C object. Any functions down this line which expect a live C object (self:CreateAnimator())
         -- for example, will throw an error.
@@ -3111,7 +3118,7 @@ Unit = Class(moho.unit_methods) {
         if self.Dead then
             return
         end
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
 
         if old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed')) then
             -- Try the specialised sound, fall back to the general one.
@@ -3131,18 +3138,12 @@ Unit = Class(moho.unit_methods) {
                 self:PlayUnitAmbientSound('AmbientMove')
             end
 
-            self:StopRocking()
         end
 
         if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StopMove' .. layer) then
                 self:PlayUnitSound('StopMove')
-            end
-
-            -- Units in the water will rock back and forth a bit
-            if layer == 'Water' then
-                self:StartRocking()
             end
         end
 
@@ -3192,7 +3193,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Surfacing and sinking, landing and take off idle effects
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         if (new == 'Up' and old == 'Bottom') or (new == 'Down' and old == 'Top') then
             self:DestroyIdleEffects()
 
@@ -3239,7 +3240,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnAnimCollision = function(self, bone, x, y, z)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpTable = self:GetBlueprint().Display.MovementEffects
 
         if bpTable[layer].Footfall then
@@ -3309,7 +3310,7 @@ Unit = Class(moho.unit_methods) {
             self:DestroyTopSpeedEffects()
         end
 
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpMTable = self:GetBlueprint().Display.MovementEffects
         if new == 'TopSpeed' and self.HasFuel then
             if bpMTable[layer].Contrails and self.ContrailEffects then
@@ -3387,7 +3388,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if not vTypeGroup.Bones or (vTypeGroup.Bones and (table.empty(vTypeGroup.Bones))) then
-                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self:GetCurrentLayer(), '.Effects {Bones ={}} in unit blueprint.')
+                WARN('*WARNING: No effect bones defined for layer group ', repr(self.UnitId), ', Add these to a table in Display.[EffectGroup].', self.Layer, '.Effects {Bones ={}} in unit blueprint.')
             else
                 for kb, vBone in vTypeGroup.Bones do
                     for ke, vEffect in effects do
@@ -3405,7 +3406,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateIdleEffects = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpTable = self:GetBlueprint().Display.IdleEffects
         if bpTable[layer] and bpTable[layer].Effects then
             self:CreateTerrainTypeEffects(bpTable[layer].Effects, 'FXIdle',  layer, nil, self.IdleEffectsBag)
@@ -3413,7 +3414,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateMovementEffects = function(self, EffectsBag, TypeSuffix, TerrainType)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local bpTable = self:GetBlueprint().Display.MovementEffects
 
         if bpTable[layer] then
@@ -3451,7 +3452,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateMotionChangeEffects = function(self, new, old)
-        local key = self:GetCurrentLayer()..old..new
+        local key = self.Layer..old..new
         local bpTable = self:GetBlueprint().Display.MotionChangeEffects[key]
 
         if bpTable then
@@ -3464,7 +3465,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Clean up any camera shake going on.
         local bpTable = self:GetBlueprint().Display.MovementEffects
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         if self.CamShakeT1 then
             KillThread(self.CamShakeT1)
 
@@ -3905,7 +3906,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Exclude things currently flying around
             for _, target in targets or {} do
-                if target:GetCurrentLayer() ~= 'Air' then
+                if target.Layer ~= 'Air' then
                     target:SetStunned(buffTable.Duration or 1)
                 end
             end
@@ -4231,45 +4232,72 @@ Unit = Class(moho.unit_methods) {
     -- ROCKING
     -------------------------------------------------------------------------------------------
     -- Causes units to rock from side to side on water
+
+    --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
     StartRocking = function(self)
-        KillThread(self.StopRockThread)
-        self.StartRockThread = self:ForkThread(self.RockingThread)
+        local bp = self:GetBlueprint().Display
+        local speed = bp.MaxRockSpeed
+        if (not self.RockManip) and (not self.Dead) and speed and speed > 0 then 
+
+            -- clear it so that GC can take it, if it exists
+            if self.StopRockThread then 
+                KillThread(self.StopRockThread)
+                self.StopRockThread = nil 
+            end
+
+            self.StartRockThread = self:ForkThread(self.RockingThread, speed)
+        end
     end,
 
+    --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
     StopRocking = function(self)
         if self.StartRockThread then
+            -- clear it so that GC can take it
             KillThread(self.StartRockThread)
-            self.StopRockThread = self:ForkThread(self.EndRockingThread)
+            self.StartRockThread = nil
+
+            local bp = self:GetBlueprint().Display
+            local speed = bp.MaxRockSpeed
+
+            self.StopRockThread = self:ForkThread(self.EndRockingThread, speed)
         end
     end,
 
-    RockingThread = function(self)
-        local bp = self:GetBlueprint().Display
-        if not self.RockManip and not self.Dead and bp.MaxRockSpeed and bp.MaxRockSpeed > 0 then
-            self.RockManip = CreateRotator(self, 0, 'z', nil, 0, (bp.MaxRockSpeed or 1.5) / 5, (bp.MaxRockSpeed or 1.5) * 3 / 5)
-            self.Trash:Add(self.RockManip)
-            self.RockManip:SetPrecedence(0)
+    --- Rocking thread to move a unit when it is on the water.
+    RockingThread = function(self, speed)
+        -- default value
+        speed = speed or 1.5
 
-            while true do
-                WaitFor(self.RockManip)
+        self.RockManip = CreateRotator(self, 0, 'z', nil, 0, speed * 0.2, speed * 0.6)
+        self.Trash:Add(self.RockManip)
+        self.RockManip:SetPrecedence(0)
 
-                if self.Dead then break end -- Abort if the unit died
+        while true do
+            WaitFor(self.RockManip)
 
-                self.RockManip:SetTargetSpeed(- bp.MaxRockSpeed or 1.5)
-                WaitFor(self.RockManip)
+            if self.Dead then break end -- Abort if the unit died
 
-                if self.Dead then break end -- Abort if the unit died
+            self.RockManip:SetTargetSpeed(-speed) 
+            WaitFor(self.RockManip)
 
-                self.RockManip:SetTargetSpeed(bp.MaxRockSpeed or 1.5)
-            end
+            if self.Dead then break end -- Abort if the unit died
+
+            self.RockManip:SetTargetSpeed(speed)
         end
     end,
 
-    EndRockingThread = function(self)
-        local bp = self:GetBlueprint().Display
+    --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
+    -- warping to the original position.
+    EndRockingThread = function(self, speed)
         if self.RockManip then
+
+            -- default value
+            speed = speed or 1.5
+
             self.RockManip:SetGoal(0)
-            self.RockManip:SetSpeed((bp.MaxRockSpeed or 1.5) / 4)
+            self.RockManip:SetSpeed(speed / 4)
             WaitFor(self.RockManip)
 
             if self.RockManip then

@@ -81,7 +81,7 @@ UAL0307 = Class(AShieldHoverLandUnit) {
 
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self:GetCurrentLayer()]) --this resets the stop feature - note that its reset on layer change!
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
             end
         end
     end,

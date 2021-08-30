@@ -122,7 +122,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         if bp.Flare then
             proj:AddFlare(bp.Flare)
         end
-        if self.unit:GetCurrentLayer() == 'Water' and bp.Audio.FireUnderWater then
+        if self.unit.Layer == 'Water' and bp.Audio.FireUnderWater then
             self:PlaySound(bp.Audio.FireUnderWater)
         elseif bp.Audio.Fire then
             self:PlaySound(bp.Audio.Fire)
@@ -1121,7 +1121,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         end
 
         local bp = self:GetBlueprint()
-        if self.unit:GetCurrentLayer() == 'Water' and bp.Audio.FireUnderWater then
+        if self.unit.Layer == 'Water' and bp.Audio.FireUnderWater then
             self:PlaySound(bp.Audio.FireUnderWater)
         elseif bp.Audio.Fire then
             self:PlaySound(bp.Audio.Fire)

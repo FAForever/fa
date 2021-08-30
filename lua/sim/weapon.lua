@@ -45,7 +45,7 @@ Weapon = Class(moho.weapon_methods) {
         if not self.unit.Trash then
             self.unit.Trash = TrashBag()
         end
-        self:SetValidTargetsForCurrentLayer(self.unit:GetCurrentLayer())
+        self:SetValidTargetsForCurrentLayer(self.unit.Layer)
         local bp = self:GetBlueprint()
         if bp.Turreted == true then
             self:SetupTurret()

@@ -71,7 +71,7 @@ CIFProtonBombProjectile = Class(NullShell) { -- T3 strategic bomber
         local army = self.Army
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         CreateLightParticle(self, -1, army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
         CreateLightParticle(self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02')
@@ -127,7 +127,7 @@ CDFProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -165,7 +165,7 @@ CDFHvyProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -294,7 +294,7 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
         local army = self.Army
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         CreateLightParticle( self, -1, army, radius * 2, 12, 'glow_03', 'ramp_red_06' )
         CreateLightParticle( self, -1, army, radius * 2, 22, 'glow_03', 'ramp_antimatter_02' )
@@ -394,7 +394,8 @@ CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) { --loya & waile
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
@@ -449,7 +450,7 @@ CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya, wagner, m
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -507,7 +508,7 @@ CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -619,7 +620,7 @@ CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) { -- T2 gs & 
         
         if radius == 0 then
             local pos = self:GetPosition()
-            local FriendlyFire = self.DamageData.DamageFriendly
+            local FriendlyFire = false
             
             DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
             DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
@@ -653,7 +654,7 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -736,7 +737,7 @@ CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
         
         if radius == 0 then -- to prevent OC from doing that decal
             local pos = self:GetPosition()
-            local FriendlyFire = self.DamageData.DamageFriendly
+            local FriendlyFire = false
             
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
@@ -897,7 +898,7 @@ CRocketProjectile = Class(SingleBeamProjectile) { -- wagner
         
         if radius == 0 then
             local pos = self:GetPosition()
-            local FriendlyFire = self.DamageData.DamageFriendly
+            local FriendlyFire = false
             
             DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
@@ -1169,7 +1170,8 @@ CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) { -- Brick
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )

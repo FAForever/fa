@@ -112,7 +112,7 @@ URS0201 = Class(CSeaUnit) {
     OnKilled = function(self, instigator, type, overkillRatio)
         self.Trash:Destroy()
         self.Trash = TrashBag()
-        if self:GetCurrentLayer() ~= 'Water' and not self.IsWaiting then
+        if self.Layer ~= 'Water' and not self.IsWaiting then
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.LandAnimationDeath
         else
             self:GetBlueprint().Display.AnimationDeath = self:GetBlueprint().Display.WaterAnimationDeath
@@ -122,7 +122,7 @@ URS0201 = Class(CSeaUnit) {
     end,
 
      DeathThread = function(self, overkillRatio)
-        if self:GetCurrentLayer() ~= 'Water' and not self.IsWaiting then
+        if self.Layer ~= 'Water' and not self.IsWaiting then
             self:PlayUnitSound('Destroyed')
             if self.PlayDestructionEffects then
                 self:CreateDestructionEffects(self, overkillRatio)
@@ -160,7 +160,7 @@ URS0201 = Class(CSeaUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)
 
-        if self:GetAIBrain().BrainType == 'Human' and self:GetCurrentLayer() ~= 'Land' then
+        if self:GetAIBrain().BrainType == 'Human' and self.Layer ~= 'Land' then
             self:SetScriptBit('RULEUTC_WeaponToggle', true)
         end
     end,
@@ -169,7 +169,7 @@ URS0201 = Class(CSeaUnit) {
     OnScriptBitSet = function(self, bit)
         CSeaUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
-            if self:GetCurrentLayer() ~= 'Land' then
+            if self.Layer ~= 'Land' then
                 self:GetStat("h1_SetSalemAmph", 0)
             else
                 self:SetScriptBit('RULEUTC_WeaponToggle', false)

@@ -17,7 +17,8 @@ TDFPlasmaHeavy03 = Class(THeavyPlasmaCannonProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )

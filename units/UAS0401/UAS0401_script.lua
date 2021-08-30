@@ -165,7 +165,7 @@ UAS0401 = Class(ASeaUnit) {
             self:Destroy()
         end)
 
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         self:DestroyIdleEffects()
         if layer == 'Water' or layer == 'Seabed' or layer == 'Sub' then
             self.SinkExplosionThread = self:ForkThread(self.ExplosionThread)
