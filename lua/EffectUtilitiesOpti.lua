@@ -308,14 +308,18 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
     local sz = physics.MeshExtentsZ or footprint.SizeZ * 0.5
     local sy = physics.MeshExtentsY or sx + sz
 
+    -- set the original mesh of the building we're making
+    local display = blueprint.Display
+    unitBeingBuilt.SetMesh(display.MeshBlueprint)
+
     -- create dummy entity for the build animation
     local entity = Entity()
     TrashBagAdd(effectsBag, entity)
 
     Warp(entity, o)
     EntitySetOrientation(entity, orientation, true)
-    EntitySetScale(entity, blueprint.Display.UniformScale)
-    EntitySetMesh(entity, blueprint.Display.BuildMeshBlueprint, true)
+    EntitySetScale(entity, display.UniformScale)
+    EntitySetMesh(entity, display.BuildMeshBlueprint, true)
     EntitySetVizToAllies(entity, 'Intel')
     EntitySetVizToEnemies(entity, 'Intel')
     EntitySetVizToNeutrals(entity, 'Intel')
@@ -427,10 +431,14 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     local sz = 1.5 * (physics.MeshExtentsZ or footprint.SizeZ * 0.5)
     local sy = physics.MeshExtentsY or sx + sz
 
+
+    -- set the original mesh of the building we're making
+    local display = blueprint.Display
+    unitBeingBuilt.SetMesh(display.MeshBlueprint)
+
     -- create dummy entity for the build animation and 
     -- store it with the factory for re-use
-    local entity = EntityCreatePropAtBone(unitBeingBuilt, 0, '/env/wreckage/props/generic/wreckage01_prop.bp')
-    LOG(repr(entity))
+    local entity = Entity()
     TrashBagAdd(EffectsBag, entity)
 
     -- EntitySetVizToEnemies(entity, 'Intel')
