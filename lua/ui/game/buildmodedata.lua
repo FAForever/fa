@@ -1095,7 +1095,7 @@ buildModeKeys = {
         [4] = SeraphimT4Eng,
     },
     -- subcommander - rambo preset
-    ['xsl0301'] = {
+    ['xsl0301_Rambo'] = {
         [1] = SeraphimT1Eng,
         [2] = SeraphimT2Eng,
         [3] = SeraphimT3Eng,
