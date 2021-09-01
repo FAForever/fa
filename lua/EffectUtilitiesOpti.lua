@@ -287,7 +287,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
     -- reset the mesh of the unit and hide it immediately
     local blueprint = EntityGetBlueprint(unitBeingBuilt)
     local display = blueprint.Display
-    unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint)
+    unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint, true)
     UnitHideBone(unitBeingBuilt, 0, true)
 
     WaitTicks(2)
@@ -409,7 +409,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     -- reset the mesh of the unit and hide it immediately
     local blueprint = EntityGetBlueprint(unitBeingBuilt)
     local display = blueprint.Display
-    unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint)
+    unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint, true)
     UnitHideBone(unitBeingBuilt, 0, true)
 
     -- wait for the original unit to have the correct orientation
@@ -525,10 +525,5 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
 
         -- show the actual unit
         UnitShowBone(unitBeingBuilt, 0, true)
-
-        vc[1] = ox
-        vc[2] = oy - sy
-        vc[3] = oz 
-        Warp(entity, vc)
     end
 end
