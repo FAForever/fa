@@ -36,7 +36,6 @@ local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
 local EntityGetOrientation = moho.entity_methods.GetOrientation
 local EntitySetOrientation = moho.entity_methods.SetOrientation
 local EntityCreateProjectile = moho.entity_methods.CreateProjectile
-local EntityCreatePropAtBone = moho.entity_methods.CreatePropAtBone
 local EntitySetVizToAllies = moho.entity_methods.SetVizToAllies
 local EntitySetVizToEnemies = moho.entity_methods.SetVizToEnemies
 local EntitySetVizToNeutrals = moho.entity_methods.SetVizToNeutrals
