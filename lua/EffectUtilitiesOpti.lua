@@ -165,7 +165,7 @@ local CybranBuildFlash01 = EffectTemplate.CybranBuildFlash01
 --- Creates the beams and welding points of the builder and its bots. The
 -- bots share the welding point which each other, as does the builder with
 -- itself.
--- @param builder A builder with builder.BuildEffectBones set. 
+-- @param builder A builder with builder.buildEffectBones set. 
 -- @param bots The bots of the builder.
 -- @param unitBeingBuilt The unit that we're building.
 -- @param buildEffectsBag The bag that we use to store / trash all effects.
@@ -176,7 +176,7 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
     WaitTicks(2 + Random(1, 4))
 
     -- early out - make sure everything is still alive
-    if builder.Dead or unitBeingBuilt.Dead then 
+    if builder.Dead or (not unitBeingBuilt) or unitBeingBuilt.Dead then 
         return 
     end
 
@@ -207,8 +207,8 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
 
     -- create a beam from each build effect bone of the builder
     if not stationary then 
-        if builder.BuildEffectBones then 
-            for k, bone in builder.BuildEffectBones do 
+        if builder.buildEffectBones then 
+            for k, bone in builder.buildEffectBones do 
                 TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, bone, beamEndBuilder, -1, army, BeamBuildEmtBp))
             end
         end
@@ -281,6 +281,9 @@ end
 local AeonBuildBeams01 = EffectTemplate.AeonBuildBeams01
 local AeonBuildBeams02 = EffectTemplate.AeonBuildBeams02
 
+--- The build animation for Aeon buildings in general.
+-- @param unitBeingBuilt The unit we're trying to build.
+-- @param effectsBag The build effects bag containing the pool and emitters.
 function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
 
     -- reset the mesh of the unit and hide it immediately
@@ -289,6 +292,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
     unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint, true)
     UnitHideBone(unitBeingBuilt, 0, true)
 
+    -- wait one tick (= 2) to get the right orientation.
     WaitTicks(2)
 
     -- always check after a wait
@@ -317,6 +321,8 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
     EntitySetOrientation(entity, orientation, true)
     EntitySetScale(entity, display.UniformScale)
     EntitySetMesh(entity, display.BuildMeshBlueprint, true)
+
+    -- make sure enemies don't get to see them
     EntitySetVizToAllies(entity, 'Intel')
     EntitySetVizToEnemies(entity, 'Intel')
     EntitySetVizToNeutrals(entity, 'Intel')
@@ -325,6 +331,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
     local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
     TrashBagAdd(effectsBag, pool)
 
+    EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, sy * 1.5, sz)
     Warp(pool, o)
 
@@ -362,15 +369,24 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
         WaitTicks(2)
     end
 
-    -- destroy dummy entity
-    EntityDestroy(entity)
-
     -- make the original building visible again if applicable
     if not unitBeingBuilt.Dead then 
         UnitShowBone(unitBeingBuilt, 0, true)
     end
+
+    -- wait a bit for bones to show
+    WaitTicks(2)
+
+    -- destroy dummy entity
+    EntityDestroy(entity)
+
+
 end
 
+--- The build animation of an engineer.
+-- @param builder The engineer in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectsBag The trash bag for the build effects.
 function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, buildEffectsBag)
     local army = builder.Army
     -- create effect on builder
@@ -386,6 +402,11 @@ function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, buil
     end
 end
 
+--- The build animation of the commander.
+-- @param builder The commander in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectBones The bone(s) of the commander where the effect starts.
+-- @param buildEffectsBag The trash bag for the build effects.
 function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
     local effect = false 
     local army = builder.Army
@@ -402,8 +423,13 @@ function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, buildEffect
     end
 end
 
-local TableCache = { }
-function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
+--- The build animation for Aeon factories, including the pool and dummy unit.
+-- @param builder The factory that is building the unit.
+-- @param unitBeingBuilt The unit we're trying to build.
+-- @param buildEffectBones The arms of the factory where the build beams come from.
+-- @param buildBone The location where the unit is beint built.
+-- @param effectsBag The build effects bag.
+function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildBone, effectsBag)
 
     -- reset the mesh of the unit and hide it immediately
     local blueprint = EntityGetBlueprint(unitBeingBuilt)
@@ -411,14 +437,13 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint, true)
     UnitHideBone(unitBeingBuilt, 0, true)
 
-    -- wait for the original unit to have the correct orientation
+    -- wait one tick (= 2) to get the right orientation.
     WaitTicks(2)
 
     -- retrieve and cache data right off the bat
-    local o = EntityGetPosition(builder, BuildBone)
+    local o = EntityGetPosition(builder, buildBone)
     local ox, oy, oz = o[1], o[2], o[3]
 
-    local tc = TableCache
     local vc = VectorCached
     local army = unitBeingBuilt.Army
     local paused = builder.IsPaused(builder)
@@ -433,11 +458,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     -- create dummy entity for the build animation and 
     -- store it with the factory for re-use
     local entity = Entity()
-    TrashBagAdd(EffectsBag, entity)
-
-    -- EntitySetVizToEnemies(entity, 'Intel')
-    -- EntitySetVizToAllies(entity, 'Intel')
-    -- EntitySetVizToNeutrals(entity, 'Intel')
+    TrashBagAdd(effectsBag, entity)
 
     -- warp it to the correct position and set the mesh
     vc[1] = ox
@@ -448,14 +469,20 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     EntitySetScale(entity, display.UniformScale)
     EntitySetMesh(entity, display.BuildMeshBlueprint, true)
 
+    -- make sure enemies don't get to see them
+    EntitySetVizToEnemies(entity, 'Intel')
+    EntitySetVizToAllies(entity, 'Intel')
+    EntitySetVizToNeutrals(entity, 'Intel')
+
     -- Create a pool mercury that slow draws into the build unit
     local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 1, nil, nil, nil)
-    TrashBagAdd(EffectsBag, pool)
+    TrashBagAdd(effectsBag, pool)
 
     -- position the pool mercury
     vc[1] = ox
     vc[2] = oy - 0.05
     vc[3] = oz 
+    EntitySetOrientation(pool, orientation, true)
     Warp(pool, vc)
 
     -- add effects depending on state
@@ -479,16 +506,17 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
         EmitterScaleEmitter(effect, (sx + sz) * 0.3)
 
         -- create build beam effects
-        for _, vBone in BuildEffectBones do
+        for _, vBone in buildEffectBones do
             effect = CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/aeon_build_03_emit.bp')
-            TrashBagAdd(EffectsBag, effect)
+            TrashBagAdd(effectsBag, effect)
             for _, vBeam in AeonBuildBeams02 do
-                effect = AttachBeamEntityToEntity(builder, vBone, builder, BuildBone, army, vBeam)
-                TrashBagAdd(EffectsBag, effect)
+                effect = AttachBeamEntityToEntity(builder, vBone, builder, buildBone, army, vBeam)
+                TrashBagAdd(effectsBag, effect)
             end
         end
     end
 
+    -- do progression checks
     if not paused then
 
         -- find offset for hover units so that they do not suddenly jump when finished
@@ -499,7 +527,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
 
         local vc = VectorCached
         local fraction = UnitGetFractionComplete(unitBeingBuilt)
-        while not unitBeingBuilt.Dead and fraction < 1 do
+        while not unitBeingBuilt.Dead and not EntityBeenDestroyed(pool) and fraction < 1 do
             -- get current fraction and see if we made progress
             local frac = UnitGetFractionComplete(unitBeingBuilt)
             if frac > fraction then 

@@ -1759,8 +1759,32 @@ CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
 SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
 -- original: SpawnBuildBots
 
+--- The build animation for Aeon buildings in general.
+-- @param unitBeingBuilt The unit we're trying to build.
+-- @param effectsBag The build effects bag containing the pool and emitters.
 CreateAeonBuildBaseThreadOpti = EffectUtilitiesOpti.CreateAeonBuildBaseThread
+-- original: CreateAeonBuildBaseThread
 
+--- The build animation of an engineer.
+-- @param builder The engineer in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectsBag The trash bag for the build effects.
 CreateAeonConstructionUnitBuildingEffectsOpti = EffectUtilitiesOpti.CreateAeonConstructionUnitBuildingEffects
+-- original: CreateAeonConstructionUnitBuildingEffects
 
+--- The build animation of the commander.
+-- @param builder The commander in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectBones The bone(s) of the commander where the effect starts.
+-- @param buildEffectsBag The trash bag for the build effects.
+CreateAeonCommanderBuildingEffectsOpti = EffectUtilitiesOpti.CreateAeonCommanderBuildingEffects
+-- original: CreateAeonCommanderBuildingEffects
+
+--- The build animation for Aeon factories, including the pool and dummy unit.
+-- @param builder The factory that is building the unit.
+-- @param unitBeingBuilt The unit we're trying to build.
+-- @param buildEffectBones The arms of the factory where the build beams come from.
+-- @param buildBone The location where the unit is beint built.
+-- @param effectsBag The build effects bag.
 CreateAeonFactoryBuildingEffectsOpti = EffectUtilitiesOpti.CreateAeonFactoryBuildingEffects
+-- original: CreateAeonFactoryBuildingEffects
