@@ -13,6 +13,7 @@ local Group = import('/lua/maui/group.lua').Group
 local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local gameColors = import('/lua/gameColors.lua').GameColors
+local utils = import('/lua/system/utils.lua')
 
 
 
@@ -364,10 +365,22 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-    for option in gameInfo.GameOptions do
-        local arg = "/" .. option
-        if HasCommandLineArg(arg) then
-            gameInfo.GameOptions[option] = GetCommandLineArg(arg, 1)[1]
+    local next = 1
+    local args, nextArgs = nil, nil
+    repeat
+        nextArgs, args = GetCommandLineArg("/gameoptions", next), nextArgs
+        next = next + 1
+    until not nextArgs
+
+    if args then
+        for _, arg in args do
+            local option = utils.StringSplit(arg, ":")
+            local name, value = option[1], option[2]
+            if name and value then
+                gameInfo.GameOptions[name] = value
+            else
+                LOG("Malformed gameoption. ignoring...")
+            end
         end
     end
 
