@@ -14,11 +14,13 @@ See guidelines for contributing [here](CONTRIBUTING.md).
 
 See git branch model for the repository and how it relates to FAF client game modes [here](branchmodel.png).
 
-Actual exe patcher are [here](https://github.com/FAForever/FA_Patcher)
+Exe patcher are [here](https://github.com/FAForever/FA_Patcher)
 
-Actual exe patches are [here](https://github.com/FAForever/FA-Binary-Patches)
+Exe patches are [here](https://github.com/FAForever/FA-Binary-Patches)
 
-Actual FAF profiler [here](https://github.com/FAForever/FAFProfiler)
+FAF profiler [here](https://github.com/FAForever/FAFProfiler)
+
+Lua benchmarks [here](https://gitlab.com/supreme-commander-forged-alliance/other/profiler)
 
 Running the game with your changes
 ----------------------------------
@@ -145,7 +147,7 @@ At the very top there is the line: `dev_path`, which should be set to wherever y
 
 Starting Forged Alliance from the command line with the following arguments:
 
-`ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog`
+`ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog /nobugreport`
 
 Will put it into a mode where it will look for updates to files that it has loaded. So when you modify a unit file or a blueprint, the game will reload the file and put it into the active session.
 
