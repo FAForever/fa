@@ -35,9 +35,52 @@ local ExplosionSmallWater = EffectTemplate.ExplosionSmallWater
 local ExplosionMediumWater = EffectTemplate.ExplosionMediumWater
 local Splashy = EffectTemplate.Splashy
 
+-- global functions as upvalue for performance
+local Random = Random
+
+-- table functions as upvalue for performance
+local TableGetn = table.getn
+
 -- math functions as upvalue for performance
 local MathMin = math.min
 
+-- moho functions as upvalue for performance
+local EntityGetPosition = moho.entity_methods.GetPosition
+local EntityGetBlueprint = moho.entity_methods.GetBlueprint
+local EntityShakeCamera = moho.entity_methods.ShakeCamera
+local EntityCreateProjectile = moho.entity_methods.CreateProjectile
+
+-- as upvalue for performance
+local ScorchSplatTextures = {
+    'scorch_001_albedo',
+    'scorch_002_albedo',
+    'scorch_003_albedo',
+    'scorch_004_albedo',
+    'scorch_005_albedo',
+    'scorch_006_albedo',
+    'scorch_007_albedo',
+    'scorch_008_albedo',
+    'scorch_009_albedo',
+    'scorch_010_albedo',
+}
+
+local ScorchSplatTexturesN = TableGetn(ScorchSplatTextures)
+
+-- as upvalue for performance
+local ScorchDecalTextures = {
+    'scorch_001_albedo',
+    'scorch_002_albedo',
+    'scorch_003_albedo',
+    'scorch_004_albedo',
+    'scorch_005_albedo',
+    'scorch_006_albedo',
+    'scorch_007_albedo',
+    'scorch_008_albedo',
+    'scorch_009_albedo',
+    'scorch_010_albedo',
+}
+
+local ScorchDecalTexturesN = TableGetn(ScorchDecalTextures)
 
 ----------------------
 -- UTILITY FUNCTION --
@@ -91,8 +134,18 @@ end
 -- DEFAULT EXPLOSION BASE FUNCTIONS --
 --------------------------------------
 
+-- keep these strings in memory so that garbage collector doesn't have to clean them up
 local ProjectileDebrisBps = {
-
+    '/effects/entities/DebrisMisc01/DebrisMisc01_proj.bp',
+    '/effects/entities/DebrisMisc02/DebrisMisc02_proj.bp',
+    '/effects/entities/DebrisMisc03/DebrisMisc03_proj.bp',
+    '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp',
+    '/effects/entities/DebrisMisc05/DebrisMisc05_proj.bp',
+    '/effects/entities/DebrisMisc06/DebrisMisc06_proj.bp',
+    '/effects/entities/DebrisMisc07/DebrisMisc07_proj.bp',
+    '/effects/entities/DebrisMisc08/DebrisMisc08_proj.bp',
+    '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp',
+    '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp',
 }
 
 --- Creates the default unit explosion used by almost all units in the game.
@@ -103,7 +156,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
         if IsUnit(unit) then
 
             -- cache blueprint values
-            local blueprint = unit:GetBlueprint()
+            local blueprint = EntityGetBlueprint(unit)
             local sx = blueprint.SizeX or 0 
             local sy = blueprint.SizeY or 0 
             local sz = blueprint.SizeZ or 0 
@@ -116,78 +169,107 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             local layer = unit.Layer
 
             -- find emitter information 
-            local effectTable = false
+            local baseEffects = false
+            local environmentEffects = false 
             local shakeTimeModifier = 0
             local shakeMaxMul = 1
 
             if layer == 'Land' then
                 -- determine land effects
                 if boundingXZRadius < 1.1 then
-                    effectTable = ExplosionSmall
+                    baseEffects = ExplosionSmall
                 elseif boundingXZRadius > 3.75 then
                     -- large units cause camera to shake
-                    effectTable = ExplosionLarge
+                    baseEffects = ExplosionLarge
                     ShakeTimeModifier = 1.0
                     ShakeMaxMul = 0.25
                 else
-                    effectTable = ExplosionMedium
+                    baseEffects = ExplosionMedium
                 end
 
                 -- environment effects (splat / decal creation)
+                local position = EntityGetPosition(unit)
+                local scorchRotation = 6.28 * Random()
+                local scorchDuration = 200 + 150 * Random()
+                local scorchLOD = 300 + 300 * Random()
                 if boundingXZRadius > 1.2 then
-                    CreateScorchMarkDecal(unit, boundingXZRadius, army)
+                    CreateDecal(
+                        position, 
+                        scorchRotation, 
+                        ScorchDecalTextures[Random(1, ScorchDecalTexturesN)], 
+                        '', 
+                        'Albedo', 
+                        scale * 3, 
+                        scale * 3, 
+                        scorchLOD, 
+                        scorchDuration, 
+                        army
+                    )
                 else
-                    CreateScorchMarkSplat(unit, boundingXZRadius, army)
+                    CreateSplat(
+                        position, 
+                        scorchRotation, 
+                        ScorchSplatTextures[Random(1, ScorchScorchTexturesN)], 
+                        scale * 4, 
+                        scale * 4, 
+                        scorchLOD,
+                        scorchDuration, 
+                        army
+                    )
                 end
 
             elseif layer == 'Air' then
                 -- determine air effects
                 if boundingXZRadius < 1.1 then
-                    effectTable = ExplosionSmallAir
+                    baseEffects = ExplosionSmallAir
                 elseif boundingXZRadius > 3 then
                     -- large units cause camera to shake
-                    effectTable = ExplosionLarge
+                    baseEffects = ExplosionLarge
                     ShakeTimeModifier = 1.0
                     ShakeMaxMul = 0.25
                 else
-                    effectTable = ExplosionMedium
+                    baseEffects = ExplosionMedium
                 end
             elseif layer == 'Water' then
                 -- determine water effects
                 if boundingXZRadius < 1 then
-                    effectTable = ExplosionSmallWater
+                    baseEffects = ExplosionSmallWater
                 elseif boundingXZRadius > 3 then
                     -- large units cause camera to shake
-                    effectTable = ExplosionMediumWater
+                    baseEffects = ExplosionMediumWater
                     ShakeTimeModifier = 1.0
                     ShakeMaxMul = 0.25
                 else
-                    effectTable = ExplosionMediumWater
+                    baseEffects = ExplosionMediumWater
                 end
 
                 -- environment effects
-                local next = table.getn(effectTable) + 1
                 if boundingXZRadius < 0.5 then
-                    for k, v in Splashy do 
-                        effectTable[next] = k 
-                        next = next + 1
-                    end
-                elseif boundingXZRadius < 1.5 then
-                    for k, v in ExplosionMediumWater do 
-                        effectTable[next] = k 
-                        next = next + 1
-                    end
+                    environmentEffects = Splashy
                 end
             end
 
-            -- create the emitters
-            CreateEffects(unit, army, effectTable)
+            -- create the emitters  
+            if baseEffects then 
+                CreateEffects(unit, army, baseEffects)
+            end
+
+            if environmentEffects then 
+                CreateEffects(unit, army, environmentEffects)       
+            end    
 
             -- create the flash
-            CreateLightParticle(unit, -1, army, boundingXZRadius * (6 + 4 * Random()), 10.5 + 4 * Random(), 'glow_03', 'ramp_flare_02')
+            CreateLightParticle(
+                unit, 
+                -1, 
+                army, 
+                boundingXZRadius * (6 + 4 * Random()),  -- (6, 10)
+                10.5 + 4 * Random(), -- (10.5, 14.5)
+                'glow_03', 
+                'ramp_flare_02'
+            )
 
             -- create debris
-            LOG(boundingXYZRadius)
             local amount = MathMin(Random(1 + (boundingXYZRadius * 25), (boundingXYZRadius * 50)) , 100)
             for i = 1, amount do
 
@@ -204,21 +286,22 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 local ydir = 10 * (r3 * sy)
                 local zdir = 10 * ((1 - r1) * sz - (sz * 0.5))
 
-                local rand = 4
+                -- determine blueprint value
+                local bp = false 
                 if boundingXYZRadius < 0.2 then
-                    rand = 9
-                elseif boundingXYZRadius > 2 then
-                    rand = 10
+                    bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
+                elseif boundingXYZRadius < 2.0 then
+                    bp = '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+                else 
+                    bp = '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp'
                 end
 
-
-                local bp = '/effects/entities/DebrisMisc0' .. rand .. '/DebrisMisc0' .. rand .. '_proj.bp'
-                LOG(bp)
-                unit:CreateProjectile(bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
+                -- create debris projectile
+                EntityCreateProjectile(unit, bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
             end
 
             -- do camera shake
-            unit:ShakeCamera(30 * boundingXZRadius, boundingXZRadius * shakeMaxMul, 0, 0.5 + shakeTimeModifier)
+            EntityShakeCamera(unit, 30 * boundingXZRadius, boundingXZRadius * shakeMaxMul, 0, 0.5 + shakeTimeModifier)
         end
     end
 end
@@ -388,32 +471,6 @@ function CreateRandomScorchSplatAtObject(obj, scale, LOD, lifetime, army)
     CreateSplat(obj:GetPosition(), GetRandomFloat(0,2 * math.pi), ScorchSplatTextures[GetRandomInt(1, table.getn(ScorchSplatTextures))], scale, scale, LOD, lifetime, army)
 end
 
-ScorchSplatTextures = {
-    'scorch_001_albedo',
-    'scorch_002_albedo',
-    'scorch_003_albedo',
-    'scorch_004_albedo',
-    'scorch_005_albedo',
-    'scorch_006_albedo',
-    'scorch_007_albedo',
-    'scorch_008_albedo',
-    'scorch_009_albedo',
-    'scorch_010_albedo',
-}
-
-ScorchDecalTextures = {
-    'scorch_001_albedo',
-    'scorch_002_albedo',
-    'scorch_003_albedo',
-    'scorch_004_albedo',
-    'scorch_005_albedo',
-    'scorch_006_albedo',
-    'scorch_007_albedo',
-    'scorch_008_albedo',
-    'scorch_009_albedo',
-    'scorch_010_albedo',
-}
-
 ----------------------
 -- WRECKAGE EFFECTS --
 ----------------------
@@ -470,6 +527,7 @@ end
 ------------------------
 -- OLD EXPLOSION TECH --
 ------------------------
+
 function CreateDefaultExplosion(unit, scale, overKillRatio)
 
     local spec = {
