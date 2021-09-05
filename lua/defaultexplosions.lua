@@ -107,6 +107,7 @@ end
 
 --- Retrieves average x / z size. Do not use in critical code, instead
 -- copy the body into your code for performance reasons.
+-- This function has an error in it: it simply returns 0.5 * bp.sizeX.
 -- @param unit The unit to get the volume of.
 function GetAverageBoundingXZRadius(unit)
     local bp = unit:GetBlueprint()
@@ -115,6 +116,7 @@ end
 
 --- Retrieves average x / y / z size. Do not use in critical code, instead
 -- copy the body into your code for performance reasons.
+-- This function has an error in it: it simply returns 0.333 * bp.sizeX.
 -- @param unit The unit to get the volume of.
 function GetAverageBoundingXYZRadius(unit)
     local bp = unit:GetBlueprint()
@@ -273,7 +275,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             )
 
             -- create debris
-            local amount = MathMin(Random(1 + (boundingXYZRadius * 25), (boundingXYZRadius * 50)) , 100)
+            local amount = MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
             for i = 1, amount do
 
                 -- get some random numbers
@@ -285,9 +287,9 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 local zpos = r3 * sz - (sz * 0.5)
 
                 -- direction debris will go in
-                local xdir = 10 * (r2 * sx - (sx * 0.5))
-                local ydir = 10 * (r3 * sy)
-                local zdir = 10 * ((1 - r1) * sz - (sz * 0.5))
+                local xdir = 10 * (r1 * sx - (sx * 0.5))
+                local ydir = 10 * (r2 * sy)
+                local zdir = 10 * (r3 * sz - (sz * 0.5))
 
                 -- determine blueprint value
                 local bp = false 
