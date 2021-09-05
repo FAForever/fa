@@ -9,12 +9,14 @@
 --****************************************************************************
 
 local Entity = import('/lua/sim/entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+
 local util = import('utilities.lua')
 local GetRandomFloat = util.GetRandomFloat
 local GetRandomInt = util.GetRandomInt
 local GetRandomOffset = util.GetRandomOffset
 local GetRandomOffset2 = util.GetRandomOffset2
+
+-- upvalue for performance
 local EfctUtil = import('EffectUtilities.lua')
 local CreateEffects = EfctUtil.CreateEffects
 local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
@@ -24,30 +26,56 @@ local CreateBoneEffectsOffset = EfctUtil.CreateBoneEffectsOffset
 local CreateRandomEffects = EfctUtil.CreateRandomEffects
 local ScaleEmittersParam = EfctUtil.ScaleEmittersParam
 
+local EffectTemplate = import('/lua/EffectTemplates.lua')
+local ExplosionSmall = EffectTemplate.ExplosionSmall
+local ExplosionLarge = EffectTemplate.ExplosionLarge
+local ExplosionMedium = EffectTemplate.ExplosionMedium
+local ExplosionSmallAir = EffectTemplate.ExplosionSmallAir
+local ExplosionSmallWater = EffectTemplate.ExplosionSmallWater
+local ExplosionMediumWater = EffectTemplate.ExplosionMediumWater
+local Splashy = EffectTemplate.Splashy
+
+-- math functions as upvalue for performance
+local MathMin = math.min
+
 
 ----------------------
 -- UTILITY FUNCTION --
 ----------------------
+
+--- Retrieves the size of the unit as defined in the blueprint. Do not use in critical code, instead
+-- copy the body into your code for performance reasons.
+-- @param unit The unit to get the size of.
 function GetUnitSizes(unit)
     local bp = unit:GetBlueprint()
     return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
 end
 
+--- Retrieves the voume of the unit as defined in the blueprint. Do not use in critical code, instead
+-- copy the body into your code for performance reasons.
+-- @param unit The unit to get the volume of.
 function GetUnitVolume(unit)
     local x, y, z = GetUnitSizes(unit)
     return x * y * z
 end
 
+--- Retrieves average x / z size. Do not use in critical code, instead
+-- copy the body into your code for performance reasons.
+-- @param unit The unit to get the volume of.
 function GetAverageBoundingXZRadius(unit)
     local bp = unit:GetBlueprint()
     return ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
 end
 
+--- Retrieves average x / y / z size. Do not use in critical code, instead
+-- copy the body into your code for performance reasons.
+-- @param unit The unit to get the volume of.
 function GetAverageBoundingXYZRadius(unit)
     local bp = unit:GetBlueprint()
     return ((bp.SizeX or 0 + bp.SizeY or 0 + bp.SizeZ or 0) * 0.333)
 end
 
+--- ??, what is the mathematics here exactly?
 function QuatFromRotation(rotation, x, y, z)
     local angleRot, qw, qx, qy, qz, angle
     angle = 0.00872664625 * rotation
@@ -62,11 +90,135 @@ end
 --------------------------------------
 -- DEFAULT EXPLOSION BASE FUNCTIONS --
 --------------------------------------
+
+local ProjectileDebrisBps = {
+
+}
+
+--- Creates the default unit explosion used by almost all units in the game.
+-- @unit The Unit to create the explosion for.
+-- @overKillRatio Has an impact on how strong the explosion is.
 function CreateScalableUnitExplosion(unit, overKillRatio)
     if unit then
         if IsUnit(unit) then
-            local explosionEntity = CreateUnitExplosionEntity(unit, overKillRatio)
-            ForkThread(_CreateScalableUnitExplosion, explosionEntity)
+
+            -- cache blueprint values
+            local blueprint = unit:GetBlueprint()
+            local sx = blueprint.SizeX or 0 
+            local sy = blueprint.SizeY or 0 
+            local sz = blueprint.SizeZ or 0 
+
+            -- cache stats 
+            local army = unit.Army
+            local boundingXZRadius = 0.5 * (sx + sz)
+            local boundingXYZRadius = 0.333 * (sx + sy + sz)
+            local volume = sx * sy * sz
+            local layer = unit.Layer
+
+            -- find emitter information 
+            local effectTable = false
+            local shakeTimeModifier = 0
+            local shakeMaxMul = 1
+
+            if layer == 'Land' then
+                -- determine land effects
+                if boundingXZRadius < 1.1 then
+                    effectTable = ExplosionSmall
+                elseif boundingXZRadius > 3.75 then
+                    -- large units cause camera to shake
+                    effectTable = ExplosionLarge
+                    ShakeTimeModifier = 1.0
+                    ShakeMaxMul = 0.25
+                else
+                    effectTable = ExplosionMedium
+                end
+
+                -- environment effects (splat / decal creation)
+                if boundingXZRadius > 1.2 then
+                    CreateScorchMarkDecal(unit, boundingXZRadius, army)
+                else
+                    CreateScorchMarkSplat(unit, boundingXZRadius, army)
+                end
+
+            elseif layer == 'Air' then
+                -- determine air effects
+                if boundingXZRadius < 1.1 then
+                    effectTable = ExplosionSmallAir
+                elseif boundingXZRadius > 3 then
+                    -- large units cause camera to shake
+                    effectTable = ExplosionLarge
+                    ShakeTimeModifier = 1.0
+                    ShakeMaxMul = 0.25
+                else
+                    effectTable = ExplosionMedium
+                end
+            elseif layer == 'Water' then
+                -- determine water effects
+                if boundingXZRadius < 1 then
+                    effectTable = ExplosionSmallWater
+                elseif boundingXZRadius > 3 then
+                    -- large units cause camera to shake
+                    effectTable = ExplosionMediumWater
+                    ShakeTimeModifier = 1.0
+                    ShakeMaxMul = 0.25
+                else
+                    effectTable = ExplosionMediumWater
+                end
+
+                -- environment effects
+                local next = table.getn(effectTable) + 1
+                if boundingXZRadius < 0.5 then
+                    for k, v in Splashy do 
+                        effectTable[next] = k 
+                        next = next + 1
+                    end
+                elseif boundingXZRadius < 1.5 then
+                    for k, v in ExplosionMediumWater do 
+                        effectTable[next] = k 
+                        next = next + 1
+                    end
+                end
+            end
+
+            -- create the emitters
+            CreateEffects(unit, army, effectTable)
+
+            -- create the flash
+            CreateLightParticle(unit, -1, army, boundingXZRadius * (6 + 4 * Random()), 10.5 + 4 * Random(), 'glow_03', 'ramp_flare_02')
+
+            -- create debris
+            LOG(boundingXYZRadius)
+            local amount = MathMin(Random(1 + (boundingXYZRadius * 25), (boundingXYZRadius * 50)) , 100)
+            for i = 1, amount do
+
+                -- get some random numbers
+                local r1, r2, r3 = Random(), Random(), Random() 
+
+                -- position where debris starts
+                local xpos = r1 * sx - (sx * 0.5)
+                local ypos = r2 * sy
+                local zpos = r3 * sz - (sz * 0.5)
+
+                -- direction debris will go in
+                local xdir = 10 * (r2 * sx - (sx * 0.5))
+                local ydir = 10 * (r3 * sy)
+                local zdir = 10 * ((1 - r1) * sz - (sz * 0.5))
+
+                local rand = 4
+                if boundingXYZRadius < 0.2 then
+                    rand = 9
+                elseif boundingXYZRadius > 2 then
+                    rand = 10
+                end
+
+
+                local bp = '/effects/entities/DebrisMisc0' .. rand .. '/DebrisMisc0' .. rand .. '_proj.bp'
+                LOG(bp)
+                unit:CreateProjectile(bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
+            end
+
+            -- do camera shake
+            unit:ShakeCamera(30 * boundingXZRadius, boundingXZRadius * shakeMaxMul, 0, 0.5 + shakeTimeModifier)
         end
     end
 end
@@ -157,7 +309,7 @@ function _CreateScalableUnitExplosion(obj)
 
     if layer == 'Water' then
         if scale < 1 then   ---- Small units
-             BaseEffectTable = EffectTemplate.ExplosionSmallWater
+            BaseEffectTable = EffectTemplate.ExplosionSmallWater
         elseif scale > 3 then ---- Large units
             BaseEffectTable = EffectTemplate.ExplosionMediumWater
             ShakeTimeModifier = 1.0
