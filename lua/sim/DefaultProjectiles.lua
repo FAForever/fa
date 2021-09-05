@@ -5,6 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
+local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
 local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
 local OCProjectiles = {}
@@ -303,7 +304,27 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
 -----------------------------------------------------------------
 -- GENERIC DEBRIS PROJECTILE
 -----------------------------------------------------------------
-BaseGenericDebris = Class(EmitterProjectile){
+
+-- upvalued for performance
+local CreateEmitterAtBone = CreateEmitterAtBone
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local GetTerrainType = GetTerrainType
+
+-- upvalued read-only values
+local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FXImpact
+
+
+-- moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityDestroy = EntityMethods.Destroy
+local EntityPlaySound = EntityMethods.PlaySound
+local EntityGetBlueprint = EntityMethods.GetBlueprint
+local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
+
+local EmitterMethods = _G.moho.IEffect
+local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
+
+BaseGenericDebris = Class(DummyProjectile){
     FxUnitHitScale = 0.25,
     FxWaterHitScale = 0.25,
     FxUnderWaterHitScale = 0.25,
@@ -312,6 +333,133 @@ BaseGenericDebris = Class(EmitterProjectile){
     FxLandHitScale = 0.5,
     FxTrails = false,
     FxTrailScale = 1,
+
+    OnImpact = function(self, targetType, targetEntity)
+
+        local emit = false
+        local army = self.Army 
+
+        local blueprint = EntityGetBlueprint(self)
+        local blueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
+
+        -- determine impact effects
+        -- Possible targetType values are:
+        --  'Unit', 'Terrain', 'Water', 'Air', 'Prop'
+        --  'Shield', 'UnitAir', 'UnderWater', 'UnitUnderwater'
+        --  'Projectile', 'ProjectileUnderWater
+
+        local impactSnd = false
+        local impactEffects = false
+        local impactEffectscale = 1
+
+        if targetType == 'Water' then
+            impactSnd = "ImpactWater"
+            impactEffects = false
+            impactEffectscale = 0.25
+        elseif targetType == 'Terrain' then
+            impactSnd = "ImpactTerrain"
+            impactEffects = false
+            impactEffectscale = 0.5
+        elseif targetType == 'Shield' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 1.0
+        elseif targetType == 'Unit' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 0.25
+        elseif targetType == 'UnitAir' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 1.0
+        elseif targetType == 'Air' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 0.25
+        elseif targetType == 'Projectile' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 1.0
+        elseif targetType == 'ProjectileUnderwater' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 1.0
+        elseif targetType == 'Prop' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 1.0
+        elseif targetType == 'Underwater' or targetType == 'UnitUnderwater' then
+            impactSnd = "Impact"
+            impactEffects = false
+            impactEffectscale = 0.25
+        else
+            LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
+        end
+
+        -- check if they were set and use default values otherwise
+        impactEffects = impactEffects or false
+        impactEffectscale = impactEffectscale or 1
+        
+        -- play impact sound
+        local snd = blueprint.Audio[impactSnd]
+        if snd then 
+            EntityPlaySound(self, snd)
+        end
+
+        -- Inlined CreateImpactEffects --
+
+        -- check if table exists, can be set to false
+        if impactEffects then 
+
+            local fxImpactTrajectoryAligned = self.FxImpactTrajectoryAligned
+
+            for _, v in impactEffects do
+
+                -- create emitter accordingly
+                if fxImpactTrajectoryAligned then
+                    emit = CreateEmitterAtBone(self, -2, army, v)
+                else
+                    emit = CreateEmitterAtEntity(self, army, v)
+                end
+
+                -- scale if applicable
+                if impactEffectscale != 1 then
+                    EmitterScaleEmitter(emit, impactEffectscale)
+                end
+            end
+        end
+
+        -- Inlined GetTerrainEffects --
+
+        -- default value
+        impactEffectType = blueprintDisplayImpactEffects.Type or 'Default'
+
+        -- get x / z position
+        local x, y, z = EntityGetPositionXYZ(self)
+
+        -- get terrain at that location and try and get some effects
+        local terrainTypeFxImpact = GetTerrainType(x, z).FXImpact
+        local terrainEffects = terrainTypeFxImpact[targetType][impactEffectType] or DefaultTerrainTypeFxImpact[targetType][impactEffectType] or false
+
+        -- Inlined CreateTerrainEffects --
+
+        effectScale = blueprintDisplayImpactEffects.Scale or 1
+
+        -- check if table exists, can be set to false
+        if terrainEffects then 
+            for _, v in terrainEffects do
+
+                -- create emitter and scale accordingly
+                emit = CreateEmitterAtBone(self, -2, army, v)
+                if effectScale != 1 then
+                    EmitterScaleEmitter(emit, effectScale)
+                end
+            end
+        end
+
+        -- destroy ourselves :(
+        EntityDestroy(self)
+    end,
 }
 
 -----------------------------------------------------------
