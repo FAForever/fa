@@ -460,7 +460,7 @@ function CheckNavalPathingSorian(aiBrain, platoon, location, maxRange, selectedW
     local threatTargetPos = location
     local isTech1 = false
 
-    local inWater = GetTerrainHeight(location[1], location[3]) < GetSurfaceHeight(location[1], location[3]) - 2
+    local inWater = GetTerrainHeight(location[1], location[3]) < GetSurfaceHeight(location[1], location[3]) - 1.5
 
     --if this threat is in the water, see if we can get to it
     if inWater then
@@ -593,7 +593,7 @@ function CheckNavalPathing(aiBrain, platoon, location, maxRange, selectedWeaponA
     local threatTargetPos = location
     local isTech1 = false
 
-    local inWater = GetTerrainHeight(location[1], location[3]) < GetSurfaceHeight(location[1], location[3]) - 2
+    local inWater = GetTerrainHeight(location[1], location[3]) < GetSurfaceHeight(location[1], location[3]) - 1.5
 
     --if this threat is in the water, see if we can get to it
     if inWater then
