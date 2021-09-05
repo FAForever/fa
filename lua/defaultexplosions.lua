@@ -33,10 +33,13 @@ local ExplosionMedium = EffectTemplate.ExplosionMedium
 local ExplosionSmallAir = EffectTemplate.ExplosionSmallAir
 local ExplosionSmallWater = EffectTemplate.ExplosionSmallWater
 local ExplosionMediumWater = EffectTemplate.ExplosionMediumWater
+local FireCloudMed01 = EffectTemplate.FireCloudMed01
+local DefaultHitExplosion01 = EffectTemplate.DefaultHitExplosion01
 local Splashy = EffectTemplate.Splashy
 
 -- global functions as upvalue for performance
 local Random = Random
+local IsUnit = IsUnit
 
 -- table functions as upvalue for performance
 local TableGetn = table.getn
@@ -168,7 +171,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             local volume = sx * sy * sz
             local layer = unit.Layer
 
-            -- find emitter information 
+            -- data for emitters / shaking
             local baseEffects = false
             local environmentEffects = false 
             local shakeTimeModifier = 0
@@ -199,8 +202,8 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                         ScorchDecalTextures[Random(1, ScorchDecalTexturesN)], 
                         '', 
                         'Albedo', 
-                        scale * 3, 
-                        scale * 3, 
+                        boundingXZRadius * 3, 
+                        boundingXZRadius * 3, 
                         scorchLOD, 
                         scorchDuration, 
                         army
@@ -209,9 +212,9 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                     CreateSplat(
                         position, 
                         scorchRotation, 
-                        ScorchSplatTextures[Random(1, ScorchScorchTexturesN)], 
-                        scale * 4, 
-                        scale * 4, 
+                        ScorchSplatTextures[Random(1, ScorchSplatTexturesN)], 
+                        boundingXZRadius * 4, 
+                        boundingXZRadius * 4, 
                         scorchLOD,
                         scorchDuration, 
                         army
@@ -306,24 +309,54 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
     end
 end
 
+--- Creates a flash and fire emitters that represents an explosion on hit.
+-- @param obj The entity to create the flash at.
+-- @param scale The scale of the flash.
 function CreateDefaultHitExplosion(obj, scale)
     if obj and not obj:BeenDestroyed() then
-        CreateFlash(obj, -1, scale * 0.5, obj.Army)
-        CreateEffects(obj, obj.Army, EffectTemplate.FireCloudMed01)
+
+        local army = obj.Army 
+
+        -- create the flash
+        CreateLightParticle(
+            obj, 
+            -1, 
+            army, 
+            0.5 * scale * (6 + 4 * Random()),   -- (6, 10)
+            10.5 + 4 * Random(),                -- (10.5, 14.5)
+            'glow_03', 
+            'ramp_flare_02'
+        )
+        
+        -- create the fire cloud
+        CreateEffects(obj, army, FireCloudMed01)
     end
 end
 
+--- Creates explosion emitters that represent a hit. Do not use in critical code, instead
+-- copy the body.
+-- @param obj The entity to create the emitters for.
+-- @param scale Unused parameter.
+-- @param xOffset Offset on the x-axis.
+-- @param yOffset Offset on the y-axis.
+-- @param zOffset Offset on the z-axis.
 function CreateDefaultHitExplosionOffset(obj, scale, xOffset, yOffset, zOffset)
     if obj:BeenDestroyed() then
         return
     end
 
-    CreateBoneEffectsOffset(obj, -1, obj.Army, EffectTemplate.DefaultHitExplosion01, xOffset, yOffset, zOffset)
+    CreateBoneEffectsOffset(obj, -1, obj.Army, DefaultHitExplosion01, xOffset, yOffset, zOffset)
 end
 
+
+--- Creates a flash and fire emitters that represents an explosion on hit.
+-- @param obj The entity to create the flash at.
+-- @param boneName The bone to attach the effect to.
+-- @param scale The scale of the flash.
 function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
-    CreateFlash(obj, boneName, scale * 0.5, obj.Army)
-    CreateBoneEffects(obj, boneName, obj.Army, EffectTemplate.FireCloudMed01)
+    local army = obj.Army
+    CreateFlash(obj, boneName, scale * 0.5, army)
+    CreateBoneEffects(obj, boneName, army, FireCloudMed01)
 end
 
 function CreateTimedStuctureUnitExplosion(obj)
@@ -337,6 +370,8 @@ function CreateTimedStuctureUnitExplosion(obj)
     end
 end
 
+--- Old function that is no longer in use. Do not use this function - it creates a whole
+-- lot of overhead that is not necessary.
 function MakeExplosionEntitySpec(unit, overKillRatio)
     return {
         Army = unit.Army,
@@ -349,12 +384,16 @@ function MakeExplosionEntitySpec(unit, overKillRatio)
     }
 end
 
+--- Old function that is no longer in use. Do not use this function - it creates a whole
+-- lot of overhead that is not necessary.
 function CreateUnitExplosionEntity(unit, overKillRatio)
     local localentity = Entity(MakeExplosionEntitySpec(unit, overKillRatio))
     Warp(localentity, unit:GetPosition())
     return localentity
 end
 
+--- Old function that is no longer in use. Do not use this function - it creates a whole
+-- lot of overhead that is not necessary.
 function _CreateScalableUnitExplosion(obj)
     local army = obj.Spec.Army
     local scale = obj.Spec.BoundingXZRadius
@@ -435,6 +474,8 @@ function _CreateScalableUnitExplosion(obj)
     obj:Destroy()
 end
 
+--- Old function that is no longer in use. Do not use this function - it creates a whole
+-- lot of overhead that is not necessary.
 function GetUnitEnvironmentalExplosionEffects(layer, scale)
     local EffectTable = {}
     if layer == 'Water' then
@@ -452,28 +493,57 @@ end
 -------------------------------
 -- CREATELIGHTPARTICLE FLASH --
 -------------------------------
+
+--- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 function CreateFlash(obj, bone, scale, army)
-    CreateLightParticle(obj, bone, army, GetRandomFloat(6,10) * scale, GetRandomFloat(10.5, 14.5), 'glow_03', 'ramp_flare_02')
+    CreateLightParticle(obj, bone, army, scale * (6 + 4 * Random()) , 10.5 + 4 * Random(), 'glow_03', 'ramp_flare_02')
 end
 
 ------------------------
 -- SCORCH MARK SPLATS --
 ------------------------
+
+--- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 function CreateScorchMarkSplat(obj, scale, army)
-    CreateSplat(obj:GetPosition(), GetRandomFloat(0,2 * math.pi), ScorchSplatTextures[GetRandomInt(1, table.getn(ScorchSplatTextures))], scale * 4, scale * 4, GetRandomFloat(200, 350), GetRandomFloat(300, 600), army)
+    CreateSplat(
+        EntityGetPosition(obj), 
+        6.28 * Random(), 
+        ScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
+        scale * 4, scale * 4, 
+        200 + 150 * Random(), 
+        300 * 300 * Random(), 
+        army
+    )
 end
 
+--- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 function CreateScorchMarkDecal(obj, scale, army)
-    CreateDecal(obj:GetPosition(), GetRandomFloat(0,2 * math.pi), ScorchDecalTextures[GetRandomInt(1, table.getn(ScorchDecalTextures))], '', 'Albedo', scale * 3, scale * 3, GetRandomFloat(200, 350), GetRandomFloat(300, 600), army)
+    CreateDecal(
+        EntityGetPosition(obj), 
+        6.28 * Random(), 
+        ScorchDecalTextures[Random(1, ScorchDecalTexturesN)],
+        '', 'Albedo', 
+        scale * 3, scale * 3, 
+        200 + 150 * Random(), 
+        300 * 300 * Random(), 
+        army
+    )
 end
 
+--- A dummy function that should not be used in critical code. Instead, copy the body and adjust it accordingly.
 function CreateRandomScorchSplatAtObject(obj, scale, LOD, lifetime, army)
-    CreateSplat(obj:GetPosition(), GetRandomFloat(0,2 * math.pi), ScorchSplatTextures[GetRandomInt(1, table.getn(ScorchSplatTextures))], scale, scale, LOD, lifetime, army)
+    CreateSplat(
+        EntityGetPosition(obj), 
+        6.28 * Random(), 
+        ScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
+        scale, scale, 
+        LOD, lifetime, army)
 end
 
 ----------------------
 -- WRECKAGE EFFECTS --
 ----------------------
+
 function CreateWreckageEffects(obj, prop)
     if IsUnit(obj) then
         local scale = GetAverageBoundingXYZRadius(obj)
@@ -501,26 +571,41 @@ end
 --------------------------------
 -- DEBRIS PROJECTILES EFFECTS --
 --------------------------------
+
 function CreateDebrisProjectiles(obj, volume, dimensions)
-    local partamounts = math.min(GetRandomInt(1 + (volume * 25), (volume * 50)) , 100)
+
+    -- for backwards compatibility
     local sx, sy, sz = unpack(dimensions)
-    local vector = obj.Spec.OverKillRatio.debris_Vector
-    for i = 1, partamounts do
-        local xpos, xpos, zpos = GetRandomOffset(sx, sy, sz, 1)
-        local xdir, ydir, zdir = GetRandomOffset(sx, sy, sz, 10)
-        if vector then
-            xdir = (vector[1] * 5) + GetRandomOffset2(sx, sy, sz, 3)
-            ydir = math.abs((vector[2] * 5)) + GetRandomOffset(sx, sy, sz, 3)
-            zdir = (vector[3] * 5) + GetRandomOffset2(sx, sy, sz, 1)
+
+    -- get number of projectiles
+    local amount = MathMin(Random(1 + (volume * 25), (volume * 50)) , 100)
+    for i = 1, amount do
+
+        -- get some random numbers
+        local r1, r2, r3 = Random(), Random(), Random() 
+
+        -- position where debris starts
+        local xpos = r1 * sx - (sx * 0.5)
+        local ypos = r2 * sy
+        local zpos = r3 * sz - (sz * 0.5)
+
+        -- direction debris will go in
+        local xdir = 10 * (r2 * sx - (sx * 0.5))
+        local ydir = 10 * (r3 * sy)
+        local zdir = 10 * ((1 - r1) * sz - (sz * 0.5))
+
+        -- determine blueprint value
+        local bp = false 
+        if boundingXYZRadius < 0.2 then
+            bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
+        elseif boundingXYZRadius < 2.0 then
+            bp = '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+        else 
+            bp = '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp'
         end
 
-        local rand = 4
-        if volume < 0.2 then
-            rand = 9
-        elseif volume > 2 then
-            rand = 10
-        end
-        obj:CreateProjectile('/effects/entities/DebrisMisc0' .. rand .. '/DebrisMisc0' .. rand .. '_proj.bp', xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
+        -- create debris projectile
+        EntityCreateProjectile(unit, bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
     end
 end
 
