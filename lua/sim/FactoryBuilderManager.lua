@@ -10,9 +10,9 @@
 local import = import 
 
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local Builder = import('/lua/sim/Builder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIGetClosestMarkerLocation = import('/lua/ai/aiutilities.lua').AIGetClosestMarkerLocation
+local RandomLocation = import('/lua/ai/aiutilities.lua').RandomLocation
+local CreateFactoryBuilder = import('/lua/sim/Builder.lua').CreateFactoryBuilder
 
 local TableInsert = table.insert
 local TableGetn = table.getn
@@ -20,9 +20,11 @@ local TableCopy = table.copy
 local WaitTicks = coroutine.yield
 
 local EntityCategoryContains = EntityCategoryContains
+local EntityCategoryFilterDown = EntityCategoryFilterDown
 local VDist2 = VDist2
 local ForkThread = ForkThread
 
+local GetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
 local GetPosition = moho.entity_methods.GetPosition
 local IsUnitState = moho.unit_methods.IsUnitState
 local GetAIBrain = moho.unit_methods.GetAIBrain
@@ -69,7 +71,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     AddBuilder = function(self, builderData, locationType)
-        local newBuilder = Builder.CreateFactoryBuilder(self.Brain, builderData, locationType)
+        local newBuilder = CreateFactoryBuilder(self.Brain, builderData, locationType)
         local BT = Builders[newBuilder.BuilderName].BuilderType 
         if type(BT) == 'string' then BT = {BT} end
 
@@ -443,7 +445,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     SetRallyPoint = function(self, factory)
-        local position = factory:GetPosition()
+        local position = GetPosition(factory)
         local rally = false
 
         if self.RallyPoint then
@@ -459,11 +461,11 @@ FactoryBuilderManager = Class(BuilderManager) {
 
         if not self.UseCenterPoint then
             -- Find closest marker to averaged location
-            rally = AIUtils.AIGetClosestMarkerLocation(self, rallyType, position[1], position[3])
+            rally = AIGetClosestMarkerLocation(self, rallyType, position[1], position[3])
         elseif self.UseCenterPoint then
             -- use BuilderManager location
-            rally = AIUtils.AIGetClosestMarkerLocation(self, rallyType, position[1], position[3])
-            local expPoint = AIUtils.AIGetClosestMarkerLocation(self, 'Expansion Area', position[1], position[3])
+            rally = AIGetClosestMarkerLocation(self, rallyType, position[1], position[3])
+            local expPoint = AIGetClosestMarkerLocation(self, 'Expansion Area', position[1], position[3])
 
             if expPoint and rally then
                 local rallyPointDistance = VDist2(position[1], position[3], rally[1], rally[3])
@@ -478,7 +480,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         -- Use factory location if no other rally or if rally point is far away
         if not rally or VDist2(rally[1], rally[3], position[1], position[3]) > 75 then
             -- DUNCAN - added to try and vary the rally points.
-            position = AIUtils.RandomLocation(position[1],position[3])
+            position = RandomLocation(position[1],position[3])
             rally = position
         end
 
