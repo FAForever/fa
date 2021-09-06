@@ -46,6 +46,8 @@ local TableGetn = table.getn
 
 -- math functions as upvalue for performance
 local MathMin = math.min
+local MathCos = math.cos 
+local MathSin = math.sin 
 
 -- moho functions as upvalue for performance
 local EntityGetPosition = moho.entity_methods.GetPosition
@@ -105,22 +107,40 @@ function GetUnitVolume(unit)
     return x * y * z
 end
 
---- Retrieves average x / z size. Do not use in critical code, instead
--- copy the body into your code for performance reasons.
--- This function has an error in it: it simply returns 0.5 * bp.sizeX.
--- @param unit The unit to get the volume of.
+--- Retrieves bounding diameter over x/z axis. Do not use in critical code, instead
+-- copy the body into your code for performance reasons. This function is 
+-- legacy code and is full of errors. Use GetAverageBoundingXZRadiusCorrect 
+-- if you're interested in the actual average bounding radius.
+-- @param unit The unit to get the diameter of.
 function GetAverageBoundingXZRadius(unit)
     local bp = unit:GetBlueprint()
     return ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
 end
 
---- Retrieves average x / y / z size. Do not use in critical code, instead
--- copy the body into your code for performance reasons.
--- This function has an error in it: it simply returns 0.333 * bp.sizeX.
--- @param unit The unit to get the volume of.
+--- Retrieves bounding radius over x/z axis. Do not use in critical code, instead
+-- copy the body into your code for performance reasons. This function is 
+-- @param unit The unit to get the radius of.
+function GetAverageBoundingXZRadiusCorrect(unit)
+    local bp = unit:GetBlueprint()
+    return ((bp.SizeX or 1) + (bp.SizeZ or 1)) * 0.25
+end
+
+--- Retrieves bounding diameter x/y/z. Do not use in critical code, instead
+-- copy the body into your code for performance reasons. This function is 
+-- legacy code and is full of errors. Use GetAverageBoundingXYZRadiusCorrect 
+-- if you're interested in the actual average bounding radius.
+-- @param unit The unit to get the diameter of.
 function GetAverageBoundingXYZRadius(unit)
     local bp = unit:GetBlueprint()
     return ((bp.SizeX or 0 + bp.SizeY or 0 + bp.SizeZ or 0) * 0.333)
+end
+
+--- Retrieves bounding radius over all axis. Do not use in critical code, instead
+-- copy the body into your code for performance reasons.
+-- @param unit The unit to get the radius of.
+function GetAverageBoundingXYZRadiusCorrect(unit)
+    local bp = unit:GetBlueprint()
+    return ((bp.SizeX or 1) + (bp.SizeZ or 1) + (bp.SizeY or 1)) * 0.166
 end
 
 --- ??, what is the mathematics here exactly?
@@ -139,19 +159,22 @@ end
 -- DEFAULT EXPLOSION BASE FUNCTIONS --
 --------------------------------------
 
--- keep these strings in memory so that garbage collector doesn't have to clean them up
+-- random selection of debris that is useful, the earlier the debris is in the table
+-- the more likely it is spawned.
 local ProjectileDebrisBps = {
-    '/effects/entities/DebrisMisc01/DebrisMisc01_proj.bp',
-    '/effects/entities/DebrisMisc02/DebrisMisc02_proj.bp',
-    '/effects/entities/DebrisMisc03/DebrisMisc03_proj.bp',
     '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp',
-    '/effects/entities/DebrisMisc05/DebrisMisc05_proj.bp',
-    '/effects/entities/DebrisMisc06/DebrisMisc06_proj.bp',
-    '/effects/entities/DebrisMisc07/DebrisMisc07_proj.bp',
-    '/effects/entities/DebrisMisc08/DebrisMisc08_proj.bp',
+    '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp',
+    '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp',
+    '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp',
+    '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp',
+    '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp',
     '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp',
     '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp',
+    '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp',
+    '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp',
 }
+
+local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 
 --- Creates the default unit explosion used by almost all units in the game.
 -- @unit The Unit to create the explosion for.
@@ -162,14 +185,14 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
 
             -- cache blueprint values
             local blueprint = EntityGetBlueprint(unit)
-            local sx = blueprint.SizeX or 0 
-            local sy = blueprint.SizeY or 0 
-            local sz = blueprint.SizeZ or 0 
+            local sx = blueprint.SizeX or 1 
+            local sy = blueprint.SizeY or 1 
+            local sz = blueprint.SizeZ or 1 
 
             -- cache stats 
             local army = unit.Army
-            local boundingXZRadius = 0.5 * (sx + sz)
-            local boundingXYZRadius = 0.333 * (sx + sy + sz)
+            local boundingXZRadius = 0.25 * (sx + sz)
+            local boundingXYZRadius = 0.166 * (sx + sy + sz)
             local volume = sx * sy * sz
             local layer = unit.Layer
 
@@ -204,8 +227,8 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                         ScorchDecalTextures[Random(1, ScorchDecalTexturesN)], 
                         '', 
                         'Albedo', 
-                        boundingXZRadius * 3, 
-                        boundingXZRadius * 3, 
+                        boundingXZRadius, 
+                        boundingXZRadius, 
                         scorchLOD, 
                         scorchDuration, 
                         army
@@ -215,8 +238,8 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                         position, 
                         scorchRotation, 
                         ScorchSplatTextures[Random(1, ScorchSplatTexturesN)], 
-                        boundingXZRadius * 4, 
-                        boundingXZRadius * 4, 
+                        boundingXZRadius, 
+                        boundingXZRadius, 
                         scorchLOD,
                         scorchDuration, 
                         army
@@ -268,41 +291,58 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 unit, 
                 -1, 
                 army, 
-                boundingXZRadius * (6 + 4 * Random()),  -- (6, 10)
+                boundingXZRadius * (2 + 1 * Random()),  -- (2, 3)
                 10.5 + 4 * Random(), -- (10.5, 14.5)
                 'glow_03', 
                 'ramp_flare_02'
             )
 
-            -- create debris
+            -- determine debris amount
             local amount = MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
+
+            -- determine debris velocity range
+            local velocity = 2 * boundingXYZRadius
+            local hVelocity = 0.5 * velocity
+
+            -- determine heading adjustments for debris origin
+            local heading = -1 * unit:GetHeading() -- inverse heading because Supreme Commander :)
+            local mch = MathCos(heading)
+            local msh = MathSin(heading)
+
+            -- make it slightly smaller so that debris originates from mesh and not from the air
+            sx = 0.8 * sx 
+            sy = 0.8 * sy 
+            sz = 0.8 * sz
+
+            -- create debris
             for i = 1, amount do
 
                 -- get some random numbers
                 local r1, r2, r3 = Random(), Random(), Random() 
 
-                -- position where debris starts
+                -- position somewhere in the size of the unit
                 local xpos = r1 * sx - (sx * 0.5)
-                local ypos = r2 * sy
+                local ypos = 0.1 * sy + 0.5 * r2 * sy
                 local zpos = r3 * sz - (sz * 0.5)
 
-                -- direction debris will go in
-                local xdir = 10 * (r1 * sx - (sx * 0.5))
-                local ydir = 10 * (r2 * sy)
-                local zdir = 10 * (r3 * sz - (sz * 0.5))
+                -- launch them into space
+                local xdir = velocity * r1 - (hVelocity)
+                local ydir = boundingXYZRadius + velocity * r2
+                local zdir = velocity * r3 - (hVelocity)
 
-                -- determine blueprint value
-                local bp = false 
-                if boundingXYZRadius < 0.2 then
-                    bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
-                elseif boundingXYZRadius < 2.0 then
-                    bp = '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
-                else 
-                    bp = '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp'
-                end
+                -- choose a random blueprint
+                local bp = ProjectileDebrisBps[MathMin(ProjectileDebrisBpsN, Random(1, i))]
 
-                -- create debris projectile
-                EntityCreateProjectile(unit, bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
+                EntityCreateProjectile(
+                    unit, 
+                    bp, 
+                    xpos * mch - zpos * msh, -- adjust for orientation of unit
+                    ypos, 
+                    xpos * msh + zpos * mch, -- adjust for orientation of unit
+                    xdir * mch - zdir * msh, -- adjust for orientation of unit 
+                    ydir, 
+                    xdir * msh + zdir * mch  -- adjust for orientation of unit
+                )
             end
 
             -- do camera shake
