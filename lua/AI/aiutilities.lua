@@ -10,12 +10,16 @@ local type = type
 
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
-local Buff = import('/lua/sim/Buff.lua')
+local GetMarker = import('/lua/sim/ScenarioUtilities.lua').GetMarker
+local GetMarkers = import('/lua/sim/ScenarioUtilities.lua').GetMarkers
+local XZDistanceTwoVectors = import('/lua/utilities.lua').XZDistanceTwoVectors
+local PlatoonGenerateSafePathTo = import('/lua/AI/aiattackutilities.lua').PlatoonGenerateSafePathTo
+local SendPlatoonWithTransportsSorian = import('/lua/AI/aiattackutilities.lua').SendPlatoonWithTransportsSorian
+local CanGraphTo = import('/lua/AI/aiattackutilities.lua').CanGraphTo
+local SendPlatoonWithTransportsNoCheck = import('/lua/AI/aiattackutilities.lua').SendPlatoonWithTransportsNoCheck
+local ApplyBuff = import('/lua/sim/Buff.lua').ApplyBuff
+local GetClosestShieldProtectingTargetSorian = import('/lua/ai/AIBehaviors.lua').GetClosestShieldProtectingTargetSorian
 local SUtils = import('/lua/AI/sorianutilities.lua')
-local AIBehaviors = import('/lua/ai/AIBehaviors.lua')
 
 local TableGetn = table.getn
 local TableCopy = table.copy
@@ -38,11 +42,18 @@ local VDist2 = VDist2
 local VDist2Sq = VDist2Sq
 local VDist3 = VDist3
 
+local GetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local GetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local GetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local GetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
 local GetThreatsAroundPosition = moho.aibrain_methods.GetThreatsAroundPosition
+local GetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
 local GetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local GetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local CanBuildStructureAt = moho.aibrain_methods.CanBuildStructureAt
+local GetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local IsUnitState = moho.unit_methods.IsUnitState
 local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
-local GetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local GetFractionComplete = moho.entity_methods.GetFractionComplete
 local GetAIBrain = moho.unit_methods.GetAIBrain
 
@@ -95,7 +106,7 @@ end
 function AIGetSortedScoutingLocations(aiBrain, maxNum)
     local markerList = AIGetMarkerLocations(aiBrain, 'Combat Zone')
     for i = 1, TableGetn(ArmyBrains) do
-        local tmpLoc = ScenarioUtils.GetMarker('ARMY_' .. i)
+        local tmpLoc = GetMarker('ARMY_' .. i)
         if tmpLoc then
             TableInsert(markerList, {Position = tmpLoc.position, Name = 'ARMY_' .. i})
         end
@@ -815,7 +826,7 @@ function GetLocationNeedingWalls(aiBrain, radius, count, unitCategory, tMin, tMa
         positions[counter] = v.Position
     end
     for _, v in positions do
-        if Utils.XZDistanceTwoVectors(v, mainPos) < radius then
+        if XZDistanceTwoVectors(v, mainPos) < radius then
             local tempUnits = TableGetn(GetOwnUnitsAroundPoint(aiBrain, ParseEntityCategory(unitCategory), v, 30))
             local numWalls = TableGetn(GetOwnUnitsAroundPoint(aiBrain, categories.WALL, v, 40))
             if tempUnits > count and numWalls < 10 and (not bestFit or tempUnits > mostUnits) then
@@ -947,7 +958,7 @@ function AIEngineersAssistFactories(aiBrain, engineers, factories)
             IssueGuard({unit}, factoryData[key].Factory)
             factoryData[key].NumGuards = factoryData[key].NumGuards + 1
         else
-            aiBrain:AssignUnitsToPlatoon('ArmyPool', {unit}, 'Unassigned', 'NoFormation')
+            AssignUnitsToPlatoon('ArmyPool', {unit}, 'Unassigned', 'NoFormation')
         end
     end
 
@@ -1085,7 +1096,7 @@ function GetBrainUnitsAroundPoint(aiBrain, category, location, radius, tBrain)
     local retTable = {}
     local counter = 0
     for _, v in units do
-        if not v.Dead and v:GetAIBrain():GetArmyIndex() == tIndex then
+        if not v.Dead and GetAIBrain(v):GetArmyIndex() == tIndex then
             counter = counter + 1
             retTable[counter] = v
         end
@@ -1193,11 +1204,11 @@ function AIFindBrainTargetInRange(aiBrain, platoon, squad, maxRange, atkPri, ene
         local retUnit = false
         local distance = false
         for num, unit in targetUnits do
-            if not unit.Dead and EntityCategoryContains(category, unit) and unit:GetAIBrain():GetArmyIndex() == enemyIndex and platoon:CanAttackTarget(squad, unit) then
+            if not unit.Dead and EntityCategoryContains(category, unit) and GetAIBrain(unit):GetArmyIndex() == enemyIndex and platoon:CanAttackTarget(squad, unit) then
                 local unitPos = unit:GetPosition()
-                if not retUnit or Utils.XZDistanceTwoVectors(position, unitPos) < distance then
+                if not retUnit or XZDistanceTwoVectors(position, unitPos) < distance then
                     retUnit = unit
-                    distance = Utils.XZDistanceTwoVectors(position, unitPos)
+                    distance = XZDistanceTwoVectors(position, unitPos)
                 end
             end
         end
@@ -1226,9 +1237,9 @@ function AIFindBrainTargetAroundPoint(aiBrain, position, maxRange, category)
     for num, unit in targetUnits do
         if not unit.Dead then
             local unitPos = unit:GetPosition()
-            if not retUnit or Utils.XZDistanceTwoVectors(position, unitPos) < distance then
+            if not retUnit or XZDistanceTwoVectors(position, unitPos) < distance then
                 retUnit = unit
-                distance = Utils.XZDistanceTwoVectors(position, unitPos)
+                distance = XZDistanceTwoVectors(position, unitPos)
             end
         end
     end
@@ -1262,7 +1273,7 @@ function RandomLocation(x, z)
 end
 
 function FindIdleGates(aiBrain)
-    local gates = aiBrain:GetListOfUnits(categories.GATE, true)
+    local gates = GetListOfUnits(categories.GATE, true)
     if gates and not TableEmpty(gates) then
         local retGates = {}
         local counter = 0
@@ -1356,7 +1367,7 @@ function GetTransports(platoon, units)
 
 
     local aiBrain = platoon:GetBrain()
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local pool = GetPlatoonUniquelyNamed('ArmyPool')
 
     -- Make sure more are needed
     local tempNeeded = {}
@@ -1414,7 +1425,7 @@ function GetTransports(platoon, units)
             --LOG("Return SortedList is " .. repr(sortedList[i].Unit.Dead))
             if transportsNeeded and sortedList[i].Unit and TableEmpty(sortedList[i].Unit:GetCargo()) and not sortedList[i].Unit:IsUnitState('TransportLoading') then
                 local id = sortedList[i].Id
-                aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
+                AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
                 numTransports = numTransports + 1
                 if not transSlotTable[id] then
                     transSlotTable[id] = GetNumTransportSlots(sortedList[i].Unit)
@@ -1463,7 +1474,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     local aiBrain
     for k, v in units do
         if not v.Dead then
-            aiBrain = v:GetAIBrain()
+            aiBrain = GetAIBrain(v)
             break
         end
     end
@@ -1501,11 +1512,11 @@ function UseTransports(units, transports, location, transportPlatoon)
     local remainingSize3 = {}
     local remainingSize2 = {}
     local remainingSize1 = {}
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local pool = GetPlatoonUniquelyNamed('ArmyPool')
     for num, unit in units do
         if not unit.Dead then
             if unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             elseif EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
                 TableInsert(shields, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
@@ -1544,7 +1555,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
-    aiBrain:AssignUnitsToPlatoon(pool, currLeftovers, 'Unassigned', 'None')
+    AssignUnitsToPlatoon(pool, currLeftovers, 'Unassigned', 'None')
     if transportPlatoon then
         transportPlatoon.UsingTransport = true
     end
@@ -1589,7 +1600,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     for k, unit in units do
         if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) then
             if not unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             end
         elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and TableEmpty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)
@@ -1600,7 +1611,7 @@ function UseTransports(units, transports, location, transportPlatoon)
     -- If some transports have no units return to pool
     for k, t in transports do
         if not t.Dead and TableEmpty(t:GetCargo()) then
-            aiBrain:AssignUnitsToPlatoon('ArmyPool', {t}, 'Scout', 'None')
+            AssignUnitsToPlatoon('ArmyPool', {t}, 'Scout', 'None')
             TableRemove(transports, k)
         end
     end
@@ -1610,7 +1621,7 @@ function UseTransports(units, transports, location, transportPlatoon)
         if location then
             -- Adding Surface Height, so the transporter get not confused, because the target is under the map (reduces unload time)
             location = {location[1], GetSurfaceHeight(location[1],location[3]), location[3]}
-            local safePath = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
+            local safePath = PlatoonGenerateSafePathTo(aiBrain, 'Air', transports[1]:GetPosition(), location, 200)
             if safePath then
                 for _, p in safePath do
                     IssueMove(transports, p)
@@ -1742,13 +1753,13 @@ function ReturnTransportsToPool(units, move)
         return false
     end
 
-    local aiBrain = unit:GetAIBrain()
+    local aiBrain = GetAIBrain(unit)
     local x, z = aiBrain:GetArmyStartPos()
     local position = RandomLocation(x, z)
-    local safePath, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Air', unit:GetPosition(), position, 200)
+    local safePath, reason = PlatoonGenerateSafePathTo(aiBrain, 'Air', unit:GetPosition(), position, 200)
     for k, unit in units do
         if not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) then
-            aiBrain:AssignUnitsToPlatoon('ArmyPool', {unit}, 'Scout', 'None')
+            AssignUnitsToPlatoon('ArmyPool', {unit}, 'Scout', 'None')
             if move then
                 if safePath then
                     for _, p in safePath do
@@ -1818,7 +1829,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
         end
 
         -- Skip the last move... we want to return and do a build
-        bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsNoCheck(aiBrain, unit.PlatoonHandle, destination, needTransports, true, false)
+        bUsedTransports = SendPlatoonWithTransportsNoCheck(aiBrain, unit.PlatoonHandle, destination, needTransports, true, false)
 
         if bUsedTransports then
             return true
@@ -1830,7 +1841,7 @@ function EngineerMoveWithSafePath(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', pos, destination)
         if path then
             local pathSize = TableGetn(path)
             -- Move to way points (but not to destination... leave that for the final command)
@@ -1861,7 +1872,7 @@ function EngineerTryReclaimCaptureArea(aiBrain, eng, pos)
             if unit.Dead or unit:BeenDestroyed() then
                 continue
             end
-            if not IsEnemy( aiBrain:GetArmyIndex(), unit:GetAIBrain():GetArmyIndex() ) then
+            if not IsEnemy( aiBrain:GetArmyIndex(), GetAIBrain(unit):GetArmyIndex() ) then
                 continue
             end
             if unit:IsCapturable() then
@@ -1935,7 +1946,7 @@ function SetupCheat(aiBrain, cheatBool)
         buffAffects.EnergyProduction.Mult = tonumber(ScenarioInfo.Options.CheatMult)
         buffAffects.MassProduction.Mult = tonumber(ScenarioInfo.Options.CheatMult)
 
-        local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+        local pool = GetPlatoonUniquelyNamed('ArmyPool')
         for _, v in pool:GetPlatoonUnits() do
             -- Apply build rate and income buffs
             ApplyCheatBuffs(v)
@@ -1946,10 +1957,10 @@ end
 
 function ApplyCheatBuffs(unit)
     if EntityCategoryContains(categories.COMMAND, unit) and ScenarioInfo.Options.OmniCheat == "on" then
-        Buff.ApplyBuff(unit, 'IntelCheat')
+        ApplyBuff(unit, 'IntelCheat')
     end
-    Buff.ApplyBuff(unit, 'CheatIncome')
-    Buff.ApplyBuff(unit, 'CheatBuildRate')
+    ApplyBuff(unit, 'CheatIncome')
+    ApplyBuff(unit, 'CheatBuildRate')
 end
 
 function EngineerTryReclaimCaptureAreaSorian(aiBrain, eng, pos)
@@ -2139,9 +2150,9 @@ function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
     end
 
     local result, bestPos = false
-    result, bestPos = AIAttackUtils.CanGraphTo(unit, destination, 'Land')
+    result, bestPos = CanGraphTo(unit, destination, 'Land')
     if not result then
-        result, bestPos = AIAttackUtils.CanGraphTo(unit, destination, 'Amphibious')
+        result, bestPos = CanGraphTo(unit, destination, 'Amphibious')
         if not result and not SUtils.CheckForMapMarkers(aiBrain) then
             result, bestPos = unit:CanPathTo(destination)
         end
@@ -2157,7 +2168,7 @@ function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
             needTransports = true
         end
         -- Skip the last move... we want to return and do a build
-        bUsedTransports = AIAttackUtils.SendPlatoonWithTransportsSorian(aiBrain, unit.PlatoonHandle, destination, needTransports, true, needTransports)
+        bUsedTransports = SendPlatoonWithTransportsSorian(aiBrain, unit.PlatoonHandle, destination, needTransports, true, needTransports)
 
         if bUsedTransports then
             return true
@@ -2166,7 +2177,7 @@ function EngineerMoveWithSafePathSorian(aiBrain, unit, destination)
 
     -- If we're here, we haven't used transports and we can path to the destination
     if result then
-        local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination, 10)
+        local path, reason = PlatoonGenerateSafePathTo(aiBrain, 'Amphibious', unit:GetPosition(), destination, 10)
         if path then
             local pathSize = TableGetn(path)
             -- Move to way points (but not to destination... leave that for the final command)
@@ -2236,9 +2247,9 @@ function AIFindPingTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPri
                         end
                     end
                     local numShields = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.SHIELD * categories.STRUCTURE, unitPos, 50, 'Enemy')
-                    if not retUnit or numShields < targetShields or (numShields == targetShields and Utils.XZDistanceTwoVectors(position, unitPos) < distance) then
+                    if not retUnit or numShields < targetShields or (numShields == targetShields and XZDistanceTwoVectors(position, unitPos) < distance) then
                         retUnit = unit
-                        distance = Utils.XZDistanceTwoVectors(position, unitPos)
+                        distance = XZDistanceTwoVectors(position, unitPos)
                         targetShields = numShields
                     end
                 end
@@ -2251,7 +2262,7 @@ function AIFindPingTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPri
                         break
                     end
                 end
-                local closestBlockingShield = AIBehaviors.GetClosestShieldProtectingTargetSorian(unit, retUnit)
+                local closestBlockingShield = GetClosestShieldProtectingTargetSorian(unit, retUnit)
                 if closestBlockingShield then
                     return closestBlockingShield
                 end
@@ -2280,9 +2291,9 @@ function AIFindAirAttackTargetInRangeSorian(aiBrain, platoon, squad, atkPri, pos
             if not unit.Dead and EntityCategoryContains(category, unit) and platoon:CanAttackTarget(squad, unit) then
                 local unitPos = unit:GetPosition()
                 local numShields = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.SHIELD * categories.STRUCTURE, unitPos, 50, 'Enemy')
-                if not retUnit or numShields < targetShields or (numShields == targetShields and Utils.XZDistanceTwoVectors(position, unitPos) < distance) then
+                if not retUnit or numShields < targetShields or (numShields == targetShields and XZDistanceTwoVectors(position, unitPos) < distance) then
                     retUnit = unit
-                    distance = Utils.XZDistanceTwoVectors(position, unitPos)
+                    distance = XZDistanceTwoVectors(position, unitPos)
                     targetShields = numShields
                 end
             end
@@ -2295,7 +2306,7 @@ function AIFindAirAttackTargetInRangeSorian(aiBrain, platoon, squad, atkPri, pos
                     break
                 end
             end
-            local closestBlockingShield = AIBehaviors.GetClosestShieldProtectingTargetSorian(unit, retUnit)
+            local closestBlockingShield = GetClosestShieldProtectingTargetSorian(unit, retUnit)
             if closestBlockingShield then
                 return closestBlockingShield
             end
@@ -2387,9 +2398,9 @@ function AIFindBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPr
                     end
                 end
                 local numShields = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.SHIELD * categories.STRUCTURE, unitPos, 46, 'Enemy')
-                if not retUnit or numShields < targetShields or (numShields == targetShields and Utils.XZDistanceTwoVectors(position, unitPos) < distance) then
+                if not retUnit or numShields < targetShields or (numShields == targetShields and XZDistanceTwoVectors(position, unitPos) < distance) then
                     retUnit = unit
-                    distance = Utils.XZDistanceTwoVectors(position, unitPos)
+                    distance = XZDistanceTwoVectors(position, unitPos)
                     targetShields = numShields
                 end
             end
@@ -2402,7 +2413,7 @@ function AIFindBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPr
                     break
                 end
             end
-            local closestBlockingShield = AIBehaviors.GetClosestShieldProtectingTargetSorian(unit, retUnit)
+            local closestBlockingShield = GetClosestShieldProtectingTargetSorian(unit, retUnit)
             if closestBlockingShield then
                 return closestBlockingShield
             end
@@ -2433,9 +2444,9 @@ function AIFindUndefendedBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRa
             if not unit.Dead and EntityCategoryContains(category, unit) and platoon:CanAttackTarget(squad, unit) then
                 local unitPos = unit:GetPosition()
                 local numShields = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.SHIELD * categories.STRUCTURE, unitPos, 46, 'Enemy')
-                if numShields < maxShields and (not retUnit or numShields < targetShields or (numShields == targetShields and Utils.XZDistanceTwoVectors(position, unitPos) < distance)) then
+                if numShields < maxShields and (not retUnit or numShields < targetShields or (numShields == targetShields and XZDistanceTwoVectors(position, unitPos) < distance)) then
                     retUnit = unit
-                    distance = Utils.XZDistanceTwoVectors(position, unitPos)
+                    distance = XZDistanceTwoVectors(position, unitPos)
                     targetShields = numShields
                 end
             end
@@ -2448,7 +2459,7 @@ function AIFindUndefendedBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRa
                     break
                 end
             end
-            local closestBlockingShield = AIBehaviors.GetClosestShieldProtectingTargetSorian(unit, retUnit)
+            local closestBlockingShield = GetClosestShieldProtectingTargetSorian(unit, retUnit)
             if closestBlockingShield then
                 return closestBlockingShield
             end
@@ -2482,7 +2493,7 @@ function AIFindBrainNukeTargetInRangeSorian(aiBrain, platoon, maxRange, atkPri, 
                 if not SUtils.CheckCost(aiBrain, unitPos, massCost * antiNukes) then continue end
                 local dupTarget = false
                 for x, z in oldTarget do
-                    if unit == z or (not z.Dead and Utils.XZDistanceTwoVectors(z:GetPosition(), unitPos) < 30) then
+                    if unit == z or (not z.Dead and XZDistanceTwoVectors(z:GetPosition(), unitPos) < 30) then
                         dupTarget = true
                     end
                 end
@@ -2494,12 +2505,12 @@ function AIFindBrainNukeTargetInRangeSorian(aiBrain, platoon, maxRange, atkPri, 
                         end
                     end
                 end
-                if (not retUnit or (distance and Utils.XZDistanceTwoVectors(position, unitPos) < distance)) and ((antiNukes + 2 < nukeCount or antiNukes == 0) and not dupTarget) then
+                if (not retUnit or (distance and XZDistanceTwoVectors(position, unitPos) < distance)) and ((antiNukes + 2 < nukeCount or antiNukes == 0) and not dupTarget) then
                     retUnit = unit
                     retPosition = unitPos
                     retAntis = antiNukes
-                    distance = Utils.XZDistanceTwoVectors(position, unitPos)
-                elseif (not retUnit or (distance and Utils.XZDistanceTwoVectors(position, unitPos) < distance)) and not dupTarget then
+                    distance = XZDistanceTwoVectors(position, unitPos)
+                elseif (not retUnit or (distance and XZDistanceTwoVectors(position, unitPos) < distance)) and not dupTarget then
                     for i = -1, 1 do
                         for j = -1, 1 do
                             if i ~= 0 and j ~= 0 then
@@ -2509,7 +2520,7 @@ function AIFindBrainNukeTargetInRangeSorian(aiBrain, platoon, maxRange, atkPri, 
                                     retUnit = unit
                                     retPosition = pos
                                     retAntis = antiNukes
-                                    distance = Utils.XZDistanceTwoVectors(position, unitPos)
+                                    distance = XZDistanceTwoVectors(position, unitPos)
                                 end
                             end
                             if retUnit then break end
@@ -2537,7 +2548,7 @@ function GetOwnUnitsAroundPointSorian(aiBrain, category, location, radius, min, 
         checkThreat = true
     end
     for _, v in units do
-        if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
+        if not v.Dead and not v:IsBeingBuilt() and GetAIBrain(v):GetArmyIndex() == index then
             local loc = v:GetPosition()
             if VDist2Sq(location[1], location[3], loc[1], loc[3]) > minDist then
                 if checkThreat then
@@ -2560,7 +2571,7 @@ function FindUnclutteredArea(aiBrain, category, location, radius, maxUnits, maxR
     local index = aiBrain:GetArmyIndex()
     local retUnits = {}
     for _, v in units do
-        if not v.Dead and not v:IsBeingBuilt() and v:GetAIBrain():GetArmyIndex() == index then
+        if not v.Dead and not v:IsBeingBuilt() and GetAIBrain(v):GetArmyIndex() == index then
             local nearby = aiBrain:GetNumUnitsAroundPoint(avoidCat, v:GetPosition(), maxRadius, 'Ally')
             if nearby < maxUnits then
                 TableInsert(retUnits, v)
@@ -2684,7 +2695,7 @@ function AIGetMarkerLocationsSorian(aiBrain, markerType)
             TableInsert(markerList, {Position = v.Position, Name = k})
         end
     end
-    local markers = ScenarioUtils.GetMarkers()
+    local markers = GetMarkers()
     if markers then
         for k, v in markers do
             if v.type == markerType then
@@ -2788,7 +2799,7 @@ function UseTransportsGhetto(units, transports)
     local aiBrain
     for k, v in units do
         if not v.Dead then
-            aiBrain = v:GetAIBrain()
+            aiBrain = GetAIBrain(v)
             break
         end
     end
@@ -2824,11 +2835,11 @@ function UseTransportsGhetto(units, transports)
     local remainingSize3 = {}
     local remainingSize2 = {}
     local remainingSize1 = {}
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local pool = GetPlatoonUniquelyNamed('ArmyPool')
     for num, unit in units do
         if not unit.Dead then
             if unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             elseif EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
                 TableInsert(shields, unit)
             elseif unit:GetBlueprint().Transport.TransportClass == 3 then
@@ -2866,7 +2877,7 @@ function UseTransportsGhetto(units, transports)
     for _, v in currLeftovers do TableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
-    aiBrain:AssignUnitsToPlatoon(pool, currLeftovers, 'Unassigned', 'None')
+    AssignUnitsToPlatoon(pool, currLeftovers, 'Unassigned', 'None')
 
 
     if transportPlatoon then
@@ -2913,7 +2924,7 @@ function UseTransportsGhetto(units, transports)
     for k, unit in units do
         if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) then
             if not unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+                AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
             end
         elseif not unit.Dead and EntityCategoryContains(categories.TRANSPORTATION, unit) and TableEmpty(unit:GetCargo()) then
             ReturnTransportsToPool({unit}, true)
