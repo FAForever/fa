@@ -13,7 +13,7 @@ local type = type
 
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local UnitTemplates = import('/lua/unittemplates.lua').UnitTemplates
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local GetMarker = import('/lua/sim/ScenarioUtilities.lua').GetMarker
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
 --for sorian ai
@@ -27,7 +27,9 @@ local TableRemove = table.remove
 local TableGetn = table.getn
 local MathCeil = math.ceil
 local MathSqrt = math.sqrt
+local WaitTicks = coroutine.yield
 
+local GetGameTimeSeconds = GetGameTimeSeconds
 local EntityCategoryContains = EntityCategoryContains
 local EntityCategoryCount = EntityCategoryCount
 local ParseEntityCategory = ParseEntityCategory
@@ -35,19 +37,18 @@ local ParseEntityCategory = ParseEntityCategory
 local VDist2 = VDist2
 local VDist2Sq = VDist2Sq
 
-local WaitTicks = coroutine.yield
-
-local IsUnitState = moho.unit_methods.IsUnitState
+local GetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local GetPlatoonUniquelyNamed = moho.platoon_methods.GetPlatoonUniquelyNamed
 local GetPlatoonPosition = moho.platoon_methods.GetPlatoonPosition
-local GetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
-local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
-local GetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
-local PlatoonExists = moho.aibrain_methods.PlatoonExists	
-local GetPosition = moho.entity_methods.GetPosition
 local GetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local GetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
 local GetThreatsAroundPosition = moho.aibrain_methods.GetThreatsAroundPosition
-
+local GetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local PlatoonExists = moho.aibrain_methods.PlatoonExists	
+local AssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local GetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local IsUnitState = moho.unit_methods.IsUnitState
+local GetPosition = moho.entity_methods.GetPosition
 
 -- types of threat to look at based on composition of platoon
 local ThreatTable =
@@ -939,10 +940,10 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                     local goodunits, overflow = AIUtils.SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
                     local numOverflow = TableGetn(overflow)
                     if TableGetn(goodunits) > numOverflow and numOverflow > 0 then
-                        local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+                        local pool = GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
+                                AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits
@@ -954,7 +955,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
                 end
                 counter = counter + 1
                 WaitTicks(10)
-                if not aiBrain:PlatoonExists(platoon) then
+                if not PlatoonExists(platoon) then
                     aiBrain.NeedTransports = aiBrain.NeedTransports - numTransportsNeeded
                     if aiBrain.NeedTransports < 0 then
                         aiBrain.NeedTransports = 0
@@ -1030,7 +1031,7 @@ function SendPlatoonWithTransports(aiBrain, platoon, destination, bRequired, bSk
         end
 
         -- check to see we're still around
-        if not platoon or not aiBrain:PlatoonExists(platoon) then
+        if not platoon or not PlatoonExists(platoon) then
             return false
         end
 
@@ -1113,10 +1114,10 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                     local goodunits, overflow = AIUtils.SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
                     local numOverflow = TableGetn(overflow)
                     if TableGetn(goodunits) > numOverflow and numOverflow > 0 then
-                        local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+                        local pool = GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
+                                AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits
@@ -1128,7 +1129,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
                 end
                 counter = counter + 1
                 WaitTicks(10)
-                if not aiBrain:PlatoonExists(platoon) then
+                if not PlatoonExists(platoon) then
                     aiBrain.NeedTransports = aiBrain.NeedTransports - numTransportsNeeded
                     if aiBrain.NeedTransports < 0 then
                         aiBrain.NeedTransports = 0
@@ -1216,7 +1217,7 @@ function SendPlatoonWithTransportsNoCheck(aiBrain, platoon, destination, bRequir
         end
 
         -- check to see we're still around
-        if not platoon or not aiBrain:PlatoonExists(platoon) then
+        if not platoon or not PlatoonExists(platoon) then
             return false
         end
 
@@ -1508,7 +1509,7 @@ function DrawPathGraph()
                 -- Draw the connecting lines to its adjacent nodes
                 for i, node in markerInfo.adjacent do
 
-                    local otherMarker = ScenarioUtils.GetMarker(node)
+                    local otherMarker = GetMarker(node)
                     if otherMarker then
                         DrawLinePop(markerInfo.position, otherMarker.position, markerInfo.color)
                     end
@@ -2230,10 +2231,10 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                     local goodunits, overflow = AIUtils.SplitTransportOverflow(units, overflowSm, overflowMd, overflowLg)
                     local numOverflow = TableGetn(overflow)
                     if TableGetn(goodunits) > numOverflow * 2 and numOverflow > 0 then
-                        local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+                        local pool = GetPlatoonUniquelyNamed('ArmyPool')
                         for _,v in overflow do
                             if not v.Dead then
-                                aiBrain:AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
+                                AssignUnitsToPlatoon(pool, {v}, 'Unassigned', 'None')
                             end
                         end
                         units = goodunits
@@ -2245,7 +2246,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
                 end
                 counter = counter + 1
                 WaitTicks(10)
-                if not aiBrain:PlatoonExists(platoon) then
+                if not PlatoonExists(platoon) then
                     aiBrain.NeedTransports = aiBrain.NeedTransports - numTransportsNeeded
                     if aiBrain.NeedTransports < 0 then
                         aiBrain.NeedTransports = 0
@@ -2304,7 +2305,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
             useGraph = 'Air'
         end
 
-        if not aiBrain:PlatoonExists(platoon) then
+        if not PlatoonExists(platoon) then
             return false
         end
 
@@ -2356,7 +2357,7 @@ function SendPlatoonWithTransportsSorian(aiBrain, platoon, destination, bRequire
         end
 
         -- check to see we're still around
-        if not platoon or not aiBrain:PlatoonExists(platoon) then
+        if not platoon or not PlatoonExists(platoon) then
             return false
         end
 
