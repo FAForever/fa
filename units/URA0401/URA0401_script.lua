@@ -38,6 +38,7 @@ URA0401 = Class(CAirUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)
         CAirUnit.OnStopBeingBuilt(self,builder,layer)
+        self:SetScriptBit('RULEUTC_StealthToggle', true)
         self.AnimManip = CreateAnimator(self)
         self.Trash:Add(self.AnimManip)
     end,
