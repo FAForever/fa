@@ -69,5 +69,8 @@ TrashBag = Class {
                 self[k] = nil
             end
         end 
+
+        -- allows the trashbag to be re-used
+        self.Next = 1
     end
 }
