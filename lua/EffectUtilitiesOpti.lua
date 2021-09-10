@@ -43,9 +43,9 @@ local TrashBagAdd = TrashBag.Add
 
 -- all possible bot blueprint values
 local CybranBuildBotBlueprints = {
-    'ura0001',
-    'ura0002',
-    'ura0003',
+    'ura0001o',
+    'ura0002o',
+    'ura0003o',
     -- 'ura0004'
 }
 
@@ -106,7 +106,7 @@ function SpawnBuildBots(builder)
             zVec = MathCos(angleInitial + (k * angle)) * VecMul
 
             -- make the bot
-            local botBlueprint = CybranBuildBotBlueprints[k] or 'ura0001'
+            local botBlueprint = CybranBuildBotBlueprints[k] or 'ura0001o'
             bot = CreateUnit(botBlueprint, builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air')
 
             -- make build bots unkillable
@@ -251,4 +251,10 @@ function CreateCybranEngineerBuildEffects(builder, buildBones, buildBots, total)
             TrashBagAdd(bot.Trash, AttachBeamEntityToEntity(builder, bone, bot, -1, army, '/effects/emitters/build_beam_03_emit.bp'))
         end
     end
+end
+
+-- AEON SPECIFICS --
+
+function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
+
 end

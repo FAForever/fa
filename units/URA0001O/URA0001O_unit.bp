@@ -6,11 +6,11 @@ UnitBlueprint {
         CirclingDirChangeFrequencySec = 1,
         CirclingElevationChangeRatio = 0.5,
         CirclingRadiusChangeMaxRatio = 0.9,
-        CirclingRadiusChangeMinRatio = 0.6,
-        CirclingRadiusVsAirMult = 0.66,
+        CirclingRadiusChangeMinRatio = 0.5,
+        CirclingRadiusVsAirMult = 0.34,
         CirclingTurnMult = 3,
         KLift = 3,
-        KLiftDamping = 1,
+        KLiftDamping = 2,
         KMove = 4,
         KMoveDamping = 1,
         KTurn = 4,
@@ -22,26 +22,23 @@ UnitBlueprint {
         Winged = false,
     },
     Categories = {
+        -- to allow it to build / repair when assist
         'CONSTRUCTION',
         'ENGINEER',
-        'POD',
         'REPAIR',
-        'UNTARGETABLE',
+
+        -- for unit restrictions
+        'POD',
+
+        -- for UI
         'NOFORMATION',
-        'INSIGNIFICANTUNIT',
-        'VISIBLETORECON'
+
+        -- makes it a dummy-isch unit
+        'UNTARGETABLE',
+        'INVULNERABLE',
+        'UNSPAWNABLE',
+        'UNSELECTABLE',
     },
-    Defense = {
-        AirThreatLevel = 0,
-        ArmorType = 'Normal',
-        EconomyThreatLevel = 0,
-        Health = 30,
-        MaxHealth = 30,
-        RegenRate = 0,
-        SubThreatLevel = 0,
-        SurfaceThreatLevel = 0,
-    },
-    Description = '<LOC ura0001_desc>Build Bot Effect',
     Display = {
         Mesh = {
             IconFadeInZoom = 2000,
@@ -49,16 +46,16 @@ UnitBlueprint {
                 {
                     AlbedoName = '/Units/URA0001/URA0001_Albedo.dds',
                     LODCutoff = 215,
-                    MeshName = '/Units/URA0001/URA0001_LOD0.scm',
+                    MeshName = '/Units/URA0001O/URA0001O_LOD0.scm',
                     NormalsName = '/UNITS/URA0001/URA0001_NormalsTS.dds',
                     ShaderName = 'Insect',
                     SpecularName = '/Units/URA0001/URA0001_SpecTeam.dds',
                 },
             },
         },
-        PlaceholderMeshName = 'URA0001',
+        PlaceholderMeshName = 'URA0001O',
         SpawnRandomRotation = true,
-        UniformScale = 0.14,
+        UniformScale = 0.12,
     },
     Economy = {
         BuildCostEnergy = 0,
@@ -104,13 +101,6 @@ UnitBlueprint {
     Intel = {
         VisionRadius = 0,
     },
-    Interface = {
-        HelpText = '<LOC ura0001_help>Build Bot Effect',
-    },
-    LifeBarHeight = 0.075,
-    LifeBarOffset = 0.25,
-    LifeBarRender = false,
-    LifeBarSize = 0.01,
     Physics = {
         BankingSlope = 0.5,
         BuildOnLayerCaps = {
@@ -122,9 +112,9 @@ UnitBlueprint {
             LAYER_Water = false,
         },
         DragCoefficient = 0.2,
-        Elevation = 3,
+        Elevation = 2,
         MaxAcceleration = 10.5,
-        MaxSpeed = 20.5,
+        MaxSpeed = 10.5,
         MaxSpeedReverse = 0,
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
@@ -134,23 +124,7 @@ UnitBlueprint {
         TurnRadius = 360,
         TurnRate = 180,
     },
-    SelectionThickness = 0.2,
-    SizeX = 0.25,
-    SizeY = 0.25,
-    SizeZ = 0.25,
-    StrategicIconSortPriority = 105,
-    Wreckage = {
-        Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-        EnergyMult = 0,
-        HealthMult = 0.9,
-        MassMult = 0.9,
-        ReclaimTimeMultiplier = 1,
-        WreckageLayers = {
-            Air = false,
-            Land = true,
-            Seabed = false,
-            Sub = false,
-            Water = false,
-        },
-    },
+    SizeX = 0.01,
+    SizeY = 0.01,
+    SizeZ = 0.01,
 }
