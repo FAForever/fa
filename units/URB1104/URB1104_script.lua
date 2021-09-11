@@ -22,12 +22,16 @@ URB1104 = Class(CMassFabricationUnit) {
     
     OnProductionUnpaused = function(self)
         CMassFabricationUnit.OnProductionUnpaused(self)
-        self.Rotator:SetTargetSpeed(150)
+        if self.Rotator then 
+            self.Rotator:SetTargetSpeed(150)
+        end
     end,
     
     OnProductionPaused = function(self)
         CMassFabricationUnit.OnProductionPaused(self)
-        self.Rotator:SetTargetSpeed(0)
+        if self.Rotator then 
+            self.Rotator:SetTargetSpeed(0)
+        end
     end,
 }
 
