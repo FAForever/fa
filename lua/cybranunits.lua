@@ -320,7 +320,10 @@ CBuildBotUnit = Class(AirUnit) {
     OnDestroy = function(self) 
         self.Dead = true 
         self.Trash:Destroy()
-        self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+        
+        if self.SpawnedBy then 
+            self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+        end
     end,
 
     Kill = function(self)
