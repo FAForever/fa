@@ -141,16 +141,20 @@ CConstructionTemplate = Class() {
 
     --- When making build effects, try and make the bots.
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
+        -- check if the unit still exists, this can happen when: 
+        -- pause during construction, constructing unit dies, unpause
+        if unitBeingBuilt then 
 
-        -- Prevent an AI from (ab)using the bots for other purposes than building
-        local builderArmy = self.Army
-        local unitBeingBuiltArmy = unitBeingBuilt.Army
-        if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
-            SpawnBuildBotsOpti(self)
-            if stationary then 
-                CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+            -- Prevent an AI from (ab)using the bots for other purposes than building
+            local builderArmy = self.Army
+            local unitBeingBuiltArmy = unitBeingBuilt.Army
+            if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
+                SpawnBuildBotsOpti(self)
+                if stationary then 
+                    CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+                end
+                CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
             end
-            CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
         end
     end,
 
@@ -320,7 +324,10 @@ CBuildBotUnit = Class(AirUnit) {
     OnDestroy = function(self) 
         self.Dead = true 
         self.Trash:Destroy()
-        self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+
+        if self.SpawnedBy then 
+            self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+        end
     end,
 
     Kill = function(self)
@@ -738,9 +745,13 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
 
     OnUnpaused = function(self)
         CStructureUnit.OnUnpaused(self)
-        CStructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
 
-        self.AnimationManipulator:SetRate(1)
+        -- make sure the unit is still there
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt then 
+            CStructureUnit.StartBuildingEffects(self, unitBeingBuilt, self.UnitBuildOrder)
+            self.AnimationManipulator:SetRate(1)
+        end
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
