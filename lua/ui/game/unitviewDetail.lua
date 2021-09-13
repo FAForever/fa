@@ -596,7 +596,13 @@ function WrapAndPlaceText(bp, builder, descID, control)
                                 weaponDetails1 = weaponDetails1..LOCF('<LOC uvd_DPS>', DPS)
                             end
 
-                            weaponDetails2 = string.format(LOC('<LOC uvd_0010>Damage: %d, Splash: %d')..', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
+                            weaponDetails2 = string.format(LOC('<LOC uvd_Damage>'), Damage)
+
+                            if MuzzleBones > 1 then
+                                weaponDetails2 = weaponDetails2..'x'..MuzzleBones
+                            end
+
+                            weaponDetails2 = weaponDetails2..string.format(', '..LOC('<LOC uvd_Range>')..', '..LOC('<LOC uvd_Reload>'),
                                 Damage, info.DamageRadius, info.MinRadius, info.MaxRadius, ReloadTime)
                         end
                         if weapon.count > 1 then
