@@ -136,6 +136,11 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
+    -- TODO: is this the best place? I tried that userInit.lua but because of the preloading that starts loading during the lobby and it crashes.
+    -- keep track of the original focus army
+    import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
+
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 
