@@ -1,9 +1,9 @@
 EmitterBlueprint {
-	BlueprintId = 'seraphim_groundFX',
+	BlueprintId = 'aeon_groundFX',
 	Lifetime = -1.00,
 	Repeattime = 10.00,
 	TextureFramecount = 1.00,
-	Blendmode = 3.00,
+	Blendmode = 0.00,
 	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = false,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/ser_plasma05.dds]],
-	RampTexture = [[/textures/particles/ramp_blue_16.dds]],
+	Texture = [[/textures/particles/glow_alpha_03.dds]],
+	RampTexture = [[/textures/particles/ramp_white_07.dds]],
 	XDirectionCurve = {
 		XRange = 10.00,
 		Keys = {
@@ -46,13 +46,13 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 10.00,
 		Keys = {
-			{ x=5.000,y=2.000,z=0.000 },
+			{ x=5.000,y=3.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 10.00,
 		Keys = {
-			{ x=5.000,y=2.000,z=1.000 },
+			{ x=5.000,y=1.000,z=1.000 },
 		},
 	},
 	VelocityCurve = {
@@ -100,7 +100,7 @@ EmitterBlueprint {
 	YPosCurve = {
 		XRange = 10.00,
 		Keys = {
-			{ x=5.000,y=0.100,z=0.100 },
+			{ x=5.000,y=0.000,z=0.000 },
 		},
 	},
 	ZPosCurve = {
@@ -112,13 +112,13 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 10.00,
 		Keys = {
-			{ x=5.000,y=0.200,z=0.000 },
+			{ x=5.000,y=0.500,z=0.000 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 10.00,
 		Keys = {
-			{ x=4.182,y=1.000,z=0.000 },
+			{ x=4.182,y=0.800,z=0.000 },
 		},
 	},
 	InitialRotationCurve = {
