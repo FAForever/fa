@@ -313,7 +313,6 @@ local GetTerrainType = GetTerrainType
 -- upvalued read-only values
 local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FXImpact
 
-
 -- moho functions for performance
 local EntityMethods = _G.moho.entity_methods
 local EntityDestroy = EntityMethods.Destroy
@@ -325,80 +324,21 @@ local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
 BaseGenericDebris = Class(DummyProjectile){
-    FxUnitHitScale = 0.25,
-    FxWaterHitScale = 0.25,
-    FxUnderWaterHitScale = 0.25,
-    FxNoneHitScale = 0.25,
-    FxImpactLand = false,
-    FxLandHitScale = 0.5,
-    FxTrails = false,
-    FxTrailScale = 1,
 
     OnImpact = function(self, targetType, targetEntity)
 
-        local emit = false
-        local army = self.Army 
-
+        -- cache values
         local blueprint = EntityGetBlueprint(self)
         local blueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
+        local impactEffectType = blueprintDisplayImpactEffects.Type or 'Default'
 
-        -- determine impact effects
-        -- Possible targetType values are:
-        --  'Unit', 'Terrain', 'Water', 'Air', 'Prop'
-        --  'Shield', 'UnitAir', 'UnderWater', 'UnitUnderwater'
-        --  'Projectile', 'ProjectileUnderWater
-
-        local impactSnd = false
-        local impactEffects = false
-        local impactEffectscale = 1
-
-        if targetType == 'Water' then
-            impactSnd = "ImpactWater"
-            impactEffects = false
-            impactEffectscale = 0.25
-        elseif targetType == 'Terrain' then
+        -- determine sound value
+        local impactSnd = "Impact"
+        if targetType == 'Terrain' then
             impactSnd = "ImpactTerrain"
-            impactEffects = false
-            impactEffectscale = 0.5
-        elseif targetType == 'Shield' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 1.0
-        elseif targetType == 'Unit' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 0.25
-        elseif targetType == 'UnitAir' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 1.0
-        elseif targetType == 'Air' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 0.25
-        elseif targetType == 'Projectile' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 1.0
-        elseif targetType == 'ProjectileUnderwater' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 1.0
-        elseif targetType == 'Prop' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 1.0
-        elseif targetType == 'Underwater' or targetType == 'UnitUnderwater' then
-            impactSnd = "Impact"
-            impactEffects = false
-            impactEffectscale = 0.25
-        else
-            LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
+        elseif targetType == 'Water' then
+            impactSnd = "ImpactWater"
         end
-
-        -- check if they were set and use default values otherwise
-        impactEffects = impactEffects or false
-        impactEffectscale = impactEffectscale or 1
         
         -- play impact sound
         local snd = blueprint.Audio[impactSnd]
@@ -406,36 +346,10 @@ BaseGenericDebris = Class(DummyProjectile){
             EntityPlaySound(self, snd)
         end
 
-        -- Inlined CreateImpactEffects --
-
-        -- check if table exists, can be set to false
-        if impactEffects then 
-
-            local fxImpactTrajectoryAligned = self.FxImpactTrajectoryAligned
-
-            for _, v in impactEffects do
-
-                -- create emitter accordingly
-                if fxImpactTrajectoryAligned then
-                    emit = CreateEmitterAtBone(self, -2, army, v)
-                else
-                    emit = CreateEmitterAtEntity(self, army, v)
-                end
-
-                -- scale if applicable
-                if impactEffectscale != 1 then
-                    EmitterScaleEmitter(emit, impactEffectscale)
-                end
-            end
-        end
-
         -- Inlined GetTerrainEffects --
 
-        -- default value
-        impactEffectType = blueprintDisplayImpactEffects.Type or 'Default'
-
         -- get x / z position
-        local x, y, z = EntityGetPositionXYZ(self)
+        local x, _, z = EntityGetPositionXYZ(self)
 
         -- get terrain at that location and try and get some effects
         local terrainTypeFxImpact = GetTerrainType(x, z).FXImpact
@@ -443,10 +357,14 @@ BaseGenericDebris = Class(DummyProjectile){
 
         -- Inlined CreateTerrainEffects --
 
-        effectScale = blueprintDisplayImpactEffects.Scale or 1
-
         -- check if table exists, can be set to false
         if terrainEffects then 
+
+            -- store values in cache
+            local emit = false
+            local army = self.Army 
+            local effectScale = blueprintDisplayImpactEffects.Scale or 1
+
             for _, v in terrainEffects do
 
                 -- create emitter and scale accordingly
