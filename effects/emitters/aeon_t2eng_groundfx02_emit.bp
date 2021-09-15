@@ -1,7 +1,7 @@
 EmitterBlueprint {
 	BlueprintId = 'aeon_t2eng_groundfx02',
-	Lifetime = -0.20,
-	Repeattime = 0.20,
+	Lifetime = -0.80,
+	Repeattime = 0.80,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
 	LocalVelocity = true,
@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 200.00,
+	LODCutoff = 80.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -46,7 +46,7 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 0.20,
 		Keys = {
-			{ x=0.000,y=8.698,z=0.000 },
+			{ x=0.000,y=4.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
@@ -58,7 +58,7 @@ EmitterBlueprint {
 	VelocityCurve = {
 		XRange = 0.20,
 		Keys = {
-			{ x=0.100,y=6.000,z=0.000 },
+			{ x=0.100,y=1.000,z=0.000 },
 		},
 	},
 	XAccelCurve = {
@@ -100,7 +100,7 @@ EmitterBlueprint {
 	YPosCurve = {
 		XRange = 0.20,
 		Keys = {
-			{ x=0.094,y=0.150,z=0.250 },
+			{ x=0.094,y=-0.100,z=0.250 },
 		},
 	},
 	ZPosCurve = {
