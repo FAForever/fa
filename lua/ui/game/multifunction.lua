@@ -1094,7 +1094,7 @@ end
 function FocusArmyChanged()
     for i, control in controls.pingBtns do
         local focusArmy = GetFocusArmy()
-        if focusArmy == -1 or not IsAlly(UIPing.OriginalFocusArmy, focusArmy) then
+        if focusArmy == -1 or UIPing.OriginalFocusArmy == -1 or not IsAlly(UIPing.OriginalFocusArmy, focusArmy) then
             control:Disable()
         else
             control:Enable()
