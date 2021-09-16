@@ -3,7 +3,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
 --- Called when the window is made.
-function OnCreate(window)
+function OnConstruct(window)
     -- keeps track of anonymous text
     window.textElementIndex = 1
     window.textElementCount = 1
@@ -16,13 +16,12 @@ function OnBegin(window)
 
     -- Set all previously used to unused
     local elements = window.textElements
-    for k = 1, textElementIndex - 1 do 
+    for k = 1, window.textElementCount - 1 do 
         elements[k].used = false
     end
 
     -- start using at the start of the cache
     window.textElementIndex = 1
-
 end
 
 --- Called when the window is done rendering.
@@ -30,7 +29,7 @@ function OnEnd(window)
     
     -- hide unused text elements
     local elements = window.textElements
-    for k = 1, count do 
+    for k = 1, window.textElementCount - 1 do 
         local element = elements[k]
         if not element.used then 
             element:Hide()
@@ -51,7 +50,8 @@ function AllocateText(window)
         LayoutHelpers.DepthOverParent(element, window.main, 2)
     
         -- keep track of it
-        table.insert(window.textElements, element)
+        window.textElements[window.textElementIndex] = element
+        window.textElementCount = window.textElementCount + 1
     end
 
     -- keep track that it is used
