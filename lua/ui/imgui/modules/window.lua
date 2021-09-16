@@ -12,12 +12,12 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
-
--- used
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Group = import('/lua/maui/group.lua').Group
 local Slider = import('/lua/maui/slider.lua').Slider
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+
+local MapPreview = import('/lua/ui/controls/mappreview.lua').MapPreview
 
 local Conversion = import('/lua/ui/imgui//modules/conversion.lua')
 local ToLabel = Conversion.ToLabel
@@ -26,14 +26,6 @@ local ToLabel = Conversion.ToLabel
 local WindowConstructFloating = import('/lua/ui/imgui/modules/window-types/floating.lua').WindowConstructFloating
 local WindowConstructDockedLeft = import('/lua/ui/imgui/modules/window-types/docked-left.lua').WindowConstructDockedLeft
 
-local WindowText = import('/lua/ui/imgui/modules/ui-elements/text.lua')
-local TextOnBegin = WindowText.OnBegin
-local TextOnEnd = WindowText.OnEnd
-local AllocateText = WindowText.AllocateText
-local CreateText = WindowText.CreateText
-local SetTextColor = WindowText.SetTextColor
-local TextWithLabel = WindowText.TextWithLabel
-
 -- Every element needs to expose / use the following data:
 -- - height: determines the height of the element, used for lists
 -- - used: determines whether the element should be hidden or not
@@ -41,6 +33,93 @@ local TextWithLabel = WindowText.TextWithLabel
 --- Basic window metatable
 mWindow = { }
 mWindow.__index = mWindow
+
+-- TEXT --
+
+local WindowText = import('/lua/ui/imgui/modules/ui-elements/text.lua')
+local TextOnConstruct = WindowText.OnConstruct
+local TextOnBegin = WindowText.OnBegin
+local TextOnEnd = WindowText.OnEnd
+
+--- Adds a text entry.
+-- @param identifier The identifier of this element.
+-- @param value The text of this element.
+mWindow.Text = WindowText.CreateText
+mWindow.CreateText = WindowText.CreateText 
+
+--- Adds a text entry.
+-- @param identifier The identifier of this element.
+-- @param value The text of this element.
+mWindow.AllocateText = WindowText.AllocateText
+
+--- Sets the text color of the upcoming text element. Initial value is 'ffffffff'.
+-- @param color The color to set the text to.
+mWindow.SetTextColor = WindowText.SetTextColor
+
+--- Adds two text entries, as if they are two columns.
+-- @param left The left text value.
+-- @param right The right text value.
+-- @param size The size of the text.
+-- @param perc The percentage (in width) when the right column starts
+mWindow.TextWithLabel = WindowText.TextWithLabel
+
+-- DIVIDERS --
+
+local WindowDivider = import('/lua/ui/imgui/modules/ui-elements/dividers.lua')
+local DividerOnConstruct = WindowDivider.OnConstruct 
+local DividerOnBegin = WindowDivider.OnBegin
+local DividerOnEnd = WindowDivider.OnEnd 
+
+--- Adds a horizontal divider.
+mWindow.Divider = WindowDivider.Divider
+
+--- Retrieves a divider element. Returns a cached element if possible, allocates a 
+-- new one if no cached element is available.
+mWindow.AllocateDivider = WindowDivider.AllocateDivider
+
+-- clear out of scope
+WindowDivider = nil
+
+-- BITMAPS --
+
+
+
+-- CHARTS -- 
+
+local WindowCharts = import('/lua/ui/imgui/modules/ui-elements/charts.lua')
+
+--- Adds in a ratio chart that uses the entire width available.
+-- @param data The data for the ratio chart. Format is { { value = double, color = string }, ... }.
+-- @param dividerWidth the width of the dividers between data points, defaults to 2.
+mWindow.RatioChart = WindowCharts.RatioChart
+
+--- Constructs a progress bar computed as current / max, capped at 0.0 and 1.0. Uses the entire width available.
+-- @param current The current value.
+-- @param max The maximum value.
+mWindow.ProgressBar = WindowCharts.ProgressBar
+
+-- SLIDERS -- 
+
+local WindowSliders = import('/lua/ui/imgui/modules/ui-elements/sliders.lua')
+
+--- Adds a slider for changing a float value.
+-- @param identifier The identifier of this element.
+-- @param label The name of this element displayed in the UI.
+-- @param min The minimum value of the slider.
+-- @param max The maximum value of the slider.
+-- @param value The value of the slider.
+mWindow.SliderFloat = WindowSliders.SliderFloat
+
+--- Adds a slider for changing a float value.
+-- @param identifier The identifier of this element.
+-- @param label The name of this element displayed in the UI.
+-- @param min The minimum value of the slider.
+-- @param max The maximum value of the slider.
+-- @param value The value of the slider.
+-- @param callbacks Called when the value is changing. Format is { OnScrub = function(value) }
+mWindow.SliderFloatCB = WindowSliders.SliderFloatCB
+
+-- GENERIC WINDOW FUNCTIONALITY --
 
 local windows = { }
 
@@ -78,20 +157,10 @@ function WindowConstruct(identifier, type, width, height)
 
     window.elements = { }
 
-    -- keeps track of anonymous dividers
-    window.dividerElementIndex = 1
-    window.dividerElementCount = 0
-    window.dividerElements = { }
-
     -- keeps track of anonymous bitmaps
     window.bitmapElementIndex = 1
     window.bitmapElementCount = 0
     window.bitmapElements = { }
-
-    -- keeps track of anonymous text
-    window.textElementIndex = 1
-    window.textElements = { }
-    window.textColor = "ffffffff"
 
     -- used for list and rendering elements
     window.oMinOffset = window.oOffset
@@ -116,6 +185,9 @@ function WindowConstruct(identifier, type, width, height)
         window.main = WindowConstructFloating(identifier)
         window.type = "floating" 
     end
+
+    TextOnConstruct(window)
+    DividerOnConstruct(window)
 
     -- keep track of it
     windows[identifier] = window
@@ -165,8 +237,6 @@ function mWindow:Begin()
     self.maxOffset = self.oMaxOffset
 
     -- reset used anonymous elements
-    self.dividerElementIndex = 1
-    self.textElementIndex = 1
     self.bitmapElementIndex = 1
 
     local function MarkElementsAsUnused(elements, count)
@@ -185,9 +255,10 @@ function mWindow:Begin()
 
     -- mark everything
     MarkElementsAsUnused(self.elements)
-    MarkElementsAsUnused(self.textElements)
-    MarkElementsAsUnused(self.dividerElements, self.dividerElementCount)
     MarkElementsAsUnused(self.bitmapElements, self.bitmapElementCount)
+
+    TextOnBegin(self)
+    DividerOnBegin(self)
 end
 
 --- Finalizes the window for rendering.
@@ -214,9 +285,10 @@ function mWindow:End()
 
     -- hide unused elements
     HideUnusedElements(self.elements)
-    HideUnusedElements(self.textElements)
-    HideUnusedElements(self.dividerElements, self.dividerElementCount)
     HideUnusedElements(self.bitmapElements, self.bitmapElementCount)
+
+    TextOnEnd(self)
+    DividerOnEnd(self)
 
     if self.type == "docked-left" then 
         LayoutHelpers.SetHeight(self.main, self.offset - 10)
@@ -235,28 +307,6 @@ end
 function mWindow:Hide()
     self.main:Hide()
 end
-
---- Adds a text entry.
--- @param identifier The identifier of this element.
--- @param value The text of this element.
-mWindow.Text = CreateText
-mWindow.CreateText = CreateText 
-
---- Adds a text entry.
--- @param identifier The identifier of this element.
--- @param value The text of this element.
-mWindow.AllocateText = AllocateText
-
---- Sets the text color of the upcoming text element. Initial value is 'ffffffff'.
--- @param color The color to set the text to.
-mWindow.SetTextColor = SetTextColor
-
---- Adds two text entries, as if they are two columns.
--- @param left The left text value.
--- @param right The right text value.
--- @param size The size of the text.
--- @param perc The percentage (in width) when the right column starts
-mWindow.TextWithLabel = TextWithLabel
 
 --- Allocates a generic bitmap.
 -- @param color The color of the bitmap.
@@ -290,46 +340,6 @@ function mWindow:AllocateBitmap(color)
 
     -- update index that represents what text element we've used so far
     self.bitmapElementIndex = self.bitmapElementIndex + 1
-
-    return element
-end
-
---- Retrieves a divider element. Returns a cached element if possible, allocates a 
--- new one if no cached element is available.
-function mWindow:AllocateDivider()
-    -- check if one is free
-    local element = self.dividerElements[self.dividerElementIndex]
-    if not element then 
-
-        -- create the bitmap
-        element = Bitmap(self.main)
-        element:SetSolidColor('dddddddd')
-
-        -- keep track of it
-        self.dividerElements[self.dividerElementIndex] = element
-        self.dividerElementCount = self.dividerElementCount + 1
-    end
-
-    -- check if we fit
-    if self:HasSufficientSpace(2) then 
-        -- keep track that it is used
-        element.used = true
-
-        -- check if the element was previously hidden
-        if element:IsHidden() then 
-            element:Show()
-        end
-
-        -- scale it
-        local outline = self.outline 
-        local rightOutline = self.rightOutline
-        element.Left:Set( function() return self.main.Left() + outline end )
-        element.Right:Set( function() return self.main.Right() - rightOutline end )
-        element.Height:Set(1)
-
-        -- update index that represents what text element we've used so far
-        self.dividerElementIndex = self.dividerElementIndex + 1
-    end
 
     return element
 end
@@ -419,8 +429,6 @@ end
 
 --- Constructs a scroll bar that limits the elements inside
 function mWindow:BeginList(identifier, height)
-
-
 
     local element = self.tracker[identifier]
     if not element then 
@@ -599,57 +607,6 @@ function mWindow:Button(identifier)
     return enabled
 end
 
-function mWindow:SetTextColor(color)
-    self.textColor = color
-end
-
---- Adds two text entries, as if they are two columns.
--- @param left The left text value.
--- @param right The right text value.
--- @param size The size of the text.
--- @param perc The percentage (in width) when the right column starts
-function mWindow:TextWithLabel(label, value, perc)
-    -- check if we fit
-    if self:HasSufficientSpace(12) then 
-        -- scope them so that they can be uplifted
-        local outline = self.outline
-        local oOutline = self.oOutline 
-        local rightOutline = self.rightOutline
-        local offset = self.offset
-
-        do 
-            -- retrieve a text element
-            local element = self:AllocateText()
-
-            -- update text content
-            element:SetColor(self.textColor)
-            element:SetText(label)
-
-            -- position it
-            element.Top:Set(function() return self.main.Top() + offset end )
-            element.Left:Set(function() return self.main.Left() + outline end)
-            element.height = 12
-        end
-
-        do 
-            -- retrieve a text element
-            local element = self:AllocateText()
-
-            -- update text content
-            element:SetColor("ffffffff")
-            element:SetText(value)
-
-            -- position it
-            element.Top:Set(function() return self.main.Top() + offset end )
-            element.Left:Set(function() return self.main.Left() + outline + math.floor(perc * (self.main.Right() - self.main.Left() - rightOutline )) - rightOutline end)
-            element.height = 12
-        end
-    end
-
-    -- update internal state
-    self:UpdateOffset(12)
-end
-
 --- Adds a text input field.
 -- @param identifier The identifier of this element.
 -- @param label The name of this element displayed in the UI.
@@ -773,312 +730,6 @@ function mWindow:EndCollapsingHeader(identifier)
     local element = self.tracker[identifier]
 
     self:Unindent()
-end
-
---- Adds a slider for changing a float value.
--- @param identifier The identifier of this element.
--- @param label The name of this element displayed in the UI.
--- @param min The minimum value of the slider.
--- @param max The maximum value of the slider.
--- @param value The value of the slider.
-function mWindow:SliderFloat(identifier, min, max, value)
-
-    local element = self.tracker[identifier]
-    if not element then 
-
-        element = Group(self.main)
-        element:DisableHitTest()
-
-        -- prevents errors with regard to the size of the group
-        LayoutHelpers.SetWidth(element, 10)
-        LayoutHelpers.SetHeight(element, 10)
-
-        -- create label UI element
-        local color = 'ffffffff'
-        local size = 12
-        local outline = self.outline
-
-        -- create label UI element
-        local label = ToLabel(identifier) 
-        element.label = UIUtil.CreateText(element, label, size, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(element.label, element, self.outline + 180, 14)
-        element.label:SetColor(color)
-
-        -- create value UI element
-        element.tValue = UIUtil.CreateText(element, tostring(value), size, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(element.tValue, element, 10, 0)
-        element.tValue:SetColor(color)
-
-        -- the return value
-        element.dValue = value
-
-        -- create slider UI element
-        local parent = element 
-        local isVertical = false 
-        local startValue = min
-        local endValue = max
-        local thumb = UIUtil.SkinnableFile('/slider02/slider_btn_up.dds')
-        local thumbOver = UIUtil.SkinnableFile('/slider02/slider_btn_over.dds')
-        local thumbDown = UIUtil.SkinnableFile('/slider02/slider_btn_down.dds')
-        local background = UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds')
-        element.slider = Slider(element, isVertical, startValue, endValue, thumb, thumbOver, thumbDown, background)
-        element.slider:SetValue(value)
-        
-        -- make it stick to the group
-        LayoutHelpers.AtLeftTopIn(element.slider, element, 0, 14)
-
-        -- slider functionality
-        element.slider.OnBeginChange =
-            function()
-                element.update = false
-            end
-
-        element.slider.OnScrub = 
-            function(self,value)
-                element.dValue = value
-                element.tValue:SetText(tostring(value))
-            end
-
-        element.slider.OnValueSet = 
-            function(self, value) 
-                element.dValue = value
-                element.tValue:SetText(tostring(value))
-            end
-
-        element.slider.OnEndChange =
-            function()
-                element.update = true
-            end
-
-        -- add properties for internal state
-        element.height = 40
-        element.update = true
-        element.identifier = identifier
-
-        -- keep track of it
-        self.tracker[identifier] = element
-    end
-
-    -- slider requires more space
-    self:UpdateOffset(element.height - 38)
-
-    -- position it
-    LayoutHelpers.AtLeftTopIn(element, self.main, self.outline, self.offset)
-    self:UpdateOffset(element.height - 2)
-
-    -- update the value if it has changed
-    if (element.dValue != value) and element.update then 
-        element.dValue = value
-        element.slider:SetValue(value)
-        element.tValue:SetText(tostring(value))
-    end
-
-    -- show it
-    element.used = true
-    if element:IsHidden() then 
-        element:Show()
-    end
-
-    return element.dValue
-end
-
---- Adds a slider for changing a float value.
--- @param identifier The identifier of this element.
--- @param label The name of this element displayed in the UI.
--- @param min The minimum value of the slider.
--- @param max The maximum value of the slider.
--- @param value The value of the slider.
--- @param callbacks Called when the value is changing. Format is { OnScrub = function(value) }
-function mWindow:SliderFloatCB(identifier, min, max, value, callbacks)
-
-    -- todo: hefty copy of SliderFloat, not maintainable - fix!
-
-    local element = self.tracker[identifier]
-    if not element then 
-
-        element = Group(self.main)
-        element:DisableHitTest()
-
-        -- prevents errors with regard to the size of the group
-        LayoutHelpers.SetWidth(element, 10)
-        LayoutHelpers.SetHeight(element, 10)
-
-        -- create label UI element
-        local color = 'ffffffff'
-        local size = 12
-        local outline = self.outline
-
-        -- create label UI element
-        local label = ToLabel(identifier) 
-        element.label = UIUtil.CreateText(element, label, size, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(element.label, element, self.outline + 180, 14)
-        element.label:SetColor(color)
-
-        -- create value UI element
-        element.tValue = UIUtil.CreateText(element, tostring(value), size, UIUtil.bodyFont)
-        LayoutHelpers.AtLeftTopIn(element.tValue, element, 10, 0)
-        element.tValue:SetColor(color)
-
-        -- the return value
-        element.dValue = value
-
-        -- create slider UI element
-        local parent = element 
-        local isVertical = false 
-        local startValue = min
-        local endValue = max
-        local thumb = UIUtil.SkinnableFile('/slider02/slider_btn_up.dds')
-        local thumbOver = UIUtil.SkinnableFile('/slider02/slider_btn_over.dds')
-        local thumbDown = UIUtil.SkinnableFile('/slider02/slider_btn_down.dds')
-        local background = UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds')
-        element.slider = Slider(element, isVertical, startValue, endValue, thumb, thumbOver, thumbDown, background)
-        element.slider:SetValue(value)
-
-        -- make it stick to the group
-        LayoutHelpers.AtLeftTopIn(element.slider, element, 0, 14)
-
-        -- slider functionality
-        element.slider.OnBeginChange =
-            function()
-                element.update = false
-            end
-
-        element.slider.OnScrub = 
-            function(self,value)
-                element.dValue = value
-                element.tValue:SetText(tostring(value))
-
-                if callbacks.OnScrub then 
-                    callbacks.OnScrub(value)
-                end
-            end
-
-        element.slider.OnValueSet = 
-            function(self, value) 
-                element.dValue = value
-                element.tValue:SetText(tostring(value))
-            end
-
-        element.slider.OnEndChange =
-            function()
-                element.update = true
-            end
-
-        -- add properties for internal state
-        element.height = 40
-        element.update = true
-        element.identifier = identifier
-
-        -- keep track of it
-        self.tracker[identifier] = element
-    end
-
-    -- slider requires more space
-    self:UpdateOffset(element.height - 38)
-
-    -- position it
-    LayoutHelpers.AtLeftTopIn(element, self.main, self.outline, self.offset)
-    self:UpdateOffset(element.height - 2)
-
-    -- update the value if it has changed
-    if (element.dValue != value) and element.update then 
-        element.dValue = value
-        element.slider:SetValue(value)
-        element.tValue:SetText(tostring(value))
-    end
-
-    -- show it
-    element.used = true
-    if element:IsHidden() then 
-        element:Show()
-    end
-
-    return element.dValue
-
-end
-
-local RatioChartDividerWidth = 2
-
---- Adds in a ratio chart that will fill the entire width.
--- @param data The data for the ratio chart. Format is { { value = double, color = string }, ... }.
-function mWindow:RatioChart(data)
-
-    -- compute total value
-    local total = 0
-    local numberOfDividers = -1
-    for k, entry in data do 
-        total = total + entry.value
-
-        if entry.value > 0 then 
-            numberOfDividers = numberOfDividers + 1
-        end
-    end
-
-    local width = self.main.Right() - self.main.Left() - 2 * self.outline - RatioChartDividerWidth * numberOfDividers
-
-    -- no values set, default
-    if total == 0 then 
-        -- create a bitmap that stretches
-        local bitmap = self:AllocateBitmap("ffffffff")
-
-        -- position it
-        LayoutHelpers.AtLeftTopIn(bitmap, self.main, self.outline, self.offset)
-
-        -- scale it
-        bitmap.Left:Set( function() return self.main.Left() + self.outline end )
-        bitmap.Right:Set( function() return self.main.Right() - self.outline end )
-        bitmap.Height:Set(5)
-    else 
-        -- position the bitmaps that make up the chart
-        local bitmapPrev = false
-        for k, entry in data do 
-            if entry.value > 0 then 
-                local bitmap = self:AllocateBitmap(entry.color)
-
-                -- determine bitmap location
-                -- fine-tune bitmap location
-
-                if bitmapPrev then 
-                    -- lock to previous bitmap
-                    LayoutHelpers.RightOf(bitmap, bitmapPrev, RatioChartDividerWidth)
-
-                    -- add small black divider
-                    local divider = self:AllocateBitmap("ff000000")
-                    LayoutHelpers.RightOf(divider, bitmapPrev, 0)
-                    divider.Right:Set(function() return bitmap.Left() end)
-                    divider.Height:Set(5)
-                else 
-                    -- lock to main window
-                    LayoutHelpers.AtLeftTopIn(bitmap, self.main, self.outline, self.offset)
-                end
-
-                -- determine width (todo: make this more dynamic?)
-                local bitmapWidth = (entry.value / total) * width
-                bitmap.Right:Set(function() return bitmap.Left() + bitmapWidth end)
-                bitmap.Height:Set(5)
-
-                -- keep track of internal state
-                bitmapPrev = bitmap
-            end
-        end
-    end
-
-    -- update internal state
-    self:UpdateOffset(7)
-end
-
---- Adds a horizontal divider.
-function mWindow:Divider()
-    -- allocate one
-    local element = self:AllocateDivider()
-
-    -- position it
-    local outline = self.outline 
-    local rightOutline = self.rightOutline 
-    LayoutHelpers.AtLeftTopIn(element, self.main, self.outline, self.offset)
-
-    -- update internal state
-    self:UpdateOffset(0)
 end
 
 -- look up table for textures
@@ -1241,21 +892,6 @@ function mWindow:BeginTab(identifier)
     end
 
     return tab.enabled
-end
-
---- Constructs a progress bar.
-function mWindow:ProgressBar(identifier, current, max)
-
-    if self:HasSufficientSpace(10) then 
-        local background = self:AllocateBitmap("ff000000")
-        LayoutHelpers.AtLeftTopIn(background, self.main, self.outline, self.offset + 3)
-
-        local progress = self:AllocateBitmap("ffffffff")
-        LayoutHelpers.AtLeftTopIn(progress, self.main, self.outline, self.offset + 3)
-        progress.Right:Set(function() return background.Left() + math.clamp(current / max, 0.0, 1.0) * (background.Right() - background.Left()) end )
-    end
-
-    self:UpdateOffset(10)
 end
 
 --- A utility function. Draws a rectangle.
