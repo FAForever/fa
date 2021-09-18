@@ -1,0 +1,41 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = '/units/UES0302/UES0302_Albedo.dds',
+                    NormalsName = '/units/UES0302/UES0302_NormalsTS.dds',
+                    SpecularName = '/units/UES0302/UES0302_SpecTeam.dds',
+                    LODCutoff = 300,
+                    ShaderName = 'Unit',
+                },
+            },
+        },
+        UniformScale = 0.13,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 200,
+        ReclaimTime = 200,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
+    },
+    Interface = {
+        HelpText = 'Back turret of the Summit',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 1.0,
+    SizeY = 0.25,
+    SizeZ = 1.0,
+}
