@@ -188,11 +188,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             local sx = blueprint.SizeX or 1 
             local sy = blueprint.SizeY or 1 
             local sz = blueprint.SizeZ or 1 
-
-            LOG(sx)
-            LOG(sy)
-            LOG(sz)
-
+            
             -- cache stats 
             local army = unit.Army
             local boundingXZRadius = 0.25 * (sx + sz)
@@ -205,8 +201,6 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             local environmentEffects = false 
             local shakeTimeModifier = 0
             local shakeMaxMul = 1
-
-            LOG(boundingXZRadius)
 
             if layer == 'Land' then
                 -- determine land effects
