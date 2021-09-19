@@ -2277,7 +2277,7 @@ Patch 3675 (5th February, 2017)
 
 Patch 3674 (5th February, 2017)
 ============================
-http://content.faforever.com/patchnotes/3674.html
+http://patchnotes.faforever.com/3674.html
 
 ### Lobby
 - Use default map from file. This allows coop, tutorials, and other mods to have an easier time
@@ -3310,7 +3310,7 @@ Patch 3652 (May 2, 2016)
 
 Patch 3650 (August 19, 2015)
 ===========================
-HTML-version of this balance oriented changelog available at: http://content.faforever.com/patchnotes/
+HTML-version of this balance oriented changelog available at: http://patchnotes.faforever.com/
 
 ### Seraphim and UEF ACU TML
 - Missile hitpoints: 3 hp → 2 hp
