@@ -1,3 +1,10 @@
+Patch 3723 (19 September, 2021)
+============================
+- Fixed a bug preventing from spawning the wreck of some experimentals
+
+### Contributors
+- Jip
+
 Patch 3722 (19 September, 2021)
 ============================
 ### Lobby

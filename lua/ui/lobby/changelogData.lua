@@ -1,5 +1,15 @@
-last_version = 3722
+last_version = 3723
 gamePatches = {
+    {
+        version = 3723,
+        name = 'Hotfix 3723',
+        description = {
+            'Fixed a bug preventing from spawning the wreck of some experimentals',
+            '',
+            '**Contributors**',
+            '- Jip',
+        },
+    },
     {
         version = 3722,
         name = 'Hotfix 3722',
