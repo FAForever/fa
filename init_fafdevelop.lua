@@ -32,7 +32,6 @@ whitelist = {
     "schook.nx5",
     "textures.nx5",
     "units.nx5",
-    "props.nx5",
     "murderparty.nxt",
     "labwars.nxt",
     "units.scd",
@@ -146,8 +145,6 @@ local function mount_map_dir(dir, glob, mountpoint)
         end
     end
 end
-mount_map_dir(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps\\', '**', '/maps')
-mount_map_dir(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps\\', '**', '/maps')
 
 -- Begin mod mounting section
 -- This section mounts sounds and ui textures from the mods directory to allow mods to add custom sounds and textures to the game
@@ -176,25 +173,36 @@ function mount_mod_content(MODFOLDER)
         end
     end
 end
-mount_mod_content(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
-mount_mod_content(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
 
--- These are the classic supcom directories. They don't work with accents or other foreign characters in usernames
-mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
+-- adds maps / mods to keep track of for the game
+local function load_vault(vault_path)
+	mount_map_dir(vault_path .. '\\maps\\', '**', '/maps')
+	mount_mod_content(vault_path .. '\\mods')
 
--- These are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the uppder ones.
-mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
+	mount_contents(vault_path .. '\\mods', '/mods')
+	mount_contents(vault_path .. '\\maps', '/maps')
+end
+
+-- load in custom vault location first so that it takes precendence
+if custom_vault_path then
+	LOG('Loading custom vault path' .. custom_vault_path)
+	load_vault(custom_vault_path)
+else
+    LOG("No custom vault path defined.")
+end
+
+-- load in files from backup vault location
+load_vault(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+
+-- load in files from default vault location
+load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx5', '/')
 
--- These are using the newly generated path from the dofile() statement at the beginning of this script
+-- these are using the newly generated path from the dofile() statement at the beginning of this script
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
 mount_dir(fa_path, '/')
-
---load preferences into the game as well, letting us have much more control over their contents. This also includes cache and similar.
-mount_dir(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games\\Supreme Commander Forged Alliance', '/preferences')
 
 hook = {
     '/schook'

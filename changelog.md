@@ -1,3 +1,22 @@
+Patch 3722 (19 September, 2021)
+============================
+### Lobby
+- Updated balance patchnotes link
+
+### Bugs
+- Fixed featured mod not working
+
+### Performances
+- Optimize default explosion
+
+### Other
+- Allowed custom vault path
+
+### Contributors
+- Jip
+- KionX
+- keyser
+
 Patch 3721 (19 September, 2021)
 ============================
 ### Lobby
@@ -85,6 +104,8 @@ Patch 3721 (19 September, 2021)
 - KeyBlue
 - Relent0r
 - Dragun
+- Askaholic
+- Madmax
 - Tagada
 - FemtoZetta
 - Rowey
@@ -93,6 +114,9 @@ Patch 3721 (19 September, 2021)
 - Melanol
 - Benzi-Junior
 - slinkingant
+- WhenDayBreaks
+- SnaggleFox
+- keyser
 
 Patch 3720 (14 May, 2021)
 ============================
@@ -2277,7 +2301,7 @@ Patch 3675 (5th February, 2017)
 
 Patch 3674 (5th February, 2017)
 ============================
-http://content.faforever.com/patchnotes/3674.html
+http://patchnotes.faforever.com/3674.html
 
 ### Lobby
 - Use default map from file. This allows coop, tutorials, and other mods to have an easier time
@@ -3310,7 +3334,7 @@ Patch 3652 (May 2, 2016)
 
 Patch 3650 (August 19, 2015)
 ===========================
-HTML-version of this balance oriented changelog available at: http://content.faforever.com/patchnotes/
+HTML-version of this balance oriented changelog available at: http://patchnotes.faforever.com/
 
 ### Seraphim and UEF ACU TML
 - Missile hitpoints: 3 hp → 2 hp

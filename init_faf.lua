@@ -1,6 +1,8 @@
---  this imports a path file that is written by Forged Alliance Forever right before it starts the game.
+-- This imports a path file that is written by Forged Alliance Forever right before it starts the game.
 dofile(InitFileDir .. '\\..\\fa_path.lua')
+
 path = {}
+
 blacklist = {
     "00_BigMap.scd",
     "00_BigMapLEM.scd",
@@ -17,8 +19,8 @@ blacklist = {
     "lobby.nxt",
     "faforever.nxt"
 }
-whitelist =
-{
+
+whitelist = {
     "effects.nx2",
     "env.nx2",
     "etc.nx2",
@@ -26,7 +28,6 @@ whitelist =
     "lua.nx2",
     "meshes.nx2",
     "mods.nx2",
-    "modules.nx2",
     "projectiles.nx2",
     "schook.nx2",
     "textures.nx2",
@@ -62,8 +63,9 @@ whitelist =
 }
 
 local function mount_dir(dir, mountpoint)
-    table.insert(path, { dir = dir, mountpoint = mountpoint } )
+    table.insert(path, { dir = dir, mountpoint = mountpoint })
 end
+
 local function mount_contents(dir, mountpoint)
     LOG('checking ' .. dir)
     for _,entry in io.dir(dir .. '\\*') do
@@ -145,10 +147,10 @@ local function mount_map_dir(dir, glob, mountpoint)
 end
 
 -- Begin mod mounting section
--- This section mounts sounds from the mods directory to allow mods to add custom sounds to the game
-function mount_mod_sounds(MODFOLDER)
+-- This section mounts sounds and ui textures from the mods directory to allow mods to add custom sounds and textures to the game
+function mount_mod_content(MODFOLDER)
     -- searching for mods inside the modfolder
-    for _,mod in io.dir( MODFOLDER..'\\*.*') do
+    for _,mod in io.dir(MODFOLDER..'\\*.*') do
         -- do we have a true directory ?
         if mod != '.' and mod != '..' then
             -- searching for sounds inside mod folder
@@ -157,7 +159,15 @@ function mount_mod_sounds(MODFOLDER)
                 if folder == 'sounds' then
                     LOG('Found mod sounds in: '..mod)
                     mount_dir(MODFOLDER..'\\'..mod..'\\sounds', '/sounds')
-                    break
+                -- mount ui textures if there are any
+                elseif folder == 'textures' then
+                    for _,folder in io.dir(MODFOLDER..'\\'..mod..'\\textures\\*.*') do
+                        if folder == 'ui' then
+                          LOG('Found mod icons in: '..mod)
+                          mount_dir(MODFOLDER..'\\'..mod..'\\textures\\ui', '/textures/ui')
+                          break
+                        end
+                    end
                 end
             end
         end
@@ -167,7 +177,7 @@ end
 -- adds maps / mods to keep track of for the game
 local function load_vault(vault_path)
 	mount_map_dir(vault_path .. '\\maps\\', '**', '/maps')
-	mount_mod_sounds(vault_path .. '\\mods')
+	mount_mod_content(vault_path .. '\\mods')
 
 	mount_contents(vault_path .. '\\mods', '/mods')
 	mount_contents(vault_path .. '\\maps', '/maps')
@@ -189,7 +199,7 @@ load_vault(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme 
 
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
- 
+
 -- these are using the newly generated path from the dofile() statement at the beginning of this script
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
 mount_dir(fa_path, '/')
@@ -197,7 +207,7 @@ mount_dir(fa_path, '/')
 hook = {
     '/schook'
 }
- 
+
 protocols = {
     'http',
     'https',

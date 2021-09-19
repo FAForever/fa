@@ -105,7 +105,7 @@ function CreateUI(parent, showPatch)
     LayoutHelpers.AtHorizontalCenterIn(PatchnotesButton, dialogContent)
     LayoutHelpers.AtBottomIn(PatchnotesButton, dialogContent, 10)
     PatchnotesButton.OnClick = function()
-        OpenURL('http://content.faforever.com/patchnotes/')
+        OpenURL('http://patchnotes.faforever.com/')
     end
 end
 

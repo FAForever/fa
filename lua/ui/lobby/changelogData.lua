@@ -1,5 +1,27 @@
-last_version = 3721
+last_version = 3722
 gamePatches = {
+    {
+        version = 3722,
+        name = 'Hotfix 3722',
+        description = {
+            '**Lobby**',
+            'Updated balance patchnotes link',
+            '',
+            '**Bugs**',
+            'Fixed featured mod not working',
+            '',
+            '**Performances**',
+            'Optimize default explosion',
+            '',
+            '**Other**',
+            'Allowed custom vault path',
+            '',
+            '**Contributors**',
+            '- Jip',
+            '- KionX',
+            '- keyser',
+        },
+    },
     {
         version = 3721,
         name = 'Game Version 3721',
@@ -89,6 +111,7 @@ gamePatches = {
             '- KeyBlue',
             '- Relent0r',
             '- Dragun',
+            '- Askaholic',
             '- Tagada',
             '- FemtoZetta',
             '- Rowey',
@@ -97,6 +120,8 @@ gamePatches = {
             '- Melanol',
             '- Benzi-Junior',
             '- slinkingant',
+            '- WhenDayBreaks',
+            '- SnaggleFox',
             '- keyser',
         },
     },
