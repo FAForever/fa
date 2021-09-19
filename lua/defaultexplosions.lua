@@ -189,6 +189,10 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             local sy = blueprint.SizeY or 1 
             local sz = blueprint.SizeZ or 1 
 
+            LOG(sx)
+            LOG(sy)
+            LOG(sz)
+
             -- cache stats 
             local army = unit.Army
             local boundingXZRadius = 0.25 * (sx + sz)
@@ -201,6 +205,8 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             local environmentEffects = false 
             local shakeTimeModifier = 0
             local shakeMaxMul = 1
+
+            LOG(boundingXZRadius)
 
             if layer == 'Land' then
                 -- determine land effects
@@ -250,7 +256,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 -- determine air effects
                 if boundingXZRadius < 1.1 then
                     baseEffects = ExplosionSmallAir
-                elseif boundingXZRadius > 3 then
+                elseif boundingXZRadius > 7 then
                     -- large units cause camera to shake
                     baseEffects = ExplosionLarge
                     ShakeTimeModifier = 1.0
@@ -260,9 +266,9 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 end
             elseif layer == 'Water' then
                 -- determine water effects
-                if boundingXZRadius < 1 then
+                if boundingXZRadius < 2 then
                     baseEffects = ExplosionSmallWater
-                elseif boundingXZRadius > 3 then
+                elseif boundingXZRadius > 3.6 then
                     -- large units cause camera to shake
                     baseEffects = ExplosionMediumWater
                     ShakeTimeModifier = 1.0
@@ -272,7 +278,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 end
 
                 -- environment effects
-                if boundingXZRadius < 0.5 then
+                if boundingXZRadius < 1.0 then
                     environmentEffects = Splashy
                 end
             end
