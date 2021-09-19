@@ -147,8 +147,8 @@ end
 function QuatFromRotation(rotation, x, y, z)
     local angleRot, qw, qx, qy, qz, angle
     angle = 0.00872664625 * rotation
-    angleRot = math.sin(angle)
-    qw = math.cos(angle)
+    angleRot = MathSin(angle)
+    qw = MathCos(angle)
     qx = x * angleRot
     qy = y * angleRot
     qz = z * angleRot
@@ -188,7 +188,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             local sx = blueprint.SizeX or 1 
             local sy = blueprint.SizeY or 1 
             local sz = blueprint.SizeZ or 1 
-            
+
             -- cache stats 
             local army = unit.Army
             local boundingXZRadius = 0.25 * (sx + sz)
