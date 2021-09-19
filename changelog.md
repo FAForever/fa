@@ -1,3 +1,21 @@
+Patch 3722 (19 September, 2021)
+============================
+### Lobby
+- Updated balance patchnotes link
+
+### Bugs
+- Fixed featured mod not working
+
+### Performances
+- Optimize default explosion
+
+### Other
+- Allowed custom vault path
+
+### Contributors
+- Jip
+- keyser
+
 Patch 3721 (19 September, 2021)
 ============================
 ### Lobby
@@ -85,6 +103,7 @@ Patch 3721 (19 September, 2021)
 - KeyBlue
 - Relent0r
 - Dragun
+- Madmax
 - Tagada
 - FemtoZetta
 - Rowey
@@ -93,6 +112,9 @@ Patch 3721 (19 September, 2021)
 - Melanol
 - Benzi-Junior
 - slinkingant
+- WhenDayBreaks
+- SnaggleFox
+- keyser
 
 Patch 3720 (14 May, 2021)
 ============================

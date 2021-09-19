@@ -4,7 +4,7 @@ master|develop
  ------------ | -------------
 [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=master)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=develop)](https://travis-ci.org/FAForever/fa)
 
-Current patch is: 3721
+Current patch is: 3722
 
 Changelog can be found [here](changelog.md).
 
