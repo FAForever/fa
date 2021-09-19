@@ -14,6 +14,7 @@ Patch 3722 (19 September, 2021)
 
 ### Contributors
 - Jip
+- KionX
 - keyser
 
 Patch 3721 (19 September, 2021)
@@ -103,6 +104,7 @@ Patch 3721 (19 September, 2021)
 - KeyBlue
 - Relent0r
 - Dragun
+- Askaholic
 - Madmax
 - Tagada
 - FemtoZetta
