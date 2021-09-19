@@ -619,15 +619,15 @@ function CreateDebrisProjectiles(obj, volume, dimensions)
     -- for backwards compatibility
     local sx, sy, sz = unpack(dimensions)
 
-        -- determine blueprint value
-        local bp = false 
-        if volume < 0.2 then
-            bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
-        elseif volume < 2.0 then
-            bp = '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
-        else 
-            bp = '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp'
-        end
+    -- determine blueprint value
+    local bp = false 
+    if volume < 0.2 then
+        bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
+    elseif volume < 2.0 then
+        bp = '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+    else 
+        bp = '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp'
+    end
 
     -- get number of projectiles
     local amount = MathMin(Random(1 + (volume * 25), (volume * 50)) , 100)
@@ -647,7 +647,7 @@ function CreateDebrisProjectiles(obj, volume, dimensions)
         local zdir = 10 * ((1 - r1) * sz - (sz * 0.5))
 
         -- create debris projectile
-        EntityCreateProjectile(unit, bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
+        EntityCreateProjectile(obj, bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
     end
 end
 
