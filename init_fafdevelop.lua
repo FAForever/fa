@@ -177,7 +177,7 @@ end
 -- adds maps / mods to keep track of for the game
 local function load_vault(vault_path)
 	mount_map_dir(vault_path .. '\\maps\\', '**', '/maps')
-	mount_mod_sounds(vault_path .. '\\mods')
+	mount_mod_content(vault_path .. '\\mods')
 
 	mount_contents(vault_path .. '\\mods', '/mods')
 	mount_contents(vault_path .. '\\maps', '/maps')
