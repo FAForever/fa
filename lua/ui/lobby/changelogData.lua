@@ -1,5 +1,22 @@
-last_version = 3721
+last_version = 3722
 gamePatches = {
+    {
+        version = 3722,
+        name = 'Hotfix 3722',
+        description = {
+            '**Lobby**',
+            'Updated balance patchnotes link',
+            '',
+            '**Bugs**',
+            'Fixed featured mod not working',
+            '',
+            '**Performances**',
+            'Optimize default explosion',
+            '',
+            '**Other**',
+            'Allowed custom vault path',
+        },
+    },
     {
         version = 3721,
         name = 'Game Version 3721',
@@ -97,6 +114,8 @@ gamePatches = {
             '- Melanol',
             '- Benzi-Junior',
             '- slinkingant',
+            '- WhenDayBreaks',
+            '- SnaggleFox',
             '- keyser',
         },
     },
