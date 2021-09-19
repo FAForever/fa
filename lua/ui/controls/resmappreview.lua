@@ -19,11 +19,12 @@ ResourceMapPreview = Class(Group) {
         self.buttonsDisabled = buttonsDisabled or false
         self.massIconSize = LayoutHelpers.ScaleNumber(massIconSize or DEFAULT_MASS_ICON_SIZE)
         self.hydroIconSize = LayoutHelpers.ScaleNumber(hydroIconSize or DEFAULT_HYDROCARBON_ICON_SIZE)
+        self.wreckageIconSize = LayoutHelpers.ScaleNumber(6)
 
         -- Bitmap pools for icons.
-        self.massIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"), self, massIconSize, massIconSize)
-        self.hydroIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"), self, hydroIconSize, hydroIconSize)
-        self.wreckageIconPool = TexturePool(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/mappreview/wreckage.dds"), self, 6, 6)
+        self.massIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-mass_bmp.dds"), self, self.massIconSize, self.massIconSize)
+        self.hydroIconPool = TexturePool(UIUtil.SkinnableFile("/game/build-ui/icon-energy_bmp.dds"), self, self.hydroIconSize, self.hydroIconSize)
+        self.wreckageIconPool = TexturePool(UIUtil.SkinnableFile("/scx_menu/lan-game-lobby/mappreview/wreckage.dds"), self, self.wreckageIconSize, self.wreckageIconSize)
 
         LayoutHelpers.SetDimensions(self, self.size, self.size)
 

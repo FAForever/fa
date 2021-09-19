@@ -94,7 +94,7 @@ local LandCategories = {
     Tank2 = (DirectFire * categories.TECH2) - categories.BOT - categories.SCOUT,
     Tank3 = (DirectFire * categories.TECH3) - categories.BOT - categories.SCOUT,
     Tank4 = (DirectFire * categories.EXPERIMENTAL) - categories.BOT - categories.SCOUT,
-    
+
     Sniper1 = (Sniper * categories.TECH1) - categories.SCOUT,
     Sniper2 = (Sniper * categories.TECH2) - categories.SCOUT,
     Sniper3 = (Sniper * categories.TECH3) - categories.SCOUT,
@@ -369,7 +369,7 @@ local AirCategories = {
 local GroundAttack = { 'Ground3', 'Ground2', 'Ground1', }
 local Transports = { 'Trans3', 'Trans2', 'Trans1', }
 local Bombers = { 'Bomb3', 'Bomb2', 'Bomb1', }
-local T3Bombers = {'Bomb3',}                            
+local T3Bombers = {'Bomb3',}
 local AntiAir = { 'AA3', 'AA2', 'AA1', }
 local AntiNavy = { 'AN3', 'AN2', 'AN1', }
 local Intel = { 'AIntel3', 'AIntel2', 'AIntel1', }
@@ -378,7 +378,7 @@ local EngAir = { 'AEngineer', }
 
 -- === Air Block Arrangement ===
 local ChevronSlot = { AntiAir, ExperAir, AntiNavy, GroundAttack, Bombers, Intel, Transports, EngAir, RemainingCategory }
-local StratSlot = { T3Bombers }                                
+local StratSlot = { T3Bombers }
 
 local AttackChevronBlock = {
     RepeatAllRows = false,
@@ -794,27 +794,27 @@ function GrowthFormation(formationUnits)
     end
     BlockBuilderLand(seaUnitsList, seaBlock, NavalCategories, 1)
     BlockBuilderLand(subUnitsList, subBlock, SubCategories, 1)
-    
+
     if unitsList.Air.Bomb3[1] then
         local count = unitsList.Air.Bomb3[1].Count
         local oldAirArea = unitsList.Air.AreaTotal
         local oldUnitTotal = unitsList.Air.UnitTotal
 
-        unitsList.Air.AreaTotal = count 
+        unitsList.Air.AreaTotal = count
         unitsList.Air.UnitTotal = count
-        
+
         BlockBuilderAirT3Bombers(unitsList.Air, 1.5) --strats formation
-        
+
         --strats are already in formation so we remove them from table and adjust all parameters.
         unitsList.Air.Bomb3 = {}
-        unitsList.Air.AreaTotal = oldAirArea - count 
+        unitsList.Air.AreaTotal = oldAirArea - count
         unitsList.Air.UnitTotal = oldUnitTotal - count
-        
+
         BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
     else
         BlockBuilderAir(unitsList.Air, GrowthChevronBlock, 1)
-    end   
-    
+    end
+
 
     CacheResults(FormationPos, formationUnits, 'GrowthFormation')
     return FormationPos
@@ -1235,10 +1235,10 @@ end
 function BlockBuilderAirT3Bombers(unitsList, spacing)
     --This is modified copy of BlockBuilderAir(). This function is used only for t3 bombers.
     --Some parts can be improved, but I just want stable and working version, so I did minimum adjustments and that's it.
-    
+
     spacing = (spacing or 1) * unitsList.Scale
     local airBlock = {}
-    
+
     if unitsList.Bomb3[1].Count > 20 then
         airBlock = {
             RepeatAllRows = false,
@@ -1254,7 +1254,7 @@ function BlockBuilderAirT3Bombers(unitsList, spacing)
             {StratSlot,StratSlot}, -- 2 lines
         }
     end
-    
+
     local numRows = table.getn(airBlock)
     local whichRow = 1
     local whichCol = 1

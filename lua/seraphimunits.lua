@@ -49,7 +49,7 @@ SFactoryUnit = Class(FactoryUnit) {
         local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffectsUnPause, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
-    
+
     OnPaused = function(self)
         -- When factory is paused take some action
         if self:IsUnitState('Building') and self.unitBeingBuilt then
@@ -404,7 +404,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            end
         end,
     },
-    
+
     OnPaused = function(self)
         SFactoryUnit.OnPaused(self)
     end,
@@ -501,7 +501,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
            end
         end,
     },
-    
+
     OnPaused = function(self)
         SFactoryUnit.OnPaused(self)
     end,
@@ -651,7 +651,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
     DeathState = State {
         Main = function(self)
             self:SetCanBeKilled(true)
-            if self:GetCurrentLayer() == 'Water' then
+            if self.Layer == 'Water' then
                 self:PlayUnitSound('HoverKilledOnWater')
             end
             self:PlayUnitSound('Destroyed')

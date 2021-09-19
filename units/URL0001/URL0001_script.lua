@@ -50,6 +50,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     -- Creation
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
+        CCommandUnit.OnCreate(self)
         self:SetCapturable(false)
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
@@ -92,12 +93,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         self.UnitBeingBuilt = unitBeingBuilt
         self.UnitBuildOrder = order
         self.BuildingUnit = true
-    end,
-
-    -- Build/Upgrade
-    CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.SpawnBuildBots(self, unitBeingBuilt, self.BuildEffectsBag)
-        EffectUtil.CreateCybranBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
     end,
 
     CreateEnhancement = function(self, enh)
@@ -198,7 +193,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
-            self:updateBuildRestrictions()
         elseif enh =='AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -207,7 +201,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             if Buff.HasBuff(self, 'CybranACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT2BuildRate')
             end
-            self:updateBuildRestrictions()
         -- T3 Engineering
         elseif enh =='T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -238,7 +231,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 }
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
-            self:updateBuildRestrictions()
         elseif enh =='T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
@@ -247,7 +239,6 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 Buff.RemoveBuff(self, 'CybranACUT3BuildRate')
             end
             self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-            self:updateBuildRestrictions()
         elseif enh =='CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
@@ -260,7 +251,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            if not (self:GetCurrentLayer() == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+            if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
         elseif enh == 'CoolingUpgradeRemove' then
@@ -275,7 +266,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self.normalRange = v.MaxRadius or 22
-                    if not (self:GetCurrentLayer() == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+                    if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
                         self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
                     end
                     break
@@ -286,15 +277,19 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif enh == 'MicrowaveLaserGeneratorRemove' then
             self:SetWeaponEnabledByLabel('MLG', false)
         elseif enh == 'NaniteTorpedoTube' then
+            local bp = self:GetBlueprint().Enhancements[enh]
             self:SetWeaponEnabledByLabel('Torpedo', true)
+            self:SetIntelRadius('Sonar', bp.NewSonarRadius or 60)
             self:EnableUnitIntel('Enhancement', 'Sonar')
-            if self:GetCurrentLayer() == 'Seabed' then
+            if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
             end
         elseif enh == 'NaniteTorpedoTubeRemove' then
+            local bpIntel = self:GetBlueprint().Intel
             self:SetWeaponEnabledByLabel('Torpedo', false)
+            self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 26)
             self:DisableUnitIntel('Enhancement', 'Sonar')
-            if self:GetCurrentLayer() == 'Seabed' then
+            if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
         end
@@ -353,14 +348,14 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         end
     end,

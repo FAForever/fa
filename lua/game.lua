@@ -266,7 +266,7 @@ end
 -- e.g. restrictions = {categories.TECH1} ->
 function ResolveRestrictions(toggle, cats, army)
     -- Initialize blueprints info only once
-    if table.getsize(bps.ids) == 0 or table.getsize(bps.upgradeable) == 0 then
+    if table.empty(bps.ids) or table.empty(bps.upgradeable) then
         bps.ids = GetUnitsIds()
         bps.upgradeable = GetUnitsUpgradable()
     end

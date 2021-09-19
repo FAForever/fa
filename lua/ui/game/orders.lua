@@ -257,7 +257,7 @@ local function AttackOrderInit(control, unitList)
     if not unitList[1] then
         return true
     end
-    
+
     --set up the icons that will be toggled on/off
     if not control.toggleModeIcon then
         control.toggleModeIcon = Bitmap(control, UIUtil.UIFile('/game/orders/toggle_red.dds'))
@@ -269,7 +269,7 @@ local function AttackOrderInit(control, unitList)
                 return true
             end
         end
-    end 
+    end
 
     if not control.mixedModeIcon then
         control.mixedModeIcon = Bitmap(control.toggleModeIcon, UIUtil.UIFile('/game/orders-panel/question-mark_bmp.dds'))
@@ -308,6 +308,10 @@ local function DockOrderBehavior(self, modifiers)
         IssueDockCommand(true)
     end
     self:SetCheck(false)
+end
+
+function Dock(clear)
+    IssueDockCommand(clear)
 end
 
 -- Used by orders that happen immediately and don't change the command mode (ie the stop button)
@@ -1182,17 +1186,17 @@ local function CreateCommonOrders(availableOrders, init)
     end
 
     local units = {}
-    if currentSelection and table.getn(currentSelection) > 0 then
+    if currentSelection and not table.empty(currentSelection) then
         for _, unit in currentSelection do
             if not IsDestroyed(unit) then
                 table.insert(units, unit)
             end
         end
     end
-    if units and table.getn(units) > 0 and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
+    if units and not table.empty(units) and EntityCategoryFilterDown(categories.MOBILE - categories.STRUCTURE, units) then
         for _, availOrder in availableOrders do
-            if (availOrder == 'RULEUCC_RetaliateToggle' and table.getn(EntityCategoryFilterDown(categories.MOBILE, units)) > 0)
-                    or table.getn(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) > 0 then
+            if (availOrder == 'RULEUCC_RetaliateToggle' and not table.empty(EntityCategoryFilterDown(categories.MOBILE, units)))
+                    or not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units)) then
                 orderCheckboxMap['AttackMove']:Enable()
                 break
             end
@@ -1227,11 +1231,11 @@ local function CreateAltOrders(availableOrders, availableToggles, units)
 
     local assitingUnitList = {}
     local podUnits = {}
-    if table.getn(units) > 0 and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
+    if not table.empty(units) and (EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units) or EntityCategoryFilterDown(categories.POD, units)) then
         local PodStagingPlatforms = EntityCategoryFilterDown(categories.PODSTAGINGPLATFORM, units)
         local Pods = EntityCategoryFilterDown(categories.POD, units)
         local assistingUnits = {}
-        if table.getn(PodStagingPlatforms) == 0 and table.getn(Pods) == 1 then
+        if table.empty(PodStagingPlatforms) and table.getn(Pods) == 1 then
             assistingUnits[1] = Pods[1]:GetCreator()
             podUnits['DroneL'] = Pods[1]
             podUnits['DroneR'] = Pods[2]
@@ -1460,7 +1464,7 @@ function SetAvailableOrders(availableOrders, availableToggles, newSelection)
     end
 
     controls.orderButtonGrid:EndBatch()
-    if table.getn(currentSelection) == 0 and controls.bg.Mini then
+    if table.empty(currentSelection) and controls.bg.Mini then
         controls.bg.Mini(true)
     elseif controls.bg.Mini then
         controls.bg.Mini(false)

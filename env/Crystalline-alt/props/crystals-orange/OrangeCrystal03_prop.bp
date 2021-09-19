@@ -1,0 +1,41 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    AlbedoName = "OrangeCrystal01_albedo.dds",
+                    LODCutoff = 500,
+                    ShaderName = 'NormalMappedTerrain',
+                    
+                },
+            },
+        },
+        UniformScale = 0.325,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 10,
+        ReclaimTime = 5,
+    },
+    Footprint = {
+        OccupancyCaps = 0,
+    },
+    Interface = {
+        HelpText = 'Crystal Formation',
+    },
+    Physics = {
+        BlockPath = true,
+    },
+    SizeX = 2,
+    SizeY = 2.25,
+    SizeZ = 3,
+}

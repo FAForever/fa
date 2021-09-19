@@ -406,7 +406,7 @@ function CreateTabs(type)
         if templatesTab and templatesTab:IsChecked() then
             local numActive = 0
             for _, tab in controls.tabs do
-                if sortedOptions[tab.ID] and table.getn(sortedOptions[tab.ID]) > 0 then
+                if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
                     numActive = numActive + 1
                 end
             end
@@ -486,7 +486,7 @@ function CreateTabs(type)
     local defaultTab = false
     local numActive = 0
     for _, tab in controls.tabs do
-        if sortedOptions[tab.ID] and table.getn(sortedOptions[tab.ID]) > 0 then
+        if sortedOptions[tab.ID] and not table.empty(sortedOptions[tab.ID]) then
             tab:Enable()
             numActive = numActive + 1
             if defaultTabOrder[tab.ID] then
@@ -1523,7 +1523,7 @@ function OnClickHandler(button, modifiers)
                 end
 
                 if not alreadyWarned and existingEnhancements[slot] ~= item.id then
-                    UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?", 
+                    UIUtil.QuickDialog(GetFrame(0), "<LOC enhancedlg_0000>Choosing this enhancement will destroy the existing enhancement in this slot.  Are you sure?",
                         "<LOC _Yes>",
                         function()
                             OrderEnhancement(item, clean, true)
@@ -1670,7 +1670,7 @@ function CreateTemplateOptionMenu(button, templateObj)
                         table.insert(entries, entry)
                     end
                 end
-                if table.getsize(entries) > 0 then
+                if not table.empty(entries) then
                     group.SubMenu = CreateSubMenu(group, entries, function(id)
                         templates.SendTemplate(theTemplate.templateID, id)
                         RefreshUI()
@@ -2007,8 +2007,8 @@ function FormatData(unitData, type)
         for i, units in sortedUnits do
             table.sort(units, SortFunc)
             local index = i
-            if table.getn(units) > 0 then
-                if table.getn(retData) > 0 then
+            if not table.empty(units) then
+                if not table.empty(retData) then
                     table.insert(retData, {type = 'spacer'})
                 end
 
@@ -2228,7 +2228,7 @@ function FormatData(unitData, type)
     if type == 'templates' and allFactories then
         -- Replace Infinite queue with Create template
         Tooltip.AddCheckboxTooltip(controls.extraBtn1, 'save_template')
-        if table.getsize(currentCommandQueue) > 0 then
+        if not table.empty(currentCommandQueue) then
             controls.extraBtn1:Enable()
             controls.extraBtn1.OnClick = function(self, modifiers)
                 TemplatesFactory.CreateBuildTemplate(currentCommandQueue)
@@ -2381,7 +2381,7 @@ function SetSecondaryDisplay(type)
             end
 
             previousModifiedCommandQueue = modifiedCommandQueue
-            if modifiedCommandQueue and table.getn(modifiedCommandQueue) > 0 then
+            if modifiedCommandQueue and not table.empty(modifiedCommandQueue) then
                 local index = 1
                 local newStack = nil
                 local lastStack = nil
@@ -2402,7 +2402,7 @@ function SetSecondaryDisplay(type)
                 end
             end
 
-            if table.getn(sortedOptions.selection) == 1 and table.getn(data) > 0 then
+            if table.getn(sortedOptions.selection) == 1 and not table.empty(data) then
                 controls.secondaryProgress:SetNeedsFrameUpdate(true)
             else
                 controls.secondaryProgress:SetNeedsFrameUpdate(false)
@@ -2410,7 +2410,7 @@ function SetSecondaryDisplay(type)
             end
         elseif type == 'attached' then
             local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(sortedOptions.selection))
-            if attachedUnits and table.getn(attachedUnits) > 0 then
+            if attachedUnits and not table.empty(attachedUnits) then
                 for _, v in attachedUnits do
                     table.insert(data, {type = 'attachedunit', id = v:GetBlueprint().BlueprintId, unit = v})
                 end
@@ -2439,7 +2439,7 @@ function CheckForOrderQueue(newSelection)
             ClearQueueGrid()
         end
         SetQueueState(false)
-    elseif table.getn(selection) > 0 then
+    elseif not table.empty(selection) then
         ClearCurrentFactoryForQueueDisplay()
         ClearQueueGrid()
         SetQueueState(false)
@@ -2483,7 +2483,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         ClearCurrentFactoryForQueueDisplay()
     end
 
-    if table.getsize(selection) > 0 then
+    if not table.empty(selection) then
         capturingKeys = false
         -- Sorting down units
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
@@ -2549,7 +2549,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
             sortedOptions.t1 = buildableUnits
         end
 
-        if table.getn(buildableUnits) > 0 then
+        if not table.empty(buildableUnits) then
             controls.constructionTab:Enable()
         else
             controls.constructionTab:Disable()
@@ -2585,7 +2585,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         end
 
         local templates = Templates.GetTemplates()
-        if allMobile and templates and table.getsize(templates) > 0 then
+        if allMobile and templates and not table.empty(templates) then
             sortedOptions.templates = {}
             for templateIndex, template in templates do
                 local valid = true
@@ -2635,7 +2635,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         import(UIUtil.GetLayoutFilename('construction')).OnSelection(true)
     end
 
-    if table.getsize(selection) > 0 then
+    if not table.empty(selection) then
         -- Repeated from original to access the local variables
         local allSameUnit = true
         local bpID = false
@@ -2663,7 +2663,7 @@ function OnSelection(buildableCategories, selection, isOldSelection)
         if options.gui_all_race_templates ~= 0 then
             local templates = Templates.GetTemplates()
             local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
-            if allMobile and templates and table.getsize(templates) > 0 then
+            if allMobile and templates and not table.empty(templates) then
 
                 local unitFactionName = selection[1]:GetBlueprint().General.FactionName
                 local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]

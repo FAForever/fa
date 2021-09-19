@@ -114,6 +114,7 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
+    BuildBotTotal = 2,
     Buffs = {
         Regen = {
             Level1 = 4,
@@ -481,6 +482,7 @@ UnitBlueprint {
             },
             Icon = 'ntt',
             Name = '<LOC enhancements_0085>Nanite Torpedo Launcher',
+            NewSonarRadius = 60,
             Slot = 'RCH',
             UpgradeEffectBones = {
                 'Chest_Right',
@@ -702,14 +704,14 @@ UnitBlueprint {
     Intel = {
         ActiveIntel = {
             Omni = true,
-            Sonar = true,
         },
         Cloak = true,
+        Sonar = true,
+        SonarRadius = 26,
         FreeIntel = false,
         OmniRadius = 26,
         RadarStealth = true,
         ReactivateTime = 2,
-        SonarRadius = 60,
         SonarStealth = true,
         VisionRadius = 26,
         WaterVisionRadius = 26,

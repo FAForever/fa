@@ -99,6 +99,14 @@ function CreateUI(parent, showPatch)
     GithubButton.OnClick = function()
         OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
     end
+
+    -- Link to the patch notes
+    local PatchnotesButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Patchnotes")
+    LayoutHelpers.AtHorizontalCenterIn(PatchnotesButton, dialogContent)
+    LayoutHelpers.AtBottomIn(PatchnotesButton, dialogContent, 10)
+    PatchnotesButton.OnClick = function()
+        OpenURL('http://content.faforever.com/patchnotes/')
+    end
 end
 
 --- Test if we should display the changelog of the new game version.

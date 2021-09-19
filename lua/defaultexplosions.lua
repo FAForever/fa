@@ -110,7 +110,7 @@ function MakeExplosionEntitySpec(unit, overKillRatio)
         BoundingXYZRadius = GetAverageBoundingXYZRadius(unit),
         OverKillRatio = overKillRatio,
         Volume = GetUnitVolume(unit),
-        Layer = unit:GetCurrentLayer(),
+        Layer = unit.Layer,
     }
 end
 
@@ -171,7 +171,7 @@ function _CreateScalableUnitExplosion(obj)
     EnvironmentalEffectTable = GetUnitEnvironmentalExplosionEffects(layer, scale)
 
     -- Merge resulting tables to final explosion emitter list
-    if table.getn(EnvironmentalEffectTable) ~= 0 then
+    if not table.empty(EnvironmentalEffectTable) then
         EffectTable = table.cat(BaseEffectTable, EnvironmentalEffectTable)
     else
         EffectTable = BaseEffectTable
@@ -269,7 +269,7 @@ function CreateWreckageEffects(obj, prop)
     if IsUnit(obj) then
         local scale = GetAverageBoundingXYZRadius(obj)
         local emitters = {}
-        local layer = obj:GetCurrentLayer()
+        local layer = obj.Layer
 
         if scale < 0.5 then -- SMALL UNITS
             emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsSml01, 1)

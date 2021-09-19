@@ -10,6 +10,8 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
+local DeprecatedWarnings = { }
+
 function CreateEffects(obj, army, EffectTable)
     local emitters = {}
     for _, v in EffectTable do
@@ -82,6 +84,7 @@ function ScaleEmittersParam(Emitters, param, minRange, maxRange)
 end
 
 function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
+    unitBeingBuilt.BuildingCube = true
     local bp = unitBeingBuilt:GetBlueprint()
     local mul = 1.15
     local xPos, yPos, zPos = unpack(unitBeingBuilt:GetPosition())
@@ -148,6 +151,7 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
         lComplete = cComplete
         cComplete = unitBeingBuilt:GetFractionComplete()
     end
+    unitBeingBuilt.BuildingCube = nil
 end
 
 function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, BuildEffectsBag)
@@ -375,6 +379,14 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
 end
 
 function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.CreateCybranBuildBeams then 
+        DeprecatedWarnings.CreateCybranBuildBeams = true 
+        WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
+    end
+
     WaitSeconds(0.2)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
     local BeamEndEntities = {}
@@ -405,6 +417,14 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Build
 end
 
 function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.SpawnBuildBots then 
+        DeprecatedWarnings.SpawnBuildBots = true 
+        WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
+    end
+
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
     -- clamped to a max of 10 to avoid insane FPS drop
     -- with mods that modify BP
@@ -462,6 +482,14 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
 end
 
 function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
+        DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
+        WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
+    end
+
     -- Create build constant build effect for each build effect bone defined
     if BuildBones and BuildBots then
         for _, vBone in BuildBones do
@@ -487,15 +515,16 @@ function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildE
     end
 end
 
+local BuildEffects = {
+    '/effects/emitters/sparks_03_emit.bp',
+    '/effects/emitters/flashes_01_emit.bp',
+}
+local UnitBuildEffects = {
+    '/effects/emitters/build_cybran_spark_flash_04_emit.bp',
+    '/effects/emitters/build_sparks_blue_02_emit.bp',
+}
+
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, BuildEffectsBag)
-    local BuildEffects = {
-        '/effects/emitters/sparks_03_emit.bp',
-        '/effects/emitters/flashes_01_emit.bp',
-    }
-    local UnitBuildEffects = {
-        '/effects/emitters/build_cybran_spark_flash_04_emit.bp',
-        '/effects/emitters/build_sparks_blue_02_emit.bp',
-    }
 
     CreateCybranBuildBeams(builder, unitBeingBuilt, BuildBones.BuildEffectBones, BuildEffectsBag)
 
@@ -554,7 +583,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
     local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
     local sy = bp.Physics.MeshExtentsY or sx + sz
-    
+
     local slice = nil
 
     -- Create a pool mercury that slow draws into the build unit
@@ -599,7 +628,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
         slider:SetSpeed(-1)
         slider:SetGoal(0, -sy * 0.5, 0)
     end
-    
+
     if not builder:IsPaused() then
         local fraction = unitBeingBuilt:GetFractionComplete()
         local scale
@@ -817,18 +846,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFac
         end
     end
 
-    -- The flash can now be seen only by the player owning the building, his allies or enemies who
-    -- have a visual of the building.
-    local unitsArmy = unitBeingBuilt.Army
-    local focusArmy = GetFocusArmy()
-    if focusArmy == -1 or IsAlly(unitsArmy, focusArmy) then
-        CreateLightParticle(unitBeingBuilt, -1, unitsArmy, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
-    elseif IsEnemy(unitsArmy, focusArmy) then
-        local blip = unitBeingBuilt:GetBlip(focusArmy)
-        if blip ~= nil and blip:IsSeenNow(focusArmy) then
-            CreateLightParticle(unitBeingBuilt, -1, unitsArmy, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
-        end
-    end
+    CreateLightParticleIntel(unitBeingBuilt, -1, unitBeingBuilt.Army, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
 
     WaitSeconds(0.5)
     BuildBaseEffect:Destroy()
@@ -1163,7 +1181,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
         for i = 1, numNodes do
             nodeList[i].entity:SetMesh(nodeMesh, false)
             nodeList[i].mesh = true
-            if emitterNodeEffects[i] ~= nil and table.getn(emitterNodeEffects[i]) ~= 0 then
+            if emitterNodeEffects[i] ~= nil and not table.empty(emitterNodeEffects[i]) then
                 for _, vEmit in emitterNodeEffects[i] do
                     emit = CreateAttachedEmitter(nodeList[i].entity, 0, unit.Army, vEmit)
                     info.Trash:Add(emit)
@@ -1441,7 +1459,7 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, tele
             unit.TeleportChargeBag = TeleportShowChargeUpFxAtUnit(unit, EffectTemplate.GenericTeleportCharge01, EffectsBag)
         end
     end
-    
+
     if teleDelay then
         WaitTicks(teleDelay * 10)
     end
@@ -1890,3 +1908,34 @@ function DestroyRemainingTeleportChargingEffects(unit, EffectsBag)
         unit.TeleportCybranSphere:Destroy()
     end
 end
+
+--- Optimized functions --
+
+local EffectUtilitiesOpti = import('/lua/EffectUtilitiesOpti.lua')
+
+--- Creates tracker beams between the builder and its build bots. The
+-- bots keep the tracker in their trashbag.
+-- @param builder The builder / tracking entity of the build bots.
+-- @param buildBones The bones to use as the origin of the beams.
+-- @param buildBots The build bots that we're tracking.
+-- @param total The number of build bots / bones. The 1st bone will track the 1st bot, etc.
+CreateCybranEngineerBuildEffectsOpti = EffectUtilitiesOpti.CreateCybranEngineerBuildEffects
+-- original: CreateCybranEngineerBuildEffects
+
+--- Creates the beams and welding points of the builder and its bots. The
+-- bots share the welding point which each other, as does the builder with
+-- itself.
+-- @param builder A builder with builder.BuildEffectBones set. 
+-- @param bots The bots of the builder.
+-- @param unitBeingBuilt The unit that we're building.
+-- @param buildEffectsBag The bag that we use to store / trash all effects.
+-- @param stationary Whether or not the builder is a building.
+CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
+-- original: CreateCybranBuildBeams
+
+--- Creates the build drones for the (cybran) builder in question. Expects  
+-- the builder.BuildBotTotal value to be set.
+-- @param builder A cybran builder such as an engineer, hive or commander.
+-- @param botBlueprint The blueprint to use for the bot.
+SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
+-- original: SpawnBuildBots

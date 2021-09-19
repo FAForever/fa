@@ -69,7 +69,7 @@ function OnFactionSelect(data)
     if ScenarioInfo.campaignInfo then
         ScenarioInfo.campaignInfo.campaignID = data.Faction
     end
-    if table.getn(factionCallbacks) > 0 then
+    if not table.empty(factionCallbacks) then
         for index, callbackFunc in factionCallbacks do
             if callbackFunc then callbackFunc(data) end
         end
@@ -181,11 +181,11 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self.Dead = true
 
     local bp = self:GetBlueprint()
-    if self:GetCurrentLayer() == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
+    if self.Layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
         self:PlayUnitSound('HoverKilledOnWater')
     end
 
-    if self:GetCurrentLayer() == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
+    if self.Layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
         self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
     else
         self:PlayUnitSound('Killed')
@@ -711,7 +711,7 @@ end
 
 -- The actual thread used by Dialogue
 function PlayDialogue()
-    while table.getn(ScenarioInfo.DialogueQueue) > 0 do
+    while not table.empty(ScenarioInfo.DialogueQueue) do
         local dTable = table.remove(ScenarioInfo.DialogueQueue, 1)
         if not dTable then WARN('dTable is nil, ScenarioInfo.DialogueQueue len is '..repr(table.getn(ScenarioInfo.DialogueQueue))) end
         if not dTable.Flushed and (not ScenarioInfo.OpEnded or dTable.Critical) then
@@ -1470,7 +1470,7 @@ function AttachUnitsToTransports(units, transports)
             local i = 1
             if bp.Transport.TransportClass == 3 then
                 while notInserted and i <= numTransports do
-                    if table.getn(transportBones[i].Lrg) > 0 then
+                    if not table.empty(transportBones[i].Lrg) then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Lrg, 1)
                         transports[i]:OnTransportAttach(bone, v)
@@ -1505,7 +1505,7 @@ function AttachUnitsToTransports(units, transports)
                 end
             elseif bp.Transport.TransportClass == 2 then
                 while notInserted and i <= numTransports do
-                    if table.getn(transportBones[i].Med) > 0 then
+                    if not table.empty(transportBones[i].Med) then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Med, 1)
                         transports[i]:OnTransportAttach(bone, v)
@@ -1528,7 +1528,7 @@ function AttachUnitsToTransports(units, transports)
                 end
             else
                 while notInserted and i <= numTransports do
-                    if table.getn(transportBones[i].Sml) > 0 then
+                    if not table.empty(transportBones[i].Sml) then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Sml, 1)
                         transports[i]:OnTransportAttach(bone, v)
@@ -1648,7 +1648,7 @@ function EndOperationSafety(units)
             subv:SetCanTakeDamage(false)
             subv:SetCanBeKilled(false)
         end
-        if units and table.getn(units) > 0 then
+        if units and not table.empty(units) then
             for subk, subv in units do
                 if not subv.Dead then
                     subv:SetCanTakeDamage(false)

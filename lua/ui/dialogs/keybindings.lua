@@ -927,7 +927,7 @@ function FormatData()
     -- flatten all key actions to a list separated by a header with info about key category
     local index = 1
     for category, group in keyGroups do
-        if table.getsize(group.actions) > 0 then
+        if not table.empty(group.actions) then
             keyData[index] = {
                 type = 'header',
                 id = index,

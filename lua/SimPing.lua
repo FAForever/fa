@@ -12,7 +12,6 @@ function AnimatePingMesh(entity)
     local time = 0
     local ascending = true
     while entity do
-        local orien = entity:GetOrientation()
         entity:SetScale(MATH_Lerp(math.sin(time), -.5, 0.5, .3, .5))
         time = time + .3
         WaitSeconds(.001)
@@ -23,7 +22,7 @@ function SpawnPing(data)
     if not PingsRemaining[data.Owner] then
         PingsRemaining[data.Owner] = PingLimit
     end
-    
+
     if PingsRemaining[data.Owner] > 0 then
         if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
             return
@@ -46,6 +45,7 @@ function SpawnPing(data)
             ping:SetVizToAllies('Always')
             ping:SetVizToNeutrals('Never')
             ping:SetMesh('/meshes/game/ping_'..data.Mesh)
+
             local animThread = ForkThread(AnimatePingMesh, ping)
             ForkThread(function()
                 WaitSeconds(data.Lifetime)

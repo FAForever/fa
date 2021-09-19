@@ -109,7 +109,7 @@ function OnFirstUpdate()
                     SelectUnits(avatars)
                     selected = GetSelectedUnits()
                 end
-            until table.getsize(selected) > 0 or GameTick() > 50
+            until not table.empty(selected) or GameTick() > 50
         end)
     end
 
@@ -136,6 +136,10 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
+    -- keep track of the original focus army
+    import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
+
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 
@@ -499,7 +503,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     -- Deselect Selens if necessary. Also do work on Hotbuild labels
     local changed = false -- Prevent recursion
-    if newSelection and table.getn(newSelection) > 0 then
+    if newSelection and not table.empty(newSelection) then
         newSelection, changed = DeselectSelens(newSelection)
 
         if changed then
@@ -514,9 +518,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         local upgradesTo = nil
         local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
         if potentialUpgrades then
-            if type(potentialUpgrades) == "string" then 
+            if type(potentialUpgrades) == "string" then
                 upgradesTo = potentialUpgrades
-            elseif type(potentialUpgrades) == "table" then 
+            elseif type(potentialUpgrades) == "table" then
                 local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
                 for _, v in potentialUpgrades do
                     if EntityCategoryContains(buildableCategories, v) then
@@ -554,7 +558,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         local n = table.getn(newSelection)
 
         -- if something died in selection, restore command mode
-        if n > 0 and table.getsize(removed) > 0 and table.getsize(added) == 0 then
+        if n > 0 and not table.empty(removed) and table.empty(added) then
             local CM = import('/lua/ui/game/commandmode.lua')
             local mode, data = unpack(CM.GetCommandMode())
 
@@ -947,10 +951,10 @@ end
 SendChat = function()
     while true do
         if UnitData.Chat then
-            if table.getn(UnitData.Chat) > 0 then
+            if not table.empty(UnitData.Chat) then
                 for index, chat in UnitData.Chat do
                     local newChat = true
-                    if table.getn(oldData) > 0 then
+                    if not table.empty(oldData) then
                         for index, old in oldData do
                             if (old.oldTime + 3) < GetGameTimeSeconds() then
                                 oldData[index] = nil

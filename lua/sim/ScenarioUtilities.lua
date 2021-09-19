@@ -33,13 +33,13 @@ function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
             local time = GetSystemTimeSecondsOnlyForProfileUse()
 
             --Spawn bases
-            while table.getn(ScenarioInfo.LoadBalance.SpawnGroups) > 0 do
+            while not table.empty(ScenarioInfo.LoadBalance.SpawnGroups) do
                 local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
                 base:SpawnGroup(name, uncapturable, true)
             end
 
             --Spawn units
-            while table.getn(ScenarioInfo.LoadBalance.PlatoonGroups) > 0 do
+            while not table.empty(ScenarioInfo.LoadBalance.PlatoonGroups) do
                 local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups, 1))
                 CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
             end
@@ -455,7 +455,7 @@ function CreateWreckage(unit, needToRotate)
         newOrientation[2] = unitRotation[4] * rotation[2] + unitRotation[2] * rotation[4] + unitRotation[3] * rotation[1] - unitRotation[1] * rotation[3]
         newOrientation[3] = unitRotation[4] * rotation[3] + unitRotation[3] * rotation[4] + unitRotation[1] * rotation[2] - unitRotation[2] * rotation[1]
         newOrientation[4] = unitRotation[4] * rotation[4] - unitRotation[1] * rotation[1] - unitRotation[2] * rotation[2] - unitRotation[3] * rotation[3]
-        
+
         prop:SetOrientation(newOrientation, true)
     end
     unit:Destroy()
@@ -467,36 +467,36 @@ function AnimateDeathThread(unit, deathAnim)
     local animator = CreateAnimator(unit)
     animator:PlayAnim(animBlock.Animation)
     local rate = unit.rate or 1
-    
+
     if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
         rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
     end
-    
+
     animator:SetRate(rate)
     animator:SetAnimationTime(1000)
     unit.Trash:Add(animator)
-    
+
     if animator then
         WaitFor(animator)
     end
-    
+
     CreateWreckage(unit, false)
 end
 
 function CreateWreckageUnit(unit)
 	local bp = unit:GetBlueprint()
-	
+
 	local isStructure = bp.CategoriesHash.STRUCTURE
 	local isAir = bp.CategoriesHash.AIR
 	local isLand = bp.CategoriesHash.LAND
 	local isExperimental = bp.CategoriesHash.EXPERIMENTAL
 	local isNaval = bp.CategoriesHash.NAVAL
 
-	local layer = unit:GetCurrentLayer()
+	local layer = unit.Layer
 	local unitPos = unit:GetPosition()
 	local deep = (GetSurfaceHeight(unitPos[1],unitPos[3]) - GetTerrainHeight(unitPos[1],unitPos[3]))
 	local deathAnim = bp.Display['AnimationDeath']
-	
+
 	-- If unit stay on land or deep<5 and have death animation, animate this
 	local needAnimate = deathAnim and unit.PlayDeathAnimation and (isLand or isAir) and (layer == 'Land' or deep < 5)
 	-- We want to random rotate all naval and air units whats haven`t death animation

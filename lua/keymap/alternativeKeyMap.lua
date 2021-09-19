@@ -121,7 +121,7 @@ defaultKeyMap = {
     ['Shift-R']             = 'shift_attack',
     ['Shift-Alt-R']         = 'shift_spreadattack',
     ['Shift-E']             = 'shift_overcharge',
-    
+
     ['Z']                   = 'alt_builders',
     ['V']                   = 'alt_radars',
     ['H']                   = 'alt_shields',

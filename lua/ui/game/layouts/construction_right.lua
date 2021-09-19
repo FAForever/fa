@@ -399,7 +399,7 @@ function LayoutTabs(controls)
         end
     end
 
-    if table.getsize(controls.tabs) > 0 then
+    if not table.empty(controls.tabs) then
         for id, control in controls.tabs do
             SetupTab(control)
 

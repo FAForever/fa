@@ -266,6 +266,7 @@ UnitBlueprint {
         AirClass = true,
         ClassGenericUpTo = 2,
         TransportClass = 1,
+        Class1Capacity = 1,
     },
     Veteran = {
         Level1 = 6,

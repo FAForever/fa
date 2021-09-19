@@ -880,7 +880,7 @@ BuilderGroup {
         #PlatoonTemplate = 'EarlyGameMassHuntersCategory',
         Priority = 950,
         BuilderConditions = {
-                #{ MIBC, 'LessThanGameTime', { 600 } },      
+                #{ MIBC, 'LessThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
@@ -984,7 +984,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 4, categories.AIR * categories.MOBILE * (categories.TECH1 + categories.TECH2 + categories.TECH3) * categories.ANTIAIR } },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MOBILE * categories.AIR * categories.TECH3 * categories.BOMBER } },
-            { UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.AIR * categories.TECH3 * categories.BOMBER } }, 
+            { UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.AIR * categories.TECH3 * categories.BOMBER } },
         },
     },
 }

@@ -55,19 +55,19 @@ Tree = Class(Prop) {
         Prop.OnDestroy(self)
         ChangeState(self, self.DeadState)
     end,
-    
+
     PlayUprootingEffect = function(self, instigator)
 		local pos = self:GetCachePosition()
 		local army = -1
         if instigator then
             army = instigator.Army
-        end		
+        end
 		local TerrainType = GetTerrainType( pos.x,pos.z )
-		
+
 		if TerrainType.FXOther.Land.TreeRootDirt01 == nil then
 			TerrainType = GetTerrainType( -1, -1 )
 		end
-		
+
 		if TerrainType.FXOther.Land.TreeRootDirt01 != nil then
 			for k, v in TerrainType.FXOther.Land.TreeRootDirt01 do
 				CreateEmitterAtEntity( self, army, v )
@@ -108,7 +108,7 @@ Tree = Class(Prop) {
                 end
                 WaitSeconds(3 + Random(1, 10) * 0.1)
                 if not self.BurnFromNuke and i == 3 then
-                    DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)    
+                    DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)
                 end
             end
             self.Motor = self.Motor or self:FallDown()

@@ -1025,13 +1025,13 @@ AOblivionCannonChargeMuzzleFlash02 = {
 
 AQuantumCannonMuzzle01 = {
     EmtBpPath .. 'disruptor_cannon_muzzle_01_emit.bp',
-    EmtBpPath .. 'quantum_cannon_muzzle_flash_04_emit.bp',  
+    EmtBpPath .. 'quantum_cannon_muzzle_flash_04_emit.bp',
     EmtBpPath .. 'aeon_light_tank_muzzle_charge_01_emit.bp',
     EmtBpPath .. 'aeon_light_tank_muzzle_charge_02_emit.bp',
 }
 AQuantumCannonMuzzle02 = {                      -- tweaked version for ships
     EmtBpPath .. 'disruptor_cannon_muzzle_01_emit.bp',
-    EmtBpPath .. 'quantum_cannon_muzzle_flash_04_emit.bp',  
+    EmtBpPath .. 'quantum_cannon_muzzle_flash_04_emit.bp',
     EmtBpPath .. 'quantum_cannon_muzzle_charge_s01_emit.bp',
     EmtBpPath .. 'quantum_cannon_muzzle_charge_s02_emit.bp',
 }
@@ -1835,7 +1835,7 @@ TFlakCannonMuzzleFlash01 = {
     EmtBpPath .. 'cannon_muzzle_flash_05_emit.bp',
     EmtBpPath .. 'cannon_muzzle_fire_02_emit.bp',
     EmtBpPath .. 'muzzle_sparks_01_emit.bp',
-    EmtBpPath .. 'cannon_muzzle_smoke_09_emit.bp', 
+    EmtBpPath .. 'cannon_muzzle_smoke_09_emit.bp',
 }
 TFragmentationShell01 = {
     EmtBpPath .. 'fragmentation_shell_phosphor_01_emit.bp',
@@ -3148,7 +3148,7 @@ ShriekerCannonHitUnit = {
 --  SERAPHIM CHRONOTRON CANNON EMITTERS
 -- ------------------------------------------------------------------------
 SChronotronCannonMuzzleCharge = {
-    EmtBpPath .. 'seraphim_chronotron_cannon_muzzle_flash_01_emit.bp', 
+    EmtBpPath .. 'seraphim_chronotron_cannon_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'seraphim_chronotron_cannon_muzzle_flash_02_emit.bp',
 }
 SChronotronCannonMuzzle = {
@@ -3185,7 +3185,7 @@ SChronotronCannonUnitHit = {
 SChronotronCannonOverChargeMuzzle = {
     EmtBpPath .. 'seraphim_chronotron_cannon_overcharge_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'seraphim_chronotron_cannon_overcharge_muzzle_flash_02_emit.bp',
-    EmtBpPath .. 'seraphim_chronotron_cannon_overcharge_muzzle_flash_03_emit.bp', 
+    EmtBpPath .. 'seraphim_chronotron_cannon_overcharge_muzzle_flash_03_emit.bp',
 }
 SChronotronCannonOverChargeProjectileTrails = {
     EmtBpPath .. 'seraphim_chronotron_cannon_overcharge_projectile_emit.bp',
@@ -3226,12 +3226,12 @@ SChronatronCannonBlastAttackAOE= {
 SLightChronotronCannonMuzzleFlash = {
     EmtBpPath.. 'seraphim_light_chronotron_cannon_muzzle_flash_01_emit.bp',
     -- -- -- EmtBpPath .. 'seraphim_light_chronotron_cannon_muzzle_flash_02_emit.bp',
-    EmtBpPath .. 'seraphim_light_chronotron_cannon_muzzle_flash_03_emit.bp', 
+    EmtBpPath .. 'seraphim_light_chronotron_cannon_muzzle_flash_03_emit.bp',
 }
 SLightChronotronCannonMuzzleFlash = {
     EmtBpPath .. 'seraphim_light_chronotron_cannon_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'seraphim_light_chronotron_cannon_muzzle_flash_02_emit.bp',
-    EmtBpPath .. 'seraphim_light_chronotron_cannon_muzzle_flash_03_emit.bp', 
+    EmtBpPath .. 'seraphim_light_chronotron_cannon_muzzle_flash_03_emit.bp',
 }
 SLightChronotronCannonProjectileTrails =
 {
@@ -3259,8 +3259,8 @@ SLightChronotronCannonLandHit = {
 SLightChronotronCannonOverChargeMuzzleFlash = {
     EmtBpPath..  'seraphim_light_chronotron_cannon_overcharge_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'seraphim_light_chronotron_cannon_overcharge_muzzle_flash_02_emit.bp',
-    EmtBpPath .. 'seraphim_light_chronotron_cannon_overcharge_muzzle_flash_03_emit.bp', 
-    EmtBpPath .. 'seraphim_light_chronotron_cannon_overcharge_muzzle_flash_04_emit.bp', 
+    EmtBpPath .. 'seraphim_light_chronotron_cannon_overcharge_muzzle_flash_03_emit.bp',
+    EmtBpPath .. 'seraphim_light_chronotron_cannon_overcharge_muzzle_flash_04_emit.bp',
 }
 SLightChronotronCannonOverChargeProjectileTrails = {
     EmtBpPath .. 'seraphim_light_chronotron_cannon_overcharge_projectile_emit.bp',
