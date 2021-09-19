@@ -145,10 +145,10 @@ local function mount_map_dir(dir, glob, mountpoint)
 end
 
 -- Begin mod mounting section
--- This section mounts sounds from the mods directory to allow mods to add custom sounds to the game
-function mount_mod_sounds(MODFOLDER)
+-- This section mounts sounds and ui textures from the mods directory to allow mods to add custom sounds and textures to the game
+function mount_mod_content(MODFOLDER)
     -- searching for mods inside the modfolder
-    for _,mod in io.dir( MODFOLDER..'\\*.*') do
+    for _,mod in io.dir(MODFOLDER..'\\*.*') do
         -- do we have a true directory ?
         if mod != '.' and mod != '..' then
             -- searching for sounds inside mod folder
@@ -157,7 +157,15 @@ function mount_mod_sounds(MODFOLDER)
                 if folder == 'sounds' then
                     LOG('Found mod sounds in: '..mod)
                     mount_dir(MODFOLDER..'\\'..mod..'\\sounds', '/sounds')
-                    break
+                -- mount ui textures if there are any
+                elseif folder == 'textures' then
+                    for _,folder in io.dir(MODFOLDER..'\\'..mod..'\\textures\\*.*') do
+                        if folder == 'ui' then
+                          LOG('Found mod icons in: '..mod)
+                          mount_dir(MODFOLDER..'\\'..mod..'\\textures\\ui', '/textures/ui')
+                          break
+                        end
+                    end
                 end
             end
         end
@@ -167,7 +175,7 @@ end
 -- adds maps / mods to keep track of for the game
 local function load_vault(vault_path)
 	mount_map_dir(vault_path .. '\\maps\\', '**', '/maps')
-	mount_mod_sounds(vault_path .. '\\mods')
+	mount_mod_content(vault_path .. '\\mods')
 
 	mount_contents(vault_path .. '\\mods', '/mods')
 	mount_contents(vault_path .. '\\maps', '/maps')
