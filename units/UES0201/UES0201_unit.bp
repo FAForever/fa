@@ -414,8 +414,8 @@ UnitBlueprint {
             TurretPitchRange = 20,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 140,
-            TurretYawSpeed = 90,
+            TurretYawRange = 160,
+            TurretYawSpeed = 100,
             Turreted = true,
             WeaponCategory = 'Direct Fire Naval',
             WeaponRepackTimeout = 0,
@@ -510,7 +510,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 150,
+            Damage = 60,
             DamageType = 'Normal',
             DisplayName = 'Angler Torpedo',
             FireTargetLayerCapsTable = {
@@ -577,7 +577,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
-            RateOfFire = 0.1,
+            RateOfFire = 0.25,
             TargetCheckInterval = 2,
             TargetPriorities = {
                 'SUBMERSIBLE',
