@@ -369,7 +369,7 @@ BaseGenericDebris = Class(DummyProjectile){
 
                 -- create emitter and scale accordingly
                 emit = CreateEmitterAtBone(self, -2, army, v)
-                if effectScale != 1 then
+                if effectScale ~= 1 then
                     EmitterScaleEmitter(emit, effectScale)
                 end
             end
@@ -385,13 +385,6 @@ BaseGenericDebris = Class(DummyProjectile){
 -----------------------------------------------------------
 OverchargeProjectile = Class() {
     OnImpact = function(self, targetType, targetEntity)
-        --[[WARN('Inside OCPROJ OnImpact')
-        LOG(targetType)
-        LOG(targetEntity)
-        if targetEntity and IsUnit(targetEntity) then
-            LOG(targetEntity.UnitId)
-        end]]
-
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
 
@@ -430,58 +423,45 @@ OverchargeProjectile = Class() {
             end
 
 
-                -- Get max energy available to drain according to how much we have
-                local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
-                local energyLimit = energyAvailable * data.energyMult
-
-                if OCProjectiles[self.Army] > 1 then
-                    energyLimit = energyLimit / OCProjectiles[self.Army]
-                end
-
-                local energyLimitDamage = self:EnergyAsDamage(energyLimit)
-
-                -- Find max available damage
-                damage = math.min(data.maxDamage, energyLimitDamage)
-
-                -- How much damage do we actually need to kill the unit?
-                local idealDamage = targetEntity:GetHealth()
-                local maxHP = self:UnitsDetection(targetType, targetEntity)
-
-                idealDamage = maxHP or data.minDamage
-
-                targetCats = targetEntity:GetBlueprint().CategoriesHash
-
-                      -----SHIELDS------
-                if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
-                    if targetCats.STRUCTURE then
-                        idealDamage = data.minDamage
-                    else
-                        idealDamage = targetEntity.MyShield:GetMaxHealth()
-                    end
-	                --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
-                    --good against group of mobile shields
-                end
-
-                      ------ ACU -------
-                if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
+            -- Get max energy available to drain according to how much we have
+            local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
+            local energyLimit = energyAvailable * data.energyMult
+            if OCProjectiles[self.Army] > 1 then
+                energyLimit = energyLimit / OCProjectiles[self.Army]
+            end
+            local energyLimitDamage = self:EnergyAsDamage(energyLimit)
+            -- Find max available damage
+            damage = math.min(data.maxDamage, energyLimitDamage)
+            -- How much damage do we actually need to kill the unit?
+            local idealDamage = targetEntity:GetHealth()
+            local maxHP = self:UnitsDetection(targetType, targetEntity)
+            idealDamage = maxHP or data.minDamage
+            targetCats = targetEntity:GetBlueprint().CategoriesHash
+                  -----SHIELDS------
+            if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
+                if targetCats.STRUCTURE then
                     idealDamage = data.minDamage
+                else
+                    idealDamage = targetEntity.MyShield:GetMaxHealth()
                 end
-
-                damage = math.min(damage, idealDamage)
-                damage = math.max(data.minDamage, damage)
-
-                -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
-                if energyAvailable < 5000 then
-                    damage = energyLimitDamage
-                end
-
+                --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
+                --good against group of mobile shields
+            end
+                  ------ ACU -------
+            if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
+                idealDamage = data.minDamage
+            end
+            damage = math.min(damage, idealDamage)
+            damage = math.max(data.minDamage, damage)
+            -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
+            if energyAvailable < 5000 then
+                damage = energyLimitDamage
+            end
         end
 
         -- Turn the final damage into energy
         local drain = self:DamageAsEnergy(damage)
 
-        --LOG('Drain is ' .. drain)
-        --LOG('Damage is ' .. damage)
         self.DamageData.DamageAmount = damage
 
         if drain > 0 then
