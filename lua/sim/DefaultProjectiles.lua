@@ -410,6 +410,7 @@ OverchargeProjectile = Class() {
         -- Energy drained is calculated by the relationship equations
         local damage = data.minDamage
 
+        local killShieldUnit = false
         if targetEntity then
             -- Handle hitting shields. We want the unit underneath, not the shield itself
             if not IsUnit(targetEntity) then
@@ -421,7 +422,6 @@ OverchargeProjectile = Class() {
 
                 targetEntity = targetEntity.Owner
             end
-
 
             -- Get max energy available to drain according to how much we have
             local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
@@ -436,9 +436,15 @@ OverchargeProjectile = Class() {
             local idealDamage = targetEntity:GetHealth()
             local maxHP = self:UnitsDetection(targetType, targetEntity)
             idealDamage = maxHP or data.minDamage
-            targetCats = targetEntity:GetBlueprint().CategoriesHash
-                  -----SHIELDS------
+            
+            local targetCats = targetEntity:GetBlueprint().CategoriesHash
+
+            -----SHIELDS------
             if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
+                if targetCats.DIESTOOCDEPLETINGSHIELD then
+                    killShieldUnit = true
+                end
+
                 if targetCats.STRUCTURE then
                     idealDamage = data.minDamage
                 else
@@ -472,7 +478,7 @@ OverchargeProjectile = Class() {
                 OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
                 -- if oc depletes a mobile shield it kills the generator, vet counted, no wreck left
-                if targetCats.DIESTOOCDEPLETINGSHIELD and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
+                if killShieldUnit and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
                     targetEntity:Kill(launcher, 'Overcharge', 2)
                     launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
                 end
