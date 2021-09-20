@@ -896,7 +896,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        local workers = self:GetAIBrain():GetUnitsAroundPoint(categories.REPAIR, self:GetPosition(), 50, 'Ally')
+        local workers = self:GetAIBrain():GetUnitsAroundPoint(categories.REPAIR - categories.DUMMYUNIT, self:GetPosition(), 50, 'Ally')
         for _, v in workers do
             if not v.Dead and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
                 table.insert(units, v)
@@ -4432,4 +4432,11 @@ Unit = Class(moho.unit_methods) {
 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+}
+
+DummyUnit = Class(moho.unit_methods) {
+    -- the only things we need
+    __init = function(self) end,
+    __post_init = function(self) end,
+    OnCreate = function(self) end,
 }

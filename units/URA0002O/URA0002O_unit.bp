@@ -38,6 +38,7 @@ UnitBlueprint {
         'INVULNERABLE',
         'UNSPAWNABLE',
         'UNSELECTABLE',
+        'DUMMY',
     },
     Display = {
         Mesh = {
