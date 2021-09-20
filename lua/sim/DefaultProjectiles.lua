@@ -453,7 +453,7 @@ OverchargeProjectile = Class() {
                 --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
                 --good against group of mobile shields
             end
-                  ------ ACU -------
+            ------ ACU -------
             if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
                 idealDamage = data.minDamage
             end
@@ -478,7 +478,7 @@ OverchargeProjectile = Class() {
                 OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
                 -- if oc depletes a mobile shield it kills the generator, vet counted, no wreck left
-                if killShieldUnit and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
+                if killShieldUnit and targetEntity and not IsDestroyed(targetEntity) and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
                     targetEntity:Kill(launcher, 'Overcharge', 2)
                     launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
                 end
