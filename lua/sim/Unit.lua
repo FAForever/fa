@@ -3638,9 +3638,9 @@ Unit = Class(moho.unit_methods) {
     -- Return the total time in seconds, cost in energy, and cost in mass to reclaim the given target from 100%.
     -- The energy and mass costs will normally be negative, to indicate that you gain mass/energy back.
     GetReclaimCosts = function(self, target_entity)
-        local bp = self:GetBlueprint()
-        local target_bp = target_entity:GetBlueprint()
         if IsUnit(target_entity) then
+            local bp = self:GetBlueprint()
+            local target_bp = target_entity:GetBlueprint()
             local mtime = target_bp.Economy.BuildCostEnergy / self:GetBuildRate()
             local etime = target_bp.Economy.BuildCostMass / self:GetBuildRate()
             local time = mtime
