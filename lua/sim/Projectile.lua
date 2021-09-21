@@ -6,8 +6,8 @@
 ------------------------------------------------------------------
 
 local Entity = import('/lua/sim/Entity.lua').Entity
-local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
+local AreaDoTThread = DefaultDamage.AreaDoTThread
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
 -- upvalued globals for performance
@@ -37,6 +37,8 @@ local EntitySetMaxHealth = EntityMethods.SetMaxHealth
 local EntitySetAmbientSound = EntityMethods.SetAmbientSound
 local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 local EntityGetPosition = EntityMethods.GetPosition
+local EntityAdjustHealth = EntityMethods.AdjustHealth
+local EntityGetHealth = EntityMethods.GetHealth
 
 local ProjectileMethods = _G.moho.projectile_methods
 local ProjectileGetLauncher = ProjectileMethods.GetLauncher
@@ -226,7 +228,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
 
         -- check for specific do-not-collide entities, such as for strategic missiles not hitting air
-        for _, p in {{self, other}, {other, self}} do
+        for _, p in {{self, other}, {other, self}} do -- TODO: table creation!
             local dnc = p[1].BlueprintDoNotCollideList
             if dnc then
                 for _, v in dnc do
@@ -243,9 +245,9 @@ Projectile = Class(ProjectileMethods, Entity) {
     -- Called when a projectile receives damage
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.BlueprintDefenseMaxHealth then
-            self:DoTakeDamage(instigator, amount, vector, damageType)
+            self.DoTakeDamage(self, instigator, amount, vector, damageType)
         else
-            self:OnKilled(instigator, damageType)
+            self.OnKilled(self, instigator, damageType)
         end
     end,
 
@@ -261,8 +263,8 @@ Projectile = Class(ProjectileMethods, Entity) {
             return
         end
 
-        self:AdjustHealth(instigator, -amount)
-        local health = self:GetHealth()
+        EntityAdjustHealth(self, instigator, -amount)
+        local health = EntityGetHealth(self)
         if health <= 0 then
             if damageType == 'Reclaimed' then
                 EntityDestroy(self)
@@ -275,7 +277,7 @@ Projectile = Class(ProjectileMethods, Entity) {
                 if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
-                self:OnKilled(instigator, damageType, excessDamageRatio)
+                self.OnKilled(self, instigator, damageType, excessDamageRatio)
             end
         end
     end,
@@ -351,7 +353,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
 
         -- If this unit category is on the weapon's do-not-collide list, skip!
-        local weaponBP = firingWeapon:GetBlueprint()
+        local weaponBP = EntityGetBlueprint(firingWeapon)
         if weaponBP.DoNotCollideList then
             for k, v in weaponBP.DoNotCollideList do
                 if EntityCategoryContains(ParseEntityCategory(v), self) then -- TODO: Parsing!!
@@ -490,10 +492,10 @@ Projectile = Class(ProjectileMethods, Entity) {
                         if radius and radius > 0 then
                             -- This is a radius buff
                             -- get the position of the projectile
-                            target:AddBuff(v, self:GetPosition())
+                            target.AddBuff(target, v, EntityGetPosition(self))
                         else
                             -- This is a single target buff
-                            target:AddBuff(v)
+                            target.AddBuff(target, v)
                         end
                     end
                 end
