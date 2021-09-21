@@ -8,21 +8,30 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- upvalue globals for performance 
+Damage = Damage 
+DamageArea = DamageArea
+WaitTicks = coroutine.yield 
+
+-- upvalue moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityGetPosition = EntityMethods.GetPosition
+
+-- Applies damage over time to a specific unit.
 UnitDoTThread = function(instigator, unit, pulses, pulseTime, damage, damType, friendly)
     for i = 1, pulses do
-        if unit and not unit:BeenDestroyed() then
-            Damage(instigator, unit:GetPosition(), unit, damage, damType )
-        else
-            break
-        end
-        WaitSeconds(pulseTime)
+        if unit and not unit.Dead then
+            Damage(instigator, EntityGetPosition(unit), unit, damage, damType )
+            WaitTicks(10 * pulseTime + 1)
+        end 
     end
 end
 
+-- Applies damage over time to a specific area.
 AreaDoTThread = function(instigator, position, pulses, pulseTime, radius, damage, damType, friendly)
     for i = 1, pulses do
         DamageArea(instigator, position, radius, damage, damType, friendly)
-        WaitSeconds(pulseTime)
+        WaitTicks(10 * pulseTime + 1)
     end
 end
 
