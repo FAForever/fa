@@ -398,7 +398,7 @@ CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
 
     SphereEffectIdleMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere01_mesh',
     SphereEffectActiveMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere02_mesh',
-    SphereEffectBp = '/effects/emitters/zapper_electricity_01_emit.bp',
+    SphereEffectBp = '/effects/emitters/zapper_electricity_02_emit.bp',
     SphereEffectBone = 'Turret_Muzzle',
 
     OnCreate = function(self)
