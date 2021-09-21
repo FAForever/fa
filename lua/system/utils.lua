@@ -544,7 +544,7 @@ end
 
 --- Returns true if the string starts with the specified value
 function StringStartsWith(stringToMatch, valueToSeek)
-    return string.sub(stringToMatch, 1, valueToSeek:len()) == valueToSeek
+    return stringToMatch:sub(1, valueToSeek:len()) == valueToSeek
 end
 
 --- Extracts a string between two specified strings
@@ -552,7 +552,7 @@ end
 function StringExtract(str, str1, str2, fromEnd)
     local pattern = str1 .. '(.*)' .. str2
     if fromEnd then pattern = '.*' .. pattern end
-    local i, ii, m = string.find(str, pattern)
+    local _, _, m = str:find(pattern)
     return m
 end
 
@@ -574,44 +574,51 @@ function StringPrepend(str, symbol)
     if not symbol then symbol = ' ' end
     return symbol .. str
 end
---- Splits a string with camel cast to a string with separate words
+
+--- Splits a string with camel case to a string with separate words
 --- e.g. StringSplitCamel('SupportCommanderUnit') -> 'Support Commander Unit'
 function StringSplitCamel(str)
-   return (str:gsub("[A-Z]", StringPrepend):gsub("^.", string.upper))
+    local first = str:sub(1, 1)
+    local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
+    return split:gsub("^.", string.upper)
 end
 
 --- Reverses order of letters for specified string
---- e.g. StringCapitalize('abc123') --> 321cba
+--- e.g. StringReverse('abc123') --> 321cba
 function StringReverse(str)
     local tbl =  {}
-    str:gsub(".",function(c) table.insert(tbl,c) end)
+    str:gsub(".", function(c) table.insert(tbl,c) end)
     tbl = table.reverse(tbl)
     return table.concat(tbl)
 end
+
 --- Capitalizes each word in specified string
 --- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
 function StringCapitalize(str)
     return string.gsub(" "..str, "%W%l", string.upper):sub(2)
 end
+
 --- Check if a given string starts with specified string
 function StringStarts(str, startString)
-   return string.sub(str, 1, string.len(startString)) == startString
+   return StringStartsWith(str, startString)
 end
+
 --- Check if a given string ends with specified string
 function StringEnds(str, endString)
-   return endString == '' or string.sub(str, -string.len(endString)) == endString
+   return endString == '' or str:sub(-endString:len()) == endString
 end
+
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
     if not itemA or not itemB then return 0 end
 
     if type(itemA) == "string" or
        type(itemB) == "string" then
-        if string.lower(itemA) == string.lower(itemB) then
+        if itemA:lower() == itemB:lower() then
             return 0
         else
             -- sort string using alpha order
-            return string.lower(itemA) < string.lower(itemB)
+            return itemA:lower() < itemB:lower()
         end
     else
        if math.abs(itemA - itemB) < 0.0001 then
