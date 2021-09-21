@@ -27,7 +27,6 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 
 -- upvalued moho functions for performance
-
 local EntityMethods = _G.moho.entity_methods
 local EntityGetBlueprint = EntityMethods.GetBlueprint
 local EntityGetArmy = EntityMethods.GetArmy
@@ -53,8 +52,9 @@ local EmitterOffsetEmitter = EmitterMethods.OffsetEmitter
 -- upvalued read-only values
 local DoNotCollideCategories = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
-
 local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FxImpact
+
+local DeprecatedWarnings = { }
 
 Projectile = Class(ProjectileMethods, Entity) {
 
@@ -97,7 +97,7 @@ Projectile = Class(ProjectileMethods, Entity) {
     -- FxImpactLandScorch = false,
     -- FxImpactLandScorchScale = 1.0,
 
-    -- performance-wise this function just hurts and is not needed
+    -- Performance-wise this function just hurts and is not needed
     ForkThread = function(self, fn, ...)
 
         LOG("Projectile forkthread called at: " .. repr(debug.getinfo(2)))
@@ -111,7 +111,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- called by engine when made
+    -- Called by engine when made
     OnCreate = function(self, inWater)
 
         -- get blueprint into local scope for performance
@@ -147,7 +147,8 @@ Projectile = Class(ProjectileMethods, Entity) {
         self.Trash = TrashBag()
     end,
 
-    -- receive damage data as deep-copy
+    -- TODO: shallow-copy the damage data instead, and update all units that require a deep copy (for example: when projectiles split the damage is sometimes divided by the number of projectiles).
+    -- Receive damage data as deep-copy from the weapon
     -- PERFORMANCE-TODO: Does this need to be a deep-copy?
     PassDamageData = function(self, DamageData)
         -- only copy data that is present
@@ -156,23 +157,11 @@ Projectile = Class(ProjectileMethods, Entity) {
             SelfDamageData[k] = value
         end
 
-        -- original approach to copying data
-        -- self.DamageData.DamageRadius = DamageData.DamageRadius
-        -- self.DamageData.DamageAmount = DamageData.DamageAmount
-        -- self.DamageData.DamageType = DamageData.DamageType
-        -- self.DamageData.DamageFriendly = DamageData.DamageFriendly
-        -- self.DamageData.CollideFriendly = DamageData.CollideFriendly
-        -- self.DamageData.DoTTime = DamageData.DoTTime
-        -- self.DamageData.DoTPulses = DamageData.DoTPulses
-        -- self.DamageData.MetaImpactAmount = DamageData.MetaImpactAmount
-        -- self.DamageData.MetaImpactRadius = DamageData.MetaImpactRadius
-        -- self.DamageData.Buffs = DamageData.Buffs
-        -- self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
-
         -- additional copy
         self.CollideFriendly = SelfDamageData.CollideFriendly
     end,
 
+    -- Called when a projectile should apply its damage
     DoDamage = function(self, instigator, DamageData, targetEntity)
         local damage = DamageData.DamageAmount
         if damage and damage > 0 then
@@ -220,6 +209,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- Called when a projectile hits some other entity
     OnCollisionCheck = function(self, other)
 
         -- if we return false the thing hitting us has no idea that it came into contact with us
@@ -250,7 +240,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         return true
     end,
 
-    -- called when a projectile receives damage
+    -- Called when a projectile receives damage
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.BlueprintDefenseMaxHealth then
             self:DoTakeDamage(instigator, amount, vector, damageType)
@@ -259,12 +249,12 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- called when a projectile should be de-allocated
+    -- Called when a projectile should be de-allocated
     OnDestroy = function(self)
         TrashBagDestroy(self.Trash)
     end,
 
-    -- called when a projectile takes damage
+    -- Called when a projectile takes damage
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Check for valid projectile
         if not self or self:BeenDestroyed() then
@@ -290,11 +280,13 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- Called when the projectile is killed.
     OnKilled = function(self, instigator, type, overkillRatio)
         self.CreateImpactEffects(self, self.Army, self.FxOnKilled, self.FxOnKilledScale)
         EntityDestroy(self)
     end,
 
+    -- ??
     DoMetaImpact = function(self, damageData)
         if damageData.MetaImpactRadius and damageData.MetaImpactAmount then
             local x, y, z = EntityGetPositionXYZ(self)
@@ -303,6 +295,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- Creates the impact effects of the projectile itself
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         -- default values
         EffectScale = EffectScale or 1
@@ -327,6 +320,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- Creates generic terrain effects that always spawn
     CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         -- default values
         EffectScale = EffectScale or 1
@@ -337,6 +331,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- Retrieves the generic terrain effects
     GetTerrainEffects = function(self, TargetType, ImpactEffectType)
         -- default value
         ImpactEffectType = ImpactEffectType or 'Default'
@@ -356,10 +351,10 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
 
         -- If this unit category is on the weapon's do-not-collide list, skip!
-        local weaponBP = firingWeapon.Blueprint
+        local weaponBP = firingWeapon:GetBlueprint()
         if weaponBP.DoNotCollideList then
             for k, v in weaponBP.DoNotCollideList do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                if EntityCategoryContains(ParseEntityCategory(v), self) then -- TODO: Parsing!!
                     return false
                 end
             end
@@ -380,7 +375,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         self.DoDamage(self, instigator, damageData, targetEntity)
 
         -- Meta-Impact
-        self.DoMetaImpact(self, damageData)
+        -- self.DoMetaImpact(self, damageData) -- this doesn't do anything, just takes up cycles
 
         -- Buffs (Stun, etc)
         self.DoUnitImpactBuffs(self, targetEntity)
@@ -412,12 +407,12 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
 
         -- ImpactEffects
-        if targetType == 'Water' then
-            ImpactEffects = self.FxImpactWater
-            ImpactEffectScale = self.FxWaterHitScale
-        elseif targetType == 'Terrain' then
+        if targetType == 'Terrain' then
             ImpactEffects = self.FxImpactLand
             ImpactEffectScale = self.FxLandHitScale
+        elseif targetType == 'Water' then
+            ImpactEffects = self.FxImpactWater
+            ImpactEffectScale = self.FxWaterHitScale
         elseif targetType == 'Shield' then
             ImpactEffects = self.FxImpactShield
             ImpactEffectScale = self.FxShieldHitScale
@@ -463,6 +458,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- An instantanious destroy for the typical projectile
     OnImpactDestroy = function(self, targetType, targetEntity)
         local destroyOnImpact = self.DestroyOnImpact
         if destroyOnImpact or not targetEntity or
@@ -471,6 +467,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- A delayed destroy for when blueprint.Physics.ImpactTimeout is set
     ImpactTimeoutThread = function(self, seconds)
         WaitSeconds(seconds)
         EntityDestroy(self)
@@ -506,33 +503,57 @@ Projectile = Class(ProjectileMethods, Entity) {
 
     -- this should never be called - use the actual function.
     GetCachePosition = function(self)
+
+        -- deprecation warning in case it ever happens.
+        if not DeprecatedWarnings.CreateCybranBuildBeams then 
+            DeprecatedWarnings.CreateCybranBuildBeams = true 
+            WARN("CreateCybranBuildBeams is deprecated: use projectile:GetPosition() instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+
         return self:GetPosition()
     end,
 
     -- this should never be called - use the actual value.
     GetCollideFriendly = function(self)
+
+        -- deprecation warning in case it ever happens.
+        if not DeprecatedWarnings.CreateCybranBuildBeams then 
+            DeprecatedWarnings.CreateCybranBuildBeams = true 
+            WARN("CreateCybranBuildBeams is deprecated: get projectile.CollideFriendly instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+
         return self.CollideFriendly
     end,
 
     -- this should never be called - use the actual value.
     PassData = function(self, data)
+
+        -- deprecation warning in case it ever happens.
+        if not DeprecatedWarnings.CreateCybranBuildBeams then 
+            DeprecatedWarnings.CreateCybranBuildBeams = true 
+            WARN("CreateCybranBuildBeams is deprecated: set projectile.Data instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+
         self.Data = data
     end,
 
     -- when the projectile exits the water
     OnExitWater = function(self)
         -- no projectile blueprint has this value set
-        -- local bp = self.Blueprint.Audio.ExitWater
-        -- if bp then
-        --     self:PlaySound(bp)
-        -- end
+        local snd = self.Blueprint.Audio.ExitWater
+        if snd then
+            EntityPlaySound(self, snd)
+        end
     end,
 
-    -- when the projectile enters the water (think about torpedo bombers)
+    -- when the projectile enters the water
     OnEnterWater = function(self)
         local snd = self.BlueprintAudio.EnterWater
         if snd then
-            self:PlaySound(snd)
+            EntityPlaySound(self, snd)
         end
     end,
 
