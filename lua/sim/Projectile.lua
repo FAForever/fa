@@ -503,45 +503,6 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- this should never be called - use the actual function.
-    GetCachePosition = function(self)
-
-        -- deprecation warning in case it ever happens.
-        if not DeprecatedWarnings.CreateCybranBuildBeams then 
-            DeprecatedWarnings.CreateCybranBuildBeams = true 
-            WARN("CreateCybranBuildBeams is deprecated: use projectile:GetPosition() instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-
-        return self:GetPosition()
-    end,
-
-    -- this should never be called - use the actual value.
-    GetCollideFriendly = function(self)
-
-        -- deprecation warning in case it ever happens.
-        if not DeprecatedWarnings.CreateCybranBuildBeams then 
-            DeprecatedWarnings.CreateCybranBuildBeams = true 
-            WARN("CreateCybranBuildBeams is deprecated: get projectile.CollideFriendly instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-
-        return self.CollideFriendly
-    end,
-
-    -- this should never be called - use the actual value.
-    PassData = function(self, data)
-
-        -- deprecation warning in case it ever happens.
-        if not DeprecatedWarnings.CreateCybranBuildBeams then 
-            DeprecatedWarnings.CreateCybranBuildBeams = true 
-            WARN("CreateCybranBuildBeams is deprecated: set projectile.Data instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-
-        self.Data = data
-    end,
-
     -- when the projectile exits the water
     OnExitWater = function(self)
         -- no projectile blueprint has this value set
@@ -592,6 +553,47 @@ Projectile = Class(ProjectileMethods, Entity) {
         if physics.TrackTarget then
             ProjectileSetLifetime(self, physics.OnLostTargetLifetime)
         end
+    end,
+
+    -- DEPRECATED --
+
+    -- this should never be called - use the actual function.
+    GetCachePosition = function(self)
+
+        -- deprecation warning in case it ever happens.
+        if not DeprecatedWarnings.CreateCybranBuildBeams then 
+            DeprecatedWarnings.CreateCybranBuildBeams = true 
+            WARN("CreateCybranBuildBeams is deprecated: use projectile:GetPosition() instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+
+        return self:GetPosition()
+    end,
+
+    -- this should never be called - use the actual value.
+    GetCollideFriendly = function(self)
+
+        -- deprecation warning in case it ever happens.
+        if not DeprecatedWarnings.CreateCybranBuildBeams then 
+            DeprecatedWarnings.CreateCybranBuildBeams = true 
+            WARN("CreateCybranBuildBeams is deprecated: get projectile.CollideFriendly instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+
+        return self.CollideFriendly
+    end,
+
+    -- this should never be called - use the actual value.
+    PassData = function(self, data)
+
+        -- deprecation warning in case it ever happens.
+        if not DeprecatedWarnings.CreateCybranBuildBeams then 
+            DeprecatedWarnings.CreateCybranBuildBeams = true 
+            WARN("CreateCybranBuildBeams is deprecated: set projectile.Data instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+
+        self.Data = data
     end,
 }
 
