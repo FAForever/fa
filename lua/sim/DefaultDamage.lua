@@ -23,7 +23,9 @@ UnitDoTThread = function(instigator, unit, pulses, pulseTime, damage, damType, f
         if unit and not unit.Dead then
             Damage(instigator, EntityGetPosition(unit), unit, damage, damType )
             WaitTicks(10 * pulseTime + 1)
-        end 
+        else 
+            break 
+        end
     end
 end
 
