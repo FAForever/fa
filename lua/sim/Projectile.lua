@@ -5,12 +5,38 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+-- DOCUMENTATION --
+
+-- Particles are the definition of garbage creation: they are created with 
+-- the sole purpose to be destroyed again a few seconds later. Therefore it 
+-- is important that they allocate as little as possible to make the life of 
+-- our garbage collector easier.
+
+-- See /engine/sim/projectile.lua for projectile-specfic moho functions
+-- See /engine/sim/entity.lua for entity-specific moho functions
+
+-- List of functions called from the c-boundary:
+-- __init           (do not edit this one)
+-- __post_init      (do not edit this one)
+-- OnCreate
+-- OnCollisionCheck
+-- OnDamage
+-- OnDestroy
+-- OnCollisionCheckWeapon
+-- OnImpact
+-- OnExitWater
+-- OnEnterWater
+
+-- IMPORTS --
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local AreaDoTThread = DefaultDamage.AreaDoTThread
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
--- upvalued globals for performance
+-- UPVALUES --
+
+-- Globals for performance
 local DamageArea = _G.DamageArea
 local Damage = _G.Damage
 
@@ -26,7 +52,7 @@ local EntityCategoryContains = EntityCategoryContains
 local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 
--- upvalued moho functions for performance
+-- Moho functions for performance
 local EntityMethods = _G.moho.entity_methods
 local EntityGetBlueprint = EntityMethods.GetBlueprint
 local EntityGetArmy = EntityMethods.GetArmy
@@ -51,10 +77,12 @@ local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 local EmitterOffsetEmitter = EmitterMethods.OffsetEmitter
 
--- upvalued read-only values
+-- Read-only values
 local DoNotCollideCategories = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FxImpact
+
+-- MISCELLANEOUS --
 
 local DeprecatedWarnings = { }
 

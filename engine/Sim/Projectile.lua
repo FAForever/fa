@@ -1,19 +1,20 @@
 --- Class Projectile
 -- @classmod Sim.Projectile
 
----
---  Change the detonate below height for the projectile
-function Projectile:ChangeDetonateBelowHeight()
+
+--- Change the detonate below height for the projectile. Edits the Blueprint.Physics.DetonateBelowHeight value on a per-projectile basis.
+-- @param height The height to detonate when below
+function Projectile:ChangeDetonateBelowHeight(height)
 end
 
----
---  Change the amount of zig zag in degrees per second
-function Projectile:ChangeMaxZigZag()
+--- Change the amount of zig zag in degrees per second. Edits the Blueprint.Physics.MaxZigZag value on a per-projectile basis.
+-- @param maximum The maximum zig zag we accept in degrees per second.
+function Projectile:ChangeMaxZigZag(maximum)
 end
 
----
---  Change the frequency of the zig zag --> min "0" (0 %), 0.5 (50%), max "1.0" (100%)
-function Projectile:ChangeZigZagFrequency()
+--- Change the frequency of the zig zag --> min "0" (0 %), 0.5 (50%), max "1.0" (100%). Edits the Blueprint.Physics.ZigZagFrequency value on a per-projectile basis.
+-- @param The new frequency of the zig zagging.
+function Projectile:ChangeZigZagFrequency(frequency)
 end
 
 ---
@@ -53,7 +54,7 @@ end
 
 ---
 --  Wrong number of arguments to Projectile:SetAccelerationVector(), expected 1, 2, or 4 but got %d
-function Projectile:SetBallisticAcceleration()
+function Projectile:SetBallisticAcceleration(accel)
 end
 
 ---
@@ -155,4 +156,3 @@ end
 --
 function Projectile:moho.projectile_methods()
 end
-
