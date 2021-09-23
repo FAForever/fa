@@ -113,7 +113,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- Called by engine when made
+    -- Called by engine when made 
     OnCreate = function(self, inWater)
 
         -- get blueprint into local scope for performance
@@ -211,7 +211,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- Called when a projectile hits some other entity
+    -- Called by the engine when a projectile hits some other entity
     OnCollisionCheck = function(self, other)
 
         -- if we return false the thing hitting us has no idea that it came into contact with us
@@ -242,7 +242,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         return true
     end,
 
-    -- Called when a projectile receives damage
+    -- Called by the engine when a projectile receives damage
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.BlueprintDefenseMaxHealth then
             self.DoTakeDamage(self, instigator, amount, vector, damageType)
@@ -251,7 +251,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- Called when a projectile should be de-allocated
+    -- Called by the engine when a projectile should be de-allocated
     OnDestroy = function(self)
         TrashBagDestroy(self.Trash)
     end,
@@ -282,7 +282,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- Called when the projectile is killed.
+    -- Called by the engine when the projectile is killed
     OnKilled = function(self, instigator, type, overkillRatio)
         self.CreateImpactEffects(self, self.Army, self.FxOnKilled, self.FxOnKilledScale)
         EntityDestroy(self)
@@ -347,6 +347,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         return TerrainEffect
     end,
 
+    -- Called by the engine, checks ... ?
     OnCollisionCheckWeapon = function(self, firingWeapon)
         if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
             return false
@@ -364,7 +365,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         return true
     end,
 
-    -- Create some cool explosions when we get destroyed
+    -- Called by the engine when a projectile hits something - time for explosions!
     OnImpact = function(self, targetType, targetEntity)
         
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
@@ -503,7 +504,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- when the projectile exits the water
+    -- Called by the engine when the projectile exits the water
     OnExitWater = function(self)
         -- no projectile blueprint has this value set
         local snd = self.Blueprint.Audio.ExitWater
@@ -512,7 +513,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- when the projectile enters the water
+    -- Called by the engine when the projectile enters the water 
     OnEnterWater = function(self)
         local snd = self.BlueprintAudio.EnterWater
         if snd then
@@ -520,6 +521,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- Adds a flare, used by uab4201 (Aeon t2 TMD) and uas0202 (Aeon T2 Cruiser) and uas0302 (Aeon t3 Battleship)
     AddFlare = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -548,6 +550,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         TrashBagAdd(self.Trash, self.MyFlare)
     end,
 
+    -- when a tracking projectile loses its target, called by the engine
     OnLostTarget = function(self)
         local physics = self.Blueprint.Physics
         if physics.TrackTarget then
