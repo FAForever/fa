@@ -9,6 +9,9 @@ Patch 3721 (19 September, 2021)
  - (#3442) Fix scathis packing animation time
  - (#3439) Fix Cybran drone visibility for other players than the owner
 
+### Stability
+ - (#3449) Fix significant hard-crash potential that patch 3721 introduced
+
 ### Performances
 
 ### AI
@@ -16,4 +19,4 @@ Patch 3721 (19 September, 2021)
 ### Other
 
 ### Contributors
- - Jip (#3442, #3439)
+ - Jip (#3442, #3439, #3449)
