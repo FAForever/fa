@@ -5,7 +5,7 @@
 --
 --  Summary  :  Default definitions collision beams
 --
---  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
