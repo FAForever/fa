@@ -282,7 +282,20 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
             # Non-Host Messages
             if data.Type == 'Launch' then
                 LOG(repr(data.GameInfo))
-                lobbyComm:LaunchGame(data.GameInfo)
+                local hostOptions = table.copy(data.GameInfo.GameOptions)
+                -- The host options contain some extra data that we don't care about
+                hostOptions['Ratings'] = nil
+                hostOptions['ScenarioFile'] = nil
+                -- This is a sanity check so we don't accidentally launch games
+                -- with the wrong game settings because the host is using a
+                -- client that doesn't support game options for matchmaker.
+                if not table.equal(gameInfo.GameOptions, hostOptions) then
+                    -- To distinguish this from regular failed connections
+                    GpgNetSend('LaunchRejected')
+                    lobbyComm:LaunchFailed(Strings.MismatchedAutolobbyOptions)
+                else
+                    lobbyComm:LaunchGame(data.GameInfo)
+                end
             end
         end
     end
@@ -365,13 +378,7 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
         LOG("requiredPlayers was set to: "..requiredPlayers)
     end
 
-    for name, value in GetCommandLineArgTable("/gameoptions") do
-        if name and value then
-            gameInfo.GameOptions[name] = value
-        else
-            LOG("Malformed gameoption. ignoring...")
-        end
-    end
+    SetGameOptionsFromCommandLine()
 
     -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
     lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
@@ -384,6 +391,8 @@ end
 function JoinGame(address, asObserver, playerName, uid)
     LOG("Joingame (name=" .. playerName .. ", uid=" .. uid .. ", address=" .. address ..")")
     CreateUI()
+
+    SetGameOptionsFromCommandLine()
 
     lobbyComm:JoinGame(address, playerName, uid)
 end
@@ -407,6 +416,16 @@ function DisconnectFromPeer(uid)
     lobbyComm:DisconnectFromPeer(uid)
 end
 
+
+function SetGameOptionsFromCommandLine()
+    for name, value in GetCommandLineArgTable("/gameoptions") do
+        if name and value then
+            gameInfo.GameOptions[name] = value
+        else
+            LOG("Malformed gameoption. ignoring...")
+        end
+    end
+end
 
 -- Return a table parsed from key:value pairs passed on the command line
 -- Example:
