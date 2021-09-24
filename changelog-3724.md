@@ -8,7 +8,9 @@ Patch 3721 (19 September, 2021)
 ### Bugs
  - (#3442) Fix scathis packing animation time
  - (#3439) Fix Cybran drone visibility for other players than the owner
-
+ 
+### Stability
+ - (#3436) Prevent fetching blueprints for potential entities with no blueprints
 ### Performances
 
 ### AI
@@ -17,3 +19,4 @@ Patch 3721 (19 September, 2021)
 
 ### Contributors
  - Jip (#3442, #3439)
+ - Crotalus (#3436)
