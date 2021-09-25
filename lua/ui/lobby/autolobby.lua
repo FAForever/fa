@@ -55,6 +55,7 @@ local Strings = LobbyComm.Strings
 local lobbyComm = false
 
 local connectedTo = {}
+local peerLaunchStatuses = {}
 
 local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
@@ -174,16 +175,46 @@ local function CheckForLaunch()
     for k,v in gameInfo.PlayerOptions do
         if v.Human and v.PL then
             allRatings[v.PlayerName] = v.PL
+            -- Initialize peer launch statuses
+            peerLaunchStatuses[v.OwnerID] = false
         end
     end
+    -- We don't need to wait for a launch status from ourselves
+    peerLaunchStatuses[localPlayerID] = nil
     gameInfo.GameOptions['Ratings'] = allRatings
 
     LOG("Host launching game.")
     lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
     LOG(repr(gameInfo))
-    lobbyComm:LaunchGame(gameInfo)
-end
 
+    local anyRejected = false
+    ForkThread(function()
+        repeat
+            -- Wait until all launch statuses have been accepted
+            local allAccepted = true
+            for _, status in peerLaunchStatuses do
+                if status == 'Rejected' then
+                    anyRejected = true
+                    allAccepted = false
+                    break
+                elseif not status or status ~= 'Accepted' then
+                    allAccepted = false
+                    break
+                end
+            end
+            if allAccepted then
+                lobbyComm:LaunchGame(gameInfo)
+                break
+            end
+            WaitSeconds(1)
+        until anyRejected
+
+        if anyRejected then
+            LOG("Some players rejected the launch! " .. repr(peerLaunchStatuses))
+            -- TODO: Add UI element for match failed.
+        end
+    end)
+end
 
 
 local function CreateUI()
@@ -273,6 +304,11 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     lobbyComm.DataReceived = function(self,data)
         LOG('DATA RECEIVED: ', repr(data))
 
+        if data.Type == 'LaunchStatus' then
+            peerLaunchStatuses[data.SenderID] = data.Status
+            return
+        end
+
         if lobbyComm:IsHost() then
             # Host Messages
             if data.Type == 'AddPlayer' then
@@ -291,9 +327,12 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
                 -- client that doesn't support game options for matchmaker.
                 if not table.equal(gameInfo.GameOptions, hostOptions) then
                     -- To distinguish this from regular failed connections
-                    GpgNetSend('LaunchRejected')
+                    GpgNetSend('LaunchStatus', 'Rejected')
+
+                    lobbyComm:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
                     lobbyComm:LaunchFailed(Strings.MismatchedAutolobbyOptions)
                 else
+                    lobbyComm:BroadcastData({ Type = 'LaunchStatus', Status = 'Accepted' })
                     lobbyComm:LaunchGame(data.GameInfo)
                 end
             end
