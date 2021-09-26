@@ -1,3 +1,6 @@
+
+dev_path = 'C:\\Users\\Jip\\Documents\\Supreme Commander\\fa'
+
 -- This imports a path file that is written by Forged Alliance Forever right before it starts the game.
 dofile(InitFileDir .. '\\..\\fa_path.lua')
 
@@ -163,7 +166,7 @@ end
 -- @param mountpoint The root folder to look for content in.
 function mount_mod_content(mountpoint)
     -- get all directories / mods at the mount point
-    for _,mod in io.dir(mountpoint..'\\*.*') do
+    for _, mod in io.dir(mountpoint..'\\*.*') do
         
         -- make sure we're not retrieving the current / previous directory
         if mod != '.' and mod != '..' then
@@ -179,8 +182,9 @@ function mount_mod_content(mountpoint)
 
                 -- if we found a directory named 'custom-strategic-icons' then we mount its content
                 if folder == 'custom-strategic-icons' then
-                    LOG('Found mod icons in: '..mod)
-                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons', '/custom-strategic-icons')
+                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
+                    LOG('Found mod icons in ' .. mod .. ', mounted at: ' .. mountLocation)
+                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons', mountLocation) 
                 end
             end
         end
@@ -197,6 +201,9 @@ local function load_content(path)
 	mount_contents(path .. '\\mods', '/mods')
 	mount_contents(path .. '\\maps', '/maps')
 end
+
+-- load in development assets
+mount_dir(dev_path, '/')
 
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
