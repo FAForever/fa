@@ -224,6 +224,10 @@ function OverrideKilled(self, instigator, type, overkillRatio)
 end
 
 function GiveUnitToArmy(unit, newArmyIndex, triggerOnGiven)
+    -- Shared army mod will result in different players having the same army number.
+    if unit.Army == newArmyIndex then
+        return unit
+    end
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
     unit.IsBeingTransferred = true
