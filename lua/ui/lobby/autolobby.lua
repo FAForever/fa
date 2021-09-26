@@ -273,7 +273,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         SetDialog(controlGroup, LOCF(Strings.ConnectionFailed, reason), "<LOC _OK>", CleanupAndExit)
     end
 
-    lobbyComm.LaunchFailed = function(self,reasonKey)
+    lobbyComm.LaunchFailed = function(self, reasonKey)
         LOG("LAUNCH FAILED")
         SetDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
     end
@@ -283,14 +283,14 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         SetDialog(controlGroup, Strings.Ejected, "<LOC _OK>", CleanupAndExit)
     end
 
-    lobbyComm.ConnectionToHostEstablished = function(self,myID,newLocalName,theHostID)
+    lobbyComm.ConnectionToHostEstablished = function(self, myID, newLocalName, theHostID)
         LOG("CONNECTED TO HOST")
         hostID = theHostID
         localPlayerName = newLocalName
         localPlayerID = myID
 
         -- Ok, I'm connected to the host. Now request to become a player
-        lobbyComm:SendData(hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), })
+        self:SendData(hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), })
     end
 
     lobbyComm.DataReceived = function(self, data)
@@ -301,7 +301,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
             return
         end
 
-        if lobbyComm:IsHost() then
+        if self:IsHost() then
             # Host Messages
             if data.Type == 'AddPlayer' then
                 HostAddPlayer(data.SenderID, data.PlayerInfo)
@@ -320,12 +320,12 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
                 if not table.equal(gameInfo.GameOptions, hostOptions) then
                     SetDialog(controlGroup, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
 
-                    lobbyComm:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
+                    self:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
                     -- To distinguish this from regular failed connections
                     GpgNetSend('LaunchStatus', 'Rejected')
                 else
-                    lobbyComm:BroadcastData({ Type = 'LaunchStatus', Status = 'Accepted' })
-                    lobbyComm:LaunchGame(data.GameInfo)
+                    self:BroadcastData({ Type = 'LaunchStatus', Status = 'Accepted' })
+                    self:LaunchGame(data.GameInfo)
                 end
             end
         end
@@ -345,7 +345,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     end
 
     lobbyComm.Hosting = function(self)
-        localPlayerID = lobbyComm:GetLocalPlayerID()
+        localPlayerID = self:GetLocalPlayerID()
         hostID = localPlayerID
 
         # Give myself the first slot
@@ -365,11 +365,11 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         end
     end
 
-    lobbyComm.PeerDisconnected = function(self,peerName,peerID)
+    lobbyComm.PeerDisconnected = function(self, peerName, peerID)
         LOG('>DEBUG> PeerDisconnected : peerName='..peerName..' peerID='..peerID)
         if IsPlayer(peerID) then
             local slot = FindSlotForID(peerID)
-            if slot and lobbyComm:IsHost() then
+            if slot and self:IsHost() then
                 gameInfo.PlayerOptions[slot] = nil
             end
         end
