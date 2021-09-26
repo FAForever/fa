@@ -2119,11 +2119,11 @@ local function TryLaunch(skipNoObserversCheck)
 
                     -- store it accordingly
                     for k, element in data.IconConfiguration do 
-                        iconReplacements[element.blueprintId] = mod.location .. "/custom-strategic-icons/" .. element.iconSet
+                        iconReplacements[string.lower(element.blueprintId)] = mod.location .. "/custom-strategic-icons/" .. element.iconSet
                     end
                 end )
 
-                -- tell us (and them spam the author, not the dev) if it failed
+                -- tell us (and then spam the author, not the dev) if it failed
                 if not ok then 
                     WARN("Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
                     WARN(msg)
