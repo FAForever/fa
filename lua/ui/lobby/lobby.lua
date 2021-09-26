@@ -2057,7 +2057,7 @@ local function TryLaunch(skipNoObserversCheck)
                     gameInfo.GameOptions[option.key] = keyVersion or valueVersion
 
                     -- Can be removed once this code leaves the develop branch
-                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
+                    SPEW("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
                 end
             end
         end
@@ -2183,6 +2183,13 @@ local function UpdateGame()
                 -- see if it exists
                 if DiskGetFileInfo(iconConfigurationPath) then 
 
+                    -- keep track of debug information
+                    local info = { }
+                    info.Name = mod.name 
+                    info.Author = mod.author 
+                    info.UUID = uuid
+                    info.Icons = { }
+
                     -- do a protected call to make sure a ui mod can not mess things up for launching
                     ok, msg = pcall(function()
                         -- retrieve configuration
@@ -2191,7 +2198,7 @@ local function UpdateGame()
 
                         -- store it accordingly
                         for k, element in data.IconConfiguration do 
-                            iconReplacements[string.lower(element.blueprintId)] = identifier .. "/" .. element.iconSet
+                            info.Icons[string.lower(element.blueprintId)] = identifier .. "/" .. element.iconSet
                         end
                     end )
 
@@ -2199,6 +2206,10 @@ local function UpdateGame()
                     if not ok then 
                         WARN("Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
                         WARN(msg)
+
+                    -- if all ok, then keep track of this one
+                    else 
+                        table.insert(iconReplacements, info)
                     end
                 end
             end

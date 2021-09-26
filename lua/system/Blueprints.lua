@@ -56,6 +56,35 @@ local here = getinfo(1).source
 local original_blueprints
 local current_mod
 
+--- Load in the pre game data that is defined in the lobby.
+local function LoadPreGameData()
+
+    -- load in the prefs file
+    local file = DiskFindFiles("/preferences", "Game.prefs")[1]
+    if not file then 
+        WARN('Blueprints.lua - Preferences file is not found. Skipping pre game data.') 
+        return 
+    end
+
+    -- try and load the pre game data of prefs file
+    local preGameData = false 
+    ok, msg = pcall(
+        function() 
+            local data = { }
+            doscript(file, data)
+            preGameData = data.PreGameData 
+        end 
+    )
+
+    -- tell us if something went wrong
+    if not ok then 
+        WARN("Blueprints.lua - Preferences file is corrupted. Skipping pre game data.")
+        WARN(msg)
+    end
+
+    return preGameData
+end
+
 local function InitOriginalBlueprints()
     current_mod = nil
     original_blueprints = {
@@ -426,17 +455,16 @@ function PreModBlueprints(all_bps)
     -- STRATEGIC ICON REPLACEMENT --
 
     -- try and load in pre game data
-    PreGameData = false
-    LoadCustomPreferences()
-
-    if PreGameData and PreGameData.IconReplacements then 
-        for id, iconset in PreGameData.IconReplacements do 
-            local bp = all_bps.Unit[id]
-            if bp then 
-                bp.StrategicIconName = iconset
-            -- TODO: how to provide valid info here for debugging?
-            else 
-                WARN("")
+    local preGameData = LoadPreGameData()
+    if preGameData and preGameData.IconReplacements then 
+        for _, info in preGameData.IconReplacements do 
+            for identifier, iconset in info.Icons do 
+                local bp = all_bps.Unit[identifier]
+                if bp then 
+                    bp.StrategicIconName = iconset
+                else 
+                    WARN("Blueprints.lua - invalid blueprint '" .. identifier .. "' in mod '" .. info.Name .. "' made by '" .. info.Author)
+                end
             end
         end
     end
@@ -689,14 +717,11 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
-    --load game preferences file
-    PreGameData = false --this stops us from tripping the games global variable uninitialised detector, which is very finicky in this file.
-    LoadCustomPreferences()
-
-    -- load blueprints from active map directory
-    if PreGameData and PreGameData.CurrentMapDir then
+    -- try and load in pre game data for current map directory
+    local preGameData = LoadPreGameData()
+    if preGameData and preGameData.CurrentMapDir then
         task = 'Blueprints Loading: Blueprints from current map'
-        files = DiskFindFiles(PreGameData.CurrentMapDir, pattern)
+        files = DiskFindFiles(preGameData.CurrentMapDir, pattern)
         for k,file in files do
             BlueprintLoaderUpdateProgress()
             -- update UnitManager UI via taskNotifier only if it exists
@@ -773,12 +798,4 @@ function ReloadBlueprint(file)
     ModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
-end
-
--- Load the game.prefs file and save it
-function LoadCustomPreferences()
-    local PrefFile = DiskFindFiles("/preferences", "Game.prefs")
-    task = 'Blueprints Loading: loading game preferences file'
-    if not PrefFile[1] then WARN('Blueprints.lua - Preferences file not found. Skipping custom content. Is the file mounted correctly in the init?') return end
-    safecall(task .. ': ' .. PrefFile[1], doscript, PrefFile[1])
 end
