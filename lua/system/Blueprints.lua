@@ -423,6 +423,18 @@ end
 -- Mod unit blueprints before allowing mods to modify it as well, to pass the most correct unit blueprint to mods
 function PreModBlueprints(all_bps)
 
+    -- STRATEGIC ICON REPLACEMENT --
+
+    --load game preferences file
+    PreGameData = false
+    LoadCustomPreferences()
+
+    if PreGameData and PreGameData.IconReplacements then 
+        for k, data in IconReplacements do 
+
+        end
+    end
+
     -- Brute51: Modified code for ship wrecks and added code for SCU presets.
     -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 

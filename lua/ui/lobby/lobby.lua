@@ -66,7 +66,6 @@ GetAITypes()
 
 --This is a special table that allows us to pass data to blueprints.lua, before the rest of the game is loaded.
 -- do not use this for anything that doesnt do blueprint modding, use GameOptions for that instead, which will load it into sim.
-PreGameData = {}
 
 local IsSyncReplayServer = false
 
@@ -2072,7 +2071,7 @@ local function TryLaunch(skipNoObserversCheck)
         -- out-of-order message delivery.
         -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
         -- check if rehosting still works for non-host players.
-        lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
+        -- lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
@@ -2081,8 +2080,63 @@ local function TryLaunch(skipNoObserversCheck)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
-        PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
-        SetPreference('PreGameData',PreGameData)
+        -- contains information that is available during blueprint loading
+        local preGameData = {}
+
+        -- store the (selected) map directory so that we can load individual blueprints from it
+        preGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
+
+        -- STRATEGIC ICON REPLACEMENT --
+
+        -- icon replacements
+        local iconReplacements = { }
+
+        -- retrieve all (selected) mods
+        local allMods = Mods.AllMods()
+        local selectedMods = Mods.GetSelectedMods()
+
+        -- loop over selected mods identifiers
+        for uuid, _ in selectedMods do 
+
+            -- get the mod, determine path to icon configuration file
+            local mod = allMods[uuid]
+
+            -- check for mod integrity
+            if not (mod.name and mod.author) then 
+                WARN("Unable to load icons from mod '" .. uuid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
+            end
+
+            -- path to configuration file
+            local iconConfigurationPath = mod.location .. "/mod_icons.lua"
+
+            -- see if it exists
+            if DiskGetFileInfo(iconConfigurationPath) then 
+
+                -- do a protected call to make sure a ui mod can not mess things up for launching
+                ok, msg = pcall(function()
+                    -- retrieve configuration
+                    local data = import(iconConfigurationPath)
+
+                    -- store it accordingly
+                    for k, element in data.IconConfiguration do 
+                        iconReplacements[element.blueprintId] = mod.location .. "/custom-strategic-icons/" .. element.iconSet
+                    end
+                end )
+
+                -- tell us (and them spam the author, not the dev) if it failed
+                if not ok then 
+                    WARN("Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
+                    WARN(msg)
+                end
+            end
+        end
+
+        preGameData.IconReplacements = iconReplacements
+
+        -- store in preferences so that we can retrieve it during blueprint loading
+        SetPreference('PreGameData',preGameData)
+
+        -- launch the game
         lobbyComm:LaunchGame(gameInfo)
     end
 
