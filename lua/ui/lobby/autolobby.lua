@@ -133,8 +133,26 @@ local function HostAddPlayer(senderId, playerInfo)
 end
 
 
-local function CheckForLaunch()
+local function WaitLaunchAccepted()
+    while true do
+        local allAccepted = true
+        for _, status in peerLaunchStatuses do
+            if status == 'Rejected' then
+                return false
+            elseif not status or status ~= 'Accepted' then
+                allAccepted = false
+                break
+            end
+        end
+        if allAccepted then
+            return true
+        end
+        WaitSeconds(1)
+    end
+end
 
+
+local function CheckForLaunch()
     local important = {}
     for slot,player in gameInfo.PlayerOptions do
         GpgNetSend('PlayerOption', player.OwnerID, 'StartSpot', slot)
@@ -187,32 +205,14 @@ local function CheckForLaunch()
     lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
     LOG(repr(gameInfo))
 
-    local anyRejected = false
     ForkThread(function()
-        repeat
-            -- Wait until all launch statuses have been accepted
-            local allAccepted = true
-            for _, status in peerLaunchStatuses do
-                if status == 'Rejected' then
-                    anyRejected = true
-                    allAccepted = false
-                    break
-                elseif not status or status ~= 'Accepted' then
-                    allAccepted = false
-                    break
-                end
-            end
-            if allAccepted then
-                lobbyComm:LaunchGame(gameInfo)
-                break
-            end
-            WaitSeconds(1)
-        until anyRejected
-
-        if anyRejected then
-            LOG("Some players rejected the launch! " .. repr(peerLaunchStatuses))
-            -- TODO: Add UI element for match failed.
+        if WaitLaunchAccepted() then
+            lobbyComm:LaunchGame(gameInfo)
+            return
         end
+
+        LOG("Some players rejected the launch! " .. repr(peerLaunchStatuses))
+        -- TODO: Add UI element for match failed.
     end)
 end
 
@@ -290,8 +290,8 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
 
     lobbyComm.ConnectionToHostEstablished = function(self,myID,newLocalName,theHostID)
         LOG("CONNECTED TO HOST")
-        if connectingDialog then
-            connectingDialog:Destroy()
+        if currentDialog then
+            currentDialog:Destroy()
         end
         hostID = theHostID
         localPlayerName = newLocalName
@@ -386,7 +386,6 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
 end
 
 
-
 -- Create a new unconnected lobby.
 function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "CreateLobby ScreenGroup") end
@@ -421,7 +420,6 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
 
     -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
     lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
-
 
     lobbyComm:HostGame()
 end
