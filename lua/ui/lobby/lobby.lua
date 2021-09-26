@@ -2073,7 +2073,7 @@ local function TryLaunch(skipNoObserversCheck)
         -- out-of-order message delivery.
         -- Downlord: I use this in clients now to store the rehost preset. So if you're going to remove this, please
         -- check if rehosting still works for non-host players.
-        -- lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
+        lobbyComm:BroadcastData({ Type = 'Launch', GameInfo = gameInfo })
 
         -- set the mods
         gameInfo.GameMods = Mods.GetGameMods(gameInfo.GameMods)
