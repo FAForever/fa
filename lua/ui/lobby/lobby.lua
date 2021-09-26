@@ -33,6 +33,8 @@ local Text = import('/lua/maui/text.lua').Text
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Border = import('/lua/ui/controls/border.lua').Border
 
+local utils = import('/lua/system/utils.lua')
+
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = Trueskill.round
 local Player = Trueskill.Player
@@ -2080,62 +2082,6 @@ local function TryLaunch(skipNoObserversCheck)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
-        -- contains information that is available during blueprint loading
-        local preGameData = {}
-
-        -- store the (selected) map directory so that we can load individual blueprints from it
-        preGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
-
-        -- STRATEGIC ICON REPLACEMENT --
-
-        -- icon replacements
-        local iconReplacements = { }
-
-        -- retrieve all (selected) mods
-        local allMods = Mods.AllMods()
-        local selectedMods = Mods.GetSelectedMods()
-
-        -- loop over selected mods identifiers
-        for uuid, _ in selectedMods do 
-
-            -- get the mod, determine path to icon configuration file
-            local mod = allMods[uuid]
-
-            -- check for mod integrity
-            if not (mod.name and mod.author) then 
-                WARN("Unable to load icons from mod '" .. uuid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
-            end
-
-            -- path to configuration file
-            local iconConfigurationPath = mod.location .. "/mod_icons.lua"
-
-            -- see if it exists
-            if DiskGetFileInfo(iconConfigurationPath) then 
-
-                -- do a protected call to make sure a ui mod can not mess things up for launching
-                ok, msg = pcall(function()
-                    -- retrieve configuration
-                    local data = import(iconConfigurationPath)
-
-                    -- store it accordingly
-                    for k, element in data.IconConfiguration do 
-                        iconReplacements[string.lower(element.blueprintId)] = mod.location .. "/custom-strategic-icons/" .. element.iconSet
-                    end
-                end )
-
-                -- tell us (and then spam the author, not the dev) if it failed
-                if not ok then 
-                    WARN("Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
-                    WARN(msg)
-                end
-            end
-        end
-
-        preGameData.IconReplacements = iconReplacements
-
-        -- store in preferences so that we can retrieve it during blueprint loading
-        SetPreference('PreGameData',preGameData)
-
         -- launch the game
         lobbyComm:LaunchGame(gameInfo)
     end
@@ -2203,9 +2149,75 @@ local function UpdateGame()
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
 
-            -- prefetch the session to make loading screen shorter
-            local mods = Mods.GetGameMods(gameInfo.GameMods)
-            PrefetchSession(scenarioInfo.map, mods, true)
+            -- contains information that is available during blueprint loading
+            local preGameData = {}
+
+            -- MAP ASSETS LOADING -- 
+
+            -- store the (selected) map directory so that we can load individual blueprints from it
+            preGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
+
+            -- STRATEGIC ICON REPLACEMENT --
+
+            -- icon replacements
+            local iconReplacements = { }
+
+            -- retrieve all (selected) mods
+            local allMods = Mods.AllMods()
+            local selectedMods = Mods.GetSelectedMods()
+
+            -- loop over selected mods identifiers
+            for uuid, _ in selectedMods do 
+
+                -- get the mod, determine path to icon configuration file
+                local mod = allMods[uuid]
+
+                -- check for mod integrity
+                if not (mod.name and mod.author) then 
+                    WARN("Unable to load icons from mod '" .. uuid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
+                end
+
+                -- path to configuration file
+                local iconConfigurationPath = mod.location .. "/mod_icons.lua"
+
+                -- see if it exists
+                if DiskGetFileInfo(iconConfigurationPath) then 
+
+                    -- do a protected call to make sure a ui mod can not mess things up for launching
+                    ok, msg = pcall(function()
+                        -- retrieve configuration
+                        local data = import(iconConfigurationPath)
+                        local identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+
+                        -- store it accordingly
+                        for k, element in data.IconConfiguration do 
+                            iconReplacements[string.lower(element.blueprintId)] = identifier .. "/" .. element.iconSet
+                        end
+                    end )
+
+                    -- tell us (and then spam the author, not the dev) if it failed
+                    if not ok then 
+                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
+                        WARN(msg)
+                    end
+                end
+            end
+
+            preGameData.IconReplacements = iconReplacements
+
+            -- store in preferences so that we can retrieve it during blueprint loading
+            SetPreference('PreGameData', preGameData)
+
+            -- PREFETCHING -- 
+
+            -- we can't prefetch in combination with PreGameData as the prefs file
+            -- is not updated accordingly, as a result when it is retrieved in
+            -- blueprints.lua it may use the old values. As it is more relevant
+            -- to have custom icon support over having a slightly faster loading
+            -- time we skip the prefetching
+
+            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
+            -- PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()

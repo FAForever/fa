@@ -430,7 +430,6 @@ function PreModBlueprints(all_bps)
     LoadCustomPreferences()
 
     if PreGameData and PreGameData.IconReplacements then 
-        LOG(repr(PreGameData.IconReplacements))
         for id, iconset in PreGameData.IconReplacements do 
             local bp = all_bps.Unit[id]
             if bp then 
