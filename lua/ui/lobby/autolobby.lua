@@ -225,7 +225,7 @@ local function CheckForLaunch()
         end
 
         LOG("Some players rejected the launch! " .. repr(peerLaunchStatuses))
-        SetDialog(Group(parent, "controlGroup"), Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
+        SetDialog(parent, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
     end)
 end
 
@@ -241,22 +241,13 @@ local function CreateUI()
     if not parent then parent = UIUtil.CreateScreenGroup(GetFrame(0), "Lobby CreateUI ScreenGroup") end
 
     local background = MenuCommon.SetupBackground(GetFrame(0))
-    --local exitButton = MenuCommon.CreateExitMenuButton(parent, background, "<LOC _Exit>")
 
-    ---------------------------------------------------------------------------
-    -- set up map panel
-    ---------------------------------------------------------------------------
-    local controlGroup = Group(parent, "controlGroup")
-    LayoutHelpers.AtCenterIn(controlGroup, parent)
-    LayoutHelpers.SetDimensions(controlGroup, 970, 670)
-
-    SetDialog(controlGroup, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
+    SetDialog(parent, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
 end
 
 
 # LobbyComm Callbacks
 local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
-    local controlGroup = Group(parent, "controlGroup")
     local LobCreateFunc = import('/lua/ui/lobby/lobbyComm.lua').CreateLobbyComm
     local lob = LobCreateFunc(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     if not lob then
@@ -265,22 +256,22 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     lobbyComm = lob
 
     lobbyComm.Connecting = function(self)
-        SetDialog(controlGroup, Strings.Connecting, "<LOC _Cancel>", CleanupAndExit)
+        SetDialog(parent, Strings.Connecting, "<LOC _Cancel>", CleanupAndExit)
     end
 
     lobbyComm.ConnectionFailed = function(self, reason)
         LOG("CONNECTION FAILED " .. reason)
-        SetDialog(controlGroup, LOCF(Strings.ConnectionFailed, reason), "<LOC _OK>", CleanupAndExit)
+        SetDialog(parent, LOCF(Strings.ConnectionFailed, reason), "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.LaunchFailed = function(self, reasonKey)
         LOG("LAUNCH FAILED")
-        SetDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
+        SetDialog(parent, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.Ejected = function(self, reason)
         LOG("EJECTED " .. reason)
-        SetDialog(controlGroup, Strings.Ejected, "<LOC _OK>", CleanupAndExit)
+        SetDialog(parent, Strings.Ejected, "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.ConnectionToHostEstablished = function(self, myID, newLocalName, theHostID)
@@ -318,7 +309,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
                 -- with the wrong game settings because the host is using a
                 -- client that doesn't support game options for matchmaker.
                 if not table.equal(gameInfo.GameOptions, hostOptions) then
-                    SetDialog(controlGroup, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
+                    SetDialog(parent, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
 
                     self:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
                     -- To distinguish this from regular failed connections
