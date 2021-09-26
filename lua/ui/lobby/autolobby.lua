@@ -53,6 +53,12 @@ local gameInfo = {
 local Strings = LobbyComm.Strings
 
 local lobbyComm = false
+local function CleanupAndExit()
+    if lobbyComm then
+        lobbyComm:Destroy()
+    end
+    ExitApplication()
+end
 
 local connectedTo = {}
 local peerLaunchStatuses = {}
@@ -212,7 +218,12 @@ local function CheckForLaunch()
         end
 
         LOG("Some players rejected the launch! " .. repr(peerLaunchStatuses))
-        -- TODO: Add UI element for match failed.
+
+        if connectingDialog then
+            connectingDialog:Destroy()
+        end
+
+        UIUtil.ShowInfoDialog(Group(parent, "controlGroup"), Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
     end)
 end
 
@@ -251,11 +262,6 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         error('Creating lobby using protocol ' .. repr(protocol) .. ' and port ' .. tostring(localPort) .. ' failed.')
     end
     lobbyComm = lob
-
-    local function CleanupAndExit()
-        lobbyComm:Destroy()
-        ExitApplication()
-    end
 
     lobbyComm.Connecting = function(self)
         connectingDialog = UIUtil.ShowInfoDialog(controlGroup, Strings.Connecting, "<LOC _Cancel>", CleanupAndExit)
@@ -326,11 +332,15 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
                 -- with the wrong game settings because the host is using a
                 -- client that doesn't support game options for matchmaker.
                 if not table.equal(gameInfo.GameOptions, hostOptions) then
-                    -- To distinguish this from regular failed connections
-                    GpgNetSend('LaunchStatus', 'Rejected')
+                    if connectingDialog then
+                        connectingDialog:Destroy()
+                    end
+
+                    local failedDlg = UIUtil.ShowInfoDialog(controlGroup, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
 
                     lobbyComm:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
-                    lobbyComm:LaunchFailed(Strings.MismatchedAutolobbyOptions)
+                    -- To distinguish this from regular failed connections
+                    GpgNetSend('LaunchStatus', 'Rejected')
                 else
                     lobbyComm:BroadcastData({ Type = 'LaunchStatus', Status = 'Accepted' })
                     lobbyComm:LaunchGame(data.GameInfo)
