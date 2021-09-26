@@ -425,13 +425,20 @@ function PreModBlueprints(all_bps)
 
     -- STRATEGIC ICON REPLACEMENT --
 
-    --load game preferences file
+    -- try and load in pre game data
     PreGameData = false
     LoadCustomPreferences()
 
     if PreGameData and PreGameData.IconReplacements then 
-        for k, data in IconReplacements do 
-
+        LOG(repr(PreGameData.IconReplacements))
+        for id, iconset in PreGameData.IconReplacements do 
+            local bp = all_bps.Unit[id]
+            if bp then 
+                bp.StrategicIconName = iconset
+            -- TODO: how to provide valid info here for debugging?
+            else 
+                WARN("")
+            end
         end
     end
 
