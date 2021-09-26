@@ -219,6 +219,9 @@ mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
 -- load in any .nxt that matches the whitelist / blacklist in FA gamedata
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
 
+--load preferences into the game as well, letting us have much more control over their contents. This also includes cache and similar.
+mount_dir(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games\\Supreme Commander Forged Alliance', '/preferences')
+
 -- TODO: ?
 mount_dir(fa_path, '/')
 
