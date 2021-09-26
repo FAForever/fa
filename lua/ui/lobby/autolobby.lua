@@ -19,13 +19,11 @@ local utils = import('/lua/system/utils.lua')
 
 
 
-local connectdialog = false
 local parent = false
 local localPlayerName = false
 local requiredPlayers = false
 
-local connectingDialog = false
-local connectionFailedDialog = false
+local currentDialog = false
 
 local localPlayerID = false
 local gameInfo = {
@@ -53,6 +51,10 @@ local gameInfo = {
 local Strings = LobbyComm.Strings
 
 local lobbyComm = false
+
+local connectedTo = {}
+local peerLaunchStatuses = {}
+
 local function CleanupAndExit()
     if lobbyComm then
         lobbyComm:Destroy()
@@ -60,8 +62,13 @@ local function CleanupAndExit()
     ExitApplication()
 end
 
-local connectedTo = {}
-local peerLaunchStatuses = {}
+local function SetDialog(...)
+    if currentDialog then
+        currentDialog:Destroy()
+    end
+
+    currentDialog = UIUtil.ShowInfoDialog(unpack(arg))
+end
 
 local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
@@ -218,22 +225,16 @@ local function CheckForLaunch()
         end
 
         LOG("Some players rejected the launch! " .. repr(peerLaunchStatuses))
-
-        if connectingDialog then
-            connectingDialog:Destroy()
-        end
-
-        UIUtil.ShowInfoDialog(Group(parent, "controlGroup"), Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
+        SetDialog(Group(parent, "controlGroup"), Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
     end)
 end
 
 
 local function CreateUI()
-
-    if (connectdialog != false) then
+    if currentDialog ~= false then
         MenuCommon.MenuCleanup()
-        connectdialog:Destroy()
-        connectdialog = false
+        currentDialog:Destroy()
+        currentDialog = false
     end
 
     -- control layout
@@ -249,7 +250,7 @@ local function CreateUI()
     LayoutHelpers.AtCenterIn(controlGroup, parent)
     LayoutHelpers.SetDimensions(controlGroup, 970, 670)
 
-    UIUtil.ShowInfoDialog(controlGroup, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
+    SetDialog(controlGroup, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
 end
 
 
@@ -264,41 +265,26 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
     lobbyComm = lob
 
     lobbyComm.Connecting = function(self)
-        connectingDialog = UIUtil.ShowInfoDialog(controlGroup, Strings.Connecting, "<LOC _Cancel>", CleanupAndExit)
+        SetDialog(controlGroup, Strings.Connecting, "<LOC _Cancel>", CleanupAndExit)
     end
 
     lobbyComm.ConnectionFailed = function(self, reason)
         LOG("CONNECTION FAILED " .. reason)
-        if connectingDialog then
-            connectingDialog:Destroy()
-        end
-
-        connectionFailedDialog = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.ConnectionFailed, reason), "<LOC _OK>", CleanupAndExit)
+        SetDialog(controlGroup, LOCF(Strings.ConnectionFailed, reason), "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.LaunchFailed = function(self,reasonKey)
         LOG("LAUNCH FAILED")
-        if connectingDialog then
-            connectingDialog:Destroy()
-        end
-
-        local failedDlg = UIUtil.ShowInfoDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
+        SetDialog(controlGroup, LOCF(Strings.LaunchFailed,LOC(reasonKey)), "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.Ejected = function(self, reason)
         LOG("EJECTED " .. reason)
-        if connectingDialog then
-            connectingDialog:Destroy()
-        end
-
-        local failedDlg = UIUtil.ShowInfoDialog(controlGroup, Strings.Ejected, CleanupAndExit)
+        SetDialog(controlGroup, Strings.Ejected, "<LOC _OK>", CleanupAndExit)
     end
 
     lobbyComm.ConnectionToHostEstablished = function(self,myID,newLocalName,theHostID)
         LOG("CONNECTED TO HOST")
-        if currentDialog then
-            currentDialog:Destroy()
-        end
         hostID = theHostID
         localPlayerName = newLocalName
         localPlayerID = myID
@@ -307,7 +293,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         lobbyComm:SendData(hostID, { Type = 'AddPlayer', PlayerInfo = MakeLocalPlayerInfo(newLocalName), })
     end
 
-    lobbyComm.DataReceived = function(self,data)
+    lobbyComm.DataReceived = function(self, data)
         LOG('DATA RECEIVED: ', repr(data))
 
         if data.Type == 'LaunchStatus' then
@@ -332,11 +318,7 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
                 -- with the wrong game settings because the host is using a
                 -- client that doesn't support game options for matchmaker.
                 if not table.equal(gameInfo.GameOptions, hostOptions) then
-                    if connectingDialog then
-                        connectingDialog:Destroy()
-                    end
-
-                    local failedDlg = UIUtil.ShowInfoDialog(controlGroup, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
+                    SetDialog(controlGroup, Strings.LaunchRejected, "<LOC _Exit>", CleanupAndExit)
 
                     lobbyComm:BroadcastData({ Type = 'LaunchStatus', Status = 'Rejected' })
                     -- To distinguish this from regular failed connections
@@ -407,7 +389,7 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         parent = false
         ExitApplication()
     end
-    connectdialog = UIUtil.ShowInfoDialog(parent, Strings.TryingToConnect, Strings.AbortConnect, OnAbort)
+    SetDialog(parent, Strings.TryingToConnect, Strings.AbortConnect, OnAbort)
 
     InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
 
