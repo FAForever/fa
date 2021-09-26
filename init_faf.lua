@@ -1,6 +1,4 @@
 
-dev_path = 'C:\\Users\\Jip\\Documents\\Supreme Commander\\fa'
-
 -- This imports a path file that is written by Forged Alliance Forever right before it starts the game.
 dofile(InitFileDir .. '\\..\\fa_path.lua')
 
@@ -201,9 +199,6 @@ local function load_content(path)
 	mount_contents(path .. '\\mods', '/mods')
 	mount_contents(path .. '\\maps', '/maps')
 end
-
--- load in development assets
-mount_dir(dev_path, '/')
 
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
