@@ -438,37 +438,11 @@ end
 
 
 function SetGameOptionsFromCommandLine()
-    for name, value in GetCommandLineArgTable("/gameoptions") do
+    for name, value in utils.GetCommandLineArgTable("/gameoptions") do
         if name and value then
             gameInfo.GameOptions[name] = value
         else
             LOG("Malformed gameoption. ignoring...")
         end
     end
-end
-
--- Return a table parsed from key:value pairs passed on the command line
--- Example:
---  command line args: /arg key1:value1 key2:value2
---  GetCommandLineArgTable("/arg") -> {key1="value1", key2="value2"}
-function GetCommandLineArgTable(option)
-    -- Find total number of args
-    local next = 1
-    local args, nextArgs = nil, nil
-    repeat
-        nextArgs, args = GetCommandLineArg(option, next), nextArgs
-        next = next + 1
-    until not nextArgs
-
-    -- Construct result table
-    local result = {}
-    if args then
-        for _, arg in args do
-            local pair = utils.StringSplit(arg, ":")
-            local name, value = pair[1], pair[2]
-            result[name] = value
-        end
-    end
-
-    return result
 end
