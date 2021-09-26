@@ -25,7 +25,7 @@ Strings = {
     ['GameLaunched'] = "<LOC lob_0008>Game was launched.",
     ['NoLaunchLimbo'] = "<LOC lob_0006>No clients allowed in limbo at launch",
     ['HostLeft'] = "<LOC lob_0007>Host abandoned lobby",
-    ['MismatchedAutolobbyOptions'] = "<LOC lob_0008>Host used outdated version of lobby or client",
+    ['LaunchRejected'] = "<LOC lob_0009>Some players are using an incompatible client version.",
 }
 
 --- @Deprecated
