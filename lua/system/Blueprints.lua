@@ -85,6 +85,35 @@ local function LoadPreGameData()
     return preGameData
 end
 
+local function AssignIcons(units, assignments, identifier)
+
+    local function AssignBlueprintId(units, id, icon)
+        local unit = units[id]
+        if unit then 
+            local path = identifier .. "/" .. icon
+            unit.StrategicIconName =  path
+        end
+    end
+
+    local function AssignTypeId(units, id, icon)
+        -- todo :)
+    end
+
+    if assignments then 
+        for k, info in assignments do 
+            if info.BlueprintId then 
+                AssignBlueprintId(units, info.BlueprintId, info.IconSet)
+                continue 
+            end
+
+            if info.TypeId then 
+                AssignTypeId(units, info.TypeId, info.IconSet)
+                continue
+            end
+        end
+    end
+end
+
 local function InitOriginalBlueprints()
     current_mod = nil
     original_blueprints = {
@@ -458,13 +487,76 @@ function PreModBlueprints(all_bps)
     local preGameData = LoadPreGameData()
     if preGameData and preGameData.IconReplacements then 
         for _, info in preGameData.IconReplacements do 
-            for identifier, iconset in info.Icons do 
-                local bp = all_bps.Unit[identifier]
-                if bp then 
-                    bp.StrategicIconName = iconset
-                else 
-                    WARN("Blueprints.lua - invalid blueprint '" .. identifier .. "' in mod '" .. info.Name .. "' made by '" .. info.Author)
+
+            -- data that is set in the lobby
+            -- info.Name = mod.name 
+            -- info.Author = mod.author 
+            -- info.Location = mod.location
+            -- info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+            -- info.UID = uid
+
+            -- all the functionality that is available in the _icons.lua
+            local state = {
+                LOG = LOG,
+                WARN = WARN, 
+                _ALERT = _ALERT,
+                SPEW = SPEW,
+                repr = repr,
+                table = table,
+                math = math, 
+                string = string,
+                tonumber = tonumber,
+                type = type,
+            }
+
+            -- try to get the icons file
+            local ok, msg = pcall(
+                function()
+                    doscript(info.Location .. "/mod_icons.lua", state)
                 end
+            )
+
+            -- if we can't, report it
+            if not ok then 
+                WARN("Blueprints.lua - Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
+                WARN(msg)
+            end
+
+            ok, msg = pcall (
+                function()
+                    -- scripted approach
+                    if state.ScriptedIconAssignments then 
+
+                        local units = table.deepcopy(all_bps.Unit)
+                        local projectiles = table.deepcopy(all_bps.Projectile)
+
+                        local scriptedIcons = state.ScriptedIconAssignments(units, projectiles)
+                        AssignIcons(all_bps.Unit, scriptedIcons, info.Identifier)
+
+                        -- inform the dev
+                        local n = table.getsize(scriptedIcons)
+                        if n > 1 then 
+                            SPEW("Blueprints.lua - Found (" .. n .. ") scripted icon assignments in " .. info.Name .. " by " .. info.Author .. ".")
+                        end
+                    end
+
+                    -- manual approach
+                    if state.IconAssignments then 
+                        AssignIcons(all_bps.Unit, state.IconAssignments, info.Identifier)
+
+                        -- inform the dev
+                        local n = table.getsize(state.IconAssignments)
+                        if n > 1 then 
+                            SPEW("Blueprints.lua - Found (" .. n .. ") manual icon assignments in " .. info.Name .. " by " .. info.Author .. ".")
+                        end
+                    end
+                end
+            )
+
+            -- if we can't, report it
+            if not ok then 
+                WARN("Blueprints.lua - Unable to load icons from mod '" .. info.Name .. "' with uuid '" .. info.UID .. "'. Please inform the author: " .. info.Author)
+                WARN(msg)
             end
         end
     end

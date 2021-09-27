@@ -2167,14 +2167,14 @@ local function UpdateGame()
             local selectedMods = Mods.GetSelectedMods()
 
             -- loop over selected mods identifiers
-            for uuid, _ in selectedMods do 
+            for uid, _ in selectedMods do 
 
                 -- get the mod, determine path to icon configuration file
-                local mod = allMods[uuid]
+                local mod = allMods[uid]
 
                 -- check for mod integrity
                 if not (mod.name and mod.author) then 
-                    WARN("Unable to load icons from mod '" .. uuid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
+                    WARN("Unable to load icons from mod '" .. uid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
                 end
 
                 -- path to configuration file
@@ -2183,33 +2183,26 @@ local function UpdateGame()
                 -- see if it exists
                 if DiskGetFileInfo(iconConfigurationPath) then 
 
-                    -- keep track of debug information
-                    local info = { }
-                    info.Name = mod.name 
-                    info.Author = mod.author 
-                    info.UUID = uuid
-                    info.Icons = { }
-
-                    -- do a protected call to make sure a ui mod can not mess things up for launching
-                    ok, msg = pcall(function()
-                        -- retrieve configuration
-                        local data = import(iconConfigurationPath)
-                        local identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
-
-                        -- store it accordingly
-                        for k, element in data.IconConfiguration do 
-                            info.Icons[string.lower(element.blueprintId)] = identifier .. "/" .. element.iconSet
+                    -- see if we can import it
+                    ok, msg = pcall(
+                        function()
+                            import(iconConfigurationPath)
                         end
-                    end )
+                    )
 
-                    -- tell us (and then spam the author, not the dev) if it failed
-                    if not ok then 
-                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
-                        WARN(msg)
-
-                    -- if all ok, then keep track of this one
-                    else 
+                    -- if it passes this basic check, then continue
+                    if ok then 
+                        local info = { }
+                        info.Name = mod.name 
+                        info.Author = mod.author 
+                        info.Location = mod.location
+                        info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+                        info.UID = uid
                         table.insert(iconReplacements, info)
+                    -- tell us (and then spam the author, not the dev) if it failed
+                    else 
+                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN(msg)
                     end
                 end
             end
