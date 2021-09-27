@@ -4,10 +4,13 @@ Patch 3721 (19 September, 2021)
 ### Lobby
 
 ### Gameplay
+ - (#3450) An alternative approach to loading in custom strategic icons
+
 
 ### Bugs
  - (#3442) Fix scathis packing animation time
  - (#3439) Fix Cybran drone visibility for other players than the owner
+ - (#3450) Fix UI textures being overridden by mods that are not enabled
 
 ### Stability
  - (#3436) Prevent fetching blueprints for potential entities with no blueprints
@@ -20,5 +23,6 @@ Patch 3721 (19 September, 2021)
 ### Other
 
 ### Contributors
- - Jip (#3442, #3439, #3449)
+ - Jip (#3442, #3439, #3449, #3450)
  - Crotalus (#3436)
+ - Balthazar (#3450)
