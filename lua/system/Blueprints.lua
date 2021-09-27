@@ -529,8 +529,8 @@ function PreModBlueprints(all_bps)
 
                         local units = table.deepcopy(all_bps.Unit)
                         local projectiles = table.deepcopy(all_bps.Projectile)
-
-                        local scriptedIcons = state.ScriptedIconAssignments(units, projectiles)
+                        local icons = DiskFindFiles(info.Location .. "/custom-strategic-icons", "*.dds")
+                        local scriptedIcons = state.ScriptedIconAssignments(units, projectiles, icons)
                         AssignIcons(all_bps.Unit, scriptedIcons, info.Identifier)
 
                         -- inform the dev
