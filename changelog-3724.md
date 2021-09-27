@@ -24,5 +24,6 @@ Patch 3721 (19 September, 2021)
 
 ### Contributors
  - Jip (#3442, #3439, #3449, #3450)
+ - KionX (#3449)
  - Crotalus (#3436)
  - Balthazar (#3450)
