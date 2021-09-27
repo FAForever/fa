@@ -6,7 +6,6 @@ Patch 3721 (19 September, 2021)
 ### Gameplay
  - (#3450) An alternative approach to loading in custom strategic icons
 
-
 ### Bugs
  - (#3442) Fix scathis packing animation time
  - (#3439) Fix Cybran drone visibility for other players than the owner
