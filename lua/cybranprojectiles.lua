@@ -523,7 +523,7 @@ CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
         
-        if radius > 0:
+        if radius > 0 then
             local pos = self:GetPosition()
             local FriendlyFire = self.DamageData.DamageFriendly
 
