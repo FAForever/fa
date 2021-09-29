@@ -287,7 +287,7 @@ UnitBlueprint {
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 30,
-            ProjectileId = '/projectiles/TDFGauss04/TDFGauss04_proj.bp',
+            ProjectileId = '/projectiles/TDFGauss02/TDFGauss02_proj.bp',
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
