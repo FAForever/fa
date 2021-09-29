@@ -4,8 +4,8 @@
 local TDFGaussCannonProjectile = import('/lua/terranprojectiles.lua').TDFLandGaussCannonProjectile
 TDFGauss04 = Class(TDFGaussCannonProjectile) {
     
-    FxUnitHitScale = 0.75,
-    FxLandHitScale = 0.75,
+    FxUnitHitScale = 0.9,
+    FxLandHitScale = 0.9,
 
     OnCreate = function(self, inWater)
         TDFGaussCannonProjectile.OnCreate(self, inWater)
