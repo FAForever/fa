@@ -167,10 +167,12 @@ local function FindCustomStrategicIcons(all_bps)
                 function()
                     -- scripted approach
                     if state.ScriptedIconAssignments then 
-
+                        -- retrieve data, make sure it is a deepcopy to prevent ui mods messing with the original
                         local units = table.deepcopy(all_bps.Unit)
                         local projectiles = table.deepcopy(all_bps.Projectile)
                         local icons = DiskFindFiles(info.Location .. "/custom-strategic-icons", "*.dds")
+
+                        -- find scripted icons and assign them
                         local scriptedIcons = state.ScriptedIconAssignments(units, projectiles, icons)
                         AssignIcons(all_bps.Unit, scriptedIcons, info.Identifier)
 
@@ -182,11 +184,11 @@ local function FindCustomStrategicIcons(all_bps)
                     end
 
                     -- manual approach
-                    if state.IconAssignments then 
-                        AssignIcons(all_bps.Unit, state.IconAssignments, info.Identifier)
+                    if state.UnitIconAssignments then 
+                        AssignIcons(all_bps.Unit, state.UnitIconAssignments, info.Identifier)
 
                         -- inform the dev
-                        local n = table.getsize(state.IconAssignments)
+                        local n = table.getsize(state.UnitIconAssignments)
                         if n > 1 then 
                             SPEW("Blueprints.lua - Found (" .. n .. ") manual icon assignments in " .. info.Name .. " by " .. info.Author .. ".")
                         end

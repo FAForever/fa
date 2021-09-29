@@ -2184,7 +2184,7 @@ local function UpdateGame()
                 if DiskGetFileInfo(iconConfigurationPath) then 
 
                     -- see if we can import it
-                    ok, msg = pcall(
+                    local ok, msg = pcall(
                         function()
                             import(iconConfigurationPath)
                         end
@@ -2209,8 +2209,18 @@ local function UpdateGame()
 
             preGameData.IconReplacements = iconReplacements
 
-            -- store in preferences so that we can retrieve it during blueprint loading
-            SetPreference('PreGameData', preGameData)
+            -- try and set the preferences - it may crash when running multiple instances on a single machine that all try and start at the same time.
+            local ok, msg = pcall(
+                function() 
+                    -- store in preferences so that we can retrieve it during blueprint loading
+                    SetPreference('PreGameData', preGameData)
+                end 
+            )
+
+            if not ok then 
+                WARN("Unable to update preferences. Are you running multiple instances on the same machine?" )
+                WARN(msg)
+            end
 
             -- PREFETCHING -- 
 
