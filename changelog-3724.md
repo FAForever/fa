@@ -4,6 +4,7 @@ Patch 3721 (19 September, 2021)
 ### Lobby
 
 ### Gameplay
+ - (#3458) Fix UEF Triad and UEF Destroyer projectile on impact animation
 
 ### Bugs
  - (#3442) Fix scathis packing animation time
@@ -20,5 +21,5 @@ Patch 3721 (19 September, 2021)
 ### Other
 
 ### Contributors
- - Jip (#3442, #3439, #3449)
+ - Jip (#3442, #3439, #3449, #3458)
  - Crotalus (#3436)
