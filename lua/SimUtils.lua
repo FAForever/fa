@@ -379,16 +379,22 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
                 failedToTransfer[ID].Orientation = unit:GetOrientation()
 
 
-                for _, reclaim in GetReclaimablesInRect(unit:GetSkirtRect()) do --wrecks can prevent drone from starting construction
-                    if reclaim.IsWreckage then
-                        reclaim:SetCollisionShape('None') --so we set collision shape 'None'
-                        table.insert(modifiedWrecks, reclaim) --and save wrecks to revert our changes later
+                local wrecks = GetReclaimablesInRect(unit:GetSkirtRect())
+                if wrecks then 
+                    for _, reclaim in wrecks do --wrecks can prevent drone from starting construction
+                        if reclaim.IsWreckage then
+                            reclaim:SetCollisionShape('None') --so we set collision shape 'None'
+                            table.insert(modifiedWrecks, reclaim) --and save wrecks to revert our changes later
+                        end
                     end
                 end
 
-                for _,u in GetUnitsInRect(unit:GetSkirtRect()) do --same as for wrecks
-                    u:SetCollisionShape('None')
-                    table.insert(modifiedUnits, u)
+                local units = GetUnitsInRect(unit:GetSkirtRect())
+                if units then 
+                    for _,u in units do --same as for wrecks
+                        u:SetCollisionShape('None')
+                        table.insert(modifiedUnits, u)
+                    end
                 end
 
                 if progress > 0.5 then --if transfer failed, we have to create wreck manually. progress should be more than 50%
