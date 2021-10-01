@@ -378,20 +378,23 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
                 failedToTransfer[ID].DefaultProgress = math.floor(progress * 1000)
                 failedToTransfer[ID].Orientation = unit:GetOrientation()
 
-
-                local wrecks = GetReclaimablesInRect(unit:GetSkirtRect())
+                -- wrecks can prevent drone from starting construction
+                local wrecks = GetReclaimablesInRect(unit:GetSkirtRect()) -- returns nil instead of empty table when empty
                 if wrecks then 
-                    for _, reclaim in wrecks do --wrecks can prevent drone from starting construction
+                    for _, reclaim in wrecks do 
                         if reclaim.IsWreckage then
-                            reclaim:SetCollisionShape('None') --so we set collision shape 'None'
-                            table.insert(modifiedWrecks, reclaim) --and save wrecks to revert our changes later
+                            -- collision shape to none to prevent it from blocking, keep track to revert later
+                            reclaim:SetCollisionShape('None')
+                            table.insert(modifiedWrecks, reclaim)
                         end
                     end
                 end
 
-                local units = GetUnitsInRect(unit:GetSkirtRect())
+                -- units can prevent drone from starting construction
+                local units = GetUnitsInRect(unit:GetSkirtRect()) -- returns nil instead of empty table when empty
                 if units then 
-                    for _,u in units do --same as for wrecks
+                    for _,u in units do
+                        -- collision shape to none to prevent it from blocking, keep track to revert later
                         u:SetCollisionShape('None')
                         table.insert(modifiedUnits, u)
                     end

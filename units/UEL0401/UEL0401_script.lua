@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/UEL0401/UEL0401_script.lua
 -- Author(s):  John Comes, David Tomandl, Gordon Duclos
 -- Summary  :  UEF Mobile Factory Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local TMobileFactoryUnit = import('/lua/terranunits.lua').TMobileFactoryUnit
