@@ -38,6 +38,10 @@ UnitBlueprint {
         'INVULNERABLE',
         'UNSPAWNABLE',
         'UNSELECTABLE',
+        'INSIGNIFICANTUNIT',
+
+        -- make it visible to recon at least
+        'VISIBLETORECON',
     },
     Display = {
         Mesh = {
