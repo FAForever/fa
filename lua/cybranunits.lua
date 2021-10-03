@@ -318,6 +318,7 @@ CBuildBotUnit = Class(AirUnit) {
 
         -- store the army in case AOE damage tries to hit the drone
         self.Army = self:GetArmy()
+        self.UnitId = self:GetUnitId()
     end,
 
     -- short-cut when being destroyed
