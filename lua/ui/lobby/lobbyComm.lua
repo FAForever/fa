@@ -37,7 +37,7 @@ function GetDefaultPlayerOptions(playerName)
         ArmyColor = 1,
         StartSpot = 1,
         Ready = false,
-        Faction = table.getn(import('/lua/factions.lua').Factions) + 1, --max faction + 1 tells lobby to pick random faction
+        Faction = table.getn(import('/lua/factions.lua').Factions) + 1, -- max faction + 1 tells lobby to pick random faction
         PlayerName = playerName or "player",
         AIPersonality = "",
         Human = true,
