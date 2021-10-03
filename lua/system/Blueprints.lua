@@ -116,12 +116,12 @@ local function AssignIcons(units, assignments, identifier)
 
     if assignments then 
         for k, info in assignments do 
-            if info.BlueprintId then 
+            if info.BlueprintId and info.IconSet then 
                 AssignBlueprintId(units, info.BlueprintId, info.IconSet)
                 continue 
             end
 
-            if info.TypeId then 
+            if info.TypeId and info.Iconset then 
                 AssignTypeId(units, info.TypeId, info.IconSet)
                 continue
             end
