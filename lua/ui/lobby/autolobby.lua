@@ -106,24 +106,8 @@ local function MakeLocalPlayerInfo(name)
     return result
 end
 
-
-local function IsColorFree(colorIndex)
-    for id,player in gameInfo.PlayerOptions do
-        if player.PlayerColor == colorIndex then
-            return false
-        end
-    end
-
-    return true
-end
-
 function wasConnected(peer)
-    for _,v in pairs(connectedTo) do
-        if v == peer then
-            return true
-        end
-    end
-    return false
+    return table.find(connectedTo, peer) ~= nil
 end
 
 function FindSlotForID(id)

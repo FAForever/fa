@@ -47,7 +47,7 @@ function table.copy(t)
     return r
 end
 
---- table.contains(t,val) returns the key for val if it is in t table.
+--- table.find(t,val) returns the key for val if it is in t table.
 --- Otherwise, return nil
 function table.find(t,val)
     if not t then return end -- prevents looping over nil table
