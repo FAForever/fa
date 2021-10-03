@@ -184,6 +184,13 @@ function mount_mod_content(mountpoint)
                     LOG('Found mod icons in ' .. mod .. ', mounted at: ' .. mountLocation)
                     mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons', mountLocation) 
                 end
+
+                -- if we found a file named 'custom-strategic-icons.scd' then we mount its content - good for performance when the number of icons is high
+                if folder == 'custom-strategic-icons.scd' then 
+                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
+                    LOG('Found mod icon package in ' .. mod .. ', mounted at: ' .. mountLocation)
+                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons.scd', mountLocation) 
+                end
             end
         end
     end

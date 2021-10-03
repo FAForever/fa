@@ -18,6 +18,7 @@ Patch 3721 (19 September, 2021)
  - (#3436) Prevent fetching blueprints for potential entities with no blueprints
  - (#3449) Fix significant hard-crash potential that patch 3721 introduced
  - (#3460) Fix potential soft-crash when gifting units upon death (with thanks to FemtoZetta)
+ - (#3467) Add SCD support for large icon sets
 
 ### Performances
 
@@ -26,7 +27,7 @@ Patch 3721 (19 September, 2021)
 ### Other
 
 ### Contributors
- - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450)
+ - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3467)
  - KionX (#3449)
  - Crotalus (#3436)
  - Balthazar (#3450)
