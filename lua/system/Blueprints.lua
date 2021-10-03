@@ -165,12 +165,17 @@ local function FindCustomStrategicIcons(all_bps)
             local ok, msg = pcall(
                 function()
                     doscript(info.Location .. "/mod_icons.lua", state)
+
+                    -- syntax errors are caught internally and instead it just returns the table untouched
+                    if not (state.UnitIconAssignments or state.ScriptedIconAssignments) then
+                        error("Blueprints.lua - can not import the icon configuration file at '" .. info.Location .. "'. This could be due to missing functionality functionality or a parsing error.")
+                    end
                 end
             )
 
             -- if we can't, report it
             if not ok then 
-                WARN("Blueprints.lua - Unable to load icons from mod '" .. mod.name .. "' with uuid '" .. uuid .. "'. Please inform the author: " .. mod.author)
+                WARN("Blueprints.lua - Unable to load icons from mod '" .. info.Name .. "' with uuid '" .. info.UID .. "'. Please inform the author: " .. info.Author)
                 WARN(msg)
             end
 

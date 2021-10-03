@@ -2186,7 +2186,15 @@ local function UpdateGame()
                     -- see if we can import it
                     local ok, msg = pcall(
                         function()
-                            import(iconConfigurationPath)
+
+                            -- attempt to load the file
+                            local env = { }
+                            doscript(iconConfigurationPath, env)
+
+                            -- syntax errors are caught internally and instead it just returns the table untouched
+                            if not (env.UnitIconAssignments or env.ScriptedIconAssignments) then
+                                error("Lobby.lua - can not import the icon configuration file at '" .. iconConfigurationPath .. "'. This could be due to missing functionality functionality or a parsing error.")
+                            end
                         end
                     )
 
