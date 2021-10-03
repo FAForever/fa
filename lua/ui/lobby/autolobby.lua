@@ -26,6 +26,10 @@ local requiredPlayers = false
 local currentDialog = false
 
 local localPlayerID = false
+
+
+--- The default game information for an automatch. This should typically never be changed directly
+-- as the server can change game options as it wishes since PR 3385.
 local gameInfo = {
     GameOptions = {
         Score = 'no',
@@ -145,7 +149,9 @@ local function HostAddPlayer(senderId, playerInfo)
     gameInfo.PlayerOptions[slot] = playerInfo
 end
 
-
+--- Waits to receive confirmation from all players as to whether they share the same
+-- game options. Is used to reject a game when this is not the case. Typically
+-- this happens when the players do not share the same (Java) client.
 local function WaitLaunchAccepted()
     while true do
         local allAccepted = true
