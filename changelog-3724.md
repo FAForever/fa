@@ -12,6 +12,7 @@ Patch 3721 (19 September, 2021)
  - (#3439) Fix Cybran drone visibility for other players than the owner
  - (#3450) Fix UI textures being overridden by mods that are not enabled
  - (#3457) Fix Cybran drone being interactable and other small issues (with thanks to Archsimkat)
+ - (#3453) Fix units being gifted to the same player causing a crash for the shared army mod (co-op campaign)
 
 ### Stability
  - (#3436) Prevent fetching blueprints for potential entities with no blueprints
@@ -29,3 +30,4 @@ Patch 3721 (19 September, 2021)
  - KionX (#3449)
  - Crotalus (#3436)
  - Balthazar (#3450)
+ - Speed2 (#3453)
