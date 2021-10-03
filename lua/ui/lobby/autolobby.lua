@@ -6,6 +6,11 @@
 --*
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
+--* FAF notes:
+--* Automatch games are configured by the lobby server by sending parameters
+--* to the FAF client which then relays that configuration to autolobby.lua
+--* through command line arguments.
+--*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -59,6 +64,7 @@ local lobbyComm = false
 local connectedTo = {}
 local peerLaunchStatuses = {}
 
+-- Cancels automatching and closes the game
 local function CleanupAndExit()
     if lobbyComm then
         lobbyComm:Destroy()
@@ -66,6 +72,7 @@ local function CleanupAndExit()
     ExitApplication()
 end
 
+-- Replace the currently displayed dialog (there is only 1).
 local function SetDialog(...)
     if currentDialog then
         currentDialog:Destroy()
@@ -74,6 +81,7 @@ local function SetDialog(...)
     currentDialog = UIUtil.ShowInfoDialog(unpack(arg))
 end
 
+-- Create PlayerInfo for our local player from command line options
 local function MakeLocalPlayerInfo(name)
     local result = LobbyComm.GetDefaultPlayerOptions(name)
     result.Human = true
@@ -151,7 +159,7 @@ end
 
 --- Waits to receive confirmation from all players as to whether they share the same
 -- game options. Is used to reject a game when this is not the case. Typically
--- this happens when the players do not share the same (Java) client.
+-- this happens when the players do not share the same (FAF) client.
 local function WaitLaunchAccepted()
     while true do
         local allAccepted = true
@@ -170,7 +178,9 @@ local function WaitLaunchAccepted()
     end
 end
 
-
+-- Check if we can launch the game and then do so. To launch the game we need
+-- to be connected to the correct number of players as configured by the
+-- command line args.
 local function CheckForLaunch()
     local important = {}
     for slot,player in gameInfo.PlayerOptions do
@@ -184,7 +194,7 @@ local function CheckForLaunch()
         end
     end
 
-    -- counts the number of players in the game.  Include yourself by default.
+    -- counts the number of players in the game. Include yourself by default.
     local playercount = 1
     for k,id in important do
         if id ~= localPlayerID then
@@ -349,7 +359,6 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         HostAddPlayer(hostID, MakeLocalPlayerInfo(localPlayerName))
 
         --  Fill in the desired scenario.
-
         gameInfo.GameOptions.ScenarioFile = self.desiredScenario
     end
 
