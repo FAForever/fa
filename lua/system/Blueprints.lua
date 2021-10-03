@@ -147,18 +147,35 @@ local function FindCustomStrategicIcons(all_bps)
             -- info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
             -- info.UID = uid
 
+            local safemath = table.copy(math)
+            safemath.random = nil
+
             -- all the functionality that is available in the _icons.lua
             local state = {
+                -- moholog-interacting statements
                 LOG = LOG,
                 WARN = WARN, 
                 _ALERT = _ALERT,
                 SPEW = SPEW,
+                error = error,
+                assert = assert,
+
+                -- debugging statements
                 repr = repr,
+
+                -- compatibility statements
+                pairs = pairs,
+                ipairs = ipairs,
+                next = next,
+
+                -- typical statements
                 table = table,
-                math = math, 
+                math = safemath, 
                 string = string,
                 tonumber = tonumber,
                 type = type,
+                unpack = unpack,
+                tostring = tostring,
             }
 
             -- try to get the icons file
