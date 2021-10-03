@@ -448,7 +448,7 @@ function SetGameOptionsFromCommandLine()
         if name and value then
             gameInfo.GameOptions[name] = value
         else
-            LOG("Malformed gameoption. ignoring...")
+            LOG("Malformed gameoption. ignoring " .. name .. ": " .. value)
         end
     end
 end
