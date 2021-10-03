@@ -184,7 +184,7 @@ local function CheckForLaunch()
         end
     end
 
-    #counts the number of players in the game.  Include yourself by default.
+    -- counts the number of players in the game.  Include yourself by default.
     local playercount = 1
     for k,id in important do
         if id ~= localPlayerID then
@@ -252,7 +252,7 @@ local function CreateUI()
 end
 
 
-# LobbyComm Callbacks
+--  LobbyComm Callbacks
 local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
     local LobCreateFunc = import('/lua/ui/lobby/lobbyComm.lua').CreateLobbyComm
     local lob = LobCreateFunc(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -299,12 +299,12 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         end
 
         if self:IsHost() then
-            # Host Messages
+            --  Host Messages
             if data.Type == 'AddPlayer' then
                 HostAddPlayer(data.SenderID, data.PlayerInfo)
             end
         else
-            # Non-Host Messages
+            --  Non-Host Messages
             if data.Type == 'Launch' then
                 LOG(repr(data.GameInfo))
                 local hostOptions = table.copy(data.GameInfo.GameOptions)
@@ -345,10 +345,10 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         localPlayerID = self:GetLocalPlayerID()
         hostID = localPlayerID
 
-        # Give myself the first slot
+        --  Give myself the first slot
         HostAddPlayer(hostID, MakeLocalPlayerInfo(localPlayerName))
 
-        # Fill in the desired scenario.
+        --  Fill in the desired scenario.
 
         gameInfo.GameOptions.ScenarioFile = self.desiredScenario
     end
