@@ -280,7 +280,7 @@ UnitBlueprint {
             Damage = 15,
             DamageType = 'Normal',
             DisplayName = 'Heavy Laser Autogun',
-            DamageRadius = 0.4,
+            DamageRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = 'Air|Land|Water|Seabed',
                 Land = 'Air|Land|Water|Seabed',
