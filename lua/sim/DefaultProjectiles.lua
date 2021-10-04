@@ -9,6 +9,10 @@ local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
 local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
 local OCProjectiles = {}
+
+-- shared between sim and ui
+local OverchargeShared = import('/lua/shared/overcharge.lua')
+
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -438,7 +442,7 @@ OverchargeProjectile = Class() {
                     energyLimit = energyLimit / OCProjectiles[self.Army]
                 end
 
-                local energyLimitDamage = self:EnergyAsDamage(energyLimit)
+                local energyLimitDamage = OverchargeShared.EnergyAsDamage(energyLimit)
 
                 -- Find max available damage
                 damage = math.min(data.maxDamage, energyLimitDamage)
@@ -478,7 +482,7 @@ OverchargeProjectile = Class() {
         end
 
         -- Turn the final damage into energy
-        local drain = self:DamageAsEnergy(damage)
+        local drain = OverchargeShared.DamageAsEnergy(damage)
 
         --LOG('Drain is ' .. drain)
         --LOG('Damage is ' .. damage)
@@ -498,17 +502,6 @@ OverchargeProjectile = Class() {
                 end
             end)
         end
-    end,
-
-    -- y = 3000e^(0.000095(x+15500))-10090 = old values
-    -- y = 4x = new values
-    -- https://www.desmos.com/calculator/ap0kazbdp0
-    DamageAsEnergy = function(self, damage)
-        return damage * 4
-    end,
-
-    EnergyAsDamage = function(self, energy)
-        return energy / 4
     end,
 
     UnitsDetection = function(self, targetType, targetEntity)
