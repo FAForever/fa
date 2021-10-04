@@ -223,7 +223,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringRandomness = 0.2,
+            FiringRandomness = 0.25,
             FiringTolerance = 0.01,
             Label = 'MainGun',
             MaxRadius = 4000,
@@ -234,7 +234,7 @@ UnitBlueprint {
             MuzzleVelocity = 150,
             MuzzleVelocityReduceDistance = 4000,
             ProjectileId = '/projectiles/AIFFragmentationSensorShell01/AIFFragmentationSensorShell01_proj.bp',
-            ProjectileLifetime = 1000,
+            ProjectileLifetime = 150,
             ProjectilesPerOnFire = 25,
             RackBones = {
                 {
