@@ -11,6 +11,7 @@ Patch 3724 (04th October, 2021)
  - (#3457) Fix Cybran drone being interactable and other small issues (with thanks to Archsimkat)
  - (#3453) Fix units being gifted to the same player causing a soft-crash for the shared army mod (co-op campaign)
  - (#3468) Revert changes to sending the results of games
+ - (#3471) Fix overcharge mouse indicator to use the right damage calculations
 
 ### Stability
  - (#3436) Prevent fetching blueprints for potential entities with no blueprints
@@ -22,7 +23,7 @@ Patch 3724 (04th October, 2021)
  - (#3385) Add support for custom game options being set by the server (for 3v3 / 4v4 TMM)
 
 ### Contributors
- - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3467, #3468)
+ - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3467, #3468, #3471)
  - KionX (#3449)
  - Crotalus (#3436)
  - Balthazar (#3450)
