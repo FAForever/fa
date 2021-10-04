@@ -442,7 +442,7 @@ OverchargeProjectile = Class() {
                     energyLimit = energyLimit / OCProjectiles[self.Army]
                 end
 
-                local energyLimitDamage = OverchargeShared.EnergyAsDamage(energyLimit)
+                local energyLimitDamage = self:EnergyAsDamage(energyLimit)
 
                 -- Find max available damage
                 damage = math.min(data.maxDamage, energyLimitDamage)
@@ -482,7 +482,7 @@ OverchargeProjectile = Class() {
         end
 
         -- Turn the final damage into energy
-        local drain = OverchargeShared.DamageAsEnergy(damage)
+        local drain = self:DamageAsEnergy(damage)
 
         --LOG('Drain is ' .. drain)
         --LOG('Damage is ' .. damage)
@@ -504,15 +504,12 @@ OverchargeProjectile = Class() {
         end
     end,
 
-    -- y = 3000e^(0.000095(x+15500))-10090 = old values
-    -- y = 4x = new values
-    -- https://www.desmos.com/calculator/ap0kazbdp0
     DamageAsEnergy = function(self, damage)
-        return damage * 4
+        return OverchargeShared.DamageAsEnergy(damage)
     end,
 
     EnergyAsDamage = function(self, energy)
-        return energy / 4
+        return OverchargeShared.EnergyAsDamage(energy)
     end,
 
     UnitsDetection = function(self, targetType, targetEntity)
