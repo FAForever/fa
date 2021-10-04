@@ -18,6 +18,7 @@ Patch 3724 (04th October, 2021)
  - (#3449) Fix significant hard-crash potential that patch 3721 introduced (with thanks to all the debugger reports)
  - (#3460) Fix potential soft-crash when gifting units upon death (with thanks to FemtoZetta)
  - (#3467) Add SCD support for large icon sets (with thanks to Deribus)
+ - (#3472) Revert changes to some projectiles that caused them to crash for mods (with thanks to DDDX)
 
 ### Other
  - (#3385) Add support for custom game options being set by the server (for 3v3 / 4v4 TMM)
@@ -30,3 +31,4 @@ Patch 3724 (04th October, 2021)
  - speed2 (#3453)
  - Askaholic (#3385)
  - BlackYps (#3385)
+ - keyser (#3472)
