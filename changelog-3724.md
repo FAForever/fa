@@ -14,14 +14,15 @@ Patch 3724 (04th October, 2021)
 
 ### Stability
  - (#3436) Prevent fetching blueprints for potential entities with no blueprints
- - (#3449) Fix significant hard-crash potential that patch 3721 introduced
+ - (#3449) Fix significant hard-crash potential that patch 3721 introduced (with thanks to all the debugger reports)
  - (#3460) Fix potential soft-crash when gifting units upon death (with thanks to FemtoZetta)
+ - (#3467) Add SCD support for large icon sets (with thanks to Deribus)
 
 ### Other
  - (#3385) Add support for custom game options being set by the server (for 3v3 / 4v4 TMM)
 
 ### Contributors
- - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3468)
+ - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3467, #3468)
  - KionX (#3449)
  - Crotalus (#3436)
  - Balthazar (#3450)
