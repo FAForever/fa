@@ -301,7 +301,7 @@
             MuzzleVelocity = 160,
             MuzzleVelocityReduceDistance = 4000,
             ProjectileId = '/projectiles/CIFArtilleryProton03/CIFArtilleryProton03_proj.bp',
-            ProjectileLifetime = 100,
+            ProjectileLifetime = 150,
             ProjectilesPerOnFire = 1,
             RackBones = {
                 {
