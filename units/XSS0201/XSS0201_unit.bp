@@ -441,7 +441,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 80,
+            Damage = 95,
             DamageType = 'Normal',
             DisplayName = 'Ana-it Torpedo Launcher',
             FireTargetLayerCapsTable = {
@@ -452,8 +452,8 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Torpedo1',
             MaxRadius = 45,
-            MuzzleSalvoDelay = 0.4,
-            MuzzleSalvoSize = 3,
+            MuzzleSalvoDelay = 0.9,
+            MuzzleSalvoSize = 4,
             MuzzleVelocity = 5,
             ProjectileId = '/projectiles/SANAnaitTorpedo01/SANAnaitTorpedo01_proj.bp',
             ProjectileLifetime = 7,
@@ -473,7 +473,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
-            RateOfFire = 0.5,
+            RateOfFire = 0.25,
             TargetCheckInterval = 0.8,
             TargetPriorities = {
                 'SUBMERSIBLE',
