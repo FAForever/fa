@@ -523,9 +523,11 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 200,
+            Damage = 40,
             DamageType = 'Normal',
             DisplayName = 'Nanite Torpedo',
+            DoTPulses = 5,
+            DoTTime = 0.5,
             FireTargetLayerCapsTable = {
                 Water = 'Seabed|Sub|Water',
             },
