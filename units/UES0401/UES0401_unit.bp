@@ -500,7 +500,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
+            RateOfFire = 0.5,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
@@ -566,7 +566,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
+            RateOfFire = 0.5,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
@@ -632,7 +632,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
+            RateOfFire = 0.5,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
@@ -698,7 +698,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
+            RateOfFire = 0.5,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
