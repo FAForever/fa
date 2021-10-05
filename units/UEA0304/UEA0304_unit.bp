@@ -302,7 +302,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
             CollideFriendly = false,
-            Damage = 3050,
+            Damage = 3100,
             DamageFriendly = true,
             DamageRadius = 5.5,
             DamageType = 'Normal',
