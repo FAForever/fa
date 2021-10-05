@@ -282,6 +282,19 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
+            Buffs = {
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 1,
+                    Radius = 5.25,
+                    TargetAllow = 'ALLUNITS',
+                    TargetDisallow = 'EXPERIMENTAL,COMMAND,WALL',
+                },
+            },
             CollideFriendly = false,
             Damage = 3100,
             DamageFriendly = true,
