@@ -14,19 +14,22 @@ XSB1104 = Class(SMassFabricationUnit) {
 
     OnCreate = function(self)
         SMassFabricationUnit.OnCreate(self)
-        self.Rotator = CreateRotator(self, 'Blades', 'y', nil, 0, 50, 0)
         self.Trash:Add(self.Rotator)
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         SMassFabricationUnit.OnStopBeingBuilt(self,builder,layer)
+        self.Rotator = CreateRotator(self, 'Blades', 'y', nil, 0, 50, 0)
         ChangeState(self, self.ActiveState)
     end,
 
     ActiveState = State {
         Main = function(self)
-            self.Rotator:SetSpinDown(false)
-            self.Rotator:SetTargetSpeed(180)
+            -- guard for eco manager mod
+            if self:GetFractionComplete() == 1.0 then 
+                self.Rotator:SetSpinDown(false)
+                self.Rotator:SetTargetSpeed(180)
+            end
         end,
 
         OnProductionPaused = function(self)
@@ -37,8 +40,11 @@ XSB1104 = Class(SMassFabricationUnit) {
 
     InActiveState = State {
         Main = function(self)
-            self.Rotator:SetSpinDown(true)
-            WaitFor(self.Rotator)
+            -- guard for eco manager mod
+            if self:GetFractionComplete() == 1.0 then 
+                self.Rotator:SetSpinDown(true)
+                WaitFor(self.Rotator)
+            end
         end,
 
         OnProductionUnpaused = function(self)

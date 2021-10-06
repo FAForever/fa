@@ -72,8 +72,11 @@ UAB1104 = Class(AMassFabricationUnit) {
         end,
 
         OnProductionPaused = function(self)
-            AMassFabricationUnit.OnProductionPaused(self)
-            ChangeState(self, self.InActiveState)
+            -- guard for eco manager mod
+            if self:GetFractionComplete() == 1.0 then 
+                AMassFabricationUnit.OnProductionPaused(self)
+                ChangeState(self, self.InActiveState)
+            end
         end,
     },
 
@@ -104,8 +107,11 @@ UAB1104 = Class(AMassFabricationUnit) {
         end,
 
         OnProductionUnpaused = function(self)
-            AMassFabricationUnit.OnProductionUnpaused(self)
-            ChangeState(self, self.OpenState)
+            -- guard for eco manager mod
+            if self:GetFractionComplete() == 1.0 then 
+                AMassFabricationUnit.OnProductionUnpaused(self)
+                ChangeState(self, self.OpenState)
+            end
         end,
     },
 }

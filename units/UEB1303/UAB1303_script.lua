@@ -32,28 +32,34 @@ UAB1303 = Class(AMassFabricationUnit) {
     end,
 
     OnProductionPaused = function(self)
-        AMassFabricationUnit.OnProductionPaused(self)
-        local num = self:GetRandomDir()
-        self.RingManip1:SetSpinDown(true)
-        self.RingManip2:SetSpinDown(true)
-        self.BallManip:SetSpinDown(true)
-        self.BallManip:SetTargetSpeed(80 + Random(0, 20) * num)
-        self.ParentManip1:SetSpinDown(true)
-        self.ParentManip1:SetTargetSpeed(80 + Random(0, 20) * num)
-        self.ParentManip2:SetSpinDown(true)
-        self.ParentManip2:SetTargetSpeed(80 + Random(0, 20) * num)
-        self.ParentManip3:SetSpinDown(true)
-        self.ParentManip3:SetTargetSpeed(80 + Random(0, 20) * num)
+        -- guard for eco manager mod
+        if self:GetFractionComplete() == 1.0 then 
+            AMassFabricationUnit.OnProductionPaused(self)
+            local num = self:GetRandomDir()
+            self.RingManip1:SetSpinDown(true)
+            self.RingManip2:SetSpinDown(true)
+            self.BallManip:SetSpinDown(true)
+            self.BallManip:SetTargetSpeed(80 + Random(0, 20) * num)
+            self.ParentManip1:SetSpinDown(true)
+            self.ParentManip1:SetTargetSpeed(80 + Random(0, 20) * num)
+            self.ParentManip2:SetSpinDown(true)
+            self.ParentManip2:SetTargetSpeed(80 + Random(0, 20) * num)
+            self.ParentManip3:SetSpinDown(true)
+            self.ParentManip3:SetTargetSpeed(80 + Random(0, 20) * num)
+        end
     end,
     
     OnProductionUnpaused = function(self)
-        AMassFabricationUnit.OnProductionUnpaused(self)
-        self.RingManip1:SetSpinDown(false)
-        self.RingManip2:SetSpinDown(false)
-        self.BallManip:SetSpinDown(false)
-        self.ParentManip1:SetSpinDown(false)
-        self.ParentManip2:SetSpinDown(false)
-        self.ParentManip3:SetSpinDown(false)
+        -- guard for eco manager mod
+        if self:GetFractionComplete() == 1.0 then 
+            AMassFabricationUnit.OnProductionUnpaused(self)
+            self.RingManip1:SetSpinDown(false)
+            self.RingManip2:SetSpinDown(false)
+            self.BallManip:SetSpinDown(false)
+            self.ParentManip1:SetSpinDown(false)
+            self.ParentManip2:SetSpinDown(false)
+            self.ParentManip3:SetSpinDown(false)
+        end
     end,
 
 

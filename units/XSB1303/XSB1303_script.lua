@@ -23,18 +23,24 @@ XSB1303 = Class(SMassFabricationUnit) {
     end,
 
     OnProductionPaused = function(self)
-        SMassFabricationUnit.OnProductionPaused(self)
-        self.RingManip1:SetSpinDown(true)
-        self.RingManip2:SetSpinDown(true)
-        self.RingManip3:SetSpinDown(true)
+        -- guard for eco manager mod
+        if self:GetFractionComplete() == 1.0 then 
+            SMassFabricationUnit.OnProductionPaused(self)
+            self.RingManip1:SetSpinDown(true)
+            self.RingManip2:SetSpinDown(true)
+            self.RingManip3:SetSpinDown(true)
+        end
     end,
     
     OnProductionUnpaused = function(self)
-        SMassFabricationUnit.OnProductionUnpaused(self)
-        self.RingManip1:SetSpinDown(false)
-        self.RingManip2:SetSpinDown(false)
-        self.RingManip3:SetSpinDown(false)
-    end,false
+        -- guard for eco manager mod
+        if self:GetFractionComplete() == 1.0 then 
+            SMassFabricationUnit.OnProductionUnpaused(self)
+            self.RingManip1:SetSpinDown(false)
+            self.RingManip2:SetSpinDown(false)
+            self.RingManip3:SetSpinDown(false)
+        end
+    end,
 }
 
 TypeClass = XSB1303

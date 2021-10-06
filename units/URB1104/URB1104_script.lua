@@ -21,15 +21,17 @@ URB1104 = Class(CMassFabricationUnit) {
     end,
     
     OnProductionUnpaused = function(self)
-        CMassFabricationUnit.OnProductionUnpaused(self)
-        if self.Rotator then 
+        -- guard for eco manager mod
+        if self:GetFractionComplete() == 1.0 then 
+            CMassFabricationUnit.OnProductionUnpaused(self)
             self.Rotator:SetTargetSpeed(150)
         end
     end,
     
     OnProductionPaused = function(self)
-        CMassFabricationUnit.OnProductionPaused(self)
-        if self.Rotator then 
+        -- guard for eco manager mod
+        if self:GetFractionComplete() == 1.0 then 
+            CMassFabricationUnit.OnProductionPaused(self)
             self.Rotator:SetTargetSpeed(0)
         end
     end,
