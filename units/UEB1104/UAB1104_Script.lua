@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1104/UAB1104_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
-#**
-#**  Summary  :  Aeon Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1104/UAB1104_script.lua
+--**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
+--**
+--**  Summary  :  Aeon Mass Fabricator
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
 
@@ -48,12 +48,12 @@ UAB1104 = Class(AMassFabricationUnit) {
             end
             self.Goal = Random(120,300)
             
-            # Ambient effects
+            -- Ambient effects
 			self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/aeon_t1_massfab_ambient_01_emit.bp')
 			self.Trash:Add(self.AmbientEffects)
 
             while not self:IsDead() do
-                # spin clockwise
+                -- spin clockwise
                 if not self.Clockwise then
                     self.Rotator:SetTargetSpeed(self.Goal)
                     self.Clockwise = true
@@ -63,7 +63,7 @@ UAB1104 = Class(AMassFabricationUnit) {
                 end
                 WaitFor(self.Rotator)
 
-                # slow down to change directions
+                -- slow down to change directions
                 self.Rotator:SetTargetSpeed(0)
                 WaitFor(self.Rotator)
                 self.Rotator:SetSpeed(0)

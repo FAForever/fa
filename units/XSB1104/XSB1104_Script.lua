@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/XSB1104/XSB1104_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  Seraphim Mass Fabricator
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/XSB1104/XSB1104_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  Seraphim Mass Fabricator
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SMassFabricationUnit = import('/lua/seraphimunits.lua').SMassFabricationUnit
 
