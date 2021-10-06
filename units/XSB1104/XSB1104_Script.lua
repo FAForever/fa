@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Mass Fabricator
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SMassFabricationUnit = import('/lua/seraphimunits.lua').SMassFabricationUnit

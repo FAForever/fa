@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Mass Fabricator
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
