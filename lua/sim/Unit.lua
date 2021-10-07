@@ -2132,13 +2132,17 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
-        if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
+
+        -- Sanity check, can prevent strange shield bugs and stuff
+        if self.Dead or self:BeenDestroyed() then 
             self:Kill()
             return false
         end
 
-        local bp = self:GetBlueprint()
         self.isFinishedUnit = true
+
+        local bp = self:GetBlueprint()
+
 
         -- Set up Veterancy tracking here. Avoids needing to check completion later.
         -- Do all this here so we only have to do for things which get completed

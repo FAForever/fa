@@ -72,7 +72,7 @@ UAB1104 = Class(AMassFabricationUnit) {
 
         OnProductionPaused = function(self)
             -- guard for eco manager mod
-            if self:GetFractionComplete() == 1.0 then 
+            if self.isFinishedUnit then 
                 AMassFabricationUnit.OnProductionPaused(self)
                 ChangeState(self, self.InActiveState)
             end
@@ -108,7 +108,7 @@ UAB1104 = Class(AMassFabricationUnit) {
 
         OnProductionUnpaused = function(self)
             -- guard for eco manager mod
-            if self:GetFractionComplete() == 1.0 then 
+            if self.isFinishedUnit then 
                 AMassFabricationUnit.OnProductionUnpaused(self)
                 ChangeState(self, self.OpenState)
             end

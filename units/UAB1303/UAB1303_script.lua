@@ -33,7 +33,7 @@ UAB1303 = Class(AMassFabricationUnit) {
 
     OnProductionPaused = function(self)
         -- guard for eco manager mod
-        if self:GetFractionComplete() == 1.0 then 
+        if self.isFinishedUnit then 
             AMassFabricationUnit.OnProductionPaused(self)
             local num = self:GetRandomDir()
             self.RingManip1:SetSpinDown(true)
@@ -51,7 +51,7 @@ UAB1303 = Class(AMassFabricationUnit) {
     
     OnProductionUnpaused = function(self)
         -- guard for eco manager mod
-        if self:GetFractionComplete() == 1.0 then 
+        if self.isFinishedUnit then 
             AMassFabricationUnit.OnProductionUnpaused(self)
             self.RingManip1:SetSpinDown(false)
             self.RingManip2:SetSpinDown(false)

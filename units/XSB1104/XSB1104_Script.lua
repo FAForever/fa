@@ -26,7 +26,7 @@ XSB1104 = Class(SMassFabricationUnit) {
     ActiveState = State {
         Main = function(self)
             -- guard for eco manager mod
-            if self:GetFractionComplete() == 1.0 then 
+            if self.isFinishedUnit then 
                 self.Rotator:SetSpinDown(false)
                 self.Rotator:SetTargetSpeed(180)
             end
@@ -41,7 +41,7 @@ XSB1104 = Class(SMassFabricationUnit) {
     InActiveState = State {
         Main = function(self)
             -- guard for eco manager mod
-            if self:GetFractionComplete() == 1.0 then 
+            if self.isFinishedUnit then 
                 self.Rotator:SetSpinDown(true)
                 WaitFor(self.Rotator)
             end

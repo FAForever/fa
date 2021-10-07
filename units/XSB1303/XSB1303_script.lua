@@ -24,7 +24,7 @@ XSB1303 = Class(SMassFabricationUnit) {
 
     OnProductionPaused = function(self)
         -- guard for eco manager mod
-        if self:GetFractionComplete() == 1.0 then 
+        if self.isFinishedUnit then 
             SMassFabricationUnit.OnProductionPaused(self)
             self.RingManip1:SetSpinDown(true)
             self.RingManip2:SetSpinDown(true)
@@ -34,7 +34,7 @@ XSB1303 = Class(SMassFabricationUnit) {
     
     OnProductionUnpaused = function(self)
         -- guard for eco manager mod
-        if self:GetFractionComplete() == 1.0 then 
+        if self.isFinishedUnit then 
             SMassFabricationUnit.OnProductionUnpaused(self)
             self.RingManip1:SetSpinDown(false)
             self.RingManip2:SetSpinDown(false)
