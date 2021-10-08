@@ -284,7 +284,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 1.5,
-                    Radius = 4,
+                    Radius = 4.55, -- this is the closest approximation in order to make the stun range the same as the DamageRadius (4)
                     TargetAllow = 'ALLUNITS',
                     TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,WALL',
                 },
