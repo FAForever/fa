@@ -290,7 +290,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 3,
-                    Radius = 6,
+                    Radius = 5.8,
                     TargetAllow = 'ALLUNITS',
                     TargetDisallow = 'EXPERIMENTAL,COMMAND,WALL',
                 },
