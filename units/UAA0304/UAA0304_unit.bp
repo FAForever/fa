@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 65,
     },
     Air = {
         AutoLandTime = 1,
@@ -289,14 +289,14 @@ UnitBlueprint {
                     },
                     AppliedToTarget = true,
                     BuffType = 'STUN',
-                    Duration = 1,
-                    Radius = 5.25,
+                    Duration = 3,
+                    Radius = 6,
                     TargetAllow = 'ALLUNITS',
                     TargetDisallow = 'EXPERIMENTAL,COMMAND,WALL',
                 },
             },
             CollideFriendly = false,
-            Damage = 3100,
+            Damage = 3000,
             DamageFriendly = true,
             DamageRadius = 5.25,
             DamageType = 'Normal',
@@ -311,7 +311,7 @@ UnitBlueprint {
             FiringTolerance = 6, # [102]
             FixBombTrajectory = true, # [152]
             Label = 'Bomb',
-            MaxRadius = 90,
+            MaxRadius = 65,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 0,

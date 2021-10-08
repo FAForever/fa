@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 65,
     },
     Air = {
         AutoLandTime = 1,
@@ -316,7 +316,7 @@ UnitBlueprint {
             FiringTolerance = 6,
             FixBombTrajectory = true,
             Label = 'Bomb',
-            MaxRadius = 90,
+            MaxRadius = 65,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 0,
