@@ -5,7 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
-local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
+local InsignificantUnit = import('/lua/sim/unit.lua').InsignificantUnit
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -260,16 +260,10 @@ CConstructionTemplate = Class() {
 
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
-CBuildBotUnit = Class(DummyUnit) {
+CBuildBotUnit = Class(InsignificantUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
-
-    -- used in formation script (!)
-    GetFootPrintSize = function(self)
-        local fp = self.Footprint
-        return MathMax(fp.SizeX, fp.SizeZ)
-    end,
 
     -- only initialise what we need (drones typically have some aim functionality)
     OnPreCreate = function(self) 
