@@ -352,7 +352,7 @@
             WeaponCategory = 'Artillery',
             WeaponRepackTimeout = 0.5,
             WeaponUnpackAnimation = '/units/URL0401/URL0401_aopen.sca',
-            WeaponUnpackAnimationRate = 0.25,
+            WeaponUnpackAnimationRate = 2.5,
             WeaponUnpackAnimatorPrecedence = 0,
             WeaponUnpackLocksMotion = true,
             WeaponUnpackTimeout = 15,

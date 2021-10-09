@@ -47,7 +47,7 @@ function table.copy(t)
     return r
 end
 
---- table.contains(t,val) returns the key for val if it is in t table.
+--- table.find(t,val) returns the key for val if it is in t table.
 --- Otherwise, return nil
 function table.find(t,val)
     if not t then return end -- prevents looping over nil table
@@ -636,6 +636,32 @@ end
 --- Clamps numeric value to specified Min and Max range
 function math.clamp(v, min, max)
     return math.max(min, math.min(max, v))
+end
+
+-- Return a table parsed from key:value pairs passed on the command line
+-- Example:
+--  command line args: /arg key1:value1 key2:value2
+--  GetCommandLineArgTable("/arg") -> {key1="value1", key2="value2"}
+function GetCommandLineArgTable(option)
+    -- Find total number of args
+    local next = 1
+    local args, nextArgs = nil, nil
+    repeat
+        nextArgs, args = GetCommandLineArg(option, next), nextArgs
+        next = next + 1
+    until not nextArgs
+
+    -- Construct result table
+    local result = {}
+    if args then
+        for _, arg in args do
+            local pair = StringSplit(arg, ":")
+            local name, value = pair[1], pair[2]
+            result[name] = value
+        end
+    end
+
+    return result
 end
 
 --- Creates timer for profiling task(s) and calculating time delta between consecutive function calls, e.g.

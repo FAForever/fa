@@ -147,8 +147,8 @@ end
 function QuatFromRotation(rotation, x, y, z)
     local angleRot, qw, qx, qy, qz, angle
     angle = 0.00872664625 * rotation
-    angleRot = math.sin(angle)
-    qw = math.cos(angle)
+    angleRot = MathSin(angle)
+    qw = MathCos(angle)
     qx = x * angleRot
     qy = y * angleRot
     qz = z * angleRot
@@ -250,7 +250,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 -- determine air effects
                 if boundingXZRadius < 1.1 then
                     baseEffects = ExplosionSmallAir
-                elseif boundingXZRadius > 3 then
+                elseif boundingXZRadius > 7 then
                     -- large units cause camera to shake
                     baseEffects = ExplosionLarge
                     ShakeTimeModifier = 1.0
@@ -260,9 +260,9 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 end
             elseif layer == 'Water' then
                 -- determine water effects
-                if boundingXZRadius < 1 then
+                if boundingXZRadius < 2 then
                     baseEffects = ExplosionSmallWater
-                elseif boundingXZRadius > 3 then
+                elseif boundingXZRadius > 3.6 then
                     -- large units cause camera to shake
                     baseEffects = ExplosionMediumWater
                     ShakeTimeModifier = 1.0
@@ -272,7 +272,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 end
 
                 -- environment effects
-                if boundingXZRadius < 0.5 then
+                if boundingXZRadius < 1.0 then
                     environmentEffects = Splashy
                 end
             end
@@ -619,15 +619,15 @@ function CreateDebrisProjectiles(obj, volume, dimensions)
     -- for backwards compatibility
     local sx, sy, sz = unpack(dimensions)
 
-        -- determine blueprint value
-        local bp = false 
-        if volume < 0.2 then
-            bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
-        elseif volume < 2.0 then
-            bp = '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
-        else 
-            bp = '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp'
-        end
+    -- determine blueprint value
+    local bp = false 
+    if volume < 0.2 then
+        bp = '/effects/entities/DebrisMisc09/DebrisMisc09_proj.bp'
+    elseif volume < 2.0 then
+        bp = '/effects/entities/DebrisMisc04/DebrisMisc04_proj.bp'
+    else 
+        bp = '/effects/entities/DebrisMisc010/DebrisMisc010_proj.bp'
+    end
 
     -- get number of projectiles
     local amount = MathMin(Random(1 + (volume * 25), (volume * 50)) , 100)
@@ -647,7 +647,7 @@ function CreateDebrisProjectiles(obj, volume, dimensions)
         local zdir = 10 * ((1 - r1) * sz - (sz * 0.5))
 
         -- create debris projectile
-        EntityCreateProjectile(unit, bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
+        EntityCreateProjectile(obj, bp, xpos, xpos, zpos, xdir, ydir + 4.5, zdir)
     end
 end
 

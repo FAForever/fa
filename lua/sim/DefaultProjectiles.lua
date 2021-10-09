@@ -9,6 +9,10 @@ local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
 local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
 local OCProjectiles = {}
+
+-- shared between sim and ui
+local OverchargeShared = import('/lua/shared/overcharge.lua')
+
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -500,15 +504,12 @@ OverchargeProjectile = Class() {
         end
     end,
 
-    -- y = 3000e^(0.000095(x+15500))-10090 = old values
-    -- y = 4x = new values
-    -- https://www.desmos.com/calculator/ap0kazbdp0
     DamageAsEnergy = function(self, damage)
-        return damage * 4
+        return OverchargeShared.DamageAsEnergy(damage)
     end,
 
     EnergyAsDamage = function(self, energy)
-        return energy / 4
+        return OverchargeShared.EnergyAsDamage(energy)
     end,
 
     UnitsDetection = function(self, targetType, targetEntity)

@@ -1,3 +1,65 @@
+
+Patch 3724 (04th October, 2021)
+============================
+### Gameplay
+ - (#3450) An alternative approach to loading in custom strategic icons
+ - (#3458) Fix UEF Triad and UEF Destroyer projectile on impact animation
+
+### Bugs
+ - (#3442) Fix scathis packing animation time
+ - (#3439) Fix Cybran drone visibility for other players than the owner
+ - (#3450) Fix UI textures being overridden by mods that are not enabled
+ - (#3457) Fix Cybran drone being interactable and other small issues (with thanks to Archsimkat)
+ - (#3453) Fix units being gifted to the same player causing a soft-crash for the shared army mod (co-op campaign)
+ - (#3468) Revert changes to sending the results of games
+ - (#3471) Fix overcharge mouse indicator to use the right damage calculations
+
+### Stability
+ - (#3436) Prevent fetching blueprints for potential entities with no blueprints
+ - (#3449) Fix significant hard-crash potential that patch 3721 introduced (with thanks to all the debugger reports)
+ - (#3460) Fix potential soft-crash when gifting units upon death (with thanks to FemtoZetta)
+ - (#3467) Add SCD support for large icon sets (with thanks to Deribus)
+ - (#3472) Revert changes to some projectiles that caused them to crash for mods (with thanks to DDDX)
+
+### Other
+ - (#3385) Add support for custom game options being set by the server (for 3v3 / 4v4 TMM)
+
+### Contributors
+ - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3467, #3468, #3471)
+ - KionX (#3449)
+ - Crotalus (#3436)
+ - Balthazar (#3450)
+ - speed2 (#3453)
+ - Askaholic (#3385)
+ - BlackYps (#3385)
+ - keyser (#3472)
+
+Patch 3723 (19 September, 2021)
+============================
+- Fixed a bug preventing from spawning the wreck of some experimentals
+
+### Contributors
+- Jip
+
+Patch 3722 (19 September, 2021)
+============================
+### Lobby
+- Updated balance patchnotes link
+
+### Bugs
+- Fixed featured mod not working
+
+### Performances
+- Optimize default explosion
+
+### Other
+- Allowed custom vault path
+
+### Contributors
+- Jip
+- KionX
+- keyser
+
 Patch 3721 (19 September, 2021)
 ============================
 ### Lobby
@@ -85,6 +147,8 @@ Patch 3721 (19 September, 2021)
 - KeyBlue
 - Relent0r
 - Dragun
+- Askaholic
+- Madmax
 - Tagada
 - FemtoZetta
 - Rowey
@@ -93,6 +157,9 @@ Patch 3721 (19 September, 2021)
 - Melanol
 - Benzi-Junior
 - slinkingant
+- WhenDayBreaks
+- SnaggleFox
+- keyser
 
 Patch 3720 (14 May, 2021)
 ============================
@@ -2277,7 +2344,7 @@ Patch 3675 (5th February, 2017)
 
 Patch 3674 (5th February, 2017)
 ============================
-http://content.faforever.com/patchnotes/3674.html
+http://patchnotes.faforever.com/3674.html
 
 ### Lobby
 - Use default map from file. This allows coop, tutorials, and other mods to have an easier time
@@ -3310,7 +3377,7 @@ Patch 3652 (May 2, 2016)
 
 Patch 3650 (August 19, 2015)
 ===========================
-HTML-version of this balance oriented changelog available at: http://content.faforever.com/patchnotes/
+HTML-version of this balance oriented changelog available at: http://patchnotes.faforever.com/
 
 ### Seraphim and UEF ACU TML
 - Missile hitpoints: 3 hp → 2 hp
