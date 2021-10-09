@@ -177,18 +177,22 @@ Projectile = Class(ProjectileMethods, Entity) {
         self.Trash = TrashBag()
     end,
 
-    -- TODO: shallow-copy the damage data instead, and update all units that require a deep copy (for example: when projectiles split the damage is sometimes divided by the number of projectiles).
-    -- Receive damage data as deep-copy from the weapon
-    -- PERFORMANCE-TODO: Does this need to be a deep-copy?
-    PassDamageData = function(self, DamageData)
+    --- Passes the damage data in a shallow manner (reference copy instead of deep copy).
+    ShallowPassDamageData = function(self, data)
+        self.DamageData = data
+        self.CollideFriendly = data.CollideFriendly
+    end,
+
+    --- Passes the damage data in a shallow manner (deep copy instead of reference).
+    PassDamageData = function(self, data)
         -- only copy data that is present
         local SelfDamageData = self.DamageData
-        for k, value in DamageData do 
+        for k, value in data do 
             SelfDamageData[k] = value
         end
 
         -- additional copy
-        self.CollideFriendly = SelfDamageData.CollideFriendly
+        self.CollideFriendly = data.CollideFriendly
     end,
 
     -- Called when a projectile should apply its damage
@@ -588,7 +592,7 @@ Projectile = Class(ProjectileMethods, Entity) {
 
     -- DEPRECATED --
 
-    -- this should never be called - use the actual function.
+    --- This should never be called - use the actual function.
     GetCachePosition = function(self)
 
         -- deprecation warning in case it ever happens.
@@ -601,7 +605,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         return self:GetPosition()
     end,
 
-    -- this should never be called - use the actual value.
+    --- This should never be called - use the actual value.
     GetCollideFriendly = function(self)
 
         -- deprecation warning in case it ever happens.
@@ -612,19 +616,6 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
 
         return self.CollideFriendly
-    end,
-
-    -- this should never be called - use the actual value.
-    PassData = function(self, data)
-
-        -- deprecation warning in case it ever happens.
-        if not DeprecatedWarnings.PassData then 
-            DeprecatedWarnings.PassData = true 
-            WARN("PassData is deprecated: set projectile.Data instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-
-        self.Data = data
     end,
 }
 
