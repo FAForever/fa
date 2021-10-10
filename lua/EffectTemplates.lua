@@ -1076,6 +1076,8 @@ AQuarkBombHit01 = {
     EmtBpPath .. 'quark_bomb_explosion_05_emit.bp',
     EmtBpPath .. 'quark_bomb_explosion_07_emit.bp',
     EmtBpPath .. 'quark_bomb_explosion_08_emit.bp',
+    EmtBpPath .. 'quark_bomb_chrono_effect_01_emit.bp',
+    EmtBpPath .. 'quark_bomb_chrono_effect_02_emit.bp',
 }
 AQuarkBombHit02 = {
     EmtBpPath .. 'quark_bomb_explosion_03_emit.bp',
