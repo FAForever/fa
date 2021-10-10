@@ -213,7 +213,7 @@ TDFGeneralGaussCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
 }
 
-TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UEB2301) UEF Triad and (UES0201) UEF Destroyer
+TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UEB2301) UEF Triad and (UES0103) UEF Frigate and (UES0202) UEF Cruiser and (UEl0201) UEF Striker and (UEL0202) UEF Pillar
     FxImpactUnit = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactLand = EffectTemplate.TGaussCannonHitLand01,
@@ -241,7 +241,37 @@ TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UEB2301)
     end,
 }
 
-TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES0302 (UEF Battleship)
+TDFMediumShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UES0201) UEF Destroyer
+    FxImpactTrajectoryAligned = false,
+    FxImpactUnit = EffectTemplate.TMediumShipGaussCannonHitUnit01,
+    FxImpactProp = EffectTemplate.TMediumShipGaussCannonHit01,
+    FxImpactLand = EffectTemplate.TMediumShipGaussCannonHit01, --
+
+    OnImpact = function(self, targetType, targetEntity)
+        local radius = self.DamageData.DamageRadius
+        
+        if radius > 0 then
+            local pos = self:GetPosition()
+            local FriendlyFire = self.DamageData.DamageFriendly
+            
+            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+            
+            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+            
+            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+                local rotation = RandomFloat(0,2*math.pi)
+                local army = self.Army
+                
+                CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 100, 70, army)
+            end
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
+}
+
+TDFBigShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES0302 (UEF Battleship)
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TShipGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TShipGaussCannonHit01,
