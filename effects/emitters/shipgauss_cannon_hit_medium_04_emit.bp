@@ -1,15 +1,15 @@
 EmitterBlueprint {
-	BlueprintId = 'shipgauss_cannon_hit_09',
+	BlueprintId = 'shipgauss_cannon_hit_04',
 	Lifetime = 3.00,
 	Repeattime = 3.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
-	LocalVelocity = true,
-	LocalAcceleration = true,
+	LocalVelocity = false,
+	LocalAcceleration = false,
 	Gravity = false,
 	AlignRotation = false,
 	AlignToBone = false,
-	Flat = true,
+	Flat = false,
 	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
@@ -18,23 +18,23 @@ EmitterBlueprint {
 	OnlyEmitOnWater = false,
 	ParticleResistance = false,
 	InterpolateEmission = true,
-	TextureStripcount = 1.00,
+	TextureStripcount = 4.00,
 	SortOrder = 0.00,
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/ring_12.dds]],
-	RampTexture = [[/textures/particles/ramp_white_29.dds]],
+	Texture = [[/textures/particles/fire_flame_add_05.dds]],
+	RampTexture = [[/textures/particles/ramp_fire_03.dds]],
 	XDirectionCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.500,y=0.000,z=0.000 },
+			{ x=1.500,y=-0.046,z=0.000 },
 		},
 	},
 	YDirectionCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.500,y=0.000,z=0.000 },
+			{ x=1.500,y=0.300,z=0.300 },
 		},
 	},
 	ZDirectionCurve = {
@@ -46,19 +46,19 @@ EmitterBlueprint {
 	EmitRateCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.470,y=2.000,z=0.000 },
+			{ x=1.500,y=6.000,z=0.000 },
 		},
 	},
 	LifetimeCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=0.226,y=20.000,z=5.000 },
+			{ x=0.768,y=6.000,z=4.000 },
 		},
 	},
 	VelocityCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.500,y=0.000,z=0.000 },
+			{ x=1.500,y=0.200,z=0.000 },
 		},
 	},
 	XAccelCurve = {
@@ -88,37 +88,37 @@ EmitterBlueprint {
 	SizeCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.500,y=0.000,z=0.000 },
+			{ x=1.500,y=0.750,z=0.000 },
 		},
 	},
 	XPosCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.530,y=0.000,z=0.000 },
+			{ x=1.530,y=0.000,z=0.150 },
 		},
 	},
 	YPosCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.500,y=0.500,z=0.000 },
+			{ x=1.515,y=0.500,z=0.500 },
 		},
 	},
 	ZPosCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.530,y=-0.300,z=0.000 },
+			{ x=1.530,y=-0.150,z=0.000 },
 		},
 	},
 	StartSizeCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=0.716,y=0.000,z=0.250 },
+			{ x=0.060,y=0.050,z=0.050 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.470,y=4.000,z=1.500 },
+			{ x=0.050,y=0.500,z=2.000 },
 		},
 	},
 	InitialRotationCurve = {
@@ -142,13 +142,13 @@ EmitterBlueprint {
 	TextureSelectionCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=1.470,y=0.000,z=0.000 },
+			{ x=1.025,y=2.000,z=4.000 },
 		},
 	},
 	RampSelectionCurve = {
 		XRange = 3.00,
 		Keys = {
-			{ x=0.894,y=1.000,z=0.000 },
+			{ x=1.500,y=0.000,z=0.000 },
 		},
 	},
 }
