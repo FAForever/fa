@@ -1,8 +1,8 @@
-#
-# Terran Gauss Cannon Projectile
-#
+--
+-- Terran Gauss Cannon Projectile
+--
 local TDFGaussCannonProjectile = import('/lua/terranprojectiles.lua').TDFGaussCannonProjectile
-TDFGauss04 = Class(TDFGaussCannonProjectile) {
+TDFGauss05 = Class(TDFGaussCannonProjectile) {
     
     FxUnitHitScale = 1.6,
     FxLandHitScale = 1.6,
@@ -21,5 +21,5 @@ TDFGauss04 = Class(TDFGaussCannonProjectile) {
         self:SetDestroyOnWater(true)
     end,
 }
-TypeClass = TDFGauss04
+TypeClass = TDFGauss05
 
