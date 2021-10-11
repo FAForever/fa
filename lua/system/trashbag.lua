@@ -69,5 +69,8 @@ TrashBag = Class {
                 self[k] = nil
             end
         end 
+
+        -- allow us to be re-used, useful for effects
+        self.Next = 1
     end
 }
