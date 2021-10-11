@@ -269,7 +269,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0285>Automatic extractor selection",
+                title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
                 key = 'automex',
                 type = 'toggle',
                 default = 'onlyT1',
