@@ -1,5 +1,5 @@
 --
--- Terran Gauss Cannon Projectile
+-- Terran Gauss Cannon Projectile (UEL0401) Fatboy
 --
 local TDFGaussCannonProjectile = import('/lua/terranprojectiles.lua').TDFLandGaussCannonProjectile
 TDFGauss04 = Class(TDFGaussCannonProjectile) {
