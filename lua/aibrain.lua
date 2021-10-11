@@ -4113,7 +4113,7 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param alliance The alliance status ('Ally', 'Enemy', 'Neutral') to those units.
     -- @param excludeInsignificantUnits Whether or not we exclude insignificant units, defaults to true.
     -- @return nil if none found or a table.
-    GetUnitsAroundPoint = function(category, position, radius, alliance, excludeInsignificantUnits)
+    GetUnitsAroundPoint = function(self, category, position, radius, alliance, excludeInsignificantUnits)
         local units = BrainGetUnitsAroundPoint(category, position, radius, alliance)
 
         -- as it can return nil, check if we have any units
