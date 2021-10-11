@@ -9,6 +9,7 @@ do
     --- Retrieves all units in a rectangle, Excludes insignificant units, such as the Cybran Drone, by default.
     -- @param rectangle The rectangle to look for units in.
     -- @param excludeInsignificantUnits Whether or not we exclude insignificant units, defaults to true. 
+    -- @return nil if none found or a table.
     _G.GetUnitsInRect = function(rectangle, excludeInsignificantUnits)
 
         -- retrieve the units 
