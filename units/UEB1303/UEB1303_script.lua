@@ -24,20 +24,26 @@ UEB1303 = Class(TMassFabricationUnit) {
     end,
     
     OnProductionPaused = function(self)
-        TMassFabricationUnit.OnProductionPaused(self)
-        self.Rotator:SetSpinDown(true)
-		if self.AmbientEffects then
-			self.AmbientEffects:Destroy()
-			self.AmbientEffects = nil
-		end            
+        -- guard for eco manager mod
+        if self.isFinishedUnit then 
+            TMassFabricationUnit.OnProductionPaused(self)
+            self.Rotator:SetSpinDown(true)
+            if self.AmbientEffects then
+                self.AmbientEffects:Destroy()
+                self.AmbientEffects = nil
+            end
+        end            
     end,
     
     OnProductionUnpaused = function(self)
-        TMassFabricationUnit.OnProductionUnpaused(self)
-        self.Rotator:SetTargetSpeed(40)
-        self.Rotator:SetSpinDown(false)
-		self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
-		self.Trash:Add(self.AmbientEffects)          
+        -- guard for eco manager mod
+        if self.isFinishedUnit then 
+            TMassFabricationUnit.OnProductionUnpaused(self)
+            self.Rotator:SetTargetSpeed(40)
+            self.Rotator:SetSpinDown(false)
+            self.AmbientEffects = CreateEmitterAtEntity(self, self:GetArmy(), '/effects/emitters/uef_t3_massfab_ambient_01_emit.bp')
+            self.Trash:Add(self.AmbientEffects)        
+        end  
     end,
 }
 
