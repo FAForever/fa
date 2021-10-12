@@ -287,7 +287,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'MainGun',
-            MaxRadius = 20, # 16 = to make it better in patrol / ground attack mode
+            MaxRadius = 20, -- 16 = to make it better in patrol / ground attack mode
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 55,
