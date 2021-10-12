@@ -2,7 +2,7 @@
 -- Cybran laser 'bolt'
 --
 local CHeavyLaserProjectile = import('/lua/cybranprojectiles.lua').CHeavyLaserProjectile
-CDFLaserHeavy01 = Class(CHeavyLaserProjectile) {}
+CDFLaserHeavy03 = Class(CHeavyLaserProjectile) {}
 
-TypeClass = CDFLaserHeavy01
+TypeClass = CDFLaserHeavy03
 
