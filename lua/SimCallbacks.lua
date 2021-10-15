@@ -42,7 +42,15 @@ local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
-local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
+local LetterArray = { 
+    ["Aeon"] = "ua", 
+    ["AEON"] = "ua",
+    ["UEF"] = "ue", 
+    ["Cybran"] = "ur", 
+    ["CYBRAN"] = "ur", 
+    ["Seraphim"] = "xs",
+    ["SERAPHIM"] = "xs",
+}
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
@@ -79,30 +87,50 @@ Callbacks.ClearCommands = function(data, units)
     IssueClearCommands(safe)
 end
 
+--- Name is self explanatory :)
 local CanBuildInSpot = import('/lua/utilities.lua').CanBuildInSpot
-Callbacks.CapMex = function(data, units)
-    local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
-    if not units[1] then return end
 
+--- Called by the UI when right-clicking a mass extractor
+Callbacks.CapMex = function(data, units)
+
+    -- check if we have a mass extractor
     local mex = GetEntityById(data.target)
     if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
 
+    -- we can't cap an extractor that is on the ocean floor
     if mex.Layer == 'Seabed' then return end
 
-    local pos = mex:GetPosition()
-    local msid
-    local builder
+    -- check if we have units
+    local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
+    if not units[1] then return end
 
+    -- find the first engineer that can build some storage
+    local msid
     for _, unit in units do
-        msid = LetterArray[unit:GetBlueprint().General.FactionName]..'b1106' -- The identity of the storage we'll build
+        msid = LetterArray[unit.factionCategory]..'b1106' -- The identity of the storage we'll build
         if unit:CanBuild(msid) then
-            builder = unit
             break
         end
+    end 
+
+    -- nobody can build a storage
+    if not msid then return end
+
+    -- find all engineers that can build that storage
+    -- todo: optimize this bit
+    local others = { }
+    local builders = { }
+    for _, unit in units do 
+        if unit:CanBuild(msid) then
+            table.insert(builders, unit)
+        else 
+            table.insert(others, unit)
+        end 
     end
 
-    if not builder then return end
-
+    -- compute locations for storages
+    -- todo: optimize this bit so no table allocations happen
+    local pos = mex:GetPosition()
     local locations = {
         up = Vector(pos.x, pos.y, pos.z - 2),
         down = Vector(pos.x, pos.y, pos.z + 2),
@@ -110,13 +138,17 @@ Callbacks.CapMex = function(data, units)
         right = Vector(pos.x + 2, pos.y, pos.z),
     }
 
+    -- order them to build things
     for key, location in locations do
         if CanBuildInSpot(mex, msid, location) then
-            IssueBuildMobile({builder}, location, msid, {})
+            for _, builder in builders do 
+                IssueBuildMobile({builder}, location, msid, {})
+            end
         end
     end
 
-    IssueGuard(units, builder)
+    -- assist for all other builders
+    IssueGuard(others, builders[1])
 end
 
 Callbacks.SpawnAndSetVeterancyUnit = function(data)
