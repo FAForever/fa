@@ -176,30 +176,62 @@ function AddDefaultCommandFeedbackBlips(pos)
     }, 0.75)
 end
 
-local lastMex = nil
+--- Allows us to detect a double tab
+local previousStructure = nil
 function AssistMex(command)
+
+    -- check if we have engineers
     local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
     if not units[1] then return end
-    local mex = GetUnitById(command.Target.EntityId)
-    if not mex or IsDestroyed(mex) then return end
 
-    local eco = mex:GetEconData()
-    local bp = mex:GetBlueprint()
-    local is_capped = eco.massProduced == bp.Economy.ProductionPerSecondMass * 1.5
-    if is_capped then return end
+    -- check if we have a building that we target
+    local structure = GetUnitById(command.Target.EntityId)
+    if not structure or IsDestroyed(structure) then return end
 
-    local cap = false
-    local focus = mex:GetFocus()
+    -- are we a structure?
+    if structure:IsInCategory('STRUCTURE') then 
 
-    if focus then -- upgrading
-        cap = IsKeyDown('Shift') and lastMex == mex
-        lastMex = mex
-    elseif not mex:IsInCategory('TECH1')  then
-        cap = true
-    end
+        -- if we have a non-t1 extractor, create storages and / or fabricators around it
+        if structure:IsInCategory('EXTRACTOR') then 
 
-    if cap then
-        SimCallback({Func = 'CapMex', Args = {target = command.Target.EntityId}}, true)
+            -- conditions 
+            local isTech1 = structure:IsInCategory('TECH1')
+            local isTech2 = structure:IsInCategory('TECH2')
+            local isTech3 = structure:IsInCategory('TECH3')
+
+            local isDoubleTapped = previousStructure == structure
+            previousStructure = structure
+
+            local isUpgrading = IsKeyDown('Shift') and isDoubleTapped
+     
+
+            -- check what type of buildings we'd like to make
+            local buildStorages = (isTech1 and isUpgrading) or (isTech2 and not isUpgrading)
+            local buildStoragesAndFabs = (isTech2 and isUpgrading) or (isTech3 and isDoubleTapped)
+
+            if buildStorages then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = {"b1106"}}}, true)
+            end
+
+            if buildStoragesAndFabs then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = {"b1106", "b1104"}}}, true)
+            end
+        end
+
+        -- if we have a t3 fabricator, create storages around it
+        if structure:IsInCategory('FABRICATOR') and structure:IsInCategory('TECH3') then 
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = {"b1106"}}}, true)
+        end
+
+        -- if we have a t2 artillery, create t1 pgens around it
+        if structure:IsInCategory('ARTILLERY') then 
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1102" }}}, true)
+        end
+
+        -- if we have a radar, create t1 pgens around it
+        if Structure:IsInCategory('RADAR') then 
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1102" }}}, true)
+        end
     end
 end
 

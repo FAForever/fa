@@ -42,15 +42,6 @@ local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
-local LetterArray = { 
-    ["Aeon"] = "ua", 
-    ["AEON"] = "ua",
-    ["UEF"] = "ue", 
-    ["Cybran"] = "ur", 
-    ["CYBRAN"] = "ur", 
-    ["Seraphim"] = "xs",
-    ["SERAPHIM"] = "xs",
-}
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
@@ -90,65 +81,182 @@ end
 --- Name is self explanatory :)
 local CanBuildInSpot = import('/lua/utilities.lua').CanBuildInSpot
 
+local LetterArray = { 
+    ["Aeon"] = "ua", 
+    ["AEON"] = "ua",
+    ["UEF"] = "ue", 
+    ["Cybran"] = "ur", 
+    ["CYBRAN"] = "ur", 
+    ["Seraphim"] = "xs",
+    ["SERAPHIM"] = "xs",
+}
+
+--- Compute the faction-specific blueprint identifier
+local function ConstructBlueprintID (faction, blueprintID)
+    return blueprintID .. LetterArray[faction]
+end
+
+--- Computes the n'th layer of a previous layer. Recursive function by definition, use FootprintToLayer for a valid initial state.
+-- @param previous The last set of points that represent a leyr.
+-- @param layers The number of layers to compute.
+local function ComputeStructureLayer (previous, nPrevious, LayerCount)
+    -- base case
+    if LayerCount <= 0 then 
+        return previous, nPrevious
+    end
+
+    
+    -- recursive case
+    local seen = { }
+    local next = { }
+    local nNext = 1
+
+    -- for each point
+    for k, prev in previous do
+        local px = prev[1]
+        local pz = prev[2] 
+
+        -- look around this point
+        for z = -1, 1 do 
+            for x = -1, 1 do 
+
+                -- dot product to determine viability
+                if z * pz + x * px > 0 then 
+
+                    -- compute next coordinates
+                    local nx = px + x 
+                    local nz = pz + z 
+
+                    -- determine uniqueness
+                    if not seen[nx] and seens[nx][nz] then 
+                        seen[nx] = seen[nx] or { }
+                        seen[nx][nz] = true 
+
+                        next[nNext] = { nx, nz }
+                        nNext = nNext + 1 
+                    end
+                end
+            end
+        end
+    end
+
+    ComputeStructureLayer(next, nNext, LayerCount - 1)
+end
+
+--- Converts a footprint to the inner edge of that structre (that is inside the structure itself), as an example:
+-- For an extractor:            {{0, 0}}
+-- For a t3 mass fabricator:    {{1, 1}, {1, 0}, {1, -1}, {0, 1}, {0, -1}, {-1, 1}, {-1, 0}, {-1, -1}}
+-- @param footprint The blueprint footprint of a unit.
+local function FootprintToLayer (footprint)
+
+    -- small buildings do not have a footprint defined
+    if not footprint then 
+        return { 0, 0 } 
+    end
+
+    local sx = footprint.SizeX 
+    local sz = footprint.SizeZ
+
+    -- to support modded units with a size of 1 and with a footprint
+    if sx == 1 and sz == 1 then 
+        return { 0, 0 } 
+    end
+
+    -- convert 3 -> -1, 1 
+    -- convert 5 -> -2, 2
+    -- convert 7 -> -3, 3
+    local factor = math.floor(0.5 * (sx - 1))
+    local min, max = - factor, factor 
+
+    -- find the inner circle that represents the first layer
+    local next = 1 
+    local nLayers = { }
+    for y = min, max do 
+        for x = min, max do 
+            if x == min or x == max or y == min or y == max then 
+                layers[next] = { x, y } 
+                next = next + 1
+            end
+        end
+    end
+
+    return layers, nLayers - 1
+end
+
 --- Called by the UI when right-clicking a mass extractor
 Callbacks.CapMex = function(data, units)
 
     -- check if we have a mass extractor
-    local mex = GetEntityById(data.target)
-    if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
+    local structure= GetEntityById(data.target)
+    if not structurethen return end 
 
     -- we can't cap an extractor that is on the ocean floor
-    if mex.Layer == 'Seabed' then return end
+    if structureLayer == 'Seabed' then return end
 
     -- check if we have units
     local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
     if not units[1] then return end
 
-    -- find the first engineer that can build some storage
-    local msid
-    for _, unit in units do
-        msid = LetterArray[unit.factionCategory]..'b1106' -- The identity of the storage we'll build
-        if unit:CanBuild(msid) then
-            break
-        end
-    end 
+    -- for each ID passed along we will try to cap it
+    for k, id in data.ids do 
 
-    -- nobody can build a storage
-    if not msid then return end
+        -- populate faction table
+        local buildersByFaction = { }
+        local others = { }
 
-    -- find all engineers that can build that storage
-    -- todo: optimize this bit
-    local others = { }
-    local builders = { }
-    for _, unit in units do 
-        if unit:CanBuild(msid) then
-            table.insert(builders, unit)
-        else 
-            table.insert(others, unit)
+        -- determine of all units in selection what they can build
+        for _, unit in units do
+            local faction = unit.factionCategory
+            local blueprintID = ConstructBlueprintID(faction, id)
+            if unit:CanBuild(blueprintID) then
+                unitsByFaction[faction] = unitsByFaction[faction] or { }
+                table.insert(unitsByFaction[faction], unit)
+            else
+                table.insert(others, unit)
         end 
-    end
 
-    -- compute locations for storages
-    -- todo: optimize this bit so no table allocations happen
-    local pos = mex:GetPosition()
-    local locations = {
-        up = Vector(pos.x, pos.y, pos.z - 2),
-        down = Vector(pos.x, pos.y, pos.z + 2),
-        left = Vector(pos.x - 2, pos.y, pos.z),
-        right = Vector(pos.x + 2, pos.y, pos.z),
-    }
+        -- check if we have some engineer that can make the unit in question
+        local oneCanBuild = false 
+        for k, faction in buildersByFaction do 
+            oneCanBuild = true
+        end 
 
-    -- order them to build things
-    for key, location in locations do
-        if CanBuildInSpot(mex, msid, location) then
+        -- early exit
+        if not oneCanBuild then return end
+
+        -- compute majority
+        -- TODOOO
+        local largest
+
+        -- make other engineers assist
+
+        -- compute locations for storages
+        local footprint = structure:GetBlueprint().Footprint
+        local layer, nLayer = FootprintToLayer(footprint)
+              layer, nLayer = ComputeStructureLayer(layer, nLayer, k)
+
+        local center = structure:GetPosition()
+        for k, location in layer do 
+
+            -- move y -> z, set y
+            location[3] = location[2]
+            location[2] = center[2]
+            
+            -- add center
+            location[1] = location[1] + center[1]
+            location[3] = location[3] + center[3]
+        end
+
+        -- order them to build things
+        for key, location in layer do
             for _, builder in builders do 
                 IssueBuildMobile({builder}, location, msid, {})
             end
         end
-    end
 
-    -- assist for all other builders
-    IssueGuard(others, builders[1])
+        -- assist for all other builders
+        IssueGuard(others, builders[1])
+    end
 end
 
 Callbacks.SpawnAndSetVeterancyUnit = function(data)
