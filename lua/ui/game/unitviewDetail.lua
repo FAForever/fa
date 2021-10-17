@@ -407,6 +407,7 @@ GetAbilityDesc = {
             bp.Display.MovementEffects.Land.Footfall.Damage.Radius)
     end,
     ability_teleport = function(bp)
+        if not bp.General.TeleportDelay then return '' end
         return LOCF('<LOC uvd_Delay>', bp.General.TeleportDelay)
     end
 }
