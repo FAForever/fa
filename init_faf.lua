@@ -129,68 +129,106 @@ local function mount_dir_with_blacklist(dir, glob, mountpoint)
     table.foreach(sorted, function(k,v) mount_dir(v,'/') end)
 end
 
+--- Keep track of what maps are loaded to prevent collisions
+local loadedMaps = { }
+
 --- A helper function that loads in additional content for maps.
--- @param mountpoint The root folder to look for content in.
-local function mount_map_content(dir, glob, mountpoint)
-    LOG('mounting maps from: '..dir)
-    mount_contents(dir, mountpoint)
-
+-- @param dir The root folder to look for content in.
+local function mount_map_content(dir)
     -- look for all directories / maps at the mount point
-    for _, map in io.dir(dir..glob) do
+    for _, map in io.dir(dir .. '//**') do
 
-        -- make sure we're not retrieving the current / previous directory
-        if map != '.' and map != '..' then
+        -- do not do anything with the current / previous directory
+        if map == '.' or map == '..' then
+            continue 
+        end
 
-            -- look at each directory inside this map
-            for _, folder in io.dir(dir..'\\'..map..'\\**') do
+        -- do not load scds / zips as maps
+        if string.find(map, ".zip") or string.find(map, ".scd") then
+            continue 
+        end
 
-                -- if we found a directory named 'movies' then we mount its content
-                if folder == 'movies' then
-                    LOG('Found map movies in: '..map)
-                    mount_dir(dir..map..'\\movies', '/movies')
-                end
+        -- do not load maps twice
+        if loadedMaps[map] then 
+            LOG("Prevented loading a map twice: " .. map)
+            continue
+        end
 
-                -- if we found a directory named 'sounds' then we mount its content
-                if folder == 'sounds' then
-                    LOG('Found map sounds in: '..map)
-                    mount_dir(dir..map..'\\sounds', '/sounds')
-                end
+        -- consider this one loaded
+        loadedMaps[map] = true 
+
+        -- mount the map
+        mount_dir(dir .. "/" .. map, "/maps/" .. map)
+
+        -- look at each directory inside this map
+        for _, folder in io.dir(dir..'\\'..map..'\\**') do
+            -- if we found a directory named 'movies' then we mount its content
+            if folder == 'movies' then
+                LOG('Found map movies in: '..map)
+                mount_dir(dir..map..'\\movies', '/movies')
+            end
+
+            -- if we found a directory named 'sounds' then we mount its content
+            if folder == 'sounds' then
+                LOG('Found map sounds in: '..map)
+                mount_dir(dir..map..'\\sounds', '/sounds')
             end
         end
     end
 end
 
+--- keep track of what mods are loaded to prevent collisions
+local loadedMods = { }
+
 --- A helper function that loads in additional content for mods.
--- @param mountpoint The root folder to look for content in.
-function mount_mod_content(mountpoint)
+-- @param dir The root folder to look for content in.
+function mount_mod_content(dir)
     -- get all directories / mods at the mount point
-    for _, mod in io.dir(mountpoint..'\\*.*') do
+    for _, mod in io.dir(dir..'/*.*') do
         
-        -- make sure we're not retrieving the current / previous directory
-        if mod != '.' and mod != '..' then
+        -- do not do anything with the current / previous directory
+        if mod == '.' or mod == '..' then
+            continue 
+        end
 
-            -- look at each directory inside this mod
-            for _, folder in io.dir(mountpoint..'\\'..mod..'\\*.*') do
-                
-                -- if we found a directory named 'sounds' then we mount its content
-                if folder == 'sounds' then
-                    LOG('Found mod sounds in: '..mod)
-                    mount_dir(mountpoint..'\\'..mod..'\\sounds', '/sounds')
-                end
+        -- do not load scds / zips as mods
+        if string.find(mod, ".zip") or string.find(mod, ".scd") then
+            continue 
+        end
 
-                -- if we found a directory named 'custom-strategic-icons' then we mount its content
-                if folder == 'custom-strategic-icons' then
-                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
-                    LOG('Found mod icons in ' .. mod .. ', mounted at: ' .. mountLocation)
-                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons', mountLocation) 
-                end
+        -- do not load mods twice
+        if loadedMods[mod] then 
+            LOG("Prevented loading a mod twice: " .. mod)
+            continue
+        end
 
-                -- if we found a file named 'custom-strategic-icons.scd' then we mount its content - good for performance when the number of icons is high
-                if folder == 'custom-strategic-icons.scd' then 
-                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
-                    LOG('Found mod icon package in ' .. mod .. ', mounted at: ' .. mountLocation)
-                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons.scd', mountLocation) 
-                end
+        -- consider this one loaded
+        loadedMods[mod] = true 
+
+        -- mount the mod
+        mount_dir(dir .. "/" .. mod, "/mods/" .. mod)
+
+        -- look at each directory inside this mod
+        for _, folder in io.dir(dir..'\\'..mod..'\\*.*') do
+            
+            -- if we found a directory named 'sounds' then we mount its content
+            if folder == 'sounds' then
+                LOG('Found mod sounds in: '..mod)
+                mount_dir(dir..'\\'..mod..'\\sounds', '/sounds')
+            end
+
+            -- if we found a directory named 'custom-strategic-icons' then we mount its content
+            if folder == 'custom-strategic-icons' then
+                local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
+                LOG('Found mod icons in ' .. mod .. ', mounted at: ' .. mountLocation)
+                mount_dir(dir..'\\'..mod..'\\custom-strategic-icons', mountLocation) 
+            end
+
+            -- if we found a file named 'custom-strategic-icons.scd' then we mount its content - good for performance when the number of icons is high
+            if folder == 'custom-strategic-icons.scd' then 
+                local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
+                LOG('Found mod icon package in ' .. mod .. ', mounted at: ' .. mountLocation)
+                mount_dir(dir..'\\'..mod..'\\custom-strategic-icons.scd', mountLocation) 
             end
         end
     end
@@ -203,8 +241,8 @@ local function load_content(path)
 	mount_map_content(path .. '\\maps\\', '**', '/maps')
 	mount_mod_content(path .. '\\mods')
 
-	mount_contents(path .. '\\mods', '/mods')
-	mount_contents(path .. '\\maps', '/maps')
+	-- mount_contents(path .. '\\mods', '/mods')
+	-- mount_contents(path .. '\\maps', '/maps')
 end
 
 -- load maps / mods from custom vault location, if set by client
