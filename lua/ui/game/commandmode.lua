@@ -192,7 +192,7 @@ function AssistMex(command)
     if structure:IsInCategory('STRUCTURE') then 
 
         -- if we have a non-t1 extractor, create storages and / or fabricators around it
-        if structure:IsInCategory('EXTRACTOR') then 
+        if structure:IsInCategory('MASSEXTRACTION') then 
 
             -- conditions 
             local isTech1 = structure:IsInCategory('TECH1')
@@ -204,7 +204,6 @@ function AssistMex(command)
 
             local isUpgrading = IsKeyDown('Shift') and isDoubleTapped
      
-
             -- check what type of buildings we'd like to make
             local buildStorages = (isTech1 and isUpgrading) or (isTech2 and not isUpgrading)
             local buildStoragesAndFabs = (isTech2 and isUpgrading) or (isTech3 and isDoubleTapped)
@@ -219,18 +218,18 @@ function AssistMex(command)
         end
 
         -- if we have a t3 fabricator, create storages around it
-        if structure:IsInCategory('FABRICATOR') and structure:IsInCategory('TECH3') then 
+        if structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = {"b1106"}}}, true)
         end
 
         -- if we have a t2 artillery, create t1 pgens around it
         if structure:IsInCategory('ARTILLERY') then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1102" }}}, true)
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1101" }}}, true)
         end
 
         -- if we have a radar, create t1 pgens around it
-        if Structure:IsInCategory('RADAR') then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1102" }}}, true)
+        if structure:IsInCategory('RADAR') then 
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1101" }}}, true)
         end
     end
 end
@@ -251,7 +250,8 @@ function OnCommandIssued(command)
                 SimCallback(cb, true)
             end
         end
-        if EntityCategoryContains(categories.STRUCTURE * categories.MASSEXTRACTION, command.Blueprint) then
+        LOG("check")
+        if EntityCategoryContains(categories.STRUCTURE, command.Blueprint) then
             local options = Prefs.GetFromCurrentProfile('options')
             if options['assist_mex'] then AssistMex(command) end
         end

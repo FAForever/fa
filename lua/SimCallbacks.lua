@@ -8,6 +8,9 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
+--- Used to warn users (mainly developers) once for invalid use of functionality 
+local Warnings = { }
+
 local Callbacks = {}
 
 function DoCallback(name, data, units)
@@ -56,6 +59,7 @@ Callbacks.PersistFerry = function(data, units)
     if table.empty(transports) then return end
     local start = data.route[1]
 
+    -- function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer])
     local helper = CreateUnit('hel0001', units[1].Army, start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
     table.insert(units, helper)
     IssueClearCommands(units)
@@ -93,164 +97,151 @@ local LetterArray = {
 
 --- Compute the faction-specific blueprint identifier
 local function ConstructBlueprintID (faction, blueprintID)
-    return blueprintID .. LetterArray[faction]
+    return LetterArray[faction] .. blueprintID 
 end
+
+--- Allocated once to prevent re-allocations and de-allocations 
+local buildLocation = Vector(0, 0, 0)
+
+--- Templates for units with a footprint of 1 such as radars and mass extractors
+local footprint1 = { 
+    -- inner layer for storages
+    { {1, 0}, {0, 1}, {-1, 0}, {0, -1}, },
+
+    -- outer layer for fabricators
+    { {-2, 0}, {-1, 1}, {0, 2}, {1, 1}, {2, 0}, {1, -1}, {0, -2}, {-1, -1}, },
+}
+
+--- Templates for units with a footprint of 3 such as fabricators
+local footprint3 = { 
+    -- inner layer for storages
+    { {-1, 2}, {0, 2}, {1, 2}, {2, 1}, {2, 0}, {2, -1}, {1, -2}, {0, -2}, {-1, -2}, {-2, -1}, {-2, 0}, {-2, 1}, },
+}
+
+--- Easy to use table for direct footprint size -> template conversion
+local footprints = {
+    footprint1,
+    { }, -- ease of use
+    footprint3
+}
 
 --- Computes the n'th layer of a previous layer. Recursive function by definition, use FootprintToLayer for a valid initial state.
 -- @param previous The last set of points that represent a leyr.
 -- @param layers The number of layers to compute.
-local function ComputeStructureLayer (previous, nPrevious, LayerCount)
-    -- base case
-    if LayerCount <= 0 then 
-        return previous, nPrevious
-    end
+local function RetrieveNthStructureLayer (footprint, nthLayer)
 
-    
-    -- recursive case
-    local seen = { }
-    local next = { }
-    local nNext = 1
+    -- attempt to retrieve the right set of layers for this footprint
+    local layers = footprints[footprint]
 
-    -- for each point
-    for k, prev in previous do
-        local px = prev[1]
-        local pz = prev[2] 
+    -- if we have some layers for this footprint
+    if layers then 
 
-        -- look around this point
-        for z = -1, 1 do 
-            for x = -1, 1 do 
+        -- attempt to retrieve the right layer count
+        local layer = layers[nthLayer]
 
-                -- dot product to determine viability
-                if z * pz + x * px > 0 then 
+        -- if we have that too
+        if layer then 
 
-                    -- compute next coordinates
-                    local nx = px + x 
-                    local nz = pz + z 
-
-                    -- determine uniqueness
-                    if not seen[nx] and seens[nx][nz] then 
-                        seen[nx] = seen[nx] or { }
-                        seen[nx][nz] = true 
-
-                        next[nNext] = { nx, nz }
-                        nNext = nNext + 1 
-                    end
-                end
-            end
+            -- then we can return that
+            return layer 
         end
     end
 
-    ComputeStructureLayer(next, nNext, LayerCount - 1)
-end
-
---- Converts a footprint to the inner edge of that structre (that is inside the structure itself), as an example:
--- For an extractor:            {{0, 0}}
--- For a t3 mass fabricator:    {{1, 1}, {1, 0}, {1, -1}, {0, 1}, {0, -1}, {-1, 1}, {-1, 0}, {-1, -1}}
--- @param footprint The blueprint footprint of a unit.
-local function FootprintToLayer (footprint)
-
-    -- small buildings do not have a footprint defined
-    if not footprint then 
-        return { 0, 0 } 
+    -- no structure layer available
+    local identifier = "RetrieveNthStructureLayer" .. footprint .. " - " .. nthLayer
+    if not Warnings[identifier] then 
+        Warnings[identifier] = true
+        WARN("Attempted to retrieve a build layer for footprint " .. footprint .. " and layer " .. nthLayer .. " which is not supported. The only supported values are: footprint 1 with layer 0 and 1, footprint 3 with layer 0.")
     end
 
-    local sx = footprint.SizeX 
-    local sz = footprint.SizeZ
-
-    -- to support modded units with a size of 1 and with a footprint
-    if sx == 1 and sz == 1 then 
-        return { 0, 0 } 
-    end
-
-    -- convert 3 -> -1, 1 
-    -- convert 5 -> -2, 2
-    -- convert 7 -> -3, 3
-    local factor = math.floor(0.5 * (sx - 1))
-    local min, max = - factor, factor 
-
-    -- find the inner circle that represents the first layer
-    local next = 1 
-    local nLayers = { }
-    for y = min, max do 
-        for x = min, max do 
-            if x == min or x == max or y == min or y == max then 
-                layers[next] = { x, y } 
-                next = next + 1
-            end
-        end
-    end
-
-    return layers, nLayers - 1
+    -- boo
+    return { }
 end
 
 --- Called by the UI when right-clicking a mass extractor
-Callbacks.CapMex = function(data, units)
+Callbacks.CapStructure = function(data, units)
 
-    -- check if we have a mass extractor
-    local structure= GetEntityById(data.target)
-    if not structurethen return end 
+    -- check if we have a structure
+    local structure = GetEntityById(data.target)
+    if not structure then return end 
 
     -- we can't cap an extractor that is on the ocean floor
-    if structureLayer == 'Seabed' then return end
+    if structure.Layer == 'Seabed' then return end
 
     -- check if we have units
     local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
     if not units[1] then return end
 
+    -- check if we have buildings we want to use for capping
+    if (not data.ids) or (not data.ids[1]) then return end 
+
     -- for each ID passed along we will try to cap it
     for k, id in data.ids do 
 
         -- populate faction table
-        local buildersByFaction = { }
         local others = { }
+        local buildersByFaction = { }
 
         -- determine of all units in selection what they can build
         for _, unit in units do
             local faction = unit.factionCategory
             local blueprintID = ConstructBlueprintID(faction, id)
             if unit:CanBuild(blueprintID) then
-                unitsByFaction[faction] = unitsByFaction[faction] or { }
-                table.insert(unitsByFaction[faction], unit)
+                buildersByFaction[faction] = buildersByFaction[faction] or { }
+                table.insert(buildersByFaction[faction], unit)
             else
                 table.insert(others, unit)
+            end
         end 
 
-        -- check if we have some engineer that can make the unit in question
+        -- sanity check: find at least one engineer that can build the structure in question
         local oneCanBuild = false 
         for k, faction in buildersByFaction do 
             oneCanBuild = true
         end 
 
-        -- early exit
-        if not oneCanBuild then return end
+        -- check if we have units
+        if not oneCanBuild then continue end 
 
-        -- compute majority
-        -- TODOOO
-        local largest
+        -- find majority
+        local faction = ""
+        local builders = { }
+        for k, engineers in buildersByFaction do 
+            if table.getn(builders) < table.getn(engineers) then 
+                builders = engineers 
+                faction = k
+            end
+        end
 
-        -- make other engineers assist
+        -- append the rest to other builders
+        for k, engineers in buildersByFaction do 
+            if k != faction then 
+                for k, engineer in engineers do 
+                    table.insert(others, engineer)
+                end
+            end
+        end
 
-        -- compute locations for storages
+        -- compute / retrieve information for capping
+        local brain = builders[1]:GetAIBrain()
+        local blueprintID = ConstructBlueprintID(faction, id)
         local footprint = structure:GetBlueprint().Footprint
-        local layer, nLayer = FootprintToLayer(footprint)
-              layer, nLayer = ComputeStructureLayer(layer, nLayer, k)
+        local layer = RetrieveNthStructureLayer(footprint.SizeX, k)
 
+        -- compute build locations and issue the capping
         local center = structure:GetPosition()
         for k, location in layer do 
 
-            -- move y -> z, set y
-            location[3] = location[2]
-            location[2] = center[2]
-            
-            -- add center
-            location[1] = location[1] + center[1]
-            location[3] = location[3] + center[3]
-        end
+            -- determine build location using cached value
+            buildLocation[1] = center[1] + 2 * location[1]
+            buildLocation[2] = center[2]
+            buildLocation[3] = center[3] + 2 * location[2]
 
-        -- order them to build things
-        for key, location in layer do
+            -- order all builders to build
             for _, builder in builders do 
-                IssueBuildMobile({builder}, location, msid, {})
+                if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+                    IssueBuildMobile({builder}, buildLocation, blueprintID, {})
+                end
             end
         end
 
