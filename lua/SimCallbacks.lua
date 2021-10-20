@@ -173,81 +173,77 @@ Callbacks.CapStructure = function(data, units)
     if not units[1] then return end
 
     -- check if we have buildings we want to use for capping
-    if (not data.ids) or (not data.ids[1]) then return end 
+    if (not data.id) or (not data.layer) then return end 
 
-    -- for each ID passed along we will try to cap it
-    for k, id in data.ids do 
+    -- populate faction table
+    local others = { }
+    local buildersByFaction = { }
 
-        -- populate faction table
-        local others = { }
-        local buildersByFaction = { }
-
-        -- determine of all units in selection what they can build
-        for _, unit in units do
-            local faction = unit.factionCategory
-            local blueprintID = ConstructBlueprintID(faction, id)
-            if unit:CanBuild(blueprintID) then
-                buildersByFaction[faction] = buildersByFaction[faction] or { }
-                table.insert(buildersByFaction[faction], unit)
-            else
-                table.insert(others, unit)
-            end
-        end 
-
-        -- sanity check: find at least one engineer that can build the structure in question
-        local oneCanBuild = false 
-        for k, faction in buildersByFaction do 
-            oneCanBuild = true
-        end 
-
-        -- check if we have units
-        if not oneCanBuild then continue end 
-
-        -- find majority
-        local faction = ""
-        local builders = { }
-        for k, engineers in buildersByFaction do 
-            if table.getn(builders) < table.getn(engineers) then 
-                builders = engineers 
-                faction = k
-            end
+    -- determine of all units in selection what they can build
+    for _, unit in units do
+        local faction = unit.factionCategory
+        local blueprintID = ConstructBlueprintID(faction, data.id)
+        if unit:CanBuild(blueprintID) then
+            buildersByFaction[faction] = buildersByFaction[faction] or { }
+            table.insert(buildersByFaction[faction], unit)
+        else
+            table.insert(others, unit)
         end
+    end 
 
-        -- append the rest to other builders
-        for k, engineers in buildersByFaction do 
-            if k != faction then 
-                for k, engineer in engineers do 
-                    table.insert(others, engineer)
-                end
-            end
+    -- sanity check: find at least one engineer that can build the structure in question
+    local oneCanBuild = false 
+    for k, faction in buildersByFaction do 
+        oneCanBuild = true
+    end 
+
+    -- check if we have units
+    if not oneCanBuild then return end 
+
+    -- find majority
+    local faction = ""
+    local builders = { }
+    for k, engineers in buildersByFaction do 
+        if table.getn(builders) < table.getn(engineers) then 
+            builders = engineers 
+            faction = k
         end
-
-        -- compute / retrieve information for capping
-        local brain = builders[1]:GetAIBrain()
-        local blueprintID = ConstructBlueprintID(faction, id)
-        local footprint = structure:GetBlueprint().Footprint
-        local layer = RetrieveNthStructureLayer(footprint.SizeX, k)
-
-        -- compute build locations and issue the capping
-        local center = structure:GetPosition()
-        for k, location in layer do 
-
-            -- determine build location using cached value
-            buildLocation[1] = center[1] + 2 * location[1]
-            buildLocation[2] = center[2]
-            buildLocation[3] = center[3] + 2 * location[2]
-
-            -- order all builders to build
-            for _, builder in builders do 
-                if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
-                    IssueBuildMobile({builder}, buildLocation, blueprintID, {})
-                end
-            end
-        end
-
-        -- assist for all other builders
-        IssueGuard(others, builders[1])
     end
+
+    -- append the rest to other builders
+    for k, engineers in buildersByFaction do 
+        if k != faction then 
+            for k, engineer in engineers do 
+                table.insert(others, engineer)
+            end
+        end
+    end
+
+    -- compute / retrieve information for capping
+    local brain = builders[1]:GetAIBrain()
+    local blueprintID = ConstructBlueprintID(faction, data.id)
+    local footprint = structure:GetBlueprint().Footprint
+    local layer = RetrieveNthStructureLayer(footprint.SizeX, data.layer)
+
+    -- compute build locations and issue the capping
+    local center = structure:GetPosition()
+    for k, location in layer do 
+
+        -- determine build location using cached value
+        buildLocation[1] = center[1] + 2 * location[1]
+        buildLocation[3] = center[3] + 2 * location[2]
+        buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
+
+        -- order all builders to build
+        for _, builder in builders do 
+            if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+                IssueBuildMobile({builder}, buildLocation, blueprintID, {})
+            end
+        end
+    end
+
+    -- assist for all other builders
+    IssueGuard(others, builders[1])
 end
 
 Callbacks.SpawnAndSetVeterancyUnit = function(data)

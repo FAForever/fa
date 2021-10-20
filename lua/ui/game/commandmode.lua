@@ -205,31 +205,33 @@ function AssistMex(command)
             local isUpgrading = IsKeyDown('Shift') and isDoubleTapped
      
             -- check what type of buildings we'd like to make
-            local buildStorages = (isTech1 and isUpgrading) or (isTech2 and not isUpgrading)
-            local buildStoragesAndFabs = (isTech2 and isUpgrading) or (isTech3 and isDoubleTapped)
+            local buildStorages = (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) or (isTech3 and not isDoubleTapped)
+            local buildFabs = (isTech2 and isUpgrading) or (isTech3 and isDoubleTapped)
 
             if buildStorages then 
-                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = {"b1106"}}}, true)
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
             end
 
-            if buildStoragesAndFabs then 
-                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = {"b1106", "b1104"}}}, true)
+            if buildFabs then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 2, id = "b1104" }}, true)
+                -- reset state in case we want storages after cancel
+                previousStructure = nil
             end
         end
 
         -- if we have a t3 fabricator, create storages around it
         if structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = {"b1106"}}}, true)
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
         end
 
         -- if we have a t2 artillery, create t1 pgens around it
         if structure:IsInCategory('ARTILLERY') then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1101" }}}, true)
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
         end
 
         -- if we have a radar, create t1 pgens around it
         if structure:IsInCategory('RADAR') then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, ids = { "b1101" }}}, true)
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
         end
     end
 end
@@ -240,7 +242,7 @@ function OnCommandIssued(command)
     else
         EndCommandMode(true)
     end
-
+    LOG("check")
     if command.CommandType == 'Guard' and command.Target.EntityId then
         local c = categories.STRUCTURE * categories.FACTORY
         if EntityCategoryContains(c, command.Blueprint) then
@@ -250,7 +252,7 @@ function OnCommandIssued(command)
                 SimCallback(cb, true)
             end
         end
-        LOG("check")
+
         if EntityCategoryContains(categories.STRUCTURE, command.Blueprint) then
             local options = Prefs.GetFromCurrentProfile('options')
             if options['assist_mex'] then AssistMex(command) end
