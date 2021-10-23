@@ -16,6 +16,9 @@ local Prefs = import('/lua/user/prefs.lua')
 local watchForQueueChange = import('/lua/ui/game/construction.lua').watchForQueueChange
 local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
 local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
+
+local WorldView = import('/lua/ui/controls/worldview.lua')
+
 --[[
  THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
 
@@ -75,6 +78,10 @@ local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
 
 --]]
 
+-- When this file is reloaded (using /EnableDiskWatch) the cursor no longer changes
+-- during command mode (e.g., when you do a move order it turns your cursor into
+-- the blue move marker). This is fixed by reloading the game.
+
 --- Can be one of three values:
 -- - order (called when performing an order)
 -- - build (called when trying to build something)
@@ -86,11 +93,29 @@ local commandMode = false
 -- - build -> name (blueprint type, e.g., xsb1101)
 -- - buildanchored -> ?
 local modeData = false
+
+--- ???
 local issuedOneCommand = false
 
+--- Behavior to run when entering command mode. If f is a function, it is called as f(commandMode, modeData).
 local startBehaviors = {}
+
+--- Behavior to run when exiting command mode. If f is a function, it is called as f(commandMode, modeData).
 local endBehaviors = {}
 
+--- Adds a starting behavior.
+-- @param behavior The behavior to add, called as behavior(commandMode, modeData).
+function AddStartBehavior(behavior)
+    table.insert(startBehaviors, behavior)
+end
+
+--- Adds a starting behavior.
+-- @param behavior The behavior to add, called as behavior(commandMode, modeData).
+function AddEndBehavior(behavior)
+    table.insert(endBehaviors, behavior)
+end
+
+--- ???
 local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
@@ -104,62 +129,65 @@ end
 
 import('/lua/ui/game/gamemain.lua').AddBeatFunction(OnCommandModeBeat)
 
--- behaviors are functions that take a single string parameter, the commandMode (or false if none)
-function AddStartBehavior(behavior)
-    table.insert(startBehaviors, behavior)
-end
-
-function AddEndBehavior(behavior)
-    table.insert(endBehaviors, behavior)
-end
-
+--- Called when the command mode starts and initialises all the data.
+-- @param newCommandMode The new command mode.
+-- @param data The new mode data.
 function StartCommandMode(newCommandMode, data)
+
+    -- clean up previous command mode
     if commandMode then
         EndCommandMode(true)
     end
 
+    -- update our local state
     commandMode = newCommandMode
     modeData = data
+
+    -- do start behaviors
     for i,v in startBehaviors do
         v(commandMode, modeData)
     end
 
-    import('/lua/ui/controls/worldview.lua').OnStartCommandMode(newCommandMode, data)
+    -- update cursor
+    WorldView.OnStartCommandMode(newCommandMode, data)
+end
+
+--- Called when the command mode ends and deconstructs all the data.
+-- @param isCancel Is set to true when it cancels a current command mode for a new one.
+function EndCommandMode(isCancel)
+
+    --- ???
+    if ignoreSelection then
+        return
+    end
+
+    -- add information to modeData for end behavior
+    modeData.isCancel = isCancel or false
+
+    -- do end behaviors
+    for i,v in endBehaviors do
+        v(commandMode, modeData)
+    end
+
+    -- ???
+    if modeData.isCancel then
+        ClearBuildTemplates()
+    end
+
+    -- update our local state
+    commandMode = false
+    modeData = false
+    issuedOneCommand = false
 end
 
 -- allocate the table once for performance
 local commandModeTable = { }
 
---- Retrieves the command mode information.
+--- Retrieves the current command mode information.
 function GetCommandMode()
     commandModeTable[1] = commandMode
     commandModeTable[2] = modeData
-
-    if commandMode and modeData then 
-        LOG(repr(commandMode))
-        LOG(repr(modeData))
-    end
-
     return commandModeTable
-end
-
-function EndCommandMode(isCancel)
-    if ignoreSelection then
-        return
-    end
-
-    modeData.isCancel = isCancel or false
-    for i,v in endBehaviors do
-        v(commandMode, modeData)
-    end
-
-    if modeData.isCancel then
-        ClearBuildTemplates()
-    end
-
-    commandMode = false
-    modeData = false
-    issuedOneCommand = false
 end
 
 --- A helper function to add the correct feedback animation.
@@ -213,7 +241,7 @@ end
 
 --- Allows us to detect a double tab
 local previousStructure = nil
-function AssistMex(command)
+function CapStructure(command)
 
     -- check if we have engineers
     local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
@@ -276,21 +304,21 @@ local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
 local categoriesStructure = categories.STRUCTURE
 
+--- Called by the engine when a new command has been issued by the player.
+-- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
 
-    -- ?
+    -- ???
     if not command.Clear then
         issuedOneCommand = true
     else
         EndCommandMode(true)
     end
 
-
     -- called when:
     -- - a factory-like construction that is not finished is being continued
     -- - a (finished) unit is being guarded (right clicked)
     if command.CommandType == 'Guard' and command.Target.EntityId then
-        LOG("Guard")
 
         -- validate factories assisting other factories
         if EntityCategoryContains(categoriesFactories, command.Blueprint) then
@@ -310,7 +338,7 @@ function OnCommandIssued(command)
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
             local options = Prefs.GetFromCurrentProfile('options')
-            if options['assist_mex'] then AssistMex(command) end
+            if options['assist_mex'] then CapStructure(command) end
         end
 
     -- called when:
@@ -333,12 +361,16 @@ function OnCommandIssued(command)
     -- - a construction is being repaired
     elseif command.CommandType == 'Repair' then
 
-        LOG("Repair")
-
         -- see if we can rebuild a structure
         if command.Target.Type == 'Entity' then -- repair wreck to rebuild
-            local cb = {Func="Rebuild", Args={entity=command.Target.EntityId, Clear=command.Clear}}
+            local cb = {Func= " Rebuild", Args={entity=command.Target.EntityId, Clear=command.Clear}}
             SimCallback(cb, true)
+        end
+
+        -- see if we can cap a structure
+        if EntityCategoryContains(categoriesStructure, command.Blueprint) then
+            local options = Prefs.GetFromCurrentProfile('options')
+            if options['assist_mex'] then CapStructure(command) end
         end
 
     -- called when:
