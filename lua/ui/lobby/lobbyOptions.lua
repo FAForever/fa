@@ -111,6 +111,24 @@ teamOptions =
 
 globalOpts = {
     {
+        default = 1,
+        label = "<LOC lobui_0802>Unrank",
+        help = "<LOC lobui_0803>Provides a toggle to unrank a game. Note that if this is said to no the game can still be unranked due to other lobby options, unranked sim mods and / or the map being unranked.",
+        key = 'Unranked',
+        values = {
+            {
+                  text = "<LOC lobui_0804>No",
+                  help = "<LOC lobui_0805>This game will be ranked if all the criteria for a ranked game are met.",
+                  key = 'No',
+              },
+              {
+                  text = "<LOC lobui_0806>Yes",
+                  help = "<LOC lobui_0807>This game will not be ranked.",
+                  key = 'Yes',
+              },
+          },
+    },
+    {
         default = 8,
         label = "<LOC lobui_0102>Unit Cap",
         help = "<LOC lobui_0103>Set the maximum number of units that can be in play",
