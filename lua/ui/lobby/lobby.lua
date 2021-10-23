@@ -978,7 +978,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     slot.ratingText:Show()
     slot.ratingText:SetText(playerInfo.PL)
-    slot.ratingText:SetColor(GetRatingColour(playerInfo.DEV))
+    slot.ratingText:SetColor("ffffffff")
 
     -- dynamic tooltip to show rating and deviation for each player
     local tooltipText = {}
