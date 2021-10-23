@@ -12,9 +12,11 @@ Patch 3724 (04th October, 2021)
     Megalith: only when fully complete as it sits
     Colossus: when complete 50% or more
     Ythotha: when complete 50% or more
+    
 ### Other
  - (#3475) Fix capitalisation consistency
  - (#3443) Allow trashbag to be re-used for effects
+
 ### Contributors
  - Uveso (#3477)
  - Rowey (#3475)
