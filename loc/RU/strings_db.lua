@@ -9074,3 +9074,11 @@ aireplace_0001="Замена ИИ"
 aireplace_0002="Переключить замену ИИ, если игрок отключился."
 aireplace_0003="Если игрок отключается, а БМК все еще активен, будет создан ИИ, чтобы взять под контроль юниты, принадлежавшие отключившемуся игроку."
 aireplace_0004="Отключенный игрок вызовет уничтожение своих юнитов в зависимости от условий совместного использования."
+
+-- unranked lobby option
+lobui_0802="Unrank"
+lobui_0803="Provides a toggle to unrank a game. Note that if this is said to no the game can still be unranked due to other lobby options, unranked sim mods and / or the map being unranked."
+lobui_0804="No"
+lobui_0805="This game will be ranked if all the criteria for a ranked game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be ranked."

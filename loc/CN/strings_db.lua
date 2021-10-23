@@ -8985,3 +8985,11 @@ zsb9603_name="Uosiya"
 zsb9602_name="Ia-iya"
 zsb9501_name="Hethiya"
 zsb9503_name="Uosiya"
+
+-- unranked lobby option
+lobui_0802="Unrank"
+lobui_0803="Provides a toggle to unrank a game. Note that if this is said to no the game can still be unranked due to other lobby options, unranked sim mods and / or the map being unranked."
+lobui_0804="No"
+lobui_0805="This game will be ranked if all the criteria for a ranked game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be ranked."
