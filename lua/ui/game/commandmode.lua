@@ -18,65 +18,24 @@ local checkBadClean = import('/lua/ui/game/construction.lua').checkBadClean
 local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
 
 local WorldView = import('/lua/ui/controls/worldview.lua')
+local GameMain = import('/lua/ui/game/gamemain.lua')
 
---[[
- THESE TABLES ARE NOT ACTUALLY USED IN SCRIPT. Just here for reference
+-- upvalue globals for performance
+local IsKeyDown = IsKeyDown
+local GetUnitById = GetUnitById
+local IsDestroyed = IsDestroyed
+local SimCallback = SimCallback
+local EntityCategoryContains = EntityCategoryContains
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local AddCommandFeedbackBlip = AddCommandFeedbackBlip
 
- -- these are the strings which represent a command mode
- commandModes = {
-     "order",
-     "build",
-     "buildanchored",
- }
+-- upvalue table operations for performance
+local TableInsert = table.insert 
+local TableEmpty = table.empty 
+local TableGetN = table.getn 
+local MathPi = math.pi
+local MathAtan = math.atan
 
- these strings come from the cpp code in UnitBP, don't change them please!
- orderModes = {
-
-    RULEUCC_Move                = (1 << 0),
-    RULEUCC_Stop                = (1 << 1),
-    RULEUCC_Attack              = (1 << 2),
-    RULEUCC_Guard               = (1 << 3),
-    RULEUCC_Patrol              = (1 << 4),
-    RULEUCC_RetaliateToggle     = (1 << 5),
-
-    // Unit specific rules
-    RULEUCC_Repair              = (1 << 6),
-    RULEUCC_Capture             = (1 << 7),
-    RULEUCC_Transport           = (1 << 8),
-    RULEUCC_CallTransport       = (1 << 9),
-    RULEUCC_Nuke                = (1 << 10),
-    RULEUCC_Tactical            = (1 << 11),
-    RULEUCC_Teleport            = (1 << 12),
-    RULEUCC_Ferry               = (1 << 13),
-    RULEUCC_SiloBuildTactical   = (1 << 14),
-    RULEUCC_SiloBuildNuke       = (1 << 15),
-    RULEUCC_Sacrifice           = (1 << 16),
-    RULEUCC_Pause               = (1 << 17),
-    RULEUCC_Overcharge          = (1 << 18),
-    RULEUCC_Dive                = (1 << 19),
-    RULEUCC_Reclaim             = (1 << 20),
-    RULEUCC_SpecialAction       = (1 << 21),
-    RULEUCC_Dock                = (1 << 22),
-
-    // Unit general
-    RULEUCC_Script              = (1 << 23),
- }
-
- toggleModes = {
-
-    // Unit toggle rules
-    RULEUTC_ShieldToggle        = (1 << 0),
-    RULEUTC_WeaponToggle        = (1 << 1),
-    RULEUTC_JammingToggle       = (1 << 2),
-    RULEUTC_IntelToggle         = (1 << 3),
-    RULEUTC_ProductionToggle    = (1 << 4),
-    RULEUTC_StealthToggle       = (1 << 5),
-    RULEUTC_GenericToggle       = (1 << 6),
-    RULEUTC_SpecialToggle       = (1 << 7),
-    RULEUTC_CloakToggle         = (1 << 8),
-}
-
---]]
 
 -- When this file is reloaded (using /EnableDiskWatch) the cursor no longer changes
 -- during command mode (e.g., when you do a move order it turns your cursor into
@@ -106,13 +65,13 @@ local endBehaviors = {}
 --- Adds a starting behavior.
 -- @param behavior The behavior to add, called as behavior(commandMode, modeData).
 function AddStartBehavior(behavior)
-    table.insert(startBehaviors, behavior)
+    TableInsert(startBehaviors, behavior)
 end
 
 --- Adds a starting behavior.
 -- @param behavior The behavior to add, called as behavior(commandMode, modeData).
 function AddEndBehavior(behavior)
-    table.insert(endBehaviors, behavior)
+    TableInsert(endBehaviors, behavior)
 end
 
 --- ???
@@ -120,14 +79,6 @@ local ignoreSelection = false
 function SetIgnoreSelection(ignore)
     ignoreSelection = ignore
 end
-
-function OnCommandModeBeat()
-    if issuedOneCommand and not IsKeyDown('Shift') then
-        EndCommandMode(true)
-    end
-end
-
-import('/lua/ui/game/gamemain.lua').AddBeatFunction(OnCommandModeBeat)
 
 --- Called when the command mode starts and initialises all the data.
 -- @param newCommandMode The new command mode.
@@ -239,8 +190,9 @@ function AddDefaultCommandFeedbackBlips(pos)
     )
 end
 
---- Allows us to detect a double tab
-local previousStructure = nil
+--- Allows us to detect a double click
+local pStructure1 = nil
+local pStructure2 = nil
 function CapStructure(command)
 
     -- check if we have engineers
@@ -254,6 +206,9 @@ function CapStructure(command)
     -- are we a structure?
     if structure:IsInCategory('STRUCTURE') then 
 
+        local isDoubleTapped = pStructure1 == structure
+        local isTripleTapped = isDoubleTapped and pStructure2 == structure
+
         -- if we have a non-t1 extractor, create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then 
 
@@ -262,14 +217,11 @@ function CapStructure(command)
             local isTech2 = structure:IsInCategory('TECH2')
             local isTech3 = structure:IsInCategory('TECH3')
 
-            local isDoubleTapped = previousStructure == structure
-            previousStructure = structure
-
-            local isUpgrading = IsKeyDown('Shift') and isDoubleTapped
+            local isUpgrading = structure:GetFocus() and IsKeyDown('Shift')
      
             -- check what type of buildings we'd like to make
-            local buildStorages = (isTech1 and isUpgrading) or (isTech2 and not isUpgrading) or (isTech3 and not isDoubleTapped)
-            local buildFabs = (isTech2 and isUpgrading) or (isTech3 and isDoubleTapped)
+            local buildStorages = (isTech1 and isUpgrading and isDoubleTapped) or (isTech2 and isDoubleTapped) or (isTech3 and isDoubleTapped)
+            local buildFabs = (isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isTripleTapped)
 
             if buildStorages then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
@@ -278,25 +230,30 @@ function CapStructure(command)
             if buildFabs then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 2, id = "b1104" }}, true)
                 -- reset state in case we want storages after cancel
-                previousStructure = nil
+                pStructure1 = nil
+                pStructure2 = nil
             end
         end
 
         -- if we have a t3 fabricator, create storages around it
-        if structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') then 
+        if structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
         end
 
         -- if we have a t2 artillery, create t1 pgens around it
-        if structure:IsInCategory('ARTILLERY') then 
+        if structure:IsInCategory('ARTILLERY') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
         end
 
         -- if we have a radar, create t1 pgens around it
-        if structure:IsInCategory('RADAR') then 
+        if structure:IsInCategory('RADAR') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
         end
     end
+
+    -- keep track of previous structure to identify a 2nd click
+    pStructure2 = pStructure1
+    pStructure1 = structure
 end
 
 -- cached category strings for performance
@@ -363,33 +320,26 @@ function OnCommandIssued(command)
 
         -- see if we can rebuild a structure
         if command.Target.Type == 'Entity' then -- repair wreck to rebuild
-            local cb = {Func= " Rebuild", Args={entity=command.Target.EntityId, Clear=command.Clear}}
+            local cb = {Func = "Rebuild", Args={entity=command.Target.EntityId, Clear=command.Clear}}
             SimCallback(cb, true)
-        end
-
-        -- see if we can cap a structure
-        if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            local options = Prefs.GetFromCurrentProfile('options')
-            if options['assist_mex'] then CapStructure(command) end
         end
 
     -- called when:
     -- - ?
     elseif command.CommandType == 'Script' and command.LuaParams.TaskName == 'AttackMove' then
-        local view = import('/lua/ui/game/worldview.lua').viewLeft
         local avgPoint = {0,0}
         for _,unit in command.Units do
             avgPoint[1] = avgPoint[1] + unit:GetPosition()[1]
             avgPoint[2] = avgPoint[2] + unit:GetPosition()[3]
         end
-        avgPoint[1] = avgPoint[1] / table.getn(command.Units)
-        avgPoint[2] = avgPoint[2] / table.getn(command.Units)
+        avgPoint[1] = avgPoint[1] / TableGetN(command.Units)
+        avgPoint[2] = avgPoint[2] / TableGetN(command.Units)
 
         avgPoint[1] = command.Target.Position[1] - avgPoint[1]
         avgPoint[2] = command.Target.Position[3] - avgPoint[2]
 
-        local rotation = math.atan(avgPoint[1]/avgPoint[2])
-        rotation = rotation * 180 / math.pi
+        local rotation = MathAtan(avgPoint[1]/avgPoint[2])
+        rotation = rotation * 180 / MathPi
         if avgPoint[2] < 0 then
             rotation = rotation + 180
         end
@@ -399,7 +349,7 @@ function OnCommandIssued(command)
 
     -- called when: 
     -- - ?
-    elseif command.Clear == true and command.CommandType ~= 'Stop' and table.getn(command.Units) == 1 and checkBadClean(command.Units[1]) then
+    elseif command.Clear == true and command.CommandType ~= 'Stop' and TableGetN(command.Units) == 1 and checkBadClean(command.Units[1]) then
         watchForQueueChange(command.Units[1])
 
     -- called when:
@@ -423,3 +373,70 @@ function OnCommandIssued(command)
     -- used by spread attack to keep track of the orders of units
     import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end
+
+--- ???
+--- Ensures the command mode ends when one one command should be passed through?
+function OnCommandModeBeat()
+    if issuedOneCommand and not IsKeyDown('Shift') then
+        EndCommandMode(true)
+    end
+end
+
+GameMain.AddBeatFunction(OnCommandModeBeat)
+
+-- The follow tables are just for reference and are not used:
+
+-- -- All possible values for commandMode
+-- local commandModes = {
+--      "order",
+--      "build",
+--      "buildanchored",
+--  }
+
+-- -- A subset of possible values for the 'name' value of modeData
+-- local orderModes = {
+
+--     -- unit general rules
+--     RULEUCC_Move                = (1 << 0),
+--     RULEUCC_Stop                = (1 << 1),
+--     RULEUCC_Attack              = (1 << 2),
+--     RULEUCC_Guard               = (1 << 3),
+--     RULEUCC_Patrol              = (1 << 4),
+--     RULEUCC_RetaliateToggle     = (1 << 5),
+
+--     -- unit specific rules
+--     RULEUCC_Repair              = (1 << 6),
+--     RULEUCC_Capture             = (1 << 7),
+--     RULEUCC_Transport           = (1 << 8),
+--     RULEUCC_CallTransport       = (1 << 9),
+--     RULEUCC_Nuke                = (1 << 10),
+--     RULEUCC_Tactical            = (1 << 11),
+--     RULEUCC_Teleport            = (1 << 12),
+--     RULEUCC_Ferry               = (1 << 13),
+--     RULEUCC_SiloBuildTactical   = (1 << 14),
+--     RULEUCC_SiloBuildNuke       = (1 << 15),
+--     RULEUCC_Sacrifice           = (1 << 16),
+--     RULEUCC_Pause               = (1 << 17),
+--     RULEUCC_Overcharge          = (1 << 18),
+--     RULEUCC_Dive                = (1 << 19),
+--     RULEUCC_Reclaim             = (1 << 20),
+--     RULEUCC_SpecialAction       = (1 << 21),
+--     RULEUCC_Dock                = (1 << 22),
+
+--     -- unit general
+--     RULEUCC_Script              = (1 << 23),
+--  }
+
+-- -- ???
+-- local toggleModes = {
+--     -- unit toggle rules
+--     RULEUTC_ShieldToggle        = (1 << 0),
+--     RULEUTC_WeaponToggle        = (1 << 1),
+--     RULEUTC_JammingToggle       = (1 << 2),
+--     RULEUTC_IntelToggle         = (1 << 3),
+--     RULEUTC_ProductionToggle    = (1 << 4),
+--     RULEUTC_StealthToggle       = (1 << 5),
+--     RULEUTC_GenericToggle       = (1 << 6),
+--     RULEUTC_SpecialToggle       = (1 << 7),
+--     RULEUTC_CloakToggle         = (1 << 8),
+-- }
