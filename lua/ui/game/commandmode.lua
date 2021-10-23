@@ -75,7 +75,16 @@ local EnhancementQueueFile = import('/lua/ui/notify/enhancementqueue.lua')
 
 --]]
 
+--- Can be one of three values:
+-- - order (called when performing an order)
+-- - build (called when trying to build something)
+-- - buildanchored (called when ... ?)
 local commandMode = false
+
+--- Contains additional information for the current command mode:
+-- - order -> name (order type, e.g., RULEUCC_Move)
+-- - build -> name (blueprint type, e.g., xsb1101)
+-- - buildanchored -> ?
 local modeData = false
 local issuedOneCommand = false
 
@@ -118,8 +127,20 @@ function StartCommandMode(newCommandMode, data)
     import('/lua/ui/controls/worldview.lua').OnStartCommandMode(newCommandMode, data)
 end
 
+-- allocate the table once for performance
+local commandModeTable = { }
+
+--- Retrieves the command mode information.
 function GetCommandMode()
-    return {commandMode, modeData}
+    commandModeTable[1] = commandMode
+    commandModeTable[2] = modeData
+
+    if commandMode and modeData then 
+        LOG(repr(commandMode))
+        LOG(repr(modeData))
+    end
+
+    return commandModeTable
 end
 
 function EndCommandMode(isCancel)
@@ -141,39 +162,53 @@ function EndCommandMode(isCancel)
     issuedOneCommand = false
 end
 
+--- A helper function to add the correct feedback animation.
+-- @param pos The position of the feedback animation.
+-- @param type The type of feedback animation.
 function AddCommandFeedbackByType(pos, type)
 
     if commandMeshResources[type] == nil then
         return false;
     else
-        AddCommandFeedbackBlip({
-                    Position = pos,
-                    MeshName = commandMeshResources[type][1],
-                    TextureName = commandMeshResources[type][2],
-                    ShaderName = 'CommandFeedback',
-                    UniformScale = 0.125,
-                }, 0.7)
+        AddCommandFeedbackBlip(
+            {
+                Position = pos,
+                MeshName = commandMeshResources[type][1],
+                TextureName = commandMeshResources[type][2],
+                ShaderName = 'CommandFeedback',
+                UniformScale = 0.125,
+            }, 
+            0.7
+        )
     end
 
     return true;
 end
 
+--- A helper function for a specific feedback animation.
+-- @param pos The position of the feedback animation.
 function AddDefaultCommandFeedbackBlips(pos)
-    AddCommandFeedbackBlip({
-        Position = pos,
-        MeshName = '/meshes/game/flag02d_lod0.scm',
-        TextureName = '/meshes/game/flag02d_albedo.dds',
-        ShaderName = 'CommandFeedback',
-        UniformScale = 0.5,
-    }, 0.7)
+    AddCommandFeedbackBlip(
+        {
+            Position = pos,
+            MeshName = '/meshes/game/flag02d_lod0.scm',
+            TextureName = '/meshes/game/flag02d_albedo.dds',
+            ShaderName = 'CommandFeedback',
+            UniformScale = 0.5,
+        }, 
+        0.7
+    )
 
-    AddCommandFeedbackBlip({
-        Position = pos,
-        MeshName = '/meshes/game/crosshair02d_lod0.scm',
-        TextureName = '/meshes/game/crosshair02d_albedo.dds',
-        ShaderName = 'CommandFeedback2',
-        UniformScale = 0.5,
-    }, 0.75)
+    AddCommandFeedbackBlip(
+        {
+            Position = pos,
+            MeshName = '/meshes/game/crosshair02d_lod0.scm',
+            TextureName = '/meshes/game/crosshair02d_albedo.dds',
+            ShaderName = 'CommandFeedback2',
+            UniformScale = 0.5,
+        }, 
+        0.75
+    )
 end
 
 --- Allows us to detect a double tab
@@ -236,50 +271,78 @@ function AssistMex(command)
     end
 end
 
+-- cached category strings for performance
+local categoriesFactories = categories.STRUCTURE * categories.FACTORY
+local categoriesShields = categories.MOBILE * categories.SHIELD
+local categoriesStructure = categories.STRUCTURE
+
 function OnCommandIssued(command)
+
+    -- ?
     if not command.Clear then
         issuedOneCommand = true
     else
         EndCommandMode(true)
     end
-    LOG("check")
+
+
+    -- called when:
+    -- - a factory-like construction that is not finished is being continued
+    -- - a (finished) unit is being guarded (right clicked)
     if command.CommandType == 'Guard' and command.Target.EntityId then
-        local c = categories.STRUCTURE * categories.FACTORY
-        if EntityCategoryContains(c, command.Blueprint) then
-            local factories = EntityCategoryFilterDown(c, command.Units) or {}
-            if not table.empty(factories) then
+        LOG("Guard")
+
+        -- validate factories assisting other factories
+        if EntityCategoryContains(categoriesFactories, command.Blueprint) then
+            local factories = EntityCategoryFilterDown(categoriesFactories, command.Units) or {}
+            if factories[1] then
                 local cb = { Func = 'ValidateAssist', Args = { target = command.Target.EntityId } }
                 SimCallback(cb, true)
             end
         end
 
-        if EntityCategoryContains(categories.STRUCTURE, command.Blueprint) then
-            local options = Prefs.GetFromCurrentProfile('options')
-            if options['assist_mex'] then AssistMex(command) end
-        end
-        --EQ:this is the only bit we add - a callback for shields so they can disable their pointers.
-        local shieldCat = categories.MOBILE * categories.SHIELD
-
-        local mobShields = EntityCategoryFilterDown(shieldCat, command.Units)
-
-        if mobShields[1] then
+        -- validate shields
+        if EntityCategoryFilterDown(categoriesShields, command.Units)[1] then
             local cb = { Func = 'FlagShield', Args = { target = command.Target.EntityId } }
             SimCallback(cb, true)
         end
+
+        -- see if we can cap a structure
+        if EntityCategoryContains(categoriesStructure, command.Blueprint) then
+            local options = Prefs.GetFromCurrentProfile('options')
+            if options['assist_mex'] then AssistMex(command) end
+        end
+
+    -- called when:
+    -- - a construction is started
     elseif command.CommandType == 'BuildMobile' then
-    AddCommandFeedbackBlip({
-        Position = command.Target.Position,
-        BlueprintID = command.Blueprint,
-        TextureName = '/meshes/game/flag02d_albedo.dds',
-        ShaderName = 'CommandFeedback',
-        UniformScale = 1,
-    }, 0.7)
+        -- add a small animation (just change the 2nd argument to 5 and back)
+        AddCommandFeedbackBlip(
+            {
+                Position = command.Target.Position,
+                BlueprintID = command.Blueprint,
+                TextureName = '/meshes/game/flag02d_albedo.dds',
+                ShaderName = 'CommandFeedback',
+                UniformScale = 5,
+            }, 
+            0.7
+        )
+
+    -- called when:
+    -- - a construction is being continued building (for non-factory units)
+    -- - a construction is being repaired
     elseif command.CommandType == 'Repair' then
-        local target = command.Target
-        if target.Type == 'Entity' then -- repair wreck to rebuild
-            local cb = {Func="Rebuild", Args={entity=target.EntityId, Clear=command.Clear}}
+
+        LOG("Repair")
+
+        -- see if we can rebuild a structure
+        if command.Target.Type == 'Entity' then -- repair wreck to rebuild
+            local cb = {Func="Rebuild", Args={entity=command.Target.EntityId, Clear=command.Clear}}
             SimCallback(cb, true)
         end
+
+    -- called when:
+    -- - ?
     elseif command.CommandType == 'Script' and command.LuaParams.TaskName == 'AttackMove' then
         local view = import('/lua/ui/game/worldview.lua').viewLeft
         local avgPoint = {0,0}
@@ -301,17 +364,30 @@ function OnCommandIssued(command)
         local cb = {Func="AttackMove", Args={Target=command.Target.Position, Rotation = rotation, Clear=command.Clear}}
         SimCallback(cb, true)
         AddDefaultCommandFeedbackBlips(command.Target.Position)
+
+    -- called when: 
+    -- - ?
     elseif command.Clear == true and command.CommandType ~= 'Stop' and table.getn(command.Units) == 1 and checkBadClean(command.Units[1]) then
         watchForQueueChange(command.Units[1])
+
+    -- called when:
+    -- - ?
     elseif command.CommandType == 'Script' and command.LuaParams and command.LuaParams.Enhancement then
         EnhancementQueueFile.enqueueEnhancement(command.Units, command.LuaParams.Enhancement)
+
+    -- called when:
+    -- - a generic stop command is issued
     elseif command.CommandType == 'Stop' then
         EnhancementQueueFile.clearEnhancements(command.Units)
+
+    -- called when:
+    -- - none of the above applies
     else
         if AddCommandFeedbackByType(command.Target.Position, command.CommandType) == false then
             AddDefaultCommandFeedbackBlips(command.Target.Position)
         end
     end
 
+    -- used by spread attack to keep track of the orders of units
     import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
 end
