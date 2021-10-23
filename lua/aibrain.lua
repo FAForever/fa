@@ -32,6 +32,7 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local CategoriesNoInsignificant = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 
 local observer = false
 local Points = {
@@ -4114,7 +4115,7 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param excludeInsignificantUnits Whether or not we exclude insignificant units, defaults to true.
     -- @return nil if none found or a table.
     GetUnitsAroundPoint = function(self, category, position, radius, alliance, excludeInsignificantUnits)
-        local units = BrainGetUnitsAroundPoint(category, position, radius, alliance)
+        local units = BrainGetUnitsAroundPoint(self, category, position, radius, alliance)
 
         -- as it can return nil, check if we have any units
         if units then 

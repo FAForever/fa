@@ -30,7 +30,7 @@ function WaitSeconds(n)
 end
 
 -- Hook some globals
-doscript '/lua/SimHook.lua'
+doscript '/lua/SimHooks.lua'
 
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
