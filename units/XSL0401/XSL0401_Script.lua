@@ -2,7 +2,7 @@
 -- File     :  /data/units/XSL0401/XSL0401_script.lua
 -- Author(s):  Jessica St. Croix, Dru Staltman, Aaron Lundquist
 -- Summary  :  Seraphim Experimental Assault Bot
--- Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit

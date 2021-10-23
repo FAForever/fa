@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/URL0402/URL0402_script.lua
 -- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
 -- Summary  :  Cybran Spider Bot Script
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
@@ -238,7 +238,7 @@ URL0402 = Class(CWalkingLandUnit) {
 
         -- only apply death damage when the unit is sufficiently build
         local bp = self:GetBlueprint()
-        local FractionThreshold = bp.General.FractionThreshold or 0.5
+        local FractionThreshold = bp.General.FractionThreshold or 1.0
         if self:GetFractionComplete() > FractionThreshold then 
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
