@@ -2,7 +2,7 @@
 -- File     :  /data/units/XSL0401/XSL0401_script.lua
 -- Author(s):  Jessica St. Croix, Dru Staltman, Aaron Lundquist
 -- Summary  :  Seraphim Experimental Assault Bot
--- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
@@ -98,13 +98,7 @@ XSL0401 = Class(SWalkingLandUnit) {
             WaitTicks(Random(1, 4))
         end
 
-        local bp = self:GetBlueprint()
-        for i, numWeapons in bp.Weapon do
-            if bp.Weapon[i].Label == 'CollossusDeath' then
-                DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
-            end
-        end
+
         WaitSeconds(3.5)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
 
@@ -131,6 +125,22 @@ XSL0401 = Class(SWalkingLandUnit) {
             end
         end
 
+        -- only apply death damage when the unit is sufficiently build
+        local bp = self:GetBlueprint()
+        local FractionThreshold = bp.General.FractionThreshold or 0.5
+        if self:GetFractionComplete() >= FractionThreshold then 
+            local bp = self:GetBlueprint()
+            for i, numWeapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'CollossusDeath' then
+                    DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    break
+                end
+            end
+        end
+
+
+
+        -- only spawn storm and do damage when the unit is finished building
         if self:GetFractionComplete() == 1 then
             self:SpawnElectroStorm()
         end
