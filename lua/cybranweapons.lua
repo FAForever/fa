@@ -81,7 +81,7 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
         end
 
         -- set their respective properties when firing
-        self.RotatorManip:SetTargetSpeed(400)
+        self.RotatorManip:SetTargetSpeed(500)
         self.RotatorManip:SetAccel(200)
 
         DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
