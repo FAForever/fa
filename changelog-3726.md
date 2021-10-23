@@ -7,12 +7,17 @@ Patch 3724 (04th October, 2021)
 ### Bug
  - (#3486) Fix (mod) units being unbuildable due to error in UI
  - (#3432) Fix overcharge occasionally basing its damage on the previous unit it hit
+ - (#3316) Fix experimentals doing death damage upon death
+    Monkeylord: only when fully complete as it sits
+    Megalith: only when fully complete as it sits
+    Colossus: when complete 50% or more
+    Ythotha: when complete 50% or more
 ### Other
  - (#3475) Fix capitalisation consistency
  - (#3443) Allow trashbag to be re-used for effects
 ### Contributors
  - Uveso (#3477)
  - Rowey (#3475)
- - Jip (#3443)
+ - Jip (#3443, #3316)
  - KionX (#3486)
  - Crotalus (#3432)
