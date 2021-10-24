@@ -246,7 +246,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a t2 artillery, create t1 pgens around it
-        elseif structure:IsInCategory('ARTILLERY') and isDoubleTapped then 
+        elseif structure:IsInCategory('ARTILLERY') and structure:IsInCategory('TECH2') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
             -- reset state

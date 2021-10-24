@@ -103,13 +103,13 @@ end
 --- Allocated once to prevent re-allocations and de-allocations 
 local buildLocation = Vector(0, 0, 0)
 
---- Special template for point defense
-local footprintPointDefense = {
-    {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1} ,
+--- Templates for units with a skirt size of 1, such as point defense
+local skirtSize1 = {
+    { {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, },
 }
 
---- Templates for units with a footprint of 1 such as radars and mass extractors
-local footprint1 = { 
+--- Templates for units with a skirtSize of 1 such as radars and mass extractors
+local skirtSize2 = { 
     -- inner layer for storages
     { {2, 0}, {0, 2}, {-2, 0}, {0, -2}, },
 
@@ -117,28 +117,31 @@ local footprint1 = {
     { {-4, 0}, {-2, 2}, {0, 4}, {2, 2}, {4, 0}, {2, -2}, {0, -4}, {-2, -2}, },
 }
 
---- Templates for units with a footprint of 3 such as fabricators
-local footprint3 = { 
+--- Templates for units with a skirtSize of 3 such as fabricators
+local skirtSize6 = { 
     -- inner layer for storages
     { {-2, 4}, {0, 4}, {2, 4}, {4, 2}, {4, 0}, {4, -2}, {2, -4}, {0, -4}, {-2, -4}, {-4, -2}, {-4, 0}, {-4, 2}, },
 }
 
---- Easy to use table for direct footprint size -> template conversion
-local footprints = {
-    footprint1,
+--- Easy to use table for direct skirtSize size -> template conversion
+local skirtSizes = {
+    skirtSize1,
+    skirtSize2,
     { }, -- ease of use
-    footprint3
+    { }, -- ease of use
+    { }, -- ease of use
+    skirtSize6
 }
 
---- Computes the n'th layer of a previous layer. Recursive function by definition, use FootprintToLayer for a valid initial state.
--- @param previous The last set of points that represent a leyr.
--- @param layers The number of layers to compute.
-local function RetrieveNthStructureLayer (footprint, nthLayer)
+--- Computes the n'th layer of a previous layer.
+-- @param skirtSize The skirt size of the unit.
+-- @param layers The nth layer we'd like to have for this unit.
+local function RetrieveNthStructureLayer (skirtSize, nthLayer)
 
-    -- attempt to retrieve the right set of layers for this footprint
-    local layers = footprints[footprint]
+    -- attempt to retrieve the right set of layers for this skirtSize
+    local layers = skirtSizes[skirtSize]
 
-    -- if we have some layers for this footprint
+    -- if we have some layers for this skirtSize
     if layers then 
 
         -- attempt to retrieve the right layer count
@@ -153,10 +156,10 @@ local function RetrieveNthStructureLayer (footprint, nthLayer)
     end
 
     -- no structure layer available
-    local identifier = "RetrieveNthStructureLayer" .. footprint .. " - " .. nthLayer
+    local identifier = "RetrieveNthStructureLayer" .. skirtSize .. " - " .. nthLayer
     if not Warnings[identifier] then 
         Warnings[identifier] = true
-        WARN("Attempted to retrieve a build layer for footprint " .. footprint .. " and layer " .. nthLayer .. " which is not supported. The only supported values are: footprint 1 with layer 0 and 1, footprint 3 with layer 0.")
+        WARN("Attempted to retrieve a build layer for skirtSize " .. skirtSize .. " and layer " .. nthLayer .. " which is not supported. The only supported values are: skirtSize 1 with layer 1, skirtSize 2 with layer 1 and 2, skirtSize 6 with layer 0.")
     end
 
     -- boo
@@ -227,15 +230,10 @@ Callbacks.CapStructure = function(data, units)
     -- compute / retrieve information for capping
     local brain = builders[1]:GetAIBrain()
     local blueprintID = ConstructBlueprintID(faction, data.id)
-    local footprint = structure:GetBlueprint().Footprint
+    local skirtSize = structure:GetBlueprint().Physics.SkirtSizeX
 
     -- compute the layer locations
-    local layer = false 
-    if data.id == "b5101" then 
-        layer = footprintPointDefense
-    else 
-        layer = RetrieveNthStructureLayer(footprint.SizeX, data.layer)
-    end
+    local layer = RetrieveNthStructureLayer(skirtSize, data.layer)
 
     -- compute build locations and issue the capping
     local center = structure:GetPosition()
