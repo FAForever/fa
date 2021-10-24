@@ -54,3 +54,9 @@ Patch 3724 (04th October, 2021)
  - Jip (#3443, #3316, #3491, #3447, #3484)
  - KionX (#3486, #3489)
  - Crotalus (#3432)
+
+### Reviewers
+ - Balthazar (#3484)
+ 
+### Translators
+ - Lenkin (#3440)
