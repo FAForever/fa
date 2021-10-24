@@ -146,12 +146,9 @@ local skirtSize6 = {
 
 --- Easy to use table for direct skirtSize size -> template conversion
 local skirtSizes = {
-    skirtSize1,
-    skirtSize2,
-    { }, -- ease of use
-    { }, -- ease of use
-    { }, -- ease of use
-    skirtSize6
+    [1] = skirtSize1,
+    [2] = skirtSize2,
+    [6] = skirtSize6
 }
 
 --- Computes the n'th layer of a previous layer.
@@ -265,25 +262,29 @@ Callbacks.CapStructure = function(data, units)
     -- compute the layer locations
     local layer = RetrieveNthStructureLayer(skirtSize, data.layer)
 
-    -- compute build locations and issue the capping
-    local center = structure:GetPosition()
-    for k, location in layer do 
+    -- check if we got anything valid
+    if layer then 
+        
+        -- compute build locations and issue the capping
+        local center = structure:GetPosition()
+        for k, location in layer do 
 
-        -- determine build location using cached value
-        buildLocation[1] = center[1] + location[1]
-        buildLocation[3] = center[3] + location[2]
-        buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
+            -- determine build location using cached value
+            buildLocation[1] = center[1] + location[1]
+            buildLocation[3] = center[3] + location[2]
+            buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
 
-        -- order all builders to build if possible
-        if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
-            for _, builder in builders do 
-                IssueBuildMobile({builder}, buildLocation, blueprintID, {})
+            -- order all builders to build if possible
+            if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+                for _, builder in builders do 
+                    IssueBuildMobile({builder}, buildLocation, blueprintID, {})
+                end
             end
         end
-    end
 
-    -- assist for all other builders
-    IssueGuard(others, builders[1])
+        -- assist for all other builders
+        IssueGuard(others, builders[1])
+    end
 end
 
 Callbacks.SpawnAndSetVeterancyUnit = function(data)
