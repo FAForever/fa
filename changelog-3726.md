@@ -1,6 +1,25 @@
 Patch 3724 (04th October, 2021)
 ============================
 
+### Features
+ - (#3484) More structures are now cap-able using a similar mechanic to storages for extractors
+    Extractors
+    - 2 clicks + shift to mass storage an upgrading t1 extractor
+    - 2 clicks to mass storage a t2 / t3 extractor
+    - 3 clicks + shift to mass fab an upgrading t2 extractor
+    - 3 clicks to mass fab cap a t3 extractor
+
+    Other structures
+    - 2 clicks to mass storage cap a t3 fabricator
+    - 2 clicks to t1 power gen cap a radar
+    - 2 clicks to t1 power gen cap a t2 artillery
+    - 2 clicks to wall cap a t1 point defense
+    
+    Assisting
+    - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
+    - When you have engineers of two or more factions, one must assist the other as they can't build the same storages.
+    - When you have engineers of one faction and units that can't build the storage (kennel drones, ACU) then they must assist an engineer as they can't build the storages themselves.
+
 ### Stability
  - (#3477) Prevent clearing critical state in AI functions
 
@@ -32,6 +51,6 @@ Patch 3724 (04th October, 2021)
 ### Contributors
  - Uveso (#3477)
  - Rowey (#3475)
- - Jip (#3443, #3316, #3491, #3447)
+ - Jip (#3443, #3316, #3491, #3447, #3484)
  - KionX (#3486, #3489)
  - Crotalus (#3432)
