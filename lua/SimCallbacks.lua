@@ -35,6 +35,10 @@ local IssueAggressiveMove = IssueAggressiveMove
 local IssueGuard = IssueGuard
 local IssueFerry = IssueFerry
 
+-- upvalue categories for performance
+local CategoriesTransportation = categories.TRANSPORTATION
+local CategoriesEngineer = categories.ENGINEER
+
 --- Used to warn users (mainly developers) once for invalid use of functionality 
 local Warnings = { }
 
@@ -63,7 +67,7 @@ local function SecureUnits(units)
         end
 
         if IsEntity(u) and OkayToMessWithArmy(u.Army) then
-            TableInsert (secure, u)
+            TableInsert(secure, u)
         end
     end
 
@@ -79,7 +83,7 @@ Callbacks.AutoOvercharge = function(data, units)
 end
 
 Callbacks.PersistFerry = function(data, units)
-    local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, SecureUnits(units))
+    local transports = EntityCategoryFilterDown(CategoriesTransportation, SecureUnits(units))
     if TableEmpty(transports) then return end
     local start = data.route[1]
 
@@ -198,7 +202,7 @@ Callbacks.CapStructure = function(data, units)
     if structure.Layer == 'Seabed' then return end
 
     -- check if we have units
-    local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
+    local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
     if not units[1] then return end
 
     -- check if we have buildings we want to use for capping
@@ -227,7 +231,7 @@ Callbacks.CapStructure = function(data, units)
     end 
 
     -- sanity check: find at least one engineer that can build the structure in question
-    local oneCanBuild = false 
+    local oneCanBuild = nil 
     for k, faction in buildersByFaction do 
         oneCanBuild = true
     end 
@@ -247,7 +251,7 @@ Callbacks.CapStructure = function(data, units)
 
     -- append the rest to other builders
     for k, engineers in buildersByFaction do 
-        if k != faction then 
+        if k ~= faction then 
             for k, engineer in engineers do 
                 TableInsert(others, engineer)
             end
@@ -264,7 +268,7 @@ Callbacks.CapStructure = function(data, units)
 
     -- check if we got anything valid
     if layer then 
-        
+
         -- compute build locations and issue the capping
         local center = structure:GetPosition()
         for k, location in layer do 
