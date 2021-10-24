@@ -246,9 +246,9 @@ Callbacks.CapStructure = function(data, units)
         buildLocation[3] = center[3] + location[2]
         buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
 
-        -- order all builders to build
-        for _, builder in builders do 
-            if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+        -- order all builders to build if possible
+        if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+            for _, builder in builders do 
                 IssueBuildMobile({builder}, buildLocation, blueprintID, {})
             end
         end

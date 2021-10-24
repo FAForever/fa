@@ -229,35 +229,57 @@ function CapStructure(command)
 
             if buildFabs then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 2, id = "b1104" }}, true)
-                -- reset state in case we want storages after cancel
+                
+                -- reset state
+                structure = nil
                 pStructure1 = nil
                 pStructure2 = nil
             end
-        end
 
         -- if we have a t3 fabricator, create storages around it
-        if structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') and isDoubleTapped then 
+        elseif structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
-        end
+
+            -- reset state
+            structure = nil
+            pStructure1 = nil
+            pStructure2 = nil
 
         -- if we have a t2 artillery, create t1 pgens around it
-        if structure:IsInCategory('ARTILLERY') and isDoubleTapped then 
+        elseif structure:IsInCategory('ARTILLERY') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
-        end
+
+            -- reset state
+            structure = nil
+            pStructure1 = nil
+            pStructure2 = nil
 
         -- if we have a radar, create t1 pgens around it
-        if structure:IsInCategory('RADAR') and isDoubleTapped then 
+        elseif structure:IsInCategory('RADAR') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
-        end
+
+            -- reset state
+            structure = nil
+            pStructure1 = nil
+            pStructure2 = nil
 
         -- if we have a radar, create t1 pgens around it
-        if structure:IsInCategory('RADAR') and isDoubleTapped then 
+        elseif structure:IsInCategory('RADAR') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
-        end
+
+            -- reset state
+            structure = nil
+            pStructure1 = nil
+            pStructure2 = nil
 
         -- if we have a t1 point defense, create walls around it
-        if structure:IsInCategory('DIRECTFIRE') and structure:IsInCategory('TECH1') and isDoubleTapped then 
+        elseif structure:IsInCategory('DIRECTFIRE') and structure:IsInCategory('TECH1') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b5101" }}, true)
+
+            -- reset state
+            structure = nil
+            pStructure1 = nil
+            pStructure2 = nil
         end
     end
 
