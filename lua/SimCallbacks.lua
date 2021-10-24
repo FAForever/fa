@@ -8,9 +8,37 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
+local SimUtils = import('/lua/SimUtils.lua')
+local SimPing = import('/lua/SimPing.lua')
+local SimTriggers = import('/lua/scenariotriggers.lua')
+local SUtils = import('/lua/ai/sorianutilities.lua')
+
+-- upvalue table operations for performance
+local TableInsert = table.insert
+local TableEmpty = table.empty
+local TableGetn = table.getn
+local TableRemove = table.remove
+local TableMerged = table.merged
+
+-- upvalue globals for performance
+local type = type
+local Vector = Vector
+local IsEntity = IsEntity
+local GetEntityById = GetEntityById
+local GetSurfaceHeight = GetSurfaceHeight
+local OkayToMessWithArmy = OkayToMessWithArmy
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+
+local IssueClearCommands = IssueClearCommands
+local IssueBuildMobile = IssueBuildMobile
+local IssueAggressiveMove = IssueAggressiveMove
+local IssueGuard = IssueGuard
+local IssueFerry = IssueFerry
+
 --- Used to warn users (mainly developers) once for invalid use of functionality 
 local Warnings = { }
 
+--- List of callbacks that is being populated throughout this file
 local Callbacks = {}
 
 function DoCallback(name, data, units)
@@ -22,7 +50,8 @@ function DoCallback(name, data, units)
     end
 end
 
-function SecureUnits(units)
+--- Common utility function to retrieve the actual units.
+local function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
         units = {units}
@@ -34,17 +63,12 @@ function SecureUnits(units)
         end
 
         if IsEntity(u) and OkayToMessWithArmy(u.Army) then
-            table.insert(secure, u)
+            TableInsert (secure, u)
         end
     end
 
     return secure
 end
-
-local SimUtils = import('/lua/SimUtils.lua')
-local SimPing = import('/lua/SimPing.lua')
-local SimTriggers = import('/lua/scenariotriggers.lua')
-local SUtils = import('/lua/ai/sorianutilities.lua')
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
@@ -56,12 +80,12 @@ end
 
 Callbacks.PersistFerry = function(data, units)
     local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, SecureUnits(units))
-    if table.empty(transports) then return end
+    if TableEmpty(transports) then return end
     local start = data.route[1]
 
     -- function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer])
     local helper = CreateUnit('hel0001', units[1].Army, start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
-    table.insert(units, helper)
+    TableInsert (units, helper)
     IssueClearCommands(units)
     for _, r in data.route do
         IssueFerry(units, r)
@@ -81,9 +105,6 @@ Callbacks.ClearCommands = function(data, units)
     local safe = SecureUnits(data.ids or units)
     IssueClearCommands(safe)
 end
-
---- Name is self explanatory :)
-local CanBuildInSpot = import('/lua/utilities.lua').CanBuildInSpot
 
 local LetterArray = { 
     ["Aeon"] = "ua", 
@@ -173,6 +194,9 @@ Callbacks.CapStructure = function(data, units)
     local structure = GetEntityById(data.target)
     if not structure then return end 
 
+    -- check if we're allowed to mess with this structure
+    if not OkayToMessWithArmy(structure.Army) then return end
+
     -- we can't cap an extractor that is on the ocean floor
     if structure.Layer == 'Seabed' then return end
 
@@ -189,13 +213,19 @@ Callbacks.CapStructure = function(data, units)
 
     -- determine of all units in selection what they can build
     for _, unit in units do
-        local faction = unit.factionCategory
-        local blueprintID = ConstructBlueprintID(faction, data.id)
-        if unit:CanBuild(blueprintID) then
-            buildersByFaction[faction] = buildersByFaction[faction] or { }
-            table.insert(buildersByFaction[faction], unit)
-        else
-            table.insert(others, unit)
+        -- make sure we're allowed to mess with this unit, if not we exclude
+        if OkayToMessWithArmy(unit.Army) then 
+            -- compute blueprint id
+            local faction = unit.factionCategory
+            local blueprintID = ConstructBlueprintID(faction, data.id)
+
+            -- check if this unit can build it
+            if unit:CanBuild(blueprintID) then
+                buildersByFaction[faction] = buildersByFaction[faction] or { }
+                TableInsert(buildersByFaction[faction], unit)
+            else
+                TableInsert(others, unit)
+            end
         end
     end 
 
@@ -212,7 +242,7 @@ Callbacks.CapStructure = function(data, units)
     local faction = ""
     local builders = { }
     for k, engineers in buildersByFaction do 
-        if table.getn(builders) < table.getn(engineers) then 
+        if TableGetn(builders) < TableGetn(engineers) then 
             builders = engineers 
             faction = k
         end
@@ -222,7 +252,7 @@ Callbacks.CapStructure = function(data, units)
     for k, engineers in buildersByFaction do 
         if k != faction then 
             for k, engineer in engineers do 
-                table.insert(others, engineer)
+                TableInsert(others, engineer)
             end
         end
     end
@@ -325,7 +355,7 @@ Callbacks.OnControlGroupAssign = function(units)
             if ScenarioInfo.ControlGroupUnits then
                 for i,v in ScenarioInfo.ControlGroupUnits do
                    if unit == v then
-                        table.remove(ScenarioInfo.ControlGroupUnits, i)
+                        TableRemove(ScenarioInfo.ControlGroupUnits, i)
                    end
                 end
             end
@@ -339,9 +369,9 @@ Callbacks.OnControlGroupAssign = function(units)
         -- add units to list
         local entities = {}
         for k,v in units do
-            table.insert(entities, GetEntityById(v))
+            TableInsert(entities, GetEntityById(v))
         end
-        ScenarioInfo.ControlGroupUnits = table.merged(ScenarioInfo.ControlGroupUnits, entities)
+        ScenarioInfo.ControlGroupUnits = TableMerged(ScenarioInfo.ControlGroupUnits, entities)
 
         -- remove units on death
         for k,v in entities do
@@ -358,9 +388,6 @@ end
 local SimCamera = import('/lua/SimCamera.lua')
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
-
-
-
 
 local SimPlayerQuery = import('/lua/SimPlayerQuery.lua')
 
