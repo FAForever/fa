@@ -74,6 +74,9 @@ function SetupSession()
 
     ArmyBrains = {}
 
+    -- assume we have no AIs in the game
+    ScenarioInfo.GameHasAIs = false
+
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
     -- needed by our scenario.
@@ -209,9 +212,10 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         AddBuildRestriction(index, ScenarioInfo.BuildRestrictions)
     end
 
-    --brain:InitializePlatoonBuildManager()
-    --ScenarioUtils.LoadArmyPBMBuilders(name)
-    --LOG('*SCENARIO DEBUG: ON POP, ARMY BRAINS = ', repr(ArmyBrains))
+    -- check if this brain is an AI, if so - then we can't skip some functionality!
+    if brain.Type == 'AI' then 
+        ScenarioInfo.GameHasAIs = true 
+    end
 end
 
 function InitializePrebuiltUnits(name)

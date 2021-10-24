@@ -28,8 +28,13 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 
 local DeprecatedWarnings = { }
 
+
+-- allows us to skip ai-specific functionality
+local GameHasAIs = ScenarioInfo.GameHasAIs
+
 -- Localised category operations for performance
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
+
 
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
@@ -971,7 +976,13 @@ Unit = Class(moho.unit_methods) {
             mass_rate = mass / time
         end
 
-        self:UpdateAssistersConsumption()
+        -- only run this part if we actually have AIs in the game, they are the ones that use
+        -- this functionality apparently. A consequence of this is that engineers start assisting
+        -- slower if they are chain-assisting each other. However, in practice it is a lot cheaper
+        -- on the performance of the game. Best to just assist what you want it to assist directly.
+        -- if GameHasAIs then 
+        --     self:UpdateAssistersConsumption()
+        -- end
 
         local myBlueprint = self:GetBlueprint()
         if self.MaintenanceConsumption then
