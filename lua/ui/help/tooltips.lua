@@ -808,7 +808,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0274>Assist a T2 or T3 massextractor with engineer(s) to build surrounding mass storages. If mex currently is upgrading, you need to shift-right click twice on the mex to build mass storages.",
     },
     options_automex = {
-        title = "<LOC OPTIONS_0285>Automatic extractor selection",
+        title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
         description = "<LOC OPTIONS_0286>After selecting an engineer, hover the mouse over a mass extractor spot to autopreselect a mass extractor for building",
     },
     options_show_attached_unit_lifebars = {

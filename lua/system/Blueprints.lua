@@ -56,6 +56,188 @@ local here = getinfo(1).source
 local original_blueprints
 local current_mod
 
+-- upvalue for performance
+pcall = pcall 
+doscript = doscript
+DiskFindFiles = DiskFindFiles
+
+--- Load in the pre game data that is defined in the lobby through the preference file.
+local function LoadPreGameData()
+
+    -- load in the prefs file
+    local file = DiskFindFiles("/preferences", "Game.prefs")[1]
+    if not file then 
+        WARN('Blueprints.lua - Preferences file is not found. Skipping pre game data.') 
+        return 
+    end
+
+    -- try and load the pre game data of prefs file
+    local preGameData = false 
+    ok, msg = pcall(
+        function() 
+            local data = { }
+            doscript(file, data)
+            preGameData = data.PreGameData 
+        end 
+    )
+
+    -- tell us if something went wrong
+    if not ok then 
+        WARN("Blueprints.lua - Preferences file is locked or corrupt. Skipping pre game data.")
+        WARN(msg)
+    end
+
+    return preGameData
+end
+
+--- Attempts to assign icons to units if they exist.
+-- @units All unit blueprints.
+-- @assignments A list of assignments { { BlueprintId = ..., IconSet = ... }, }.
+-- @identifier The identifier of the UI mod that ensures compatibility when turned off (/textures/ui/game/common/strategicicons/identifier)
+local function AssignIcons(units, assignments, identifier)
+
+    local StringLower = string.lower
+
+    local function AssignBlueprintId(units, id, icon)
+        -- do not punish people for capitalization of unit database
+        id = StringLower(id)
+
+        -- check whether unit exists
+        local unit = units[id]
+        if unit then 
+            local path = identifier .. "/" .. icon
+            unit.StrategicIconName =  path
+        end
+    end
+
+    local function AssignTypeId(units, id, icon)
+        -- todo :)
+    end
+
+    if assignments then 
+        for k, info in assignments do 
+            if info.BlueprintId and info.IconSet then 
+                AssignBlueprintId(units, info.BlueprintId, info.IconSet)
+                continue 
+            end
+
+            if info.TypeId and info.Iconset then 
+                AssignTypeId(units, info.TypeId, info.IconSet)
+                continue
+            end
+        end
+    end
+end
+
+--- Finds and applies custom strategic icons defined by UI mods.
+-- @param all_bps The table with all blueprint values.
+local function FindCustomStrategicIcons(all_bps)
+
+    -- STRATEGIC ICON REPLACEMENT --
+
+    -- try and load in pre game data
+    local preGameData = LoadPreGameData()
+    if preGameData and preGameData.IconReplacements then 
+        for _, info in preGameData.IconReplacements do 
+
+            -- data that is set in the lobby
+            -- info.Name = mod.name 
+            -- info.Author = mod.author 
+            -- info.Location = mod.location
+            -- info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+            -- info.UID = uid
+
+            local safemath = table.copy(math)
+            safemath.random = nil
+
+            -- all the functionality that is available in the _icons.lua
+            local state = {
+                -- moholog-interacting statements
+                LOG = LOG,
+                WARN = WARN, 
+                _ALERT = _ALERT,
+                SPEW = SPEW,
+                error = error,
+                assert = assert,
+
+                -- debugging statements
+                repr = repr,
+
+                -- compatibility statements
+                pairs = pairs,
+                ipairs = ipairs,
+                next = next,
+
+                -- typical statements
+                table = table,
+                math = safemath, 
+                string = string,
+                tonumber = tonumber,
+                type = type,
+                unpack = unpack,
+                tostring = tostring,
+            }
+
+            -- try to get the icons file
+            local ok, msg = pcall(
+                function()
+                    doscript(info.Location .. "/mod_icons.lua", state)
+
+                    -- syntax errors are caught internally and instead it just returns the table untouched
+                    if not (state.UnitIconAssignments or state.ScriptedIconAssignments) then
+                        error("Blueprints.lua - can not import the icon configuration file at '" .. info.Location .. "'. This could be due to missing functionality functionality or a parsing error.")
+                    end
+                end
+            )
+
+            -- if we can't, report it
+            if not ok then 
+                WARN("Blueprints.lua - Unable to load icons from mod '" .. info.Name .. "' with uuid '" .. info.UID .. "'. Please inform the author: " .. info.Author)
+                WARN(msg)
+            end
+
+            ok, msg = pcall (
+                function()
+                    -- scripted approach
+                    if state.ScriptedIconAssignments then 
+                        -- retrieve data, make sure it is a deepcopy to prevent ui mods messing with the original
+                        local units = table.deepcopy(all_bps.Unit)
+                        local projectiles = table.deepcopy(all_bps.Projectile)
+                        local icons = DiskFindFiles(info.Location .. "/custom-strategic-icons", "*.dds")
+
+                        -- find scripted icons and assign them
+                        local scriptedIcons = state.ScriptedIconAssignments(units, projectiles, icons)
+                        AssignIcons(all_bps.Unit, scriptedIcons, info.Identifier)
+
+                        -- inform the dev
+                        local n = table.getsize(scriptedIcons)
+                        if n > 0 then 
+                            SPEW("Blueprints.lua - Found (" .. n .. ") scripted icon assignments in " .. info.Name .. " by " .. info.Author .. ".")
+                        end
+                    end
+
+                    -- manual approach
+                    if state.UnitIconAssignments then 
+                        AssignIcons(all_bps.Unit, state.UnitIconAssignments, info.Identifier)
+
+                        -- inform the dev
+                        local n = table.getsize(state.UnitIconAssignments)
+                        if n > 0 then 
+                            SPEW("Blueprints.lua - Found (" .. n .. ") manual icon assignments in " .. info.Name .. " by " .. info.Author .. ".")
+                        end
+                    end
+                end
+            )
+
+            -- if we can't, report it
+            if not ok then 
+                WARN("Blueprints.lua - Unable to load icons from mod '" .. info.Name .. "' with uuid '" .. info.UID .. "'. Please inform the author: " .. info.Author)
+                WARN(msg)
+            end
+        end
+    end
+end
+
 local function InitOriginalBlueprints()
     current_mod = nil
     original_blueprints = {
@@ -614,6 +796,11 @@ function PostModBlueprints(all_bps)
         BlueprintLoaderUpdateProgress()
     end
     HandleUnitWithBuildPresets(preset_bps, all_bps)
+
+    -- find custom strategic icons defined by ui mods, this should be the very last thing 
+    -- we do before releasing the blueprint values to the game as we want to catch all
+    -- units, even those included by mods.
+    FindCustomStrategicIcons(all_bps)
 end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
@@ -671,14 +858,11 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
-    --load game preferences file
-    PreGameData = false --this stops us from tripping the games global variable uninitialised detector, which is very finicky in this file.
-    LoadCustomPreferences()
-
-    -- load blueprints from active map directory
-    if PreGameData and PreGameData.CurrentMapDir then
+    -- try and load in pre game data for current map directory
+    local preGameData = LoadPreGameData()
+    if preGameData and preGameData.CurrentMapDir then
         task = 'Blueprints Loading: Blueprints from current map'
-        files = DiskFindFiles(PreGameData.CurrentMapDir, pattern)
+        files = DiskFindFiles(preGameData.CurrentMapDir, pattern)
         for k,file in files do
             BlueprintLoaderUpdateProgress()
             -- update UnitManager UI via taskNotifier only if it exists
@@ -755,12 +939,4 @@ function ReloadBlueprint(file)
     ModBlueprints(original_blueprints)
     RegisterAllBlueprints(original_blueprints)
     original_blueprints = nil
-end
-
--- Load the game.prefs file and save it
-function LoadCustomPreferences()
-    local PrefFile = DiskFindFiles("/preferences", "Game.prefs")
-    task = 'Blueprints Loading: loading game preferences file'
-    if not PrefFile[1] then WARN('Blueprints.lua - Preferences file not found. Skipping custom content. Is the file mounted correctly in the init?') return end
-    safecall(task .. ': ' .. PrefFile[1], doscript, PrefFile[1])
 end

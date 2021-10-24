@@ -13,13 +13,13 @@ local THeavyPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').THeavy
 TDFPlasmaHeavy04 = Class(THeavyPlasmaCannonProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
+        -- local radius = self.DamageData.DamageRadius
+        -- local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
-        DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
+        -- DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
+        -- DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
 
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        -- self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat

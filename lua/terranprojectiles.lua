@@ -213,7 +213,7 @@ TDFGeneralGaussCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
 }
 
-TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
+TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UEB2301) UEF Triad and (UES0201) UEF Destroyer
     FxImpactUnit = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactLand = EffectTemplate.TGaussCannonHitLand01,
@@ -241,7 +241,7 @@ TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     end,
 }
 
-TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES0302 (UEF battleship)
+TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES0302 (UEF Battleship)
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TShipGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TShipGaussCannonHit01,
@@ -272,7 +272,7 @@ TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES03
     end,
 }
 
-TDFLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- fatboy & UEB2301 (uef T2 pd) & UES0201 (UEF destroyer)
+TDFLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- Fatboy
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TLandGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TLandGaussCannonHit01,
@@ -858,12 +858,12 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
+        -- local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        -- DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        -- DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
 
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        -- self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)

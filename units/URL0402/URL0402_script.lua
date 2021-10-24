@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/URL0402/URL0402_script.lua
 -- Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
 -- Summary  :  Cybran Spider Bot Script
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
@@ -236,18 +236,24 @@ URL0402 = Class(CWalkingLandUnit) {
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
 
+        -- only apply death damage when the unit is sufficiently build
         local bp = self:GetBlueprint()
-        local position = self:GetPosition()
-        local qx, qy, qz, qw = unpack(self:GetOrientation())
-        local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
-        for i, numWeapons in bp.Weapon do
-            if bp.Weapon[i].Label == 'SpiderDeath' then
-                position[3] = position[3]+3*math.cos(a)
-                position[1] = position[1]+3*math.sin(a)
-                DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
-                break
+        local FractionThreshold = bp.General.FractionThreshold or 0.99
+        if self:GetFractionComplete() >= FractionThreshold then 
+            local bp = self:GetBlueprint()
+            local position = self:GetPosition()
+            local qx, qy, qz, qw = unpack(self:GetOrientation())
+            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            for i, numWeapons in bp.Weapon do
+                if bp.Weapon[i].Label == 'SpiderDeath' then
+                    position[3] = position[3]+3*math.cos(a)
+                    position[1] = position[1]+3*math.sin(a)
+                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    break
+                end
             end
         end
+
         DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Center_Turret', 2)

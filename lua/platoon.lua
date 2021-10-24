@@ -216,7 +216,6 @@ Platoon = Class(moho.platoon_methods) {
             v.AssistSet = nil
             v.AssistPlatoon = nil
             v.UnitBeingAssist = nil
-            v.UnitBeingBuilt = nil
             v.ReclaimInProgress = nil
             v.CaptureInProgress = nil
             if v:IsPaused() then
