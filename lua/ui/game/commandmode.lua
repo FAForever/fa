@@ -249,6 +249,16 @@ function CapStructure(command)
         if structure:IsInCategory('RADAR') and isDoubleTapped then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
         end
+
+        -- if we have a radar, create t1 pgens around it
+        if structure:IsInCategory('RADAR') and isDoubleTapped then 
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
+        end
+
+        -- if we have a t1 point defense, create walls around it
+        if structure:IsInCategory('DIRECTFIRE') and structure:IsInCategory('TECH1') and isDoubleTapped then 
+            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b5101" }}, true)
+        end
     end
 
     -- keep track of previous structure to identify a 2nd click

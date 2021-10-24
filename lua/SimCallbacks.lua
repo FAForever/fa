@@ -103,19 +103,24 @@ end
 --- Allocated once to prevent re-allocations and de-allocations 
 local buildLocation = Vector(0, 0, 0)
 
+--- Special template for point defense
+local footprintPointDefense = {
+    {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1} ,
+}
+
 --- Templates for units with a footprint of 1 such as radars and mass extractors
 local footprint1 = { 
     -- inner layer for storages
-    { {1, 0}, {0, 1}, {-1, 0}, {0, -1}, },
+    { {2, 0}, {0, 2}, {-2, 0}, {0, -2}, },
 
     -- outer layer for fabricators
-    { {-2, 0}, {-1, 1}, {0, 2}, {1, 1}, {2, 0}, {1, -1}, {0, -2}, {-1, -1}, },
+    { {-4, 0}, {-2, 2}, {0, 4}, {2, 2}, {4, 0}, {2, -2}, {0, -4}, {-2, -2}, },
 }
 
 --- Templates for units with a footprint of 3 such as fabricators
 local footprint3 = { 
     -- inner layer for storages
-    { {-1, 2}, {0, 2}, {1, 2}, {2, 1}, {2, 0}, {2, -1}, {1, -2}, {0, -2}, {-1, -2}, {-2, -1}, {-2, 0}, {-2, 1}, },
+    { {-2, 4}, {0, 4}, {2, 4}, {4, 2}, {4, 0}, {4, -2}, {2, -4}, {0, -4}, {-2, -4}, {-4, -2}, {-4, 0}, {-4, 2}, },
 }
 
 --- Easy to use table for direct footprint size -> template conversion
@@ -155,7 +160,7 @@ local function RetrieveNthStructureLayer (footprint, nthLayer)
     end
 
     -- boo
-    return { }
+    return false
 end
 
 --- Called by the UI when right-clicking a mass extractor
@@ -223,15 +228,22 @@ Callbacks.CapStructure = function(data, units)
     local brain = builders[1]:GetAIBrain()
     local blueprintID = ConstructBlueprintID(faction, data.id)
     local footprint = structure:GetBlueprint().Footprint
-    local layer = RetrieveNthStructureLayer(footprint.SizeX, data.layer)
+
+    -- compute the layer locations
+    local layer = false 
+    if data.id == "b5101" then 
+        layer = footprintPointDefense
+    else 
+        layer = RetrieveNthStructureLayer(footprint.SizeX, data.layer)
+    end
 
     -- compute build locations and issue the capping
     local center = structure:GetPosition()
     for k, location in layer do 
 
         -- determine build location using cached value
-        buildLocation[1] = center[1] + 2 * location[1]
-        buildLocation[3] = center[3] + 2 * location[2]
+        buildLocation[1] = center[1] + location[1]
+        buildLocation[3] = center[3] + location[2]
         buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
 
         -- order all builders to build
