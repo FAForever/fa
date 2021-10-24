@@ -356,7 +356,7 @@ function OnCommandIssued(command)
                 BlueprintID = command.Blueprint,
                 TextureName = '/meshes/game/flag02d_albedo.dds',
                 ShaderName = 'CommandFeedback',
-                UniformScale = 5,
+                UniformScale = 1,
             }, 
             0.7
         )
