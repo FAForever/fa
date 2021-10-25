@@ -104,6 +104,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             RemoveUnitEnhancement(self, 'TeleporterRemove')
             self:RemoveCommandCap('RULEUCC_Teleport')
         elseif enh == 'StealthGenerator' then
+            local bp = self:GetBlueprint().Enhancements[enh]
             self:AddToggleCap('RULEUTC_CloakToggle')
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
@@ -113,6 +114,25 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self.StealthEnh = true
             self:EnableUnitIntel('Enhancement', 'RadarStealth')
             self:EnableUnitIntel('Enhancement', 'SonarStealth')
+            if not Buffs['CybranACUStealthBonus'] then
+               BuffBlueprint {
+                    Name = 'CybranACUStealthBonus',
+                    DisplayName = 'CybranACUStealthBonus',
+                    BuffType = 'ACUSTEALTHBONUS',
+                    Stacks = 'ALWAYS',
+                    Duration = -1,
+                    Affects = {
+                        MaxHealth = {
+                            Add = bp.NewHealth,
+                            Mult = 1.0,
+                        },
+                    },
+                }
+            end
+            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+            end
+            Buff.ApplyBuff(self, 'CybranACUStealthBonus')
         elseif enh == 'StealthGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
@@ -121,6 +141,9 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self.CloakEnh = false
             self.StealthFieldEffects = false
             self.CloakingEffects = false
+            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+            end
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
@@ -155,6 +178,9 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             if Buff.HasBuff(self, 'CybranACUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranACUCloakBonus')
             end
+            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
+            end
             Buff.ApplyBuff(self, 'CybranACUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
             self:RemoveToggleCap('RULEUTC_CloakToggle')
@@ -162,6 +188,9 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self.CloakEnh = false
             if Buff.HasBuff(self, 'CybranACUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranACUCloakBonus')
+            end
+            if Buff.HasBuff(self, 'CybranACUStealthBonus') then
+                Buff.RemoveBuff(self, 'CybranACUStealthBonus')
             end
         -- T2 Engineering
         elseif enh =='AdvancedEngineering' then
