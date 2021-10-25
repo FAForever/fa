@@ -14,6 +14,26 @@ EmitterTempEmtBpPath = '/effects/emitters/temp/'
 WeaponSteam01 = {
     EmtBpPath .. 'weapon_mist_01_emit.bp',
 }
+-- ---------------------------------------------------------------
+-- New OverCharge Effects
+-- ---------------------------------------------------------------
+
+OverChargeMuzzleFlash = {
+    EmtBpPath .. 'OverCharge_Muzzle_Flash.bp',
+    EmtBpPath .. 'OverCharge_Muzzle_Smoke_01.bp',
+    EmtBpPath .. 'OverCharge_Muzzle_Smoke_02.bp',
+}
+
+OverChargeTrail = { EmtBpPath .. 'OverChargePolyTrail.bp', }
+
+OverChargePolyTrail = { EmtBpPath .. 'OverChargeTrail_01.bp' }
+
+OverChargeHit = {
+    EmtBpPath .. 'OverChargeHit_01.bp',
+    EmtBpPath .. 'OverChargeHit_02.bp',
+    EmtBpPath .. 'OverChargeHit_03.bp',
+    EmtBpPath .. 'OverChargeHit_04.bp',
+}
 
 -- ---------------------------------------------------------------
 -- Concussion Ring Effects

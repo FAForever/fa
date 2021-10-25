@@ -8,6 +8,7 @@ local Projectile = import('/lua/sim/Projectile.lua').Projectile
 local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
 local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
+local EffectTemplate = import('/lua/EffectTemplates.lua')
 local OCProjectiles = {}
 
 -- shared between sim and ui

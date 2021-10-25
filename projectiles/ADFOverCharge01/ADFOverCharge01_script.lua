@@ -1,4 +1,4 @@
--- Aeon Mortar
+-- Aeon OverCharge
 
 local ALaserBotProjectile = import('/lua/aeonprojectiles.lua').ALaserBotProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -6,12 +6,12 @@ local OverchargeProjectile = import('/lua/sim/DefaultProjectiles.lua').Overcharg
 
 TDFOverCharge01 = Class(ALaserBotProjectile, OverchargeProjectile) {
 
-    PolyTrail = '/effects/emitters/aeon_commander_overcharge_trail_01_emit.bp',
-    FxTrails = EffectTemplate.ACommanderOverchargeFXTrail01,
+    PolyTrail = '/effects/emitters/OverChargePolyTrail.bp',
+    FxTrails = EffectTemplate.OverChargeTrail,
 
-    FxImpactUnit = EffectTemplate.ACommanderOverchargeHit01,
-    FxImpactProp = EffectTemplate.ACommanderOverchargeHit01,
-    FxImpactLand = EffectTemplate.ACommanderOverchargeHit01,
+    FxImpactUnit = EffectTemplate.OverChargeHit,
+    FxImpactProp = EffectTemplate.OverChargeHit,
+    FxImpactLand = EffectTemplate.OverChargeHit,
 
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
