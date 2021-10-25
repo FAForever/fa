@@ -153,7 +153,7 @@ UnitBlueprint {
         BuildCostEnergy = 80,
         BuildCostMass = 20,
         BuildTime = 90,
-        MaintenanceConsumptionPerSecondEnergy = 0,
+        MaintenanceConsumptionPerSecondEnergy = 1,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -197,7 +197,7 @@ UnitBlueprint {
         RadarRadius = 40,
         RadarStealth = true,
         VisionRadius = 24,
-        StealthWaitTime = 1,
+        StealthWaitTime = 3,
     },
     Interface = {
         HelpText = '<LOC xsl0101_help>Combat Scout',
