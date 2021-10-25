@@ -110,13 +110,19 @@ XSL0001 = Class(ACUUnit) {
                         Regen = {
                             Add = 0,
                             Mult = bp.RegenPerSecond,
-                            Floor = bp.RegenFloor,
                             BPCeilings = {
                                 TECH1 = bp.RegenCeilingT1,
                                 TECH2 = bp.RegenCeilingT2,
                                 TECH3 = bp.RegenCeilingT3,
                                 EXPERIMENTAL = bp.RegenCeilingT4,
                                 SUBCOMMANDER = bp.RegenCeilingSCU,
+                            },
+                            BPFloors = {
+                                TECH1 = bp.RegenFloorT1,
+                                TECH2 = bp.RegenFloorT2,
+                                TECH3 = bp.RegenFloorT3,
+                                EXPERIMENTAL = bp.RegenFloorT4,
+                                SUBCOMMANDER = bp.RegenFloorSCU,
                             },
                         },
                     },
@@ -143,6 +149,10 @@ XSL0001 = Class(ACUUnit) {
                     Affects = {
                         MaxHealth = {
                             Add = bp.ACUAddHealth,
+                            Mult = 1,
+                        },
+                        Regen = {
+                            Add = bp.NewRegenRate,
                             Mult = 1,
                         },
                     },
