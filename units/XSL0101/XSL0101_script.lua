@@ -6,6 +6,7 @@
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoGunWeapon
+local Buff = import('/lua/sim/Buff.lua')
 
 XSL0101 = Class(SWalkingLandUnit) {
     Weapons = {
@@ -28,6 +29,10 @@ XSL0101 = Class(SWalkingLandUnit) {
         if bit == 8 then
             self.Sync.LowPriority = false
             self:RevealUnit()
+
+            if Buff.HasBuff(self, 'SelenCloakVisionDebuff') then
+                Buff.RemoveBuff(self, 'SelenCloakVisionDebuff')
+            end
         else
             SWalkingLandUnit.OnScriptBitSet(self, bit)
         end
@@ -75,6 +80,29 @@ XSL0101 = Class(SWalkingLandUnit) {
             self:SetMaintenanceConsumptionActive()
             self:EnableUnitIntel('ToggleBit5', 'RadarStealth')
             self:EnableUnitIntel('ToggleBit8', 'Cloak')
+
+            if not Buffs['SelenCloakVisionDebuff'] then
+               BuffBlueprint {
+                    Name = 'SelenCloakVisionDebuff',
+                    DisplayName = 'SelenCloakVisionDebuff',
+                    BuffType = 'SELENCLOAKBONUS',
+                    Stacks = 'ALWAYS',
+                    Duration = -1,
+                    Affects = {
+                        VisionRadius = {
+                            Mult = 0.6,
+                        },
+                        RadarRadius = {
+                            Mult = 0.6,
+                        },
+                    },
+                }
+            end
+            if Buff.HasBuff(self, 'SelenCloakVisionDebuff') then
+                Buff.RemoveBuff(self, 'SelenCloakVisionDebuff')
+            end
+            Buff.ApplyBuff(self, 'SelenCloakVisionDebuff')
+
             self.WaitingForCloak = false
         end
         self.CloakThread = nil
@@ -83,6 +111,7 @@ XSL0101 = Class(SWalkingLandUnit) {
     -- Turn off the cloak to begin with
     OnStopBeingBuilt = function(self, builder, layer)
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+        self:SetMaintenanceConsumptionInactive()
         self:SetScriptBit('RULEUTC_CloakToggle', true)
         self.WaitingForCloak = false
         self:ForkThread(self.HideUnit)
@@ -101,6 +130,10 @@ XSL0101 = Class(SWalkingLandUnit) {
         -- If we begin moving, reveal ourselves
         if old == 'Stopped' then
             self:RevealUnit()
+
+            if Buff.HasBuff(self, 'SelenCloakVisionDebuff') then
+                Buff.RemoveBuff(self, 'SelenCloakVisionDebuff')
+            end
         end
 
         SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
