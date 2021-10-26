@@ -24,9 +24,11 @@ OverChargeMuzzleFlash = {
     EmtBpPath .. 'OverCharge_Muzzle_Smoke_02.bp',
 }
 
-OverChargeTrail = { EmtBpPath .. 'OverChargePolyTrail.bp', }
+-- trails are emitter blueprints
+OverChargeTrail = { EmtBpPath .. 'OverChargeTrail_01.bp', }
 
-OverChargePolyTrail = { EmtBpPath .. 'OverChargeTrail_01.bp' }
+-- these are trail blueprints
+OverChargePolyTrail = { EmtBpPath .. 'OverChargePolyTrail.bp' }
 
 OverChargeHit = {
     EmtBpPath .. 'OverChargeHit_01.bp',
