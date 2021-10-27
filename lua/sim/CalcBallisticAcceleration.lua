@@ -1,38 +1,106 @@
-local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
+
+-- This file is used by the following units:
+-- - dead0202 (T2 UEF bomber/fighter: Janus)
+-- - uaa0103 (t1 Aeon bomber: Shimmer)
+-- - uaa0304 (t3 Aeon bomber: Shocker)
+-- - uea0103 (t1 UEF bomber: Scorcher)
+-- - uea0304 (t3 UEF bomber: Ambassador)
+-- - ura0103 (t1 Cybran bomber: Zeus)
+-- - ura0304 (t3 Cybran bomber: Revenant)
+-- - xsa0103 (t1 Seraphim bomber: Sinnve)
+-- - xsa0202 (t2 Seraphim bomber/fighter: Notha)
+-- - xsa0304 (t3 Seraphim bomber: Sinntha)
+-- - xsa0402 (t4 Seraphim bomber: Ahwassa)
+
+-- It got introduced because some units miss their shell on their first pass 
+-- over a unit. That is obviously frustrating and this function can be enabled
+-- for a unit when you add Blueprint.Weapon[X].FixBombTrajectory = true to
+-- the weapon blueprint of a unit.
+
+XZDist = import("/lua/utilities.lua").XZDistanceTwoVectors
+
+-- upvalue globals for performance
+local VDist2 = VDist2
+local GetSurfaceHeight = GetSurfaceHeight
+
+-- upvalue moho functions for performance
+local ProjectileMethods = _G.moho.projectile_methods 
+local ProjectileGetVelocity = ProjectileMethods.GetVelocity
+local ProjectileGetLauncher = ProjectileMethods.GetLauncher 
+
+local EntityMethods = _G.moho.entity_methods 
+local EntityGetPosition = EntityMethods.GetPosition
+
+local UnitMethods = _G.moho.unit_methods 
+local UnitGetVelocity = UnitMethods.GetVelocity()
+
+local WeaponMethods = _G.moho.weapon_methods 
+local WeaponGetTargetEntity = WeaponMethods.GetTargetEntity
+local WeaponGetCurrentTargetPos = WeaponMethods.GetCurrentTargetPos
+
+-- upvalue math functions for performance
+local MathClamp = math.clamp
+local MathPow = math.pow
 
 -- This table stores last acceleration and numbers of bombs left in a cluster bomb run, as well as the original target
 -- format : bomb_data[entityId] = {n_left=<n_left>, acc=<last_acc>, targetpos=<original_targetpos>}
 bomb_data = {}
 
+local NullVector = Vector(0, 0, 0)
+
 CalculateBallisticAcceleration = function(weapon, projectile)
+
+    -- default acceleration
+    local acc = 4.75
+
+    -- quick exit: no launcher means we just do something
+    local launcher = ProjectileGetLauncher(projectile)
+    if not launcher then return acc end
+    
+    local id = launcher.EntityId
+
+    -- temporarily value used to catch vectors
+    local vector
+    
+    -- get projectile position and velocity
+    vector = EntityGetPosition(projectile)
+    local ppx = vector[1]
+    local ppy = vector[2]
+    local ppz = vector[3]
+
+    vector = ProjectileGetVelocity(projectile)
+    local pvx = 10 * vector[1]
+    local pvy = 10 * vector[2]
+    local pvz = 10 * vector[3]
+
+    -- get target position and velocity
+    vector = WeaponGetCurrentTargetPos(weapon)
+    local tpx = vector[1]
+    local tpz = vector[3]
+    local tpy = GetSurfaceHeight(x, z)
+
+    local entity = WeaponGetTargetEntity((projectile))
+    if entity and IsUnit(entity) then 
+        vector = UnitGetVelocity(entity)
+    else 
+        vector = NullVector
+    end
+
+    local tvx = 10 * vector[1]
+    local tvy = 10 * vector[2]
+    local tvz = 10 * vector[3]
+
+    -- retrieve blueprint information (ouch!)
     local bp = weapon:GetBlueprint()
     local MuzzleSalvoSize = bp.MuzzleSalvoSize
     local MuzzleSalvoDelay = bp.MuzzleSalvoDelay
-    local acc = 4.75
-    local launcher = projectile:GetLauncher()
-    if not launcher then return acc end
-    local id = launcher.EntityId
 
-    -- Get projectile position and velocity
-    -- velocity needs to multiplied by 10 due to being returned /tick instead of /s
-    local proj = {pos=projectile:GetPosition(), vel=VMult(Vector(launcher:GetVelocity()), 10)}
-    local entity = launcher:GetTargetEntity()
-
-    local target
-    if entity and IsUnit(entity) then
-        -- target is a entity
-        target = {pos=entity:GetPosition(), vel=VMult(Vector(entity:GetVelocity()), 10)}
-    else
-        -- target is something else i.e. attack ground
-        target = {pos=weapon:GetCurrentTargetPos(), vel=Vector(0, 0, 0)}
-    end
-
+    -- not happy with this yet
     if MuzzleSalvoSize > 1 and bomb_data[id] == nil then
-        bomb_data[id] = {acc = 4.75, n_left = MuzzleSalvoSize, targetpos = target.pos}
+        bomb_data[id] = {acc = acc, n_left = MuzzleSalvoSize, targetpos = target.pos}
     end
 
     local mydata = bomb_data[id]
-
     if not target.pos or mydata.usestore then
         if mydata then
             -- use same acceleration as last bomb
@@ -48,13 +116,20 @@ CalculateBallisticAcceleration = function(weapon, projectile)
         return acc
     end
 
-    -- calculate flat(exclude y-axis) distance and velocity between projectile and target
-    local dist = {pos=XZDist(proj.pos, target.pos), vel=XZDist(proj.vel, target.vel)}
-    if dist.vel == 0 then return acc end
+    -- compute flat distances velocity
+    local dv = VDist2(pvx, pvz, tvx, tvz)
 
+    -- early exit: we can just drop and we'll hit
+    if dv == 0 then 
+        return acc 
+    end
+
+    -- compute flat distance of position
+    local dp = VDist2(ppx, ppz, tpx, tpz)
+
+    -- deliberately drop the bomb before the target, could be useful for torpedo bombers
     if bp.DropBombShort then
-        -- deliberately drop bomb short by % ratio, could be useful for torpedo bombers
-        dist.pos = dist.pos * math.clamp(1 - bp.DropBombShort, 0, 1)
+        dp = dp * MathClamp(1 - bp.DropBombShort, 0, 1)
     end
 
     if bomb_data[id] ~= nil then -- bomber will drop several bombs
