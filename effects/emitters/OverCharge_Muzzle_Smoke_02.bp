@@ -24,7 +24,7 @@ EmitterBlueprint {
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/OverCharge_Muzzle_Smoke_02.dds]],
-	RampTexture = [[/textures/particles/ramp_white_07.dds]],
+	RampTexture = [[/textures/particles/ramp_aeon_overcharge.dds]],
 	XDirectionCurve = {
 		XRange = 2.00,
 		Keys = {
@@ -110,15 +110,15 @@ EmitterBlueprint {
 		},
 	},
 	StartSizeCurve = {
-		XRange = 2.00,
+		XRange = 1.00,
 		Keys = {
-			{ x=0.955,y=0.105,z=0.000 },
+			{ x=0.500,y=0.105,z=0.000 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 2.00,
 		Keys = {
-			{ x=0.000,y=1.230,z=0.250 },
+			{ x=0.000,y=0.950,z=0.250 },
 		},
 	},
 	InitialRotationCurve = {

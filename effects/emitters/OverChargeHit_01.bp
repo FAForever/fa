@@ -1,7 +1,7 @@
 EmitterBlueprint {
 	BlueprintId = 'OverChargeHit_01',
-	Lifetime = 7.00,
-	Repeattime = 7.00,
+	Lifetime = 4.00,
+	Repeattime = 5.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
 	LocalVelocity = true,
@@ -24,7 +24,7 @@ EmitterBlueprint {
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/electricity_08.dds]],
-	RampTexture = [[/textures/particles/ramp_blue_08.dds]],
+	RampTexture = [[/textures/particles/ramp_aeon_overcharge.dds]],
 	XDirectionCurve = {
 		XRange = 7.00,
 		Keys = {

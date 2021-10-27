@@ -1,13 +1,13 @@
 TrailEmitterBlueprint {
 	BlueprintId = 'OverChargePolyTrail',
 	Lifetime = -1.00,
-    TrailLength = 7,
-    Size = 0.5,
+    TrailLength = 3.0,
+    Size = 1.0,
     SortOrder = 0,
     BlendMode = 3,
     TextureRepeatRate = 1,
     LODCutoff = 160,
-	RepeatTexture = [[/textures/particles/OverCharge_Projectile.dds]],
-	RampTexture = [[/textures/particles/ramp_white_04.dds]],
+	RepeatTexture = [[/textures/particles/railgun_trail_01.dds]],
+	RampTexture = [[/textures/particles/ramp_aeon_overcharge.dds]],
 }
 

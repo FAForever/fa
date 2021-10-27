@@ -1,9 +1,9 @@
 EmitterBlueprint {
 	BlueprintId = 'OverChargeHit_02',
-	Lifetime = 1.00,
+	Lifetime = 4.00,
 	Repeattime = 1.00,
 	TextureFramecount = 1.00,
-	Blendmode = 1.00,
+	Blendmode = 3.00,
 	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
@@ -24,7 +24,7 @@ EmitterBlueprint {
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/electricity_09.dds]],
-	RampTexture = [[/textures/particles/ramp_white_premod_01.dds]],
+	RampTexture = [[/textures/particles/ramp_aeon_overcharge.dds]],
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {
@@ -112,13 +112,13 @@ EmitterBlueprint {
 	StartSizeCurve = {
 		XRange = 2.00,
 		Keys = {
-			{ x=0.500,y=1.750,z=0.750 },
+			{ x=0.500,y=0.500,z=0.500 },
 		},
 	},
 	EndSizeCurve = {
 		XRange = 2.00,
 		Keys = {
-			{ x=0.750,y=3.000,z=1.500 },
+			{ x=0.750,y=1.000,z=1.000 },
 		},
 	},
 	InitialRotationCurve = {
