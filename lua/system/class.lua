@@ -72,10 +72,17 @@ State machines
 ]]
 
 
+-- upvalue globals for performance
 local getmetatable = getmetatable
 local setmetatable = setmetatable
-local getn = table.getn
 local ForkThread = ForkThread
+local getfenv = getfenv
+local type = type
+local assert = assert
+local unpack = unpack
+
+-- cached values
+local emptyMetaTable = getmetatable {}
 
 --
 -- Class is a callable object for defining new classes, and the metatable for class objects.
