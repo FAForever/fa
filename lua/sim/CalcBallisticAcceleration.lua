@@ -46,6 +46,10 @@ local MathPow = math.pow
 -- format : bomb_data[entityId] = {n_left=<n_left>, acc=<last_acc>, targetpos=<original_targetpos>}
 bomb_data = {}
 
+-- upvalued reference for performance
+local upBombData = bomb_data
+
+-- default null vector
 local NullVector = Vector(0, 0, 0)
 
 CalculateBallisticAcceleration = function(weapon, projectile)
@@ -56,8 +60,6 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- quick exit: no launcher means we just do something
     local launcher = ProjectileGetLauncher(projectile)
     if not launcher then return acc end
-    
-    local id = launcher.EntityId
 
     -- temporarily value used to catch vectors
     local vector
@@ -73,12 +75,13 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local pvy = 10 * vector[2]
     local pvz = 10 * vector[3]
 
-    -- get target position and velocity
+    -- get target position
     vector = WeaponGetCurrentTargetPos(weapon)
     local tpx = vector[1]
     local tpz = vector[3]
     local tpy = GetSurfaceHeight(x, z)
 
+    -- determine target velocity
     local entity = WeaponGetTargetEntity((projectile))
     if entity and IsUnit(entity) then 
         vector = UnitGetVelocity(entity)
@@ -90,17 +93,17 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local tvy = 10 * vector[2]
     local tvz = 10 * vector[3]
 
-    -- retrieve blueprint information (ouch!)
+    -- retrieve blueprint information all in one go
     local bp = weapon:GetBlueprint()
-    local MuzzleSalvoSize = bp.MuzzleSalvoSize
-    local MuzzleSalvoDelay = bp.MuzzleSalvoDelay
+    local salvoSize = bp.MuzzleSalvoSize
+    local salvoDelay = bp.MuzzleSalvoDelay
+    local dropShort = bp.DropBombShort
 
     -- not happy with this yet
-    if MuzzleSalvoSize > 1 and bomb_data[id] == nil then
-        bomb_data[id] = {acc = acc, n_left = MuzzleSalvoSize, targetpos = target.pos}
-    end
+    local id = launcher.EntityId
+    local data = upBombData[id] or { acc = acc, n_left = MuzzleSalvoSize, targetpos = target.pos }
 
-    local mydata = bomb_data[id]
+    local mydata = upBombData[id]
     if not target.pos or mydata.usestore then
         if mydata then
             -- use same acceleration as last bomb
@@ -109,7 +112,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
             mydata.usestore = true -- Signal that we've lost our target to lock in these settings
 
             if mydata.n_left < 1 then
-                bomb_data[id] = nil
+                upBombData[id] = nil
             end
         end
 
@@ -132,17 +135,17 @@ CalculateBallisticAcceleration = function(weapon, projectile)
         dp = dp * MathClamp(1 - bp.DropBombShort, 0, 1)
     end
 
-    if bomb_data[id] ~= nil then -- bomber will drop several bombs
+    if upBombData[id] ~= nil then -- bomber will drop several bombs
         -- calculate space between bombs, this is multiplied by 0.5
         -- to get the bombs overlapping a bit
         local len = MuzzleSalvoDelay * dist.vel * 0.5
-        local current_bomb = MuzzleSalvoSize - bomb_data[id].n_left
+        local current_bomb = MuzzleSalvoSize - upBombData[id].n_left
 
         -- calculate the position for this particular bomb
         dist.pos = dist.pos - (len * (MuzzleSalvoSize - 1)) / 2 + len * current_bomb
-        bomb_data[id].n_left = bomb_data[id].n_left - 1
-        if bomb_data[id].n_left < 1 then
-            bomb_data[id] = nil
+        upBombData[id].n_left = upBombData[id].n_left - 1
+        if upBombData[id].n_left < 1 then
+            upBombData[id] = nil
         end
     end
 
