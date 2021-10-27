@@ -80,6 +80,7 @@ local getfenv = getfenv
 local type = type
 local assert = assert
 local unpack = unpack
+local ipairs = ipairs
 
 -- cached values
 local emptyMetaTable = getmetatable {}
