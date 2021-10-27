@@ -274,6 +274,19 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
+            Buffs = {
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 1,
+                    Radius = 0,
+                    TargetAllow = 'TECH1,TECH2',
+                    TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,NAVAL,STRUCTURE',
+                },
+            },
             CollideFriendly = false,
             Damage = 150,
             DamageType = 'Normal',
