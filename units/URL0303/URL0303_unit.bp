@@ -281,7 +281,7 @@ UnitBlueprint {
                     },
                     AppliedToTarget = true,
                     BuffType = 'STUN',
-                    Duration = 1,
+                    Duration = 1.5,
                     Radius = 0,
                     TargetAllow = 'TECH1,TECH2',
                     TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,NAVAL,STRUCTURE',
