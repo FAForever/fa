@@ -16,14 +16,13 @@ __module_metatable = {
 -- upvalue for performance: changes the calls to access these
 -- tables from GETGLOBAl to GETUPVALUE. This change can be inspected by calling
 -- LOG(repr(debug.listcode(import))).
-local upModuleMetatable = __module_metatable
 local upModules = __modules
+local upModuleMetatable = __module_metatable
 
 -- upvalue globals for performance
-local LOG = LOG
-local SPEW = SPEW
-local WARN = WARN
-local error = error
+-- local LOG = LOG
+-- local WARN = WARN
+-- local error = error
 local setmetatable = setmetatable
 local pcall = pcall
 local doscript = doscript
@@ -33,12 +32,10 @@ local FileCollapsePath = FileCollapsePath
 local StringLower = string.lower
 local StringSub = string.sub
 
--- upvalue table operations for performance
-local TableInsert = table.insert 
-
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
+-- local SPEW = SPEW
 -- local once = true
 
 --- The global import function used to keep track of modules.
@@ -120,4 +117,4 @@ function dirty_module(name, why)
     end
 end
 
-TableInsert(__diskwatch, dirty_module)
+table.insert(__diskwatch, dirty_module)
