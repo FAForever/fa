@@ -5,7 +5,6 @@ local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
 bomb_data = {}
 
 CalculateBallisticAcceleration = function(weapon, projectile)
-    LOG("CalculateBallisticAcceleration")
     local bp = weapon:GetBlueprint()
     local MuzzleSalvoSize = bp.MuzzleSalvoSize
     local MuzzleSalvoDelay = bp.MuzzleSalvoDelay
