@@ -35,7 +35,6 @@ CalculateBallisticAcceleration = function(weapon, projectile)
 
     if not target.pos or mydata.usestore then
         if mydata then
-            LOG("cached!")
             -- use same acceleration as last bomb
             acc = mydata.acc
             mydata.n_left = mydata.n_left - 1
@@ -73,8 +72,6 @@ CalculateBallisticAcceleration = function(weapon, projectile)
 
     end
 
-    LOG("computing!")
-
     -- how many seconds until the bomb hits the target in xz-space
     local time = dist.pos / dist.vel
     if time == 0 then return acc end
@@ -91,7 +88,6 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- a = 2 * (1/t)^2 * x
 
     acc = 2 * math.pow(1 / time , 2) * (proj.pos[2] - target.tpos[2])
-    LOG(acc)
 
     if bomb_data[id] then
         -- store last acceleration in case target dies in the middle of carpet bomb run
