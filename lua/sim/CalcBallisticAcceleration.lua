@@ -103,7 +103,6 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local id = launcher.EntityId
     local data = upBombData[id] or { acc = acc, n_left = MuzzleSalvoSize, targetpos = target.pos }
 
-    local mydata = upBombData[id]
     if not target.pos or mydata.usestore then
         if mydata then
             -- use same acceleration as last bomb
