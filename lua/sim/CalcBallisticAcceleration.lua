@@ -79,7 +79,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     vector = WeaponGetCurrentTargetPos(weapon)
     local tpx = vector[1]
     local tpz = vector[3]
-    local tpy = GetSurfaceHeight(x, z)
+    local tpy = GetSurfaceHeight(tpx, tpz)
 
     -- determine target velocity
     local entity = WeaponGetTargetEntity((projectile))
@@ -150,13 +150,13 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     end
 
     -- how many seconds until the bomb hits the target in xz-space
-    local time = dist.pos / dist.vel
+    local time = dp / dv
     if time == 0 then return acc end
 
-    -- find out where the target will be at that point in time (it could be moving)
-    target.tpos = {target.pos[1] + time * target.vel[1], 0, target.pos[3] + time * target.vel[3]}
-    -- what is the height at that future position
-    target.tpos[2] = GetSurfaceHeight(target.tpos[1], target.tpos[3])
+    -- determine y coordinate
+    local tpx = tpx + time * tvx,
+    local tpz = tpz + time * tvz
+    local tpy = GetSurfaceHeight(tpx, tpz)
 
     -- The basic formula for displacement over time is x = v0*t + 0.5*a*t^2
     -- x: displacement, v0: initial velocity, a: acceleration, t: time
@@ -164,11 +164,12 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- now we can calculate what acceleration we need to make it hit the target in the y-axis
     -- a = 2 * (1/t)^2 * x
 
-    acc = 2 * math.pow(1 / time , 2) * (proj.pos[2] - target.tpos[2])
+    local invTime = 1/time
+    acc = 2 * invTime * invTime * (ppy - tvy)
 
-    if bomb_data[id] then
+    if upBombData[id] then
         -- store last acceleration in case target dies in the middle of carpet bomb run
-        bomb_data[id].acc = acc
+        upBombData[id].acc = acc
     end
 
     return acc
