@@ -70,18 +70,31 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    -- assume there are no AIs
+    ScenarioInfo.GameHasAIs = false
+
+    -- if the AI replacement is on then there may be AIs
+    if ScenarioInfo.Options.AIReplacement == 'On' then 
+        ScenarioInfo.GameHasAIs = true 
+        SPEW("Detected ai replacement option being enabled: enabling AI functionality")
+    end
+
+    -- if we're doing a campaign / special map then there may be AIs
+    if ScenarioInfo.type ~= 'skirmish' then 
+        ScenarioInfo.GameHasAIs = true 
+        SPEW("Detected a non-skirmish type map: enabling AI functionality")
+    end
+
+    -- if the map maker explicitly tells us
+    if ScenarioInfo.requiresAiFunctionality then 
+        ScenarioInfo.GameHasAIs = true 
+        SPEW("Detected the 'requiresAiFunctionality' field set by the map: enabling AI functionality")
+    end
+
     -- LOG('SetupSession: ', repr(ScenarioInfo))
 
     ArmyBrains = {}
-
-    -- if the AI replacement is on then there may be AIs, otherwise we check each brain
-    if ScenarioInfo.Options.AIReplacement == 'On' then 
-        ScenarioInfo.GameHasAIs = true 
-        SPEW("Game has AI replacement option enabled")
-    else 
-        ScenarioInfo.GameHasAIs = false 
-    end
-
+    
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
     -- needed by our scenario.
