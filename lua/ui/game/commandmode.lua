@@ -206,19 +206,19 @@ function CapStructure(command)
     -- are we a structure and are we holding shift?
     if structure:IsInCategory('STRUCTURE') and IsKeyDown('Shift') then 
 
+        -- various conditions written out for clarity
+        local isTech1 = structure:IsInCategory('TECH1')
+        local isTech2 = structure:IsInCategory('TECH2')
+        local isTech3 = structure:IsInCategory('TECH3')
+
+        local isUpgrading = structure:GetFocus() ~= nil
+
+        local isTech1AndUpgrading = isTech1 and isUpgrading
         local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
         local isTripleTapped = structure ~= nil and (pStructure1 == structure) and (pStructure2 == structure) 
 
         -- if we have a non-t1 extractor, create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then 
-
-            -- various conditions written out for clarity
-            local isTech1 = structure:IsInCategory('TECH1')
-            local isTech2 = structure:IsInCategory('TECH2')
-            local isTech3 = structure:IsInCategory('TECH3')
-
-            local isUpgrading = structure:GetFocus() ~= nil
-            local isTech1AndUpgrading = isTech1 and isUpgrading
 
             -- check what type of buildings we'd like to make
             local buildStorages = (isTech1AndUpgrading or isTech2 or isTech3)
@@ -263,16 +263,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a radar, create t1 pgens around it
-        elseif structure:IsInCategory('RADAR') then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
-
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
-
-        -- if we have a radar, create t1 pgens around it
-        elseif (structure:IsInCategory('RADAR') or structure:IsInCategory('OMNI')) then 
+        elseif ((structure:IsInCategory('RADAR') and (isTech2 or isTech1AndUpgrading)) or structure:IsInCategory('OMNI')) then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
             -- reset state
