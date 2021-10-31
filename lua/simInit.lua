@@ -74,8 +74,13 @@ function SetupSession()
 
     ArmyBrains = {}
 
-    -- assume we have no AIs in the game
-    ScenarioInfo.GameHasAIs = false
+    -- if the AI replacement is on then there may be AIs, otherwise we check each brain
+    if ScenarioInfo.Options.AIReplacement == 'On' then 
+        ScenarioInfo.GameHasAIs = true 
+        SPEW("Game has AI replacement option enabled")
+    else 
+        ScenarioInfo.GameHasAIs = false 
+    end
 
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
@@ -212,9 +217,13 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         AddBuildRestriction(index, ScenarioInfo.BuildRestrictions)
     end
 
-    -- check if this brain is an AI, if so - then we can't skip some functionality!
-    if brain.Type == 'AI' then 
-        ScenarioInfo.GameHasAIs = true 
+    -- check if this brain is an active AI by checking its type and whether 
+    -- skirmish systems are setup (prevents detecting NEUTRAL_CIVILIAN or ARMY_17)
+    local brainType = brain.BrainType 
+    local brainSkirmishSystems = brain.SkirmishSystems 
+    if brainType == 'AI' and brainSkirmishSystems then 
+        ScenarioInfo.GameHasAIs = true
+        SPEW("Game has AIs in it: " .. brain.Name) 
     end
 end
 
@@ -226,7 +235,6 @@ end
 -- any units yet) and we're ready to start the game. It's responsible for setting up
 -- the initial units and any other gameplay state we need.
 function BeginSession()
-    LOG('BeginSession...')
     SPEW('Active mods in sim: ', repr(__active_mods))
 
     GameOverListeners = {}
