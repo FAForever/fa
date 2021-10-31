@@ -32,10 +32,10 @@ local EntityMethods = _G.moho.entity_methods
 local EntityGetPosition = EntityMethods.GetPosition
 
 local UnitMethods = _G.moho.unit_methods 
-local UnitGetVelocity = UnitMethods.GetVelocity()
+local UnitGetVelocity = UnitMethods.GetVelocity
+local UnitGetTargetEntity = UnitMethods.GetTargetEntity
 
 local WeaponMethods = _G.moho.weapon_methods 
-local WeaponGetTargetEntity = WeaponMethods.GetTargetEntity
 local WeaponGetCurrentTargetPos = WeaponMethods.GetCurrentTargetPos
 
 -- upvalue math functions for performance
@@ -70,28 +70,32 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local ppy = vector[2]
     local ppz = vector[3]
 
-    vector = ProjectileGetVelocity(projectile)
-    local pvx = 10 * vector[1]
-    local pvy = 10 * vector[2]
-    local pvz = 10 * vector[3]
+    pv = UnitGetVelocity(launcher)
 
-    -- get target position
-    vector = WeaponGetCurrentTargetPos(weapon)
-    local tpx = vector[1]
-    local tpz = vector[3]
-    local tpy = GetSurfaceHeight(tpx, tpz)
+    -- get target position (take into account target bone)
+    local tpx, tpy, tpz, tv
 
-    -- determine target velocity
-    local entity = WeaponGetTargetEntity((projectile))
-    if entity and IsUnit(entity) then 
-        vector = UnitGetVelocity(entity)
+    -- get the entity we're targeting
+    local target = UnitGetTargetEntity(launcher)
+
+    -- firing at unit
+    if target and IsUnit(target) then 
+        vector = EntityGetPosition(target)
+        local tpx = vector[1]
+        local tpz = vector[3]
+        local tpy = GetSurfaceHeight(tpx, tpz)
+
+        local tv = UnitGetVelocity(target)
+
+    -- firing at ground or props 
     else 
-        vector = NullVector
-    end
+        vector = WeaponGetCurrentTargetPos(weapon)
+        local tpx = vector[1]
+        local tpz = vector[3]
+        local tpy = GetSurfaceHeight(tpx, tpz)
 
-    local tvx = 10 * vector[1]
-    local tvy = 10 * vector[2]
-    local tvz = 10 * vector[3]
+        local tv = 0
+    end
 
     -- retrieve blueprint information all in one go
     local bp = weapon:GetBlueprint()
@@ -101,25 +105,31 @@ CalculateBallisticAcceleration = function(weapon, projectile)
 
     -- not happy with this yet
     local id = launcher.EntityId
-    local data = upBombData[id] or { acc = acc, n_left = MuzzleSalvoSize, targetpos = target.pos }
+    local data = upBombData[id] or { 
+        acceleration = acc, 
+        remaining = salvoSize, 
+        -- target x / y / z
+        tpx = tpx, tpy = tpy, tpz = tpz,
+        -- override = false,
+    }
 
-    if not target.pos or mydata.usestore then
-        if mydata then
-            -- use same acceleration as last bomb
-            acc = mydata.acc
-            mydata.n_left = mydata.n_left - 1
-            mydata.usestore = true -- Signal that we've lost our target to lock in these settings
+    data.override = target.Dead 
 
-            if mydata.n_left < 1 then
-                upBombData[id] = nil
-            end
+    -- we can override the acceleration when we've lost the target
+    if data.override then
+        -- use same acceleration as last bomb
+        acc = data.acceleration
+        data.remaining = data.remaining - 1
+
+        if data.remaining < 1 then
+            upBombData[id] = nil
         end
 
         return acc
     end
 
     -- compute flat distances velocity
-    local dv = VDist2(pvx, pvz, tvx, tvz)
+    local dv = 10 * math.abs(pv - tv)
 
     -- early exit: we can just drop and we'll hit
     if dv == 0 then 
@@ -130,22 +140,19 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local dp = VDist2(ppx, ppz, tpx, tpz)
 
     -- deliberately drop the bomb before the target, could be useful for torpedo bombers
-    if bp.DropBombShort then
-        dp = dp * MathClamp(1 - bp.DropBombShort, 0, 1)
+    if dropShort then
+        dp = dp * MathClamp(1 - dropShort, 0, 1)
     end
 
-    if upBombData[id] ~= nil then -- bomber will drop several bombs
-        -- calculate space between bombs, this is multiplied by 0.5
-        -- to get the bombs overlapping a bit
-        local len = MuzzleSalvoDelay * dist.vel * 0.5
-        local current_bomb = MuzzleSalvoSize - upBombData[id].n_left
+    -- calculate space between bombs, multiplier of 0.5 to make them overlap
+    local len = MuzzleSalvoDelay * dv * 0.5
+    local current_bomb = salvoSize - data.remaining
 
-        -- calculate the position for this particular bomb
-        dist.pos = dist.pos - (len * (MuzzleSalvoSize - 1)) / 2 + len * current_bomb
-        upBombData[id].n_left = upBombData[id].n_left - 1
-        if upBombData[id].n_left < 1 then
-            upBombData[id] = nil
-        end
+    -- calculate the position for this particular bomb
+    dp = dp - (len * (salvoSize - 1)) / 2 + len * current_bomb
+    data.remaining = data.remaining - 1
+    if data.remaining < 1 then
+        upBombData[id] = nil
     end
 
     -- how many seconds until the bomb hits the target in xz-space
@@ -153,7 +160,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     if time == 0 then return acc end
 
     -- determine y coordinate
-    local tpx = tpx + time * tvx,
+    local tpx = tpx + time * tvx
     local tpz = tpz + time * tvz
     local tpy = GetSurfaceHeight(tpx, tpz)
 
@@ -163,13 +170,11 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- now we can calculate what acceleration we need to make it hit the target in the y-axis
     -- a = 2 * (1/t)^2 * x
 
-    local invTime = 1/time
+    local invTime = 1 / time
     acc = 2 * invTime * invTime * (ppy - tvy)
 
-    if upBombData[id] then
-        -- store last acceleration in case target dies in the middle of carpet bomb run
-        upBombData[id].acc = acc
-    end
+    -- store last acceleration in case target dies in the middle of carpet bomb run
+    data.acc = acc
 
     return acc
 end
