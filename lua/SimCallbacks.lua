@@ -139,7 +139,7 @@ local skirtSize2 = {
     { {2, 0}, {0, 2}, {-2, 0}, {0, -2}, },
 
     -- outer layer for fabricators
-    { {-4, 0}, {-2, 2}, {0, 4}, {2, 2}, {4, 0}, {2, -2}, {0, -4}, {-2, -2}, },
+    {  {-2, 2}, {2, 2}, {2, -2}, {-2, -2}, {-4, 0},{0, 4}, {4, 0}, {0, -4}, },
 }
 
 --- Templates for units with a skirtSize of 3 such as fabricators

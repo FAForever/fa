@@ -203,35 +203,32 @@ function CapStructure(command)
     local structure = GetUnitById(command.Target.EntityId)
     if not structure or IsDestroyed(structure) then return end
 
-    -- are we a structure?
-    if structure:IsInCategory('STRUCTURE') then 
+    -- are we a structure and are we holding shift?
+    if structure:IsInCategory('STRUCTURE') and IsKeyDown('Shift') then 
 
+        -- various conditions written out for clarity
+        local isTech1 = structure:IsInCategory('TECH1')
+        local isTech2 = structure:IsInCategory('TECH2')
+        local isTech3 = structure:IsInCategory('TECH3')
+
+        local isUpgrading = structure:GetFocus() ~= nil
+
+        local isTech1AndUpgrading = isTech1 and isUpgrading
         local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
-        local isTripleTapped = structure ~= nil and (pStructure2 == structure)
+        local isTripleTapped = structure ~= nil and (pStructure1 == structure) and (pStructure2 == structure) 
 
         -- if we have a non-t1 extractor, create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then 
 
-            -- various conditions written out for clarity
-            local isTech1 = structure:IsInCategory('TECH1')
-            local isTech2 = structure:IsInCategory('TECH2')
-            local isTech3 = structure:IsInCategory('TECH3')
-
-            local isUpgrading = (structure:GetFocus() ~= nil) and IsKeyDown('Shift')
-     
-            local isTech1AndUpgrading = (isTech1 and isUpgrading and isDoubleTapped)
-            local isTech2AndTapped = (isTech2 and (not isUpgrading) and isDoubleTapped)
-            local isTech3AndTapped = (isTech3 and isDoubleTapped)
-
             -- check what type of buildings we'd like to make
-            local buildStorages = (isTech1AndUpgrading or isTech2AndTapped or isTech3AndTapped)
+            local buildStorages = (isTech1AndUpgrading or isTech2 or isTech3)
             local buildFabs = (isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isTripleTapped)
 
             if buildStorages then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
 
                 -- only clear state if we can't make fabricators 
-                if isTech1AndUpgrading or isTech2AndTapped then 
+                if isTech1AndUpgrading or isTech2 then 
                     structure = nil
                     pStructure1 = nil
                     pStructure2 = nil
@@ -248,7 +245,7 @@ function CapStructure(command)
             end
 
         -- if we have a t3 fabricator, create storages around it
-        elseif structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') and isDoubleTapped then 
+        elseif structure:IsInCategory('MASSFABRICATION') and structure:IsInCategory('TECH3') then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
 
             -- reset state
@@ -257,7 +254,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a t2 artillery, create t1 pgens around it
-        elseif structure:IsInCategory('ARTILLERY') and structure:IsInCategory('TECH2') and isDoubleTapped then 
+        elseif structure:IsInCategory('ARTILLERY') and structure:IsInCategory('TECH2') then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
             -- reset state
@@ -266,16 +263,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a radar, create t1 pgens around it
-        elseif structure:IsInCategory('RADAR') and isDoubleTapped then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
-
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
-
-        -- if we have a radar, create t1 pgens around it
-        elseif (structure:IsInCategory('RADAR') or structure:IsInCategory('OMNI')) and isDoubleTapped then 
+        elseif ((structure:IsInCategory('RADAR') and (isTech2 or isTech1AndUpgrading)) or structure:IsInCategory('OMNI')) then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
             -- reset state
@@ -284,7 +272,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a t1 point defense, create walls around it
-        elseif structure:IsInCategory('DIRECTFIRE') and structure:IsInCategory('TECH1') and isDoubleTapped then 
+        elseif structure:IsInCategory('DIRECTFIRE') and structure:IsInCategory('TECH1') then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b5101" }}, true)
 
             -- reset state
