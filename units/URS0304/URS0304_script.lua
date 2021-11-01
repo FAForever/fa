@@ -11,19 +11,19 @@ local CIFMissileLoaWeapon = CybranWeapons.CIFMissileLoaWeapon
 local CIFMissileStrategicWeapon = CybranWeapons.CIFMissileStrategicWeapon
 local CANTorpedoLauncherWeapon = CybranWeapons.CANTorpedoLauncherWeapon
 
-URS0304 = Class(CSubUnit) {
+URS0304 = Class(CSubUnit)({
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        NukeMissile = Class(CIFMissileStrategicWeapon){},
-        CruiseMissile = Class(CIFMissileLoaWeapon){},
-        Torpedo01 = Class(CANTorpedoLauncherWeapon){},
-        Torpedo02= Class(CANTorpedoLauncherWeapon){},
+        NukeMissile = Class(CIFMissileStrategicWeapon)({}),
+        CruiseMissile = Class(CIFMissileLoaWeapon)({}),
+        Torpedo01 = Class(CANTorpedoLauncherWeapon)({}),
+        Torpedo02 = Class(CANTorpedoLauncherWeapon)({}),
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
         CSubUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
     end,
-}
+})
 
 TypeClass = URS0304

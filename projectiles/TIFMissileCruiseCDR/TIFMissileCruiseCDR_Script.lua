@@ -5,7 +5,7 @@ local TMissileCruiseProjectile = import('/lua/terranprojectiles.lua').TMissileCr
 local Explosion = import('/lua/defaultexplosions.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
+TIFMissileCruiseCDR = Class(TMissileCruiseProjectile)({
 
     FxAirUnitHitScale = 1.65,
     FxLandHitScale = 1.65,
@@ -57,6 +57,8 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
             # Further increase check intervals
             self:SetTurnRate(100)
             KillThread(self.MoveThread)
+        else
+
         end
     end,
 
@@ -71,6 +73,6 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile) {
         TMissileCruiseProjectile.OnEnterWater(self)
         self:SetDestroyOnWater(true)
     end,
-}
+})
 TypeClass = TIFMissileCruiseCDR
 

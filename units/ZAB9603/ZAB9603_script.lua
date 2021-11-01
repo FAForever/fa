@@ -9,13 +9,13 @@
 #****************************************************************************
 
 local ASeaFactoryUnit = import('/lua/aeonunits.lua').ASeaFactoryUnit
-ZAB9603 = Class(ASeaFactoryUnit) {
+ZAB9603 = Class(ASeaFactoryUnit)({
     OnCreate = function(self)
         ASeaFactoryUnit.OnCreate(self)
         self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -15, 0, 0, -1)
         self.Trash:Add(self.BuildPointSlider)
     end,
-}
+})
 
 TypeClass = ZAB9603
 

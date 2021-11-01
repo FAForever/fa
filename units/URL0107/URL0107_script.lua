@@ -15,9 +15,9 @@ local CDFLaserHeavyWeapon = CybranWeaponsFile.CDFLaserHeavyWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
 
-URL0107 = Class(CWalkingLandUnit) {
+URL0107 = Class(CWalkingLandUnit)({
     Weapons = {
-        LaserArms = Class(CDFLaserHeavyWeapon) {},
+        LaserArms = Class(CDFLaserHeavyWeapon)({}),
         #RocketBackpack = Class(CDFRocketIridiumWeapon) {},
     },
 
@@ -29,10 +29,10 @@ URL0107 = Class(CWalkingLandUnit) {
         end
     end,
 
-    CreateBuildEffects = function( self, unitBeingBuilt, order )
-       EffectUtil.CreateCybranBuildBeamsOpti( self, { }, unitBeingBuilt, self.BuildEffectsBag, false)
+    CreateBuildEffects = function(self, unitBeingBuilt, order)
+        EffectUtil.CreateCybranBuildBeamsOpti(self, {}, unitBeingBuilt, self.BuildEffectsBag, false)
     end,
-    
-}
+
+})
 
 TypeClass = URL0107

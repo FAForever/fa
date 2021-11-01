@@ -11,10 +11,10 @@ local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local FxAmbient = import('/lua/effecttemplates.lua').AResourceGenAmbient
 local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
-XAB1401 = Class(AStructureUnit) {
+XAB1401 = Class(AStructureUnit)({
 
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon)({}),
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -32,7 +32,7 @@ XAB1401 = Class(AStructureUnit) {
         end
     end,
 
-    ResourceOn = State {
+    ResourceOn = State({
         Main = function(self)
             local aiBrain = self:GetAIBrain()
             local massAdd = 0
@@ -44,8 +44,8 @@ XAB1401 = Class(AStructureUnit) {
                 local massNeed = aiBrain:GetEconomyRequested('MASS') * 10
                 local energyNeed = aiBrain:GetEconomyRequested('ENERGY') * 10
 
-                local massIncome = (aiBrain:GetEconomyIncome('MASS') * 10) - massAdd
-                local energyIncome = (aiBrain:GetEconomyIncome('ENERGY') * 10) - energyAdd
+                local massIncome = aiBrain:GetEconomyIncome('MASS') * 10 - massAdd
+                local energyIncome = aiBrain:GetEconomyIncome('ENERGY') * 10 - energyAdd
 
                 massAdd = 20
                 if massNeed - massIncome > 0 then
@@ -53,7 +53,7 @@ XAB1401 = Class(AStructureUnit) {
                 end
 
                 if maxMass and massAdd > maxMass then
-                   massAdd = maxMass
+                    massAdd = maxMass
                 end
                 self:SetProductionPerSecondMass(massAdd)
 
@@ -66,10 +66,10 @@ XAB1401 = Class(AStructureUnit) {
                 end
                 self:SetProductionPerSecondEnergy(energyAdd)
 
-                WaitSeconds(.5)
+                WaitSeconds(0.5)
             end
         end,
-    },
+    }),
 
     GetRandomDir = function(self)
         local num = Random(0, 2)
@@ -78,6 +78,6 @@ XAB1401 = Class(AStructureUnit) {
         end
         return -1
     end,
-}
+})
 
 TypeClass = XAB1401

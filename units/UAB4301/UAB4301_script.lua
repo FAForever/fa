@@ -9,7 +9,7 @@
 --#****************************************************************************
 local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
 
-UAB4301 = Class(AShieldStructureUnit) {
+UAB4301 = Class(AShieldStructureUnit)({
     ShieldEffects = {
         '/effects/emitters/aeon_shield_generator_t2_01_emit.bp',
         '/effects/emitters/aeon_shield_generator_t3_02_emit.bp',
@@ -17,7 +17,7 @@ UAB4301 = Class(AShieldStructureUnit) {
         '/effects/emitters/aeon_shield_generator_t3_04_emit.bp',
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
         AShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
         self.ShieldEffectsBag = {}
     end,
@@ -62,7 +62,7 @@ UAB4301 = Class(AShieldStructureUnit) {
             self.ShieldEffectsBag = {}
         end
     end,
-    
+
     OnKilled = function(self, instigator, type, overkillRatio)
         AShieldStructureUnit.OnKilled(self, instigator, type, overkillRatio)
         if self.OrbManip1 then
@@ -74,6 +74,6 @@ UAB4301 = Class(AShieldStructureUnit) {
             self.OrbManip2 = nil
         end
     end,
-}
+})
 
 TypeClass = UAB4301

@@ -11,12 +11,12 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 local TDFRiotWeapon = import('/lua/terranweapons.lua').TDFRiotWeapon
 
-XEL0209 = Class(TConstructionUnit) {
+XEL0209 = Class(TConstructionUnit)({
     Weapons = {
-        Riotgun01 = Class(TDFRiotWeapon) {
+        Riotgun01 = Class(TDFRiotWeapon)({
             FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank,
             FxMuzzleFlashScale = 0.75,
-        },
+        }),
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -31,26 +31,26 @@ XEL0209 = Class(TConstructionUnit) {
     end,
 
     --[[OnStartBuild = function(self, unitBeingBuilt, order)
-        --Disable the gun while building something
-        self:SetWeaponEnabledByLabel('Riotgun01', false)
-        TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
-    end,
+            --Disable the gun while building something
+            self:SetWeaponEnabledByLabel('Riotgun01', false)
+            TConstructionUnit.OnStartBuild(self, unitBeingBuilt, order)
+        end,
 
-    OnStopBuild = function(self)
-        --Re-enable the gun after done building
-        self:SetWeaponEnabledByLabel('Riotgun01', true)
-        TConstructionUnit.OnStopBuild(self)
-    end,
+        OnStopBuild = function(self)
+            --Re-enable the gun after done building
+            self:SetWeaponEnabledByLabel('Riotgun01', true)
+            TConstructionUnit.OnStopBuild(self)
+        end,
 
-    OnStartReclaim = function(self, target)
-        TConstructionUnit.OnStartReclaim(self, target)
-        self:SetAllWeaponsEnabled(false)
-    end,
+        OnStartReclaim = function(self, target)
+            TConstructionUnit.OnStartReclaim(self, target)
+            self:SetAllWeaponsEnabled(false)
+        end,
 
-    OnStopReclaim = function(self, target)
-        TConstructionUnit.OnStopReclaim(self, target)
-        self:SetAllWeaponsEnabled(true)
-    end,--]]
-}
+        OnStopReclaim = function(self, target)
+            TConstructionUnit.OnStopReclaim(self, target)
+            self:SetAllWeaponsEnabled(true)
+        end,--]]
+})
 
 TypeClass = XEL0209

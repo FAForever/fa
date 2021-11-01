@@ -6,7 +6,7 @@
 -- 
 local CLOATacticalMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalMissileProjectile
 
-CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
+CIFMissileTactical03 = Class(CLOATacticalMissileProjectile)({
 
     NumChildMissiles = 3,
 
@@ -15,60 +15,61 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
         self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
         self.Split = false
         self.MovementTurnLevel = 1
-        self:ForkThread( self.MovementThread )
+        self:ForkThread(self.MovementThread)
     end,
-    
+
     PassDamageData = function(self, damageData)
-        CLOATacticalMissileProjectile.PassDamageData(self,damageData)
+        CLOATacticalMissileProjectile.PassDamageData(self, damageData)
         local launcherbp = self:GetLauncher():GetBlueprint()
         self.ChildDamageData = table.copy(self.DamageData)
         self.ChildDamageData.DamageAmount = launcherbp.SplitDamage.DamageAmount or 0
         self.ChildDamageData.DamageRadius = launcherbp.SplitDamage.DamageRadius or 1
-    end,    
-    
+    end,
+
     OnImpact = function(self, targetType, targetEntity)
         local army = self.Army
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        CreateLightParticle( self, -1, army, 3, 7, 'glow_03', 'ramp_fire_11' )
-        
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
+
+        CreateLightParticle(self, -1, army, 3, 7, 'glow_03', 'ramp_fire_11')
+
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        
+
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
+
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local rotation = RandomFloat(0,2*math.pi)
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+3, radius+3, 300, 90, army)
+            local rotation = RandomFloat(0, 2 * math.pi)
+
+            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius + 3, radius + 3, 300, 90, army)
         end
-        
+
         -- if I collide with terrain dont split
-        if targetType != 'Projectile' then
+        if targetType ~= 'Projectile' then
             self.Split = true
         end
         CLOATacticalMissileProjectile.OnImpact(self, targetType, targetEntity)
-    end,   
-    
+    end,
+
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.Split and (amount >= self:GetHealth()) then
+        if not self.Split and amount >= self:GetHealth() then
             self.Split = true
             local vx, vy, vz = self:GetVelocity()
             local velocity = 7
             local ChildProjectileBP = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp'
-            local angle = (2*math.pi) / self.NumChildMissiles
-            local spreadMul = 0.5  -- Adjusts the width of the dispersal
+            local angle = 2 * math.pi / self.NumChildMissiles
+            -- Adjusts the width of the dispersal
+            local spreadMul = 0.5
 
             -- Launch projectiles at semi-random angles away from split location
-            for i = 0, (self.NumChildMissiles - 1) do
-                local xVec = vx + math.sin(i*angle) * spreadMul
-                local yVec = vy + math.cos(i*angle) * spreadMul
-                local zVec = vz + math.cos(i*angle) * spreadMul
+            for i = 0, self.NumChildMissiles - 1 do
+                local xVec = vx + math.sin(i * angle) * spreadMul
+                local yVec = vy + math.cos(i * angle) * spreadMul
+                local zVec = vz + math.cos(i * angle) * spreadMul
                 local proj = self:CreateChildProjectile(ChildProjectileBP)
-                proj:SetVelocity(xVec,yVec,zVec)
+                proj:SetVelocity(xVec, yVec, zVec)
                 proj:SetVelocity(velocity)
                 proj:PassDamageData(self.ChildDamageData)
             end
@@ -106,8 +107,10 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
             -- Further increase check intervals            
             self:SetTurnRate(100)
             KillThread(self.MoveThread)
+        else
+
         end
-    end,        
+    end,
 
     GetDistanceToTarget = function(self)
         local tpos = self:GetCurrentTargetPosition()
@@ -115,6 +118,6 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile) {
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
-}
+})
 TypeClass = CIFMissileTactical03
 

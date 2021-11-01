@@ -12,13 +12,15 @@ local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CDFLaserHeavyWeapon = import('/lua/cybranweapons.lua').CDFLaserHeavyWeapon
 
 
-URB2301 = Class(CStructureUnit) {
+URB2301 = Class(CStructureUnit)({
 
     Weapons = {
-        MainGun = Class(CDFLaserHeavyWeapon) {
-        FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'},
-    }
+        MainGun = Class(CDFLaserHeavyWeapon)({
+            FxMuzzleFlash = {
+                '/effects/emitters/particle_cannon_muzzle_02_emit.bp',
+            },
+        }),
     },
-}
+})
 
 TypeClass = URB2301

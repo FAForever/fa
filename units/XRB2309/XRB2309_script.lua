@@ -10,9 +10,9 @@ local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedo
 local utilities = import('/lua/utilities.lua')
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
-XRB2309 = Class(CStructureUnit) {
+XRB2309 = Class(CStructureUnit)({
     Weapons = {
-        Turret01 = Class(CKrilTorpedoLauncherWeapon) {},
+        Turret01 = Class(CKrilTorpedoLauncherWeapon)({}),
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -20,8 +20,10 @@ XRB2309 = Class(CStructureUnit) {
         self:StartSinkingFromBuild()
 
         -- Add inital sinking effects
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4)) -- One-off
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5)) -- One-off
+        -- One-off
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water02_footfall01_01_emit.bp'):ScaleEmitter(1.4))
+        -- One-off
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_snowy01_landing01_01_emit.bp'):ScaleEmitter(1.5))
 
         ChangeState(self, self.IdleState)
     end,
@@ -29,10 +31,13 @@ XRB2309 = Class(CStructureUnit) {
     StartSinkingFromBuild = function(self)
         -- do not start sinking when unit is below water surface already
         local position = self:GetPosition()
-        if GetSurfaceHeight(position[1], position[3]) > position[2] then return end
+        if GetSurfaceHeight(position[1], position[3]) > position[2] then
+            return
+        end
 
         -- Add sinking effect for the duration of the sinking
-        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5)) -- Continuous
+        -- Continuous
+        self.Trash:Add(CreateAttachedEmitter(self, 'xrb2308', self.Army, '/effects/emitters/tt_water_submerge02_01_emit.bp'):ScaleEmitter(1.5))
 
         -- Create sinker projectile
         local bone = 0
@@ -40,7 +45,8 @@ XRB2309 = Class(CStructureUnit) {
         self.sinkProjectile = proj
 
         -- Start the sinking after a delay of the given number of seconds, attaching to a given bone and entity.
-        proj:SetLocalAngularVelocity(0, 0, 0) -- Change this to make it rotate some while sinking
+        -- Change this to make it rotate some while sinking
+        proj:SetLocalAngularVelocity(0, 0, 0)
         proj:Start(0, self, bone)
         proj:SetBallisticAcceleration(-0.75)
 
@@ -52,7 +58,8 @@ XRB2309 = Class(CStructureUnit) {
     DepthWatcher = function(self)
         self.sinkingFromBuild = true
 
-        local sinkFor = 3.4 -- Use this to set the depth - Basic maths required
+        -- Use this to set the depth - Basic maths required
+        local sinkFor = 3.4
         while self.sinkProjectile and sinkFor > 0 do
             WaitTicks(1)
             sinkFor = sinkFor - 0.1
@@ -61,7 +68,8 @@ XRB2309 = Class(CStructureUnit) {
         local bottom = true
         if not self.Dead then
             if self.sinkProjectile then
-                bottom = false -- We must have timed out
+                -- We must have timed out
+                bottom = false
                 self.sinkProjectile:Destroy()
                 self.sinkProjectile = nil
             end
@@ -84,12 +92,19 @@ XRB2309 = Class(CStructureUnit) {
         self.OpenAnim:PlayAnim(bpAnim)
         self.Trash:Add(self.OpenAnim)
         self:PlaySound(bp.Audio.Deploy)
-        
+
         local pos = self:GetPosition()
-        
-        for _,army in self.SpottedByArmy or {} do
-            VizMarker({X = pos[1], Z = pos[3], Radius = 4, LifeTime = 0.3, Army = army, Vision = true,})
-        end  
+
+        for _, army in self.SpottedByArmy or {} do
+            VizMarker({
+                X = pos[1],
+                Z = pos[3],
+                Radius = 4,
+                LifeTime = 0.3,
+                Army = army,
+                Vision = true,
+            })
+        end
     end,
 
     DeathThread = function(self, overkillRatio, instigator)
@@ -105,7 +120,8 @@ XRB2309 = Class(CStructureUnit) {
 
         -- Here down is near-shadowing the function, all to change the entity subset. Dumb, right?
         local isNaval = true
-        local shallSink = true -- This unit should definitely sink, no need to check cats.
+        -- This unit should definitely sink, no need to check cats.
+        local shallSink = true
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
         self:DestroyAllDamageEffects()
@@ -132,24 +148,26 @@ XRB2309 = Class(CStructureUnit) {
         self.overkillRatio = overkillRatio
 
         local this = self
-        self:StartSinking(
-            function()
-                this:DestroyUnit(overkillRatio)
-            end
-        )
+        self:StartSinking(function()
+
+            this:DestroyUnit(overkillRatio)
+        end)
     end,
 
     -- Called from unit.lua DeathThread
     StartSinking = function(self, callback)
-        if not self.sinkingFromBuild and self.Bottom then -- We don't want to sink at death if we're on the seabed
+        if not self.sinkingFromBuild and self.Bottom then
+            -- We don't want to sink at death if we're on the seabed
             self:ForkThread(callback)
-        elseif self.sinkingFromBuild then -- If still sinking, set the destruction callback for impact
+        elseif self.sinkingFromBuild then
+            -- If still sinking, set the destruction callback for impact
             self.sinkProjectile.callback = callback
             return
-        else -- Unit is static and floating. Use normal destruction params
+        else
+            -- Unit is static and floating. Use normal destruction params
             CStructureUnit.StartSinking(self, callback)
         end
     end,
-}
+})
 
 TypeClass = XRB2309

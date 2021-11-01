@@ -1,4 +1,4 @@
-﻿#****************************************************************************
+#****************************************************************************
 #**
 #**  File     :  /data/projectiles/SANHeavyCavitationTorpedo01/SANHeavyCavitationTorpedo01_script.lua
 #**  Author(s):  Gordon Duclos
@@ -12,8 +12,8 @@ local SHeavyCavitationTorpedo = import('/lua/seraphimprojectiles.lua').SHeavyCav
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
-    FxSplashScale = .4,
+SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo)({
+    FxSplashScale = 0.4,
     FxEnterWaterEmitter = {
         '/effects/emitters/destruction_water_splash_ripples_01_emit.bp',
         '/effects/emitters/destruction_water_splash_wash_01_emit.bp',
@@ -22,11 +22,12 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
     OnEnterWater = function(self)
         SHeavyCavitationTorpedo.OnEnterWater(self)
 
-        for i in self.FxEnterWaterEmitter do #splash
-            CreateEmitterAtEntity(self,self.Army,self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+        for i in self.FxEnterWaterEmitter do
+            #splash
+            CreateEmitterAtEntity(self, self.Army, self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
         end
         self.AirTrails:Destroy()
-        CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
 
         self:TrackTarget(true):StayUnderwater(true)
         self:SetCollideSurface(false)
@@ -34,11 +35,11 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         self:ForkThread(self.ProjectileSplit)
     end,
 
-    OnCreate = function(self,inWater)
-        SHeavyCavitationTorpedo.OnCreate(self,inWater)
+    OnCreate = function(self, inWater)
+        SHeavyCavitationTorpedo.OnCreate(self, inWater)
         -- if we are starting in the water then immediately switch to tracking in water
         self:TrackTarget(false)
-        self.AirTrails = CreateEmitterOnEntity(self,self.Army,EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
+        self.AirTrails = CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
     end,
 
@@ -50,12 +51,14 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
 
         # Create projectiles in a dispersal pattern
         local numProjectiles = 3
-        local angle = (2*math.pi) / numProjectiles
+        local angle = 2 * math.pi / numProjectiles
         local angleInitial = RandomFloat(0, angle)
 
         # Randomization of the spread
-        local angleVariation = angle * 0.3 # Adjusts angle variance spread
-        local spreadMul = .4 # Adjusts the width of the dispersal
+        # Adjusts angle variance spread
+        local angleVariation = angle * 0.3
+        # Adjusts the width of the dispersal
+        local spreadMul = 0.4
         local xVec = 0
         local yVec = vy
         local zVec = 0
@@ -73,17 +76,17 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo) {
         end
 
         # Launch projectiles at semi-random angles away from split location
-        for i = 0, (numProjectiles -1) do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
+        for i = 0, numProjectiles - 1 do
+            xVec = vx + math.sin(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
+            zVec = vz + math.cos(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:PassDamageData(DividedDamageData)
             proj:PassData(self:GetTrackingTarget())
-            proj:SetVelocity(xVec,yVec,zVec)
+            proj:SetVelocity(xVec, yVec, zVec)
             proj:SetVelocity(velocity)
         end
         self:Destroy()
     end,
 
-}
+})
 TypeClass = SANHeavyCavitationTorpedo01

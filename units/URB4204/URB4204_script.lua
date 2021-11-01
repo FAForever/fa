@@ -9,7 +9,7 @@
 --#****************************************************************************
 local CShieldStructureUnit = import('/lua/cybranunits.lua').CShieldStructureUnit
 
-URB4204 = Class(CShieldStructureUnit) {
+URB4204 = Class(CShieldStructureUnit)({
     ShieldEffects = {
         '/effects/emitters/cybran_shield_02_generator_01_emit.bp',
         '/effects/emitters/cybran_shield_02_generator_02_emit.bp',
@@ -37,7 +37,7 @@ URB4204 = Class(CShieldStructureUnit) {
         end
 
         for k, v in self.ShieldEffects do
-            table.insert( self.ShieldEffectsBag, CreateAttachedEmitter(self, 'Shaft', self.Army, v))
+            table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'Shaft', self.Army, v))
         end
     end,
 
@@ -52,6 +52,6 @@ URB4204 = Class(CShieldStructureUnit) {
             self.ShieldEffectsBag = {}
         end
     end,
-}
+})
 
 TypeClass = URB4204

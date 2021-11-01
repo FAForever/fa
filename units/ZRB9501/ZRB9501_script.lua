@@ -9,9 +9,9 @@
 #****************************************************************************
 local CLandFactoryUnit = import('/lua/cybranunits.lua').CLandFactoryUnit
 
-ZRB9501 = Class(CLandFactoryUnit) {
+ZRB9501 = Class(CLandFactoryUnit)({
     BuildAttachBone = 'Attachpoint',
     UpgradeThreshhold1 = 0.267,
     UpgradeThreshhold2 = 0.53,
-}
+})
 TypeClass = ZRB9501

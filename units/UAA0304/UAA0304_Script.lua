@@ -9,18 +9,18 @@ local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
 local AIFBombQuarkWeapon = import('/lua/aeonweapons.lua').AIFBombQuarkWeapon
 
 
-UAA0304 = Class(AAirUnit) {
+UAA0304 = Class(AAirUnit)({
     Weapons = {
-        Bomb = Class(AIFBombQuarkWeapon) {},
+        Bomb = Class(AIFBombQuarkWeapon)({}),
     },
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return
         end
-        
+
         AAirUnit.OnDamage(self, instigator, amount, vector, damageType)
     end,
-}
+})
 
 TypeClass = UAA0304

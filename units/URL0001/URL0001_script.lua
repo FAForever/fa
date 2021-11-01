@@ -17,13 +17,15 @@ local CDFOverchargeWeapon = CWeapons.CDFOverchargeWeapon
 local CANTorpedoLauncherWeapon = CWeapons.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
 
-URL0001 = Class(ACUUnit, CCommandUnit) {
+URL0001 = Class(ACUUnit, CCommandUnit)({
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightRipper = Class(CCannonMolecularWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
-        MLG = Class(CDFHeavyMicrowaveLaserGeneratorCom) {
-            DisabledFiringBones = {'Turret_Muzzle_03'},
+        DeathWeapon = Class(DeathNukeWeapon)({}),
+        RightRipper = Class(CCannonMolecularWeapon)({}),
+        Torpedo = Class(CANTorpedoLauncherWeapon)({}),
+        MLG = Class(CDFHeavyMicrowaveLaserGeneratorCom)({
+            DisabledFiringBones = {
+                'Turret_Muzzle_03',
+            },
 
             SetOnTransport = function(self, transportstate)
                 CDFHeavyMicrowaveLaserGeneratorCom.SetOnTransport(self, transportstate)
@@ -37,10 +39,10 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     WaitSeconds(0.3)
                 end
             end,
-        },
+        }),
 
-        OverCharge = Class(CDFOverchargeWeapon) {},
-        AutoOverCharge = Class(CDFOverchargeWeapon) {},
+        OverCharge = Class(CDFOverchargeWeapon)({}),
+        AutoOverCharge = Class(CDFOverchargeWeapon)({}),
     },
 
     __init = function(self)
@@ -58,8 +60,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetupBuildBones()
         end
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        
+        self:AddBuildRestriction(categories.CYBRAN * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+
         local wepBp = self:GetBlueprint().Weapon
         self.normalRange = 22
         self.torpRange = 60
@@ -68,6 +70,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 self.normalRange = v.MaxRadius
             elseif v.Label == 'Torpedo' then
                 self.torpRange = v.MaxRadius
+            else
+
             end
         end
     end,
@@ -124,7 +128,9 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
@@ -133,12 +139,14 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'CloakingGenerator' then
             local bp = self:GetBlueprint().Enhancements[enh]
-            if not bp then return end
+            if not bp then
+                return
+            end
             self.StealthEnh = false
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')
             if not Buffs['CybranACUCloakBonus'] then
-               BuffBlueprint {
+                BuffBlueprint({
                     Name = 'CybranACUCloakBonus',
                     DisplayName = 'CybranACUCloakBonus',
                     BuffType = 'ACUCLOAKBONUS',
@@ -150,7 +158,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             if Buff.HasBuff(self, 'CybranACUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranACUCloakBonus')
@@ -163,14 +171,16 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             if Buff.HasBuff(self, 'CybranACUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranACUCloakBonus')
             end
-        -- T2 Engineering
-        elseif enh =='AdvancedEngineering' then
+            -- T2 Engineering
+        elseif enh == 'AdvancedEngineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
-            if not bp then return end
+            if not bp then
+                return
+            end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             if not Buffs['CybranACUT2BuildRate'] then
-                BuffBlueprint {
+                BuffBlueprint({
                     Name = 'CybranACUT2BuildRate',
                     DisplayName = 'CybranACUT2BuildRate',
                     BuffType = 'ACUBUILDRATE',
@@ -178,7 +188,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -190,25 +200,29 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
-        elseif enh =='AdvancedEngineeringRemove' then
+        elseif enh == 'AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.CYBRAN * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'CybranACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT2BuildRate')
             end
-        -- T3 Engineering
-        elseif enh =='T3Engineering' then
+            -- T3 Engineering
+        elseif enh == 'T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
-            if not bp then return end
+            if not bp then
+                return
+            end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             if not Buffs['CybranACUT3BuildRate'] then
-                BuffBlueprint {
+                BuffBlueprint({
                     Name = 'CybranACUT3BuildRate',
                     DisplayName = 'CybranCUT3BuildRate',
                     BuffType = 'ACUBUILDRATE',
@@ -216,7 +230,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -228,18 +242,20 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
-        elseif enh =='T3EngineeringRemove' then
+        elseif enh == 'T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:RestoreBuildRestrictions()
             if Buff.HasBuff(self, 'CybranACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT3BuildRate')
             end
-            self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
-        elseif enh =='CoolingUpgrade' then
+            self:AddBuildRestriction(categories.CYBRAN * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+        elseif enh == 'CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
@@ -251,7 +267,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+            if not self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube') then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
         elseif enh == 'CoolingUpgradeRemove' then
@@ -266,7 +282,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self.normalRange = v.MaxRadius or 22
-                    if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
+                    if not self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube') then
                         self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
                     end
                     break
@@ -292,6 +308,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
+        else
+
         end
     end,
 
@@ -348,15 +366,17 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
+        else
+
         end
     end,
 
@@ -370,6 +390,8 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             self:SetMaintenanceConsumptionInactive()
         elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
+        else
+
         end
     end,
 
@@ -392,13 +414,15 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
 
     OnLayerChange = function(self, new, old)
         ACUUnit.OnLayerChange(self, new, old)
-        if self:GetWeaponByLabel('DummyWeapon') == nil then return end
+        if self:GetWeaponByLabel('DummyWeapon') == nil then
+            return
+        end
         if new == "Seabed" and self:HasEnhancement('NaniteTorpedoTube') then
             self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange or 60)
         else
             self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange or 22)
         end
     end,
-}
+})
 
 TypeClass = URL0001

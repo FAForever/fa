@@ -9,7 +9,7 @@
 --#****************************************************************************
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
 
-UAB1104 = Class(AMassFabricationUnit) {
+UAB1104 = Class(AMassFabricationUnit)({
     OnCreate = function(self)
         AMassFabricationUnit.OnCreate(self)
         self.Damaged = false
@@ -21,12 +21,12 @@ UAB1104 = Class(AMassFabricationUnit) {
         self.Trash:Add(self.AnimManip)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AMassFabricationUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.OpenState)
     end,
 
-    OpenState = State {
+    OpenState = State({
         Main = function(self)
             if self.AmbientEffects then
                 self.AmbientEffects:Destroy()
@@ -74,9 +74,9 @@ UAB1104 = Class(AMassFabricationUnit) {
             AMassFabricationUnit.OnProductionPaused(self)
             ChangeState(self, self.InActiveState)
         end,
-    },
+    }),
 
-    InActiveState = State {
+    InActiveState = State({
         Main = function(self)
             if self.AmbientEffects then
                 self.AmbientEffects:Destroy()
@@ -107,7 +107,7 @@ UAB1104 = Class(AMassFabricationUnit) {
             AMassFabricationUnit.OnProductionUnpaused(self)
             ChangeState(self, self.OpenState)
         end,
-    },
-}
+    }),
+})
 
 TypeClass = UAB1104

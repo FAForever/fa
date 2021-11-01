@@ -6,7 +6,7 @@
 -----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
-local WeaponsFile = import ('/lua/seraphimweapons.lua')
+local WeaponsFile = import('/lua/seraphimweapons.lua')
 local SDFExperimentalPhasonProj = WeaponsFile.SDFExperimentalPhasonProj
 local SDFAireauWeapon = WeaponsFile.SDFAireauWeapon
 local SDFSinnuntheWeapon = WeaponsFile.SDFSinnuntheWeapon
@@ -15,7 +15,7 @@ local utilities = import('/lua/utilities.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local explosion = import('/lua/defaultexplosions.lua')
 
-XSL0401 = Class(SWalkingLandUnit) {
+XSL0401 = Class(SWalkingLandUnit)({
     SpawnEffects = {
         '/effects/emitters/seraphim_othuy_spawn_01_emit.bp',
         '/effects/emitters/seraphim_othuy_spawn_02_emit.bp',
@@ -26,7 +26,7 @@ XSL0401 = Class(SWalkingLandUnit) {
     SpawnElectroStorm = function(self)
         local position = self:GetPosition()
         local spawnEffects = self.SpawnEffects
-        
+
         -- Spawn the Energy Being
         local spiritUnit = CreateUnitHPR('XSL0402', self.Army, position[1], position[2], position[3], 0, 0, 0)
         -- Create effects for spawning of energy being
@@ -44,9 +44,9 @@ XSL0401 = Class(SWalkingLandUnit) {
     end,
 
     Weapons = {
-        EyeWeapon = Class(SDFExperimentalPhasonProj) {},
-        LeftArm = Class(SDFAireauWeapon) {},
-        RightArm = Class(SDFSinnuntheWeapon) {
+        EyeWeapon = Class(SDFExperimentalPhasonProj)({}),
+        LeftArm = Class(SDFAireauWeapon)({}),
+        RightArm = Class(SDFSinnuntheWeapon)({
             PlayFxMuzzleChargeSequence = function(self, muzzle)
                 -- CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
                 if not self.ClawTopRotator then
@@ -69,9 +69,9 @@ XSL0401 = Class(SWalkingLandUnit) {
                     self.ClawBottomRotator:SetGoal(0):SetSpeed(50)
                 end)
             end,
-        },
-        LeftAA = Class(SAAOlarisCannonWeapon) {},
-        RightAA = Class(SAAOlarisCannonWeapon) {},
+        }),
+        LeftAA = Class(SAAOlarisCannonWeapon)({}),
+        RightAA = Class(SAAOlarisCannonWeapon)({}),
     },
 
     StartBeingBuiltEffects = function(self, builder, layer)
@@ -79,16 +79,31 @@ XSL0401 = Class(SWalkingLandUnit) {
         self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
     end,
 
-    DeathThread = function(self, overkillRatio , instigator)
-        local bigExplosionBones = {'Torso', 'Head', 'pelvis'}
-        local explosionBones = {'Right_Arm_B07', 'Right_Arm_B03',
-                                'Left_Arm_B10', 'Left_Arm_B07',
-                                'Chest_B01', 'Chest_B03',
-                                'Right_Leg_B01', 'Right_Leg_B02', 'Right_Leg_B03',
-                                'Left_Leg_B17', 'Left_Leg_B14', 'Left_Leg_B15'}
+    DeathThread = function(self, overkillRatio, instigator)
+        local bigExplosionBones = {
+            'Torso',
+            'Head',
+            'pelvis',
+        }
+        local explosionBones = {
+            'Right_Arm_B07',
+            'Right_Arm_B03',
+            'Left_Arm_B10',
+            'Left_Arm_B07',
+            'Chest_B01',
+            'Chest_B03',
+            'Right_Leg_B01',
+            'Right_Leg_B02',
+            'Right_Leg_B03',
+            'Left_Leg_B17',
+            'Left_Leg_B14',
+            'Left_Leg_B15',
 
+        }
         explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {
+            self:GetUnitSizes(),
+        })
         WaitSeconds(2)
 
         local RandBoneIter = RandomIter(explosionBones)
@@ -120,7 +135,8 @@ XSL0401 = Class(SWalkingLandUnit) {
                 self.CreateUnitDestructionDebris(self, true, true, false)
             elseif overkillRatio <= 3 then
                 self.CreateUnitDestructionDebris(self, true, true, true)
-            else -- Vaporized
+            else
+                -- Vaporized
                 self.CreateUnitDestructionDebris(self, true, true, true)
             end
         end
@@ -128,7 +144,7 @@ XSL0401 = Class(SWalkingLandUnit) {
         -- only apply death damage when the unit is sufficiently build
         local bp = self:GetBlueprint()
         local FractionThreshold = bp.General.FractionThreshold or 0.5
-        if self:GetFractionComplete() >= FractionThreshold then 
+        if self:GetFractionComplete() >= FractionThreshold then
             local bp = self:GetBlueprint()
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
@@ -149,6 +165,6 @@ XSL0401 = Class(SWalkingLandUnit) {
         self:Destroy()
     end,
 
-}
+})
 
 TypeClass = XSL0401

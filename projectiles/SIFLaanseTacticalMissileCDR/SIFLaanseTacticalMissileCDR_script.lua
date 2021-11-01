@@ -10,7 +10,7 @@
 
 local SLaanseTacticalMissile = import('/lua/seraphimprojectiles.lua').SLaanseTacticalMissile
 
-SIFLaanseTacticalMissileCDR = Class(SLaanseTacticalMissile) {
+SIFLaanseTacticalMissileCDR = Class(SLaanseTacticalMissile)({
 
     OnCreate = function(self)
         SLaanseTacticalMissile.OnCreate(self)
@@ -49,6 +49,8 @@ SIFLaanseTacticalMissileCDR = Class(SLaanseTacticalMissile) {
             # Further increase check intervals
             self:SetTurnRate(100)
             KillThread(self.MoveThread)
+        else
+
         end
     end,
 
@@ -58,6 +60,6 @@ SIFLaanseTacticalMissileCDR = Class(SLaanseTacticalMissile) {
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
-}
+})
 TypeClass = SIFLaanseTacticalMissileCDR
 

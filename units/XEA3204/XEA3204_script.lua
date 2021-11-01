@@ -7,7 +7,7 @@
 
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 
-XEA3204 = Class(TConstructionUnit) {
+XEA3204 = Class(TConstructionUnit)({
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
         self.docked = true
@@ -40,10 +40,10 @@ XEA3204 = Class(TConstructionUnit) {
     end,
 
     -- Don't make wreckage
-    CreateWreckage = function (self, overkillRatio)
+    CreateWreckage = function(self, overkillRatio)
         overkillRatio = 1.1
         TConstructionUnit.CreateWreckage(self, overkillRatio)
     end,
-}
+})
 
 TypeClass = XEA3204

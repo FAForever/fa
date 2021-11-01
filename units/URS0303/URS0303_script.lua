@@ -14,26 +14,26 @@ local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
 local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon
 local loading = false
 
-URS0303 = Class(AircraftCarrier) {
+URS0303 = Class(AircraftCarrier)({
 
     Weapons = {
-    -- Weapons
-    --  4 AA Autocannon w/ Guided Rounds
-    --  1 "Zapper" Anti-Missile
+        -- Weapons
+        --  4 AA Autocannon w/ Guided Rounds
+        --  1 "Zapper" Anti-Missile
 
-        AAGun01 = Class(CAAAutocannon) {},
-        AAGun02 = Class(CAAAutocannon) {},
-        AAGun03 = Class(CAAAutocannon) {},
-        AAGun04 = Class(CAAAutocannon) {},
+        AAGun01 = Class(CAAAutocannon)({}),
+        AAGun02 = Class(CAAAutocannon)({}),
+        AAGun03 = Class(CAAAutocannon)({}),
+        AAGun04 = Class(CAAAutocannon)({}),
 
-        Zapper = Class(CAMZapperWeapon) {},
+        Zapper = Class(CAMZapperWeapon)({}),
 
     },
 
     BuildAttachBone = 'Attachpoint',
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AircraftCarrier.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -42,7 +42,7 @@ URS0303 = Class(AircraftCarrier) {
         ChangeState(self, self.IdleState)
     end,
 
-    IdleState = State {
+    IdleState = State({
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
@@ -53,9 +53,9 @@ URS0303 = Class(AircraftCarrier) {
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
-    },
+    }),
 
-    BuildingState = State {
+    BuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             self:SetBusy(true)
@@ -69,9 +69,9 @@ URS0303 = Class(AircraftCarrier) {
             AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
-    },
+    }),
 
-    FinishedBuildingState = State {
+    FinishedBuildingState = State({
         Main = function(self)
             self:SetBusy(true)
             local unitBuilding = self.UnitBeingBuilt
@@ -80,18 +80,24 @@ URS0303 = Class(AircraftCarrier) {
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                local worldPos = self:CalculateWorldPositionFromRelative({
+                    0,
+                    0,
+                    -20,
+                })
+                IssueMoveOffFactory({
+                    unitBuilding,
+                }, worldPos)
+                unitBuilding:ShowBone(0, true)
             end
             self:SetBusy(false)
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,
-    },
+    }),
 
 
-}
+})
 
 TypeClass = URS0303
 

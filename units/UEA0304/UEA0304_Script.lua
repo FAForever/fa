@@ -9,20 +9,20 @@ local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TIFSmallYieldNuclearBombWeapon = import('/lua/terranweapons.lua').TIFSmallYieldNuclearBombWeapon
 local TAirToAirLinkedRailgun = import('/lua/terranweapons.lua').TAirToAirLinkedRailgun
 
-UEA0304 = Class(TAirUnit) {
+UEA0304 = Class(TAirUnit)({
     Weapons = {
-        Bomb = Class(TIFSmallYieldNuclearBombWeapon) {},
-        LinkedRailGun1 = Class(TAirToAirLinkedRailgun) {},
-        LinkedRailGun2 = Class(TAirToAirLinkedRailgun) {},
+        Bomb = Class(TIFSmallYieldNuclearBombWeapon)({}),
+        LinkedRailGun1 = Class(TAirToAirLinkedRailgun)({}),
+        LinkedRailGun2 = Class(TAirToAirLinkedRailgun)({}),
     },
-    
+
     OnDamage = function(self, instigator, amount, vector, damageType)
         if instigator and instigator:GetBlueprint().CategoriesHash.STRATEGICBOMBER and instigator.Army == self.Army then
             return
         end
-        
+
         TAirUnit.OnDamage(self, instigator, amount, vector, damageType)
     end,
-}
+})
 
 TypeClass = UEA0304

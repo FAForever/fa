@@ -12,51 +12,55 @@ local CDFMissileMesonWeapon = CybranWeaponsFile.CDFMissileMesonWeapon
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local SlowAmphibious = import('/lua/defaultunits.lua').SlowAmphibiousLandUnit
 
-URL0203 = Class(CLandUnit, SlowAmphibious) {
+URL0203 = Class(CLandUnit, SlowAmphibious)({
 
     Weapons = {
-        Bolter = Class(CDFElectronBolterWeapon) {},
-        Rocket = Class(CDFMissileMesonWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        Bolter = Class(CDFElectronBolterWeapon)({}),
+        Rocket = Class(CDFMissileMesonWeapon)({}),
+        Torpedo = Class(CANTorpedoLauncherWeapon)({}),
     },
-    
+
     OnStopBeingBuilt = function(self, builder, layer)
-        CLandUnit.OnStopBeingBuilt(self,builder,layer)
+        CLandUnit.OnStopBeingBuilt(self, builder, layer)
         # If created with F2 on land, then play the transform anim.
-        if(self.Layer == 'Land') then
-			# Enable Land weapons
-	        self:SetWeaponEnabledByLabel('Rocket', true)
-	        self:SetWeaponEnabledByLabel('Bolter', true)
-			# Disable Torpedo
-	        self:SetWeaponEnabledByLabel('Torpedo', false)
-        elseif (self.Layer == 'Seabed') then
-			# Disable Land Weapons
-	        self:SetWeaponEnabledByLabel('Rocket', false)
-	        self:SetWeaponEnabledByLabel('Bolter', false)
-			# Enable Torpedo
-	        self:SetWeaponEnabledByLabel('Torpedo', true)
+        if self.Layer == 'Land' then
+            # Enable Land weapons
+            self:SetWeaponEnabledByLabel('Rocket', true)
+            self:SetWeaponEnabledByLabel('Bolter', true)
+            # Disable Torpedo
+            self:SetWeaponEnabledByLabel('Torpedo', false)
+        elseif self.Layer == 'Seabed' then
+            # Disable Land Weapons
+            self:SetWeaponEnabledByLabel('Rocket', false)
+            self:SetWeaponEnabledByLabel('Bolter', false)
+            # Enable Torpedo
+            self:SetWeaponEnabledByLabel('Torpedo', true)
+        else
+
         end
-       self.WeaponsEnabled = true
+        self.WeaponsEnabled = true
     end,
 
-	OnLayerChange = function(self, new, old)
-		CLandUnit.OnLayerChange(self, new, old)
-		if self.WeaponsEnabled then
-			if( new == 'Land' ) then
-				# Enable Land weapons
-				self:SetWeaponEnabledByLabel('Rocket', true)
-				self:SetWeaponEnabledByLabel('Bolter', true)
-				# Disable Torpedo
-				self:SetWeaponEnabledByLabel('Torpedo', false)
-			elseif ( new == 'Seabed' ) then
-				# Disable Land Weapons
-				self:SetWeaponEnabledByLabel('Rocket', false)
-				self:SetWeaponEnabledByLabel('Bolter', false)
-				# Enable Torpedo
-				self:SetWeaponEnabledByLabel('Torpedo', true)
-			end
-		end
+    OnLayerChange = function(self, new, old)
+        CLandUnit.OnLayerChange(self, new, old)
+        if self.WeaponsEnabled then
+            if new == 'Land' then
+                # Enable Land weapons
+                self:SetWeaponEnabledByLabel('Rocket', true)
+                self:SetWeaponEnabledByLabel('Bolter', true)
+                # Disable Torpedo
+                self:SetWeaponEnabledByLabel('Torpedo', false)
+            elseif new == 'Seabed' then
+                # Disable Land Weapons
+                self:SetWeaponEnabledByLabel('Rocket', false)
+                self:SetWeaponEnabledByLabel('Bolter', false)
+                # Enable Torpedo
+                self:SetWeaponEnabledByLabel('Torpedo', true)
+            else
+
+            end
+        end
         SlowAmphibious.OnLayerChange(self, new, old)
-	end,
-}
+    end,
+})
 TypeClass = URL0203

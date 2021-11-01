@@ -13,8 +13,13 @@ local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 
-XEA0306 = Class(AirTransport) {
-    AirDestructionEffectBones = {'FrontRight_Engine_Exhaust','FrontLeft_Engine_Exhaust','BackRight_Engine_Exhaust','BackLeft_Engine_Exhaust'},
+XEA0306 = Class(AirTransport)({
+    AirDestructionEffectBones = {
+        'FrontRight_Engine_Exhaust',
+        'FrontLeft_Engine_Exhaust',
+        'BackRight_Engine_Exhaust',
+        'BackLeft_Engine_Exhaust',
+    },
 
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_mobile_01_emit.bp',
@@ -25,16 +30,21 @@ XEA0306 = Class(AirTransport) {
     BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
 
     Weapons = {
-        MissleRackFrontLeft = Class(TSAMLauncher) {},
-        MissleRackBackLeft = Class(TSAMLauncher) {},
-        MissleRackBackRight = Class(TSAMLauncher) {},
-        MissleRackFrontRight = Class(TSAMLauncher) {},
-        PlasmaLeft = Class(TDFHeavyPlasmaCannonWeapon) {},
-        PlasmaRight = Class(TDFHeavyPlasmaCannonWeapon) {},
+        MissleRackFrontLeft = Class(TSAMLauncher)({}),
+        MissleRackBackLeft = Class(TSAMLauncher)({}),
+        MissleRackBackRight = Class(TSAMLauncher)({}),
+        MissleRackFrontRight = Class(TSAMLauncher)({}),
+        PlasmaLeft = Class(TDFHeavyPlasmaCannonWeapon)({}),
+        PlasmaRight = Class(TDFHeavyPlasmaCannonWeapon)({}),
     },
 
     DestructionTicks = 250,
-    EngineRotateBones = {'FrontRight_Engine', 'FrontLeft_Engine', 'BackRight_Engine', 'BackLeft_Engine', },
+    EngineRotateBones = {
+        'FrontRight_Engine',
+        'FrontLeft_Engine',
+        'BackRight_Engine',
+        'BackLeft_Engine',
+    },
 
     OnCreate = function(self)
         AirTransport.OnCreate(self)
@@ -44,10 +54,11 @@ XEA0306 = Class(AirTransport) {
         self.UnfoldAnim:SetRate(0)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AirTransport.OnStopBeingBuilt(self,builder,layer)
-        self.EngineManipulators = {}
+    OnStopBeingBuilt = function(self, builder, layer)
+        AirTransport.OnStopBeingBuilt(self, builder, layer)
+        self.EngineManipulators = {
 
+        }
         self.UnfoldAnim:SetRate(1)
 
         -- create the engine thrust manipulators
@@ -56,7 +67,7 @@ XEA0306 = Class(AirTransport) {
         end
 
         -- set up the thursting arcs for the engines
-        for keys,values in self.EngineManipulators do
+        for keys, values in self.EngineManipulators do
             --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
             values:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
         end
@@ -88,10 +99,12 @@ XEA0306 = Class(AirTransport) {
 
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
-        if (new == 'Down') then
+        if new == 'Down' then
             self.LandingAnimManip:SetRate(-1)
-        elseif (new == 'Up') then
+        elseif new == 'Up' then
             self.LandingAnimManip:SetRate(1)
+        else
+
         end
     end,
 
@@ -116,6 +129,6 @@ XEA0306 = Class(AirTransport) {
             return bp.SizeX, bp.SizeY, bp.SizeZ
         end
     end,
-}
+})
 
 TypeClass = XEA0306

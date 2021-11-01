@@ -10,10 +10,10 @@ local WeaponFile = import('/lua/terranweapons.lua')
 local TIFCruiseMissileLauncherSub = WeaponFile.TIFCruiseMissileLauncherSub
 local TIFStrategicMissileWeapon = WeaponFile.TIFStrategicMissileWeapon
 
-UES0304 = Class(TSubUnit) {
+UES0304 = Class(TSubUnit)({
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        CruiseMissiles = Class(TIFCruiseMissileLauncherSub) {
+        CruiseMissiles = Class(TIFCruiseMissileLauncherSub)({
             CurrentRack = 1,
 
             PlayFxMuzzleSequence = function(self, muzzle)
@@ -24,7 +24,8 @@ UES0304 = Class(TSubUnit) {
                 TIFCruiseMissileLauncherSub.PlayFxMuzzleSequence(self, muzzle)
                 WaitFor(self.Rotator)
                 WaitSeconds(1)
-                self.Rotator:SetGoal(0) -- This tells the door to close without affecting launch time
+                -- This tells the door to close without affecting launch time
+                self.Rotator:SetGoal(0)
             end,
 
             CreateProjectileAtMuzzle = function(self, muzzle)
@@ -44,9 +45,9 @@ UES0304 = Class(TSubUnit) {
                 self.Rotator:Destroy()
                 self.Rotator = nil
             end,
-        },
+        }),
 
-        NukeMissiles = Class(TIFStrategicMissileWeapon) {
+        NukeMissiles = Class(TIFStrategicMissileWeapon)({
             CurrentRack = 1,
 
             PlayFxMuzzleSequence = function(self, muzzle)
@@ -57,7 +58,8 @@ UES0304 = Class(TSubUnit) {
                 TIFCruiseMissileLauncherSub.PlayFxMuzzleSequence(self, muzzle)
                 WaitFor(self.Rotator)
                 WaitSeconds(1)
-                self.Rotator:SetGoal(0) -- This tells the door to close without affecting launch time
+                -- This tells the door to close without affecting launch time
+                self.Rotator:SetGoal(0)
             end,
 
             CreateProjectileAtMuzzle = function(self, muzzle)
@@ -77,8 +79,8 @@ UES0304 = Class(TSubUnit) {
                 self.Rotator:Destroy()
                 self.Rotator = nil
             end,
-        },
+        }),
     },
-}
+})
 
 TypeClass = UES0304

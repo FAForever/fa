@@ -10,7 +10,7 @@
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
-XSA0101 = Class(SAirUnit) {
+XSA0101 = Class(SAirUnit)({
     OnImpact = function(self, with, other)
         SAirUnit.OnImpact(self, with, other)
         local pos = self:GetPosition()
@@ -22,9 +22,10 @@ XSA0101 = Class(SAirUnit) {
             Army = self.Army,
             Omni = false,
             WaterVision = false,
+
         }
         local vizEntity = VizMarker(spec)
     end,
-}
+})
 
 TypeClass = XSA0101

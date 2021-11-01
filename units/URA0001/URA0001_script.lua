@@ -9,42 +9,51 @@ local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBu
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-local DeprecatedWarnings = { }
+local DeprecatedWarnings = {
 
--- Kept after #3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
+    -- Kept after #3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
 
-URA0001 = Class(CAirUnit) {
+}
+URA0001 = Class(CAirUnit)({
     spawnedBy = nil,
 
     OnCreate = function(self)
 
-      -- add deprecation warning
-      if not DeprecatedWarnings.URA0001 then 
-        DeprecatedWarnings.URA0001 = true 
-        WARN("URA0001 is deprecated: use URA0001O, URA0002O or URA0003O instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-      end
+        -- add deprecation warning
+        if not DeprecatedWarnings.URA0001 then
+            DeprecatedWarnings.URA0001 = true
+            WARN("URA0001 is deprecated: use URA0001O, URA0002O or URA0003O instead.")
+            WARN("Source: "..repr(debug.getinfo(2)))
+        end
 
-      CAirUnit.OnCreate(self)
-      self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
-      self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-      self.BuildArmManipulator:SetPrecedence(5)
-      self.Trash:Add(self.BuildArmManipulator)
-      self:SetConsumptionActive(false)
+        CAirUnit.OnCreate(self)
+        self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001', 'URA0001', 0)
+        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
+        self.BuildArmManipulator:SetPrecedence(5)
+        self.Trash:Add(self.BuildArmManipulator)
+        self:SetConsumptionActive(false)
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
-        CreateCybranBuildBeams(self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag)
+        CreateCybranBuildBeams(self, unitBeingBuilt, {
+            'Muzzle_03',
+        }, self.BuildEffectsBag)
     end,
 
     OnStartCapture = function(self, target)
-        IssueStop({self}) -- You can't capture!
+        -- You can't capture!
+        IssueStop({
+            self,
+        })
     end,
 
     OnStartReclaim = function(self, target)
-        IssueStop({self}) -- You can't reclaim!
+        -- You can't reclaim!
+        IssueStop({
+            self,
+        })
     end,
 
     -- We never want to waste effort sinking these
@@ -73,11 +82,10 @@ URA0001 = Class(CAirUnit) {
     end,
 
     -- Don't cycle intel!
-    EnableUnitIntel = function(self, disabler, intel)
-    end,
+    EnableUnitIntel = function(self, disabler, intel) end,
 
     -- Don't make wreckage
-    CreateWreckage = function (self, overkillRatio)
+    CreateWreckage = function(self, overkillRatio)
         overkillRatio = 1.1
         CAirUnit.CreateWreckage(self, overkillRatio)
     end,
@@ -85,12 +93,18 @@ URA0001 = Class(CAirUnit) {
     -- Prevent the unit from reporting consumption values (avoids junk in the resource overlay)
     UpdateConsumptionValues = function(self) end,
 
-    IdleState = State {
+    IdleState = State({
         Main = function(self)
-            IssueClearCommands({self})
-            IssueMove({self}, self:GetPosition())
+            IssueClearCommands({
+                self,
+            })
+            IssueMove({
+                self,
+            }, self:GetPosition())
             WaitSeconds(0.5)
-            IssueMove({self}, self.spawnedBy:GetPosition())
+            IssueMove({
+                self,
+            }, self.spawnedBy:GetPosition())
 
             local delay = 0.1
             local wait = 0
@@ -109,9 +123,9 @@ URA0001 = Class(CAirUnit) {
 
             self:Destroy()
         end,
-    },
+    }),
 
-    BuildState = State {
+    BuildState = State({
         Main = function(self)
             local focus = self.spawnedBy:GetFocusUnit()
 
@@ -119,10 +133,14 @@ URA0001 = Class(CAirUnit) {
                 ChangeState(self, self.IdleState)
             end
 
-            IssueClearCommands({self})
-            IssueGuard({self}, focus)
+            IssueClearCommands({
+                self,
+            })
+            IssueGuard({
+                self,
+            }, focus)
         end,
-    },
-}
+    }),
+})
 
 TypeClass = URA0001

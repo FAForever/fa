@@ -11,9 +11,9 @@ local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local CreateBuildCubeThread = import('/lua/EffectUtilities.lua').CreateBuildCubeThread
 
-UES0305 = Class(TSeaUnit) {
+UES0305 = Class(TSeaUnit)({
     Weapons = {
-        Torpedo01 = Class(TANTorpedoAngler) {},
+        Torpedo01 = Class(TANTorpedoAngler)({}),
     },
 
     TimedSonarTTIdleEffects = {
@@ -28,7 +28,7 @@ UES0305 = Class(TSeaUnit) {
             },
             Type = 'SonarBuoy01',
         },
-    }, 
+    },
 
     CreateIdleEffects = function(self)
         TSeaUnit.CreateIdleEffects(self)
@@ -48,12 +48,12 @@ UES0305 = Class(TSeaUnit) {
                         for ke, vEffect in effects do
                             emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
-                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0,vTypeGroup.Offset[3] or 0)
+                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                             end
                         end
-                    end                    
+                    end
                 end
-                WaitSeconds(6)                
+                WaitSeconds(6)
             end
         end
     end,
@@ -61,7 +61,7 @@ UES0305 = Class(TSeaUnit) {
     DestroyIdleEffects = function(self)
         self.TimedSonarEffectsThread:Destroy()
         TSeaUnit.DestroyIdleEffects(self)
-    end,     
+    end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
         self:HideBone(0, true)
@@ -70,6 +70,6 @@ UES0305 = Class(TSeaUnit) {
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
-}
+})
 
 TypeClass = UES0305

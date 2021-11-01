@@ -9,8 +9,8 @@
 #****************************************************************************
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
-UEB0102 = Class(TAirFactoryUnit) {
-    
+UEB0102 = Class(TAirFactoryUnit)({
+
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
         #local unitBldg = self.UnitBeingBuilt
@@ -18,13 +18,15 @@ UEB0102 = Class(TAirFactoryUnit) {
             self.ArmSlider = CreateSlider(self, 'Arm01')
             self.Trash:Add(self.ArmSlider)
         end
-        
+
     end,
 
     MovingArmsThread = function(self)
         TAirFactoryUnit.MovingArmsThread(self)
         while true do
-            if not self.ArmSlider then return end
+            if not self.ArmSlider then
+                return
+            end
             self.ArmSlider:SetGoal(0, 6, 0)
             self.ArmSlider:SetSpeed(20)
             WaitFor(self.ArmSlider)
@@ -32,16 +34,18 @@ UEB0102 = Class(TAirFactoryUnit) {
             WaitFor(self.ArmSlider)
         end
     end,
-    
+
     StopArmsMoving = function(self)
         TAirFactoryUnit.StopArmsMoving(self)
-        if not self.ArmSlider then return end
+        if not self.ArmSlider then
+            return
+        end
         self.ArmSlider:SetGoal(0, 0, 0)
         self.ArmSlider:SetSpeed(40)
     end,
 
 
---Overwrite FinishBuildThread to speed up platform lowering rate
+    --Overwrite FinishBuildThread to speed up platform lowering rate
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
@@ -49,7 +53,8 @@ UEB0102 = Class(TAirFactoryUnit) {
         local bp = self:GetBlueprint()
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)        --Change: SetRate(4)
+            --Change: SetRate(4)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -59,7 +64,7 @@ UEB0102 = Class(TAirFactoryUnit) {
         end
         self:DetachAll(bp.Display.BuildAttachBone or 0)
         self:DestroyBuildRotator()
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
             self:SetBusy(false)
@@ -67,16 +72,17 @@ UEB0102 = Class(TAirFactoryUnit) {
         end
     end,
 
---Overwrite PlayFxRollOffEnd to speed up platform raising rate
+    --Overwrite PlayFxRollOffEnd to speed up platform raising rate
 
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(10)                                            --Change: SetRate(-4)
+            --Change: SetRate(-4)
+            self.RollOffAnim:SetRate(10)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil
         end
     end,
-}
+})
 
 TypeClass = UEB0102

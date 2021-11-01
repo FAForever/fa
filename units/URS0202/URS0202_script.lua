@@ -12,9 +12,9 @@ local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
 local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaserInvisible
 
-URS0202 = Class(CSeaUnit) {
+URS0202 = Class(CSeaUnit)({
     Weapons = {
-        TargetPainter = Class(TargetingLaser) {
+        TargetPainter = Class(TargetingLaser)({
             -- Unit in range. Cease ground fire and turn on AA
             OnWeaponFired = function(self)
                 if not self.AA then
@@ -26,7 +26,7 @@ URS0202 = Class(CSeaUnit) {
                 TargetingLaser.OnWeaponFired(self)
             end,
 
-            IdleState = State(TargetingLaser.IdleState) {
+            IdleState = State(TargetingLaser.IdleState)({
                 -- Start with the AA gun off to reduce twitching of ground fire
                 Main = function(self)
                     self.unit:SetWeaponEnabledByLabel('GroundGun', true)
@@ -35,13 +35,13 @@ URS0202 = Class(CSeaUnit) {
                     self.AA = false
                     TargetingLaser.IdleState.Main(self)
                 end,
-            },
-        },
-        ParticleGun = Class(CDFProtonCannonWeapon) {},
-        AAGun = Class(CAANanoDartWeapon) {},
-        GroundGun = Class(CAANanoDartWeapon) {},
-        Zapper = Class(CAMZapperWeapon03) {},
+            }),
+        }),
+        ParticleGun = Class(CDFProtonCannonWeapon)({}),
+        AAGun = Class(CAANanoDartWeapon)({}),
+        GroundGun = Class(CAANanoDartWeapon)({}),
+        Zapper = Class(CAMZapperWeapon03)({}),
     },
-}
+})
 
 TypeClass = URS0202

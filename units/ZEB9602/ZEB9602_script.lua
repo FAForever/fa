@@ -11,7 +11,7 @@
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
 
-ZEB9602 = Class(TAirFactoryUnit) {
+ZEB9602 = Class(TAirFactoryUnit)({
 
     StartArmsMoving = function(self)
         TAirFactoryUnit.StartArmsMoving(self)
@@ -33,9 +33,15 @@ ZEB9602 = Class(TAirFactoryUnit) {
         TAirFactoryUnit.MovingArmsThread(self)
         local dir = 1
         while true do
-            if not self.ArmSlider1 then return end
-            if not self.ArmSlider2 then return end
-            if not self.ArmSlider3 then return end
+            if not self.ArmSlider1 then
+                return
+            end
+            if not self.ArmSlider2 then
+                return
+            end
+            if not self.ArmSlider3 then
+                return
+            end
             self.ArmSlider1:SetGoal(0, -5, 0)
             self.ArmSlider1:SetSpeed(20)
             self.ArmSlider2:SetGoal(0, 2 * dir, 0)
@@ -64,7 +70,7 @@ ZEB9602 = Class(TAirFactoryUnit) {
         self.ArmSlider3:SetSpeed(40)
     end,
 
---Overwrite FinishBuildThread to speed up platform lowering rate
+    --Overwrite FinishBuildThread to speed up platform lowering rate
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
@@ -72,7 +78,8 @@ ZEB9602 = Class(TAirFactoryUnit) {
         local bp = self:GetBlueprint()
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(15)        --Change: SetRate(4)
+            --Change: SetRate(4)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(15)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -82,7 +89,7 @@ ZEB9602 = Class(TAirFactoryUnit) {
         end
         self:DetachAll(bp.Display.BuildAttachBone or 0)
         self:DestroyBuildRotator()
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
             self:SetBusy(false)
@@ -90,16 +97,17 @@ ZEB9602 = Class(TAirFactoryUnit) {
         end
     end,
 
---Overwrite PlayFxRollOffEnd to speed up platform raising rate
+    --Overwrite PlayFxRollOffEnd to speed up platform raising rate
 
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(15)                                            --Change: SetRate(-4)
+            --Change: SetRate(-4)
+            self.RollOffAnim:SetRate(15)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil
         end
     end,
-}
+})
 
 TypeClass = ZEB9602

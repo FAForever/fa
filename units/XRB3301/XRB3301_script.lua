@@ -11,11 +11,17 @@ local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 local CSoothSayerAmbient = import('/lua/EffectTemplates.lua').CSoothSayerAmbient
 
-XRB3301 = Class(CRadarUnit) {
+XRB3301 = Class(CRadarUnit)({
     IntelEffects = {
         {
-            Bones = { 'Emitter', },
-            Offset = { 0, 0, 4, },
+            Bones = {
+                'Emitter',
+            },
+            Offset = {
+                0,
+                0,
+                4,
+            },
             Type = 'Jammer01',
         },
     },
@@ -30,8 +36,9 @@ XRB3301 = Class(CRadarUnit) {
                 v:Destroy()
             end
         end
-        self.OmniEffectsBag = {}
+        self.OmniEffectsBag = {
 
+        }
         for k, v in CSoothSayerAmbient do
             table.insert(self.OmniEffectsBag, CreateAttachedEmitter(self, 'XRB3301', self.Army, v))
         end
@@ -48,6 +55,7 @@ XRB3301 = Class(CRadarUnit) {
             Radius = curRadius,
             LifeTime = -1,
             Army = army,
+
         }
         local vizEnt = VizMarker(spec)
         vizEnt.DeathThread = ForkThread(self.VisibleEntityDeathThread, vizEnt, curRadius)
@@ -98,7 +106,7 @@ XRB3301 = Class(CRadarUnit) {
         end
     end,
 
-    ExpandingVision = State {
+    ExpandingVision = State({
         Main = function(self)
             WaitSeconds(0.1)
             while true do
@@ -119,9 +127,9 @@ XRB3301 = Class(CRadarUnit) {
                 WaitSeconds(0.2)
             end
         end,
-    },
+    }),
 
-    ContractingVision = State {
+    ContractingVision = State({
         Main = function(self)
             while true do
                 if self:GetResourceConsumed() == 1 then
@@ -145,7 +153,7 @@ XRB3301 = Class(CRadarUnit) {
                 WaitSeconds(0.2)
             end
         end,
-    },
-}
+    }),
+})
 
 TypeClass = XRB3301

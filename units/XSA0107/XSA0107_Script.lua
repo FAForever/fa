@@ -10,8 +10,8 @@
 
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
 
-XSA0107 = Class(AirTransport) {
+XSA0107 = Class(AirTransport)({
     Weapons = {},
-}
+})
 
 TypeClass = XSA0107

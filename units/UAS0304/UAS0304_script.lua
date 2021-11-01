@@ -10,12 +10,12 @@ local WeaponFile = import('/lua/aeonweapons.lua')
 local AIFMissileTacticalSerpentineWeapon = WeaponFile.AIFMissileTacticalSerpentineWeapon
 local AIFQuantumWarhead = WeaponFile.AIFQuantumWarhead
 
-UAS0304 = Class(ASubUnit) {
+UAS0304 = Class(ASubUnit)({
     DeathThreadDestructionWaitTime = 0,
     Weapons = {
-        CruiseMissiles = Class(AIFMissileTacticalSerpentineWeapon) {},
-        NukeMissiles = Class(AIFQuantumWarhead) {},
+        CruiseMissiles = Class(AIFMissileTacticalSerpentineWeapon)({}),
+        NukeMissiles = Class(AIFQuantumWarhead)({}),
     },
-}
+})
 
 TypeClass = UAS0304

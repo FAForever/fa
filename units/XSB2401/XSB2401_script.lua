@@ -11,9 +11,9 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
-XSB2401 = Class(SStructureUnit) {
+XSB2401 = Class(SStructureUnit)({
     Weapons = {
-        ExperimentalNuke = Class(SIFExperimentalStrategicMissile) {
+        ExperimentalNuke = Class(SIFExperimentalStrategicMissile)({
             OnWeaponFired = function(self)
                 self.unit:ForkThread(self.unit.HideMissile)
             end,
@@ -22,8 +22,8 @@ XSB2401 = Class(SStructureUnit) {
                 self.unit:ForkThread(self.unit.ChargeNukeSound)
                 SIFExperimentalStrategicMissile.PlayFxWeaponUnpackSequence(self)
             end,
-        },
-        DeathWeapon = Class(DeathNukeWeapon) {},
+        }),
+        DeathWeapon = Class(DeathNukeWeapon)({}),
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -54,7 +54,7 @@ XSB2401 = Class(SStructureUnit) {
         self.MissileBuilt = true
         self:StopBuildEffects()
 
-        SStructureUnit.OnSiloBuildEnd(self,weapon)
+        SStructureUnit.OnSiloBuildEnd(self, weapon)
     end,
 
     PlayBuildEffects = function(self)
@@ -68,7 +68,7 @@ XSB2401 = Class(SStructureUnit) {
                 if not self.MissileEffect[bidx] then
                     self.MissileEffect[bidx] = {}
                 end
-                self.MissileEffect[bidx][k] = CreateAttachedEmitter(self,bone, self.Army, v)
+                self.MissileEffect[bidx][k] = CreateAttachedEmitter(self, bone, self.Army, v)
             end
         end
         self:PlayUnitSound('Construct')
@@ -111,7 +111,7 @@ XSB2401 = Class(SStructureUnit) {
             self:HideBone(missileBone, true)
             if self.MissileSlider then
                 self.MissileSlider:SetSpeed(400)
-                self.MissileSlider:SetGoal(0,0,0)
+                self.MissileSlider:SetGoal(0, 0, 0)
             end
         end
     end,
@@ -134,6 +134,6 @@ XSB2401 = Class(SStructureUnit) {
         WaitSeconds(9.5)
         self:StopUnitAmbientSound('NukeCharge')
     end,
-}
+})
 
 TypeClass = XSB2401

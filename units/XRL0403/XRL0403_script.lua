@@ -25,23 +25,24 @@ local CIFSmartCharge = CybranWeaponsFile.CIFSmartCharge
 local CAABurstCloudFlakArtilleryWeapon = CybranWeaponsFile.CAABurstCloudFlakArtilleryWeapon
 local CDFBrackmanCrabHackPegLauncherWeapon = CybranWeaponsFile.CDFBrackmanCrabHackPegLauncherWeapon
 
-XRL0403 = Class(CWalkingLandUnit) {
+XRL0403 = Class(CWalkingLandUnit)({
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        ParticleGunRight = Class(CDFHvyProtonCannonWeapon) {},
-        ParticleGunLeft = Class(CDFHvyProtonCannonWeapon) {},
-        Torpedo01 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo02 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo03 = Class(CANNaniteTorpedoWeapon) {},
-        Torpedo04 = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedo = Class(CIFSmartCharge) {},
-        AAGun = Class(CAABurstCloudFlakArtilleryWeapon) {},
-        HackPegLauncher= Class(CDFBrackmanCrabHackPegLauncherWeapon){},
+        ParticleGunRight = Class(CDFHvyProtonCannonWeapon)({}),
+        ParticleGunLeft = Class(CDFHvyProtonCannonWeapon)({}),
+        Torpedo01 = Class(CANNaniteTorpedoWeapon)({}),
+        Torpedo02 = Class(CANNaniteTorpedoWeapon)({}),
+        Torpedo03 = Class(CANNaniteTorpedoWeapon)({}),
+        Torpedo04 = Class(CANNaniteTorpedoWeapon)({}),
+        AntiTorpedo = Class(CIFSmartCharge)({}),
+        AAGun = Class(CAABurstCloudFlakArtilleryWeapon)({}),
+        HackPegLauncher = Class(CDFBrackmanCrabHackPegLauncherWeapon)({}),
     },
 
-    DisableAllButHackPegLauncher= function(self)
-        self:SetWeaponEnabledByLabel('ParticleGunRight', false) -- -- -- Disable all other weapons.
+    DisableAllButHackPegLauncher = function(self)
+        -- -- -- Disable all other weapons.
+        self:SetWeaponEnabledByLabel('ParticleGunRight', false)
         self:SetWeaponEnabledByLabel('ParticleGunLeft', false)
         self:SetWeaponEnabledByLabel('AAGun', false)
         self:SetWeaponEnabledByLabel('Torpedo01', false)
@@ -49,11 +50,12 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:ShowBone('Missile_Turret', true)
     end,
 
-    EnableHackPegLauncher= function(self)
-        self:SetWeaponEnabledByLabel('HackPegLauncher', true)   -- -- -- Enable and show hack-peg launcher.
+    EnableHackPegLauncher = function(self)
+        -- -- -- Enable and show hack-peg launcher.
+        self:SetWeaponEnabledByLabel('HackPegLauncher', true)
     end,
 
-    OnCreate= function(self)
+    OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
         if self:IsValidBone('Missile_Turret') then
@@ -70,8 +72,8 @@ XRL0403 = Class(CWalkingLandUnit) {
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
 
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
@@ -82,7 +84,7 @@ XRL0403 = Class(CWalkingLandUnit) {
             self.AnimationManipulator:SetRate(1)
 
             self:ForkThread(function()
-                WaitSeconds(self.AnimationManipulator:GetAnimationDuration()*self.AnimationManipulator:GetRate())
+                WaitSeconds(self.AnimationManipulator:GetAnimationDuration() * self.AnimationManipulator:GetRate())
                 self:SetUnSelectable(false)
                 self.AnimationManipulator:Destroy()
             end)
@@ -102,6 +104,8 @@ XRL0403 = Class(CWalkingLandUnit) {
             self:EnableUnitIntel('Layer', 'Sonar')
             -- Increase speed while in water
             self:SetSpeedMult(self:GetBlueprint().Physics.WaterSpeedMultiplier)
+        else
+
         end
     end,
 
@@ -113,16 +117,15 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     CreateDeathExplosionDustRing = function(self)
         local blanketSides = 18
-        local blanketAngle = (2*math.pi) / blanketSides
+        local blanketAngle = 2 * math.pi / blanketSides
         local blanketStrength = 1
         local blanketVelocity = 2.8
 
-        for i = 0, (blanketSides-1) do
-            local blanketX = math.sin(i*blanketAngle)
-            local blanketZ = math.cos(i*blanketAngle)
+        for i = 0, blanketSides - 1 do
+            local blanketX = math.sin(i * blanketAngle)
+            local blanketZ = math.cos(i * blanketAngle)
 
-            local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ)
-                :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
+            local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ):SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
     end,
 
@@ -132,7 +135,8 @@ XRL0403 = Class(CWalkingLandUnit) {
         for k, vBone in bones do
             position = self:GetPosition(vBone)
             offset = utilities.GetDifferenceVector(position, basePosition)
-            velocity = utilities.GetDirectionVector(position, basePosition) --
+            --
+            velocity = utilities.GetDirectionVector(position, basePosition)
             velocity.x = velocity.x + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat(0.0, 0.3)
@@ -158,11 +162,17 @@ XRL0403 = Class(CWalkingLandUnit) {
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Left_Leg01_B01', 4.5, army)
         CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp'):OffsetEmitter(0, 5, 0)
-        CreateAttachedEmitter(self,'XRL0403', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp'):OffsetEmitter(0, 5, 0)
-        CreateAttachedEmitter(self,'XRL0403', army, '/effects/emitters/distortion_ring_01_emit.bp')
-        self:CreateFirePlumes(army, {'XRL0403'}, 0)
+        CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp'):OffsetEmitter(0, 5, 0)
+        CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/distortion_ring_01_emit.bp')
+        self:CreateFirePlumes(army, {
+            'XRL0403',
+        }, 0)
 
-        self:CreateFirePlumes(army, {'Right_Leg01_B01','Right_Leg02_B01','Left_Leg02_B01',}, 0.5)
+        self:CreateFirePlumes(army, {
+            'Right_Leg01_B01',
+            'Right_Leg02_B01',
+            'Left_Leg02_B01',
+        }, 0.5)
 
         self:CreateExplosionDebris(army)
         self:CreateExplosionDebris(army)
@@ -176,28 +186,32 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:CreateDamageEffects('Left_Turret_Barrel', army)
 
         WaitSeconds(1)
-        self:CreateFirePlumes(army, {'Right_Leg01_B01','Right_Leg02_B01','Left_Leg02_B01',}, 0.5)
+        self:CreateFirePlumes(army, {
+            'Right_Leg01_B01',
+            'Right_Leg02_B01',
+            'Left_Leg02_B01',
+        }, 0.5)
         WaitSeconds(0.4)
         self:CreateDeathExplosionDustRing()
-        
+
         -- only apply death damage when the unit is sufficiently build
         local bp = self:GetBlueprint()
         local FractionThreshold = bp.General.FractionThreshold or 0.99
-        if self:GetFractionComplete() >= FractionThreshold then 
+        if self:GetFractionComplete() >= FractionThreshold then
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = math.atan2(2.0 * qx * qz + qw * qy, qw * qw + qx * qx - qz * qz - qy * qy)
             for i, numWeapons in bp.Weapon do
-                if(bp.Weapon[i].Label == 'MegalithDeath') then
-                    position[3] = position[3]+2.5*math.cos(a)
-                    position[1] = position[1]+2.5*math.sin(a)
+                if bp.Weapon[i].Label == 'MegalithDeath' then
+                    position[3] = position[3] + 2.5 * math.cos(a)
+                    position[1] = position[1] + 2.5 * math.sin(a)
                     DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                     break
                 end
             end
         end
-        
+
         WaitSeconds(0.4)
 
 
@@ -212,31 +226,41 @@ XRL0403 = Class(CWalkingLandUnit) {
 
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
-        DamageRing(self, {x,y,z}, 0.1, 3, 1, 'Force', true)
+        DamageRing(self, {
+            x,
+            y,
+            z,
+        }, 0.1, 3, 1, 'Force', true)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Right_Turret', 2)
 
         -- Finish up force ring to push trees
-        DamageRing(self, {x,y,z}, 0.1, 3, 1, 'Force', true)
+        DamageRing(self, {
+            x,
+            y,
+            z,
+        }, 0.1, 3, 1, 'Force', true)
 
         -- Explosion on and damage fire on various bones
-        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
+        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
         CreateDeathExplosion(self, 'Flare_Muzzle03', 2)
-        self:CreateFirePlumes(army, {'Torpedo_Muzzle11'}, -1)
+        self:CreateFirePlumes(army, {
+            'Torpedo_Muzzle11',
+        }, -1)
         self:CreateDamageEffects('Right_Turret', army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
         self:CreateDamageEffects('Right_Footfall_02', army)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle01', 1)
         self:CreateExplosionDebris(army)
 
-        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
+        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
         self:CreateDamageEffects('Torpedo_Muzzle01', army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1,2) .. '_B0' .. Random(1,2), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
         CreateDeathExplosion(self, 'Flare_Muzzle06', 2)
         self:CreateDamageEffects('Left_Leg02_B02', army)
         explosion.CreateFlash(self, 'Right_Leg01_B01', 3.2, army)
@@ -250,14 +274,14 @@ XRL0403 = Class(CWalkingLandUnit) {
     OnMotionHorzEventChange = function(self, new, old)
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
 
-        if (old == 'Stopped') then
+        if old == 'Stopped' then
             local bpDisplay = self:GetBlueprint().Display
             if bpDisplay.AnimationWalk and self.Animator then
                 self.Animator:SetDirectionalAnim(true)
                 self.Animator:SetRate(bpDisplay.AnimationWalkRate)
             end
-         end
+        end
     end,
-}
+})
 
 TypeClass = XRL0403

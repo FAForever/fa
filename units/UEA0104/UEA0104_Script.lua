@@ -16,36 +16,55 @@ local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local TAirToAirLinkedRailgun = WeaponsFile.TAirToAirLinkedRailgun
 local TDFRiotWeapon = WeaponsFile.TDFRiotWeapon
 
-UEA0104 = Class(AirTransport) {
-    AirDestructionEffectBones = { 'Char04', 'Char03', 'Char02', 'Char01',
-                                'Front_Right_Exhaust','Front_Left_Exhaust','Back_Right_Exhaust','Back_Left_Exhaust',
-                                'Right_Arm05','Right_Arm07','Right_Arm02','Right_Arm03', 'Right_Arm04','Right_Arm01'},
+UEA0104 = Class(AirTransport)({
+    AirDestructionEffectBones = {
+        'Char04',
+        'Char03',
+        'Char02',
+        'Char01',
+        'Front_Right_Exhaust',
+        'Front_Left_Exhaust',
+        'Back_Right_Exhaust',
+        'Back_Left_Exhaust',
+        'Right_Arm05',
+        'Right_Arm07',
+        'Right_Arm02',
+        'Right_Arm03',
+        'Right_Arm04',
+        'Right_Arm01',
+    },
 
 
     BeamExhaustCruise = '/effects/emitters/transport_thruster_beam_01_emit.bp',
     BeamExhaustIdle = '/effects/emitters/transport_thruster_beam_02_emit.bp',
 
     Weapons = {
-        FrontLinkedRailGun = Class(TAirToAirLinkedRailgun) {},
-        BackLinkedRailGun = Class(TAirToAirLinkedRailgun) {},
-        FrontRiotGun = Class(TDFRiotWeapon) {},
-        BackRiotGun = Class(TDFRiotWeapon) {},
+        FrontLinkedRailGun = Class(TAirToAirLinkedRailgun)({}),
+        BackLinkedRailGun = Class(TAirToAirLinkedRailgun)({}),
+        FrontRiotGun = Class(TDFRiotWeapon)({}),
+        BackRiotGun = Class(TDFRiotWeapon)({}),
     },
 
     DestructionTicks = 250,
-    EngineRotateBones = {'Front_Right_Engine', 'Front_Left_Engine', 'Back_Left_Engine', 'Back_Right_Engine', },
+    EngineRotateBones = {
+        'Front_Right_Engine',
+        'Front_Left_Engine',
+        'Back_Left_Engine',
+        'Back_Right_Engine',
+    },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AirTransport.OnStopBeingBuilt(self,builder,layer)
-        self.EngineManipulators = {}
+    OnStopBeingBuilt = function(self, builder, layer)
+        AirTransport.OnStopBeingBuilt(self, builder, layer)
+        self.EngineManipulators = {
 
-        -- create the engine thrust manipulators
+            -- create the engine thrust manipulators
+        }
         for k, v in self.EngineRotateBones do
             table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", v))
         end
 
         -- set up the thursting arcs for the engines
-        for keys,values in self.EngineManipulators do
+        for keys, values in self.EngineManipulators do
             --                      XMAX,XMIN,YMAX,YMIN,ZMAX,ZMIN, TURNMULT, TURNSPEED
             values:SetThrustingParam(-0.25, 0.25, -0.75, 0.75, -0.0, 0.0, 1.0, 0.25)
         end
@@ -59,10 +78,12 @@ UEA0104 = Class(AirTransport) {
 
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
-        if (new == 'Down') then
+        if new == 'Down' then
             self.LandingAnimManip:SetRate(-1)
-        elseif (new == 'Up') then
+        elseif new == 'Up' then
             self.LandingAnimManip:SetRate(1)
+        else
+
         end
     end,
 
@@ -119,6 +140,6 @@ UEA0104 = Class(AirTransport) {
         end
     end,
 
-}
+})
 
 TypeClass = UEA0104

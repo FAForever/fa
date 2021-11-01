@@ -7,7 +7,7 @@
 
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 
-UEA0001 = Class(TConstructionUnit) {
+UEA0001 = Class(TConstructionUnit)({
     Parent = nil,
 
     OnScriptBitSet = function(self, bit)
@@ -37,10 +37,10 @@ UEA0001 = Class(TConstructionUnit) {
     end,
 
     -- Don't make wreckage
-    CreateWreckage = function (self, overkillRatio)
+    CreateWreckage = function(self, overkillRatio)
         overkillRatio = 1.1
         TConstructionUnit.CreateWreckage(self, overkillRatio)
     end,
-}
+})
 
 TypeClass = UEA0001

@@ -4,7 +4,9 @@
 
 local TDFGaussCannonProjectile = import('/lua/terranprojectiles.lua').TDFGaussCannonProjectile
 
-TDFGauss01 = Class(TDFGaussCannonProjectile) {
-    FxTrails = {'/effects/emitters/gauss_cannon_munition_trail_03_emit.bp',},
-}
+TDFGauss01 = Class(TDFGaussCannonProjectile)({
+    FxTrails = {
+        '/effects/emitters/gauss_cannon_munition_trail_03_emit.bp',
+    },
+})
 TypeClass = TDFGauss01

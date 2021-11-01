@@ -4,11 +4,13 @@
 local ADepthChargeProjectile = import('/lua/aeonprojectiles.lua').ADepthChargeProjectile
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
-AANDepthCharge03 = Class(ADepthChargeProjectile) {
+AANDepthCharge03 = Class(ADepthChargeProjectile)({
 
     CountdownLength = 10,
-    FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-                    '/effects/emitters/water_splash_plume_01_emit.bp',},
+    FxEnterWater = {
+        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+        '/effects/emitters/water_splash_plume_01_emit.bp',
+    },
 
 
     OnCreate = function(self)
@@ -28,7 +30,8 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
     OnEnterWater = function(self)
         #ADepthChargeProjectile.OnEnterWater(self)
 
-        for i in self.FxEnterWater do #splash
+        for i in self.FxEnterWater do
+            #splash
             CreateEmitterAtEntity(self, self.Army, self.FxEnterWater[i])
         end
 
@@ -73,10 +76,11 @@ AANDepthCharge03 = Class(ADepthChargeProjectile) {
             Omni = false,
             Vision = false,
             Army = self.Army,
+
         }
         local vizEntity = VizMarker(spec)
         ADepthChargeProjectile.OnImpact(self, TargetType, TargetEntity)
     end,
-}
+})
 
 TypeClass = AANDepthCharge03

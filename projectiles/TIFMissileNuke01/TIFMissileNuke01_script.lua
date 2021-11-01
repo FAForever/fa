@@ -3,9 +3,11 @@
 --
 local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
 
-TIFMissileNuke01 = Class(TIFMissileNuke) {
+TIFMissileNuke01 = Class(TIFMissileNuke)({
 
-    InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
+    InitialEffects = {
+        '/effects/emitters/nuke_munition_launch_trail_02_emit.bp',
+    },
     LaunchEffects = {
         '/effects/emitters/nuke_munition_launch_trail_03_emit.bp',
         '/effects/emitters/nuke_munition_launch_trail_05_emit.bp',
@@ -21,6 +23,6 @@ TIFMissileNuke01 = Class(TIFMissileNuke) {
         self.effectEntityPath = '/effects/Entities/UEFNukeEffectController01/UEFNukeEffectController01_proj.bp'
         self:LauncherCallbacks()
     end,
-}
+})
 
 TypeClass = TIFMissileNuke01

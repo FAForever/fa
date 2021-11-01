@@ -6,10 +6,10 @@
 
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 
-ZXA0001 = Class(TConstructionUnit) {
+ZXA0001 = Class(TConstructionUnit)({
     OnCreate = function(self)
         TConstructionUnit.OnCreate(self)
-        
+
         self:SetUnSelectable(true)
         self:SetDoNotTarget(true)
         self:SetCollisionShape('None')
@@ -18,6 +18,6 @@ ZXA0001 = Class(TConstructionUnit) {
         self:SetVizToFocusPlayer('Never')
         self:SetVizToNeutrals('Never')
     end,
-}
-    
+})
+
 TypeClass = ZXA0001

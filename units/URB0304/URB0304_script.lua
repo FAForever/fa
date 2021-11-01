@@ -10,9 +10,9 @@
 local CQuantumGateUnit = import('/lua/cybranunits.lua').CQuantumGateUnit
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-URB0304 = Class(CQuantumGateUnit) {
+URB0304 = Class(CQuantumGateUnit)({
     GateBones = {
-        {   
+        {
             'Gate01_Left_FX',
             'Gate01_Right_FX',
         },
@@ -43,7 +43,7 @@ URB0304 = Class(CQuantumGateUnit) {
         self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[2][1], self.GateBones[2][2], self.Trash, 2.7)
         self:ForkThread(EffectUtil.CreateCybranQuantumGateEffect, self.GateBones[3][1], self.GateBones[3][2], self.Trash, 3.1)
 
-        for kBonesSet,vBoneSet in self.GateBones do
+        for kBonesSet, vBoneSet in self.GateBones do
             for kBone, vBone in vBoneSet do
                 for kEffect, vEffect in self.GateEffects do
                     self.Trash:Add(CreateAttachedEmitter(self, vBone, self.Army, vEffect))
@@ -51,6 +51,6 @@ URB0304 = Class(CQuantumGateUnit) {
             end
         end
     end,
-}
+})
 
 TypeClass = URB0304

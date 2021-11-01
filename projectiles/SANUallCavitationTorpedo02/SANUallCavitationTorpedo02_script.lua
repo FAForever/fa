@@ -8,6 +8,5 @@
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
-SANUallCavitationTorpedo02 = Class(import('/lua/seraphimprojectiles.lua').SUallCavitationTorpedo) {
-}
+SANUallCavitationTorpedo02 = Class(import('/lua/seraphimprojectiles.lua').SUallCavitationTorpedo)({})
 TypeClass = SANUallCavitationTorpedo02

@@ -8,11 +8,11 @@ local SHoverLandUnit = import('/lua/seraphimunits.lua').SHoverLandUnit
 local SDFThauCannon = import('/lua/seraphimweapons.lua').SDFThauCannon
 local SlowHover = import('/lua/defaultunits.lua').SlowHoverLandUnit
 
-XSL0203 = Class(SHoverLandUnit, SlowHover) {
+XSL0203 = Class(SHoverLandUnit, SlowHover)({
     Weapons = {
-        TauCannon01 = Class(SDFThauCannon){
+        TauCannon01 = Class(SDFThauCannon)({
             FxMuzzleFlashScale = 0.5,
-        },
+        }),
     },
-}
+})
 TypeClass = XSL0203

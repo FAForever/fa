@@ -8,10 +8,10 @@
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CIFMissileStrategicWeapon = import('/lua/cybranweapons.lua').CIFMissileStrategicWeapon
 
-URB2305 = Class(CStructureUnit) {
+URB2305 = Class(CStructureUnit)({
     Weapons = {
-        NukeMissiles = Class(CIFMissileStrategicWeapon) {},
+        NukeMissiles = Class(CIFMissileStrategicWeapon)({}),
     },
-}
+})
 
 TypeClass = URB2305

@@ -7,9 +7,12 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local SAirFactoryUnit = import('/lua/seraphimunits.lua').SAirFactoryUnit
-XSB0202 = Class(SAirFactoryUnit) {
+XSB0202 = Class(SAirFactoryUnit)({
 
-    RollOffBones = { 'Pod01', 'Pod02', },
+    RollOffBones = {
+        'Pod01',
+        'Pod02',
+    },
 
     OnCreate = function(self)
         SAirFactoryUnit.OnCreate(self)
@@ -26,6 +29,6 @@ XSB0202 = Class(SAirFactoryUnit) {
         self.Rotator2:SetSpeed(0)
         SAirFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-}
+})
 
 TypeClass = XSB0202

@@ -9,7 +9,7 @@
 --#****************************************************************************
 local TShieldStructureUnit = import('/lua/terranunits.lua').TShieldStructureUnit
 
-UEB4301 = Class(TShieldStructureUnit) {
+UEB4301 = Class(TShieldStructureUnit)({
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_t2_01_emit.bp',
         '/effects/emitters/terran_shield_generator_T3_02_emit.bp',
@@ -33,7 +33,7 @@ UEB4301 = Class(TShieldStructureUnit) {
         if self.Rotator2 then
             self.Rotator2:SetTargetSpeed(-10)
         end
-        
+
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
@@ -49,7 +49,7 @@ UEB4301 = Class(TShieldStructureUnit) {
         TShieldStructureUnit.OnShieldDisabled(self)
         self.Rotator1:SetTargetSpeed(0)
         self.Rotator2:SetTargetSpeed(0)
-        
+
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
@@ -57,6 +57,6 @@ UEB4301 = Class(TShieldStructureUnit) {
             self.ShieldEffectsBag = {}
         end
     end,
-}
+})
 
 TypeClass = UEB4301

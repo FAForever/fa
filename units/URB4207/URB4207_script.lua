@@ -9,7 +9,7 @@
 --#****************************************************************************
 local CShieldStructureUnit = import('/lua/cybranunits.lua').CShieldStructureUnit
 
-URB4207 = Class(CShieldStructureUnit) {
+URB4207 = Class(CShieldStructureUnit)({
     ShieldEffects = {
         '/effects/emitters/cybran_shield_05_generator_01_emit.bp',
         '/effects/emitters/cybran_shield_05_generator_02_emit.bp',
@@ -29,7 +29,7 @@ URB4207 = Class(CShieldStructureUnit) {
         if self.Rotator1 then
             self.Rotator1:SetTargetSpeed(10)
         end
-        
+
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
@@ -45,7 +45,7 @@ URB4207 = Class(CShieldStructureUnit) {
     OnShieldDisabled = function(self)
         CShieldStructureUnit.OnShieldDisabled(self)
         self.Rotator1:SetTargetSpeed(0)
-        
+
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
@@ -53,6 +53,6 @@ URB4207 = Class(CShieldStructureUnit) {
             self.ShieldEffectsBag = {}
         end
     end,
-}
+})
 
 TypeClass = URB4207

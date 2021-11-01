@@ -10,7 +10,7 @@
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
 
-UEB0103 = Class(TSeaFactoryUnit) {
+UEB0103 = Class(TSeaFactoryUnit)({
     StartArmsMoving = function(self)
         TSeaFactoryUnit.StartArmsMoving(self)
         if not self.ArmSlider then
@@ -23,7 +23,9 @@ UEB0103 = Class(TSeaFactoryUnit) {
     MovingArmsThread = function(self)
         TSeaFactoryUnit.MovingArmsThread(self)
         while true do
-            if not self.ArmSlider then return end
+            if not self.ArmSlider then
+                return
+            end
             self.ArmSlider:SetGoal(0, 0, 40)
             self.ArmSlider:SetSpeed(40)
             WaitFor(self.ArmSlider)
@@ -34,11 +36,13 @@ UEB0103 = Class(TSeaFactoryUnit) {
 
     StopArmsMoving = function(self)
         TSeaFactoryUnit.StopArmsMoving(self)
-        if not self.ArmSlider then return end
+        if not self.ArmSlider then
+            return
+        end
         self.ArmSlider:SetGoal(0, 0, 0)
         self.ArmSlider:SetSpeed(40)
     end,
 
-}
+})
 
 TypeClass = UEB0103

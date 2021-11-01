@@ -9,10 +9,12 @@ local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AIFQuantumWarhead = import('/lua/aeonweapons.lua').AIFQuantumWarhead
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
-UAB2305 = Class(AStructureUnit) {
+UAB2305 = Class(AStructureUnit)({
     Weapons = {
-        QuantumMissiles = Class(AIFQuantumWarhead) {
-            UnpackEffects01 = {'/effects/emitters/aeon_nuke_unpack_01_emit.bp',},
+        QuantumMissiles = Class(AIFQuantumWarhead)({
+            UnpackEffects01 = {
+                '/effects/emitters/aeon_nuke_unpack_01_emit.bp',
+            },
 
             PlayFxWeaponUnpackSequence = function(self)
                 for k, v in self.UnpackEffects01 do
@@ -21,11 +23,11 @@ UAB2305 = Class(AStructureUnit) {
 
                 AIFQuantumWarhead.PlayFxWeaponUnpackSequence(self)
             end,
-        },
+        }),
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AStructureUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AStructureUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint()
         self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
         self:ForkThread(self.PlayArmSounds)
@@ -42,6 +44,6 @@ UAB2305 = Class(AStructureUnit) {
             self:PlaySound(myBlueprint.Audio.Activate)
         end
     end,
-}
+})
 
 TypeClass = UAB2305

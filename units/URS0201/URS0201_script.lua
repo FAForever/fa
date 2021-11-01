@@ -13,24 +13,26 @@ local CDFProtonCannonWeapon = CybranWeapons.CDFProtonCannonWeapon
 local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
 local CIFSmartCharge = import('/lua/cybranweapons.lua').CIFSmartCharge
 
-URS0201 = Class(CSeaUnit) {
+URS0201 = Class(CSeaUnit)({
     SwitchAnims = true,
     Walking = false,
     IsWaiting = false,
 
     Weapons = {
-        ParticleGun = Class(CDFProtonCannonWeapon) {},
-        AAGun = Class(CAAAutocannon) {},
-        TorpedoR = Class(CANNaniteTorpedoWeapon) {},
-        TorpedoL = Class(CANNaniteTorpedoWeapon) {},
-        AntiTorpedoF = Class(CIFSmartCharge) {},
-        AntiTorpedoB = Class(CIFSmartCharge) {},
+        ParticleGun = Class(CDFProtonCannonWeapon)({}),
+        AAGun = Class(CAAAutocannon)({}),
+        TorpedoR = Class(CANNaniteTorpedoWeapon)({}),
+        TorpedoL = Class(CANNaniteTorpedoWeapon)({}),
+        AntiTorpedoF = Class(CIFSmartCharge)({}),
+        AntiTorpedoB = Class(CIFSmartCharge)({}),
     },
 
     OnMotionHorzEventChange = function(self, new, old)
         CSeaUnit.OnMotionHorzEventChange(self, new, old)
 
-        if self.Dead then return end
+        if self.Dead then
+            return
+        end
 
         if not self.IsWaiting then
             if self.Walking then
@@ -43,6 +45,8 @@ URS0201 = Class(CSeaUnit) {
                     end
                 elseif new == 'Stopped' then
                     self.AnimManip:SetRate(0)
+                else
+
                 end
             end
         end
@@ -62,6 +66,8 @@ URS0201 = Class(CSeaUnit) {
         elseif new == 'Water' then
             self:EnableUnitIntel('Layer', 'Sonar')
             self:SetSpeedMult(1)
+        else
+
         end
 
         -- Can only be built in water so transformthread only needs to be run
@@ -87,7 +93,7 @@ URS0201 = Class(CSeaUnit) {
             self.AnimManip:SetRate(2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 1.0)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 1.0 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self:SetImmobile(false)
             self.SwitchAnims = true
@@ -100,7 +106,7 @@ URS0201 = Class(CSeaUnit) {
             self.AnimManip:SetRate(-2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 0.5)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 0.5 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self.AnimManip:Destroy()
             self.AnimManip = nil
@@ -121,7 +127,7 @@ URS0201 = Class(CSeaUnit) {
         CSeaUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-     DeathThread = function(self, overkillRatio)
+    DeathThread = function(self, overkillRatio)
         if self.Layer ~= 'Water' and not self.IsWaiting then
             self:PlayUnitSound('Destroyed')
             if self.PlayDestructionEffects then
@@ -136,7 +142,8 @@ URS0201 = Class(CSeaUnit) {
                     self.CreateUnitDestructionDebris(self, true, true, false)
                 elseif overkillRatio <= 3 then
                     self.CreateUnitDestructionDebris(self, true, true, true)
-                else -- VAPORIZED
+                else
+                    -- VAPORIZED
                     self.CreateUnitDestructionDebris(self, true, true, true)
                 end
             end
@@ -156,7 +163,7 @@ URS0201 = Class(CSeaUnit) {
             CSeaUnit.DeathThread(self, overkillRatio)
         end
     end,
-    
+
     OnStopBeingBuilt = function(self, builder, layer)
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)
 
@@ -164,7 +171,7 @@ URS0201 = Class(CSeaUnit) {
             self:SetScriptBit('RULEUTC_WeaponToggle', true)
         end
     end,
-    
+
     -- Disable amphibious mode
     OnScriptBitSet = function(self, bit)
         CSeaUnit.OnScriptBitSet(self, bit)
@@ -173,8 +180,8 @@ URS0201 = Class(CSeaUnit) {
                 self:GetStat("h1_SetSalemAmph", 0)
             else
                 self:SetScriptBit('RULEUTC_WeaponToggle', false)
-            end 
-        end    
+            end
+        end
     end,
 
     -- Enable amphibious mode
@@ -184,6 +191,6 @@ URS0201 = Class(CSeaUnit) {
             self:GetStat("h1_SetSalemAmph", 1)
         end
     end,
-}
+})
 
 TypeClass = URS0201

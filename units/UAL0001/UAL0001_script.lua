@@ -17,13 +17,13 @@ local ADFOverchargeWeapon = AWeapons.ADFOverchargeWeapon
 local ADFChronoDampener = AWeapons.ADFChronoDampener
 local Buff = import('/lua/sim/Buff.lua')
 
-UAL0001 = Class(ACUUnit) {
+UAL0001 = Class(ACUUnit)({
     Weapons = {
-        DeathWeapon = Class(DeathNukeWeapon) {},
-        RightDisruptor = Class(ADFDisruptorCannonWeapon) {},
-        ChronoDampener = Class(ADFChronoDampener) {},
-        OverCharge = Class(ADFOverchargeWeapon) {},
-        AutoOverCharge = Class(ADFOverchargeWeapon) {},
+        DeathWeapon = Class(DeathNukeWeapon)({}),
+        RightDisruptor = Class(ADFDisruptorCannonWeapon)({}),
+        ChronoDampener = Class(ADFChronoDampener)({}),
+        OverCharge = Class(ADFOverchargeWeapon)({}),
+        AutoOverCharge = Class(ADFOverchargeWeapon)({}),
     },
 
     __init = function(self)
@@ -38,7 +38,7 @@ UAL0001 = Class(ACUUnit) {
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+        self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -59,7 +59,9 @@ UAL0001 = Class(ACUUnit) {
         if enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
@@ -69,14 +71,16 @@ UAL0001 = Class(ACUUnit) {
         elseif enh == 'ResourceAllocationAdvanced' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationAdvancedRemove' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        -- Shields
+            -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -93,16 +97,16 @@ UAL0001 = Class(ACUUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        -- Teleporter
+            -- Teleporter
         elseif enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        -- Chrono Dampener
+            -- Chrono Dampener
         elseif enh == 'ChronoDampener' then
             self:SetWeaponEnabledByLabel('ChronoDampener', true)
             if not Buffs['AeonACUChronoDampener'] then
-                BuffBlueprint {
+                BuffBlueprint({
                     Name = 'AeonACUChronoDampener',
                     DisplayName = 'AeonACUChronoDampener',
                     BuffType = 'DamageStabilization',
@@ -114,7 +118,7 @@ UAL0001 = Class(ACUUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             Buff.ApplyBuff(self, 'AeonACUChronoDampener')
         elseif enh == 'ChronoDampenerRemove' then
@@ -122,15 +126,17 @@ UAL0001 = Class(ACUUnit) {
                 Buff.RemoveBuff(self, 'AeonACUChronoDampener')
             end
             self:SetWeaponEnabledByLabel('ChronoDampener', false)
-        -- T2 Engineering
-        elseif enh =='AdvancedEngineering' then
+            -- T2 Engineering
+        elseif enh == 'AdvancedEngineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
-            if not bp then return end
+            if not bp then
+                return
+            end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
 
-        if not Buffs['AeonACUT2BuildRate'] then
-                BuffBlueprint {
+            if not Buffs['AeonACUT2BuildRate'] then
+                BuffBlueprint({
                     Name = 'AeonACUT2BuildRate',
                     DisplayName = 'AeonACUT2BuildRate',
                     BuffType = 'ACUBUILDRATE',
@@ -138,7 +144,7 @@ UAL0001 = Class(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -150,25 +156,29 @@ UAL0001 = Class(ACUUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             Buff.ApplyBuff(self, 'AeonACUT2BuildRate')
-        elseif enh =='AdvancedEngineeringRemove' then
+        elseif enh == 'AdvancedEngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
-         end
-        -- T3 Engineering
-        elseif enh =='T3Engineering' then
+            end
+            -- T3 Engineering
+        elseif enh == 'T3Engineering' then
             local bp = self:GetBlueprint().Enhancements[enh]
-            if not bp then return end
+            if not bp then
+                return
+            end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
             if not Buffs['AeonACUT3BuildRate'] then
-                BuffBlueprint {
+                BuffBlueprint({
                     Name = 'AeonACUT3BuildRate',
                     DisplayName = 'AeonCUT3BuildRate',
                     BuffType = 'ACUBUILDRATE',
@@ -176,7 +186,7 @@ UAL0001 = Class(ACUUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -188,18 +198,20 @@ UAL0001 = Class(ACUUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             Buff.ApplyBuff(self, 'AeonACUT3BuildRate')
-        elseif enh =='T3EngineeringRemove' then
+        elseif enh == 'T3EngineeringRemove' then
             local bp = self:GetBlueprint().Economy.BuildRate
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
-         end
-        -- Crysalis Beam
+            end
+            -- Crysalis Beam
         elseif enh == 'CrysalisBeam' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
@@ -215,7 +227,7 @@ UAL0001 = Class(ACUUnit) {
             oc:ChangeMaxRadius(bpDisrupt or 22)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bpDisrupt or 22)
-        -- Heat Sink Augmentation
+            -- Heat Sink Augmentation
         elseif enh == 'HeatSink' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
@@ -223,7 +235,7 @@ UAL0001 = Class(ACUUnit) {
             local wep = self:GetWeaponByLabel('RightDisruptor')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
             wep:ChangeRateOfFire(bpDisrupt or 1)
-        -- Enhanced Sensor Systems
+            -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
@@ -231,7 +243,9 @@ UAL0001 = Class(ACUUnit) {
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
-      end
+        else
+
+        end
     end,
 
     CreateHeavyShield = function(self, bp)
@@ -239,7 +253,7 @@ UAL0001 = Class(ACUUnit) {
         self:CreateShield(bp)
         self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
         self:SetMaintenanceConsumptionActive()
-    end
-}
+    end,
+})
 
 TypeClass = UAL0001

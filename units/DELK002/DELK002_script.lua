@@ -14,10 +14,9 @@ local TAAPhalanxWeapon = import('/lua/kirvesweapons.lua').TAAPhalanxWeapon
 local EffectUtils = import('/lua/effectutilities.lua')
 local Effects = import('/lua/effecttemplates.lua')
 
-DELK002 = Class(TLandUnit) {
+DELK002 = Class(TLandUnit)({
     Weapons = {
-        GatlingCannon = Class(TAAPhalanxWeapon)
-        {
+        GatlingCannon = Class(TAAPhalanxWeapon)({
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip1 then
                     self.SpinManip1:SetTargetSpeed(0)
@@ -61,10 +60,10 @@ DELK002 = Class(TLandUnit) {
                 self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Right_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TAAPhalanxWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
-        },
+        }),
 
     },
 
-}
+})
 
 TypeClass = DELK002

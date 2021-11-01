@@ -13,10 +13,9 @@ local TDFHeavyPlasmaCannonWeapon = import('/lua/terranweapons.lua').TDFHeavyPlas
 local EffectUtils = import('/lua/effectutilities.lua')
 local Effects = import('/lua/effecttemplates.lua')
 
-XEB2306 = Class(TStructureUnit) {
+XEB2306 = Class(TStructureUnit)({
     Weapons = {
-        MainGun = Class(TDFHeavyPlasmaCannonWeapon) 
-        {
+        MainGun = Class(TDFHeavyPlasmaCannonWeapon)({
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(0)
@@ -26,11 +25,11 @@ XEB2306 = Class(TStructureUnit) {
             end,
 
             PlayFxRackSalvoChargeSequence = function(self)
-                if not self.SpinManip then 
+                if not self.SpinManip then
                     self.SpinManip = CreateRotator(self.unit, 'Gun_Barrel', 'z', nil, 270, 180, 60)
                     self.unit.Trash:Add(self.SpinManip)
                 end
-                
+
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(500)
                 end
@@ -43,9 +42,9 @@ XEB2306 = Class(TStructureUnit) {
                 end
                 self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Exhaust', self.unit.Army, Effects.WeaponSteam01)
                 TDFHeavyPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
-            end,    
-        }
+            end,
+        }),
     },
-}
+})
 
 TypeClass = XEB2306

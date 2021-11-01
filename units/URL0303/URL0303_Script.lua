@@ -12,7 +12,7 @@ local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
 local MissileRedirect = import('/lua/defaultantiprojectile.lua').MissileRedirect
 
-local EMPDeathWeapon = Class(Weapon) {
+local EMPDeathWeapon = Class(Weapon)({
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
@@ -20,36 +20,37 @@ local EMPDeathWeapon = Class(Weapon) {
 
     Fire = function(self)
         local blueprint = self:GetBlueprint()
-        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
-                   blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
+        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
-}
+})
 
-URL0303 = Class(CWalkingLandUnit) {
+URL0303 = Class(CWalkingLandUnit)({
     PlayEndAnimDestructionEffects = false,
 
     Weapons = {
-        Disintigrator = Class(CDFLaserDisintegratorWeapon) {},
-        HeavyBolter = Class(CDFElectronBolterWeapon) {},
-        DeathWeapon = Class(EMPDeathWeapon) {},
+        Disintigrator = Class(CDFLaserDisintegratorWeapon)({}),
+        HeavyBolter = Class(CDFElectronBolterWeapon)({}),
+        DeathWeapon = Class(EMPDeathWeapon)({}),
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         local bp = self:GetBlueprint().Defense.AntiMissile
-        local antiMissile = MissileRedirect {
+        local antiMissile = MissileRedirect({
             Owner = self,
             Radius = bp.Radius,
             AttachBone = bp.AttachBone,
-            RedirectRateOfFire = bp.RedirectRateOfFire
-        }
+            RedirectRateOfFire = bp.RedirectRateOfFire,
+        })
         self.Trash:Add(antiMissile)
         self.ChargingInitiated = false
         self.ChargingInProgress = false
     end,
 
     InitiateCharge = function(self)
-        if self.ChargingInitiated then return end
+        if self.ChargingInitiated then
+            return
+        end
 
         self.ChargingInitiated = true
         local blueprint = self:GetBlueprint()
@@ -80,9 +81,12 @@ URL0303 = Class(CWalkingLandUnit) {
     end,
 
     DoDeathWeapon = function(self)
-        if self:IsBeingBuilt() then return end
+        if self:IsBeingBuilt() then
+            return
+        end
 
-        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
+        -- Handle the normal DeathWeapon procedures
+        CWalkingLandUnit.DoDeathWeapon(self)
 
         -- Now handle our special buff and FX
         local original_bp = table.deepcopy(self:GetBlueprint().Buffs)
@@ -104,6 +108,6 @@ URL0303 = Class(CWalkingLandUnit) {
         -- Play EMP Effect
         CreateLightParticle(self, -1, -1, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
     end,
-}
+})
 
 TypeClass = URL0303

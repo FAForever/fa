@@ -10,18 +10,21 @@
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AAATemporalFizzWeapon = import('/lua/aeonweapons.lua').AAATemporalFizzWeapon
 
-UAB2204 = Class(AStructureUnit) {
+UAB2204 = Class(AStructureUnit)({
     Weapons = {
-        AAFizz = Class(AAATemporalFizzWeapon) {
-            ChargeEffectMuzzles = {'Turret_Right_Muzzle', 'Turret_Left_Muzzle'},
+        AAFizz = Class(AAATemporalFizzWeapon)({
+            ChargeEffectMuzzles = {
+                'Turret_Right_Muzzle',
+                'Turret_Left_Muzzle',
+            },
 
             PlayFxRackSalvoChargeSequence = function(self)
                 AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence(self)
                 CreateAttachedEmitter(self.unit, 'Turret_Right_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
                 CreateAttachedEmitter(self.unit, 'Turret_Left_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
             end,
-        },
+        }),
     },
-}
+})
 
 TypeClass = UAB2204

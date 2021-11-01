@@ -10,11 +10,13 @@
 local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
 local ADFLaserLightWeapon = import('/lua/aeonweapons.lua').ADFLaserLightWeapon
 
-UAA0203 = Class(AAirUnit) {
+UAA0203 = Class(AAirUnit)({
     Weapons = {
-        Turret = Class(ADFLaserLightWeapon) {
-            FxChassisMuzzleFlash = {'/effects/emitters/aeon_gunship_body_illumination_01_emit.bp',},
-            
+        Turret = Class(ADFLaserLightWeapon)({
+            FxChassisMuzzleFlash = {
+                '/effects/emitters/aeon_gunship_body_illumination_01_emit.bp',
+            },
+
             PlayFxMuzzleSequence = function(self, muzzle)
                 local army = self.unit.Army
                 for k, v in self.FxMuzzleFlash do
@@ -24,9 +26,9 @@ UAA0203 = Class(AAirUnit) {
                 for k, v in self.FxChassisMuzzleFlash do
                     CreateAttachedEmitter(self.unit, -1, army, v)
                 end
-            end,        
-        },
+            end,
+        }),
     },
-}
+})
 
 TypeClass = UAA0203

@@ -9,7 +9,7 @@
 --#****************************************************************************
 local TShieldSeaUnit = import('/lua/terranunits.lua').TShieldSeaUnit
 
-XES0205 = Class(TShieldSeaUnit) {
+XES0205 = Class(TShieldSeaUnit)({
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_shipmobile_01_emit.bp',
         '/effects/emitters/terran_shield_generator_shipmobile_02_emit.bp',
@@ -46,6 +46,6 @@ XES0205 = Class(TShieldSeaUnit) {
             self.ShieldEffectsBag = {}
         end
     end,
-}
+})
 
 TypeClass = XES0205

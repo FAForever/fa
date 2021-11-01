@@ -12,9 +12,9 @@ local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon
 local DefaultProjectileWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultProjectileWeapon
 
-URB2302 = Class(CStructureUnit) {
+URB2302 = Class(CStructureUnit)({
     Weapons = {
-        MainGun = Class(CIFArtilleryWeapon) {
+        MainGun = Class(CIFArtilleryWeapon)({
             FxMuzzleFlashScale = 0.6,
             FxGroundEffect = EffectTemplate.CDisruptorGroundEffect,
             FxVentEffect = EffectTemplate.CDisruptorVentEffect,
@@ -38,8 +38,8 @@ URB2302 = Class(CStructureUnit) {
                     CreateAttachedEmitter(self.unit, 'Barrel_B01', army, v)
                 end
             end,
-        }
+        }),
     },
-}
+})
 
 TypeClass = URB2302

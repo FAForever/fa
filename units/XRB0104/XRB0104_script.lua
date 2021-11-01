@@ -9,7 +9,6 @@
 -- ****************************************************************************
 local CConstructionStructureUnit = import('/lua/cybranunits.lua').CConstructionStructureUnit
 
-XRB0104 = Class(CConstructionStructureUnit) {
-}
+XRB0104 = Class(CConstructionStructureUnit)({})
 
 TypeClass = XRB0104

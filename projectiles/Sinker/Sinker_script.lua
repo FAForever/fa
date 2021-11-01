@@ -1,7 +1,7 @@
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local Projectile = import('/lua/sim/projectile.lua').Projectile
 
-Sinker = Class(Projectile) {
+Sinker = Class(Projectile)({
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
@@ -22,12 +22,11 @@ Sinker = Class(Projectile) {
             local sinker = self
             local wait = delay
 
-            self:ForkThread(
-                function()
-                    WaitTicks(wait)
-                    sinker:StartSinking(targetEntity, targetBone)
-                end
-            )
+            self:ForkThread(function()
+
+                WaitTicks(wait)
+                sinker:StartSinking(targetEntity, targetBone)
+            end)
         else
             self:StartSinking(targEntity, targBone)
         end
@@ -58,8 +57,8 @@ Sinker = Class(Projectile) {
             self:Destroy()
             if self.callback then
                 ForkThread(self.callback)
-            end    
+            end
         end
     end,
-}
+})
 TypeClass = Sinker

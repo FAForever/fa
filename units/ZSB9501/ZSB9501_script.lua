@@ -10,7 +10,7 @@
 
 local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
 
-ZSB9501 = Class(SLandFactoryUnit) {
+ZSB9501 = Class(SLandFactoryUnit)({
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)
         local bp = self:GetBlueprint()
@@ -27,6 +27,6 @@ ZSB9501 = Class(SLandFactoryUnit) {
         SLandFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-}
+})
 
 TypeClass = ZSB9501

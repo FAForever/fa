@@ -9,7 +9,7 @@
 --#****************************************************************************
 local TQuantumGateUnit = import('/lua/terranunits.lua').TQuantumGateUnit
 
-UEB0304 = Class(TQuantumGateUnit) {
+UEB0304 = Class(TQuantumGateUnit)({
     GateEffectVerticalOffset = 0.35,
     GateEffectScale = 0.42,
 
@@ -21,14 +21,14 @@ UEB0304 = Class(TQuantumGateUnit) {
         self.GateEffectEntity:SetParentOffset(Vector(0, 0, self.GateEffectVerticalOffset))
         self.GateEffectEntity:SetVizToAllies('Intel')
         self.GateEffectEntity:SetVizToNeutrals('Intel')
-        self.GateEffectEntity:SetVizToEnemies('Intel')          
+        self.GateEffectEntity:SetVizToEnemies('Intel')
         self.Trash:Add(self.GateEffectEntity)
 
         CreateAttachedEmitter(self, 'Left_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
         CreateAttachedEmitter(self, 'Right_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
-      
+
         TQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)
     end,
-}
+})
 
 TypeClass = UEB0304

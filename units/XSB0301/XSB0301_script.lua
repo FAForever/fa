@@ -10,7 +10,7 @@
 
 local SLandFactoryUnit = import('/lua/seraphimunits.lua').SLandFactoryUnit
 
-XSB0301 = Class(SLandFactoryUnit) {
+XSB0301 = Class(SLandFactoryUnit)({
 
     OnCreate = function(self)
         SLandFactoryUnit.OnCreate(self)
@@ -31,6 +31,6 @@ XSB0301 = Class(SLandFactoryUnit) {
         self.Rotator3:SetSpeed(0)
         SLandFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-}
+})
 
 TypeClass = XSB0301

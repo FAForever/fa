@@ -9,7 +9,7 @@ local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamika
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
-local EMPDeathWeapon = Class(Weapon) {
+local EMPDeathWeapon = Class(Weapon)({
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
@@ -17,12 +17,11 @@ local EMPDeathWeapon = Class(Weapon) {
 
     Fire = function(self)
         local blueprint = self:GetBlueprint()
-        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
-                   blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
+        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
-}
+})
 
-XRL0302 = Class(CWalkingLandUnit) {
+XRL0302 = Class(CWalkingLandUnit)({
 
     IntelEffects = {
         Cloak = {
@@ -37,8 +36,8 @@ XRL0302 = Class(CWalkingLandUnit) {
     },
 
     Weapons = {
-        Suicide = Class(CMobileKamikazeBombWeapon) {},
-        DeathWeapon = Class(EMPDeathWeapon) {},
+        Suicide = Class(CMobileKamikazeBombWeapon)({}),
+        DeathWeapon = Class(EMPDeathWeapon)({}),
     },
 
     AmbientExhaustBones = {
@@ -54,7 +53,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         self.EffectsBag = {}
         self.AmbientExhaustEffectsBag = {}
-        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
+        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
 
@@ -75,7 +74,7 @@ XRL0302 = Class(CWalkingLandUnit) {
     OnProductionPaused = function(self)
         self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
-    
+
     EmitPeriodicEffects = function(self)
         while not self.Dead do
             local army = self:GetArmy()
@@ -98,9 +97,11 @@ XRL0302 = Class(CWalkingLandUnit) {
             self:GetWeaponByLabel('Suicide'):FireWeapon()
         end
     end,
-    
+
     DoDeathWeapon = function(self)
-        if self:IsBeingBuilt() then return end
+        if self:IsBeingBuilt() then
+            return
+        end
 
         if self.EffectsBag then
             EffectUtil.CleanupEffectBag(self, 'EffectsBag')
@@ -112,7 +113,8 @@ XRL0302 = Class(CWalkingLandUnit) {
         end
         self.PeriodicFXThread:Destroy()
         self.PeriodicFXThread = nil
-        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
+        -- Handle the normal DeathWeapon procedures
+        CWalkingLandUnit.DoDeathWeapon(self)
 
         -- Now handle our special buff
         local bp
@@ -127,12 +129,12 @@ XRL0302 = Class(CWalkingLandUnit) {
             self:AddBuff(bp)
         end
     end,
-    
+
     OnDestroy = function(self)
         CWalkingLandUnit.OnDestroy(self)
     end,
 
- 
-}
+
+})
 
 TypeClass = XRL0302

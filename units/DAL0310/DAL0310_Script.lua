@@ -12,9 +12,9 @@
 local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
 local ADFDisruptorCannonWeapon = import('/lua/aeonweapons.lua').ADFDisruptorWeapon
 
-DAL0310 = Class(AHoverLandUnit) {
+DAL0310 = Class(AHoverLandUnit)({
     Weapons = {
-        MainGun = Class(ADFDisruptorCannonWeapon) {
+        MainGun = Class(ADFDisruptorCannonWeapon)({
             CreateProjectileAtMuzzle = function(self, muzzle)
                 local proj = ADFDisruptorCannonWeapon.CreateProjectileAtMuzzle(self, muzzle)
                 local data = self:GetBlueprint().DamageToShields
@@ -22,8 +22,8 @@ DAL0310 = Class(AHoverLandUnit) {
                     proj:PassData(data)
                 end
             end,
-          }
+        }),
     },
-}
+})
 TypeClass = DAL0310
 

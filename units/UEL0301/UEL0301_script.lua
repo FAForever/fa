@@ -12,7 +12,7 @@ local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
-UEL0301 = Class(CommandUnit) {
+UEL0301 = Class(CommandUnit)({
     IntelEffects = {
         {
             Bones = {
@@ -24,8 +24,8 @@ UEL0301 = Class(CommandUnit) {
     },
 
     Weapons = {
-        RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
+        RightHeavyPlasmaCannon = Class(TDFHeavyPlasmaCannonWeapon)({}),
+        DeathWeapon = Class(SCUDeathWeapon)({}),
     },
 
     OnCreate = function(self)
@@ -85,7 +85,9 @@ UEL0301 = Class(CommandUnit) {
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
-        if not bp then return end
+        if not bp then
+            return
+        end
         if enh == 'Pod' then
             local location = self:GetPosition('AttachSpecial01')
             local pod = CreateUnitHPR('UEA0003', self.Army, location[1], location[2], location[3], 0, 0, 0)
@@ -129,10 +131,12 @@ UEL0301 = Class(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        elseif enh =='ResourceAllocation' then
+        elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
-            if not bp then return end
+            if not bp then
+                return
+            end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
@@ -157,20 +161,22 @@ UEL0301 = Class(CommandUnit) {
             self:DisableUnitIntel('Enhancement', 'Jammer')
             self.RadarJammerEnh = false
             self:RemoveToggleCap('RULEUTC_JammingToggle')
-        elseif enh =='AdvancedCoolingUpgrade' then
+        elseif enh == 'AdvancedCoolingUpgrade' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(bp.NewRateOfFire)
-        elseif enh =='AdvancedCoolingUpgradeRemove' then
+        elseif enh == 'AdvancedCoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:ChangeRateOfFire(self:GetBlueprint().Weapon[1].RateOfFire or 1)
-        elseif enh =='HighExplosiveOrdnance' then
+        elseif enh == 'HighExplosiveOrdnance' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
-        elseif enh =='HighExplosiveOrdnanceRemove' then
+        elseif enh == 'HighExplosiveOrdnanceRemove' then
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
+        else
+
         end
     end,
 
@@ -179,7 +185,7 @@ UEL0301 = Class(CommandUnit) {
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -195,6 +201,6 @@ UEL0301 = Class(CommandUnit) {
             end
         end
     end,
-}
+})
 
 TypeClass = UEL0301

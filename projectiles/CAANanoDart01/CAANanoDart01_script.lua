@@ -4,12 +4,12 @@
 
 CAANanoDartProjectile03 = import('/lua/cybranprojectiles.lua').CAANanoDartProjectile03
 
-CAANanoDart01 = Class(CAANanoDartProjectile03) {
+CAANanoDart01 = Class(CAANanoDartProjectile03)({
 
-   OnCreate = function(self)
+    OnCreate = function(self)
         CAANanoDartProjectile03.OnCreate(self)
         self:ForkThread(self.UpdateThread)
-   end,
+    end,
 
 
     UpdateThread = function(self)
@@ -19,7 +19,7 @@ CAANanoDart01 = Class(CAANanoDartProjectile03) {
         local army = self:GetArmy()
 
         for i in self.FxTrails do
-            CreateEmitterOnEntity(self,army,self.FxTrails[i])
+            CreateEmitterOnEntity(self, army, self.FxTrails[i])
         end
 
         WaitSeconds(0.5)
@@ -31,6 +31,6 @@ CAANanoDart01 = Class(CAANanoDartProjectile03) {
         self:SetTurnRate(360)
 
     end,
-}
+})
 
 TypeClass = CAANanoDart01

@@ -8,9 +8,9 @@ local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
 local ADFQuantumAutogunWeapon = import('/lua/aeonweapons.lua').ADFQuantumAutogunWeapon
 local SlowHover = import('/lua/defaultunits.lua').SlowHoverLandUnit
 
-XAL0203 = Class(AHoverLandUnit, SlowHover) {
+XAL0203 = Class(AHoverLandUnit, SlowHover)({
     Weapons = {
-        MainGun = Class(ADFQuantumAutogunWeapon) {}
+        MainGun = Class(ADFQuantumAutogunWeapon)({}),
     },
-}
+})
 TypeClass = XAL0203

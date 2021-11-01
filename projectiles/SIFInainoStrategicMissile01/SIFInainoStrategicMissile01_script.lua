@@ -6,7 +6,7 @@
 ---------------------------------------------------------------------------------------------------
 local SIFInainoStrategicMissile = import('/lua/seraphimprojectiles.lua').SIFInainoStrategicMissile
 
-SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
+SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile)({
     FxSplashScale = 0.5,
     FxTrails = {},
 
@@ -32,6 +32,6 @@ SIFInainoStrategicMissile01 = Class(SIFInainoStrategicMissile) {
         self.effectEntityPath = '/effects/entities/InainoEffectController01/InainoEffectController01_proj.bp'
         self:LauncherCallbacks()
     end,
-}
+})
 
 TypeClass = SIFInainoStrategicMissile01

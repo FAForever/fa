@@ -16,16 +16,22 @@ local SDFHeavyPhasicAutoGunWeapon = SeraphimWeapons.SDFHeavyPhasicAutoGunWeapon
 
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
 
-XSA0104 = Class(AirTransport) {
+XSA0104 = Class(AirTransport)({
 
-    ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp',},
+    ContrailEffects = {
+        '/effects/emitters/contrail_ser_polytrail_01_emit.bp',
+    },
 
-    AirDestructionEffectBones = { 'XSA0104','Left_Attachpoint08','Right_Attachpoint02'},
+    AirDestructionEffectBones = {
+        'XSA0104',
+        'Left_Attachpoint08',
+        'Right_Attachpoint02',
+    },
 
     Weapons = {
-        AutoGun = Class(SDFHeavyPhasicAutoGunWeapon) {},
-        AALeft = Class(SAAShleoCannonWeapon) {},
-        AARight = Class(SAAShleoCannonWeapon) {},
+        AutoGun = Class(SDFHeavyPhasicAutoGunWeapon)({}),
+        AALeft = Class(SAAShleoCannonWeapon)({}),
+        AARight = Class(SAAShleoCannonWeapon)({}),
     },
 
     -- Override air destruction effects so we can do something custom here
@@ -40,6 +46,6 @@ XSA0104 = Class(AirTransport) {
             WaitSeconds(util.GetRandomFloat(0.2, 0.9))
         end
     end,
-}
+})
 
 TypeClass = XSA0104

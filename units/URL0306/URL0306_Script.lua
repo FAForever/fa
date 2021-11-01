@@ -10,14 +10,15 @@
 
 local CRadarJammerUnit = import('/lua/cybranunits.lua').CRadarJammerUnit
 local EffectUtil = import('/lua/EffectUtilities.lua')
-local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
+--import a default weapon so our pointer doesnt explode
+local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
 
-URL0306 = Class(CRadarJammerUnit) {
+URL0306 = Class(CRadarJammerUnit)({
 
-    Weapons = {        
-        TargetPointer = Class(DefaultProjectileWeapon) {},
+    Weapons = {
+        TargetPointer = Class(DefaultProjectileWeapon)({}),
     },
-    
+
     IntelEffects = {
         {
             Bones = {
@@ -32,39 +33,46 @@ URL0306 = Class(CRadarJammerUnit) {
             Type = 'Jammer01',
         },
     },
-    
-    OnStopBeingBuilt = function(self,builder,layer)
-        CRadarJammerUnit.OnStopBeingBuilt(self,builder,layer)
-        self.ShieldEffectsBag = {}
-        
-        self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
-        self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        CRadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
+        self.ShieldEffectsBag = {
+
+        }
+        --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
+        self.TargetPointer = self:GetWeapon(1)
+        --we save this to the unit table so dont have to call every time.
+        self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable
+        --a flag to let our thread know whether we should turn on our pointer.
+        self.PointerEnabled = true
     end,
-    
+
     DisablePointer = function(self)
-        self.TargetPointer:SetFireTargetLayerCaps('None') --this disables the stop feature - note that its reset on layer change!
-        self.PointerRestartThread = self:ForkThread( self.PointerRestart )
+        --this disables the stop feature - note that its reset on layer change!
+        self.TargetPointer:SetFireTargetLayerCaps('None')
+        self.PointerRestartThread = self:ForkThread(self.PointerRestart)
     end,
-    
+
     PointerRestart = function(self)
-    --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
+        --sadly i couldnt find some way of doing this without a thread. dont know where to check if its still assisting other than this.
         while self.PointerEnabled == false do
             WaitSeconds(1)
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
+                --this resets the stop feature - note that its reset on layer change!
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer])
             end
         end
     end,
-    
+
     OnLayerChange = function(self, new, old)
         CRadarJammerUnit.OnLayerChange(self, new, old)
-        
+
         if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+            --since its reset on layer change we need to do this. unfortunate.
+            self.TargetPointer:SetFireTargetLayerCaps('None')
         end
     end,
-}
+})
 
 TypeClass = URL0306

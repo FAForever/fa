@@ -6,14 +6,14 @@
 -----------------------------------------------------------------
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
-XEB2402 = Class(TAirFactoryUnit) {
+XEB2402 = Class(TAirFactoryUnit)({
 
     OnStopBeingBuilt = function(self)
         TAirFactoryUnit.OnStopBeingBuilt(self)
         ChangeState(self, self.OpenState)
     end,
 
-    OpenState = State() {
+    OpenState = State()({
         Retract = function(self)
             -- Retract cage
             self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
@@ -61,14 +61,14 @@ XEB2402 = Class(TAirFactoryUnit) {
 
             -- Create warning lights and other VFX
             local army = self.Army
-            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.06, -0.10, 1.90))
-            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.06, -0.10, 1.90))
-            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.08, -0.5, 1.60))
-            self.Trash:Add(CreateAttachedEmitter(self,'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.04, -0.5, 1.60))
-            self.Trash:Add(CreateAttachedEmitter(self,'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_01_emit.bp'):OffsetEmitter(0.7, -0.85, 0.35))
-            self.Trash:Add(CreateAttachedEmitter(self,'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_02_emit.bp'):OffsetEmitter(-0.7, -0.85, 0.35))
-            self.Trash:Add(CreateAttachedEmitter(self,'ConstructBeam01', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter(2.00))
-            self.Trash:Add(CreateAttachedEmitter(self,'ConstructBeam02', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter(2.00))
+            self.Trash:Add(CreateAttachedEmitter(self, 'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.06, -0.1, 1.9))
+            self.Trash:Add(CreateAttachedEmitter(self, 'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.06, -0.1, 1.9))
+            self.Trash:Add(CreateAttachedEmitter(self, 'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(0.08, -0.5, 1.6))
+            self.Trash:Add(CreateAttachedEmitter(self, 'Tower_B04', army, '/effects/emitters/light_blue_blinking_01_emit.bp'):OffsetEmitter(-0.04, -0.5, 1.6))
+            self.Trash:Add(CreateAttachedEmitter(self, 'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_01_emit.bp'):OffsetEmitter(0.7, -0.85, 0.35))
+            self.Trash:Add(CreateAttachedEmitter(self, 'Attachpoint01', army, '/effects/emitters/structure_steam_ambient_02_emit.bp'):OffsetEmitter(-0.7, -0.85, 0.35))
+            self.Trash:Add(CreateAttachedEmitter(self, 'ConstructBeam01', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter(2.0))
+            self.Trash:Add(CreateAttachedEmitter(self, 'ConstructBeam02', army, '/effects/emitters/light_red_rotator_01_emit.bp'):ScaleEmitter(2.0))
 
             -- Tell the satellite that we're its parent
             self.Satellite.Parent = self
@@ -88,24 +88,33 @@ XEB2402 = Class(TAirFactoryUnit) {
 
                 -- Release unit
                 self.Satellite:DetachFrom()
-                IssueMove({self.Satellite}, self:GetRallyPoint())
+                IssueMove({
+                    self.Satellite,
+                }, self:GetRallyPoint())
                 self.Satellite:Open()
 
                 self.waitingForLaunch = false
                 self:Retract()
 
-                IssueClearCommands({self})
+                IssueClearCommands({
+                    self,
+                })
             end
 
             ChangeState(self, self.IdleState)
         end,
-    },
+    }),
 
     -- Override OnStartBuild to cancel any and all commands if we already have a Satellite
     OnStartBuild = function(self, unitBeingBuilt, order)
         if self.Satellite or self.waitingForLaunch then
-            IssueStop({self})
-            IssueClearCommands({self}) -- This clears the State launch procedure for some reason, leading to the following hack
+            IssueStop({
+                self,
+            })
+            -- This clears the State launch procedure for some reason, leading to the following hack
+            IssueClearCommands({
+                self,
+            })
 
             -- This is ugly but necessary. It will keep resetting the launch procedure if the player spams to build a Satellite before initial launch
             -- It looks bad, but it's better than that player not getting a Satellite at all
@@ -124,7 +133,9 @@ XEB2402 = Class(TAirFactoryUnit) {
         self:PlayUnitSound('ConstructStop')
 
         if not unitBeingBuilt:IsBeingBuilt() and not self.Satellite and not self.waitingForLaunch then
-            IssueStop({self})
+            IssueStop({
+                self,
+            })
             self.newSatellite = unitBeingBuilt
             ChangeState(self, self.OpenState)
         else
@@ -173,6 +184,6 @@ XEB2402 = Class(TAirFactoryUnit) {
             end
         end
     end,
-}
+})
 
 TypeClass = XEB2402

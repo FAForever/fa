@@ -8,16 +8,24 @@
 --#**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
-XSB1102 = Class(SEnergyCreationUnit) {
+XSB1102 = Class(SEnergyCreationUnit)({
     AirEffects = {
-        '/effects/emitters/hydrocarbon_heatshimmer_01_emit.bp'
+        '/effects/emitters/hydrocarbon_heatshimmer_01_emit.bp',
     },
-    AirEffectsBones = {'Exhaust01','Exhaust02','Exhaust03'},
-    WaterEffects = {'/effects/emitters/underwater_idle_bubbles_01_emit.bp',},
-    WaterEffectsBones = {'Exhaust01'},
+    AirEffectsBones = {
+        'Exhaust01',
+        'Exhaust02',
+        'Exhaust03',
+    },
+    WaterEffects = {
+        '/effects/emitters/underwater_idle_bubbles_01_emit.bp',
+    },
+    WaterEffectsBones = {
+        'Exhaust01',
+    },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        SEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        SEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
 
         local effects = {}
         local bones = {}
@@ -30,6 +38,8 @@ XSB1102 = Class(SEnergyCreationUnit) {
             effects = self.WaterEffects
             bones = self.WaterEffectsBones
             scale = 3
+        else
+
         end
 
         for keys, values in effects do
@@ -51,6 +61,6 @@ XSB1102 = Class(SEnergyCreationUnit) {
             self.LoopAnimation:SetRate(0.0)
         end
     end,
-}
+})
 
 TypeClass = XSB1102

@@ -19,16 +19,16 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
 
-URL0402 = Class(CWalkingLandUnit) {
+URL0402 = Class(CWalkingLandUnit)({
     WalkingAnimRate = 1.2,
 
     Weapons = {
-        MainGun = Class(CDFHeavyMicrowaveLaserGenerator) {},
-        RightLaserTurret = Class(CDFElectronBolterWeapon) {},
-        LeftLaserTurret = Class(CDFElectronBolterWeapon) {},
-        RightAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        LeftAntiAirMissile = Class(CAAMissileNaniteWeapon) {},
-        Torpedo = Class(CANTorpedoLauncherWeapon) {},
+        MainGun = Class(CDFHeavyMicrowaveLaserGenerator)({}),
+        RightLaserTurret = Class(CDFElectronBolterWeapon)({}),
+        LeftLaserTurret = Class(CDFElectronBolterWeapon)({}),
+        RightAntiAirMissile = Class(CAAMissileNaniteWeapon)({}),
+        LeftAntiAirMissile = Class(CAAMissileNaniteWeapon)({}),
+        Torpedo = Class(CANTorpedoLauncherWeapon)({}),
     },
 
     OnStartBeingBuilt = function(self, builder, layer)
@@ -88,7 +88,7 @@ URL0402 = Class(CWalkingLandUnit) {
             return
         end
         if self.AmbientEffectThread ~= nil then
-           self.AmbientEffectThread:Destroy()
+            self.AmbientEffectThread:Destroy()
         end
         if self.AmbientExhaustEffectsBag then
             EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
@@ -105,6 +105,8 @@ URL0402 = Class(CWalkingLandUnit) {
                     table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
                 end
             end
+        else
+
         end
     end,
 
@@ -151,16 +153,15 @@ URL0402 = Class(CWalkingLandUnit) {
 
     CreateDeathExplosionDustRing = function(self)
         local blanketSides = 18
-        local blanketAngle = (2 * math.pi) / blanketSides
+        local blanketAngle = 2 * math.pi / blanketSides
         local blanketStrength = 1
         local blanketVelocity = 2.8
 
-        for i = 0, (blanketSides - 1) do
+        for i = 0, blanketSides - 1 do
             local blanketX = math.sin(i * blanketAngle)
             local blanketZ = math.cos(i * blanketAngle)
 
-            local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ)
-                :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
+            local Blanketparts = self:CreateProjectile('/effects/entities/DestructionDust01/DestructionDust01_proj.bp', blanketX, 1.5, blanketZ + 4, blanketX, 0, blanketZ):SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
     end,
 
@@ -197,9 +198,15 @@ URL0402 = Class(CWalkingLandUnit) {
         explosion.CreateFlash(self, 'Center_Turret', 4.5, army)
         CreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp')
         CreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp')
-        self:CreateFirePlumes(army, {'Center_Turret'}, 0)
+        self:CreateFirePlumes(army, {
+            'Center_Turret',
+        }, 0)
 
-        self:CreateFirePlumes(army, {'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
+        self:CreateFirePlumes(army, {
+            'Right_Leg01_B01',
+            'Right_Leg03_B01',
+            'Left_Leg03_B01',
+        }, 0.5)
 
         self:CreateExplosionDebris(army)
         self:CreateExplosionDebris(army)
@@ -213,7 +220,11 @@ URL0402 = Class(CWalkingLandUnit) {
         self:CreateDamageEffects('Center_Turret_Barrel', army)
 
         WaitSeconds(1)
-        self:CreateFirePlumes(army, {'Right_Leg01_B01', 'Right_Leg03_B01', 'Left_Leg03_B01', }, 0.5)
+        self:CreateFirePlumes(army, {
+            'Right_Leg01_B01',
+            'Right_Leg03_B01',
+            'Left_Leg03_B01',
+        }, 0.5)
         WaitSeconds(0.3)
         self:CreateDeathExplosionDustRing()
         WaitSeconds(0.4)
@@ -239,52 +250,62 @@ URL0402 = Class(CWalkingLandUnit) {
         -- only apply death damage when the unit is sufficiently build
         local bp = self:GetBlueprint()
         local FractionThreshold = bp.General.FractionThreshold or 0.99
-        if self:GetFractionComplete() >= FractionThreshold then 
+        if self:GetFractionComplete() >= FractionThreshold then
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = math.atan2(2.0 * qx * qz + qw * qy, qw * qw + qx * qx - qz * qz - qy * qy)
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'SpiderDeath' then
-                    position[3] = position[3]+3*math.cos(a)
-                    position[1] = position[1]+3*math.sin(a)
+                    position[3] = position[3] + 3 * math.cos(a)
+                    position[1] = position[1] + 3 * math.sin(a)
                     DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                     break
                 end
             end
         end
 
-        DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
+        DamageRing(self, {
+            x,
+            y,
+            z,
+        }, 0.1, 3, 1, 'Force', true)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Center_Turret', 2)
 
         -- Finish up force ring to push trees
-        DamageRing(self, {x, y,z}, 0.1, 3, 1, 'Force', true)
+        DamageRing(self, {
+            x,
+            y,
+            z,
+        }, 0.1, 3, 1, 'Force', true)
 
         -- Explosion on and damage fire on various bones
-        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
-        self:CreateFirePlumes(army, {'Left_Projectile01'}, -1)
+        self:CreateFirePlumes(army, {
+            'Left_Projectile01',
+        }, -1)
         self:CreateDamageEffects('Right_Turret', army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Leg01_B03', army)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris(army)
 
-        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
-        self:CreateDamageEffects('Right_Projectile0' .. Random(1, 2), army)
+        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
+        self:CreateDamageEffects('Right_Projectile0'..Random(1, 2), army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateDamageEffects('Left_Leg03_B03', army)
 
         self:CreateWreckage(0.1)
         self:Destroy()
     end,
-}
+})
 
 TypeClass = URL0402

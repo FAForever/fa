@@ -9,67 +9,72 @@ local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
 local utilities = import('/lua/utilities.lua')
 
-XRB2308 = Class(CStructureUnit) {
+XRB2308 = Class(CStructureUnit)({
     Weapons = {
-        Turret01 = Class(CKrilTorpedoLauncherWeapon) {},
+        Turret01 = Class(CKrilTorpedoLauncherWeapon)({}),
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
         CStructureUnit.OnStopBeingBuilt(self, builder, layer)
-        
+
         local pos = self:GetPosition()
         local armySelf = self.Army
         local health = self:GetHealth()
         local armies = ListArmies()
         local spottedByArmy = {}
         local fireState = self:GetFireState()
-        
-        for _,army in armies do
+
+        for _, army in armies do
             if not IsAlly(armySelf, army) then
                 local blip = self:GetBlip(army)
-                
+
                 if blip and blip:IsSeenEver(army) then
                     table.insert(spottedByArmy, ScenarioInfo.ArmySetup[army].ArmyIndex)
                 end
             end
         end
 
-        
-        if not self:IsIdleState() then --not IsIdle means that dummy HARMS has attack order and we want to transfer it to actual HARMS
+
+        if not self:IsIdleState() then
+            --not IsIdle means that dummy HARMS has attack order and we want to transfer it to actual HARMS
             self:ForkThread(self.CreateNewHarmsWithDelay, armySelf, pos, spottedByArmy, fireState)
         else
             self:Destroy()
-            
+
             local newHARMS = CreateUnitHPR('XRB2309', armySelf, pos[1], pos[2], pos[3], 0, 0, 0)
-        
+
             newHARMS:SetHealth(newHARMS, health)
             newHARMS.SpottedByArmy = spottedByArmy
             newHARMS:SetFireState(fireState)
         end
     end,
-    
-    CreateNewHarmsWithDelay = function(self, armySelf, pos, spottedByArmy, fireState) 
-        WaitTicks(1) --wait 1 tick to determine HARMS target
-        
+
+    CreateNewHarmsWithDelay = function(self, armySelf, pos, spottedByArmy, fireState)
+        --wait 1 tick to determine HARMS target
+        WaitTicks(1)
+
         if not self:IsDead() then
             local health = self:GetHealth()
             local target = self:GetTargetEntity()
-            
+
             self:Destroy()
-            
+
             local newHARMS = CreateUnitHPR('XRB2309', armySelf, pos[1], pos[2], pos[3], 0, 0, 0)
-        
+
             newHARMS:SetHealth(newHARMS, health)
             newHARMS.SpottedByArmy = spottedByArmy
             newHARMS:SetFireState(fireState)
-            
+
             if target then
-                IssueAttack({newHARMS}, target)
-            end    
-        end    
+                IssueAttack({
+                    newHARMS,
+                }, target)
+            end
+        end
     end,
-    
-    DeathThread = function(self, overkillRatio, instigator) --dummy HARMS needs this death thread in case it dies during CreateNewHarmsWithDelay()
+
+    DeathThread = function(self, overkillRatio, instigator)
+        --dummy HARMS needs this death thread in case it dies during CreateNewHarmsWithDelay()
         local bp = self:GetBlueprint()
 
         -- Add an initial death explosion
@@ -82,7 +87,8 @@ XRB2308 = Class(CStructureUnit) {
 
         -- Here down is near-shadowing the function, all to change the entity subset. Dumb, right?
         local isNaval = true
-        local shallSink = true -- This unit should definitely sink, no need to check cats.
+        -- This unit should definitely sink, no need to check cats.
+        local shallSink = true
 
         WaitSeconds(utilities.GetRandomFloat(self.DestructionExplosionWaitDelayMin, self.DestructionExplosionWaitDelayMax))
         self:DestroyAllDamageEffects()
@@ -109,24 +115,26 @@ XRB2308 = Class(CStructureUnit) {
         self.overkillRatio = overkillRatio
 
         local this = self
-        self:StartSinking(
-            function()
-                this:DestroyUnit(overkillRatio)
-            end
-        )
+        self:StartSinking(function()
+
+            this:DestroyUnit(overkillRatio)
+        end)
     end,
 
     -- Called from unit.lua DeathThread
     StartSinking = function(self, callback)
-        if not self.sinkingFromBuild and self.Bottom then -- We don't want to sink at death if we're on the seabed
+        if not self.sinkingFromBuild and self.Bottom then
+            -- We don't want to sink at death if we're on the seabed
             self:ForkThread(callback)
-        elseif self.sinkingFromBuild then -- If still sinking, set the destruction callback for impact
+        elseif self.sinkingFromBuild then
+            -- If still sinking, set the destruction callback for impact
             self.sinkProjectile.callback = callback
             return
-        else -- Unit is static and floating. Use normal destruction params
+        else
+            -- Unit is static and floating. Use normal destruction params
             CStructureUnit.StartSinking(self, callback)
         end
     end,
-}
+})
 
 TypeClass = XRB2308

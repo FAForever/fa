@@ -10,7 +10,7 @@
 local SQuantumGateUnit = import('/lua/seraphimunits.lua').SQuantumGateUnit
 local EffectTemplates = import('/lua/EffectTemplates.lua')
 
-XSB0304 = Class(SQuantumGateUnit) {
+XSB0304 = Class(SQuantumGateUnit)({
     OnStopBeingBuilt = function(self, builder, layer)
         -- Place emitters at the center of the gateway.
         for k, v in EffectTemplates.SeraphimSubCommanderGateway01 do
@@ -36,6 +36,6 @@ XSB0304 = Class(SQuantumGateUnit) {
 
         SQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)
     end,
-}
+})
 
 TypeClass = XSB0304

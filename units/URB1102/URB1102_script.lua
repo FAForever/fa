@@ -9,23 +9,37 @@
 --#****************************************************************************
 local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
 
-URB1102 = Class(CEnergyCreationUnit) {
-    AirEffects = {'/effects/emitters/hydrocarbon_smoke_01_emit.bp',},
-    AirEffectsBones = {'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04',},
-    WaterEffects = {'/effects/emitters/underwater_idle_bubbles_01_emit.bp',},
-    WaterEffectsBones = {'Exhaust01', 'Exhaust02', 'Exhaust03', 'Exhaust04',},
+URB1102 = Class(CEnergyCreationUnit)({
+    AirEffects = {
+        '/effects/emitters/hydrocarbon_smoke_01_emit.bp',
+    },
+    AirEffectsBones = {
+        'Exhaust01',
+        'Exhaust02',
+        'Exhaust03',
+        'Exhaust04',
+    },
+    WaterEffects = {
+        '/effects/emitters/underwater_idle_bubbles_01_emit.bp',
+    },
+    WaterEffectsBones = {
+        'Exhaust01',
+        'Exhaust02',
+        'Exhaust03',
+        'Exhaust04',
+    },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        CEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        CEnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         self.EffectsBag = {}
         ChangeState(self, self.ActiveState)
     end,
 
-    ActiveState = State {
+    ActiveState = State({
         Main = function(self)
             local effects = {}
             local bones = {}
-            local scale = .5
+            local scale = 0.5
 
             -- Play the "activate" sound
             local myBlueprint = self:GetBlueprint()
@@ -40,11 +54,13 @@ URB1102 = Class(CEnergyCreationUnit) {
                 effects = self.WaterEffects
                 bones = self.WaterEffectsBones
                 scale = 2
+            else
+
             end
 
             for keffects, veffects in effects do
                 for kbones, vbones in bones do
-                    table.insert(self.EffectsBag, CreateAttachedEmitter(self, vbones, self.Army, veffects):ScaleEmitter(scale):OffsetEmitter(0,-.1,0))
+                    table.insert(self.EffectsBag, CreateAttachedEmitter(self, vbones, self.Army, veffects):ScaleEmitter(scale):OffsetEmitter(0, -0.1, 0))
                 end
             end
         end,
@@ -52,12 +68,12 @@ URB1102 = Class(CEnergyCreationUnit) {
         OnInActive = function(self)
             ChangeState(self, self.InActiveState)
         end,
-    },
+    }),
 
-    InActiveState = State {
+    InActiveState = State({
         Main = function(self)
             if self.EffectsBag then
-                for keys,values in self.EffectsBag do
+                for keys, values in self.EffectsBag do
                     values:Destroy()
                 end
                 self.EffectsBag = {}
@@ -67,7 +83,7 @@ URB1102 = Class(CEnergyCreationUnit) {
         OnActive = function(self)
             ChangeState(self, self.ActiveState)
         end,
-    },
-}
+    }),
+})
 
 TypeClass = URB1102

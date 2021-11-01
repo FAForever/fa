@@ -10,25 +10,25 @@
 
 local SOtheTacticalBomb = import('/lua/seraphimprojectiles.lua').SOtheTacticalBomb
 
-SBOOtheTacticalBomb02 = Class(SOtheTacticalBomb) {
+SBOOtheTacticalBomb02 = Class(SOtheTacticalBomb)({
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
+
+        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
+
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local army = self.Army
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
-            CreateDecal( pos, RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', radius*5, radius*5, 200, 70, army)          
+            CreateDecal(pos, RandomFloat(0.0, 6.28), 'Scorch_012_albedo', '', 'Albedo', radius * 5, radius * 5, 200, 70, army)
         end
-        
-		SOtheTacticalBomb.OnImpact(self, targetType, targetEntity) 
+
+        SOtheTacticalBomb.OnImpact(self, targetType, targetEntity)
     end,
-}
+})
 TypeClass = SBOOtheTacticalBomb02

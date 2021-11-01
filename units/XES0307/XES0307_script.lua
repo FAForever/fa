@@ -14,14 +14,14 @@ local TDFHiroPlasmaCannon = WeaponsFile.TDFHiroPlasmaCannon
 local TANTorpedoAngler = WeaponsFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponsFile.TIFSmartCharge
 
-UES0302 = Class(TSeaUnit) {
+UES0302 = Class(TSeaUnit)({
     Weapons = {
-        HiroCannonFront = Class(TDFHiroPlasmaCannon) {},
-        HiroCannonBack = Class(TDFHiroPlasmaCannon) {},
-        AntiTorpedo = Class(TIFSmartCharge) {},
-        TorpedoLeft01 = Class(TANTorpedoAngler) {},
-        TorpedoRight01 = Class(TANTorpedoAngler) {},
-        PhalanxGun = Class(TAMPhalanxWeapon) {
+        HiroCannonFront = Class(TDFHiroPlasmaCannon)({}),
+        HiroCannonBack = Class(TDFHiroPlasmaCannon)({}),
+        AntiTorpedo = Class(TIFSmartCharge)({}),
+        TorpedoLeft01 = Class(TANTorpedoAngler)({}),
+        TorpedoRight01 = Class(TANTorpedoAngler)({}),
+        PhalanxGun = Class(TAMPhalanxWeapon)({
             PlayFxWeaponUnpackSequence = function(self)
                 if not self.SpinManip then
                     self.SpinManip = CreateRotator(self.unit, 'Front_Turret01_Barrel', 'z', nil, 270, 180, 60)
@@ -39,38 +39,38 @@ UES0302 = Class(TSeaUnit) {
                 end
                 TAMPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
-        },
+        }),
     },
 
 
 
-        OnKilled = function(self, instigator, type, overkillRatio)
-            if not self.Dead then
-                local wep1 = self:GetWeaponByLabel('HiroCannonFront')
-                local bp1 = wep1:GetBlueprint()
-                if bp1.Audio.BeamStop then
-                    wep1:PlaySound(bp1.Audio.BeamStop)
-                end
-                if bp1.Audio.BeamLoop and wep1.Beams[1].Beam then
-                    wep1.Beams[1].Beam:SetAmbientSound(nil, nil)
-                end
-                for k, v in wep1.Beams do
-                    v.Beam:Disable()
-                end
-
-                local wep2 = self:GetWeaponByLabel('HiroCannonBack')
-                local bp2 = wep2:GetBlueprint()
-                if bp2.Audio.BeamStop then
-                    wep2:PlaySound(bp2.Audio.BeamStop)
-                end
-                if bp2.Audio.BeamLoop and wep2.Beams[1].Beam then
-                    wep2.Beams[1].Beam:SetAmbientSound(nil, nil)
-                end
-                for k, v in wep2.Beams do
-                    v.Beam:Disable()
-                end
+    OnKilled = function(self, instigator, type, overkillRatio)
+        if not self.Dead then
+            local wep1 = self:GetWeaponByLabel('HiroCannonFront')
+            local bp1 = wep1:GetBlueprint()
+            if bp1.Audio.BeamStop then
+                wep1:PlaySound(bp1.Audio.BeamStop)
             end
-            TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
-        end,
-}
+            if bp1.Audio.BeamLoop and wep1.Beams[1].Beam then
+                wep1.Beams[1].Beam:SetAmbientSound(nil, nil)
+            end
+            for k, v in wep1.Beams do
+                v.Beam:Disable()
+            end
+
+            local wep2 = self:GetWeaponByLabel('HiroCannonBack')
+            local bp2 = wep2:GetBlueprint()
+            if bp2.Audio.BeamStop then
+                wep2:PlaySound(bp2.Audio.BeamStop)
+            end
+            if bp2.Audio.BeamLoop and wep2.Beams[1].Beam then
+                wep2.Beams[1].Beam:SetAmbientSound(nil, nil)
+            end
+            for k, v in wep2.Beams do
+                v.Beam:Disable()
+            end
+        end
+        TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
+    end,
+})
 TypeClass = UES0302

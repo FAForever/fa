@@ -6,17 +6,17 @@
 -----------------------------------------------------------------
 
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
-local WeaponsFile = import ('/lua/aeonweapons.lua')
+local WeaponsFile = import('/lua/aeonweapons.lua')
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
 local utilities = import('/lua/utilities.lua')
 local explosion = import('/lua/defaultexplosions.lua')
 
-UAL0401 = Class(AWalkingLandUnit) {
+UAL0401 = Class(AWalkingLandUnit)({
     Weapons = {
-        EyeWeapon = Class(ADFPhasonLaser) {},
-        RightArmTractor = Class(ADFTractorClaw) {},
-        LeftArmTractor = Class(ADFTractorClaw) {},
+        EyeWeapon = Class(ADFPhasonLaser)({}),
+        RightArmTractor = Class(ADFTractorClaw)({}),
+        LeftArmTractor = Class(ADFTractorClaw)({}),
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -37,10 +37,12 @@ UAL0401 = Class(AWalkingLandUnit) {
         end
     end,
 
-    DeathThread = function(self, overkillRatio , instigator)
+    DeathThread = function(self, overkillRatio, instigator)
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {
+            self:GetUnitSizes(),
+        })
         WaitSeconds(2)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)
@@ -61,15 +63,15 @@ UAL0401 = Class(AWalkingLandUnit) {
         -- only apply death damage when the unit is sufficiently build
         local bp = self:GetBlueprint()
         local FractionThreshold = bp.General.FractionThreshold or 0.5
-        if self:GetFractionComplete() >= FractionThreshold then 
+        if self:GetFractionComplete() >= FractionThreshold then
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = math.atan2(2.0 * qx * qz + qw * qy, qw * qw + qx * qx - qz * qz - qy * qy)
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
-                    position[3] = position[3]+5*math.cos(a)
-                    position[1] = position[1]+5*math.sin(a)
+                    position[3] = position[3] + 5 * math.cos(a)
+                    position[1] = position[1] + 5 * math.sin(a)
                     DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                     break
                 end
@@ -91,13 +93,14 @@ UAL0401 = Class(AWalkingLandUnit) {
             elseif overkillRatio <= 3 then
                 self.CreateUnitDestructionDebris(self, true, true, true)
                 self.CreateUnitDestructionDebris(self, true, true, true)
-            else -- Vaporized
+            else
+                -- Vaporized
                 self.CreateUnitDestructionDebris(self, true, true, true)
             end
         end
 
         self:Destroy()
     end,
-}
+})
 
 TypeClass = UAL0401

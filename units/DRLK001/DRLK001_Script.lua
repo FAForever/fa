@@ -10,10 +10,12 @@ local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaser
 local Effects = import('/lua/effecttemplates.lua')
 
-DRLK001 = Class(CWalkingLandUnit) {
+DRLK001 = Class(CWalkingLandUnit)({
     Weapons = {
-        TargetPainter = Class(TargetingLaser) {
-            FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'},
+        TargetPainter = Class(TargetingLaser)({
+            FxMuzzleFlash = {
+                '/effects/emitters/particle_cannon_muzzle_02_emit.bp',
+            },
 
             -- Unit in range. Cease ground fire and turn on AA
             OnWeaponFired = function(self)
@@ -26,7 +28,7 @@ DRLK001 = Class(CWalkingLandUnit) {
                 TargetingLaser.OnWeaponFired(self)
             end,
 
-            IdleState = State(TargetingLaser.IdleState) {
+            IdleState = State(TargetingLaser.IdleState)({
                 -- Start with the AA gun off to reduce twitching of ground fire
                 Main = function(self)
                     self.unit:SetWeaponEnabledByLabel('GroundGun', true)
@@ -35,11 +37,11 @@ DRLK001 = Class(CWalkingLandUnit) {
                     self.AA = false
                     TargetingLaser.IdleState.Main(self)
                 end,
-            },
-        },
-        AAGun = Class(CAANanoDartWeapon) {},
-        GroundGun = Class(CAANanoDartWeapon) {},
+            }),
+        }),
+        AAGun = Class(CAANanoDartWeapon)({}),
+        GroundGun = Class(CAANanoDartWeapon)({}),
     },
-}
+})
 
 TypeClass = DRLK001

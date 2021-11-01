@@ -2,8 +2,10 @@ local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-SIFExperimentalStrategicDeath01 = Class(NullShell) {
-    NormalEffects = {'/effects/emitters/quantum_warhead_01_emit.bp',},
+SIFExperimentalStrategicDeath01 = Class(NullShell)({
+    NormalEffects = {
+        '/effects/emitters/quantum_warhead_01_emit.bp',
+    },
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 
     EffectThread = function(self)
@@ -17,7 +19,7 @@ SIFExperimentalStrategicDeath01 = Class(NullShell) {
         CreateLightParticle(self, -1, self.Army, 60, 15, 'glow_02', 'ramp_blue_16')
         WaitSeconds(0.1)
         CreateLightParticle(self, -1, self.Army, 30, 30, 'glow', 'ramp_blue_22')
-        
+
         self:ForkThread(self.ShakeAndBurnMe, army)
         self:ForkThread(self.DistortionField)
 
@@ -30,12 +32,12 @@ SIFExperimentalStrategicDeath01 = Class(NullShell) {
         self:ShakeCamera(75, 3, 0, 10)
         WaitSeconds(0.5)
         -- CreateDecal(position, heading, textureName, type, sizeX, sizeZ, lodParam, duration, army)");
-        local orientation = RandomFloat(0,2*math.pi)
+        local orientation = RandomFloat(0, 2 * math.pi)
         local pos = self:GetPosition()
-        
+
         DamageArea(self, pos, 25, 1, 'Force', true)
         DamageArea(self, pos, 25, 1, 'Force', true)
-        
+
         CreateDecal(pos, orientation, 'Scorch_012_albedo', '', 'Albedo', 70, 70, 800, 0, army)
         CreateDecal(pos, orientation, 'Crater01_normals', '', 'Normals', 70, 70, 800, 0, army)
         self:ShakeCamera(105, 10, 0, 2)
@@ -47,10 +49,10 @@ SIFExperimentalStrategicDeath01 = Class(NullShell) {
         local proj = self:CreateProjectile('/effects/QuantumWarhead/QuantumWarheadEffect01_proj.bp')
         local scale = proj:GetBlueprint().Display.UniformScale
 
-        proj:SetScaleVelocity(0.3 * scale,0.3 * scale,0.3 * scale)
+        proj:SetScaleVelocity(0.3 * scale, 0.3 * scale, 0.3 * scale)
         WaitSeconds(17.0)
-        proj:SetScaleVelocity(0.01 * scale,0.01 * scale,0.01 * scale)
+        proj:SetScaleVelocity(0.01 * scale, 0.01 * scale, 0.01 * scale)
     end,
-}
+})
 
 TypeClass = SIFExperimentalStrategicDeath01

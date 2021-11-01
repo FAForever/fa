@@ -4,15 +4,19 @@
 
 local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
 
-TIFMissileNukeCDR = Class(TIFMissileNuke) {
+TIFMissileNukeCDR = Class(TIFMissileNuke)({
 
     BeamName = '/effects/emitters/missile_exhaust_fire_beam_06_emit.bp',
-    InitialEffects = {'/effects/emitters/nuke_munition_launch_trail_02_emit.bp',},
+    InitialEffects = {
+        '/effects/emitters/nuke_munition_launch_trail_02_emit.bp',
+    },
     LaunchEffects = {
         '/effects/emitters/nuke_munition_launch_trail_03_emit.bp',
         '/effects/emitters/nuke_munition_launch_trail_05_emit.bp',
     },
-    ThrustEffects = {'/effects/emitters/nuke_munition_launch_trail_04_emit.bp',},
+    ThrustEffects = {
+        '/effects/emitters/nuke_munition_launch_trail_04_emit.bp',
+    },
 
     OnCreate = function(self)
         TIFMissileNuke.OnCreate(self)
@@ -29,7 +33,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         end
     end,
 
-    
+
     -- Tactical nuke has different flight path
     MovementThread = function(self)
         local target = self:GetTrackingTarget()
@@ -49,7 +53,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
     DoDamage = function(self, instigator, DamageData, targetEntity)
         local nukeDamage = function(self, instigator, pos, brain, army, damageType)
             if self.TotalTime == 0 then
-                DamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true)
+                DamageArea(instigator, pos, self.Radius, self.Damage, damageType or 'Nuke', true, true)
             end
         end
 
@@ -77,6 +81,8 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
             -- Further increase check intervals
             self:SetTurnRate(200)
             KillThread(self.MoveThread)
+        else
+
         end
     end,
 
@@ -84,5 +90,5 @@ TIFMissileNukeCDR = Class(TIFMissileNuke) {
         TIFMissileNuke.OnEnterWater(self)
         self:SetDestroyOnWater(true)
     end,
-}
+})
 TypeClass = TIFMissileNukeCDR

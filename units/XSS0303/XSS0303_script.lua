@@ -13,19 +13,19 @@ local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 
-XSS0303 = Class(AircraftCarrier) {
+XSS0303 = Class(AircraftCarrier)({
 
     Weapons = {
-        AntiAirRight = Class(SAALosaareAutoCannonWeapon) {},
-        AntiAirLeft = Class(SAALosaareAutoCannonWeapon) {},
-        CruiseMissiles = Class(SLaanseMissileWeapon) {},
+        AntiAirRight = Class(SAALosaareAutoCannonWeapon)({}),
+        AntiAirLeft = Class(SAALosaareAutoCannonWeapon)({}),
+        CruiseMissiles = Class(SLaanseMissileWeapon)({}),
     },
 
 
     BuildAttachBone = 'XSS0303',
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AircraftCarrier.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AircraftCarrier.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -34,7 +34,7 @@ XSS0303 = Class(AircraftCarrier) {
         ChangeState(self, self.IdleState)
     end,
 
-    IdleState = State {
+    IdleState = State({
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
@@ -45,9 +45,9 @@ XSS0303 = Class(AircraftCarrier) {
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
-    },
+    }),
 
-    BuildingState = State {
+    BuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             self:SetBusy(true)
@@ -61,9 +61,9 @@ XSS0303 = Class(AircraftCarrier) {
             AircraftCarrier.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
-    },
+    }),
 
-    FinishedBuildingState = State {
+    FinishedBuildingState = State({
         Main = function(self)
             self:SetBusy(true)
             local unitBuilding = self.UnitBeingBuilt
@@ -72,16 +72,22 @@ XSS0303 = Class(AircraftCarrier) {
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                local worldPos = self:CalculateWorldPositionFromRelative({
+                    0,
+                    0,
+                    -20,
+                })
+                IssueMoveOffFactory({
+                    unitBuilding,
+                }, worldPos)
+                unitBuilding:ShowBone(0, true)
             end
             self:SetBusy(false)
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,
-    },
-}
+    }),
+})
 
 TypeClass = XSS0303
 

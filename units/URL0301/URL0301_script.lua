@@ -15,20 +15,20 @@ local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
 local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
-URL0301 = Class(CCommandUnit) {
+URL0301 = Class(CCommandUnit)({
     LeftFoot = 'Left_Foot02',
     RightFoot = 'Right_Foot02',
 
     Weapons = {
-        DeathWeapon = Class(SCUDeathWeapon) {},
-        RightDisintegrator = Class(CDFLaserDisintegratorWeapon) {
+        DeathWeapon = Class(SCUDeathWeapon)({}),
+        RightDisintegrator = Class(CDFLaserDisintegratorWeapon)({
             OnCreate = function(self)
                 CDFLaserDisintegratorWeapon.OnCreate(self)
                 -- Disable buff
                 self:DisableBuff('STUN')
             end,
-        },
-        NMissile = Class(CAAMissileNaniteWeapon) {},
+        }),
+        NMissile = Class(CAAMissileNaniteWeapon)({}),
     },
 
     -- Creation
@@ -67,13 +67,15 @@ URL0301 = Class(CCommandUnit) {
     CreateEnhancement = function(self, enh)
         CCommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
-        if not bp then return end
+        if not bp then
+            return
+        end
         if enh == 'CloakingGenerator' then
             self.StealthEnh = false
             self.CloakEnh = true
             self:EnableUnitIntel('Enhancement', 'Cloak')
             if not Buffs['CybranSCUCloakBonus'] then
-               BuffBlueprint {
+                BuffBlueprint({
                     Name = 'CybranSCUCloakBonus',
                     DisplayName = 'CybranSCUCloakBonus',
                     BuffType = 'SCUCLOAKBONUS',
@@ -85,7 +87,7 @@ URL0301 = Class(CCommandUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
@@ -125,7 +127,7 @@ URL0301 = Class(CCommandUnit) {
             CCommandUnit.CreateEnhancement(self, enh)
             local bpRegenRate = self:GetBlueprint().Enhancements.SelfRepairSystem.NewRegenRate or 0
             if not Buffs['CybranSCURegenerateBonus'] then
-               BuffBlueprint {
+                BuffBlueprint({
                     Name = 'CybranSCURegenerateBonus',
                     DisplayName = 'CybranSCURegenerateBonus',
                     BuffType = 'SCUREGENERATEBONUS',
@@ -137,7 +139,7 @@ URL0301 = Class(CCommandUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             if Buff.HasBuff(self, 'CybranSCURegenerateBonus') then
                 Buff.RemoveBuff(self, 'CybranSCURegenerateBonus')
@@ -148,7 +150,7 @@ URL0301 = Class(CCommandUnit) {
             if Buff.HasBuff(self, 'CybranSCURegenerateBonus') then
                 Buff.RemoveBuff(self, 'CybranSCURegenerateBonus')
             end
-        elseif enh =='ResourceAllocation' then
+        elseif enh == 'ResourceAllocation' then
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
@@ -156,10 +158,10 @@ URL0301 = Class(CCommandUnit) {
             local bpEcon = self:GetBlueprint().Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
-        elseif enh =='Switchback' then
+        elseif enh == 'Switchback' then
             self.BuildBotTotal = 4
             if not Buffs['CybranSCUBuildRate'] then
-                BuffBlueprint {
+                BuffBlueprint({
                     Name = 'CybranSCUBuildRate',
                     DisplayName = 'CybranSCUBuildRate',
                     BuffType = 'SCUBUILDRATE',
@@ -167,11 +169,11 @@ URL0301 = Class(CCommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                     },
-                }
+                })
             end
             Buff.ApplyBuff(self, 'CybranSCUBuildRate')
         elseif enh == 'SwitchbackRemove' then
@@ -193,6 +195,8 @@ URL0301 = Class(CCommandUnit) {
         elseif enh == 'EMPChargeRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:DisableBuff('STUN')
+        else
+
         end
     end,
 
@@ -265,15 +269,17 @@ URL0301 = Class(CCommandUnit) {
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
+        else
+
         end
     end,
 
@@ -287,8 +293,10 @@ URL0301 = Class(CCommandUnit) {
             self:SetMaintenanceConsumptionInactive()
         elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
+        else
+
         end
     end,
-}
+})
 
 TypeClass = URL0301

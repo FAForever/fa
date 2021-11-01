@@ -1,4 +1,4 @@
-﻿-----------------------------------------------------------------
+-----------------------------------------------------------------
 -- File     :  /cdimage/units/XSL0301/XSL0301_script.lua
 -- Author(s):  Jessica St. Croix, Gordon Duclos
 -- Summary  :  Seraphim Sub Commander Script
@@ -14,18 +14,18 @@ local SDFLightChronotronCannonWeapon = SWeapons.SDFLightChronotronCannonWeapon
 local SDFOverChargeWeapon = SWeapons.SDFLightChronotronCannonOverchargeWeapon
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 
-XSL0301 = Class(CommandUnit) {
+XSL0301 = Class(CommandUnit)({
     Weapons = {
-        LightChronatronCannon = Class(SDFLightChronotronCannonWeapon) {},
-        DeathWeapon = Class(SCUDeathWeapon) {},
-        OverCharge = Class(SDFOverChargeWeapon) {},
-        AutoOverCharge = Class(SDFOverChargeWeapon) {},
-        Missile = Class(SIFLaanseTacticalMissileLauncher) {
+        LightChronatronCannon = Class(SDFLightChronotronCannonWeapon)({}),
+        DeathWeapon = Class(SCUDeathWeapon)({}),
+        OverCharge = Class(SDFOverChargeWeapon)({}),
+        AutoOverCharge = Class(SDFOverChargeWeapon)({}),
+        Missile = Class(SIFLaanseTacticalMissileLauncher)({
             OnCreate = function(self)
                 SIFLaanseTacticalMissileLauncher.OnCreate(self)
                 self:SetWeaponEnabled(false)
             end,
-        },
+        }),
     },
 
     __init = function(self)
@@ -48,13 +48,15 @@ XSL0301 = Class(CommandUnit) {
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
         local bp = self:GetBlueprint().Enhancements[enh]
-        if not bp then return end
+        if not bp then
+            return
+        end
         -- Teleporter
         if enh == 'Teleporter' then
             self:AddCommandCap('RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             self:RemoveCommandCap('RULEUCC_Teleport')
-        -- Missile
+            -- Missile
         elseif enh == 'Missile' then
             self:AddCommandCap('RULEUCC_Tactical')
             self:AddCommandCap('RULEUCC_SiloBuildTactical')
@@ -63,7 +65,7 @@ XSL0301 = Class(CommandUnit) {
             self:RemoveCommandCap('RULEUCC_Tactical')
             self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
-        -- Shields
+            -- Shields
         elseif enh == 'Shield' then
             self:AddToggleCap('RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -73,7 +75,7 @@ XSL0301 = Class(CommandUnit) {
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             self:RemoveToggleCap('RULEUTC_ShieldToggle')
-        -- Overcharge
+            -- Overcharge
         elseif enh == 'Overcharge' then
             self:AddCommandCap('RULEUCC_Overcharge')
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
@@ -84,10 +86,10 @@ XSL0301 = Class(CommandUnit) {
             self:SetWeaponEnabledByLabel('AutoOverCharge', false)
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
             self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
-        -- Engineering Throughput Upgrade
-        elseif enh =='EngineeringThroughput' then
+            -- Engineering Throughput Upgrade
+        elseif enh == 'EngineeringThroughput' then
             if not Buffs['SeraphimSCUBuildRate'] then
-                BuffBlueprint {
+                BuffBlueprint({
                     Name = 'SeraphimSCUBuildRate',
                     DisplayName = 'SeraphimSCUBuildRate',
                     BuffType = 'SCUBUILDRATE',
@@ -95,21 +97,21 @@ XSL0301 = Class(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add = bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
                             Mult = 1,
                         },
                     },
-                }
+                })
             end
             Buff.ApplyBuff(self, 'SeraphimSCUBuildRate')
         elseif enh == 'EngineeringThroughputRemove' then
             if Buff.HasBuff(self, 'SeraphimSCUBuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimSCUBuildRate')
             end
-        -- Damage Stabilization
+            -- Damage Stabilization
         elseif enh == 'DamageStabilization' then
             if not Buffs['SeraphimSCUDamageStabilization'] then
-               BuffBlueprint {
+                BuffBlueprint({
                     Name = 'SeraphimSCUDamageStabilization',
                     DisplayName = 'SeraphimSCUDamageStabilization',
                     BuffType = 'SCUUPGRADEDMG',
@@ -125,17 +127,17 @@ XSL0301 = Class(CommandUnit) {
                             Mult = 1.0,
                         },
                     },
-                }
+                })
             end
             if Buff.HasBuff(self, 'SeraphimSCUDamageStabilization') then
                 Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
             Buff.ApplyBuff(self, 'SeraphimSCUDamageStabilization')
-          elseif enh == 'DamageStabilizationRemove' then
+        elseif enh == 'DamageStabilizationRemove' then
             if Buff.HasBuff(self, 'SeraphimSCUDamageStabilization') then
                 Buff.RemoveBuff(self, 'SeraphimSCUDamageStabilization')
             end
-        -- Enhanced Sensor Systems
+            -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
             self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
             self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
@@ -155,8 +157,10 @@ XSL0301 = Class(CommandUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 25)
+        else
+
         end
     end,
-}
+})
 
 TypeClass = XSL0301

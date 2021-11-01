@@ -18,16 +18,16 @@ local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
 local NavalCannonOblivionWeapon = import('/lua/aeon_naval_weapons.lua').ADFCannonOblivionNaval
 
 
-UAS0201 = Class(ASeaUnit) {
+UAS0201 = Class(ASeaUnit)({
     BackWakeEffect = {},
     Weapons = {
-        FrontTurret = Class(NavalCannonOblivionWeapon) {},
-        DepthCharge = Class(AANDepthChargeBombWeapon) {},
-        Torpedo1 = Class(AANChronoTorpedoWeapon) {},
-        Torpedo2 = Class(AANChronoTorpedoWeapon) {},
-        AntiTorpedo = Class(AIFQuasarAntiTorpedoWeapon) {},
-        AntiTorpedo2 = Class(AIFQuasarAntiTorpedoWeapon) {},
+        FrontTurret = Class(NavalCannonOblivionWeapon)({}),
+        DepthCharge = Class(AANDepthChargeBombWeapon)({}),
+        Torpedo1 = Class(AANChronoTorpedoWeapon)({}),
+        Torpedo2 = Class(AANChronoTorpedoWeapon)({}),
+        AntiTorpedo = Class(AIFQuasarAntiTorpedoWeapon)({}),
+        AntiTorpedo2 = Class(AIFQuasarAntiTorpedoWeapon)({}),
     },
-}
+})
 
 TypeClass = UAS0201

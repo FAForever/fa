@@ -7,9 +7,9 @@
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoGunWeapon
 
-XSL0101 = Class(SWalkingLandUnit) {
+XSL0101 = Class(SWalkingLandUnit)({
     Weapons = {
-        LaserTurret = Class(SDFPhasicAutoGunWeapon) {
+        LaserTurret = Class(SDFPhasicAutoGunWeapon)({
             OnWeaponFired = function(self)
                 if not self.unit.WaitingForCloak then
                     self.unit:RevealUnit()
@@ -20,7 +20,7 @@ XSL0101 = Class(SWalkingLandUnit) {
                     self.unit.CloakThread = self.unit:ForkThread(self.unit.HideUnit)
                 end
             end,
-        },
+        }),
     },
 
     -- Toggle disabled
@@ -105,6 +105,6 @@ XSL0101 = Class(SWalkingLandUnit) {
 
         SWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
     end,
-}
+})
 
 TypeClass = XSL0101

@@ -13,20 +13,20 @@ local AAATemporalFizzWeapon = aWeapons.AAATemporalFizzWeapon
 local explosion = import('/lua/defaultexplosions.lua')
 local CzarShield = import('/lua/shield.lua').CzarShield
 
-UAA0310 = Class(AirTransport) {
+UAA0310 = Class(AirTransport)({
     DestroyNoFallRandomChance = 1.1,
     BuildAttachBone = 'UAA0310',
 
     Weapons = {
-        QuantumBeamGeneratorWeapon = Class(AQuantumBeamGenerator){},
-        SonicPulseBattery1 = Class(AAAZealotMissileWeapon) {},
-        SonicPulseBattery2 = Class(AAAZealotMissileWeapon) {},
-        SonicPulseBattery3 = Class(AAAZealotMissileWeapon) {},
-        SonicPulseBattery4 = Class(AAAZealotMissileWeapon) {},
-        DepthCharge01 = Class(AANDepthChargeBombWeapon) {},
-        DepthCharge02 = Class(AANDepthChargeBombWeapon) {},
-        AAFizz01 = Class(AAATemporalFizzWeapon) {},
-        AAFizz02 = Class(AAATemporalFizzWeapon) {},
+        QuantumBeamGeneratorWeapon = Class(AQuantumBeamGenerator)({}),
+        SonicPulseBattery1 = Class(AAAZealotMissileWeapon)({}),
+        SonicPulseBattery2 = Class(AAAZealotMissileWeapon)({}),
+        SonicPulseBattery3 = Class(AAAZealotMissileWeapon)({}),
+        SonicPulseBattery4 = Class(AAAZealotMissileWeapon)({}),
+        DepthCharge01 = Class(AANDepthChargeBombWeapon)({}),
+        DepthCharge02 = Class(AANDepthChargeBombWeapon)({}),
+        AAFizz01 = Class(AAATemporalFizzWeapon)({}),
+        AAFizz02 = Class(AAATemporalFizzWeapon)({}),
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -55,14 +55,20 @@ UAA0310 = Class(AirTransport) {
         AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
 
-    OnAnimTerrainCollision = function(self, bone,x,y,z)
-        DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
+    OnAnimTerrainCollision = function(self, bone, x, y, z)
+        DamageArea(self, {
+            x,
+            y,
+            z,
+        }, 5, 1000, 'Default', true, false)
         explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {
+            self:GetUnitSizes(),
+        })
     end,
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        AirTransport.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        AirTransport.OnStopBeingBuilt(self, builder, layer)
         ChangeState(self, self.IdleState)
     end,
 
@@ -70,7 +76,7 @@ UAA0310 = Class(AirTransport) {
         AirTransport.OnFailedToBuild(self)
         ChangeState(self, self.IdleState)
     end,
-	
+
     CreateShield = function(self, bpShield)
         local bpShield = table.deepcopy(bpShield)
         self:DestroyShield()
@@ -82,7 +88,7 @@ UAA0310 = Class(AirTransport) {
         self.Trash:Add(self.MyShield)
     end,
 
-    IdleState = State {
+    IdleState = State({
         Main = function(self)
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
@@ -93,9 +99,9 @@ UAA0310 = Class(AirTransport) {
             self.UnitBeingBuilt = unitBuilding
             ChangeState(self, self.BuildingState)
         end,
-    },
+    }),
 
-    BuildingState = State {
+    BuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
@@ -108,9 +114,9 @@ UAA0310 = Class(AirTransport) {
             AirTransport.OnStopBuild(self, unitBeingBuilt)
             ChangeState(self, self.FinishedBuildingState)
         end,
-    },
+    }),
 
-    FinishedBuildingState = State {
+    FinishedBuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             unitBuilding:DetachFrom(true)
@@ -118,14 +124,20 @@ UAA0310 = Class(AirTransport) {
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
-                local worldPos = self:CalculateWorldPositionFromRelative({0, 0, -20})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
-                unitBuilding:ShowBone(0,true)
+                local worldPos = self:CalculateWorldPositionFromRelative({
+                    0,
+                    0,
+                    -20,
+                })
+                IssueMoveOffFactory({
+                    unitBuilding,
+                }, worldPos)
+                unitBuilding:ShowBone(0, true)
             end
             self:RequestRefreshUI()
             ChangeState(self, self.IdleState)
         end,
-    }
-}
+    }),
+})
 
 TypeClass = UAA0310

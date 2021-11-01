@@ -18,7 +18,7 @@ local SCCollisionBeam = import('/lua/defaultcollisionbeams.lua').SCCollisionBeam
 
 
 
-local PhasonCollisionBeam = Class(SCCollisionBeam) {
+local PhasonCollisionBeam = Class(SCCollisionBeam)({
 
     FxBeamStartPoint = {
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_01_emit.bp',
@@ -27,7 +27,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_04_emit.bp',
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_05_emit.bp',
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_06_emit.bp',
-        '/units/DSLK004/effects/seraphim_electricity_emit.bp'
+        '/units/DSLK004/effects/seraphim_electricity_emit.bp',
     },
     FxBeam = {
         '/units/DSLK004/effects/seraphim_lightning_beam_01_emit.bp',
@@ -81,7 +81,9 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             damage = damage * dmgmod
         end
 
-        if damage <= 0 then return end
+        if damage <= 0 then
+            return
+        end
 
         if instigator then
             local radius = damageData.DamageRadius
@@ -95,13 +97,13 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
                     DamageArea(instigator, BeamEndPos, radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
                 else
-                    ForkThread(DefaultDamage.AreaDoTThread, instigator, BeamEndPos, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), radius, damage, damageData.DamageType, damageData.DamageFriendly)
+                    ForkThread(DefaultDamage.AreaDoTThread, instigator, BeamEndPos, damageData.DoTPulses or 1, damageData.DoTTime / damageData.DoTPulses or 1, radius, damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             elseif targetEntity then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
                     Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
                 else
-                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), damage, damageData.DamageType, damageData.DamageFriendly)
+                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, damageData.DoTTime / damageData.DoTPulses or 1, damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             else
                 DamageArea(instigator, BeamEndPos, 0.25, damage, damageData.DamageType, damageData.DamageFriendly)
@@ -145,11 +147,13 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             LOG('*ERROR: THERE IS NO BEAM EMITTER DEFINED FOR THIS COLLISION BEAM ', repr(self.FxBeam))
         end
     end,
-}
+})
 
-local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
+local PhasonCollisionBeam2 = Class(PhasonCollisionBeam)({
 
-    FxBeam = { '/units/DSLK004/effects/seraphim_lightning_beam_02_emit.bp', },
+    FxBeam = {
+        '/units/DSLK004/effects/seraphim_lightning_beam_02_emit.bp',
+    },
     TerrainImpactScale = 0.1,
 
     OnImpact = function(self, impactType, targetEntity)
@@ -160,6 +164,8 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
         elseif not impactType == 'Unit' then
             KillThread(self.Scorching)
             self.Scorching = nil
+        else
+
         end
         PhasonCollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
@@ -171,15 +177,15 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
     end,
 
     ScorchThread = function(self)
-        local size = 1 + (Random() * 1.1)
+        local size = 1 + Random() * 1.1
         local CurrentPosition = self:GetPosition(1)
-        local LastPosition = Vector(0,0,0)
+        local LastPosition = Vector(0, 0, 0)
         local skipCount = 1
         local Util = import('/lua/utilities.lua')
 
         while true do
             if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
-                CreateSplat(CurrentPosition, Util.GetRandomFloat(0,2*math.pi), self.SplatTexture, size, size, 100, 100, self.Army)
+                CreateSplat(CurrentPosition, Util.GetRandomFloat(0, 2 * math.pi), self.SplatTexture, size, size, 100, 100, self.Army)
                 LastPosition = CurrentPosition
                 skipCount = 1
             else
@@ -187,13 +193,13 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
             end
 
             WaitSeconds(self.ScorchSplatDropTime)
-            size = 1 + (Random() * 1.1)
+            size = 1 + Random() * 1.1
             CurrentPosition = self:GetPosition(1)
         end
     end,
-}
+})
 
-local PhasonBeam = Class(DefaultBeamWeapon) {
+local PhasonBeam = Class(DefaultBeamWeapon)({
     BeamType = PhasonCollisionBeam,
     FxMuzzleFlash = {},
     FxChargeMuzzleFlash = {},
@@ -214,27 +220,28 @@ local PhasonBeam = Class(DefaultBeamWeapon) {
         end
         return DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
     end,
-}
+})
 
-DSLK004 = Class(SLandUnit) {
+DSLK004 = Class(SLandUnit)({
     Weapons = {
-        PhasonBeamAir = Class(PhasonBeam) {},
-        PhasonBeamGround = Class(PhasonBeam) {
+        PhasonBeamAir = Class(PhasonBeam)({}),
+        PhasonBeamGround = Class(PhasonBeam)({
             BeamType = PhasonCollisionBeam2,
             FxBeamEndPointScale = 0.01,
-        },
+        }),
     },
 
-    OnStopBeingBuilt = function(self,builder,layer)
-        SLandUnit.OnStopBeingBuilt(self,builder,layer)
+    OnStopBeingBuilt = function(self, builder, layer)
+        SLandUnit.OnStopBeingBuilt(self, builder, layer)
 
         local EfctTempl = {
             '/units/DSLK004/effects/orbeffect_01.bp',
             '/units/DSLK004/effects/orbeffect_02.bp',
+
         }
         for k, v in EfctTempl do
             CreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
     end,
-}
+})
 TypeClass = DSLK004

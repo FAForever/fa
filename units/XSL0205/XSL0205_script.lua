@@ -14,9 +14,9 @@ local SAAOlarisCannonWeapon = import('/lua/seraphimweapons.lua').SAAOlarisCannon
 local SlowHover = import('/lua/defaultunits.lua').SlowHoverLandUnit
 
 #changed from SLandUnit
-XSL0205 = Class(SHoverLandUnit, SlowHover) {
+XSL0205 = Class(SHoverLandUnit, SlowHover)({
     Weapons = {
-        AAGun = Class(SAAOlarisCannonWeapon) {},
+        AAGun = Class(SAAOlarisCannonWeapon)({}),
     },
-}
+})
 TypeClass = XSL0205

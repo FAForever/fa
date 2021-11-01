@@ -13,13 +13,13 @@ local SDFUltraChromaticBeamGenerator = SeraphimWeapons.SDFUltraChromaticBeamGene
 local SANAnaitTorpedo = SeraphimWeapons.SANAnaitTorpedo
 local SDFAjelluAntiTorpedoDefense = SeraphimWeapons.SDFAjelluAntiTorpedoDefense
 
-XSS0201 = Class(SSubUnit) {
+XSS0201 = Class(SSubUnit)({
     BackWakeEffect = {},
     Weapons = {
-        FrontTurret = Class(SDFUltraChromaticBeamGenerator) {},
-        BackTurret = Class(SDFUltraChromaticBeamGenerator) {},
-        Torpedo1 = Class(SANAnaitTorpedo) {},
-        AntiTorpedo = Class(SDFAjelluAntiTorpedoDefense) {},
+        FrontTurret = Class(SDFUltraChromaticBeamGenerator)({}),
+        BackTurret = Class(SDFUltraChromaticBeamGenerator)({}),
+        Torpedo1 = Class(SANAnaitTorpedo)({}),
+        AntiTorpedo = Class(SDFAjelluAntiTorpedoDefense)({}),
     },
 
     OnKilled = function(self, instigator, type, overkillRatio)
@@ -58,6 +58,8 @@ XSS0201 = Class(SSubUnit) {
         elseif new == 'Down' then
             self:SetWeaponEnabledByLabel('FrontTurret', false)
             self:SetWeaponEnabledByLabel('BackTurret', false)
+        else
+
         end
     end,
 
@@ -67,8 +69,10 @@ XSS0201 = Class(SSubUnit) {
         --- Unless we're gifted, we should have an original builder.
         --- Remains to be seen if this property is actually copied during gift
         if self.originalBuilder then
-            IssueDive({self})
+            IssueDive({
+                self,
+            })
         end
-    end
-}
+    end,
+})
 TypeClass = XSS0201

@@ -8,10 +8,10 @@
 local ACruiseMissileWeapon = import('/lua/aeonweapons.lua').ACruiseMissileWeapon
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 
-UAB2108 = Class(AStructureUnit) {
+UAB2108 = Class(AStructureUnit)({
     Weapons = {
-        CruiseMissile = Class(ACruiseMissileWeapon) {},
+        CruiseMissile = Class(ACruiseMissileWeapon)({}),
     },
-}
+})
 
 TypeClass = UAB2108

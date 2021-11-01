@@ -9,7 +9,7 @@
 #****************************************************************************
 
 local SSeaFactoryUnit = import('/lua/seraphimunits.lua').SSeaFactoryUnit
-XSB0203 = Class(SSeaFactoryUnit) {
+XSB0203 = Class(SSeaFactoryUnit)({
     OnCreate = function(self)
         SSeaFactoryUnit.OnCreate(self)
         local bp = self:GetBlueprint()
@@ -25,7 +25,7 @@ XSB0203 = Class(SSeaFactoryUnit) {
         self.Rotator2:SetSpeed(0)
         SSeaFactoryUnit.OnKilled(self, instigator, type, overkillRatio)
     end,
-}
+})
 
 TypeClass = XSB0203
 

@@ -9,10 +9,10 @@
 #****************************************************************************
 local CAirFactoryUnit = import('/lua/cybranunits.lua').CAirFactoryUnit
 
-URB0302 = Class(CAirFactoryUnit) {
+URB0302 = Class(CAirFactoryUnit)({
     PlatformBone = 'B01',
 
---Overwrite FinishBuildThread to speed up platform lowering rate
+    --Overwrite FinishBuildThread to speed up platform lowering rate
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
@@ -20,7 +20,8 @@ URB0302 = Class(CAirFactoryUnit) {
         local bp = self:GetBlueprint()
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
-            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(40)        --Change: SetRate(4)
+            --Change: SetRate(4)
+            self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(40)
             self.Trash:Add(self.RollOffAnim)
             WaitTicks(1)
             WaitFor(self.RollOffAnim)
@@ -30,7 +31,7 @@ URB0302 = Class(CAirFactoryUnit) {
         end
         self:DetachAll(bp.Display.BuildAttachBone or 0)
         self:DestroyBuildRotator()
-        if order != 'Upgrade' then
+        if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
             self:SetBusy(false)
@@ -38,16 +39,17 @@ URB0302 = Class(CAirFactoryUnit) {
         end
     end,
 
---Overwrite PlayFxRollOffEnd to speed up platform raising rate
+    --Overwrite PlayFxRollOffEnd to speed up platform raising rate
 
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
-            self.RollOffAnim:SetRate(40)                                            --Change: SetRate(-4)
+            --Change: SetRate(-4)
+            self.RollOffAnim:SetRate(40)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil
         end
     end,
-}
+})
 
 TypeClass = URB0302

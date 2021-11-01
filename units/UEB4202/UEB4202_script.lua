@@ -9,15 +9,15 @@
 --#****************************************************************************
 local TShieldStructureUnit = import('/lua/terranunits.lua').TShieldStructureUnit
 
-UEB4202 = Class(TShieldStructureUnit) {
+UEB4202 = Class(TShieldStructureUnit)({
     ShieldEffects = {
         '/effects/emitters/terran_shield_generator_t2_01_emit.bp',
         '/effects/emitters/terran_shield_generator_t2_02_emit.bp',
         --'/effects/emitters/terran_shield_generator_t2_03_emit.bp',
     },
-    
-    OnStopBeingBuilt = function(self,builder,layer)
-        TShieldStructureUnit.OnStopBeingBuilt(self,builder,layer)
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        TShieldStructureUnit.OnStopBeingBuilt(self, builder, layer)
         self.Rotator1 = CreateRotator(self, 'Spinner', 'y', nil, 10, 5, 10)
         self.Rotator2 = CreateRotator(self, 'B01', 'z', nil, -10, 5, -10)
         self.Trash:Add(self.Rotator1)
@@ -33,7 +33,7 @@ UEB4202 = Class(TShieldStructureUnit) {
         if self.Rotator2 then
             self.Rotator2:SetTargetSpeed(-10)
         end
-        
+
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
@@ -49,7 +49,7 @@ UEB4202 = Class(TShieldStructureUnit) {
         TShieldStructureUnit.OnShieldDisabled(self)
         self.Rotator1:SetTargetSpeed(0)
         self.Rotator2:SetTargetSpeed(0)
-        
+
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
@@ -58,7 +58,7 @@ UEB4202 = Class(TShieldStructureUnit) {
         end
     end,
 
-    UpgradingState = State(TShieldStructureUnit.UpgradingState) {
+    UpgradingState = State(TShieldStructureUnit.UpgradingState)({
         Main = function(self)
             self.Rotator1:SetTargetSpeed(90)
             self.Rotator2:SetTargetSpeed(90)
@@ -74,7 +74,7 @@ UEB4202 = Class(TShieldStructureUnit) {
         DisableShield = function(self)
             TShieldStructureUnit.DisableShield(self)
         end,
-    }
-}
+    }),
+})
 
 TypeClass = UEB4202

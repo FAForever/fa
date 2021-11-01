@@ -4,7 +4,7 @@
 #
 local CLOATacticalChildMissileProjectile = import('/lua/cybranprojectiles.lua').CLOATacticalChildMissileProjectile
 
-CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
+CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile)({
 
     OnCreate = function(self)
         CLOATacticalChildMissileProjectile.OnCreate(self)
@@ -23,8 +23,10 @@ CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
         self:SetDestroyOnWater(true)
         self:TrackTarget(true)
         self:SetTurnRate(80)
-        self:SetMaxSpeed(15)#25
-        self:SetAcceleration(6)#25
+        #25
+        self:SetMaxSpeed(15)
+        #25
+        self:SetAcceleration(6)
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
@@ -32,5 +34,5 @@ CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile) {
             CLOATacticalChildMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)
         end
     end,
-}
+})
 TypeClass = CIFMissileTacticalSplit01

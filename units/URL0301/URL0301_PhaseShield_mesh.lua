@@ -1,4 +1,4 @@
-MeshBlueprint {
+MeshBlueprint({
     IconFadeInZoom = 130,
     LODs = {
         {
@@ -11,4 +11,4 @@ MeshBlueprint {
             LODCutoff = 195,
         },
     },
-}
+})

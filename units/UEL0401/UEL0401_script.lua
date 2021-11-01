@@ -15,26 +15,29 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
-UEL0401 = Class(TMobileFactoryUnit) {
+UEL0401 = Class(TMobileFactoryUnit)({
     FxDamageScale = 2.5,
     PrepareToBuildAnimRate = 5,
     BuildAttachBone = 'Build_Attachpoint',
-    RollOffBones = {'Arm_Right03_Build_Emitter', 'Arm_Left03_Build_Emitter', },
+    RollOffBones = {
+        'Arm_Right03_Build_Emitter',
+        'Arm_Left03_Build_Emitter',
+    },
 
     Weapons = {
-        RightTurret01 = Class(TDFGaussCannonWeapon) {},
-        RightTurret02 = Class(TDFGaussCannonWeapon) {},
-        LeftTurret01 = Class(TDFGaussCannonWeapon) {},
-        LeftTurret02 = Class(TDFGaussCannonWeapon) {},
-        RightRiotgun = Class(TDFRiotWeapon) {
-            FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank
-        },
-        LeftRiotgun = Class(TDFRiotWeapon) {
-            FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank
-        },
-        RightAAGun = Class(TAALinkedRailgun) {},
-        LeftAAGun = Class(TAALinkedRailgun) {},
-        Torpedo = Class(TANTorpedoAngler) {},
+        RightTurret01 = Class(TDFGaussCannonWeapon)({}),
+        RightTurret02 = Class(TDFGaussCannonWeapon)({}),
+        LeftTurret01 = Class(TDFGaussCannonWeapon)({}),
+        LeftTurret02 = Class(TDFGaussCannonWeapon)({}),
+        RightRiotgun = Class(TDFRiotWeapon)({
+            FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank,
+        }),
+        LeftRiotgun = Class(TDFRiotWeapon)({
+            FxMuzzleFlash = EffectTemplate.TRiotGunMuzzleFxTank,
+        }),
+        RightAAGun = Class(TAALinkedRailgun)({}),
+        LeftAAGun = Class(TAALinkedRailgun)({}),
+        Torpedo = Class(TANTorpedoAngler)({}),
     },
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -62,10 +65,12 @@ UEL0401 = Class(TMobileFactoryUnit) {
         elseif new == 'Seabed' then
             self:AddBuildRestriction(categories.ALLUNITS)
             self:RequestRefreshUI()
+        else
+
         end
     end,
 
-    IdleState = State {
+    IdleState = State({
         OnStartBuild = function(self, unitBuilding, order)
             TMobileFactoryUnit.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
@@ -78,9 +83,9 @@ UEL0401 = Class(TMobileFactoryUnit) {
             self:DetachAll(self.BuildAttachBone)
             self:SetBusy(false)
         end,
-    },
+    }),
 
-    BuildingState = State {
+    BuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
@@ -105,9 +110,9 @@ UEL0401 = Class(TMobileFactoryUnit) {
 
             ChangeState(self, self.RollingOffState)
         end,
-    },
+    }),
 
-    RollingOffState = State {
+    RollingOffState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             if not unitBuilding.Dead then
@@ -127,14 +132,20 @@ UEL0401 = Class(TMobileFactoryUnit) {
             if not unitBuilding.Dead then
                 unitBuilding:DetachFrom(true)
                 self:DetachAll(self.BuildAttachBone)
-                local  worldPos = self:CalculateWorldPositionFromRelative({0, 0, -15})
-                IssueMoveOffFactory({unitBuilding}, worldPos)
+                local worldPos = self:CalculateWorldPositionFromRelative({
+                    0,
+                    0,
+                    -15,
+                })
+                IssueMoveOffFactory({
+                    unitBuilding,
+                }, worldPos)
             end
 
             self:DestroyRollOffEffects()
             ChangeState(self, self.IdleState)
         end,
-    },
+    }),
 
     CreateRollOffEffects = function(self)
         local army = self.Army
@@ -160,6 +171,6 @@ UEL0401 = Class(TMobileFactoryUnit) {
         end
         self.ReleaseEffectsBag = {}
     end,
-}
+})
 
 TypeClass = UEL0401
