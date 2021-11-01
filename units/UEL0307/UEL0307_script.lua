@@ -8,6 +8,19 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetAccel = CRotateManipulatorMethods.SetAccel
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+
+local UnitWeaponMethods = _G.moho.weapon_methods
+local UnitWeaponMethodsSetFireTargetLayerCaps = UnitWeaponMethods.SetFireTargetLayerCaps
+-- End of automatically upvalued moho functions
+
 local TShieldLandUnit = import('/lua/terranunits.lua').TShieldLandUnit
 --import a default weapon so our pointer doesnt explode
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
@@ -27,8 +40,9 @@ UEL0307 = Class(TShieldLandUnit)({
         TShieldLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.ShieldEffectsBag = {
 
+
+            --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         }
-        --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         self.TargetPointer = self:GetWeapon(1)
         --we save this to the unit table so dont have to call every time.
         self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable
@@ -43,16 +57,16 @@ UEL0307 = Class(TShieldLandUnit)({
             self.RotatorManipulator = CreateRotator(self, 'Spinner', 'y')
             self.Trash:Add(self.RotatorManipulator)
         end
-        self.RotatorManipulator:SetAccel(5)
-        self.RotatorManipulator:SetTargetSpeed(30)
+        CRotateManipulatorMethodsSetAccel(self.RotatorManipulator, 5)
+        CRotateManipulatorMethodsSetTargetSpeed(self.RotatorManipulator, 30)
         if not self.AnimationManipulator then
             local myBlueprint = self:GetBlueprint()
             --LOG( 'it is ', repr(myBlueprint.Display.AnimationOpen) )
             self.AnimationManipulator = CreateAnimator(self)
-            self.AnimationManipulator:PlayAnim(myBlueprint.Display.AnimationOpen)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimationManipulator, myBlueprint.Display.AnimationOpen)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:SetRate(1)
+        CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 1)
 
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
@@ -80,8 +94,8 @@ UEL0307 = Class(TShieldLandUnit)({
 
     DestroyManipulators = function(self)
         if self.RotatorManipulator then
-            self.RotatorManipulator:SetAccel(10)
-            self.RotatorManipulator:SetTargetSpeed(0)
+            CRotateManipulatorMethodsSetAccel(self.RotatorManipulator, 10)
+            CRotateManipulatorMethodsSetTargetSpeed(self.RotatorManipulator, 0)
             -- Unless it goes smoothly back to its original position,
             -- it will snap there when the manipulator is destroyed.
             -- So for now, we'll just keep it on.
@@ -90,7 +104,7 @@ UEL0307 = Class(TShieldLandUnit)({
             --self.RotatorManipulator = nil
         end
         if self.AnimationManipulator then
-            self.AnimationManipulator:SetRate(-1)
+            CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, -1)
             WaitFor(self.AnimationManipulator)
             self.AnimationManipulator:Destroy()
             self.AnimationManipulator = nil
@@ -99,7 +113,7 @@ UEL0307 = Class(TShieldLandUnit)({
 
     DisablePointer = function(self)
         --this disables the stop feature - note that its reset on layer change!
-        self.TargetPointer:SetFireTargetLayerCaps('None')
+        UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, 'None')
         self.PointerRestartThread = self:ForkThread(self.PointerRestart)
     end,
 
@@ -118,7 +132,7 @@ UEL0307 = Class(TShieldLandUnit)({
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
                 --this resets the stop feature - note that its reset on layer change!
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer])
+                UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, self.TargetLayerCaps[self.Layer])
             end
         end
     end,
@@ -128,7 +142,7 @@ UEL0307 = Class(TShieldLandUnit)({
 
         if self.PointerEnabled == false then
             --since its reset on layer change we need to do this. unfortunate.
-            self.TargetPointer:SetFireTargetLayerCaps('None')
+            UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, 'None')
         end
     end,
 })

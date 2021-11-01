@@ -1,3 +1,11 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtBone = GlobalMethods.CreateEmitterAtBone
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+-- End of automatically upvalued moho functions
+
 #****************************************************************************
 #**
 #**  File     :  /data/projectiles/AIFFragmentationSensorShell02/AIFFragmentationSensorShell02_script.lua
@@ -21,7 +29,7 @@ AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjecti
 
             # Split effects
             for k, v in FxFragEffect do
-                CreateEmitterAtBone(self, -1, self:GetArmy(), v)
+                GlobalMethodsCreateEmitterAtBone(self, -1, self:GetArmy(), v)
             end
 
             local vx, vy, vz = self:GetVelocity()
@@ -50,8 +58,8 @@ AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjecti
                 xVec = vx + math.sin(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
                 zVec = vz + math.cos(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
                 local proj = self:CreateChildProjectile(bp.FragmentId)
-                proj:SetVelocity(xVec, yVec, zVec)
-                proj:SetVelocity(velocity)
+                ProjectileMethodsSetVelocity(proj, xVec, yVec, zVec)
+                ProjectileMethodsSetVelocity(proj, velocity)
                 proj:PassDamageData(self.DamageData)
             end
             local pos = self:GetPosition()
@@ -63,6 +71,7 @@ AIFFragmentationSensorShell02 = Class(AArtilleryFragmentationSensorShellProjecti
                 Army = self.Data.Army,
                 Omni = false,
                 WaterVision = false,
+
 
             }
             self:Destroy()

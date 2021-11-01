@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UEB4301/UEB4301_script.lua
@@ -28,10 +33,10 @@ UEB4301 = Class(TShieldStructureUnit)({
     OnShieldEnabled = function(self)
         TShieldStructureUnit.OnShieldEnabled(self)
         if self.Rotator1 then
-            self.Rotator1:SetTargetSpeed(10)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator1, 10)
         end
         if self.Rotator2 then
-            self.Rotator2:SetTargetSpeed(-10)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator2, -10)
         end
 
         if self.ShieldEffectsBag then
@@ -47,8 +52,8 @@ UEB4301 = Class(TShieldStructureUnit)({
 
     OnShieldDisabled = function(self)
         TShieldStructureUnit.OnShieldDisabled(self)
-        self.Rotator1:SetTargetSpeed(0)
-        self.Rotator2:SetTargetSpeed(0)
+        CRotateManipulatorMethodsSetTargetSpeed(self.Rotator1, 0)
+        CRotateManipulatorMethodsSetTargetSpeed(self.Rotator2, 0)
 
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do

@@ -8,6 +8,11 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 #Below, changed from ALandUnit to AHoverLandUnit
 local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
 local AAATemporalFizzWeapon = import('/lua/aeonweapons.lua').AAATemporalFizzWeapon
@@ -27,8 +32,8 @@ UAL0205 = Class(AHoverLandUnit, SlowHover)({
 
             PlayFxRackSalvoChargeSequence = function(self)
                 AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence(self)
-                CreateAttachedEmitter(self.unit, 'Muzzle_R01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
-                CreateAttachedEmitter(self.unit, 'Muzzle_L01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
+                GlobalMethodsCreateAttachedEmitter(self.unit, 'Muzzle_R01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
+                GlobalMethodsCreateAttachedEmitter(self.unit, 'Muzzle_L01', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
             end,
         }),
     },

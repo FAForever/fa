@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UAB0304/UAB0304_script.lua
@@ -14,7 +19,7 @@ UAB0304 = Class(AQuantumGateUnit)({
 
     OnStopBeingBuilt = function(self, builder, layer)
         for k, v in AQuantumGateAmbient do
-            CreateAttachedEmitter(self, 'UAB0304', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'UAB0304', self.Army, v)
         end
 
         AQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)

@@ -1,3 +1,11 @@
+-- Automatically upvalued moho functions for performance
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsOffsetEmitter = IEffectMethods.OffsetEmitter
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UES0305/UES0305_script.lua
@@ -48,7 +56,7 @@ UES0305 = Class(TSeaUnit)({
                         for ke, vEffect in effects do
                             emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
-                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
+                                IEffectMethodsOffsetEmitter(emit, vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                             end
                         end
                     end
@@ -64,7 +72,7 @@ UES0305 = Class(TSeaUnit)({
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
-        self:HideBone(0, true)
+        UnitMethodsHideBone(self, 0, true)
         self.BeingBuiltShowBoneTriggered = false
         if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))

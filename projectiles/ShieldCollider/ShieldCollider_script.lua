@@ -5,6 +5,29 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CCollisionManipulatorMethods = _G.moho.CollisionManipulator
+local CCollisionManipulatorMethodsEnableTerrainCheck = CCollisionManipulatorMethods.EnableTerrainCheck
+local CCollisionManipulatorMethodsWatchBone = CCollisionManipulatorMethods.WatchBone
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsAttachBoneTo = EntityMethods.AttachBoneTo
+local EntityMethodsDetachAll = EntityMethods.DetachAll
+local EntityMethodsSetVizToAllies = EntityMethods.SetVizToAllies
+local EntityMethodsSetVizToEnemies = EntityMethods.SetVizToEnemies
+local EntityMethodsSetVizToFocusPlayer = EntityMethods.SetVizToFocusPlayer
+local EntityMethodsSetVizToNeutrals = EntityMethods.SetVizToNeutrals
+
+local GlobalMethods = _G
+local GlobalMethodsWarp = GlobalMethods.Warp
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetCollision = ProjectileMethods.SetCollision
+local ProjectileMethodsSetLocalAngularVelocity = ProjectileMethods.SetLocalAngularVelocity
+local ProjectileMethodsSetStayUpright = ProjectileMethods.SetStayUpright
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+-- End of automatically upvalued moho functions
+
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local Projectile = import('/lua/sim/projectile.lua').Projectile
 
@@ -13,12 +36,12 @@ ShieldCollider = Class(Projectile)({
         Projectile.OnCreate(self)
 
         -- Set to 'Always' to see a nice box
-        self:SetVizToFocusPlayer('Never')
-        self:SetVizToAllies('Never')
-        self:SetVizToNeutrals('Never')
-        self:SetVizToEnemies('Never')
-        self:SetStayUpright(false)
-        self:SetCollision(true)
+        EntityMethodsSetVizToFocusPlayer(self, 'Never')
+        EntityMethodsSetVizToAllies(self, 'Never')
+        EntityMethodsSetVizToNeutrals(self, 'Never')
+        EntityMethodsSetVizToEnemies(self, 'Never')
+        ProjectileMethodsSetStayUpright(self, false)
+        ProjectileMethodsSetCollision(self, true)
     end,
 
     -- Shields only detect projectiles, so we attach one to keep track of the unit.
@@ -32,8 +55,8 @@ ShieldCollider = Class(Projectile)({
         local vx, vy, vz = self.Plane:GetVelocity()
 
         -- For now we just follow the plane along, not attaching so it can rotate
-        self:SetVelocity(10 * vx, 10 * vy, 10 * vz)
-        Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
+        ProjectileMethodsSetVelocity(self, 10 * vx, 10 * vy, 10 * vz)
+        GlobalMethodsWarp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
     end,
 
     OnCollisionCheck = function(self, other)
@@ -49,7 +72,7 @@ ShieldCollider = Class(Projectile)({
 
     OnDestroy = function(self)
         -- If our projectile is getting destroyed we never want to have anything attached
-        self:DetachAll('anchor')
+        EntityMethodsDetachAll(self, 'anchor')
         if self.Trash then
             self.Trash:Destroy()
         end
@@ -63,7 +86,7 @@ ShieldCollider = Class(Projectile)({
                 -- and the units centre is below it, then its below the ground and that can cause it to hit water instead.
                 -- All this is just to prevent that, because falling planes are stupid.
 
-                self:SetVelocity(0, 0, 0)
+                ProjectileMethodsSetVelocity(self, 0, 0, 0)
                 if not self.Plane.GroundImpacted then
                     self.Plane:OnImpact(targetType)
                 end
@@ -81,21 +104,22 @@ ShieldCollider = Class(Projectile)({
                         y = wy,
                         z = wz,
 
+
                     }
                     local exclusions = categories.EXPERIMENTAL + categories.TRANSPORTATION - categories.uea0203
                     if not EntityCategoryContains(exclusions, self.Plane) then
                         -- Exclude experimentals and transports from momentum system, but not damage
-                        Warp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
+                        GlobalMethodsWarp(self, self.Plane:GetPosition(self.PlaneBone), self.Plane:GetOrientation())
 
                         -- Make sure to detach just in case, prior to trying to attach
-                        self:DetachAll('anchor')
-                        self.Plane:DetachAll(self.PlaneBone)
+                        EntityMethodsDetachAll(self, 'anchor')
+                        EntityMethodsDetachAll(self.Plane, self.PlaneBone)
 
                         -- We attach our bone at the very last moment when we need it
-                        self.Plane:AttachBoneTo(self.PlaneBone, self, 'anchor')
+                        EntityMethodsAttachBoneTo(self.Plane, self.PlaneBone, self, 'anchor')
                         self.Plane.Detector = CreateCollisionDetector(self.Plane)
-                        self.Plane.Detector:WatchBone(self.PlaneBone)
-                        self.Plane.Detector:EnableTerrainCheck(true)
+                        CCollisionManipulatorMethodsWatchBone(self.Plane.Detector, self.PlaneBone)
+                        CCollisionManipulatorMethodsEnableTerrainCheck(self.Plane.Detector, true)
                         self.Plane.Detector:Enable()
 
                         -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
@@ -153,7 +177,7 @@ ShieldCollider = Class(Projectile)({
         -- Less for larger planes; also 2 is a nice number
         local spin = math.min(4 / volume, 2)
         -- Ideally I would just set this to whatever the plane had but I dont know how
-        self:SetLocalAngularVelocity(spin, spin, spin)
+        ProjectileMethodsSetLocalAngularVelocity(self, spin, spin, spin)
 
         -- Current plane velocity
         local vx, vy, vz = self.Plane:GetVelocity()
@@ -206,7 +230,7 @@ ShieldCollider = Class(Projectile)({
         vy = math.clamp(vy, -4, 4)
         vz = math.clamp(vz, -7, 7)
 
-        self:SetVelocity(forceScalar * vx, forceScalar * vy, forceScalar * vz)
+        ProjectileMethodsSetVelocity(self, forceScalar * vx, forceScalar * vy, forceScalar * vz)
     end,
 })
 

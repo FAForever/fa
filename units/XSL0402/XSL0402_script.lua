@@ -1,3 +1,11 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/XSL0402/XSL0402_script.lua
@@ -20,9 +28,9 @@ XSL0402 = Class(SEnergyBallUnit)({
         SEnergyBallUnit.OnCreate(self)
         for k, v in EffectTemplate.OthuyAmbientEmanation do
             -- XSL0402
-            CreateAttachedEmitter(self, 'Outer_Tentaclebase', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Outer_Tentaclebase', self.Army, v)
         end
-        self:HideBone(0, true)
+        UnitMethodsHideBone(self, 0, true)
     end,
 })
 

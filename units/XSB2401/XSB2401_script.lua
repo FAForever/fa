@@ -5,6 +5,12 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SIFExperimentalStrategicMissile = import('/lua/seraphimweapons.lua').SIFExperimentalStrategicMissile
 local EffectUtil = import('/lua/EffectUtilities.lua')
@@ -92,7 +98,7 @@ XSB2401 = Class(SStructureUnit)({
 
         local missileBone = self:GetBlueprint().Display.MissileBone
         if missileBone and self.NotCancelled then
-            self:ShowBone(missileBone, true)
+            UnitMethodsShowBone(self, missileBone, true)
             if self.MissileSlider then
                 self.MissileSlider:SetGoal(0, 0, 115)
                 self.MissileSlider:SetSpeed(1.93)
@@ -108,7 +114,7 @@ XSB2401 = Class(SStructureUnit)({
     RetractMissile = function(self)
         local missileBone = self:GetBlueprint().Display.MissileBone
         if missileBone then
-            self:HideBone(missileBone, true)
+            UnitMethodsHideBone(self, missileBone, true)
             if self.MissileSlider then
                 self.MissileSlider:SetSpeed(400)
                 self.MissileSlider:SetGoal(0, 0, 0)

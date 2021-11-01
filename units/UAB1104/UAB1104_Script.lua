@@ -1,3 +1,13 @@
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetSpinDown = CRotateManipulatorMethods.SetSpinDown
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UAB1104/UAB1104_script.lua
@@ -35,7 +45,8 @@ UAB1104 = Class(AMassFabricationUnit)({
 
             if not self.Open then
                 self.Open = true
-                self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen):SetRate(1)
+                CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationOpen)
+                CAnimationManipulatorMethodsSetRate(self.AnimManip, 1)
                 WaitFor(self.AnimManip)
             end
 
@@ -43,7 +54,7 @@ UAB1104 = Class(AMassFabricationUnit)({
                 self.Rotator = CreateRotator(self, 'Axis', 'z', nil, 0, 50, 0)
                 self.Trash:Add(self.Rotator)
             else
-                self.Rotator:SetSpinDown(false)
+                CRotateManipulatorMethodsSetSpinDown(self.Rotator, false)
             end
             self.Goal = Random(120, 300)
 
@@ -54,16 +65,16 @@ UAB1104 = Class(AMassFabricationUnit)({
             while not self.Dead do
                 -- spin clockwise
                 if not self.Clockwise then
-                    self.Rotator:SetTargetSpeed(self.Goal)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, self.Goal)
                     self.Clockwise = true
                 else
-                    self.Rotator:SetTargetSpeed(-self.Goal)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, -self.Goal)
                     self.Clockwise = false
                 end
                 WaitFor(self.Rotator)
 
                 -- slow down to change directions
-                self.Rotator:SetTargetSpeed(0)
+                CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, 0)
                 WaitFor(self.Rotator)
                 self.Rotator:SetSpeed(0)
                 self.Goal = Random(120, 300)
@@ -85,19 +96,19 @@ UAB1104 = Class(AMassFabricationUnit)({
 
             if self.Open then
                 if self.Clockwise == true then
-                    self.Rotator:SetSpinDown(true)
-                    self.Rotator:SetTargetSpeed(self.Goal)
+                    CRotateManipulatorMethodsSetSpinDown(self.Rotator, true)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, self.Goal)
                 else
-                    self.Rotator:SetTargetSpeed(0)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, 0)
                     WaitFor(self.Rotator)
-                    self.Rotator:SetSpinDown(true)
-                    self.Rotator:SetTargetSpeed(self.Goal)
+                    CRotateManipulatorMethodsSetSpinDown(self.Rotator, true)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, self.Goal)
                 end
                 WaitFor(self.Rotator)
             end
 
             if self.Open then
-                self.AnimManip:SetRate(-1)
+                CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
                 self.Open = false
                 WaitFor(self.AnimManip)
             end

@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsWarp = GlobalMethods.Warp
+-- End of automatically upvalued moho functions
+
 ---------------------------------------------------------------------------------------------------------------
 -- File     :  /data/projectiles/SIFExperimentalStrategicMissile01/SIFExperimentalStrategicMissile01_script.lua
 -- Author(s):  Gordon Duclos
@@ -40,7 +45,7 @@ SIFExperimentalStrategicMissile01 = Class(SExperimentalStrategicMissile)({
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE, TargetEntity) then
             local pos = self:GetPosition()
             pos[2] = pos[2] + 20
-            Warp(self.effectEntity, pos)
+            GlobalMethodsWarp(self.effectEntity, pos)
         end
     end,
 })

@@ -5,6 +5,17 @@
 -- Copyright Š 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsAddToggleCap = UnitMethods.AddToggleCap
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRemoveToggleCap = UnitMethods.RemoveToggleCap
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+local UnitMethodsSetProductionPerSecondEnergy = UnitMethods.SetProductionPerSecondEnergy
+local UnitMethodsSetProductionPerSecondMass = UnitMethods.SetProductionPerSecondMass
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 local CybranUnits = import('/lua/cybranunits.lua')
 local CCommandUnit = CybranUnits.CCommandUnit
 
@@ -34,12 +45,12 @@ URL0301 = Class(CCommandUnit)({
     -- Creation
     OnCreate = function(self)
         CCommandUnit.OnCreate(self)
-        self:SetCapturable(false)
-        self:HideBone('AA_Gun', true)
-        self:HideBone('Power_Pack', true)
-        self:HideBone('Rez_Protocol', true)
-        self:HideBone('Torpedo', true)
-        self:HideBone('Turbine', true)
+        UnitMethodsSetCapturable(self, false)
+        UnitMethodsHideBone(self, 'AA_Gun', true)
+        UnitMethodsHideBone(self, 'Power_Pack', true)
+        UnitMethodsHideBone(self, 'Rez_Protocol', true)
+        UnitMethodsHideBone(self, 'Torpedo', true)
+        UnitMethodsHideBone(self, 'Turbine', true)
         self:SetWeaponEnabledByLabel('NMissile', false)
         if self:GetBlueprint().General.BuildBones then
             self:SetupBuildBones()
@@ -97,12 +108,12 @@ URL0301 = Class(CCommandUnit)({
             self:DisableUnitIntel('Enhancement', 'Cloak')
             self.StealthEnh = false
             self.CloakEnh = false
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_CloakToggle')
             if Buff.HasBuff(self, 'CybranSCUCloakBonus') then
                 Buff.RemoveBuff(self, 'CybranSCUCloakBonus')
             end
         elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_CloakToggle')
+            UnitMethodsAddToggleCap(self, 'RULEUTC_CloakToggle')
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
                 self.IntelEffectsBag = nil
@@ -112,16 +123,16 @@ URL0301 = Class(CCommandUnit)({
             self:EnableUnitIntel('Enhancement', 'RadarStealth')
             self:EnableUnitIntel('Enhancement', 'SonarStealth')
         elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_CloakToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = false
             self.CloakEnh = false
         elseif enh == 'NaniteMissileSystem' then
-            self:ShowBone('AA_Gun', true)
+            UnitMethodsShowBone(self, 'AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', true)
         elseif enh == 'NaniteMissileSystemRemove' then
-            self:HideBone('AA_Gun', true)
+            UnitMethodsHideBone(self, 'AA_Gun', true)
             self:SetWeaponEnabledByLabel('NMissile', false)
         elseif enh == 'SelfRepairSystem' then
             CCommandUnit.CreateEnhancement(self, enh)
@@ -152,12 +163,12 @@ URL0301 = Class(CCommandUnit)({
             end
         elseif enh == 'ResourceAllocation' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'Switchback' then
             self.BuildBotTotal = 4
             if not Buffs['CybranSCUBuildRate'] then

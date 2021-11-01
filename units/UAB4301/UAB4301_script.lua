@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetSpinDown = CRotateManipulatorMethods.SetSpinDown
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UAB4301/UAB4301_script.lua
@@ -28,12 +34,12 @@ UAB4301 = Class(AShieldStructureUnit)({
             self.OrbManip1 = CreateRotator(self, 'Orb', 'y', nil, 0, 45, -45)
             self.Trash:Add(self.OrbManip1)
         end
-        self.OrbManip1:SetTargetSpeed(-45)
+        CRotateManipulatorMethodsSetTargetSpeed(self.OrbManip1, -45)
         if not self.OrbManip2 then
             self.OrbManip2 = CreateRotator(self, 'Orb', 'z', nil, 0, 45, 45)
             self.Trash:Add(self.OrbManip2)
         end
-        self.OrbManip2:SetTargetSpeed(45)
+        CRotateManipulatorMethodsSetTargetSpeed(self.OrbManip2, 45)
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
                 v:Destroy()
@@ -48,12 +54,12 @@ UAB4301 = Class(AShieldStructureUnit)({
     OnShieldDisabled = function(self)
         AShieldStructureUnit.OnShieldDisabled(self)
         if self.OrbManip1 then
-            self.OrbManip1:SetSpinDown(true)
-            self.OrbManip1:SetTargetSpeed(0)
+            CRotateManipulatorMethodsSetSpinDown(self.OrbManip1, true)
+            CRotateManipulatorMethodsSetTargetSpeed(self.OrbManip1, 0)
         end
         if self.OrbManip2 then
-            self.OrbManip2:SetSpinDown(true)
-            self.OrbManip2:SetTargetSpeed(0)
+            CRotateManipulatorMethodsSetSpinDown(self.OrbManip2, true)
+            CRotateManipulatorMethodsSetTargetSpeed(self.OrbManip2, 0)
         end
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do

@@ -9,6 +9,12 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 local SZthuthaamArtilleryShell = import('/lua/seraphimprojectiles.lua').SZthuthaamArtilleryShell
 
 SIFZthuthaamArtilleryShell02 = Class(SZthuthaamArtilleryShell)({
@@ -17,8 +23,8 @@ SIFZthuthaamArtilleryShell02 = Class(SZthuthaamArtilleryShell)({
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -27,7 +33,7 @@ SIFZthuthaamArtilleryShell02 = Class(SZthuthaamArtilleryShell)({
             local rotation = RandomFloat(0, 2 * math.pi)
             local army = self.Army
 
-            CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 100, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 100, army)
         end
 
         SZthuthaamArtilleryShell.OnImpact(self, targetType, targetEntity)

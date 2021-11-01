@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 -----------------------------------------------------------------
 -- File     :  /cdimage/units/XRB0304/XRB0304_script.lua
 -- Author(s):  Dru Staltman, Gordon Duclos
@@ -19,11 +25,11 @@ XRB0304 = Class(CConstructionStructureUnit)({
         local candidates = GetUnitsInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
         for k, v in candidates do
             if target == v:GetBlueprint().BlueprintId then
-                self:HideBone('xrb0304', true)
-                self:ShowBone('TurretT3', true)
-                self:ShowBone('Door3_B03', true)
-                self:ShowBone('B03', true)
-                self:ShowBone('Attachpoint03', true)
+                UnitMethodsHideBone(self, 'xrb0304', true)
+                UnitMethodsShowBone(self, 'TurretT3', true)
+                UnitMethodsShowBone(self, 'Door3_B03', true)
+                UnitMethodsShowBone(self, 'B03', true)
+                UnitMethodsShowBone(self, 'Attachpoint03', true)
                 return
             end
         end

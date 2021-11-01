@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetLifetime = ProjectileMethods.SetLifetime
+-- End of automatically upvalued moho functions
+
 #
 # Ship-based Anti-Torpedo Script
 #
@@ -6,7 +11,7 @@ local QuasarAntiTorpedoChargeSubProjectile = import('/lua/aeonprojectiles.lua').
 AIMAntiTorpedo01 = Class(QuasarAntiTorpedoChargeSubProjectile)({
     OnLostTarget = function(self)
         self:SetAcceleration(-3.6)
-        self:SetLifetime(0.5)
+        ProjectileMethodsSetLifetime(self, 0.5)
     end,
 })
 

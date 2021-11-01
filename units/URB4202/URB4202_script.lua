@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/URB4202/URB4202_script.lua
@@ -26,7 +31,7 @@ URB4202 = Class(CShieldStructureUnit)({
     OnShieldEnabled = function(self)
         CShieldStructureUnit.OnShieldEnabled(self)
         if self.Rotator1 then
-            self.Rotator1:SetTargetSpeed(10)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator1, 10)
         end
 
         if self.ShieldEffectsBag then
@@ -42,7 +47,7 @@ URB4202 = Class(CShieldStructureUnit)({
 
     OnShieldDisabled = function(self)
         CShieldStructureUnit.OnShieldDisabled(self)
-        self.Rotator1:SetTargetSpeed(0)
+        CRotateManipulatorMethodsSetTargetSpeed(self.Rotator1, 0)
 
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do

@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/XSB1102/XSB1102_script.lua
@@ -50,15 +56,15 @@ XSB1102 = Class(SEnergyCreationUnit)({
 
         local bp = self:GetBlueprint().Display
         self.LoopAnimation = CreateAnimator(self)
-        self.LoopAnimation:PlayAnim(bp.LoopingAnimation, true)
-        self.LoopAnimation:SetRate(0.5)
+        CAnimationManipulatorMethodsPlayAnim(self.LoopAnimation, bp.LoopingAnimation, true)
+        CAnimationManipulatorMethodsSetRate(self.LoopAnimation, 0.5)
         self.Trash:Add(self.LoopAnimation)
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         SEnergyCreationUnit.OnKilled(self, instigator, type, overkillRatio)
         if self.LoopAnimation then
-            self.LoopAnimation:SetRate(0.0)
+            CAnimationManipulatorMethodsSetRate(self.LoopAnimation, 0.0)
         end
     end,
 })

@@ -2,6 +2,13 @@
 -- URA0203 : cybran T2 gunship & URA0401 : Soul Ripper
 --
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+local GlobalMethodsDamageRing = GlobalMethods.DamageRing
+-- End of automatically upvalued moho functions
+
 local CIridiumRocketProjectile = import('/lua/cybranprojectiles.lua').CIridiumRocketProjectile
 
 CDFRocketIridium01 = Class(CIridiumRocketProjectile)({
@@ -13,11 +20,11 @@ CDFRocketIridium01 = Class(CIridiumRocketProjectile)({
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
         if radius > 0 then
-            DamageArea(self, pos, radius - 1, 1, 'Force', FriendlyFire)
-            DamageArea(self, pos, radius - 1, 1, 'Force', FriendlyFire)
+            GlobalMethodsDamageArea(self, pos, radius - 1, 1, 'Force', FriendlyFire)
+            GlobalMethodsDamageArea(self, pos, radius - 1, 1, 'Force', FriendlyFire)
         else
-            DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
-            DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
+            GlobalMethodsDamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
+            GlobalMethodsDamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
         end
 
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
@@ -26,13 +33,13 @@ CDFRocketIridium01 = Class(CIridiumRocketProjectile)({
             local army = self.Army
 
             if radius > 0 then
-                DamageRing(self, pos, radius, 5 / 4 * radius, 1, 'Fire', true)
+                GlobalMethodsDamageRing(self, pos, radius, 5 / 4 * radius, 1, 'Fire', true)
 
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius - 0.5, radius - 0.5, 100, 50, army)
+                GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius - 0.5, radius - 0.5, 100, 50, army)
             else
-                DamageRing(self, pos, 1, 5 / 4, 1, 'Fire', true)
+                GlobalMethodsDamageRing(self, pos, 1, 5 / 4, 1, 'Fire', true)
 
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 100, 50, army)
+                GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 100, 50, army)
             end
         end
 

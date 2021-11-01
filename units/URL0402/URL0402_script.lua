@@ -5,6 +5,35 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetAmbientSound = EntityMethods.SetAmbientSound
+local EntityMethodsShakeCamera = EntityMethods.ShakeCamera
+
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+local GlobalMethodsDamageRing = GlobalMethods.DamageRing
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
+
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsScaleEmitter = IEffectMethods.ScaleEmitter
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetBallisticAcceleration = ProjectileMethods.SetBallisticAcceleration
+local ProjectileMethodsSetCollision = ProjectileMethods.SetCollision
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetUnSelectable = UnitMethods.SetUnSelectable
+-- End of automatically upvalued moho functions
+
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')
@@ -37,19 +66,20 @@ URL0402 = Class(CWalkingLandUnit)({
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
+        CAnimationManipulatorMethodsPlayAnim(self.AnimationManipulator, self:GetBlueprint().Display.AnimationActivate, false)
+        CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 0)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         self:CreateUnitAmbientEffect(self.Layer)
         if self.AnimationManipulator then
-            self:SetUnSelectable(true)
-            self.AnimationManipulator:SetRate(1)
+            UnitMethodsSetUnSelectable(self, true)
+            CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 1)
 
             self:ForkThread(function()
                 WaitSeconds(self.AnimationManipulator:GetAnimationDuration() * self.AnimationManipulator:GetRate())
-                self:SetUnSelectable(false)
+                UnitMethodsSetUnSelectable(self, false)
                 self.AnimationManipulator:Destroy()
             end)
         end
@@ -135,10 +165,10 @@ URL0402 = Class(CWalkingLandUnit)({
             local wep = self:GetWeapon(1)
             if wep.Beams then
                 if wep.Audio.BeamLoop and wep.Beams[1].Beam then
-                    wep.Beams[1].Beam:SetAmbientSound(nil, nil)
+                    EntityMethodsSetAmbientSound(wep.Beams[1].Beam, nil, nil)
                 end
                 for k, v in wep.Beams do
-                    v.Beam:Disable()
+                    IAniManipulatorMethodsDisable(v.Beam)
                 end
             end
         end
@@ -147,7 +177,7 @@ URL0402 = Class(CWalkingLandUnit)({
 
     CreateDamageEffects = function(self, bone, army)
         for k, v in EffectTemplate.DamageFireSmoke01 do
-            CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
+            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, bone, army, v), 1.5)
         end
     end,
 
@@ -176,7 +206,9 @@ URL0402 = Class(CWalkingLandUnit)({
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat(0.0, 0.3)
             proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
-            proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):SetCollision(false)
+            ProjectileMethodsSetBallisticAcceleration(proj, utilities.GetRandomFloat(-1, -2))
+            ProjectileMethodsSetVelocity(proj, utilities.GetRandomFloat(3, 4))
+            ProjectileMethodsSetCollision(proj, false)
 
             local emitter = CreateEmitterOnEntity(proj, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
@@ -186,7 +218,7 @@ URL0402 = Class(CWalkingLandUnit)({
 
     CreateExplosionDebris = function(self, army)
         for k, v in EffectTemplate.ExplosionDebrisLrg01 do
-            CreateAttachedEmitter(self, 'URL0402', army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'URL0402', army, v)
         end
     end,
 
@@ -196,8 +228,8 @@ URL0402 = Class(CWalkingLandUnit)({
 
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Center_Turret', 4.5, army)
-        CreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp')
-        CreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp')
+        GlobalMethodsCreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp')
+        GlobalMethodsCreateAttachedEmitter(self, 'URL0402', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp')
         self:CreateFirePlumes(army, {
             'Center_Turret',
         }, 0)
@@ -233,11 +265,11 @@ URL0402 = Class(CWalkingLandUnit)({
         -- When the spider bot impacts with the ground
         -- Effects: Explosion on turret, dust effects on the muzzle tip, large dust ring around unit
         -- Other: Damage force ring to force trees over and camera shake
-        self:ShakeCamera(50, 5, 0, 1)
+        EntityMethodsShakeCamera(self, 50, 5, 0, 1)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         for k, v in EffectTemplate.FootFall01 do
-            CreateAttachedEmitter(self, 'Center_Turret_Muzzle', army, v):ScaleEmitter(2)
-            CreateAttachedEmitter(self, 'Center_Turret_Muzzle', army, v):ScaleEmitter(2)
+            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, Center_Turret_Muzzle, army, v), 2)
+            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, Center_Turret_Muzzle, army, v), 2)
         end
 
 
@@ -259,13 +291,13 @@ URL0402 = Class(CWalkingLandUnit)({
                 if bp.Weapon[i].Label == 'SpiderDeath' then
                     position[3] = position[3] + 3 * math.cos(a)
                     position[1] = position[1] + 3 * math.sin(a)
-                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    GlobalMethodsDamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                     break
                 end
             end
         end
 
-        DamageRing(self, {
+        GlobalMethodsDamageRing(self, {
             x,
             y,
             z,
@@ -274,7 +306,7 @@ URL0402 = Class(CWalkingLandUnit)({
         CreateDeathExplosion(self, 'Center_Turret', 2)
 
         -- Finish up force ring to push trees
-        DamageRing(self, {
+        GlobalMethodsDamageRing(self, {
             x,
             y,
             z,

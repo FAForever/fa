@@ -5,6 +5,27 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsAttachBoneTo = EntityMethods.AttachBoneTo
+local EntityMethodsDetachAll = EntityMethods.DetachAll
+local EntityMethodsDetachFrom = EntityMethods.DetachFrom
+local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
+
+local GlobalMethods = _G
+local GlobalMethodsIssueMoveOffFactory = GlobalMethods.IssueMoveOffFactory
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRestoreBuildRestrictions = UnitMethods.RestoreBuildRestrictions
+local UnitMethodsSetBusy = UnitMethods.SetBusy
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 local TMobileFactoryUnit = import('/lua/terranunits.lua').TMobileFactoryUnit
 local WeaponsFile = import('/lua/terranweapons.lua')
 local TDFGaussCannonWeapon = WeaponsFile.TDFLandGaussCannonWeapon
@@ -44,7 +65,8 @@ UEL0401 = Class(TMobileFactoryUnit)({
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         self.EffectsBag = {}
         self.PrepareToBuildManipulator = CreateAnimator(self)
-        self.PrepareToBuildManipulator:PlayAnim(self:GetBlueprint().Display.AnimationBuild, false):SetRate(0)
+        CAnimationManipulatorMethodsPlayAnim(self.PrepareToBuildManipulator, self:GetBlueprint().Display.AnimationBuild, false)
+        CAnimationManipulatorMethodsSetRate(self.PrepareToBuildManipulator, 0)
         self.ReleaseEffectsBag = {}
         self.AttachmentSliderManip = CreateSlider(self, self.BuildAttachBone)
         ChangeState(self, self.IdleState)
@@ -60,11 +82,11 @@ UEL0401 = Class(TMobileFactoryUnit)({
     OnLayerChange = function(self, new, old)
         TMobileFactoryUnit.OnLayerChange(self, new, old)
         if new == 'Land' then
-            self:RestoreBuildRestrictions()
-            self:RequestRefreshUI()
+            UnitMethodsRestoreBuildRestrictions(self)
+            EntityMethodsRequestRefreshUI(self)
         elseif new == 'Seabed' then
             self:AddBuildRestriction(categories.ALLUNITS)
-            self:RequestRefreshUI()
+            EntityMethodsRequestRefreshUI(self)
         else
 
         end
@@ -74,32 +96,32 @@ UEL0401 = Class(TMobileFactoryUnit)({
         OnStartBuild = function(self, unitBuilding, order)
             TMobileFactoryUnit.OnStartBuild(self, unitBuilding, order)
             self.UnitBeingBuilt = unitBuilding
-            self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
+            CAnimationManipulatorMethodsSetRate(self.PrepareToBuildManipulator, self.PrepareToBuildAnimRate)
             ChangeState(self, self.BuildingState)
         end,
 
         Main = function(self)
-            self.PrepareToBuildManipulator:SetRate(-self.PrepareToBuildAnimRate)
-            self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            CAnimationManipulatorMethodsSetRate(self.PrepareToBuildManipulator, -self.PrepareToBuildAnimRate)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
+            UnitMethodsSetBusy(self, false)
         end,
     }),
 
     BuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self.PrepareToBuildManipulator:SetRate(self.PrepareToBuildAnimRate)
+            CAnimationManipulatorMethodsSetRate(self.PrepareToBuildManipulator, self.PrepareToBuildAnimRate)
             local bone = self.BuildAttachBone
-            self:DetachAll(bone)
+            EntityMethodsDetachAll(self, bone)
             if not self.UnitBeingBuilt.Dead then
-                unitBuilding:AttachBoneTo(-2, self, bone)
+                EntityMethodsAttachBoneTo(unitBuilding, -2, self, bone)
                 local unitHeight = unitBuilding:GetBlueprint().SizeY
                 self.AttachmentSliderManip:SetGoal(0, unitHeight, 0)
                 self.AttachmentSliderManip:SetSpeed(-1)
-                unitBuilding:HideBone(0, true)
+                UnitMethodsHideBone(unitBuilding, 0, true)
             end
             WaitSeconds(3)
-            unitBuilding:ShowBone(0, true)
+            UnitMethodsShowBone(unitBuilding, 0, true)
             WaitFor(self.PrepareToBuildManipulator)
             local unitBuilding = self.UnitBeingBuilt
             self.UnitDoneBeingBuilt = false
@@ -116,7 +138,7 @@ UEL0401 = Class(TMobileFactoryUnit)({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             if not unitBuilding.Dead then
-                unitBuilding:ShowBone(0, true)
+                UnitMethodsShowBone(unitBuilding, 0, true)
             end
             WaitFor(self.PrepareToBuildManipulator)
             WaitFor(self.AttachmentSliderManip)
@@ -130,14 +152,14 @@ UEL0401 = Class(TMobileFactoryUnit)({
             WaitFor(self.AttachmentSliderManip)
 
             if not unitBuilding.Dead then
-                unitBuilding:DetachFrom(true)
-                self:DetachAll(self.BuildAttachBone)
+                EntityMethodsDetachFrom(unitBuilding, true)
+                EntityMethodsDetachAll(self, self.BuildAttachBone)
                 local worldPos = self:CalculateWorldPositionFromRelative({
                     0,
                     0,
                     -15,
                 })
-                IssueMoveOffFactory({
+                GlobalMethodsIssueMoveOffFactory({
                     unitBuilding,
                 }, worldPos)
             end

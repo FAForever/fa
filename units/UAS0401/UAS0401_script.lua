@@ -5,6 +5,22 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsAttachBoneTo = EntityMethods.AttachBoneTo
+local EntityMethodsDetachAll = EntityMethods.DetachAll
+local EntityMethodsDetachFrom = EntityMethods.DetachFrom
+local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
+local EntityMethodsSetParentOffset = EntityMethods.SetParentOffset
+
+local GlobalMethods = _G
+local GlobalMethodsIssueMoveOffFactory = GlobalMethods.IssueMoveOffFactory
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsRestoreBuildRestrictions = UnitMethods.RestoreBuildRestrictions
+local UnitMethodsSetBusy = UnitMethods.SetBusy
+-- End of automatically upvalued moho functions
+
 local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
 local WeaponsFile = import('/lua/aeonweapons.lua')
@@ -32,11 +48,11 @@ UAS0401 = Class(ASeaUnit)({
         ASeaUnit.OnStopBeingBuilt(self, builder, layer)
 
         if layer == 'Water' then
-            self:RestoreBuildRestrictions()
-            self:RequestRefreshUI()
+            UnitMethodsRestoreBuildRestrictions(self)
+            EntityMethodsRequestRefreshUI(self)
         else
             self:AddBuildRestriction(categories.ALLUNITS)
-            self:RequestRefreshUI()
+            EntityMethodsRequestRefreshUI(self)
         end
 
         ChangeState(self, self.IdleState)
@@ -59,14 +75,14 @@ UAS0401 = Class(ASeaUnit)({
     OnMotionVertEventChange = function(self, new, old)
         ASeaUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
-            self:RestoreBuildRestrictions()
-            self:RequestRefreshUI()
+            UnitMethodsRestoreBuildRestrictions(self)
+            EntityMethodsRequestRefreshUI(self)
             self:SetWeaponEnabledByLabel('MainGun', true)
             self:PlayUnitSound('Open')
         elseif new == 'Down' then
             self:SetWeaponEnabledByLabel('MainGun', false)
             self:AddBuildRestriction(categories.ALLUNITS)
-            self:RequestRefreshUI()
+            EntityMethodsRequestRefreshUI(self)
             self:PlayUnitSound('Close')
         else
 
@@ -113,8 +129,8 @@ UAS0401 = Class(ASeaUnit)({
 
     IdleState = State({
         Main = function(self)
-            self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
+            UnitMethodsSetBusy(self, false)
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -128,29 +144,29 @@ UAS0401 = Class(ASeaUnit)({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
-            self:DetachAll(bone)
+            EntityMethodsDetachAll(self, bone)
             if not self.UnitBeingBuilt.Dead then
-                unitBuilding:AttachBoneTo(-2, self, bone)
+                EntityMethodsAttachBoneTo(unitBuilding, -2, self, bone)
                 if EntityCategoryContains(categories.ENGINEER + categories.uas0102 + categories.uas0103, unitBuilding) then
-                    unitBuilding:SetParentOffset({
+                    EntityMethodsSetParentOffset(unitBuilding, {
                         0,
                         0,
                         1,
                     })
                 elseif EntityCategoryContains(categories.TECH2 - categories.ENGINEER, unitBuilding) then
-                    unitBuilding:SetParentOffset({
+                    EntityMethodsSetParentOffset(unitBuilding, {
                         0,
                         0,
                         3,
                     })
                 elseif EntityCategoryContains(categories.uas0203, unitBuilding) then
-                    unitBuilding:SetParentOffset({
+                    EntityMethodsSetParentOffset(unitBuilding, {
                         0,
                         0,
                         1.5,
                     })
                 else
-                    unitBuilding:SetParentOffset({
+                    EntityMethodsSetParentOffset(unitBuilding, {
                         0,
                         0,
                         2.5,
@@ -169,14 +185,14 @@ UAS0401 = Class(ASeaUnit)({
     FinishedBuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
+            EntityMethodsDetachFrom(unitBuilding, true)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
             local worldPos = self:CalculateWorldPositionFromRelative({
                 0,
                 0,
                 -20,
             })
-            IssueMoveOffFactory({
+            GlobalMethodsIssueMoveOffFactory({
                 unitBuilding,
             }, worldPos)
             ChangeState(self, self.IdleState)

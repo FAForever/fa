@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetAccel = CRotateManipulatorMethods.SetAccel
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 #****************************************************************************
 #**
 #**  File     :  /cdimage/units/URB1104/URB1104_script.lua
@@ -18,21 +24,21 @@ URB1104 = Class(CMassFabricationUnit)({
         CMassFabricationUnit.OnStopBeingBuilt(self, builder, layer)
         self.Rotator = CreateRotator(self, 'Blade', 'z')
         self.Trash:Add(self.Rotator)
-        self.Rotator:SetAccel(40)
-        self.Rotator:SetTargetSpeed(150)
+        CRotateManipulatorMethodsSetAccel(self.Rotator, 40)
+        CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, 150)
     end,
 
     OnProductionUnpaused = function(self)
         CMassFabricationUnit.OnProductionUnpaused(self)
         if self.Rotator then
-            self.Rotator:SetTargetSpeed(150)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, 150)
         end
     end,
 
     OnProductionPaused = function(self)
         CMassFabricationUnit.OnProductionPaused(self)
         if self.Rotator then
-            self.Rotator:SetTargetSpeed(0)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator, 0)
         end
     end,
 })

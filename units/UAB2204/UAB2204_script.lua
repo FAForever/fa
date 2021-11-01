@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UAB2204/UAB2204_script.lua
@@ -20,8 +25,8 @@ UAB2204 = Class(AStructureUnit)({
 
             PlayFxRackSalvoChargeSequence = function(self)
                 AAATemporalFizzWeapon.PlayFxRackSalvoChargeSequence(self)
-                CreateAttachedEmitter(self.unit, 'Turret_Right_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
-                CreateAttachedEmitter(self.unit, 'Turret_Left_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
+                GlobalMethodsCreateAttachedEmitter(self.unit, 'Turret_Right_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_02_emit.bp')
+                GlobalMethodsCreateAttachedEmitter(self.unit, 'Turret_Left_Muzzle', self.unit.Army, '/effects/emitters/temporal_fizz_muzzle_charge_03_emit.bp')
             end,
         }),
     },

@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 ------------------------------------------------------------
 --
 --  File     :  /Projectiles/AIFMiasmaShell02/AIFMiasmaShell02_script.lua
@@ -18,8 +24,8 @@ AIFMiasmaShell02 = Class(AMiasmaProjectile02)({
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -28,7 +34,7 @@ AIFMiasmaShell02 = Class(AMiasmaProjectile02)({
             local rotation = RandomFloat(0, 2 * math.pi)
             local army = self.Army
 
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius + 1, radius + 1, 200, 100, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius + 1, radius + 1, 200, 100, army)
         end
 
 

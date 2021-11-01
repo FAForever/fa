@@ -1,3 +1,14 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetAmbientSound = EntityMethods.SetAmbientSound
+
+local GlobalMethods = _G
+local GlobalMethodsIssueDive = GlobalMethods.IssueDive
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
+-- End of automatically upvalued moho functions
+
 --****************************************************************************
 --**
 --**  File     :  /cdimage/units/XSS0201/XSS0201_script.lua
@@ -29,10 +40,10 @@ XSS0201 = Class(SSubUnit)({
             wep1:PlaySound(bp1.Audio.BeamStop)
         end
         if bp1.Audio.BeamLoop and wep1.Beams[1].Beam then
-            wep1.Beams[1].Beam:SetAmbientSound(nil, nil)
+            EntityMethodsSetAmbientSound(wep1.Beams[1].Beam, nil, nil)
         end
         for k, v in wep1.Beams do
-            v.Beam:Disable()
+            IAniManipulatorMethodsDisable(v.Beam)
         end
 
         local wep2 = self:GetWeaponByLabel('BackTurret')
@@ -41,10 +52,10 @@ XSS0201 = Class(SSubUnit)({
             wep2:PlaySound(bp2.Audio.BeamStop)
         end
         if bp2.Audio.BeamLoop and wep2.Beams[1].Beam then
-            wep2.Beams[1].Beam:SetAmbientSound(nil, nil)
+            EntityMethodsSetAmbientSound(wep2.Beams[1].Beam, nil, nil)
         end
         for k, v in wep2.Beams do
-            v.Beam:Disable()
+            IAniManipulatorMethodsDisable(v.Beam)
         end
 
         SSubUnit.OnKilled(self, instigator, type, overkillRatio)
@@ -69,7 +80,7 @@ XSS0201 = Class(SSubUnit)({
         --- Unless we're gifted, we should have an original builder.
         --- Remains to be seen if this property is actually copied during gift
         if self.originalBuilder then
-            IssueDive({
+            GlobalMethodsIssueDive({
                 self,
             })
         end

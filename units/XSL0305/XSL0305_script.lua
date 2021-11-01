@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetScriptBit = UnitMethods.SetScriptBit
+local UnitMethodsSetSpeedMult = UnitMethods.SetSpeedMult
+-- End of automatically upvalued moho functions
+
 --**************************************************************************
 --
 --  File     :  /data/units/XSL0305/XSL0305_script.lua
@@ -22,7 +28,7 @@ XSL0305 = Class(SLandUnit)({
         SniperGun = Class(SDFSihEnergyRifleSniperMode)({
             SetOnTransport = function(self, transportstate)
                 SDFSihEnergyRifleSniperMode.SetOnTransport(self, transportstate)
-                self.unit:SetScriptBit('RULEUTC_WeaponToggle', false)
+                UnitMethodsSetScriptBit(self.unit, 'RULEUTC_WeaponToggle', false)
             end,
         }),
     },
@@ -49,7 +55,7 @@ XSL0305 = Class(SLandUnit)({
         SLandUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
             local bp = self:GetBlueprint()
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier * 0.75)
+            UnitMethodsSetSpeedMult(self, bp.Physics.LandSpeedMultiplier * 0.75)
 
             self:SetWeaponEnabledByLabel('SniperGun', true)
             self:SetWeaponEnabledByLabel('MainGun', false)
@@ -64,6 +70,7 @@ XSL0305 = Class(SLandUnit)({
         end
         self.ShieldEffectsBag = {
 
+
         }
         table.insert(self.ShieldEffectsBag, CreateAttachedEmitter(self, 'XSL0305', self.Army, '/effects/emitters/seraphim_being_built_ambient_01_emit.bp'))
     end,
@@ -73,7 +80,7 @@ XSL0305 = Class(SLandUnit)({
         if bit == 1 then
             -- Reset movement speed
             local bp = self:GetBlueprint()
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
+            UnitMethodsSetSpeedMult(self, bp.Physics.LandSpeedMultiplier)
 
             self:SetWeaponEnabledByLabel('SniperGun', false)
             self:SetWeaponEnabledByLabel('MainGun', true)

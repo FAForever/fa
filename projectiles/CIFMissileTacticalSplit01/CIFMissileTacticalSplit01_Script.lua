@@ -1,3 +1,15 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetDamage = ProjectileMethods.SetDamage
+local ProjectileMethodsSetDestroyOnWater = ProjectileMethods.SetDestroyOnWater
+local ProjectileMethodsSetMaxSpeed = ProjectileMethods.SetMaxSpeed
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+local ProjectileMethodsTrackTarget = ProjectileMethods.TrackTarget
+-- End of automatically upvalued moho functions
+
 #
 # Cybran "Loa" Tactical Missile, child missiles that create when the mother projectile is shot down by
 # enemy anti-missile systems
@@ -8,8 +20,8 @@ CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile)({
 
     OnCreate = function(self)
         CLOATacticalChildMissileProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.5)
-        self:SetDamage(25)
+        EntityMethodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 2.5)
+        ProjectileMethodsSetDamage(self, 25)
         self.invincible = true
         self:ForkThread(self.DelayForDestruction)
     end,
@@ -20,11 +32,11 @@ CIFMissileTacticalSplit01 = Class(CLOATacticalChildMissileProjectile)({
         WaitSeconds(0.3)
         self.invincible = false
         self.CanTakeDamage = true
-        self:SetDestroyOnWater(true)
-        self:TrackTarget(true)
-        self:SetTurnRate(80)
+        ProjectileMethodsSetDestroyOnWater(self, true)
+        ProjectileMethodsTrackTarget(self, true)
+        ProjectileMethodsSetTurnRate(self, 80)
         #25
-        self:SetMaxSpeed(15)
+        ProjectileMethodsSetMaxSpeed(self, 15)
         #25
         self:SetAcceleration(6)
     end,

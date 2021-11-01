@@ -8,6 +8,36 @@
 -- ****************************************************************************
 
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetDirectionalAnim = CAnimationManipulatorMethods.SetDirectionalAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsShakeCamera = EntityMethods.ShakeCamera
+
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+local GlobalMethodsDamageRing = GlobalMethods.DamageRing
+
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsOffsetEmitter = IEffectMethods.OffsetEmitter
+local IEffectMethodsScaleEmitter = IEffectMethods.ScaleEmitter
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetBallisticAcceleration = ProjectileMethods.SetBallisticAcceleration
+local ProjectileMethodsSetCollision = ProjectileMethods.SetCollision
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsSetSpeedMult = UnitMethods.SetSpeedMult
+local UnitMethodsSetUnSelectable = UnitMethods.SetUnSelectable
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local MobileUnit = import('/lua/defaultunits.lua').MobileUnit
 local explosion = import('/lua/defaultexplosions.lua')
@@ -47,7 +77,7 @@ XRL0403 = Class(CWalkingLandUnit)({
         self:SetWeaponEnabledByLabel('AAGun', false)
         self:SetWeaponEnabledByLabel('Torpedo01', false)
 
-        self:ShowBone('Missile_Turret', true)
+        UnitMethodsShowBone(self, 'Missile_Turret', true)
     end,
 
     EnableHackPegLauncher = function(self)
@@ -59,7 +89,7 @@ XRL0403 = Class(CWalkingLandUnit)({
         CWalkingLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
         if self:IsValidBone('Missile_Turret') then
-            self:HideBone('Missile_Turret', true)
+            UnitMethodsHideBone(self, 'Missile_Turret', true)
         end
     end,
 
@@ -69,23 +99,24 @@ XRL0403 = Class(CWalkingLandUnit)({
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
+        CAnimationManipulatorMethodsPlayAnim(self.AnimationManipulator, self:GetBlueprint().Display.AnimationActivate, false)
+        CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 0)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
 
         if self:IsValidBone('Missile_Turret') then
-            self:HideBone('Missile_Turret', true)
+            UnitMethodsHideBone(self, 'Missile_Turret', true)
         end
 
         if self.AnimationManipulator then
-            self:SetUnSelectable(true)
-            self.AnimationManipulator:SetRate(1)
+            UnitMethodsSetUnSelectable(self, true)
+            CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 1)
 
             self:ForkThread(function()
                 WaitSeconds(self.AnimationManipulator:GetAnimationDuration() * self.AnimationManipulator:GetRate())
-                self:SetUnSelectable(false)
+                UnitMethodsSetUnSelectable(self, false)
                 self.AnimationManipulator:Destroy()
             end)
         end
@@ -99,11 +130,11 @@ XRL0403 = Class(CWalkingLandUnit)({
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
             -- Set movement speed to default
-            self:SetSpeedMult(1)
+            UnitMethodsSetSpeedMult(self, 1)
         elseif new == 'Seabed' then
             self:EnableUnitIntel('Layer', 'Sonar')
             -- Increase speed while in water
-            self:SetSpeedMult(self:GetBlueprint().Physics.WaterSpeedMultiplier)
+            UnitMethodsSetSpeedMult(self, self:GetBlueprint().Physics.WaterSpeedMultiplier)
         else
 
         end
@@ -111,7 +142,7 @@ XRL0403 = Class(CWalkingLandUnit)({
 
     CreateDamageEffects = function(self, bone, army)
         for k, v in EffectTemplate.DamageFireSmoke01 do
-            CreateAttachedEmitter(self, bone, army, v):ScaleEmitter(1.5)
+            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, bone, army, v), 1.5)
         end
     end,
 
@@ -141,7 +172,9 @@ XRL0403 = Class(CWalkingLandUnit)({
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat(0.0, 0.3)
             proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
-            proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):SetCollision(false)
+            ProjectileMethodsSetBallisticAcceleration(proj, utilities.GetRandomFloat(-1, -2))
+            ProjectileMethodsSetVelocity(proj, utilities.GetRandomFloat(3, 4))
+            ProjectileMethodsSetCollision(proj, false)
 
             local emitter = CreateEmitterOnEntity(proj, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
@@ -151,7 +184,7 @@ XRL0403 = Class(CWalkingLandUnit)({
 
     CreateExplosionDebris = function(self, army)
         for k, v in EffectTemplate.ExplosionDebrisLrg01 do
-            CreateAttachedEmitter(self, 'XRL0403', army, v):OffsetEmitter(0, 5, 0)
+            IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, XRL0403, army, v), 0, 5, 0)
         end
     end,
 
@@ -161,9 +194,9 @@ XRL0403 = Class(CWalkingLandUnit)({
 
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Left_Leg01_B01', 4.5, army)
-        CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp'):OffsetEmitter(0, 5, 0)
-        CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/explosion_fire_sparks_02_emit.bp'):OffsetEmitter(0, 5, 0)
-        CreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/distortion_ring_01_emit.bp')
+        IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, XRL0403, army, /effects/emitters/destruction_explosion_concussion_ring_03_emit.bp), 0, 5, 0)
+        IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, XRL0403, army, /effects/emitters/explosion_fire_sparks_02_emit.bp), 0, 5, 0)
+        GlobalMethodsCreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/distortion_ring_01_emit.bp')
         self:CreateFirePlumes(army, {
             'XRL0403',
         }, 0)
@@ -206,7 +239,7 @@ XRL0403 = Class(CWalkingLandUnit)({
                 if bp.Weapon[i].Label == 'MegalithDeath' then
                     position[3] = position[3] + 2.5 * math.cos(a)
                     position[1] = position[1] + 2.5 * math.sin(a)
-                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    GlobalMethodsDamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                     break
                 end
             end
@@ -218,7 +251,7 @@ XRL0403 = Class(CWalkingLandUnit)({
         -- When the spider bot impacts with the ground
         -- Effects: Explosion on turret, dust effects on the muzzle tip, large dust ring around unit
         -- Other: Damage force ring to force trees over and camera shake
-        self:ShakeCamera(40, 4, 1, 3.8)
+        EntityMethodsShakeCamera(self, 40, 4, 1, 3.8)
         CreateDeathExplosion(self, 'Left_Turret_Barrel', 1)
 
         self:CreateExplosionDebris(army)
@@ -226,7 +259,7 @@ XRL0403 = Class(CWalkingLandUnit)({
 
         local x, y, z = unpack(self:GetPosition())
         z = z + 3
-        DamageRing(self, {
+        GlobalMethodsDamageRing(self, {
             x,
             y,
             z,
@@ -235,7 +268,7 @@ XRL0403 = Class(CWalkingLandUnit)({
         CreateDeathExplosion(self, 'Right_Turret', 2)
 
         -- Finish up force ring to push trees
-        DamageRing(self, {
+        GlobalMethodsDamageRing(self, {
             x,
             y,
             z,
@@ -266,7 +299,7 @@ XRL0403 = Class(CWalkingLandUnit)({
         explosion.CreateFlash(self, 'Right_Leg01_B01', 3.2, army)
 
         self:CreateWreckage(0.1)
-        self:ShakeCamera(3, 2, 0, 0.15)
+        EntityMethodsShakeCamera(self, 3, 2, 0, 0.15)
         self:Destroy()
     end,
 
@@ -277,8 +310,8 @@ XRL0403 = Class(CWalkingLandUnit)({
         if old == 'Stopped' then
             local bpDisplay = self:GetBlueprint().Display
             if bpDisplay.AnimationWalk and self.Animator then
-                self.Animator:SetDirectionalAnim(true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate)
+                CAnimationManipulatorMethodsSetDirectionalAnim(self.Animator, true)
+                CAnimationManipulatorMethodsSetRate(self.Animator, bpDisplay.AnimationWalkRate)
             end
         end
     end,

@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/URB2302/URB2302_script.lua
@@ -25,17 +30,17 @@ URB2302 = Class(CStructureUnit)({
                 local army = self.unit.Army
                 DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
                 for k, v in self.FxGroundEffect do
-                    CreateAttachedEmitter(self.unit, 'URB2302', army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, 'URB2302', army, v)
                 end
                 for k, v in self.FxVentEffect do
-                    CreateAttachedEmitter(self.unit, 'Exhaust_Left', army, v)
-                    CreateAttachedEmitter(self.unit, 'Exhaust_Right', army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, 'Exhaust_Left', army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, 'Exhaust_Right', army, v)
                 end
                 for k, v in self.FxMuzzleEffect do
-                    CreateAttachedEmitter(self.unit, 'Turret_Muzzle', army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, 'Turret_Muzzle', army, v)
                 end
                 for k, v in self.FxCoolDownEffect do
-                    CreateAttachedEmitter(self.unit, 'Barrel_B01', army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, 'Barrel_B01', army, v)
                 end
             end,
         }),

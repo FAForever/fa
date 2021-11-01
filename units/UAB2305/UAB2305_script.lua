@@ -5,6 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AIFQuantumWarhead = import('/lua/aeonweapons.lua').AIFQuantumWarhead
 local EffectUtil = import('/lua/EffectUtilities.lua')
@@ -18,7 +23,7 @@ UAB2305 = Class(AStructureUnit)({
 
             PlayFxWeaponUnpackSequence = function(self)
                 for k, v in self.UnpackEffects01 do
-                    CreateAttachedEmitter(self.unit, 'B04', self.unit.Army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, 'B04', self.unit.Army, v)
                 end
 
                 AIFQuantumWarhead.PlayFxWeaponUnpackSequence(self)

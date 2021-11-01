@@ -5,6 +5,17 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsIssueDive = GlobalMethods.IssueDive
+
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsOffsetEmitter = IEffectMethods.OffsetEmitter
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetSpeedMult = UnitMethods.SetSpeedMult
+-- End of automatically upvalued moho functions
+
 local SSonarUnit = import('/lua/seraphimunits.lua').SSonarUnit
 local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
 local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit
@@ -20,7 +31,7 @@ XSB3202 = Class(SSubUnit)({
         -- Unless we're gifted, we should have an original builder.
         -- Remains to be seen if this property is actually copied during gift
         if self.originalBuilder then
-            IssueDive({
+            GlobalMethodsIssueDive({
                 self,
             })
         end
@@ -44,9 +55,9 @@ XSB3202 = Class(SSubUnit)({
         local mult = self:GetBlueprint().Physics.SubSpeedMultiplier
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
-            self:SetSpeedMult(1)
+            UnitMethodsSetSpeedMult(self, 1)
         elseif new == 'Down' then
-            self:SetSpeedMult(mult)
+            UnitMethodsSetSpeedMult(self, mult)
         else
 
         end
@@ -65,7 +76,7 @@ XSB3202 = Class(SSubUnit)({
                         for ke, vEffect in effects do
                             emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
-                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
+                                IEffectMethodsOffsetEmitter(emit, vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                             end
                         end
                     end

@@ -5,6 +5,15 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+local GlobalMethodsIssuePatrol = GlobalMethods.IssuePatrol
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+-- End of automatically upvalued moho functions
+
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SSJammerCrystalAmbient = import('/lua/EffectTemplates.lua').SJammerCrystalAmbient
 
@@ -12,14 +21,14 @@ XSC9002 = Class(SStructureUnit)({
     OnCreate = function(self, builder, layer)
         -- Place emitters on certain light bones on the mesh.
         for _, v in SSJammerCrystalAmbient do
-            CreateAttachedEmitter(self, 'XSC9002', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'XSC9002', self.Army, v)
         end
 
         self:ForkThread(self.LandBlipThread)
         self:ForkThread(self.AirBlipThread)
 
         -- Make unit uncapturable
-        self:SetCapturable(false)
+        UnitMethodsSetCapturable(self, false)
 
         SStructureUnit.OnCreate(self)
     end,
@@ -45,28 +54,28 @@ XSC9002 = Class(SStructureUnit)({
             self.airChildUnit = CreateUnitHPR('XSC9011', self.Army, position[1], position[2], position[3], 0, 0, 0)
             self.airChildUnit.parentCrystal = self
 
-            IssuePatrol({
+            GlobalMethodsIssuePatrol({
                 self.airChildUnit,
             }, {
                 position[1] + Random(-10, 10),
                 position[2],
                 position[3] + Random(-10, 10),
             })
-            IssuePatrol({
+            GlobalMethodsIssuePatrol({
                 self.airChildUnit,
             }, {
                 position[1] + Random(-10, 10),
                 position[2],
                 position[3] + Random(-10, 10),
             })
-            IssuePatrol({
+            GlobalMethodsIssuePatrol({
                 self.airChildUnit,
             }, {
                 position[1] + Random(-10, 10),
                 position[2],
                 position[3] + Random(-10, 10),
             })
-            IssuePatrol({
+            GlobalMethodsIssuePatrol({
                 self.airChildUnit,
             }, {
                 position[1] + Random(-10, 10),

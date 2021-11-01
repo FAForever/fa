@@ -5,6 +5,17 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetAmbientSound = EntityMethods.SetAmbientSound
+
+local GlobalMethods = _G
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
+-- End of automatically upvalued moho functions
+
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 local WeaponsFile = import('/lua/aeonweapons.lua')
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
@@ -29,11 +40,11 @@ UAL0401 = Class(AWalkingLandUnit)({
         end
 
         if bp.Audio.BeamLoop and wep.Beams[1].Beam then
-            wep.Beams[1].Beam:SetAmbientSound(nil, nil)
+            EntityMethodsSetAmbientSound(wep.Beams[1].Beam, nil, nil)
         end
 
         for k, v in wep.Beams do
-            v.Beam:Disable()
+            IAniManipulatorMethodsDisable(v.Beam)
         end
     end,
 
@@ -72,7 +83,7 @@ UAL0401 = Class(AWalkingLandUnit)({
                 if bp.Weapon[i].Label == 'CollossusDeath' then
                     position[3] = position[3] + 5 * math.cos(a)
                     position[1] = position[1] + 5 * math.sin(a)
-                    DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    GlobalMethodsDamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                     break
                 end
             end

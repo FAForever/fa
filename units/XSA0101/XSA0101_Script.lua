@@ -23,6 +23,7 @@ XSA0101 = Class(SAirUnit)({
             Omni = false,
             WaterVision = false,
 
+
         }
         local vizEntity = VizMarker(spec)
     end,

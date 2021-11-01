@@ -1,3 +1,14 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetMesh = EntityMethods.SetMesh
+
+local GlobalMethods = _G
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+
+local UnitWeaponMethods = _G.moho.weapon_methods
+local UnitWeaponMethodsFireWeapon = UnitWeaponMethods.FireWeapon
+-- End of automatically upvalued moho functions
+
 ----------------------------------------------------------------
 -- File     :  /data/units/XRL0302/XRL0302_script.lua
 -- Author(s):  Jessica St. Croix, Gordon Duclos
@@ -17,7 +28,7 @@ local EMPDeathWeapon = Class(Weapon)({
 
     Fire = function(self)
         local blueprint = self:GetBlueprint()
-        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
+        GlobalMethodsDamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
 })
 
@@ -67,12 +78,13 @@ XRL0302 = Class(CWalkingLandUnit)({
     HideUnit = function(self)
         WaitTicks(1)
         --LOG('IEXIST3', self:GetBlueprint().Display.CloakMeshBlueprint)
-        self:SetMesh(self:GetBlueprint().Display.CloakMeshBlueprint, true)
+        EntityMethodsSetMesh(self, self:GetBlueprint().Display.CloakMeshBlueprint, true)
     end,
 
     -- Allow the trigger button to blow the weapon, resulting in OnKilled instigator 'nil'
     OnProductionPaused = function(self)
-        self:GetWeaponByLabel('Suicide'):FireWeapon()
+        self:GetWeaponByLabel('Suicide')
+        UnitWeaponMethodsFireWeapon(self)
     end,
 
     EmitPeriodicEffects = function(self)
@@ -94,7 +106,8 @@ XRL0302 = Class(CWalkingLandUnit)({
     OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
         if instigator then
-            self:GetWeaponByLabel('Suicide'):FireWeapon()
+            self:GetWeaponByLabel('Suicide')
+            UnitWeaponMethodsFireWeapon(self)
         end
     end,
 

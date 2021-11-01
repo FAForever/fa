@@ -21,6 +21,7 @@ UEL0103 = Class(TLandUnit)({
                     Lifetime = bp.CameraLifetime or 5,
                     Army = self.unit.Army,
 
+
                 }
                 if proj and not proj:BeenDestroyed() then
                     proj:PassData(data)

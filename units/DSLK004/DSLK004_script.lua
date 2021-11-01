@@ -7,6 +7,18 @@
 --**  Copyright © 2008 Blade Braver!
 --****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local CollisionBeamEntityMethods = _G.moho.CollisionBeamEntity
+local CollisionBeamEntityMethodsSetBeamFx = CollisionBeamEntityMethods.SetBeamFx
+
+local GlobalMethods = _G
+local GlobalMethodsAttachBeamToEntity = GlobalMethods.AttachBeamToEntity
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+local GlobalMethodsCreateSplat = GlobalMethods.CreateSplat
+local GlobalMethodsDamage = GlobalMethods.Damage
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
 --local CollisionBeamFile = import('/lua/kirvesbeams.lua')
 local DefaultBeamWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultBeamWeapon
@@ -95,18 +107,18 @@ local PhasonCollisionBeam = Class(SCCollisionBeam)({
 
             if radius and radius > 0 then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
-                    DamageArea(instigator, BeamEndPos, radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
+                    GlobalMethodsDamageArea(instigator, BeamEndPos, radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
                 else
                     ForkThread(DefaultDamage.AreaDoTThread, instigator, BeamEndPos, damageData.DoTPulses or 1, damageData.DoTTime / damageData.DoTPulses or 1, radius, damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             elseif targetEntity then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
-                    Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
+                    GlobalMethodsDamage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
                 else
                     ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, damageData.DoTTime / damageData.DoTPulses or 1, damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             else
-                DamageArea(instigator, BeamEndPos, 0.25, damage, damageData.DamageType, damageData.DamageFriendly)
+                GlobalMethodsDamageArea(instigator, BeamEndPos, 0.25, damage, damageData.DamageType, damageData.DamageFriendly)
             end
         else
             LOG('*ERROR: THERE IS NO INSTIGATOR FOR DAMAGE ON THIS COLLISIONBEAM = ', repr(damageData))
@@ -133,13 +145,13 @@ local PhasonCollisionBeam = Class(SCCollisionBeam)({
                 fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, 0, self.Army, bp)
             else
                 fxBeam = CreateBeamEmitter(bp, self.Army)
-                AttachBeamToEntity(fxBeam, self, 0, self.Army)
+                GlobalMethodsAttachBeamToEntity(fxBeam, self, 0, self.Army)
             end
 
             -- collide on start if it's a continuous beam
             local weaponBlueprint = self.Weapon:GetBlueprint()
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
-            self:SetBeamFx(fxBeam, bCollideOnStart)
+            CollisionBeamEntityMethodsSetBeamFx(self, fxBeam, bCollideOnStart)
 
             table.insert(self.BeamEffectsBag, fxBeam)
             self.Trash:Add(fxBeam)
@@ -185,7 +197,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam)({
 
         while true do
             if Util.GetDistanceBetweenTwoVectors(CurrentPosition, LastPosition) > 0.25 or skipCount > 100 then
-                CreateSplat(CurrentPosition, Util.GetRandomFloat(0, 2 * math.pi), self.SplatTexture, size, size, 100, 100, self.Army)
+                GlobalMethodsCreateSplat(CurrentPosition, Util.GetRandomFloat(0, 2 * math.pi), self.SplatTexture, size, size, 100, 100, self.Army)
                 LastPosition = CurrentPosition
                 skipCount = 1
             else
@@ -238,9 +250,10 @@ DSLK004 = Class(SLandUnit)({
             '/units/DSLK004/effects/orbeffect_01.bp',
             '/units/DSLK004/effects/orbeffect_02.bp',
 
+
         }
         for k, v in EfctTempl do
-            CreateAttachedEmitter(self, 'Orb', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
     end,
 })

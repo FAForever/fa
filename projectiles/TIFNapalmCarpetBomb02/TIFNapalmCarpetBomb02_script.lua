@@ -8,6 +8,13 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+local GlobalMethodsDamageRing = GlobalMethods.DamageRing
+-- End of automatically upvalued moho functions
+
 local TNapalmHvyCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
@@ -19,8 +26,8 @@ TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile)({
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -29,9 +36,9 @@ TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile)({
             local size = radius + RandomFloat(0.75, 2.0)
             local army = self.Army
 
-            DamageRing(self, pos, 0.1, 5 / 4 * radius, 10, 'Fire', FriendlyFire, false)
+            GlobalMethodsDamageRing(self, pos, 0.1, 5 / 4 * radius, 10, 'Fire', FriendlyFire, false)
 
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 50, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 50, army)
         end
 
         TNapalmHvyCarpetBombProjectile.OnImpact(self, targetType, targetEntity)

@@ -1,3 +1,10 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsAttachBoneTo = EntityMethods.AttachBoneTo
+local EntityMethodsEnableIntel = EntityMethods.EnableIntel
+local EntityMethodsInitIntel = EntityMethods.InitIntel
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UES0103/UES0103_script.lua
@@ -26,11 +33,11 @@ UES0103 = Class(TSeaUnit)({
         self.RadarEnt = Entity({})
         self.Trash:Add(self.RadarEnt)
         local bp = self:GetBlueprint()
-        self.RadarEnt:InitIntel(self.Army, 'Radar', bp.Intel.RadarRadius or 75)
-        self.RadarEnt:EnableIntel('Radar')
-        self.RadarEnt:InitIntel(self.Army, 'Sonar', bp.Intel.SonarRadius or 75)
-        self.RadarEnt:EnableIntel('Sonar')
-        self.RadarEnt:AttachBoneTo(-1, self, 0)
+        EntityMethodsInitIntel(self.RadarEnt, self.Army, 'Radar', bp.Intel.RadarRadius or 75)
+        EntityMethodsEnableIntel(self.RadarEnt, 'Radar')
+        EntityMethodsInitIntel(self.RadarEnt, self.Army, 'Sonar', bp.Intel.SonarRadius or 75)
+        EntityMethodsEnableIntel(self.RadarEnt, 'Sonar')
+        EntityMethodsAttachBoneTo(self.RadarEnt, -1, self, 0)
     end,
 })
 

@@ -1,3 +1,20 @@
+-- Automatically upvalued moho functions for performance
+local CBuilderArmManipulatorMethods = _G.moho.BuilderArmManipulator
+local CBuilderArmManipulatorMethodsSetAimingArc = CBuilderArmManipulatorMethods.SetAimingArc
+
+local GlobalMethods = _G
+local GlobalMethodsIssueClearCommands = GlobalMethods.IssueClearCommands
+local GlobalMethodsIssueGuard = GlobalMethods.IssueGuard
+local GlobalMethodsIssueMove = GlobalMethods.IssueMove
+local GlobalMethodsIssueStop = GlobalMethods.IssueStop
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsSetPrecedence = IAniManipulatorMethods.SetPrecedence
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetConsumptionActive = UnitMethods.SetConsumptionActive
+-- End of automatically upvalued moho functions
+
 -----------------------------------------------------------------
 -- File     :  /cdimage/units/URA0001/URA0001_script.lua
 -- Author(s):  Gordon Duclos
@@ -12,6 +29,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local DeprecatedWarnings = {
 
     -- Kept after #3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
+
 
 }
 URA0001 = Class(CAirUnit)({
@@ -28,10 +46,10 @@ URA0001 = Class(CAirUnit)({
 
         CAirUnit.OnCreate(self)
         self.BuildArmManipulator = CreateBuilderArmController(self, 'URA0001', 'URA0001', 0)
-        self.BuildArmManipulator:SetAimingArc(-180, 180, 360, -90, 90, 360)
-        self.BuildArmManipulator:SetPrecedence(5)
+        CBuilderArmManipulatorMethodsSetAimingArc(self.BuildArmManipulator, -180, 180, 360, -90, 90, 360)
+        IAniManipulatorMethodsSetPrecedence(self.BuildArmManipulator, 5)
         self.Trash:Add(self.BuildArmManipulator)
-        self:SetConsumptionActive(false)
+        UnitMethodsSetConsumptionActive(self, false)
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
@@ -44,14 +62,14 @@ URA0001 = Class(CAirUnit)({
 
     OnStartCapture = function(self, target)
         -- You can't capture!
-        IssueStop({
+        GlobalMethodsIssueStop({
             self,
         })
     end,
 
     OnStartReclaim = function(self, target)
         -- You can't reclaim!
-        IssueStop({
+        GlobalMethodsIssueStop({
             self,
         })
     end,
@@ -95,14 +113,14 @@ URA0001 = Class(CAirUnit)({
 
     IdleState = State({
         Main = function(self)
-            IssueClearCommands({
+            GlobalMethodsIssueClearCommands({
                 self,
             })
-            IssueMove({
+            GlobalMethodsIssueMove({
                 self,
             }, self:GetPosition())
             WaitSeconds(0.5)
-            IssueMove({
+            GlobalMethodsIssueMove({
                 self,
             }, self.spawnedBy:GetPosition())
 
@@ -133,10 +151,10 @@ URA0001 = Class(CAirUnit)({
                 ChangeState(self, self.IdleState)
             end
 
-            IssueClearCommands({
+            GlobalMethodsIssueClearCommands({
                 self,
             })
-            IssueGuard({
+            GlobalMethodsIssueGuard({
                 self,
             }, focus)
         end,

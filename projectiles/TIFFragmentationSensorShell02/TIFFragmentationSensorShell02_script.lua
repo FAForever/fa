@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 --
 -- Terran T1 Artillery Fragmentation/Sensor Shells : uel0103
 --
@@ -10,8 +16,8 @@ TIFFragmentationSensorShell02 = Class(TArtilleryProjectile)({
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -20,7 +26,7 @@ TIFFragmentationSensorShell02 = Class(TArtilleryProjectile)({
             local rotation = RandomFloat(0, 2 * math.pi)
             local army = self.Army
 
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 100, 10, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 100, 10, army)
         end
 
 

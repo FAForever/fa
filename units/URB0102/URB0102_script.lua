@@ -1,3 +1,16 @@
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsDetachAll = EntityMethods.DetachAll
+local EntityMethodsDetachFrom = EntityMethods.DetachFrom
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetBlockCommandQueue = UnitMethods.SetBlockCommandQueue
+local UnitMethodsSetBusy = UnitMethods.SetBusy
+-- End of automatically upvalued moho functions
+
 #****************************************************************************
 #**
 #**  File     :  /cdimage/units/URB0102/URB0102_script.lua
@@ -22,8 +35,8 @@ URB0102 = Class(CAirFactoryUnit)({
     --Overwrite FinishBuildThread to speed up platform lowering rate
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
-        self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
+        UnitMethodsSetBusy(self, true)
+        UnitMethodsSetBlockCommandQueue(self, true)
         local bp = self:GetBlueprint()
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
@@ -34,15 +47,15 @@ URB0102 = Class(CAirFactoryUnit)({
             WaitFor(self.RollOffAnim)
         end
         if unitBeingBuilt and not unitBeingBuilt.Dead then
-            unitBeingBuilt:DetachFrom(true)
+            EntityMethodsDetachFrom(unitBeingBuilt, true)
         end
-        self:DetachAll(bp.Display.BuildAttachBone or 0)
+        EntityMethodsDetachAll(self, bp.Display.BuildAttachBone or 0)
         self:DestroyBuildRotator()
         if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
-            self:SetBusy(false)
-            self:SetBlockCommandQueue(false)
+            UnitMethodsSetBusy(self, false)
+            UnitMethodsSetBlockCommandQueue(self, false)
         end
     end,
 
@@ -51,7 +64,7 @@ URB0102 = Class(CAirFactoryUnit)({
     PlayFxRollOffEnd = function(self)
         if self.RollOffAnim then
             --Change: SetRate(-4)
-            self.RollOffAnim:SetRate(10)
+            CAnimationManipulatorMethodsSetRate(self.RollOffAnim, 10)
             WaitFor(self.RollOffAnim)
             self.RollOffAnim:Destroy()
             self.RollOffAnim = nil

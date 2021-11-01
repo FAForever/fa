@@ -1,3 +1,27 @@
+-- Automatically upvalued moho functions for performance
+local CCollisionManipulatorMethods = _G.moho.CollisionManipulator
+local CCollisionManipulatorMethodsEnableTerrainCheck = CCollisionManipulatorMethods.EnableTerrainCheck
+local CCollisionManipulatorMethodsWatchBone = CCollisionManipulatorMethods.WatchBone
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsDetachAll = EntityMethods.DetachAll
+local EntityMethodsDetachFrom = EntityMethods.DetachFrom
+local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
+
+local GlobalMethods = _G
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+local GlobalMethodsIssueMoveOffFactory = GlobalMethods.IssueMoveOffFactory
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsSetBusy = UnitMethods.SetBusy
+local UnitMethodsSetFocusEntity = UnitMethods.SetFocusEntity
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 -----------------------------------------------------------------
 -- File     :  /cdimage/units/UAA0310/UAA0310_script.lua
 -- Author(s):  John Comes
@@ -32,7 +56,7 @@ UAA0310 = Class(AirTransport)({
     OnKilled = function(self, instigator, type, overkillRatio)
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
         for _, v in wep.Beams do
-            v.Beam:Disable()
+            IAniManipulatorMethodsDisable(v.Beam)
             if wep.HoldFireThread then
                 KillThread(wep.HoldFireThread)
             end
@@ -41,22 +65,22 @@ UAA0310 = Class(AirTransport)({
 
         self.detector = CreateCollisionDetector(self)
         self.Trash:Add(self.detector)
-        self.detector:WatchBone('Left_Turret01_Muzzle')
-        self.detector:WatchBone('Right_Turret01_Muzzle')
-        self.detector:WatchBone('Left_Turret02_WepFocus')
-        self.detector:WatchBone('Right_Turret02_WepFocus')
-        self.detector:WatchBone('Left_Turret03_Muzzle')
-        self.detector:WatchBone('Right_Turret03_Muzzle')
-        self.detector:WatchBone('Attachpoint01')
-        self.detector:WatchBone('Attachpoint02')
-        self.detector:EnableTerrainCheck(true)
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Left_Turret01_Muzzle')
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Right_Turret01_Muzzle')
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Left_Turret02_WepFocus')
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Right_Turret02_WepFocus')
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Left_Turret03_Muzzle')
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Right_Turret03_Muzzle')
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Attachpoint01')
+        CCollisionManipulatorMethodsWatchBone(self.detector, 'Attachpoint02')
+        CCollisionManipulatorMethodsEnableTerrainCheck(self.detector, true)
         self.detector:Enable()
 
         AirTransport.OnKilled(self, instigator, type, overkillRatio)
     end,
 
     OnAnimTerrainCollision = function(self, bone, x, y, z)
-        DamageArea(self, {
+        GlobalMethodsDamageArea(self, {
             x,
             y,
             z,
@@ -83,15 +107,15 @@ UAA0310 = Class(AirTransport)({
 
         self.MyShield = CzarShield(bpShield, self)
 
-        self:SetFocusEntity(self.MyShield)
+        UnitMethodsSetFocusEntity(self, self.MyShield)
         self:EnableShield()
         self.Trash:Add(self.MyShield)
     end,
 
     IdleState = State({
         Main = function(self)
-            self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
+            UnitMethodsSetBusy(self, false)
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -105,8 +129,8 @@ UAA0310 = Class(AirTransport)({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
-            self:DetachAll(bone)
-            unitBuilding:HideBone(0, true)
+            EntityMethodsDetachAll(self, bone)
+            UnitMethodsHideBone(unitBuilding, 0, true)
             self.UnitDoneBeingBuilt = false
         end,
 
@@ -119,8 +143,8 @@ UAA0310 = Class(AirTransport)({
     FinishedBuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
+            EntityMethodsDetachFrom(unitBuilding, true)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
@@ -129,12 +153,12 @@ UAA0310 = Class(AirTransport)({
                     0,
                     -20,
                 })
-                IssueMoveOffFactory({
+                GlobalMethodsIssueMoveOffFactory({
                     unitBuilding,
                 }, worldPos)
-                unitBuilding:ShowBone(0, true)
+                UnitMethodsShowBone(unitBuilding, 0, true)
             end
-            self:RequestRefreshUI()
+            EntityMethodsRequestRefreshUI(self)
             ChangeState(self, self.IdleState)
         end,
     }),

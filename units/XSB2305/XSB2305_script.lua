@@ -5,6 +5,11 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+-- End of automatically upvalued moho functions
+
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SIFInainoWeapon = import('/lua/seraphimweapons.lua').SIFInainoWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -19,7 +24,7 @@ XSB2305 = Class(SStructureUnit)({
                 self.unit:PlayUnitAmbientSound('NukeCharge')
 
                 for k, v in FxLaunch do
-                    CreateEmitterAtEntity(self.unit, self.unit.Army, v)
+                    GlobalMethodsCreateEmitterAtEntity(self.unit, self.unit.Army, v)
                 end
 
                 WaitSeconds(9.5)

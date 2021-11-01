@@ -5,6 +5,22 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetAnimationFraction = CAnimationManipulatorMethods.SetAnimationFraction
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsGetStat = UnitMethods.GetStat
+local UnitMethodsSetImmobile = UnitMethods.SetImmobile
+local UnitMethodsSetScriptBit = UnitMethods.SetScriptBit
+local UnitMethodsSetSpeedMult = UnitMethods.SetSpeedMult
+-- End of automatically upvalued moho functions
+
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
 local CybranWeapons = import('/lua/cybranweapons.lua')
@@ -39,12 +55,13 @@ URS0201 = Class(CSeaUnit)({
                 if old == 'Stopped' then
                     if self.SwitchAnims then
                         self.SwitchAnims = false
-                        self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationWalk, true):SetRate(self:GetBlueprint().Display.AnimationWalkRate or 1.1)
+                        CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationWalk, true)
+                        CAnimationManipulatorMethodsSetRate(self.AnimManip, self:GetBlueprint().Display.AnimationWalkRate or 1.1)
                     else
-                        self.AnimManip:SetRate(2.8)
+                        CAnimationManipulatorMethodsSetRate(self.AnimManip, 2.8)
                     end
                 elseif new == 'Stopped' then
-                    self.AnimManip:SetRate(0)
+                    CAnimationManipulatorMethodsSetRate(self.AnimManip, 0)
                 else
 
                 end
@@ -62,10 +79,10 @@ URS0201 = Class(CSeaUnit)({
         -- Enable sonar on water only, apply speed multiplier on land
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
-            self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
+            UnitMethodsSetSpeedMult(self, bp.Physics.LandSpeedMultiplier)
         elseif new == 'Water' then
             self:EnableUnitIntel('Layer', 'Sonar')
-            self:SetSpeedMult(1)
+            UnitMethodsSetSpeedMult(self, 1)
         else
 
         end
@@ -88,29 +105,29 @@ URS0201 = Class(CSeaUnit)({
         local bp = self:GetBlueprint()
         local scale = bp.Display.UniformScale or 1
         if land then
-            self:SetImmobile(true)
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
-            self.AnimManip:SetRate(2)
+            UnitMethodsSetImmobile(self, true)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationTransform)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, 2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 1.0 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            EntityMethodsSetCollisionShape(self, 'Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 1.0 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
-            self:SetImmobile(false)
+            UnitMethodsSetImmobile(self, false)
             self.SwitchAnims = true
             self.Walking = true
             self.Trash:Add(self.AnimManip)
         else
-            self:SetImmobile(true)
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTransform)
-            self.AnimManip:SetAnimationFraction(1)
-            self.AnimManip:SetRate(-2)
+            UnitMethodsSetImmobile(self, true)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationTransform)
+            CAnimationManipulatorMethodsSetAnimationFraction(self.AnimManip, 1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 0.5 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            EntityMethodsSetCollisionShape(self, 'Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 0.5 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self.AnimManip:Destroy()
             self.AnimManip = nil
-            self:SetImmobile(false)
+            UnitMethodsSetImmobile(self, false)
             self.Walking = false
         end
     end,
@@ -168,7 +185,7 @@ URS0201 = Class(CSeaUnit)({
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)
 
         if self:GetAIBrain().BrainType == 'Human' and self.Layer ~= 'Land' then
-            self:SetScriptBit('RULEUTC_WeaponToggle', true)
+            UnitMethodsSetScriptBit(self, 'RULEUTC_WeaponToggle', true)
         end
     end,
 
@@ -177,9 +194,9 @@ URS0201 = Class(CSeaUnit)({
         CSeaUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
             if self.Layer ~= 'Land' then
-                self:GetStat("h1_SetSalemAmph", 0)
+                UnitMethodsGetStat(self, "h1_SetSalemAmph", 0)
             else
-                self:SetScriptBit('RULEUTC_WeaponToggle', false)
+                UnitMethodsSetScriptBit(self, 'RULEUTC_WeaponToggle', false)
             end
         end
     end,
@@ -188,7 +205,7 @@ URS0201 = Class(CSeaUnit)({
     OnScriptBitClear = function(self, bit)
         CSeaUnit.OnScriptBitClear(self, bit)
         if bit == 1 then
-            self:GetStat("h1_SetSalemAmph", 1)
+            UnitMethodsGetStat(self, "h1_SetSalemAmph", 1)
         end
     end,
 })

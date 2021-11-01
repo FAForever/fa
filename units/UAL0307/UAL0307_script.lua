@@ -8,6 +8,15 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local UnitWeaponMethods = _G.moho.weapon_methods
+local UnitWeaponMethodsSetFireTargetLayerCaps = UnitWeaponMethods.SetFireTargetLayerCaps
+-- End of automatically upvalued moho functions
+
 local AShieldHoverLandUnit = import('/lua/aeonunits.lua').AShieldHoverLandUnit
 --import a default weapon so our pointer doesnt explode
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
@@ -26,8 +35,9 @@ UAL0307 = Class(AShieldHoverLandUnit)({
         AShieldHoverLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.ShieldEffectsBag = {
 
+
+            --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         }
-        --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         self.TargetPointer = self:GetWeapon(1)
         --we save this to the unit table so dont have to call every time.
         self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable
@@ -40,9 +50,9 @@ UAL0307 = Class(AShieldHoverLandUnit)({
         if not self.Animator then
             self.Animator = CreateAnimator(self)
             self.Trash:Add(self.Animator)
-            self.Animator:PlayAnim(self:GetBlueprint().Display.AnimationOpen)
+            CAnimationManipulatorMethodsPlayAnim(self.Animator, self:GetBlueprint().Display.AnimationOpen)
         end
-        self.Animator:SetRate(1)
+        CAnimationManipulatorMethodsSetRate(self.Animator, 1)
 
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
@@ -58,7 +68,7 @@ UAL0307 = Class(AShieldHoverLandUnit)({
     OnShieldDisabled = function(self)
         AShieldHoverLandUnit.OnShieldDisabled(self)
         if self.Animator then
-            self.Animator:SetRate(-1)
+            CAnimationManipulatorMethodsSetRate(self.Animator, -1)
         end
 
         if self.ShieldEffectsBag then
@@ -71,7 +81,7 @@ UAL0307 = Class(AShieldHoverLandUnit)({
 
     DisablePointer = function(self)
         --this disables the stop feature - note that its reset on layer change!
-        self.TargetPointer:SetFireTargetLayerCaps('None')
+        UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, 'None')
         self.PointerRestartThread = self:ForkThread(self.PointerRestart)
     end,
 
@@ -88,7 +98,7 @@ UAL0307 = Class(AShieldHoverLandUnit)({
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
                 --this resets the stop feature - note that its reset on layer change!
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer])
+                UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, self.TargetLayerCaps[self.Layer])
             end
         end
     end,
@@ -98,7 +108,7 @@ UAL0307 = Class(AShieldHoverLandUnit)({
 
         if self.PointerEnabled == false then
             --since its reset on layer change we need to do this. unfortunate.
-            self.TargetPointer:SetFireTargetLayerCaps('None')
+            UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, 'None')
         end
     end,
 })

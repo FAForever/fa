@@ -1,3 +1,14 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetAmbientSound = EntityMethods.SetAmbientSound
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
+-- End of automatically upvalued moho functions
+
 ----------------------------------------------------------------------------
 --
 --  File     :  /cdimage/units/UES0307/UES0307_script.lua
@@ -28,14 +39,14 @@ UES0302 = Class(TSeaUnit)({
                     self.unit.Trash:Add(self.SpinManip)
                 end
                 if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(270)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.SpinManip, 270)
                 end
                 TAMPhalanxWeapon.PlayFxWeaponUnpackSequence(self)
             end,
 
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(0)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.SpinManip, 0)
                 end
                 TAMPhalanxWeapon.PlayFxWeaponPackSequence(self)
             end,
@@ -52,10 +63,10 @@ UES0302 = Class(TSeaUnit)({
                 wep1:PlaySound(bp1.Audio.BeamStop)
             end
             if bp1.Audio.BeamLoop and wep1.Beams[1].Beam then
-                wep1.Beams[1].Beam:SetAmbientSound(nil, nil)
+                EntityMethodsSetAmbientSound(wep1.Beams[1].Beam, nil, nil)
             end
             for k, v in wep1.Beams do
-                v.Beam:Disable()
+                IAniManipulatorMethodsDisable(v.Beam)
             end
 
             local wep2 = self:GetWeaponByLabel('HiroCannonBack')
@@ -64,10 +75,10 @@ UES0302 = Class(TSeaUnit)({
                 wep2:PlaySound(bp2.Audio.BeamStop)
             end
             if bp2.Audio.BeamLoop and wep2.Beams[1].Beam then
-                wep2.Beams[1].Beam:SetAmbientSound(nil, nil)
+                EntityMethodsSetAmbientSound(wep2.Beams[1].Beam, nil, nil)
             end
             for k, v in wep2.Beams do
-                v.Beam:Disable()
+                IAniManipulatorMethodsDisable(v.Beam)
             end
         end
         TSeaUnit.OnKilled(self, instigator, type, overkillRatio)

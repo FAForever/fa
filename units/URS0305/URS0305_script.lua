@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsOffsetEmitter = IEffectMethods.OffsetEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/URB3202/URB3202_script.lua
@@ -43,7 +48,7 @@ URB3302 = Class(CSeaUnit)({
                         for ke, vEffect in effects do
                             emit = CreateAttachedEmitter(self, vBone, self.Army, vEffect):ScaleEmitter(vTypeGroup.Scale or 1)
                             if vTypeGroup.Offset then
-                                emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
+                                IEffectMethodsOffsetEmitter(emit, vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                             end
                         end
                     end

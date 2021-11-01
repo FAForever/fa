@@ -1,3 +1,20 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsAddCommandCap = UnitMethods.AddCommandCap
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRemoveCommandCap = UnitMethods.RemoveCommandCap
+local UnitMethodsRestoreBuildRestrictions = UnitMethods.RestoreBuildRestrictions
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+local UnitMethodsSetProductionPerSecondEnergy = UnitMethods.SetProductionPerSecondEnergy
+local UnitMethodsSetProductionPerSecondMass = UnitMethods.SetProductionPerSecondMass
+
+local UnitWeaponMethods = _G.moho.weapon_methods
+local UnitWeaponMethodsChangeRateOfFire = UnitWeaponMethods.ChangeRateOfFire
+-- End of automatically upvalued moho functions
+
 --****************************************************************************
 --**
 --**  File     :  /cdimage/units/XSL0001/XSL0001_script.lua
@@ -37,11 +54,11 @@ XSL0001 = Class(ACUUnit)({
 
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
-        self:SetCapturable(false)
+        UnitMethodsSetCapturable(self, false)
         self:SetupBuildBones()
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
-        self:HideBone('Left_Upgrade', true)
+        UnitMethodsHideBone(self, 'Back_Upgrade', true)
+        UnitMethodsHideBone(self, 'Right_Upgrade', true)
+        UnitMethodsHideBone(self, 'Left_Upgrade', true)
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.SERAPHIM * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
     end,
@@ -63,6 +80,7 @@ XSL0001 = Class(ACUUnit)({
         local all = brain:GetUnitsAroundPoint(unitCat, self:GetPosition(), bp.Radius, 'Ally')
         local units = {
 
+
         }
         for _, u in all do
             if not u.Dead and not u:IsBeingBuilt() then
@@ -81,7 +99,7 @@ XSL0001 = Class(ACUUnit)({
             local units = self:GetUnitsToBuff(bp)
             for _, unit in units do
                 Buff.ApplyBuff(unit, buff)
-                unit:RequestRefreshUI()
+                EntityMethodsRequestRefreshUI(unit)
             end
             WaitSeconds(5)
         end
@@ -125,11 +143,13 @@ XSL0001 = Class(ACUUnit)({
                     },
 
 
+
                 }
                 buff_bp.Affects.MaxHealth = {
                     Add = 0,
                     Mult = bp.MaxHealthFactor,
                     DoNotFill = true,
+
 
 
                 }
@@ -187,24 +207,24 @@ XSL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationAdvanced' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then
                 return
             end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationAdvancedRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
             --Damage Stabilization
         elseif enh == 'DamageStabilization' then
             if not Buffs['SeraphimACUDamageStabilization'] then
@@ -268,17 +288,17 @@ XSL0001 = Class(ACUUnit)({
             end
             --Teleporter
         elseif enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Teleport')
             -- Tactical Missile
         elseif enh == 'Missile' then
-            self:AddCommandCap('RULEUCC_Tactical')
-            self:AddCommandCap('RULEUCC_SiloBuildTactical')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Tactical')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', true)
         elseif enh == 'MissileRemove' then
-            self:RemoveCommandCap('RULEUCC_Tactical')
-            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Tactical')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
             --T2 Engineering
         elseif enh == 'AdvancedEngineering' then
@@ -318,7 +338,7 @@ XSL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             self:AddBuildRestriction(categories.SERAPHIM * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'SeraphimACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimACUT2BuildRate')
@@ -361,7 +381,7 @@ XSL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             if Buff.HasBuff(self, 'SeraphimACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimACUT3BuildRate')
             end
@@ -379,7 +399,7 @@ XSL0001 = Class(ACUUnit)({
             --Heat Sink Augmentation
         elseif enh == 'RateOfFire' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
-            wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
+            UnitWeaponMethodsChangeRateOfFire(wep, bp.NewRateOfFire or 2)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 44)
             local oc = self:GetWeaponByLabel('OverCharge')
             oc:ChangeMaxRadius(bp.NewMaxRadius or 44)
@@ -388,7 +408,7 @@ XSL0001 = Class(ACUUnit)({
         elseif enh == 'RateOfFireRemove' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
-            wep:ChangeRateOfFire(bpDisrupt or 1)
+            UnitWeaponMethodsChangeRateOfFire(wep, bpDisrupt or 1)
             bpDisrupt = self:GetBlueprint().Weapon[1].MaxRadius
             wep:ChangeMaxRadius(bpDisrupt or 22)
             local oc = self:GetWeaponByLabel('OverCharge')

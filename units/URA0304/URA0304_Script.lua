@@ -5,6 +5,11 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetScriptBit = UnitMethods.SetScriptBit
+-- End of automatically upvalued moho functions
+
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CIFBombNeutronWeapon = import('/lua/cybranweapons.lua').CIFBombNeutronWeapon
 local CAAAutocannon = import('/lua/cybranweapons.lua').CAAAutocannon
@@ -28,7 +33,7 @@ URA0304 = Class(CAirUnit)({
 
     OnStopBeingBuilt = function(self, builder, layer)
         CAirUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetScriptBit('RULEUTC_StealthToggle', true)
+        UnitMethodsSetScriptBit(self, 'RULEUTC_StealthToggle', true)
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)

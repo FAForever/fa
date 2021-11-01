@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetDestroyOnWater = ProjectileMethods.SetDestroyOnWater
+-- End of automatically upvalued moho functions
+
 #
 # Terran Gauss Cannon Projectile
 #
@@ -10,7 +15,7 @@ TDFGauss04 = Class(TDFGaussCannonProjectile)({
     OnCreate = function(self, inWater)
         TDFGaussCannonProjectile.OnCreate(self, inWater)
         if not inWater then
-            self:SetDestroyOnWater(true)
+            ProjectileMethodsSetDestroyOnWater(self, true)
         else
             self:ForkThread(self.DestroyOnWaterThread)
         end
@@ -18,7 +23,7 @@ TDFGauss04 = Class(TDFGaussCannonProjectile)({
 
     DestroyOnWaterThread = function(self)
         WaitSeconds(0.2)
-        self:SetDestroyOnWater(true)
+        ProjectileMethodsSetDestroyOnWater(self, true)
     end,
 })
 TypeClass = TDFGauss04

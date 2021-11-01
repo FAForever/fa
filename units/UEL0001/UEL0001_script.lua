@@ -5,6 +5,39 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetBoneEnabled = CAnimationManipulatorMethods.SetBoneEnabled
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsKill = EntityMethods.Kill
+local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
+
+local GlobalMethods = _G
+local GlobalMethodsRemoveEconomyEvent = GlobalMethods.RemoveEconomyEvent
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsSetPrecedence = IAniManipulatorMethods.SetPrecedence
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsAddCommandCap = UnitMethods.AddCommandCap
+local UnitMethodsAddToggleCap = UnitMethods.AddToggleCap
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRemoveCommandCap = UnitMethods.RemoveCommandCap
+local UnitMethodsRemoveNukeSiloAmmo = UnitMethods.RemoveNukeSiloAmmo
+local UnitMethodsRemoveTacticalSiloAmmo = UnitMethods.RemoveTacticalSiloAmmo
+local UnitMethodsRemoveToggleCap = UnitMethods.RemoveToggleCap
+local UnitMethodsRestoreBuildRestrictions = UnitMethods.RestoreBuildRestrictions
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+local UnitMethodsSetCreator = UnitMethods.SetCreator
+local UnitMethodsSetProductionPerSecondEnergy = UnitMethods.SetProductionPerSecondEnergy
+local UnitMethodsSetProductionPerSecondMass = UnitMethods.SetProductionPerSecondMass
+local UnitMethodsSetWorkProgress = UnitMethods.SetWorkProgress
+local UnitMethodsStopSiloBuild = UnitMethods.StopSiloBuild
+-- End of automatically upvalued moho functions
+
 local Shield = import('/lua/shield.lua').Shield
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local TerranWeaponFile = import('/lua/terranweapons.lua')
@@ -31,10 +64,10 @@ UEL0001 = Class(ACUUnit)({
 
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
-        self:SetCapturable(false)
-        self:HideBone('Right_Upgrade', true)
-        self:HideBone('Left_Upgrade', true)
-        self:HideBone('Back_Upgrade_B01', true)
+        UnitMethodsSetCapturable(self, false)
+        UnitMethodsHideBone(self, 'Right_Upgrade', true)
+        UnitMethodsHideBone(self, 'Left_Upgrade', true)
+        UnitMethodsHideBone(self, 'Back_Upgrade_B01', true)
         self:SetupBuildBones()
         self.HasLeftPod = false
         self.HasRightPod = false
@@ -48,11 +81,11 @@ UEL0001 = Class(ACUUnit)({
             return
         end
         self.Animator = CreateAnimator(self)
-        self.Animator:SetPrecedence(0)
+        IAniManipulatorMethodsSetPrecedence(self.Animator, 0)
         if self.IdleAnim then
-            self.Animator:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true)
+            CAnimationManipulatorMethodsPlayAnim(self.Animator, self:GetBlueprint().Display.AnimationIdle, true)
             for k, v in self.DisabledBones do
-                self.Animator:SetBoneEnabled(v, false)
+                CAnimationManipulatorMethodsSetBoneEnabled(self.Animator, v, false)
             end
         end
         self:BuildManipulatorSetEnabled(false)
@@ -65,7 +98,7 @@ UEL0001 = Class(ACUUnit)({
     OnStartBuild = function(self, unitBeingBuilt, order)
         ACUUnit.OnStartBuild(self, unitBeingBuilt, order)
         if self.Animator then
-            self.Animator:SetRate(0)
+            CAnimationManipulatorMethodsSetRate(self.Animator, 0)
         end
     end,
 
@@ -86,15 +119,15 @@ UEL0001 = Class(ACUUnit)({
             end
             if self.HasLeftPod == true then
                 self.RebuildingPod = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
-                self:RequestRefreshUI()
+                EntityMethodsRequestRefreshUI(self)
                 WaitFor(self.RebuildingPod)
-                self:SetWorkProgress(0.0)
-                RemoveEconomyEvent(self, self.RebuildingPod)
+                UnitMethodsSetWorkProgress(self, 0.0)
+                GlobalMethodsRemoveEconomyEvent(self, self.RebuildingPod)
                 self.RebuildingPod = nil
                 local location = self:GetPosition('AttachSpecial02')
                 local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'LeftPod')
-                pod:SetCreator(self)
+                UnitMethodsSetCreator(pod, self)
                 self.Trash:Add(pod)
                 self.LeftPod = pod
             end
@@ -105,22 +138,22 @@ UEL0001 = Class(ACUUnit)({
             end
             if self.HasRightPod == true then
                 self.RebuildingPod2 = CreateEconomyEvent(self, 1600, 160, 10, self.SetWorkProgress)
-                self:RequestRefreshUI()
+                EntityMethodsRequestRefreshUI(self)
                 WaitFor(self.RebuildingPod2)
-                self:SetWorkProgress(0.0)
-                RemoveEconomyEvent(self, self.RebuildingPod2)
+                UnitMethodsSetWorkProgress(self, 0.0)
+                GlobalMethodsRemoveEconomyEvent(self, self.RebuildingPod2)
                 self.RebuildingPod2 = nil
                 local location = self:GetPosition('AttachSpecial01')
                 local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
                 pod:SetParent(self, 'RightPod')
-                pod:SetCreator(self)
+                UnitMethodsSetCreator(pod, self)
                 self.Trash:Add(pod)
                 self.RightPod = pod
             end
         else
 
         end
-        self:RequestRefreshUI()
+        EntityMethodsRequestRefreshUI(self)
     end,
 
     NotifyOfPodDeath = function(self, pod, rebuildDrone)
@@ -152,7 +185,7 @@ UEL0001 = Class(ACUUnit)({
             local location = self:GetPosition('AttachSpecial02')
             local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'LeftPod')
-            pod:SetCreator(self)
+            UnitMethodsSetCreator(pod, self)
             self.Trash:Add(pod)
             self.HasLeftPod = true
             self.LeftPod = pod
@@ -160,7 +193,7 @@ UEL0001 = Class(ACUUnit)({
             local location = self:GetPosition('AttachSpecial01')
             local pod = CreateUnitHPR('UEA0001', self.Army, location[1], location[2], location[3], 0, 0, 0)
             pod:SetParent(self, 'RightPod')
-            pod:SetCreator(self)
+            UnitMethodsSetCreator(pod, self)
             self.Trash:Add(pod)
             self.HasRightPod = true
             self.RightPod = pod
@@ -168,33 +201,33 @@ UEL0001 = Class(ACUUnit)({
             if self.HasLeftPod == true then
                 self.HasLeftPod = false
                 if self.LeftPod and not self.LeftPod.Dead then
-                    self.LeftPod:Kill()
+                    EntityMethodsKill(self.LeftPod)
                     self.LeftPod = nil
                 end
                 if self.RebuildingPod ~= nil then
-                    RemoveEconomyEvent(self, self.RebuildingPod)
+                    GlobalMethodsRemoveEconomyEvent(self, self.RebuildingPod)
                     self.RebuildingPod = nil
                 end
             end
             if self.HasRightPod == true then
                 self.HasRightPod = false
                 if self.RightPod and not self.RightPod.Dead then
-                    self.RightPod:Kill()
+                    EntityMethodsKill(self.RightPod)
                     self.RightPod = nil
                 end
                 if self.RebuildingPod2 ~= nil then
-                    RemoveEconomyEvent(self, self.RebuildingPod2)
+                    GlobalMethodsRemoveEconomyEvent(self, self.RebuildingPod2)
                     self.RebuildingPod2 = nil
                 end
             end
             KillThread(self.RebuildThread)
             KillThread(self.RebuildThread2)
         elseif enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsAddToggleCap(self, 'RULEUTC_ShieldToggle')
             self:CreateShield(bp)
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
@@ -202,7 +235,7 @@ UEL0001 = Class(ACUUnit)({
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
             RemoveUnitEnhancement(self, 'ShieldRemove')
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_ShieldToggle')
         elseif enh == 'ShieldGeneratorField' then
             self:DestroyShield()
             self:ForkThread(function()
@@ -214,7 +247,7 @@ UEL0001 = Class(ACUUnit)({
         elseif enh == 'ShieldGeneratorFieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_ShieldToggle')
         elseif enh == 'AdvancedEngineering' then
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -247,7 +280,7 @@ UEL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             self:AddBuildRestriction(categories.UEF * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             self:AddBuildRestriction(categories.UEF * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
@@ -285,7 +318,7 @@ UEL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
             end
@@ -342,38 +375,38 @@ UEL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'TacticalMissile' then
-            self:AddCommandCap('RULEUCC_Tactical')
-            self:AddCommandCap('RULEUCC_SiloBuildTactical')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Tactical')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('TacMissile', true)
         elseif enh == 'TacticalNukeMissile' then
-            self:RemoveCommandCap('RULEUCC_Tactical')
-            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
-            self:AddCommandCap('RULEUCC_Nuke')
-            self:AddCommandCap('RULEUCC_SiloBuildNuke')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Tactical')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_SiloBuildTactical')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Nuke')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_SiloBuildNuke')
             self:SetWeaponEnabledByLabel('TacMissile', false)
             self:SetWeaponEnabledByLabel('TacNukeMissile', true)
             local amt = self:GetTacticalSiloAmmoCount()
-            self:RemoveTacticalSiloAmmo(amt or 0)
-            self:StopSiloBuild()
+            UnitMethodsRemoveTacticalSiloAmmo(self, amt or 0)
+            UnitMethodsStopSiloBuild(self)
         elseif enh == 'TacticalMissileRemove' or enh == 'TacticalNukeMissileRemove' then
-            self:RemoveCommandCap('RULEUCC_Nuke')
-            self:RemoveCommandCap('RULEUCC_SiloBuildNuke')
-            self:RemoveCommandCap('RULEUCC_Tactical')
-            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Nuke')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_SiloBuildNuke')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Tactical')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('TacMissile', false)
             self:SetWeaponEnabledByLabel('TacNukeMissile', false)
             local amt = self:GetTacticalSiloAmmoCount()
-            self:RemoveTacticalSiloAmmo(amt or 0)
+            UnitMethodsRemoveTacticalSiloAmmo(self, amt or 0)
             local amt = self:GetNukeSiloAmmoCount()
-            self:RemoveNukeSiloAmmo(amt or 0)
-            self:StopSiloBuild()
+            UnitMethodsRemoveNukeSiloAmmo(self, amt or 0)
+            UnitMethodsStopSiloBuild(self)
         else
 
         end

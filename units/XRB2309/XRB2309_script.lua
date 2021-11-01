@@ -5,6 +5,18 @@
 -- Copyright ? 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetPosition = EntityMethods.SetPosition
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetBallisticAcceleration = ProjectileMethods.SetBallisticAcceleration
+local ProjectileMethodsSetLocalAngularVelocity = ProjectileMethods.SetLocalAngularVelocity
+-- End of automatically upvalued moho functions
+
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
 local utilities = import('/lua/utilities.lua')
@@ -46,9 +58,9 @@ XRB2309 = Class(CStructureUnit)({
 
         -- Start the sinking after a delay of the given number of seconds, attaching to a given bone and entity.
         -- Change this to make it rotate some while sinking
-        proj:SetLocalAngularVelocity(0, 0, 0)
+        ProjectileMethodsSetLocalAngularVelocity(proj, 0, 0, 0)
         proj:Start(0, self, bone)
-        proj:SetBallisticAcceleration(-0.75)
+        ProjectileMethodsSetBallisticAcceleration(proj, -0.75)
 
         self.Trash:Add(proj)
         self.Depthwatcher = self:ForkThread(self.DepthWatcher)
@@ -75,7 +87,7 @@ XRB2309 = Class(CStructureUnit)({
             end
 
             -- Stop the unit's momentum
-            self:SetPosition(self:GetPosition(), true)
+            EntityMethodsSetPosition(self, self:GetPosition(), true)
             self:FinalAnimation()
         end
 
@@ -89,7 +101,7 @@ XRB2309 = Class(CStructureUnit)({
         local bpAnim = bp.Display.AnimationDeploy
 
         self.OpenAnim = CreateAnimator(self)
-        self.OpenAnim:PlayAnim(bpAnim)
+        CAnimationManipulatorMethodsPlayAnim(self.OpenAnim, bpAnim)
         self.Trash:Add(self.OpenAnim)
         self:PlaySound(bp.Audio.Deploy)
 

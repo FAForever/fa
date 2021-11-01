@@ -8,6 +8,12 @@
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+-- End of automatically upvalued moho functions
+
 local AirTransport = import('/lua/defaultunits.lua').AirTransport
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
@@ -50,7 +56,8 @@ URA0104 = Class(AirTransport)({
         AirTransport.OnCreate(self)
         if not self.OpenAnim then
             self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0)
+            CAnimationManipulatorMethodsPlayAnim(self.OpenAnim, self:GetBlueprint().Display.AnimationOpen, false)
+            CAnimationManipulatorMethodsSetRate(self.OpenAnim, 0)
             self.Trash:Add(self.OpenAnim)
         end
     end,
@@ -59,7 +66,8 @@ URA0104 = Class(AirTransport)({
         AirTransport.OnStopBeingBuilt(self, builder, layer)
         self.AnimManip = CreateAnimator(self)
         self.Trash:Add(self.AnimManip)
-        self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
+        CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationTakeOff, false)
+        CAnimationManipulatorMethodsSetRate(self.AnimManip, 1)
         if not self.OpenAnim then
             self.OpenAnim = CreateAnimator(self)
             self.Trash:Add(self.OpenAnim)
@@ -71,11 +79,13 @@ URA0104 = Class(AirTransport)({
         AirTransport.OnMotionVertEventChange(self, new, old)
         -- Aborting a landing
         if new == 'Top' or new == 'Up' and old == 'Down' then
-            self.AnimManip:SetRate(-1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
         elseif new == 'Down' then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand, false):SetRate(1.5)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationLand, false)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, 1.5)
         elseif new == 'Up' then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationTakeOff, false)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, 1)
         else
 
         end

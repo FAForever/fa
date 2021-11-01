@@ -1,3 +1,12 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetDestroyOnWater = ProjectileMethods.SetDestroyOnWater
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+-- End of automatically upvalued moho functions
+
 #
 # Terran Land-Based Cruise Missile
 #
@@ -23,13 +32,13 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile)({
 
     OnCreate = function(self)
         TMissileCruiseProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2)
+        EntityMethodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 2)
         self.MoveThread = self:ForkThread(self.MovementThread)
     end,
 
     MovementThread = function(self)
         self.WaitTime = 0.1
-        self:SetTurnRate(8)
+        ProjectileMethodsSetTurnRate(self, 8)
         WaitSeconds(0.3)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
@@ -43,19 +52,19 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile)({
         if dist > 50 then
             #Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
-            self:SetTurnRate(20)
+            ProjectileMethodsSetTurnRate(self, 20)
         elseif dist > 30 and dist <= 150 then
             # Increase check intervals
-            self:SetTurnRate(30)
+            ProjectileMethodsSetTurnRate(self, 30)
             WaitSeconds(1.5)
-            self:SetTurnRate(30)
+            ProjectileMethodsSetTurnRate(self, 30)
         elseif dist > 10 and dist <= 30 then
             # Further increase check intervals
             WaitSeconds(0.3)
-            self:SetTurnRate(50)
+            ProjectileMethodsSetTurnRate(self, 50)
         elseif dist > 0 and dist <= 10 then
             # Further increase check intervals
-            self:SetTurnRate(100)
+            ProjectileMethodsSetTurnRate(self, 100)
             KillThread(self.MoveThread)
         else
 
@@ -71,7 +80,7 @@ TIFMissileCruiseCDR = Class(TMissileCruiseProjectile)({
 
     OnEnterWater = function(self)
         TMissileCruiseProjectile.OnEnterWater(self)
-        self:SetDestroyOnWater(true)
+        ProjectileMethodsSetDestroyOnWater(self, true)
     end,
 })
 TypeClass = TIFMissileCruiseCDR

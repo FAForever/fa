@@ -5,6 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetCreator = UnitMethods.SetCreator
+-- End of automatically upvalued moho functions
+
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 
 XEA3204 = Class(TConstructionUnit)({
@@ -16,7 +21,7 @@ XEA3204 = Class(TConstructionUnit)({
     SetParent = function(self, parent, podName)
         self.Parent = parent
         self.PodName = podName
-        self:SetCreator(parent)
+        UnitMethodsSetCreator(self, parent)
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)

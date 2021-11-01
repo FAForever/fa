@@ -7,6 +7,11 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local UnitWeaponMethods = _G.moho.weapon_methods
+local UnitWeaponMethodsSetFireTargetLayerCaps = UnitWeaponMethods.SetFireTargetLayerCaps
+-- End of automatically upvalued moho functions
+
 local SShieldHoverLandUnit = import('/lua/seraphimunits.lua').SShieldHoverLandUnit
 --import a default weapon so our pointer doesnt explode
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon
@@ -25,8 +30,9 @@ XSL0307 = Class(SShieldHoverLandUnit)({
         SShieldHoverLandUnit.OnStopBeingBuilt(self, builder, layer)
         self.ShieldEffectsBag = {
 
+
+            --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         }
-        --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
         self.TargetPointer = self:GetWeapon(1)
         --we save this to the unit table so dont have to call every time.
         self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable
@@ -61,7 +67,7 @@ XSL0307 = Class(SShieldHoverLandUnit)({
 
     DisablePointer = function(self)
         --this disables the stop feature - note that its reset on layer change!
-        self.TargetPointer:SetFireTargetLayerCaps('None')
+        UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, 'None')
         self.PointerRestartThread = self:ForkThread(self.PointerRestart)
     end,
 
@@ -78,7 +84,7 @@ XSL0307 = Class(SShieldHoverLandUnit)({
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
                 --this resets the stop feature - note that its reset on layer change!
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer])
+                UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, self.TargetLayerCaps[self.Layer])
             end
         end
     end,
@@ -88,7 +94,7 @@ XSL0307 = Class(SShieldHoverLandUnit)({
 
         if self.PointerEnabled == false then
             --since its reset on layer change we need to do this. unfortunate.
-            self.TargetPointer:SetFireTargetLayerCaps('None')
+            UnitWeaponMethodsSetFireTargetLayerCaps(self.TargetPointer, 'None')
         end
     end,
 })

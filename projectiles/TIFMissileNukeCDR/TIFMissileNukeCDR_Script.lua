@@ -2,6 +2,15 @@
 -- Terran CDR Nuke
 --
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetDestroyOnWater = ProjectileMethods.SetDestroyOnWater
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+-- End of automatically upvalued moho functions
+
 local TIFMissileNuke = import('/lua/terranprojectiles.lua').TIFMissileNuke
 
 TIFMissileNukeCDR = Class(TIFMissileNuke)({
@@ -40,7 +49,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke)({
         local launcher = self:GetLauncher()
         self.CreateEffects(self, self.InitialEffects, self.Army, 1)
         self.WaitTime = 0.1
-        self:SetTurnRate(8)
+        ProjectileMethodsSetTurnRate(self, 8)
         WaitSeconds(0.3)
         self.CreateEffects(self, self.LaunchEffects, self.Army, 1)
         self.CreateEffects(self, self.ThrustEffects, self.Army, 1)
@@ -53,7 +62,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke)({
     DoDamage = function(self, instigator, DamageData, targetEntity)
         local nukeDamage = function(self, instigator, pos, brain, army, damageType)
             if self.TotalTime == 0 then
-                DamageArea(instigator, pos, self.Radius, self.Damage, damageType or 'Nuke', true, true)
+                GlobalMethodsDamageArea(instigator, pos, self.Radius, self.Damage, damageType or 'Nuke', true, true)
             end
         end
 
@@ -67,19 +76,19 @@ TIFMissileNukeCDR = Class(TIFMissileNuke)({
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
-            self:SetTurnRate(20)
+            ProjectileMethodsSetTurnRate(self, 20)
         elseif dist > 128 and dist <= 213 then
             -- Increase check intervals
-            self:SetTurnRate(30)
+            ProjectileMethodsSetTurnRate(self, 30)
             WaitSeconds(1.5)
-            self:SetTurnRate(30)
+            ProjectileMethodsSetTurnRate(self, 30)
         elseif dist > 43 and dist <= 107 then
             -- Further increase check intervals
             WaitSeconds(0.3)
-            self:SetTurnRate(75)
+            ProjectileMethodsSetTurnRate(self, 75)
         elseif dist > 0 and dist <= 43 then
             -- Further increase check intervals
-            self:SetTurnRate(200)
+            ProjectileMethodsSetTurnRate(self, 200)
             KillThread(self.MoveThread)
         else
 
@@ -88,7 +97,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke)({
 
     OnEnterWater = function(self)
         TIFMissileNuke.OnEnterWater(self)
-        self:SetDestroyOnWater(true)
+        ProjectileMethodsSetDestroyOnWater(self, true)
     end,
 })
 TypeClass = TIFMissileNukeCDR

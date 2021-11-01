@@ -1,3 +1,10 @@
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetBreakOffDistanceMult = UnitMethods.SetBreakOffDistanceMult
+local UnitMethodsSetBreakOffTriggerMult = UnitMethods.SetBreakOffTriggerMult
+local UnitMethodsSetSpeedMult = UnitMethods.SetSpeedMult
+-- End of automatically upvalued moho functions
+
 --****************************************************************************
 --**
 --**  File     :  /data/units/XSA0202/XSA0202_script.lua
@@ -33,11 +40,11 @@ XSA0202 = Class(SAirUnit)({
 
                 OnGotTarget = function(self)
                     if self.unit:IsUnitState('Moving') then
-                        self.unit:SetSpeedMult(1.0)
+                        UnitMethodsSetSpeedMult(self.unit, 1.0)
                     else
-                        self.unit:SetBreakOffTriggerMult(2.0)
-                        self.unit:SetBreakOffDistanceMult(8.0)
-                        self.unit:SetSpeedMult(0.67)
+                        UnitMethodsSetBreakOffTriggerMult(self.unit, 2.0)
+                        UnitMethodsSetBreakOffDistanceMult(self.unit, 8.0)
+                        UnitMethodsSetSpeedMult(self.unit, 0.67)
                         SDFBombOtheWeapon.OnGotTarget(self)
                     end
                 end,
@@ -45,19 +52,19 @@ XSA0202 = Class(SAirUnit)({
 
             OnGotTarget = function(self)
                 if self.unit:IsUnitState('Moving') then
-                    self.unit:SetSpeedMult(1.0)
+                    UnitMethodsSetSpeedMult(self.unit, 1.0)
                 else
-                    self.unit:SetBreakOffTriggerMult(2.0)
-                    self.unit:SetBreakOffDistanceMult(8.0)
-                    self.unit:SetSpeedMult(0.67)
+                    UnitMethodsSetBreakOffTriggerMult(self.unit, 2.0)
+                    UnitMethodsSetBreakOffDistanceMult(self.unit, 8.0)
+                    UnitMethodsSetSpeedMult(self.unit, 0.67)
                     SDFBombOtheWeapon.OnGotTarget(self)
                 end
             end,
 
             OnLostTarget = function(self)
-                self.unit:SetBreakOffTriggerMult(1.0)
-                self.unit:SetBreakOffDistanceMult(1.0)
-                self.unit:SetSpeedMult(1.0)
+                UnitMethodsSetBreakOffTriggerMult(self.unit, 1.0)
+                UnitMethodsSetBreakOffDistanceMult(self.unit, 1.0)
+                UnitMethodsSetSpeedMult(self.unit, 1.0)
                 SDFBombOtheWeapon.OnLostTarget(self)
             end,
         }),

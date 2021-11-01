@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsOffsetEmitter = IEffectMethods.OffsetEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /data/units/XES0205/XES0205_script.lua
@@ -31,7 +36,7 @@ XES0205 = Class(TShieldSeaUnit)({
         end
         for _, v in self.ShieldEffects do
             local emitter = CreateAttachedEmitter(self, 'XES0205', self:GetArmy(), v)
-            emitter:OffsetEmitter(0, -0.15, 0.35)
+            IEffectMethodsOffsetEmitter(emitter, 0, -0.15, 0.35)
             table.insert(self.ShieldEffectsBag, emitter)
         end
     end,

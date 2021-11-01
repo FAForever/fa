@@ -1,3 +1,16 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterOnEntity = GlobalMethods.CreateEmitterOnEntity
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetMaxSpeed = ProjectileMethods.SetMaxSpeed
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+local ProjectileMethodsTrackTarget = ProjectileMethods.TrackTarget
+-- End of automatically upvalued moho functions
+
 #****************************************************************************
 #**
 #**  File     :  /data/projectiles/SANHeavyCavitationTorpedo03/SANHeavyCavitationTorpedo03_script.lua
@@ -13,10 +26,10 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 SANHeavyCavitationTorpedo03 = Class(SHeavyCavitationTorpedo)({
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
+        EntityMethodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 0.1)
         SHeavyCavitationTorpedo.OnCreate(self)
         self:ForkThread(self.PauseUntilTrack)
-        CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        GlobalMethodsCreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
     end,
 
     PauseUntilTrack = function(self)
@@ -41,9 +54,9 @@ SANHeavyCavitationTorpedo03 = Class(SHeavyCavitationTorpedo)({
             turnrate = 720
         end
         WaitSeconds(waittime)
-        self:SetMaxSpeed(20)
-        self:TrackTarget(true)
-        self:SetTurnRate(turnrate)
+        ProjectileMethodsSetMaxSpeed(self, 20)
+        ProjectileMethodsTrackTarget(self, true)
+        ProjectileMethodsSetTurnRate(self, turnrate)
     end,
 
     GetDistanceToTarget = function(self)

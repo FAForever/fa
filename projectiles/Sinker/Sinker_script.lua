@@ -1,3 +1,18 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsAttachBoneTo = EntityMethods.AttachBoneTo
+local EntityMethodsSetVizToAllies = EntityMethods.SetVizToAllies
+local EntityMethodsSetVizToFocusPlayer = EntityMethods.SetVizToFocusPlayer
+local EntityMethodsSetVizToNeutrals = EntityMethods.SetVizToNeutrals
+
+local GlobalMethods = _G
+local GlobalMethodsWarp = GlobalMethods.Warp
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetBallisticAcceleration = ProjectileMethods.SetBallisticAcceleration
+local ProjectileMethodsSetStayUpright = ProjectileMethods.SetStayUpright
+-- End of automatically upvalued moho functions
+
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local Projectile = import('/lua/sim/projectile.lua').Projectile
 
@@ -5,10 +20,10 @@ Sinker = Class(Projectile)({
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
-        self:SetVizToFocusPlayer('Never')
-        self:SetVizToAllies('Never')
-        self:SetVizToNeutrals('Never')
-        self:SetStayUpright(false)
+        EntityMethodsSetVizToFocusPlayer(self, 'Never')
+        EntityMethodsSetVizToAllies(self, 'Never')
+        EntityMethodsSetVizToNeutrals(self, 'Never')
+        ProjectileMethodsSetStayUpright(self, false)
     end,
 
     --- Start the sinking after the given delay for the given entity/bone.
@@ -41,13 +56,13 @@ Sinker = Class(Projectile)({
             return
         end
 
-        Warp(self, pos, targetEntity:GetOrientation())
-        targetEntity:AttachBoneTo(targetBone, self, 'anchor')
+        GlobalMethodsWarp(self, pos, targetEntity:GetOrientation())
+        EntityMethodsAttachBoneTo(targetEntity, targetBone, self, 'anchor')
 
         if not targetEntity:BeenDestroyed() then
             local bp = self:GetBlueprint()
             local acc = -bp.Physics.SinkSpeed
-            self:SetBallisticAcceleration(acc + GetRandomFloat(-0.02, 0.02))
+            ProjectileMethodsSetBallisticAcceleration(self, acc + GetRandomFloat(-0.02, 0.02))
         end
     end,
 

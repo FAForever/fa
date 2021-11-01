@@ -1,3 +1,20 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsShakeCamera = EntityMethods.ShakeCamera
+
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+local GlobalMethodsCreateLightParticle = GlobalMethods.CreateLightParticle
+
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsOffsetEmitter = IEffectMethods.OffsetEmitter
+local IEffectMethodsSetEmitterCurveParam = IEffectMethods.SetEmitterCurveParam
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetScaleVelocity = ProjectileMethods.SetScaleVelocity
+-- End of automatically upvalued moho functions
+
 ------------------------------------------------------------------------------
 -- File     :  /projectiles/CIFEMPFluxWarhead02/CIFEMPFluxWarhead02_script.lua
 -- Author(s):  Gordon Duclos
@@ -15,27 +32,27 @@ AIFQuantumWarhead02 = Class(NullShell)({
     CloudFlareEffects = EffectTemplate.CloudFlareEffects01,
 
     EffectThread = function(self)
-        CreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
+        GlobalMethodsCreateLightParticle(self, -1, self.Army, 200, 200, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
 
         self:ForkThread(self.ShakeAndBurnMe, self.Army)
         self:ForkThread(self.InnerCloudFlares, self.Army)
         self:ForkThread(self.DistortionField)
 
         for k, v in self.NormalEffects do
-            CreateEmitterAtEntity(self, self.Army, v)
+            GlobalMethodsCreateEmitterAtEntity(self, self.Army, v)
         end
     end,
 
     ShakeAndBurnMe = function(self, army)
-        self:ShakeCamera(75, 3, 0, 10)
+        EntityMethodsShakeCamera(self, 75, 3, 0, 10)
         WaitSeconds(0.5)
         -- CreateDecal(position, heading, textureName, type, sizeX, sizeZ, lodParam, duration, army)");
         local orientation = RandomFloat(0, 2 * math.pi)
-        CreateDecal(self:GetPosition(), orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
-        CreateDecal(self:GetPosition(), orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
-        self:ShakeCamera(105, 10, 0, 2)
+        GlobalMethodsCreateDecal(self:GetPosition(), orientation, 'Crater01_albedo', '', 'Albedo', 50, 50, 1200, 0, army)
+        GlobalMethodsCreateDecal(self:GetPosition(), orientation, 'Crater01_normals', '', 'Normals', 50, 50, 1200, 0, army)
+        EntityMethodsShakeCamera(self, 105, 10, 0, 2)
         WaitSeconds(2)
-        self:ShakeCamera(75, 1, 0, 15)
+        EntityMethodsShakeCamera(self, 75, 1, 0, 15)
     end,
 
     InnerCloudFlares = function(self, army)
@@ -55,30 +72,30 @@ AIFQuantumWarhead02 = Class(NullShell)({
 
             for k, v in self.CloudFlareEffects do
                 emit = CreateEmitterAtEntity(self, army, v)
-                emit:OffsetEmitter(x * OffsetMul, y * OffsetMul, z * OffsetMul)
-                emit:SetEmitterCurveParam('XDIR_CURVE', x * DirectionMul, 0.01)
-                emit:SetEmitterCurveParam('YDIR_CURVE', y * DirectionMul, 0.01)
-                emit:SetEmitterCurveParam('ZDIR_CURVE', z * DirectionMul, 0.01)
+                IEffectMethodsOffsetEmitter(emit, x * OffsetMul, y * OffsetMul, z * OffsetMul)
+                IEffectMethodsSetEmitterCurveParam(emit, 'XDIR_CURVE', x * DirectionMul, 0.01)
+                IEffectMethodsSetEmitterCurveParam(emit, 'YDIR_CURVE', y * DirectionMul, 0.01)
+                IEffectMethodsSetEmitterCurveParam(emit, 'ZDIR_CURVE', z * DirectionMul, 0.01)
             end
 
             if math.mod(i, 11) == 0 then
-                CreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
+                GlobalMethodsCreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
             end
 
             WaitSeconds(RandomFloat(0.05, 0.15))
         end
 
-        CreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
-        CreateEmitterAtEntity(self, army, '/effects/emitters/quantum_warhead_ring_01_emit.bp')
+        GlobalMethodsCreateLightParticle(self, -1, army, 13, 3, 'beam_white_01', 'ramp_quantum_warhead_flash_01')
+        GlobalMethodsCreateEmitterAtEntity(self, army, '/effects/emitters/quantum_warhead_ring_01_emit.bp')
     end,
 
     DistortionField = function(self)
         local proj = self:CreateProjectile('/effects/QuantumWarhead/QuantumWarheadEffect01_proj.bp')
         local scale = proj:GetBlueprint().Display.UniformScale
 
-        proj:SetScaleVelocity(0.123 * scale, 0.123 * scale, 0.123 * scale)
+        ProjectileMethodsSetScaleVelocity(proj, 0.123 * scale, 0.123 * scale, 0.123 * scale)
         WaitSeconds(17.0)
-        proj:SetScaleVelocity(0.01 * scale, 0.01 * scale, 0.01 * scale)
+        ProjectileMethodsSetScaleVelocity(proj, 0.01 * scale, 0.01 * scale, 0.01 * scale)
     end,
 })
 

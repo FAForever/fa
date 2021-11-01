@@ -4,6 +4,11 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetScriptBit = UnitMethods.SetScriptBit
+-- End of automatically upvalued moho functions
+
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoGunWeapon
 
@@ -83,7 +88,7 @@ XSL0101 = Class(SWalkingLandUnit)({
     -- Turn off the cloak to begin with
     OnStopBeingBuilt = function(self, builder, layer)
         SWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetScriptBit('RULEUTC_CloakToggle', true)
+        UnitMethodsSetScriptBit(self, 'RULEUTC_CloakToggle', true)
         self.WaitingForCloak = false
         self:ForkThread(self.HideUnit)
     end,

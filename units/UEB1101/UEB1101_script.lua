@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetSpinDown = CRotateManipulatorMethods.SetSpinDown
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UEB1101/UEB1101_script.lua
@@ -18,10 +24,12 @@ UEB1101 = Class(TEnergyCreationUnit)({
             Slider3 = CreateSlider(self, 'B05'),
             Slider4 = CreateSlider(self, 'B06'),
 
+
         }
         self.Spinners = {
             Spinner1 = CreateRotator(self, 'B01', 'y', nil, 0, 60, 360):SetTargetSpeed(0),
             Spinner2 = CreateRotator(self, 'B02', 'y', nil, 0, 30, 360):SetTargetSpeed(0),
+
 
         }
         for k, v in self.Sliders do
@@ -67,10 +75,10 @@ UEB1101 = Class(TEnergyCreationUnit)({
                 WaitFor(v)
             end
             for k, v in self.Spinners do
-                v:SetSpinDown(false)
+                CRotateManipulatorMethodsSetSpinDown(v, false)
             end
-            self.Spinners.Spinner1:SetTargetSpeed(180)
-            self.Spinners.Spinner2:SetTargetSpeed(-90)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Spinners.Spinner1, 180)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Spinners.Spinner2, -90)
             WaitSeconds(5)
             ChangeState(self, self.IdleOpenState)
         end,
@@ -89,8 +97,8 @@ UEB1101 = Class(TEnergyCreationUnit)({
                 self.Effect1:Destroy()
             end
             for k, v in self.Spinners do
-                v:SetSpinDown(true)
-                v:SetTargetSpeed(360)
+                CRotateManipulatorMethodsSetSpinDown(v, true)
+                CRotateManipulatorMethodsSetTargetSpeed(v, 360)
             end
             for k, v in self.Spinners do
                 WaitFor(v)

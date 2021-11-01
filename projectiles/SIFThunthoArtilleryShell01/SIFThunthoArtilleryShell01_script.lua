@@ -8,6 +8,14 @@
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+-- End of automatically upvalued moho functions
+
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local SThunthoArtilleryShell = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
@@ -22,7 +30,7 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell)({
 
         ### Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity(self, self:GetArmy(), v)
+            GlobalMethodsCreateEmitterAtEntity(self, self:GetArmy(), v)
         end
 
         local vx, vy, vz = self:GetVelocity()
@@ -55,8 +63,8 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell)({
             xVec = vx + math.sin(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
             zVec = vz + math.cos(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
             local proj = self:CreateChildProjectile(bp.FragmentId)
-            proj:SetVelocity(xVec, yVec, zVec)
-            proj:SetVelocity(velocity)
+            ProjectileMethodsSetVelocity(proj, xVec, yVec, zVec)
+            ProjectileMethodsSetVelocity(proj, velocity)
             proj:PassDamageData(self.DamageData)
         end
 

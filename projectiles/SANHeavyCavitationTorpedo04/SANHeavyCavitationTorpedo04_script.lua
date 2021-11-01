@@ -8,6 +8,19 @@
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterOnEntity = GlobalMethods.CreateEmitterOnEntity
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetMaxSpeed = ProjectileMethods.SetMaxSpeed
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+local ProjectileMethodsTrackTarget = ProjectileMethods.TrackTarget
+-- End of automatically upvalued moho functions
+
 local SHeavyCavitationTorpedo = import('/lua/seraphimprojectiles.lua').SHeavyCavitationTorpedo
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -15,9 +28,9 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo)({
     OnCreate = function(self)
         SHeavyCavitationTorpedo.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
+        EntityMethodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 0.1)
         self:ForkThread(self.PauseUntilTrack)
-        CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        GlobalMethodsCreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
     end,
 
     PauseUntilTrack = function(self)
@@ -42,9 +55,9 @@ SANHeavyCavitationTorpedo04 = Class(SHeavyCavitationTorpedo)({
             turnrate = 720
         end
         WaitSeconds(waittime)
-        self:SetMaxSpeed(14)
-        self:TrackTarget(true)
-        self:SetTurnRate(turnrate)
+        ProjectileMethodsSetMaxSpeed(self, 14)
+        ProjectileMethodsTrackTarget(self, true)
+        ProjectileMethodsSetTurnRate(self, turnrate)
     end,
 
     GetDistanceToTarget = function(self)

@@ -5,6 +5,19 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsKill = EntityMethods.Kill
+
+local GlobalMethods = _G
+local GlobalMethodsCreateLightParticle = GlobalMethods.CreateLightParticle
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetAccMult = UnitMethods.SetAccMult
+local UnitMethodsSetSpeedMult = UnitMethods.SetSpeedMult
+-- End of automatically upvalued moho functions
+
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 local cWeapons = import('/lua/cybranweapons.lua')
@@ -20,7 +33,7 @@ local EMPDeathWeapon = Class(Weapon)({
 
     Fire = function(self)
         local blueprint = self:GetBlueprint()
-        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
+        GlobalMethodsDamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
 })
 
@@ -61,8 +74,8 @@ URL0303 = Class(CWalkingLandUnit)({
         self.ChargingInProgress = true
         self:SetWeaponEnabledByLabel('Disintigrator', false)
         self:SetWeaponEnabledByLabel('HeavyBolter', false)
-        self:SetAccMult(blueprint.Physics.ChargeAccMult)
-        self:SetSpeedMult(blueprint.Physics.ChargeSpeedMult)
+        UnitMethodsSetAccMult(self, blueprint.Physics.ChargeAccMult)
+        UnitMethodsSetSpeedMult(self, blueprint.Physics.ChargeSpeedMult)
         -- EMP duration mult added in DoDeathWeapon 
 
         local bufffx1 = CreateAttachedEmitter(self, 0, self:GetArmy(), '/effects/emitters/cybran_loyalist_charge_01_emit.bp')
@@ -71,7 +84,7 @@ URL0303 = Class(CWalkingLandUnit)({
         self.Trash:Add(bufffx2)
         StartCountdown(self.EntityId, blueprint.SecondsBeforeExplosionWhenCharging)
         WaitSeconds(blueprint.SecondsBeforeExplosionWhenCharging)
-        self:Kill()
+        EntityMethodsKill(self)
     end,
 
     OnScriptBitSet = function(self, bit)
@@ -106,7 +119,7 @@ URL0303 = Class(CWalkingLandUnit)({
         end
 
         -- Play EMP Effect
-        CreateLightParticle(self, -1, -1, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
+        GlobalMethodsCreateLightParticle(self, -1, -1, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
     end,
 })
 

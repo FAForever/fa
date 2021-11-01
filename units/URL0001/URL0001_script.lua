@@ -5,6 +5,25 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetIntelRadius = EntityMethods.SetIntelRadius
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsAddCommandCap = UnitMethods.AddCommandCap
+local UnitMethodsAddToggleCap = UnitMethods.AddToggleCap
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRemoveCommandCap = UnitMethods.RemoveCommandCap
+local UnitMethodsRemoveToggleCap = UnitMethods.RemoveToggleCap
+local UnitMethodsRestoreBuildRestrictions = UnitMethods.RestoreBuildRestrictions
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+local UnitMethodsSetProductionPerSecondEnergy = UnitMethods.SetProductionPerSecondEnergy
+local UnitMethodsSetProductionPerSecondMass = UnitMethods.SetProductionPerSecondMass
+
+local UnitWeaponMethods = _G.moho.weapon_methods
+local UnitWeaponMethodsChangeRateOfFire = UnitWeaponMethods.ChangeRateOfFire
+-- End of automatically upvalued moho functions
+
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local CCommandUnit = import('/lua/cybranunits.lua').CCommandUnit
 local CWeapons = import('/lua/cybranweapons.lua')
@@ -53,9 +72,9 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
         CCommandUnit.OnCreate(self)
-        self:SetCapturable(false)
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
+        UnitMethodsSetCapturable(self, false)
+        UnitMethodsHideBone(self, 'Back_Upgrade', true)
+        UnitMethodsHideBone(self, 'Right_Upgrade', true)
         if self:GetBlueprint().General.BuildBones then
             self:SetupBuildBones()
         end
@@ -87,8 +106,8 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
         self:DisableUnitIntel('Enhancement', 'SonarStealth')
         self:DisableUnitIntel('Enhancement', 'Cloak')
         self:DisableUnitIntel('Enhancement', 'Sonar')
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
+        UnitMethodsHideBone(self, 'Back_Upgrade', true)
+        UnitMethodsHideBone(self, 'Right_Upgrade', true)
         self:ForkThread(self.GiveInitialResources)
     end,
 
@@ -102,13 +121,13 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
     CreateEnhancement = function(self, enh)
         ACUUnit.CreateEnhancement(self, enh)
         if enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
             RemoveUnitEnhancement(self, 'Teleporter')
             RemoveUnitEnhancement(self, 'TeleporterRemove')
-            self:RemoveCommandCap('RULEUCC_Teleport')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'StealthGenerator' then
-            self:AddToggleCap('RULEUTC_CloakToggle')
+            UnitMethodsAddToggleCap(self, 'RULEUTC_CloakToggle')
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
                 self.IntelEffectsBag = nil
@@ -118,7 +137,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             self:EnableUnitIntel('Enhancement', 'RadarStealth')
             self:EnableUnitIntel('Enhancement', 'SonarStealth')
         elseif enh == 'StealthGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_CloakToggle')
             self:DisableUnitIntel('Enhancement', 'RadarStealth')
             self:DisableUnitIntel('Enhancement', 'SonarStealth')
             self.StealthEnh = false
@@ -131,12 +150,12 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             if not bp then
                 return
             end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'CloakingGenerator' then
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then
@@ -165,7 +184,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             end
             Buff.ApplyBuff(self, 'CybranACUCloakBonus')
         elseif enh == 'CloakingGeneratorRemove' then
-            self:RemoveToggleCap('RULEUTC_CloakToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_CloakToggle')
             self:DisableUnitIntel('Enhancement', 'Cloak')
             self.CloakEnh = false
             if Buff.HasBuff(self, 'CybranACUCloakBonus') then
@@ -208,7 +227,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             self:AddBuildRestriction(categories.CYBRAN * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'CybranACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT2BuildRate')
@@ -250,7 +269,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             if Buff.HasBuff(self, 'CybranACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT3BuildRate')
             end
@@ -260,7 +279,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             local wep = self:GetWeaponByLabel('RightRipper')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
             self.normalRange = bp.NewMaxRadius or 30
-            wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
+            UnitWeaponMethodsChangeRateOfFire(wep, bp.NewRateOfFire or 2)
             local microwave = self:GetWeaponByLabel('MLG')
             microwave:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local oc = self:GetWeaponByLabel('OverCharge')
@@ -275,7 +294,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             local wepBp = self:GetBlueprint().Weapon
             for k, v in wepBp do
                 if v.Label == 'RightRipper' then
-                    wep:ChangeRateOfFire(v.RateOfFire or 1)
+                    UnitWeaponMethodsChangeRateOfFire(wep, v.RateOfFire or 1)
                     wep:ChangeMaxRadius(v.MaxRadius or 22)
                     self.normalRange = v.MaxRadius or 22
                     self:GetWeaponByLabel('MLG'):ChangeMaxRadius(v.MaxRadius or 22)
@@ -295,7 +314,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
         elseif enh == 'NaniteTorpedoTube' then
             local bp = self:GetBlueprint().Enhancements[enh]
             self:SetWeaponEnabledByLabel('Torpedo', true)
-            self:SetIntelRadius('Sonar', bp.NewSonarRadius or 60)
+            EntityMethodsSetIntelRadius(self, 'Sonar', bp.NewSonarRadius or 60)
             self:EnableUnitIntel('Enhancement', 'Sonar')
             if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
@@ -303,7 +322,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
         elseif enh == 'NaniteTorpedoTubeRemove' then
             local bpIntel = self:GetBlueprint().Intel
             self:SetWeaponEnabledByLabel('Torpedo', false)
-            self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 26)
+            EntityMethodsSetIntelRadius(self, 'Sonar', bpIntel.SonarRadius or 26)
             self:DisableUnitIntel('Enhancement', 'Sonar')
             if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)

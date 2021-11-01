@@ -8,6 +8,12 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 local SOtheTacticalBomb = import('/lua/seraphimprojectiles.lua').SOtheTacticalBomb
 
 SBOOtheTacticalBomb02 = Class(SOtheTacticalBomb)({
@@ -16,8 +22,8 @@ SBOOtheTacticalBomb02 = Class(SOtheTacticalBomb)({
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -25,7 +31,7 @@ SBOOtheTacticalBomb02 = Class(SOtheTacticalBomb)({
             local army = self.Army
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
-            CreateDecal(pos, RandomFloat(0.0, 6.28), 'Scorch_012_albedo', '', 'Albedo', radius * 5, radius * 5, 200, 70, army)
+            GlobalMethodsCreateDecal(pos, RandomFloat(0.0, 6.28), 'Scorch_012_albedo', '', 'Albedo', radius * 5, radius * 5, 200, 70, army)
         end
 
         SOtheTacticalBomb.OnImpact(self, targetType, targetEntity)

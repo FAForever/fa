@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetSpinDown = CRotateManipulatorMethods.SetSpinDown
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UEB4202/UEB4202_script.lua
@@ -28,10 +34,10 @@ UEB4202 = Class(TShieldStructureUnit)({
     OnShieldEnabled = function(self)
         TShieldStructureUnit.OnShieldEnabled(self)
         if self.Rotator1 then
-            self.Rotator1:SetTargetSpeed(10)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator1, 10)
         end
         if self.Rotator2 then
-            self.Rotator2:SetTargetSpeed(-10)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator2, -10)
         end
 
         if self.ShieldEffectsBag then
@@ -47,8 +53,8 @@ UEB4202 = Class(TShieldStructureUnit)({
 
     OnShieldDisabled = function(self)
         TShieldStructureUnit.OnShieldDisabled(self)
-        self.Rotator1:SetTargetSpeed(0)
-        self.Rotator2:SetTargetSpeed(0)
+        CRotateManipulatorMethodsSetTargetSpeed(self.Rotator1, 0)
+        CRotateManipulatorMethodsSetTargetSpeed(self.Rotator2, 0)
 
         if self.ShieldEffectsBag then
             for k, v in self.ShieldEffectsBag do
@@ -60,10 +66,10 @@ UEB4202 = Class(TShieldStructureUnit)({
 
     UpgradingState = State(TShieldStructureUnit.UpgradingState)({
         Main = function(self)
-            self.Rotator1:SetTargetSpeed(90)
-            self.Rotator2:SetTargetSpeed(90)
-            self.Rotator1:SetSpinDown(true)
-            self.Rotator2:SetSpinDown(true)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator1, 90)
+            CRotateManipulatorMethodsSetTargetSpeed(self.Rotator2, 90)
+            CRotateManipulatorMethodsSetSpinDown(self.Rotator1, true)
+            CRotateManipulatorMethodsSetSpinDown(self.Rotator2, true)
             TShieldStructureUnit.UpgradingState.Main(self)
         end,
 

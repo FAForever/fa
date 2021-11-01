@@ -5,6 +5,19 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetIntelRadius = EntityMethods.SetIntelRadius
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsAddCommandCap = UnitMethods.AddCommandCap
+local UnitMethodsAddToggleCap = UnitMethods.AddToggleCap
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRemoveCommandCap = UnitMethods.RemoveCommandCap
+local UnitMethodsRemoveToggleCap = UnitMethods.RemoveToggleCap
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+-- End of automatically upvalued moho functions
+
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local SWeapons = import('/lua/seraphimweapons.lua')
 local Buff = import('/lua/sim/Buff.lua')
@@ -34,8 +47,8 @@ XSL0301 = Class(CommandUnit)({
 
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
-        self:SetCapturable(false)
-        self:HideBone('Back_Upgrade', true)
+        UnitMethodsSetCapturable(self, false)
+        UnitMethodsHideBone(self, 'Back_Upgrade', true)
         self:SetupBuildBones()
         self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
         self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = true
@@ -53,35 +66,35 @@ XSL0301 = Class(CommandUnit)({
         end
         -- Teleporter
         if enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Teleport')
             -- Missile
         elseif enh == 'Missile' then
-            self:AddCommandCap('RULEUCC_Tactical')
-            self:AddCommandCap('RULEUCC_SiloBuildTactical')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Tactical')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', true)
         elseif enh == 'MissileRemove' then
-            self:RemoveCommandCap('RULEUCC_Tactical')
-            self:RemoveCommandCap('RULEUCC_SiloBuildTactical')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Tactical')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_SiloBuildTactical')
             self:SetWeaponEnabledByLabel('Missile', false)
             -- Shields
         elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsAddToggleCap(self, 'RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             self:CreateShield(bp)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_ShieldToggle')
             -- Overcharge
         elseif enh == 'Overcharge' then
-            self:AddCommandCap('RULEUCC_Overcharge')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Overcharge')
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = false
             self:GetWeaponByLabel('AutoOverCharge').NeedsUpgrade = false
         elseif enh == 'OverchargeRemove' then
-            self:RemoveCommandCap('RULEUCC_Overcharge')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Overcharge')
             self:SetWeaponEnabledByLabel('OverCharge', false)
             self:SetWeaponEnabledByLabel('AutoOverCharge', false)
             self:GetWeaponByLabel('OverCharge').NeedsUpgrade = true
@@ -139,8 +152,8 @@ XSL0301 = Class(CommandUnit)({
             end
             -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
-            self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
-            self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
+            EntityMethodsSetIntelRadius(self, 'Vision', bp.NewVisionRadius or 104)
+            EntityMethodsSetIntelRadius(self, 'Omni', bp.NewOmniRadius or 104)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
             local wep = self:GetWeaponByLabel('OverCharge')
@@ -149,8 +162,8 @@ XSL0301 = Class(CommandUnit)({
             aoc:ChangeMaxRadius(35)
         elseif enh == 'EnhancedSensorsRemove' then
             local bpIntel = self:GetBlueprint().Intel
-            self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
-            self:SetIntelRadius('Omni', bpIntel.OmniRadius or 16)
+            EntityMethodsSetIntelRadius(self, 'Vision', bpIntel.VisionRadius or 26)
+            EntityMethodsSetIntelRadius(self, 'Omni', bpIntel.OmniRadius or 16)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
             local wep = self:GetWeaponByLabel('OverCharge')

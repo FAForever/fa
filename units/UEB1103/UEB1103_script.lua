@@ -8,6 +8,12 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+-- End of automatically upvalued moho functions
+
 local TMassCollectionUnit = import('/lua/terranunits.lua').TMassCollectionUnit
 
 UEB1103 = Class(TMassCollectionUnit)({
@@ -17,7 +23,7 @@ UEB1103 = Class(TMassCollectionUnit)({
         if not self.AnimationManipulator then
             return
         end
-        self.AnimationManipulator:SetRate(0)
+        CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 0)
         self.AnimationManipulator:Destroy()
         self.AnimationManipulator = nil
     end,
@@ -28,7 +34,7 @@ UEB1103 = Class(TMassCollectionUnit)({
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, true)
+        CAnimationManipulatorMethodsPlayAnim(self.AnimationManipulator, self:GetBlueprint().Display.AnimationOpen, true)
     end,
 
     OnProductionPaused = function(self)
@@ -36,7 +42,7 @@ UEB1103 = Class(TMassCollectionUnit)({
         if not self.AnimationManipulator then
             return
         end
-        self.AnimationManipulator:SetRate(0)
+        CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 0)
     end,
 
     OnProductionUnpaused = function(self)
@@ -44,7 +50,7 @@ UEB1103 = Class(TMassCollectionUnit)({
         if not self.AnimationManipulator then
             return
         end
-        self.AnimationManipulator:SetRate(1)
+        CAnimationManipulatorMethodsSetRate(self.AnimationManipulator, 1)
     end,
 })
 

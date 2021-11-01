@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 --
 -- UEF T2 Artillery projectile : ueb2303
 --
@@ -14,8 +20,8 @@ TIFArtillery01 = Class(TArtilleryProjectilePolytrail)({
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -24,7 +30,7 @@ TIFArtillery01 = Class(TArtilleryProjectilePolytrail)({
             local rotation = RandomFloat(0, 2 * math.pi)
             local army = self.Army
 
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 100, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 100, army)
         end
 
         TArtilleryProjectilePolytrail.OnImpact(self, targetType, targetEntity)

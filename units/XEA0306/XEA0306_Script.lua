@@ -5,6 +5,15 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsSetPrecedence = IAniManipulatorMethods.SetPrecedence
+-- End of automatically upvalued moho functions
+
 local explosion = import('/lua/defaultexplosions.lua')
 local util = import('/lua/utilities.lua')
 local WeaponsFile = import('/lua/terranweapons.lua')
@@ -50,16 +59,17 @@ XEA0306 = Class(AirTransport)({
         AirTransport.OnCreate(self)
 
         self.UnfoldAnim = CreateAnimator(self)
-        self.UnfoldAnim:PlayAnim('/units/xea0306/xea0306_aunfold.sca')
-        self.UnfoldAnim:SetRate(0)
+        CAnimationManipulatorMethodsPlayAnim(self.UnfoldAnim, '/units/xea0306/xea0306_aunfold.sca')
+        CAnimationManipulatorMethodsSetRate(self.UnfoldAnim, 0)
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         AirTransport.OnStopBeingBuilt(self, builder, layer)
         self.EngineManipulators = {
 
+
         }
-        self.UnfoldAnim:SetRate(1)
+        CAnimationManipulatorMethodsSetRate(self.UnfoldAnim, 1)
 
         -- create the engine thrust manipulators
         for k, v in self.EngineRotateBones do
@@ -73,9 +83,10 @@ XEA0306 = Class(AirTransport)({
         end
 
         self.LandingAnimManip = CreateAnimator(self)
-        self.LandingAnimManip:SetPrecedence(0)
+        IAniManipulatorMethodsSetPrecedence(self.LandingAnimManip, 0)
         self.Trash:Add(self.LandingAnimManip)
-        self.LandingAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand):SetRate(1)
+        CAnimationManipulatorMethodsPlayAnim(self.LandingAnimManip, self:GetBlueprint().Display.AnimationLand)
+        CAnimationManipulatorMethodsSetRate(self.LandingAnimManip, 1)
     end,
 
     -- When a unit attaches or detaches, tell the shield about it.
@@ -100,9 +111,9 @@ XEA0306 = Class(AirTransport)({
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         if new == 'Down' then
-            self.LandingAnimManip:SetRate(-1)
+            CAnimationManipulatorMethodsSetRate(self.LandingAnimManip, -1)
         elseif new == 'Up' then
-            self.LandingAnimManip:SetRate(1)
+            CAnimationManipulatorMethodsSetRate(self.LandingAnimManip, 1)
         else
 
         end

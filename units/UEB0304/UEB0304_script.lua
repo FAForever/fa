@@ -1,3 +1,17 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsAttachBoneTo = EntityMethods.AttachBoneTo
+local EntityMethodsSetDrawScale = EntityMethods.SetDrawScale
+local EntityMethodsSetMesh = EntityMethods.SetMesh
+local EntityMethodsSetParentOffset = EntityMethods.SetParentOffset
+local EntityMethodsSetVizToAllies = EntityMethods.SetVizToAllies
+local EntityMethodsSetVizToEnemies = EntityMethods.SetVizToEnemies
+local EntityMethodsSetVizToNeutrals = EntityMethods.SetVizToNeutrals
+
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UEB0304/UEB0304_script.lua
@@ -15,17 +29,17 @@ UEB0304 = Class(TQuantumGateUnit)({
 
     OnStopBeingBuilt = function(self, builder, layer)
         self.GateEffectEntity = import('/lua/sim/Entity.lua').Entity()
-        self.GateEffectEntity:AttachBoneTo(-1, self, 'UEB0304')
-        self.GateEffectEntity:SetMesh('/effects/entities/ForceField01/ForceField01_mesh')
-        self.GateEffectEntity:SetDrawScale(self.GateEffectScale)
-        self.GateEffectEntity:SetParentOffset(Vector(0, 0, self.GateEffectVerticalOffset))
-        self.GateEffectEntity:SetVizToAllies('Intel')
-        self.GateEffectEntity:SetVizToNeutrals('Intel')
-        self.GateEffectEntity:SetVizToEnemies('Intel')
+        EntityMethodsAttachBoneTo(self.GateEffectEntity, -1, self, 'UEB0304')
+        EntityMethodsSetMesh(self.GateEffectEntity, '/effects/entities/ForceField01/ForceField01_mesh')
+        EntityMethodsSetDrawScale(self.GateEffectEntity, self.GateEffectScale)
+        EntityMethodsSetParentOffset(self.GateEffectEntity, Vector(0, 0, self.GateEffectVerticalOffset))
+        EntityMethodsSetVizToAllies(self.GateEffectEntity, 'Intel')
+        EntityMethodsSetVizToNeutrals(self.GateEffectEntity, 'Intel')
+        EntityMethodsSetVizToEnemies(self.GateEffectEntity, 'Intel')
         self.Trash:Add(self.GateEffectEntity)
 
-        CreateAttachedEmitter(self, 'Left_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
-        CreateAttachedEmitter(self, 'Right_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
+        GlobalMethodsCreateAttachedEmitter(self, 'Left_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
+        GlobalMethodsCreateAttachedEmitter(self, 'Right_Gate_FX', self.Army, '/effects/emitters/terran_gate_01_emit.bp')
 
         TQuantumGateUnit.OnStopBeingBuilt(self, builder, layer)
     end,

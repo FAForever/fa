@@ -1,3 +1,17 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetMaxSpeed = ProjectileMethods.SetMaxSpeed
+local ProjectileMethodsSetStayUpright = ProjectileMethods.SetStayUpright
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+local ProjectileMethodsSetVelocityAlign = ProjectileMethods.SetVelocityAlign
+local ProjectileMethodsStayUnderwater = ProjectileMethods.StayUnderwater
+local ProjectileMethodsTrackTarget = ProjectileMethods.TrackTarget
+-- End of automatically upvalued moho functions
+
 #
 # Depth Charge Script
 #
@@ -32,36 +46,36 @@ AANDepthCharge03 = Class(ADepthChargeProjectile)({
 
         for i in self.FxEnterWater do
             #splash
-            CreateEmitterAtEntity(self, self.Army, self.FxEnterWater[i])
+            GlobalMethodsCreateEmitterAtEntity(self, self.Army, self.FxEnterWater[i])
         end
 
         #self:SetMaxSpeed(20)
         #self:SetVelocity(0)
         #self:SetAcceleration(5)
-        self:TrackTarget(true)
-        self:StayUnderwater(true)
-        self:SetTurnRate(360)
-        self:SetVelocityAlign(true)
-        self:SetStayUpright(false)
+        ProjectileMethodsTrackTarget(self, true)
+        ProjectileMethodsStayUnderwater(self, true)
+        ProjectileMethodsSetTurnRate(self, 360)
+        ProjectileMethodsSetVelocityAlign(self, true)
+        ProjectileMethodsSetStayUpright(self, false)
         #self:ForkThread(self.EnterWaterMovementThread)
     end,
 
     EnterWaterMovementThread = function(self)
         WaitTicks(1)
-        self:SetVelocity(0.5)
+        ProjectileMethodsSetVelocity(self, 0.5)
     end,
 
     OnLostTarget = function(self)
-        self:SetMaxSpeed(2)
+        ProjectileMethodsSetMaxSpeed(self, 2)
         self:SetAcceleration(-0.6)
         self:ForkThread(self.CountdownMovement)
     end,
 
     CountdownMovement = function(self)
         WaitSeconds(3)
-        self:SetMaxSpeed(0)
+        ProjectileMethodsSetMaxSpeed(self, 0)
         self:SetAcceleration(0)
-        self:SetVelocity(0)
+        ProjectileMethodsSetVelocity(self, 0)
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
@@ -76,6 +90,7 @@ AANDepthCharge03 = Class(ADepthChargeProjectile)({
             Omni = false,
             Vision = false,
             Army = self.Army,
+
 
         }
         local vizEntity = VizMarker(spec)

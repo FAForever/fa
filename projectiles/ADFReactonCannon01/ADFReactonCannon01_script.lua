@@ -8,14 +8,20 @@
 #    Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+local GlobalMethodsCreateLightParticle = GlobalMethods.CreateLightParticle
+-- End of automatically upvalued moho functions
+
 local AReactonCannonProjectile = import('/lua/aeonprojectiles.lua').AReactonCannonProjectile
 
 ADFReactonCannon01 = Class(AReactonCannonProjectile)({
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local launcher = self:GetLauncher()
         if launcher and launcher:HasEnhancement('StabilitySuppressant') then
-            CreateLightParticle(self, -1, army, 3.0, 6, 'ring_05', 'ramp_green_02')
-            CreateEmitterAtEntity(self, army, '/effects/emitters/oblivion_cannon_hit_11_emit.bp')
+            GlobalMethodsCreateLightParticle(self, -1, army, 3.0, 6, 'ring_05', 'ramp_green_02')
+            GlobalMethodsCreateEmitterAtEntity(self, army, '/effects/emitters/oblivion_cannon_hit_11_emit.bp')
         end
         AReactonCannonProjectile.CreateImpactEffects(self, army, EffectTable, EffectScale)
     end,

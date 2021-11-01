@@ -1,3 +1,9 @@
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/URA0401/URA0401_script.lua
@@ -69,6 +75,7 @@ URA0401 = Class(CAirUnit)({
                 '/effects/emitters/dirty_exhaust_smoke_01_emit.bp',
                 '/effects/emitters/dirty_exhaust_sparks_01_emit.bp',
 
+
             }
             local ExhaustBeam = '/effects/emitters/missile_exhaust_fire_beam_03_emit.bp'
 
@@ -90,11 +97,13 @@ URA0401 = Class(CAirUnit)({
         CAirUnit.OnMotionVertEventChange(self, new, old)
 
         if new == 'Top' or new == 'Up' and old == 'Down' then
-            self.AnimManip:SetRate(-1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
         elseif new == 'Down' then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand, false):SetRate(1.5)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationLand, false)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, 1.5)
         elseif new == 'Up' then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationTakeOff, false)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, 1)
         else
 
         end

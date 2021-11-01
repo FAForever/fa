@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local CRotateManipulatorMethods = _G.moho.RotateManipulator
+local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTargetSpeed
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/DEL0204/DEL0204_script.lua
@@ -20,7 +25,7 @@ DEL0204 = Class(TWalkingLandUnit)({
         GatlingCannon = Class(TDFPlasmaCannonWeapon)({
             PlayFxWeaponPackSequence = function(self)
                 if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(0)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.SpinManip, 0)
                 end
                 self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxWeaponPackSequence(self)
@@ -33,14 +38,14 @@ DEL0204 = Class(TWalkingLandUnit)({
                 end
 
                 if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(500)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.SpinManip, 500)
                 end
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
 
             PlayFxRackSalvoReloadSequence = function(self)
                 if self.SpinManip then
-                    self.SpinManip:SetTargetSpeed(200)
+                    CRotateManipulatorMethodsSetTargetSpeed(self.SpinManip, 200)
                 end
                 self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)

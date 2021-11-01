@@ -4,6 +4,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetScriptBit = UnitMethods.SetScriptBit
+-- End of automatically upvalued moho functions
+
 local TConstructionUnit = import('/lua/terranunits.lua').TConstructionUnit
 
 UEA0003 = Class(TConstructionUnit)({
@@ -26,7 +31,7 @@ UEA0003 = Class(TConstructionUnit)({
     SetParent = function(self, parent, podName)
         self.Parent = parent
         self.Pod = podName
-        self:SetScriptBit('RULEUTC_WeaponToggle', true)
+        UnitMethodsSetScriptBit(self, 'RULEUTC_WeaponToggle', true)
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)

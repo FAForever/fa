@@ -8,6 +8,21 @@
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsDetachAll = EntityMethods.DetachAll
+local EntityMethodsDetachFrom = EntityMethods.DetachFrom
+local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
+
+local GlobalMethods = _G
+local GlobalMethodsIssueMoveOffFactory = GlobalMethods.IssueMoveOffFactory
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsSetBusy = UnitMethods.SetBusy
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
@@ -36,8 +51,8 @@ XSS0303 = Class(AircraftCarrier)({
 
     IdleState = State({
         Main = function(self)
-            self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
+            UnitMethodsSetBusy(self, false)
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -50,10 +65,10 @@ XSS0303 = Class(AircraftCarrier)({
     BuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            self:SetBusy(true)
+            UnitMethodsSetBusy(self, true)
             local bone = self.BuildAttachBone
-            self:DetachAll(bone)
-            unitBuilding:HideBone(0, true)
+            EntityMethodsDetachAll(self, bone)
+            UnitMethodsHideBone(unitBuilding, 0, true)
             self.UnitDoneBeingBuilt = false
         end,
 
@@ -65,10 +80,10 @@ XSS0303 = Class(AircraftCarrier)({
 
     FinishedBuildingState = State({
         Main = function(self)
-            self:SetBusy(true)
+            UnitMethodsSetBusy(self, true)
             local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
+            EntityMethodsDetachFrom(unitBuilding, true)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
@@ -77,13 +92,13 @@ XSS0303 = Class(AircraftCarrier)({
                     0,
                     -20,
                 })
-                IssueMoveOffFactory({
+                GlobalMethodsIssueMoveOffFactory({
                     unitBuilding,
                 }, worldPos)
-                unitBuilding:ShowBone(0, true)
+                UnitMethodsShowBone(unitBuilding, 0, true)
             end
-            self:SetBusy(false)
-            self:RequestRefreshUI()
+            UnitMethodsSetBusy(self, false)
+            EntityMethodsRequestRefreshUI(self)
             ChangeState(self, self.IdleState)
         end,
     }),

@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UAA0203/UAA0203_script.lua
@@ -20,11 +25,11 @@ UAA0203 = Class(AAirUnit)({
             PlayFxMuzzleSequence = function(self, muzzle)
                 local army = self.unit.Army
                 for k, v in self.FxMuzzleFlash do
-                    CreateAttachedEmitter(self.unit, muzzle, army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, muzzle, army, v)
                 end
 
                 for k, v in self.FxChassisMuzzleFlash do
-                    CreateAttachedEmitter(self.unit, -1, army, v)
+                    GlobalMethodsCreateAttachedEmitter(self.unit, -1, army, v)
                 end
             end,
         }),

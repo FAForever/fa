@@ -1,3 +1,19 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+local GlobalMethodsCreateEmitterOnEntity = GlobalMethods.CreateEmitterOnEntity
+
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsScaleEmitter = IEffectMethods.ScaleEmitter
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetCollideSurface = ProjectileMethods.SetCollideSurface
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+-- End of automatically upvalued moho functions
+
 #****************************************************************************
 #**
 #**  File     :  /data/projectiles/SANHeavyCavitationTorpedo02/SANHeavyCavitationTorpedo02_script.lua
@@ -27,16 +43,16 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo)({
     },
 
     OnEnterWater = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
+        EntityMethodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 0.1)
         SHeavyCavitationTorpedo.OnEnterWater(self)
 
         for i in self.FxEnterWaterEmitter do
             #splash
-            CreateEmitterAtEntity(self, self.Army, self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+            IEffectMethodsScaleEmitter(CreateEmitterAtEntity(self, self.Army, FxEnterWaterEmitter[i]), self.FxSplashScale)
         end
         self.AirTrails:Destroy()
-        CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
-        self:SetCollideSurface(false)
+        GlobalMethodsCreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        ProjectileMethodsSetCollideSurface(self, false)
     end,
 
     OnCreate = function(self)
@@ -74,7 +90,7 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo)({
 
         # Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity(self, self.Army, v)
+            GlobalMethodsCreateEmitterAtEntity(self, self.Army, v)
         end
 
         # Launch projectiles at semi-random angles away from split location
@@ -84,8 +100,8 @@ SANHeavyCavitationTorpedo02 = Class(SHeavyCavitationTorpedo)({
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:PassDamageData(DividedDamageData)
             proj:PassData(self:GetTrackingTarget())
-            proj:SetVelocity(xVec, yVec, zVec)
-            proj:SetVelocity(velocity)
+            ProjectileMethodsSetVelocity(proj, xVec, yVec, zVec)
+            ProjectileMethodsSetVelocity(proj, velocity)
         end
         self:Destroy()
     end,

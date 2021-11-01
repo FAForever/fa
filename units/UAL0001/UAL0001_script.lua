@@ -8,6 +8,25 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetIntelRadius = EntityMethods.SetIntelRadius
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsAddCommandCap = UnitMethods.AddCommandCap
+local UnitMethodsAddToggleCap = UnitMethods.AddToggleCap
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRemoveCommandCap = UnitMethods.RemoveCommandCap
+local UnitMethodsRemoveToggleCap = UnitMethods.RemoveToggleCap
+local UnitMethodsRestoreBuildRestrictions = UnitMethods.RestoreBuildRestrictions
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+local UnitMethodsSetProductionPerSecondEnergy = UnitMethods.SetProductionPerSecondEnergy
+local UnitMethodsSetProductionPerSecondMass = UnitMethods.SetProductionPerSecondMass
+
+local UnitWeaponMethods = _G.moho.weapon_methods
+local UnitWeaponMethodsChangeRateOfFire = UnitWeaponMethods.ChangeRateOfFire
+-- End of automatically upvalued moho functions
+
 local ACUUnit = import('/lua/defaultunits.lua').ACUUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFDisruptorCannonWeapon = AWeapons.ADFDisruptorCannonWeapon
@@ -32,11 +51,11 @@ UAL0001 = Class(ACUUnit)({
 
     OnCreate = function(self)
         ACUUnit.OnCreate(self)
-        self:SetCapturable(false)
+        UnitMethodsSetCapturable(self, false)
         self:SetupBuildBones()
-        self:HideBone('Back_Upgrade', true)
-        self:HideBone('Right_Upgrade', true)
-        self:HideBone('Left_Upgrade', true)
+        UnitMethodsHideBone(self, 'Back_Upgrade', true)
+        UnitMethodsHideBone(self, 'Right_Upgrade', true)
+        UnitMethodsHideBone(self, 'Left_Upgrade', true)
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
     end,
@@ -62,46 +81,46 @@ UAL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationAdvanced' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local bpEcon = self:GetBlueprint().Economy
             if not bp then
                 return
             end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationAdvancedRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
             -- Shields
         elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsAddToggleCap(self, 'RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             self:CreateShield(bp)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_ShieldToggle')
         elseif enh == 'ShieldHeavy' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsAddToggleCap(self, 'RULEUTC_ShieldToggle')
             self:ForkThread(self.CreateHeavyShield, bp)
         elseif enh == 'ShieldHeavyRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_ShieldToggle')
             -- Teleporter
         elseif enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Teleport')
             -- Chrono Dampener
         elseif enh == 'ChronoDampener' then
             self:SetWeaponEnabledByLabel('ChronoDampener', true)
@@ -164,7 +183,7 @@ UAL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
@@ -206,7 +225,7 @@ UAL0001 = Class(ACUUnit)({
             if not bp then
                 return
             end
-            self:RestoreBuildRestrictions()
+            UnitMethodsRestoreBuildRestrictions(self)
             self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
             if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
@@ -230,19 +249,19 @@ UAL0001 = Class(ACUUnit)({
             -- Heat Sink Augmentation
         elseif enh == 'HeatSink' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
-            wep:ChangeRateOfFire(bp.NewRateOfFire or 2)
+            UnitWeaponMethodsChangeRateOfFire(wep, bp.NewRateOfFire or 2)
         elseif enh == 'HeatSinkRemove' then
             local wep = self:GetWeaponByLabel('RightDisruptor')
             local bpDisrupt = self:GetBlueprint().Weapon[1].RateOfFire
-            wep:ChangeRateOfFire(bpDisrupt or 1)
+            UnitWeaponMethodsChangeRateOfFire(wep, bpDisrupt or 1)
             -- Enhanced Sensor Systems
         elseif enh == 'EnhancedSensors' then
-            self:SetIntelRadius('Vision', bp.NewVisionRadius or 104)
-            self:SetIntelRadius('Omni', bp.NewOmniRadius or 104)
+            EntityMethodsSetIntelRadius(self, 'Vision', bp.NewVisionRadius or 104)
+            EntityMethodsSetIntelRadius(self, 'Omni', bp.NewOmniRadius or 104)
         elseif enh == 'EnhancedSensorsRemove' then
             local bpIntel = self:GetBlueprint().Intel
-            self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
-            self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
+            EntityMethodsSetIntelRadius(self, 'Vision', bpIntel.VisionRadius or 26)
+            EntityMethodsSetIntelRadius(self, 'Omni', bpIntel.OmniRadius or 26)
         else
 
         end

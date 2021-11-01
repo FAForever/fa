@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+-- End of automatically upvalued moho functions
+
 --#****************************************************************************
 --#**
 --#**  File     :  /cdimage/units/UAB5202/UAB5202_script.lua
@@ -14,16 +19,16 @@ local SeraphimAirStagePlat01 = import('/lua/EffectTemplates.lua').SeraphimAirSta
 XSB5202 = Class(SAirStagingPlatformUnit)({
     OnStopBeingBuilt = function(self, builder, layer)
         for k, v in SeraphimAirStagePlat02 do
-            CreateAttachedEmitter(self, 'XSB5202', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'XSB5202', self.Army, v)
         end
 
         for k, v in SeraphimAirStagePlat01 do
-            CreateAttachedEmitter(self, 'Pod01', self.Army, v)
-            CreateAttachedEmitter(self, 'Pod02', self.Army, v)
-            CreateAttachedEmitter(self, 'Pod03', self.Army, v)
-            CreateAttachedEmitter(self, 'Pod04', self.Army, v)
-            CreateAttachedEmitter(self, 'Pod05', self.Army, v)
-            CreateAttachedEmitter(self, 'Pod06', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Pod01', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Pod02', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Pod03', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Pod04', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Pod05', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Pod06', self.Army, v)
         end
 
         SAirStagingPlatformUnit.OnStopBeingBuilt(self, builder, layer)

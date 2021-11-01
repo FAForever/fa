@@ -1,3 +1,11 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+-- End of automatically upvalued moho functions
+
 #
 # Terran Fragmentation/Sensor Shells
 #
@@ -16,7 +24,7 @@ TIFFragmentationSensorShell01 = Class(TArtilleryProjectile)({
 
         # Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity(self, self:GetArmy(), v)
+            GlobalMethodsCreateEmitterAtEntity(self, self:GetArmy(), v)
         end
 
         local vx, vy, vz = self:GetVelocity()
@@ -45,8 +53,8 @@ TIFFragmentationSensorShell01 = Class(TArtilleryProjectile)({
             xVec = vx + math.sin(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
             zVec = vz + math.cos(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
             local proj = self:CreateChildProjectile(bp.FragmentId)
-            proj:SetVelocity(xVec, yVec, zVec)
-            proj:SetVelocity(velocity)
+            ProjectileMethodsSetVelocity(proj, xVec, yVec, zVec)
+            ProjectileMethodsSetVelocity(proj, velocity)
             proj:PassDamageData(self.DamageData)
         end
         local pos = self:GetPosition()
@@ -58,6 +66,7 @@ TIFFragmentationSensorShell01 = Class(TArtilleryProjectile)({
             Army = self.Data.Army,
             Omni = false,
             WaterVision = false,
+
 
         }
         local vizEntity = VizMarker(spec)

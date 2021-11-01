@@ -5,6 +5,25 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsDetachAll = EntityMethods.DetachAll
+local EntityMethodsDetachFrom = EntityMethods.DetachFrom
+local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
+local EntityMethodsSetMesh = EntityMethods.SetMesh
+
+local GlobalMethods = _G
+local GlobalMethodsIssueMoveOffFactory = GlobalMethods.IssueMoveOffFactory
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsSetBusy = UnitMethods.SetBusy
+local UnitMethodsShowBone = UnitMethods.ShowBone
+-- End of automatically upvalued moho functions
+
 local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local TSAMLauncher = import('/lua/terranweapons.lua').TSAMLauncher
@@ -47,9 +66,9 @@ UES0401 = Class(AircraftCarrier)({
     end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
+        EntityMethodsSetMesh(self, self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
-            self:HideBone(0, true)
+            UnitMethodsHideBone(self, 0, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
@@ -57,9 +76,9 @@ UES0401 = Class(AircraftCarrier)({
     PlayAllOpenAnims = function(self, open)
         for k, v in self.OpenAnimManips do
             if open then
-                v:SetRate(1)
+                CAnimationManipulatorMethodsSetRate(v, 1)
             else
-                v:SetRate(-1)
+                CAnimationManipulatorMethodsSetRate(v, -1)
             end
         end
     end,
@@ -135,8 +154,8 @@ UES0401 = Class(AircraftCarrier)({
 
     IdleState = State({
         Main = function(self)
-            self:DetachAll(self.BuildAttachBone)
-            self:SetBusy(false)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
+            UnitMethodsSetBusy(self, false)
         end,
 
         OnStartBuild = function(self, unitBuilding, order)
@@ -150,8 +169,8 @@ UES0401 = Class(AircraftCarrier)({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
             local bone = self.BuildAttachBone
-            self:DetachAll(bone)
-            unitBuilding:HideBone(0, true)
+            EntityMethodsDetachAll(self, bone)
+            UnitMethodsHideBone(unitBuilding, 0, true)
             self.UnitDoneBeingBuilt = false
         end,
 
@@ -164,8 +183,8 @@ UES0401 = Class(AircraftCarrier)({
     FinishedBuildingState = State({
         Main = function(self)
             local unitBuilding = self.UnitBeingBuilt
-            unitBuilding:DetachFrom(true)
-            self:DetachAll(self.BuildAttachBone)
+            EntityMethodsDetachFrom(unitBuilding, true)
+            EntityMethodsDetachAll(self, self.BuildAttachBone)
             if self:TransportHasAvailableStorage() then
                 self:AddUnitToStorage(unitBuilding)
             else
@@ -174,13 +193,13 @@ UES0401 = Class(AircraftCarrier)({
                     0,
                     -20,
                 })
-                IssueMoveOffFactory({
+                GlobalMethodsIssueMoveOffFactory({
                     unitBuilding,
                 }, worldPos)
-                unitBuilding:ShowBone(0, true)
+                UnitMethodsShowBone(unitBuilding, 0, true)
             end
 
-            self:RequestRefreshUI()
+            EntityMethodsRequestRefreshUI(self)
             ChangeState(self, self.IdleState)
         end,
     }),

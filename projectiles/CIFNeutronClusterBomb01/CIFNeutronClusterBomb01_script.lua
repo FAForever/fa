@@ -8,6 +8,12 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 local CNeutronClusterBombProjectile = import('/lua/cybranprojectiles.lua').CNeutronClusterBombProjectile
 
 CIFNeutronClusterBomb01 = Class(CNeutronClusterBombProjectile)({
@@ -16,8 +22,8 @@ CIFNeutronClusterBomb01 = Class(CNeutronClusterBombProjectile)({
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -27,7 +33,7 @@ CIFNeutronClusterBomb01 = Class(CNeutronClusterBombProjectile)({
             local size = radius - 1.5 + RandomFloat(0, 1.0)
             local army = self.Army
 
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 30, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 30, army)
         end
 
         CNeutronClusterBombProjectile.OnImpact(self, targetType, targetEntity)

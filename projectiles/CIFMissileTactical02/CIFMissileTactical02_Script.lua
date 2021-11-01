@@ -1,3 +1,18 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsCreateLightParticle = GlobalMethods.CreateLightParticle
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetDestroyOnWater = ProjectileMethods.SetDestroyOnWater
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+-- End of automatically upvalued moho functions
+
 -- 
 -- URS0304 : cybran nuke sub
 -- Cybran "Loa" Tactical Missile, structure unit and sub launched variant of this projectile,
@@ -13,7 +28,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
 
     OnCreate = function(self)
         CLOATacticalMissileProjectile.OnCreate(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
+        EntityMethodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 2.0)
         self.Split = false
         self.MovementTurnLevel = 1
         self:ForkThread(self.MovementThread)
@@ -33,10 +48,10 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
         local pos = self:GetPosition()
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        CreateLightParticle(self, -1, army, 3, 7, 'glow_03', 'ramp_fire_11')
+        GlobalMethodsCreateLightParticle(self, -1, army, 3, 7, 'glow_03', 'ramp_fire_11')
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -44,7 +59,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
             local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
             local rotation = RandomFloat(0, 2 * math.pi)
 
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 200, 90, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 200, 90, army)
         end
 
         -- if I collide with terrain dont split
@@ -70,8 +85,8 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
                 local yVec = vy + math.cos(i * angle) * spreadMul
                 local zVec = vz + math.cos(i * angle) * spreadMul
                 local proj = self:CreateChildProjectile(ChildProjectileBP)
-                proj:SetVelocity(xVec, yVec, zVec)
-                proj:SetVelocity(velocity)
+                ProjectileMethodsSetVelocity(proj, xVec, yVec, zVec)
+                ProjectileMethodsSetVelocity(proj, velocity)
                 proj:PassDamageData(self.ChildDamageData)
             end
         end
@@ -80,7 +95,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
 
     MovementThread = function(self)
         self.WaitTime = 0.1
-        self:SetTurnRate(8)
+        ProjectileMethodsSetTurnRate(self, 8)
         WaitSeconds(0.3)
         while not self:BeenDestroyed() do
             self:SetTurnRateByDist()
@@ -94,19 +109,19 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
         if dist > 50 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
-            self:SetTurnRate(20)
+            ProjectileMethodsSetTurnRate(self, 20)
         elseif dist > 64 and dist <= 107 then
             -- Increase check intervals
-            self:SetTurnRate(30)
+            ProjectileMethodsSetTurnRate(self, 30)
             WaitSeconds(1.5)
-            self:SetTurnRate(30)
+            ProjectileMethodsSetTurnRate(self, 30)
         elseif dist > 21 and dist <= 64 then
             -- Further increase check intervals
             WaitSeconds(0.3)
-            self:SetTurnRate(50)
+            ProjectileMethodsSetTurnRate(self, 50)
         elseif dist > 0 and dist <= 21 then
             -- Further increase check intervals            
-            self:SetTurnRate(100)
+            ProjectileMethodsSetTurnRate(self, 100)
             KillThread(self.MoveThread)
         else
 
@@ -122,7 +137,7 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
 
     OnExitWater = function(self)
         CLOATacticalMissileProjectile.OnExitWater(self)
-        self:SetDestroyOnWater(true)
+        ProjectileMethodsSetDestroyOnWater(self, true)
     end,
 })
 TypeClass = CIFMissileTactical02

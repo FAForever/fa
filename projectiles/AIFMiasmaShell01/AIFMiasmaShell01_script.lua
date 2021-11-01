@@ -2,6 +2,11 @@
 -- Aeon T2 Artillery Projectile : uab2303
 --
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 local AMiasmaProjectile = import('/lua/aeonprojectiles.lua').AMiasmaProjectile
 local utilities = import('/lua/utilities.lua')
 
@@ -33,8 +38,8 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile)({
         self:Destroy()
 
         -- already kill the trees, so better make them fall. Even if it would be better that it doesn't kill trees at all.
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 

@@ -5,6 +5,17 @@
 -- Copyright ? 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetHealth = EntityMethods.SetHealth
+
+local GlobalMethods = _G
+local GlobalMethodsIssueAttack = GlobalMethods.IssueAttack
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetFireState = UnitMethods.SetFireState
+-- End of automatically upvalued moho functions
+
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedoLauncherWeapon
 local utilities = import('/lua/utilities.lua')
@@ -43,9 +54,9 @@ XRB2308 = Class(CStructureUnit)({
 
             local newHARMS = CreateUnitHPR('XRB2309', armySelf, pos[1], pos[2], pos[3], 0, 0, 0)
 
-            newHARMS:SetHealth(newHARMS, health)
+            EntityMethodsSetHealth(newHARMS, newHARMS, health)
             newHARMS.SpottedByArmy = spottedByArmy
-            newHARMS:SetFireState(fireState)
+            UnitMethodsSetFireState(newHARMS, fireState)
         end
     end,
 
@@ -61,12 +72,12 @@ XRB2308 = Class(CStructureUnit)({
 
             local newHARMS = CreateUnitHPR('XRB2309', armySelf, pos[1], pos[2], pos[3], 0, 0, 0)
 
-            newHARMS:SetHealth(newHARMS, health)
+            EntityMethodsSetHealth(newHARMS, newHARMS, health)
             newHARMS.SpottedByArmy = spottedByArmy
-            newHARMS:SetFireState(fireState)
+            UnitMethodsSetFireState(newHARMS, fireState)
 
             if target then
-                IssueAttack({
+                GlobalMethodsIssueAttack({
                     newHARMS,
                 }, target)
             end

@@ -5,6 +5,12 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local WeaponsFile = import('/lua/seraphimweapons.lua')
 local SDFExperimentalPhasonProj = WeaponsFile.SDFExperimentalPhasonProj
@@ -31,7 +37,7 @@ XSL0401 = Class(SWalkingLandUnit)({
         local spiritUnit = CreateUnitHPR('XSL0402', self.Army, position[1], position[2], position[3], 0, 0, 0)
         -- Create effects for spawning of energy being
         for k, v in spawnEffects do
-            CreateAttachedEmitter(spiritUnit, -1, self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(spiritUnit, -1, self.Army, v)
         end
     end,
 
@@ -84,6 +90,7 @@ XSL0401 = Class(SWalkingLandUnit)({
             'Torso',
             'Head',
             'pelvis',
+
         }
         local explosionBones = {
             'Right_Arm_B07',
@@ -98,6 +105,7 @@ XSL0401 = Class(SWalkingLandUnit)({
             'Left_Leg_B17',
             'Left_Leg_B14',
             'Left_Leg_B15',
+
 
         }
         explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
@@ -148,7 +156,7 @@ XSL0401 = Class(SWalkingLandUnit)({
             local bp = self:GetBlueprint()
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
-                    DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
+                    GlobalMethodsDamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
                     break
                 end
             end

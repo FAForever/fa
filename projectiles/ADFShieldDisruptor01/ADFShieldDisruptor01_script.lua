@@ -1,3 +1,8 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsDamage = GlobalMethods.Damage
+-- End of automatically upvalued moho functions
+
 -- ****************************************************************************
 -- **
 -- **  File     :  /data/projectiles/ADFShieldDisruptor01/ADFShieldDisruptor01_script.lua
@@ -22,7 +27,7 @@ ADFShieldDisruptor01 = Class(ADisruptorProjectile)({
 
         -- Never cause overspill damage to the unit, 1 min to avoid logspam with 0 declared damage
         local damage = math.max(math.min(self.Data, TargetEntity:GetHealth()), 1)
-        Damage(self, {
+        GlobalMethodsDamage(self, {
             0,
             0,
             0,

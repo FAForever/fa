@@ -8,6 +8,25 @@
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsSetCollisionShape = EntityMethods.SetCollisionShape
+
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+local GlobalMethodsCreateEmitterOnEntity = GlobalMethods.CreateEmitterOnEntity
+
+local IEffectMethods = _G.moho.IEffect
+local IEffectMethodsScaleEmitter = IEffectMethods.ScaleEmitter
+
+local ProjectileMethods = _G.moho.projectile_methods
+local ProjectileMethodsSetCollideSurface = ProjectileMethods.SetCollideSurface
+local ProjectileMethodsSetTurnRate = ProjectileMethods.SetTurnRate
+local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
+local ProjectileMethodsStayUnderwater = ProjectileMethods.StayUnderwater
+local ProjectileMethodsTrackTarget = ProjectileMethods.TrackTarget
+-- End of automatically upvalued moho functions
+
 local SHeavyCavitationTorpedo = import('/lua/seraphimprojectiles.lua').SHeavyCavitationTorpedo
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -24,23 +43,24 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo)({
 
         for i in self.FxEnterWaterEmitter do
             #splash
-            CreateEmitterAtEntity(self, self.Army, self.FxEnterWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+            IEffectMethodsScaleEmitter(CreateEmitterAtEntity(self, self.Army, FxEnterWaterEmitter[i]), self.FxSplashScale)
         end
         self.AirTrails:Destroy()
-        CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        GlobalMethodsCreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails)
+        ProjectileMethodsTrackTarget(self, true)
 
-        self:TrackTarget(true):StayUnderwater(true)
-        self:SetCollideSurface(false)
-        self:SetTurnRate(360)
+        ProjectileMethodsStayUnderwater(self, true)
+        ProjectileMethodsSetCollideSurface(self, false)
+        ProjectileMethodsSetTurnRate(self, 360)
         self:ForkThread(self.ProjectileSplit)
     end,
 
     OnCreate = function(self, inWater)
         SHeavyCavitationTorpedo.OnCreate(self, inWater)
         -- if we are starting in the water then immediately switch to tracking in water
-        self:TrackTarget(false)
+        ProjectileMethodsTrackTarget(self, false)
         self.AirTrails = CreateEmitterOnEntity(self, self.Army, EffectTemplate.SHeavyCavitationTorpedoFxTrails02)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 0.1)
+        EntityMethodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 0.1)
     end,
 
     ProjectileSplit = function(self)
@@ -72,7 +92,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo)({
 
         # Split effects
         for k, v in FxFragEffect do
-            CreateEmitterAtEntity(self, self.Army, v)
+            GlobalMethodsCreateEmitterAtEntity(self, self.Army, v)
         end
 
         # Launch projectiles at semi-random angles away from split location
@@ -82,8 +102,8 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo)({
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:PassDamageData(DividedDamageData)
             proj:PassData(self:GetTrackingTarget())
-            proj:SetVelocity(xVec, yVec, zVec)
-            proj:SetVelocity(velocity)
+            ProjectileMethodsSetVelocity(proj, xVec, yVec, zVec)
+            ProjectileMethodsSetVelocity(proj, velocity)
         end
         self:Destroy()
     end,

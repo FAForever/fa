@@ -24,6 +24,7 @@ UEA0203 = Class(AirTransport)({
         self.EngineManipulators = {
 
             -- Create the engine thrust manipulators
+
         }
         for key, value in self.EngineRotateBones do
             table.insert(self.EngineManipulators, CreateThrustController(self, "thruster", value))

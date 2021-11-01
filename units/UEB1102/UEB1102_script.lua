@@ -8,6 +8,11 @@
 --  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+-- End of automatically upvalued moho functions
+
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
 
 UEB1102 = Class(TEnergyCreationUnit)({
@@ -83,7 +88,7 @@ UEB1102 = Class(TEnergyCreationUnit)({
                 end
                 self.EffectsBag = {}
             end
-            self.AnimManip:SetRate(-1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
         end,
 
         OnActive = function(self)

@@ -1,3 +1,12 @@
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsSetProductionPerSecondEnergy = UnitMethods.SetProductionPerSecondEnergy
+local UnitMethodsSetProductionPerSecondMass = UnitMethods.SetProductionPerSecondMass
+-- End of automatically upvalued moho functions
+
 #****************************************************************************
 #**
 #**  File     :  /data/units/XAB1401/XAB1401_script.lua
@@ -28,7 +37,7 @@ XAB1401 = Class(AStructureUnit)({
         self:ForkThread(self.ResourceMonitor)
 
         for k, v in FxAmbient do
-            CreateAttachedEmitter(self, 'Orb', self.Army, v)
+            GlobalMethodsCreateAttachedEmitter(self, 'Orb', self.Army, v)
         end
     end,
 
@@ -55,7 +64,7 @@ XAB1401 = Class(AStructureUnit)({
                 if maxMass and massAdd > maxMass then
                     massAdd = maxMass
                 end
-                self:SetProductionPerSecondMass(massAdd)
+                UnitMethodsSetProductionPerSecondMass(self, massAdd)
 
                 energyAdd = 1000
                 if energyNeed - energyIncome > 0 then
@@ -64,7 +73,7 @@ XAB1401 = Class(AStructureUnit)({
                 if maxEnergy and energyAdd > maxEnergy then
                     energyAdd = maxEnergy
                 end
-                self:SetProductionPerSecondEnergy(energyAdd)
+                UnitMethodsSetProductionPerSecondEnergy(self, energyAdd)
 
                 WaitSeconds(0.5)
             end

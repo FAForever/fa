@@ -1,3 +1,12 @@
+-- Automatically upvalued moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsShakeCamera = EntityMethods.ShakeCamera
+
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+local GlobalMethodsDamageArea = GlobalMethods.DamageArea
+-- End of automatically upvalued moho functions
+
 ------------------------------------------------------------
 --
 --  File     :  /data/projectiles/AIFFragmentationSensorShell03/AIFFragmentationSensorShell03_script.lua
@@ -19,8 +28,8 @@ AIFFragmentationSensorShell03 = Class(AArtilleryFragmentationSensorShellProjecti
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~= 0
 
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
-        DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
+        GlobalMethodsDamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -29,10 +38,10 @@ AIFFragmentationSensorShell03 = Class(AArtilleryFragmentationSensorShellProjecti
             local size = RandomFloat(2.25, 3.75)
             local army = self.Army
 
-            CreateDecal(pos, rotation, 'scorch_004_albedo', '', 'Albedo', size, size, 200, 50, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'scorch_004_albedo', '', 'Albedo', size, size, 200, 50, army)
         end
 
-        self:ShakeCamera(20, 1, 0, 1)
+        EntityMethodsShakeCamera(self, 20, 1, 0, 1)
 
         AArtilleryFragmentationSensorShellProjectile.OnImpact(self, targetType, targetEntity)
     end,

@@ -5,6 +5,21 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local IAniManipulatorMethods = _G.moho.manipulator_methods
+local IAniManipulatorMethodsSetPrecedence = IAniManipulatorMethods.SetPrecedence
+
+local UnitMethods = _G.moho.unit_methods
+local UnitMethodsAddCommandCap = UnitMethods.AddCommandCap
+local UnitMethodsAddToggleCap = UnitMethods.AddToggleCap
+local UnitMethodsHideBone = UnitMethods.HideBone
+local UnitMethodsRemoveCommandCap = UnitMethods.RemoveCommandCap
+local UnitMethodsRemoveToggleCap = UnitMethods.RemoveToggleCap
+local UnitMethodsSetCapturable = UnitMethods.SetCapturable
+local UnitMethodsSetProductionPerSecondEnergy = UnitMethods.SetProductionPerSecondEnergy
+local UnitMethodsSetProductionPerSecondMass = UnitMethods.SetProductionPerSecondMass
+-- End of automatically upvalued moho functions
+
 local CommandUnit = import('/lua/defaultunits.lua').CommandUnit
 local AWeapons = import('/lua/aeonweapons.lua')
 local ADFReactonCannon = AWeapons.ADFReactonCannon
@@ -25,7 +40,7 @@ UAL0301 = Class(CommandUnit)({
     OnStopBuild = function(self, unitBeingBuilt)
         CommandUnit.OnStopBuild(self, unitBeingBuilt)
         self:BuildManipulatorSetEnabled(false)
-        self.BuildArmManipulator:SetPrecedence(0)
+        IAniManipulatorMethodsSetPrecedence(self.BuildArmManipulator, 0)
         self:SetWeaponEnabledByLabel('RightReactonCannon', true)
         self:GetWeaponManipulatorByLabel('RightReactonCannon'):SetHeadingPitch(self.BuildArmManipulator:GetHeadingPitch())
         self.UnitBeingBuilt = nil
@@ -35,8 +50,8 @@ UAL0301 = Class(CommandUnit)({
 
     OnCreate = function(self)
         CommandUnit.OnCreate(self)
-        self:SetCapturable(false)
-        self:HideBone('Turbine', true)
+        UnitMethodsSetCapturable(self, false)
+        UnitMethodsHideBone(self, 'Turbine', true)
         self:SetupBuildBones()
     end,
 
@@ -52,25 +67,25 @@ UAL0301 = Class(CommandUnit)({
         end
         -- Teleporter
         if enh == 'Teleporter' then
-            self:AddCommandCap('RULEUCC_Teleport')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Teleport')
         elseif enh == 'TeleporterRemove' then
-            self:RemoveCommandCap('RULEUCC_Teleport')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Teleport')
             -- Shields
         elseif enh == 'Shield' then
-            self:AddToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsAddToggleCap(self, 'RULEUTC_ShieldToggle')
             self:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             self:CreateShield(bp)
         elseif enh == 'ShieldRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_ShieldToggle')
         elseif enh == 'ShieldHeavy' then
             self:ForkThread(self.CreateHeavyShield, bp)
         elseif enh == 'ShieldHeavyRemove' then
             self:DestroyShield()
             self:SetMaintenanceConsumptionInactive()
-            self:RemoveToggleCap('RULEUTC_ShieldToggle')
+            UnitMethodsRemoveToggleCap(self, 'RULEUTC_ShieldToggle')
             -- ResourceAllocation
         elseif enh == 'ResourceAllocation' then
             local bp = self:GetBlueprint().Enhancements[enh]
@@ -78,12 +93,12 @@ UAL0301 = Class(CommandUnit)({
             if not bp then
                 return
             end
-            self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
             local bpEcon = self:GetBlueprint().Economy
-            self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
-            self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
+            UnitMethodsSetProductionPerSecondEnergy(self, bpEcon.ProductionPerSecondEnergy or 0)
+            UnitMethodsSetProductionPerSecondMass(self, bpEcon.ProductionPerSecondMass or 0)
             -- Engineering Focus Module
         elseif enh == 'EngineeringFocusingModule' then
             if not Buffs['AeonSCUBuildRate'] then
@@ -131,9 +146,9 @@ UAL0301 = Class(CommandUnit)({
             end
             -- Sacrifice
         elseif enh == 'Sacrifice' then
-            self:AddCommandCap('RULEUCC_Sacrifice')
+            UnitMethodsAddCommandCap(self, 'RULEUCC_Sacrifice')
         elseif enh == 'SacrificeRemove' then
-            self:RemoveCommandCap('RULEUCC_Sacrifice')
+            UnitMethodsRemoveCommandCap(self, 'RULEUCC_Sacrifice')
             -- StabilitySupressant
         elseif enh == 'StabilitySuppressant' then
             local wep = self:GetWeaponByLabel('RightReactonCannon')

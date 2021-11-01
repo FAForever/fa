@@ -8,6 +8,11 @@
 #**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateEmitterAtEntity = GlobalMethods.CreateEmitterAtEntity
+-- End of automatically upvalued moho functions
+
 local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
 local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -19,6 +24,7 @@ local barrelBones = {
     'Turret_Barrel_C_B01',
     'Turret_Barrel_B_B01',
     'Turret_Barrel_A_B01',
+
 }
 local recoilBones = {
     'Turret_Barrel_F_B02',
@@ -27,6 +33,7 @@ local recoilBones = {
     'Turret_Barrel_C_B02',
     'Turret_Barrel_B_B02',
     'Turret_Barrel_A_B02',
+
 }
 local muzzleBones = {
     'Turret_Barrel_F_B03',
@@ -35,6 +42,7 @@ local muzzleBones = {
     'Turret_Barrel_C_B03',
     'Turret_Barrel_B_B03',
     'Turret_Barrel_A_B03',
+
 
 }
 URL0401 = Class(CLandUnit)({
@@ -78,7 +86,7 @@ URL0401 = Class(CLandUnit)({
                 local FxLaunch = EffectTemplate.CArtilleryFlash02
 
                 for k, v in FxLaunch do
-                    CreateEmitterAtEntity(self.unit, self.unit.Army, v)
+                    GlobalMethodsCreateEmitterAtEntity(self.unit, self.unit.Army, v)
                 end
             end,
 

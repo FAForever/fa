@@ -8,6 +8,11 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+-- Automatically upvalued moho functions for performance
+local GlobalMethods = _G
+local GlobalMethodsCreateDecal = GlobalMethods.CreateDecal
+-- End of automatically upvalued moho functions
+
 local THeavyPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').THeavyPlasmaCannonProjectile
 
 TDFPlasmaHeavy04 = Class(THeavyPlasmaCannonProjectile)({
@@ -26,7 +31,7 @@ TDFPlasmaHeavy04 = Class(THeavyPlasmaCannonProjectile)({
             local rotation = RandomFloat(0, 2 * math.pi)
             local army = self.Army
 
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 0.5, 0.5, 50, 15, army)
+            GlobalMethodsCreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 0.5, 0.5, 50, 15, army)
         end
 
         THeavyPlasmaCannonProjectile.OnImpact(self, targetType, targetEntity)

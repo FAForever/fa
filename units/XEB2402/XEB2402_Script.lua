@@ -1,3 +1,21 @@
+-- Automatically upvalued moho functions for performance
+local CAnimationManipulatorMethods = _G.moho.AnimationManipulator
+local CAnimationManipulatorMethodsPlayAnim = CAnimationManipulatorMethods.PlayAnim
+local CAnimationManipulatorMethodsSetAnimationFraction = CAnimationManipulatorMethods.SetAnimationFraction
+local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
+
+local EntityMethods = _G.moho.entity_methods
+local EntityMethodsAttachTo = EntityMethods.AttachTo
+local EntityMethodsDetachFrom = EntityMethods.DetachFrom
+local EntityMethodsKill = EntityMethods.Kill
+
+local GlobalMethods = _G
+local GlobalMethodsIssueClearCommands = GlobalMethods.IssueClearCommands
+local GlobalMethodsIssueMove = GlobalMethods.IssueMove
+local GlobalMethodsIssueStop = GlobalMethods.IssueStop
+local GlobalMethodsSetIgnoreArmyUnitCap = GlobalMethods.SetIgnoreArmyUnitCap
+-- End of automatically upvalued moho functions
+
 -----------------------------------------------------------------
 -- File     :  /cdimage/units/XEB2402/XEB2402_script.lua
 -- Author(s):  Dru Staltman
@@ -16,24 +34,26 @@ XEB2402 = Class(TAirFactoryUnit)({
     OpenState = State()({
         Retract = function(self)
             -- Retract cage
-            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
-            self.AnimManip:SetAnimationFraction(1)
-            self.AnimManip:SetRate(-1)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, '/units/XEB2402/XEB2402_aopen01.sca')
+            CAnimationManipulatorMethodsSetAnimationFraction(self.AnimManip, 1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
             WaitFor(self.AnimManip)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, '/units/XEB2402/XEB2402_aopen.sca')
 
             -- Retract Arms
-            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
-            self.AnimManip:SetAnimationFraction(1)
-            self.AnimManip:SetRate(-1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
+            CAnimationManipulatorMethodsSetAnimationFraction(self.AnimManip, 1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
             self:PlayUnitSound('MoveArms')
             WaitFor(self.AnimManip)
         end,
 
         Extend = function(self)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, '/units/XEB2402/XEB2402_aopen.sca')
             -- Extend Arms
-            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen.sca'):SetRate(-1)
-            self.AnimManip:SetAnimationFraction(0)
-            self.AnimManip:SetRate(1)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
+            CAnimationManipulatorMethodsSetAnimationFraction(self.AnimManip, 0)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, 1)
             self:PlayUnitSound('MoveArms')
             WaitFor(self.AnimManip)
 
@@ -41,9 +61,9 @@ XEB2402 = Class(TAirFactoryUnit)({
             self:CreateSatellite()
 
             -- Extend cage
-            self.AnimManip:PlayAnim('/units/XEB2402/XEB2402_aopen01.sca')
-            self.AnimManip:SetAnimationFraction(0)
-            self.AnimManip:SetRate(1)
+            CAnimationManipulatorMethodsPlayAnim(self.AnimManip, '/units/XEB2402/XEB2402_aopen01.sca')
+            CAnimationManipulatorMethodsSetAnimationFraction(self.AnimManip, 0)
+            CAnimationManipulatorMethodsSetRate(self.AnimManip, 1)
             WaitFor(self.AnimManip)
         end,
 
@@ -56,7 +76,7 @@ XEB2402 = Class(TAirFactoryUnit)({
                 self.newSatellite = nil
             else
                 self.Satellite = CreateUnitHPR('XEA0002', self.Army, location[1], location[2], location[3], 0, 0, 0)
-                self.Satellite:AttachTo(self, 'Attachpoint01')
+                EntityMethodsAttachTo(self.Satellite, self, 'Attachpoint01')
             end
 
             -- Create warning lights and other VFX
@@ -87,8 +107,8 @@ XEB2402 = Class(TAirFactoryUnit)({
                 self:Extend()
 
                 -- Release unit
-                self.Satellite:DetachFrom()
-                IssueMove({
+                EntityMethodsDetachFrom(self.Satellite)
+                GlobalMethodsIssueMove({
                     self.Satellite,
                 }, self:GetRallyPoint())
                 self.Satellite:Open()
@@ -96,7 +116,7 @@ XEB2402 = Class(TAirFactoryUnit)({
                 self.waitingForLaunch = false
                 self:Retract()
 
-                IssueClearCommands({
+                GlobalMethodsIssueClearCommands({
                     self,
                 })
             end
@@ -108,11 +128,11 @@ XEB2402 = Class(TAirFactoryUnit)({
     -- Override OnStartBuild to cancel any and all commands if we already have a Satellite
     OnStartBuild = function(self, unitBeingBuilt, order)
         if self.Satellite or self.waitingForLaunch then
-            IssueStop({
+            GlobalMethodsIssueStop({
                 self,
             })
             -- This clears the State launch procedure for some reason, leading to the following hack
-            IssueClearCommands({
+            GlobalMethodsIssueClearCommands({
                 self,
             })
 
@@ -133,7 +153,7 @@ XEB2402 = Class(TAirFactoryUnit)({
         self:PlayUnitSound('ConstructStop')
 
         if not unitBeingBuilt:IsBeingBuilt() and not self.Satellite and not self.waitingForLaunch then
-            IssueStop({
+            GlobalMethodsIssueStop({
                 self,
             })
             self.newSatellite = unitBeingBuilt
@@ -145,7 +165,7 @@ XEB2402 = Class(TAirFactoryUnit)({
 
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
-            self.Satellite:Kill()
+            EntityMethodsKill(self.Satellite)
         end
 
         self:SetActiveConsumptionInactive()
@@ -166,7 +186,7 @@ XEB2402 = Class(TAirFactoryUnit)({
 
             -- Disable unit cap for campaigns
             if ScenarioInfo.CampaignMode then
-                SetIgnoreArmyUnitCap(captorArmyIndex, true)
+                GlobalMethodsSetIgnoreArmyUnitCap(captorArmyIndex, true)
             end
 
             -- Shift the two units to the new army and assign relationship
@@ -180,7 +200,7 @@ XEB2402 = Class(TAirFactoryUnit)({
             -- Reapply unit cap checks
             local captorBrain = captor:GetAIBrain()
             if ScenarioInfo.CampaignMode and not captorBrain.IgnoreArmyCaps then
-                SetIgnoreArmyUnitCap(captorArmyIndex, false)
+                GlobalMethodsSetIgnoreArmyUnitCap(captorArmyIndex, false)
             end
         end
     end,
