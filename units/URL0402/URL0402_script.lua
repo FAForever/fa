@@ -19,9 +19,6 @@ local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
 local GlobalMethodsDamageRing = GlobalMethods.DamageRing
 
-local IAniManipulatorMethods = _G.moho.manipulator_methods
-local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
-
 local IEffectMethods = _G.moho.IEffect
 local IEffectMethodsScaleEmitter = IEffectMethods.ScaleEmitter
 
@@ -168,7 +165,7 @@ URL0402 = Class(CWalkingLandUnit)({
                     EntityMethodsSetAmbientSound(wep.Beams[1].Beam, nil, nil)
                 end
                 for k, v in wep.Beams do
-                    IAniManipulatorMethodsDisable(v.Beam)
+                    v.Beam:Disable()
                 end
             end
         end

@@ -12,9 +12,6 @@ local GlobalMethods = _G
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
 local GlobalMethodsIssueMoveOffFactory = GlobalMethods.IssueMoveOffFactory
 
-local IAniManipulatorMethods = _G.moho.manipulator_methods
-local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
-
 local UnitMethods = _G.moho.unit_methods
 local UnitMethodsHideBone = UnitMethods.HideBone
 local UnitMethodsSetBusy = UnitMethods.SetBusy
@@ -56,7 +53,7 @@ UAA0310 = Class(AirTransport)({
     OnKilled = function(self, instigator, type, overkillRatio)
         local wep = self:GetWeaponByLabel('QuantumBeamGeneratorWeapon')
         for _, v in wep.Beams do
-            IAniManipulatorMethodsDisable(v.Beam)
+            v.Beam:Disable()
             if wep.HoldFireThread then
                 KillThread(wep.HoldFireThread)
             end

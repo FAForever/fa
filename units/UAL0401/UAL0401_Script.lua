@@ -11,9 +11,6 @@ local EntityMethodsSetAmbientSound = EntityMethods.SetAmbientSound
 
 local GlobalMethods = _G
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
-
-local IAniManipulatorMethods = _G.moho.manipulator_methods
-local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
 -- End of automatically upvalued moho functions
 
 local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
@@ -44,7 +41,7 @@ UAL0401 = Class(AWalkingLandUnit)({
         end
 
         for k, v in wep.Beams do
-            IAniManipulatorMethodsDisable(v.Beam)
+            v.Beam:Disable()
         end
     end,
 

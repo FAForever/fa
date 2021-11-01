@@ -4,9 +4,6 @@ local EntityMethodsSetAmbientSound = EntityMethods.SetAmbientSound
 
 local GlobalMethods = _G
 local GlobalMethodsIssueDive = GlobalMethods.IssueDive
-
-local IAniManipulatorMethods = _G.moho.manipulator_methods
-local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
 -- End of automatically upvalued moho functions
 
 --****************************************************************************
@@ -43,7 +40,7 @@ XSS0201 = Class(SSubUnit)({
             EntityMethodsSetAmbientSound(wep1.Beams[1].Beam, nil, nil)
         end
         for k, v in wep1.Beams do
-            IAniManipulatorMethodsDisable(v.Beam)
+            v.Beam:Disable()
         end
 
         local wep2 = self:GetWeaponByLabel('BackTurret')
@@ -55,7 +52,7 @@ XSS0201 = Class(SSubUnit)({
             EntityMethodsSetAmbientSound(wep2.Beams[1].Beam, nil, nil)
         end
         for k, v in wep2.Beams do
-            IAniManipulatorMethodsDisable(v.Beam)
+            v.Beam:Disable()
         end
 
         SSubUnit.OnKilled(self, instigator, type, overkillRatio)

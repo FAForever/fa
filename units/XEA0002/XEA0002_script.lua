@@ -15,9 +15,6 @@ local EntityMethodsAttachBoneTo = EntityMethods.AttachBoneTo
 local GlobalMethods = _G
 local GlobalMethodsIssueBuildFactory = GlobalMethods.IssueBuildFactory
 
-local IAniManipulatorMethods = _G.moho.manipulator_methods
-local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
-
 local ProjectileMethods = _G.moho.projectile_methods
 local ProjectileMethodsSetLocalAngularVelocity = ProjectileMethods.SetLocalAngularVelocity
 local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
@@ -65,7 +62,7 @@ XEA0002 = Class(TAirUnit)({
 
         local wep = self:GetWeaponByLabel('OrbitalDeathLaserWeapon')
         for _, v in wep.Beams do
-            IAniManipulatorMethodsDisable(v.Beam)
+            v.Beam:Disable()
         end
 
         self.IsDying = true

@@ -4,9 +4,6 @@ local CRotateManipulatorMethodsSetTargetSpeed = CRotateManipulatorMethods.SetTar
 
 local EntityMethods = _G.moho.entity_methods
 local EntityMethodsSetAmbientSound = EntityMethods.SetAmbientSound
-
-local IAniManipulatorMethods = _G.moho.manipulator_methods
-local IAniManipulatorMethodsDisable = IAniManipulatorMethods.Disable
 -- End of automatically upvalued moho functions
 
 ----------------------------------------------------------------------------
@@ -66,7 +63,7 @@ UES0302 = Class(TSeaUnit)({
                 EntityMethodsSetAmbientSound(wep1.Beams[1].Beam, nil, nil)
             end
             for k, v in wep1.Beams do
-                IAniManipulatorMethodsDisable(v.Beam)
+                v.Beam:Disable()
             end
 
             local wep2 = self:GetWeaponByLabel('HiroCannonBack')
@@ -78,7 +75,7 @@ UES0302 = Class(TSeaUnit)({
                 EntityMethodsSetAmbientSound(wep2.Beams[1].Beam, nil, nil)
             end
             for k, v in wep2.Beams do
-                IAniManipulatorMethodsDisable(v.Beam)
+                v.Beam:Disable()
             end
         end
         TSeaUnit.OnKilled(self, instigator, type, overkillRatio)
