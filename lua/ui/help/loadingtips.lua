@@ -35,7 +35,7 @@ Tips = {
     "<LOC loadingtip_0033>Power Generators adjacent to Static Artilleries will increase their rate of fire",
     "<LOC loadingtip_0034>Engineers are more efficient for build power than Engineering Stations",
     "<LOC loadingtip_0035>Dealing maximum damage with overcharge (15,000), costs 60k energy and requires at least 67k energy in your storage",
-    "<LOC loadingtip_0036>The Salem can not shoot backwards",
+    "<LOC loadingtip_0036>The Salem cannot shoot backwards",
     "<LOC loadingtip_0037>Toggle the Salem's ability to let it also move on land",
     "<LOC loadingtip_0038>Only build a Salvation after you have built a Paragon",
     "<LOC loadingtip_0039>Your Engineers on Patrol or Attack-Move order will stop reclaiming when your storage is nearly full",
