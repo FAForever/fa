@@ -26,7 +26,7 @@ Patch 3726 (26th November, 2021)
 ### Bug
  - (#3486) Fix (mod) units being unbuildable due to error in UI
  - (#3432) Fix overcharge occasionally basing its damage on the previous unit it hit
- - (#3316) Fix experimentals doing death damage upon death
+ - (#3316) Fix experimentals doing death damage upon death during construction
     Monkeylord: only when fully complete as it sits
     Megalith: only when fully complete as it sits
     Colossus: when complete 50% or more
