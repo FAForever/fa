@@ -69,6 +69,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
         if bomb_data[id].n_left < 1 then
             bomb_data[id] = nil
         end
+
     end
 
     -- how many seconds until the bomb hits the target in xz-space
