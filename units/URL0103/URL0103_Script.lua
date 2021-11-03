@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URL0103/URL0103_script.lua
-#**  Author(s):  John Comes, David Tomandl
-#**
-#**  Summary  :  Cybran Mobile Mortar Script
-#**
-#**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URL0103/URL0103_script.lua
+--**  Author(s):  John Comes, David Tomandl
+--**
+--**  Summary  :  Cybran Mobile Mortar Script
+--**
+--**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')
