@@ -9,11 +9,9 @@
 --****************************************************************************
 
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
-local CybranWeaponsFile = import('/lua/cybranweapons.lua')
-local CIFGrenadeWeapon = CybranWeaponsFile.CIFGrenadeWeapon
+local CIFGrenadeWeapon = import('/lua/cybranweapons.lua').CIFGrenadeWeapon
 
 URL0103 = Class(CWalkingLandUnit) {
-    DestructionTicks = 400,
 
     Weapons = {
         MainGun = Class(CIFGrenadeWeapon) {
@@ -25,10 +23,8 @@ URL0103 = Class(CWalkingLandUnit) {
 				'/effects/emitters/cannon_muzzle_smoke_13_emit.bp',
             },
             FxMuzzleFlashScale = 0.5,
-			
         },
     },
 }
 
 TypeClass = URL0103
-
