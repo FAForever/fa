@@ -33,6 +33,7 @@ Patch 3726 (26th November, 2021)
     Ythotha: when complete 50% or more
     
 ### Other
+ - (#3417) Add unit tests for generic utility functions
  - (#3420) Fix small issues for units of the Cybran faction.
  - (#3492) Remove greyness when deviation is high
     In combination with other work, such as combining the number of
@@ -46,6 +47,7 @@ Patch 3726 (26th November, 2021)
  - (#3491) Fix the attack animation of the Monkey Lord
 
 ### Performance
+ - (#3417) Add minor performance improvements for generic utility functions
  - (#3447) Remove old AI related code that was being run regardless of whether AIs were in-game
     This also changes the behavior of assisting engineers: just make a chain of 10
     engineers assisting each other where the first engineer is assisting a 
@@ -57,6 +59,7 @@ Patch 3726 (26th November, 2021)
  - (#3502) Optimize the import function that is used by all files.
 
 ### Contributors
+ - Askaholic (#3417)
  - Madmax (#3420)
  - Uveso (#3477)
  - Rowey (#3475)
