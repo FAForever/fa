@@ -14,7 +14,7 @@ __module_metatable = {
 }
 
 -- upvalue for performance: changes the calls to access these
--- tables from GETGLOBAl to GETUPVALUE. This change can be inspected by calling
+-- tables from GETGLOBAL to GETUPVALUE. This change can be inspected by calling
 -- LOG(repr(debug.listcode(import))).
 local upModules = __modules
 local upModuleMetatable = __module_metatable
@@ -23,6 +23,7 @@ local upModuleMetatable = __module_metatable
 -- local LOG = LOG
 -- local WARN = WARN
 -- local error = error
+-- local SPEW = SPEW
 local setmetatable = setmetatable
 local pcall = pcall
 local doscript = doscript
@@ -35,7 +36,6 @@ local StringSub = string.sub
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
--- local SPEW = SPEW
 -- local once = true
 
 --- The global import function used to keep track of modules.
@@ -54,7 +54,7 @@ function import(name)
         return existing
     end
 
-    -- inform the devs that we're loading this module (todo: remove?)
+    -- inform the devs that we're loading this module for the first time
     if informDevOfLoad then 
         SPEW("Loading module '", name, "'")
     end
