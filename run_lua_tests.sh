@@ -24,12 +24,13 @@ while read file; do
   (( files_checked++ ))
 done < <(find . -type d \( -path ./testmaps -o -path ./engine \) -prune -false -o -name '*.lua' -o -name '*.bp')
 
+echo "Checked $files_checked files"
+
 if [[ $had_error != 0 ]]; then
   echo "Syntax errors detected."
+  exit $had_error
 else
   echo "Syntax OK."
 fi
 
-echo "Checked $files_checked files"
-
-exit $had_error
+pushd tests && lua test_utils.lua && popd
