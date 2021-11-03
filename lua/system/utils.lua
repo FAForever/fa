@@ -4,19 +4,34 @@
 -- * Summary    : Contains global functions for working with tables and strings
 -- ==========================================================================================
 
+
+-- upvalue globals for performance
+local type = type 
+local pcall = pcall 
+local unpack = unpack 
+local next = next
+
+-- local Random = Random
+
+-- upvalue table operations for performance
+local TableInsert = table.insert 
+local TableGetn = table.getn 
+local TableRemove = table.remove 
+local TableSort = table.sort
+
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
     local keyList = {}
     for key, val in someSet do
-        table.insert(keyList, key)
+        TableInsert(keyList, key)
     end
 
     return function()
-        local size = table.getn(keyList)
+        local size = TableGetn(keyList)
 
         if size > 0 then
-            local key = table.remove(keyList, Random(1, size))
+            local key = TableRemove(keyList, Random(1, size))
             return key, someSet[key]
         else
             return
@@ -80,7 +95,7 @@ function table.removeByValue(t,val)
     if not t then return end -- prevent looping over nil table
     for k,v in t do
         if v == val then
-            table.remove(t,k)
+            TableRemove(t,k)
             return
         end
     end
@@ -170,11 +185,11 @@ function table.cat(t1, t2)
     if not t2 then return table.copy(t1) end
     local r = {}
     for i,v in t1 do
-        table.insert(r, v)
+        TableInsert(r, v)
     end
 
     for i,v in t2 do
-        table.insert(r, v)
+        TableInsert(r, v)
     end
 
     return r
@@ -185,10 +200,10 @@ end
 function table.concatenate(...)
     local ret = {}
 
-    for index = 1, table.getn(arg) do
+    for index = 1, TableGetn(arg) do
         if arg[index] then
             for k, v in arg[index] do
-                table.insert(ret, v)
+                TableInsert(ret, v)
             end
         end
     end
@@ -201,7 +216,7 @@ end
 --- but this avoids the need to copy the values in t1, saving some time.
 function table.destructiveCat(t1, t2)
     for k, v in t2 do
-        table.insert(t1, v)
+        TableInsert(t1, v)
     end
 end
 
@@ -210,7 +225,7 @@ end
 --- [comp] is an optional comparison function, defaulting to less-than.
 function table.sorted(t, comp)
     local r = table.copy(t)
-    table.sort(r, comp)
+    TableSort(r, comp)
     return r
 end
 
@@ -250,7 +265,7 @@ function table.keys(t, comp)
         r[n] = k -- faster than table.insert(r,k)
         n = n + 1
     end
-    if comp ~= false then table.sort(r, comp) end
+    if comp ~= false then TableSort(r, comp) end
     return r
 end
 
@@ -414,7 +429,7 @@ function table.shuffle(t)
     local r = {}
     for key, val in RandomIter(t) do
         if type(key) == 'number' then
-            table.insert(r, val)
+            TableInsert(r, val)
         else
             r[key] = val
         end
@@ -435,7 +450,7 @@ function table.binsert(t, value, cmp)
          end
       end
 
-      table.insert(t, mid + state, value)
+      TableInsert(t, mid + state, value)
       return mid + state
    end
 
