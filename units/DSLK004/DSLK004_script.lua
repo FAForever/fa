@@ -15,7 +15,6 @@ local GlobalMethods = _G
 local GlobalMethodsAttachBeamToEntity = GlobalMethods.AttachBeamToEntity
 local GlobalMethodsCreateAttachedEmitter = GlobalMethods.CreateAttachedEmitter
 local GlobalMethodsCreateSplat = GlobalMethods.CreateSplat
-local GlobalMethodsDamage = GlobalMethods.Damage
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
 -- End of automatically upvalued moho functions
 
@@ -113,7 +112,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam)({
                 end
             elseif targetEntity then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
-                    GlobalMethodsDamage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
+                    Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
                 else
                     ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, damageData.DoTTime / damageData.DoTPulses or 1, damage, damageData.DamageType, damageData.DamageFriendly)
                 end

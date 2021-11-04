@@ -7,7 +7,6 @@
 
 -- Automatically upvalued moho functions for performance
 local EntityMethods = _G.moho.entity_methods
-local EntityMethodsKill = EntityMethods.Kill
 local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
 local EntityMethodsSetIntelRadius = EntityMethods.SetIntelRadius
 
@@ -123,7 +122,7 @@ UEL0301 = Class(CommandUnit)({
             if self.HasPod == true then
                 self.HasPod = false
                 if self.Pod and not self.Pod:BeenDestroyed() then
-                    EntityMethodsKill(self.Pod)
+                    self.Pod:Kill()
                     self.Pod = nil
                 end
                 if self.RebuildingPod ~= nil then

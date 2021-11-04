@@ -12,7 +12,6 @@ local CAnimationManipulatorMethodsSetBoneEnabled = CAnimationManipulatorMethods.
 local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
 
 local EntityMethods = _G.moho.entity_methods
-local EntityMethodsKill = EntityMethods.Kill
 local EntityMethodsRequestRefreshUI = EntityMethods.RequestRefreshUI
 
 local GlobalMethods = _G
@@ -201,7 +200,7 @@ UEL0001 = Class(ACUUnit)({
             if self.HasLeftPod == true then
                 self.HasLeftPod = false
                 if self.LeftPod and not self.LeftPod.Dead then
-                    EntityMethodsKill(self.LeftPod)
+                    self.LeftPod:Kill()
                     self.LeftPod = nil
                 end
                 if self.RebuildingPod ~= nil then
@@ -212,7 +211,7 @@ UEL0001 = Class(ACUUnit)({
             if self.HasRightPod == true then
                 self.HasRightPod = false
                 if self.RightPod and not self.RightPod.Dead then
-                    EntityMethodsKill(self.RightPod)
+                    self.RightPod:Kill()
                     self.RightPod = nil
                 end
                 if self.RebuildingPod2 ~= nil then

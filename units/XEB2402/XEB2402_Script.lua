@@ -7,7 +7,6 @@ local CAnimationManipulatorMethodsSetRate = CAnimationManipulatorMethods.SetRate
 local EntityMethods = _G.moho.entity_methods
 local EntityMethodsAttachTo = EntityMethods.AttachTo
 local EntityMethodsDetachFrom = EntityMethods.DetachFrom
-local EntityMethodsKill = EntityMethods.Kill
 
 local GlobalMethods = _G
 local GlobalMethodsIssueClearCommands = GlobalMethods.IssueClearCommands
@@ -165,7 +164,7 @@ XEB2402 = Class(TAirFactoryUnit)({
 
     OnKilled = function(self, instigator, type, overkillRatio)
         if self.Satellite and not self.Satellite.Dead and not self.Satellite.IsDying then
-            EntityMethodsKill(self.Satellite)
+            self.Satellite:Kill()
         end
 
         self:SetActiveConsumptionInactive()

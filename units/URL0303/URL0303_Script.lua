@@ -6,9 +6,6 @@
 -----------------------------------------------------------------
 
 -- Automatically upvalued moho functions for performance
-local EntityMethods = _G.moho.entity_methods
-local EntityMethodsKill = EntityMethods.Kill
-
 local GlobalMethods = _G
 local GlobalMethodsCreateLightParticle = GlobalMethods.CreateLightParticle
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
@@ -84,7 +81,7 @@ URL0303 = Class(CWalkingLandUnit)({
         self.Trash:Add(bufffx2)
         StartCountdown(self.EntityId, blueprint.SecondsBeforeExplosionWhenCharging)
         WaitSeconds(blueprint.SecondsBeforeExplosionWhenCharging)
-        EntityMethodsKill(self)
+        self:Kill()
     end,
 
     OnScriptBitSet = function(self, bit)
