@@ -265,8 +265,8 @@ URL0402 = Class(CWalkingLandUnit)({
         EntityMethodsShakeCamera(self, 50, 5, 0, 1)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         for k, v in EffectTemplate.FootFall01 do
-            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, Center_Turret_Muzzle, army, v), 2)
-            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, Center_Turret_Muzzle, army, v), 2)
+            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, "Center_Turret_Muzzle", army, v), 2)
+            IEffectMethodsScaleEmitter(CreateAttachedEmitter(self, "Center_Turret_Muzzle", army, v), 2)
         end
 
 

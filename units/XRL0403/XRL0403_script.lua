@@ -184,7 +184,7 @@ XRL0403 = Class(CWalkingLandUnit)({
 
     CreateExplosionDebris = function(self, army)
         for k, v in EffectTemplate.ExplosionDebrisLrg01 do
-            IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, XRL0403, army, v), 0, 5, 0)
+            IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, "XRL0403", army, v), 0, 5, 0)
         end
     end,
 
@@ -194,8 +194,8 @@ XRL0403 = Class(CWalkingLandUnit)({
 
         -- Create Initial explosion effects
         explosion.CreateFlash(self, 'Left_Leg01_B01', 4.5, army)
-        IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, XRL0403, army, /effects/emitters/destruction_explosion_concussion_ring_03_emit.bp), 0, 5, 0)
-        IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, XRL0403, army, /effects/emitters/explosion_fire_sparks_02_emit.bp), 0, 5, 0)
+        IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, "XRL0403", army, "/effects/emitters/destruction_explosion_concussion_ring_03_emit.bp"), 0, 5, 0)
+        IEffectMethodsOffsetEmitter(CreateAttachedEmitter(self, "XRL0403", army, "/effects/emitters/explosion_fire_sparks_02_emit.bp"), 0, 5, 0)
         GlobalMethodsCreateAttachedEmitter(self, 'XRL0403', army, '/effects/emitters/distortion_ring_01_emit.bp')
         self:CreateFirePlumes(army, {
             'XRL0403',
