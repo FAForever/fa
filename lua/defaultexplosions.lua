@@ -55,8 +55,7 @@ local EntityGetBlueprint = moho.entity_methods.GetBlueprint
 local EntityShakeCamera = moho.entity_methods.ShakeCamera
 local EntityCreateProjectile = moho.entity_methods.CreateProjectile
 
--- as upvalue for performance
-local ScorchSplatTextures = {
+ScorchSplatTextures = {
     'scorch_001_albedo',
     'scorch_002_albedo',
     'scorch_003_albedo',
@@ -69,10 +68,11 @@ local ScorchSplatTextures = {
     'scorch_010_albedo',
 }
 
+-- as upvalue for performance
+local UpvaluedScorchSplatTextures = ScorchSplatTextures
 local ScorchSplatTexturesN = TableGetn(ScorchSplatTextures)
 
--- as upvalue for performance
-local ScorchDecalTextures = {
+ScorchDecalTextures = {
     'scorch_001_albedo',
     'scorch_002_albedo',
     'scorch_003_albedo',
@@ -85,6 +85,8 @@ local ScorchDecalTextures = {
     'scorch_010_albedo',
 }
 
+-- as upvalue for performance
+local UpvaluedScorchDecalTextures = ScorchDecalTextures
 local ScorchDecalTexturesN = TableGetn(ScorchDecalTextures)
 
 ----------------------
@@ -224,7 +226,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                     CreateDecal(
                         position, 
                         scorchRotation, 
-                        ScorchDecalTextures[Random(1, ScorchDecalTexturesN)], 
+                        UpvaluedScorchDecalTextures[Random(1, ScorchDecalTexturesN)], 
                         '', 
                         'Albedo', 
                         boundingXZRadius, 
@@ -237,7 +239,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                     CreateSplat(
                         position, 
                         scorchRotation, 
-                        ScorchSplatTextures[Random(1, ScorchSplatTexturesN)], 
+                        UpvaluedScorchSplatTextures[Random(1, ScorchSplatTexturesN)], 
                         boundingXZRadius, 
                         boundingXZRadius, 
                         scorchLOD,
@@ -550,7 +552,7 @@ function CreateScorchMarkSplat(obj, scale, army)
     CreateSplat(
         EntityGetPosition(obj), 
         6.28 * Random(), 
-        ScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
+        UpvaluedScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
         scale * 4, scale * 4, 
         200 + 150 * Random(), 
         300 * 300 * Random(), 
@@ -563,7 +565,7 @@ function CreateScorchMarkDecal(obj, scale, army)
     CreateDecal(
         EntityGetPosition(obj), 
         6.28 * Random(), 
-        ScorchDecalTextures[Random(1, ScorchDecalTexturesN)],
+        UpvaluedScorchDecalTextures[Random(1, ScorchDecalTexturesN)],
         '', 'Albedo', 
         scale * 3, scale * 3, 
         200 + 150 * Random(), 
@@ -577,7 +579,7 @@ function CreateRandomScorchSplatAtObject(obj, scale, LOD, lifetime, army)
     CreateSplat(
         EntityGetPosition(obj), 
         6.28 * Random(), 
-        ScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
+        UpvaluedScorchSplatTextures[Random(1, ScorchSplatTexturesN)],
         scale, scale, 
         LOD, lifetime, army)
 end
