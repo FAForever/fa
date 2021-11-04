@@ -24,6 +24,7 @@ Patch 3726 (26th November, 2021)
  - (#3477) Prevent clearing critical state in AI functions
 
 ### Bug
+ - (#3522) Fix upvalue issue of patch 3721
  - (#3486) Fix (mod) units being unbuildable due to error in UI
  - (#3432) Fix overcharge occasionally basing its damage on the previous unit it hit
  - (#3316) Fix experimentals doing death damage upon death during construction
@@ -63,7 +64,7 @@ Patch 3726 (26th November, 2021)
  - Madmax (#3420)
  - Uveso (#3477)
  - Rowey (#3475)
- - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500)
+ - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522)
  - KionX (#3486, #3489)
  - Crotalus (#3432)
 
