@@ -142,7 +142,7 @@ function LOC(s)
         return s
     end
 
-    if StringGsub(s,1,5) ~= [[<LOC ]] then
+    if StringSub(s,1,5) ~= [[<LOC ]] then
         -- This string doesn't have a <LOC key> tag
         return LocExpand(s)
     end
