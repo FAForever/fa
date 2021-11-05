@@ -34,6 +34,14 @@ Patch 3726 (26th November, 2021)
     Ythotha: when complete 50% or more
     
 ### Other
+ - (#3523) Switch off debug utilities by default
+    This is only useful for developers, but it did cause
+    a (slight) drain on resources when it was turned on
+    even though you're not looking at the logs. It turns it
+    off by default during each startup, you can prevent 
+    this as a developer by adding
+    `debug = { enable_debug_facilities = true }`
+    to your preference file
  - (#3417) Add unit tests for generic utility functions
  - (#3420) Fix small issues for units of the Cybran faction.
  - (#3492) Remove greyness when deviation is high
@@ -65,7 +73,7 @@ Patch 3726 (26th November, 2021)
  - Uveso (#3477)
  - Rowey (#3475)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522)
- - KionX (#3486, #3489)
+ - KionX (#3486, #3489, #3523)
  - Crotalus (#3432)
 
 ### Reviewers
