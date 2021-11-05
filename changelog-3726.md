@@ -54,6 +54,7 @@ Patch 3726 (26th November, 2021)
  - (#3443) Allow trashbag to be re-used for effects
  - (#3489) Fix UI description of teleport
  - (#3491) Fix the attack animation of the Monkey Lord
+ - (#3349) Updates the readme with the most recent dependencies
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -73,7 +74,7 @@ Patch 3726 (26th November, 2021)
  - Uveso (#3477)
  - Rowey (#3475)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522)
- - KionX (#3486, #3489, #3523)
+ - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
 
 ### Reviewers
