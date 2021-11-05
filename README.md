@@ -22,6 +22,8 @@ FAF profiler [here](https://github.com/FAForever/FAFProfiler)
 
 Lua benchmarks [here](https://gitlab.com/supreme-commander-forged-alliance/other/profiler)
 
+Replaces Bugsplat [here](https://github.com/FAForever/FADeepProbe)
+
 Running the game with your changes
 ----------------------------------
 
