@@ -8,6 +8,17 @@
 
 local optionsLogic = import('/lua/options/optionsLogic.lua')
 
+if table.empty(GetPreference('Options.Log')) then
+    SetPreference('Options.Log', {
+        Debug = false,
+        Info = false,
+        Warn = false,
+        Error = false,
+        Custom = false,
+        Filter = '*debug:'
+    })
+end
+
 -- check if there are any profiles defined
 function ProfilesExist()
     local profiles = GetPreference("profile.profiles")
