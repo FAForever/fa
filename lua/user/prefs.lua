@@ -8,15 +8,14 @@
 
 local optionsLogic = import('/lua/options/optionsLogic.lua')
 
-if table.empty(GetPreference('Options.Log')) then
+if not GetPreference('debug.enable_debug_facilities') then
     SetPreference('Options.Log', {
         Debug = false,
         Info = false,
         Warn = false,
         Error = false,
         Custom = false,
-        Filter = '*debug:'
-    })
+        Filter = '*debug:'})
 end
 
 -- check if there are any profiles defined
