@@ -8,6 +8,7 @@ ProjectileBlueprint {
         UniformScale = 1.0,
     },
     Physics = {
+        CollideEntity = false,
         MinBounceCount = 3,
         MaxBounceCount = 3,
         DestroyOnWater = true,

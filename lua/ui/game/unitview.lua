@@ -27,6 +27,9 @@ local updateThread = nil
 local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
 
+-- shared between sim and ui
+local OverchargeShared = import('/lua/shared/overcharge.lua')
+
 function OverchargeCanKill()
     if unitHP[1] and unitHP.blueprintId then
         local selected = GetSelectedUnits()
@@ -53,8 +56,7 @@ function OverchargeCanKill()
 
             if bp then
                 local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
-                -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
-                local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
+                local damage = OverchargeShared.EnergyAsDamage(GetEconomyTotals().stored.ENERGY)
 
                 if damage > bp.maxDamage then
                     damage = bp.maxDamage

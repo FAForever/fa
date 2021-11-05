@@ -28,6 +28,14 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 
 local DeprecatedWarnings = { }
 
+
+-- allows us to skip ai-specific functionality
+local GameHasAIs = ScenarioInfo.GameHasAIs
+
+-- Localised category operations for performance
+local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
+
+
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
 -- Deprecated function warning flags
@@ -896,7 +904,7 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
-        local workers = self:GetAIBrain():GetUnitsAroundPoint(categories.REPAIR, self:GetPosition(), 50, 'Ally')
+        local workers = self:GetAIBrain():GetUnitsAroundPoint(UpdateAssistersConsumptionCats, self:GetPosition(), 50, 'Ally')
         for _, v in workers do
             if not v.Dead and v:IsUnitState('Repairing') and v:GetFocusUnit() == self then
                 table.insert(units, v)
@@ -968,7 +976,13 @@ Unit = Class(moho.unit_methods) {
             mass_rate = mass / time
         end
 
-        self:UpdateAssistersConsumption()
+        -- only run this part if we actually have AIs in the game, they are the ones that use
+        -- this functionality apparently. A consequence of this is that engineers start assisting
+        -- slower if they are chain-assisting each other. However, in practice it is a lot cheaper
+        -- on the performance of the game. Best to just assist what you want it to assist directly.
+        -- if GameHasAIs then 
+        --     self:UpdateAssistersConsumption()
+        -- end
 
         local myBlueprint = self:GetBlueprint()
         if self.MaintenanceConsumption then
@@ -2630,6 +2644,12 @@ Unit = Class(moho.unit_methods) {
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
 
+        -- kept after #3355 for backwards compatibility with mods
+        if self.buildBots then
+            for _, b in self.buildBots do
+                ChangeState(b, b.IdleState)
+            end
+        end
     end,
 
     OnStartSacrifice = function(self, target_unit)
@@ -3632,9 +3652,9 @@ Unit = Class(moho.unit_methods) {
     -- Return the total time in seconds, cost in energy, and cost in mass to reclaim the given target from 100%.
     -- The energy and mass costs will normally be negative, to indicate that you gain mass/energy back.
     GetReclaimCosts = function(self, target_entity)
-        local bp = self:GetBlueprint()
-        local target_bp = target_entity:GetBlueprint()
         if IsUnit(target_entity) then
+            local bp = self:GetBlueprint()
+            local target_bp = target_entity:GetBlueprint()
             local mtime = target_bp.Economy.BuildCostEnergy / self:GetBuildRate()
             local etime = target_bp.Economy.BuildCostMass / self:GetBuildRate()
             local time = mtime

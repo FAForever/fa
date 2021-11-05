@@ -32,7 +32,6 @@ whitelist = {
     "schook.nx5",
     "textures.nx5",
     "units.nx5",
-    "props.nx5",
     "murderparty.nxt",
     "labwars.nxt",
     "units.scd",
@@ -62,6 +61,7 @@ whitelist = {
     "texturepack.nxt",
     "sc_music.scd"
 }
+
 
 local function mount_dir(dir, mountpoint)
     table.insert(path, { dir = dir, mountpoint = mountpoint })
@@ -129,72 +129,111 @@ local function mount_dir_with_blacklist(dir, glob, mountpoint)
     table.foreach(sorted, function(k,v) mount_dir(v,'/') end)
 end
 
--- Begin map mounting section
--- This section mounts movies and sounds from maps, essential for custom missions and scripted maps
-local function mount_map_dir(dir, glob, mountpoint)
+--- A helper function that loads in additional content for maps.
+-- @param mountpoint The root folder to look for content in.
+local function mount_map_content(dir, glob, mountpoint)
     LOG('mounting maps from: '..dir)
     mount_contents(dir, mountpoint)
-    for _, map in io.dir(dir..glob) do
-        for _, folder in io.dir(dir..'\\'..map..'\\**') do
-            if folder == 'movies' then
-                LOG('Found map movies in: '..map)
-                mount_dir(dir..map..'\\movies', '/movies')
-            elseif folder == 'sounds' then
-                LOG('Found map sounds in: '..map)
-                mount_dir(dir..map..'\\sounds', '/sounds')
-            end
-        end
-    end
-end
-mount_map_dir(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps\\', '**', '/maps')
-mount_map_dir(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps\\', '**', '/maps')
 
--- Begin mod mounting section
--- This section mounts sounds and ui textures from the mods directory to allow mods to add custom sounds and textures to the game
-function mount_mod_content(MODFOLDER)
-    -- searching for mods inside the modfolder
-    for _,mod in io.dir(MODFOLDER..'\\*.*') do
-        -- do we have a true directory ?
-        if mod != '.' and mod != '..' then
-            -- searching for sounds inside mod folder
-            for _,folder in io.dir(MODFOLDER..'\\'..mod..'\\*.*') do
-                -- if we found a folder named sounds then mount it
+    -- look for all directories / maps at the mount point
+    for _, map in io.dir(dir..glob) do
+
+        -- make sure we're not retrieving the current / previous directory
+        if map != '.' and map != '..' then
+
+            -- look at each directory inside this map
+            for _, folder in io.dir(dir..'\\'..map..'\\**') do
+
+                -- if we found a directory named 'movies' then we mount its content
+                if folder == 'movies' then
+                    LOG('Found map movies in: '..map)
+                    mount_dir(dir..map..'\\movies', '/movies')
+                end
+
+                -- if we found a directory named 'sounds' then we mount its content
                 if folder == 'sounds' then
-                    LOG('Found mod sounds in: '..mod)
-                    mount_dir(MODFOLDER..'\\'..mod..'\\sounds', '/sounds')
-                -- mount ui textures if there are any
-                elseif folder == 'textures' then
-                    for _,folder in io.dir(MODFOLDER..'\\'..mod..'\\textures\\*.*') do
-                        if folder == 'ui' then
-                          LOG('Found mod icons in: '..mod)
-                          mount_dir(MODFOLDER..'\\'..mod..'\\textures\\ui', '/textures/ui')
-                          break
-                        end
-                    end
+                    LOG('Found map sounds in: '..map)
+                    mount_dir(dir..map..'\\sounds', '/sounds')
                 end
             end
         end
     end
 end
-mount_mod_content(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
-mount_mod_content(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods')
 
--- These are the classic supcom directories. They don't work with accents or other foreign characters in usernames
-mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
+--- A helper function that loads in additional content for mods.
+-- @param mountpoint The root folder to look for content in.
+function mount_mod_content(mountpoint)
+    -- get all directories / mods at the mount point
+    for _, mod in io.dir(mountpoint..'\\*.*') do
+        
+        -- make sure we're not retrieving the current / previous directory
+        if mod != '.' and mod != '..' then
 
--- These are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the uppder ones.
-mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
+            -- look at each directory inside this mod
+            for _, folder in io.dir(mountpoint..'\\'..mod..'\\*.*') do
+                
+                -- if we found a directory named 'sounds' then we mount its content
+                if folder == 'sounds' then
+                    LOG('Found mod sounds in: '..mod)
+                    mount_dir(mountpoint..'\\'..mod..'\\sounds', '/sounds')
+                end
+
+                -- if we found a directory named 'custom-strategic-icons' then we mount its content
+                if folder == 'custom-strategic-icons' then
+                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
+                    LOG('Found mod icons in ' .. mod .. ', mounted at: ' .. mountLocation)
+                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons', mountLocation) 
+                end
+
+                -- if we found a file named 'custom-strategic-icons.scd' then we mount its content - good for performance when the number of icons is high
+                if folder == 'custom-strategic-icons.scd' then 
+                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
+                    LOG('Found mod icon package in ' .. mod .. ', mounted at: ' .. mountLocation)
+                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons.scd', mountLocation) 
+                end
+            end
+        end
+    end
+end
+
+--- A helper function to load in all maps and mods on a given location.
+-- @param path The root folder for the maps and mods
+local function load_content(path)
+    -- load in additional things, like sounds and 
+	mount_map_content(path .. '\\maps\\', '**', '/maps')
+	mount_mod_content(path .. '\\mods')
+
+	mount_contents(path .. '\\mods', '/mods')
+	mount_contents(path .. '\\maps', '/maps')
+end
+
+-- load maps / mods from custom vault location, if set by client
+if custom_vault_path then
+	LOG('Loading custom vault path' .. custom_vault_path)
+	load_content(custom_vault_path)
+else
+    LOG("No custom vault path defined.")
+end
+
+-- load maps / mods from backup vault location location
+load_content(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+
+-- load maps / mods from my documents vault location
+load_content(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
+
+-- load in any .nxt that matches the whitelist / blacklist in FAF gamedata
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
 mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx5', '/')
 
--- These are using the newly generated path from the dofile() statement at the beginning of this script
+-- load in any .nxt that matches the whitelist / blacklist in FA gamedata
 mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
-mount_dir(fa_path, '/')
 
---load preferences into the game as well, letting us have much more control over their contents. This also includes cache and similar.
+-- TODO: should we limit this?
+-- load preferences into the game as well, letting us have much more control over their contents. This also includes cache and similar.
 mount_dir(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games\\Supreme Commander Forged Alliance', '/preferences')
+
+-- TODO: ?
+mount_dir(fa_path, '/')
 
 hook = {
     '/schook'
@@ -209,5 +248,7 @@ protocols = {
     'daap',
     'im',
 }
+
+
 
 table.insert(path, 1, { dir = InitFileDir .. '\\..\\DevData', mountpoint = '/' })

@@ -136,6 +136,10 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
+    -- keep track of the original focus army
+    import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
+
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 

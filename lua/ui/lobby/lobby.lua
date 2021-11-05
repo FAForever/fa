@@ -33,6 +33,8 @@ local Text = import('/lua/maui/text.lua').Text
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Border = import('/lua/ui/controls/border.lua').Border
 
+local utils = import('/lua/system/utils.lua')
+
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = Trueskill.round
 local Player = Trueskill.Player
@@ -66,7 +68,6 @@ GetAITypes()
 
 --This is a special table that allows us to pass data to blueprints.lua, before the rest of the game is loaded.
 -- do not use this for anything that doesnt do blueprint modding, use GameOptions for that instead, which will load it into sim.
-PreGameData = {}
 
 local IsSyncReplayServer = false
 
@@ -840,30 +841,6 @@ function GetPlayerDisplayName(playerInfo)
     end
 end
 
---- Players with a higher deviation have their rating colour tarnished, to make smurfs easier to
--- detect.
-function GetRatingColour(deviation)
-    if deviation < 100 then
-        return "ffffffff"
-    end
-
-    if deviation > 150 then
-        return "ff333333"
-    end
-
-    -- Linear scale of greyness in between.
-
-    -- Fraction of the way between 100 and 150 we are.
-    local greynessFraction = (deviation - 100) / 50
-
-    -- Grey colour value we want (value between 0 and 255). 51 is 0x33.
-    local greyness = 51 + (1 - greynessFraction) * 204
-
-    -- Shoehorn that into a colour value string. Madly, because Lua.
-    local value = string.format('%02x', greyness)
-    return "ff" .. value .. value .. value
-end
-
 local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
 
 -- update the data in a player slot
@@ -977,7 +954,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     slot.ratingText:Show()
     slot.ratingText:SetText(playerInfo.PL)
-    slot.ratingText:SetColor(GetRatingColour(playerInfo.DEV))
+    slot.ratingText:SetColor("ffffffff")
 
     -- dynamic tooltip to show rating and deviation for each player
     local tooltipText = {}
@@ -2056,7 +2033,7 @@ local function TryLaunch(skipNoObserversCheck)
                     gameInfo.GameOptions[option.key] = keyVersion or valueVersion
 
                     -- Can be removed once this code leaves the develop branch
-                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
+                    SPEW("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
                 end
             end
         end
@@ -2081,8 +2058,7 @@ local function TryLaunch(skipNoObserversCheck)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
-        PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
-        SetPreference('PreGameData',PreGameData)
+        -- launch the game
         lobbyComm:LaunchGame(gameInfo)
     end
 
@@ -2149,9 +2125,97 @@ local function UpdateGame()
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
 
-            -- prefetch the session to make loading screen shorter
-            local mods = Mods.GetGameMods(gameInfo.GameMods)
-            PrefetchSession(scenarioInfo.map, mods, true)
+            -- contains information that is available during blueprint loading
+            local preGameData = {}
+
+            -- MAP ASSETS LOADING -- 
+
+            -- store the (selected) map directory so that we can load individual blueprints from it
+            preGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
+
+            -- STRATEGIC ICON REPLACEMENT --
+
+            -- icon replacements
+            local iconReplacements = { }
+
+            -- retrieve all (selected) mods
+            local allMods = Mods.AllMods()
+            local selectedMods = Mods.GetSelectedMods()
+
+            -- loop over selected mods identifiers
+            for uid, _ in selectedMods do 
+
+                -- get the mod, determine path to icon configuration file
+                local mod = allMods[uid]
+
+                -- check for mod integrity
+                if not (mod.name and mod.author) then 
+                    WARN("Unable to load icons from mod '" .. uid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
+                end
+
+                -- path to configuration file
+                local iconConfigurationPath = mod.location .. "/mod_icons.lua"
+
+                -- see if it exists
+                if DiskGetFileInfo(iconConfigurationPath) then 
+
+                    -- see if we can import it
+                    local ok, msg = pcall(
+                        function()
+
+                            -- attempt to load the file
+                            local env = { }
+                            doscript(iconConfigurationPath, env)
+
+                            -- syntax errors are caught internally and instead it just returns the table untouched
+                            if not (env.UnitIconAssignments or env.ScriptedIconAssignments) then
+                                error("Lobby.lua - can not import the icon configuration file at '" .. iconConfigurationPath .. "'. This could be due to missing functionality functionality or a parsing error.")
+                            end
+                        end
+                    )
+
+                    -- if it passes this basic check, then continue
+                    if ok then 
+                        local info = { }
+                        info.Name = mod.name 
+                        info.Author = mod.author 
+                        info.Location = mod.location
+                        info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+                        info.UID = uid
+                        table.insert(iconReplacements, info)
+                    -- tell us (and then spam the author, not the dev) if it failed
+                    else 
+                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN(msg)
+                    end
+                end
+            end
+
+            preGameData.IconReplacements = iconReplacements
+
+            -- try and set the preferences - it may crash when running multiple instances on a single machine that all try and start at the same time.
+            local ok, msg = pcall(
+                function() 
+                    -- store in preferences so that we can retrieve it during blueprint loading
+                    SetPreference('PreGameData', preGameData)
+                end 
+            )
+
+            if not ok then 
+                WARN("Unable to update preferences. Are you running multiple instances on the same machine?" )
+                WARN(msg)
+            end
+
+            -- PREFETCHING -- 
+
+            -- we can't prefetch in combination with PreGameData as the prefs file
+            -- is not updated accordingly, as a result when it is retrieved in
+            -- blueprints.lua it may use the old values. As it is more relevant
+            -- to have custom icon support over having a slightly faster loading
+            -- time we skip the prefetching
+
+            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
+            -- PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()

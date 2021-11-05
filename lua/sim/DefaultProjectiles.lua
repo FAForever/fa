@@ -5,9 +5,14 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
+local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
 local GetDistanceBetweenTwoEntities = import('/lua/utilities.lua').GetDistanceBetweenTwoEntities
 local OCProjectiles = {}
+
+-- shared between sim and ui
+local OverchargeShared = import('/lua/shared/overcharge.lua')
+
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -303,15 +308,80 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
 -----------------------------------------------------------------
 -- GENERIC DEBRIS PROJECTILE
 -----------------------------------------------------------------
-BaseGenericDebris = Class(EmitterProjectile){
-    FxUnitHitScale = 0.25,
-    FxWaterHitScale = 0.25,
-    FxUnderWaterHitScale = 0.25,
-    FxNoneHitScale = 0.25,
-    FxImpactLand = false,
-    FxLandHitScale = 0.5,
-    FxTrails = false,
-    FxTrailScale = 1,
+
+-- upvalued for performance
+local CreateEmitterAtBone = CreateEmitterAtBone
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local GetTerrainType = GetTerrainType
+
+-- upvalued read-only values
+local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FXImpact
+
+-- moho functions for performance
+local EntityMethods = _G.moho.entity_methods
+local EntityDestroy = EntityMethods.Destroy
+local EntityPlaySound = EntityMethods.PlaySound
+local EntityGetBlueprint = EntityMethods.GetBlueprint
+local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
+
+local EmitterMethods = _G.moho.IEffect
+local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
+
+BaseGenericDebris = Class(DummyProjectile){
+
+    OnImpact = function(self, targetType, targetEntity)
+
+        -- cache values
+        local blueprint = EntityGetBlueprint(self)
+        local blueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
+        local impactEffectType = blueprintDisplayImpactEffects.Type or 'Default'
+
+        -- determine sound value
+        local impactSnd = "Impact"
+        if targetType == 'Terrain' then
+            impactSnd = "ImpactTerrain"
+        elseif targetType == 'Water' then
+            impactSnd = "ImpactWater"
+        end
+        
+        -- play impact sound
+        local snd = blueprint.Audio[impactSnd]
+        if snd then 
+            EntityPlaySound(self, snd)
+        end
+
+        -- Inlined GetTerrainEffects --
+
+        -- get x / z position
+        local x, _, z = EntityGetPositionXYZ(self)
+
+        -- get terrain at that location and try and get some effects
+        local terrainTypeFxImpact = GetTerrainType(x, z).FXImpact
+        local terrainEffects = terrainTypeFxImpact[targetType][impactEffectType] or DefaultTerrainTypeFxImpact[targetType][impactEffectType] or false
+
+        -- Inlined CreateTerrainEffects --
+
+        -- check if table exists, can be set to false
+        if terrainEffects then 
+
+            -- store values in cache
+            local emit = false
+            local army = self.Army 
+            local effectScale = blueprintDisplayImpactEffects.Scale or 1
+
+            for _, v in terrainEffects do
+
+                -- create emitter and scale accordingly
+                emit = CreateEmitterAtBone(self, -2, army, v)
+                if effectScale ~= 1 then
+                    EmitterScaleEmitter(emit, effectScale)
+                end
+            end
+        end
+
+        -- destroy ourselves :(
+        EntityDestroy(self)
+    end,
 }
 
 -----------------------------------------------------------
@@ -319,13 +389,6 @@ BaseGenericDebris = Class(EmitterProjectile){
 -----------------------------------------------------------
 OverchargeProjectile = Class() {
     OnImpact = function(self, targetType, targetEntity)
-        --[[WARN('Inside OCPROJ OnImpact')
-        LOG(targetType)
-        LOG(targetEntity)
-        if targetEntity and IsUnit(targetEntity) then
-            LOG(targetEntity.UnitId)
-        end]]
-
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
         self.DamageData.DamageAmount = 0
 
@@ -351,6 +414,7 @@ OverchargeProjectile = Class() {
         -- Energy drained is calculated by the relationship equations
         local damage = data.minDamage
 
+        local killShieldUnit = false
         if targetEntity then
             -- Handle hitting shields. We want the unit underneath, not the shield itself
             if not IsUnit(targetEntity) then
@@ -363,59 +427,51 @@ OverchargeProjectile = Class() {
                 targetEntity = targetEntity.Owner
             end
 
+            -- Get max energy available to drain according to how much we have
+            local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
+            local energyLimit = energyAvailable * data.energyMult
+            if OCProjectiles[self.Army] > 1 then
+                energyLimit = energyLimit / OCProjectiles[self.Army]
+            end
+            local energyLimitDamage = self:EnergyAsDamage(energyLimit)
+            -- Find max available damage
+            damage = math.min(data.maxDamage, energyLimitDamage)
+            -- How much damage do we actually need to kill the unit?
+            local idealDamage = targetEntity:GetHealth()
+            local maxHP = self:UnitsDetection(targetType, targetEntity)
+            idealDamage = maxHP or data.minDamage
+            
+            local targetCats = targetEntity:GetBlueprint().CategoriesHash
 
-                -- Get max energy available to drain according to how much we have
-                local energyAvailable = launcher:GetAIBrain():GetEconomyStored('ENERGY')
-                local energyLimit = energyAvailable * data.energyMult
-
-                if OCProjectiles[self.Army] > 1 then
-                    energyLimit = energyLimit / OCProjectiles[self.Army]
+            -----SHIELDS------
+            if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
+                if targetCats.DIESTOOCDEPLETINGSHIELD then
+                    killShieldUnit = true
                 end
 
-                local energyLimitDamage = self:EnergyAsDamage(energyLimit)
-
-                -- Find max available damage
-                damage = math.min(data.maxDamage, energyLimitDamage)
-
-                -- How much damage do we actually need to kill the unit?
-                local idealDamage = targetEntity:GetHealth()
-                local maxHP = self:UnitsDetection(targetType, targetEntity)
-
-                idealDamage = maxHP or data.minDamage
-
-                targetCats = targetEntity:GetBlueprint().CategoriesHash
-
-                      -----SHIELDS------
-                if targetEntity.MyShield and targetEntity.MyShield.ShieldType == 'Bubble' then
-                    if targetCats.STRUCTURE then
-                        idealDamage = data.minDamage
-                    else
-                        idealDamage = targetEntity.MyShield:GetMaxHealth()
-                    end
-	                --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
-                    --good against group of mobile shields
-                end
-
-                      ------ ACU -------
-                if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
+                if targetCats.STRUCTURE then
                     idealDamage = data.minDamage
+                else
+                    idealDamage = targetEntity.MyShield:GetMaxHealth()
                 end
-
-                damage = math.min(damage, idealDamage)
-                damage = math.max(data.minDamage, damage)
-
-                -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
-                if energyAvailable < 5000 then
-                    damage = energyLimitDamage
-                end
-
+                --MaxHealth instead of GetHealth because with getHealth OC won't kill bubble shield which is in AoE range but has more hp than targetEntity.MyShield.
+                --good against group of mobile shields
+            end
+            ------ ACU -------
+            if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
+                idealDamage = data.minDamage
+            end
+            damage = math.min(damage, idealDamage)
+            damage = math.max(data.minDamage, damage)
+            -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
+            if energyAvailable < 5000 then
+                damage = energyLimitDamage
+            end
         end
 
         -- Turn the final damage into energy
         local drain = self:DamageAsEnergy(damage)
 
-        --LOG('Drain is ' .. drain)
-        --LOG('Damage is ' .. damage)
         self.DamageData.DamageAmount = damage
 
         if drain > 0 then
@@ -426,7 +482,7 @@ OverchargeProjectile = Class() {
                 OCProjectiles[self.Army] = OCProjectiles[self.Army] - 1
                 launcher.EconDrain = nil
                 -- if oc depletes a mobile shield it kills the generator, vet counted, no wreck left
-                if targetCats.DIESTOOCDEPLETINGSHIELD and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
+                if killShieldUnit and targetEntity and not IsDestroyed(targetEntity) and (IsDestroyed(targetEntity.MyShield) or (not targetEntity.MyShield:IsUp())) then
                     targetEntity:Kill(launcher, 'Overcharge', 2)
                     launcher:OnKilledUnit(targetEntity, targetEntity:GetVeterancyValue())
                 end
@@ -434,15 +490,12 @@ OverchargeProjectile = Class() {
         end
     end,
 
-    -- y = 3000e^(0.000095(x+15500))-10090 = old values
-    -- y = 4x = new values
-    -- https://www.desmos.com/calculator/ap0kazbdp0
     DamageAsEnergy = function(self, damage)
-        return damage * 4
+        return OverchargeShared.DamageAsEnergy(damage)
     end,
 
     EnergyAsDamage = function(self, energy)
-        return energy / 4
+        return OverchargeShared.EnergyAsDamage(energy)
     end,
 
     UnitsDetection = function(self, targetType, targetEntity)

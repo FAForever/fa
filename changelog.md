@@ -1,3 +1,166 @@
+
+Patch 3724 (04th October, 2021)
+============================
+### Gameplay
+ - (#3450) An alternative approach to loading in custom strategic icons
+ - (#3458) Fix UEF Triad and UEF Destroyer projectile on impact animation
+
+### Bugs
+ - (#3442) Fix scathis packing animation time
+ - (#3439) Fix Cybran drone visibility for other players than the owner
+ - (#3450) Fix UI textures being overridden by mods that are not enabled
+ - (#3457) Fix Cybran drone being interactable and other small issues (with thanks to Archsimkat)
+ - (#3453) Fix units being gifted to the same player causing a soft-crash for the shared army mod (co-op campaign)
+ - (#3468) Revert changes to sending the results of games
+ - (#3471) Fix overcharge mouse indicator to use the right damage calculations
+
+### Stability
+ - (#3436) Prevent fetching blueprints for potential entities with no blueprints
+ - (#3449) Fix significant hard-crash potential that patch 3721 introduced (with thanks to all the debugger reports)
+ - (#3460) Fix potential soft-crash when gifting units upon death (with thanks to FemtoZetta)
+ - (#3467) Add SCD support for large icon sets (with thanks to Deribus)
+ - (#3472) Revert changes to some projectiles that caused them to crash for mods (with thanks to DDDX)
+
+### Other
+ - (#3385) Add support for custom game options being set by the server (for 3v3 / 4v4 TMM)
+
+### Contributors
+ - Jip (#3442, #3439, #3449, #3458, #3457, #3460, #3450, #3467, #3468, #3471)
+ - KionX (#3449)
+ - Crotalus (#3436)
+ - Balthazar (#3450)
+ - speed2 (#3453)
+ - Askaholic (#3385)
+ - BlackYps (#3385)
+ - keyser (#3472)
+
+Patch 3723 (19 September, 2021)
+============================
+- Fixed a bug preventing from spawning the wreck of some experimentals
+
+### Contributors
+- Jip
+
+Patch 3722 (19 September, 2021)
+============================
+### Lobby
+- Updated balance patchnotes link
+
+### Bugs
+- Fixed featured mod not working
+
+### Performances
+- Optimize default explosion
+
+### Other
+- Allowed custom vault path
+
+### Contributors
+- Jip
+- KionX
+- keyser
+
+Patch 3721 (19 September, 2021)
+============================
+### Lobby
+- Improved visibility of balance patchnotes
+- Improved CPU benchmark to take into account RAM
+- Removed large map preview when map preview is hidden (map generator)
+- Prevented kyros lobby from displaying spawn location when map preview is hidden (map generator)
+- Fixed ACU display in large map preview
+- Fixed the link for curated map button
+
+### Gameplay
+- Removed reclaim rate from scoreboard mass income
+- Added decals on a lot of projectiles impact and tree falling effect for aesthetics
+- Added feature : preselection of mex when selection engineer and hovering the cursor over a mass spot
+- Allowed battleship/battlecruiser to render their weapon reload bar
+- Speed up Aeon static shields death animation to match other faction
+- Added a hotkey for dock
+- Made sonars more reliable to hit
+
+### Bugs
+- Fixed game resulting in draw when it should not
+- Fixed units doing some friendlyfire and inaccurate damage
+- Fixed Cybran ACU sonar that was working without the torpedo upgrade
+- Fixed unit cap display in coop
+- Fixed some UI scaling issues
+- Fixed game ID displayed in the scoreboard
+- Fixed a warning with shield overspill function
+- Fixed a bug happening when engies were not able to build
+- Fixed some warnings due to lava trees missing textures
+- Fixed aoe damage not working properly on build drones
+- Fixed hotkey not working with Seraphim SACU in buildmode
+
+### Performances
+- Optimized cybran build effects and reduced the number of drones spawned by hives
+- Code optimisation related to weapons
+- Call to faster function
+- Improved UEF build beam logic
+- Simplified Seraphim flash effect at finished structure
+- Simplified UEF static shield build effect
+- Optimized math calculations
+- Optimized function to generate random numbers
+- Optimized logic for structure rotation toward enemies (for point defenses, artillery)
+- Optimized HQ logic
+- Prefetch data in the lobby to speed up loading screen
+- Removed unused code which aimed to rock boats
+- Optimized the access to the current layer of a unit
+- Optimized trashbag
+- Benchmark tool for developper allowing to evaluate easily code impact on performances
+
+### AI
+- Fixed a bug preventing AI from firing nukes from Aeon SML
+- Fixed AI's ACU upgrade in coop
+- Fixed arty range issues with AI
+- Removed unused code for AI
+- Improved description of AI code
+- Fixed AI platoon function
+- Fixed AI game result
+
+### Other
+- Improved and more visible weather
+- Added new props for maps
+- Display beetle as cloacked for the owner
+- Removed duplicates of adjacency visual effects
+- Added field engineer icon to Cybran/Seraphim/Aeon, so it display in case they possess one.
+- Updated loading tips
+- Prevented observers from pinging
+- Prevented sending resources to enemies
+- Fixed tooltip to support experimental transporter
+- Improved code style consistency
+- Fixed chrono dampner and RAS description
+- Removed Aquatic tag from T3 UEF maa
+- Fixed the visual of several cybran unit's weapon
+- Added old patchnotes changes until the version 3636
+- Test code with FAF lua language
+- Better naming of T3 maa unit folders
+- Small refactoring with regard to taunts
+- Add textures for map generator
+
+### Contributors
+- Jip
+- Uveso
+- speed2
+- KionX
+- Sheikah
+- KeyBlue
+- Relent0r
+- Dragun
+- Askaholic
+- Madmax
+- Tagada
+- FemtoZetta
+- Rowey
+- Divran
+- Timocov
+- Melanol
+- Benzi-Junior
+- slinkingant
+- WhenDayBreaks
+- SnaggleFox
+- keyser
+
 Patch 3720 (14 May, 2021)
 ============================
 - Land
@@ -2181,7 +2344,7 @@ Patch 3675 (5th February, 2017)
 
 Patch 3674 (5th February, 2017)
 ============================
-http://content.faforever.com/patchnotes/3674.html
+http://patchnotes.faforever.com/3674.html
 
 ### Lobby
 - Use default map from file. This allows coop, tutorials, and other mods to have an easier time
@@ -3214,7 +3377,7 @@ Patch 3652 (May 2, 2016)
 
 Patch 3650 (August 19, 2015)
 ===========================
-HTML-version of this balance oriented changelog available at: http://content.faforever.com/patchnotes/
+HTML-version of this balance oriented changelog available at: http://patchnotes.faforever.com/
 
 ### Seraphim and UEF ACU TML
 - Missile hitpoints: 3 hp → 2 hp

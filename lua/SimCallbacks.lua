@@ -8,6 +8,41 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
+local SimUtils = import('/lua/SimUtils.lua')
+local SimPing = import('/lua/SimPing.lua')
+local SimTriggers = import('/lua/scenariotriggers.lua')
+local SUtils = import('/lua/ai/sorianutilities.lua')
+
+-- upvalue table operations for performance
+local TableInsert = table.insert
+local TableEmpty = table.empty
+local TableGetn = table.getn
+local TableRemove = table.remove
+local TableMerged = table.merged
+
+-- upvalue globals for performance
+local type = type
+local Vector = Vector
+local IsEntity = IsEntity
+local GetEntityById = GetEntityById
+local GetSurfaceHeight = GetSurfaceHeight
+local OkayToMessWithArmy = OkayToMessWithArmy
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+
+local IssueClearCommands = IssueClearCommands
+local IssueBuildMobile = IssueBuildMobile
+local IssueAggressiveMove = IssueAggressiveMove
+local IssueGuard = IssueGuard
+local IssueFerry = IssueFerry
+
+-- upvalue categories for performance
+local CategoriesTransportation = categories.TRANSPORTATION
+local CategoriesEngineer = categories.ENGINEER
+
+--- Used to warn users (mainly developers) once for invalid use of functionality 
+local Warnings = { }
+
+--- List of callbacks that is being populated throughout this file
 local Callbacks = {}
 
 function DoCallback(name, data, units)
@@ -19,7 +54,8 @@ function DoCallback(name, data, units)
     end
 end
 
-function SecureUnits(units)
+--- Common utility function to retrieve the actual units.
+local function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
         units = {units}
@@ -31,18 +67,12 @@ function SecureUnits(units)
         end
 
         if IsEntity(u) and OkayToMessWithArmy(u.Army) then
-            table.insert(secure, u)
+            TableInsert(secure, u)
         end
     end
 
     return secure
 end
-
-local SimUtils = import('/lua/SimUtils.lua')
-local SimPing = import('/lua/SimPing.lua')
-local SimTriggers = import('/lua/scenariotriggers.lua')
-local SUtils = import('/lua/ai/sorianutilities.lua')
-local LetterArray = { ["Aeon"] = "ua", ["UEF"] = "ue", ["Cybran"] = "ur", ["Seraphim"] = "xs" }
 
 Callbacks.AutoOvercharge = function(data, units)
     for _, u in units or {} do
@@ -53,12 +83,13 @@ Callbacks.AutoOvercharge = function(data, units)
 end
 
 Callbacks.PersistFerry = function(data, units)
-    local transports = EntityCategoryFilterDown(categories.TRANSPORTATION, SecureUnits(units))
-    if table.empty(transports) then return end
+    local transports = EntityCategoryFilterDown(CategoriesTransportation, SecureUnits(units))
+    if TableEmpty(transports) then return end
     local start = data.route[1]
 
+    -- function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer])
     local helper = CreateUnit('hel0001', units[1].Army, start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
-    table.insert(units, helper)
+    TableInsert (units, helper)
     IssueClearCommands(units)
     for _, r in data.route do
         IssueFerry(units, r)
@@ -79,44 +110,185 @@ Callbacks.ClearCommands = function(data, units)
     IssueClearCommands(safe)
 end
 
-local CanBuildInSpot = import('/lua/utilities.lua').CanBuildInSpot
-Callbacks.CapMex = function(data, units)
-    local units = EntityCategoryFilterDown(categories.ENGINEER, SecureUnits(units))
+local LetterArray = { 
+    ["Aeon"] = "ua", 
+    ["AEON"] = "ua",
+    ["UEF"] = "ue", 
+    ["Cybran"] = "ur", 
+    ["CYBRAN"] = "ur", 
+    ["Seraphim"] = "xs",
+    ["SERAPHIM"] = "xs",
+}
+
+--- Compute the faction-specific blueprint identifier
+local function ConstructBlueprintID (faction, blueprintID)
+    return LetterArray[faction] .. blueprintID 
+end
+
+--- Allocated once to prevent re-allocations and de-allocations 
+local buildLocation = Vector(0, 0, 0)
+
+--- Templates for units with a skirt size of 1, such as point defense
+local skirtSize1 = {
+    { {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, },
+}
+
+--- Templates for units with a skirtSize of 1 such as radars and mass extractors
+local skirtSize2 = { 
+    -- inner layer for storages
+    { {2, 0}, {0, 2}, {-2, 0}, {0, -2}, },
+
+    -- outer layer for fabricators
+    {  {-2, 2}, {2, 2}, {2, -2}, {-2, -2}, {-4, 0},{0, 4}, {4, 0}, {0, -4}, },
+}
+
+--- Templates for units with a skirtSize of 3 such as fabricators
+local skirtSize6 = { 
+    -- inner layer for storages
+    { {-2, 4}, {0, 4}, {2, 4}, {4, 2}, {4, 0}, {4, -2}, {2, -4}, {0, -4}, {-2, -4}, {-4, -2}, {-4, 0}, {-4, 2}, },
+}
+
+--- Easy to use table for direct skirtSize size -> template conversion
+local skirtSizes = {
+    [1] = skirtSize1,
+    [2] = skirtSize2,
+    [6] = skirtSize6
+}
+
+--- Computes the n'th layer of a previous layer.
+-- @param skirtSize The skirt size of the unit.
+-- @param layers The nth layer we'd like to have for this unit.
+local function RetrieveNthStructureLayer (skirtSize, nthLayer)
+
+    -- attempt to retrieve the right set of layers for this skirtSize
+    local layers = skirtSizes[skirtSize]
+
+    -- if we have some layers for this skirtSize
+    if layers then 
+
+        -- attempt to retrieve the right layer count
+        local layer = layers[nthLayer]
+
+        -- if we have that too
+        if layer then 
+
+            -- then we can return that
+            return layer 
+        end
+    end
+
+    -- no structure layer available
+    local identifier = "RetrieveNthStructureLayer" .. skirtSize .. " - " .. nthLayer
+    if not Warnings[identifier] then 
+        Warnings[identifier] = true
+        WARN("Attempted to retrieve a build layer for skirtSize " .. skirtSize .. " and layer " .. nthLayer .. " which is not supported. The only supported values are: skirtSize 1 with layer 1, skirtSize 2 with layer 1 and 2, skirtSize 6 with layer 0.")
+    end
+
+    -- boo
+    return false
+end
+
+--- Called by the UI when right-clicking a mass extractor
+Callbacks.CapStructure = function(data, units)
+
+    -- check if we have a structure
+    local structure = GetEntityById(data.target)
+    if not structure then return end 
+
+    -- check if we're allowed to mess with this structure
+    if not OkayToMessWithArmy(structure.Army) then return end
+
+    -- we can't cap an extractor that is on the ocean floor
+    if structure.Layer == 'Seabed' then return end
+
+    -- check if we have units
+    local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
     if not units[1] then return end
 
-    local mex = GetEntityById(data.target)
-    if not mex or not EntityCategoryContains(categories.MASSEXTRACTION * categories.STRUCTURE, mex) then return end
+    -- check if we have buildings we want to use for capping
+    if (not data.id) or (not data.layer) then return end 
 
-    if mex.Layer == 'Seabed' then return end
+    -- populate faction table
+    local others = { }
+    local buildersByFaction = { }
 
-    local pos = mex:GetPosition()
-    local msid
-    local builder
-
+    -- determine of all units in selection what they can build
     for _, unit in units do
-        msid = LetterArray[unit:GetBlueprint().General.FactionName]..'b1106' -- The identity of the storage we'll build
-        if unit:CanBuild(msid) then
-            builder = unit
-            break
+        -- make sure we're allowed to mess with this unit, if not we exclude
+        if OkayToMessWithArmy(unit.Army) then 
+            -- compute blueprint id
+            local faction = unit.factionCategory
+            local blueprintID = ConstructBlueprintID(faction, data.id)
+
+            -- check if this unit can build it
+            if unit:CanBuild(blueprintID) then
+                buildersByFaction[faction] = buildersByFaction[faction] or { }
+                TableInsert(buildersByFaction[faction], unit)
+            else
+                TableInsert(others, unit)
+            end
+        end
+    end 
+
+    -- sanity check: find at least one engineer that can build the structure in question
+    local oneCanBuild = nil 
+    for k, faction in buildersByFaction do 
+        oneCanBuild = true
+    end 
+
+    -- check if we have units
+    if not oneCanBuild then return end 
+
+    -- find majority
+    local faction = ""
+    local builders = { }
+    for k, engineers in buildersByFaction do 
+        if TableGetn(builders) < TableGetn(engineers) then 
+            builders = engineers 
+            faction = k
         end
     end
 
-    if not builder then return end
-
-    local locations = {
-        up = Vector(pos.x, pos.y, pos.z - 2),
-        down = Vector(pos.x, pos.y, pos.z + 2),
-        left = Vector(pos.x - 2, pos.y, pos.z),
-        right = Vector(pos.x + 2, pos.y, pos.z),
-    }
-
-    for key, location in locations do
-        if CanBuildInSpot(mex, msid, location) then
-            IssueBuildMobile({builder}, location, msid, {})
+    -- append the rest to other builders
+    for k, engineers in buildersByFaction do 
+        if k ~= faction then 
+            for k, engineer in engineers do 
+                TableInsert(others, engineer)
+            end
         end
     end
 
-    IssueGuard(units, builder)
+    -- compute / retrieve information for capping
+    local brain = builders[1]:GetAIBrain()
+    local blueprintID = ConstructBlueprintID(faction, data.id)
+    local skirtSize = structure:GetBlueprint().Physics.SkirtSizeX
+
+    -- compute the layer locations
+    local layer = RetrieveNthStructureLayer(skirtSize, data.layer)
+
+    -- check if we got anything valid
+    if layer then 
+
+        -- compute build locations and issue the capping
+        local center = structure:GetPosition()
+        for k, location in layer do 
+
+            -- determine build location using cached value
+            buildLocation[1] = center[1] + location[1]
+            buildLocation[3] = center[3] + location[2]
+            buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
+
+            -- order all builders to build if possible
+            if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+                for _, builder in builders do 
+                    IssueBuildMobile({builder}, buildLocation, blueprintID, {})
+                end
+            end
+        end
+
+        -- assist for all other builders
+        IssueGuard(others, builders[1])
+    end
 end
 
 Callbacks.SpawnAndSetVeterancyUnit = function(data)
@@ -188,7 +360,7 @@ Callbacks.OnControlGroupAssign = function(units)
             if ScenarioInfo.ControlGroupUnits then
                 for i,v in ScenarioInfo.ControlGroupUnits do
                    if unit == v then
-                        table.remove(ScenarioInfo.ControlGroupUnits, i)
+                        TableRemove(ScenarioInfo.ControlGroupUnits, i)
                    end
                 end
             end
@@ -202,9 +374,9 @@ Callbacks.OnControlGroupAssign = function(units)
         -- add units to list
         local entities = {}
         for k,v in units do
-            table.insert(entities, GetEntityById(v))
+            TableInsert(entities, GetEntityById(v))
         end
-        ScenarioInfo.ControlGroupUnits = table.merged(ScenarioInfo.ControlGroupUnits, entities)
+        ScenarioInfo.ControlGroupUnits = TableMerged(ScenarioInfo.ControlGroupUnits, entities)
 
         -- remove units on death
         for k,v in entities do
@@ -221,9 +393,6 @@ end
 local SimCamera = import('/lua/SimCamera.lua')
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
-
-
-
 
 local SimPlayerQuery = import('/lua/SimPlayerQuery.lua')
 

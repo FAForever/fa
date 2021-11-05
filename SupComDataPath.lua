@@ -8,4 +8,4 @@
 --     etc...
 --
 -- And that SupComDataPath gets copied from here to bin/
-dofile(InitFileDir .. '..\\repo\\faf\\init.lua')
+dofile(InitFileDir .. '\\init_faf.lua')
