@@ -58,21 +58,6 @@ local integratedMods = { }
 integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
--- typical FAF packages
-local allowedAssetsNx2 = { }
-allowedAssetsNx2["effects.nx2"] = true
-allowedAssetsNx2["env.nx2"] = true
-allowedAssetsNx2["etc.nx2"] = true
-allowedAssetsNx2["loc.nx2"] = true
-allowedAssetsNx2["lua.nx2"] = true
-allowedAssetsNx2["meshes.nx2"] = true
-allowedAssetsNx2["mods.nx2"] = true
-allowedAssetsNx2["projectiles.nx2"] = true
-allowedAssetsNx2["schook.nx2"] = true
-allowedAssetsNx2["textures.nx2"] = true
-allowedAssetsNx2["units.nx2"] = true
-allowedAssetsNx2 = LowerHashTable(allowedAssetsNx2)
-
 -- typical FA packages
 local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true

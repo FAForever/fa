@@ -1,5 +1,5 @@
 
-this is a dummy file to help work with init files as they have a limited lua functionality available to them.
+This is a dummy file to help work with init files as they have a limited lua functionality available to them.
 
 ```lua
 local function repr(t, indent, seen)
