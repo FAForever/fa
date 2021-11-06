@@ -118,12 +118,12 @@ globalOpts = {
         values = {
             {
                   text = "<LOC lobui_0804>No",
-                  help = "<LOC lobui_0805>This game will be ranked if all the criteria for a ranked game are met.",
+                  help = "<LOC lobui_0805>This game will be ratedif all the criteria for a rated game are met.",
                   key = 'No',
               },
               {
                   text = "<LOC lobui_0806>Yes",
-                  help = "<LOC lobui_0807>This game will not be ranked.",
+                  help = "<LOC lobui_0807>This game will not be unrated.",
                   key = 'Yes',
               },
           },
