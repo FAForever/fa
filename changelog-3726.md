@@ -32,6 +32,12 @@ Patch 3726 (26th November, 2021)
     Megalith: only when fully complete as it sits
     Colossus: when complete 50% or more
     Ythotha: when complete 50% or more
+ - (#3440) Removes the dummy drone from the unit restriction list
+    This drone was often misintepreted as an easy way to unrate a game. In
+    contrast to what the name suggests it does have a function: to help gift
+    units when a player dies and full share is on. The drone can no longer be
+    restricted and instead there is a dedicated lobby option to unrate the
+    game.
     
 ### Other
  - (#3523) Switch off debug utilities by default
@@ -67,17 +73,22 @@ Patch 3726 (26th November, 2021)
     engineers are assisting various factories - typically engineers assist 
     directly and therefore I suspect the gameplay consequence is minimal.
  - (#3502) Optimize the import function that is used by all files.
+ - (#3512) Removes AI threat computations and fixes AI detection
+    AI code was being run during every game even when no AI was present in
+    said game. After discussing it with the AI devs this pull requests
+    completely removes the threat computations.
 
 ### Contributors
- - Askaholic (#3417)
+ - Askaholic (#3417, #3440)
  - Madmax (#3420)
  - Uveso (#3477)
  - Rowey (#3475)
- - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522)
+ - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522, #3512, #3440)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
 
 ### Reviewers
  - Balthazar (#3484)
+ - Relent0r (#3512)
 ### Translators
  - Lenkin (#3440)
