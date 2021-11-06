@@ -62,8 +62,8 @@ Patch 3726 (26th November, 2021)
  - (#3491) Fix the attack animation of the Monkey Lord
  - (#3349) Updates the readme with the most recent dependencies
  - (#3461) Remove game quality computations for games with more than two teams
-    The system is not designed to compute the quality of a game when
-    more than (or less than) two teams are involved. Hence, the 
+    The Trueskill system is not designed to compute the quality of a game 
+    when more than (or less than) two teams are involved. Hence, the 
     computation is gibberish anyhow.
 
 ### Performance
@@ -90,10 +90,11 @@ Patch 3726 (26th November, 2021)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522, #3512, #3440)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
+ - Benzi-Junior (#3461)
 
 ### Reviewers
  - Balthazar (#3484)
  - Relent0r (#3512)
- 
+
 ### Translators
  - Lenkin (#3440)
