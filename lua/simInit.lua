@@ -236,7 +236,7 @@ function OnCreateArmyBrain(index, brain, name, nickname)
     local brainSkirmishSystems = brain.SkirmishSystems 
     if brainType == 'AI' and brainSkirmishSystems then 
         ScenarioInfo.GameHasAIs = true
-        SPEW("Game has AIs in it: " .. brain.Name) 
+        SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality") 
     end
 end
 
