@@ -55,44 +55,54 @@ local integratedMods = { }
 integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
--- typically FA / FAF related packages that we do appreciate
-local assetsAllowed = { }
-assetsAllowed["effects.nx2"] = true
-assetsAllowed["env.nx2"] = true
-assetsAllowed["etc.nx2"] = true
-assetsAllowed["loc.nx2"] = true
-assetsAllowed["lua.nx2"] = true
-assetsAllowed["meshes.nx2"] = true
-assetsAllowed["mods.nx2"] = true
-assetsAllowed["projectiles.nx2"] = true
-assetsAllowed["schook.nx2"] = true
-assetsAllowed["textures.nx2"] = true
-assetsAllowed["units.nx2"] = true
-assetsAllowed["units.scd"] = true
-assetsAllowed["textures.scd"] = true
-assetsAllowed["skins.scd"] = true
-assetsAllowed["schook.scd"] = true
-assetsAllowed["props.scd"] = true
-assetsAllowed["projectiles.scd"] = true
-assetsAllowed["objects.scd"] = true
-assetsAllowed["moholua.scd"] = true
-assetsAllowed["mohodata.scd"] = true
-assetsAllowed["mods.scd"] = true
-assetsAllowed["meshes.scd"] = true
-assetsAllowed["lua.scd"] = true
-assetsAllowed["loc_us.scd"] = true
-assetsAllowed["loc_es.scd"] = true
-assetsAllowed["loc_fr.scd"] = true
-assetsAllowed["loc_it.scd"] = true
-assetsAllowed["loc_de.scd"] = true
-assetsAllowed["loc_ru.scd"] = true
-assetsAllowed["env.scd"] = true
-assetsAllowed["effects.scd"] = true
-assetsAllowed["editor.scd"] = true
-assetsAllowed["ambience.scd"] = true
-assetsAllowed["lobbymanager_v105.scd"] = true
-assetsAllowed["sc_music.scd"] = true
-assetsAllowed = LowerHashTable(assetsAllowed)
+-- typical FAF packages
+local allowedAssetsNx2 = { }
+allowedAssetsNx2["effects.nx2"] = true
+allowedAssetsNx2["env.nx2"] = true
+allowedAssetsNx2["etc.nx2"] = true
+allowedAssetsNx2["loc.nx2"] = true
+allowedAssetsNx2["lua.nx2"] = true
+allowedAssetsNx2["meshes.nx2"] = true
+allowedAssetsNx2["mods.nx2"] = true
+allowedAssetsNx2["projectiles.nx2"] = true
+allowedAssetsNx2["schook.nx2"] = true
+allowedAssetsNx2["textures.nx2"] = true
+allowedAssetsNx2["units.nx2"] = true
+allowedAssetsNx2 = LowerHashTable(allowedAssetsNx2)
+
+-- typical FA packages
+local allowedAssetsScd = { }
+allowedAssetsScd["units.scd"] = true
+allowedAssetsScd["textures.scd"] = true
+allowedAssetsScd["skins.scd"] = true
+allowedAssetsScd["schook.scd"] = true
+allowedAssetsScd["props.scd"] = true
+allowedAssetsScd["projectiles.scd"] = true
+allowedAssetsScd["objects.scd"] = true
+allowedAssetsScd["moholua.scd"] = true
+allowedAssetsScd["mohodata.scd"] = true
+allowedAssetsScd["mods.scd"] = true
+allowedAssetsScd["meshes.scd"] = true
+allowedAssetsScd["lua.scd"] = true
+allowedAssetsScd["loc_us.scd"] = true
+allowedAssetsScd["loc_es.scd"] = true
+allowedAssetsScd["loc_fr.scd"] = true
+allowedAssetsScd["loc_it.scd"] = true
+allowedAssetsScd["loc_de.scd"] = true
+allowedAssetsScd["loc_ru.scd"] = true
+allowedAssetsScd["env.scd"] = true
+allowedAssetsScd["effects.scd"] = true
+allowedAssetsScd["editor.scd"] = true
+allowedAssetsScd["ambience.scd"] = true
+allowedAssetsScd["lobbymanager_v105.scd"] = true
+allowedAssetsScd["sc_music.scd"] = true
+allowedAssetsScd = LowerHashTable(allowedAssetsScd)
+
+-- typical backwards compatible packages
+local allowedAssetsNxt = { }
+allowedAssetsNxt["texturepack.nxt"] = true
+allowedAssetsNxt["advanced strategic icons.nxt"] = true
+allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
 
 -- default wave banks to prevent collisions
 local soundsBlocked = { }
@@ -129,11 +139,11 @@ end
 --- Mounts all allowed content in a directory, including scd and zip files, to the mountpoint.
 -- @param dir The absolute path to the directory
 -- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountContent(dir, mountpoint)
+local function MountContent(dir, mountpoint, allowedAssets)
     for _,entry in IoDir(dir .. '/*') do
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
-            if assetsAllowed[mp] then 
+            if allowedAssets[mp] then 
                 MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
             else 
                 LOG("Prevented loading content that is not allowed: " .. entry)
@@ -145,11 +155,11 @@ end
 --- Mounts all allowed content in a directory, including scd and zip files, directly.
 -- @param dir The absolute path to the directory
 -- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountAllowedContent(dir)
+local function MountAllowedContent(dir, allowedAssets)
     for _,entry in IoDir(dir .. '/*') do
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
-            if assetsAllowed[mp] then 
+            if allowedAssets[mp] then 
                 MountDirectory(dir .. "/" .. entry, '/')
             else 
                 LOG("Prevented loading content that is not allowed: " .. entry)
@@ -407,10 +417,11 @@ else
 end
 
 -- load in any .nxt that matches the whitelist / blacklist in FAF gamedata
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', '/')
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNx2)
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
 
 -- load in any .nxt that matches the whitelist / blacklist in FA gamedata
-MountAllowedContent(fa_path .. '/gamedata/', '*.scd', '/')
+MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 
 -- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar
 MountDirectory(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance', '/preferences')
