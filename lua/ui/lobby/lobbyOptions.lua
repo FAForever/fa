@@ -113,7 +113,7 @@ globalOpts = {
     {
         default = 1,
         label = "<LOC lobui_0802>Unrate",
-        help = "<LOC lobui_0803>Provides a toggle to unrank a game. Note that if this is said to no the game can still be unranked due to other lobby options, unranked sim mods and / or the map being unranked.",
+        help = "<LOC lobui_0803>Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated.",
         key = 'Unranked',
         values = {
             {
