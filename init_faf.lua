@@ -1,5 +1,10 @@
 -- START OF COPY --
 
+-- in an ideal world this file would be loaded (using dofile) by the other
+-- initialisation files to prevent code duplication. However, as it stands
+-- we can not load in additional init files with the current deployment 
+-- system and therefore we copy/paste this section into the other init files.
+
 -- imports fa_path to determine where it is installed
 dofile(InitFileDir .. '/../fa_path.lua')
 
@@ -52,21 +57,6 @@ end
 local integratedMods = { }
 integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
-
--- typical FAF packages
-local allowedAssetsNx2 = { }
-allowedAssetsNx2["effects.nx2"] = true
-allowedAssetsNx2["env.nx2"] = true
-allowedAssetsNx2["etc.nx2"] = true
-allowedAssetsNx2["loc.nx2"] = true
-allowedAssetsNx2["lua.nx2"] = true
-allowedAssetsNx2["meshes.nx2"] = true
-allowedAssetsNx2["mods.nx2"] = true
-allowedAssetsNx2["projectiles.nx2"] = true
-allowedAssetsNx2["schook.nx2"] = true
-allowedAssetsNx2["textures.nx2"] = true
-allowedAssetsNx2["units.nx2"] = true
-allowedAssetsNx2 = LowerHashTable(allowedAssetsNx2)
 
 -- typical FA packages
 local allowedAssetsScd = { }
@@ -403,6 +393,21 @@ end
 
 -- END OF COPY --
 
+-- typical FAF packages
+local allowedAssetsNx2 = { }
+allowedAssetsNx2["effects.nx2"] = true
+allowedAssetsNx2["env.nx2"] = true
+allowedAssetsNx2["etc.nx2"] = true
+allowedAssetsNx2["loc.nx2"] = true
+allowedAssetsNx2["lua.nx2"] = true
+allowedAssetsNx2["meshes.nx2"] = true
+allowedAssetsNx2["mods.nx2"] = true
+allowedAssetsNx2["projectiles.nx2"] = true
+allowedAssetsNx2["schook.nx2"] = true
+allowedAssetsNx2["textures.nx2"] = true
+allowedAssetsNx2["units.nx2"] = true
+allowedAssetsNx2 = LowerHashTable(allowedAssetsNx2)
+
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
 	LOG('Loading custom vault path' .. custom_vault_path)
@@ -415,11 +420,10 @@ else
     LoadVaultContent(SHGetFolderPath('PERSONAL') .. 'My Games/Gas Powered Games/Supreme Commander Forged Alliance')
 end
 
--- load in any .nxt that matches the whitelist / blacklist in FAF gamedata
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', '/')
-
--- load in any .nxt that matches the whitelist / blacklist in FA gamedata
-MountAllowedContent(fa_path .. '/gamedata/', '*.scd', '/')
+-- load in .nxt / .nx2 / .scd files that we allow
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNx2)
+MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 
 -- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar
 MountDirectory(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance', '/preferences')

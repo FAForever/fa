@@ -1,5 +1,10 @@
 -- START OF COPY --
 
+-- in an ideal world this file would be loaded (using dofile) by the other
+-- initialisation files to prevent code duplication. However, as it stands
+-- we can not load in additional init files with the current deployment 
+-- system and therefore we copy/paste this section into the other init files.
+
 -- imports fa_path to determine where it is installed
 dofile(InitFileDir .. '/../fa_path.lua')
 

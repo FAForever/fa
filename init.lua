@@ -1,6 +1,9 @@
-
-
 -- START OF COPY --
+
+-- in an ideal world this file would be loaded (using dofile) by the other
+-- initialisation files to prevent code duplication. However, as it stands
+-- we can not load in additional init files with the current deployment 
+-- system and therefore we copy/paste this section into the other init files.
 
 -- imports fa_path to determine where it is installed
 dofile(InitFileDir .. '/../fa_path.lua')
@@ -416,11 +419,9 @@ else
     LoadVaultContent(SHGetFolderPath('PERSONAL') .. 'My Games/Gas Powered Games/Supreme Commander Forged Alliance')
 end
 
--- load in any .nxt that matches the whitelist / blacklist in FAF gamedata
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNx2)
+-- load in .nxt / .nx2 / .scd files that we allow
 MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
-
--- load in any .nxt that matches the whitelist / blacklist in FA gamedata
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNx2)
 MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 
 -- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar
