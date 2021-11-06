@@ -8433,3 +8433,11 @@ adaptive_lightning_key_1_help = "Einige vereinzelte Blitzeffekte."
 adaptive_lightning_key_2_help = "Normale Einstellung für die Blitzeffekte."
 adaptive_lightning_key_3 = "Aktiviert - viele"
 adaptive_lightning_key_3_help = "Blitzsturm. Die Blitzeffekte tauchen häufig auf."
+
+-- unranked lobby option
+lobui_0802="Unrate"
+lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
+lobui_0804="No"
+lobui_0805="This game will be rated if all the criteria for a rated game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be rated."
