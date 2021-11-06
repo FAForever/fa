@@ -8056,3 +8056,11 @@ aireplace_0001="AI Replacement"
 aireplace_0002="Toggle AI Replacement if a player disconnects."
 aireplace_0003="If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected."
 aireplace_0004="A disconnected player will cause the destruction of their units based on share conditions."
+
+-- unranked lobby option
+lobui_0802="Unrate"
+lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
+lobui_0804="No"
+lobui_0805="This game will be rated if all the criteria for a rated game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be rated."
