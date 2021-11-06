@@ -1,6 +1,7 @@
 
 -- START OF COPY --
 
+
 -- imports fa_path to determine where it is installed
 dofile(InitFileDir .. '/../fa_path.lua')
 
@@ -15,6 +16,7 @@ local StringLower = string.lower
 local IoDir = io.dir
 
 local TableInsert = table.insert
+local TableGetn = table.getn
 
 -- read by the engine to determine where to find assets
 path = {}
@@ -39,13 +41,9 @@ protocols = {
 local UpvaluedPath = path 
 local UpvaluedPathNext = 1
 
--- defined to read scenario files
-STRING = function(s) return s end 
-
 -- mods that have been integrated, based on folder name 
-local integratedMods = { 
-    "nvidia fix"
-}
+local integratedMods = { }
+integratedMods["nvidia fix"] = true
 
 -- old mods and other things we do not appreciate
 local assetsBlocked = {
@@ -107,6 +105,20 @@ local assetsAllowed = {
     "texturepack.nxt",
     "sc_music.scd"
 }
+
+-- default wave banks to prevent collisions
+local soundsBlocked = { }
+local faSounds = IoDir(fa_path .. '/sounds/*')
+for k, v in faSounds do 
+    soundsBlocked[StringLower(v)] = true
+end
+
+-- default movie files to prevent collisions
+local moviesBlocked = { }
+local faMovies = IoDir(fa_path .. '/movies/*')
+for k, v in faMovies do 
+    moviesBlocked[StringLower(v)] = true
+end
 
 --- Mounts a directory or scd / zip file.
 -- @param dir The absolute path to the directory
@@ -199,7 +211,7 @@ function MountMapContent(dir)
             continue 
         end
 
-        -- do not load scds / zips as maps
+        -- do not load archives as maps
         if StringFind(map, ".zip") or StringFind(map, ".scd")  or StringFind(map, ".rar") then
             continue 
         end
@@ -237,14 +249,42 @@ function MountMapContent(dir)
         for _, folder in IoDir(dir..'/'..map..'/**') do
             -- if we found a directory named 'movies' then we mount its content
             if folder == 'movies' then
-                LOG('Found map movies in: '..map)
-                MountDirectory(dir..map..'/movies', '/movies')
+                local conflictingFiles = { }
+                for _, file in IoDir(dir .. '/' .. map .. '/movies/*') do
+                    if moviesBlocked[StringLower(file)] then 
+                        TableInsert(conflictingFiles, file)
+                    end
+                end
+                    
+                if TableGetn(conflictingFiles) > 0 then 
+                    LOG('Found conflicting movies with the base game for map: ' .. map)
+                    for k, v in conflictingFiles do 
+                        LOG(" - Conflicting sound file: " .. v )
+                    end
+                else
+                    LOG("Mounting movies of map: " .. map )
+                    MountDirectory(dir..map..'/movies', '/movies')
+                end
             end
 
             -- if we found a directory named 'sounds' then we mount its content
             if folder == 'sounds' then
-                LOG('Found map sounds in: '..map)
-                MountDirectory(dir..map..'/sounds', '/sounds')
+                local conflictingFiles = { }
+                for _, file in IoDir(dir .. '/' .. map .. '/sounds/*') do
+                    if soundsBlocked[StringLower(file)] then 
+                        TableInsert(conflictingFiles, file)
+                    end
+                end
+                    
+                if TableGetn(conflictingFiles) > 0 then 
+                    LOG('Found conflicting sounds with the base game for map: ' .. map)
+                    for k, v in conflictingFiles do 
+                        LOG(" - Conflicting sound file: " .. v )
+                    end
+                else
+                    LOG("Mounting sounds of map: " .. map )
+                    MountDirectory(dir..map..'/sounds', '/sounds')
+                end
             end
         end
     end
@@ -267,17 +307,13 @@ function MountModContent(dir)
             continue 
         end
 
-        LOG(mod)
-
         -- do not load integrated mods
-        for k, integrated in integratedMods do
-            if StringLower(integrated) == mod then 
-                _ALERT("Blocked mod that is integrated: " .. mod )
-                continue 
-            end
+        if integratedMods[mod] then 
+            _ALERT("Blocked mod that is integrated: " .. mod )
+            continue 
         end 
 
-        -- do not load scds / zips as mods
+        -- do not load archives as mods
         if StringFind(mod, ".zip") or StringFind(mod, ".scd") or StringFind(mod, ".rar") then
             continue 
         end
@@ -313,8 +349,22 @@ function MountModContent(dir)
             
             -- if we found a directory named 'sounds' then we mount its content
             if folder == 'sounds' then
-                LOG('Found mod sounds in: ' .. mod)
-                MountDirectory(dir .. '/' .. mod .. '/sounds', '/sounds')
+                local conflictingFiles = { }
+                for _, file in IoDir(dir .. '/' .. mod .. '/sounds/*') do
+                    if soundsBlocked[StringLower(file)] then 
+                        TableInsert(conflictingFiles, file)
+                    end
+                end
+                    
+                if TableGetn(conflictingFiles) > 0 then 
+                    LOG('Found conflicting sounds with the base game for mod: ' .. mod)
+                    for k, v in conflictingFiles do 
+                        LOG(" - Conflicting sound file: " .. v )
+                    end
+                else
+                    LOG("Mounting sounds in mod: " .. mod )
+                    MountDirectory(dir .. mod .. '/sounds', '/sounds')
+                end
             end
 
             -- if we found a directory named 'custom-strategic-icons' then we mount its content
@@ -352,6 +402,9 @@ else
     LOG("No custom vault path defined.")
 end
 
+-- load in development assets
+MountDirectory('C:/Develop/supreme-commander/fa', '/')
+
 -- load maps / mods from backup vault location location
 LoadVaultContent(InitFileDir .. '/../user/My Games/Gas Powered Games/Supreme Commander Forged Alliance')
 
@@ -369,4 +422,61 @@ MountAllowedContent(fa_path .. '/gamedata/', '*.scd', '/')
 MountDirectory(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance', '/preferences')
 
 -- Load in all the data of the steam installation (movies, maps, sound folders)
-MountDirectory(fa_path, '/')
+MountDirectory(fa_path .. "/movies", '/movies')
+MountDirectory(fa_path .. "/sounds", '/sounds')
+MountDirectory(fa_path .. "/maps", '/maps')
+MountDirectory(fa_path .. "/fonts", '/fonts')
+
+-- Available in global scope
+
+-- string
+-- tostring
+-- gcinfo
+-- _ALERT
+-- loadlib
+-- os
+-- unpack
+-- require
+-- getfenv
+-- serialize
+-- setmetatable
+-- next
+-- _TRACEBACK
+-- assert
+-- tonumber
+-- io
+-- rawequal
+-- collectgarbage
+-- getmetatable
+-- STRING
+-- InitFileDir
+-- coroutine
+-- hook
+-- _LOADED
+-- rawset
+-- LuaDumpBinary
+-- path
+-- protocols
+-- LaunchDir
+-- SHGetFolderPath
+-- LOG
+-- math
+-- import
+-- pcall
+-- debug
+-- __pow
+-- type
+-- newproxy
+-- table
+-- fa_path
+-- print
+-- _G
+-- rawget
+-- loadstring
+-- _VERSION
+-- dofile
+-- setfenv
+-- pairs
+-- ipairs
+-- error
+-- loadfile
