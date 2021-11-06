@@ -1,244 +1,32 @@
 
--- This imports a path file that is written by Forged Alliance Forever right before it starts the game.
-dofile(InitFileDir .. '\\..\\fa_path.lua')
 
+-- START OF COPY --
+
+-- imports fa_path to determine where it is installed
+dofile(InitFileDir .. '/../fa_path.lua')
+
+-- upvalued performance
+local dofile = dofile
+
+local StringFind = string.find 
+local StringGsub = string.gsub
+local StringSub = string.sub
+local StringLower = string.lower
+
+local IoDir = io.dir
+
+local TableInsert = table.insert
+local TableGetn = table.getn
+
+-- read by the engine to determine where to find assets
 path = {}
 
-blacklist = {
-    "00_BigMap.scd",
-    "00_BigMapLEM.scd",
-    "fa-ladder.scd",
-    "fa_ladder.scd",
-    "faladder.scd",
-    "powerlobby.scd",
-    "02_sorian_ai_pack.scd",
-    "03_lobbyenhancement.scd",
-    "randmap.scd",
-    "_Eject.scd",
-    "Eject.scd",
-    "gaz_ui",
-    "lobby.nxt",
-    "faforever.nxt"
-}
-
-whitelist = {
-    "effects.nx2",
-    "env.nx2",
-    "etc.nx2",
-    "loc.nx2",
-    "lua.nx2",
-    "meshes.nx2",
-    "mods.nx2",
-    "projectiles.nx2",
-    "schook.nx2",
-    "textures.nx2",
-    "units.nx2",
-    "murderparty.nxt",
-    "labwars.nxt",
-    "units.scd",
-    "textures.scd",
-    "skins.scd",
-    "schook.scd",
-    "props.scd",
-    "projectiles.scd",
-    "objects.scd",
-    "moholua.scd",
-    "mohodata.scd",
-    "mods.scd",
-    "meshes.scd",
-    "lua.scd",
-    "loc_us.scd",
-    "loc_es.scd",
-    "loc_fr.scd",
-    "loc_it.scd",
-    "loc_de.scd",
-    "loc_ru.scd",
-    "env.scd",
-    "effects.scd",
-    "editor.scd",
-    "ambience.scd",
-    "advanced strategic icons.nxt",
-    "lobbymanager_v105.scd",
-    "texturepack.nxt",
-    "sc_music.scd"
-}
-
-local function mount_dir(dir, mountpoint)
-    table.insert(path, { dir = dir, mountpoint = mountpoint })
-end
-
-local function mount_contents(dir, mountpoint)
-    LOG('checking ' .. dir)
-    for _,entry in io.dir(dir .. '\\*') do
-        if entry != '.' and entry != '..' then
-            local mp = string.lower(entry)
-            local safe = true
-            for i, black in blacklist do
-                safe = safe and (string.find(mp, black, 1) == nil)
-            end
-            if safe then
-                mp = string.gsub(mp, '[.]scd$', '')
-                mp = string.gsub(mp, '[.]zip$', '')
-                mount_dir(dir .. '\\' .. entry, mountpoint .. '/' .. mp)
-            else
-                LOG('not safe ' .. entry)
-            end
-        end
-    end
-end
-
-local function mount_dir_with_whitelist(dir, glob, mountpoint)
-    sorted = {}
-    LOG('checking ' .. dir .. glob)
-    for _,entry in io.dir(dir .. glob) do
-        if entry != '.' and entry != '..' then
-            local mp = string.lower(entry)
-            local notsafe = true
-            for i, white in whitelist do
-                    notsafe = notsafe and (string.find(mp, white, 1) == nil)
-            end
-            if notsafe then
-                    LOG('not safe ' .. dir .. entry)
-            else
-                    table.insert(sorted, dir .. entry)
-            end
-        end
-    end
-    table.sort(sorted)
-    table.foreach(sorted, function(k,v) mount_dir(v,'/') end)
-end
-
-local function mount_dir_with_blacklist(dir, glob, mountpoint)
-    sorted = {}
-    LOG('checking ' .. dir .. glob)
-    for _,entry in io.dir(dir .. glob) do
-        if entry != '.' and entry != '..' then
-            local mp = string.lower(entry)
-            local safe = true
-            for i, black in blacklist do
-                    safe = safe and (string.find(mp, black, 1) == nil)
-            end
-            if safe then
-                    table.insert(sorted, dir .. entry)
-            else
-                    LOG('not safe ' .. dir .. entry)
-            end
-        end
-    end
-    table.sort(sorted)
-    table.foreach(sorted, function(k,v) mount_dir(v,'/') end)
-end
-
---- A helper function that loads in additional content for maps.
--- @param mountpoint The root folder to look for content in.
-local function mount_map_content(dir, glob, mountpoint)
-    LOG('mounting maps from: '..dir)
-    mount_contents(dir, mountpoint)
-
-    -- look for all directories / maps at the mount point
-    for _, map in io.dir(dir..glob) do
-
-        -- make sure we're not retrieving the current / previous directory
-        if map != '.' and map != '..' then
-
-            -- look at each directory inside this map
-            for _, folder in io.dir(dir..'\\'..map..'\\**') do
-
-                -- if we found a directory named 'movies' then we mount its content
-                if folder == 'movies' then
-                    LOG('Found map movies in: '..map)
-                    mount_dir(dir..map..'\\movies', '/movies')
-                end
-
-                -- if we found a directory named 'sounds' then we mount its content
-                if folder == 'sounds' then
-                    LOG('Found map sounds in: '..map)
-                    mount_dir(dir..map..'\\sounds', '/sounds')
-                end
-            end
-        end
-    end
-end
-
---- A helper function that loads in additional content for mods.
--- @param mountpoint The root folder to look for content in.
-function mount_mod_content(mountpoint)
-    -- get all directories / mods at the mount point
-    for _, mod in io.dir(mountpoint..'\\*.*') do
-        
-        -- make sure we're not retrieving the current / previous directory
-        if mod != '.' and mod != '..' then
-
-            -- look at each directory inside this mod
-            for _, folder in io.dir(mountpoint..'\\'..mod..'\\*.*') do
-                
-                -- if we found a directory named 'sounds' then we mount its content
-                if folder == 'sounds' then
-                    LOG('Found mod sounds in: '..mod)
-                    mount_dir(mountpoint..'\\'..mod..'\\sounds', '/sounds')
-                end
-
-                -- if we found a directory named 'custom-strategic-icons' then we mount its content
-                if folder == 'custom-strategic-icons' then
-                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
-                    LOG('Found mod icons in ' .. mod .. ', mounted at: ' .. mountLocation)
-                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons', mountLocation) 
-                end
-
-                -- if we found a file named 'custom-strategic-icons.scd' then we mount its content - good for performance when the number of icons is high
-                if folder == 'custom-strategic-icons.scd' then 
-                    local mountLocation = '/textures/ui/common/game/strategicicons/' .. string.lower(mod)
-                    LOG('Found mod icon package in ' .. mod .. ', mounted at: ' .. mountLocation)
-                    mount_dir(mountpoint..'\\'..mod..'\\custom-strategic-icons.scd', mountLocation) 
-                end
-            end
-        end
-    end
-end
-
---- A helper function to load in all maps and mods on a given location.
--- @param path The root folder for the maps and mods
-local function load_content(path)
-    -- load in additional things, like sounds and 
-	mount_map_content(path .. '\\maps\\', '**', '/maps')
-	mount_mod_content(path .. '\\mods')
-
-	mount_contents(path .. '\\mods', '/mods')
-	mount_contents(path .. '\\maps', '/maps')
-end
-
--- load maps / mods from custom vault location, if set by client
-if custom_vault_path then
-	LOG('Loading custom vault path' .. custom_vault_path)
-	load_content(custom_vault_path)
-else
-    LOG("No custom vault path defined.")
-end
-
--- load maps / mods from backup vault location location
-load_content(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
-
--- load maps / mods from my documents vault location
-load_content(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance')
-
--- load in any .nxt that matches the whitelist / blacklist in FAF gamedata
-mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
-mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
-
--- load in any .nxt that matches the whitelist / blacklist in FA gamedata
-mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
-
--- TODO: should we limit this?
--- load preferences into the game as well, letting us have much more control over their contents. This also includes cache and similar.
-mount_dir(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games\\Supreme Commander Forged Alliance', '/preferences')
-
--- TODO: ?
-mount_dir(fa_path, '/')
-
+-- read by the engine to determine hook folders
 hook = {
     '/schook'
 }
 
+-- read by the engine to determine supported protocols
 protocols = {
     'http',
     'https',
@@ -249,3 +37,386 @@ protocols = {
     'im',
 }
 
+-- upvalued for performance
+local UpvaluedPath = path 
+local UpvaluedPathNext = 1
+
+--- Lowers the strings of a hash-based table, crashes when other type of keys are used (integers, for example)
+local function LowerHashTable(t)
+    local o = { }
+    for k, v in t do 
+        o[StringLower(k)] = v 
+    end
+    return o
+end
+
+-- mods that have been integrated, based on folder name 
+local integratedMods = { }
+integratedMods["nvidia fix"] = true
+integratedMods = LowerHashTable(integratedMods)
+
+-- typically FA / FAF related packages that we do appreciate
+local assetsAllowed = { }
+assetsAllowed["effects.nx2"] = true
+assetsAllowed["env.nx2"] = true
+assetsAllowed["etc.nx2"] = true
+assetsAllowed["loc.nx2"] = true
+assetsAllowed["lua.nx2"] = true
+assetsAllowed["meshes.nx2"] = true
+assetsAllowed["mods.nx2"] = true
+assetsAllowed["projectiles.nx2"] = true
+assetsAllowed["schook.nx2"] = true
+assetsAllowed["textures.nx2"] = true
+assetsAllowed["units.nx2"] = true
+assetsAllowed["units.scd"] = true
+assetsAllowed["textures.scd"] = true
+assetsAllowed["skins.scd"] = true
+assetsAllowed["schook.scd"] = true
+assetsAllowed["props.scd"] = true
+assetsAllowed["projectiles.scd"] = true
+assetsAllowed["objects.scd"] = true
+assetsAllowed["moholua.scd"] = true
+assetsAllowed["mohodata.scd"] = true
+assetsAllowed["mods.scd"] = true
+assetsAllowed["meshes.scd"] = true
+assetsAllowed["lua.scd"] = true
+assetsAllowed["loc_us.scd"] = true
+assetsAllowed["loc_es.scd"] = true
+assetsAllowed["loc_fr.scd"] = true
+assetsAllowed["loc_it.scd"] = true
+assetsAllowed["loc_de.scd"] = true
+assetsAllowed["loc_ru.scd"] = true
+assetsAllowed["env.scd"] = true
+assetsAllowed["effects.scd"] = true
+assetsAllowed["editor.scd"] = true
+assetsAllowed["ambience.scd"] = true
+assetsAllowed["lobbymanager_v105.scd"] = true
+assetsAllowed["sc_music.scd"] = true
+assetsAllowed = LowerHashTable(assetsAllowed)
+
+-- default wave banks to prevent collisions
+local soundsBlocked = { }
+local faSounds = IoDir(fa_path .. '/sounds/*')
+for k, v in faSounds do 
+    if v == '.' or v == '..' then 
+        continue 
+    end
+    soundsBlocked[StringLower(v)] = true
+end
+
+-- default movie files to prevent collisions
+local moviesBlocked = { }
+local faMovies = IoDir(fa_path .. '/movies/*')
+for k, v in faMovies do 
+    if v == '.' or v == '..' then 
+        continue 
+    end
+    moviesBlocked[StringLower(v)] = true
+end
+
+--- Mounts a directory or scd / zip file.
+-- @param dir The absolute path to the directory
+-- @param mountpoint The path to use in the game (e.g., /maps/...)
+local function MountDirectory(dir, mountpoint)
+    UpvaluedPath[UpvaluedPathNext] = { 
+        dir = dir, 
+        mountpoint = mountpoint 
+    }
+
+    UpvaluedPathNext = UpvaluedPathNext + 1
+end
+
+--- Mounts all allowed content in a directory, including scd and zip files, to the mountpoint.
+-- @param dir The absolute path to the directory
+-- @param mountpoint The path to use in the game (e.g., /maps/...)
+local function MountContent(dir, mountpoint)
+    for _,entry in IoDir(dir .. '/*') do
+        if entry != '.' and entry != '..' then
+            local mp = StringLower(entry)
+            if assetsAllowed[mp] then 
+                MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
+            else 
+                LOG("Prevented loading content that is not allowed: " .. entry)
+            end
+        end
+    end
+end
+
+--- Mounts all allowed content in a directory, including scd and zip files, directly.
+-- @param dir The absolute path to the directory
+-- @param mountpoint The path to use in the game (e.g., /maps/...)
+local function MountAllowedContent(dir)
+    for _,entry in IoDir(dir .. '/*') do
+        if entry != '.' and entry != '..' then
+            local mp = StringLower(entry)
+            if assetsAllowed[mp] then 
+                MountDirectory(dir .. "/" .. entry, '/')
+            else 
+                LOG("Prevented loading content that is not allowed: " .. entry)
+            end
+        end
+    end
+end
+
+--- Keep track of what maps are loaded to prevent collisions
+local loadedMaps = { }
+
+--- A helper function that loads in additional content for maps.
+-- @param mountpoint The root folder to look for content in.
+local function MountMapContent(dir)
+    -- look for all directories / maps at the mount point
+    for _, map in IoDir(dir .. '/*') do
+
+        -- prevent capital letters messing things up
+        map = StringLower(map)
+
+        -- do not do anything with the current / previous directory
+        if map == '.' or map == '..' then
+            continue 
+        end
+
+        -- do not load archives as maps
+        if StringSub(map, -4) == ".zip" or StringSub(map, -4) == ".scd"  or StringSub(map, -4) == ".rar" then
+            continue 
+        end
+
+        -- check if the folder contains map required map files
+        local scenarioFile = false 
+        local scmapFile = false 
+        local saveFile = false 
+        local scriptFile = false 
+        for _, file in IoDir(dir .. "/" .. map .. "/*") do 
+            if StringSub(file, -13) == '_scenario.lua' then 
+                scenarioFile = file 
+            elseif StringSub(file, -11) == '_script.lua' then 
+                scriptFile = file 
+            elseif StringSub(file, -9) == '_save.lua' then 
+                saveFile = file 
+            elseif StringSub(file, -6) == '.scmap' then 
+                scmapFile = file 
+            end
+        end
+
+        -- check if it has a scenario file
+        if not scenarioFile then 
+            LOG("Map doesn't have a scenario file: " .. dir .. "/" .. map)
+            continue 
+        end
+
+        if not scmapFile then 
+            LOG("Map doesn't have a scmap file: " .. dir .. "/" .. map)
+            continue 
+        end
+
+        if not saveFile then 
+            LOG("Map doesn't have a save file: " .. dir .. "/" .. map)
+            continue 
+        end
+
+        if not scriptFile then 
+            LOG("Map doesn't have a script file: " .. dir .. "/" .. map)
+            continue 
+        end
+
+        -- tried to load in the scenario file, but in all cases it pollutes the global scope and we can't have that
+        -- https://stackoverflow.com/questions/9540732/loadfile-without-polluting-global-environment
+
+        -- do not load maps twice
+        if loadedMaps[map] then 
+            LOG("Prevented loading a map twice: " .. map)
+            continue
+        end
+
+        -- consider this one loaded
+        loadedMaps[map] = true 
+
+        -- mount the map
+        MountDirectory(dir .. "/" .. map, "/maps/" .. map)
+
+        -- look at each directory inside this map
+        for _, folder in IoDir(dir .. '/' .. map .. '/*') do
+
+            -- do not do anything with the current / previous directory
+            if folder == '.' or folder == '..' then
+                continue 
+            end
+
+            if folder == 'movies' then
+                -- find conflicting files
+                local conflictingFiles = { }
+                for _, file in IoDir(dir .. '/' .. map .. '/movies/*') do
+                    if moviesBlocked[StringLower(file)] then 
+                        TableInsert(conflictingFiles, file)
+                    end
+                end
+                    
+                -- report them if they exist and do not mount
+                if TableGetn(conflictingFiles) > 0 then 
+                    LOG('Found conflicting movies with the base game for map, cannot mount movies for: ' .. map)
+                    for k, v in conflictingFiles do 
+                        LOG(" - Conflicting movie file: " .. v )
+                    end
+                -- else, mount folder
+                else
+                    LOG("Mounting movies of map: " .. map )
+                    MountDirectory(dir..map..'/movies', '/movies')
+                end
+            elseif folder == 'sounds' then
+                -- find conflicting files
+                local conflictingFiles = { }
+                for _, file in IoDir(dir .. '/' .. map .. '/sounds/*') do
+                    if soundsBlocked[StringLower(file)] then 
+                        TableInsert(conflictingFiles, file)
+                    end
+                end
+                    
+                -- report them if they exist and do not mount
+                if TableGetn(conflictingFiles) > 0 then 
+                    LOG('Found conflicting sounds with the base game for map, cannot mount sounds for: ' .. map)
+                    for k, v in conflictingFiles do 
+                        LOG(" - Conflicting sound file: " .. v )
+                    end
+
+                -- else, mount folder
+                else
+                    LOG("Mounting sounds of map: " .. map )
+                    MountDirectory(dir..map..'/sounds', '/sounds')
+                end
+            end
+        end
+    end
+end
+
+--- keep track of what mods are loaded to prevent collisions
+local loadedMods = { }
+
+--- A helper function that loads in additional content for mods.
+-- @param mountpoint The root folder to look for content in.
+local function MountModContent(dir)
+    -- get all directories / mods at the mount point
+    for _, mod in io.dir(dir..'/*.*') do
+        
+        -- prevent capital letters messing things up
+        mod = StringLower(mod)
+
+        -- do not do anything with the current / previous directory
+        if mod == '.' or mod == '..' then
+            continue 
+        end
+
+        -- do not load integrated mods
+        if integratedMods[mod] then 
+            _ALERT("Blocked mod that is integrated: " .. mod )
+            continue 
+        end 
+
+        -- do not load archives as mods
+        if StringFind(mod, ".zip") or StringFind(mod, ".scd") or StringFind(mod, ".rar") then
+            continue 
+        end
+
+        -- check if the folder contains a _info.lua
+        local infoFile = false 
+        for _, file in IoDir(dir .. "/" .. mod .. "/*") do 
+            if StringSub(file, -9) == '_info.lua' then 
+                infoFile = file 
+            end
+        end
+
+        -- check if it has a scenario file
+        if not infoFile then 
+            _ALERT("Mod doesn't have an info file: " .. dir .. "/" .. mod)
+            continue 
+        end
+
+        -- do not load mods twice
+        if loadedMods[mod] then 
+            LOG("Prevented loading a mod twice: " .. mod)
+            continue
+        end
+
+        -- consider this one loaded
+        loadedMods[mod] = true 
+
+        -- mount the mod
+        MountDirectory(dir .. "/" .. mod, "/mods/" .. mod)
+
+        -- look at each directory inside this mod
+        for _, folder in IoDir(dir .. '/' .. mod .. '/*') do
+            
+            -- if we found a directory named 'sounds' then we mount its content
+            if folder == 'sounds' then
+                -- find conflicting files
+                local conflictingFiles = { }
+                for _, file in IoDir(dir .. '/' .. mod .. '/sounds/*') do
+                    if soundsBlocked[StringLower(file)] then 
+                        TableInsert(conflictingFiles, file)
+                    end
+                end
+                    
+                -- report them if they exist and do not mount
+                if TableGetn(conflictingFiles) > 0 then 
+                    LOG('Found conflicting sounds with the base game for mod, cannot mount sounds for: ' .. mod)
+                    for k, v in conflictingFiles do 
+                        LOG(" - Conflicting sound file: " .. v )
+                    end
+                -- else, mount folder
+                else
+                    LOG("Mounting sounds in mod: " .. mod )
+                    MountDirectory(dir .. mod .. '/sounds', '/sounds')
+                end
+            end
+
+            -- if we found a directory named 'custom-strategic-icons' then we mount its content
+            if folder == 'custom-strategic-icons' then
+                local mountLocation = '/textures/ui/common/game/strategicicons/' .. mod
+                LOG('Found mod icons in ' .. mod .. ', mounted at: ' .. mountLocation)
+                MountDirectory(dir .. '/' .. mod .. '/custom-strategic-icons', mountLocation) 
+            end
+
+            -- if we found a file named 'custom-strategic-icons.scd' then we mount its content - good for performance when the number of icons is high
+            if folder == 'custom-strategic-icons.scd' then 
+                local mountLocation = '/textures/ui/common/game/strategicicons/' .. mod
+                LOG('Found mod icon package in ' .. mod .. ', mounted at: ' .. mountLocation)
+                MountDirectory(dir .. '/' .. mod .. '/custom-strategic-icons.scd', mountLocation) 
+            end
+        end
+    end
+end
+
+--- A helper function to load in all maps and mods on a given location.
+-- @param path The root folder for the maps and mods
+local function LoadVaultContent(path)
+    -- load in additional things, like sounds and 
+	MountMapContent(path .. '/maps')
+	MountModContent(path .. '/mods')
+end
+
+-- END OF COPY --
+
+-- load maps / mods from custom vault location, if set by client
+if custom_vault_path then
+	LOG('Loading custom vault path' .. custom_vault_path)
+	LoadVaultContent(custom_vault_path)
+else
+    LOG("No custom vault path defined: loading from backup locations. You should update your client to 2021/10/+.")
+    -- load maps / mods from backup vault location location
+    LoadVaultContent(InitFileDir .. '/../user/My Games/Gas Powered Games/Supreme Commander Forged Alliance')
+    -- load maps / mods from my documents vault location
+    LoadVaultContent(SHGetFolderPath('PERSONAL') .. 'My Games/Gas Powered Games/Supreme Commander Forged Alliance')
+end
+
+-- load in any .nxt that matches the whitelist / blacklist in FAF gamedata
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', '/')
+
+-- load in any .nxt that matches the whitelist / blacklist in FA gamedata
+MountAllowedContent(fa_path .. '/gamedata/', '*.scd', '/')
+
+-- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar
+MountDirectory(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance', '/preferences')
+
+-- Load in all the data of the steam installation (movies, maps, sound folders)
+MountDirectory(fa_path .. "/movies", '/movies')
+MountDirectory(fa_path .. "/sounds", '/sounds')
+MountDirectory(fa_path .. "/maps", '/maps')
+MountDirectory(fa_path .. "/fonts", '/fonts')
