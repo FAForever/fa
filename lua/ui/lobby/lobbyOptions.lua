@@ -112,7 +112,7 @@ teamOptions =
 globalOpts = {
     {
         default = 1,
-        label = "<LOC lobui_0802>Unrank",
+        label = "<LOC lobui_0802>Unrate",
         help = "<LOC lobui_0803>Provides a toggle to unrank a game. Note that if this is said to no the game can still be unranked due to other lobby options, unranked sim mods and / or the map being unranked.",
         key = 'Unranked',
         values = {

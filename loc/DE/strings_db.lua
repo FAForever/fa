@@ -8435,7 +8435,7 @@ adaptive_lightning_key_3 = "Aktiviert - viele"
 adaptive_lightning_key_3_help = "Blitzsturm. Die Blitzeffekte tauchen häufig auf."
 
 -- unranked lobby option
-lobui_0802="Unrank"
+lobui_0802="Unrate"
 lobui_0803="Provides a toggle to unrank a game. Note that if this is set to no the game can still be unranked due to other lobby options, unranked sim mods and / or the map being unranked."
 lobui_0804="No"
 lobui_0805="This game will be ranked if all the criteria for a ranked game are met."
