@@ -61,6 +61,10 @@ Patch 3726 (26th November, 2021)
  - (#3489) Fix UI description of teleport
  - (#3491) Fix the attack animation of the Monkey Lord
  - (#3349) Updates the readme with the most recent dependencies
+ - (#3461) Remove game quality computations for games with more than two teams
+    The system is not designed to compute the quality of a game when
+    more than (or less than) two teams are involved. Hence, the 
+    computation is gibberish anyhow.
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -90,5 +94,6 @@ Patch 3726 (26th November, 2021)
 ### Reviewers
  - Balthazar (#3484)
  - Relent0r (#3512)
+ 
 ### Translators
  - Lenkin (#3440)
