@@ -66,6 +66,7 @@ Patch 3726 (26th November, 2021)
     The Trueskill system is not designed to compute the quality of a game 
     when more than (or less than) two teams are involved. Hence, the 
     computation is gibberish anyhow.
+ - (#3526) Remove the curated maps button until an alternative is available
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -97,7 +98,7 @@ Patch 3726 (26th November, 2021)
  - Uveso (#3477)
  - Rowey (#3475)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
-        #3522, #3512, #3440, #3419, #3525)
+        #3522, #3512, #3440, #3419, #3525, #3526)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
