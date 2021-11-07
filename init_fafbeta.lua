@@ -257,7 +257,7 @@ local function MountMapContent(dir)
                 -- else, mount folder
                 else
                     LOG("Mounting movies of map: " .. map )
-                    MountDirectory(dir..map..'/movies', '/movies')
+                    MountDirectory(dir .. "/" .. map .. '/movies', '/movies')
                 end
             elseif folder == 'sounds' then
                 -- find conflicting files
@@ -278,7 +278,7 @@ local function MountMapContent(dir)
                 -- else, mount folder
                 else
                     LOG("Mounting sounds of map: " .. map )
-                    MountDirectory(dir..map..'/sounds', '/sounds')
+                    MountDirectory(dir.. "/" .. map .. '/sounds', '/sounds')
                 end
             end
         end
@@ -361,7 +361,7 @@ local function MountModContent(dir)
                 -- else, mount folder
                 else
                     LOG("Mounting sounds in mod: " .. mod )
-                    MountDirectory(dir .. mod .. '/sounds', '/sounds')
+                    MountDirectory(dir .. "/" .. mod .. '/sounds', '/sounds')
                 end
             end
 
