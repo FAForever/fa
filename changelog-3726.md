@@ -38,7 +38,7 @@ Patch 3726 (26th November, 2021)
     Adds icon support to FAF Beta.
 
     Adds the ability to more easily block content that is integrated.
- - (#3527) 
+ - (#3527) Integrate the Nvidia Fix mod and block the mod from loading
 
 ### Bug
  - (#3522) Fix upvalue issue of patch 3721
