@@ -20,7 +20,7 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	LowFidelity = true,
+	LowFidelity = false,
 	MedFidelity = true,
 	HighFidelity = true,
 	Texture = [[/textures/particles/blast_cloud_01.dds]],
