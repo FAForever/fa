@@ -394,19 +394,19 @@ end
 -- END OF COPY --
 
 -- typical FAF packages
-local allowedAssetsNx2 = { }
-allowedAssetsNx2["effects.nx2"] = true
-allowedAssetsNx2["env.nx2"] = true
-allowedAssetsNx2["etc.nx2"] = true
-allowedAssetsNx2["loc.nx2"] = true
-allowedAssetsNx2["lua.nx2"] = true
-allowedAssetsNx2["meshes.nx2"] = true
-allowedAssetsNx2["mods.nx2"] = true
-allowedAssetsNx2["projectiles.nx2"] = true
-allowedAssetsNx2["schook.nx2"] = true
-allowedAssetsNx2["textures.nx2"] = true
-allowedAssetsNx2["units.nx2"] = true
-allowedAssetsNx2 = LowerHashTable(allowedAssetsNx2)
+local allowedAssetsNxy = { }
+allowedAssetsNxy["effects.nx2"] = true
+allowedAssetsNxy["env.nx2"] = true
+allowedAssetsNxy["etc.nx2"] = true
+allowedAssetsNxy["loc.nx2"] = true
+allowedAssetsNxy["lua.nx2"] = true
+allowedAssetsNxy["meshes.nx2"] = true
+allowedAssetsNxy["mods.nx2"] = true
+allowedAssetsNxy["projectiles.nx2"] = true
+allowedAssetsNxy["schook.nx2"] = true
+allowedAssetsNxy["textures.nx2"] = true
+allowedAssetsNxy["units.nx2"] = true
+allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)
 
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
@@ -422,7 +422,7 @@ end
 
 -- load in .nxt / .nx2 / .scd files that we allow
 MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNx2)
+MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNxy)
 MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 
 -- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar
