@@ -38,6 +38,7 @@ Patch 3726 (26th November, 2021)
     units when a player dies and full share is on. The drone can no longer be
     restricted and instead there is a dedicated lobby option to unrate the
     game.
+ - (#3525) Fix the unpathable skirts of the Seraphim Quantum Gateway
     
 ### Other
  - (#3523) Switch off debug utilities by default
@@ -95,7 +96,8 @@ Patch 3726 (26th November, 2021)
  - Madmax (#3420, #3419)
  - Uveso (#3477)
  - Rowey (#3475)
- - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522, #3512, #3440, #3419)
+ - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
+        #3522, #3512, #3440, #3419, #3525)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
