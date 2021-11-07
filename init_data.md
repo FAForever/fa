@@ -1,5 +1,18 @@
 
+### Introduction
+
 This is a dummy file to help work with init files as they have a limited lua functionality available to them.
+
+Extensions:
+ - .nx2: FAF
+ - .nx3: ?
+ - .nx4: FAF Beta
+ - .nx5: FAF Develop
+ - .nxt: miscellaneous
+
+The latter is included for support of the old advanced strategic icons (ASI) that got replaced by [#3450](https://github.com/FAForever/fa/pull/3450) to the vault-ready mods in this [repository](https://github.com/Garanas/strategic-icon-mod-examples).
+
+### Scope
 
 ```lua
 local function repr(t, indent, seen)
