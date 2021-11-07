@@ -137,6 +137,9 @@ end
 
 function CreateUI(isReplay)
 
+    -- prevents the nvidia stuttering bug with their more recent drivers
+    ConExecute('d3d_WindowsCursor on')  
+
     -- keep track of the original focus army
     import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
 
