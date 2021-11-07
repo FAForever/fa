@@ -23,12 +23,22 @@ Patch 3726 (26th November, 2021)
 ### Stability
  - (#3477) Prevent clearing critical state in AI functions
  - (#3490) Refactor the init files of the game
-    This is an involved change but one that was due. The init files
-    were loading in content that could clash and they were hard to
-    maintain in general. They're now refactored with clear shared sections
-    of code. Sadly - no shared init file is deployable. This will make
-    future changes to the be a breeze, such as blocking a mod that
-    we integrate into the game.
+    This is an involved change but one that was due. 
+    
+    The init files can no longer load in content that clash between
+    the base game files or between older versions of the same mod.
+    This could also occur when the mod was not activated.
+
+    The client supports loading content from a separate vault
+    location, the init files need to support this functionality
+    accordingly. The init files of the game types FAF, FAF Beta
+    and FAF Develop support this functionality. Other game types 
+    need to be updated accordingly.
+
+    Adds icon support to FAF Beta.
+
+    Adds the ability to more easily block content that is integrated.
+ - (#3527) 
 
 ### Bug
  - (#3522) Fix upvalue issue of patch 3721
@@ -105,7 +115,8 @@ Patch 3726 (26th November, 2021)
  - Uveso (#3477)
  - Rowey (#3475)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
-        #3522, #3512, #3440, #3419, #3525, #3526, #3490)
+        #3522, #3512, #3440, #3419, #3525, #3526, #3490,
+        #3527)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
