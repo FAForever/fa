@@ -35,6 +35,13 @@ Patch 3726 (26th November, 2021)
     and FAF Develop support this functionality. Other game types 
     need to be updated accordingly.
 
+    The vault location determined by the client is used to load in
+    content (maps / mods). Any other location is no longer read and
+    therefore any map / mod in the other locations are not found
+    by the game. If after this patch you 'lost' a few of your
+    maps and / or mods it means that they were in an old vault 
+    location - you'd need to move those manually.
+
     Adds icon support to FAF Beta.
 
     Adds the ability to more easily block content that is integrated.
