@@ -81,13 +81,21 @@ Patch 3726 (26th November, 2021)
     AI code was being run during every game even when no AI was present in
     said game. After discussing it with the AI devs this pull requests
     completely removes the threat computations.
+ - (#3419) Reduce impact on sim of common hover emitter effects
+    Effects have an impact on the sim, in particular when they create a 
+    particle. Once the particles exist they appear to be free of charge. 
+    With this PR we reduced the number of particles created for various 
+    units such as the Aeon T1 engineer to bring them into the same cost
+    range (sim wise) as the other engineers, without impacting their
+    visual appearance too much. Disables the hover effects of these units
+    all together when playing on low fidelity.
 
 ### Contributors
  - Askaholic (#3417, #3440)
- - Madmax (#3420)
+ - Madmax (#3420, #3419)
  - Uveso (#3477)
  - Rowey (#3475)
- - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522, #3512, #3440)
+ - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, #3522, #3512, #3440, #3419)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
