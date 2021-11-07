@@ -55,23 +55,7 @@ end
 
 -- mods that have been integrated, based on folder name 
 local integratedMods = { }
-integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
-
--- typical FAF packages
-local allowedAssetsNx2 = { }
-allowedAssetsNx2["effects.nx2"] = true
-allowedAssetsNx2["env.nx2"] = true
-allowedAssetsNx2["etc.nx2"] = true
-allowedAssetsNx2["loc.nx2"] = true
-allowedAssetsNx2["lua.nx2"] = true
-allowedAssetsNx2["meshes.nx2"] = true
-allowedAssetsNx2["mods.nx2"] = true
-allowedAssetsNx2["projectiles.nx2"] = true
-allowedAssetsNx2["schook.nx2"] = true
-allowedAssetsNx2["textures.nx2"] = true
-allowedAssetsNx2["units.nx2"] = true
-allowedAssetsNx2 = LowerHashTable(allowedAssetsNx2)
 
 -- typical FA packages
 local allowedAssetsScd = { }
@@ -105,6 +89,7 @@ allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 local allowedAssetsNxt = { }
 allowedAssetsNxt["texturepack.nxt"] = true
 allowedAssetsNxt["advanced strategic icons.nxt"] = true
+allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
 allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
 
 -- default wave banks to prevent collisions
@@ -158,8 +143,8 @@ end
 --- Mounts all allowed content in a directory, including scd and zip files, directly.
 -- @param dir The absolute path to the directory
 -- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountAllowedContent(dir, allowedAssets)
-    for _,entry in IoDir(dir .. '/*') do
+local function MountAllowedContent(dir, pattern, allowedAssets)
+    for _,entry in IoDir(dir .. pattern) do
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
             if allowedAssets[mp] then 
@@ -272,7 +257,7 @@ local function MountMapContent(dir)
                 -- else, mount folder
                 else
                     LOG("Mounting movies of map: " .. map )
-                    MountDirectory(dir..map..'/movies', '/movies')
+                    MountDirectory(dir .. "/" .. map .. '/movies', '/movies')
                 end
             elseif folder == 'sounds' then
                 -- find conflicting files
@@ -293,7 +278,7 @@ local function MountMapContent(dir)
                 -- else, mount folder
                 else
                     LOG("Mounting sounds of map: " .. map )
-                    MountDirectory(dir..map..'/sounds', '/sounds')
+                    MountDirectory(dir.. "/" .. map .. '/sounds', '/sounds')
                 end
             end
         end
@@ -376,7 +361,7 @@ local function MountModContent(dir)
                 -- else, mount folder
                 else
                     LOG("Mounting sounds in mod: " .. mod )
-                    MountDirectory(dir .. mod .. '/sounds', '/sounds')
+                    MountDirectory(dir .. "/" .. mod .. '/sounds', '/sounds')
                 end
             end
 
@@ -406,29 +391,3 @@ local function LoadVaultContent(path)
 end
 
 -- END OF COPY --
-
--- load maps / mods from custom vault location, if set by client
-if custom_vault_path then
-	LOG('Loading custom vault path' .. custom_vault_path)
-	LoadVaultContent(custom_vault_path)
-else
-    LOG("No custom vault path defined: loading from backup locations. You should update your client to 2021/10/+.")
-    -- load maps / mods from backup vault location location
-    LoadVaultContent(InitFileDir .. '/../user/My Games/Gas Powered Games/Supreme Commander Forged Alliance')
-    -- load maps / mods from my documents vault location
-    LoadVaultContent(SHGetFolderPath('PERSONAL') .. 'My Games/Gas Powered Games/Supreme Commander Forged Alliance')
-end
-
--- load in .nxt / .nx2 / .scd files that we allow
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx2', allowedAssetsNx2)
-MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
-
--- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar
-MountDirectory(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance', '/preferences')
-
--- Load in all the data of the steam installation (movies, maps, sound folders)
-MountDirectory(fa_path .. "/movies", '/movies')
-MountDirectory(fa_path .. "/sounds", '/sounds')
-MountDirectory(fa_path .. "/maps", '/maps')
-MountDirectory(fa_path .. "/fonts", '/fonts')
