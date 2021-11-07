@@ -55,6 +55,7 @@ end
 
 -- mods that have been integrated, based on folder name 
 local integratedMods = { }
+integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
 -- typical FA packages
