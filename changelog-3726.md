@@ -92,6 +92,13 @@ Patch 3726 (26th November, 2021)
     computation is gibberish anyhow.
  - (#3526) Remove the curated maps button until an alternative is available
  - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is
+ - (#3531) Add an option to scale down the UI (to 80%) for low resolution monitors
+    This doesn't appear to be an issue at first due to the infinite 
+    zoom but when the score board takes up 50% of your screen due to a
+    1024x720 resolution then it suddenly is.
+
+    Not all of the UI can manage this - please report issues in #game-general
+    in the FAF discord when you find them.
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -124,7 +131,7 @@ Patch 3726 (26th November, 2021)
  - Rowey (#3475, #3528)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
-        #3527)
+        #3527, #3531)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
