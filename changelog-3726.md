@@ -91,6 +91,7 @@ Patch 3726 (26th November, 2021)
     when more than (or less than) two teams are involved. Hence, the 
     computation is gibberish anyhow.
  - (#3526) Remove the curated maps button until an alternative is available
+ - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -120,7 +121,7 @@ Patch 3726 (26th November, 2021)
  - Askaholic (#3417, #3440)
  - Madmax (#3420, #3419)
  - Uveso (#3477)
- - Rowey (#3475)
+ - Rowey (#3475, #3528)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527)
