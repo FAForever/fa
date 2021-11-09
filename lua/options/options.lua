@@ -305,6 +305,7 @@ options = {
                 default = 1.0,
                 custom = {
                     states = {
+                        {text = "80%", key = 0.8,},
                         {text = "100%", key = 1.0,},
                         {text = "125%", key = 1.25,},
                         {text = "150%", key = 1.5,},
