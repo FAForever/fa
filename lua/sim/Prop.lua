@@ -10,8 +10,29 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 
 local minimumLabelMass = 10
 
+-- upvalue globals for performance
+local type = type
+local Warp = Warp
+local GetTerrainHeight = GetTerrainHeight
+
+-- upvalue moho functions for performance
+local EntityMethods = moho.entity_methods
+local EntityGetEntityId = EntityMethods.GetEntityId
+local EntityGetBlueprint = EntityMethods.GetBlueprint
+local EntityGetPosition = EntityMethods.GetPosition
+
+-- upvalue trashbag functions for performance
+local TrashBag = TrashBag
+
+-- upvalue math functions for performance
+local MathMax = math.max
+
+-- upvalue table functions for performance
+local TableInsert = table.insert
+
 Prop = Class(moho.prop_methods, Entity) {
-    -- Do not call the base class __init and __post_init, we already have a c++ object
+
+    -- override __init and __post_init to prevent creating an additional C++ object
     __init = function(self, spec)
     end,
 
@@ -19,59 +40,78 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnCreate = function(self)
-        self.EventCallbacks = {
-            OnKilled = {},
-            OnReclaimed = {},
-        }
-        Entity.OnCreate(self)
-        self.Trash = TrashBag()
-        local bp = self:GetBlueprint()
-        local economy = bp.Economy
 
-        -- These values are used in world props like rocks / stones / trees
-        local unitWreck = bp.UnitWreckage
-        if not unitWreck then -- This function is called from Wreckage.lua, don't call twice
-            local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1 -- Set by some maps to reduce the value of starting non-wreck reclaim
-            self:SetMaxReclaimValues(
+        -- # Caching
+
+        self.Trash = TrashBag()
+        self.EntityId = EntityGetEntityId(self)
+        self.Blueprint = EntityGetBlueprint(self)
+        self.CachePosition = EntityGetPosition(self)
+        self.MaxHealth = MathMax(50, bp.Defense.MaxHealth)
+        
+        self.EventCallbacks = { }
+
+        -- # Reclaim values
+
+        -- used by typical props, wrecks have their own mechanism to set its value
+        if not bp.UnitWreckage then 
+            local economy = bp.Economy
+
+            -- set by some adaptive maps to influence how much a prop is worth
+            local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1 
+
+            self.SetMaxReclaimValues(self,
                 economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
                 (economy.ReclaimMassMax * modifier) or 0,
                 (economy.ReclaimEnergyMax * modifier) or 0
             )
         end
 
-        -- Correct to terrain, just to be sure
-        local pos = self:GetPosition()
-        local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
-        if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
-            pos[2] = terrainAltitude
-            Warp(self, pos) -- Warp the prop to the surface. We never want things hiding underground!
+        -- # Terrain correction
+
+        -- Find props that, for some reason, are below ground at their central bone
+        local terrainAltitude = GetTerrainHeight(self.CachePosition[1], self.CachePosition[3])
+        if self.CachePosition[2] < terrainAltitude then 
+            self.CachePosition[2] = terrainAltitude
+
+            -- Warp the prop to the surface. We never want things hiding underground!
+            Warp(self, self.CachePosition) 
         end
 
-        self.CachePosition = pos
+        -- # Set health and status
 
-        local max = math.max(50, bp.Defense.MaxHealth)
-        self:SetMaxHealth(max)
-        self:SetHealth(self, max)
-        self:SetCanTakeDamage(not EntityCategoryContains(categories.INVULNERABLE, self))
-        self:SetCanBeKilled(true)
+        self.SetMaxHealth(self, self.MaxHealth)
+        self.SetHealth(self, self, self.MaxHealth)
+        self.CanTakeDamage = not EntityCategoryContains(categories.INVULNERABLE, self)
+        self.CanBeKilled = true
     end,
 
-    AddPropCallback = function(self, fn, type)
-        if not fn then
-            error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
-            return
-        end
-        table.insert(self.EventCallbacks[type], fn)
+    --- Adds a prop callback.
+    -- @param self The prop itself.
+    -- @param fn The function to call with the prop as its first argument and an optional second argument.
+    -- @param type When the function should be called (OnKilled, OnReclaimed)
+    AddPropCallback = function(self, fn, when)
+        local callbacks = self.EventCallbacks[when] or { }
+        self.EventCallbacks[when] = callbacks
+        TableInsert(callbacks, fn)
     end,
 
-    DoPropCallbacks = function(self, type, param)
-        if self.EventCallbacks[type] then
-            for num, cb in self.EventCallbacks[type] do
+    --- Performs prop callbacks
+    -- @param self The prop itself.
+    -- @param when The callbacks to run.
+    -- @param param An additional parameter to feed into the callbacks.
+    DoPropCallbacks = function(self, when, param)
+        local callbacks = self.EventCallbacks[when]
+        if callbacks then
+            for num, cb in callbacks do
                 cb(self, param)
             end
         end
     end,
 
+    --- Removes all prop callbacks with the same function reference.
+    -- @param self The prop itself.
+    -- @param fn The function to remove.
     RemoveCallback = function(self, fn)
         for k, v in self.EventCallbacks do
             if type(v) == "table" then
@@ -86,7 +126,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     -- Returns the cache position of the prop, since it doesn't move, it's a big optimization
     GetCachePosition = function(self)
-        return self.CachePosition or self:GetPosition()
+        return self.CachePosition
     end,
 
     -- Sets if the unit can take damage.  val = true means it can take damage.
