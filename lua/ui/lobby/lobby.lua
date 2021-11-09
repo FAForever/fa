@@ -3475,12 +3475,12 @@ function CreateUI(maxPlayers)
 
     if singlePlayer then
         GUI.restrictedUnitsOrPresetsBtn:Hide()
-    --elseif isHost then
-    --    GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0424>Presets"))
-    --    GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
-    --        ShowPresetDialog()
-    --    end
-    --    Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'Lobby_presetDescription')
+    elseif isHost then
+        GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0424>Presets"))
+        GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
+            ShowPresetDialog()
+        end
+        Tooltip.AddButtonTooltip(GUI.restrictedUnitsOrPresetsBtn, 'Lobby_presetDescription')
     else
         GUI.restrictedUnitsOrPresetsBtn.label:SetText(LOC("<LOC lobui_0332>Unit Manager"))
         GUI.restrictedUnitsOrPresetsBtn.OnClick = function(self, modifiers)
@@ -5853,326 +5853,327 @@ end
 
 --- Delegate to UIUtil's CreateInputDialog, adding the ridiculus chatEdit hack.
 function CreateInputDialog(parent, title, listener, str)
-   UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit, str)
+    UIUtil.CreateInputDialog(parent, title, listener, GUI.chatEdit, str)
 end
 
--- Show the lobby preset UI. 
+-- Show the lobby preset UI.
 function ShowPresetDialog()
-   local dialogContent = Group(GUI)
-   LayoutHelpers.SetDimensions(dialogContent, 600, 530)
+    local dialogContent = Group(GUI)
+    LayoutHelpers.SetDimensions(dialogContent, 600, 530)
 
-   local presetDialog = Popup(GUI, dialogContent)
-   presetDialog.OnClosed = presetDialog.Destroy
-   GUI.presetDialog = presetDialog
+    local presetDialog = Popup(GUI, dialogContent)
+    presetDialog.OnClosed = presetDialog.Destroy
+    GUI.presetDialog = presetDialog
 
-   -- Title
-   local titleText = UIUtil.CreateText(dialogContent, LOC('<LOC tooltipui0694>Lobby Presets'), 17, 'Arial Gras', true)
-   LayoutHelpers.AtHorizontalCenterIn(titleText, dialogContent, 0)
-   LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
+    -- Title
+    local titleText = UIUtil.CreateText(dialogContent, LOC('<LOC tooltipui0694>Lobby Presets'), 17, 'Arial Gras', true)
+    LayoutHelpers.AtHorizontalCenterIn(titleText, dialogContent, 0)
+    LayoutHelpers.AtTopIn(titleText, dialogContent, 10)
 
-   -- Preset List
-   local PresetList = ItemList(dialogContent)
-   PresetList:SetFont(UIUtil.bodyFont, 14)
-   PresetList:ShowMouseoverItem(true)
-   LayoutHelpers.SetDimensions(PresetList, 265, 430)
-   LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
-   LayoutHelpers.AtLeftIn(PresetList, dialogContent, 14)
-   LayoutHelpers.AtTopIn(PresetList, dialogContent, 38)
-   UIUtil.CreateLobbyVertScrollbar(PresetList, 2)
+    -- Preset List
+    local PresetList = ItemList(dialogContent)
+    PresetList:SetFont(UIUtil.bodyFont, 14)
+    PresetList:ShowMouseoverItem(true)
+    LayoutHelpers.SetDimensions(PresetList, 265, 430)
+    LayoutHelpers.DepthOverParent(PresetList, dialogContent, 10)
+    LayoutHelpers.AtLeftIn(PresetList, dialogContent, 14)
+    LayoutHelpers.AtTopIn(PresetList, dialogContent, 38)
+    UIUtil.CreateLobbyVertScrollbar(PresetList, 2)
 
-   -- Info List
-   local InfoList = ItemList(dialogContent)
-   InfoList:SetFont(UIUtil.bodyFont, 11)
-   InfoList:SetColors(nil, "00000000")
-   InfoList:ShowMouseoverItem(true)
-   LayoutHelpers.SetDimensions(InfoList, 281, 430)
-   LayoutHelpers.RightOf(InfoList, PresetList, 26)
+    -- Info List
+    local InfoList = ItemList(dialogContent)
+    InfoList:SetFont(UIUtil.bodyFont, 11)
+    InfoList:SetColors(nil, "00000000")
+    InfoList:ShowMouseoverItem(true)
+    LayoutHelpers.SetDimensions(InfoList, 281, 430)
+    LayoutHelpers.RightOf(InfoList, PresetList, 26)
 
-   -- Quit button
-   local QuitButton = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close')
-   LayoutHelpers.AtRightIn(QuitButton, dialogContent, 1)
-   LayoutHelpers.AtTopIn(QuitButton, dialogContent, 1)
+    -- Quit button
+    local QuitButton = UIUtil.CreateButtonStd(dialogContent, '/dialogs/close_btn/close')
+    LayoutHelpers.AtRightIn(QuitButton, dialogContent, 1)
+    LayoutHelpers.AtTopIn(QuitButton, dialogContent, 1)
 
-   -- Load button
-   local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Load>Load")
-   LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -2)
-   LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 10)
-   LoadButton:Disable()
+    -- Load button
+    local LoadButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Load>Load")
+    LayoutHelpers.AtLeftIn(LoadButton, dialogContent, -2)
+    LayoutHelpers.AtBottomIn(LoadButton, dialogContent, 10)
+    LoadButton:Disable()
 
-   -- Create button. Occupies the same space as the load button, when available.
-   local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Create>Create")
-   LayoutHelpers.RightOf(CreateButton, LoadButton, 28)
+    -- Create button. Occupies the same space as the load button, when available.
+    local CreateButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Create>Create")
+    LayoutHelpers.RightOf(CreateButton, LoadButton, 28)
 
-   -- Save button
-   local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Save>Save")
-   LayoutHelpers.RightOf(SaveButton, CreateButton, 28)
-   SaveButton:Disable()
+    -- Save button
+    local SaveButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Save>Save")
+    LayoutHelpers.RightOf(SaveButton, CreateButton, 28)
+    SaveButton:Disable()
 
-   -- Delete button
-   local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Delete>Delete")
-   LayoutHelpers.RightOf(DeleteButton, SaveButton, 28)
-   DeleteButton:Disable()
+    -- Delete button
+    local DeleteButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "<LOC _Delete>Delete")
+    LayoutHelpers.RightOf(DeleteButton, SaveButton, 28)
+    DeleteButton:Disable()
 
-   LoadButton.OnClick = function(self)
-       LoadPreset(PresetList:GetSelection() + 1)
-   end
+    LoadButton.OnClick = function(self)
+        LoadPreset(PresetList:GetSelection() + 1)
+    end
 
-   QuitButton.OnClick = function(self)
-       presetDialog:Hide()
-   end
+    QuitButton.OnClick = function(self)
+        presetDialog:Hide()
+    end
 
-   CreateButton.OnClick = function(self)
-       local dialogComplete = function(self, presetName)
-           if not presetName or presetName == "" then
-               return
-           end
-           local profiles = LoadPresetsList()
-           table.insert(profiles, GetPresetFromSettings(presetName))
-           SavePresetsList(profiles)
+    CreateButton.OnClick = function(self)
+        local dialogComplete = function(self, presetName)
+            if not presetName or presetName == "" then
+                return
+            end
+            local profiles = LoadPresetsList()
+            table.insert(profiles, GetPresetFromSettings(presetName))
+            SavePresetsList(profiles)
 
-           RefreshAvailablePresetsList(PresetList)
+            RefreshAvailablePresetsList(PresetList)
 
-           PresetList:SetSelection(0)
-           PresetList:OnClick(0)
-       end
+            PresetList:SetSelection(0)
+            PresetList:OnClick(0)
+        end
 
-       CreateInputDialog(GUI, "<LOC tooltipui0704>Select name for new preset", dialogComplete)
-   end
+        CreateInputDialog(GUI, "<LOC tooltipui0704>Select name for new preset", dialogComplete)
+    end
 
-   SaveButton.OnClick = function(self)
-       local selectedPreset = PresetList:GetSelection() + 1
+    SaveButton.OnClick = function(self)
+        local selectedPreset = PresetList:GetSelection() + 1
 
-       SavePreset(selectedPreset)
-       ShowPresetDetails(selectedPreset, InfoList)
-   end
+        SavePreset(selectedPreset)
+        ShowPresetDetails(selectedPreset, InfoList)
+    end
 
-   DeleteButton.OnClick = function(self)
-       local profiles = LoadPresetsList()
+    DeleteButton.OnClick = function(self)
+        local profiles = LoadPresetsList()
 
-       -- Converting between zero-based indexing in the list and the table indexing...
-       table.remove(profiles, PresetList:GetSelection() + 1)
+        -- Converting between zero-based indexing in the list and the table indexing...
+        table.remove(profiles, PresetList:GetSelection() + 1)
 
-       SavePresetsList(profiles)
-       RefreshAvailablePresetsList(PresetList)
+        SavePresetsList(profiles)
+        RefreshAvailablePresetsList(PresetList)
 
-       -- And clear the detail view.
-       InfoList:DeleteAllItems()
-   end
+        -- And clear the detail view.
+        InfoList:DeleteAllItems()
+    end
 
-   -- Called when the selected item in the preset list changes.
-   local onListItemChanged = function(self, row)
-       ShowPresetDetails(row + 1, InfoList)
-       LoadButton:Enable()
-       SaveButton:Enable()
-       DeleteButton:Enable()
-   end
+    -- Called when the selected item in the preset list changes.
+    local onListItemChanged = function(self, row)
+        ShowPresetDetails(row + 1, InfoList)
+        LoadButton:Enable()
+        SaveButton:Enable()
+        DeleteButton:Enable()
+    end
 
-   -- Because GPG's event model is painfully retarded..
-   PresetList.OnKeySelect = onListItemChanged
-   PresetList.OnClick = function(self, row, event)
-       self:SetSelection(row)
-       onListItemChanged(self, row)
-   end
+    -- Because GPG's event model is painfully retarded..
+    PresetList.OnKeySelect = onListItemChanged
+    PresetList.OnClick = function(self, row, event)
+        self:SetSelection(row)
+        onListItemChanged(self, row)
+    end
 
-   PresetList.OnDoubleClick = function(self, row)
-       LoadPreset(row + 1)
-   end
+    PresetList.OnDoubleClick = function(self, row)
+        LoadPreset(row + 1)
+    end
 
-   -- When the user double-clicks on a metadata field, give them a popup to change its value.
-   InfoList.OnDoubleClick = function(self, row)
-       -- Closure copy, accounting for zero-based indexing in ItemList.
-       local theRow = row + 1
+    -- When the user double-clicks on a metadata field, give them a popup to change its value.
+    InfoList.OnDoubleClick = function(self, row)
+        -- Closure copy, accounting for zero-based indexing in ItemList.
+        local theRow = row + 1
 
-       local nameChanged = function(self, str)
-           if str == "" then
-               return
-           end
+        local nameChanged = function(self, str)
+            if str == "" then
+                return
+            end
 
-           local profiles = LoadPresetsList()
-           profiles[theRow].Name = str
-           SavePresetsList(profiles)
+            local profiles = LoadPresetsList()
+            profiles[theRow].Name = str
+            SavePresetsList(profiles)
 
-           -- Update the name displayed in the presets list, preserving selection.
-           local lastselect = PresetList:GetSelection()
-           RefreshAvailablePresetsList(PresetList)
-           PresetList:SetSelection(lastselect)
+            -- Update the name displayed in the presets list, preserving selection.
+            local lastselect = PresetList:GetSelection()
+            RefreshAvailablePresetsList(PresetList)
+            PresetList:SetSelection(lastselect)
 
-           ShowPresetDetails(theRow, InfoList)
-       end
+            ShowPresetDetails(theRow, InfoList)
+        end
 
-       if row == 0 then
-           CreateInputDialog(GUI, "Rename your preset", nameChanged)
-       end
-   end
+        if row == 0 then
+            CreateInputDialog(GUI, "Rename your preset", nameChanged)
+        end
+    end
 
-   -- Show the "Double-click to edit" tooltip when the user mouses-over an editable field.
-   InfoList.OnMouseoverItem = function(self, row)
-       -- Determine which metadata cell they moused-over, if any.
-       local metadataType
-       -- For now, only name is editable. A nice mechanism to edit game preferences seems plausible.
-       if row == 0 then
-           metadataType = "Preset name"
-       else
-           Tooltip.DestroyMouseoverDisplay()
-           return
-       end
+    -- Show the "Double-click to edit" tooltip when the user mouses-over an editable field.
+    InfoList.OnMouseoverItem = function(self, row)
+        -- Determine which metadata cell they moused-over, if any.
+        local metadataType
+        -- For now, only name is editable. A nice mechanism to edit game preferences seems plausible.
+        if row == 0 then
+            metadataType = "Preset name"
+        else
+            Tooltip.DestroyMouseoverDisplay()
+            return
+        end
 
-       local tooltip = {
-           text = metadataType,
-           body = "Double-click to edit"
-       }
+        local tooltip = {
+            text = metadataType,
+            body = "Double-click to edit"
+        }
 
-       Tooltip.CreateMouseoverDisplay(self, tooltip, 0, true)
-   end
+        Tooltip.CreateMouseoverDisplay(self, tooltip, 0, true)
+    end
 
-   RefreshAvailablePresetsList(PresetList)
-   if PresetList:GetItemCount() == 0 then
-       CreateHelpWindow()
-   end
+    RefreshAvailablePresetsList(PresetList)
+    if PresetList:GetItemCount() == 0 then
+        CreateHelpWindow()
+    end
 end
 
 function CreateHelpWindow()
-   local dialogContent = Group(GUI)
-   LayoutHelpers.SetDimensions(dialogContent, 420, 225)
+    local dialogContent = Group(GUI)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 225)
 
-   local helpWindow = Popup(GUI, dialogContent)
+    local helpWindow = Popup(GUI, dialogContent)
 
-   -- Help textfield
-   local textArea = TextArea(dialogContent, 400, 163)
-   LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
-   LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
-   textArea:SetText(LOC("<LOC tooltipui0706>This dialog allows you to save a snapshot of the current game configuration and reload it later.\n\nOnce the game settings are as you want them, use the \"Create\" button on this dialog to store it. You can reload the stored configuration by selecting it and pressing the \"Load\" button.\n\nThe \"Save\" button will overwrite a selected existing preset with the current configuration."))
+    -- Help textfield
+    local textArea = TextArea(dialogContent, 400, 163)
+    LayoutHelpers.AtLeftIn(textArea, dialogContent, 13)
+    LayoutHelpers.AtTopIn(textArea, dialogContent, 10)
+    textArea:SetText(LOC("<LOC tooltipui0706>This dialog allows you to save a snapshot of the current game configuration and reload it later.\n\nOnce the game settings are as you want them, use the \"Create\" button on this dialog to store it. You can reload the stored configuration by selecting it and pressing the \"Load\" button.\n\nThe \"Save\" button will overwrite a selected existing preset with the current configuration."))
 
-   -- OK button
-   local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
-   LayoutHelpers.AtHorizontalCenterIn(OkButton, dialogContent)
-   LayoutHelpers.AtBottomIn(OkButton, dialogContent, 8)
-   OkButton.OnClick = function(self)
-       helpWindow:Close()
-   end
+    -- OK button
+    local OkButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Ok")
+    LayoutHelpers.AtHorizontalCenterIn(OkButton, dialogContent)
+    LayoutHelpers.AtBottomIn(OkButton, dialogContent, 8)
+    OkButton.OnClick = function(self)
+        helpWindow:Close()
+    end
 end
 
 -- Refresh list of presets
 function RefreshAvailablePresetsList(PresetList)
-   local profiles = LoadPresetsList()
-   PresetList:DeleteAllItems()
+    local profiles = LoadPresetsList()
+    PresetList:DeleteAllItems()
 
-   for k, v in profiles do
-       PresetList:AddItem(v.Name)
-   end
+    for k, v in profiles do
+        PresetList:AddItem(v.Name)
+    end
 end
 
 -- Update the right-hand panel of the preset dialog to show the contents of the currently selected
 -- profile (passed by name as a parameter)
 function ShowPresetDetails(preset, InfoList)
-   local profiles = LoadPresetsList()
-   InfoList:DeleteAllItems()
-   InfoList:AddItem('Preset Name: ' .. profiles[preset].Name)
+    local profiles = LoadPresetsList()
+    InfoList:DeleteAllItems()
+    InfoList:AddItem('Preset Name: ' .. profiles[preset].Name)
 
-   if DiskGetFileInfo(profiles[preset].MapPath) then
-       InfoList:AddItem('Map: ' .. profiles[preset].MapName)
-   else
-       InfoList:AddItem('Map: Unavailable (' .. profiles[preset].MapName .. ')')
-   end
+    if DiskGetFileInfo(profiles[preset].MapPath) then
+        InfoList:AddItem('Map: ' .. profiles[preset].MapName)
+    else
+        InfoList:AddItem('Map: Unavailable (' .. profiles[preset].MapName .. ')')
+    end
 
-   InfoList:AddItem('')
+    InfoList:AddItem('')
 
-   -- For each mod, look up its name and pretty-print it.
-   local allMods = Mods.AllMods()
-   for modId, v in profiles[preset].GameMods do
-       if v then
-           InfoList:AddItem('Mod: ' .. allMods[modId].name)
-       end
-   end
+    -- For each mod, look up its name and pretty-print it.
+    local allMods = Mods.AllMods()
+    for modId, v in profiles[preset].GameMods do
+        if v then
+            InfoList:AddItem('Mod: ' .. allMods[modId].name)
+        end
+    end
 
-   InfoList:AddItem('')
-   InfoList:AddItem('Settings :')
-   for k, v in sortedpairs(profiles[preset].GameOptions) do
-       InfoList:AddItem('- '..k..' : '..tostring(v))
-   end
+    InfoList:AddItem('')
+    InfoList:AddItem('Settings :')
+    for k, v in sortedpairs(profiles[preset].GameOptions) do
+        InfoList:AddItem('- '..k..' : '..tostring(v))
+    end
 end
 
 -- Create a preset table representing the current configuration.
 function GetPresetFromSettings(presetName)
-   -- Since GameOptions may only contain strings and ints, some added tables need to be removed before storing
-   local cleanGameOptions = table.copy(gameInfo.GameOptions)
-   cleanGameOptions.ClanTags = nil
-   cleanGameOptions.Ratings = nil
+    -- Since GameOptions may only contain strings and ints, some added tables need to be removed before storing
+    local cleanGameOptions = table.copy(gameInfo.GameOptions)
+    cleanGameOptions.ClanTags = nil
+    cleanGameOptions.Ratings = nil
 
-   -- Since PlayerOptions may only contain strings and ints, some added tables need to be removed before storing
-   local cleanPlayerOptions = table.copy(gameInfo.PlayerOptions)
-   cleanPlayerOptions.AsTable = nil
-   cleanPlayerOptions.isEmpty = nil
-   cleanPlayerOptions.pairs = nil
-   cleanPlayerOptions.print = nil
+    -- Since PlayerOptions may only contain strings and ints, some added tables need to be removed before storing
+    local cleanPlayerOptions = table.copy(gameInfo.PlayerOptions)
+    cleanPlayerOptions.AsTable = nil
+    cleanPlayerOptions.isEmpty = nil
+    cleanPlayerOptions.pairs = nil
+    cleanPlayerOptions.print = nil
 
-   return {
-       Name = presetName,
-       MapName = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name,
-       MapPath = gameInfo.GameOptions.ScenarioFile,
-       GameOptions = cleanGameOptions,
-       GameMods = gameInfo.GameMods,
-       PlayerOptions = cleanPlayerOptions
-   }
+    return {
+        Name = presetName,
+        MapName = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile).name,
+        MapPath = gameInfo.GameOptions.ScenarioFile,
+        GameOptions = cleanGameOptions,
+        GameMods = gameInfo.GameMods,
+        PlayerOptions = cleanPlayerOptions
+    }
 end
 
 -- Load the given preset
 function LoadPreset(presetIndex)
-   local preset = LoadPresetsList()[presetIndex]
+    local preset = LoadPresetsList()[presetIndex]
 
-   if not preset.GameOptions.RestrictedCategories then
-       preset.GameOptions.RestrictedCategories = {}
-   end
+    if not preset.GameOptions.RestrictedCategories then
+        preset.GameOptions.RestrictedCategories = {}
+    end
 
-   SetGameOptions(preset.GameOptions, true)
+    SetGameOptions(preset.GameOptions, true)
 
-   rehostPlayerOptions = preset.PlayerOptions
-   selectedSimMods = preset.GameMods
-   HostUtils.UpdateMods()
+    rehostPlayerOptions = preset.PlayerOptions
+    selectedSimMods = preset.GameMods
+    HostUtils.UpdateMods()
 
-   if GUI.presetDialog then
-       GUI.presetDialog:Hide()
-   end
-   UpdateGame()
+    if GUI.presetDialog then
+        GUI.presetDialog:Hide()
+    end
+    UpdateGame()
 end
 
 function LoadPresetByName(name)
-   local presets = LoadPresetsList()
-   for index, preset in ipairs(presets) do
-       if preset.Name == name then
-           LoadPreset(index)
-           break
-       end
-   end
+    local presets = LoadPresetsList()
+    for index, preset in ipairs(presets) do
+        if preset.Name == name then
+            LoadPreset(index)
+            break
+        end
+    end
 end
 
 -- Write the current settings to the given preset profile index
 function SavePreset(index)
-   local presets = LoadPresetsList()
+    local presets = LoadPresetsList()
 
-   local selectedPreset = index
-   presets[selectedPreset] = GetPresetFromSettings(presets[selectedPreset].Name)
+    local selectedPreset = index
+    presets[selectedPreset] = GetPresetFromSettings(presets[selectedPreset].Name)
 
-   SavePresetsList(presets)
+    SavePresetsList(presets)
 end
 
 function SavePresetToName(presetName)
-   local presets = LoadPresetsList()
-   local found = false
-   for index, preset in ipairs(presets) do
-       if preset.Name == presetName then
-           presets[index] = GetPresetFromSettings(presetName)
-           found = true
-           break
-       end
-   end
+    local presets = LoadPresetsList()
+    local found = false
+    for index, preset in ipairs(presets) do
+        if preset.Name == presetName then
+            presets[index] = GetPresetFromSettings(presetName)
+            found = true
+            break
+        end
+    end
 
-   if not found then
-       table.insert(presets, GetPresetFromSettings(presetName))
-   end
+    if not found then
+        table.insert(presets, GetPresetFromSettings(presetName))
+    end
 
-   SavePresetsList(presets)
+    SavePresetsList(presets)
 end
+
 -- Find the key for the given value in a table.
 -- Nil keys are not supported.
 function indexOf(table, needle)
