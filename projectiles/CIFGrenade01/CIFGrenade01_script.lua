@@ -7,12 +7,16 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 CIFGrenade01 = Class(CArtilleryProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
+
+        CArtilleryProjectile.OnImpact(self, targetType, targetEntity)
+
+
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        DamageArea( self, pos, radius, 0.25, 'Force', FriendlyFire )
+        -- DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
@@ -24,7 +28,7 @@ CIFGrenade01 = Class(CArtilleryProjectile) {
             CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius, radius, 100, 10, army)
         end
 
-        CArtilleryProjectile.OnImpact(self, targetType, targetEntity)
+
     end,
 
     FxImpactUnit = EffectTemplate.CEMPGrenadeHit01,

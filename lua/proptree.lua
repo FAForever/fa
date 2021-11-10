@@ -24,8 +24,7 @@ Tree = Class(Prop) {
         ChangeState(self, self.FallingState)
     end,
 
-    OnDamage = function(self, instigator, armormod, direction, type)
-        Prop.OnDamage(self, instigator, armormod, direction, type)
+    OnDamage = function(self, instigator, amount, direction, type)
         if type == 'Force' then
             self.Motor = self.Motor or self:FallDown()
             self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
@@ -40,7 +39,7 @@ Tree = Class(Prop) {
         elseif type == 'Disintegrate' then
             self:Destroy()
         else
-            if Random(1, 8) <= 1 then
+            if Random(1, 10) <= 2 then
                 ChangeState(self, self.BurningState)
             end
         end
@@ -197,37 +196,39 @@ Tree = Class(Prop) {
 
 TreeGroup = Class(Prop) {
 
+    --- Break when colliding with a projectile of some sort
     OnCollisionCheck = function(self, other)
-        self:Breakup()
+        self.Breakup(self)
         return false
     end,
 
+    --- Break when colliding with something / someone
     OnCollision = function(self, other, vec)
-        self:Breakup()
+        self.Breakup(self)
     end,
 
-    OnDamage = function(self, instigator, armormod, direction, type)
-        if type != 'Force' then
-            if Random(1, 10) <= 1 then
-                self:Breakup()
-            end
-        else
-            self:Breakup()
-        end
+    --- Break when receiving damage
+    OnDamage = function(self, instigator, amount, direction, type)
+        self.Breakup(self)
     end,
 
-    Breakup = function(self)
+    --- Breaks up the tree group into smaller trees
+    Breakup = function(self, instigator, amount, direction, type)
+        -- can't do much when we're destroyed
         if self:BeenDestroyed() then
             return
         end
 
-        -- If the blueprint defines a SingleTreeBlueprint, we turn every bone into
-        -- a copy of that blueprint
-        if self:GetBlueprint().SingleTreeBlueprint then
-            return SplitProp(self, self:GetBlueprint().SingleTreeBlueprint)
-        end
+        -- data required to retrieve sub props
+        local props = false
+        local blueprint = self.Blueprint
 
-        -- Otherwise, we use the bone names to create a different prop for each bone
-        return self:SplitOnBonesByName(self:GetBlueprint().SingleTreeDir)
+        -- a group with a single prop type in it
+        if blueprint.SingleTreeBlueprint then
+            props = SplitProp(self, blueprint.SingleTreeBlueprint)
+        -- a group with multiple prop types in it
+        else 
+            props = self:SplitOnBonesByName(blueprint.SingleTreeDir)
+        end
     end,
 }

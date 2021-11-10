@@ -47,15 +47,15 @@ Prop = Class(moho.prop_methods, Entity) {
         self.EntityId = EntityGetEntityId(self)
         self.Blueprint = EntityGetBlueprint(self)
         self.CachePosition = EntityGetPosition(self)
-        self.MaxHealth = MathMax(50, bp.Defense.MaxHealth)
+        self.MaxHealth = MathMax(50, self.Blueprint.Defense.MaxHealth)
         
         self.EventCallbacks = { }
 
         -- # Reclaim values
 
         -- used by typical props, wrecks have their own mechanism to set its value
-        if not bp.UnitWreckage then 
-            local economy = bp.Economy
+        if not self.Blueprint.UnitWreckage then 
+            local economy = self.Blueprint.Economy
 
             -- set by some adaptive maps to influence how much a prop is worth
             local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1 
