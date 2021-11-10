@@ -2,18 +2,19 @@ Patch 3726 (26th November, 2021)
 ============================
 
 ### Features
- - (#3484, #3500) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
+ - (#3484, #3500, #3535) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
     Extractors
-    - 1 click + shift to mass storage an upgrading t1 extractor
-    - 1 click to mass storage a t2 / t3 extractor
+    - 2 clicks + shift to mass storage an upgrading t1 extractor
+    - 2 clicks to mass storage a t2 / t3 extractor
     - 3 clicks + shift to mass fab an upgrading t2 extractor
     - 3 clicks to mass fab cap a t3 extractor
 
     Other structures
-    - 1 click to mass storage cap a t3 fabricator
-    - 1 click to t1 power gen cap a radar
-    - 1 click to t1 power gen cap a t2 artillery
-    - 1 click to wall cap a t1 point defense
+    - 2 clicks + shift to t1 power gen cap an upgrading t1 radar
+    - 2 clicks to t1 power gen cap a t2 / t3 radar
+    - 2 clicks to t1 power gen cap a t2 artillery
+    - 2 clicks to wall cap a t1 point defense
+    - 2 clicks to mass storage cap a t3 fabricator
     
     Assisting behavior
     - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
@@ -27,7 +28,8 @@ Patch 3726 (26th November, 2021)
     
     The init files can no longer load in content that clash between
     the base game files or between older versions of the same mod.
-    This could also occur when the mod was not activated.
+    This could also occur when the mod was not activated for sound
+    and / or movie files.
 
     The client supports loading content from a separate vault
     location, the init files need to support this functionality
