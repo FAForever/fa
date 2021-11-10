@@ -69,14 +69,15 @@ Tree = Class(Prop) {
 
             elseif type == 'Fire' and not self.Burning then 
                 -- fire type damage, slightly higher odds to catch fire
-                if Random(1, 10) <= 2 then
+                if Random(1, 12) <= 2 then
                     self.Burning = true
                     self.Trash:Add(ForkThread(self.BurnThread, self))
                 end
-
-            elseif not self.Burning then
-                -- any other damage type, small chance we catch fire
-                if true or Random(1, 8) <= 1 then
+            end
+            
+            if type ~= 'Force' and not self.Burning then 
+                -- any damage type but force can cause a burn
+                if Random(1, 8) <= 1 then
                     self.Burning = true
                     self.Trash:Add(ForkThread(self.BurnThread, self))
                 end
@@ -98,7 +99,6 @@ Tree = Class(Prop) {
 
         -- destroy remaining effects after a while
         WaitTicks(150)
-        self.Trash:Destroy()
 
         -- make it sink after a while
         WaitTicks(150)
@@ -126,7 +126,7 @@ Tree = Class(Prop) {
         for k, v in FireEffects do
 
             effect = CreateEmitterAtEntity(self, -1, v )
-            effect:OffsetEmitter(0, 0.25, 0)
+            effect:OffsetEmitter(0, 0.15, 0)
             effect:ScaleEmitter(3)
 
             -- keep track
@@ -139,13 +139,12 @@ Tree = Class(Prop) {
 
         -- light splash
         effect = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
-        trash:Add(effect)
 
         -- sounds
         self:PlayPropSound('BurnStart')
         self:PlayPropAmbientSound('BurnLoop')
 
-        -- wait a bit before we change to scorched tree
+        -- wait a bit before we change to a scorched tree
         WaitTicks(50)
         self:SetMesh(self.Blueprint.Display.MeshBlueprintWrecked)
 
@@ -168,7 +167,6 @@ Tree = Class(Prop) {
         -- wait a bit before we make a scorch mark
         WaitTicks(50)
         DefaultExplosions.CreateScorchMarkSplat( self, 0.5, -1 )
-        trash:Add(effect)
 
         -- try and spread the fire
         DamageArea(self, position, 1, 1, 'Fire', true)
@@ -177,14 +175,19 @@ Tree = Class(Prop) {
         self:PlayPropAmbientSound(nil)
 
         -- destroy all effects
-        trash:Destroy()
+        for k = 1, effectsHead - 1 do 
+            effects[k]:Destroy()
+        end
 
         -- add smoke effect removed when the tree is destroyed
         effect = CreateEmitterAtEntity(self, -1, FireEffects[3] )
         effect:ScaleEmitter(1 + Random())
+        self.Trash:Add(effect)
 
-        -- fall down in a random direction
-        self.FallThread(self, Random() * 2 - 1, 0, Random() * 2 - 1, 0.25)
+        -- fall down in a random direction if we didn't before
+        if not self.Fallen then 
+            self.FallThread(self, Random() * 2 - 1, 0, Random() * 2 - 1, 0.25)
+        end
 
     end,
 }
