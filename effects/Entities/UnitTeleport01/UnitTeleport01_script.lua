@@ -41,7 +41,7 @@ UnitTeleportEffect01 = Class(NullShell) {
 
         -- Smoke ring, explosion effects
         CreateLightParticleIntel( self, -1, army, 35, 10, 'glow_02', 'ramp_blue_13' )
-        DamageRing(self, pos, .1, 11, 100, 'Force', false, false)
+        DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
 
         for k, v in EffectTemplate.CommanderTeleport01 do
             CreateEmitterOnEntity( self, army, v )
@@ -54,7 +54,7 @@ UnitTeleportEffect01 = Class(NullShell) {
         CreateDecal(self:GetPosition(), decalOrient, 'Crater05_normals', '', 'Normals', 12, 12, 500, 600, army)
 
 		WaitSeconds(.1)
-        DamageRing(self, pos, .1, 11, 100, 'Force', false, false)
+        DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
 
 		-- Knockdown force rings
         WaitSeconds(0.39)
