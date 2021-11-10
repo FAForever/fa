@@ -205,6 +205,7 @@ Prop = Class(moho.prop_methods, Entity) {
         local health = self:GetHealth()
         if health <= 0 then
             if damageType == 'Reclaimed' then
+                LOG("Reclaimed!")
                 self:Destroy()
             else
                 local excessDamageRatio = 0.0

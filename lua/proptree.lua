@@ -73,6 +73,9 @@ Tree = Class(Prop) {
                     self.Burning = true
                     self.Trash:Add(ForkThread(self.BurnThread, self))
                 end
+            elseif type == "Reclaimed" then 
+                -- oh noes!
+                self:Destroy()
             end
             
             if type ~= 'Force' and not self.Burning then 
@@ -136,6 +139,11 @@ Tree = Class(Prop) {
             -- add it to trash bag
             trash:Add(effect)
         end
+
+        -- add randomness to direction of smoke
+        local r = Random()
+        effects[3]:SetEmitterCurveParam("XDIR_CURVE", 0.005 + 0.02 * r, 0.01)
+        effects[3]:SetEmitterCurveParam("ZDIR_CURVE", 0.005 + 0.02 * r, 0.01)
 
         -- light splash
         effect = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
