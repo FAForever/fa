@@ -24,47 +24,68 @@ UnitTeleportEffect01 = Class(NullShell) {
         local pos = self:GetPosition()
         pos[2] = GetSurfaceHeight(pos[1], pos[3]) - 2
 
+        -- initial effect
         for k, v in EffectTemplate.CSGTestEffect2 do
             CreateEmitterOnEntity( self, army, v )
         end
 
-        -- Initial light flashs
-        CreateLightParticleIntel( self, -1, army, 18, 4, 'flare_lens_add_02', 'ramp_blue_13' )
-        WaitSeconds(0.3)
-        CreateLightParticleIntel( self, -1, army, 35, 10, 'flare_lens_add_02', 'ramp_blue_13' )
+        -- initial light flash
+        CreateLightParticleIntel( self, -1, army, 22, 4, 'flare_lens_add_02', 'ramp_blue_13' )
+        DamageRing(self, pos, 0.1, 2, 1, 'Force', false, false)
+        DamageRing(self, pos, 2, 4, 1, 'Fire', false, false)
+
+        WaitSeconds(0.1)
+        DamageRing(self, pos, 2, 4, 1, 'Force', false, false)
+        WaitSeconds(0.1)
+        DamageRing(self, pos, 4, 6, 1, 'Force', false, false)
+        WaitSeconds(0.1)
+
+        CreateLightParticleIntel( self, -1, army, 38, 10, 'flare_lens_add_02', 'ramp_blue_13' )
 
 		--self:CreateEnergySpinner()
         self:CreateQuantumEnergy(army)
 
+        -- knockdown trees
+        for k = 1, 4 do 
+            DamageRing(self, pos, 0.1, 6 + k * 1, 1, 'Force', false, false)
+            WaitSeconds(0.1)
+        end
+
+        DamageRing(self, pos, 2, 7, 1, 'Fire', false, false)
+
 		-- Wait till we want the commander to appear visibily
-		WaitSeconds(1.8)
+		WaitSeconds(1.4)
 
         -- Smoke ring, explosion effects
         CreateLightParticleIntel( self, -1, army, 35, 10, 'glow_02', 'ramp_blue_13' )
         DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
 
         for k, v in EffectTemplate.CommanderTeleport01 do
-            CreateEmitterOnEntity( self, army, v )
+            CreateEmitterOnEntity( self, army, v ):ScaleEmitter(1.20)
         end
-        --self:ForkThread(self.CreateSmokeRing)
+
+        WaitSeconds(0.1)
 
         local decalOrient = RandomFloat(0,2*math.pi)
         CreateDecal(self:GetPosition(), decalOrient, 'nuke_scorch_002_albedo', '', 'Albedo', 28, 28, 500, 600, army)
         CreateDecal(self:GetPosition(), decalOrient, 'Crater05_normals', '', 'Normals', 28, 28, 500, 600, army)
         CreateDecal(self:GetPosition(), decalOrient, 'Crater05_normals', '', 'Normals', 12, 12, 500, 600, army)
 
-		WaitSeconds(.1)
         DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
+        WaitSeconds(0.2)
+		-- knockdown trees
+        for k = 1, 2 do 
+            DamageRing(self, pos, 11, 11 + k, 1, 'Force', false, false)
+            WaitSeconds(0.1)
+        end
 
-		-- Knockdown force rings
-        WaitSeconds(0.39)
-        DamageRing(self, pos, 11, 20, 1, 'Force', false, false)
-        WaitSeconds(.1)
-        DamageRing(self, pos, 11, 20, 1, 'Force', false, false)
-        WaitSeconds(0.5)
+		-- knockdown trees
+        for k = 1, 4 do 
+            DamageRing(self, pos, 11, 13 + k * 2, 1, 'Force', false, false)
+            WaitSeconds(0.1)
+        end
 
         -- Scorch decal and light some trees on fire
-        WaitSeconds(0.3)
         DamageRing(self, pos, 20, 27, 1, 'Fire', false, false)
     end,
 
