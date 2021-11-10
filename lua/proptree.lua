@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     : /lua/proptree.lua
-#**
-#**  Summary  : Class for tree props that can burn and fall down and such
-#**
-#**  Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     : /lua/proptree.lua
+--**
+--**  Summary  : Class for tree props that can burn and fall down and such
+--**
+--**  Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
 local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
 local DefaultExplosions = import('/lua/defaultexplosions.lua')
@@ -221,13 +221,13 @@ TreeGroup = Class(Prop) {
             return
         end
 
-        # If the blueprint defines a SingleTreeBlueprint, we turn every bone into
-        # a copy of that blueprint
+        -- If the blueprint defines a SingleTreeBlueprint, we turn every bone into
+        -- a copy of that blueprint
         if self:GetBlueprint().SingleTreeBlueprint then
             return SplitProp(self, self:GetBlueprint().SingleTreeBlueprint)
         end
 
-        # Otherwise, we use the bone names to create a different prop for each bone
+        -- Otherwise, we use the bone names to create a different prop for each bone
         return self:SplitOnBonesByName(self:GetBlueprint().SingleTreeDir)
     end,
 }
