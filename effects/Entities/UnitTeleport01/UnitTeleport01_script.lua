@@ -31,8 +31,9 @@ UnitTeleportEffect01 = Class(NullShell) {
 
         -- initial light flash
         CreateLightParticleIntel( self, -1, army, 22, 4, 'flare_lens_add_02', 'ramp_blue_13' )
+        DamageRing(self, pos, 0.1, 4, 1, 'Fire', false, false)
+        DamageRing(self, pos, 2, 6, 1, 'Fire', false, false)
         DamageRing(self, pos, 0.1, 2, 1, 'Force', false, false)
-        DamageRing(self, pos, 2, 4, 1, 'Fire', false, false)
 
         WaitSeconds(0.1)
         DamageRing(self, pos, 2, 4, 1, 'Force', false, false)
@@ -41,8 +42,6 @@ UnitTeleportEffect01 = Class(NullShell) {
         WaitSeconds(0.1)
 
         CreateLightParticleIntel( self, -1, army, 38, 10, 'flare_lens_add_02', 'ramp_blue_13' )
-
-		--self:CreateEnergySpinner()
         self:CreateQuantumEnergy(army)
 
         -- knockdown trees

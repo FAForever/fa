@@ -49,6 +49,7 @@ Tree = Class(Prop) {
             if type == 'Force' then
                 if not self.Fallen then 
                     -- change internal state
+                    self.Burning = true
                     self.Fallen = true
                     self.Trash:Add(ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
 
@@ -67,9 +68,10 @@ Tree = Class(Prop) {
                 -- we just got obliterated
                 self:Destroy()
 
-            elseif type == 'Fire' and not self.Burning then 
+            elseif type == 'Fire-override' or (type == 'Fire' and not self.Burning) then 
+
                 -- fire type damage, slightly higher odds to catch fire
-                if Random(1, 12) <= 2 then
+                if Random(1, 14) <= 2 then
                     self.Burning = true
                     self.Trash:Add(ForkThread(self.BurnThread, self))
                 end
@@ -78,7 +80,7 @@ Tree = Class(Prop) {
                 self:Destroy()
             end
             
-            if type ~= 'Force' and not self.Burning then 
+            if type ~= 'Force' and type ~= 'Fire' and not self.Burning and not self.Fallen then 
                 -- any damage type but force can cause a burn
                 if Random(1, 8) <= 1 then
                     self.Burning = true
@@ -100,8 +102,9 @@ Tree = Class(Prop) {
         local motor = self:FallDown()
         motor:Whack(dx, dy, dz, depth, true)
 
-        -- destroy remaining effects after a while
+        -- no longer be able to catch fire after a while
         WaitTicks(150)
+        self.Burning = true 
 
         -- make it sink after a while
         WaitTicks(150)
@@ -143,6 +146,7 @@ Tree = Class(Prop) {
         -- add randomness to direction of smoke
         local r = Random()
         effects[3]:SetEmitterCurveParam("XDIR_CURVE", 0.005 + 0.02 * r, 0.01)
+        effects[3]:SetEmitterCurveParam("YDIR_CURVE", 0.005 + 0.01 * Random(), 0.01)
         effects[3]:SetEmitterCurveParam("ZDIR_CURVE", 0.005 + 0.02 * r, 0.01)
 
         -- light splash
