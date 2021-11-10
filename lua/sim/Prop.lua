@@ -193,6 +193,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnDestroy = function(self)
+        self.Dead = true
         self:UpdateReclaimLeft()
         self.Trash:Destroy()
     end,

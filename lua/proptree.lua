@@ -11,188 +11,183 @@ local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
 local DefaultExplosions = import('/lua/defaultexplosions.lua')
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
+-- upvalue for performance
+local Random = Random
+local WaitTicks = coroutine.yield
+
 Tree = Class(Prop) {
 
+    --- Initialize the tree
+    OnCreate = function (self, spec)
+        Prop.OnCreate(self, spec)
+        self.Burning = false 
+        self.Fallen = false
+        self.Dead = false 
+    end,
+
+    --- Collision check with projectiles
     OnCollisionCheck = function(self, other)
-        return true
+        return not self.Dead
     end,
 
+    --- Collision check with units
     OnCollision = function(self, other, nx, ny, nz, depth)
-        self.Motor = self.Motor or self:FallDown()
-        self.Motor:Whack(nx, ny, nz, depth, true)
-        self:PlayUprootingEffect(other)
-        ChangeState(self, self.FallingState)
+        if not self.Dead then 
+            if not self.Fallen then 
+                -- change internal state
+                self.Fallen = true
+                self.Trash:Add(ForkThread(self.FallThread, self, nx, ny, nz, depth))
+                self:PlayUprootingEffect(other)
+            end
+        end
     end,
 
+    --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
+    -- damage and that the base class is not called accordingly.
     OnDamage = function(self, instigator, amount, direction, type)
-        if type == 'Force' then
-            self.Motor = self.Motor or self:FallDown()
-            self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
-            local bp = self:GetBlueprint()
-            self:SetMesh(bp.Display.MeshBlueprintWrecked)
-            ChangeState(self, self.FallingState)
-        elseif type == 'Nuke' then
-            if Random(1, 250) < 5 then
-                ChangeState(self, self.BurningState)
-                self.BurnFromNuke = true
-            end
-        elseif type == 'Disintegrate' then
-            self:Destroy()
-        else
-            if Random(1, 10) <= 2 then
-                ChangeState(self, self.BurningState)
+        if not self.Dead then 
+            if type == 'Force' then
+                if not self.Fallen then 
+                    -- change internal state
+                    self.Fallen = true
+                    self.Trash:Add(ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
+
+                    -- change the mesh
+                    self:SetMesh(self.Blueprint.Display.MeshBlueprintWrecked)
+                end
+
+            elseif type == 'Nuke' and not self.Burning then
+                -- slight chance we catch fire
+                if Random(1, 250) < 5 then
+                    self.Burning = true
+                    self.Trash:Add(ForkThread(self.BurnThread, self))
+                end
+
+            elseif type == 'Disintegrate' then
+                -- we just got obliterated
+                self:Destroy()
+
+            elseif type == 'Fire' and not self.Burning then 
+                -- fire type damage, slightly higher odds to catch fire
+                if Random(1, 10) <= 2 then
+                    self.Burning = true
+                    self.Trash:Add(ForkThread(self.BurnThread, self))
+                end
+
+            elseif not self.Burning then
+                -- any other damage type, small chance we catch fire
+                if true or Random(1, 8) <= 1 then
+                    self.Burning = true
+                    self.Trash:Add(ForkThread(self.BurnThread, self))
+                end
             end
         end
     end,
 
-    OnKilled = function(self)
-        Prop.OnKilled(self)
-        ChangeState(self, self.DeadState)
-    end,
-
-    OnDestroy = function(self)
-        Prop.OnDestroy(self)
-        ChangeState(self, self.DeadState)
-    end,
-
+    --- Uprooting effect when the tree falls over
     PlayUprootingEffect = function(self, instigator)
-		local pos = self:GetCachePosition()
-		local army = -1
-        if instigator then
-            army = instigator.Army
-        end
-		local TerrainType = GetTerrainType( pos.x,pos.z )
-
-		if TerrainType.FXOther.Land.TreeRootDirt01 == nil then
-			TerrainType = GetTerrainType( -1, -1 )
-		end
-
-		if TerrainType.FXOther.Land.TreeRootDirt01 != nil then
-			for k, v in TerrainType.FXOther.Land.TreeRootDirt01 do
-				CreateEmitterAtEntity( self, army, v )
-			end
-		end
+        CreateEmitterAtEntity( self, -1, '/effects/emitters/tree_uproot_01_emit.bp' )
         self:PlayPropSound('TreeFall')
     end,
 
+    --- Contains all the falling logic
+    FallThread = function(self, dx, dy, dz, depth)
+        -- make it fall down
+        local motor = self:FallDown()
+        motor:Whack(dx, dy, dz, depth, true)
 
-    BurningState = State {
+        -- destroy remaining effects after a while
+        WaitTicks(150)
+        self.Trash:Destroy()
 
-        Main = function(self)
-            local effects = {}
-            local fx
-            local bp = self:GetBlueprint()
-            for k, v in FireEffects do
-                fx = CreateEmitterAtEntity(self, -1, v ):OffsetEmitter(0, 0.5, 0):ScaleEmitter(4)
-                table.insert(effects, fx)
-                self.Trash:Add(fx)
+        -- make it sink after a while
+        WaitTicks(150)
+        self:SinkAway(-.1)
+
+        -- get rid of it when it is completely below the terrain
+        WaitTicks(100)
+        self:Destroy()
+    end,
+
+    --- Contains all the burning logic
+    BurnThread = function(self)
+
+        -- used throughout this function
+        local trash = self.Trash
+        local position = self.CachePosition
+
+        local effect = false 
+        local effects = { }
+        local effectsHead = 1
+
+        local fireSize = 0.75 * Random() + 0.25
+
+        -- fire effect
+        for k, v in FireEffects do
+
+            effect = CreateEmitterAtEntity(self, -1, v )
+            effect:OffsetEmitter(0, 0.25, 0)
+            effect:ScaleEmitter(3)
+
+            -- keep track
+            effects[effectsHead] = effect
+            effectsHead = effectsHead + 1
+
+            -- add it to trash bag
+            trash:Add(effect)
+        end
+
+        -- light splash
+        effect = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
+        trash:Add(effect)
+
+        -- sounds
+        self:PlayPropSound('BurnStart')
+        self:PlayPropAmbientSound('BurnLoop')
+
+        -- wait a bit before we change to scorched tree
+        WaitTicks(50)
+        self:SetMesh(self.Blueprint.Display.MeshBlueprintWrecked)
+
+        -- more fire effects
+        for i = 5, 1, -1 do
+
+            -- do not change the distort effect
+            effects[1]:ScaleEmitter(3 + fireSize * (5 - i))
+            effects[3]:ScaleEmitter(3 + fireSize * (5 - i))
+
+            -- hold up a bit
+            WaitTicks(20 + Random(10, 50))
+
+            -- try and spread out the fire
+            if i == 3 then
+                DamageArea(self, position, 1, 1, 'Fire', true)
             end
-            fx = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
-            table.insert(effects, fx)
-            self.Trash:Add(fx)
+        end
 
-            self:PlayPropSound('BurnStart')
-            self:PlayPropAmbientSound('BurnLoop')
+        -- wait a bit before we make a scorch mark
+        WaitTicks(50)
+        DefaultExplosions.CreateScorchMarkSplat( self, 0.5, -1 )
+        trash:Add(effect)
 
-            WaitSeconds(0.5)
-            self:SetMesh(bp.Display.MeshBlueprintWrecked)
-            for i = 5, 1, -1 do
-                for k, v in effects do
-                    v:Destroy()
-                end
-                for k, v in FireEffects do
-                    local fx = CreateAttachedEmitter(self, -2, -1, v ):OffsetEmitter(0, 0, 0.3):ScaleEmitter(i * 0.5)
-                    table.insert(effects, fx)
-                    self.Trash:Add(fx)
-                end
-                WaitSeconds(3 + Random(1, 10) * 0.1)
-                if not self.BurnFromNuke and i == 3 then
-                    DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)
-                end
-            end
-            self.Motor = self.Motor or self:FallDown()
-            self.Motor:Whack(GetRandomFloat(-1, 1), 0, GetRandomFloat(-1, 1), 0.25, true)
-            WaitSeconds(5)
-            DefaultExplosions.CreateScorchMarkSplat( self, 0.5, -1 )
-            DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)
-            self:PlayPropAmbientSound(nil)
-            for k, v in effects do
-                v:Destroy()
-            end
-            self:SinkAway(-.1)
-            self.Motor = nil
-            WaitSeconds(10)
-            self:Destroy()
-        end,
+        -- try and spread the fire
+        DamageArea(self, position, 1, 1, 'Fire', true)
 
-        OnCollisionCheck = function(self, other)
-            if IsUnit(other) then
-                return true
-            else
-                return false
-            end
-        end,
+        -- stop all sound
+        self:PlayPropAmbientSound(nil)
 
-        OnCollision = function(self, other, nx, ny, nz, depth)
-            self.Motor = self.Motor or self:FallDown()
+        -- destroy all effects
+        trash:Destroy()
 
-            local otherbp = other:GetBlueprint()
-            local is_big = (otherbp.SizeX * otherbp.SizeZ) > 0.2
-            if is_big then
-                self.Motor:Whack(nx, ny, nz, depth, true)
-            else
-                self.Motor:Whack(nx, ny, nz, .05, false)
-            end
-        end,
+        -- add smoke effect removed when the tree is destroyed
+        effect = CreateEmitterAtEntity(self, -1, FireEffects[3] )
+        effect:ScaleEmitter(1 + Random())
 
-        OnDamage = function(self, instigator, armormod, direction, type)
-            if type == 'Force' then
-                self.Motor = self:FallDown()
-                self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
-            elseif type == 'Disintegrate' then
-                self:Destroy()
-            end
-        end,
+        -- fall down in a random direction
+        self.FallThread(self, Random() * 2 - 1, 0, Random() * 2 - 1, 0.25)
 
-    },
-
-    FallingState = State {
-
-        Main = function(self)
-            local bp = self:GetBlueprint()
-            WaitSeconds(30)
-            self:SinkAway(-.1)
-            self.Motor = nil
-            WaitSeconds(10)
-            self:Destroy()
-        end,
-
-        OnDamage = function(self, instigator, armormod, direction, type)
-            if type == 'Disintegrate' then
-                self:Destroy()
-            end
-        end,
-    },
-
-    DeadState = State {
-        Main = function(self)
-        end,
-
-        OnCollisionCheck = function(self, other)
-            return false
-        end,
-
-        OnCollision = function(self, other, nx, ny, nz, depth)
-
-        end,
-
-        OnDamage = function(self, instigator, armormod, direction, type)
-
-        end,
-    },
+    end,
 }
-
-
 
 TreeGroup = Class(Prop) {
 
