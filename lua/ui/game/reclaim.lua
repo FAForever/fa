@@ -156,6 +156,7 @@ function CreateReclaimLabel(view)
 end
 
 function UpdateLabels()
+    LOG("Updating labels")
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
 
     local onScreenReclaimIndex = 1

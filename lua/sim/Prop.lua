@@ -14,6 +14,7 @@ local minimumLabelMass = 10
 local type = type
 local Sync = Sync 
 local Warp = Warp
+local pcall = pcall
 local GetTerrainHeight = GetTerrainHeight
 
 -- upvalue moho functions for performance
@@ -100,7 +101,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
         EntitySetMaxHealth(self, self.MaxHealth)
         EntitySetHealth(self, self, self.MaxHealth)
-        self.CanTakeDamage = not self.Blueprint.Categories.INVULNERABLE
+        self.CanTakeDamage = self.Blueprint.Categories.INVULNERABLE or false
         self.CanBeKilled = true
     end,
 
@@ -218,10 +219,10 @@ Prop = Class(moho.prop_methods, Entity) {
 
         -- adjust our health
         self.Health = self.Health - amount 
-        EntitySetHealth(self.Health)
+        EntitySetHealth(self, self, self.Health)
 
         -- check if we're still alive
-        if health <= 0 then
+        if self.Health <= 0 then
             if damageType == 'Reclaimed' then
                 EntityDestroy(self)
             else
@@ -325,14 +326,14 @@ Prop = Class(moho.prop_methods, Entity) {
         local economy = self.Blueprint.Economy
         local time = 1
         if economy then
-            time = bp.economy.ReclaimTimeMultiplier or bp.economy.ReclaimMassTimeMultiplier or bp.economy.ReclaimEnergyTimeMultiplier or 1
+            time = economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1
         end
 
         -- compute directory prefix if it is not set
         if not dirprefix then
             -- default dirprefix to parent dir of our own blueprint
             -- trim ".../groups/blah_prop.bp" to just ".../"
-            dirprefix = StringGsub(bp.BlueprintId, "[^/]*/[^/]*$", "")
+            dirprefix = StringGsub(self.Blueprint.BlueprintId, "[^/]*/[^/]*$", "")
         end
 
         -- values used in the for loop
@@ -354,10 +355,10 @@ Prop = Class(moho.prop_methods, Entity) {
 
             -- determine prop name (removing _01, _02 from bone name)
             trimmedBoneName = StringGsub(bone, "_?[0-9]+$", "")
-            blueprint = dirprefix .. btrim .. "_prop.bp"
+            blueprint = dirprefix .. trimmedBoneName .. "_prop.bp"
 
             -- attempt to make the prop
-            ok, out = pcall(self.CreatePropAtBone, self, ibone, newbp)
+            ok, out = pcall(self.CreatePropAtBone, self, ibone, blueprint)
             if ok then 
                 out.SetMaxReclaimValues(out, time, mass, energy)
                 props[ibone] = out 
