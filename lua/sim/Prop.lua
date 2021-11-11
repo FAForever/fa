@@ -48,6 +48,7 @@ Prop = Class(moho.prop_methods, Entity) {
         self.Blueprint = EntityGetBlueprint(self)
         self.CachePosition = EntityGetPosition(self)
         self.MaxHealth = MathMax(50, self.Blueprint.Defense.MaxHealth)
+        self.Health = self.MaxHealth
         
         self.EventCallbacks = { }
 

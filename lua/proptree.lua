@@ -8,21 +8,53 @@
 --****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
 local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
-local DefaultExplosions = import('/lua/defaultexplosions.lua')
+local CreateScorchMarkSplat = import('/lua/defaultexplosions.lua').CreateScorchMarkSplat
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
+
+local BurningTrees = 0
+local MaximumBurningTrees = 100
 
 -- upvalue for performance
 local Random = Random
+local ForkThread = ForkThread
+local DamageArea = DamageArea
 local WaitTicks = coroutine.yield
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateLightParticleIntel = CreateLightParticleIntel
+
+-- upvalued for performance (function-scope benchmark)
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+
+local EntityMethods = moho.entity_methods 
+local EntityDestroy = EntityMethods.Destroy
+local EntitySetMesh = EntityMethods.SetMesh
+
+local EffectMethods = moho.IEffect
+local EffectScaleEmitter = EffectMethods.ScaleEmitter
+local EffectOffsetEmitter = EffectMethods.OffsetEmitter
+local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 
 Tree = Class(Prop) {
 
     --- Initialize the tree
     OnCreate = function (self, spec)
         Prop.OnCreate(self, spec)
+        self.NoBurn = false
         self.Burning = false 
         self.Fallen = false
         self.Dead = false 
+    end,
+
+    OnDestroy = function(self)
+        Prop.OnDestroy(self)
+
+        -- reduce burning tree count
+        if self.Burning then 
+            BurningTrees = BurningTrees - 1
+            LOG("OnDestroy - burning trees: " .. tostring(BurningTrees) .. ", for entity id: " .. self.EntityId)
+        end
     end,
 
     --- Collision check with projectiles
@@ -36,7 +68,7 @@ Tree = Class(Prop) {
             if not self.Fallen then 
                 -- change internal state
                 self.Fallen = true
-                self.Trash:Add(ForkThread(self.FallThread, self, nx, ny, nz, depth))
+                TrashAdd(self.Trash, ForkThread(self.FallThread, self, nx, ny, nz, depth))
                 self:PlayUprootingEffect(other)
             end
         end
@@ -45,46 +77,48 @@ Tree = Class(Prop) {
     --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
     -- damage and that the base class is not called accordingly.
     OnDamage = function(self, instigator, amount, direction, type)
+
         if not self.Dead then 
+
+            local canFall = not self.Fallen 
+            local canBurn = (not self.Burning) and (not self.NoBurn)
+
             if type == 'Force' then
-                if not self.Fallen then 
+                if canFall then 
                     -- change internal state
-                    self.Burning = true
+                    self.NoBurn = true
                     self.Fallen = true
-                    self.Trash:Add(ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
+                    TrashAdd(self.Trash, ForkThread(self.FallThread, self, direction[1], direction[2], direction[3], 0.5))
 
                     -- change the mesh
-                    self:SetMesh(self.Blueprint.Display.MeshBlueprintWrecked)
+                    EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
                 end
 
-            elseif type == 'Nuke' and not self.Burning then
+            elseif type == 'Nuke' and canBurn then
                 -- slight chance we catch fire
                 if Random(1, 250) < 5 then
-                    self.Burning = true
-                    self.Trash:Add(ForkThread(self.BurnThread, self))
+                    self.Burn(self)
                 end
 
             elseif type == 'Disintegrate' then
                 -- we just got obliterated
-                self:Destroy()
+                EntityDestroy(self)
 
-            elseif type == 'Fire-override' or (type == 'Fire' and not self.Burning) then 
+            elseif type == 'Fire' and canBurn then 
 
                 -- fire type damage, slightly higher odds to catch fire
-                if Random(1, 14) <= 2 then
-                    self.Burning = true
-                    self.Trash:Add(ForkThread(self.BurnThread, self))
+                if Random(1, 35) <= 2 then
+                    self.Burn(self)
                 end
             elseif type == "Reclaimed" then 
                 -- oh noes!
-                self:Destroy()
+                EntityDestroy(self)
             end
             
-            if type ~= 'Force' and type ~= 'Fire' and not self.Burning and not self.Fallen then 
+            if (type ~= 'Force') and (type ~= 'Fire') and canBurn and canFall then 
                 -- any damage type but force can cause a burn
-                if Random(1, 8) <= 1 then
-                    self.Burning = true
-                    self.Trash:Add(ForkThread(self.BurnThread, self))
+                if Random(1, 20) <= 1 then
+                    self.Burn(self)
                 end
             end
         end
@@ -104,7 +138,7 @@ Tree = Class(Prop) {
 
         -- no longer be able to catch fire after a while
         WaitTicks(150)
-        self.Burning = true 
+        self.NoBurn = true 
 
         -- make it sink after a while
         WaitTicks(150)
@@ -112,7 +146,18 @@ Tree = Class(Prop) {
 
         -- get rid of it when it is completely below the terrain
         WaitTicks(100)
-        self:Destroy()
+        EntityDestroy(self)
+    end,
+
+    Burn = function(self)
+        -- limit maximum number of burning trees on the map
+        if Random(1, MaximumBurningTrees) > BurningTrees then 
+            BurningTrees = BurningTrees + 1
+            LOG("Burning trees: " .. tostring(BurningTrees))
+
+            self.Burning = true 
+            TrashAdd(self.Trash, ForkThread(self.BurnThread, self))
+        end
     end,
 
     --- Contains all the burning logic
@@ -132,33 +177,33 @@ Tree = Class(Prop) {
         for k, v in FireEffects do
 
             effect = CreateEmitterAtEntity(self, -1, v )
-            effect:OffsetEmitter(0, 0.15, 0)
-            effect:ScaleEmitter(3)
+            EffectOffsetEmitter(effect, 0, 0.15, 0)
+            EffectScaleEmitter(effect, 3)
 
             -- keep track
             effects[effectsHead] = effect
             effectsHead = effectsHead + 1
 
             -- add it to trash bag
-            trash:Add(effect)
+            TrashAdd(trash, effect)
         end
 
         -- add randomness to direction of smoke
         local r = Random()
-        effects[3]:SetEmitterCurveParam("XDIR_CURVE", 0.005 + 0.02 * r, 0.01)
-        effects[3]:SetEmitterCurveParam("YDIR_CURVE", 0.005 + 0.01 * Random(), 0.01)
-        effects[3]:SetEmitterCurveParam("ZDIR_CURVE", 0.005 + 0.02 * r, 0.01)
+        EffectSetEmitterCurveParam(effects[3], "XDIR_CURVE", 0.005 + 0.02 * r, 0.01)
+        EffectSetEmitterCurveParam(effects[3], "YDIR_CURVE", 0.005 + 0.01 * Random(), 0.01)
+        EffectSetEmitterCurveParam(effects[3], "ZDIR_CURVE", 0.005 + 0.02 * r, 0.01)
 
         -- light splash
         effect = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
 
         -- sounds
-        self:PlayPropSound('BurnStart')
-        self:PlayPropAmbientSound('BurnLoop')
+        self.PlayPropSound(self, 'BurnStart')
+        self.PlayPropAmbientSound(self, 'BurnLoop')
 
         -- wait a bit before we change to a scorched tree
         WaitTicks(50)
-        self:SetMesh(self.Blueprint.Display.MeshBlueprintWrecked)
+        EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
 
         -- more fire effects
         for i = 5, 1, -1 do
@@ -178,13 +223,13 @@ Tree = Class(Prop) {
 
         -- wait a bit before we make a scorch mark
         WaitTicks(50)
-        DefaultExplosions.CreateScorchMarkSplat( self, 0.5, -1 )
+        CreateScorchMarkSplat( self, 0.5, -1 )
 
         -- try and spread the fire
         DamageArea(self, position, 1, 1, 'Fire', true)
 
         -- stop all sound
-        self:PlayPropAmbientSound(nil)
+        self.PlayPropAmbientSound(self, nil)
 
         -- destroy all effects
         for k = 1, effectsHead - 1 do 
@@ -193,8 +238,8 @@ Tree = Class(Prop) {
 
         -- add smoke effect removed when the tree is destroyed
         effect = CreateEmitterAtEntity(self, -1, FireEffects[3] )
-        effect:ScaleEmitter(1 + Random())
-        self.Trash:Add(effect)
+        EffectScaleEmitter(effect, 1 + Random())
+        TrashAdd(trash, effect)
 
         -- fall down in a random direction if we didn't before
         if not self.Fallen then 

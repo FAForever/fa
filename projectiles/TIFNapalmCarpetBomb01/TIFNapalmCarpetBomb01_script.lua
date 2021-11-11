@@ -6,12 +6,14 @@ local TNapalmCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalm
 
 TIFNapalmCarpetBomb01 = Class(TNapalmCarpetBombProjectile) {
     OnImpact = function(self, targetType, targetEntity)
+
+        TNapalmCarpetBombProjectile.OnImpact( self, targetType, targetEntity )
+
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        DamageArea( self, pos, 0.5 * radius, 1, 'Force', FriendlyFire )
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
@@ -21,11 +23,11 @@ TIFNapalmCarpetBomb01 = Class(TNapalmCarpetBombProjectile) {
             local size = radius + RandomFloat(0.75,2.0)
             local army = self.Army
             
-            DamageRing(self, pos, 0.1, 5/4 * radius, 10, 'Fire', FriendlyFire, false)
+            DamageRing(self, pos, 0.1, 3/4 * radius, 10, 'Fire', FriendlyFire, false)
             
  			CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', size, size, 150, 30, army)
 		end	 
-		TNapalmCarpetBombProjectile.OnImpact( self, targetType, targetEntity )
+
     end,
 }
 
