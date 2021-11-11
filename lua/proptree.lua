@@ -12,7 +12,7 @@ local CreateScorchMarkSplat = import('/lua/defaultexplosions.lua').CreateScorchM
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 local BurningTrees = 0
-local MaximumBurningTrees = 100
+local MaximumBurningTrees = 150
 
 -- upvalue for performance
 local Random = Random
