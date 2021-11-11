@@ -12,7 +12,6 @@ local minimumLabelMass = 10
 
 -- upvalue globals for performance
 local type = type
-local Sync = Sync 
 local Warp = Warp
 local pcall = pcall
 local GetTerrainHeight = GetTerrainHeight
@@ -23,6 +22,8 @@ local EntityDestroy = EntityMethods.Destroy
 local EntitySetHealth = EntityMethods.SetHealth
 local EntitySetMaxHealth = EntityMethods.SetMaxHealth
 local EntityAdjustHealth = EntityMethods.AdjustHealth
+local EntityGetHealth = EntityMethods.GetHealth
+local EntityGetMaxHealth = EntityMethods.GetMaxHealth
 local EntityGetEntityId = EntityMethods.GetEntityId
 local EntityGetBlueprint = EntityMethods.GetBlueprint
 local EntityGetPosition = EntityMethods.GetPosition
@@ -65,8 +66,6 @@ Prop = Class(moho.prop_methods, Entity) {
         self.EntityId = EntityGetEntityId(self)
         self.Blueprint = EntityGetBlueprint(self)
         self.CachePosition = EntityGetPosition(self)
-        self.MaxHealth = MathMax(50, self.Blueprint.Defense.MaxHealth)
-        self.Health = self.MaxHealth
         
         self.EventCallbacks = { }
 
@@ -99,9 +98,10 @@ Prop = Class(moho.prop_methods, Entity) {
 
         -- # Set health and status
 
-        EntitySetMaxHealth(self, self.MaxHealth)
-        EntitySetHealth(self, self, self.MaxHealth)
-        self.CanTakeDamage = self.Blueprint.Categories.INVULNERABLE or false
+        local maxHealth = MathMax(50, self.Blueprint.Defense.MaxHealth)
+        EntitySetMaxHealth(self, maxHealth)
+        EntitySetHealth(self, self, maxHealth)
+        self.CanTakeDamage = (not self.Blueprint.Categories.INVULNERABLE) or false
         self.CanBeKilled = true
     end,
 
@@ -164,7 +164,7 @@ Prop = Class(moho.prop_methods, Entity) {
     --- Constructs reclaim effects. Separate function for mod compatibility.
     -- @param target The entity that reclaimed the prop.
     CreateReclaimEndEffects = function(self, target)
-        EffectUtil.PlayReclaimEndEffects(self, target)
+        EffectUtil.PlayReclaimEndEffects(target, self)
     end,
 
     --- Syncs the mass label to the UI.
@@ -185,7 +185,7 @@ Prop = Class(moho.prop_methods, Entity) {
         local data = false
 
         -- check if prop should receive sync data
-        if not EntityBeenDestroyed(self) then
+        if not EntityBeenDestroyed(self) and mass >= minimumLabelMass then
             -- prop is around and worthy
             data = { }
             data.mass = mass
@@ -197,6 +197,7 @@ Prop = Class(moho.prop_methods, Entity) {
         end
 
         -- update the sync
+        LOG(data)
         Sync.Reclaim[self.EntityId] = data
     end,
 
@@ -218,17 +219,18 @@ Prop = Class(moho.prop_methods, Entity) {
         if not self.CanTakeDamage then return end
 
         -- adjust our health
-        self.Health = self.Health - amount 
-        EntitySetHealth(self, self, self.Health)
+        local preHealth = EntityGetHealth(self)
+        EntityAdjustHealth(self, instigator, -amount)
+        local health = MathMax(preHealth - amount, 0)
 
         -- check if we're still alive
-        if self.Health <= 0 then
+        if health <= 0 then
             if damageType == 'Reclaimed' then
                 EntityDestroy(self)
             else
                 -- Calculate the excess damage amount
-                local excess = self.Health
-                local maxHealth = self.MaxHealth
+                local excess = preHealth
+                local maxHealth = EntityGetMaxHealth(self)
                 if excess < 0 and maxHealth > 0 then
                     self.Kill(self, instigator, damageType, -excess / maxHealth)
                 else 
@@ -260,9 +262,9 @@ Prop = Class(moho.prop_methods, Entity) {
 
     --- Mimics the engine behavior when calculating the reclaim value of a prop.
     UpdateReclaimLeft = function(self)
-        if not EntityBeenDestroyed(self) then
-            local max = self.MaxHealth
-            local health = self.Health
+        if not self.Dead then
+            local max = EntityGetMaxHealth(self)
+            local health = EntityGetHealth(self)
             local ratio = (max and max > 0 and health / max) or 1
 
             -- we have to take into account if the wreck has been partly reclaimed by an engineer
