@@ -53,7 +53,6 @@ Tree = Class(Prop) {
         -- reduce burning tree count
         if self.Burning then 
             BurningTrees = BurningTrees - 1
-            LOG("OnDestroy - burning trees: " .. tostring(BurningTrees) .. ", for entity id: " .. self.EntityId)
         end
     end,
 
@@ -153,7 +152,6 @@ Tree = Class(Prop) {
         -- limit maximum number of burning trees on the map
         if Random(1, MaximumBurningTrees) > BurningTrees then 
             BurningTrees = BurningTrees + 1
-            LOG("Burning trees: " .. tostring(BurningTrees))
 
             self.Burning = true 
             TrashAdd(self.Trash, ForkThread(self.BurnThread, self))
