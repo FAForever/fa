@@ -21,7 +21,7 @@ local OutsidePlayableAreaReclaim = {}
 function UpdateReclaim(syncTable)
     ReclaimChanged = true
     for id, data in syncTable do
-        if not data.mass then
+        if not data then
             Reclaim[id] = nil
             OutsidePlayableAreaReclaim[id] = nil
         else
