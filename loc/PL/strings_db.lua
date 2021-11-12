@@ -8634,3 +8634,11 @@ adaptive_lightning_key_1_help = "Some lightning, but not so much."
 adaptive_lightning_key_2_help = "Normal lightning settings."
 adaptive_lightning_key_3 = "enabled - more"
 adaptive_lightning_key_3_help = "Lightning storm."
+
+-- unranked lobby option
+lobui_0802="Unrate"
+lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
+lobui_0804="No"
+lobui_0805="This game will be rated if all the criteria for a rated game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be rated."
