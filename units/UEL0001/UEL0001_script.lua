@@ -71,7 +71,7 @@ UEL0001 = Class(ACUUnit)({
         self.HasLeftPod = false
         self.HasRightPod = false
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction(categories.UEF * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+        self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -149,8 +149,6 @@ UEL0001 = Class(ACUUnit)({
                 self.Trash:Add(pod)
                 self.RightPod = pod
             end
-        else
-
         end
         EntityMethodsRequestRefreshUI(self)
     end,
@@ -165,11 +163,9 @@ UEL0001 = Class(ACUUnit)({
                 if self.HasRightPod == true then
                     self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
                 end
-            else
-
             end
         else
-            self:CreateEnhancement(pod..'Remove')
+            self:CreateEnhancement(pod .. 'Remove')
         end
     end,
 
@@ -280,8 +276,8 @@ UEL0001 = Class(ACUUnit)({
                 return
             end
             UnitMethodsRestoreBuildRestrictions(self)
-            self:AddBuildRestriction(categories.UEF * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
-            self:AddBuildRestriction(categories.UEF * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
+            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'UEFACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT2BuildRate')
             end
@@ -321,7 +317,7 @@ UEL0001 = Class(ACUUnit)({
             if Buff.HasBuff(self, 'UEFACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'UEFACUT3BuildRate')
             end
-            self:AddBuildRestriction(categories.UEF * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.UEF * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         elseif enh == 'DamageStabilization' then
             if not Buffs['UEFACUDamageStabilization'] then
                 BuffBlueprint({
@@ -406,8 +402,6 @@ UEL0001 = Class(ACUUnit)({
             local amt = self:GetNukeSiloAmmoCount()
             UnitMethodsRemoveNukeSiloAmmo(self, amt or 0)
             UnitMethodsStopSiloBuild(self)
-        else
-
         end
     end,
 })

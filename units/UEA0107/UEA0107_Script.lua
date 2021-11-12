@@ -76,12 +76,10 @@ UEA0107 = Class(AirTransport)({
 
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
-        if new == 'Down' then
+        if (new == 'Down') then
             CAnimationManipulatorMethodsSetRate(self.LandingAnimManip, -1)
-        elseif new == 'Up' then
+        elseif (new == 'Up') then
             CAnimationManipulatorMethodsSetRate(self.LandingAnimManip, 1)
-        else
-
         end
     end,
 

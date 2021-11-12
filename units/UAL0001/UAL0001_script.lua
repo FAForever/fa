@@ -57,7 +57,7 @@ UAL0001 = Class(ACUUnit)({
         UnitMethodsHideBone(self, 'Right_Upgrade', true)
         UnitMethodsHideBone(self, 'Left_Upgrade', true)
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+        self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -184,7 +184,7 @@ UAL0001 = Class(ACUUnit)({
                 return
             end
             UnitMethodsRestoreBuildRestrictions(self)
-            self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
             end
@@ -226,7 +226,7 @@ UAL0001 = Class(ACUUnit)({
                 return
             end
             UnitMethodsRestoreBuildRestrictions(self)
-            self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
             end
@@ -262,8 +262,6 @@ UAL0001 = Class(ACUUnit)({
             local bpIntel = self:GetBlueprint().Intel
             EntityMethodsSetIntelRadius(self, 'Vision', bpIntel.VisionRadius or 26)
             EntityMethodsSetIntelRadius(self, 'Omni', bpIntel.OmniRadius or 26)
-        else
-
         end
     end,
 

@@ -5,7 +5,6 @@ local GlobalMethodsCreateLightParticle = GlobalMethods.CreateLightParticle
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
 
 local ProjectileMethods = _G.moho.projectile_methods
-local ProjectileMethodsSetCollision = ProjectileMethods.SetCollision
 local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
 -- End of automatically upvalued moho functions
 
@@ -35,14 +34,12 @@ SBOZhanaseeBombProjectile01 = Class(SZhanaseeBombProjectile)({
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
         GlobalMethodsCreateLightParticle(self, -1, army, 26, 5, 'sparkle_white_add_08', 'ramp_white_24')
-        self:CreateProjectile('/effects/entities/SBOZhanaseeBombEffect01/SBOZhanaseeBombEffect01_proj.bp', 0, 0, 0, 0, 10.0, 0)
-        ProjectileMethodsSetCollision(self, false)
+        self:CreateProjectile('/effects/entities/SBOZhanaseeBombEffect01/SBOZhanaseeBombEffect01_proj.bp', 0, 0, 0, 0, 10.0, 0):SetCollision(false)
 
         -- One initial projectile following same directional path as the original
-        ProjectileMethodsSetVelocity(self, 0, 10.0, 0)
-        self:CreateProjectile('/effects/entities/SBOZhanaseeBombEffect02/SBOZhanaseeBombEffect02_proj.bp', 0, 0, 0, 0, 0.05, 0)
-        ProjectileMethodsSetCollision(self, false)
-        ProjectileMethodsSetVelocity(self, 0, 0.05, 0)
+        ProjectileMethodsSetVelocity(CreateProjectile("/effects/entities/SBOZhanaseeBombEffect01/SBOZhanaseeBombEffect01_proj.bp", 0, 0, 0, 0, 10.0, 0), 0, 10.0, 0)
+        self:CreateProjectile('/effects/entities/SBOZhanaseeBombEffect02/SBOZhanaseeBombEffect02_proj.bp', 0, 0, 0, 0, 0.05, 0):SetCollision(false)
+        ProjectileMethodsSetVelocity(CreateProjectile("/effects/entities/SBOZhanaseeBombEffect02/SBOZhanaseeBombEffect02_proj.bp", 0, 0, 0, 0, 0.05, 0), 0, 0.05, 0)
 
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             GlobalMethodsCreateDecal(pos, RandomFloat(0.0, 6.28), 'Scorch_012_albedo', '', 'Albedo', 40, 40, 300, 200, army)

@@ -96,16 +96,14 @@ URA0401 = Class(CAirUnit)({
     OnMotionVertEventChange = function(self, new, old)
         CAirUnit.OnMotionVertEventChange(self, new, old)
 
-        if new == 'Top' or new == 'Up' and old == 'Down' then
+        if ((new == 'Top' or (new == 'Up')) and (old == 'Down')) then
             CAnimationManipulatorMethodsSetRate(self.AnimManip, -1)
-        elseif new == 'Down' then
+        elseif (new == 'Down') then
             CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationLand, false)
             CAnimationManipulatorMethodsSetRate(self.AnimManip, 1.5)
-        elseif new == 'Up' then
+        elseif (new == 'Up') then
             CAnimationManipulatorMethodsPlayAnim(self.AnimManip, self:GetBlueprint().Display.AnimationTakeOff, false)
             CAnimationManipulatorMethodsSetRate(self.AnimManip, 1)
-        else
-
         end
     end,
 })

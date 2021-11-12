@@ -68,17 +68,17 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile)({
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.Split and amount >= self:GetHealth() then
+        if not self.Split and (amount >= self:GetHealth()) then
             self.Split = true
             local vx, vy, vz = self:GetVelocity()
             local velocity = 7
             local ChildProjectileBP = '/projectiles/CIFMissileTacticalSplit01/CIFMissileTacticalSplit01_proj.bp'
-            local angle = 2 * math.pi / self.NumChildMissiles
+            local angle = (2 * math.pi) / self.NumChildMissiles
             -- Adjusts the width of the dispersal
             local spreadMul = 0.5
 
             -- Launch projectiles at semi-random angles away from split location
-            for i = 0, self.NumChildMissiles - 1 do
+            for i = 0, (self.NumChildMissiles - 1) do
                 local xVec = vx + math.sin(i * angle) * spreadMul
                 local yVec = vy + math.cos(i * angle) * spreadMul
                 local zVec = vz + math.cos(i * angle) * spreadMul
@@ -121,8 +121,6 @@ CIFMissileTactical03 = Class(CLOATacticalMissileProjectile)({
             -- Further increase check intervals            
             ProjectileMethodsSetTurnRate(self, 100)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

@@ -45,8 +45,6 @@ XSL0305 = Class(SLandUnit)({
                 self.sniperRange = v.MaxRadius
             elseif v.Label == 'MainGun' then
                 self.normalRange = v.MaxRadius
-            else
-
             end
         end
     end,

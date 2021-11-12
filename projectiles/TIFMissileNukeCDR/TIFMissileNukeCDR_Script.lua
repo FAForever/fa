@@ -62,7 +62,7 @@ TIFMissileNukeCDR = Class(TIFMissileNuke)({
     DoDamage = function(self, instigator, DamageData, targetEntity)
         local nukeDamage = function(self, instigator, pos, brain, army, damageType)
             if self.TotalTime == 0 then
-                GlobalMethodsDamageArea(instigator, pos, self.Radius, self.Damage, damageType or 'Nuke', true, true)
+                GlobalMethodsDamageArea(instigator, pos, self.Radius, self.Damage, (damageType or 'Nuke'), true, true)
             end
         end
 
@@ -90,8 +90,6 @@ TIFMissileNukeCDR = Class(TIFMissileNuke)({
             -- Further increase check intervals
             ProjectileMethodsSetTurnRate(self, 200)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

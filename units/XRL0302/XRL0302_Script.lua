@@ -4,9 +4,6 @@ local EntityMethodsSetMesh = EntityMethods.SetMesh
 
 local GlobalMethods = _G
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
-
-local UnitWeaponMethods = _G.moho.weapon_methods
-local UnitWeaponMethodsFireWeapon = UnitWeaponMethods.FireWeapon
 -- End of automatically upvalued moho functions
 
 ----------------------------------------------------------------
@@ -83,8 +80,7 @@ XRL0302 = Class(CWalkingLandUnit)({
 
     -- Allow the trigger button to blow the weapon, resulting in OnKilled instigator 'nil'
     OnProductionPaused = function(self)
-        self:GetWeaponByLabel('Suicide')
-        UnitWeaponMethodsFireWeapon(self)
+        self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
 
     EmitPeriodicEffects = function(self)
@@ -106,8 +102,7 @@ XRL0302 = Class(CWalkingLandUnit)({
     OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
         if instigator then
-            self:GetWeaponByLabel('Suicide')
-            UnitWeaponMethodsFireWeapon(self)
+            self:GetWeaponByLabel('Suicide'):FireWeapon()
         end
     end,
 

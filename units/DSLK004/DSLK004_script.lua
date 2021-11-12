@@ -108,13 +108,13 @@ local PhasonCollisionBeam = Class(SCCollisionBeam)({
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
                     GlobalMethodsDamageArea(instigator, BeamEndPos, radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
                 else
-                    ForkThread(DefaultDamage.AreaDoTThread, instigator, BeamEndPos, damageData.DoTPulses or 1, damageData.DoTTime / damageData.DoTPulses or 1, radius, damage, damageData.DamageType, damageData.DamageFriendly)
+                    ForkThread(DefaultDamage.AreaDoTThread, instigator, BeamEndPos, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), radius, damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             elseif targetEntity then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
                     Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
                 else
-                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, damageData.DoTTime / damageData.DoTPulses or 1, damage, damageData.DamageType, damageData.DamageFriendly)
+                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             else
                 GlobalMethodsDamageArea(instigator, BeamEndPos, 0.25, damage, damageData.DamageType, damageData.DamageFriendly)
@@ -175,8 +175,6 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam)({
         elseif not impactType == 'Unit' then
             KillThread(self.Scorching)
             self.Scorching = nil
-        else
-
         end
         PhasonCollisionBeam.OnImpact(self, impactType, targetEntity)
     end,
@@ -188,7 +186,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam)({
     end,
 
     ScorchThread = function(self)
-        local size = 1 + Random() * 1.1
+        local size = 1 + (Random() * 1.1)
         local CurrentPosition = self:GetPosition(1)
         local LastPosition = Vector(0, 0, 0)
         local skipCount = 1
@@ -204,7 +202,7 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam)({
             end
 
             WaitSeconds(self.ScorchSplatDropTime)
-            size = 1 + Random() * 1.1
+            size = 1 + (Random() * 1.1)
             CurrentPosition = self:GetPosition(1)
         end
     end,

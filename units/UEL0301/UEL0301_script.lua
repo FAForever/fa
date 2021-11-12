@@ -197,8 +197,6 @@ UEL0301 = Class(CommandUnit)({
             local wep = self:GetWeaponByLabel('RightHeavyPlasmaCannon')
             wep:AddDamageRadiusMod(bp.NewDamageRadius)
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
-        else
-
         end
     end,
 

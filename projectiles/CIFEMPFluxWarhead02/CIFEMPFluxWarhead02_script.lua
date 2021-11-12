@@ -80,7 +80,7 @@ CIFEMPFluxWarhead02 = Class(NullShell)({
 
     StarCloudDispersal = function(self)
         local numProjectiles = 5
-        local angle = 2 * math.pi / numProjectiles
+        local angle = (2 * math.pi) / numProjectiles
         local angleInitial = RandomFloat(0, angle)
         local angleVariation = angle * 0.5
         local projectiles = {
@@ -98,11 +98,11 @@ CIFEMPFluxWarhead02 = Class(NullShell)({
 
         -- Launch projectiles at semi-random angles away from the sphere, with enough
         -- initial velocity to escape sphere core
-        for i = 0, numProjectiles - 1 do
-            xVec = math.sin(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation))
+        for i = 0, (numProjectiles - 1) do
+            xVec = math.sin(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
             yVec = 0.3 + RandomFloat(-0.8, 1.0)
-            zVec = math.cos(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation))
-            velocity = 2.4 + yVec * 3
+            zVec = math.cos(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
+            velocity = 2.4 + (yVec * 3)
             table.insert(projectiles, self:CreateProjectile('/projectiles/CIFEMPFluxWarhead03/CIFEMPFluxWarhead03_proj.bp', 0, 0, 0, xVec, yVec, zVec):SetVelocity(velocity):SetBallisticAcceleration(1.0))
         end
 

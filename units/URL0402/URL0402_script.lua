@@ -22,11 +22,6 @@ local GlobalMethodsDamageRing = GlobalMethods.DamageRing
 local IEffectMethods = _G.moho.IEffect
 local IEffectMethodsScaleEmitter = IEffectMethods.ScaleEmitter
 
-local ProjectileMethods = _G.moho.projectile_methods
-local ProjectileMethodsSetBallisticAcceleration = ProjectileMethods.SetBallisticAcceleration
-local ProjectileMethodsSetCollision = ProjectileMethods.SetCollision
-local ProjectileMethodsSetVelocity = ProjectileMethods.SetVelocity
-
 local UnitMethods = _G.moho.unit_methods
 local UnitMethodsSetUnSelectable = UnitMethods.SetUnSelectable
 -- End of automatically upvalued moho functions
@@ -132,8 +127,6 @@ URL0402 = Class(CWalkingLandUnit)({
                     table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
                 end
             end
-        else
-
         end
     end,
 
@@ -180,11 +173,11 @@ URL0402 = Class(CWalkingLandUnit)({
 
     CreateDeathExplosionDustRing = function(self)
         local blanketSides = 18
-        local blanketAngle = 2 * math.pi / blanketSides
+        local blanketAngle = (2 * math.pi) / blanketSides
         local blanketStrength = 1
         local blanketVelocity = 2.8
 
-        for i = 0, blanketSides - 1 do
+        for i = 0, (blanketSides - 1) do
             local blanketX = math.sin(i * blanketAngle)
             local blanketZ = math.cos(i * blanketAngle)
 
@@ -203,9 +196,7 @@ URL0402 = Class(CWalkingLandUnit)({
             velocity.z = velocity.z + utilities.GetRandomFloat(-0.3, 0.3)
             velocity.y = velocity.y + utilities.GetRandomFloat(0.0, 0.3)
             proj = self:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', offset.x, offset.y + yBoneOffset, offset.z, velocity.x, velocity.y, velocity.z)
-            ProjectileMethodsSetBallisticAcceleration(proj, utilities.GetRandomFloat(-1, -2))
-            ProjectileMethodsSetVelocity(proj, utilities.GetRandomFloat(3, 4))
-            ProjectileMethodsSetCollision(proj, false)
+            proj:SetBallisticAcceleration(utilities.GetRandomFloat(-1, -2)):SetVelocity(utilities.GetRandomFloat(3, 4)):SetCollision(false)
 
             local emitter = CreateEmitterOnEntity(proj, army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
@@ -283,7 +274,7 @@ URL0402 = Class(CWalkingLandUnit)({
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * qx * qz + qw * qy, qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = math.atan2(2.0 * (qx * qz + (qw * qy)), qw * qw + qx * qx - qz * qz - (qy * qy))
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'SpiderDeath' then
                     position[3] = position[3] + 3 * math.cos(a)
@@ -310,7 +301,7 @@ URL0402 = Class(CWalkingLandUnit)({
         }, 0.1, 3, 1, 'Force', true)
 
         -- Explosion on and damage fire on various bones
-        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateFirePlumes(army, {
             'Left_Projectile01',
@@ -318,17 +309,17 @@ URL0402 = Class(CWalkingLandUnit)({
         self:CreateDamageEffects('Right_Turret', army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Leg01_B03', army)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris(army)
 
-        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
-        self:CreateDamageEffects('Right_Projectile0'..Random(1, 2), army)
+        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
+        self:CreateDamageEffects('Right_Projectile0' .. Random(1, 2), army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateDamageEffects('Left_Leg03_B03', army)
 

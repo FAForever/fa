@@ -1,9 +1,6 @@
 -- Automatically upvalued moho functions for performance
 local GlobalMethods = _G
 local GlobalMethodsDamageArea = GlobalMethods.DamageArea
-
-local ProjectileMethods = _G.moho.projectile_methods
-local ProjectileMethodsSetCollision = ProjectileMethods.SetCollision
 -- End of automatically upvalued moho functions
 
 -------------------------------------------------------------------------------
@@ -29,8 +26,7 @@ SBOOhwalliStategicBomb01 = Class(SOhwalliStrategicBombProjectile)({
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
 
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            self:CreateProjectile('/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp', 0, 0, 0, 0, 0, 0)
-            ProjectileMethodsSetCollision(self, false)
+            self:CreateProjectile('/effects/entities/SBOOhwalliBombEffectController01/SBOOhwalliBombEffectController01_proj.bp', 0, 0, 0, 0, 0, 0):SetCollision(false)
         end
         SOhwalliStrategicBombProjectile.OnImpact(self, targetType, targetEntity)
     end,

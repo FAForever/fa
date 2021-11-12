@@ -58,8 +58,6 @@ XSB3202 = Class(SSubUnit)({
             UnitMethodsSetSpeedMult(self, 1)
         elseif new == 'Down' then
             UnitMethodsSetSpeedMult(self, mult)
-        else
-
         end
     end,
 

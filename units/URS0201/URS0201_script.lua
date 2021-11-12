@@ -62,8 +62,6 @@ URS0201 = Class(CSeaUnit)({
                     end
                 elseif new == 'Stopped' then
                     CAnimationManipulatorMethodsSetRate(self.AnimManip, 0)
-                else
-
                 end
             end
         end
@@ -83,8 +81,6 @@ URS0201 = Class(CSeaUnit)({
         elseif new == 'Water' then
             self:EnableUnitIntel('Layer', 'Sonar')
             UnitMethodsSetSpeedMult(self, 1)
-        else
-
         end
 
         -- Can only be built in water so transformthread only needs to be run
@@ -110,7 +106,7 @@ URS0201 = Class(CSeaUnit)({
             CAnimationManipulatorMethodsSetRate(self.AnimManip, 2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            EntityMethodsSetCollisionShape(self, 'Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 1.0 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            EntityMethodsSetCollisionShape(self, 'Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 1.0)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             UnitMethodsSetImmobile(self, false)
             self.SwitchAnims = true
@@ -123,7 +119,7 @@ URS0201 = Class(CSeaUnit)({
             CAnimationManipulatorMethodsSetRate(self.AnimManip, -2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            EntityMethodsSetCollisionShape(self, 'Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 0.5 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            EntityMethodsSetCollisionShape(self, 'Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 0.5)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self.AnimManip:Destroy()
             self.AnimManip = nil

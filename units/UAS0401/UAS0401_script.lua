@@ -84,8 +84,6 @@ UAS0401 = Class(ASeaUnit)({
             self:AddBuildRestriction(categories.ALLUNITS)
             EntityMethodsRequestRefreshUI(self)
             self:PlayUnitSound('Close')
-        else
-
         end
 
         if new == 'Up' and old == 'Bottom' then
@@ -112,7 +110,7 @@ UAS0401 = Class(ASeaUnit)({
             -- Target depth, in this case the seabed
             local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
             -- Doesnt sink too much, just maneuveres the bed better.
-            local difference = math.max(seafloor + Yoffset - pos[2], -0.5)
+            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5)
             self.SinkSlider:SetSpeed(1)
 
             self.SinkSlider:SetGoal(0, difference, 0)

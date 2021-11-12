@@ -58,8 +58,6 @@ SIFLaanseTacticalMissileCDR = Class(SLaanseTacticalMissile)({
             # Further increase check intervals
             ProjectileMethodsSetTurnRate(self, 100)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

@@ -65,8 +65,6 @@ UEB1102 = Class(TEnergyCreationUnit)({
                 effects = self.WaterEffects
                 bones = self.WaterEffectsBones
                 scale = 3
-            else
-
             end
             for keys, values in effects do
                 for keysbones, valuesbones in bones do

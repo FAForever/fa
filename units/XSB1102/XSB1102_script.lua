@@ -44,8 +44,6 @@ XSB1102 = Class(SEnergyCreationUnit)({
             effects = self.WaterEffects
             bones = self.WaterEffectsBones
             scale = 3
-        else
-
         end
 
         for keys, values in effects do

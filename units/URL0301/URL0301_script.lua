@@ -206,8 +206,6 @@ URL0301 = Class(CCommandUnit)({
         elseif enh == 'EMPChargeRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:DisableBuff('STUN')
-        else
-
         end
     end,
 
@@ -289,8 +287,6 @@ URL0301 = Class(CCommandUnit)({
                 self.IntelEffectsBag = {}
                 self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
-        else
-
         end
     end,
 
@@ -304,8 +300,6 @@ URL0301 = Class(CCommandUnit)({
             self:SetMaintenanceConsumptionInactive()
         elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
-        else
-
         end
     end,
 })

@@ -73,8 +73,6 @@ TIFMissileCruise05 = Class(TMissileCruiseProjectile)({
         elseif dist > 0 and dist <= 10 then
             ProjectileMethodsSetTurnRate(self, 100)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

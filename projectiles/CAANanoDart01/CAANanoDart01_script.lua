@@ -38,7 +38,7 @@ CAANanoDart01 = Class(CAANanoDartProjectile03)({
         WaitSeconds(0.5)
         EntityMethodsSetMesh(self, '/projectiles/CAANanoDart01/CAANanoDartUnPacked01_mesh')
         ProjectileMethodsSetMaxSpeed(self, 60)
-        self:SetAcceleration(16 + Random() * 5)
+        self:SetAcceleration(16 + (Random() * 5))
 
         WaitSeconds(0.3)
         ProjectileMethodsSetTurnRate(self, 360)

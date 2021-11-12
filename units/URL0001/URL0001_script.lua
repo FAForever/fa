@@ -79,7 +79,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             self:SetupBuildBones()
         end
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction(categories.CYBRAN * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+        self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
 
         local wepBp = self:GetBlueprint().Weapon
         self.normalRange = 22
@@ -89,8 +89,6 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
                 self.normalRange = v.MaxRadius
             elseif v.Label == 'Torpedo' then
                 self.torpRange = v.MaxRadius
-            else
-
             end
         end
     end,
@@ -228,7 +226,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
                 return
             end
             UnitMethodsRestoreBuildRestrictions(self)
-            self:AddBuildRestriction(categories.CYBRAN * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'CybranACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT2BuildRate')
             end
@@ -273,7 +271,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             if Buff.HasBuff(self, 'CybranACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'CybranACUT3BuildRate')
             end
-            self:AddBuildRestriction(categories.CYBRAN * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         elseif enh == 'CoolingUpgrade' then
             local bp = self:GetBlueprint().Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
@@ -286,7 +284,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             oc:ChangeMaxRadius(bp.NewMaxRadius or 30)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 30)
-            if not self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube') then
+            if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
         elseif enh == 'CoolingUpgradeRemove' then
@@ -301,7 +299,7 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
                     self:GetWeaponByLabel('OverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self:GetWeaponByLabel('AutoOverCharge'):ChangeMaxRadius(v.MaxRadius or 22)
                     self.normalRange = v.MaxRadius or 22
-                    if not self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube') then
+                    if not (self.Layer == 'Seabed' and self:HasEnhancement('NaniteTorpedoTube')) then
                         self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
                     end
                     break
@@ -327,8 +325,6 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             if self.Layer == 'Seabed' then
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.normalRange)
             end
-        else
-
         end
     end,
 
@@ -394,8 +390,6 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
                 self.IntelEffectsBag = {}
                 self.CreateTerrainTypeEffects(self, self.IntelEffects.Field, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             end
-        else
-
         end
     end,
 
@@ -409,8 +403,6 @@ URL0001 = Class(ACUUnit, CCommandUnit)({
             self:SetMaintenanceConsumptionInactive()
         elseif self.StealthEnh and not self:IsIntelEnabled('RadarStealth') and not self:IsIntelEnabled('SonarStealth') then
             self:SetMaintenanceConsumptionInactive()
-        else
-
         end
     end,
 

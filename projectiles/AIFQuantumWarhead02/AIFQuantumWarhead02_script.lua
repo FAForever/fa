@@ -57,18 +57,18 @@ AIFQuantumWarhead02 = Class(NullShell)({
 
     InnerCloudFlares = function(self, army)
         local numFlares = 50
-        local angle = 2 * math.pi / numFlares
+        local angle = (2 * math.pi) / numFlares
         local angleInitial = 0.0
-        local angleVariation = 2 * math.pi
+        local angleVariation = (2 * math.pi)
 
         local emit, x, y, z = nil
         local DirectionMul = 0.02
         local OffsetMul = 4
 
-        for i = 0, numFlares - 1 do
-            x = math.sin(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation))
+        for i = 0, (numFlares - 1) do
+            x = math.sin(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
             y = 0.5
-            z = math.cos(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation))
+            z = math.cos(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation))
 
             for k, v in self.CloudFlareEffects do
                 emit = CreateEmitterAtEntity(self, army, v)
