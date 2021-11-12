@@ -16,9 +16,17 @@ local ReclaimChanged = true
 local PlayableArea
 local OutsidePlayableAreaReclaim = {}
 
+-- Used for computations that require a vector, but we don't want to allocate a new one
+local DummyVector = Vector(0, 0, 0)
+
+local DummyCollection = { }
+
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
 function UpdateReclaim(syncTable)
+
+    LOG("Changed elements: " .. tostring(table.getsize(syncTable)))
+
     ReclaimChanged = true
     for id, data in syncTable do
         if not data then
@@ -40,6 +48,13 @@ end
 function SetPlayableArea(rect)
     ReclaimChanged = true
     PlayableArea = rect
+
+    -- step 0: (n) only keep reclaim in view
+    -- step 1: (n) find min / max reclaim
+    -- step 3: (n) put reclaim in bins
+    -- step 4: (n) select bins until we have enough reclaim
+
+    -- This won't be perfect, but it will be a lot better then sorting it
 
     local newReclaim = {}
     local newOutsidePlayableAreaReclaim = {}
@@ -155,22 +170,109 @@ function CreateReclaimLabel(view)
     return label
 end
 
-function UpdateLabels()
-    LOG("Updating labels")
-    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
+local function UpdateProjectedLocations(view, labels)
+    -- local reference to a vector that we can reuse
+    local vector = DummyVector
+    local pos 
 
-    local onScreenReclaimIndex = 1
-    local onScreenReclaims = {}
+    -- for each known label
+    for k, v in labels do
+        
+        -- retrieve position
+        pos = v.position
 
-    -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
-    for _, r in Reclaim do
-        r.onScreen = OnScreen(view, r.position)
-        if r.onScreen and r.mass >= MinAmount then
-            onScreenReclaims[onScreenReclaimIndex] = r
-            onScreenReclaimIndex = onScreenReclaimIndex + 1
+        -- transfer into dummy vector
+        vector[1] = pos[1]
+        vector[2] = pos[2]
+        vector[3] = pos[3]
+
+        -- use engine to compute projection
+        v.projected = view:Project(vector)
+    end
+end
+
+local function ChooseLabels(view, labels)
+
+    -- update the screen positions of the labels
+    UpdateProjectedLocations(view, labels)
+
+    -- collection of labels
+    local head = 1 
+    local collection = DummyCollection
+
+    -- go over all known labels
+    for _, label in labels do
+
+        -- check whether we're valuable enough
+        if label.mass >= MinAmount then
+
+            -- check whether we're on screen
+            local projected = label.projected
+            if not (projected.x < 0 or projected.y < 0 or projected.x > viewWidth or projected.y > viewHeight) then 
+
+                -- add to collection
+                collection[head] = label
+                head = head + 1
+            end
         end
     end
 
+    if head < MaxLabels then 
+        return 
+end
+
+function UpdateLabels()
+    LOG("Updating labels")
+
+    -- (0) O(n) filter out those not visible
+
+    -- (1.5) O(1) quick exit: if those that are visible are less than the maximum number of labels
+
+    -- (1) O(n) filter out those that are more than an upper threshold (we want those anyhow)
+
+    -- (2) O(n) compute mean and standard deviation
+
+    -- (3) O(n) drop those that are below 1 std from the mean
+    -- (4) O(n) take those that are above 1 std from the mean (we want those anyhow)
+
+    -- (4.5) O(1) quick exit: if our set is larger than 1000
+
+    -- (5) O(n) bin the remaining elements
+
+    -- (6) O(n) select from largest bins forward
+
+    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
+    local viewWidth = view:Width()
+    local viewHeight = view:Height()
+
+    -- upvalue for performance
+    local labels = Reclaim
+
+    -- update the screen positions of the labels
+    UpdateProjectedLocations(view, labels)
+
+    -- collection of labels
+    local head = 1 
+    local collection = DummyCollection
+
+    -- go over all known labels
+    for _, label in labels do
+
+        -- check whether we're valuable enough
+        if label.mass >= MinAmount then
+
+            -- check whether we're on screen
+            local projected = label.projected
+            if not (projected.x < 0 or projected.y < 0 or projected.x > viewWidth or projected.y > viewHeight) then 
+
+                -- add to collection
+                collection[head] = label
+                head = head + 1
+            end
+        end
+    end
+
+    LOG(table.getn(onScreenReclaims))
     table.sort(onScreenReclaims, function(a, b) return a.mass > b.mass end)
 
     -- Create/Update as many reclaim labels as we need

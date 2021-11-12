@@ -181,6 +181,8 @@ Prop = Class(moho.prop_methods, Entity) {
             return
         end
 
+        -- todo: add check if prop is in playable area
+
         -- construct sync data
         local data = false
 
@@ -197,7 +199,6 @@ Prop = Class(moho.prop_methods, Entity) {
         end
 
         -- update the sync
-        LOG(data)
         Sync.Reclaim[self.EntityId] = data
     end,
 
