@@ -52,6 +52,7 @@ CategoriesSkipped  = {
     ["NOFORMATION"] = true,
     ["UNSELECTABLE"] = true,
     ["UNTARGETABLE"] = true,
+    ["zxa0001"] = true,    -- Dummy unit for gifting unfinished buildings
     ["uab5103"] = true,    -- Aeon Quantum Gate Beacon
     ["uab5204"] = true,    -- Concrete
     ["ueb5204"] = true,    -- Concrete

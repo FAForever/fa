@@ -4,8 +4,6 @@ master|develop
  ------------ | -------------
 [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=master)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=develop)](https://travis-ci.org/FAForever/fa)
 
-Current patch is: 3724
-
 Changelog can be found [here](changelog.md).
 
 
@@ -16,10 +14,20 @@ See guidelines for contributing [here](CONTRIBUTING.md).
 
 See git branch model for the repository and how it relates to FAF client game modes [here](branchmodel.png).
 
-Actual exe patches are [here](https://github.com/FAETHER/FA-Binary-Patches)
+Exe patcher are [here](https://github.com/FAForever/FA_Patcher)
+
+Exe patches are [here](https://github.com/FAForever/FA-Binary-Patches)
+
+FAF profiler [here](https://github.com/FAForever/FAFProfiler)
+
+Lua benchmarks [here](https://gitlab.com/supreme-commander-forged-alliance/other/profiler)
+
+Replaces Bugsplat [here](https://github.com/FAForever/FADeepProbe)
 
 Running the game with your changes
 ----------------------------------
+
+The easiest way to running the game with your changes is to create a DevData directory nested in FAForever and put all the modified files there.
 
 When FA starts without any command line arguments, it looks for a file called `SupComDataPath.lua`.
 
@@ -141,7 +149,7 @@ At the very top there is the line: `dev_path`, which should be set to wherever y
 
 Starting Forged Alliance from the command line with the following arguments:
 
-`ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog`
+`ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog /nobugreport`
 
 Will put it into a mode where it will look for updates to files that it has loaded. So when you modify a unit file or a blueprint, the game will reload the file and put it into the active session.
 

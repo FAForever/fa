@@ -8417,3 +8417,11 @@ xsl0301_NanoCombat_name="SACU (Nano Combatant Preset)"
 xsl0301_Rambo_desc="Support Armoured Command Unit (Rambo Preset)"
 xsl0301_Rambo_help="Support Armored Command Unit. Enhanced during construction with the personal shield generator, nano-repair system and overcharge enhancements."
 xsl0301_Rambo_name="SACU (Rambo Preset)"
+
+-- unranked lobby option
+lobui_0802="Unrate"
+lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
+lobui_0804="No"
+lobui_0805="This game will be rated if all the criteria for a rated game are met."
+lobui_0806="Yes"
+lobui_0807="This game will not be rated."
