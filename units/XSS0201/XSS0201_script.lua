@@ -58,8 +58,6 @@ XSS0201 = Class(SSubUnit)({
         elseif new == 'Down' then
             self:SetWeaponEnabledByLabel('FrontTurret', false)
             self:SetWeaponEnabledByLabel('BackTurret', false)
-        else
-
         end
     end,
 

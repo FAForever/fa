@@ -54,8 +54,6 @@ URB1102 = Class(CEnergyCreationUnit)({
                 effects = self.WaterEffects
                 bones = self.WaterEffectsBones
                 scale = 2
-            else
-
             end
 
             for keffects, veffects in effects do

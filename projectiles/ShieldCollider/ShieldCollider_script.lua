@@ -138,8 +138,6 @@ ShieldCollider = Class(Projectile)({
             elseif targetType ~= 'Shield' then
                 -- Don't go through here for non-bubble shield collisions
                 self:Destroy()
-            else
-
             end
         end
     end,

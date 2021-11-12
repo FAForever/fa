@@ -65,8 +65,6 @@ TIFMissileCruise03 = Class(TMissileCruiseProjectile)({
             -- Further increase check intervals            
             self:SetTurnRate(100)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

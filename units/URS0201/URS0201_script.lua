@@ -45,8 +45,6 @@ URS0201 = Class(CSeaUnit)({
                     end
                 elseif new == 'Stopped' then
                     self.AnimManip:SetRate(0)
-                else
-
                 end
             end
         end
@@ -66,8 +64,6 @@ URS0201 = Class(CSeaUnit)({
         elseif new == 'Water' then
             self:EnableUnitIntel('Layer', 'Sonar')
             self:SetSpeedMult(1)
-        else
-
         end
 
         -- Can only be built in water so transformthread only needs to be run

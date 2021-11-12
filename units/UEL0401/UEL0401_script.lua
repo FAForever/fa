@@ -65,8 +65,6 @@ UEL0401 = Class(TMobileFactoryUnit)({
         elseif new == 'Seabed' then
             self:AddBuildRestriction(categories.ALLUNITS)
             self:RequestRefreshUI()
-        else
-
         end
     end,
 

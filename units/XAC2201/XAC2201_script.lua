@@ -6,5 +6,5 @@
 --**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-XAC2201 = Class(import('/lua/aeonunits.lua').ACivilianStructureUnit) { }
+XAC2201 = Class(import('/lua/aeonunits.lua').ACivilianStructureUnit)({})
 TypeClass = XAC2201

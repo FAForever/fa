@@ -243,8 +243,6 @@ UAL0001 = Class(ACUUnit)({
             local bpIntel = self:GetBlueprint().Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 26)
-        else
-
         end
     end,
 

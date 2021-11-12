@@ -35,8 +35,6 @@ URL0203 = Class(CLandUnit, SlowAmphibious)({
             self:SetWeaponEnabledByLabel('Bolter', false)
             # Enable Torpedo
             self:SetWeaponEnabledByLabel('Torpedo', true)
-        else
-
         end
         self.WeaponsEnabled = true
     end,
@@ -56,8 +54,6 @@ URL0203 = Class(CLandUnit, SlowAmphibious)({
                 self:SetWeaponEnabledByLabel('Bolter', false)
                 # Enable Torpedo
                 self:SetWeaponEnabledByLabel('Torpedo', true)
-            else
-
             end
         end
         SlowAmphibious.OnLayerChange(self, new, old)

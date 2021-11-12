@@ -117,8 +117,6 @@ UEL0001 = Class(ACUUnit)({
                 self.Trash:Add(pod)
                 self.RightPod = pod
             end
-        else
-
         end
         self:RequestRefreshUI()
     end,
@@ -133,8 +131,6 @@ UEL0001 = Class(ACUUnit)({
                 if self.HasRightPod == true then
                     self.RebuildThread2 = self:ForkThread(self.RebuildPod, 2)
                 end
-            else
-
             end
         else
             self:CreateEnhancement(pod..'Remove')
@@ -374,8 +370,6 @@ UEL0001 = Class(ACUUnit)({
             local amt = self:GetNukeSiloAmmoCount()
             self:RemoveNukeSiloAmmo(amt or 0)
             self:StopSiloBuild()
-        else
-
         end
     end,
 })

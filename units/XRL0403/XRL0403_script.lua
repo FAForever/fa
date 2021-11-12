@@ -104,8 +104,6 @@ XRL0403 = Class(CWalkingLandUnit)({
             self:EnableUnitIntel('Layer', 'Sonar')
             -- Increase speed while in water
             self:SetSpeedMult(self:GetBlueprint().Physics.WaterSpeedMultiplier)
-        else
-
         end
     end,
 

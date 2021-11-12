@@ -164,8 +164,6 @@ local PhasonCollisionBeam2 = Class(PhasonCollisionBeam)({
         elseif not impactType == 'Unit' then
             KillThread(self.Scorching)
             self.Scorching = nil
-        else
-
         end
         PhasonCollisionBeam.OnImpact(self, impactType, targetEntity)
     end,

@@ -157,8 +157,6 @@ XSL0301 = Class(CommandUnit)({
             wep:ChangeMaxRadius(bp.NewMaxRadius or 25)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bp.NewMaxRadius or 25)
-        else
-
         end
     end,
 })

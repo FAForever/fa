@@ -103,8 +103,6 @@ XEA0306 = Class(AirTransport)({
             self.LandingAnimManip:SetRate(-1)
         elseif new == 'Up' then
             self.LandingAnimManip:SetRate(1)
-        else
-
         end
     end,
 

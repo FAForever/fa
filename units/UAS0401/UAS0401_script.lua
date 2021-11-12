@@ -68,8 +68,6 @@ UAS0401 = Class(ASeaUnit)({
             self:AddBuildRestriction(categories.ALLUNITS)
             self:RequestRefreshUI()
             self:PlayUnitSound('Close')
-        else
-
         end
 
         if new == 'Up' and old == 'Bottom' then

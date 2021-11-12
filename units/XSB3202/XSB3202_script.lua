@@ -47,8 +47,6 @@ XSB3202 = Class(SSubUnit)({
             self:SetSpeedMult(1)
         elseif new == 'Down' then
             self:SetSpeedMult(mult)
-        else
-
         end
     end,
 

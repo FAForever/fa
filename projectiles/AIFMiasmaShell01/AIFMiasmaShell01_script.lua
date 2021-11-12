@@ -19,8 +19,6 @@ AIFMiasmaShell01 = Class(AMiasmaProjectile)({
             -- Generic Impact Sound
         elseif bp.Impact then
             self:PlaySound(bp.Impact)
-        else
-
         end
 
         self:CreateImpactEffects(self:GetArmy(), self.FxImpactNone, self.FxNoneHitScale)

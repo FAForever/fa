@@ -71,8 +71,6 @@ UES0401 = Class(AircraftCarrier)({
             self:PlayAllOpenAnims(false)
         elseif new == 'Top' then
             self:PlayAllOpenAnims(true)
-        else
-
         end
 
         if new == 'Up' and old == 'Bottom' then

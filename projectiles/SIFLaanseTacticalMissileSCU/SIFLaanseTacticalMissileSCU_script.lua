@@ -49,8 +49,6 @@ SIFLaanseTacticalMissile01 = Class(SLaanseTacticalMissile)({
             # Further increase check intervals
             self:SetTurnRate(100)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

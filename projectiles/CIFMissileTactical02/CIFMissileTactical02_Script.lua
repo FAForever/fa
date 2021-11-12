@@ -108,8 +108,6 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile)({
             -- Further increase check intervals            
             self:SetTurnRate(100)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

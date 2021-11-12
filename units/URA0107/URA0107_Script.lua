@@ -58,8 +58,6 @@ URA0107 = Class(AirTransport)({
             --             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationIdle, true):SetRate(1)
         elseif new == 'Up' then
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
-        else
-
         end
     end,
 

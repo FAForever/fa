@@ -81,8 +81,6 @@ TIFMissileNukeCDR = Class(TIFMissileNuke)({
             -- Further increase check intervals
             self:SetTurnRate(200)
             KillThread(self.MoveThread)
-        else
-
         end
     end,
 

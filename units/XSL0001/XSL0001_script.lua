@@ -395,8 +395,6 @@ XSL0001 = Class(ACUUnit)({
             oc:ChangeMaxRadius(bpDisrupt or 22)
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(bpDisrupt or 22)
-        else
-
         end
     end,
 })

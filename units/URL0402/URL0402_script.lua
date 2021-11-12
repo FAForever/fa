@@ -105,8 +105,6 @@ URL0402 = Class(CWalkingLandUnit)({
                     table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
                 end
             end
-        else
-
         end
     end,
 
