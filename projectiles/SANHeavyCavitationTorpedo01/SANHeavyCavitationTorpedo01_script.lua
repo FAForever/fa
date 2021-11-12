@@ -51,7 +51,7 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo)({
 
         # Create projectiles in a dispersal pattern
         local numProjectiles = 3
-        local angle = 2 * math.pi / numProjectiles
+        local angle = (2 * math.pi) / numProjectiles
         local angleInitial = RandomFloat(0, angle)
 
         # Randomization of the spread
@@ -76,9 +76,9 @@ SANHeavyCavitationTorpedo01 = Class(SHeavyCavitationTorpedo)({
         end
 
         # Launch projectiles at semi-random angles away from split location
-        for i = 0, numProjectiles - 1 do
-            xVec = vx + math.sin(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
-            zVec = vz + math.cos(angleInitial + i * angle + RandomFloat(-angleVariation, angleVariation)) * spreadMul
+        for i = 0, (numProjectiles - 1) do
+            xVec = vx + math.sin(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation)) * spreadMul
+            zVec = vz + math.cos(angleInitial + (i * angle) + RandomFloat(-angleVariation, angleVariation)) * spreadMul
             local proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:PassDamageData(DividedDamageData)
             proj:PassData(self:GetTrackingTarget())

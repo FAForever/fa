@@ -151,11 +151,11 @@ URL0402 = Class(CWalkingLandUnit)({
 
     CreateDeathExplosionDustRing = function(self)
         local blanketSides = 18
-        local blanketAngle = 2 * math.pi / blanketSides
+        local blanketAngle = (2 * math.pi) / blanketSides
         local blanketStrength = 1
         local blanketVelocity = 2.8
 
-        for i = 0, blanketSides - 1 do
+        for i = 0, (blanketSides - 1) do
             local blanketX = math.sin(i * blanketAngle)
             local blanketZ = math.cos(i * blanketAngle)
 
@@ -252,7 +252,7 @@ URL0402 = Class(CWalkingLandUnit)({
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * qx * qz + qw * qy, qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = math.atan2(2.0 * (qx * qz + (qw * qy)), qw * qw + qx * qx - qz * qz - (qy * qy))
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'SpiderDeath' then
                     position[3] = position[3] + 3 * math.cos(a)
@@ -279,7 +279,7 @@ URL0402 = Class(CWalkingLandUnit)({
         }, 0.1, 3, 1, 'Force', true)
 
         -- Explosion on and damage fire on various bones
-        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateFirePlumes(army, {
             'Left_Projectile01',
@@ -287,17 +287,17 @@ URL0402 = Class(CWalkingLandUnit)({
         self:CreateDamageEffects('Right_Turret', army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         self:CreateDamageEffects('Right_Leg01_B03', army)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle', 1)
         self:CreateExplosionDebris(army)
 
-        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
-        self:CreateDamageEffects('Right_Projectile0'..Random(1, 2), army)
+        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
+        self:CreateDamageEffects('Right_Projectile0' .. Random(1, 2), army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 3)..'_B0'..Random(1, 3), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 3) .. '_B0' .. Random(1, 3), 0.25)
         CreateDeathExplosion(self, 'Left_Projectile01', 2)
         self:CreateDamageEffects('Left_Leg03_B03', army)
 

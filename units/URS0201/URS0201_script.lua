@@ -89,7 +89,7 @@ URS0201 = Class(CSeaUnit)({
             self.AnimManip:SetRate(2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 1.0 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 1.0)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self:SetImmobile(false)
             self.SwitchAnims = true
@@ -102,7 +102,7 @@ URS0201 = Class(CSeaUnit)({
             self.AnimManip:SetRate(-2)
             self.IsWaiting = true
             WaitFor(self.AnimManip)
-            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, bp.CollisionOffsetY + bp.SizeY * 0.5 or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
+            self:SetCollisionShape('Box', bp.CollisionOffsetX or 0, (bp.CollisionOffsetY + (bp.SizeY * 0.5)) or 0, bp.CollisionOffsetZ or 0, bp.SizeX * scale, bp.SizeY * scale, bp.SizeZ * scale)
             self.IsWaiting = false
             self.AnimManip:Destroy()
             self.AnimManip = nil

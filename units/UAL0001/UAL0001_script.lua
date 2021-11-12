@@ -38,7 +38,7 @@ UAL0001 = Class(ACUUnit)({
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+        self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -165,7 +165,7 @@ UAL0001 = Class(ACUUnit)({
                 return
             end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'AeonACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT2BuildRate')
             end
@@ -207,7 +207,7 @@ UAL0001 = Class(ACUUnit)({
                 return
             end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.AEON * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.AEON * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'AeonACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'AeonACUT3BuildRate')
             end

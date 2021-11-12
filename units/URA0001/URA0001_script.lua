@@ -23,7 +23,7 @@ URA0001 = Class(CAirUnit)({
         if not DeprecatedWarnings.URA0001 then
             DeprecatedWarnings.URA0001 = true
             WARN("URA0001 is deprecated: use URA0001O, URA0002O or URA0003O instead.")
-            WARN("Source: "..repr(debug.getinfo(2)))
+            WARN("Source: " .. repr(debug.getinfo(2)))
         end
 
         CAirUnit.OnCreate(self)

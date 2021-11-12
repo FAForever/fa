@@ -34,7 +34,7 @@ UES0401 = Class(AircraftCarrier)({
         self.OpenAnimManips = {}
         self.OpenAnimManips[1] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen.sca'):SetRate(-1)
         for i = 2, 6 do
-            self.OpenAnimManips[i] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen0'..i..'.sca'):SetRate(-1)
+            self.OpenAnimManips[i] = CreateAnimator(self):PlayAnim('/units/ues0401/ues0401_aopen0' .. i .. '.sca'):SetRate(-1)
         end
 
         for k, v in self.OpenAnimManips do
@@ -97,7 +97,7 @@ UES0401 = Class(AircraftCarrier)({
             -- Target depth, in this case the seabed
             local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
             -- Doesnt sink too much, just maneuveres the bed better.
-            local difference = math.max(seafloor + Yoffset - pos[2], -0.5)
+            local difference = math.max(((seafloor + Yoffset) - pos[2]), -0.5)
             self.SinkSlider:SetSpeed(1)
 
             self.SinkSlider:SetGoal(0, difference, 0)

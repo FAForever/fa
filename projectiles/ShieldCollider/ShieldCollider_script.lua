@@ -105,7 +105,7 @@ ShieldCollider = Class(Projectile)({
 
                     if not self.Plane.deathWep or not self.Plane.DeathCrashDamage then
                         -- Bail if stuff's missing.
-                        WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint? - '..self.UnitId)
+                        WARN('ShieldCollider: did not find a deathWep on the plane! Is the weapon defined in the blueprint? - ' .. self.UnitId)
                         return
                     end
 
@@ -163,9 +163,9 @@ ShieldCollider = Class(Projectile)({
         vz = 10 * vz
 
         -- The length of our vector
-        local speed = math.sqrt(vx * vx + vy * vy + vz * vz)
+        local speed = math.sqrt(vx * vx + vy * vy + (vz * vz))
         -- The length of our other vector
-        local shieldMag = math.sqrt(wx * wx + wy * wy + wz * wz)
+        local shieldMag = math.sqrt(wx * wx + wy * wy + (wz * wz))
 
         -- Normalizing all our shield vector, so we dont need to deal with scalar nonsense
         wx = wx / shieldMag
@@ -178,10 +178,10 @@ ShieldCollider = Class(Projectile)({
         -- Our kinetic energy, used to scale the stoppingpower
         local ke = 0.5 * volume * speed * speed
         -- 2 is a perfect bounce, 0 is unaffected velocity
-        local stoppingPower = math.min(50 / ke * 0.5, 2)
+        local stoppingPower = math.min(50 / (ke * 0.5), 2)
 
         -- We take our unit vectors and calculate the angle. That 10 is to convert speed back to its "proper" length
-        local angleCos = 10 * dotProduct / speed * shieldMag
+        local angleCos = 10 * dotProduct / (speed * shieldMag)
         angleCos = math.clamp(-1, angleCos, 1)
 
         -- Well, almost - its incredibly inaccurate at angles close to 0, but it doesnt matter since this is mostly a visual thing
@@ -189,7 +189,7 @@ ShieldCollider = Class(Projectile)({
         -- So we just clamp it to make sure its ok and no more worries
 
         -- Bounciness coefficient, set to taste; 1.0 is a 'perfect' bounce
-        local forceScalar = 1 - 0.65 * angleCos * stoppingPower / 2
+        local forceScalar = 1 - 0.65 * angleCos * (stoppingPower / 2)
         -- The more direct the hit the lower it is, down to a minimum of 1-0.5
         -- StoppingPower also affects this, so the more ke we have, the less our velocity is changed, and so the less our coefficient is affected.
 

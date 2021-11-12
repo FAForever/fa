@@ -17,9 +17,9 @@ URB1301 = Class(CEnergyCreationUnit)({
         for i = 1, 36 do
             local fxname
             if i < 10 then
-                fxname = 'BlinkyLight0'..i
+                fxname = 'BlinkyLight0' .. i
             else
-                fxname = 'BlinkyLight'..i
+                fxname = 'BlinkyLight' .. i
             end
             local fx = CreateAttachedEmitter(self, fxname, self.Army, '/effects/emitters/light_yellow_02_emit.bp'):OffsetEmitter(0, 0, 0.01):ScaleEmitter(1)
             self.Trash:Add(fx)

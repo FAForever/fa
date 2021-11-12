@@ -70,11 +70,11 @@ URA0104 = Class(AirTransport)({
     OnMotionVertEventChange = function(self, new, old)
         AirTransport.OnMotionVertEventChange(self, new, old)
         -- Aborting a landing
-        if new == 'Top' or new == 'Up' and old == 'Down' then
+        if ((new == 'Top' or (new == 'Up')) and (old == 'Down')) then
             self.AnimManip:SetRate(-1)
-        elseif new == 'Down' then
+        elseif (new == 'Down') then
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand, false):SetRate(1.5)
-        elseif new == 'Up' then
+        elseif (new == 'Up') then
             self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
         end
     end,

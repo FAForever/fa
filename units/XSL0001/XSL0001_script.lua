@@ -43,7 +43,7 @@ XSL0001 = Class(ACUUnit)({
         self:HideBone('Right_Upgrade', true)
         self:HideBone('Left_Upgrade', true)
         -- Restrict what enhancements will enable later
-        self:AddBuildRestriction(categories.SERAPHIM * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+        self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -75,7 +75,7 @@ XSL0001 = Class(ACUUnit)({
 
     RegenBuffThread = function(self, type)
         local bp = self:GetBlueprint().Enhancements[type]
-        local buff = 'SeraphimACU'..type
+        local buff = 'SeraphimACU' .. type
 
         while not self.Dead do
             local units = self:GetUnitsToBuff(bp)
@@ -97,13 +97,13 @@ XSL0001 = Class(ACUUnit)({
             local buff
             local type
 
-            buff = 'SeraphimACU'..enh
+            buff = 'SeraphimACU' .. enh
 
             if not Buffs[buff] then
                 local buff_bp = {
                     Name = buff,
                     DisplayName = buff,
-                    BuffType = 'COMMANDERAURA_'..enh,
+                    BuffType = 'COMMANDERAURA_' .. enh,
                     Stacks = 'REPLACE',
                     Duration = 5,
                     Effects = {
@@ -136,7 +136,7 @@ XSL0001 = Class(ACUUnit)({
                 BuffBlueprint(buff_bp)
             end
 
-            buff2 = buff..'SelfBuff'
+            buff2 = buff .. 'SelfBuff'
 
             if not Buffs[buff2] then
                 -- AURA SELF BUFF
@@ -177,8 +177,8 @@ XSL0001 = Class(ACUUnit)({
                 'SeraphimACURegenAura',
                 'SeraphimACUAdvancedRegenAura',
             } do
-                if Buff.HasBuff(self, b..'SelfBuff') then
-                    Buff.RemoveBuff(self, b..'SelfBuff')
+                if Buff.HasBuff(self, b .. 'SelfBuff') then
+                    Buff.RemoveBuff(self, b .. 'SelfBuff')
                 end
             end
         elseif enh == 'ResourceAllocation' then
@@ -319,7 +319,7 @@ XSL0001 = Class(ACUUnit)({
                 return
             end
             self:RestoreBuildRestrictions()
-            self:AddBuildRestriction(categories.SERAPHIM * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             if Buff.HasBuff(self, 'SeraphimACUT2BuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimACUT2BuildRate')
             end
@@ -365,7 +365,7 @@ XSL0001 = Class(ACUUnit)({
             if Buff.HasBuff(self, 'SeraphimACUT3BuildRate') then
                 Buff.RemoveBuff(self, 'SeraphimACUT3BuildRate')
             end
-            self:AddBuildRestriction(categories.SERAPHIM * categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER)
+            self:AddBuildRestriction(categories.SERAPHIM * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
             --Blast Attack
         elseif enh == 'BlastAttack' then
             local wep = self:GetWeaponByLabel('ChronotronCannon')

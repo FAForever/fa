@@ -115,11 +115,11 @@ XRL0403 = Class(CWalkingLandUnit)({
 
     CreateDeathExplosionDustRing = function(self)
         local blanketSides = 18
-        local blanketAngle = 2 * math.pi / blanketSides
+        local blanketAngle = (2 * math.pi) / blanketSides
         local blanketStrength = 1
         local blanketVelocity = 2.8
 
-        for i = 0, blanketSides - 1 do
+        for i = 0, (blanketSides - 1) do
             local blanketX = math.sin(i * blanketAngle)
             local blanketZ = math.cos(i * blanketAngle)
 
@@ -199,9 +199,9 @@ XRL0403 = Class(CWalkingLandUnit)({
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * qx * qz + qw * qy, qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = math.atan2(2.0 * (qx * qz + (qw * qy)), qw * qw + qx * qx - qz * qz - (qy * qy))
             for i, numWeapons in bp.Weapon do
-                if bp.Weapon[i].Label == 'MegalithDeath' then
+                if (bp.Weapon[i].Label == 'MegalithDeath') then
                     position[3] = position[3] + 2.5 * math.cos(a)
                     position[1] = position[1] + 2.5 * math.sin(a)
                     DamageArea(self, position, bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
@@ -240,7 +240,7 @@ XRL0403 = Class(CWalkingLandUnit)({
         }, 0.1, 3, 1, 'Force', true)
 
         -- Explosion on and damage fire on various bones
-        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
+        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 2) .. '_B0' .. Random(1, 2), 0.25)
         CreateDeathExplosion(self, 'Flare_Muzzle03', 2)
         self:CreateFirePlumes(army, {
             'Torpedo_Muzzle11',
@@ -248,17 +248,17 @@ XRL0403 = Class(CWalkingLandUnit)({
         self:CreateDamageEffects('Right_Turret', army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 2) .. '_B0' .. Random(1, 2), 0.25)
         self:CreateDamageEffects('Right_Footfall_02', army)
         WaitSeconds(0.5)
         CreateDeathExplosion(self, 'Left_Turret_Muzzle01', 1)
         self:CreateExplosionDebris(army)
 
-        CreateDeathExplosion(self, 'Right_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
+        CreateDeathExplosion(self, 'Right_Leg0' .. Random(1, 2) .. '_B0' .. Random(1, 2), 0.25)
         self:CreateDamageEffects('Torpedo_Muzzle01', army)
         WaitSeconds(0.5)
 
-        CreateDeathExplosion(self, 'Left_Leg0'..Random(1, 2)..'_B0'..Random(1, 2), 0.25)
+        CreateDeathExplosion(self, 'Left_Leg0' .. Random(1, 2) .. '_B0' .. Random(1, 2), 0.25)
         CreateDeathExplosion(self, 'Flare_Muzzle06', 2)
         self:CreateDamageEffects('Left_Leg02_B02', army)
         explosion.CreateFlash(self, 'Right_Leg01_B01', 3.2, army)
@@ -272,7 +272,7 @@ XRL0403 = Class(CWalkingLandUnit)({
     OnMotionHorzEventChange = function(self, new, old)
         CWalkingLandUnit.OnMotionHorzEventChange(self, new, old)
 
-        if old == 'Stopped' then
+        if (old == 'Stopped') then
             local bpDisplay = self:GetBlueprint().Display
             if bpDisplay.AnimationWalk and self.Animator then
                 self.Animator:SetDirectionalAnim(true)

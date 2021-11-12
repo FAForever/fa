@@ -67,7 +67,7 @@ UAL0401 = Class(AWalkingLandUnit)({
             local bp = self:GetBlueprint()
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
-            local a = math.atan2(2.0 * qx * qz + qw * qy, qw * qw + qx * qx - qz * qz - qy * qy)
+            local a = math.atan2(2.0 * (qx * qz + (qw * qy)), qw * qw + qx * qx - qz * qz - (qy * qy))
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
                     position[3] = position[3] + 5 * math.cos(a)

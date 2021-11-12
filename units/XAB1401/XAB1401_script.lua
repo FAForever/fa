@@ -21,7 +21,7 @@ XAB1401 = Class(AStructureUnit)({
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
         local num = self:GetRandomDir()
-        self.BallManip = CreateRotator(self, 'Orb', 'y', nil, 0, 15, 80 + Random(0, 20) * num)
+        self.BallManip = CreateRotator(self, 'Orb', 'y', nil, 0, 15, 80 + (Random(0, 20) * num))
         self.Trash:Add(self.BallManip)
 
         ChangeState(self, self.ResourceOn)
@@ -44,8 +44,8 @@ XAB1401 = Class(AStructureUnit)({
                 local massNeed = aiBrain:GetEconomyRequested('MASS') * 10
                 local energyNeed = aiBrain:GetEconomyRequested('ENERGY') * 10
 
-                local massIncome = aiBrain:GetEconomyIncome('MASS') * 10 - massAdd
-                local energyIncome = aiBrain:GetEconomyIncome('ENERGY') * 10 - energyAdd
+                local massIncome = (aiBrain:GetEconomyIncome('MASS') * 10) - massAdd
+                local energyIncome = (aiBrain:GetEconomyIncome('ENERGY') * 10) - energyAdd
 
                 massAdd = 20
                 if massNeed - massIncome > 0 then
