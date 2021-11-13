@@ -13,7 +13,7 @@ local WeakKeyMeta = { __mode = 'k' }
 
 -- Set this true to get tracebacks in error messages. It slows down lazyvars a lot,
 -- so don't use except when debugging.
-ExtendedErrorMessages = false
+local ExtendedErrorMessages = false
 
 function LazyVarMetaTable:__call()
     if not self[1] then
