@@ -2,8 +2,10 @@
 -- LazyVar module
 --
 
+-- upvalue for performance
+local pcall = pcall
 
-local EvalContext = nil
+local EvalContext = false
 
 local LazyVarMetaTable = { }
 
@@ -16,6 +18,16 @@ local WeakKeyMeta = { __mode = 'k' }
 local ExtendedErrorMessages = false
 
 function LazyVarMetaTable:__call()
+
+    if self.Debug then 
+        LOG("__call: " .. tostring(self[1]))
+        LOG(repr(debug.getinfo(0)))
+        LOG(repr(debug.getinfo(1)))
+        LOG(repr(debug.getinfo(2)))
+        LOG(repr(debug.getinfo(3)))
+        LOG(repr(debug.getinfo(4)))
+    end
+
     if not self[1] then
         if self.busy then
             error("circular dependency in lazy evaluation for variable " .. (self.trace or ''), 2)
@@ -25,6 +37,11 @@ function LazyVarMetaTable:__call()
         for u in self.uses do
             u.used_by[self] = nil
         end
+
+        for k, v in self.uses do 
+            self.uses[k] = nil
+        end
+
         self.uses = {}
         local oldContext = EvalContext
         EvalContext = self
@@ -78,10 +95,12 @@ function LazyVarMetaTable:SetValue(value)
     self.trace = nil
     self[1] = value
     -- Now remove us from the used_by lists for any lazy vars we used to use.
+
     for u in self.uses do
         u.used_by[self] = nil
     end
-    self.uses = {}
+    self.uses = { }
+
     for i,v in ipairs(dirtyList) do
         v:OnDirty()
     end
@@ -104,8 +123,17 @@ function LazyVarMetaTable:Destroy()
     self.value = nil
 end
 
+local count = 1
+local threshold = 1000
+
 function Create(initial)
-    result = {&1&4}
+
+    count = count + 1 
+    if count / threshold == math.floor(count / threshold) then 
+        LOG("Count: " .. count )
+    end
+
+    result = { }
     setmetatable(result, LazyVarMetaTable)
     result[1] = initial or 0
     result.used_by = {}

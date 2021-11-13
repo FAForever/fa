@@ -10,7 +10,7 @@ local LazyVar = import('/lua/lazyvar.lua')
 
 -- # Settings
 
-local MaxLabels = 100 -- The maximum number of labels created in a game session
+local MaxLabels = 1000 -- The maximum number of labels created in a game session
 local MinAmount = options.minimum_reclaim_amount or 10
 
 -- # Lazy evaluation
@@ -138,10 +138,45 @@ local RootLabel = Class(Group) {
         update = update or (position[3] ~= self.OldCameraPosition[3])
 
         if update then 
-            LazyView:Set(self.View)
 
+            -- keep track of current zoom / position
             self.OldCameraZoom = zoom 
             self.OldCameraPosition = position
+
+            -- retrieve pixel factor
+            local pixelFactor = LayoutHelpers.GetPixelScaleFactor()
+
+            -- for each displayed label: project and position it
+            for k = 1, MaxLabels do 
+                local label = LabelPool[k]
+                if label and label.Displayed then 
+                    local projected = self.View:Project(label.Position)
+
+                    if k == 1 then 
+                        label.mass.Left.Debug = true 
+                    end
+
+                    local left = pixelFactor * (projected.x - 12)
+                    local top = pixelFactor * (projected.y - 13)
+                    local width = pixelFactor * 14 
+                    local height = pixelFactor * 14 
+
+                    label.mass.Left:SetValue(left)
+                    label.mass.Top:SetValue(top)
+                    label.mass.Right:SetValue(left + width)
+                    label.mass.Bottom:SetValue(top + height)
+
+                    local left = pixelFactor * (projected.x + 4)
+                    local top = pixelFactor * (projected.y - 13)
+                    local width = pixelFactor * 25 
+                    local height = pixelFactor * 25 
+
+                    label.text.Left:SetValue(left)
+                    label.text.Top:SetValue(top)
+                    label.text.Right:SetValue(left + width)
+                    label.text.Bottom:SetValue(top + height)
+                end
+            end
         end
     end,
 }
@@ -152,10 +187,10 @@ local Label = Class(Group) {
         self.parent = parent
 
         -- default values
-        self.Top:Set(0)
-        self.Left:Set(0)
-        self.Width:Set(25)
-        self.Height:Set(25)
+        self.Top:SetValue(0)
+        self.Left:SetValue(0)
+        self.Width:SetValue(25)
+        self.Height:SetValue(25)
     end,
 }
 
@@ -165,19 +200,22 @@ function CreateReclaimLabel(root)
     ReclaimLabelsMade = ReclaimLabelsMade + 1
     local label = Label(root)
 
+    local pixelScaleFactor = LayoutHelpers.GetPixelScaleFactor()
+
     -- mass bitmap
     label.mass = Bitmap(label)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-    LayoutHelpers.AtLeftIn(label.mass, label)
-    LayoutHelpers.AtVerticalCenterIn(label.mass, label)
-    LayoutHelpers.SetDimensions(label.mass, 14, 14)
+    label.mass.Left:SetValue(0)
+    label.mass.Top:SetValue(0)
+    label.mass.Width:SetValue(pixelScaleFactor * 14)
+    label.mass.Height:SetValue(pixelScaleFactor * 14)
 
     -- text information
     label.text = UIUtil.CreateText(label, "10", 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
     label.text:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(label.text, label, 16)
-    LayoutHelpers.AtVerticalCenterIn(label.text, label)
+    label.text.Left:SetValue(0)
+    label.text.Top:SetValue(0)
 
     -- disable various settings
     label:DisableHitTest(true)
@@ -192,7 +230,7 @@ function CreateReclaimLabel(root)
 
         -- change our position
         self.Position = label.position
-        self.PixelFactor = 1 / LayoutHelpers.GetPixelScaleFactor()
+        self.Displayed = true
 
         -- update mass
         if label.mass ~= self.oldMass then
@@ -201,24 +239,6 @@ function CreateReclaimLabel(root)
             self.oldMass = label.mass
         end
     end
-
-    -- update left position
-    label.Left:Set(
-        function()
-            UpdateLeft = UpdateLeft + 1
-            local projected = LazyView():Project(label.Position)
-            return label.PixelFactor * (projected.x - 12) 
-        end
-    )
-
-    -- update right position
-    label.Top:Set(
-        function()
-            UpdateTop = UpdateTop + 1
-            local projected = LazyView():Project(label.Position)
-            return label.PixelFactor * (projected.y - 13)
-        end
-    )
 
     return label
 end
@@ -268,6 +288,7 @@ function UpdateLabels(root)
                 LabelPool[index] = nil
             elseif not label:IsHidden() then
                 label:Hide()
+                label.Displayed = false
             end
         end
     end
@@ -335,19 +356,13 @@ function OnCommandGraphShow(bool)
             while CommandGraphActive do
 
                 keydown = IsKeyDown('Control')
-                LOG(keydown)
                 if keydown then 
                     ShowReclaim(true)
                     
                     if not Thread then 
-                        LOG("Creating reclaim thread!")
                         Thread = ForkThread(ShowReclaimThread)
                     end
                 end
-
-                LOG("UpdateLeft: " .. tostring(UpdateLeft))
-                LOG("UpdateTop: " .. tostring(UpdateTop))
-                LOG("ReclaimLabelsMade: " .. tostring(ReclaimLabelsMade))
 
                 WaitSeconds(.1)
             end
