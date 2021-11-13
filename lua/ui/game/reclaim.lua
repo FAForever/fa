@@ -139,6 +139,8 @@ local RootLabel = Class(Group) {
 
         if update then 
 
+            -- LOG("update")
+
             -- keep track of current zoom / position
             self.OldCameraZoom = zoom 
             self.OldCameraPosition = position
@@ -147,34 +149,73 @@ local RootLabel = Class(Group) {
             local pixelFactor = LayoutHelpers.GetPixelScaleFactor()
 
             -- for each displayed label: project and position it
+            local view = self.View
+            -- local width = view:Width()
+            -- local height = view:Height()
+
+            local project = self.View.Project 
+            local label, projected, px, py
+            local left, top, width, height
+            local element
+
+            -- local DummyVector2 = Vector2(0, 0)
+            -- local topLeft, topRight, bottomLeft, bottomRight 
+
+            -- DummyVector2[1] = 0 
+            -- DummyVector2[2] = 0
+            -- topLeft = UnProject(view, DummyVector2)
+
+            -- DummyVector2[1] = width 
+            -- DummyVector2[2] = 0
+            -- topRight = UnProject(view, DummyVector2)
+
+            -- DummyVector2[1] = 0 
+            -- DummyVector2[2] = height
+            -- bottomLeft = UnProject(view, DummyVector2)
+
+            -- DummyVector2[1] = width 
+            -- DummyVector2[2] = height
+            -- bottomRight = UnProject(view, DummyVector2)
+
+            -- LOG("topLeft: " .. repr(topLeft))
+            -- LOG("topRight: " .. repr(topRight))
+            -- LOG("bottomLeft: " .. repr(bottomLeft))
+            -- LOG("bottomRight: " .. repr(bottomRight))
+            -- LOG("GetMouseScreenPos: " .. repr(GetMouseScreenPos()))
+            -- LOG("GetMouseWorldPos: " .. repr(GetMouseWorldPos()))
+
             for k = 1, MaxLabels do 
-                local label = LabelPool[k]
+                label = LabelPool[k]
                 if label and label.Displayed then 
-                    local projected = self.View:Project(label.Position)
 
-                    if k == 1 then 
-                        label.mass.Left.Debug = true 
-                    end
+                    -- determine projected position: this introduces a ton of small blocks!
+                    projected = project(view, label.Position)
+                    px = projected[1]
+                    py = projected[2]
 
-                    local left = pixelFactor * (projected.x - 12)
-                    local top = pixelFactor * (projected.y - 13)
-                    local width = pixelFactor * 14 
-                    local height = pixelFactor * 14 
+                    -- determine position and size of bitmap
+                    left = pixelFactor * (px - 12)
+                    top = pixelFactor * (py - 13)
+                    width = pixelFactor * 14 
+                    height = pixelFactor * 14 
 
-                    label.mass.Left:SetValue(left)
-                    label.mass.Top:SetValue(top)
-                    label.mass.Right:SetValue(left + width)
-                    label.mass.Bottom:SetValue(top + height)
+                    element = label.mass
+                    element.Left[1] = (left)
+                    element.Top[1] = (top)
+                    element.Right[1] = (left + width)
+                    element.Bottom[1] = (top + height)
 
-                    local left = pixelFactor * (projected.x + 4)
-                    local top = pixelFactor * (projected.y - 13)
-                    local width = pixelFactor * 25 
-                    local height = pixelFactor * 25 
+                    -- determine position and size of text
+                    left = pixelFactor * (px + 4)
+                    top = pixelFactor * (py - 13)
+                    width = pixelFactor * 25 
+                    height = pixelFactor * 25 
 
-                    label.text.Left:SetValue(left)
-                    label.text.Top:SetValue(top)
-                    label.text.Right:SetValue(left + width)
-                    label.text.Bottom:SetValue(top + height)
+                    element = label.text
+                    element.Left[1] = (left)
+                    element.Top[1] = (top)
+                    element.Right[1] = (left + width)
+                    element.Bottom[1] = (top + height)
                 end
             end
         end
@@ -189,6 +230,8 @@ local Label = Class(Group) {
         -- default values
         self.Top:SetValue(0)
         self.Left:SetValue(0)
+        self.Right:SetValue(25)
+        self.Bottom:SetValue(25)
         self.Width:SetValue(25)
         self.Height:SetValue(25)
     end,
@@ -207,6 +250,7 @@ function CreateReclaimLabel(root)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
     label.mass.Left:SetValue(0)
     label.mass.Top:SetValue(0)
+
     label.mass.Width:SetValue(pixelScaleFactor * 14)
     label.mass.Height:SetValue(pixelScaleFactor * 14)
 
