@@ -10,7 +10,7 @@ local LazyVar = import('/lua/lazyvar.lua')
 
 -- # Settings
 
-local MaxLabels = 1000 -- The maximum number of labels created in a game session
+local MaxLabels = 100 -- The maximum number of labels created in a game session
 local MinAmount = options.minimum_reclaim_amount or 10
 
 -- # Lazy evaluation
@@ -131,7 +131,7 @@ local RootLabel = Class(Group) {
         local zoom = self.Camera:GetZoom()
         local position = self.Camera:GetFocusPosition()
 
-        local update = false
+        local update = ReclaimChanged
         update = update or (zoom ~= self.OldCameraZoom)
         update = update or (position[1] ~= self.OldCameraPosition[1])
         update = update or (position[2] ~= self.OldCameraPosition[2])
@@ -173,7 +173,7 @@ function CreateReclaimLabel(root)
     LayoutHelpers.SetDimensions(label.mass, 14, 14)
 
     -- text information
-    label.text = UIUtil.CreateText(label, "", 10, UIUtil.bodyFont)
+    label.text = UIUtil.CreateText(label, "10", 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
     label.text:SetDropShadow(true)
     LayoutHelpers.AtLeftIn(label.text, label, 16)
@@ -192,6 +192,7 @@ function CreateReclaimLabel(root)
 
         -- change our position
         self.Position = label.position
+        self.PixelFactor = 1 / LayoutHelpers.GetPixelScaleFactor()
 
         -- update mass
         if label.mass ~= self.oldMass then
@@ -204,32 +205,18 @@ function CreateReclaimLabel(root)
     -- update left position
     label.Left:Set(
         function()
-            local view = LazyView()
-
-            if view then 
-                UpdateLeft = UpdateLeft + 1
-                local projected = view:Project(label.Position)
-                local value = (projected.x - 12) / LayoutHelpers.GetPixelScaleFactor()
-                return value
-            else 
-                return 0
-            end
+            UpdateLeft = UpdateLeft + 1
+            local projected = LazyView():Project(label.Position)
+            return label.PixelFactor * (projected.x - 12) 
         end
     )
 
     -- update right position
     label.Top:Set(
         function()
-            local view = LazyView()
-
-            if view then 
-                UpdateTop = UpdateTop + 1
-                local projected = view:Project(label.Position)
-                local value = (projected.y - 13) / LayoutHelpers.GetPixelScaleFactor()
-                return value
-            else 
-                return 0 
-            end
+            UpdateTop = UpdateTop + 1
+            local projected = LazyView():Project(label.Position)
+            return label.PixelFactor * (projected.y - 13)
         end
     )
 
@@ -243,7 +230,6 @@ function UpdateLabels(root)
 
     local onScreenReclaimIndex = 1
 
-    once = false
     -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
     for _, r in Reclaim do
         r.onScreen = OnScreen(view, r.position)
@@ -299,7 +285,7 @@ function ShowReclaim(show)
     end
 end
 
-function ShowReclaimThread(watch_key)
+function ShowReclaimThread()
     local view = import('/lua/ui/game/worldview.lua').viewLeft
     local camera = GetCamera("WorldCamera")
 
@@ -366,8 +352,9 @@ function OnCommandGraphShow(bool)
                 WaitSeconds(.1)
             end
 
-            KillThread(Thread)
             ShowReclaim(false)
+            KillThread(Thread)
+            Thread = nil
         end)
     else
         CommandGraphActive = false -- above coroutine runs until now
