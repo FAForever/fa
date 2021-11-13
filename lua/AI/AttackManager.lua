@@ -1,3 +1,22 @@
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local aibrain_methodsGetCurrentEnemy = moho.aibrain_methods.GetCurrentEnemy
+local tableRemove = table.remove
+local unpack = unpack
+local error = error
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local tableEmpty = table.empty
+local aibrain_methodsGetPlatoonsList = moho.aibrain_methods.GetPlatoonsList
+local tableGetn = table.getn
+local type = type
+local aibrain_methodsSetUpAttackVectorsToArmy = moho.aibrain_methods.SetUpAttackVectorsToArmy
+local platoon_methodsSetPlatoonFormationOverride = moho.platoon_methods.SetPlatoonFormationOverride
+local SPEW = SPEW
+local EntityCategoryContains = EntityCategoryContains
+
 local Utilities = import('/lua/utilities.lua')
 
 -- ATTACK MANAGER SPEC
@@ -140,7 +159,7 @@ AttackManager = Class({
             self.Platoons = {}
         end
         self.NeedSort = true
-        table.insert(self.Platoons, pltnTable)
+        tableInsert(self.Platoons, pltnTable)
     end,
 
     ClearPlatoonList = function(self)
@@ -155,7 +174,7 @@ AttackManager = Class({
     CheckAttackConditions = function(self, pltnInfo)
         for k, v in pltnInfo.AttackConditions do
             if v[3][1] == "default_brain" then
-                table.remove(v[3], 1)
+                tableRemove(v[3], 1)
             end
             if iscallable(v[1]) then
                 if not v[1](self.brain, unpack(v[2])) then
@@ -182,7 +201,7 @@ AttackManager = Class({
         local sortedList = {}
         --Simple selection sort, this can be made faster later if we decide we need it.
         if self.Platoons then
-            for i = 1, table.getn(self.Platoons) do
+            for i = 1, tableGetn(self.Platoons) do
                 local highest = 0
                 local key, value
                 for k, v in self.Platoons do
@@ -193,7 +212,7 @@ AttackManager = Class({
                     end
                 end
                 sortedList[i] = value
-                table.remove(self.Platoons, key)
+                tableRemove(self.Platoons, key)
             end
             self.Platoons = sortedList
         end
@@ -204,9 +223,9 @@ AttackManager = Class({
     FormAttackPlatoon = function(self)
         local attackForcePL = {}
         local namedPlatoonList = {}
-        local poolPlatoon = self.brain:GetPlatoonUniquelyNamed('ArmyPool')
+        local poolPlatoon = aibrain_methodsGetPlatoonUniquelyNamed(self.brain, 'ArmyPool')
         if poolPlatoon then
-            table.insert(attackForcePL, poolPlatoon)
+            tableInsert(attackForcePL, poolPlatoon)
         end
         if self.NeedSort then
             self:SortPlatoonsViaPriority()
@@ -214,17 +233,17 @@ AttackManager = Class({
         for k,v in self.Platoons do
             if self:CheckAttackConditions(v) then
                 local combineList = {}
-                local platoonList = self.brain:GetPlatoonsList()
+                local platoonList = aibrain_methodsGetPlatoonsList(self.brain)
                 for j, platoon in platoonList do
                     if platoon:IsPartOfAttackForce() then
                         for i, name in platoon.PlatoonData.AMPlatoons do
                             if name == v.PlatoonName then
-                                table.insert(combineList, platoon)
+                                tableInsert(combineList, platoon)
                             end
                         end
                     end
                 end
-                if not table.empty(combineList) or v.UsePool then
+                if not tableEmpty(combineList) or v.UsePool then
                     local tempPlatoon
                     if self.Platoons[k].AIName then
                         tempPlatoon = self.brain:CombinePlatoons(combineList, v.AIName)
@@ -234,9 +253,9 @@ AttackManager = Class({
                     local formation = 'GrowthFormation'
 
                     if v.PlatoonData.OverrideFormation then
-                        tempPlatoon:SetPlatoonFormationOverride(v.PlatoonData.OverrideFormation)
+                        platoon_methodsSetPlatoonFormationOverride(tempPlatoon, v.PlatoonData.OverrideFormation)
                     elseif v.PlatoonType == 'Air' and not v.UsePool then
-                        tempPlatoon:SetPlatoonFormationOverride('GrowthFormation')
+                        platoon_methodsSetPlatoonFormationOverride(tempPlatoon, 'GrowthFormation')
                     end
 
                     if v.UsePool then
@@ -253,8 +272,8 @@ AttackManager = Class({
                             error('*AI WARNING: Invalid Platoon Type - ' .. v.PlatoonType, 2)
                             break
                         end
-                        local poolPlatoon = self.brain:GetPlatoonUniquelyNamed('ArmyPool')
-                        local poolUnits = poolPlatoon:GetPlatoonUnits()
+                        local poolPlatoon = aibrain_methodsGetPlatoonUniquelyNamed(self.brain, 'ArmyPool')
+                        local poolUnits = platoon_methodsGetPlatoonUnits(poolPlatoon)
                         local addUnits = {}
                         if v.LocationType then
                             local location = false
@@ -271,17 +290,17 @@ AttackManager = Class({
                             for i,unit in poolUnits do
                                 if Utilities.GetDistanceBetweenTwoVectors(unit:GetPosition(), location.Location) <= location.Radius
                                     and EntityCategoryContains(checkCategory, unit) then
-                                        table.insert(addUnits, unit)
+                                        tableInsert(addUnits, unit)
                                 end
                             end
                         else
                             for i,unit in poolUnits do
                                 if EntityCategoryContains(checkCategory, unit) then
-                                    table.insert(addUnits, unit)
+                                    tableInsert(addUnits, unit)
                                 end
                             end
                         end
-                        self.brain:AssignUnitsToPlatoon(tempPlatoon, addUnits, 'Attack', formation)
+                        aibrain_methodsAssignUnitsToPlatoon(self.brain, tempPlatoon, addUnits, 'Attack', formation)
                     end
                     if v.PlatoonData then
                         tempPlatoon:SetPlatoonData(v.PlatoonData)
@@ -339,7 +358,7 @@ AttackManager = Class({
     end,
 
     GetNumberAttackForcePlatoons = function(self)
-        local platoonList = self.brain:GetPlatoonsList()
+        local platoonList = aibrain_methodsGetPlatoonsList(self.brain)
         local result = 0
         for k, v in platoonList do
             if v:IsPartOfAttackForce() then
@@ -352,9 +371,9 @@ AttackManager = Class({
     end,
 
     AttackManageAttackVectors = function(self)
-        local enemyBrain = self.brain:GetCurrentEnemy()
+        local enemyBrain = aibrain_methodsGetCurrentEnemy(self.brain)
         if enemyBrain then
-            self.brain:SetUpAttackVectorsToArmy()
+            aibrain_methodsSetUpAttackVectorsToArmy(self.brain)
         end
     end,
 

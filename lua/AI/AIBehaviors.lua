@@ -5,6 +5,76 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local unit_methodsGetCargo = moho.unit_methods.GetCargo
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local weapon_methodsGetCurrentTarget = moho.weapon_methods.GetCurrentTarget
+local unit_methodsIsIdleState = moho.unit_methods.IsIdleState
+local aibrain_methodsGetCurrentUnits = moho.aibrain_methods.GetCurrentUnits
+local IssueGuard = IssueGuard
+local tableInsert = table.insert
+local platoon_methodsSetPrioritizedTargetList = moho.platoon_methods.SetPrioritizedTargetList
+local unit_methodsGetWorkProgress = moho.unit_methods.GetWorkProgress
+local unit_methodsTransportHasSpaceFor = moho.unit_methods.TransportHasSpaceFor
+local unit_methodsGetNukeSiloAmmoCount = moho.unit_methods.GetNukeSiloAmmoCount
+local unit_methodsSetAutoMode = moho.unit_methods.SetAutoMode
+local unit_methodsSetScriptBit = moho.unit_methods.SetScriptBit
+local aibrain_methodsGetArmyStat = moho.aibrain_methods.GetArmyStat
+local aibrain_methodsGetThreatsAroundPosition = moho.aibrain_methods.GetThreatsAroundPosition
+local IssueTransportUnload = IssueTransportUnload
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local VDist2Sq = VDist2Sq
+local IssueStop = IssueStop
+local platoon_methodsIsCommandsActive = moho.platoon_methods.IsCommandsActive
+local aibrain_methodsGetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local next = next
+local tableEmpty = table.empty
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local IssueClearCommands = IssueClearCommands
+local tableGetn = table.getn
+local mathSqrt = math.sqrt
+local aibrain_methodsGetEconomyStored = moho.aibrain_methods.GetEconomyStored
+local aibrain_methodsGetMapWaterRatio = moho.aibrain_methods.GetMapWaterRatio
+local Random = Random
+local platoon_methodsMoveToLocation = moho.platoon_methods.MoveToLocation
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local aibrain_methodsBuildUnit = moho.aibrain_methods.BuildUnit
+local stringFind = string.find
+local aibrain_methodsMakePlatoon = moho.aibrain_methods.MakePlatoon
+local GetMapSize = GetMapSize
+local IssueRepair = IssueRepair
+local IssueTransportLoad = IssueTransportLoad
+local ipairs = ipairs
+local platoon_methodsFindClosestUnit = moho.platoon_methods.FindClosestUnit
+local aibrain_methodsPlatoonExists = moho.aibrain_methods.PlatoonExists
+local GetGameTimeSeconds = GetGameTimeSeconds
+local IssueTeleport = IssueTeleport
+local IssueOverCharge = IssueOverCharge
+local EntityCategoryContains = EntityCategoryContains
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local tableCopy = table.copy
+local IssueMove = IssueMove
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local IssueAttack = IssueAttack
+local platoon_methodsAggressiveMoveToLocation = moho.platoon_methods.AggressiveMoveToLocation
+local aibrain_methodsGetNoRushTicks = moho.aibrain_methods.GetNoRushTicks
+local ParseEntityCategory = ParseEntityCategory
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local unit_methodsGetWeapon = moho.unit_methods.GetWeapon
+local GetTerrainHeight = GetTerrainHeight
+local IssueAggressiveMove = IssueAggressiveMove
+local unit_methodsGetFuelRatio = moho.unit_methods.GetFuelRatio
+local mathMax = math.max
+local platoon_methodsAttackTarget = moho.platoon_methods.AttackTarget
+local VDist3 = VDist3
+local aibrain_methodsGetHighestThreatPosition = moho.aibrain_methods.GetHighestThreatPosition
+local platoon_methodsPatrol = moho.platoon_methods.Patrol
+local platoon_methodsGetBrain = moho.platoon_methods.GetBrain
+local VDist2 = VDist2
+local GetSurfaceHeight = GetSurfaceHeight
+local platoon_methodsGetPlatoonPosition = moho.platoon_methods.GetPlatoonPosition
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Utilities = import('/lua/utilities.lua')
 local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
@@ -22,11 +92,11 @@ function CDRRunAway(aiBrain, cdr)
     if cdr:GetHealthPercent() < 0.7 then
         AIUtils.AIFindDefensiveArea(aiBrain, cdr, categories.DEFENSE * categories.ANTIAIR, 10000)
         local cdrPos = cdr:GetPosition()
-        local nmeAir = aiBrain:GetUnitsAroundPoint(categories.AIR, cdrPos, 25, 'Enemy')
-        local nmeLand = aiBrain:GetUnitsAroundPoint(categories.LAND, cdrPos, 25, 'Enemy')
-        local nmeHardcore = aiBrain:GetUnitsAroundPoint(categories.EXPERIMENTAL, cdrPos, 25, 'Enemy')
+        local nmeAir = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.AIR, cdrPos, 25, 'Enemy')
+        local nmeLand = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.LAND, cdrPos, 25, 'Enemy')
+        local nmeHardcore = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.EXPERIMENTAL, cdrPos, 25, 'Enemy')
         if nmeAir > 3 or nmeLand > 3 or nmeHardcore > 0 then
-            if cdr:IsUnitState('Building') then
+            if unit_methodsIsUnitState(cdr, 'Building') then
                 cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
             end
 
@@ -40,8 +110,8 @@ function CDRRunAway(aiBrain, cdr)
 
             local canTeleport = cdr:HasEnhancement('Teleporter')
             local runSpot, prevSpot
-            local plat = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+            local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+            aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {cdr}, 'support', 'None')
             repeat
                 if canTeleport then
                     runSpot = AIUtils.AIFindDefensiveArea(aiBrain, cdr, category, 10000)
@@ -55,7 +125,7 @@ function CDRRunAway(aiBrain, cdr)
                         if canTeleport then
                             IssueTeleport({cdr}, runSpot)
                         else
-                            cmd = plat:MoveToLocation(runSpot, false)
+                            cmd = platoon_methodsMoveToLocation(plat, runSpot, false)
                         end
                     end
                 end
@@ -63,9 +133,9 @@ function CDRRunAway(aiBrain, cdr)
 
                 if not cdr.Dead then
                     cdrPos = cdr:GetPosition()
-                    nmeAir = aiBrain:GetUnitsAroundPoint(categories.AIR, cdrPos, 25, 'Enemy')
-                    nmeLand = aiBrain:GetUnitsAroundPoint(categories.LAND, cdrPos, 25, 'Enemy')
-                    nmeHardcore = aiBrain:GetUnitsAroundPoint(categories.EXPERIMENTAL, cdrPos, 25, 'Enemy')
+                    nmeAir = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.AIR, cdrPos, 25, 'Enemy')
+                    nmeLand = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.LAND, cdrPos, 25, 'Enemy')
+                    nmeHardcore = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.EXPERIMENTAL, cdrPos, 25, 'Enemy')
                 end
             until cdr.Dead or (nmeAir < 2 and nmeLand < 2 and nmeHardcore == 0) or cdr:GetHealthPercent() > 0.7
 
@@ -94,7 +164,7 @@ function CDROverCharge(aiBrain, cdr)
 
     -- Increase distress on non-water maps
     local distressRange = 60
-    if cdr:GetHealthPercent() > 0.8 and aiBrain:GetMapWaterRatio() < 0.4 then
+    if cdr:GetHealthPercent() > 0.8 and aibrain_methodsGetMapWaterRatio(aiBrain) < 0.4 then
         distressRange = 100
     end
 
@@ -114,12 +184,12 @@ function CDROverCharge(aiBrain, cdr)
 
     -- Take away engineers too
     local cdrPos = cdr.CDRHome
-    local numUnits = aiBrain:GetNumUnitsAroundPoint(categories.LAND - categories.SCOUT, cdrPos, (maxRadius), 'Enemy')
+    local numUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND - categories.SCOUT, cdrPos, (maxRadius), 'Enemy')
     local distressLoc = aiBrain:BaseMonitorDistressLocation(cdrPos)
     local overCharging = false
 
     -- Don't move if upgrading
-    if cdr:IsUnitState("Upgrading") or cdr:IsUnitState("Enhancing") then
+    if unit_methodsIsUnitState(cdr, "Upgrading") or unit_methodsIsUnitState(cdr, "Enhancing") then
         return
     end
 
@@ -131,8 +201,8 @@ function CDROverCharge(aiBrain, cdr)
         if cdr.UnitBeingBuilt then
             cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
         end
-        local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+        aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {cdr}, 'support', 'None')
         plat:Stop()
         local priList = {
             categories.EXPERIMENTAL,
@@ -158,7 +228,7 @@ function CDROverCharge(aiBrain, cdr)
                 repeat
                     searchRadius = searchRadius + 30
                     for k, v in priList do
-                        target = plat:FindClosestUnit('Support', 'Enemy', true, v)
+                        target = platoon_methodsFindClosestUnit(plat, 'Support', 'Enemy', true, v)
                         if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) <= searchRadius then
                             local cdrLayer = cdr.Layer
                             local targetLayer = target.Layer
@@ -176,15 +246,15 @@ function CDROverCharge(aiBrain, cdr)
 
                     -- If inside base dont check threat, just shoot!
                     if Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) > 45 then
-                        enemyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface')
-                        enemyCdrThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'Commander')
-                        friendlyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                        enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, targetPos, 1, true, 'AntiSurface')
+                        enemyCdrThreat = aibrain_methodsGetThreatAtPosition(aiBrain, targetPos, 1, true, 'Commander')
+                        friendlyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, targetPos, 1, true, 'AntiSurface', aibrain_methodsGetArmyIndex(aiBrain))
                         if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) then
                             break
                         end
                     end
 
-                    if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and target and not target.Dead then
+                    if aibrain_methodsGetEconomyStored(aiBrain, 'ENERGY') >= weapon.EnergyRequired and target and not target.Dead then
                         overCharging = true
                         IssueClearCommands({cdr})
                         IssueOverCharge({cdr}, target)
@@ -194,9 +264,9 @@ function CDROverCharge(aiBrain, cdr)
                         IssueMove({cdr}, cdr.CDRHome)
                     end
                 elseif distressLoc then
-                    enemyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface')
-                    enemyCdrThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'Commander')
-                    friendlyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                    enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, distressLoc, 1, true, 'AntiSurface')
+                    enemyCdrThreat = aibrain_methodsGetThreatAtPosition(aiBrain, distressLoc, 1, true, 'Commander')
+                    friendlyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, distressLoc, 1, true, 'AntiSurface', aibrain_methodsGetArmyIndex(aiBrain))
                     if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 3) then
                         break
                     end
@@ -223,7 +293,7 @@ function CDROverCharge(aiBrain, cdr)
                 return
             end
 
-            if aiBrain:GetNumUnitsAroundPoint(categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy') <= 0
+            if aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy') <= 0
                 and (not distressLoc or Utilities.XZDistanceTwoVectors(distressLoc, cdrPos) > distressRange) then
                 continueFighting = false
             end
@@ -231,7 +301,7 @@ function CDROverCharge(aiBrain, cdr)
             if (cdr:GetHealthPercent() < 0.75) and Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) > 30 then
                 continueFighting = false
             end
-        until not continueFighting or not aiBrain:PlatoonExists(plat)
+        until not continueFighting or not aibrain_methodsPlatoonExists(aiBrain, plat)
 
         IssueClearCommands({cdr})
 
@@ -244,7 +314,7 @@ function CDROverCharge(aiBrain, cdr)
 end
 
 function CDRRevertPriorityChange(aiBrain, cdr)
-    if cdr.PreviousPriority and cdr.Platoon and aiBrain:PlatoonExists(cdr.Platoon) then
+    if cdr.PreviousPriority and cdr.Platoon and aibrain_methodsPlatoonExists(aiBrain, cdr.Platoon) then
         aiBrain:PBMSetPriority(cdr.Platoon, cdr.PreviousPriority)
     end
 end
@@ -255,11 +325,11 @@ function CDRReturnHome(aiBrain, cdr)
     local distSqAway = 1600
     local loc = cdr.CDRHome
     if not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
-        local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+        aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {cdr}, 'support', 'None')
         repeat
             CDRRevertPriorityChange(aiBrain, cdr)
-            if not aiBrain:PlatoonExists(plat) then
+            if not aibrain_methodsPlatoonExists(aiBrain, plat) then
                 return
             end
             IssueStop({cdr})
@@ -274,11 +344,11 @@ function CDRReturnHome(aiBrain, cdr)
 end
 
 function SetCDRHome(cdr, plat)
-    cdr.CDRHome = table.copy(cdr:GetPosition())
+    cdr.CDRHome = tableCopy(cdr:GetPosition())
 end
 
 function CommanderBehavior(platoon)
-    for _, v in platoon:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(platoon) do
         if not v.Dead and not v.CommanderThread then
             v.CommanderThread = v:ForkThread(CommanderThread, platoon)
         end
@@ -286,7 +356,7 @@ function CommanderBehavior(platoon)
 end
 
 function CommanderBehaviorImproved(platoon)
-    for _, v in platoon:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(platoon) do
         if not v.Dead and not v.CommanderThread then
             v.CommanderThread = v:ForkThread(CommanderThreadImproved, platoon)
         end
@@ -309,13 +379,13 @@ function CommanderThread(cdr, platoon)
         WaitTicks(1)
 
         -- Call platoon resume building deal...
-        if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Building")
-        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
-        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState('BlockCommandQueue') then
-            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
-                local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-                aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
-            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
+        if not cdr.Dead and unit_methodsIsIdleState(cdr) and not cdr.GoingHome and not unit_methodsIsUnitState(cdr, "Building")
+        and not unit_methodsIsUnitState(cdr, "Attacking") and not unit_methodsIsUnitState(cdr, "Repairing")
+        and not unit_methodsIsUnitState(cdr, "Upgrading") and not unit_methodsIsUnitState(cdr, 'BlockCommandQueue') then
+            if not cdr.EngineerBuildQueue or tableEmpty(cdr.EngineerBuildQueue) then
+                local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, pool, {cdr}, 'Unassigned', 'None')
+            elseif cdr.EngineerBuildQueue and not tableEmpty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end
@@ -340,28 +410,28 @@ function CommanderThreadImproved(cdr, platoon)
         WaitTicks(1)
 
         -- Call platoon resume building deal...
-        if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr:IsUnitState("Moving")
-        and not cdr:IsUnitState("Building") and not cdr:IsUnitState("Guarding")
-        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing")
-        and not cdr:IsUnitState("Upgrading") and not cdr:IsUnitState("Enhancing")
-        and not cdr:IsUnitState('BlockCommandQueue') then
+        if not cdr.Dead and unit_methodsIsIdleState(cdr) and not cdr.GoingHome and not unit_methodsIsUnitState(cdr, "Moving")
+        and not unit_methodsIsUnitState(cdr, "Building") and not unit_methodsIsUnitState(cdr, "Guarding")
+        and not unit_methodsIsUnitState(cdr, "Attacking") and not unit_methodsIsUnitState(cdr, "Repairing")
+        and not unit_methodsIsUnitState(cdr, "Upgrading") and not unit_methodsIsUnitState(cdr, "Enhancing")
+        and not unit_methodsIsUnitState(cdr, 'BlockCommandQueue') then
             -- if we have nothing to build...
-            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
+            if not cdr.EngineerBuildQueue or tableEmpty(cdr.EngineerBuildQueue) then
                 -- check if the we have still a platton assigned to the CDR
                 if cdr.PlatoonHandle then
-                    local platoonUnits = cdr.PlatoonHandle:GetPlatoonUnits() or 1
+                    local platoonUnits = platoon_methodsGetPlatoonUnits(cdr.PlatoonHandle) or 1
                     -- only disband the platton if we have 1 unit, plan and buildername. (NEVER disband the armypool platoon!!!)
-                    if table.getn(platoonUnits) == 1 and cdr.PlatoonHandle.PlanName and cdr.PlatoonHandle.BuilderName then
+                    if tableGetn(platoonUnits) == 1 and cdr.PlatoonHandle.PlanName and cdr.PlatoonHandle.BuilderName then
                         --SPEW('ACU PlatoonHandle found. Plan: '..cdr.PlatoonHandle.PlanName..' - Builder '..cdr.PlatoonHandle.BuilderName..'. Disbanding CDR platoon!')
                         cdr.PlatoonHandle:PlatoonDisband()
                     end
                 end
                 -- get the global armypool platoon
-                local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+                local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
                 -- assing the CDR to the armypool
-                aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, pool, {cdr}, 'Unassigned', 'None')
             -- if we have a BuildQueue then continue building
-            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
+            elseif cdr.EngineerBuildQueue and not tableEmpty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuilding)
                 end
@@ -377,7 +447,7 @@ function BuildOnceAI(platoon)
 end
 
 function AirUnitRefit(self)
-    for k, v in self:GetPlatoonUnits() do
+    for k, v in platoon_methodsGetPlatoonUnits(self) do
         if not v.Dead and not v.RefitThread then
             v.RefitThreat = v:ForkThread(AirUnitRefitThread, self:GetPlan(), self.PlatoonData)
         end
@@ -392,20 +462,20 @@ function AirUnitRefitThread(unit, plan, data)
 
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
-        local fuel = unit:GetFuelRatio()
+        local fuel = unit_methodsGetFuelRatio(unit)
         local health = unit:GetHealthPercent()
         if not unit.Loading and (fuel < 0.2 or health < 0.4) then
             -- Find air stage
-            if aiBrain:GetCurrentUnits(categories.AIRSTAGINGPLATFORM) > 0 then
+            if aibrain_methodsGetCurrentUnits(aiBrain, categories.AIRSTAGINGPLATFORM) > 0 then
                 local unitPos = unit:GetPosition()
                 local plats = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIRSTAGINGPLATFORM, unitPos, 400)
-                if not table.empty(plats) then
+                if not tableEmpty(plats) then
                     local closest, distance
                     for _, v in plats do
                         if not v.Dead then
                             local roomAvailable = false
                             if not EntityCategoryContains(categories.CARRIER, v) then
-                                roomAvailable = v:TransportHasSpaceFor(unit)
+                                roomAvailable = unit_methodsTransportHasSpaceFor(v, unit)
                             end
                             if roomAvailable then
                                 local platPos = v:GetPosition()
@@ -418,8 +488,8 @@ function AirUnitRefitThread(unit, plan, data)
                         end
                     end
                     if closest then
-                        local plat = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(plat, {unit}, 'Attack', 'None')
+                        local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+                        aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {unit}, 'Attack', 'None')
                         IssueStop({unit})
                         IssueClearCommands({unit})
                         IssueTransportLoad({unit}, closest)
@@ -430,7 +500,7 @@ function AirUnitRefitThread(unit, plan, data)
                             closest.CarrierStaging = closest:ForkThread(CarrierStagingThread)
                             closest.Refueling = {}
                         end
-                        table.insert(closest.Refueling, unit)
+                        tableInsert(closest.Refueling, unit)
                         unit.Loading = true
                     end
                 end
@@ -446,7 +516,7 @@ function AirStagingThread(unit)
         local ready = true
         local numUnits = 0
         for _, v in unit.Refueling do
-            if not v.Dead and (v:GetFuelRatio() < 0.9 or v:GetHealthPercent() < 0.9) then
+            if not v.Dead and (unit_methodsGetFuelRatio(v) < 0.9 or v:GetHealthPercent() < 0.9) then
                 ready = false
             elseif not v.Dead then
                 numUnits = numUnits + 1
@@ -462,15 +532,15 @@ function AirStagingThread(unit)
                     v.Loading = false
                     local plat
                     if not v.PlanName then
-                        plat = aiBrain:MakePlatoon('', 'HuntAI')
+                        plat = aibrain_methodsMakePlatoon(aiBrain, '', 'HuntAI')
                     else
-                        plat = aiBrain:MakePlatoon('', v.PlanName)
+                        plat = aibrain_methodsMakePlatoon(aiBrain, '', v.PlanName)
                     end
                     if v.PlatoonData then
                         plat.PlatoonData = {}
                         plat.PlatoonData = v.PlatoonData
                     end
-                    aiBrain:AssignUnitsToPlatoon(plat, {v}, 'Attack', 'GrowthFormation')
+                    aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {v}, 'Attack', 'GrowthFormation')
                 end
             end
         end
@@ -479,7 +549,7 @@ function AirStagingThread(unit)
 end
 
 function AirLandToggle(platoon)
-    for _, v in platoon:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(platoon) do
         if not v.Dead and not v.AirLandToggleThread then
             v.AirLandToggleThread = v:ForkThread(AirLandToggleThread)
         end
@@ -495,7 +565,7 @@ function AirLandToggleThread(unit)
         if v.ToggleWeapon then
             local weaponType = 'Land'
             for n, wType in v.FireTargetLayerCapsTable do
-                if string.find(wType, 'Air') then
+                if stringFind(wType, 'Air') then
                     weaponType = 'Air'
                     break
                 end
@@ -512,7 +582,7 @@ function AirLandToggleThread(unit)
         return
     end
 
-    while not unit.Dead and unit:IsUnitState('Busy') do
+    while not unit.Dead and unit_methodsIsUnitState(unit, 'Busy') do
         WaitSeconds(2)
     end
 
@@ -520,18 +590,18 @@ function AirLandToggleThread(unit)
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
         local position = unit:GetPosition()
-        local numAir = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.AIR) - unitCat , position, antiAirRange, 'Enemy')
-        local numGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Enemy')
-        local frndAir = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.AIR) - unitCat, position, antiAirRange, 'Ally')
-        local frndGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Ally')
+        local numAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.MOBILE * categories.AIR) - unitCat , position, antiAirRange, 'Enemy')
+        local numGround = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Enemy')
+        local frndAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.MOBILE * categories.AIR) - unitCat, position, antiAirRange, 'Ally')
+        local frndGround = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Ally')
         if numAir > 5 and frndAir < 3 then
-            unit:SetScriptBit('RULEUTC_WeaponToggle', false)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', false)
         elseif numGround > (numAir * 1.5) then
-            unit:SetScriptBit('RULEUTC_WeaponToggle', true)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', true)
         elseif frndAir > frndGround then
-            unit:SetScriptBit('RULEUTC_WeaponToggle', true)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', true)
         else
-            unit:SetScriptBit('RULEUTC_WeaponToggle', false)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', false)
         end
         WaitSeconds(10)
     end
@@ -585,22 +655,22 @@ local SurfacePriorities = {
 -- the commander that was found, else nil
 -------------------------------------------------------
 CommanderOverrideCheck = function(self)
-    local aiBrain = self:GetBrain()
-    local experimental = self:GetPlatoonUnits()[1]
+    local aiBrain = platoon_methodsGetBrain(self)
+    local experimental = platoon_methodsGetPlatoonUnits(self)[1]
 
-    local mainWeapon = experimental:GetWeapon(1)
+    local mainWeapon = unit_methodsGetWeapon(experimental, 1)
     local weaponRange = mainWeapon:GetBlueprint().MaxRadius + 50 -- Look outside range.
 
-    local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
-    if table.empty(commanders) or commanders[1].Dead then
+    local commanders = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.COMMAND, platoon_methodsGetPlatoonPosition(self), weaponRange, 'Enemy')
+    if tableEmpty(commanders) or commanders[1].Dead then
         return false
     end
 
-    local currentTarget = mainWeapon:GetCurrentTarget()
+    local currentTarget = weapon_methodsGetCurrentTarget(mainWeapon)
     if commanders[1] ~= currentTarget then
         -- Commander in range who isn't our current target. Force weapons to reacquire targets so they'll grab him.
         for i=1, experimental:GetWeaponCount() do
-            experimental:GetWeapon(i):ResetTarget()
+            unit_methodsGetWeapon(experimental, i):ResetTarget()
         end
     end
 
@@ -619,7 +689,7 @@ end
 -------------------------------------------------------
 GetExperimentalUnit = function(platoon)
     local unit = nil
-    for k, v in platoon:GetPlatoonUnits() do
+    for k, v in platoon_methodsGetPlatoonUnits(platoon) do
         if not v.Dead then
             unit = v
             break
@@ -659,7 +729,7 @@ WreckBase = function(self, base)
     for _, priority in SurfacePriorities do
         local numUnitsAtBase = 0
         local notDeadUnit = false
-        local unitsAtBase = self:GetBrain():GetUnitsAroundPoint(ParseEntityCategory(priority), base.Position, 100, 'Enemy')
+        local unitsAtBase = platoon_methodsGetBrain(self):GetUnitsAroundPoint(ParseEntityCategory(priority), base.Position, 100, 'Enemy')
         for _, unit in unitsAtBase do
             if not unit.Dead then
                 notDeadUnit = unit
@@ -684,7 +754,7 @@ end
 -- target unit, target base, else nil
 -------------------------------------------------------
 FindExperimentalTarget = function(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
         -- No target
         return
@@ -698,7 +768,7 @@ FindExperimentalTarget = function(self)
         local mostUnits = 0
         local bestUnit = false
         for _, base in enemyBases do
-            local unitsAtBase = aiBrain:GetUnitsAroundPoint(ParseEntityCategory(priority), base.Position, 100, 'Enemy')
+            local unitsAtBase = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory(priority), base.Position, 100, 'Enemy')
             local numUnitsAtBase = 0
             local notDeadUnit = false
 
@@ -715,7 +785,7 @@ FindExperimentalTarget = function(self)
                     mostUnits = numUnitsAtBase
                     bestUnit = notDeadUnit
                 elseif numUnitsAtBase == mostUnits then
-                    local myPos = self:GetPlatoonPosition()
+                    local myPos = platoon_methodsGetPlatoonPosition(self)
                     local dist1 = VDist2(myPos[1], myPos[3], base.Position[1], base.Position[3])
                     local dist2 = VDist2(myPos[1], myPos[3], bestBase.Position[1], bestBase.Position[3])
 
@@ -766,7 +836,7 @@ function BehemothBehavior(self)
         end
 
         -- Walk to and kill target loop
-        while not experimental.Dead and not experimental:IsIdleState() do
+        while not experimental.Dead and not unit_methodsIsIdleState(experimental) do
             local nearCommander = CommanderOverrideCheck(self)
             if nearCommander and nearCommander ~= targetUnit then
                 IssueClearCommands({experimental})
@@ -846,14 +916,14 @@ function GetClosestShieldProtectingTarget(attackingUnit, targetUnit)
     local blockingList = {}
 
     -- If targetUnit is within the radius of any shields, the shields need to be destroyed.
-    local shields = aiBrain:GetUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE, targetUnit:GetPosition(), 50, 'Enemy')
+    local shields = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.SHIELD * categories.STRUCTURE, targetUnit:GetPosition(), 50, 'Enemy')
     for _, shield in shields do
         if not shield.Dead then
             local shieldPos = shield:GetPosition()
             local shieldSizeSq = GetShieldRadiusAboveGroundSquared(shield)
 
             if VDist2Sq(tPos[1], tPos[3], shieldPos[1], shieldPos[3]) < shieldSizeSq then
-                table.insert(blockingList, shield)
+                tableInsert(blockingList, shield)
             end
         end
     end
@@ -883,20 +953,20 @@ end
 -- nil (function loops until experimental dies)
 -------------------------------------------------------
 function InWaterCheck(platoon)
-    local t4Pos = platoon:GetPlatoonPosition()
+    local t4Pos = platoon_methodsGetPlatoonPosition(platoon)
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
     return inWater
 end
 
 function FatBoyBehavior(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     AssignExperimentalPriorities(self)
 
     local experimental = GetExperimentalUnit(self)
     local targetUnit = false
     local lastBase = false
 
-    local mainWeapon = experimental:GetWeapon(1)
+    local mainWeapon = unit_methodsGetWeapon(experimental, 1)
     local weaponRange = mainWeapon:GetBlueprint().MaxRadius
 
     experimental.Platoons = experimental.Platoons or {}
@@ -917,7 +987,7 @@ function FatBoyBehavior(self)
             -- Wait to get in range
             local pos = experimental:GetPosition()
             while VDist2(pos[1], pos[3], lastBase.Position[1], lastBase.Position[3]) > weaponRange + 10
-                and not experimental.Dead and not experimental:IsIdleState() do
+                and not experimental.Dead and not unit_methodsIsIdleState(experimental) do
                     WaitSeconds(5)
             end
 
@@ -928,12 +998,12 @@ function FatBoyBehavior(self)
             for _, platoon in experimental.Platoons do
                 local platoonUnits = false
 
-                if aiBrain:PlatoonExists(platoon) then
-                    platoonUnits = platoon:GetPlatoonUnits()
+                if aibrain_methodsPlatoonExists(aiBrain, platoon) then
+                    platoonUnits = platoon_methodsGetPlatoonUnits(platoon)
                 end
 
-                if platoonUnits and not table.empty(platoonUnits) then
-                    table.insert(goodList, platoon)
+                if platoonUnits and not tableEmpty(platoonUnits) then
+                    tableInsert(goodList, platoon)
                 end
             end
 
@@ -948,10 +1018,10 @@ function FatBoyBehavior(self)
                 FatBoyBuildCheck(self)
 
                 -- Once we have 20 units, form them into a platoon and send them to attack the base we're attacking!
-                if experimental.NewPlatoon and table.getn(experimental.NewPlatoon:GetPlatoonUnits()) >= 20 then
+                if experimental.NewPlatoon and tableGetn(platoon_methodsGetPlatoonUnits(experimental.NewPlatoon)) >= 20 then
                     experimental.NewPlatoon:ForkAIThread(FatboyChildBehavior, experimental, lastBase)
 
-                    table.insert(experimental.Platoons, experimental.NewPlatoon)
+                    tableInsert(experimental.Platoons, experimental.NewPlatoon)
                     experimental.NewPlatoon = nil
                 end
                 WaitSeconds(1)
@@ -971,32 +1041,32 @@ end
 -- nil
 -------------------------------------------------------
 function FatBoyBuildCheck(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     local experimental = GetExperimentalUnit(self)
 
     -- Randomly build T3 MMLs, siege bots, and percivals.
     local buildUnits = {'uel0303', 'xel0305', 'xel0306', }
-    local unitToBuild = buildUnits[Random(1, table.getn(buildUnits))]
+    local unitToBuild = buildUnits[Random(1, tableGetn(buildUnits))]
 
-    aiBrain:BuildUnit(experimental, unitToBuild, 1)
+    aibrain_methodsBuildUnit(aiBrain, experimental, unitToBuild, 1)
     WaitTicks(1)
 
     local unitBeingBuilt = false
     repeat
         unitBeingBuilt = unitBeingBuilt or experimental.UnitBeingBuilt
         WaitSeconds(1)
-    until experimental.Dead or unitBeingBuilt or aiBrain:GetArmyStat("UnitCap_MaxCap", 0.0).Value - aiBrain:GetArmyStat("UnitCap_Current", 0.0).Value < 10
+    until experimental.Dead or unitBeingBuilt or aibrain_methodsGetArmyStat(aiBrain, "UnitCap_MaxCap", 0.0).Value - aibrain_methodsGetArmyStat(aiBrain, "UnitCap_Current", 0.0).Value < 10
 
     repeat
         WaitSeconds(3)
-    until experimental.Dead or experimental:IsIdleState() or aiBrain:GetArmyStat("UnitCap_MaxCap", 0.0).Value - aiBrain:GetArmyStat("UnitCap_Current", 0.0).Value < 10
+    until experimental.Dead or unit_methodsIsIdleState(experimental) or aibrain_methodsGetArmyStat(aiBrain, "UnitCap_MaxCap", 0.0).Value - aibrain_methodsGetArmyStat(aiBrain, "UnitCap_Current", 0.0).Value < 10
 
-    if not experimental.NewPlatoon or not aiBrain:PlatoonExists(experimental.NewPlatoon) then
-        experimental.NewPlatoon = aiBrain:MakePlatoon('', '')
+    if not experimental.NewPlatoon or not aibrain_methodsPlatoonExists(aiBrain, experimental.NewPlatoon) then
+        experimental.NewPlatoon = aibrain_methodsMakePlatoon(aiBrain, '', '')
     end
 
     if unitBeingBuilt and not unitBeingBuilt.Dead then
-        aiBrain:AssignUnitsToPlatoon(experimental.NewPlatoon, {unitBeingBuilt}, 'Attack', 'NoFormation')
+        aibrain_methodsAssignUnitsToPlatoon(aiBrain, experimental.NewPlatoon, {unitBeingBuilt}, 'Attack', 'NoFormation')
         IssueClearCommands({unitBeingBuilt})
         IssueGuard({unitBeingBuilt}, experimental)
     end
@@ -1016,14 +1086,14 @@ end
 -- nil
 -------------------------------------------------------
 function FatboyChildBehavior(self, parent, base)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     local targetUnit = false
 
     -- Find target loop
-    while aiBrain:PlatoonExists(self) and not table.empty(self:GetPlatoonUnits()) do
+    while aibrain_methodsPlatoonExists(aiBrain, self) and not tableEmpty(platoon_methodsGetPlatoonUnits(self)) do
         targetUnit, base = WreckBase(self, base)
 
-        local units = self:GetPlatoonUnits()
+        local units = platoon_methodsGetPlatoonUnits(self)
         if not base then
             -- Wrecked base. Kill AI thread
             IssueClearCommands(units)
@@ -1037,7 +1107,7 @@ function FatboyChildBehavior(self, parent, base)
         end
 
         -- Walk to and kill target loop
-        while aiBrain:PlatoonExists(self) and not table.empty(self:GetPlatoonUnits()) and not targetUnit.Dead do
+        while aibrain_methodsPlatoonExists(aiBrain, self) and not tableEmpty(platoon_methodsGetPlatoonUnits(self)) and not targetUnit.Dead do
             WaitSeconds(3)
         end
 
@@ -1046,9 +1116,9 @@ function FatboyChildBehavior(self, parent, base)
 end
 
 TempestBehavior = function(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     local unit
-    for k, v in self:GetPlatoonUnits() do
+    for k, v in platoon_methodsGetPlatoonUnits(self) do
         if not v.Dead then
             unit = v
             break
@@ -1065,15 +1135,15 @@ TempestBehavior = function(self)
 
     unit.BuiltUnitCount = 0
     self.Patrolling = false
-    while aiBrain:PlatoonExists(self) and not unit.Dead do
+    while aibrain_methodsPlatoonExists(aiBrain, self) and not unit.Dead do
         local position = unit:GetPosition()
-        local numStrucs = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE - (categories.MASSEXTRACTION + categories.WALL), position, 65, 'Enemy')
-        local numNaval = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.NAVAL) * (categories.EXPERIMENTAL + categories.TECH3 + categories.TECH2), position, 65, 'Enemy')
+        local numStrucs = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.MASSEXTRACTION + categories.WALL), position, 65, 'Enemy')
+        local numNaval = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.MOBILE * categories.NAVAL) * (categories.EXPERIMENTAL + categories.TECH3 + categories.TECH2), position, 65, 'Enemy')
         while unit.BuiltUnitCount < 8 and (numStrucs > 5 or numNaval > 10) do
             self.Patrolling = false
             self.BreakOff = true
-            local numAir = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.AIR) * (categories.EXPERIMENTAL + categories.TECH3), position, 65, 'Enemy')
-            local numDef = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE * (categories.DEFENSE + categories.STRATEGIC), position, 75, 'Enemy')
+            local numAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.MOBILE * categories.AIR) * (categories.EXPERIMENTAL + categories.TECH3), position, 65, 'Enemy')
+            local numDef = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.STRUCTURE * (categories.DEFENSE + categories.STRATEGIC), position, 75, 'Enemy')
             local unitToBuild = false
             if numDef > numNaval and numDef > numAir then
                 if Random(1, 2) == 1 then
@@ -1092,7 +1162,7 @@ TempestBehavior = function(self)
             if unitToBuild then
                 IssueStop({unit})
                 IssueClearCommands({unit})
-                aiBrain:BuildUnit(unit, unitToBuild, 1)
+                aibrain_methodsBuildUnit(aiBrain, unit, unitToBuild, 1)
             end
 
             local unitBeingBuilt = false
@@ -1101,8 +1171,8 @@ TempestBehavior = function(self)
                 WaitSeconds(5)
                 unitBeingBuilt = unit.UnitBeingBuilt
                 building = false
-                for k, v in self:GetPlatoonUnits() do
-                    if not v.Dead and v:IsUnitState('Building') then
+                for k, v in platoon_methodsGetPlatoonUnits(self) do
+                    if not v.Dead and unit_methodsIsUnitState(v, 'Building') then
                         building = true
                         break
                     end
@@ -1114,21 +1184,21 @@ TempestBehavior = function(self)
                 testHeading = unit:GetHeading()
                 unit.BuiltUnitCount = unit.BuiltUnitCount + 1
                 ScenarioFramework.CreateUnitDestroyedTrigger(TempestUnitDeath, unitBeingBuilt)
-                aiBrain:AssignUnitsToPlatoon(self, {unitBeingBuilt}, 'Attack', 'GrowthFormation')
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, self, {unitBeingBuilt}, 'Attack', 'GrowthFormation')
                 IssueClearCommands({unitBeingBuilt})
                 unitBeingBuilt:ForkThread(TempestBuiltUnitMoveOut, position, testHeading)
             end
             self.BreakOff = false
-            numStrucs = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE - (categories.MASSEXTRACTION + categories.WALL), position, 65, 'Enemy')
-            numNaval = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.NAVAL) * (categories.EXPERIMENTAL + categories.TECH3 + categories.TECH2), position, 65, 'Enemy')
+            numStrucs = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.STRUCTURE - (categories.MASSEXTRACTION + categories.WALL), position, 65, 'Enemy')
+            numNaval = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.MOBILE * categories.NAVAL) * (categories.EXPERIMENTAL + categories.TECH3 + categories.TECH2), position, 65, 'Enemy')
         end
 
-        if aiBrain:PlatoonExists(self) and not self.Patrolling then
+        if aibrain_methodsPlatoonExists(aiBrain, self) and not self.Patrolling then
             self:Stop()
             self.Patrolling = true
-            scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
+            scoutPath = AIUtils.AIGetSortedNavalLocations(platoon_methodsGetBrain(self))
             for k, v in scoutPath do
-                self:Patrol(v)
+                platoon_methodsPatrol(self, v)
             end
         end
         WaitSeconds(5)
@@ -1203,7 +1273,7 @@ CzarBehavior = function(self)
 
         local nearCommander = CommanderOverrideCheck(self)
         local oldCommander = nil
-        while nearCommander and not experimental.Dead and not experimental:IsIdleState() do
+        while nearCommander and not experimental.Dead and not unit_methodsIsIdleState(experimental) do
             if nearCommander and nearCommander ~= oldCommander and nearCommander ~= targetUnit then
                 IssueClearCommands({experimental})
                 WaitTicks(5)
@@ -1237,7 +1307,7 @@ end
 -- nil (function loops until experimental dies)
 -------------------------------------------------------
 AhwassaBehavior = function(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     local experimental = GetExperimentalUnit(self)
     if not experimental then
         return
@@ -1275,7 +1345,7 @@ end
 -- nil (function loops until experimental dies)
 -------------------------------------------------------
 TickBehavior = function(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     local experimental = GetExperimentalUnit(self)
     if not experimental then
         return
@@ -1320,10 +1390,10 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
 
     -- Look for commander first
     local position = experimental:GetPosition()
-    local threatTable = aiBrain:GetThreatsAroundPosition(position, 16, true, 'Commander')
+    local threatTable = aibrain_methodsGetThreatsAroundPosition(aiBrain, position, 16, true, 'Commander')
     for _, threat in threatTable do
         if threat[3] > 0 then
-            local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('COMMAND'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
+            local unitsAtLocation = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory('COMMAND'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
             local validUnit = false
             for _, unit in unitsAtLocation do
                 if not unit.Dead then
@@ -1332,14 +1402,14 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
                 end
             end
             if validUnit then
-                return table.copy(validUnit:GetPosition())
+                return tableCopy(validUnit:GetPosition())
             end
         end
     end
 
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
         -- No target
-        return aiBrain:GetHighestThreatPosition(0, true, 'Economy')
+        return aibrain_methodsGetHighestThreatPosition(aiBrain, 0, true, 'Economy')
     end
 
     -- Now look through the bases for the highest economic threat and largest cluster of units
@@ -1347,8 +1417,8 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     local bestBaseThreat = nil
     local maxBaseThreat = 0
     for _, base in enemyBases do
-        local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
-        if not table.empty(threatTable) then
+        local threatTable = aibrain_methodsGetThreatsAroundPosition(aiBrain, base.Position, 1, true, 'Economy')
+        if not tableEmpty(threatTable) then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable
@@ -1366,8 +1436,8 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     local bestThreat = 1
     for idx, threat in bestBaseThreat do
         if threat[3] > 0 then
-            local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('STRUCTURE'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
-            local numunits = table.getn(unitsAtLocation)
+            local unitsAtLocation = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory('STRUCTURE'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
+            local numunits = tableGetn(unitsAtLocation)
 
             if numunits > maxUnits then
                 maxUnits = numunits
@@ -1380,14 +1450,14 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
         local bestPos = {0, 0, 0}
         local maxUnits = 0
         local lookAroundTable = {-2, -1, 0, 1, 2}
-        local squareRadius = (ScenarioInfo.size[1] / 16) / table.getn(lookAroundTable)
+        local squareRadius = (ScenarioInfo.size[1] / 16) / tableGetn(lookAroundTable)
         for ix, offsetX in lookAroundTable do
             for iz, offsetZ in lookAroundTable do
-                local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('STRUCTURE'), {bestBaseThreat[bestThreat][1] + offsetX*squareRadius, 0, bestBaseThreat[bestThreat][2]+offsetZ*squareRadius}, squareRadius, 'Enemy')
-                local numUnits = table.getn(unitsAtLocation)
+                local unitsAtLocation = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory('STRUCTURE'), {bestBaseThreat[bestThreat][1] + offsetX*squareRadius, 0, bestBaseThreat[bestThreat][2]+offsetZ*squareRadius}, squareRadius, 'Enemy')
+                local numUnits = tableGetn(unitsAtLocation)
                 if numUnits > maxUnits then
                     maxUnits = numUnits
-                    bestPos = table.copy(unitsAtLocation[1]:GetPosition())
+                    bestPos = tableCopy(unitsAtLocation[1]:GetPosition())
                 end
             end
         end
@@ -1413,9 +1483,9 @@ function NukeCheck(aiBrain)
         size = mapSizeZ
     end
 
-    local sizeDiag = math.sqrt((size * size) * 2)
-    local nukeWait = math.max((sizeDiag / 40), 10)
-    local numNukes = aiBrain:GetCurrentUnits(categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
+    local sizeDiag = mathSqrt((size * size) * 2)
+    local nukeWait = mathMax((sizeDiag / 40), 10)
+    local numNukes = aibrain_methodsGetCurrentUnits(aiBrain, categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
 
     while true do
         lastNukes = numNukes
@@ -1423,13 +1493,13 @@ function NukeCheck(aiBrain)
             WaitSeconds(nukeWait)
             waitcount = 0
             nukeCount = 0
-            numNukes = aiBrain:GetCurrentUnits(categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
-            Nukes = aiBrain:GetListOfUnits(categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3, true)
+            numNukes = aibrain_methodsGetCurrentUnits(aiBrain, categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
+            Nukes = aibrain_methodsGetListOfUnits(aiBrain, categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3, true)
             for _, v in Nukes do
-                if v:GetWorkProgress() * 100 > waitcount then
-                    waitcount = v:GetWorkProgress() * 100
+                if unit_methodsGetWorkProgress(v) * 100 > waitcount then
+                    waitcount = unit_methodsGetWorkProgress(v) * 100
                 end
-                if v:GetNukeSiloAmmoCount() > 0 then
+                if unit_methodsGetNukeSiloAmmoCount(v) > 0 then
                     nukeCount = nukeCount + 1
                 end
             end
@@ -1442,7 +1512,7 @@ function NukeCheck(aiBrain)
             end
         until numNukes > lastNukes and waitcount < 65 and rollcount < 2
 
-        Nukes = aiBrain:GetListOfUnits(categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3, true)
+        Nukes = aibrain_methodsGetListOfUnits(aiBrain, categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3, true)
         rollcount = rollcount + (numNukes - lastNukes)
 
         for _, v in Nukes do
@@ -1451,13 +1521,13 @@ function NukeCheck(aiBrain)
         WaitSeconds(5)
 
         for _, v in Nukes do
-            v:SetAutoMode(true)
+            unit_methodsSetAutoMode(v, true)
         end
     end
 end
 
 function AirLandToggleSorian(platoon)
-    for _, v in platoon:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(platoon) do
         if not v.Dead and not v.AirLandToggleThreadSorian then
             v.AirLandToggleThreadSorian = v:ForkThread(AirLandToggleThreadSorian)
         end
@@ -1475,7 +1545,7 @@ function AirLandToggleThreadSorian(unit)
         if v.ToggleWeapon then
             local weaponType = 'Land'
             for n, wType in v.FireTargetLayerCapsTable do
-                if string.find(wType, 'Air') then
+                if stringFind(wType, 'Air') then
                     weaponType = 'Air'
                     break
                 end
@@ -1495,18 +1565,18 @@ function AirLandToggleThreadSorian(unit)
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
         local position = unit:GetPosition()
-        local numAir = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.AIR) - unitCat , position, antiAirRange, 'Enemy')
-        local numGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Enemy')
-        local frndAir = aiBrain:GetNumUnitsAroundPoint((categories.MOBILE * categories.AIR) - unitCat, position, antiAirRange, 'Ally')
-        local frndGround = aiBrain:GetNumUnitsAroundPoint((categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Ally')
+        local numAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.MOBILE * categories.AIR) - unitCat , position, antiAirRange, 'Enemy')
+        local numGround = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Enemy')
+        local frndAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.MOBILE * categories.AIR) - unitCat, position, antiAirRange, 'Ally')
+        local frndGround = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, (categories.LAND + categories.NAVAL + categories.STRUCTURE) - unitCat, position, landRange, 'Ally')
         if numAir > 5 and frndAir < 3 then
-            unit:SetScriptBit('RULEUTC_WeaponToggle', false)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', false)
         elseif numGround > (numAir * 1.5) then
-            unit:SetScriptBit('RULEUTC_WeaponToggle', true)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', true)
         elseif frndAir > frndGround then
-            unit:SetScriptBit('RULEUTC_WeaponToggle', true)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', true)
         else
-            unit:SetScriptBit('RULEUTC_WeaponToggle', false)
+            unit_methodsSetScriptBit(unit, 'RULEUTC_WeaponToggle', false)
         end
         WaitSeconds(10)
     end
@@ -1603,12 +1673,12 @@ function CDRRunAwaySorian(aiBrain, cdr)
         shieldPercent = 1
     end
 
-    local nmeHardcore = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL, cdrPos, 130, 'Enemy')
-    local nmeT3 = aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.TECH3 - categories.ENGINEER, cdrPos, 50, 'Enemy')
+    local nmeHardcore = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.EXPERIMENTAL, cdrPos, 130, 'Enemy')
+    local nmeT3 = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND * categories.TECH3 - categories.ENGINEER, cdrPos, 50, 'Enemy')
     if cdr:GetHealthPercent() < 0.7 or shieldPercent < 0.3 or nmeHardcore > 0 or nmeT3 > 4 then
-        local nmeAir = aiBrain:GetNumUnitsAroundPoint(categories.AIR - categories.SCOUT - categories.INTELLIGENCE, cdrPos, 30, 'Enemy')
-        local nmeLand = aiBrain:GetNumUnitsAroundPoint(categories.COMMAND + categories.LAND - categories.ENGINEER - categories.SCOUT - categories.TECH1, cdrPos, 40, 'Enemy')
-        local nmaShield = aiBrain:GetNumUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE, cdrPos, 100, 'Ally')
+        local nmeAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.AIR - categories.SCOUT - categories.INTELLIGENCE, cdrPos, 30, 'Enemy')
+        local nmeLand = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.COMMAND + categories.LAND - categories.ENGINEER - categories.SCOUT - categories.TECH1, cdrPos, 40, 'Enemy')
+        local nmaShield = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.SHIELD * categories.STRUCTURE, cdrPos, 100, 'Ally')
         if nmeAir > 4 or nmeLand > 9 or nmeT3 > 4 or nmeHardcore > 0 or cdr:GetHealthPercent() < 0.7 or shieldPercent < 0.3 then
             if cdr.UnitBeingBuilt then
                 cdr.UnitBeingBuiltBehavior = cdr.UnitBeingBuilt
@@ -1623,7 +1693,7 @@ function CDRRunAwaySorian(aiBrain, cdr)
             end
 
             aiBrain.BaseMonitor.CDRDistress = cdrPos
-            aiBrain.BaseMonitor.CDRThreatLevel = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'AntiSurface')
+            aiBrain.BaseMonitor.CDRThreatLevel = aibrain_methodsGetThreatAtPosition(aiBrain, cdrPos, 1, true, 'AntiSurface')
 
             CDRRevertPriorityChange(aiBrain, cdr)
 
@@ -1639,11 +1709,11 @@ function CDRRunAwaySorian(aiBrain, cdr)
             end
 
             local runSpot, prevSpot
-            local plat = aiBrain:MakePlatoon('', '')
+            local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
             local canTeleport = false
-            aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+            aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {cdr}, 'support', 'None')
             repeat
-                if not aiBrain:PlatoonExists(plat) then
+                if not aibrain_methodsPlatoonExists(aiBrain, plat) then
                     return
                 end
 
@@ -1654,7 +1724,7 @@ function CDRRunAwaySorian(aiBrain, cdr)
                 end
 
                 if not runSpot then
-                    local x, z = aiBrain:GetArmyStartPos()
+                    local x, z = aibrain_methodsGetArmyStartPos(aiBrain)
                     runSpot = AIUtils.RandomLocation(x, z)
                 end
 
@@ -1672,10 +1742,10 @@ function CDRRunAwaySorian(aiBrain, cdr)
 
                 if not cdr.Dead then
                     cdrPos = cdr:GetPosition()
-                    nmeAir = aiBrain:GetNumUnitsAroundPoint(categories.AIR - categories.SCOUT - categories.INTELLIGENCE, cdrPos, 30, 'Enemy')
-                    nmeLand = aiBrain:GetNumUnitsAroundPoint(categories.COMMAND + categories.LAND - categories.ENGINEER - categories.SCOUT - categories.TECH1, cdrPos, 40, 'Enemy')
-                    nmeT3 = aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.TECH3 - categories.ENGINEER, cdrPos, 50, 'Enemy')
-                    nmeHardcore = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL, cdrPos, 130, 'Enemy')
+                    nmeAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.AIR - categories.SCOUT - categories.INTELLIGENCE, cdrPos, 30, 'Enemy')
+                    nmeLand = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.COMMAND + categories.LAND - categories.ENGINEER - categories.SCOUT - categories.TECH1, cdrPos, 40, 'Enemy')
+                    nmeT3 = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND * categories.TECH3 - categories.ENGINEER, cdrPos, 50, 'Enemy')
+                    nmeHardcore = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.EXPERIMENTAL, cdrPos, 130, 'Enemy')
                     if (cdr:HasEnhancement('Shield') or cdr:HasEnhancement('ShieldGeneratorField') or cdr:HasEnhancement('ShieldHeavy')) and cdr:ShieldIsOn() then
                         shieldPercent = (cdr.MyShield:GetHealth() / cdr.MyShield:GetMaxHealth())
                     else
@@ -1711,15 +1781,15 @@ function CDROverChargeSorian(aiBrain, cdr)
     cdr.UnitBeingBuiltBehavior = false
 
     local cdrPos = cdr.CDRHome
-    local numUnits1 = aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.TECH1 - categories.SCOUT - categories.ENGINEER, cdrPos, maxRadius, 'Enemy')
-    local numUnits2 = aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.TECH2 - categories.SCOUT - categories.ENGINEER, cdrPos, maxRadius, 'Enemy')
-    local numUnits3 = aiBrain:GetNumUnitsAroundPoint(categories.LAND * categories.TECH3 - categories.SCOUT - categories.ENGINEER, cdrPos, maxRadius, 'Enemy')
-    local numUnitsEng = aiBrain:GetNumUnitsAroundPoint(categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3), cdrPos, maxRadius, 'Enemy')
-    local numUnits4 = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL, cdrPos, maxRadius + 130, 'Enemy')
-    local numStructs = aiBrain:GetNumUnitsAroundPoint(categories.STRUCTURE, cdrPos, maxRadius, 'Enemy')
-    local numUnitsDF = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.STRUCTURE * categories.DIRECTFIRE - categories.TECH1, cdrPos, maxRadius + 50, 'Enemy')
-    local numUnitsDF1 = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.STRUCTURE * categories.DIRECTFIRE * categories.TECH1, cdrPos, maxRadius + 30, 'Enemy')
-    local numUnitsIF = aiBrain:GetNumUnitsAroundPoint(categories.DEFENSE * categories.STRUCTURE * categories.INDIRECTFIRE - categories.TECH1, cdrPos, maxRadius + 260, 'Enemy')
+    local numUnits1 = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND * categories.TECH1 - categories.SCOUT - categories.ENGINEER, cdrPos, maxRadius, 'Enemy')
+    local numUnits2 = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND * categories.TECH2 - categories.SCOUT - categories.ENGINEER, cdrPos, maxRadius, 'Enemy')
+    local numUnits3 = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND * categories.TECH3 - categories.SCOUT - categories.ENGINEER, cdrPos, maxRadius, 'Enemy')
+    local numUnitsEng = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3), cdrPos, maxRadius, 'Enemy')
+    local numUnits4 = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.EXPERIMENTAL, cdrPos, maxRadius + 130, 'Enemy')
+    local numStructs = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.STRUCTURE, cdrPos, maxRadius, 'Enemy')
+    local numUnitsDF = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.DEFENSE * categories.STRUCTURE * categories.DIRECTFIRE - categories.TECH1, cdrPos, maxRadius + 50, 'Enemy')
+    local numUnitsDF1 = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.DEFENSE * categories.STRUCTURE * categories.DIRECTFIRE * categories.TECH1, cdrPos, maxRadius + 30, 'Enemy')
+    local numUnitsIF = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.DEFENSE * categories.STRUCTURE * categories.INDIRECTFIRE - categories.TECH1, cdrPos, maxRadius + 260, 'Enemy')
     local totalUnits = numUnits1 + numUnits2 + numUnits3 + numUnits4 + numStructs + numUnitsEng
     local distressLoc = aiBrain:BaseMonitorDistressLocation(cdrPos)
 
@@ -1737,9 +1807,9 @@ function CDROverChargeSorian(aiBrain, cdr)
 
     local commanderResponse = false
     if distressLoc then
-        local distressUnitsNaval = aiBrain:GetNumUnitsAroundPoint(categories.NAVAL, distressLoc, 40, 'Enemy')
-        local distressUnitsAir = aiBrain:GetNumUnitsAroundPoint(categories.AIR * (categories.BOMBER + categories.GROUNDATTACK + categories.ANTINAVY), distressLoc, 30, 'Enemy')
-        local distressUnitsexp = aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL, distressLoc, 50, 'Enemy')
+        local distressUnitsNaval = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.NAVAL, distressLoc, 40, 'Enemy')
+        local distressUnitsAir = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.AIR * (categories.BOMBER + categories.GROUNDATTACK + categories.ANTINAVY), distressLoc, 30, 'Enemy')
+        local distressUnitsexp = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.EXPERIMENTAL, distressLoc, 50, 'Enemy')
         if distressUnitsNaval > 0 then
             if cdr:HasEnhancement('NaniteTorpedoTube') and distressUnitsNaval < 5 and distressUnitsexp < 1 then
                 commanderResponse = true
@@ -1767,14 +1837,14 @@ function CDROverChargeSorian(aiBrain, cdr)
         cdr.Fighting = true
         cdr.GoingHome = false
         cdr.Upgrading = false
-        local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+        aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {cdr}, 'support', 'None')
         plat:Stop()
 
         local priList = {categories.ENERGYPRODUCTION * categories.STRUCTURE * categories.DRAGBUILD, categories.TECH3 * categories.INDIRECTFIRE,
             categories.TECH3 * categories.MOBILE, categories.TECH2 * categories.INDIRECTFIRE, categories.MOBILE * categories.TECH2,
             categories.TECH1 * categories.INDIRECTFIRE, categories.TECH1 * categories.MOBILE, categories.CONSTRUCTION * categories.STRUCTURE, categories.ECONOMIC * categories.STRUCTURE, categories.ALLUNITS}
-        plat:SetPrioritizedTargetList('support', priList)
+        platoon_methodsSetPrioritizedTargetList(plat, 'support', priList)
         cdr:SetTargetPriorities(priList)
 
         local target
@@ -1788,7 +1858,7 @@ function CDROverChargeSorian(aiBrain, cdr)
             if counter >= 5 or not target or target.Dead or Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) > maxRadius then
                 counter = 0
                 for _, v in priList do
-                    target = plat:FindClosestUnit('Support', 'Enemy', true, v)
+                    target = platoon_methodsFindClosestUnit(plat, 'Support', 'Enemy', true, v)
                     if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) < maxRadius then
                         local cdrLayer = cdr.Layer
                         local targetLayer = target.Layer
@@ -1801,13 +1871,13 @@ function CDROverChargeSorian(aiBrain, cdr)
                 end
                 if target then
                     local targetPos = target:GetPosition()
-                    enemyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface')
-                    enemyCdrThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'Commander')
-                    friendlyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                    enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, targetPos, 1, true, 'AntiSurface')
+                    enemyCdrThreat = aibrain_methodsGetThreatAtPosition(aiBrain, targetPos, 1, true, 'Commander')
+                    friendlyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, targetPos, 1, true, 'AntiSurface', aibrain_methodsGetArmyIndex(aiBrain))
                     if enemyThreat - enemyCdrThreat >= friendlyThreat + cdrThreat then
                         return
                     end
-                    if aiBrain:GetEconomyStored('ENERGY') >= weapon.EnergyRequired and target and not target.Dead and Utilities.XZDistanceTwoVectors(cdrCurrentPos, target:GetPosition()) <= weapRange then
+                    if aibrain_methodsGetEconomyStored(aiBrain, 'ENERGY') >= weapon.EnergyRequired and target and not target.Dead and Utilities.XZDistanceTwoVectors(cdrCurrentPos, target:GetPosition()) <= weapRange then
                         overCharging = true
                         IssueClearCommands({cdr})
                         IssueOverCharge({cdr}, target)
@@ -1818,9 +1888,9 @@ function CDROverChargeSorian(aiBrain, cdr)
                         IssueMove({cdr}, cdr.CDRHome)
                     end
                 elseif distressLoc then
-                    enemyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface')
-                    enemyCdrThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'Commander')
-                    friendlyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                    enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, distressLoc, 1, true, 'AntiSurface')
+                    enemyCdrThreat = aibrain_methodsGetThreatAtPosition(aiBrain, distressLoc, 1, true, 'Commander')
+                    friendlyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, distressLoc, 1, true, 'AntiSurface', aibrain_methodsGetArmyIndex(aiBrain))
                     if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) then
                         return
                     end
@@ -1852,15 +1922,15 @@ function CDROverChargeSorian(aiBrain, cdr)
                 shieldPercent = 1
             end
 
-            enemyThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'AntiSurface')
-            enemyCdrThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'Commander')
-            friendlyThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
-            if ((aiBrain:GetNumUnitsAroundPoint(categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy') == 0)
+            enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, cdrPos, 1, true, 'AntiSurface')
+            enemyCdrThreat = aibrain_methodsGetThreatAtPosition(aiBrain, cdrPos, 1, true, 'Commander')
+            friendlyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, cdrPos, 1, true, 'AntiSurface', aibrain_methodsGetArmyIndex(aiBrain))
+            if ((aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy') == 0)
                 and (not distressLoc or (Utilities.XZDistanceTwoVectors(distressLoc, cdrPos) > distressRange)
-                and (Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) < maxRadius))) or enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) or (aiBrain:GetNumUnitsAroundPoint(categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy')) >= 15 or (cdr:GetHealthPercent() < .80 or shieldPercent < .30) then
+                and (Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) < maxRadius))) or enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) or (aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy')) >= 15 or (cdr:GetHealthPercent() < .80 or shieldPercent < .30) then
                 continueFighting = false
             end
-        until not continueFighting or not aiBrain:PlatoonExists(plat)
+        until not continueFighting or not aibrain_methodsPlatoonExists(aiBrain, plat)
 
         cdr.Fighting = false
         IssueClearCommands({cdr})
@@ -1881,8 +1951,8 @@ function CDRReturnHomeSorian(aiBrain, cdr, Mult)
     local distSqAway = rad * rad
     local loc = cdr.CDRHome
     if not cdr.Dead and VDist2Sq(cdrPos[1], cdrPos[3], loc[1], loc[3]) > distSqAway then
-        local plat = aiBrain:MakePlatoon('', '')
-        aiBrain:AssignUnitsToPlatoon(plat, {cdr}, 'support', 'None')
+        local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+        aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {cdr}, 'support', 'None')
         IssueClearCommands({cdr})
 
         repeat
@@ -1890,7 +1960,7 @@ function CDRReturnHomeSorian(aiBrain, cdr, Mult)
             cdr.GoingHome = true
             cdr.Fighting = false
             cdr.Upgrading = false
-            if not aiBrain:PlatoonExists(plat) then
+            if not aibrain_methodsPlatoonExists(aiBrain, plat) then
                 return
             end
             IssueMove({cdr}, loc)
@@ -1909,10 +1979,10 @@ function CDRFinishUnit(cdr)
         IssueRepair({cdr}, cdr.UnitBeingBuiltBehavior)
         repeat
             WaitSeconds(1)
-            if cdr.GoingHome or cdr:IsUnitState("Attacking") or cdr.Fighting then
+            if cdr.GoingHome or unit_methodsIsUnitState(cdr, "Attacking") or cdr.Fighting then
                 return
             end
-        until cdr:IsIdleState()
+        until unit_methodsIsIdleState(cdr)
 
         IssueClearCommands({cdr})
         cdr.UnitBeingBuiltBehavior = false
@@ -1920,7 +1990,7 @@ function CDRFinishUnit(cdr)
 end
 
 function CommanderBehaviorSorian(platoon)
-    for _, v in platoon:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(platoon) do
         if not v.Dead and not v.CommanderThread then
             v.CommanderThread = v:ForkThread(CommanderThreadSorian, platoon)
         end
@@ -1928,7 +1998,7 @@ function CommanderBehaviorSorian(platoon)
 end
 
 function CDRHideBehavior(aiBrain, cdr)
-    if cdr:IsIdleState() then
+    if unit_methodsIsIdleState(cdr) then
         cdr.GoingHome = false
         cdr.Fighting = false
         cdr.Upgrading = false
@@ -1936,9 +2006,9 @@ function CDRHideBehavior(aiBrain, cdr)
         local category = false
         local runShield = false
         local runPos = false
-        local nmaShield = aiBrain:GetNumUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE, cdr:GetPosition(), 100, 'Ally')
-        local nmaPD = aiBrain:GetNumUnitsAroundPoint(categories.DIRECTFIRE * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
-        local nmaAA = aiBrain:GetNumUnitsAroundPoint(categories.ANTIAIR * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
+        local nmaShield = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.SHIELD * categories.STRUCTURE, cdr:GetPosition(), 100, 'Ally')
+        local nmaPD = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.DIRECTFIRE * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
+        local nmaAA = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.ANTIAIR * categories.DEFENSE, cdr:GetPosition(), 100, 'Ally')
 
         if nmaShield > 0 then
             category = categories.SHIELD * categories.STRUCTURE
@@ -1956,7 +2026,7 @@ function CDRHideBehavior(aiBrain, cdr)
         end
 
         if not category or not runPos then
-            local x, z = aiBrain:GetArmyStartPos()
+            local x, z = aibrain_methodsGetArmyStartPos(aiBrain)
             runPos = AIUtils.RandomLocation(x, z)
             IssueClearCommands({cdr})
             IssueMove({cdr}, runPos)
@@ -1979,7 +2049,7 @@ function CommanderThreadSorian(cdr, platoon)
     local aiBrain = cdr:GetAIBrain()
     aiBrain:BuildScoutLocationsSorian()
     if not SUtils.CheckForMapMarkers(aiBrain) then
-        SUtils.AISendChat('all', ArmyBrains[aiBrain:GetArmyIndex()].Nickname, 'badmap')
+        SUtils.AISendChat('all', ArmyBrains[aibrain_methodsGetArmyIndex(aiBrain)].Nickname, 'badmap')
     end
 
     moveOnNext = false
@@ -1995,7 +2065,7 @@ function CommanderThreadSorian(cdr, platoon)
 
         -- Overcharge
         if Mult == 1 and not cdr.Dead and not cdr.Upgrading and SBC.GreaterThanGameTime(aiBrain, Delay) and
-        UCBC.HaveGreaterThanUnitsWithCategory(aiBrain,  1, 'FACTORY') and aiBrain:GetNoRushTicks() <= 0 then
+        UCBC.HaveGreaterThanUnitsWithCategory(aiBrain,  1, 'FACTORY') and aibrain_methodsGetNoRushTicks(aiBrain) <= 0 then
             CDROverChargeSorian(aiBrain, cdr)
         end
         WaitTicks(1)
@@ -2008,15 +2078,15 @@ function CommanderThreadSorian(cdr, platoon)
         if not cdr.Dead then CDRReturnHomeSorian(aiBrain, cdr, Mult) end
         WaitTicks(1)
 
-        if not cdr.Dead and cdr:IsIdleState() and moveOnNext then
+        if not cdr.Dead and unit_methodsIsIdleState(cdr) and moveOnNext then
             CDRHideBehavior(aiBrain, cdr)
             moveOnNext = false
         end
         WaitTicks(1)
 
-        if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr.Fighting and not cdr.Upgrading and not cdr:IsUnitState("Building")
-        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr.UnitBeingBuiltBehavior and not cdr:IsUnitState("Upgrading")
-        and not cdr:IsUnitState("Enhancing") and not moveOnNext then
+        if not cdr.Dead and unit_methodsIsIdleState(cdr) and not cdr.GoingHome and not cdr.Fighting and not cdr.Upgrading and not unit_methodsIsUnitState(cdr, "Building")
+        and not unit_methodsIsUnitState(cdr, "Attacking") and not unit_methodsIsUnitState(cdr, "Repairing") and not cdr.UnitBeingBuiltBehavior and not unit_methodsIsUnitState(cdr, "Upgrading")
+        and not unit_methodsIsUnitState(cdr, "Enhancing") and not moveOnNext then
             moveWait = moveWait + 1
             if moveWait >= 10 then
                 moveWait = 0
@@ -2028,14 +2098,14 @@ function CommanderThreadSorian(cdr, platoon)
         WaitTicks(1)
 
         -- Call platoon resume building deal...
-        if not cdr.Dead and cdr:IsIdleState() and not cdr.GoingHome and not cdr.Fighting and not cdr.Upgrading and not cdr:IsUnitState("Building")
-        and not cdr:IsUnitState("Attacking") and not cdr:IsUnitState("Repairing") and not cdr.UnitBeingBuiltBehavior and not cdr:IsUnitState("Upgrading")
-        and not cdr:IsUnitState("Enhancing") and not (SUtils.XZDistanceTwoVectorsSq(cdr.CDRHome, cdr:GetPosition()) > 100)
-        and not cdr:IsUnitState('BlockCommandQueue') then
-            if not cdr.EngineerBuildQueue or table.empty(cdr.EngineerBuildQueue) then
-                local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-                aiBrain:AssignUnitsToPlatoon(pool, {cdr}, 'Unassigned', 'None')
-            elseif cdr.EngineerBuildQueue and not table.empty(cdr.EngineerBuildQueue) then
+        if not cdr.Dead and unit_methodsIsIdleState(cdr) and not cdr.GoingHome and not cdr.Fighting and not cdr.Upgrading and not unit_methodsIsUnitState(cdr, "Building")
+        and not unit_methodsIsUnitState(cdr, "Attacking") and not unit_methodsIsUnitState(cdr, "Repairing") and not cdr.UnitBeingBuiltBehavior and not unit_methodsIsUnitState(cdr, "Upgrading")
+        and not unit_methodsIsUnitState(cdr, "Enhancing") and not (SUtils.XZDistanceTwoVectorsSq(cdr.CDRHome, cdr:GetPosition()) > 100)
+        and not unit_methodsIsUnitState(cdr, 'BlockCommandQueue') then
+            if not cdr.EngineerBuildQueue or tableEmpty(cdr.EngineerBuildQueue) then
+                local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, pool, {cdr}, 'Unassigned', 'None')
+            elseif cdr.EngineerBuildQueue and not tableEmpty(cdr.EngineerBuildQueue) then
                 if not cdr.NotBuildingThread then
                     cdr.NotBuildingThread = cdr:ForkThread(platoon.WatchForNotBuildingSorian)
                 end
@@ -2051,7 +2121,7 @@ function CommanderThreadSorian(cdr, platoon)
 end
 
 function AirUnitRefitSorian(self)
-    for k, v in self:GetPlatoonUnits() do
+    for k, v in platoon_methodsGetPlatoonUnits(self) do
         if not v.Dead and not v.RefitThread then
             v.RefitThread = v:ForkThread(AirUnitRefitThreadSorian, self:GetPlan(), self.PlatoonData)
         end
@@ -2066,23 +2136,23 @@ function AirUnitRefitThreadSorian(unit, plan, data)
 
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
-        local fuel = unit:GetFuelRatio()
+        local fuel = unit_methodsGetFuelRatio(unit)
         local health = unit:GetHealthPercent()
         if not unit.Loading and (fuel < 0.2 or health < 0.4) then
 
             -- Find air stage
-            if aiBrain:GetCurrentUnits(categories.AIRSTAGINGPLATFORM - categories.CARRIER - categories.EXPERIMENTAL) > 0 then
+            if aibrain_methodsGetCurrentUnits(aiBrain, categories.AIRSTAGINGPLATFORM - categories.CARRIER - categories.EXPERIMENTAL) > 0 then
                 local unitPos = unit:GetPosition()
                 local plats = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIRSTAGINGPLATFORM - categories.CARRIER - categories.EXPERIMENTAL, unitPos, 400)
-                if not table.empty(plats) then
+                if not tableEmpty(plats) then
                     local closest, distance
                     for k, v in plats do
                         if not v.Dead then
                             local roomAvailable = false
                             if not EntityCategoryContains(categories.CARRIER, v) then
-                                roomAvailable = v:TransportHasSpaceFor(unit)
+                                roomAvailable = unit_methodsTransportHasSpaceFor(v, unit)
                             end
-                            if roomAvailable and (not v.Refueling or table.getn(v.Refueling) < 6) then
+                            if roomAvailable and (not v.Refueling or tableGetn(v.Refueling) < 6) then
                                 local platPos = v:GetPosition()
                                 local tempDist = VDist2(unitPos[1], unitPos[3], platPos[1], platPos[3])
                                 if (not closest or tempDist < distance) then
@@ -2093,8 +2163,8 @@ function AirUnitRefitThreadSorian(unit, plan, data)
                         end
                     end
                     if closest then
-                        local plat = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(plat, {unit}, 'Attack', 'None')
+                        local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+                        aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {unit}, 'Attack', 'None')
                         IssueStop({unit})
                         IssueClearCommands({unit})
                         IssueTransportLoad({unit}, closest)
@@ -2105,7 +2175,7 @@ function AirUnitRefitThreadSorian(unit, plan, data)
                             closest.CarrierStaging = closest:ForkThread(CarrierStagingThread)
                             closest.Refueling = {}
                         end
-                        table.insert(closest.Refueling, unit)
+                        tableInsert(closest.Refueling, unit)
                         unit.Loading = true
                     end
                 end
@@ -2121,50 +2191,50 @@ function AirStagingThreadSorian(unit)
         local ready = true
         local numUnits = 0
         for _, v in unit.Refueling do
-            if not v.Dead and (v:GetFuelRatio() < 0.9 or v:GetHealthPercent() < 0.9) then
+            if not v.Dead and (unit_methodsGetFuelRatio(v) < 0.9 or v:GetHealthPercent() < 0.9) then
                 ready = false
             elseif not v.Dead then
                 numUnits = numUnits + 1
             end
         end
 
-        local cargo = unit:GetCargo()
-        if ready and numUnits == 0 and not table.empty(cargo) then
+        local cargo = unit_methodsGetCargo(unit)
+        if ready and numUnits == 0 and not tableEmpty(cargo) then
             local pos = unit:GetPosition()
             IssueClearCommands({unit})
             IssueTransportUnload({unit}, {pos[1] + 5, pos[2], pos[3] + 5})
             for _, v in cargo do
                 local plat
                 if not v.PlanName then
-                    plat = aiBrain:MakePlatoon('', 'AirHuntAI')
+                    plat = aibrain_methodsMakePlatoon(aiBrain, '', 'AirHuntAI')
                 else
-                    plat = aiBrain:MakePlatoon('', v.PlanName)
+                    plat = aibrain_methodsMakePlatoon(aiBrain, '', v.PlanName)
                 end
 
                 if v.PlatoonData then
                     plat.PlatoonData = {}
                     plat.PlatoonData = v.PlatoonData
                 end
-                aiBrain:AssignUnitsToPlatoon(plat, {v}, 'Attack', 'GrowthFormation')
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {v}, 'Attack', 'GrowthFormation')
             end
         end
         if numUnits > 0 then
             WaitSeconds(2)
             for k, v in unit.Refueling do
-                if not v.Dead and not v:IsUnitState('Attached') and (v:GetFuelRatio() < .9 or v:GetHealthPercent() < .9) then
+                if not v.Dead and not unit_methodsIsUnitState(v, 'Attached') and (unit_methodsGetFuelRatio(v) < .9 or v:GetHealthPercent() < .9) then
                     v.Loading = false
                     local plat
                     if not v.PlanName then
-                        plat = aiBrain:MakePlatoon('', 'AirHuntAI')
+                        plat = aibrain_methodsMakePlatoon(aiBrain, '', 'AirHuntAI')
                     else
-                        plat = aiBrain:MakePlatoon('', v.PlanName)
+                        plat = aibrain_methodsMakePlatoon(aiBrain, '', v.PlanName)
                     end
 
                     if v.PlatoonData then
                         plat.PlatoonData = {}
                         plat.PlatoonData = v.PlatoonData
                     end
-                    aiBrain:AssignUnitsToPlatoon(plat, {v}, 'Attack', 'GrowthFormation')
+                    aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, {v}, 'Attack', 'GrowthFormation')
                     unit.Refueling[k] = nil
                 end
             end
@@ -2174,7 +2244,7 @@ function AirStagingThreadSorian(unit)
 end
 
 AssignExperimentalPrioritiesSorian = function(platoon)
-    local platoonUnits = platoon:GetPlatoonUnits()
+    local platoonUnits = platoon_methodsGetPlatoonUnits(platoon)
     for k, v in platoonUnits do
         if v and not v.Dead then
             SetLandTargetPrioritiesSorian(v, T4WeaponPrioritiesSorian)
@@ -2184,14 +2254,14 @@ end
 
 SetLandTargetPrioritiesSorian = function(self, priTable)
     for i = 1, self:GetWeaponCount() do
-        local wep = self:GetWeapon(i)
+        local wep = unit_methodsGetWeapon(self, i)
 
         if wep:GetBlueprint().CannotAttackGround then
             continue
         end
 
         for onLayer, targetLayers in wep:GetBlueprint().FireTargetLayerCapsTable do
-            if string.find(targetLayers, 'Land') then
+            if stringFind(targetLayers, 'Land') then
                 wep:SetWeaponPriorities(priTable)
                 break
             end
@@ -2203,7 +2273,7 @@ WreckBaseSorian = function(self, base)
     for _, priority in SurfacePrioritiesSorian do
         local numUnitsAtBase = 0
         local notDeadUnit = false
-        local unitsAtBase = self:GetBrain():GetUnitsAroundPoint(ParseEntityCategory(priority), base.Position, 200, 'Enemy')
+        local unitsAtBase = platoon_methodsGetBrain(self):GetUnitsAroundPoint(ParseEntityCategory(priority), base.Position, 200, 'Enemy')
 
         for _, unit in unitsAtBase do
             if not unit.Dead then
@@ -2221,7 +2291,7 @@ WreckBaseSorian = function(self, base)
 end
 
 FindExperimentalTargetSorian = function(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
         -- No target
         return
@@ -2235,7 +2305,7 @@ FindExperimentalTargetSorian = function(self)
         local mostUnits = 0
         local bestUnit = false
         for _, base in enemyBases do
-            local unitsAtBase = aiBrain:GetUnitsAroundPoint(ParseEntityCategory(priority), base.Position, 100, 'Enemy')
+            local unitsAtBase = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory(priority), base.Position, 100, 'Enemy')
             local numUnitsAtBase = 0
             local notDeadUnit = false
 
@@ -2252,7 +2322,7 @@ FindExperimentalTargetSorian = function(self)
                     mostUnits = numUnitsAtBase
                     bestUnit = notDeadUnit
                 elseif numUnitsAtBase == mostUnits then
-                    local myPos = self:GetPlatoonPosition()
+                    local myPos = platoon_methodsGetPlatoonPosition(self)
                     local dist1 = VDist2(myPos[1], myPos[3], base.Position[1], base.Position[3])
                     local dist2 = VDist2(myPos[1], myPos[3], bestBase.Position[1], bestBase.Position[3])
                     if dist1 < dist2 then
@@ -2271,7 +2341,7 @@ FindExperimentalTargetSorian = function(self)
 end
 
 CommanderOverrideCheckSorian = function(self)
-    local platoonUnits = self:GetPlatoonUnits()
+    local platoonUnits = platoon_methodsGetPlatoonUnits(self)
     local experimental
     for _, v in platoonUnits do
         if not v.Dead then
@@ -2284,23 +2354,23 @@ CommanderOverrideCheckSorian = function(self)
         return false
     end
 
-    local mainWeapon = experimental:GetWeapon(1)
+    local mainWeapon = unit_methodsGetWeapon(experimental, 1)
     local weaponRange = mainWeapon:GetBlueprint().MaxRadius
 
-    local aiBrain = self:GetBrain()
-    local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
+    local aiBrain = platoon_methodsGetBrain(self)
+    local commanders = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.COMMAND, platoon_methodsGetPlatoonPosition(self), weaponRange, 'Enemy')
 
-    if table.empty(commanders) or commanders[1].Dead or commanders[1].Layer == 'Seabed' then
+    if tableEmpty(commanders) or commanders[1].Dead or commanders[1].Layer == 'Seabed' then
         return false
     end
 
-    local currentTarget = mainWeapon:GetCurrentTarget()
+    local currentTarget = weapon_methodsGetCurrentTarget(mainWeapon)
     if commanders[1] ~= currentTarget then
         -- Commander in range who isn't our current target. Force weapons to reacquire targets so they'll grab him.
         for k, v in platoonUnits do
             if not v.Dead then
                 for i=1, v:GetWeaponCount() do
-                    v:GetWeapon(i):ResetTarget()
+                    unit_methodsGetWeapon(v, i):ResetTarget()
                 end
             end
         end
@@ -2311,16 +2381,16 @@ CommanderOverrideCheckSorian = function(self)
 end
 
 GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
-    if not aiBrain or not aiBrain:PlatoonExists(experimental) then
+    if not aiBrain or not aibrain_methodsPlatoonExists(aiBrain, experimental) then
         return nil
     end
 
     -- Look for commander first
-    local position = experimental:GetPlatoonPosition()
-    local threatTable = aiBrain:GetThreatsAroundPosition(position, 16, true, 'Commander')
+    local position = platoon_methodsGetPlatoonPosition(experimental)
+    local threatTable = aibrain_methodsGetThreatsAroundPosition(aiBrain, position, 16, true, 'Commander')
     for _, threat in threatTable do
         if threat[3] > 0 then
-            local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('COMMAND'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
+            local unitsAtLocation = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory('COMMAND'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
             local validUnit = false
             for _, unit in unitsAtLocation do
                 if not unit.Dead then
@@ -2329,7 +2399,7 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
                 end
             end
             if validUnit then
-                return table.copy(validUnit:GetPosition())
+                return tableCopy(validUnit:GetPosition())
             end
         end
     end
@@ -2339,14 +2409,14 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
 
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
         -- No target
-        return aiBrain:GetHighestThreatPosition(0, true, 'Economy')
+        return aibrain_methodsGetHighestThreatPosition(aiBrain, 0, true, 'Economy')
     end
 
     local bestBaseThreat = nil
     local maxBaseThreat = 0
     for _, base in enemyBases do
-        local threatTable = aiBrain:GetThreatsAroundPosition(base.Position, 1, true, 'Economy')
-        if not table.empty(threatTable) then
+        local threatTable = aibrain_methodsGetThreatsAroundPosition(aiBrain, base.Position, 1, true, 'Economy')
+        if not tableEmpty(threatTable) then
             if threatTable[1][3] > maxBaseThreat then
                 maxBaseThreat = threatTable[1][3]
                 bestBaseThreat = threatTable
@@ -2364,8 +2434,8 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
     local bestThreat = 1
     for idx, threat in bestBaseThreat do
         if threat[3] > 0 then
-            local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('STRUCTURE'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
-            local numunits = table.getn(unitsAtLocation)
+            local unitsAtLocation = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory('STRUCTURE'), {threat[1], 0, threat[2]}, ScenarioInfo.size[1] / 16, 'Enemy')
+            local numunits = tableGetn(unitsAtLocation)
 
             if numunits > maxUnits then
                 maxUnits = numunits
@@ -2378,14 +2448,14 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
         local bestPos = {0, 0, 0}
         local maxUnits = 0
         local lookAroundTable = {-2, -1, 0, 1, 2}
-        local squareRadius = (ScenarioInfo.size[1] / 16) / table.getn(lookAroundTable)
+        local squareRadius = (ScenarioInfo.size[1] / 16) / tableGetn(lookAroundTable)
         for ix, offsetX in lookAroundTable do
             for iz, offsetZ in lookAroundTable do
-                local unitsAtLocation = aiBrain:GetUnitsAroundPoint(ParseEntityCategory('STRUCTURE'), {bestBaseThreat[bestThreat][1] + offsetX * squareRadius, 0, bestBaseThreat[bestThreat][2] + offsetZ * squareRadius}, squareRadius, 'Enemy')
-                local numUnits = table.getn(unitsAtLocation)
+                local unitsAtLocation = aibrain_methodsGetUnitsAroundPoint(aiBrain, ParseEntityCategory('STRUCTURE'), {bestBaseThreat[bestThreat][1] + offsetX * squareRadius, 0, bestBaseThreat[bestThreat][2] + offsetZ * squareRadius}, squareRadius, 'Enemy')
+                local numUnits = tableGetn(unitsAtLocation)
                 if numUnits > maxUnits then
                     maxUnits = numUnits
-                    bestPos = table.copy(unitsAtLocation[1]:GetPosition())
+                    bestPos = tableCopy(unitsAtLocation[1]:GetPosition())
                 end
             end
         end
@@ -2400,23 +2470,23 @@ end
 
 ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
     local cmd = false
-    local platoonUnits = platoon:GetPlatoonUnits()
-    local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, layer, platoon:GetPlatoonPosition(), dest, nil, nil, pathDist)
+    local platoonUnits = platoon_methodsGetPlatoonUnits(platoon)
+    local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, layer, platoon_methodsGetPlatoonPosition(platoon), dest, nil, nil, pathDist)
     if not path then
         if aggro == 'AttackMove' then
-            cmd = platoon:AggressiveMoveToLocation(dest)
+            cmd = platoon_methodsAggressiveMoveToLocation(platoon, dest)
         elseif aggro ~= 'AttackDest' then
-            cmd = platoon:MoveToLocation(dest, false)
+            cmd = platoon_methodsMoveToLocation(platoon, dest, false)
         end
     else
-        local pathSize = table.getn(path)
+        local pathSize = tableGetn(path)
         for k, point in path do
             if k == pathSize and aggro == 'AttackDest' then
                 -- Let the main script issue the move to attack the target
             elseif aggro == 'AttackMove' then
-                cmd = platoon:AggressiveMoveToLocation(point)
+                cmd = platoon_methodsAggressiveMoveToLocation(platoon, point)
             else
-                cmd = platoon:MoveToLocation(point, false)
+                cmd = platoon_methodsMoveToLocation(platoon, point, false)
             end
         end
     end
@@ -2425,8 +2495,8 @@ ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
 end
 
 CzarBehaviorSorian = function(self)
-    local aiBrain = self:GetBrain()
-    if not aiBrain:PlatoonExists(self) then
+    local aiBrain = platoon_methodsGetBrain(self)
+    if not aibrain_methodsPlatoonExists(aiBrain, self) then
         return
     end
 
@@ -2438,33 +2508,33 @@ CzarBehaviorSorian = function(self)
 
     local cmd
     local targetUnit, targetBase = FindExperimentalTargetSorian(self)
-    local platoonUnits = self:GetPlatoonUnits()
+    local platoonUnits = platoon_methodsGetPlatoonUnits(self)
     local oldTargetUnit = nil
-    while aiBrain:PlatoonExists(self) do
+    while aibrain_methodsPlatoonExists(aiBrain, self) do
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
-        if (targetUnit and targetUnit ~= oldTargetUnit) or not self:IsCommandsActive(cmd) then
-            if targetUnit and VDist3(targetUnit:GetPosition(), self:GetPlatoonPosition()) > 100 then
+        if (targetUnit and targetUnit ~= oldTargetUnit) or not platoon_methodsIsCommandsActive(self, cmd) then
+            if targetUnit and VDist3(targetUnit:GetPosition(), platoon_methodsGetPlatoonPosition(self)) > 100 then
                 IssueClearCommands(platoonUnits)
                 WaitTicks(5)
 
                 cmd = ExpPathToLocation(aiBrain, self, 'Air', targetUnit:GetPosition(), false, 62500)
-                cmd = self:AttackTarget(targetUnit)
+                cmd = platoon_methodsAttackTarget(self, targetUnit)
             else
                 IssueClearCommands(platoonUnits)
                 WaitTicks(5)
 
-                cmd = self:AttackTarget(targetUnit)
+                cmd = platoon_methodsAttackTarget(self, targetUnit)
             end
         end
 
         local nearCommander = CommanderOverrideCheckSorian(self)
         local oldCommander = nil
-        while nearCommander and aiBrain:PlatoonExists(self) and self:IsCommandsActive(cmd) do
+        while nearCommander and aibrain_methodsPlatoonExists(aiBrain, self) and platoon_methodsIsCommandsActive(self, cmd) do
             if nearCommander and nearCommander ~= oldCommander then
                 IssueClearCommands(platoonUnits)
                 WaitTicks(5)
 
-                cmd = self:AttackTarget(nearCommander)
+                cmd = platoon_methodsAttackTarget(self, nearCommander)
                 targetUnit = nearCommander
             end
             WaitSeconds(1)
@@ -2480,8 +2550,8 @@ CzarBehaviorSorian = function(self)
 end
 
 AhwassaBehaviorSorian = function(self)
-    local aiBrain = self:GetBrain()
-    if not aiBrain:PlatoonExists(self) then
+    local aiBrain = platoon_methodsGetBrain(self)
+    if not aibrain_methodsPlatoonExists(aiBrain, self) then
         return
     end
 
@@ -2492,8 +2562,8 @@ AhwassaBehaviorSorian = function(self)
     AssignExperimentalPrioritiesSorian(self)
     local targetLocation = GetHighestThreatClusterLocationSorian(aiBrain, self)
     local oldTargetLocation = nil
-    local platoonUnits = self:GetPlatoonUnits()
-    while aiBrain:PlatoonExists(self) do
+    local platoonUnits = platoon_methodsGetPlatoonUnits(self)
+    while aibrain_methodsPlatoonExists(aiBrain, self) do
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
         if targetLocation and targetLocation ~= oldTargetLocation then
             IssueClearCommands(platoonUnits)
@@ -2509,8 +2579,8 @@ AhwassaBehaviorSorian = function(self)
 end
 
 TickBehaviorSorian = function(self)
-    local aiBrain = self:GetBrain()
-    if not aiBrain:PlatoonExists(self) then
+    local aiBrain = platoon_methodsGetBrain(self)
+    if not aibrain_methodsPlatoonExists(aiBrain, self) then
         return
     end
 
@@ -2521,11 +2591,11 @@ TickBehaviorSorian = function(self)
     AssignExperimentalPrioritiesSorian(self)
     local targetLocation = GetHighestThreatClusterLocationSorian(aiBrain, self)
     local oldTargetLocation = nil
-    local platoonUnits = self:GetPlatoonUnits()
+    local platoonUnits = platoon_methodsGetPlatoonUnits(self)
     local cmd
-    while aiBrain:PlatoonExists(self) do
+    while aibrain_methodsPlatoonExists(aiBrain, self) do
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
-        if (targetLocation and targetLocation ~= oldTargetLocation) or not self:IsCommandsActive(cmd) then
+        if (targetLocation and targetLocation ~= oldTargetLocation) or not platoon_methodsIsCommandsActive(self, cmd) then
             IssueClearCommands(platoonUnits)
             cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, false, 62500)
             WaitSeconds(25)
@@ -2538,7 +2608,7 @@ TickBehaviorSorian = function(self)
 end
 
 function ScathisBehaviorSorian(self)
-    local aiBrain = self:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(self)
 
     AssignExperimentalPrioritiesSorian(self)
 
@@ -2547,8 +2617,8 @@ function ScathisBehaviorSorian(self)
     local targetUnit = false
     local lastBase = false
     local airUnit = false
-    local platoonUnits = self:GetPlatoonUnits()
-    while aiBrain:PlatoonExists(self) do
+    local platoonUnits = platoon_methodsGetPlatoonUnits(self)
+    while aibrain_methodsPlatoonExists(aiBrain, self) do
         if lastBase then
             targetUnit, lastBase = WreckBaseSorian(self, lastBase)
         end
@@ -2563,7 +2633,7 @@ function ScathisBehaviorSorian(self)
         end
 
         -- Walk to and kill target loop
-        while aiBrain:PlatoonExists(self) and targetUnit and not targetUnit.Dead do
+        while aibrain_methodsPlatoonExists(aiBrain, self) and targetUnit and not targetUnit.Dead do
             local nearCommander = CommanderOverrideCheckSorian(self)
             if nearCommander and nearCommander ~= targetUnit then
                 IssueClearCommands(platoonUnits)
@@ -2591,7 +2661,7 @@ function ScathisBehaviorSorian(self)
                 IssueAggressiveMove({experimental}, closestBlockingShield:GetPosition())
 
                 -- Wait for shield to die loop
-                while not closestBlockingShield.Dead and aiBrain:PlatoonExists(self) do
+                while not closestBlockingShield.Dead and aibrain_methodsPlatoonExists(aiBrain, self) do
                     self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
                     WaitSeconds(1)
                 end
@@ -2616,7 +2686,7 @@ function ScathisBehaviorSorian(self)
 end
 
 function InWaterCheck(platoon)
-    local t4Pos = platoon:GetPlatoonPosition()
+    local t4Pos = platoon_methodsGetPlatoonPosition(platoon)
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
 
     return inWater
@@ -2635,10 +2705,10 @@ function FatBoyBehaviorSorian(self)
     local lastBase = false
     local airUnit = false
     local useMove = true
-    local aiBrain = self:GetBrain()
-    local platoonUnits = self:GetPlatoonUnits()
+    local aiBrain = platoon_methodsGetBrain(self)
+    local platoonUnits = platoon_methodsGetPlatoonUnits(self)
     local cmd
-    while aiBrain:PlatoonExists(self) do
+    while aibrain_methodsPlatoonExists(aiBrain, self) do
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
         if lastBase then
             targetUnit, lastBase = WreckBaseSorian(self, lastBase)
@@ -2661,7 +2731,7 @@ function FatBoyBehaviorSorian(self)
         end
 
         -- Walk to and kill target loop
-        while aiBrain:PlatoonExists(self) and targetUnit and not targetUnit.Dead and useMove == InWaterCheck(self) and self:IsCommandsActive(cmd) do
+        while aibrain_methodsPlatoonExists(aiBrain, self) and targetUnit and not targetUnit.Dead and useMove == InWaterCheck(self) and platoon_methodsIsCommandsActive(self, cmd) do
             self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
             useMove = InWaterCheck(self)
             local nearCommander = CommanderOverrideCheckSorian(self)
@@ -2670,7 +2740,7 @@ function FatBoyBehaviorSorian(self)
                 if useMove then
                     cmd = ExpPathToLocation(aiBrain, self, 'Amphibious', nearCommander:GetPosition(), false)
                 else
-                    cmd = self:AttackTarget(targetUnit)
+                    cmd = platoon_methodsAttackTarget(self, targetUnit)
                 end
                 targetUnit = nearCommander
             end
@@ -2704,7 +2774,7 @@ function FatBoyBehaviorSorian(self)
                 end
 
                 -- Wait for shield to die loop
-                while not closestBlockingShield.Dead and aiBrain:PlatoonExists(self) and useMove == InWaterCheck(self) and self:IsCommandsActive(cmd) do
+                while not closestBlockingShield.Dead and aibrain_methodsPlatoonExists(aiBrain, self) and useMove == InWaterCheck(self) and platoon_methodsIsCommandsActive(self, cmd) do
                     self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
                     useMove = InWaterCheck(self)
                     WaitSeconds(1)
@@ -2743,10 +2813,10 @@ function BehemothBehaviorSorian(self)
     local airUnit = false
     local useMove = true
     local farTarget = false
-    local aiBrain = self:GetBrain()
-    local platoonUnits = self:GetPlatoonUnits()
+    local aiBrain = platoon_methodsGetBrain(self)
+    local platoonUnits = platoon_methodsGetPlatoonUnits(self)
     local cmd
-    while aiBrain:PlatoonExists(self) do
+    while aibrain_methodsPlatoonExists(aiBrain, self) do
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
         useMove = InWaterCheck(self)
         if lastBase then
@@ -2758,7 +2828,7 @@ function BehemothBehaviorSorian(self)
         end
 
         farTarget = false
-        if targetUnit and SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), targetUnit:GetPosition()) >= 40000 then
+        if targetUnit and SUtils.XZDistanceTwoVectorsSq(platoon_methodsGetPlatoonPosition(self), targetUnit:GetPosition()) >= 40000 then
             farTarget = true
         end
 
@@ -2774,20 +2844,20 @@ function BehemothBehaviorSorian(self)
         -- Walk to and kill target loop
         local nearCommander = CommanderOverrideCheckSorian(self)
         local ACUattack = false
-        while aiBrain:PlatoonExists(self) and targetUnit and not targetUnit.Dead and useMove == InWaterCheck(self) and
-        self:IsCommandsActive(cmd) and (nearCommander or ((farTarget and SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), targetUnit:GetPosition()) >= 40000) or
-        (not farTarget and SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), targetUnit:GetPosition()) < 40000))) do
+        while aibrain_methodsPlatoonExists(aiBrain, self) and targetUnit and not targetUnit.Dead and useMove == InWaterCheck(self) and
+        platoon_methodsIsCommandsActive(self, cmd) and (nearCommander or ((farTarget and SUtils.XZDistanceTwoVectorsSq(platoon_methodsGetPlatoonPosition(self), targetUnit:GetPosition()) >= 40000) or
+        (not farTarget and SUtils.XZDistanceTwoVectorsSq(platoon_methodsGetPlatoonPosition(self), targetUnit:GetPosition()) < 40000))) do
             self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
             useMove = InWaterCheck(self)
             nearCommander = CommanderOverrideCheckSorian(self)
 
             if nearCommander and (nearCommander ~= targetUnit or
-            (not ACUattack and SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), nearCommander:GetPosition()) < 40000)) then
+            (not ACUattack and SUtils.XZDistanceTwoVectorsSq(platoon_methodsGetPlatoonPosition(self), nearCommander:GetPosition()) < 40000)) then
                 IssueClearCommands(platoonUnits)
                 if useMove then
                     cmd = ExpPathToLocation(aiBrain, self, 'Amphibious', nearCommander:GetPosition(), false)
                 else
-                    cmd = self:AttackTarget(targetUnit)
+                    cmd = platoon_methodsAttackTarget(self, targetUnit)
                     ACUattack = true
                 end
                 targetUnit = nearCommander
@@ -2815,23 +2885,23 @@ function BehemothBehaviorSorian(self)
                 self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
                 useMove = InWaterCheck(self)
                 IssueClearCommands(platoonUnits)
-                if useMove or SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), closestBlockingShield:GetPosition()) < 40000 then
+                if useMove or SUtils.XZDistanceTwoVectorsSq(platoon_methodsGetPlatoonPosition(self), closestBlockingShield:GetPosition()) < 40000 then
                     cmd = ExpPathToLocation(aiBrain, self, 'Amphibious', closestBlockingShield:GetPosition(), false)
                 else
                     cmd = ExpPathToLocation(aiBrain, self, 'Amphibious', closestBlockingShield:GetPosition(), 'AttackMove')
                 end
 
                 local farAway = true
-                if SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), closestBlockingShield:GetPosition()) < 40000 then
+                if SUtils.XZDistanceTwoVectorsSq(platoon_methodsGetPlatoonPosition(self), closestBlockingShield:GetPosition()) < 40000 then
                     farAway = false
                 end
 
                 -- Wait for shield to die loop
-                while not closestBlockingShield.Dead and aiBrain:PlatoonExists(self) and useMove == InWaterCheck(self)
-                and self:IsCommandsActive(cmd) do
+                while not closestBlockingShield.Dead and aibrain_methodsPlatoonExists(aiBrain, self) and useMove == InWaterCheck(self)
+                and platoon_methodsIsCommandsActive(self, cmd) do
                     self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
                     useMove = InWaterCheck(self)
-                    local targDistSq = SUtils.XZDistanceTwoVectorsSq(self:GetPlatoonPosition(), closestBlockingShield:GetPosition())
+                    local targDistSq = SUtils.XZDistanceTwoVectorsSq(platoon_methodsGetPlatoonPosition(self), closestBlockingShield:GetPosition())
                     if (farAway and targDistSq < 40000) or (not farAway and targDistSq >= 40000) then
                         break
                     end
@@ -2868,14 +2938,14 @@ function GetClosestShieldProtectingTargetSorian(attackingUnit, targetUnit)
     local aiBrain = attackingUnit:GetAIBrain()
     local tPos = targetUnit:GetPosition()
     local aPos = attackingUnit:GetPosition()
-    local shields = aiBrain:GetUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE, targetUnit:GetPosition(), 50, 'Enemy')
+    local shields = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.SHIELD * categories.STRUCTURE, targetUnit:GetPosition(), 50, 'Enemy')
     for _, shield in shields do
         if not shield.Dead then
             local shieldPos = shield:GetPosition()
             local shieldSizeSq = GetShieldRadiusAboveGroundSquared(shield)
 
             if VDist2Sq(tPos[1], tPos[3], shieldPos[1], shieldPos[3]) < shieldSizeSq then
-                table.insert(blockingList, shield)
+                tableInsert(blockingList, shield)
             end
         end
     end

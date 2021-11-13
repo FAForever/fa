@@ -8,6 +8,13 @@
 ----------------------------------------------------------------------------
 
 -- Global list of all buffs found in the system.
+local ipairs = ipairs
+local LOG = LOG
+local setmetatable = setmetatable
+local WARN = WARN
+local next = next
+local type = type
+
 BuilderGroups = {}
 
 -- Buff blueprints are created by invoking BuffBlueprint() with a table

@@ -6,6 +6,25 @@
 #**
 #**  Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
+local prop_methodsSetMesh = moho.prop_methods.SetMesh
+local prop_methodsFallDown = moho.prop_methods.FallDown
+local IsUnit = IsUnit
+local prop_methodsDestroy = moho.prop_methods.Destroy
+local DamageArea = DamageArea
+local prop_methodsBeenDestroyed = moho.prop_methods.BeenDestroyed
+local GetTerrainType = GetTerrainType
+local CreateLightParticleIntel = CreateLightParticleIntel
+local MotorFallDownWhack = moho.MotorFallDown.Whack
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateAttachedEmitter = CreateAttachedEmitter
+local SplitProp = SplitProp
+local prop_methodsSinkAway = moho.prop_methods.SinkAway
+local prop_methodsGetBlueprint = moho.prop_methods.GetBlueprint
+local Random = Random
+
 local Prop = import('/lua/sim/Prop.lua').Prop
 local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
 local DefaultExplosions = import('/lua/defaultexplosions.lua')
@@ -18,8 +37,8 @@ Tree = Class(Prop) {
     end,
 
     OnCollision = function(self, other, nx, ny, nz, depth)
-        self.Motor = self.Motor or self:FallDown()
-        self.Motor:Whack(nx, ny, nz, depth, true)
+        self.Motor = self.Motor or prop_methodsFallDown(self)
+        MotorFallDownWhack(self.Motor, nx, ny, nz, depth, true)
         self:PlayUprootingEffect(other)
         ChangeState(self, self.FallingState)
     end,
@@ -27,10 +46,10 @@ Tree = Class(Prop) {
     OnDamage = function(self, instigator, armormod, direction, type)
         Prop.OnDamage(self, instigator, armormod, direction, type)
         if type == 'Force' then
-            self.Motor = self.Motor or self:FallDown()
-            self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
-            local bp = self:GetBlueprint()
-            self:SetMesh(bp.Display.MeshBlueprintWrecked)
+            self.Motor = self.Motor or prop_methodsFallDown(self)
+            MotorFallDownWhack(self.Motor, direction[1], direction[2], direction[3], 1, true)
+            local bp = prop_methodsGetBlueprint(self)
+            prop_methodsSetMesh(self, bp.Display.MeshBlueprintWrecked)
             ChangeState(self, self.FallingState)
         elseif type == 'Nuke' then
             if Random(1, 250) < 5 then
@@ -38,7 +57,7 @@ Tree = Class(Prop) {
                 self.BurnFromNuke = true
             end
         elseif type == 'Disintegrate' then
-            self:Destroy()
+            prop_methodsDestroy(self)
         else
             if Random(1, 8) <= 1 then
                 ChangeState(self, self.BurningState)
@@ -82,28 +101,28 @@ Tree = Class(Prop) {
         Main = function(self)
             local effects = {}
             local fx
-            local bp = self:GetBlueprint()
+            local bp = prop_methodsGetBlueprint(self)
             for k, v in FireEffects do
                 fx = CreateEmitterAtEntity(self, -1, v ):OffsetEmitter(0, 0.5, 0):ScaleEmitter(4)
-                table.insert(effects, fx)
+                tableInsert(effects, fx)
                 self.Trash:Add(fx)
             end
             fx = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
-            table.insert(effects, fx)
+            tableInsert(effects, fx)
             self.Trash:Add(fx)
 
             self:PlayPropSound('BurnStart')
             self:PlayPropAmbientSound('BurnLoop')
 
             WaitSeconds(0.5)
-            self:SetMesh(bp.Display.MeshBlueprintWrecked)
+            prop_methodsSetMesh(self, bp.Display.MeshBlueprintWrecked)
             for i = 5, 1, -1 do
                 for k, v in effects do
                     v:Destroy()
                 end
                 for k, v in FireEffects do
                     local fx = CreateAttachedEmitter(self, -2, -1, v ):OffsetEmitter(0, 0, 0.3):ScaleEmitter(i * 0.5)
-                    table.insert(effects, fx)
+                    tableInsert(effects, fx)
                     self.Trash:Add(fx)
                 end
                 WaitSeconds(3 + Random(1, 10) * 0.1)
@@ -111,8 +130,8 @@ Tree = Class(Prop) {
                     DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)
                 end
             end
-            self.Motor = self.Motor or self:FallDown()
-            self.Motor:Whack(GetRandomFloat(-1, 1), 0, GetRandomFloat(-1, 1), 0.25, true)
+            self.Motor = self.Motor or prop_methodsFallDown(self)
+            MotorFallDownWhack(self.Motor, GetRandomFloat(-1, 1), 0, GetRandomFloat(-1, 1), 0.25, true)
             WaitSeconds(5)
             DefaultExplosions.CreateScorchMarkSplat( self, 0.5, -1 )
             DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)
@@ -120,10 +139,10 @@ Tree = Class(Prop) {
             for k, v in effects do
                 v:Destroy()
             end
-            self:SinkAway(-.1)
+            prop_methodsSinkAway(self, -.1)
             self.Motor = nil
             WaitSeconds(10)
-            self:Destroy()
+            prop_methodsDestroy(self)
         end,
 
         OnCollisionCheck = function(self, other)
@@ -135,23 +154,23 @@ Tree = Class(Prop) {
         end,
 
         OnCollision = function(self, other, nx, ny, nz, depth)
-            self.Motor = self.Motor or self:FallDown()
+            self.Motor = self.Motor or prop_methodsFallDown(self)
 
             local otherbp = other:GetBlueprint()
             local is_big = (otherbp.SizeX * otherbp.SizeZ) > 0.2
             if is_big then
-                self.Motor:Whack(nx, ny, nz, depth, true)
+                MotorFallDownWhack(self.Motor, nx, ny, nz, depth, true)
             else
-                self.Motor:Whack(nx, ny, nz, .05, false)
+                MotorFallDownWhack(self.Motor, nx, ny, nz, .05, false)
             end
         end,
 
         OnDamage = function(self, instigator, armormod, direction, type)
             if type == 'Force' then
-                self.Motor = self:FallDown()
-                self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
+                self.Motor = prop_methodsFallDown(self)
+                MotorFallDownWhack(self.Motor, direction[1], direction[2], direction[3], 1, true)
             elseif type == 'Disintegrate' then
-                self:Destroy()
+                prop_methodsDestroy(self)
             end
         end,
 
@@ -160,17 +179,17 @@ Tree = Class(Prop) {
     FallingState = State {
 
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = prop_methodsGetBlueprint(self)
             WaitSeconds(30)
-            self:SinkAway(-.1)
+            prop_methodsSinkAway(self, -.1)
             self.Motor = nil
             WaitSeconds(10)
-            self:Destroy()
+            prop_methodsDestroy(self)
         end,
 
         OnDamage = function(self, instigator, armormod, direction, type)
             if type == 'Disintegrate' then
-                self:Destroy()
+                prop_methodsDestroy(self)
             end
         end,
     },
@@ -217,17 +236,17 @@ TreeGroup = Class(Prop) {
     end,
 
     Breakup = function(self)
-        if self:BeenDestroyed() then
+        if prop_methodsBeenDestroyed(self) then
             return
         end
 
         # If the blueprint defines a SingleTreeBlueprint, we turn every bone into
         # a copy of that blueprint
-        if self:GetBlueprint().SingleTreeBlueprint then
-            return SplitProp(self, self:GetBlueprint().SingleTreeBlueprint)
+        if prop_methodsGetBlueprint(self).SingleTreeBlueprint then
+            return SplitProp(self, prop_methodsGetBlueprint(self).SingleTreeBlueprint)
         end
 
         # Otherwise, we use the bone names to create a different prop for each bone
-        return self:SplitOnBonesByName(self:GetBlueprint().SingleTreeDir)
+        return self:SplitOnBonesByName(prop_methodsGetBlueprint(self).SingleTreeDir)
     end,
 }

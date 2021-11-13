@@ -1,30 +1,38 @@
+local Sound = Sound
+local STR_Utf8Len = STR_Utf8Len
+local mathFloor = math.floor
+local STR_Utf8SubString = STR_Utf8SubString
+local stringChar = string.char
+local WARN = WARN
+local mathMod = math.mod
+
 function UTF(unicode)
-    if unicode <= 0x7F then return string.char(unicode) end
+    if unicode <= 0x7F then return stringChar(unicode) end
 
     if (unicode <= 0x7FF) then
-        local Byte0 = 0xC0 + math.floor(unicode / 0x40);
-        local Byte1 = 0x80 + math.mod(unicode, 0x40);
-        return string.char(Byte0, Byte1);
+        local Byte0 = 0xC0 + mathFloor(unicode / 0x40);
+        local Byte1 = 0x80 + mathMod(unicode, 0x40);
+        return stringChar(Byte0, Byte1);
     end;
 
     if (unicode <= 0xFFFF) then
-        local Byte0 = 0xE0 + math.floor(unicode / 0x1000);
-        local Byte1 = 0x80 + math.mod(math.floor(unicode / 0x40), 0x40);
-        local Byte2 = 0x80 + math.mod(unicode, 0x40);
-        return string.char(Byte0, Byte1, Byte2);
+        local Byte0 = 0xE0 + mathFloor(unicode / 0x1000);
+        local Byte1 = 0x80 + mathMod(mathFloor(unicode / 0x40), 0x40);
+        local Byte2 = 0x80 + mathMod(unicode, 0x40);
+        return stringChar(Byte0, Byte1, Byte2);
     end;
 
     if (unicode <= 0x10FFFF) then
         local code = unicode
-        local Byte3= 0x80 + math.mod(code, 0x40);
-        code       = math.floor(code / 0x40)
-        local Byte2= 0x80 + math.mod(code, 0x40);
-        code       = math.floor(code / 0x40)
-        local Byte1= 0x80 + math.mod(code, 0x40);
-        code       = math.floor(code / 0x40)
+        local Byte3= 0x80 + mathMod(code, 0x40);
+        code       = mathFloor(code / 0x40)
+        local Byte2= 0x80 + mathMod(code, 0x40);
+        code       = mathFloor(code / 0x40)
+        local Byte1= 0x80 + mathMod(code, 0x40);
+        code       = mathFloor(code / 0x40)
         local Byte0= 0xF0 + code;
 
-        return string.char(Byte0, Byte1, Byte2, Byte3);
+        return stringChar(Byte0, Byte1, Byte2, Byte3);
     end;
 
     WARN('Unicode cannot be greater than U+10FFFF! (UTF('.. unicode ..'))')

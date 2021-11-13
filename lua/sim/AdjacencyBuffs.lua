@@ -5,6 +5,11 @@
 --**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+local ipairs = ipairs
+local stringUpper = string.upper
+local next = next
+local tableInsert = table.insert
+
 local AdjBuffFuncs = import('/lua/sim/AdjacencyBuffFunctions.lua')
 
 local adj = {           -- SIZE4     SIZE8   SIZE12    SIZE16   SIZE20
@@ -67,7 +72,7 @@ for a, buffs in adj do
             BuffBlueprint {
                 Name = name,
                 DisplayName = display_name,
-                BuffType = string.upper(t) .. 'BONUS',
+                BuffType = stringUpper(t) .. 'BONUS',
                 Stacks = 'ALWAYS',
                 Duration = -1,
                 EntityCategory = category,
@@ -77,7 +82,7 @@ for a, buffs in adj do
                 Affects = {[t]={Add=add}},
             }
 
-            table.insert(_G[a .. 'AdjacencyBuffs'], name)
+            tableInsert(_G[a .. 'AdjacencyBuffs'], name)
         end
     end
 end

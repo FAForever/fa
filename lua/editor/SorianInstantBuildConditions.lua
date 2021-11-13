@@ -7,6 +7,24 @@
 #**             Build conditions always return true or false
 #**
 #****************************************************************************
+local tonumber = tonumber
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local aibrain_methodsGetCurrentUnits = moho.aibrain_methods.GetCurrentUnits
+local error = error
+local GetMapSize = GetMapSize
+local sorianbuildconditionsUp = import('/lua/editor/SorianBuildConditions.lua')
+local next = next
+local ipairs = ipairs
+local ParseEntityCategory = ParseEntityCategory
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local unit_methodsGetGuards = moho.unit_methods.GetGuards
+local tableGetn = table.getn
+local type = type
+local WARN = WARN
+local EntityCategoryContains = EntityCategoryContains
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -89,7 +107,7 @@ end
 #
 ##############################################################################################################
 function CDRHealthGreaterThan(aiBrain, health, shield)
-    local cdr = aiBrain:GetListOfUnits(categories.COMMAND, false)[1]
+    local cdr = aibrain_methodsGetListOfUnits(aiBrain, categories.COMMAND, false)[1]
     if not cdr then return false end
     local cdrhealth = cdr:GetHealthPercent()
     local cdrshield
@@ -121,9 +139,9 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
         category = ParseEntityCategory(category)
     end
     if not idleReq then
-        numUnits = aiBrain:GetListOfUnits(category, false)
+        numUnits = aibrain_methodsGetListOfUnits(aiBrain, category, false)
     else
-        numUnits = aiBrain:GetListOfUnits(category, true)
+        numUnits = aibrain_methodsGetListOfUnits(aiBrain, category, true)
     end
     for k,v in numUnits do
         if v:GetFractionComplete() == 1 then
@@ -156,9 +174,9 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
         category = ParseEntityCategory(category)
     end
     if not idleReq then
-        numUnits = aiBrain:GetListOfUnits(category, false)
+        numUnits = aibrain_methodsGetListOfUnits(aiBrain, category, false)
     else
-        numUnits = aiBrain:GetListOfUnits(category, true)
+        numUnits = aibrain_methodsGetListOfUnits(aiBrain, category, true)
     end
     for k,v in numUnits do
         if v:GetFractionComplete() == 1 then
@@ -195,9 +213,9 @@ function HaveLessThanUnitsForMapSize(aiBrain, sizetable, category, idleReq)
         category = ParseEntityCategory(category)
     end
     if not idleReq then
-        numUnits = aiBrain:GetCurrentUnits(category)
+        numUnits = aibrain_methodsGetCurrentUnits(aiBrain, category)
     else
-        numUnits = table.getn(aiBrain:GetListOfUnits(category, true))
+        numUnits = tableGetn(aibrain_methodsGetListOfUnits(aiBrain, category, true))
     end
     if numUnits < numReq then
         return true
@@ -218,10 +236,10 @@ function HaveLessThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
         category = ParseEntityCategory(category)
     end
 
-    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
+    local unitsBuilding = aibrain_methodsGetListOfUnits(aiBrain, categories.CONSTRUCTION, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
-        if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
+        if not unit:BeenDestroyed() and unit_methodsIsUnitState(unit, 'Building') then
             local buildingUnit = unit.UnitBeingBuilt
             if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(category, buildingUnit) then
                 numBuilding = numBuilding + 1
@@ -250,10 +268,10 @@ function HaveGreaterThanUnitsInCategoryBeingBuilt(aiBrain, numunits, category)
         category = ParseEntityCategory(category)
     end
 
-    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
+    local unitsBuilding = aibrain_methodsGetListOfUnits(aiBrain, categories.CONSTRUCTION, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
-        if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
+        if not unit:BeenDestroyed() and unit_methodsIsUnitState(unit, 'Building') then
             local buildingUnit = unit.UnitBeingBuilt
             if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(category, buildingUnit) then
                 numBuilding = numBuilding + 1
@@ -299,10 +317,10 @@ end
 #
 ##############################################################################################################
 function GreaterThanEconEfficiencyOverTimeExp(aiBrain, MassEfficiency, EnergyEfficiency)
-    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
+    local unitsBuilding = aibrain_methodsGetListOfUnits(aiBrain, categories.CONSTRUCTION, false)
     local numBuilding = 0
     for unitNum, unit in unitsBuilding do
-        if not unit:BeenDestroyed() and unit:IsUnitState('Building') then
+        if not unit:BeenDestroyed() and unit_methodsIsUnitState(unit, 'Building') then
             local buildingUnit = unit.UnitBeingBuilt
             if buildingUnit and not buildingUnit.Dead and EntityCategoryContains(categories.EXPERIMENTAL, buildingUnit) then
                 numBuilding = numBuilding + 1
@@ -475,7 +493,7 @@ function EngineerNeedsAssistance(aiBrain, doesbool, locationType, category)
         local engs = engineerManager:GetEngineersBuildingCategory(bCategory, categories.ALLUNITS)
         for k,v in engs do
             if v.DesiresAssist == true then
-                if v.MinNumAssistees and SUtils.GetGuards(aiBrain, v) < v.MinNumAssistees then
+                if v.MinNumAssistees and unit_methodsGetGuards(aiBrain, v) < v.MinNumAssistees then
                     numFound = numFound + 1
                 end
             end
@@ -485,7 +503,7 @@ function EngineerNeedsAssistance(aiBrain, doesbool, locationType, category)
         engs = engineerManager:GetEngineersBuildQueue(cat)
         for k,v in engs do
             if v.DesiresAssist == true then
-                if v.MinNumAssistees and SUtils.GetGuards(aiBrain, v) < v.MinNumAssistees then
+                if v.MinNumAssistees and unit_methodsGetGuards(aiBrain, v) < v.MinNumAssistees then
                     numFound = numFound + 1
                 end
             end
@@ -500,7 +518,7 @@ end
 function LessThanExpansionBases(aiBrain)
     local expBaseCount = 0
     local numberofAIs = SUtils.GetNumberOfAIs(aiBrain)
-    local startX, startZ = aiBrain:GetArmyStartPos()
+    local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
     local isWaterMap = false
     local checkNum = tonumber(ScenarioInfo.Options.LandExpansionsAllowed) or 5
     local navalMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
@@ -525,7 +543,7 @@ end
 function LessThanNavalBases(aiBrain)
     local expBaseCount = 0
     local checkNum = tonumber(ScenarioInfo.Options.NavalExpansionsAllowed) or 4
-    local isIsland = import('/lua/editor/SorianBuildConditions.lua').IsIslandMap(aiBrain)
+    local isIsland = sorianbuildconditionsUp.IsIslandMap(aiBrain)
     expBaseCount = aiBrain:GetManagerCount('Naval Area')
     #LOG('*AI DEBUG: '.. aiBrain.Nickname ..' LessThanNavalBases Total = '..expBaseCount)
     if isIsland and expBaseCount < checkNum then
@@ -557,7 +575,7 @@ function HavePoolUnitComparisonAtLocationExp(aiBrain, locationType, unitCount, u
         WARN('*AI WARNING: HavePoolUnitComparisonAtLocation - Invalid location - ' .. locationType)
         return false
     end
-    local poolPlatoon = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local poolPlatoon = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local numUnits = poolPlatoon:GetNumCategoryUnits(testCat, engineerManager:GetLocationCoords(), engineerManager.Radius * 2.5)
     return CompareBody(numUnits, unitCount, compareType)
 end

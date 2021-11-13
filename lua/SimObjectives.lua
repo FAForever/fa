@@ -21,6 +21,46 @@
 -- Unknown
 -- Camera
 
+local unit_methodsGetStat = moho.unit_methods.GetStat
+local GetUnitsInRect = GetUnitsInRect
+local stringLower = string.lower
+local error = error
+local tableRemoveByValue = table.removeByValue
+local unit_methodsGetBlip = moho.unit_methods.GetBlip
+local tableInsert = table.insert
+local ListArmies = ListArmies
+local ipairs = ipairs
+local tableGetsize = table.getsize
+local GetGameTimeSeconds = GetGameTimeSeconds
+local aibrain_methodsGetArmyStat = moho.aibrain_methods.GetArmyStat
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
+local objectivearrowUp = import('objectiveArrow.lua')
+local simcameramarkersUp = import('/lua/simcameramarkers.lua')
+local aibrain_methodsGetBlueprintStat = moho.aibrain_methods.GetBlueprintStat
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local EntityCategoryContains = EntityCategoryContains
+local IsEntity = IsEntity
+local mathCeil = math.ceil
+local ForkThread = ForkThread
+local tableRemove = table.remove
+local unpack = unpack
+local next = next
+local KillThread = KillThread
+local pairs = pairs
+local GetArmyBrain = GetArmyBrain
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local mathMax = math.max
+local tableEmpty = table.empty
+local tableGetn = table.getn
+local stringFormat = string.format
+local mathFloor = math.floor
+local unit_methodsIsBeingBuilt = moho.unit_methods.IsBeingBuilt
+local unit_methodsSetStrategicUnderlay = moho.unit_methods.SetStrategicUnderlay
+local WARN = WARN
+local CreateDecal = CreateDecal
+local Vector = Vector
+local blip_methodsIsSeenEver = moho.blip_methods.IsSeenEver
+
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Triggers = import('/lua/scenariotriggers.lua')
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
@@ -36,7 +76,7 @@ function GetPlayerArmy()
     if not playerArmy then
         for _, v in ArmyBrains do
             if v.BrainType == 'Human' then
-                playerArmy = v:GetArmyIndex()
+                playerArmy = aibrain_methodsGetArmyIndex(v)
                 break
             end
         end
@@ -74,7 +114,7 @@ function Camera(objectiveType, completeState, title, description, positionTable)
 
     for i, v in positionTable do
         numMarkers = numMarkers + 1
-        local newMark = import('/lua/simcameramarkers.lua').AddCameraMarker(v)
+        local newMark = simcameramarkersUp.AddCameraMarker(v)
         newMark:AddCallback(RemoveMarker)
     end
 
@@ -118,7 +158,7 @@ function ControlGroup(Type, Complete, Title, Description, Target)
     end
 
     local function WatchGroups(requirements)
-        local totalReqs = table.getn(requirements)
+        local totalReqs = tableGetn(requirements)
         while objective.Active do
             local reqsMet = 0
 
@@ -131,7 +171,7 @@ function ControlGroup(Type, Complete, Title, Description, Target)
                             if EntityCategoryContains(requirement.Category, unit) then
                                 if not unit.Marked and objective.MarkUnits then
                                     unit.Marked = true
-                                    local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                                    local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
                                     local arrow = ObjectiveArrow {AttachTo = unit}
                                     objective:AddUnitTarget(unit)
                                 end
@@ -149,7 +189,7 @@ function ControlGroup(Type, Complete, Title, Description, Target)
             end
 
             if lastReqsMet ~= reqsMet then
-                local progress = string.format('(%s/%s)', reqsMet, totalReqs)
+                local progress = stringFormat('(%s/%s)', reqsMet, totalReqs)
                 UpdateObjective(Title, 'Progress', progress, objective.Tag)
                 objective:OnProgress(reqsMet, totalReqs)
                 lastReqsMet = reqsMet
@@ -214,12 +254,12 @@ function CreateGroup(name, userCallback, numRequired)
     end
 
     objectiveGroup.AddObjective = function(self, objective)
-        table.insert(self.Objectives, objective)
+        tableInsert(self.Objectives, objective)
         objective:AddResultCallback(OnResult)
     end
 
     objectiveGroup.RemoveObjective = function(self, objective)
-        table.removeByValue(self.Objectives, objective)
+        tableRemoveByValue(self.Objectives, objective)
     end
 
     return objectiveGroup
@@ -228,7 +268,7 @@ end
 -- Kill units
 function Kill(Type, Complete, Title, Description, Target)
     Target.killed = 0
-    Target.total = table.getn(Target.Units)
+    Target.total = tableGetn(Target.Units)
 
     local image = GetActionIcon('kill')
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -252,7 +292,7 @@ function Kill(Type, Complete, Title, Description, Target)
         end
         Target.killed = Target.killed + 1
 
-        local progress = string.format('(%s/%s)', Target.killed, Target.total)
+        local progress = stringFormat('(%s/%s)', Target.killed, Target.total)
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
         objective:OnProgress(Target.killed, Target.total)
 
@@ -275,7 +315,7 @@ function Kill(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
             if Target.FlashVisible then
@@ -287,7 +327,7 @@ function Kill(Type, Complete, Title, Description, Target)
         end
     end
 
-    local progress = string.format('(%s/%s)', Target.killed, Target.total)
+    local progress = stringFormat('(%s/%s)', Target.killed, Target.total)
     UpdateObjective(Title, 'Progress', progress, objective.Tag)
 
     return objective
@@ -300,7 +340,7 @@ end
 -- }
 function Capture(Type, Complete, Title, Description, Target)
     Target.captured = 0
-    Target.total = table.getn(Target.Units)
+    Target.total = tableGetn(Target.Units)
     local required = Target.NumRequired or Target.total
     local returnUnits = {}
 
@@ -320,13 +360,13 @@ function Capture(Type, Complete, Title, Description, Target)
     end
 
     objective.OnUnitCaptured = function(unit, captor)
-        table.insert(returnUnits, unit)
+        tableInsert(returnUnits, unit)
         if not objective.Active then
             return
         end
 
         Target.captured = Target.captured + 1
-        local progress = string.format('(%s/%s)', Target.captured, required)
+        local progress = stringFormat('(%s/%s)', Target.captured, required)
         objective:OnProgress(Target.captured, required)
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
         if Target.captured >= required then
@@ -360,7 +400,7 @@ function Capture(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
 
@@ -374,7 +414,7 @@ function Capture(Type, Complete, Title, Description, Target)
         end
     end
 
-    local progress = string.format('(%s/%s)', Target.captured, required)
+    local progress = stringFormat('(%s/%s)', Target.captured, required)
     UpdateObjective(Title, 'Progress', progress, objective.Tag)
 
     return objective
@@ -383,9 +423,9 @@ end
 -- Kill or Capture units
 function KillOrCapture(Type, Complete, Title, Description, Target)
     local KilledOrCaptured = 0
-    local Total = table.getn(Target.Units)
+    local Total = tableGetn(Target.Units)
     local PercentRequired = Target.PercentRequired or 100
-    local NumRequired = math.ceil(Total * (PercentRequired / 100))
+    local NumRequired = mathCeil(Total * (PercentRequired / 100))
 
     local image = GetActionIcon('KillOrCapture')
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -405,9 +445,9 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
     objective.UpdateProgress = function()
         local progress
         if Target.PercentProgress then
-            progress = string.format('(%s%%/%s%%)', math.floor(((Total - (Total - KilledOrCaptured)) / Total) * 100), PercentRequired)
+            progress = stringFormat('(%s%%/%s%%)', mathFloor(((Total - (Total - KilledOrCaptured)) / Total) * 100), PercentRequired)
         elseif Target.ShowProgress == nil or Target.ShowProgress then
-            progress = string.format('(%s/%s)', KilledOrCaptured, NumRequired)
+            progress = stringFormat('(%s/%s)', KilledOrCaptured, NumRequired)
         end
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
     end
@@ -440,7 +480,7 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         if not objective.Active then
             return
         end
-        table.insert(captured, unit)
+        tableInsert(captured, unit)
         KilledOrCaptured = KilledOrCaptured + 1
         objective:OnProgress(KilledOrCaptured, NumRequired)
         objective:UpdateProgress()
@@ -472,7 +512,7 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         end
         for _, cUnit in captured do
             if cUnit == unit then
-                table.insert(captured, newUnit)
+                tableInsert(captured, newUnit)
                 break
             end
         end
@@ -484,7 +524,7 @@ function KillOrCapture(Type, Complete, Title, Description, Target)
         if not unit.Dead then
             -- Mark the units unless MarkUnits == false
             if Target.MarkUnits == nil or Target.MarkUnits then
-                local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
                 local arrow = ObjectiveArrow {AttachTo = unit}
             end
 
@@ -505,7 +545,7 @@ end
 -- Reclaim units
 function Reclaim(Type, Complete, Title, Description, Target)
     Target.reclaimed = 0
-    Target.total = table.getn(Target.Units)
+    Target.total = tableGetn(Target.Units)
 
     local image = GetActionIcon("reclaim")
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
@@ -528,7 +568,7 @@ function Reclaim(Type, Complete, Title, Description, Target)
         end
 
         Target.reclaimed = Target.reclaimed + 1
-        local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
+        local progress = stringFormat('(%s/%s)', Target.reclaimed, Target.total)
         objective:OnProgress(Target.reclaimed, Target.total)
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
         if Target.reclaimed == Target.total then
@@ -566,12 +606,12 @@ function Reclaim(Type, Complete, Title, Description, Target)
     end
 
     for _, unit in Target.Units do
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
         CreateTriggers(unit, objective)
     end
 
-    local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
+    local progress = stringFormat('(%s/%s)', Target.reclaimed, Target.total)
     UpdateObjective(Title, 'Progress', progress, objective.Tag)
 
     return objective
@@ -580,7 +620,7 @@ end
 -- ReclaimProp
 function ReclaimProp(Type, Complete, Title, Description, Target)
     Target.reclaimed = 0
-    Target.total = table.getn(Target.Wrecks)
+    Target.total = tableGetn(Target.Wrecks)
 
     local image = GetActionIcon("reclaim")
     local objective = AddObjective(Type, Complete, Title, Description, image)
@@ -610,7 +650,7 @@ function ReclaimProp(Type, Complete, Title, Description, Target)
         end
 
         Target.reclaimed = Target.reclaimed + 1
-        local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
+        local progress = stringFormat('(%s/%s)', Target.reclaimed, Target.total)
         objective:OnProgress(Target.reclaimed, Target.total)
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
         if Target.reclaimed == Target.total then
@@ -623,14 +663,14 @@ function ReclaimProp(Type, Complete, Title, Description, Target)
     for _, wreck in Target.Wrecks do
         -- Mark the units if MarkUnits == true
         if Target.MarkUnits then
-            local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+            local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
             local arrow = ObjectiveArrow {AttachTo = unit}
         end
         Triggers.CreatePropReclaimedTrigger(OnPropReclaimed, wreck)
         Triggers.CreatePropKilledTrigger(OnPropKilled, wreck)
     end
 
-    local progress = string.format('(%s/%s)', Target.reclaimed, Target.total)
+    local progress = stringFormat('(%s/%s)', Target.reclaimed, Target.total)
     UpdateObjective(Title, 'Progress', progress, objective.Tag)
 
     return objective
@@ -639,7 +679,7 @@ end
 -- Locate units
 function Locate(Type, Complete, Title, Description, Target)
     Target.located = 0
-    Target.total = table.getn(Target.Units)
+    Target.total = tableGetn(Target.Units)
     local isLocated = {}
 
     local image = GetActionIcon("locate")
@@ -651,7 +691,7 @@ function Locate(Type, Complete, Title, Description, Target)
         end
         Target.located = Target.located + 1
         isLocated[unit] = true
-        local progress = string.format('(%s/%s)', Target.located, Target.total)
+        local progress = stringFormat('(%s/%s)', Target.located, Target.total)
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
         objective:OnProgress(Target.located, Target.total)
         if Target.located == Target.total then
@@ -673,7 +713,7 @@ function Locate(Type, Complete, Title, Description, Target)
         CreateIntelTriggers(unit, objective)
     end
 
-    local progress = string.format('(%s/%s)', Target.located, Target.total)
+    local progress = stringFormat('(%s/%s)', Target.located, Target.total)
     UpdateObjective(Title, 'Progress', progress, objective.Tag)
 
     return objective
@@ -686,7 +726,7 @@ end
 function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
     local image = GetActionIcon('Move')
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
-    local total = table.getn(Target.Units)
+    local total = tableGetn(Target.Units)
     local numRequired = Target.NumRequired or total
     Target.Count = 0
 
@@ -715,7 +755,7 @@ function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
 
             if cnt ~= Target.Count then
                 Target.Count = cnt
-                local progress = string.format('(%s/%s)', Target.Count, numRequired)
+                local progress = stringFormat('(%s/%s)', Target.Count, numRequired)
                 objective:OnProgress(Target.Count, numRequired)
                 if Target.ShowProgress then
                     UpdateObjective(Title, 'Progress', progress, objective.Tag)
@@ -767,7 +807,7 @@ function SpecificUnitsInArea(Type, Complete, Title, Description, Target)
     end
 
     if Target.ShowProgress then
-        local progress = string.format('(%s/%s)', Target.Count, numRequired)
+        local progress = stringFormat('(%s/%s)', Target.Count, numRequired)
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
     end
 
@@ -810,7 +850,7 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
     end
 
     local function WatchArea(requirements)
-        local totalReqs = table.getn(requirements)
+        local totalReqs = tableGetn(requirements)
         while objective.Active do
             local reqsMet = 0
 
@@ -820,12 +860,12 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
                 local ArmiesList = CreateArmiesList(requirement.Armies)
                 if units then
                     for _, unit in units do
-                        if not unit.Dead and not unit:IsBeingBuilt() then
+                        if not unit.Dead and not unit_methodsIsBeingBuilt(unit) then
                             if not (requirement.ArmyIndex or requirement.Armies) or (requirement.ArmyIndex == unit.Army) or ArmiesList[unit.Army] then
                                 if EntityCategoryContains(requirement.Category, unit) then
                                     if not unit.Marked and objective.MarkUnits then
                                         unit.Marked = true
-                                        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                                        local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
                                         local arrow = ObjectiveArrow {AttachTo = unit}
                                         objective:AddUnitTarget(unit)
                                     end
@@ -841,7 +881,7 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
             end
 
             if lastReqsMet ~= reqsMet then
-                local progress = string.format('(%s/%s)', reqsMet, totalReqs)
+                local progress = stringFormat('(%s/%s)', reqsMet, totalReqs)
                 UpdateObjective(Title, 'Progress', progress, objective.Tag)
                 objective:OnProgress(reqsMet, totalReqs)
                 lastReqsMet = reqsMet
@@ -881,7 +921,7 @@ function CategoriesInArea(Type, Complete, Title, Description, Action, Target)
         reqRef.CompareFunc = GetCompareFunc(requirement.CompareOp)
     end
 
-    UpdateObjective(Title, 'Progress', string.format('(0/%d)', table.getsize(Target.Requirements)), objective.Tag)
+    UpdateObjective(Title, 'Progress', stringFormat('(0/%d)', tableGetsize(Target.Requirements)), objective.Tag)
     ForkThread(WatchArea, Target.Requirements)
 
     return objective
@@ -940,15 +980,15 @@ function ArmyStatCompare(Type, Complete, Title, Description, Action, Target)
 
             for brain, _ in aibrains do
                 if category then
-                    testVal = testVal + brain:GetBlueprintStat(statName, category)
+                    testVal = testVal + aibrain_methodsGetBlueprintStat(brain, statName, category)
                 else
-                    testVal = testVal + brain:GetArmyStat(statName, value).Value
+                    testVal = testVal + aibrain_methodsGetArmyStat(brain, statName, value).Value
                 end
             end
 
             if Target.ShowProgress then
                 if testVal ~= oldVal then
-                    local progress = string.format('(%s/%s)', testVal, value)
+                    local progress = stringFormat('(%s/%s)', testVal, value)
                     UpdateObjective(Title, 'Progress', progress, objective.Tag)
                     oldVal = testVal
                 end
@@ -1028,7 +1068,7 @@ function UnitStatCompare(Type, Complete, Title, Description, Action, Target)
 
     local function WatchStat(statName, unit, compareFunc, value)
         while objective.Active do
-            if compareFunc(unit:GetStat(statName, value).Value, value) then
+            if compareFunc(unit_methodsGetStat(unit, statName, value).Value, value) then
                 objective.Active = false
                 objective:OnResult(true)
                 UpdateObjective(Title, 'complete', 'complete', objective.Tag)
@@ -1065,10 +1105,10 @@ function CategoryStatCompare(Type, Complete, Title, Description, Action, Target)
     local function WatchStat(statName, aibrains, category, compareFunc, value)
         while objective.Active do
             for brain, _ in aibrains do
-                local unitsInCategory = brain:GetListOfUnits(category, false)
+                local unitsInCategory = aibrain_methodsGetListOfUnits(brain, category, false)
                 if unitsInCategory then
                     for _, unit in unitsInCategory do
-                        if compareFunc(unit:GetStat(statName, value).Value, value) then
+                        if compareFunc(unit_methodsGetStat(unit, statName, value).Value, value) then
                             objective.Active = false
                             objective:OnResult(true)
                             UpdateObjective(Title, 'complete', 'complete', objective.Tag)
@@ -1101,7 +1141,7 @@ function Protect(Type, Complete, Title, Description, Target)
 
     local image = GetActionIcon("protect")
     local objective = AddObjective(Type, Complete, Title, Description, image, Target)
-    local total = table.getn(Target.Units)
+    local total = tableGetn(Target.Units)
     local max = total
     local numRequired = Target.NumRequired or total
     local timer = nil
@@ -1115,10 +1155,10 @@ function Protect(Type, Complete, Title, Description, Target)
         objective:OnProgress(total, numRequired)
 
         if Target.ShowProgress then
-            local progress = string.format('(%s/%s)', total, numRequired)
+            local progress = stringFormat('(%s/%s)', total, numRequired)
             UpdateObjective(Title, 'Progress', progress, objective.Tag)
         elseif Target.PercentProgress then
-            local progress = string.format('(%s%%)', math.ceil(total / max * 100))
+            local progress = stringFormat('(%s%%)', mathCeil(total / max * 100))
             UpdateObjective(Title, 'Progress', progress, objective.Tag)
         end
 
@@ -1167,7 +1207,7 @@ function Protect(Type, Complete, Title, Description, Target)
     end
 
     if Target.Timer then
-        timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
+        timer = Triggers.CreateTimerTrigger(
             OnExpired,
             Target.Timer,
             true,
@@ -1181,10 +1221,10 @@ function Protect(Type, Complete, Title, Description, Target)
     end
 
     if Target.ShowProgress then
-        local progress = string.format('(%s/%s)', total, numRequired)
+        local progress = stringFormat('(%s/%s)', total, numRequired)
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
     elseif Target.PercentProgress then
-        local progress = string.format('(%s%%)', math.ceil(total / max * 100))
+        local progress = stringFormat('(%s%%)', mathCeil(total / max * 100))
         UpdateObjective(Title, 'Progress', progress, objective.Tag)
     end
 
@@ -1233,7 +1273,7 @@ function Timer(Type, Complete, Title, Description, Target)
         Sync.ObjectiveTimer = 0
     end
 
-    timer = import('/lua/ScenarioTriggers.lua').CreateTimerTrigger(
+    timer = Triggers.CreateTimerTrigger(
         OnExpired,
         Target.Timer,
         false,
@@ -1279,9 +1319,9 @@ function Basic(Type, Complete, Title, Description, Image, Target)
 
     objective.AddBasicUnitTarget = function(self, unit)
         objective:AddUnitTarget(unit)
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
-        table.insert(objective.UnitMarkers, arrow)
+        tableInsert(objective.UnitMarkers, arrow)
     end
 
     objective.AddTarget = function(self, target)
@@ -1319,9 +1359,9 @@ function Basic(Type, Complete, Title, Description, Image, Target)
             if target.MarkUnits then
                 for _, unit in target.Units do
                     if not unit.Dead then
-                        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+                        local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
                         local arrow = ObjectiveArrow {AttachTo = unit}
-                        table.insert(objective.UnitMarkers, arrow)
+                        tableInsert(objective.UnitMarkers, arrow)
                         if target.AlwaysVisible then
                             SetupVizMarker(self, unit)
                         end
@@ -1366,7 +1406,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
     else
         tag = 'Objective' .. objNum
         objNum = objNum + 1
-        table.insert(SavedList, {AddArgs = {Type, Complete, Title, Description, ActionImage, Target, true, tag, n=8}, Tag=tag})
+        tableInsert(SavedList, {AddArgs = {Type, Complete, Title, Description, ActionImage, Target, true, tag, n=8}, Tag=tag})
     end
 
     -- Set up objective table to return.
@@ -1410,13 +1450,13 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         -- Called on success or failure
         ResultCallbacks = {},
         AddResultCallback = function(self, cb)
-            table.insert(self.ResultCallbacks, cb)
+            tableInsert(self.ResultCallbacks, cb)
         end,
 
         -- Some objective types can provide progress updates (not success/fail)
         ProgressCallbacks = {},
         AddProgressCallback = function(self, cb)
-            table.insert(self.ProgressCallbacks, cb)
+            tableInsert(self.ProgressCallbacks, cb)
         end,
 
         -- Dont override these if you want notification. Call Add???Callback
@@ -1435,7 +1475,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             -- Revert strategic icons
             for _, v in self.IconOverrides do
                 if not v:BeenDestroyed() then
-                    v:SetStrategicUnderlay("")
+                    unit_methodsSetStrategicUnderlay(v, "")
                 end
             end
 
@@ -1484,7 +1524,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             -- now if weve been detected by the focus army ...
             if armyindex == GetPlayerArmy() then
                 -- get the blip that is associated with the unit
-                local blip = cbunit:GetBlip(armyindex)
+                local blip = unit_methodsGetBlip(cbunit, armyindex)
 
                 -- Only provide the target position to the user layer if
                 -- the blip IsSeenEver() (i.e. has been identified).
@@ -1496,7 +1536,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
                                 return
                             end
 
-                            if blip:IsSeenEver(armyindex) then
+                            if blip_methodsIsSeenEver(blip, armyindex) then
                                 UpdateObjective(Title,
                                                 'Target',
                                                 {
@@ -1550,7 +1590,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         unit:AddDetectedByHook(detectedByCB)
 
         -- See if we can detect the unit right now
-        local blip = unit:GetBlip(GetPlayerArmy())
+        local blip = unit_methodsGetBlip(unit, GetPlayerArmy())
         if blip then
             detectedByCB(unit, GetPlayerArmy())
         end
@@ -1634,14 +1674,14 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             local spec = {
                 X = rect.x0 + width/2,
                 Z = rect.y0 + height/2,
-                Radius = math.max(width, height),
+                Radius = mathMax(width, height),
                 LifeTime = -1,
                 Omni = false,
                 Vision = true,
                 Army = GetPlayerArmy(),
             }
             local vizmarker = VizMarker(spec)
-            table.insert(objective.VizMarkers, vizmarker);
+            tableInsert(objective.VizMarkers, vizmarker);
         end
     end
 
@@ -1668,7 +1708,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
             local spec = {
                 X = rect.x0 + width/2,
                 Z = rect.y0 + height/2,
-                Radius = math.max(width, height),
+                Radius = mathMax(width, height),
                 LifeTime = 0.01,
                 Omni = false,
                 Vision = true,
@@ -1695,7 +1735,7 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
     if Target and Target.Requirements then
         for _, req in Target.Requirements do
             if req.Area then
-                table.insert(userTargets, {Type = 'Area', Value = ScenarioUtils.AreaToRect(req.Area)})
+                tableInsert(userTargets, {Type = 'Area', Value = ScenarioUtils.AreaToRect(req.Area)})
             end
         end
     elseif Target and Target.Timer then
@@ -1704,8 +1744,8 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
 
     if Target.Category then
         local bps = EntityCategoryGetUnitList(Target.Category)
-        if not table.empty(bps) then
-            table.insert(userTargets, {Type = 'Blueprint', BlueprintId = bps[1]})
+        if not tableEmpty(bps) then
+            tableInsert(userTargets, {Type = 'Blueprint', BlueprintId = bps[1]})
         end
     end
 
@@ -1740,13 +1780,13 @@ function AddObjective(Type,         -- 'primary', 'bonus', etc
         -- Mark the units unless MarkUnits == false
         if Target.MarkUnits == nil or Target.MarkUnits then
             if Type == 'primary' then
-                unit:SetStrategicUnderlay('icon_objective_primary')
+                unit_methodsSetStrategicUnderlay(unit, 'icon_objective_primary')
             elseif Type == 'secondary' then
-                unit:SetStrategicUnderlay('icon_objective_secondary')
+                unit_methodsSetStrategicUnderlay(unit, 'icon_objective_secondary')
             elseif Type == 'bonus' then
-                unit:SetStrategicUnderlay('icon_objective_bonus')
+                unit_methodsSetStrategicUnderlay(unit, 'icon_objective_bonus')
             end
-            table.insert(self.IconOverrides, unit)
+            tableInsert(self.IconOverrides, unit)
         end
     end
 
@@ -1799,9 +1839,9 @@ function DeleteObjective(Objective, IsLoading)
         updateField = 'delete',
     }
     if not IsLoading then
-        table.insert(SavedList, {DeleteArgs = userObjectiveUpdate})
+        tableInsert(SavedList, {DeleteArgs = userObjectiveUpdate})
     end
-    table.insert(Sync.ObjectivesUpdateTable, userObjectiveUpdate)
+    tableInsert(Sync.ObjectivesUpdateTable, userObjectiveUpdate)
 end
 
 -- Update legacy style objective using correct syntax
@@ -1829,11 +1869,11 @@ function UpdateObjective(Title, UpdateField, NewData, objTag, IsLoading, InTime)
     end
 
     if not IsLoading then
-        table.insert(SavedList, {UpdateArgs = {Title, UpdateField, NewData, objTag, true, GetGameTimeSeconds(), n=6}, Tag=objTag})
+        tableInsert(SavedList, {UpdateArgs = {Title, UpdateField, NewData, objTag, true, GetGameTimeSeconds(), n=6}, Tag=objTag})
     end
 
     -- All fields are stored with lowercase names
-    UpdateField = string.lower(UpdateField)
+    UpdateField = stringLower(UpdateField)
     if not (
         (UpdateField == 'type') or
         (UpdateField == 'complete') or
@@ -1858,7 +1898,7 @@ function UpdateObjective(Title, UpdateField, NewData, objTag, IsLoading, InTime)
         if UpdateField == 'complete' then
             userObjectiveUpdate['time'] = InTime or GetGameTimeSeconds()
         end
-        table.insert(Sync.ObjectivesUpdateTable, userObjectiveUpdate)
+        tableInsert(Sync.ObjectivesUpdateTable, userObjectiveUpdate)
     end
 end
 
@@ -1879,7 +1919,7 @@ function GetCompareFunc(op)
 end
 
 function GetActionIcon(actionString)
-    local action = string.lower(actionString)
+    local action = stringLower(actionString)
     if action == "kill"     then return "/game/orders/attack_btn_up.dds"        end
     if action == "capture"  then return "/game/orders/convert_btn_up.dds"       end
     if action == "build"    then return "/game/orders/production_btn_up.dds"    end
@@ -1932,18 +1972,18 @@ function OnUnitGivenBase(objective, target, unit, newUnit, markUnits)
         end
     end
     if index > 0 then
-        table.remove(target.Units, index)
+        tableRemove(target.Units, index)
     end
-    table.insert(target.Units, newUnit)
+    tableInsert(target.Units, newUnit)
     BasicUnitTarget(objective, newUnit, markUnits)
 end
 
 function BasicUnitTarget(objective, unit, markUnits)
     objective:AddUnitTarget(unit)
     if markUnits then
-        local ObjectiveArrow = import('objectiveArrow.lua').ObjectiveArrow
+        local ObjectiveArrow = objectivearrowUp.ObjectiveArrow
         local arrow = ObjectiveArrow {AttachTo = unit}
-        table.insert(objective.UnitMarkers, arrow)
+        tableInsert(objective.UnitMarkers, arrow)
     end
 end
 
@@ -1966,7 +2006,7 @@ function CreateTriggers(unit, objective, useOnKilledWhenReclaimed)
 end
 
 function CreateIntelTriggers(unit, objective, isAlreadyLocated)
-    local IntelTrigger = import('/lua/ScenarioTriggers.lua').CreateArmyIntelTrigger
+    local IntelTrigger = Triggers.CreateArmyIntelTrigger
     if objective.OnUnitGiven then
         Triggers.CreateUnitGivenTrigger(objective.OnUnitGiven, unit)
     end

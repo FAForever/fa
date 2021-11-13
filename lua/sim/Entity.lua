@@ -5,6 +5,9 @@
 #**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local entity_methodsGetEntityId = moho.entity_methods.GetEntityId
+local entity_methodsGetArmy = moho.entity_methods.GetArmy
+
 Entity = Class(moho.entity_methods) {
 
     __init = function(self,spec)
@@ -17,8 +20,8 @@ Entity = Class(moho.entity_methods) {
 
     OnCreate = function(self,spec)
         self.Spec = spec
-        self.EntityId = self:GetEntityId()
-        self.Army = self:GetArmy()
+        self.EntityId = entity_methodsGetEntityId(self)
+        self.Army = entity_methodsGetArmy(self)
     end,
 
     OnDestroy = function(self)

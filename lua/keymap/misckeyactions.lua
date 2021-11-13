@@ -1,5 +1,19 @@
 -- This file contains key bindable actions that don't fit elsewhere
 
+local tostring = tostring
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local tableEqual = table.equal
+local tableFind = table.find
+local enhancementcommonUp = import('/lua/enhancementcommon.lua')
+local tableRemove = table.remove
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local tableEmpty = table.empty
+local tableConcatkeys = table.concatkeys
+local tableGetn = table.getn
+local type = type
+
 local Prefs = import('/lua/user/prefs.lua')
 
 local lockZoomEnable = false
@@ -124,7 +138,7 @@ function getGetNextFactory(factoryType)
         if factoryList then
             local nextFac = factoryList[currentFactoryIndex] or factoryList[1]
             currentFactoryIndex = currentFactoryIndex + 1
-            if currentFactoryIndex > table.getn(factoryList) then
+            if currentFactoryIndex > tableGetn(factoryList) then
                 currentFactoryIndex = 1
             end
             SelectUnits({nextFac})
@@ -142,7 +156,7 @@ function GetNearestIdleLTMex()
         ConExecute('UI_SelectByCategory +nearest +idle +inview MASSEXTRACTION TECH' .. tech)
         tech = tech + 1
         local tempList = GetSelectedUnits()
-        if tempList ~= nil and not table.empty(tempList) then
+        if tempList ~= nil and not tableEmpty(tempList) then
             break
         end
     end
@@ -161,7 +175,7 @@ end
 
 -- This function might be too slow in larger games, needs testing
 function GetSimilarUnits()
-    local enhance = import('/lua/enhancementcommon.lua')
+    local enhance = enhancementcommonUp
     local curSelection = GetSelectedUnits()
     if curSelection then
         -- Find out what enhancements the current unit has
@@ -170,7 +184,7 @@ function GetSimilarUnits()
 
         -- Select all similar units by category
         local bp = curSelection[1]:GetBlueprint()
-        local catString = table.concatkeys(bp.CategoriesHash, " * ")
+        local catString = tableConcatkeys(bp.CategoriesHash, " * ")
         UISelectionByCategory(catString, false, false, false, false)
 
         -- Get enhancements on each unit and filter down to only those with the same as the first unit
@@ -180,11 +194,11 @@ function GetSimilarUnits()
             local unitId = unit:GetEntityId()
             local unitEnhancements = enhance.GetEnhancements(unitId)
             if curUnitEnhancements and unitEnhancements then
-                if table.equal(unitEnhancements, curUnitEnhancements) then
-                    table.insert(tempSelectionTable, unit)
+                if tableEqual(unitEnhancements, curUnitEnhancements) then
+                    tableInsert(tempSelectionTable, unit)
                 end
             elseif curUnitEnhancements == nil and unitEnhancements == nil then
-                table.insert(tempSelectionTable, unit)
+                tableInsert(tempSelectionTable, unit)
             end
         end
         SelectUnits(tempSelectionTable)
@@ -239,9 +253,9 @@ function AddNearestIdleEngineersSeq()
     -- Check if current selection contains only idle engineers
     local idleEngineers = allIdleEngineers
     for _, unit in currentSelection do
-        local key = table.find(idleEngineers, unit)
+        local key = tableFind(idleEngineers, unit)
         if key then
-            table.remove(idleEngineers, key)
+            tableRemove(idleEngineers, key)
         else
             -- Not an idle engineer, clear selection
             SelectUnits(nil)
@@ -251,7 +265,7 @@ function AddNearestIdleEngineersSeq()
         end
     end
 
-    if table.empty(idleEngineers) then
+    if tableEmpty(idleEngineers) then
         return
     end
 
@@ -290,9 +304,9 @@ function CycleIdleFactories()
     local i = 3
     while i > 0 do
         for curCat = 1, 3 do
-            if not table.empty(sortedFactories[curCat][i]) then
+            if not tableEmpty(sortedFactories[curCat][i]) then
                 for _, unit in sortedFactories[curCat][i] do
-                    table.insert(factoriesList, unit)
+                    tableInsert(factoriesList, unit)
                 end
             end
         end
@@ -300,7 +314,7 @@ function CycleIdleFactories()
     end
 
     local selection = GetSelectedUnits() or {}
-    if table.equal(selection, {factoriesList[curFacIndex]}) then
+    if tableEqual(selection, {factoriesList[curFacIndex]}) then
         curFacIndex = curFacIndex + 1
         if not factoriesList[curFacIndex] then
             curFacIndex = 1
@@ -329,7 +343,7 @@ function CycleUnitTypesInSel()
     local isNewSel = false
     if sortedUnits[unitCurType] then
         for _, unit in selection do
-            if not table.find(sortedUnits[unitCurType], unit) then
+            if not tableFind(sortedUnits[unitCurType], unit) then
                 isNewSel = true
                 break
             end
@@ -343,13 +357,13 @@ function CycleUnitTypesInSel()
         sortedUnits = {}
         for i, cat in ipairs(unitTypes) do
             local units = EntityCategoryFilterDown(cat, selection)
-            if not table.empty(units) then
-                table.insert(sortedUnits, units)
+            if not tableEmpty(units) then
+                tableInsert(sortedUnits, units)
             end
         end
 
         -- First type should be selected
-        if not table.empty(sortedUnits) then
+        if not tableEmpty(sortedUnits) then
             unitCurType = 1
         else
             unitCurType = nil
@@ -369,7 +383,7 @@ end
 function CreateTemplateFactory()
     local currentCommandQueue
     local selection = GetSelectedUnits()
-    if selection and table.getn(selection) == 1 and selection[1]:IsInCategory('FACTORY') then
+    if selection and tableGetn(selection) == 1 and selection[1]:IsInCategory('FACTORY') then
         currentCommandQueue = SetCurrentFactoryForQueueDisplay(selection[1])
     end
     import('/lua/ui/templates_factory.lua').CreateBuildTemplate(currentCommandQueue)
@@ -384,7 +398,7 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
     local unitIds = {}
 
     for _, unit in units or {} do
-        table.insert(unitIds, unit:GetEntityId())
+        tableInsert(unitIds, unit:GetEntityId())
     end
 
     SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})

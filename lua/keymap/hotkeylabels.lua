@@ -1,6 +1,16 @@
 -- This file is called from gamemain.lua when a game launches
 -- It assigns unit IDs and order strings to the basic key (The key without modifiers) bound to them
 
+local ipairs = ipairs
+local pairs = pairs
+local stringLen = string.len
+local stringLower = string.lower
+local stringFind = string.find
+local WARN = WARN
+local stringGsub = string.gsub
+local next = next
+local tableInsert = table.insert
+
 local unitkeygroups = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
 local construction = import('/lua/ui/game/construction.lua')
 local orders = import('/lua/ui/game/orders.lua')
@@ -114,19 +124,19 @@ function getKeyTables()
 
     -- Get them from the building tab
     for groupName, groupItems in unitkeygroups do -- Since this file hardcodes all unit ids that can be affected by hotbuild, helpidrelations will get them all
-        local g = groupName.lower(groupName)
+        local g = stringLower(groupName)
         for _, item in groupItems do
-            local i = item.lower(item)
+            local i = stringLower(item)
 
             if __blueprints[i] then
                 if not helpIdRelations[i] then
                     helpIdRelations[i] = {g}
                 else
-                    table.insert(helpIdRelations[i], g)
+                    tableInsert(helpIdRelations[i], g)
                 end
             else
                 if otherRelations[i] then
-                    table.insert(otherRelations[i], g)
+                    tableInsert(otherRelations[i], g)
                 else
                     otherRelations[i] = {g}
                 end
@@ -139,7 +149,7 @@ function getKeyTables()
         for key, value in group do
             if otherRelations[value] then -- Check if the group contained more than just unit IDs
                 for ids, values in pairs(otherRelations[value]) do
-                    table.insert(helpIdRelations[id], values.lower(values))
+                    tableInsert(helpIdRelations[id], stringLower(values))
                 end
             end
         end
@@ -200,7 +210,7 @@ function getKeyTables()
     -- Remove unused ones (too long)
     for _, metagroup in {idRelations, orderKeys} do
         for id1, group in metagroup do
-            group["textsize"] = textSizes[string.len(group.key)]
+            group["textsize"] = textSizes[stringLen(group.key)]
             if not group["textsize"] then
                 WARN('Not showing label for keybind ' .. group.key .. ' due to length')
                 metagroup[id1] = nil
@@ -210,7 +220,7 @@ function getKeyTables()
 
     -- Handle textsize for upgrades seperately
     if upgradeKey then
-        upgradeKey["textsize"] = textSizes[string.len(upgradeKey.key)]
+        upgradeKey["textsize"] = textSizes[stringLen(upgradeKey.key)]
         if not upgradeKey["textsize"] then
             WARN('Not showing label for keybind ' .. upgradeKey.key .. ' due to length')
             upgradeKey = nil
@@ -223,19 +233,19 @@ end
 -- Determine which modifier keys are present in the keybind string
 function getKeyUse(key)
     local colour = 1
-    if string.find(key, "Shift*") then
+    if stringFind(key, "Shift*") then
         -- No colour change for shift
-        key = key.gsub(key, "Shift.", "")
+        key = stringGsub(key, "Shift.", "")
     end
 
-    if string.find(key, "Ctrl*") then
+    if stringFind(key, "Ctrl*") then
         colour = colour + 1
-        key = key.gsub(key, "Ctrl.", "")
+        key = stringGsub(key, "Ctrl.", "")
     end
 
-    if string.find(key, "Alt*") then
+    if stringFind(key, "Alt*") then
         colour = colour + 2
-        key = key.gsub(key, "Alt.", "")
+        key = stringGsub(key, "Alt.", "")
     end
 
     return key, colours[colour]

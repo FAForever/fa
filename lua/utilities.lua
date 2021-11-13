@@ -5,6 +5,23 @@
 -- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local Random = Random
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local mathAbs = math.abs
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local Vector = Vector
+local mathAcos = math.acos
+local mathSqrt = math.sqrt
+local tableGetn = table.getn
+local VDist3 = VDist3
+local IsAlly = IsAlly
+local mathPow = math.pow
+local VDist2 = VDist2
+local EntityCategoryContains = EntityCategoryContains
+local Rect = Rect
+
 function GetDistanceBetweenTwoEntities(entity1, entity2)
     return VDist3(entity1:GetPosition(),entity2:GetPosition())
 end
@@ -40,8 +57,8 @@ function CanBuildInSpot(originUnit, unitId, pos)
             local structPos = struct:GetPosition()
 
             -- These can be positive or negative, so we need to make them positive using math.abs
-            local xDist = math.abs(pos.x - structPos.x)
-            local zDist = math.abs(pos.z - structPos.z)
+            local xDist = mathAbs(pos.x - structPos.x)
+            local zDist = mathAbs(pos.z - structPos.z)
 
             local skirtDiffx = mySkirtX + (structPhysics.SkirtSizeX / 2)
             local skirtDiffz = mySkirtZ + (structPhysics.SkirtSizeZ / 2)
@@ -76,7 +93,7 @@ function GetEnemyUnitsInSphere(unit, position, radius)
     for _, v in UnitsinRec do
         local dist = VDist3(position, v:GetPosition())
         if unit.Army ~= v.Army and dist <= radius then
-            table.insert(RadEntities, v)
+            tableInsert(RadEntities, v)
         end
     end
 
@@ -103,7 +120,7 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
         local dist = VDist3(position, v:GetPosition())
         local vArmy = v.Army
         if unit.Army ~= vArmy and not IsAlly(unit.Army, vArmy) and dist <= radius and EntityCategoryContains(categories or categories.ALLUNITS, v) then
-            table.insert(RadEntities, v)
+            tableInsert(RadEntities, v)
         end
     end
 
@@ -111,7 +128,7 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
 end
 
 function GetDistanceBetweenTwoPoints(x1, y1, z1, x2, y2, z2)
-    return (math.sqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2))
+    return (mathSqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2))
 end
 
 function GetDistanceBetweenTwoVectors(v1, v2)
@@ -123,7 +140,7 @@ function XZDistanceTwoVectors(v1, v2)
 end
 
 function GetVectorLength(v)
-    return math.sqrt(math.pow(v.x, 2) + math.pow(v.y, 2) + math.pow(v.z, 2))
+    return mathSqrt(mathPow(v.x, 2) + mathPow(v.y, 2) + mathPow(v.z, 2))
 end
 
 function NormalizeVector(v)
@@ -217,7 +234,7 @@ function GetAngleInBetween(v1, v2)
     vec2 = NormalizeVector(v2)
     local dotp = DotP(vec1, vec2)
 
-    return math.acos(dotp) * (360 / (math.pi * 2))
+    return mathAcos(dotp) * (360 / (math.pi * 2))
 end
 
 --- Computes the full angle between the two vectors in two dimensions: the y dimension is not taken into account. Angle
@@ -233,7 +250,7 @@ function GetAngleCCW(base, direction)
     local ort = { bn[3], 0, -bn[1] }
 
     -- compute the radians, correct it accordingly
-    local rads = math.acos(bn[1] * dn[1] + bn[3] * dn[3])
+    local rads = mathAcos(bn[1] * dn[1] + bn[3] * dn[3])
     if ort[1] * dn[1] + ort[3] * dn[3] < 0 then
         rads = 2 * math.pi - rads
     end
@@ -246,7 +263,7 @@ function UserConRequest(string)
     if not Sync.UserConRequests then
         Sync.UserConRequests = {}
     end
-    table.insert(Sync.UserConRequests, string)
+    tableInsert(Sync.UserConRequests, string)
 end
 
 -----------------------------------------------------------------
@@ -254,10 +271,10 @@ end
 -----------------------------------------------------------------
 function TableCat(...)
     local ret = {}
-    for index = 1, table.getn(arg) do
+    for index = 1, tableGetn(arg) do
         if arg[index] ~= nil then
             for k, v in arg[index] do
-                table.insert(ret, v)
+                tableInsert(ret, v)
             end
         end
     end

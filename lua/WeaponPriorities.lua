@@ -1,3 +1,24 @@
+local GetFocusArmy = GetFocusArmy
+local OkayToMessWithArmy = OkayToMessWithArmy
+local tableCopy = table.copy
+local GetEntityById = GetEntityById
+local stringFind = string.find
+local weapon_methodsResetTarget = moho.weapon_methods.ResetTarget
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local loadstring = loadstring
+local unit_methodsGetWeapon = moho.unit_methods.GetWeapon
+local GetUnitBlueprintByName = GetUnitBlueprintByName
+local ParseEntityCategory = ParseEntityCategory
+local type = type
+local stringSub = string.sub
+local pcall = pcall
+local WARN = WARN
+local print = print
+local weapon_methodsSetTargetingPriorities = moho.weapon_methods.SetTargetingPriorities
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
+
 local parsedPriorities
 local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
 
@@ -7,7 +28,7 @@ function HandleInputString(inputString)
     local inputTable = false
     --we check that its a table by its first character
     --we also check that it doesnt contain any functions that would have been run, by looking for "("
-    if string.sub(inputString, 1, 1) == "{" and not string.find(inputString,"%(") then
+    if stringSub(inputString, 1, 1) == "{" and not stringFind(inputString,"%(") then
         --this checks for syntax errors in the string so we can continue onwards.
         --for some reason the compiling also works out if the categories even exist? well whatever that just makes this work better i guess.
         if pcall(loadstring("return "..inputString)) then
@@ -45,10 +66,10 @@ function SetWeaponPriorities(data)
         --this is needed to prevent crashes when there is a mistake in the middle of input string
         --and priTable has such structure: {[1] = userdata: EntityCategory, [2] = empty!, [3] = userdata: EntityCategory}
         for key,cat in prioritiesTable or {} do
-            table.insert(editedPriorities, cat)
+            tableInsert(editedPriorities, cat)
         end
         for key,cat in prioritiesTableLimited or {} do
-            table.insert(editedPrioritiesLimited, cat)
+            tableInsert(editedPrioritiesLimited, cat)
         end
     end
 
@@ -75,7 +96,7 @@ function SetWeaponPriorities(data)
         local unit = GetEntityById(unitId)
 
         if unit and OkayToMessWithArmy(unit.Army) then
-            table.insert(units, unit)
+            tableInsert(units, unit)
         end
     end
 
@@ -98,38 +119,38 @@ function SetWeaponPriorities(data)
 
             if default then
                 for i = 1, weaponCount do
-                    local weapon = unit:GetWeapon(i)
-                    weapon:SetTargetingPriorities(parsedPriorities[blueprintId][i])
-                    weapon:ResetTarget()
+                    local weapon = unit_methodsGetWeapon(unit, i)
+                    weapon_methodsSetTargetingPriorities(weapon, parsedPriorities[blueprintId][i])
+                    weapon_methodsResetTarget(weapon)
                 end
             elseif data.exclusive then
                 for i = 1, weaponCount do
-                    local weapon = unit:GetWeapon(i)
-                    weapon:SetTargetingPriorities(finalPriorities)
-                    weapon:ResetTarget()
+                    local weapon = unit_methodsGetWeapon(unit, i)
+                    weapon_methodsSetTargetingPriorities(weapon, finalPriorities)
+                    weapon_methodsResetTarget(weapon)
                 end
             elseif preparedPrioTables[blueprintId] then
                 for i = 1, weaponCount do
-                    local weapon = unit:GetWeapon(i)
-                    weapon:SetTargetingPriorities(preparedPrioTables[blueprintId][i])
-                    weapon:ResetTarget()
+                    local weapon = unit_methodsGetWeapon(unit, i)
+                    weapon_methodsSetTargetingPriorities(weapon, preparedPrioTables[blueprintId][i])
+                    weapon_methodsResetTarget(weapon)
                 end
             else
                 preparedPrioTables[blueprintId] = {}
 
                 for i = 1, weaponCount do
-                    local weapon = unit:GetWeapon(i)
+                    local weapon = unit_methodsGetWeapon(unit, i)
                     local defaultPriorities = parsedPriorities[blueprintId][i]
-                    local mergedPriorities = table.copy(finalPriorities) or {}
+                    local mergedPriorities = tableCopy(finalPriorities) or {}
 
                     for k,v in defaultPriorities do
-                        table.insert(mergedPriorities, v)
+                        tableInsert(mergedPriorities, v)
                     end
 
                     preparedPrioTables[blueprintId][i] = mergedPriorities
 
-                    weapon:SetTargetingPriorities(mergedPriorities)
-                    weapon:ResetTarget()
+                    weapon_methodsSetTargetingPriorities(weapon, mergedPriorities)
+                    weapon_methodsResetTarget(weapon)
                 end
             end
         end
@@ -168,7 +189,7 @@ function parseDefaultPriorities()
 
                     finalPriorities[id][weaponNum][line] = parsedTemp[categories]
 
-                elseif string.find(categories, '%(') then
+                elseif stringFind(categories, '%(') then
                     local parsed = ParseEntityCategoryProperly(categories)
 
                     finalPriorities[id][weaponNum][line] = parsed
@@ -192,15 +213,15 @@ function categoryLimiter(inputStr, filterStr)
     local modifiedString = ""
 
     while initIndex do
-        local startIndex, endIndex, priority = string.find(inputStr, "([^,{}]+)", initIndex)
+        local startIndex, endIndex, priority = stringFind(inputStr, "([^,{}]+)", initIndex)
         if endIndex then
             initIndex = endIndex + 1
-            local categoryStart, categoryEnd = string.find(priority, filterStr)
+            local categoryStart, categoryEnd = stringFind(priority, filterStr)
 
             -- exclude priority that contains given category if there is no "-" in front of it.
-            if not categoryStart or string.sub(priority, categoryStart - 1, categoryStart - 1) == "-"
-                                 or string.sub(priority, categoryStart - 2, categoryStart - 2) == "-" then
-                table.insert(priorityStrings, priority)
+            if not categoryStart or stringSub(priority, categoryStart - 1, categoryStart - 1) == "-"
+                                 or stringSub(priority, categoryStart - 2, categoryStart - 2) == "-" then
+                tableInsert(priorityStrings, priority)
             end
         else
             initIndex = nil

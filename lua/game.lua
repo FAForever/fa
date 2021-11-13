@@ -5,6 +5,19 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local tostring = tostring
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local tableDeepcopy = table.deepcopy
+local error = error
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local tableEmpty = table.empty
+local mathMax = math.max
+local type = type
+local WARN = WARN
+local tableSort = table.sort
+
 FireState = {
     RETURN_FIRE = 0,
     HOLD_FIRE = 1,
@@ -76,8 +89,8 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
     if upgradeBaseData and targetData.DifferentialUpgradeCostCalculation then
         -- We cant make a differential on buildtime. Not sure why but if we do it yields incorrect
         -- results. So just mass and energy.
-        mass = math.max(mass - upgradeBaseData.BuildCostMass, 0)
-        energy = math.max(energy - upgradeBaseData.BuildCostEnergy, 0)
+        mass = mathMax(mass - upgradeBaseData.BuildCostMass, 0)
+        energy = mathMax(energy - upgradeBaseData.BuildCostEnergy, 0)
     end
 
     -- Apply penalties/bonuses to effective costs
@@ -85,9 +98,9 @@ function GetConstructEconomyModel(builder, targetData, upgradeBaseData)
     local energy_mod = builder.EnergyModifier or 0
     local mass_mod = builder.MassModifier or 0
 
-    buildtime = math.max(buildtime * (100 + time_mod) * 0.01, 0.1)
-    energy = math.max(energy * (100 + energy_mod) * 0.01, 0)
-    mass = math.max(mass * (100 + mass_mod) * 0.01, 0)
+    buildtime = mathMax(buildtime * (100 + time_mod) * 0.01, 0.1)
+    energy = mathMax(energy * (100 + energy_mod) * 0.01, 0)
+    mass = mathMax(mass * (100 + mass_mod) * 0.01, 0)
 
     return buildtime / rate, energy, mass
 end
@@ -237,16 +250,16 @@ local function GetUnitsUpgradable()
                not bp.CategoriesHash['BUILTBYTIER3ENGINEER'] and
                not bp.CategoriesHash['BUILTBYTIER3COMMANDER'] then
 
-               local unit = table.deepcopy(bp)
+               local unit = tableDeepcopy(bp)
                unit.id = id -- Save id for a reference
-               table.insert(units, unit)
+               tableInsert(units, unit)
             end
         end
     end
 
     -- Ensure units are sorted in increasing order of upgrades
     -- This increase performance when checking for breaks in upgrade-chain
-    table.sort(units, SortUnits)
+    tableSort(units, SortUnits)
 
     return units
 end
@@ -256,7 +269,7 @@ local function GetUnitsIds()
     local units = {}
     for id, bp in __blueprints do
         if IsValidUnit(bp, id) then
-            table.insert(units, id)
+            tableInsert(units, id)
         end
     end
     return units
@@ -266,7 +279,7 @@ end
 -- e.g. restrictions = {categories.TECH1} ->
 function ResolveRestrictions(toggle, cats, army)
     -- Initialize blueprints info only once
-    if table.empty(bps.ids) or table.empty(bps.upgradeable) then
+    if tableEmpty(bps.ids) or tableEmpty(bps.upgradeable) then
         bps.ids = GetUnitsIds()
         bps.upgradeable = GetUnitsUpgradable()
     end

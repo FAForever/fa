@@ -1,5 +1,9 @@
 
 -- imports for functionality
+local ipairs = ipairs
+local next = next
+local unit_methodsGetFocusUnit = moho.unit_methods.GetFocusUnit
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
@@ -119,7 +123,7 @@ function SpawnBuildBots(builder)
     end
 
     -- make the drones focus builder target
-    local focus = builder:GetFocusUnit()
+    local focus = unit_methodsGetFocusUnit(builder)
 
     -- focus may be nil if we got paused and building is finished
     if focus then 

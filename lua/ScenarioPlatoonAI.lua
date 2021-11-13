@@ -5,6 +5,65 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------
 
+local tableShuffle = table.shuffle
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local unit_methodsIsIdleState = moho.unit_methods.IsIdleState
+local aibrain_methodsFindUnit = moho.aibrain_methods.FindUnit
+local IssueGuard = IssueGuard
+local tableInsert = table.insert
+local platoon_methodsUseFerryBeacon = moho.platoon_methods.UseFerryBeacon
+local aibrain_methodsBuildStructure = moho.aibrain_methods.BuildStructure
+local aibrain_methodsSetUpAttackVectorsToArmy = moho.aibrain_methods.SetUpAttackVectorsToArmy
+local stringSub = string.sub
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local IssueStop = IssueStop
+local platoon_methodsIsCommandsActive = moho.platoon_methods.IsCommandsActive
+local platoon_methodsGetSquadPosition = moho.platoon_methods.GetSquadPosition
+local ForkThread = ForkThread
+local platoon_methodsGetSquadUnits = moho.platoon_methods.GetSquadUnits
+local next = next
+local tableEmpty = table.empty
+local aibrain_methodsCanBuildStructureAt = moho.aibrain_methods.CanBuildStructureAt
+local IssueClearCommands = IssueClearCommands
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local tableGetn = table.getn
+local stringGsub = string.gsub
+local Random = Random
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local platoon_methodsMoveToLocation = moho.platoon_methods.MoveToLocation
+local platoon_methodsUnloadAllAtLocation = moho.platoon_methods.UnloadAllAtLocation
+local IsEnemy = IsEnemy
+local aibrain_methodsMakePlatoon = moho.aibrain_methods.MakePlatoon
+local error = error
+local aibrain_methodsDisbandPlatoon = moho.aibrain_methods.DisbandPlatoon
+local stringFind = string.find
+local IssueRepair = IssueRepair
+local aibrain_methodsFindPlaceToBuild = moho.aibrain_methods.FindPlaceToBuild
+local ipairs = ipairs
+local platoon_methodsFindClosestUnit = moho.platoon_methods.FindClosestUnit
+local IssueTransportLoad = IssueTransportLoad
+local aibrain_methodsPlatoonExists = moho.aibrain_methods.PlatoonExists
+local platoon_methodsUniquelyNamePlatoon = moho.platoon_methods.UniquelyNamePlatoon
+local type = type
+local aibrain_methodsPickBestAttackVector = moho.aibrain_methods.PickBestAttackVector
+local EntityCategoryContains = EntityCategoryContains
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local IssueMove = IssueMove
+local IssuePatrol = IssuePatrol
+local tableRemove = table.remove
+local platoon_methodsAggressiveMoveToLocation = moho.platoon_methods.AggressiveMoveToLocation
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local platoon_methodsAttackTarget = moho.platoon_methods.AttackTarget
+local aibrain_methodsGetHighestThreatPosition = moho.aibrain_methods.GetHighestThreatPosition
+local VDist3 = VDist3
+local platoon_methodsPatrol = moho.platoon_methods.Patrol
+local platoon_methodsGetBrain = moho.platoon_methods.GetBrain
+local VDist2 = VDist2
+local platoon_methodsGetPlatoonPosition = moho.platoon_methods.GetPlatoonPosition
+local aibrain_methodsGetAttackVectors = moho.aibrain_methods.GetAttackVectors
+
 local Utilities = import('/lua/utilities.lua')
 local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
@@ -18,27 +77,27 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 --      parameter 0: string: platoon = "default_platoon"
 --------------------------------------------------------
 function PlatoonAttackClosestUnit(platoon)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     local target
 
     while not target do
-        target = platoon:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS)
+        target = platoon_methodsFindClosestUnit(platoon, 'Attack', 'Enemy', true, categories.ALLUNITS)
         WaitSeconds(3)
     end
     platoon:Stop()
 
-    local cmd = platoon:AggressiveMoveToLocation(target:GetPosition())
-    while aiBrain:PlatoonExists(platoon) do
+    local cmd = platoon_methodsAggressiveMoveToLocation(platoon, target:GetPosition())
+    while aibrain_methodsPlatoonExists(aiBrain, platoon) do
         if target ~= nil then
-            if target.Dead or not platoon:IsCommandsActive(cmd) then
-                target = platoon:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS-categories.WALL)
+            if target.Dead or not platoon_methodsIsCommandsActive(platoon, cmd) then
+                target = platoon_methodsFindClosestUnit(platoon, 'Attack', 'Enemy', true, categories.ALLUNITS-categories.WALL)
                 if target and not target.Dead then
                     platoon:Stop()
-                    cmd = platoon:AggressiveMoveToLocation(target:GetPosition())
+                    cmd = platoon_methodsAggressiveMoveToLocation(platoon, target:GetPosition())
                 end
             end
         else
-            target = platoon:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS)
+            target = platoon_methodsFindClosestUnit(platoon, 'Attack', 'Enemy', true, categories.ALLUNITS)
         end
         WaitSeconds(17)
     end
@@ -49,7 +108,7 @@ end
 --      parameter 0: string: platoon = "default_platoon"
 --------------------------------------------------------
 function BuildOnce(platoon)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     if aiBrain.HasPlatoonList then
         aiBrain:PBMSetPriority(platoon, 0)
     else
@@ -62,8 +121,8 @@ end
 --      parameter 0: string: platoon = "default_platoon"
 --------------------------------------------------------
 function DefaultOSBasePatrol(platoon)
-    local aiBrain = platoon:GetBrain()
-    local master = string.sub(platoon.PlatoonData.BuilderName, 11)
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local master = stringSub(platoon.PlatoonData.BuilderName, 11)
     local chain = false
     if platoon.PlatoonData.LocationType and Scenario.Chains[aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'] then
         chain = aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'
@@ -105,16 +164,16 @@ end
 -----------------------------------------------------------
 function PlatoonAttackHighestThreat(platoon)
     local patrol = false
-    local aiBrain = platoon:GetBrain()
-    local location, threat = aiBrain:GetHighestThreatPosition(1, true)
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local location, threat = aibrain_methodsGetHighestThreatPosition(aiBrain, 1, true)
     platoon:Stop()
-    local cmd = platoon:AggressiveMoveToLocation(location)
-    while aiBrain:PlatoonExists(platoon) do
-        if not platoon:IsCommandsActive(cmd) then
-            location, threat = aiBrain:GetHighestThreatPosition(1, true)
+    local cmd = platoon_methodsAggressiveMoveToLocation(platoon, location)
+    while aibrain_methodsPlatoonExists(aiBrain, platoon) do
+        if not platoon_methodsIsCommandsActive(platoon, cmd) then
+            location, threat = aibrain_methodsGetHighestThreatPosition(aiBrain, 1, true)
             if threat > 0 then
                 platoon:Stop()
-                cmd = platoon:AggressiveMoveToLocation(location)
+                cmd = platoon_methodsAggressiveMoveToLocation(platoon, location)
             end
         end
         WaitSeconds(13)
@@ -140,14 +199,14 @@ function PlatoonAttackLocation(platoon)
     if type(location) == 'string' then
         location = ScenarioUtils.MarkerToPosition(location)
     end
-    local aiBrain = platoon:GetBrain()
-    local cmd = platoon:AggressiveMoveToLocation(location)
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local cmd = platoon_methodsAggressiveMoveToLocation(platoon, location)
     local threat = 0
-    while aiBrain:PlatoonExists(platoon) do
-        if not platoon:IsCommandsActive(cmd) then
-            location, threat = platoon:GetBrain():GetHighestThreatPosition(1, true)
+    while aibrain_methodsPlatoonExists(aiBrain, platoon) do
+        if not platoon_methodsIsCommandsActive(platoon, cmd) then
+            location, threat = platoon_methodsGetBrain(platoon):GetHighestThreatPosition(1, true)
             platoon:Stop()
-            cmd = platoon:AggressiveMoveToLocation(location)
+            cmd = platoon_methodsAggressiveMoveToLocation(platoon, location)
         end
         WaitSeconds(13)
     end
@@ -168,7 +227,7 @@ end
 function PlatoonAttackLocationList(platoon)
     platoon:Stop()
     local location = nil
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     local data = platoon.PlatoonData
     if not data.LocationList and not data.LocationChain then
         error('*SCENARIO PLATOON AI ERROR: PlatoonAttackLocationList requires a LocationList or LocationChain in PlatoonData to operate', 2)
@@ -180,34 +239,34 @@ function PlatoonAttackLocationList(platoon)
     else
         for _, v in data.LocationList do
             if type(v) == 'string' then
-                table.insert(positions, ScenarioUtils.MarkerToPosition(v))
+                tableInsert(positions, ScenarioUtils.MarkerToPosition(v))
             else
-                table.insert(positions, v)
+                tableInsert(positions, v)
             end
         end
     end
 
     if data.High then
-        location = PlatoonChooseHighest(platoon:GetBrain(), positions, 1)
+        location = PlatoonChooseHighest(platoon_methodsGetBrain(platoon), positions, 1)
     else
-        location = PlatoonChooseLowestNonNegative(platoon:GetBrain(), positions, 1)
+        location = PlatoonChooseLowestNonNegative(platoon_methodsGetBrain(platoon), positions, 1)
     end
 
     local cmd
     if location then
-        cmd = platoon:AggressiveMoveToLocation(location)
+        cmd = platoon_methodsAggressiveMoveToLocation(platoon, location)
     end
 
-    while aiBrain:PlatoonExists(platoon) do
-        if not location or not platoon:IsCommandsActive(cmd) then
+    while aibrain_methodsPlatoonExists(aiBrain, platoon) do
+        if not location or not platoon_methodsIsCommandsActive(platoon, cmd) then
             if data.High then
-                location = PlatoonChooseHighest(platoon:GetBrain(), positions, 1, location)
+                location = PlatoonChooseHighest(platoon_methodsGetBrain(platoon), positions, 1, location)
             else
-                location = PlatoonChooseLowestNonNegative(platoon:GetBrain(), positions, 1, location)
+                location = PlatoonChooseLowestNonNegative(platoon_methodsGetBrain(platoon), positions, 1, location)
             end
             if location then
                 platoon:Stop()
-                cmd = platoon:AggressiveMoveToLocation(location)
+                cmd = platoon_methodsAggressiveMoveToLocation(platoon, location)
             end
         end
         WaitSeconds(13)
@@ -224,8 +283,8 @@ end
 --      parameter 0: string: platoon = "default_platoon"
 ------------------------------------------------------------------------------------------------
 function TransportPool(platoon)
-    local aiBrain = platoon:GetBrain()
-    local tPool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local tPool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'TransportPool')
     local location = false
     local data = platoon.PlatoonData
     if platoon.PlatoonData then
@@ -238,11 +297,11 @@ function TransportPool(platoon)
         end
     end
     if not tPool then
-        tPool = aiBrain:MakePlatoon('None', 'None')
-        tPool:UniquelyNamePlatoon('TransportPool')
+        tPool = aibrain_methodsMakePlatoon(aiBrain, 'None', 'None')
+        platoon_methodsUniquelyNamePlatoon(tPool, 'TransportPool')
     end
-    for _, unit in platoon:GetPlatoonUnits() do
-        aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'GrowthFormation')
+    for _, unit in platoon_methodsGetPlatoonUnits(platoon) do
+        aibrain_methodsAssignUnitsToPlatoon(aiBrain, 'TransportPool', {unit}, 'Scout', 'GrowthFormation')
         if location then
             IssueMove({unit}, location)
         end
@@ -273,7 +332,7 @@ end
 --      parameter 0: string: platoon = "default_platoon"
 -------------------------------------------------------------------------------------------------------------------
 function LandAssaultWithTransports(platoon)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     local data = platoon.PlatoonData
 
     for varName, varData in data do
@@ -301,7 +360,7 @@ function LandAssaultWithTransports(platoon)
         local tempNum = 0
         for landingChain, attackChain in data.AssaultChains do
             for num, pos in ScenarioUtils.ChainToPositions(attackChain) do
-                if aiBrain:GetThreatAtPosition(pos, 1, true) > 0 then
+                if aibrain_methodsGetThreatAtPosition(aiBrain, pos, 1, true) > 0 then
                     tempChains[landingChain] = attackChain
                     tempNum = tempNum + 1
                     break
@@ -329,9 +388,9 @@ function LandAssaultWithTransports(platoon)
     else
         for _, v in data.AttackPoints do
             if type(v) == 'string' then
-                table.insert(attackPositions, ScenarioUtils.MarkerToPosition(v))
+                tableInsert(attackPositions, ScenarioUtils.MarkerToPosition(v))
             else
-                table.insert(attackPositions, v)
+                tableInsert(attackPositions, v)
             end
         end
     end
@@ -345,9 +404,9 @@ function LandAssaultWithTransports(platoon)
     else
         for _, v in data.LandingList do
             if type(v) == 'string' then
-                table.insert(landingPositions, ScenarioUtils.MarkerToPosition(v))
+                tableInsert(landingPositions, ScenarioUtils.MarkerToPosition(v))
             else
-                table.insert(landingPositions, v)
+                tableInsert(landingPositions, v)
             end
         end
     end
@@ -373,16 +432,16 @@ function LandAssaultWithTransports(platoon)
     else
         landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
     end
-    cmd = platoon:UnloadAllAtLocation(landingLocation)
+    cmd = platoon_methodsUnloadAllAtLocation(platoon, landingLocation)
     local attached = true
     while attached do
         attached = false
         WaitSeconds(3)
-        if not aiBrain:PlatoonExists(platoon) then
+        if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
             return
         end
-        for num, unit in platoon:GetPlatoonUnits() do
-            if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) and unit:IsUnitState('Attached') then
+        for num, unit in platoon_methodsGetPlatoonUnits(platoon) do
+            if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) and unit_methodsIsUnitState(unit, 'Attached') then
                 attached = true
                 break
             end
@@ -405,11 +464,11 @@ function LandAssaultWithTransports(platoon)
         end
 
         for _, v in attackRoute do
-            platoon:Patrol(v)
+            platoon_methodsPatrol(platoon, v)
         end
     end
 
-    for num, unit in platoon:GetPlatoonUnits() do
+    for num, unit in platoon_methodsGetPlatoonUnits(platoon) do
         if EntityCategoryContains(categories.ENGINEER, unit) then
             platoon:CaptureAI()
             break
@@ -438,19 +497,19 @@ function MoveToThread(platoon)
             else
                 for _, v in data.MoveRoute do
                     if type(v) == 'string' then
-                        table.insert(movePositions, ScenarioUtils.MarkerToPosition(v))
+                        tableInsert(movePositions, ScenarioUtils.MarkerToPosition(v))
                     else
-                        table.insert(movePositions, v)
+                        tableInsert(movePositions, v)
                     end
                 end
             end
             if data.UseTransports then
                 for _, v in movePositions do
-                    platoon:MoveToLocation(v, data.UseTransports)
+                    platoon_methodsMoveToLocation(platoon, v, data.UseTransports)
                 end
             else
                 for _, v in movePositions do
-                    platoon:MoveToLocation(v, false)
+                    platoon_methodsMoveToLocation(platoon, v, false)
                 end
             end
         else
@@ -480,9 +539,9 @@ function PatrolThread(platoon)
             else
                 for _, v in data.PatrolRoute do
                     if type(v) == 'string' then
-                        platoon:Patrol(ScenarioUtils.MarkerToPosition(v))
+                        platoon_methodsPatrol(platoon, ScenarioUtils.MarkerToPosition(v))
                     else
-                        platoon:Patrol(v)
+                        platoon_methodsPatrol(platoon, v)
                     end
                 end
             end
@@ -515,9 +574,9 @@ function RandomPatrolThread(platoon)
                 local route = {}
                 for _, v in data.PatrolRoute do
                     if type(v) == 'string' then
-                        table.insert(route, ScenarioUtils.MarkerToPosition(v))
+                        tableInsert(route, ScenarioUtils.MarkerToPosition(v))
                     else
-                        table.insert(route, v)
+                        tableInsert(route, v)
                     end
                 end
                 ScenarioFramework.PlatoonPatrolRoute(platoon, GetRandomPatrolRoute(route))
@@ -543,7 +602,7 @@ function RandomDefensePatrolThread(platoon)
     platoon:Stop()
     if data then
         if data.PatrolChain then
-            for _, v in platoon:GetPlatoonUnits() do
+            for _, v in platoon_methodsGetPlatoonUnits(platoon) do
                 ScenarioFramework.GroupPatrolRoute({v}, GetRandomPatrolRoute(ScenarioUtils.ChainToPositions(data.PatrolChain)))
             end
         else
@@ -567,7 +626,7 @@ function PatrolChainPickerThread(platoon)
     platoon:Stop()
     if data then
         if data.PatrolChains then
-            local chain = Random(1, table.getn(data.PatrolChains))
+            local chain = Random(1, tableGetn(data.PatrolChains))
             ScenarioFramework.PlatoonPatrolRoute(platoon, ScenarioUtils.ChainToPositions(data.PatrolChains[chain]))
         else
             error('*SCENARIO PLATOON AI ERROR: PatrolChains not defined', 2)
@@ -588,8 +647,8 @@ function SplitPatrolThread(platoon)
     platoon:Stop()
     if data then
         if data.PatrolChains then
-            local num = table.getn(data.PatrolChains)
-            for _, v in platoon:GetPlatoonUnits() do
+            local num = tableGetn(data.PatrolChains)
+            for _, v in platoon_methodsGetPlatoonUnits(platoon) do
                 local chain = Random(1, num)
                 ScenarioFramework.GroupPatrolChain({v}, data.PatrolChains[chain])
             end
@@ -606,8 +665,8 @@ end
 --      parameter 0: string platoon = "default_platoon"
 -------------------------------------------------------
 function EngineersBuildPlatoon(platoon)
-    local aiBrain = platoon:GetBrain()
-    local platoonUnits = platoon:GetPlatoonUnits()
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local platoonUnits = platoon_methodsGetPlatoonUnits(platoon)
     local data = platoon.PlatoonData
     local platoonName = data.PlatoonName
     local eng = false
@@ -628,7 +687,7 @@ function EngineersBuildPlatoon(platoon)
             if not eng then
                 eng = v
             else
-                table.insert(engTable, v)
+                tableInsert(engTable, v)
             end
         end
     end
@@ -637,20 +696,20 @@ function EngineersBuildPlatoon(platoon)
     end
 
     -- Wait for eng to stop moving
-    while eng:IsUnitState('Moving') do
+    while unit_methodsIsUnitState(eng, 'Moving') do
         WaitSeconds(3)
-        if not aiBrain:PlatoonExists(platoon) then
+        if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
             return
         end
     end
 
     -- Have all engineers guard main engineer
-    if not table.empty(engTable) then
+    if not tableEmpty(engTable) then
         if eng.Dead then -- Must check if a death occured since platoon was forked
             for num, unit in engTable do
                 if not unit.Dead then
-                    eng = table.remove(engTable, num)
-                    if not table.empty(engTable) then
+                    eng = tableRemove(engTable, num)
+                    if not tableEmpty(engTable) then
                         IssueGuard(engTable, eng)
                     end
                     break
@@ -665,7 +724,7 @@ function EngineersBuildPlatoon(platoon)
         aiBrain.EngBuiltPlatoonList = {}
     end
 
-    while aiBrain:PlatoonExists(platoon) do
+    while aibrain_methodsPlatoonExists(aiBrain, platoon) do
         -- Set new primary eng
         if eng.Dead then
             return
@@ -678,7 +737,7 @@ function EngineersBuildPlatoon(platoon)
                     break
                 else
                     local plat = aiBrain.EngBuiltPlatoonList[v.PlatoonName]
-                    if not aiBrain:PlatoonExists(plat) then
+                    if not aibrain_methodsPlatoonExists(aiBrain, plat) then
                         buildingPlatoon = v.PlatoonName
                         buildingData = v
                         break
@@ -686,7 +745,7 @@ function EngineersBuildPlatoon(platoon)
                 end
             end
         end
-        if not eng:IsUnitState('Patrolling') and (eng:IsUnitState('Reclaiming') or eng:IsUnitState('Building') or eng:IsUnitState('Upgrading') or eng:IsUnitState('Repairing')) then
+        if not unit_methodsIsUnitState(eng, 'Patrolling') and (unit_methodsIsUnitState(eng, 'Reclaiming') or unit_methodsIsUnitState(eng, 'Building') or unit_methodsIsUnitState(eng, 'Upgrading') or unit_methodsIsUnitState(eng, 'Repairing')) then
             busy = true
         end
         if not busy and buildingPlatoon then
@@ -694,10 +753,10 @@ function EngineersBuildPlatoon(platoon)
             local unitGroup = ScenarioUtils.FlattenTreeGroup(aiBrain.Name, buildingPlatoon)
             local plat
             for strName, tblData in unitGroup do
-                if eng and aiBrain:CanBuildStructureAt(tblData.type, tblData.Position) then
+                if eng and aibrain_methodsCanBuildStructureAt(aiBrain, tblData.type, tblData.Position) then
                     IssueStop({eng})
                     IssueClearCommands({eng})
-                    local result = aiBrain:BuildStructure(eng, tblData.type, {tblData.Position[1], tblData.Position[3], 0}, false)
+                    local result = aibrain_methodsBuildStructure(aiBrain, eng, tblData.type, {tblData.Position[1], tblData.Position[3], 0}, false)
                     unitBeingBuilt = false
 
                     repeat
@@ -708,13 +767,13 @@ function EngineersBuildPlatoon(platoon)
                             if not unitBeingBuilt then
                                 unitBeingBuilt = eng.UnitBeingBuilt
                                 if unitBeingBuilt then
-                                    table.insert(newPlatoonUnits, unitBeingBuilt)
+                                    tableInsert(newPlatoonUnits, unitBeingBuilt)
                                 end
                             end
                         end
-                    until not eng or eng.Dead or eng:IsIdleState()
+                    until not eng or eng.Dead or unit_methodsIsIdleState(eng)
                     if not aiBrain.EngBuiltPlatoonList[buildingPlatoon] then
-                        plat = aiBrain:MakePlatoon('', '')
+                        plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
                         aiBrain.EngBuiltPlatoonList[buildingPlatoon] = plat
                         plat.EngBuildName = buildingPlatoon
                         plat:AddDestroyCallback(function(aiBrain, plat)
@@ -722,11 +781,11 @@ function EngineersBuildPlatoon(platoon)
                         end
                        )
                     end
-                    aiBrain:AssignUnitsToPlatoon(aiBrain.EngBuiltPlatoonList[buildingPlatoon], {unitBeingBuilt}, 'Attack', 'NoFormation')
+                    aibrain_methodsAssignUnitsToPlatoon(aiBrain, aiBrain.EngBuiltPlatoonList[buildingPlatoon], {unitBeingBuilt}, 'Attack', 'NoFormation')
                 end
             end
             buildingPlatoon = false
-            if not table.empty(plat:GetPlatoonUnits()) then
+            if not tableEmpty(platoon_methodsGetPlatoonUnits(plat)) then
                 if buildingData.PlatoonData then
                     plat.PlatoonData = buildingData.PlatoonData
                 end
@@ -747,13 +806,13 @@ function EngineersBuildPlatoon(platoon)
             newPlatoonUnits = {}
 
             -- Disband if desired
-            if aiBrain:PlatoonExists(platoon) and data.DisbandAfterBuilding then
-                aiBrain:DisbandPlatoon(platoon)
+            if aibrain_methodsPlatoonExists(aiBrain, platoon) and data.DisbandAfterBuilding then
+                aibrain_methodsDisbandPlatoon(aiBrain, platoon)
             end
         end
-        if not eng:IsUnitState('Patrolling') and data.PatrolChain then
+        if not unit_methodsIsUnitState(eng, 'Patrolling') and data.PatrolChain then
             for _, v in ScenarioUtils.ChainToPositions(data.PatrolChain) do
-                platoon:Patrol(v)
+                platoon_methodsPatrol(platoon, v)
             end
         end
         WaitSeconds(11)
@@ -764,8 +823,8 @@ function GetHumanEnemies(armyIndex)
     humans = {}
 
     for i, brain in ArmyBrains do
-        if brain.BrainType == 'Human' and IsEnemy(armyIndex, brain:GetArmyIndex()) then
-            table.insert(humans, brain)
+        if brain.BrainType == 'Human' and IsEnemy(armyIndex, aibrain_methodsGetArmyIndex(brain)) then
+            tableInsert(humans, brain)
         end
     end
 
@@ -783,20 +842,20 @@ end
 --      parameter 0: string: platoon = "default_platoon"
 ----------------------------------------------------------------------------------------------
 function CategoryHunterPlatoonAI(platoon)
-    local aiBrain = platoon:GetBrain()
-    local platoonUnits = platoon:GetPlatoonUnits()
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local platoonUnits = platoon_methodsGetPlatoonUnits(platoon)
     local data = platoon.PlatoonData
     local target = false
-    while aiBrain:PlatoonExists(platoon) do
+    while aibrain_methodsPlatoonExists(aiBrain, platoon) do
         -- Find nearest enemy category to this platoon
         -- Cheat to find the focus army's units
         local newTarget = false
-        local platPos = platoon:GetPlatoonPosition()
-        local enemies = table.shuffle(GetHumanEnemies(aiBrain:GetArmyIndex()))
+        local platPos = platoon_methodsGetPlatoonPosition(platoon)
+        local enemies = tableShuffle(GetHumanEnemies(aibrain_methodsGetArmyIndex(aiBrain)))
         for i, enemy in enemies do
             for catNum, category in platoon.PlatoonData.CategoryList do
-                local unitList = enemy:GetListOfUnits(category, false, false)
-                if not table.empty(unitList) then
+                local unitList = aibrain_methodsGetListOfUnits(enemy, category, false, false)
+                if not tableEmpty(unitList) then
                     local distance = 100000
                     for _, v in unitList do
                         if not v.Dead then
@@ -810,7 +869,7 @@ function CategoryHunterPlatoonAI(platoon)
                     -- If the target has changed, attack new target
                     if newTarget ~= target then
                         platoon:Stop()
-                        platoon:AttackTarget(newTarget)
+                        platoon_methodsAttackTarget(platoon, newTarget)
                     end
                 end
                 if newTarget then
@@ -821,15 +880,15 @@ function CategoryHunterPlatoonAI(platoon)
 
         -- If there are no targets, seek out and fight nearest enemy the platoon can find; no cheeting here
         if not newTarget then
-            target = platoon:FindClosestUnit('Attack', 'Enemy', true, categories.ALLUNITS-categories.WALL)
+            target = platoon_methodsFindClosestUnit(platoon, 'Attack', 'Enemy', true, categories.ALLUNITS-categories.WALL)
             if target and not target.Dead then
                 platoon:Stop()
-                platoon:AggressiveMoveToLocation(target:GetPosition())
+                platoon_methodsAggressiveMoveToLocation(platoon, target:GetPosition())
 
             -- If we still cant find a target, go to the highest threat position on the map
             else
                 platoon:Stop()
-                platoon:AggressiveMoveToLocation(aiBrain:GetHighestThreatPosition(1, true))
+                platoon_methodsAggressiveMoveToLocation(platoon, aibrain_methodsGetHighestThreatPosition(aiBrain, 1, true))
             end
         end
         WaitSeconds(Random(73, 181) * .1)
@@ -883,8 +942,8 @@ end
 --      parameter 0: string: platoon = "default_platoon"
 -------------------------------------------------------------------------------------------------------------------------
 function StartBaseEngineerThread(platoon)
-    local aiBrain = platoon:GetBrain()
-    local platoonUnits = platoon:GetPlatoonUnits()
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local platoonUnits = platoon_methodsGetPlatoonUnits(platoon)
     local data = platoon.PlatoonData
     local baseName
     -- Check for bad variables
@@ -945,7 +1004,7 @@ function StartBaseEngineerThread(platoon)
             if not eng then
                 eng = v
             else
-                table.insert(engTable, v)
+                tableInsert(engTable, v)
             end
         end
     end
@@ -953,9 +1012,9 @@ function StartBaseEngineerThread(platoon)
         error('*SCENARIO PLATOON AI ERROR: No Engineers found in platoon using StartBaseEngineer', 2)
     end
     -- Wait for eng to stop moving
-    while not eng.Dead and  eng:IsUnitState('Moving') do
+    while not eng.Dead and  unit_methodsIsUnitState(eng, 'Moving') do
         WaitSeconds(3)
-        if not aiBrain:PlatoonExists(platoon) then
+        if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
             return
         end
     end
@@ -979,12 +1038,12 @@ function StartBaseEngineerThread(platoon)
     end
 
     -- Have all engineers guard main engineer
-    if not table.empty(engTable) then
+    if not tableEmpty(engTable) then
         if eng.Dead then -- Must check if a death occured since platoon was forked
             for num, unit in engTable do
                 if not unit.Dead then
-                    eng = table.remove(engTable, num)
-                    if not table.empty(engTable) then
+                    eng = tableRemove(engTable, num)
+                    if not tableEmpty(engTable) then
                         IssueGuard(engTable, eng)
                     end
                     break
@@ -1028,13 +1087,13 @@ function StartBaseEngineerThread(platoon)
     end
 
     -- Send engineers on patrol
-    if aiBrain:PlatoonExists(platoon) then
+    if aibrain_methodsPlatoonExists(aiBrain, platoon) then
         EngPatrol(eng, engTable, data)
     end
 
     -- Disband if desired
-    if aiBrain:PlatoonExists(platoon) and data.DisbandAfterPatrol then
-        aiBrain:DisbandPlatoon(platoon)
+    if aibrain_methodsPlatoonExists(aiBrain, platoon) and data.DisbandAfterPatrol then
+        aibrain_methodsDisbandPlatoon(aiBrain, platoon)
     end
 end
 
@@ -1047,29 +1106,29 @@ function StartBaseTransports(platoon, data, aiBrain)
         if data.TransportRoute then
             for _, v in data.TransportRoute do
                 if type(v) == 'string' then
-                    platoon:MoveToLocation(ScenarioUtils.MarkerToPosition(v), false, 'Scout')
+                    platoon_methodsMoveToLocation(platoon, ScenarioUtils.MarkerToPosition(v), false, 'Scout')
                 else
-                    platoon:MoveToLocation(v, false, 'Scout')
+                    platoon_methodsMoveToLocation(platoon, v, false, 'Scout')
                 end
             end
         elseif data.TransportChain then
             local transPositionChain = {}
             transPositionChain = ScenarioUtils.ChainToPositions(data.TransportChain)
             for _, v in transPositionChain do
-                platoon:MoveToLocation(v, false, 'Scout')
+                platoon_methodsMoveToLocation(platoon, v, false, 'Scout')
             end
         end
 
         -- Unload transports
         if type(data.LandingLocation) == 'string' then
-            cmd = platoon:UnloadAllAtLocation(ScenarioUtils.MarkerToPosition(data.LandingLocation))
+            cmd = platoon_methodsUnloadAllAtLocation(platoon, ScenarioUtils.MarkerToPosition(data.LandingLocation))
         else
-            cmd = platoon:UnloadAllAtLocation(data.LandingLocation)
+            cmd = platoon_methodsUnloadAllAtLocation(platoon, data.LandingLocation)
         end
         -- Wait for unload to end
-        while platoon:IsCommandsActive(cmd) do
+        while platoon_methodsIsCommandsActive(platoon, cmd) do
             WaitSeconds(3)
-            if not aiBrain:PlatoonExists(platoon) then
+            if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
                 return false
             end
         end
@@ -1082,14 +1141,14 @@ function StartBaseTransports(platoon, data, aiBrain)
     if data.MoveBeacon then
         while not ScenarioInfo.VarTable[data.MoveBeacon] do
             WaitSeconds(3)
-            if not aiBrain:PlatoonExists(platoon) then
+            if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
                 return false
             end
         end
-        cmd = platoon:UseFerryBeacon(categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon])
-        while platoon:IsCommandsActive(cmd) do
+        cmd = platoon_methodsUseFerryBeacon(platoon, categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon])
+        while platoon_methodsIsCommandsActive(platoon, cmd) do
             WaitSeconds(3)
-            if not aiBrain:PlatoonExists(platoon) then
+            if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
                 return false
             end
         end
@@ -1102,13 +1161,13 @@ end
 -- Takes transports in platoon, returns them to pool, flys them back to return location
 function ReturnTransportsToPool(platoon, data)
     -- Put transports back in TPool
-    local aiBrain = platoon:GetBrain()
-    for _, unit in platoon:GetPlatoonUnits() do
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    for _, unit in platoon_methodsGetPlatoonUnits(platoon) do
         if EntityCategoryContains(categories.TRANSPORTATION, unit) then
             -- If a route was given, reverse the route on return
             if data.TransportRoute then
-                aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                for i=table.getn(data.TransportRoute), 1, -1 do
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, 'TransportPool', {unit}, 'Scout', 'None')
+                for i=tableGetn(data.TransportRoute), 1, -1 do
                     if type(data.TransportRoute[1]) == 'string' then
                         IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportRoute[i]))
                     else
@@ -1126,8 +1185,8 @@ function ReturnTransportsToPool(platoon, data)
             elseif data.TransportChain then
                 local transPositionChain = {}
                 transPositionChain = ScenarioUtils.ChainToPositions(data.TransportChain)
-                aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                for i=table.getn(transPositionChain), 1, -1 do
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, 'TransportPool', {unit}, 'Scout', 'None')
+                for i=tableGetn(transPositionChain), 1, -1 do
                     IssueMove({unit}, transPositionChain[i])
                 end
                 if data.TransportReturn then
@@ -1140,7 +1199,7 @@ function ReturnTransportsToPool(platoon, data)
                 -- Return to Transport Return if no route
             else
                 if data.TransportReturn then
-                    aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
+                    aibrain_methodsAssignUnitsToPlatoon(aiBrain, 'TransportPool', {unit}, 'Scout', 'None')
                     if type(data.TransportReturn) == 'string' then
                         IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportReturn))
                     else
@@ -1159,12 +1218,12 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
     local unitTable = data.NamedUnitBuild
     if unitTable then
         for num, unitName in unitTable do
-            local unit = ScenarioUtils.FindUnit(unitName, Scenario.Armies[aiBrain.Name].Units)
+            local unit = aibrain_methodsFindUnit(unitName, Scenario.Armies[aiBrain.Name].Units)
             if unit then
-                if aiBrain:CanBuildStructureAt(unit.type, unit.Position) then
+                if aibrain_methodsCanBuildStructureAt(aiBrain, unit.type, unit.Position) then
                     IssueStop({eng})
                     IssueClearCommands({eng})
-                    local result = aiBrain:BuildStructure(eng, unit.type, {unit.Position[1], unit.Position[3], 0}, false)
+                    local result = aibrain_methodsBuildStructure(aiBrain, eng, unit.type, {unit.Position[1], unit.Position[3], 0}, false)
                     if result then
                         unitBeingBuilt = eng.UnitBeingBuilt
                     end
@@ -1183,7 +1242,7 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
                                 data.NamedUnitBuildReportCallback(unitBeingBuilt, eng)
                             end
                         end
-                    until not (eng:IsUnitState('Building') or eng:IsUnitState('Repairing') or eng:IsUnitState('Moving' or eng:IsUnitState('Reclaiming')))
+                    until not (unit_methodsIsUnitState(eng, 'Building') or unit_methodsIsUnitState(eng, 'Repairing') or unit_methodsIsUnitState(eng, 'Moving' or unit_methodsIsUnitState(eng, 'Reclaiming')))
                     data.NamedUnitFinishedCallback(unitBeingBuilt)
                 end
             end
@@ -1202,10 +1261,10 @@ function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
             return true
         end
         for _, v in buildGroup do
-            if aiBrain:CanBuildStructureAt(v.type, v.Position) then
+            if aibrain_methodsCanBuildStructureAt(aiBrain, v.type, v.Position) then
                 IssueStop({eng})
                 IssueClearCommands({eng})
-                local result = aiBrain:BuildStructure(eng, v.type, {v.Position[1], v.Position[3], 0}, false)
+                local result = aibrain_methodsBuildStructure(aiBrain, eng, v.type, {v.Position[1], v.Position[3], 0}, false)
                 if result then
                     unitBeingBuilt = eng.UnitBeingBuilt
                 end
@@ -1219,7 +1278,7 @@ function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
                     else
                         unitBeingBuilt = eng.UnitBeingBuilt
                     end
-                until eng:IsIdleState()
+                until unit_methodsIsIdleState(eng)
             end
         end
     end
@@ -1242,11 +1301,11 @@ function StartBaseConstruction(eng, engTable, data, aiBrain)
             closeToBuilder = eng
         end
         for _, v in cons.BuildStructures do
-            if string.find(v, 'T2Air') or string.find(v, 'T3Air')
-                or string.find(v, 'T2Land') or string.find(v, 'T3Land')
-                or string.find(v, 'T2Naval') or string.find(v, 'T3Naval') then
-                v = string.gsub(v, '2', '1')
-                v = string.gsub(v, '3', '1')
+            if stringFind(v, 'T2Air') or stringFind(v, 'T3Air')
+                or stringFind(v, 'T2Land') or stringFind(v, 'T3Land')
+                or stringFind(v, 'T2Naval') or stringFind(v, 'T3Naval') then
+                v = stringGsub(v, '2', '1')
+                v = stringGsub(v, '3', '1')
             end
             EngineerBuildStructure(aiBrain, eng, v, baseTmpl, buildingTmpl)
             if eng.UnitBeingBuilt then
@@ -1262,7 +1321,7 @@ function StartBaseConstruction(eng, engTable, data, aiBrain)
                 else
                     unitBeingBuilt = eng.UnitBeingBuilt
                 end
-            until not (eng:IsUnitState('Building') or eng:IsUnitState('Repairing') or eng:IsUnitState('Moving') or eng:IsUnitState('Reclaiming'))
+            until not (unit_methodsIsUnitState(eng, 'Building') or unit_methodsIsUnitState(eng, 'Repairing') or unit_methodsIsUnitState(eng, 'Moving') or unit_methodsIsUnitState(eng, 'Reclaiming'))
         end
     end
     return true
@@ -1280,8 +1339,8 @@ function StartBaseBuildBase(eng, engTable, data, aiBrain)
             while not allBuilt do
                 local busy = false
                 if not eng.Dead then
-                    if eng:IsUnitState('Building') or eng:IsUnitState('Repairing')
-                        or eng:IsUnitState('Reclaiming') or eng:IsUnitState('Moving') then
+                    if unit_methodsIsUnitState(eng, 'Building') or unit_methodsIsUnitState(eng, 'Repairing')
+                        or unit_methodsIsUnitState(eng, 'Reclaiming') or unit_methodsIsUnitState(eng, 'Moving') then
                             busy = true
                     end
                     if not busy then
@@ -1320,7 +1379,7 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
             error('*SCENARIO PLATOON AI ERROR: Invalid basename - ' .. data.MaintainBaseTemplate, 2)
         end
     end
-    if not eng and aiBrain:PlatoonExists(platoon) then
+    if not eng and aibrain_methodsPlatoonExists(aiBrain, platoon) then
         eng, engTable = AssistOtherEngineer(eng, engTable, unitBeingBuilt)
         if not eng then
             return false
@@ -1329,8 +1388,8 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
     while data.MaintainBaseTemplate do
         local busy = false
         if eng and not eng.Dead then
-            if eng:IsUnitState('Building') or eng:IsUnitState('Reclaiming') or eng:IsUnitState('Repairing') or
-                              (eng:IsUnitState('Moving') and not eng:IsUnitState('Patrolling')) then
+            if unit_methodsIsUnitState(eng, 'Building') or unit_methodsIsUnitState(eng, 'Reclaiming') or unit_methodsIsUnitState(eng, 'Repairing') or
+                              (unit_methodsIsUnitState(eng, 'Moving') and not unit_methodsIsUnitState(eng, 'Patrolling')) then
                 busy = true
             elseif data.Busy then
                 data.Busy = false
@@ -1348,18 +1407,18 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
                 end
             end
         end
-        if (data.PatrolRoute or data.PatrolChain) and not busy and not (eng:IsUnitState('Moving')
-                             or eng:IsUnitState('Building')or eng:IsUnitState('Repairing')
-                             or eng:IsUnitState('Patrolling') or eng:IsUnitState('Reclaiming')) then
+        if (data.PatrolRoute or data.PatrolChain) and not busy and not (unit_methodsIsUnitState(eng, 'Moving')
+                             or unit_methodsIsUnitState(eng, 'Building')or unit_methodsIsUnitState(eng, 'Repairing')
+                             or unit_methodsIsUnitState(eng, 'Patrolling') or unit_methodsIsUnitState(eng, 'Reclaiming')) then
             local patrolPositions = {}
             if data.PatrolChain then
                 patrolPositions = ScenarioUtils.ChainToPositions(data.PatrolChain)
             else
                 for _, v in data.PatrolRoute do
                     if type(v) == 'string' then
-                        table.insert(patrolPositions, ScenarioUtils.MarkerToPosition(v))
+                        tableInsert(patrolPositions, ScenarioUtils.MarkerToPosition(v))
                     else
-                        table.insert(patrolPositions, v)
+                        tableInsert(patrolPositions, v)
                     end
                 end
             end
@@ -1374,7 +1433,7 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
             end
         end
         WaitSeconds(5)
-        if not aiBrain:PlatoonExists(platoon) then
+        if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
             return false
         end
         if eng and eng.Dead  then
@@ -1392,7 +1451,7 @@ end
 -- Utility Function
 -- Sends engineers on patrol for StartBaseEngineer
 function EngPatrol(eng, engTable, data)
-    table.insert(engTable, eng)
+    tableInsert(engTable, eng)
     -- Patrol an area if nothing else to do
     if data.PatrolRoute or data.PatrolChain then
         local patrolPositions = {}
@@ -1401,9 +1460,9 @@ function EngPatrol(eng, engTable, data)
         else
             for _, v in data.PatrolRoute do
                 if type(v) == 'string' then
-                    table.insert(patrolPositions, ScenarioUtils.MarkerToPosition(v))
+                    tableInsert(patrolPositions, ScenarioUtils.MarkerToPosition(v))
                 else
-                    table.insert(patrolPositions, v)
+                    tableInsert(patrolPositions, v)
                 end
             end
         end
@@ -1423,11 +1482,11 @@ end
 -- Utility Function
 -- Resets main engineer and engTablef or StartBaseEngineer
 function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
-    if engTable and not table.empty(engTable) then
+    if engTable and not tableEmpty(engTable) then
         for num, unit in engTable do
             if not unit.Dead then
-                eng = table.remove(engTable, num)
-                if not table.empty(engTable) then
+                eng = tableRemove(engTable, num)
+                if not tableEmpty(engTable) then
                     IssueGuard(engTable, eng)
                 end
                 if unitBeingBuilt and not unitBeingBuilt.Dead then
@@ -1461,10 +1520,10 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
             if type[1][1] == building.StructureType then
                 for m, location in type do
                     if m > 1 then
-                        if aiBrain:CanBuildStructureAt(structureCategory, {location[1], 0, location[2]}) then
+                        if aibrain_methodsCanBuildStructureAt(aiBrain, structureCategory, {location[1], 0, location[2]}) then
                             IssueStop({builder})
                             IssueClearCommands({builder})
-                            local result = aiBrain:BuildStructure(builder, structureCategory, location, false)
+                            local result = aibrain_methodsBuildStructure(aiBrain, builder, structureCategory, location, false)
                             if result then
                                 return true
                             end
@@ -1474,7 +1533,7 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
             end
         end
     else
-        if aiBrain:FindPlaceToBuild(building, structureCategory, brainBaseTemplate, false, nil) then
+        if aibrain_methodsFindPlaceToBuild(aiBrain, building, structureCategory, brainBaseTemplate, false, nil) then
             IssueStop({builder})
             IssueClearCommands({builder})
             if AIBuildStructures.AIExecuteBuildStructure(aiBrain, builder, building, builder, false,
@@ -1489,12 +1548,12 @@ end
 -- Utility Function
 -- Stops factory assisting when an eng platoon is maintaining a base
 function BreakOffFactoryAssist(platoon, data)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     if platoon.PlatoonData.FactoryAssistList then
         for listFacNum, listFac in platoon.PlatoonData.FactoryAssistList do
             local num = 1
-            while num <= table.getn(listFac.Engineers) do
-                table.remove(listFac.Engineers, num)
+            while num <= tableGetn(listFac.Engineers) do
+                tableRemove(listFac.Engineers, num)
                 listFac.NumEngs = listFac.NumEngs - 1
                 for brainFacNum, brainFacData in aiBrain.FactoryAssistList do
                     if brainFacData.Factory == listFac.Factory then
@@ -1510,7 +1569,7 @@ end
 -- Tell engineers to assist factories in a locationType
 function EngineersAssistFactories(platoon, locationType)
     locationType = locationType or platoon.PlatoonData.LocationType
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     local location, radius
     local needReorganize = true
     local reassignEngs = false
@@ -1531,34 +1590,34 @@ function EngineersAssistFactories(platoon, locationType)
 
     -- Find engineers
     local engTable = {}
-    for num, unit in platoon:GetPlatoonUnits() do
+    for num, unit in platoon_methodsGetPlatoonUnits(platoon) do
         if EntityCategoryContains(categories.CONSTRUCTION, unit) then
-            table.insert(engTable, unit)
-            table.insert(reassignEngPool, unit)
+            tableInsert(engTable, unit)
+            tableInsert(reassignEngPool, unit)
         end
     end
 
     -- Main loop for assisting below
 
     local newFactory = false
-    while aiBrain:PlatoonExists(platoon) do
+    while aibrain_methodsPlatoonExists(aiBrain, platoon) do
         if not platoon.PlatoonData.Busy then
             -- Check for dead factories
             local num = 1
-            while num <= table.getn(platoon.PlatoonData.FactoryAssistList) do
+            while num <= tableGetn(platoon.PlatoonData.FactoryAssistList) do
                 if platoon.PlatoonData.FactoryAssistList[num].Factory.Dead then
                     reassignEngs = true
                     for engNum, eng in platoon.PlatoonData.FactoryAssistList[num].Engineers do
-                        table.insert(reassignEngPool, eng)
+                        tableInsert(reassignEngPool, eng)
                     end
-                    table.remove(platoon.PlatoonData.FactoryAssistList, num)
+                    tableRemove(platoon.PlatoonData.FactoryAssistList, num)
                 else
                     num = num + 1
                 end
             end
 
             -- Find factories in the area belonging to proper brain
-            local tempFactories = aiBrain:GetUnitsAroundPoint(categories.FACTORY, location, radius, 'Ally')
+            local tempFactories = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.FACTORY, location, radius, 'Ally')
             for num, factory in tempFactories do
                 if factory:GetAIBrain() == aiBrain then
                     local found = false
@@ -1569,7 +1628,7 @@ function EngineersAssistFactories(platoon, locationType)
                         end
                     end
                     if not found then
-                        table.insert(platoon.PlatoonData.FactoryAssistList, {Factory = factory, Engineers = {}, NumEngs = 0 })
+                        tableInsert(platoon.PlatoonData.FactoryAssistList, {Factory = factory, Engineers = {}, NumEngs = 0 })
                         needReorganize = true
                     end
                 end
@@ -1586,7 +1645,7 @@ function EngineersAssistFactories(platoon, locationType)
                     end
                 end
                 if not found then
-                    table.insert(aiBrain.FactoryAssistList, {Factory = pltnFacData.Factory, NumEngs = 0})
+                    tableInsert(aiBrain.FactoryAssistList, {Factory = pltnFacData.Factory, NumEngs = 0})
                     pltnFacData.NumEngs = 0
                 else
                     pltnFacData.NumEngs = brainFacData.NumEngs
@@ -1595,16 +1654,16 @@ function EngineersAssistFactories(platoon, locationType)
 
             -- check for dead engineers
             local engNum = 1
-            while engNum < table.getn(engTable) do
+            while engNum < tableGetn(engTable) do
                 local eng = engTable[engNum]
                 if eng.Dead then
-                    table.remove(engTable, engNum)
+                    tableRemove(engTable, engNum)
                     -- Remove from platoon factory assist list
                     for facNum, facData in platoon.PlatoonData.FactoryAssistList do
                         for facEngNum, facEngData in facData.Engineers do
                             if eng == facEngData then
                                 facData.NumEngs = facData.NumEngs - 1
-                                table.remove(facData.Engineers, facEngNum)
+                                tableRemove(facData.Engineers, facEngNum)
                                 -- reduce number in global fac list
                                 for brainFacNum, brainFacData in aiBrain.FactoryAssistList do
                                     if brainFacData.Factory == facData.Factory then
@@ -1622,9 +1681,9 @@ function EngineersAssistFactories(platoon, locationType)
 
             -- If maintain base finished, reassign all engs
             if platoon.PlatoonData.ReassignAssist then
-                for num, unit in platoon:GetPlatoonUnits() do
+                for num, unit in platoon_methodsGetPlatoonUnits(platoon) do
                     if not unit.Dead and EntityCategoryContains(categories.CONSTRUCTION, unit) then
-                        table.insert(reassignEngPool, unit)
+                        tableInsert(reassignEngPool, unit)
                     end
                 end
             end
@@ -1646,7 +1705,7 @@ function EngineersAssistFactories(platoon, locationType)
                 ReorganizeEngineers(platoon, engTable)
             end
             -- Any leftovers?
-            if not table.empty(reassignEngPool) then
+            if not tableEmpty(reassignEngPool) then
                 EngAssist(platoon, reassignEngPool)
             end
 
@@ -1665,7 +1724,7 @@ end
 -- Reorganizes engineer assisting if there is an imbalance
 function ReorganizeEngineers(platoon, engTable)
     local unbalanced = true
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     local loopCounter = 0
     while unbalanced and loopCounter < 20 do
         loopCounter = loopCounter + 1
@@ -1686,12 +1745,12 @@ function ReorganizeEngineers(platoon, engTable)
             end
         end
         -- If difference is greater than 1 across factories: reorganize
-        if (facHighNum - facLowNum) > 1 and facHighData ~= facLowData and not table.empty(facHighData.Engineers) then
+        if (facHighNum - facLowNum) > 1 and facHighData ~= facLowData and not tableEmpty(facHighData.Engineers) then
             unbalanced = true
-            if not table.empty(facHighData.Engineers) then
+            if not tableEmpty(facHighData.Engineers) then
                 for engNum, engData in facHighData.Engineers do
                     if not engData.Dead then
-                        local moveEng = table.remove(facHighData.Engineers, engNum)
+                        local moveEng = tableRemove(facHighData.Engineers, engNum)
                         facHighData.NumEngs = facHighData.NumEngs - 1
                         -- Decrease number in global fac list
                         for brainFacNum, brainFacData in aiBrain.FactoryAssistList do
@@ -1720,10 +1779,10 @@ end
 -- Utility Function
 -- Assign engineers to factories to assist
 function EngAssist(platoon, engTable)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     -- Have engineers assist the factories
     local engNum = 1
-    while engNum <= table.getn(engTable) do
+    while engNum <= tableGetn(engTable) do
         eng = engTable[engNum]
         if not eng.Dead and not platoon.PlatoonData.Rebuilding then
             local lowNum = -1
@@ -1736,7 +1795,7 @@ function EngAssist(platoon, engTable)
             end
             -- Store eng with correct factory, update number, have engs assist
             if lowFac then
-                table.insert(lowFac.Engineers, eng)
+                tableInsert(lowFac.Engineers, eng)
                 lowFac.NumEngs = lowFac.NumEngs + 1
                 for brainNumFac, brainFacData in aiBrain.FactoryAssistList do
                     if lowFac.Factory == brainFacData.Factory then
@@ -1746,7 +1805,7 @@ function EngAssist(platoon, engTable)
                 end
                 IssueClearCommands({eng})
                 IssueGuard({eng}, lowFac.Factory)
-                table.remove(engTable, engNum)
+                tableRemove(engTable, engNum)
             else
                 engNum = engNum + 1
             end
@@ -1787,7 +1846,7 @@ function ReadyWaitVariables(data)
     if data.WaitVariable then
         while not ScenarioInfo.VarTable[data.WaitVariable] do
             WaitSeconds(5)
-            if not aiBrain:PlatoonExists(platoon) then
+            if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
                 return false
             end
         end
@@ -1804,20 +1863,20 @@ function GetLoadTransports(platoon)
     end
 
     platoon:Stop()
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
 
     -- Load transports
     local transportTable = {}
     local transSlotTable = {}
 
-    local scoutUnits = platoon:GetSquadUnits('scout') or {}
+    local scoutUnits = platoon_methodsGetSquadUnits(platoon, 'scout') or {}
 
     for num, unit in scoutUnits do
         local id = unit.UnitId
         if not transSlotTable[id] then
             transSlotTable[id] = GetNumTransportSlots(unit)
         end
-        table.insert(transportTable,
+        tableInsert(transportTable,
             {
                 Transport = unit,
                 LargeSlots = transSlotTable[id].Large,
@@ -1831,17 +1890,17 @@ function GetLoadTransports(platoon)
     local remainingSize3 = {}
     local remainingSize2 = {}
     local remainingSize1 = {}
-    for num, unit in platoon:GetPlatoonUnits() do
+    for num, unit in platoon_methodsGetPlatoonUnits(platoon) do
         if EntityCategoryContains(categories.url0306 + categories.DEFENSE, unit) then
-            table.insert(shields, unit)
+            tableInsert(shields, unit)
         elseif unit:GetBlueprint().Transport.TransportClass == 3 then
-            table.insert(remainingSize3, unit)
+            tableInsert(remainingSize3, unit)
         elseif unit:GetBlueprint().Transport.TransportClass == 2 then
-            table.insert(remainingSize2, unit)
+            tableInsert(remainingSize2, unit)
         elseif unit:GetBlueprint().Transport.TransportClass == 1 then
-            table.insert(remainingSize1, unit)
+            tableInsert(remainingSize1, unit)
         else
-            table.insert(remainingSize1, unit)
+            tableInsert(remainingSize1, unit)
         end
     end
 
@@ -1856,32 +1915,32 @@ function GetLoadTransports(platoon)
     transportTable, leftoverShields = SortUnitsOnTransports(transportTable, shields, largeHave - needed.Large)
     transportTable, leftoverUnits = SortUnitsOnTransports(transportTable, remainingSize3, -1)
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, leftoverShields, -1)
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do tableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, remainingSize2, -1)
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do tableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, remainingSize1, -1)
-    for _, v in currLeftovers do table.insert(leftoverUnits, v) end
+    for _, v in currLeftovers do tableInsert(leftoverUnits, v) end
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
     -- Old load transports
     local monitorUnits = {}
     for num, data in transportTable do
-        if not table.empty(data.Units) then
+        if not tableEmpty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
-            for _, v in data.Units do table.insert(monitorUnits, v) end
+            for _, v in data.Units do tableInsert(monitorUnits, v) end
         end
     end
 
     local attached = true
     repeat
         WaitSeconds(2)
-        if not aiBrain:PlatoonExists(platoon) then
+        if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
             return false
         end
         attached = true
         for _, v in monitorUnits do
-            if not v.Dead and not v:IsIdleState() then
+            if not v.Dead and not unit_methodsIsIdleState(v) then
                 attached = false
                 break
             end
@@ -1891,23 +1950,23 @@ function GetLoadTransports(platoon)
     -- Any units that aren't transports and aren't attached send back to pool
     local pool
     if platoon.PlatoonData.BuilderName and platoon.PlatoonData.LocationType then
-        pool = aiBrain:GetPlatoonUniquelyNamed(platoon.PlatoonData.LocationType..'_LeftoverUnits')
+        pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, platoon.PlatoonData.LocationType..'_LeftoverUnits')
         if not pool then
-            pool = aiBrain:MakePlatoon('', '')
-            pool:UniquelyNamePlatoon(platoon.PlatoonData.LocationType..'_LeftoverUnits')
+            pool = aibrain_methodsMakePlatoon(aiBrain, '', '')
+            platoon_methodsUniquelyNamePlatoon(pool, platoon.PlatoonData.LocationType..'_LeftoverUnits')
             if platoon.PlatoonData.AMPlatoons then
                 pool.PlatoonData.AMPlatoons = {platoon.PlatoonData.LocationType..'_LeftoverUnits'}
                 pool:SetPartOfAttackForce()
             end
         end
     else
-        pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+        pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     end
 
-    for _, unit in platoon:GetPlatoonUnits() do
+    for _, unit in platoon_methodsGetPlatoonUnits(platoon) do
         if not EntityCategoryContains(categories.TRANSPORTATION, unit) then
-            if not unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
+            if not unit_methodsIsUnitState(unit, 'Attached') then
+                aibrain_methodsAssignUnitsToPlatoon(aiBrain, pool, {unit}, 'Unassigned', 'None')
             end
         end
     end
@@ -1945,7 +2004,7 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
                 end
             end
             if transSlotNum > 0 then
-                table.insert(transportTable[transSlotNum].Units, unit)
+                tableInsert(transportTable[transSlotNum].Units, unit)
                 if unit:GetBlueprint().Transport.TransportClass == 3 and remainingLarge >= 1 then
                     transportTable[transSlotNum].LargeSlots = transportTable[transSlotNum].LargeSlots - 1
                     transportTable[transSlotNum].MediumSlots = transportTable[transSlotNum].MediumSlots - 2
@@ -1961,10 +2020,10 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
                 elseif remainingSml > 0 then
                     transportTable[transSlotNum].SmallSlots = transportTable[transSlotNum].SmallSlots - 1
                 else
-                    table.insert(leftoverUnits, unit)
+                    tableInsert(leftoverUnits, unit)
                 end
             else
-                table.insert(leftoverUnits, unit)
+                tableInsert(leftoverUnits, unit)
             end
         end
     end
@@ -1977,15 +2036,15 @@ function GetRandomPatrolRoute(patrol)
     local randPatrol = {}
     local tempPatrol = {}
     for _, v in patrol do
-        table.insert(tempPatrol, v)
+        tableInsert(tempPatrol, v)
     end
 
-    local num = table.getn(tempPatrol)
+    local num = tableGetn(tempPatrol)
     local rand
     for i = 1, num do
         rand = Random(1, num + 1 - i)
-        table.insert(randPatrol, tempPatrol[rand])
-        table.remove(tempPatrol, rand)
+        tableInsert(randPatrol, tempPatrol[rand])
+        tableRemove(tempPatrol, rand)
     end
 
     return randPatrol
@@ -2000,7 +2059,7 @@ function PlatoonChooseLowestNonNegative(aiBrain, locationList, ringSize, locatio
     local locationSet = false
 
     for _, v in locationList do
-        currThreat = aiBrain:GetThreatAtPosition(v, ringSize, true)
+        currThreat = aibrain_methodsGetThreatAtPosition(aiBrain, v, ringSize, true)
         WaitSeconds(0.1)
         if not location or location ~= v then
             if (currThreat < bestThreat and currThreat > 0) or not locationSet then
@@ -2026,7 +2085,7 @@ function PlatoonChooseLowest(aiBrain, locationList, ringSize, location)
     local currThreat = 0
 
     for _, v in locationList do
-        currThreat = aiBrain:GetThreatAtPosition(v, ringSize, true)
+        currThreat = aibrain_methodsGetThreatAtPosition(aiBrain, v, ringSize, true)
         WaitSeconds(0.1)
         if not location or location ~= v then
             if (currThreat < bestThreat) or not locationSet then
@@ -2051,7 +2110,7 @@ function PlatoonChooseHighest(aiBrain, locationList, ringSize, location)
     local currThreat = 0
 
     for _, v in locationList do
-        currThreat = aiBrain:GetThreatAtPosition(v, ringSize, true)
+        currThreat = aibrain_methodsGetThreatAtPosition(aiBrain, v, ringSize, true)
         WaitSeconds(0.1)
         if currThreat > highestThreat and (not location or location ~= v) then
             highestThreat = currThreat
@@ -2067,14 +2126,14 @@ end
 function PlatoonChooseRandomNonNegative(aiBrain, locationList, ringSize)
     local landingList = {}
     for _, v in locationList do
-        if aiBrain:GetThreatAtPosition(v, ringSize, true) > 0 then
+        if aibrain_methodsGetThreatAtPosition(aiBrain, v, ringSize, true) > 0 then
             WaitSeconds(0.1)
-            table.insert(landingList, v)
+            tableInsert(landingList, v)
         end
     end
-    local loc = landingList[Random(1, table.getn(landingList))]
+    local loc = landingList[Random(1, tableGetn(landingList))]
     if not loc then
-        loc = locationList[Random(1, table.getn(locationList))]
+        loc = locationList[Random(1, tableGetn(locationList))]
     end
     return loc
 end
@@ -2086,15 +2145,15 @@ function PlatoonChooseHighestAttackRoute(aiBrain, locationList, ringSize)
     local tempRoute = {}
 
     for _, v in locationList do
-        table.insert(tempRoute, v)
+        tableInsert(tempRoute, v)
     end
 
-    local num = table.getn(tempRoute)
+    local num = tableGetn(tempRoute)
     for i = 1, num do
-        table.insert(attackRoute, PlatoonChooseHighest(aiBrain, tempRoute, ringSize))
+        tableInsert(attackRoute, PlatoonChooseHighest(aiBrain, tempRoute, ringSize))
         for k, v in tempRoute do
             if attackRoute[i] == v then
-                table.remove(tempRoute, k)
+                tableRemove(tempRoute, k)
                 break
             end
         end
@@ -2110,15 +2169,15 @@ function PlatoonChooseLowestAttackRoute(aiBrain, locationList, ringSize)
     local tempRoute = {}
 
     for _, v in locationList do
-        table.insert(tempRoute, v)
+        tableInsert(tempRoute, v)
     end
 
-    local num = table.getn(tempRoute)
+    local num = tableGetn(tempRoute)
     for i = 1, num do
-        table.insert(attackRoute, PlatoonChooseLowestNonNegative(aiBrain, tempRoute, ringSize))
+        tableInsert(attackRoute, PlatoonChooseLowestNonNegative(aiBrain, tempRoute, ringSize))
         for k, v in tempRoute do
             if attackRoute[i] == v then
-                table.remove(tempRoute, k)
+                tableRemove(tempRoute, k)
                 break
             end
         end
@@ -2131,7 +2190,7 @@ end
 -- Function that gets the correct number of transports for a platoon
 function GetTransportsThread(platoon)
     local data = platoon.PlatoonData
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
 
     local neededTable = GetNumTransports(platoon)
     local numTransports = 0
@@ -2142,10 +2201,10 @@ function GetTransportsThread(platoon)
     local transSlotTable = {}
 
     if transportsNeeded then
-        local pool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
+        local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'TransportPool')
         if not pool then
-            pool = aiBrain:MakePlatoon('None', 'None')
-            pool:UniquelyNamePlatoon('TransportPool')
+            pool = aibrain_methodsMakePlatoon(aiBrain, 'None', 'None')
+            platoon_methodsUniquelyNamePlatoon(pool, 'TransportPool')
         end
         while transportsNeeded do
             neededTable = GetNumTransports(platoon)
@@ -2155,7 +2214,7 @@ function GetTransportsThread(platoon)
             tempNeeded.Medium = neededTable.Medium
             tempNeeded.Large = neededTable.Large
             -- Find out how many units are needed currently
-            for _, v in platoon:GetPlatoonUnits() do
+            for _, v in platoon_methodsGetPlatoonUnits(platoon) do
                 if not v.Dead then
                     if EntityCategoryContains(categories.TRANSPORTATION, v) then
                         local id = v.UnitId
@@ -2188,21 +2247,21 @@ function GetTransportsThread(platoon)
                 end
             end
             if transportsNeeded then
-                local location = platoon:GetPlatoonPosition()
+                local location = platoon_methodsGetPlatoonPosition(platoon)
                 local transports = {}
                 -- Determine distance of transports from platoon
-                for _, unit in pool:GetPlatoonUnits() do
-                    if EntityCategoryContains(categories.TRANSPORTATION, unit) and not unit:IsUnitState('Busy') then
+                for _, unit in platoon_methodsGetPlatoonUnits(pool) do
+                    if EntityCategoryContains(categories.TRANSPORTATION, unit) and not unit_methodsIsUnitState(unit, 'Busy') then
                         local unitPos = unit:GetPosition()
                         local curr = {Unit=unit, Distance=VDist2(unitPos[1], unitPos[3], location[1], location[3]),
                                        Id = unit.UnitId}
-                        table.insert(transports, curr)
+                        tableInsert(transports, curr)
                     end
                 end
-                if not table.empty(transports) then
+                if not tableEmpty(transports) then
                     local sortedList = {}
                     -- Sort distances
-                    for k = 1, table.getn(transports) do
+                    for k = 1, tableGetn(transports) do
                         local lowest = -1
                         local key, value
                         for j, u in transports do
@@ -2214,13 +2273,13 @@ function GetTransportsThread(platoon)
                         end
                         sortedList[k] = value
                         -- Remove from unsorted table
-                        table.remove(transports, key)
+                        tableRemove(transports, key)
                     end
                     -- Take transports as needed
-                    for i = 1, table.getn(sortedList) do
+                    for i = 1, tableGetn(sortedList) do
                         if transportsNeeded then
                             local id = sortedList[i].Id
-                            aiBrain:AssignUnitsToPlatoon(platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
+                            aibrain_methodsAssignUnitsToPlatoon(aiBrain, platoon, {sortedList[i].Unit}, 'Scout', 'GrowthFormation')
                             numTransports = numTransports + 1
                             if not transSlotTable[id] then
                                 transSlotTable[id] = GetNumTransportSlots(sortedList[i].Unit)
@@ -2254,11 +2313,11 @@ function GetTransportsThread(platoon)
             end
             if transportsNeeded then
                 WaitSeconds(7)
-                if not aiBrain:PlatoonExists(platoon) then
+                if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
                     return false
                 end
                 local unitFound = false
-                for _, unit in platoon:GetPlatoonUnits() do
+                for _, unit in platoon_methodsGetPlatoonUnits(platoon) do
                     if not EntityCategoryContains(categories.TRANSPORTATION, unit) then
                         unitFound = true
                         break
@@ -2283,7 +2342,7 @@ function GetNumTransports(platoon)
         Large = 0,
     }
     local transportClass
-    for _, v in platoon:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(platoon) do
         transportClass = v:GetBlueprint().Transport.TransportClass
         if transportClass == 1 then
             transportNeeded.Small = transportNeeded.Small + 1
@@ -2309,11 +2368,11 @@ function GetNumTransportSlots(unit)
     }
     for i = 1, unit:GetBoneCount() do
         if unit:GetBoneName(i) ~= nil then
-            if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
+            if stringFind(unit:GetBoneName(i), 'Attachpoint_Lrg') then
                 bones.Large = bones.Large + 1
-            elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
+            elseif stringFind(unit:GetBoneName(i), 'Attachpoint_Med') then
                 bones.Medium = bones.Medium + 1
-            elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
+            elseif stringFind(unit:GetBoneName(i), 'Attachpoint') then
                 bones.Small = bones.Small + 1
             end
         end
@@ -2324,12 +2383,12 @@ end
 -- Utility Function
 -- NOT USED - Creates a route to something
 function GetRouteToVector(platoon, squad)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     local data = platoon.PlatoonData
 
     -- All vectors in the table
-    aiBrain:SetUpAttackVectorsToArmy()
-    local vectorTable = aiBrain:GetAttackVectors()
+    aibrain_methodsSetUpAttackVectorsToArmy(aiBrain)
+    local vectorTable = aibrain_methodsGetAttackVectors(aiBrain)
     local lowX = 10000
     local lowZ = 10000
     local highX = -1
@@ -2350,8 +2409,8 @@ function GetRouteToVector(platoon, squad)
     end
 
     -- Check if route needs to be generated
-    local atkVector = aiBrain:PickBestAttackVector(platoon, squad, 'Enemy', data.CompareCategory, data.CompareType)
-    local pltPosition = platoon:GetSquadPosition(squad)
+    local atkVector = aibrain_methodsPickBestAttackVector(aiBrain, platoon, squad, 'Enemy', data.CompareCategory, data.CompareType)
+    local pltPosition = platoon_methodsGetSquadPosition(platoon, squad)
     local moveEW, moveNS
     if lowX > pltPosition[1] and lowX < atkVector[1] then
         moveEW = true
@@ -2395,18 +2454,18 @@ end
 -- Moves a platoon along a route holding up the thread until finished
 function MoveAlongRoute(platoon, route)
     local cmd = false
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
 
     -- Move platoon along route
     for _, v in route do
-        cmd = platoon:MoveToLocation(v, false)
+        cmd = platoon_methodsMoveToLocation(platoon, v, false)
     end
 
     -- Make sure we have a command then check if commands are finished every second
     if cmd then
-        while platoon:IsCommandsActive(cmd) do
+        while platoon_methodsIsCommandsActive(platoon, cmd) do
             WaitSeconds(1)
-            if not aiBrain:PlatoonExists(platoon) then
+            if not aibrain_methodsPlatoonExists(aiBrain, platoon) then
                 return false
             end
         end

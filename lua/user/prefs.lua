@@ -6,6 +6,12 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+local ipairs = ipairs
+local tableEmpty = table.empty
+local tableInsert = table.insert
+local next = next
+local tableGetn = table.getn
+
 local optionsLogic = import('/lua/options/optionsLogic.lua')
 
 if not GetPreference('debug.enable_debug_facilities') then
@@ -21,7 +27,7 @@ end
 -- check if there are any profiles defined
 function ProfilesExist()
     local profiles = GetPreference("profile.profiles")
-    if (not profiles) or (table.empty(profiles)) then
+    if (not profiles) or (tableEmpty(profiles)) then
         return false
     end
     return true
@@ -30,7 +36,7 @@ end
 function GetProfileCount()
     local profiles = GetPreference("profile.profiles")
     if profiles then
-        return table.getn(profiles)
+        return tableGetn(profiles)
     else
         return 0
     end
@@ -63,8 +69,8 @@ function CreateProfile(name)
     end
 
     if foundName == 0 then
-        table.insert(profiles, {Name = name})
-        SetPreference("profile.current", table.getn(profiles)) -- table.insert adds to the end of the table
+        tableInsert(profiles, {Name = name})
+        SetPreference("profile.current", tableGetn(profiles)) -- table.insert adds to the end of the table
     else
         return false
     end

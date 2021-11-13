@@ -7,6 +7,13 @@
 --**
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+local aibrain_methodsGetEconomyStored = moho.aibrain_methods.GetEconomyStored
+local unit_methodsRemoveToggleCap = moho.unit_methods.RemoveToggleCap
+local unit_methodsAddToggleCap = moho.unit_methods.AddToggleCap
+local Warp = Warp
+local aibrain_methodsTakeResource = moho.aibrain_methods.TakeResource
+local unit_methodsGetResourceConsumed = moho.unit_methods.GetResourceConsumed
+
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
 -- TODO: make sure each new instance is using a previous metatable
@@ -37,27 +44,27 @@ function RemoteViewing(SuperClass)
         DisableRemoteViewingButtons = function(self)
             self.Sync.Abilities = self:GetBlueprint().Abilities
             self.Sync.Abilities.TargetLocation.Active = false
-            self:RemoveToggleCap('RULEUTC_IntelToggle')
+            unit_methodsRemoveToggleCap(self, 'RULEUTC_IntelToggle')
         end,
 
         EnableRemoteViewingButtons = function(self)
             self.Sync.Abilities = self:GetBlueprint().Abilities
             self.Sync.Abilities.TargetLocation.Active = true
-            self:AddToggleCap('RULEUTC_IntelToggle')
+            unit_methodsAddToggleCap(self, 'RULEUTC_IntelToggle')
         end,
 
         OnTargetLocation = function(self, location)
             -- Initial energy drain here - we drain resources instantly when an eye is relocated (including initial move)
             local aiBrain = self:GetAIBrain()
             local bp = self:GetBlueprint()
-            local have = aiBrain:GetEconomyStored('ENERGY')
+            local have = aibrain_methodsGetEconomyStored(aiBrain, 'ENERGY')
             local need = bp.Economy.InitialRemoteViewingEnergyDrain
             if not ( have > need ) then
                 return
             end
 
             -- Drain economy here
-            aiBrain:TakeResource( 'ENERGY', bp.Economy.InitialRemoteViewingEnergyDrain )
+            aibrain_methodsTakeResource(aiBrain,  'ENERGY', bp.Economy.InitialRemoteViewingEnergyDrain )
 
             self.RemoteViewingData.VisibleLocation = location
             self:CreateVisibleEntity()
@@ -140,10 +147,10 @@ function RemoteViewing(SuperClass)
 
         DisableResourceMonitor = function(self)
             WaitSeconds(0.5)
-            local fraction = self:GetResourceConsumed()
+            local fraction = unit_methodsGetResourceConsumed(self)
             while fraction == 1 do
                 WaitSeconds(0.5)
-                fraction = self:GetResourceConsumed()
+                fraction = unit_methodsGetResourceConsumed(self)
             end
             if self.RemoteViewingData.IntelButton then
                 self.RemoteViewingData.DisableCounter = self.RemoteViewingData.DisableCounter + 1

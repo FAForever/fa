@@ -10,6 +10,42 @@
 ---------------------------------------------------------------------------
 -- TERRAN DEFAULT UNITS
 ---------------------------------------------------------------------------
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local unit_methodsGetConsumptionPerSecondEnergy = moho.unit_methods.GetConsumptionPerSecondEnergy
+local unit_methodsSetConsumptionPerSecondEnergy = moho.unit_methods.SetConsumptionPerSecondEnergy
+local NotifyUpgrade = NotifyUpgrade
+local unit_methodsGetConsumptionPerSecondMass = moho.unit_methods.GetConsumptionPerSecondMass
+local CreateAnimator = CreateAnimator
+local ipairs = ipairs
+local unit_methodsRequestRefreshUI = moho.unit_methods.RequestRefreshUI
+local unit_methodsGetPosition = moho.unit_methods.GetPosition
+local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
+local unit_methodsGetNumBuildOrders = moho.unit_methods.GetNumBuildOrders
+local scenarioframeworkUp = import('/lua/ScenarioFramework.lua')
+local coroutineYield = coroutine.yield
+local WaitFor = WaitFor
+local unit_methodsSetMesh = moho.unit_methods.SetMesh
+local CreateRotator = CreateRotator
+local AnimationManipulatorSetAnimationFraction = moho.AnimationManipulator.SetAnimationFraction
+local unit_methodsSetConsumptionActive = moho.unit_methods.SetConsumptionActive
+local tableCopy = table.copy
+local unit_methodsSetDoNotTarget = moho.unit_methods.SetDoNotTarget
+local ForkThread = ForkThread
+local unit_methodsGetAIBrain = moho.unit_methods.GetAIBrain
+local RotateManipulatorSetTargetSpeed = moho.RotateManipulator.SetTargetSpeed
+local next = next
+local unit_methodsSetWorkProgress = moho.unit_methods.SetWorkProgress
+local KillThread = KillThread
+local unit_methodsGetBlueprint = moho.unit_methods.GetBlueprint
+local unit_methodsGetResourceConsumed = moho.unit_methods.GetResourceConsumed
+local unit_methodsDestroy = moho.unit_methods.Destroy
+local AnimationManipulatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local CreateAttachedEmitter = CreateAttachedEmitter
+local unit_methodsSetConsumptionPerSecondMass = moho.unit_methods.SetConsumptionPerSecondMass
+local CreateUnitHPR = CreateUnitHPR
+local unit_methodsGetCargo = moho.unit_methods.GetCargo
+local unit_methodsHideBone = moho.unit_methods.HideBone
+
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -62,7 +98,7 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
 
     OnUnpaused = function(self)
         AirFactoryUnit.OnUnpaused(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
+        if unit_methodsGetNumBuildOrders(self, categories.ALLUNITS) > 0 and not unit_methodsIsUnitState(self, 'Upgrading') then
             self:StartArmsMoving()
         end
     end,
@@ -130,7 +166,7 @@ TConstructionUnit = Class(ConstructionUnit) {
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self:GetBlueprint().Display.AnimationWater then
+        if unit_methodsGetBlueprint(self).Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -148,11 +184,11 @@ TConstructionUnit = Class(ConstructionUnit) {
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self:GetBlueprint().Display.AnimationWater)
-            self.TransformManipulator:SetRate(1)
+            AnimationManipulatorPlayAnim(self.TransformManipulator, unit_methodsGetBlueprint(self).Display.AnimationWater)
+            AnimationManipulatorSetRate(self.TransformManipulator, 1)
             self.TransformManipulator:SetPrecedence(0)
         else
-            self.TransformManipulator:SetRate(-1)
+            AnimationManipulatorSetRate(self.TransformManipulator, -1)
             self.TransformManipulator:SetPrecedence(0)
             WaitFor(self.TransformManipulator)
             self.TransformManipulator:Destroy()
@@ -214,9 +250,9 @@ TMassStorageUnit = Class(MassStorageUnit) {}
 --------------------------------------------------------------
 TMobileFactoryUnit = Class(LandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
-            self:HideBone(0, true)
+        unit_methodsSetMesh(self, unit_methodsGetBlueprint(self).Display.BuildMeshBlueprint, true)
+        if unit_methodsGetBlueprint(self).General.UpgradesFrom  ~= builder.UnitId then
+            unit_methodsHideBone(self, 0, true)
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,
@@ -251,7 +287,7 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnUnpaused = function(self)
         SeaFactoryUnit.OnUnpaused(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') then
+        if unit_methodsGetNumBuildOrders(self, categories.ALLUNITS) > 0 and not unit_methodsIsUnitState(self, 'Upgrading') then
             self:StartArmsMoving()
         end
     end,
@@ -317,12 +353,12 @@ TRadarJammerUnit = Class(RadarJammerUnit) {
             self.Trash:Add(self.MySpinner)
         end
         RadarJammerUnit.OnIntelEnabled(self)
-        self.MySpinner:SetTargetSpeed(180)
+        RotateManipulatorSetTargetSpeed(self.MySpinner, 180)
     end,
 
     OnIntelDisabled = function(self)
         RadarJammerUnit.OnIntelDisabled(self)
-        self.MySpinner:SetTargetSpeed(0)
+        RotateManipulatorSetTargetSpeed(self.MySpinner, 0)
     end,
 }
 
@@ -397,7 +433,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
                 -- store off the pod name so we can give to new unit
                 local podName = k
-                local newPod = import('/lua/ScenarioFramework.lua').GiveUnitToArmy(v.PodHandle, captor.Army)
+                local newPod = scenarioframeworkUp.GiveUnitToArmy(v.PodHandle, captor.Army)
                 newPod.PodName = podName
 
                 -- create a callback for when the unit is flipped.  set creator for the new pod to the new tower
@@ -428,7 +464,7 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         TStructureUnit.OnStartBuild(self,unitBeingBuilt,order)
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = unit_methodsGetBlueprint(self).General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             self.NowUpgrading = true
             ChangeState(self, self.UpgradingState)
@@ -440,7 +476,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
 
     SetPodConsumptionRebuildRate = function(self, podData)
-        local bp = self:GetBlueprint()
+        local bp = unit_methodsGetBlueprint(self)
         -- Get build rate of tower
         local buildRate = bp.Economy.BuildRate
 
@@ -448,22 +484,22 @@ TPodTowerUnit = Class(TStructureUnit) {
         local mass_rate = (podData.BuildCostMass / podData.BuildTime) * buildRate
 
         -- Set Consumption - Buff system will replace this here
-        self:SetConsumptionPerSecondEnergy(energy_rate)
-        self:SetConsumptionPerSecondMass(mass_rate)
-        self:SetConsumptionActive(true)
+        unit_methodsSetConsumptionPerSecondEnergy(self, energy_rate)
+        unit_methodsSetConsumptionPerSecondMass(self, mass_rate)
+        unit_methodsSetConsumptionActive(self, true)
     end,
 
     CreatePod = function(self, podName)
-        local location = self:GetPosition(self.PodData[podName].PodAttachpoint)
+        local location = unit_methodsGetPosition(self, self.PodData[podName].PodAttachpoint)
         self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)
         self.PodData[podName].PodHandle:SetParent(self, podName)
         self.PodData[podName].Active = true
     end,
 
     OnTransportAttach = function(self, bone, attachee)
-        attachee:SetDoNotTarget(true)
+        unit_methodsSetDoNotTarget(attachee, true)
         self:PlayUnitSound('Close')
-        self:RequestRefreshUI()
+        unit_methodsRequestRefreshUI(self)
         local PodPresent = 0
         for _, v in self.PodData or {} do
             if v.Active then
@@ -471,33 +507,33 @@ TPodTowerUnit = Class(TStructureUnit) {
             end
         end
         local PodAttached = 0
-        for _, v in self:GetCargo() do
+        for _, v in unit_methodsGetCargo(self) do
             PodAttached = PodAttached + 1
         end
         if PodAttached == PodPresent and self.OpeningAnimationStarted then
-            local bp = self:GetBlueprint()
+            local bp = unit_methodsGetBlueprint(self)
             if not self.OpenAnim then return end
-            self.OpenAnim:SetRate(1.5)
+            AnimationManipulatorSetRate(self.OpenAnim, 1.5)
             self.OpeningAnimationStarted = false
         end
     end,
 
     OnTransportDetach = function(self, bone, attachee)
-        attachee:SetDoNotTarget(false)
+        unit_methodsSetDoNotTarget(attachee, false)
         self:PlayUnitSound('Open')
-        self:RequestRefreshUI()
+        unit_methodsRequestRefreshUI(self)
         if not self.OpeningAnimationStarted then
             self.OpeningAnimationStarted = true
-            local bp = self:GetBlueprint()
+            local bp = unit_methodsGetBlueprint(self)
             if not self.OpenAnim then
                 self.OpenAnim = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnim)
             end
-            self.OpenAnim:PlayAnim(bp.Display.AnimationOpen, false):SetRate(2.0)
+            AnimationManipulatorPlayAnim(self.OpenAnim, bp.Display.AnimationOpen, false):SetRate(2.0)
             -- wait 5 ticks and stop the animation so that the doors stay open
             ForkThread(function ()
-                coroutine.yield(5)
-                self.OpenAnim:SetRate(0)
+                coroutineYield(5)
+                AnimationManipulatorSetRate(self.OpenAnim, 0)
             end)
         end
     end,
@@ -505,19 +541,19 @@ TPodTowerUnit = Class(TStructureUnit) {
     FinishedBeingBuilt = State {
         Main = function(self)
             -- Wait one tick to make sure this wasn't captured and we don't create an extra pod
-            coroutine.yield(1)
+            coroutineYield(1)
 
             -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
             -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
             -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
             self.TowerCaptured = nil
-            local bp = self:GetBlueprint()
+            local bp = unit_methodsGetBlueprint(self)
             for _, v in bp.Economy.EngineeringPods do
                 if v.CreateWithUnit and not self.PodData[v.PodName].Active then
                     if not self.PodData then
                         self.PodData = {}
                     end
-                    self.PodData[v.PodName] = table.copy(v)
+                    self.PodData[v.PodName] = tableCopy(v)
                     self:CreatePod(v.PodName)
                 end
             end
@@ -533,13 +569,13 @@ TPodTowerUnit = Class(TStructureUnit) {
                 self:SetPodConsumptionRebuildRate(self.PodData[ self.Rebuilding ])
                 ChangeState(self, self.RebuildingPodState)
             end
-            local bp = self:GetBlueprint()
+            local bp = unit_methodsGetBlueprint(self)
             while true and not self.Rebuilding do
                 for _, v in bp.Economy.EngineeringPods do
                     -- Check if all the pods are active
                     if not self.PodData[v.PodName].Active then
                         -- Cost of new pod
-                        local podBP = self:GetAIBrain():GetUnitBlueprint(v.PodUnitID)
+                        local podBP = unit_methodsGetAIBrain(self):GetUnitBlueprint(v.PodUnitID)
                         self.PodData[v.PodName].EnergyRemain = podBP.Economy.BuildCostEnergy
                         self.PodData[v.PodName].MassRemain = podBP.Economy.BuildCostMass
 
@@ -553,11 +589,11 @@ TPodTowerUnit = Class(TStructureUnit) {
 
                         -- Change to RebuildingPodState
                         self.Rebuilding = v.PodName
-                        self:SetWorkProgress(0.01)
+                        unit_methodsSetWorkProgress(self, 0.01)
                         ChangeState(self, self.RebuildingPodState)
                     end
                 end
-                coroutine.yield(1)
+                coroutineYield(1)
             end
         end,
 
@@ -574,14 +610,14 @@ TPodTowerUnit = Class(TStructureUnit) {
                 WaitTicks(1)
                 -- While the pod being built isn't finished
                 -- Update mass and energy given to new pod - update build bar
-                local fraction = self:GetResourceConsumed()
-                local energy = self:GetConsumptionPerSecondEnergy() * fraction * 0.1
-                local mass = self:GetConsumptionPerSecondMass() * fraction * 0.1
+                local fraction = unit_methodsGetResourceConsumed(self)
+                local energy = unit_methodsGetConsumptionPerSecondEnergy(self) * fraction * 0.1
+                local mass = unit_methodsGetConsumptionPerSecondMass(self) * fraction * 0.1
 
                 self.PodData[ self.Rebuilding ].EnergyRemain = self.PodData[ self.Rebuilding ].EnergyRemain - energy
                 self.PodData[ self.Rebuilding ].MassRemain = self.PodData[ self.Rebuilding ].MassRemain - mass
 
-                self:SetWorkProgress((self.PodData[ self.Rebuilding ].BuildCostMass - self.PodData[ self.Rebuilding ].MassRemain) / self.PodData[ self.Rebuilding ].BuildCostMass)
+                unit_methodsSetWorkProgress(self, (self.PodData[ self.Rebuilding ].BuildCostMass - self.PodData[ self.Rebuilding ].MassRemain) / self.PodData[ self.Rebuilding ].BuildCostMass)
 
                 if (self.PodData[ self.Rebuilding ].EnergyRemain <= 0) and (self.PodData[ self.Rebuilding ].MassRemain <= 0) then
                     rebuildFinished = true
@@ -591,18 +627,18 @@ TPodTowerUnit = Class(TStructureUnit) {
             -- create pod, deactivate consumption, clear building
             self:CreatePod(self.Rebuilding)
             self.Rebuilding = false
-            self:SetWorkProgress(0)
-            self:SetConsumptionPerSecondEnergy(0)
-            self:SetConsumptionPerSecondMass(0)
-            self:SetConsumptionActive(false)
+            unit_methodsSetWorkProgress(self, 0)
+            unit_methodsSetConsumptionPerSecondEnergy(self, 0)
+            unit_methodsSetConsumptionPerSecondMass(self, 0)
+            unit_methodsSetConsumptionActive(self, false)
 
             ChangeState(self, self.MaintainPodsState)
         end,
 
         OnProductionPaused = function(self)
-            self:SetConsumptionPerSecondEnergy(0)
-            self:SetConsumptionPerSecondMass(0)
-            self:SetConsumptionActive(false)
+            unit_methodsSetConsumptionPerSecondEnergy(self, 0)
+            unit_methodsSetConsumptionPerSecondMass(self, 0)
+            unit_methodsSetConsumptionActive(self, false)
             ChangeState(self, self.PausedState)
         end,
     },
@@ -620,7 +656,7 @@ TPodTowerUnit = Class(TStructureUnit) {
     UpgradingState = State {
         Main = function(self)
             self:StopRocking()
-            local bp = self:GetBlueprint().Display
+            local bp = unit_methodsGetBlueprint(self).Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()
@@ -630,15 +666,15 @@ TPodTowerUnit = Class(TStructureUnit) {
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
                 self:StartUpgradeEffects(unitBuilding)
-                self.AnimatorUpgradeManip:PlayAnim(bp.AnimationUpgrade, false):SetRate(0)
+                AnimationManipulatorPlayAnim(self.AnimatorUpgradeManip, bp.AnimationUpgrade, false):SetRate(0)
 
                 while fractionOfComplete < 1 and not self.Dead do
                     fractionOfComplete = unitBuilding:GetFractionComplete()
-                    self.AnimatorUpgradeManip:SetAnimationFraction(fractionOfComplete)
+                    AnimationManipulatorSetAnimationFraction(self.AnimatorUpgradeManip, fractionOfComplete)
                     WaitTicks(1)
                 end
                 if not self.Dead then
-                    self.AnimatorUpgradeManip:SetRate(1)
+                    AnimationManipulatorSetRate(self.AnimatorUpgradeManip, 1)
                 end
             end
         end,
@@ -665,7 +701,7 @@ TPodTowerUnit = Class(TStructureUnit) {
                         v.Active = false
                     end
                 end
-                self:Destroy()
+                unit_methodsDestroy(self)
             end
         end,
 

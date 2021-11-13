@@ -8,6 +8,19 @@
 --
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
+local ipairs = ipairs
+local aibrain_methodsGetEconomyStoredRatio = moho.aibrain_methods.GetEconomyStoredRatio
+local tableEmpty = table.empty
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local aibrain_methodsGetNoRushTicks = moho.aibrain_methods.GetNoRushTicks
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local GetGameTimeSeconds = GetGameTimeSeconds
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local aibrain_methodsGetMapWaterRatio = moho.aibrain_methods.GetMapWaterRatio
+local GetMapSize = GetMapSize
+local next = next
+local Random = Random
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Utils = import('/lua/utilities.lua')
 
@@ -239,7 +252,7 @@ end
 ------------------------------------------------------------------------------
 function ReclaimablesInArea(aiBrain, locType)
     --DUNCAN - was .9. Reduced as dont need to reclaim yet if plenty of mass
-    if aiBrain:GetEconomyStoredRatio('MASS') > .7 then
+    if aibrain_methodsGetEconomyStoredRatio(aiBrain, 'MASS') > .7 then
         return false
     end
 
@@ -249,7 +262,7 @@ function ReclaimablesInArea(aiBrain, locType)
     --end
 
     local ents = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
-    if ents and not table.empty(ents) then
+    if ents and not tableEmpty(ents) then
         return true
     end
 
@@ -285,7 +298,7 @@ function CheckAvailableGates(aiBrain, locType)
         return false
     else
         for k,v in gates do
-            if not v:IsUnitState('TransportLoading') then
+            if not unit_methodsIsUnitState(v, 'TransportLoading') then
                 return true
             end
         end
@@ -303,7 +316,7 @@ end
 --
 ------------------------------------------------------------------------------
 function GreaterThanMapWaterRatio(aiBrain, num)
-    local ratio = aiBrain:GetMapWaterRatio()
+    local ratio = aibrain_methodsGetMapWaterRatio(aiBrain)
     if ratio > num then
         return true
     end
@@ -311,7 +324,7 @@ function GreaterThanMapWaterRatio(aiBrain, num)
 end
 
 function LessThanMapWaterRatio(aiBrain, num)
-    local ratio = aiBrain:GetMapWaterRatio()
+    local ratio = aibrain_methodsGetMapWaterRatio(aiBrain)
     if ratio < num then
         return true
     end
@@ -327,7 +340,7 @@ end
 --
 ------------------------------------------------------------------------------
 function ArmyNeedsTransports(aiBrain)
-    if aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports and aiBrain.NeedTransports > 0  then
+    if aiBrain and aibrain_methodsGetNoRushTicks(aiBrain) <= 0 and aiBrain.NeedTransports and aiBrain.NeedTransports > 0  then
         return true
     end
     return false
@@ -341,7 +354,7 @@ end
 --
 ------------------------------------------------------------------------------
 function TransportNeedGreater(aiBrain, number)
-    if aiBrain and aiBrain.NeedsTransports and aiBrain:GetNoRushTicks() <= 0 and aiBrain.NeedTransports > number then
+    if aiBrain and aiBrain.NeedsTransports and aibrain_methodsGetNoRushTicks(aiBrain) <= 0 and aiBrain.NeedTransports > number then
         return true
     end
     return false
@@ -354,7 +367,7 @@ end
 --
 ------------------------------------------------------------------------------
 function ArmyWantsTransports(aiBrain)
-    if aiBrain and aiBrain:GetNoRushTicks() <= 0 and aiBrain.WantTransports then
+    if aiBrain and aibrain_methodsGetNoRushTicks(aiBrain) <= 0 and aiBrain.WantTransports then
         return true
     end
     return false
@@ -367,7 +380,7 @@ end
 --
 ------------------------------------------------------------------------------
 function CDRRunningAway(aiBrain)
-    local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
+    local units = aibrain_methodsGetListOfUnits(aiBrain, categories.COMMAND, false)
     for k,v in units do
         if not v.Dead and v.Running then
             return true
@@ -445,7 +458,7 @@ end
 function IsIsland(aiBrain, check)
 
     if not aiBrain.islandCheck then
-        local startX, startZ = aiBrain:GetArmyStartPos()
+        local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
         aiBrain.isIsland = false
         aiBrain.islandMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         aiBrain.islandCheck = true

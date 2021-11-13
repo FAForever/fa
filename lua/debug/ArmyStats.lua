@@ -5,6 +5,12 @@
 --*
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
+local ipairs = ipairs
+local stringLower = string.lower
+local tostring = tostring
+local next = next
+local stringFormat = string.format
+
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
@@ -37,7 +43,7 @@ end
 
 function CreateDialog(army,section)
 
-    filter = string.lower(section)
+    filter = stringLower(section)
 
     dialog = Group(gameParent, 'Army Stats')
     dialog.Depth:Set(1000)
@@ -77,12 +83,12 @@ end
 
 function AddStats(parentCtrl, children, indent, add)
     for k,v in children do
-        local addChildren = add or string.lower(v.Name) == filter
+        local addChildren = add or stringLower(v.Name) == filter
 
         local value = ""
         if v.Value ~= nil then
             if v.Type == "Float" then
-                value = ": " .. string.format("%.4f",v.Value)
+                value = ": " .. stringFormat("%.4f",v.Value)
             elseif v.Type == "Integer" then
                 value = ": " .. tostring(v.Value)
             else

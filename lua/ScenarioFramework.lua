@@ -5,6 +5,81 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local VDist3 = VDist3
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local unit_methodsSetUnSelectable = moho.unit_methods.SetUnSelectable
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local IssueUpgrade = IssueUpgrade
+local SetArmyColor = SetArmyColor
+local weapon_methodsGetCurrentTarget = moho.weapon_methods.GetCurrentTarget
+local aibrain_methodsFindUnit = moho.aibrain_methods.FindUnit
+local tableRemoveByValue = table.removeByValue
+local tableInsert = table.insert
+local unit_methodsSetBusy = moho.unit_methods.SetBusy
+local unit_methodsGetNumBuildOrders = moho.unit_methods.GetNumBuildOrders
+local aibrain_methodsBuildStructure = moho.aibrain_methods.BuildStructure
+local stringSub = string.sub
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
+local IsAlly = IsAlly
+local SetAlliance = SetAlliance
+local IssueTransportUnload = IssueTransportUnload
+local IsUnit = IsUnit
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local FlushIntelInRect = FlushIntelInRect
+local IssueStop = IssueStop
+local ForkThread = ForkThread
+local unit_methodsSetWorkProgress = moho.unit_methods.SetWorkProgress
+local next = next
+local GetArmyBrain = GetArmyBrain
+local tableEmpty = table.empty
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local IssueClearCommands = IssueClearCommands
+local aibrain_methodsCanBuildStructureAt = moho.aibrain_methods.CanBuildStructureAt
+local CreateAttachedEmitter = CreateAttachedEmitter
+local tableGetn = table.getn
+local mathFloor = math.floor
+local stringGsub = string.gsub
+local Random = Random
+local platoon_methodsMoveToLocation = moho.platoon_methods.MoveToLocation
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local tableDeepcopy = table.deepcopy
+local aibrain_methodsGetAvailableFactories = moho.aibrain_methods.GetAvailableFactories
+local GetUnitsInRect = GetUnitsInRect
+local stringFind = string.find
+local unit_methodsSetCustomName = moho.unit_methods.SetCustomName
+local ipairs = ipairs
+local GetGameTimeSeconds = GetGameTimeSeconds
+local type = type
+local IssueFormPatrol = IssueFormPatrol
+local EntityCategoryContains = EntityCategoryContains
+local mathMod = math.mod
+local SetIgnoreArmyUnitCap = SetIgnoreArmyUnitCap
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local IssueMove = IssueMove
+local ChangeUnitArmy = ChangeUnitArmy
+local AddBuildRestriction = AddBuildRestriction
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local IssuePatrol = IssuePatrol
+local tableRemove = table.remove
+local platoon_methodsAggressiveMoveToLocation = moho.platoon_methods.AggressiveMoveToLocation
+local CPrefetchSetReset = moho.CPrefetchSet.Reset
+local RemoveBuildRestriction = RemoveBuildRestriction
+local unit_methodsShowBone = moho.unit_methods.ShowBone
+local KillThread = KillThread
+local IssueAggressiveMove = IssueAggressiveMove
+local unit_methodsGetWeapon = moho.unit_methods.GetWeapon
+local DiskGetFileInfo = DiskGetFileInfo
+local stringFormat = string.format
+local SetPlayableRect = SetPlayableRect
+local unit_methodsIsBeingBuilt = moho.unit_methods.IsBeingBuilt
+local LOG = LOG
+local platoon_methodsPatrol = moho.platoon_methods.Patrol
+local WARN = WARN
+local GetMovieDuration = GetMovieDuration
+local platoon_methodsGetBrain = moho.platoon_methods.GetBrain
+local unit_methodsHideBone = moho.unit_methods.HideBone
+local platoon_methodsGetPlatoonPosition = moho.platoon_methods.GetPlatoonPosition
+
 local TriggerFile = import('scenariotriggers.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
@@ -14,8 +89,8 @@ local SimCamera = import('/lua/SimCamera.lua').SimCamera
 local Cinematics = import('/lua/cinematics.lua')
 local SimUIVars = import('/lua/sim/SimUIState.lua')
 
-PingGroups = import('/lua/SimPingGroup.lua')
-Objectives = import('/lua/SimObjectives.lua')
+local PingGroups = import('/lua/SimPingGroup.lua')
+local Objectives = import('/lua/SimObjectives.lua')
 
 local PauseUnitDeathActive = false
 
@@ -30,7 +105,7 @@ end
 --   bool _allSecondary - true if all secondary objectives completed, otherwise, false
 --   bool _allBonus - true if all bonus objectives completed, otherwise, false
 function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
-    local opFile = string.gsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
+    local opFile = stringGsub(ScenarioInfo.Options.ScenarioFile, 'scenario', 'operation')
     local _opData = {}
 
     if DiskGetFileInfo(opFile) then
@@ -59,7 +134,7 @@ local factionCallbacks = {}
 function RequestPlayerFaction(callback)
     Sync.RequestPlayerFaction = true
     if callback then
-        table.insert(factionCallbacks, callback)
+        tableInsert(factionCallbacks, callback)
     end
 end
 
@@ -69,7 +144,7 @@ function OnFactionSelect(data)
     if ScenarioInfo.campaignInfo then
         ScenarioInfo.campaignInfo.campaignID = data.Faction
     end
-    if not table.empty(factionCallbacks) then
+    if not tableEmpty(factionCallbacks) then
         for index, callbackFunc in factionCallbacks do
             if callbackFunc then callbackFunc(data) end
         end
@@ -198,7 +273,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
         end
     end
 
-    if self.PlayDeathAnimation and not self:IsBeingBuilt() then
+    if self.PlayDeathAnimation and not unit_methodsIsBeingBuilt(self) then
         self:ForkThread(self.PlayAnimationThread, 'AnimationDeath')
         self:SetCollisionShape('None')
     end
@@ -407,7 +482,7 @@ function GetCatUnitsInArea(cat, area, brain)
 
         for _, v in filteredList do
             if v:GetAIBrain() == brain then
-                table.insert(result, v)
+                tableInsert(result, v)
             end
         end
     end
@@ -506,15 +581,15 @@ function PlatoonMoveRoute(platoon, route, squad)
     for _, v in route do
         if type(v) == 'string' then
             if squad then
-                platoon:MoveToLocation(ScenarioUtils.MarkerToPosition(v), false, squad)
+                platoon_methodsMoveToLocation(platoon, ScenarioUtils.MarkerToPosition(v), false, squad)
             else
-                platoon:MoveToLocation(ScenarioUtils.MarkerToPosition(v), false)
+                platoon_methodsMoveToLocation(platoon, ScenarioUtils.MarkerToPosition(v), false)
             end
         else
             if squad then
-                platoon:MoveToLocation(v, false, squad)
+                platoon_methodsMoveToLocation(platoon, v, false, squad)
             else
-                platoon:MoveToLocation(v, false)
+                platoon_methodsMoveToLocation(platoon, v, false)
             end
         end
     end
@@ -525,15 +600,15 @@ function PlatoonPatrolRoute(platoon, route, squad)
     for _, v in route do
         if type(v) == 'string' then
             if squad then
-                platoon:Patrol(ScenarioUtils.MarkerToPosition(v), squad)
+                platoon_methodsPatrol(platoon, ScenarioUtils.MarkerToPosition(v), squad)
             else
-                platoon:Patrol(ScenarioUtils.MarkerToPosition(v))
+                platoon_methodsPatrol(platoon, ScenarioUtils.MarkerToPosition(v))
             end
         else
             if squad then
-                platoon:Patrol(v, squad)
+                platoon_methodsPatrol(platoon, v, squad)
             else
-                platoon:Patrol(v)
+                platoon_methodsPatrol(platoon, v)
             end
         end
     end
@@ -542,9 +617,9 @@ end
 function PlatoonMoveChain(platoon, chain, squad)
     for _, v in ScenarioUtils.ChainToPositions(chain) do
         if squad then
-            platoon:MoveToLocation(v, false, squad)
+            platoon_methodsMoveToLocation(platoon, v, false, squad)
         else
-            platoon:MoveToLocation(v, false)
+            platoon_methodsMoveToLocation(platoon, v, false)
         end
     end
 end
@@ -553,9 +628,9 @@ end
 function PlatoonPatrolChain(platoon, chain, squad)
     for _, v in ScenarioUtils.ChainToPositions(chain) do
         if squad then
-            platoon:Patrol(v, squad)
+            platoon_methodsPatrol(platoon, v, squad)
         else
-            platoon:Patrol(v)
+            platoon_methodsPatrol(platoon, v)
         end
     end
 end
@@ -565,9 +640,9 @@ function PlatoonAttackChain(platoon, chain, squad)
     local cmd = false
     for _, v in ScenarioUtils.ChainToPositions(chain) do
         if squad then
-            cmd = platoon:AggressiveMoveToLocation(v, squad)
+            cmd = platoon_methodsAggressiveMoveToLocation(platoon, v, squad)
         else
-            cmd = platoon:AggressiveMoveToLocation(v)
+            cmd = platoon_methodsAggressiveMoveToLocation(platoon, v)
         end
     end
 
@@ -621,7 +696,7 @@ function GroupProgressTimerThread(group, time)
     while currTime < time do
         for _, v in group do
             if not v.Dead then
-                v:SetWorkProgress(currTime/time)
+                unit_methodsSetWorkProgress(v, currTime/time)
             end
         end
         WaitSeconds(1)
@@ -647,7 +722,7 @@ function Dialogue(dialogueTable, callback, critical, speaker)
     end
 
     if canSpeak then
-        local dTable = table.deepcopy(dialogueTable)
+        local dTable = tableDeepcopy(dialogueTable)
         if callback then
             dTable.Callback = callback
         end
@@ -660,7 +735,7 @@ function Dialogue(dialogueTable, callback, critical, speaker)
             ScenarioInfo.DialogueQueue = {}
             ScenarioInfo.DialogueFinished = {}
         end
-        table.insert(ScenarioInfo.DialogueQueue, dTable)
+        tableInsert(ScenarioInfo.DialogueQueue, dTable)
         if not ScenarioInfo.DialogueLock then
             ScenarioInfo.DialogueLock = true
             ForkThread(PlayDialogue)
@@ -684,10 +759,10 @@ function SetupMFDSync(movieTable, text)
 
     local tempText = LOC(text)
     local tempData = {}
-    local nameStart = string.find(tempText, ']')
+    local nameStart = stringFind(tempText, ']')
     if nameStart ~= nil then
-        tempData.name = LOC("<LOC "..string.sub(tempText, 2, nameStart - 1)..">")
-        tempData.text = string.sub(tempText, nameStart + 2)
+        tempData.name = LOC("<LOC "..stringSub(tempText, 2, nameStart - 1)..">")
+        tempData.text = stringSub(tempText, nameStart + 2)
     else
         tempData.name = "INVALID NAME"
         tempData.text = tempText
@@ -695,7 +770,7 @@ function SetupMFDSync(movieTable, text)
     end
 
     local timeSecs = GetGameTimeSeconds()
-    tempData.time = string.format("%02d:%02d:%02d", math.floor(timeSecs/360), math.floor(timeSecs/60), math.mod(timeSecs, 60))
+    tempData.time = stringFormat("%02d:%02d:%02d", mathFloor(timeSecs/360), mathFloor(timeSecs/60), mathMod(timeSecs, 60))
     tempData.color = 'ffffffff'
     if movieTable[4] == 'UEF' then
         tempData.color = 'ff00c1ff'
@@ -715,14 +790,14 @@ end
 
 -- The actual thread used by Dialogue
 function PlayDialogue()
-    while not table.empty(ScenarioInfo.DialogueQueue) do
-        local dTable = table.remove(ScenarioInfo.DialogueQueue, 1)
-        if not dTable then WARN('dTable is nil, ScenarioInfo.DialogueQueue len is '..repr(table.getn(ScenarioInfo.DialogueQueue))) end
+    while not tableEmpty(ScenarioInfo.DialogueQueue) do
+        local dTable = tableRemove(ScenarioInfo.DialogueQueue, 1)
+        if not dTable then WARN('dTable is nil, ScenarioInfo.DialogueQueue len is '..repr(tableGetn(ScenarioInfo.DialogueQueue))) end
         if not dTable.Flushed and (not ScenarioInfo.OpEnded or dTable.Critical) then
             for _, v in dTable do
                 if v ~= nil and not dTable.Flushed and (not ScenarioInfo.OpEnded or dTable.Critical) then
                     if not v.vid and v.bank and v.cue then
-                        table.insert(Sync.Voice, {Cue = v.cue, Bank = v.bank})
+                        tableInsert(Sync.Voice, {Cue = v.cue, Bank = v.bank})
                         if not v.delay then
                             WaitSeconds(5)
                         end
@@ -770,9 +845,9 @@ end
 
 function PlayUnlockDialogue()
     if Random(1, 2) == 1 then
-        table.insert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
+        tableInsert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01370'})
     else
-        table.insert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01372'})
+        tableInsert(Sync.Voice, {Bank = 'XGG', Cue = 'Computer_Computer_UnitRevalation_01372'})
     end
 end
 
@@ -786,7 +861,7 @@ function DisplayMissionText(string)
     if not Sync.MissionText then
         Sync.MissionText = {}
     end
-    table.insert(Sync.MissionText, string)
+    tableInsert(Sync.MissionText, string)
 end
 
 -- Video Text
@@ -794,7 +869,7 @@ function DisplayVideoText(string)
     if not Sync.VideoText then
         Sync.VideoText = {}
     end
-    table.insert(Sync.VideoText, string)
+    tableInsert(Sync.VideoText, string)
 end
 
 -- Play an NIS
@@ -827,7 +902,7 @@ end
 
 -- Plays an XACT sound if needed - currently all VOs are videos
 function PlayVoiceOver(voSound)
-    table.insert(Sync.Voice, voSound)
+    tableInsert(Sync.Voice, voSound)
     local pauseHere = nil
 end
 
@@ -898,7 +973,7 @@ function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, e
         for _, enh in enhancements do
             if bp.Enhancements[enh].ShowBones then
                 for _, bone in bp.Enhancements[enh].ShowBones do
-                    table.removeByValue(bonesToHide, bone)
+                    tableRemoveByValue(bonesToHide, bone)
                 end
             end
         end
@@ -914,9 +989,9 @@ function SpawnCommander(brain, unit, effect, name, PauseAtDeath, DeathTrigger, e
 
     -- If true is passed as parameter then it uses default name.
     if name == true then
-        ACU:SetCustomName(GetArmyBrain(brain).Nickname)
+        unit_methodsSetCustomName(ACU, GetArmyBrain(brain).Nickname)
     elseif type(name) == 'string' then
-        ACU:SetCustomName(name)
+        unit_methodsSetCustomName(ACU, name)
     end
 
     if PauseAtDeath then
@@ -955,9 +1030,9 @@ function FakeGateInUnit(unit, callbackFunction, bonesToHide)
     local bp = unit:GetBlueprint()
 
     if EntityCategoryContains(categories.COMMAND + categories.SUBCOMMANDER, unit) then
-        unit:HideBone(0, true)
-        unit:SetUnSelectable(true)
-        unit:SetBusy(true)
+        unit_methodsHideBone(unit, 0, true)
+        unit_methodsSetUnSelectable(unit, true)
+        unit_methodsSetBusy(unit, true)
         unit:PlayUnitSound('CommanderArrival')
         unit:CreateProjectile('/effects/entities/UnitTeleport03/UnitTeleport03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
         WaitSeconds(0.75)
@@ -967,14 +1042,14 @@ function FakeGateInUnit(unit, callbackFunction, bonesToHide)
             unit:SetMesh(psm, true)
         end
 
-        unit:ShowBone(0, true)
+        unit_methodsShowBone(unit, 0, true)
 
         for _, v in bonesToHide or bp.Display.WarpInEffect.HideBones do
-            unit:HideBone(v, true)
+            unit_methodsHideBone(unit, v, true)
         end
 
-        unit:SetUnSelectable(false)
-        unit:SetBusy(false)
+        unit_methodsSetUnSelectable(unit, false)
+        unit_methodsSetBusy(unit, false)
 
         local totalBones = unit:GetBoneCount() - 1
         for _, v in import('/lua/EffectTemplates.lua').UnitTeleportSteam01 do
@@ -1049,7 +1124,7 @@ function RemoveRestriction(army, categories, isSilent)
         SimUIVars.SaveTechAllowance(categories)
         if not isSilent then
             if not Sync.NewTech then Sync.NewTech = {} end
-            table.insert(Sync.NewTech, EntityCategoryGetUnitList(categories))
+            tableInsert(Sync.NewTech, EntityCategoryGetUnitList(categories))
         end
         RemoveBuildRestriction(army, categories)
 
@@ -1082,9 +1157,9 @@ function GetFactories(brain, point, radius)
 
     local available = {}
     if point then
-        available = brain:GetAvailableFactories(point, radius)
+        available = aibrain_methodsGetAvailableFactories(brain, point, radius)
     else
-        available = brain:GetAvailableFactories()
+        available = aibrain_methodsGetAvailableFactories(brain)
     end
 
     local retTable = {
@@ -1093,25 +1168,25 @@ function GetFactories(brain, point, radius)
         T1Naval = {}, T2Naval = {}, T3Naval = {},
     }
     for _, v in available do
-        if not v:IsUnitState('Building') and (v:GetNumBuildOrders(categories.ALLUNITS) == 0) then
+        if not unit_methodsIsUnitState(v, 'Building') and (unit_methodsGetNumBuildOrders(v, categories.ALLUNITS) == 0) then
             if EntityCategoryContains(categories.TECH1 * categories.AIR, v) then
-                table.insert(retTable.T1Air, v)
+                tableInsert(retTable.T1Air, v)
             elseif EntityCategoryContains(categories.TECH2 * categories.AIR, v) then
-                table.insert(retTable.T2Air, v)
+                tableInsert(retTable.T2Air, v)
             elseif EntityCategoryContains(categories.TECH3 * categories.AIR, v) then
-                table.insert(retTable.T3Air, v)
+                tableInsert(retTable.T3Air, v)
             elseif EntityCategoryContains(categories.TECH1 * categories.LAND, v) then
-                table.insert(retTable.T1Land, v)
+                tableInsert(retTable.T1Land, v)
             elseif EntityCategoryContains(categories.TECH2 * categories.LAND, v) then
-                table.insert(retTable.T2Land, v)
+                tableInsert(retTable.T2Land, v)
             elseif EntityCategoryContains(categories.TECH3 * categories.LAND, v) then
-                table.insert(retTable.T3Land, v)
+                tableInsert(retTable.T3Land, v)
             elseif EntityCategoryContains(categories.TECH1 * categories.NAVAL, v) then
-                table.insert(retTable.T1Naval, v)
+                tableInsert(retTable.T1Naval, v)
             elseif EntityCategoryContains(categories.TECH2 * categories.NAVAL, v) then
-                table.insert(retTable.T2Naval, v)
+                tableInsert(retTable.T2Naval, v)
             elseif EntityCategoryContains(categories.TECH3 * categories.NAVAL, v) then
-                table.insert(retTable.T3Naval, v)
+                tableInsert(retTable.T3Naval, v)
             end
         end
     end
@@ -1131,7 +1206,7 @@ function CreateVisibleAreaLocation(vizRadius, vizLocation, vizLifetime, vizArmy)
         Z = vizLocation[3],
         Radius = vizRadius,
         LifeTime = vizLifetime,
-        Army = vizArmy:GetArmyIndex(),
+        Army = aibrain_methodsGetArmyIndex(vizArmy),
     }
     local vizEntity = VizMarker(spec)
 
@@ -1145,7 +1220,7 @@ function CreateVisibleAreaAtUnit(vizRadius, vizUnit, vizLifetime, vizArmy)
         Z = pos[3],
         Radius = vizRadius,
         LifeTime = vizLifetime,
-        Army = vizArmy:GetArmyIndex(),
+        Army = aibrain_methodsGetArmyIndex(vizArmy),
     }
     local vizEntity = VizMarker(spec)
 
@@ -1178,13 +1253,13 @@ function SetPlayableArea(rect, voFlag)
         rect = ScenarioUtils.AreaToRect(rect)
     end
 
-    local x0 = rect.x0 - math.mod(rect.x0 , 4)
-    local y0 = rect.y0 - math.mod(rect.y0 , 4)
-    local x1 = rect.x1 - math.mod(rect.x1, 4)
-    local y1 = rect.y1 - math.mod(rect.y1, 4)
+    local x0 = rect.x0 - mathMod(rect.x0 , 4)
+    local y0 = rect.y0 - mathMod(rect.y0 , 4)
+    local x1 = rect.x1 - mathMod(rect.x1, 4)
+    local y1 = rect.y1 - mathMod(rect.y1, 4)
 
-    LOG(string.format('Debug: SetPlayableArea before round : %s, %s %s, %s', rect.x0, rect.y0, rect.x1, rect.y1))
-    LOG(string.format('Debug: SetPlayableArea after round : %s, %s %s, %s', x0, y0, x1, y1))
+    LOG(stringFormat('Debug: SetPlayableArea before round : %s, %s %s, %s', rect.x0, rect.y0, rect.x1, rect.y1))
+    LOG(stringFormat('Debug: SetPlayableArea after round : %s, %s %s, %s', x0, y0, x1, y1))
 
     ScenarioInfo.MapData.PlayableRect = {x0, y0, x1, y1}
     rect.x0 = x0
@@ -1195,7 +1270,7 @@ function SetPlayableArea(rect, voFlag)
     SetPlayableRect(x0, y0, x1, y1)
     if voFlag then
         ForkThread(PlayableRectCameraThread, rect)
-        table.insert(Sync.Voice, {Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
+        tableInsert(Sync.Voice, {Cue = 'Computer_Computer_MapExpansion_01380', Bank = 'XGG'})
     end
 
     import('/lua/SimSync.lua').SyncPlayableRect(rect)
@@ -1215,7 +1290,7 @@ end
 
 -- Sets platoon to only be built once
 function BuildOnce(platoon)
-    local aiBrain = platoon:GetBrain()
+    local aiBrain = platoon_methodsGetBrain(platoon)
     aiBrain:PBMSetPriority(platoon, 0)
 end
 
@@ -1352,21 +1427,21 @@ function PlatoonAttackWithTransports(platoon, landingChain, attackChain, instant
 end
 
 function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, instant, moveChain)
-    local aiBrain = platoon:GetBrain()
-    local allUnits = platoon:GetPlatoonUnits()
-    local startPos = platoon:GetPlatoonPosition()
+    local aiBrain = platoon_methodsGetBrain(platoon)
+    local allUnits = platoon_methodsGetPlatoonUnits(platoon)
+    local startPos = platoon_methodsGetPlatoonPosition(platoon)
     local units = {}
     local transports = {}
     for _, v in allUnits do
         if EntityCategoryContains(categories.TRANSPORTATION, v) then
-            table.insert(transports, v)
+            tableInsert(transports, v)
         else
-            table.insert(units, v)
+            tableInsert(units, v)
         end
     end
 
     local landingLocs = ScenarioUtils.ChainToPositions(landingChain)
-    local landingLocation = landingLocs[Random(1, table.getn(landingLocs))]
+    local landingLocation = landingLocs[Random(1, tableGetn(landingLocs))]
 
     if instant then
         AttachUnitsToTransports(units, transports)
@@ -1389,7 +1464,7 @@ function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, i
             end
             attached = false
             for num, unit in units do
-                if not unit.Dead and unit:IsUnitState('Attached') then
+                if not unit.Dead and unit_methodsIsUnitState(unit, 'Attached') then
                     attached = true
                     break
                 end
@@ -1408,7 +1483,7 @@ function PlatoonAttackWithTransportsThread(platoon, landingChain, attackChain, i
 
     if instant then
         IssueMove(transports, startPos)
-        aiBrain:AssignUnitsToPlatoon('Army_Pool', transports, 'Unassigned', 'None')
+        aibrain_methodsAssignUnitsToPlatoon(aiBrain, 'Army_Pool', transports, 'Unassigned', 'None')
     end
 end
 
@@ -1416,10 +1491,10 @@ end
 function AttachUnitsToTransports(units, transports)
     local locUnits = {}
     for _, v in units do
-        table.insert(locUnits, v)
+        tableInsert(locUnits, v)
     end
     local transportBones = {}
-    local numTransports = table.getn(transports)
+    local numTransports = tableGetn(transports)
     for k, unit in transports do
         transportBones[k] = {
             Lrg = {},
@@ -1428,18 +1503,18 @@ function AttachUnitsToTransports(units, transports)
         }
         for i = 1, unit:GetBoneCount() do
             if unit:GetBoneName(i) ~= nil then
-                if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
-                    table.insert(transportBones[k].Lrg, unit:GetBoneName(i))
-                elseif string.find(unit:GetBoneName(i), 'Attachpoint_Med') then
-                    table.insert(transportBones[k].Med, unit:GetBoneName(i))
-                elseif string.find(unit:GetBoneName(i), 'Attachpoint') then
-                    table.insert(transportBones[k].Sml, unit:GetBoneName(i))
+                if stringFind(unit:GetBoneName(i), 'Attachpoint_Lrg') then
+                    tableInsert(transportBones[k].Lrg, unit:GetBoneName(i))
+                elseif stringFind(unit:GetBoneName(i), 'Attachpoint_Med') then
+                    tableInsert(transportBones[k].Med, unit:GetBoneName(i))
+                elseif stringFind(unit:GetBoneName(i), 'Attachpoint') then
+                    tableInsert(transportBones[k].Sml, unit:GetBoneName(i))
                 end
             end
         end
     end
     local sortedGroup = {}
-    for i = 1, table.getn(locUnits) do
+    for i = 1, tableGetn(locUnits) do
         local highest = 0
         local key, value
         for k, v in locUnits do
@@ -1459,11 +1534,11 @@ function AttachUnitsToTransports(units, transports)
             end
         end
         sortedGroup[i] = value
-        table.remove(locUnits, key)
+        tableRemove(locUnits, key)
     end
     locUnits = sortedGroup
     for _, v in locUnits do
-        if not v:IsUnitState('Attached') then
+        if not unit_methodsIsUnitState(v, 'Attached') then
             -- Attach locUnits and remove bones when locUnits attached
             local bp = v:GetBlueprint()
             local notInserted = true
@@ -1474,9 +1549,9 @@ function AttachUnitsToTransports(units, transports)
             local i = 1
             if bp.Transport.TransportClass == 3 then
                 while notInserted and i <= numTransports do
-                    if not table.empty(transportBones[i].Lrg) then
+                    if not tableEmpty(transportBones[i].Lrg) then
                         notInserted = false
-                        local bone = table.remove(transportBones[i].Lrg, 1)
+                        local bone = tableRemove(transportBones[i].Lrg, 1)
                         transports[i]:OnTransportAttach(bone, v)
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
@@ -1490,7 +1565,7 @@ function AttachUnitsToTransports(units, transports)
                                     key = kbone
                                 end
                             end
-                            table.remove(transportBones[i].Med, key)
+                            tableRemove(transportBones[i].Med, key)
                         end
                         for j = 1, 4 do
                             local lowDist = 100
@@ -1502,16 +1577,16 @@ function AttachUnitsToTransports(units, transports)
                                     key = kbone
                                 end
                             end
-                            table.remove(transportBones[i].Sml, key)
+                            tableRemove(transportBones[i].Sml, key)
                         end
                     end
                     i = i + 1
                 end
             elseif bp.Transport.TransportClass == 2 then
                 while notInserted and i <= numTransports do
-                    if not table.empty(transportBones[i].Med) then
+                    if not tableEmpty(transportBones[i].Med) then
                         notInserted = false
-                        local bone = table.remove(transportBones[i].Med, 1)
+                        local bone = tableRemove(transportBones[i].Med, 1)
                         transports[i]:OnTransportAttach(bone, v)
                         v:AttachBoneTo(attachBone, transports[i], bone)
                         local bonePos = transports[i]:GetPosition(bone)
@@ -1525,16 +1600,16 @@ function AttachUnitsToTransports(units, transports)
                                     key = kbone
                                 end
                             end
-                            table.remove(transportBones[i].Sml, key)
+                            tableRemove(transportBones[i].Sml, key)
                         end
                     end
                     i = i + 1
                 end
             else
                 while notInserted and i <= numTransports do
-                    if not table.empty(transportBones[i].Sml) then
+                    if not tableEmpty(transportBones[i].Sml) then
                         notInserted = false
-                        local bone = table.remove(transportBones[i].Sml, 1)
+                        local bone = tableRemove(transportBones[i].Sml, 1)
                         transports[i]:OnTransportAttach(bone, v)
                         v:AttachBoneTo(attachBone, transports[i], bone)
                     end
@@ -1554,7 +1629,7 @@ function DetermineBestAttackLocation(attackingBrain, targetBrain, relationship, 
     local attackLocation = nil
 
     for locationsCount, position in tableOfAttackLocations do
-        foundUnits = attackingBrain:GetUnitsAroundPoint(categories.ALLUNITS, position, pointRadius, relationship)
+        foundUnits = aibrain_methodsGetUnitsAroundPoint(attackingBrain, categories.ALLUNITS, position, pointRadius, relationship)
 
         for throwawayCounter, unit in foundUnits do
             if unit:GetAIBrain() == targetBrain then
@@ -1574,7 +1649,7 @@ end
 -- Returns a random entry from a table.
 -- ex: takeoff_Spot = ScenarioFramework.GetRandomEntry(ScenarioUtils.ChainToPositions('Offscreen_Launch_Points'))
 function GetRandomEntry(tableOfData)
-    return tableOfData[Random(1, table.getn(tableOfData))]
+    return tableOfData[Random(1, tableGetn(tableOfData))]
 end
 
 function KillBaseInArea(brain, area, category)
@@ -1588,7 +1663,7 @@ function KillBaseInArea(brain, area, category)
                 rect = subArea
             end
             for _, unit in GetUnitsInRect(rect) do
-                table.insert(unitTable, unit)
+                tableInsert(unitTable, unit)
             end
         end
     else
@@ -1604,7 +1679,7 @@ function KillBaseInArea(brain, area, category)
     if unitTable then
         for num, unit in unitTable do
             if not unit.Dead and unit:GetAIBrain() == brain and EntityCategoryContains(category, unit) then
-                table.insert(filteredUnits, unit)
+                tableInsert(filteredUnits, unit)
             end
         end
         ForkThread(KillBaseInAreaThread, filteredUnits)
@@ -1612,13 +1687,13 @@ function KillBaseInArea(brain, area, category)
 end
 
 function KillBaseInAreaThread(unitTable)
-    local numUnits = table.getn(unitTable)
-    local waitNum = math.floor(numUnits / 20)
+    local numUnits = tableGetn(unitTable)
+    local waitNum = mathFloor(numUnits / 20)
     for num, unit in unitTable do
         if not unit.Dead then
             unit:Kill()
         end
-        if waitNum > 0 and num >= waitNum and math.mod(waitNum, num) == 0 then
+        if waitNum > 0 and num >= waitNum and mathMod(waitNum, num) == 0 then
             WaitTicks(6)
         end
     end
@@ -1648,11 +1723,11 @@ function EndOperationSafety(units)
                 SetAlliance(v.Name, subv.Name, 'Neutral')
             end
         end
-        for subk, subv in v:GetListOfUnits(categories.COMMAND, false) do
+        for subk, subv in aibrain_methodsGetListOfUnits(v, categories.COMMAND, false) do
             subv:SetCanTakeDamage(false)
             subv:SetCanBeKilled(false)
         end
-        if units and not table.empty(units) then
+        if units and not tableEmpty(units) then
             for subk, subv in units do
                 if not subv.Dead then
                     subv:SetCanTakeDamage(false)
@@ -1689,7 +1764,7 @@ function EndOperationCameraLocation(location)
 end
 
 function OperationCameraThread(location, heading, faction, track, unit, unlock, time)
-    local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+    local cam = SimCamera('WorldCamera')
     LockInput()
     cam:UseGameClock()
     WaitTicks(1)
@@ -1765,7 +1840,7 @@ end
 function MissionNISCameraThread(unit, blendtime, holdtime, orientationoffset, positionoffset, zoomval)
     if not ScenarioInfo.NIS then
         ScenarioInfo.NIS = true
-        local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+        local cam = SimCamera('WorldCamera')
         LockInput()
         cam:UseGameClock()
         WaitTicks(1)
@@ -1841,7 +1916,7 @@ end
 --   }
 function OperationNISCameraThread(unitInfo, camInfo)
     if not ScenarioInfo.NIS or camInfo.overrideCam then
-        local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+        local cam = SimCamera('WorldCamera')
 
         local position, heading, vizmarker
         -- Setup camera information
@@ -1902,7 +1977,7 @@ function OperationNISCameraThread(unitInfo, camInfo)
         if camInfo.holdTime then
             WaitSeconds(camInfo.holdTime)
             if camInfo.resetCam then
-                cam:Reset()
+                CPrefetchSetReset(cam)
             else
                 cam:RevertRotation()
             end
@@ -1952,7 +2027,7 @@ function FlagUnkillableSelect(armyNumber, units)
 end
 
 function FlagUnkillable(armyNumber, exceptions)
-    local units = ArmyBrains[armyNumber]:GetListOfUnits(categories.ALLUNITS, false)
+    local units = aibrain_methodsGetListOfUnits(ArmyBrains[armyNumber], categories.ALLUNITS, false)
     for _, v in units do
         if not v.CanTakeDamage then
             v.UndamagableFlagSet = true
@@ -1977,7 +2052,7 @@ function FlagUnkillable(armyNumber, exceptions)
 end
 
 function UnflagUnkillable(armyNumber)
-    local units = ArmyBrains[armyNumber]:GetListOfUnits(categories.ALLUNITS, false)
+    local units = aibrain_methodsGetListOfUnits(ArmyBrains[armyNumber], categories.ALLUNITS, false)
     for _, v in units do
         -- Only revert units that weren't already set
         if not v.UnKillableFlagSet then
@@ -1996,12 +2071,12 @@ function EngineerBuildUnits(army, unitName, ...)
     local aiBrain = engUnit:GetAIBrain()
     for k, v in arg do
         if k ~= 'n' then
-            local unitData = ScenarioUtils.FindUnit(v, Scenario.Armies[army].Units)
+            local unitData = aibrain_methodsFindUnit(v, Scenario.Armies[army].Units)
             if not unitData then
                 WARN('*WARNING: Invalid unit name ' .. v)
             end
-            if unitData and aiBrain:CanBuildStructureAt(unitData.type, unitData.Position) then
-                aiBrain:BuildStructure(engUnit, unitData.type, {unitData.Position[1], unitData.Position[3], 0}, false)
+            if unitData and aibrain_methodsCanBuildStructureAt(aiBrain, unitData.type, unitData.Position) then
+                aibrain_methodsBuildStructure(aiBrain, engUnit, unitData.type, {unitData.Position[1], unitData.Position[3], 0}, false)
             end
         end
     end
@@ -2085,13 +2160,13 @@ function AntiOffMapMainThread()
                 if UnitsThatAreInOffMapRect then
                     for index, UnitThatIsOffMap in  UnitsThatAreInOffMapRect do
                         if not UnitThatIsOffMap.IAmOffMapThread then
-                            table.insert(NewUnitsThatAreOffMap, UnitThatIsOffMap)
+                            tableInsert(NewUnitsThatAreOffMap, UnitThatIsOffMap)
                         end
                     end
                 else
             end
         end
-        local NumberOfUnitsOffMap = table.getn(NewUnitsThatAreOffMap)
+        local NumberOfUnitsOffMap = tableGetn(NewUnitsThatAreOffMap)
         for index, NewUnitThatIsOffMap in NewUnitsThatAreOffMap do
             if not NewUnitThatIsOffMap.IAmOffMap then
                 NewUnitThatIsOffMap.IAmOffMap = true
@@ -2195,9 +2270,9 @@ function GetTimeIAmAllowedToBeOffMap(self)
     end
 
     for i = 1, self:GetWeaponCount() do
-        local wep = self:GetWeapon(i)
+        local wep = unit_methodsGetWeapon(self, i)
         if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
-            if wep:GetCurrentTarget()  then
+            if weapon_methodsGetCurrentTarget(wep)  then
                 value = airspeed * 2
             end
 

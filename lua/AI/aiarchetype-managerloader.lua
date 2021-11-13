@@ -7,6 +7,20 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local aibehaviorsUp = import('/lua/ai/AIBehaviors.lua')
+local aibrain_methodsSetResourceSharing = moho.aibrain_methods.SetResourceSharing
+local GetArmyUnitCap = GetArmyUnitCap
+local aibrain_methodsGetCurrentUnits = moho.aibrain_methods.GetCurrentUnits
+local next = next
+local ipairs = ipairs
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local LOG = LOG
+local GetArmyUnitCostTotal = GetArmyUnitCostTotal
+local EntityCategoryContains = EntityCategoryContains
+
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
@@ -47,10 +61,10 @@ end
 
 function ExecutePlan(aiBrain)
     aiBrain:SetConstantEvaluate(false)
-    local behaviors = import('/lua/ai/AIBehaviors.lua')
+    local behaviors = aibehaviorsUp
     WaitSeconds(1)
     if not aiBrain.BuilderManagers.MAIN.FactoryManager:HasBuilderList() then
-        aiBrain:SetResourceSharing(true)
+        aibrain_methodsSetResourceSharing(aiBrain, true)
 
         if aiBrain.Sorian then
             aiBrain:SetupUnderEnergyStatTriggerSorian(0.1)
@@ -65,8 +79,8 @@ function ExecutePlan(aiBrain)
         # Get units out of pool and assign them to the managers
         local mainManagers = aiBrain.BuilderManagers.MAIN
 
-        local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
-        for k,v in pool:GetPlatoonUnits() do
+        local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
+        for k,v in platoon_methodsGetPlatoonUnits(pool) do
             if EntityCategoryContains(categories.ENGINEER, v) then
                 mainManagers.EngineerManager:AddUnit(v)
             elseif EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, v) then
@@ -95,7 +109,7 @@ function SetupMainBase(aiBrain)
         ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality = baseType
     end
 
-    LOG('*AI DEBUG: ARMY ', repr(aiBrain:GetArmyIndex()), ': Initiating Archetype using ' .. base)
+    LOG('*AI DEBUG: ARMY ', repr(aibrain_methodsGetArmyIndex(aiBrain)), ': Initiating Archetype using ' .. base)
     AIAddBuilderTable.AddGlobalBaseTemplate(aiBrain, 'MAIN', base)
     aiBrain:ForceManagerSort()
 end
@@ -109,9 +123,9 @@ function UnitCapWatchThread(aiBrain)
     KillT1 = false
     while true do
         WaitSeconds(30)
-        if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) > (GetArmyUnitCap(aiBrain:GetArmyIndex()) - 10) then
+        if GetArmyUnitCostTotal(aibrain_methodsGetArmyIndex(aiBrain)) > (GetArmyUnitCap(aibrain_methodsGetArmyIndex(aiBrain)) - 10) then
             if not KillT1 then
-                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.MOBILE * categories.LAND, true)
+                local units = aibrain_methodsGetListOfUnits(aiBrain, categories.TECH1 * categories.MOBILE * categories.LAND, true)
                 local count = 0
                 for k, v in units do
                     v:Kill()
@@ -120,7 +134,7 @@ function UnitCapWatchThread(aiBrain)
                 end
                 KillT1 = true
             elseif not KillPD then
-                local units = aiBrain:GetListOfUnits(categories.TECH1 * categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE, true)
+                local units = aibrain_methodsGetListOfUnits(aiBrain, categories.TECH1 * categories.DEFENSE * categories.DIRECTFIRE * categories.STRUCTURE, true)
 
                 for k, v in units do
                     v:Kill()
@@ -143,7 +157,7 @@ function UnitCapWatchThreadSorian(aiBrain)
     #LOG('*AI DEBUG: UnitCapWatchThreadSorian started')
     while true do
         WaitSeconds(30)
-        if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) > (GetArmyUnitCap(aiBrain:GetArmyIndex()) - 20) then
+        if GetArmyUnitCostTotal(aibrain_methodsGetArmyIndex(aiBrain)) > (GetArmyUnitCap(aibrain_methodsGetArmyIndex(aiBrain)) - 20) then
             local underCap = false
 
             # More than 1 T3 Power	  ##(aiBrain, number of units to check for, category of units to check for, category of units to kill off)
@@ -183,14 +197,14 @@ function UnitCapWatchThreadSorian(aiBrain)
 end
 
 function GetAIUnderUnitCap(aiBrain, num, checkCat, killCat)
-    if aiBrain:GetCurrentUnits(checkCat) > num then
-        local units = aiBrain:GetListOfUnits(killCat, true)
+    if aibrain_methodsGetCurrentUnits(aiBrain, checkCat) > num then
+        local units = aibrain_methodsGetListOfUnits(aiBrain, killCat, true)
         for k, v in units do
             v:Kill()
         end
     end
     #If AI under 90% of units cap, return true
-    if GetArmyUnitCostTotal(aiBrain:GetArmyIndex()) <= (GetArmyUnitCap(aiBrain:GetArmyIndex()) * .10) then
+    if GetArmyUnitCostTotal(aibrain_methodsGetArmyIndex(aiBrain)) <= (GetArmyUnitCap(aibrain_methodsGetArmyIndex(aiBrain)) * .10) then
         return true
     end
     #If not, wait a tick to prevent lag and return false

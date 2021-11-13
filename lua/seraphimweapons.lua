@@ -9,6 +9,12 @@
 --**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+local ipairs = ipairs
+local weapon_methodsGetBlueprint = moho.weapon_methods.GetBlueprint
+local CreateAttachedEmitter = CreateAttachedEmitter
+local next = next
+local GetTerrainType = GetTerrainType
+
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
@@ -211,7 +217,7 @@ SDFExperimentalPhasonLaser = Class(DefaultBeamWeapon) {
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -240,7 +246,7 @@ SDFUltraChromaticBeamGenerator = Class(DefaultBeamWeapon) {
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
             local army = self.unit.Army
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)

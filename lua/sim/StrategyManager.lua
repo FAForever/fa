@@ -7,6 +7,9 @@
 #**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved. All lefts reserved too.
 #****************************************************************************
 
+local ipairs = ipairs
+local next = next
+
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')

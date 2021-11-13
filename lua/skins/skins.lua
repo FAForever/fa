@@ -13,6 +13,10 @@
 --  panelColor: default color when drawing a panel
 
 
+local ipairs = ipairs
+local tableAssimilate = table.assimilate
+local next = next
+
 skins = {
     uef = {
         default = "default",
@@ -182,7 +186,7 @@ skins = {
         local default = skins[v.default]
         while default do
             -- Copy the entire default chain into the toplevel skin.
-            table.assimilate(v, default)
+            tableAssimilate(v, default)
 
             default = skins[default.default]
         end

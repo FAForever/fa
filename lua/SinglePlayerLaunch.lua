@@ -1,16 +1,30 @@
 -- Logic and defaults for launching non-skirmish sessions
+local tonumber = tonumber
+local tableCopy = table.copy
+local ainamesUp = import('/lua/ui/lobby/ainames.lua')
+local stringFind = string.find
+local error = error
+local mathRandom = math.random
+local next = next
+local ipairs = ipairs
+local factionsUp = import('/lua/factions.lua')
+local tableGetn = table.getn
+local LOG = LOG
+local WARN = WARN
+local mathMod = math.mod
+
 local Prefs = import('/lua/user/prefs.lua')
 local MapUtils = import('/lua/ui/maputil.lua')
 local aiTypes = import('/lua/ui/lobby/aitypes.lua').aitypes
 
 function GetRandomName(faction, aiKey)
     WARN('GRN: ',faction)
-    local aiNames = import('/lua/ui/lobby/ainames.lua').ainames
-    local factions = import('/lua/factions.lua').Factions
+    local aiNames = ainamesUp.ainames
+    local factions = factionsUp.Factions
 
-    faction = faction or (math.random(table.getn(factions)))
+    faction = faction or (mathRandom(tableGetn(factions)))
 
-    local name = aiNames[factions[faction].Key][math.random(table.getn(aiNames[factions[faction].Key]))]
+    local name = aiNames[factions[faction].Key][mathRandom(tableGetn(aiNames[factions[faction].Key]))]
 
     if aiKey then
         local aiName = "AI"
@@ -26,7 +40,7 @@ function GetRandomName(faction, aiKey)
 end
 
 function GetRandomFaction()
-    return math.random(table.getn(import('/lua/factions.lua').Factions))
+    return mathRandom(tableGetn(import('/lua/factions.lua').Factions))
 end
 
 function VerifyScenarioConfiguration(scenarioInfo)
@@ -51,7 +65,7 @@ end
 
 -- Note that the map name must include the full path, it won't try to guess the path based on name
 function SetupCampaignSession(scenario, difficulty, inFaction, campaignFlowInfo, isTutorial)
-    local factions = import('/lua/factions.lua').Factions
+    local factions = factionsUp.Factions
     local faction = inFaction or 1
     if not scenario then
         error("SetupCampaignSession - scenario required")
@@ -113,7 +127,7 @@ end
 
 
 function FixupMapName(mapName)
-    if (not string.find(mapName, "/")) and (not string.find(mapName, "\\")) then
+    if (not stringFind(mapName, "/")) and (not stringFind(mapName, "\\")) then
         mapName = "/maps/" .. mapName .. "/" .. mapName .. "_scenario.lua"
     end
     return mapName
@@ -135,7 +149,7 @@ local defaultOptions = {
 }
 
 local function GetCommandLineOptions(isPerfTest)
-    local options = table.copy(defaultOptions)
+    local options = tableCopy(defaultOptions)
 
     if isPerfTest then
         options.FogOfWar = 'none'
@@ -189,7 +203,7 @@ function SetupBotSession(mapName)
 
     sessionInfo.teamInfo = {}
 
-    local numColors = table.getn(import('/lua/gameColors.lua').GameColors.PlayerColors)
+    local numColors = tableGetn(import('/lua/gameColors.lua').GameColors.PlayerColors)
 
     local ai
     local aiopt = GetCommandLineArg("/ai", 1)
@@ -207,8 +221,8 @@ function SetupBotSession(mapName)
         sessionInfo.teamInfo[index].ArmyName = name
         sessionInfo.teamInfo[index].Faction = GetRandomFaction()
         sessionInfo.teamInfo[index].Human = false
-        sessionInfo.teamInfo[index].PlayerColor = math.mod(index, numColors)
-        sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
+        sessionInfo.teamInfo[index].PlayerColor = mathMod(index, numColors)
+        sessionInfo.teamInfo[index].ArmyColor = mathMod(index, numColors)
         sessionInfo.teamInfo[index].AIPersonality = ai
     end
 
@@ -229,7 +243,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
     local faction
     if HasCommandLineArg("/faction") then
         faction = tonumber(GetCommandLineArg("/faction", 1)[1])
-        local maxFaction = table.getn(import('/lua/factions.lua').Factions)
+        local maxFaction = tableGetn(import('/lua/factions.lua').Factions)
         if faction < 1 or faction > maxFaction then
             error("SetupCommandLineSession - selected faction index " .. faction .. " must be between 1 and " ..  maxFaction)
         end
@@ -257,7 +271,7 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
 
     local armies = sessionInfo.scenarioInfo.Configurations.standard.teams[1].armies
 
-    local numColors = table.getn(import('/lua/gameColors.lua').GameColors.PlayerColors)
+    local numColors = tableGetn(import('/lua/gameColors.lua').GameColors.PlayerColors)
 
     for index, name in armies do
         sessionInfo.teamInfo[index] = import('/lua/ui/lobby/lobbyComm.lua').GetDefaultPlayerOptions(sessionInfo.playerName)
@@ -272,14 +286,14 @@ local function SetupCommandLineSkirmish(scenario, isPerfTest)
             sessionInfo.teamInfo[index].Human = false
         end
         sessionInfo.teamInfo[index].ArmyName = name
-        sessionInfo.teamInfo[index].PlayerColor = math.mod(index, numColors)
-        sessionInfo.teamInfo[index].ArmyColor = math.mod(index, numColors)
+        sessionInfo.teamInfo[index].PlayerColor = mathMod(index, numColors)
+        sessionInfo.teamInfo[index].ArmyColor = mathMod(index, numColors)
     end
 
     local extras = MapUtils.GetExtraArmies(sessionInfo.scenarioInfo)
     if extras then
         for k,armyName in extras do
-            local index = table.getn(sessionInfo.teamInfo) + 1
+            local index = tableGetn(sessionInfo.teamInfo) + 1
             sessionInfo.teamInfo[index] = import('/lua/ui/lobby/lobbyComm.lua').GetDefaultPlayerOptions("civilian")
             sessionInfo.teamInfo[index].PlayerName = 'civilian'
             sessionInfo.teamInfo[index].Civilian = true
@@ -300,7 +314,7 @@ function StartCommandLineSession(mapName, isPerfTest)
 
     mapName = FixupMapName(mapName)
 
-    local scenario = import('/lua/ui/maputil.lua').LoadScenario(mapName)
+    local scenario = MapUtils.LoadScenario(mapName)
     if not scenario then
         error("Unable to load map " .. mapName)
     end

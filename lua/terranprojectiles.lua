@@ -11,6 +11,23 @@
 --------------------------------------------------------------------------
 --  TERRAN PROJECTILES SCRIPTS
 --------------------------------------------------------------------------
+local projectile_methodsTrackTarget = moho.projectile_methods.TrackTarget
+local projectile_methodsSetMaxSpeed = moho.projectile_methods.SetMaxSpeed
+local DamageArea = DamageArea
+local CreateSplat = CreateSplat
+local projectile_methodsShakeCamera = moho.projectile_methods.ShakeCamera
+local projectile_methodsStayUnderwater = moho.projectile_methods.StayUnderwater
+local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
+local projectile_methodsGetPosition = moho.projectile_methods.GetPosition
+local next = next
+local ipairs = ipairs
+local projectile_methodsSetVelocity = moho.projectile_methods.SetVelocity
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateDecal = CreateDecal
+local CreateEmitterAtBone = CreateEmitterAtBone
+local projectile_methodsSetTurnRate = moho.projectile_methods.SetTurnRate
+local projectile_methodsSetCollisionShape = moho.projectile_methods.SetCollisionShape
+
 local Projectile = import('/lua/sim/projectile.lua').Projectile
 local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
@@ -91,7 +108,7 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -171,7 +188,7 @@ TDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
 
     OnCreate = function(self, inWater)
         OnWaterEntryEmitterProjectile.OnCreate(self)
-        self:TrackTarget(false)
+        projectile_methodsTrackTarget(self, false)
     end,
 
     OnEnterWater = function(self)
@@ -181,8 +198,8 @@ TDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
             CreateEmitterAtEntity(self, self.Army, v)
         end
 
-        self:TrackTarget(false)
-        self:StayUnderwater(true)
+        projectile_methodsTrackTarget(self, false)
+        projectile_methodsStayUnderwater(self, true)
         -- self:SetTurnRate(0)
         -- self:SetMaxSpeed(1)
         -- self:SetVelocity(0, -0.25, 0)
@@ -221,7 +238,7 @@ TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UEB2301)
         local radius = self.DamageData.DamageRadius
         
         if radius > 0 then
-            local pos = self:GetPosition()
+            local pos = projectile_methodsGetPosition(self)
             local FriendlyFire = self.DamageData.DamageFriendly
             
             DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -250,7 +267,7 @@ TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES03
         local radius = self.DamageData.DamageRadius
         
         if radius > 0 then
-            local pos = self:GetPosition()
+            local pos = projectile_methodsGetPosition(self)
             local FriendlyFire = self.DamageData.DamageFriendly
             
             DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -265,7 +282,7 @@ TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES03
                 CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 100, 70, army)
             end
             
-            self:ShakeCamera( 20, 1, 0, 1 )
+            projectile_methodsShakeCamera(self,  20, 1, 0, 1 )
         end
         
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
@@ -282,7 +299,7 @@ TDFLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- Fatbo
         local radius = self.DamageData.DamageRadius
         
         if radius > 0 then
-            local pos = self:GetPosition()
+            local pos = projectile_methodsGetPosition(self)
             local FriendlyFire = self.DamageData.DamageFriendly
             
             DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -343,7 +360,7 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) { -- strategic bom
 
     OnImpact = function(self, targetType, targetEntity)
         -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -377,7 +394,7 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
     FxImpactUnderWater = {},
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -494,7 +511,7 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
             if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
+                IEffectScaleEmitter(emit, EffectScale or 1)
             end
         end
     end,
@@ -513,7 +530,7 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -536,7 +553,7 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
             if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
+                IEffectScaleEmitter(emit, EffectScale or 1)
             end
         end
     end,
@@ -560,7 +577,7 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -729,29 +746,29 @@ TTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
         -- if we are starting in the water then immediately switch to tracking in water and
         -- create underwater trail effects
         if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
+            projectile_methodsTrackTarget(self, true):StayUnderwater(true)
             self:OnEnterWater(self)
         end
     end,
 
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
 
         for k, v in self.FxEnterWater do -- splash
             CreateEmitterAtEntity(self, self.Army, v)
         end
-        self:TrackTarget(true)
-        self:StayUnderwater(true)
-        self:SetTurnRate(120)
-        self:SetMaxSpeed(18)
+        projectile_methodsTrackTarget(self, true)
+        projectile_methodsStayUnderwater(self, true)
+        projectile_methodsSetTurnRate(self, 120)
+        projectile_methodsSetMaxSpeed(self, 18)
         -- self:SetVelocity(0)
         self:ForkThread(self.MovementThread)
     end,
 
     MovementThread = function(self)
         WaitTicks(1)
-        self:SetVelocity(3)
+        projectile_methodsSetVelocity(self, 3)
     end,
 }
 --------------------------------------------------------------------------
@@ -766,7 +783,7 @@ TTorpedoSubProjectile = Class(EmitterProjectile) {
     FxImpactUnderWater = EffectTemplate.TTorpedoHitUnit01,
     FxImpactNone = {},
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
     end,
 }
@@ -821,7 +838,7 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- percival
     FxImpactUnderWater = {},
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -856,7 +873,7 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
     PolyTrail = EffectTemplate.THeavyPlasmaGatlingCannonPolyTrail,
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         -- local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         

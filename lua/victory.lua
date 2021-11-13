@@ -1,3 +1,18 @@
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local tableEqual = table.equal
+local ForkThread = ForkThread
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local ArmyIsOutOfGame = ArmyIsOutOfGame
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local tableEmpty = table.empty
+local GetGameTimeSeconds = GetGameTimeSeconds
+local ArmyIsCivilian = ArmyIsCivilian
+local IsAlly = IsAlly
+local SetCommandSource = SetCommandSource
+local EndGame = EndGame
+
 gameOver = false
 
 local victoryCategories = {
@@ -7,7 +22,7 @@ local victoryCategories = {
 }
 
 function AllUnitsInCategoryDead(brain,categoryCheck)
-    local ListOfUnits = brain:GetListOfUnits(categoryCheck, false)
+    local ListOfUnits = aibrain_methodsGetListOfUnits(brain, categoryCheck, false)
     for index, unit in ListOfUnits do
         if unit.CanBeKilled and not unit.Dead and unit:GetFractionComplete() == 1 then
             return false
@@ -26,7 +41,7 @@ function ObserverAfterDeath(armyIndex)
                 if not ArmyIsOutOfGame(i) then
                     return
                 end
-                table.insert(humans, humanIndex)
+                tableInsert(humans, humanIndex)
             end
             humanIndex = humanIndex + 1
         end
@@ -51,18 +66,18 @@ function CheckVictory(scenarioInfo)
         -- Look for newly defeated brains and tell them they're dead
         local stillAlive = {}
         for _, brain in ArmyBrains do
-            if not brain:IsDefeated() and not ArmyIsCivilian(brain:GetArmyIndex()) then
+            if not brain:IsDefeated() and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(brain)) then
                 if AllUnitsInCategoryDead(brain,categoryCheck) then
                     brain:OnDefeat()
-                    ObserverAfterDeath(brain:GetArmyIndex())
+                    ObserverAfterDeath(aibrain_methodsGetArmyIndex(brain))
                 else
-                    table.insert(stillAlive, brain)
+                    tableInsert(stillAlive, brain)
                 end
             end
         end
 
         -- uh-oh, there is nobody alive... It's a draw.
-        if table.empty(stillAlive) then
+        if tableEmpty(stillAlive) then
             CallEndGame()
             return
         end
@@ -79,7 +94,7 @@ function CheckVictory(scenarioInfo)
 
             for j, other in stillAlive do
                 if i ~= j then
-                    if not brain.RequestingAlliedVictory or not IsAlly(brain:GetArmyIndex(), other:GetArmyIndex()) then
+                    if not brain.RequestingAlliedVictory or not IsAlly(aibrain_methodsGetArmyIndex(brain), aibrain_methodsGetArmyIndex(other)) then
                         win = false
                         break
                     end
@@ -89,7 +104,7 @@ function CheckVictory(scenarioInfo)
 
         local callback = nil
         if win then
-            local equal = table.equal(stillAlive, potentialWinners)
+            local equal = tableEqual(stillAlive, potentialWinners)
             if not equal then
                 victoryTime = GetGameTimeSeconds() + 5
                 potentialWinners = stillAlive

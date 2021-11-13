@@ -5,6 +5,54 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+local shield_methodsSetMesh = moho.shield_methods.SetMesh
+local aibrain_methodsGetEconomyStored = moho.aibrain_methods.GetEconomyStored
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local unit_methodsGetBuildRate = moho.unit_methods.GetBuildRate
+local unit_methodsGetShieldRatio = moho.unit_methods.GetShieldRatio
+local IsEnemy = IsEnemy
+local shield_methodsSetVizToAllies = moho.shield_methods.SetVizToAllies
+local shield_methodsGetEntityId = moho.shield_methods.GetEntityId
+local _c_CreateShield = _c_CreateShield
+local shield_methodsGetHealth = moho.shield_methods.GetHealth
+local ipairs = ipairs
+local unit_methodsGetGuards = moho.unit_methods.GetGuards
+local tableInsert = table.insert
+local CreateEmitterAtBone = CreateEmitterAtBone
+local shield_methodsGetArmy = moho.shield_methods.GetArmy
+local ArmyGetHandicap = ArmyGetHandicap
+local shield_methodsSetVizToEnemies = moho.shield_methods.SetVizToEnemies
+local mathMin = math.min
+local EntityCategoryContains = EntityCategoryContains
+local IsUnit = IsUnit
+local shield_methodsGetPosition = moho.shield_methods.GetPosition
+local unit_methodsGetArmorMult = moho.unit_methods.GetArmorMult
+local IsEntity = IsEntity
+local shield_methodsSetDrawScale = moho.shield_methods.SetDrawScale
+local unit_methodsRevertCollisionShape = moho.unit_methods.RevertCollisionShape
+local shield_methodsSetHealth = moho.shield_methods.SetHealth
+local ForkThread = ForkThread
+local OrientFromDir = OrientFromDir
+local shield_methodsAdjustHealth = moho.shield_methods.AdjustHealth
+local next = next
+local ParseEntityCategory = ParseEntityCategory
+local KillThread = KillThread
+local pairs = pairs
+local unit_methodsGetResourceConsumed = moho.unit_methods.GetResourceConsumed
+local mathMax = math.max
+local unit_methodsGetFocusUnit = moho.unit_methods.GetFocusUnit
+local tableAssimilate = table.assimilate
+local shield_methodsAttachBoneTo = moho.shield_methods.AttachBoneTo
+local shield_methodsSetMaxHealth = moho.shield_methods.SetMaxHealth
+local shield_methodsSetVizToNeutrals = moho.shield_methods.SetVizToNeutrals
+local unit_methodsSetShieldRatio = moho.unit_methods.SetShieldRatio
+local shield_methodsGetMaxHealth = moho.shield_methods.GetMaxHealth
+local Warp = Warp
+local Vector = Vector
+local shield_methodsSetCollisionShape = moho.shield_methods.SetCollisionShape
+local shield_methodsSetParentOffset = moho.shield_methods.SetParentOffset
+local shield_methodsSetVizToFocusPlayer = moho.shield_methods.SetVizToFocusPlayer
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 local Overspill = import('/lua/overspill.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -32,7 +80,7 @@ Shield = Class(moho.shield_methods, Entity) {
         spec.Size = spec.ShieldSize
 
         -- Apply default options
-        local spec = table.assimilate(spec, DEFAULT_OPTIONS)
+        local spec = tableAssimilate(spec, DEFAULT_OPTIONS)
         spec.Owner = owner
 
         _c_CreateShield(self, spec)
@@ -44,8 +92,8 @@ Shield = Class(moho.shield_methods, Entity) {
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
         self.ImpactMeshBp = spec.ImpactMesh
-        self.Army = self:GetArmy()
-        self.EntityId = self:GetEntityId()
+        self.Army = shield_methodsGetArmy(self)
+        self.EntityId = shield_methodsGetEntityId(self)
         self._IsUp = false
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
@@ -54,10 +102,10 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         self:SetSize(spec.Size)
-        self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self, spec.ShieldMaxHealth)
+        shield_methodsSetMaxHealth(self, spec.ShieldMaxHealth)
+        shield_methodsSetHealth(self, self, spec.ShieldMaxHealth)
         self:SetType('Bubble')
-        self.SpillOverDmgMod = math.max(spec.ShieldSpillOverDamageMod or 0.15, 0)
+        self.SpillOverDmgMod = mathMax(spec.ShieldSpillOverDamageMod or 0.15, 0)
 
         -- Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -65,12 +113,12 @@ Shield = Class(moho.shield_methods, Entity) {
         self:SetRechargeTime(spec.ShieldRechargeTime or 5, spec.ShieldEnergyDrainRechargeTime or 5)
         self:SetVerticalOffset(spec.ShieldVerticalOffset)
 
-        self:SetVizToFocusPlayer('Always')
-        self:SetVizToEnemies('Intel')
-        self:SetVizToAllies('Always')
-        self:SetVizToNeutrals('Intel')
+        shield_methodsSetVizToFocusPlayer(self, 'Always')
+        shield_methodsSetVizToEnemies(self, 'Intel')
+        shield_methodsSetVizToAllies(self, 'Always')
+        shield_methodsSetVizToNeutrals(self, 'Intel')
 
-        self:AttachBoneTo(-1, spec.Owner, -1)
+        shield_methodsAttachBoneTo(self, -1, spec.Owner, -1)
 
         self:SetShieldRegenRate(spec.ShieldRegenRate)
         self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
@@ -116,14 +164,14 @@ Shield = Class(moho.shield_methods, Entity) {
 
     UpdateShieldRatio = function(self, value)
         if value >= 0 then
-            self.Owner:SetShieldRatio(value)
+            unit_methodsSetShieldRatio(self.Owner, value)
         else
-            self.Owner:SetShieldRatio(self:GetHealth() / self:GetMaxHealth())
+            unit_methodsSetShieldRatio(self.Owner, shield_methodsGetHealth(self) / shield_methodsGetMaxHealth(self))
         end
     end,
 
     GetCachePosition = function(self)
-        return self:GetPosition()
+        return shield_methodsGetPosition(self)
     end,
 
     -- Note, this is called by native code to calculate spillover damage. The
@@ -134,9 +182,9 @@ Shield = Class(moho.shield_methods, Entity) {
     OnGetDamageAbsorption = function(self, instigator, amount, type)
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
-        amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
-        return math.min(self:GetHealth(), amount)
+        amount = amount * (unit_methodsGetArmorMult(self.Owner, type))
+        amount = amount * (1.0 - ArmyGetHandicap(shield_methodsGetArmy(self)))
+        return mathMin(shield_methodsGetHealth(self), amount)
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
@@ -162,9 +210,9 @@ Shield = Class(moho.shield_methods, Entity) {
     GetOverkill = function(self, instigator, amount, type)
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
-        amount = amount * (self.Owner:GetArmorMult(type))
-        amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
-        local finalVal =  amount - self:GetHealth()
+        amount = amount * (unit_methodsGetArmorMult(self.Owner, type))
+        amount = amount * (1.0 - ArmyGetHandicap(shield_methodsGetArmy(self)))
+        local finalVal =  amount - shield_methodsGetHealth(self)
         if finalVal < 0 then
             finalVal = 0
         end
@@ -193,14 +241,14 @@ Shield = Class(moho.shield_methods, Entity) {
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
-            self:AdjustHealth(instigator, -absorbed)
+            shield_methodsAdjustHealth(self, instigator, -absorbed)
             self:UpdateShieldRatio(-1)
             ForkThread(self.CreateImpactEffect, self, vector)
             if self.RegenThread then
                 KillThread(self.RegenThread)
                 self.RegenThread = nil
             end
-            if self:GetHealth() <= 0 then
+            if shield_methodsGetHealth(self) <= 0 then
                 ChangeState(self, self.DamageRechargeState)
             elseif self.OffHealth < 0 then
                 if self.RegenRate > 0 then
@@ -229,9 +277,9 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         WaitSeconds(self.RegenStartTime)
-        while self:GetHealth() < self:GetMaxHealth() do
+        while shield_methodsGetHealth(self) < shield_methodsGetMaxHealth(self) do
 
-            self:AdjustHealth(self.Owner, self.RegenRate / 10)
+            shield_methodsAdjustHealth(self, self.Owner, self.RegenRate / 10)
 
             self:UpdateShieldRatio(-1)
 
@@ -249,14 +297,14 @@ Shield = Class(moho.shield_methods, Entity) {
         local previousTickTotalBR
         local previousTickAssisters
 
-        while self.RegenThread and not self.Owner.ActiveConsumption or self.OnStateCharging and self:GetHealth() ~= shieldBP.ShieldMaxHealth do
+        while self.RegenThread and not self.Owner.ActiveConsumption or self.OnStateCharging and shield_methodsGetHealth(self) ~= shieldBP.ShieldMaxHealth do
             if previousTickAssisters then
                 local realBuildRate = 0
 
                 for key, unit in previousTickAssisters do
                     -- ActiveConsumption means unit is not on pause. Without this, rapid pausing/unpausing engies causes hp drops
                     if not unit.Dead and unit.ActiveConsumption then
-                        realBuildRate = realBuildRate + (unit:GetResourceConsumed() * unit.AssistBuildRate)
+                        realBuildRate = realBuildRate + (unit_methodsGetResourceConsumed(unit) * unit.AssistBuildRate)
                     else
                         realBuildRate = realBuildRate + unit.AssistBuildRate
                     end
@@ -265,14 +313,14 @@ Shield = Class(moho.shield_methods, Entity) {
                 if realBuildRate ~= previousTickTotalBR then
                     local health = (previousTickTotalBR - realBuildRate) * RegenPerBR --calculate "free" hp that should be subtracted
 
-                    self:AdjustHealth(self.Owner, -health)
+                    shield_methodsAdjustHealth(self, self.Owner, -health)
                 end
 
                 previousTickAssisters = nil
                 previousTickTotalBR = nil
             end
 
-            local assisters = self.Owner:GetGuards()
+            local assisters = unit_methodsGetGuards(self.Owner)
 
             if assisters[1] then
                 local engineers = {}
@@ -280,11 +328,11 @@ Shield = Class(moho.shield_methods, Entity) {
 
                 for key, unit in assisters do
                     --only engies can have shield as FocusUnit, also checking for pause
-                    if unit:GetFocusUnit() == self.Owner and unit.ActiveConsumption then
-                        unit.AssistBuildRate = unit:GetBuildRate()
+                    if unit_methodsGetFocusUnit(unit) == self.Owner and unit.ActiveConsumption then
+                        unit.AssistBuildRate = unit_methodsGetBuildRate(unit)
                         totalBR = totalBR + unit.AssistBuildRate
 
-                        table.insert(engineers, unit)
+                        tableInsert(engineers, unit)
                     end
                 end
 
@@ -304,7 +352,7 @@ Shield = Class(moho.shield_methods, Entity) {
         if not self or self.Owner.Dead then return end
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
-        Warp(ImpactMesh, self:GetPosition())
+        Warp(ImpactMesh, shield_methodsGetPosition(self))
 
         if self.ImpactMeshBp ~= '' then
             ImpactMesh:SetMesh(self.ImpactMeshBp)
@@ -321,7 +369,7 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     OnDestroy = function(self)
-        self:SetMesh('')
+        shield_methodsSetMesh(self, '')
         if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
@@ -379,9 +427,9 @@ Shield = Class(moho.shield_methods, Entity) {
     RemoveShield = function(self)
         self._IsUp = false
 
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
 
-        self:SetMesh('')
+        shield_methodsSetMesh(self, '')
         if self.MeshZ ~= nil then
             self.MeshZ:Destroy()
             self.MeshZ = nil
@@ -389,11 +437,11 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     CreateShieldMesh = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, self.Size / 2)
+        shield_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, self.Size / 2)
 
-        self:SetMesh(self.MeshBp)
-        self:SetParentOffset(Vector(0, self.ShieldVerticalOffset, 0))
-        self:SetDrawScale(self.Size)
+        shield_methodsSetMesh(self, self.MeshBp)
+        shield_methodsSetParentOffset(self, Vector(0, self.ShieldVerticalOffset, 0))
+        shield_methodsSetDrawScale(self, self.Size)
 
         if self.MeshZ == nil then
             self.MeshZ = Entity {Owner = self.Owner}
@@ -416,9 +464,9 @@ Shield = Class(moho.shield_methods, Entity) {
     ChargingUp = function(self, curProgress, time)
         self.Charging = true
         while curProgress < time do
-            local fraction = self.Owner:GetResourceConsumed()
+            local fraction = unit_methodsGetResourceConsumed(self.Owner)
             curProgress = curProgress + (fraction / 10)
-            curProgress = math.min(curProgress, time)
+            curProgress = mathMin(curProgress, time)
 
             local workProgress = curProgress / time
 
@@ -452,7 +500,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 self.OnStateCharging = nil
 
                 -- If the shield has less than full health, allow the shield to begin regening
-                if self:GetHealth() < self:GetMaxHealth() and self.RegenRate > 0 then
+                if shield_methodsGetHealth(self) < shield_methodsGetMaxHealth(self) and self.RegenRate > 0 then
                     self.RegenThread = ForkThread(self.RegenStartThread, self)
                     self.Owner.Trash:Add(self.RegenThread)
                 end
@@ -471,7 +519,7 @@ Shield = Class(moho.shield_methods, Entity) {
             local aiBrain = self.Owner:GetAIBrain()
 
             WaitSeconds(1.0)
-            local fraction = self.Owner:GetResourceConsumed()
+            local fraction = unit_methodsGetResourceConsumed(self.Owner)
             local on = true
             local test = false
 
@@ -481,8 +529,8 @@ Shield = Class(moho.shield_methods, Entity) {
 
                 self:UpdateShieldRatio(-1)
 
-                fraction = self.Owner:GetResourceConsumed()
-                if fraction ~= 1 and aiBrain:GetEconomyStored('ENERGY') <= 1 then
+                fraction = unit_methodsGetResourceConsumed(self.Owner)
+                if fraction ~= 1 and aibrain_methodsGetEconomyStored(aiBrain, 'ENERGY') <= 1 then
                     if test then
                         on = false
                     else
@@ -518,10 +566,10 @@ Shield = Class(moho.shield_methods, Entity) {
             end
 
             -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
-            self.OffHealth = self:GetHealth()
+            self.OffHealth = shield_methodsGetHealth(self)
 
             if self.DamageRecharge then
-                self.DamageRecharge = self.Owner:GetShieldRatio(self.Owner)
+                self.DamageRecharge = unit_methodsGetShieldRatio(self.Owner, self.Owner)
             end
 
             -- Get rid of the shield bar
@@ -554,7 +602,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 self:ChargingUp(0, self.ShieldRechargeTime)
 
                 -- Fully charged, get full health
-                self:SetHealth(self, self:GetMaxHealth())
+                shield_methodsSetHealth(self, self, shield_methodsGetMaxHealth(self))
 
                 self.DamageRecharge = nil
                 ChangeState(self, self.OnState)
@@ -566,7 +614,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
                 self:ChargingUp(self.ShieldRechargeTime * self.DamageRecharge, self.ShieldRechargeTime)
 
-                self:SetHealth(self, self:GetMaxHealth())
+                shield_methodsSetHealth(self, self, shield_methodsGetMaxHealth(self))
 
                 self.DamageRecharge = nil
                 ChangeState(self, self.OnState)
@@ -590,7 +638,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- If the unit is attached to a transport, make sure the shield goes to the off state
             -- so the shield isn't turned on while on a transport
-            if not self.Owner:IsUnitState('Attached') then
+            if not unit_methodsIsUnitState(self.Owner, 'Attached') then
                 ChangeState(self, self.OnState)
             else
                 ChangeState(self, self.OffState)
@@ -627,7 +675,7 @@ PersonalBubble = Class(Shield) {
         self.ShieldSize = spec.ShieldSize
 
         -- Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
         self:SetType('Personal')
     end,
 
@@ -646,12 +694,12 @@ PersonalBubble = Class(Shield) {
 
     CreateShieldMesh = function(self)
         Shield.CreateShieldMesh(self)
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
     end,
 
     RemoveShield = function(self)
         Shield.RemoveShield(self)
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
     end,
 
     OnState = State(Shield.OnState) {
@@ -668,21 +716,21 @@ PersonalBubble = Class(Shield) {
         Main = function(self)
             -- When the shield is down for some reason, reset the unit's collision profile so it can
             -- again be hit.
-            self.Owner:RevertCollisionShape()
+            unit_methodsRevertCollisionShape(self.Owner)
             Shield.OffState.Main(self)
         end
     },
 
     DamageRechargeState = State(Shield.DamageRechargeState) {
         Main = function(self)
-            self.Owner:RevertCollisionShape()
+            unit_methodsRevertCollisionShape(self.Owner)
             Shield.DamageRechargeState.Main(self)
          end
     },
 
     EnergyDrainRechargeState = State(Shield.EnergyDrainRechargeState) {
         Main = function(self)
-            self.Owner:RevertCollisionShape()
+            unit_methodsRevertCollisionShape(self.Owner)
             Shield.EnergyDrainRechargeState.Main(self)
         end
     }
@@ -771,8 +819,8 @@ PersonalShield = Class(Shield){
         self:SetSize(spec.Size)
         self:SetType('Personal')
 
-        self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self, spec.ShieldMaxHealth)
+        shield_methodsSetMaxHealth(self, spec.ShieldMaxHealth)
+        shield_methodsSetHealth(self, self, spec.ShieldMaxHealth)
 
         -- Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -780,12 +828,12 @@ PersonalShield = Class(Shield){
         self:SetRechargeTime(spec.ShieldRechargeTime or 5, spec.ShieldEnergyDrainRechargeTime or 5)
         self:SetVerticalOffset(spec.ShieldVerticalOffset)
 
-        self:SetVizToFocusPlayer('Always')
-        self:SetVizToEnemies('Intel')
-        self:SetVizToAllies('Always')
-        self:SetVizToNeutrals('Always')
+        shield_methodsSetVizToFocusPlayer(self, 'Always')
+        shield_methodsSetVizToEnemies(self, 'Intel')
+        shield_methodsSetVizToAllies(self, 'Always')
+        shield_methodsSetVizToNeutrals(self, 'Always')
 
-        self:AttachBoneTo(-1, spec.Owner, -1)
+        shield_methodsAttachBoneTo(self, -1, spec.Owner, -1)
 
         self:SetShieldRegenRate(spec.ShieldRegenRate)
         self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
@@ -812,7 +860,7 @@ PersonalShield = Class(Shield){
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactEnt = Entity {Owner = self.Owner}
 
-        Warp(ImpactEnt, self:GetPosition())
+        Warp(ImpactEnt, shield_methodsGetPosition(self))
         ImpactEnt:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
 
         for k, v in self.ImpactEffects do
@@ -826,12 +874,12 @@ PersonalShield = Class(Shield){
     CreateShieldMesh = function(self)
         -- Personal shields (unit shields) don't handle collisions anymore.
         -- This is done in the Unit's OnDamage function instead.
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
         self.Owner:SetMesh(self.OwnerShieldMesh, true)
     end,
 
     RemoveShield = function(self)
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
         self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
     end,
 
@@ -909,8 +957,8 @@ CzarShield = Class(PersonalShield) {
         self:SetSize(spec.Size)
         self:SetType('Personal')
 
-        self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self, spec.ShieldMaxHealth)
+        shield_methodsSetMaxHealth(self, spec.ShieldMaxHealth)
+        shield_methodsSetHealth(self, self, spec.ShieldMaxHealth)
 
         -- Show our 'lifebar'
         self:UpdateShieldRatio(1.0)
@@ -918,12 +966,12 @@ CzarShield = Class(PersonalShield) {
         self:SetRechargeTime(spec.ShieldRechargeTime or 5, spec.ShieldEnergyDrainRechargeTime or 5)
         self:SetVerticalOffset(spec.ShieldVerticalOffset)
 
-        self:SetVizToFocusPlayer('Always')
-        self:SetVizToEnemies('Intel')
-        self:SetVizToAllies('Always')
-        self:SetVizToNeutrals('Always')
+        shield_methodsSetVizToFocusPlayer(self, 'Always')
+        shield_methodsSetVizToEnemies(self, 'Intel')
+        shield_methodsSetVizToAllies(self, 'Always')
+        shield_methodsSetVizToNeutrals(self, 'Always')
 
-        self:AttachBoneTo(-1, spec.Owner, -1)
+        shield_methodsAttachBoneTo(self, -1, spec.Owner, -1)
 
         self:SetShieldRegenRate(spec.ShieldRegenRate)
         self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
@@ -936,10 +984,10 @@ CzarShield = Class(PersonalShield) {
 
     CreateImpactEffect = function(self, vector)
         if not self or self.Owner.Dead then return end
-        local army = self:GetArmy()
+        local army = shield_methodsGetArmy(self)
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
-        local pos = self:GetPosition()
+        local pos = shield_methodsGetPosition(self)
 
         -- Shield has non-standard form (ellipsoid) and no collision, so we need some magic to make impacts look good
         -- All impacts from above and below (>1 & <1) cause big pulses in the center of shield
@@ -976,11 +1024,11 @@ CzarShield = Class(PersonalShield) {
     CreateShieldMesh = function(self)
         -- Personal shields (unit shields) don't handle collisions anymore.
         -- This is done in the Unit's OnDamage function instead.
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
 
-        self:SetMesh(self.MeshBp)
-        self:SetParentOffset(Vector(0, self.ShieldVerticalOffset, 0))
-        self:SetDrawScale(self.Size)
+        shield_methodsSetMesh(self, self.MeshBp)
+        shield_methodsSetParentOffset(self, Vector(0, self.ShieldVerticalOffset, 0))
+        shield_methodsSetDrawScale(self, self.Size)
     end,
 
     OnDestroy = function(self)
@@ -989,6 +1037,6 @@ CzarShield = Class(PersonalShield) {
 
     RemoveShield = function(self)
         Shield.RemoveShield(self)
-        self:SetCollisionShape('None')
+        shield_methodsSetCollisionShape(self, 'None')
     end,
 }

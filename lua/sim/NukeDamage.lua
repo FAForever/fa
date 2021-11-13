@@ -1,3 +1,9 @@
+local ipairs = ipairs
+local ForkThread = ForkThread
+local DamageArea = DamageArea
+local next = next
+local DamageRing = DamageRing
+
 NukeAOE = Class() {
     Damage = false,
     Radius = false,

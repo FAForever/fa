@@ -8,6 +8,20 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local mathCeil = math.ceil
+local stringFind = string.find
+local unpack = unpack
+local error = error
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local KillThread = KillThread
+local tableGetn = table.getn
+local type = type
+local GetGameTimeSeconds = GetGameTimeSeconds
+local LOG = LOG
+local WARN = WARN
+
 BrainConditionsMonitor = Class {
 
     PreCreate = function(self)
@@ -90,7 +104,7 @@ BrainConditionsMonitor = Class {
         # Check if the cData matches up
         for num,data in self.ConditionData.TableConditions[cFilename][cFunctionName] do
             # Check if the data is the same length
-            if table.getn(data.ConditionParameters) == table.getn(cData) then
+            if tableGetn(data.ConditionParameters) == tableGetn(cData) then
                 local match = true
                 # Check each piece of data to make sure it matches
                 for k,v in data.ConditionParameters do
@@ -115,15 +129,15 @@ BrainConditionsMonitor = Class {
         else
             newCondition = ImportCondition()
         end
-        newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, cFilename, cFunctionName, cData)
-        table.insert(self.ResultTable, newCondition)
+        newCondition:Create(self.Brain, tableGetn(self.ResultTable) + 1, cFilename, cFunctionName, cData)
+        tableInsert(self.ResultTable, newCondition)
 
         # Add in a hashed table for quicker key lookup, may not be necessary
         local newTable = {
             ConditionParameters = cData,
             Key = newCondition:GetKey(),
         }
-        table.insert(self.ConditionData.TableConditions[cFilename][cFunctionName], newTable)
+        tableInsert(self.ConditionData.TableConditions[cFilename][cFunctionName], newTable)
         return newTable.Key
     end,
 
@@ -147,15 +161,15 @@ BrainConditionsMonitor = Class {
 
         # No match, insert data into the function conditions table
         local newCondition = FunctionCondition()
-        newCondition:Create(self.Brain, table.getn(self.ResultTable) + 1, func, parameters)
-        table.insert(self.ResultTable, newCondition)
+        newCondition:Create(self.Brain, tableGetn(self.ResultTable) + 1, func, parameters)
+        tableInsert(self.ResultTable, newCondition)
 
         local newTable = {
             Function = func,
             Key = newCondition:GetKey(),
             ConditionParameters = parameters,
         }
-        table.insert(self.ConditionData.FunctionConditions, newTable)
+        tableInsert(self.ConditionData.FunctionConditions, newTable)
         return newTable.Key
     end,
 
@@ -164,8 +178,8 @@ BrainConditionsMonitor = Class {
         while true do
             local checks = 0
             local numResults = 0
-            local numChecks = table.getn(self.ResultTable)
-            local numPerTick = math.ceil(numChecks / (self.ThreadWaitDuration * 10))
+            local numChecks = tableGetn(self.ResultTable)
+            local numPerTick = mathCeil(numChecks / (self.ThreadWaitDuration * 10))
 
             for k,v in self.ResultTable do
                 if not v:LocationExists() then
@@ -268,7 +282,7 @@ ImportCondition = Class(Condition) {
         local found = false
         for k,v in self.FunctionData do
             if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
-                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                if stringFind(v, 'ARMY_') or stringFind(v, 'Large Expansion') or stringFind(v, 'Expansion Area') or stringFind(v, 'EXPANSION_AREA') or stringFind(v, 'Naval Area') or stringFind(v, 'MAIN') then
                     found = true
                     if self.Brain.BuilderManagers[v] then
                         return true
@@ -317,7 +331,7 @@ InstantImportCondition = Class(Condition) {
         local found = false
         for k,v in self.FunctionData do
             if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
-                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                if stringFind(v, 'ARMY_') or stringFind(v, 'Large Expansion') or stringFind(v, 'Expansion Area') or stringFind(v, 'EXPANSION_AREA') or stringFind(v, 'Naval Area') or stringFind(v, 'MAIN') then
                     found = true
                     if self.Brain.BuilderManagers[v] then
                         return true
@@ -347,7 +361,7 @@ FunctionCondition = Class(Condition) {
         local found = false
         for k,v in self.FunctionParameters do
             if type(v) == 'string' and not (v == 'Naval Area' or v == 'Expansion Area' or v == 'Large Expansion Area') then
-                if string.find(v, 'ARMY_') or string.find(v, 'Large Expansion') or string.find(v, 'Expansion Area') or string.find(v, 'EXPANSION_AREA') or string.find(v, 'Naval Area') or string.find(v, 'MAIN') then
+                if stringFind(v, 'ARMY_') or stringFind(v, 'Large Expansion') or stringFind(v, 'Expansion Area') or stringFind(v, 'EXPANSION_AREA') or stringFind(v, 'Naval Area') or stringFind(v, 'MAIN') then
                     found = true
                     if self.Brain.BuilderManagers[v] then
                         return true

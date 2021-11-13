@@ -1,6 +1,15 @@
 
 -- The global sync table is copied from the sim layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
+local ipairs = ipairs
+local tableEmpty = table.empty
+local GetFocusArmy = GetFocusArmy
+local tableMerged = table.merged
+local SessionIsReplay = SessionIsReplay
+local stringFormat = string.format
+local WARN = WARN
+local next = next
+
 Sync = {}
 
 -- The PreviousSync table holds just what you'd expect it to, the sync table from the previous
@@ -22,8 +31,8 @@ function OnSync()
         ExitGame()
     end
 
-    if not table.empty(Sync.UnitData) then
-        UnitData = table.merged(UnitData,Sync.UnitData)
+    if not tableEmpty(Sync.UnitData) then
+        UnitData = tableMerged(UnitData,Sync.UnitData)
     end
 
     for id, v in Sync.ReleaseIds do
@@ -47,7 +56,7 @@ function OnSync()
         ConExecute('UI_RenderUnitBars true')
     end
 
-    if not table.empty(Sync.AIChat) then
+    if not tableEmpty(Sync.AIChat) then
         for k, v in Sync.AIChat do
             import('/lua/AIChatSorian.lua').AIChat(v.group, v.text, v.sender)
         end
@@ -64,7 +73,7 @@ function OnSync()
     end
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
-    if not table.empty(Sync.Reclaim) then
+    if not tableEmpty(Sync.Reclaim) then
         UpdateReclaim(Sync.Reclaim)
     end
 
@@ -79,7 +88,7 @@ function OnSync()
         end
 
         GpgNetSend('TeamkillHappened', data.time, data.victim.id, data.victim.name,  data.instigator.id, data.instigator.name)
-        WARN(string.format("TEAMKILL: %s KILLED BY %s, TIME: %s", data.victim.name, data.instigator.name, data.time))
+        WARN(stringFormat("TEAMKILL: %s KILLED BY %s, TIME: %s", data.victim.name, data.instigator.name, data.time))
 
         if GetFocusArmy() == victim then
             import('/lua/ui/dialogs/teamkill.lua').CreateDialog(data)
@@ -90,7 +99,7 @@ function OnSync()
         GpgNetSend('EnforceRating')
     end
 
-    if Sync.EnhanceMessage and not table.empty(Sync.EnhanceMessage) then
+    if Sync.EnhanceMessage and not tableEmpty(Sync.EnhanceMessage) then
         for _, messageTable in Sync.EnhanceMessage do
             sendEnhancementMessage(messageTable)
         end

@@ -5,6 +5,41 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local unit_methodsSetBlockCommandQueue = moho.unit_methods.SetBlockCommandQueue
+local BuilderArmManipulatorSetAimingArc = moho.BuilderArmManipulator.SetAimingArc
+local CreateAnimator = CreateAnimator
+local tableInsert = table.insert
+local CreateSlider = CreateSlider
+local ipairs = ipairs
+local RotateManipulatorClearGoal = moho.RotateManipulator.ClearGoal
+local weapon_methodsSetTargetEntity = moho.weapon_methods.SetTargetEntity
+local unit_methodsSetBusy = moho.unit_methods.SetBusy
+local CreateEmitterAtBone = CreateEmitterAtBone
+local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
+local CreateBuilderArmController = CreateBuilderArmController
+local WaitFor = WaitFor
+local RotateManipulatorSetCurrentAngle = moho.RotateManipulator.SetCurrentAngle
+local EntityCategoryContains = EntityCategoryContains
+local weapon_methodsSetTargetGround = moho.weapon_methods.SetTargetGround
+local weapon_methodsFireWeapon = moho.weapon_methods.FireWeapon
+local IssueMove = IssueMove
+local unpack = unpack
+local next = next
+local unit_methodsDetachAll = moho.unit_methods.DetachAll
+local unit_methodsGetBlueprint = moho.unit_methods.GetBlueprint
+local unit_methodsGetFocusUnit = moho.unit_methods.GetFocusUnit
+local Vector = Vector
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local AnimationManipulatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local RotateManipulatorGetCurrentAngle = moho.RotateManipulator.GetCurrentAngle
+local CreateAttachedEmitter = CreateAttachedEmitter
+local unit_methodsGetWeapon = moho.unit_methods.GetWeapon
+local VDist3 = VDist3
+local tableGetn = table.getn
+local Random = Random
+
 local DefaultUnitsFile = import('defaultunits.lua')
 local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
@@ -52,18 +87,18 @@ SFactoryUnit = Class(FactoryUnit) {
 
     OnPaused = function(self)
         -- When factory is paused take some action
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
+        if unit_methodsIsUnitState(self, 'Building') and self.unitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-            self:StartBuildFx(self:GetFocusUnit())
+            self:StartBuildFx(unit_methodsGetFocusUnit(self))
         end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
-            self:StartBuildFxUnpause(self:GetFocusUnit())
+        if unit_methodsIsUnitState(self, 'Building') and self.unitBeingBuilt then
+            self:StartBuildFxUnpause(unit_methodsGetFocusUnit(self))
         end
     end,
 }
@@ -79,19 +114,19 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     FinishBuildThread = function(self, unitBeingBuilt, order)
-        self:SetBusy(true)
-        self:SetBlockCommandQueue(true)
+        unit_methodsSetBusy(self, true)
+        unit_methodsSetBlockCommandQueue(self, true)
         if unitBeingBuilt and not unitBeingBuilt.Dead and EntityCategoryContains(categories.AIR, unitBeingBuilt) then
             unitBeingBuilt:DetachFrom(true)
-            local bp = self:GetBlueprint()
-            self:DetachAll(bp.Display.BuildAttachBone or 0)
+            local bp = unit_methodsGetBlueprint(self)
+            unit_methodsDetachAll(self, bp.Display.BuildAttachBone or 0)
         end
         self:DestroyBuildRotator()
         if order ~= 'Upgrade' then
             ChangeState(self, self.RollingOffState)
         else
-            self:SetBusy(false)
-            self:SetBlockCommandQueue(false)
+            unit_methodsSetBusy(self, false)
+            unit_methodsSetBlockCommandQueue(self, false)
         end
     end,
 
@@ -100,13 +135,13 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
         if not self.ReleaseEffectsBag then self.ReleaseEffectsBag = {} end
         for _, v in self.RollOffBones do
             local fx = AttachBeamEntityToEntity(self, v, unitB, -1, self.Army, EffectTemplate.TTransportBeam01)
-            table.insert(self.ReleaseEffectsBag, fx)
+            tableInsert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
             fx = AttachBeamEntityToEntity(unitB, -1, self, v, self.Army, EffectTemplate.TTransportBeam02)
-            table.insert(self.ReleaseEffectsBag, fx)
+            tableInsert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
             fx = CreateEmitterAtBone(self, v, self.Army, EffectTemplate.TTransportGlow01)
-            table.insert(self.ReleaseEffectsBag, fx)
+            tableInsert(self.ReleaseEffectsBag, fx)
             self.Trash:Add(fx)
         end
     end,
@@ -127,7 +162,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
     end,
 
     RolloffBody = function(self)
-        self:SetBusy(true)
+        unit_methodsSetBusy(self, true)
         local unitBuilding = self.UnitBeingBuilt
 
         -- If the unit being built isn't an engineer use normal rolloff
@@ -135,7 +170,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
             AirFactoryUnit.RolloffBody(self)
         else
             -- Engineers need to be slid off the factory
-            local bp = self:GetBlueprint()
+            local bp = unit_methodsGetBlueprint(self)
             if not self.AttachmentSliderManip then
                 self.AttachmentSliderManip = CreateSlider(self, bp.Display.BuildAttachBone or 0)
             end
@@ -150,7 +185,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
 
             if not unitBuilding.Dead then
                 unitBuilding:DetachFrom(true)
-                self:DetachAll(bp.Display.BuildAttachBone or 0)
+                unit_methodsDetachAll(self, bp.Display.BuildAttachBone or 0)
             end
 
             if self.AttachmentSliderManip then
@@ -158,7 +193,7 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
                 self.AttachmentSliderManip = nil
             end
             self:DestroyRollOffEffects()
-            self:SetBusy(false)
+            unit_methodsSetBusy(self, false)
 
             ChangeState(self, self.IdleState)
         end
@@ -166,26 +201,26 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = unit_methodsGetBlueprint(self).General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
-                savedAngle = self.Rotator1:GetCurrentAngle()
+                savedAngle = RotateManipulatorGetCurrentAngle(self.Rotator1)
                 self.Rotator1:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator1, savedAngle)
                 unitBeingBuilt.Rotator1:SetGoal(savedAngle)
                 -- Freeze the next rotator to 0, since that's where it will be
-                unitBeingBuilt.Rotator2:SetCurrentAngle(0)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator2, 0)
                 unitBeingBuilt.Rotator2:SetGoal(0)
             end
 
             if self.Rotator2 then
-                savedAngle = self.Rotator2:GetCurrentAngle()
+                savedAngle = RotateManipulatorGetCurrentAngle(self.Rotator2)
                 self.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator2:SetCurrentAngle(savedAngle)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator2, savedAngle)
                 unitBeingBuilt.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator3:SetCurrentAngle(0)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator3, 0)
                 unitBeingBuilt.Rotator3:SetGoal(0)
             end
         end
@@ -197,13 +232,13 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
             if unitBuilding:GetFractionComplete() == 1 then
                 -- Start halted rotators on upgraded unit
                 if unitBuilding.Rotator1 then
-                    unitBuilding.Rotator1:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator1)
                 end
                 if unitBuilding.Rotator2 then
-                    unitBuilding.Rotator2:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator2)
                 end
                 if unitBuilding.Rotator3 then
-                    unitBuilding.Rotator3:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator3)
                 end
             end
             AirFactoryUnit.UpgradingState.OnStopBuild(self, unitBuilding)
@@ -213,12 +248,12 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
            AirFactoryUnit.UpgradingState.OnFailedToBuild(self)
            -- Failed to build, so resume rotators
            if self.Rotator1 then
-               self.Rotator1:ClearGoal()
+               RotateManipulatorClearGoal(self.Rotator1)
                self.Rotator1:SetSpeed(5)
            end
 
             if self.Rotator2 then
-               self.Rotator2:ClearGoal()
+               RotateManipulatorClearGoal(self.Rotator2)
                self.Rotator2:SetSpeed(5)
            end
         end,
@@ -264,14 +299,14 @@ SConstructionUnit = Class(ConstructionUnit) {
     SetupBuildBones = function(self)
         ConstructionUnit.SetupBuildBones(self)
 
-        local bp = self:GetBlueprint()
+        local bp = unit_methodsGetBlueprint(self)
         local buildbones = bp.General.BuildBones
         if self.BuildArmManipulator then
-            self.BuildArmManipulator:SetAimingArc(buildbones.YawMin or -180, buildbones.YawMax or 180, buildbones.YawSlew or 360, buildbones.PitchMin or -90, buildbones.PitchMax or 90, buildbones.PitchSlew or 360)
+            BuilderArmManipulatorSetAimingArc(self.BuildArmManipulator, buildbones.YawMin or -180, buildbones.YawMax or 180, buildbones.YawSlew or 360, buildbones.PitchMin or -90, buildbones.PitchMax or 90, buildbones.PitchSlew or 360)
         end
         if bp.General.BuildBonesAlt1 then
             self.BuildArm2Manipulator = CreateBuilderArmController(self, bp.General.BuildBonesAlt1.YawBone or 0 , bp.General.BuildBonesAlt1.PitchBone or 0, bp.General.BuildBonesAlt1.AimBone or 0)
-            self.BuildArm2Manipulator:SetAimingArc(bp.General.BuildBonesAlt1.YawMin or -180, bp.General.BuildBonesAlt1.YawMax or 180, bp.General.BuildBonesAlt1.YawSlew or 360, bp.General.BuildBonesAlt1.PitchMin or -90, bp.General.BuildBonesAlt1.PitchMax or 90, bp.General.BuildBonesAlt1.PitchSlew or 360)
+            BuilderArmManipulatorSetAimingArc(self.BuildArm2Manipulator, bp.General.BuildBonesAlt1.YawMin or -180, bp.General.BuildBonesAlt1.YawMax or 180, bp.General.BuildBonesAlt1.YawSlew or 360, bp.General.BuildBonesAlt1.PitchMin or -90, bp.General.BuildBonesAlt1.PitchMax or 90, bp.General.BuildBonesAlt1.PitchSlew or 360)
             self.BuildArm2Manipulator:SetPrecedence(5)
             if self.BuildingOpenAnimManip and self.Build2ArmManipulator then
                 self.BuildArm2Manipulator:Disable()
@@ -347,26 +382,26 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = unit_methodsGetBlueprint(self).General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
-                savedAngle = self.Rotator1:GetCurrentAngle()
+                savedAngle = RotateManipulatorGetCurrentAngle(self.Rotator1)
                 self.Rotator1:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator1, savedAngle)
                 unitBeingBuilt.Rotator1:SetGoal(savedAngle)
                 -- Freeze the next rotator to 0, since that's where it will be
-                unitBeingBuilt.Rotator2:SetCurrentAngle(0)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator2, 0)
                 unitBeingBuilt.Rotator2:SetGoal(0)
             end
 
             if self.Rotator2 then
-                savedAngle = self.Rotator2:GetCurrentAngle()
+                savedAngle = RotateManipulatorGetCurrentAngle(self.Rotator2)
                 self.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator2:SetCurrentAngle(savedAngle)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator2, savedAngle)
                 unitBeingBuilt.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator3:SetCurrentAngle(0)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator3, 0)
                 unitBeingBuilt.Rotator3:SetGoal(0)
             end
         end
@@ -378,13 +413,13 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
             if unitBuilding:GetFractionComplete() == 1 then
                 -- Start halted rotators on upgraded unit
                 if unitBuilding.Rotator1 then
-                    unitBuilding.Rotator1:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator1)
                 end
                 if unitBuilding.Rotator2 then
-                    unitBuilding.Rotator2:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator2)
                 end
                 if unitBuilding.Rotator3 then
-                    unitBuilding.Rotator3:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator3)
                 end
             end
             LandFactoryUnit.UpgradingState.OnStopBuild(self, unitBuilding)
@@ -394,12 +429,12 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            LandFactoryUnit.UpgradingState.OnFailedToBuild(self)
            -- Failed to build, so resume rotators
            if self.Rotator1 then
-               self.Rotator1:ClearGoal()
+               RotateManipulatorClearGoal(self.Rotator1)
                self.Rotator1:SetSpeed(5)
            end
 
             if self.Rotator2 then
-               self.Rotator2:ClearGoal()
+               RotateManipulatorClearGoal(self.Rotator2)
                self.Rotator2:SetSpeed(5)
            end
         end,
@@ -444,26 +479,26 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
-        local unitid = self:GetBlueprint().General.UpgradesTo
+        local unitid = unit_methodsGetBlueprint(self).General.UpgradesTo
         if unitBeingBuilt.UnitId == unitid and order == 'Upgrade' then
             -- Stop pods that exist in the upgraded unit
             local savedAngle
             if self.Rotator1 then
-                savedAngle = self.Rotator1:GetCurrentAngle()
+                savedAngle = RotateManipulatorGetCurrentAngle(self.Rotator1)
                 self.Rotator1:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator1:SetCurrentAngle(savedAngle)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator1, savedAngle)
                 unitBeingBuilt.Rotator1:SetGoal(savedAngle)
                 -- Freeze the next rotator to 0, since that's where it will be
-                unitBeingBuilt.Rotator2:SetCurrentAngle(0)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator2, 0)
                 unitBeingBuilt.Rotator2:SetGoal(0)
             end
 
             if self.Rotator2 then
-                savedAngle = self.Rotator2:GetCurrentAngle()
+                savedAngle = RotateManipulatorGetCurrentAngle(self.Rotator2)
                 self.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator2:SetCurrentAngle(savedAngle)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator2, savedAngle)
                 unitBeingBuilt.Rotator2:SetGoal(savedAngle)
-                unitBeingBuilt.Rotator3:SetCurrentAngle(0)
+                RotateManipulatorSetCurrentAngle(unitBeingBuilt.Rotator3, 0)
                 unitBeingBuilt.Rotator3:SetGoal(0)
             end
         end
@@ -475,13 +510,13 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
             if unitBuilding:GetFractionComplete() == 1 then
                 -- Start halted rotators on upgraded unit
                 if unitBuilding.Rotator1 then
-                    unitBuilding.Rotator1:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator1)
                 end
                 if unitBuilding.Rotator2 then
-                    unitBuilding.Rotator2:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator2)
                 end
                 if unitBuilding.Rotator3 then
-                    unitBuilding.Rotator3:ClearGoal()
+                    RotateManipulatorClearGoal(unitBuilding.Rotator3)
                 end
             end
             SeaFactoryUnit.UpgradingState.OnStopBuild(self, unitBuilding)
@@ -491,12 +526,12 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
             SeaFactoryUnit.UpgradingState.OnFailedToBuild(self)
             -- Failed to build, so resume rotators
             if self.Rotator1 then
-                self.Rotator1:ClearGoal()
+                RotateManipulatorClearGoal(self.Rotator1)
                 self.Rotator1:SetSpeed(5)
             end
 
             if self.Rotator2 then
-               self.Rotator2:ClearGoal()
+               RotateManipulatorClearGoal(self.Rotator2)
                self.Rotator2:SetSpeed(5)
            end
         end,
@@ -528,16 +563,16 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
         if not self.AnimationManipulator then
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
-            self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false)
+            AnimationManipulatorPlayAnim(self.AnimationManipulator, unit_methodsGetBlueprint(self).Display.AnimationActivate, false)
         end
-        self.AnimationManipulator:SetRate(1)
+        AnimationManipulatorSetRate(self.AnimationManipulator, 1)
     end,
 
     OnShieldDisabled = function(self)
         ShieldStructureUnit.OnShieldDisabled(self)
         if not self.AnimationManipulator then return end
 
-        self.AnimationManipulator:SetRate(-1)
+        AnimationManipulatorSetRate(self.AnimationManipulator, -1)
     end,
 }
 
@@ -601,29 +636,29 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
             local weaponMinRange = bp.Weapon[1].MinRadius or 0
             local beamLifetime = bp.Weapon[1].BeamLifetime or 1
             local reaquireTime = bp.Weapon[1].RequireTime or 0.5
-            local weapon = self:GetWeapon(1)
+            local weapon = unit_methodsGetWeapon(self, 1)
 
             self:ForkThread(self.LifeThread)
 
             while true do
                 local location = self:GetPosition()
-                local targets = aiBrain:GetUnitsAroundPoint(categories.LAND - categories.UNTARGETABLE, location, weaponMaxRange)
+                local targets = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.LAND - categories.UNTARGETABLE, location, weaponMaxRange)
                 local filteredUnits = {}
                 for k, v in targets do
                     if VDist3(location, v:GetPosition()) >= weaponMinRange and v ~= self then
-                        table.insert(filteredUnits, v)
+                        tableInsert(filteredUnits, v)
                     end
                 end
-                local target = filteredUnits[Random(1, table.getn(filteredUnits))]
+                local target = filteredUnits[Random(1, tableGetn(filteredUnits))]
                 if target then
-                    weapon:SetTargetEntity(target)
+                    weapon_methodsSetTargetEntity(weapon, target)
                 else
-                    weapon:SetTargetGround({location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20)})
+                    weapon_methodsSetTargetGround(weapon, {location[1] + Random(-20, 20), location[2], location[3] + Random(-20, 20)})
                 end
                 -- Wait a tick to let the target update awesomely.
                 WaitSeconds(.1)
                 self.timeAlive = self.timeAlive + .1
-                weapon:FireWeapon()
+                weapon_methodsFireWeapon(weapon)
 
                 WaitSeconds(beamLifetime)
                 DefaultBeamWeapon.PlayFxBeamEnd(weapon, weapon.Beams[1].Beam)

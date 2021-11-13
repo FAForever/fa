@@ -11,6 +11,30 @@
 --------------------------------------------------------------------------
 --  CYBRAN PROJECILES SCRIPTS
 --------------------------------------------------------------------------
+local projectile_methodsTrackTarget = moho.projectile_methods.TrackTarget
+local projectile_methodsSetMaxSpeed = moho.projectile_methods.SetMaxSpeed
+local DamageArea = DamageArea
+local DamageRing = DamageRing
+local mathCos = math.cos
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local projectile_methodsStayUnderwater = moho.projectile_methods.StayUnderwater
+local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
+local projectile_methodsGetPosition = moho.projectile_methods.GetPosition
+local next = next
+local mathSin = math.sin
+local ipairs = ipairs
+local projectile_methodsSetVelocity = moho.projectile_methods.SetVelocity
+local CreateLightParticle = CreateLightParticle
+local CreateDecal = CreateDecal
+local projectile_methodsCreateProjectile = moho.projectile_methods.CreateProjectile
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
+local projectile_methodsCreateChildProjectile = moho.projectile_methods.CreateChildProjectile
+local projectile_methodsSetTurnRate = moho.projectile_methods.SetTurnRate
+local projectile_methodsSetCollisionShape = moho.projectile_methods.SetCollisionShape
+local projectile_methodsDestroy = moho.projectile_methods.Destroy
+local Random = Random
+
 local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
 local OnWaterEntryEmitterProjectile = DefaultProjectileFile.OnWaterEntryEmitterProjectile
@@ -69,7 +93,7 @@ CIFProtonBombProjectile = Class(NullShell) { -- T3 strategic bomber
 
     OnImpact = function(self, targetType, targetEntity)
         local army = self.Army
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -96,9 +120,9 @@ CIFProtonBombProjectile = Class(NullShell) { -- T3 strategic bomber
         local blanketVelocity = 6.25
 
         for i = 0, (blanketSides-1) do
-            local blanketX = math.sin(i*blanketAngle)
-            local blanketZ = math.cos(i*blanketAngle)
-            self:CreateProjectile('/effects/entities/EffectProtonAmbient01/EffectProtonAmbient01_proj.bp', blanketX, 0.5, blanketZ, blanketX, 0, blanketZ)
+            local blanketX = mathSin(i*blanketAngle)
+            local blanketZ = mathCos(i*blanketAngle)
+            projectile_methodsCreateProjectile(self, '/effects/entities/EffectProtonAmbient01/EffectProtonAmbient01_proj.bp', blanketX, 0.5, blanketZ, blanketX, 0, blanketZ)
                 :SetVelocity(blanketVelocity):SetAcceleration(-0.3)
         end
 
@@ -125,7 +149,7 @@ CDFProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -163,7 +187,7 @@ CDFHvyProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxTrailOffset = 0,
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -292,7 +316,7 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         local army = self.Army
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -393,7 +417,7 @@ CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) { --loya & waile
     FxImpactUnderWater = {},
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -448,7 +472,7 @@ CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya, wagner, m
     FxImpactLand = EffectTemplate.CElectronBolterHitLand01,
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -506,7 +530,7 @@ CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
     FxOnKilledScale = 2.5,
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -586,7 +610,7 @@ CIFMolecularResonanceShell = Class(SinglePolyTrailProjectile) {
     DelayedDestroyThread = function(self)
         WaitSeconds(0.3)
         self.CreateImpactEffects(self, self.Army, self.FxImpactUnit, self.FxUnitHitScale)
-        self:Destroy()
+        projectile_methodsDestroy(self)
     end,
 
     OnImpact = function(self, TargetType, TargetEntity)
@@ -597,7 +621,7 @@ CIFMolecularResonanceShell = Class(SinglePolyTrailProjectile) {
                 self:ForkThread(self.DelayedDestroyThread)
             else
                 SinglePolyTrailProjectile.OnImpact(self, TargetType, TargetEntity)
-                self:Destroy()
+                projectile_methodsDestroy(self)
             end
         end
     end,
@@ -619,7 +643,7 @@ CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) { -- T2 gs & 
         local radius = self.DamageData.DamageRadius
         
         if radius == 0 then
-            local pos = self:GetPosition()
+            local pos = projectile_methodsGetPosition(self)
             local FriendlyFire = false
             
             DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
@@ -652,7 +676,7 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -736,7 +760,7 @@ CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
         local radius = self.DamageData.DamageRadius
         
         if radius == 0 then -- to prevent OC from doing that decal
-            local pos = self:GetPosition()
+            local pos = projectile_methodsGetPosition(self)
             local FriendlyFire = false
             
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
@@ -777,7 +801,7 @@ CMissileAAProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactUnderWater = {},
 
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         SingleBeamProjectile.OnCreate(self)
     end,
 }
@@ -834,13 +858,13 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         if self.Impacted == false and targetType ~= 'Air' then
             self.Impacted = true
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),-Random(1.5,3))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1.5,3),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),-Random(1,2))
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1.5,2.5),Random(1,3),0)
-            self:CreateChildProjectile(self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),Random(2,4))
+            projectile_methodsCreateChildProjectile(self, self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
+            projectile_methodsCreateChildProjectile(self, self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
+            projectile_methodsCreateChildProjectile(self, self.ChildProjectile):SetVelocity(0,Random(1,3),-Random(1.5,3))
+            projectile_methodsCreateChildProjectile(self, self.ChildProjectile):SetVelocity(Random(1.5,3),Random(1,3),0)
+            projectile_methodsCreateChildProjectile(self, self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),-Random(1,2))
+            projectile_methodsCreateChildProjectile(self, self.ChildProjectile):SetVelocity(-Random(1.5,2.5),Random(1,3),0)
+            projectile_methodsCreateChildProjectile(self, self.ChildProjectile):SetVelocity(-Random(1,2),Random(1,3),Random(2,4))
             SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
         end
     end,
@@ -852,7 +876,7 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
 
     DelayedDestroyThread = function(self)
         WaitSeconds(0.5)
-        self:Destroy()
+        projectile_methodsDestroy(self)
     end,
 }
 
@@ -897,7 +921,7 @@ CRocketProjectile = Class(SingleBeamProjectile) { -- wagner
         local radius = self.DamageData.DamageRadius
         
         if radius == 0 then
-            local pos = self:GetPosition()
+            local pos = projectile_methodsGetPosition(self)
             local FriendlyFire = false
             
             DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
@@ -936,7 +960,7 @@ CLOATacticalMissileProjectile = Class(SingleBeamProjectile) {
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self,army,v)
             if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
+                IEffectScaleEmitter(emit, EffectScale or 1)
             end
         end
     end,
@@ -972,7 +996,7 @@ CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
     FxOnKilledScale = 0.375,
 
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         SingleBeamProjectile.OnCreate(self)
     end,
 
@@ -986,7 +1010,7 @@ CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
         for k, v in EffectTable do
             emit = CreateEmitterAtEntity(self, army, v)
             if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
+                IEffectScaleEmitter(emit, EffectScale or 1)
             end
         end
     end,
@@ -1055,7 +1079,7 @@ CTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
         OnWaterEntryEmitterProjectile.OnCreate(self, inWater)
         -- if we are starting in the water then immediately switch to tracking in water
         if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
+            projectile_methodsTrackTarget(self, true):StayUnderwater(true)
             self:OnEnterWater(self)
         end
     end,
@@ -1063,7 +1087,7 @@ CTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
 
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
     end,
 
 }
@@ -1084,7 +1108,7 @@ CTorpedoSubProjectile = Class(EmitterProjectile) {
     FxNoneHitScale = 1,
     FxImpactNone = {},
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
     end,
 }
@@ -1117,7 +1141,7 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
             end
         end
 
-        self:TrackTarget(false)
+        projectile_methodsTrackTarget(self, false)
     end,
 
     OnEnterWater = function(self)
@@ -1127,12 +1151,12 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
             CreateEmitterAtEntity(self, self.Army, v)
         end
 
-        self:TrackTarget(false)
-        self:StayUnderwater(true)
-        self:SetTurnRate(0)
-        self:SetMaxSpeed(1)
-        self:SetVelocity(0, -0.25, 0)
-        self:SetVelocity(0.25)
+        projectile_methodsTrackTarget(self, false)
+        projectile_methodsStayUnderwater(self, true)
+        projectile_methodsSetTurnRate(self, 0)
+        projectile_methodsSetMaxSpeed(self, 1)
+        projectile_methodsSetVelocity(self, 0, -0.25, 0)
+        projectile_methodsSetVelocity(self, 0.25)
     end,
 
     AddDepthCharge = function(self, tbl)
@@ -1169,7 +1193,7 @@ CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) { -- Brick
     FxTrailOffset = 0,
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         

@@ -7,6 +7,13 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local aibrain_methodsGetCurrentEnemy = moho.aibrain_methods.GetCurrentEnemy
+local unitcountbuildconditionsUp = import('/lua/editor/UnitCountBuildConditions.lua')
+local GetGameTimeSeconds = GetGameTimeSeconds
+local mathFloor = math.floor
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -28,17 +35,17 @@ local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
 function LandAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local UC = unitcountbuildconditionsUp
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
         return true
     end
-    if aiBrain:GetCurrentEnemy() then
-        local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-        local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    if aibrain_methodsGetCurrentEnemy(aiBrain) then
+        local estartX, estartZ = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyStartPos()
+        local enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
         --targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSurface')
-        targetNumber = SUtils.GetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
+        targetNumber = aibrain_methodsGetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
     end
 
     local position = engineerManager:GetLocationCoords()
@@ -47,7 +54,7 @@ function LandAttackCondition(aiBrain, locationType, targetNumber)
     --local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
     local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER)
     local airThreat = 0 #pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
-    local adjustForTime = 1 + (math.floor(GetGameTimeSeconds()/60) * .01)
+    local adjustForTime = 1 + (mathFloor(GetGameTimeSeconds()/60) * .01)
     --LOG("*AI DEBUG: Pool Threat: "..surThreat.." adjustment: "..adjustForTime.." Enemy Threat: "..targetNumber)
     if (surThreat + airThreat) >= targetNumber and targetNumber > 0 then
         return true

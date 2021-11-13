@@ -8,6 +8,11 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local Random = Random
+local sorianbuildconditionsUp = import('/lua/editor/SorianBuildConditions.lua')
+local GetMapSize = GetMapSize
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+
 BaseBuilderTemplate {
     BaseTemplateName = 'SorianMainWater',
     Builders = {
@@ -237,8 +242,8 @@ BaseBuilderTemplate {
 
         local mapSizeX, mapSizeZ = GetMapSize()
 
-        local startX, startZ = aiBrain:GetArmyStartPos()
-        local isIsland = import('/lua/editor/SorianBuildConditions.lua').IsIslandMap(aiBrain)
+        local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
+        local isIsland = sorianbuildconditionsUp.IsIslandMap(aiBrain)
 
         if per == 'sorianwater' then
             return 1000, 'sorianwater'

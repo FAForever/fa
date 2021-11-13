@@ -1,3 +1,12 @@
+local ipairs = ipairs
+local tostring = tostring
+local stringLen = string.len
+local stringFormat = string.format
+local type = type
+local getmetatable = getmetatable
+local unpack = unpack
+local next = next
+
 local sort = table.sort
 local insert = table.insert
 local concat = table.concat
@@ -20,7 +29,7 @@ local function get_names(t,maxdepth,result,prefix)
     for k,v in t do
         if type(k)=='string' and type(v)!='string' and type(v)!='number' and type(v)!='boolean' then
             local name = prefix .. k
-            if result[v]==nil or string.len(name) < string.len(result[v]) then
+            if result[v]==nil or stringLen(name) < stringLen(result[v]) then
                 result[v] = name
 
                 if type(v)=='table' and maxdepth>0 then
@@ -46,7 +55,7 @@ local function _repr(obj, indent, width, mindepth, objectstack)
         return global_names[obj], global_names[obj]
 
     elseif type(obj) == 'string' then
-        local r = string.format("%q",obj)
+        local r = stringFormat("%q",obj)
         return r,r
 
     elseif type(obj) ~= 'table' then

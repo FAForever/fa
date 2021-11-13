@@ -3,6 +3,14 @@
 -- Implement import()
 
 --- Table of all loaded modules, indexed by name.
+local ipairs = ipairs
+local tableInsert = table.insert
+local LOG = LOG
+local WARN = WARN
+local error = error
+local next = next
+local SPEW = SPEW
+
 __modules = {}
 
 --- Upvalued version of all loaded modules for performance
@@ -117,4 +125,4 @@ function dirty_module(name, why)
     end
 end
 
-table.insert(__diskwatch, dirty_module)
+tableInsert(__diskwatch, dirty_module)

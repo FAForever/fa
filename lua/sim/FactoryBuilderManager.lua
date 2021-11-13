@@ -7,6 +7,32 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+local GetSurfaceHeight = GetSurfaceHeight
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local IssueFactoryRallyPoint = IssueFactoryRallyPoint
+local error = error
+local unit_methodsGetGuards = moho.unit_methods.GetGuards
+local tableInsert = table.insert
+local ipairs = ipairs
+local aibrain_methodsCanBuildPlatoon = moho.aibrain_methods.CanBuildPlatoon
+local aibrain_methodsPlatoonExists = moho.aibrain_methods.PlatoonExists
+local aibrain_methodsBuildPlatoon = moho.aibrain_methods.BuildPlatoon
+local EntityCategoryContains = EntityCategoryContains
+local tableCopy = table.copy
+local aibrain_methodsGetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local IssueClearFactoryCommands = IssueClearFactoryCommands
+local EntityCategoryCount = EntityCategoryCount
+local next = next
+local GetTerrainHeight = GetTerrainHeight
+local tableEmpty = table.empty
+local aipersonality_methodsGetPlatoonSize = moho.aipersonality_methods.GetPlatoonSize
+local tableGetn = table.getn
+local WARN = WARN
+local VDist2 = VDist2
+local SPEW = SPEW
+local Random = Random
+
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
@@ -49,7 +75,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 local newRally = false
                 local bestDist = 99999
                 local rallyheight = GetTerrainHeight(self.RallyPoint[1], self.RallyPoint[3])
-                if self.Brain:GetNumUnitsAroundPoint(categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
+                if aibrain_methodsGetNumUnitsAroundPoint(self.Brain, categories.STRUCTURE, self.RallyPoint, 15, 'Ally') > 0 then
                     -- LOG('*AI DEBUG: Searching for a new Rally Point Location')
                     for x = -30, 30, 5 do
                         for z = -30, 30, 5 do
@@ -58,7 +84,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                                 continue
                             end
                             local tempPos = { self.RallyPoint[1] + x, height, self.RallyPoint[3] + z }
-                            if self.Brain:GetNumUnitsAroundPoint(categories.STRUCTURE, tempPos, 15, 'Ally') > 0 then
+                            if aibrain_methodsGetNumUnitsAroundPoint(self.Brain, categories.STRUCTURE, tempPos, 15, 'Ally') > 0 then
                                 continue
                             end
                             if not newRally or VDist2(tempPos[1], tempPos[3], self.RallyPoint[1], self.RallyPoint[3]) < bestDist then
@@ -99,7 +125,7 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     GetNumFactories = function(self)
         if self.FactoryList then
-            return table.getn(self.FactoryList)
+            return tableGetn(self.FactoryList)
         end
         return 0
     end,
@@ -112,7 +138,7 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     GetNumCategoryBeingBuilt = function(self, category, facCategory)
-        return table.getn(self:GetFactoriesBuildingCategory(category, facCategory))
+        return tableGetn(self:GetFactoriesBuildingCategory(category, facCategory))
     end,
 
     GetFactoriesBuildingCategory = function(self, category, facCategory)
@@ -122,7 +148,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            if not v:IsUnitState('Upgrading') and not v:IsUnitState('Building') then
+            if not unit_methodsIsUnitState(v, 'Upgrading') and not unit_methodsIsUnitState(v, 'Building') then
                 continue
             end
 
@@ -135,7 +161,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            tableInsert(units, v)
         end
         return units
     end,
@@ -149,11 +175,11 @@ FactoryBuilderManager = Class(BuilderManager) {
                 continue
             end
 
-            if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
+            if v.NumAssistees and tableGetn(unit_methodsGetGuards(v)) >= v.NumAssistees then
                 continue
             end
 
-            table.insert(retUnits, v)
+            tableInsert(retUnits, v)
         end
         return retUnits
     end,
@@ -165,7 +191,7 @@ FactoryBuilderManager = Class(BuilderManager) {
 
     AddFactory = function(self,unit)
         if not self:FactoryAlreadyExists(unit) then
-            table.insert(self.FactoryList, unit)
+            tableInsert(self.FactoryList, unit)
             unit.DesiresAssist = true
             if EntityCategoryContains(categories.LAND, unit) then
                 self:SetupNewFactory(unit, 'Land')
@@ -228,10 +254,10 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     FactoryDestroyed = function(self, factory)
-        local guards = factory:GetGuards()
+        local guards = unit_methodsGetGuards(factory)
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
-                if self.Brain:PlatoonExists(v.AssistPlatoon) then
+                if aibrain_methodsPlatoonExists(self.Brain, v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
                     v.AssistPlatoon = nil
@@ -252,10 +278,10 @@ FactoryBuilderManager = Class(BuilderManager) {
     end,
 
     DelayBuildOrder = function(self,factory,bType,time)
-        local guards = factory:GetGuards()
+        local guards = unit_methodsGetGuards(factory)
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
-                if self.Brain:PlatoonExists(v.AssistPlatoon) then
+                if aibrain_methodsPlatoonExists(self.Brain, v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
                     v.AssistPlatoon = nil
@@ -318,12 +344,12 @@ FactoryBuilderManager = Class(BuilderManager) {
                     -- LOG('*AI DEBUG: Replacement unit found!')
                     local replacement = self:GetCustomReplacement(v, templateName, faction)
                     if replacement then
-                        table.insert(template, replacement)
+                        tableInsert(template, replacement)
                     else
-                        table.insert(template, v)
+                        tableInsert(template, v)
                     end
                 else
-                    table.insert(template, v)
+                    tableInsert(template, v)
                 end
             end
         elseif faction and customData and customData[faction] then
@@ -333,7 +359,7 @@ FactoryBuilderManager = Class(BuilderManager) {
                 -- get the first squad from the template
                 for k,v in templateData.FactionSquads do
                     -- use this squad as base template for the replacement
-                    Squad = table.copy(v[1])
+                    Squad = tableCopy(v[1])
                     -- flag this template as dummy
                     Squad[1] = "NoOriginalUnit"
                     break
@@ -347,7 +373,7 @@ FactoryBuilderManager = Class(BuilderManager) {
             end
             local replacement = self:GetCustomReplacement(Squad, templateName, faction)
             if replacement then
-                table.insert(template, replacement)
+                tableInsert(template, replacement)
             end
         end
         return template
@@ -363,11 +389,11 @@ FactoryBuilderManager = Class(BuilderManager) {
             for k,v in templateData[faction] do
                 if rand <= v[2] or template[1] == 'NoOriginalUnit' then
                     -- LOG('*AI DEBUG: Insert possibility.')
-                    table.insert(possibles, v[1])
+                    tableInsert(possibles, v[1])
                 end
             end
-            if not table.empty(possibles) then
-                rand = Random(1,table.getn(possibles))
+            if not tableEmpty(possibles) then
+                rand = Random(1,tableGetn(possibles))
                 local customUnitID = possibles[rand]
                 -- LOG('*AI DEBUG: Replaced with '..customUnitID)
                 retTemplate = { customUnitID, template[2], template[3], template[4], template[5] }
@@ -385,7 +411,7 @@ FactoryBuilderManager = Class(BuilderManager) {
         if builder then
             local template = self:GetFactoryTemplate(builder:GetPlatoonTemplate(), factory)
             -- LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Factory Builder Manager Building - ',repr(builder.BuilderName))
-            self.Brain:BuildPlatoon(template, {factory}, 1)
+            aibrain_methodsBuildPlatoon(self.Brain, template, {factory}, 1)
         else
             -- No builder found setup way to check again
             self:ForkThread(self.DelayBuildOrder, factory, bType, 2)
@@ -411,15 +437,15 @@ FactoryBuilderManager = Class(BuilderManager) {
         end
 
         -- This faction doesn't have unit of this type
-        if table.getn(template) == 2 then
+        if tableGetn(template) == 2 then
             return false
         end
 
         local personality = self.Brain:GetPersonality()
-        local ptnSize = personality:GetPlatoonSize()
+        local ptnSize = aipersonality_methodsGetPlatoonSize(personality)
 
         -- This function takes a table of factories to determine if it can build
-        return self.Brain:CanBuildPlatoon(template, params)
+        return aibrain_methodsCanBuildPlatoon(self.Brain, template, params)
     end,
 
     DelayRallyPoint = function(self, factory)

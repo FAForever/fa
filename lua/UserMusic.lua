@@ -9,6 +9,14 @@
 --#****************************************************************************
 
 -- List of battle cues to cycle through
+local KillThread = KillThread
+local tableGetsize = table.getsize
+local Sound = Sound
+local tableGetn = table.getn
+local ForkThread = ForkThread
+local WaitFor = WaitFor
+local mathMod = math.mod
+
 local BattleCues = {
     Sound({Cue = 'Battle', Bank = 'Music'}),
 }
@@ -78,7 +86,7 @@ end
 function StartBattleMusic()
     BattleStart = GameTick()
     PlayMusic(BattleCues[BattleCueIndex], 0) -- immediately
-    BattleCueIndex = math.mod(BattleCueIndex,table.getn(BattleCues)) + 1
+    BattleCueIndex = mathMod(BattleCueIndex,tableGetn(BattleCues)) + 1
 
     if battleWatch then KillThread(battleWatch) end
     battleWatch = ForkThread(
@@ -98,7 +106,7 @@ function StartPeaceMusic()
     LastBattleNotify = GameTick()
 
     PlayMusic(PeaceCues[PeaceCueIndex], 3)
-    PeaceCueIndex = math.mod(PeaceCueIndex, table.getsize(PeaceCues)) + 1
+    PeaceCueIndex = mathMod(PeaceCueIndex, tableGetsize(PeaceCues)) + 1
 end
 
 function PlayMusic(cue, delay)

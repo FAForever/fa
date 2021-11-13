@@ -6,32 +6,39 @@
 #**  Summary  :
 #**
 #****************************************************************************
+local ipairs = ipairs
+local stringLower = string.lower
+local IsAlly = IsAlly
+local stringGsub = string.gsub
+local next = next
+local type = type
+
 function ProcessAIChat(to, from, text)
     local armies = GetArmiesTable()
     if (to == 'allies' or type(to) == 'number') then
         for i, v in armies.armiesTable do
             if not v.human and not v.civilian and IsAlly(i, from) and (to == 'allies' or to == i) then
-                local testtext = string.gsub(text, '%s(.*)', '')
-                local aftertext = string.gsub(text, '^%a+%s', '')
+                local testtext = stringGsub(text, '%s(.*)', '')
+                local aftertext = stringGsub(text, '^%a+%s', '')
                 aftertext = trim(aftertext)
-                if string.lower(testtext) == 'target' and aftertext != '' then
-                    if string.lower(aftertext) == 'at will' then
+                if stringLower(testtext) == 'target' and aftertext != '' then
+                    if stringLower(aftertext) == 'at will' then
                         SimCallback({Func = 'AIChat', Args = {Army = i, NewTarget = 'at will'}})
                     else
                         for x, z in armies.armiesTable do
-                            if trim(string.lower(string.gsub(z.nickname,'%b()', ''))) == string.lower(aftertext) then
+                            if trim(stringLower(stringGsub(z.nickname,'%b()', ''))) == stringLower(aftertext) then
                                 SimCallback({Func = 'AIChat', Args = {Army = i, NewTarget = x}})
                             end
                         end
                     end
-                elseif string.lower(testtext) == 'focus' and aftertext != '' then
-                    local focus = trim(string.lower(aftertext))
+                elseif stringLower(testtext) == 'focus' and aftertext != '' then
+                    local focus = trim(stringLower(aftertext))
                     SimCallback({Func = 'AIChat', Args = {Army = i, NewFocus = focus}})
-                elseif string.lower(testtext) == 'current' and aftertext == 'focus' then
+                elseif stringLower(testtext) == 'current' and aftertext == 'focus' then
                     SimCallback({Func = 'AIChat', Args = {Army = i, CurrentFocus = true}})
-                elseif string.lower(testtext) == 'give' and aftertext == 'me an engineer' and to == i then
+                elseif stringLower(testtext) == 'give' and aftertext == 'me an engineer' and to == i then
                     SimCallback({Func = 'AIChat', Args = {Army = i, ToArmy = from, GiveEngineer = true}})
-                elseif string.lower(testtext) == 'command' and to == i then
+                elseif stringLower(testtext) == 'command' and to == i then
                     SimCallback({Func = 'AIChat', Args = {Army = i, ToArmy = from, Command = true, Text = aftertext}})
                 elseif to == i then
                     SimCallback({Func = 'AIChat', Args = {Army = i, ToArmy = from, Command = true, Text = ''}})
@@ -42,5 +49,5 @@ function ProcessAIChat(to, from, text)
 end
 
 function trim(s)
-    return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+    return (stringGsub(s, "^%s*(.-)%s*$", "%1"))
 end

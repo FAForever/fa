@@ -1,3 +1,9 @@
+local KillThread = KillThread
+local CollisionBeamEntityGetPosition = moho.CollisionBeamEntity.GetPosition
+local Vector = Vector
+local CreateSplat = CreateSplat
+local Random = Random
+
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local CustomEffectTemplate = import('/lua/kirveseffects.lua')
@@ -80,7 +86,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
 
     ScorchThread = function(self)
         local size = 1 + (Random() * 1.1)
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         while true do
@@ -94,7 +100,7 @@ UnstablePhasonLaserCollisionBeam2 = Class(SCCollisionBeam) {
 
             WaitSeconds(self.ScorchSplatDropTime)
             size = 1 + (Random() * 1.1)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,
 }

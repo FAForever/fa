@@ -8,6 +8,17 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
+local ipairs = ipairs
+local KillThread = KillThread
+local Vector = Vector
+local tableInsert = table.insert
+local CreateSplat = CreateSplat
+local CollisionBeamEntityGetArmy = moho.CollisionBeamEntity.GetArmy
+local CollisionBeamEntityGetPosition = moho.CollisionBeamEntity.GetPosition
+local CreateBeamEntityToEntity = CreateBeamEntityToEntity
+local next = next
+local Random = Random
+
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
@@ -110,9 +121,9 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 3.5 + (Random() * 3.5) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -132,7 +143,7 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 3.2 + (Random() * 3.5)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,    
 }
@@ -183,9 +194,9 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 1.5 + (Random() * 1.5) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -205,7 +216,7 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 1.2 + (Random() * 1.5)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,
 }
@@ -247,9 +258,9 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 1.5 + (Random() * 1.5) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -269,7 +280,7 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 1.2 + (Random() * 1.5)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,
 }
@@ -316,9 +327,9 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 4.0 + (Random() * 1.0) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -338,15 +349,15 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 4.0 + (Random() * 1.0)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,
     
     CreateBeamEffects = function(self)
         SCCollisionBeam.CreateBeamEffects(self)
         for k, v in EffectTemplate.SExperimentalPhasonLaserBeam do
-			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), v )
-			table.insert( self.BeamEffectsBag, fxBeam )
+			local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, CollisionBeamEntityGetArmy(self), v )
+			tableInsert( self.BeamEffectsBag, fxBeam )
 			self.Trash:Add(fxBeam)
         end
         -- local fxBeam = CreateBeamEntityToEntity(self, 0, self, 1, self:GetArmy(), '/effects/emitters/seraphim_expirimental_laser_beam_02_emit.bp' )
@@ -385,9 +396,9 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 1.5 + (Random() * 1.5) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -407,7 +418,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 1.2 + (Random() * 1.5)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,
 }
@@ -444,9 +455,9 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 1 + (Random() * 1) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -466,7 +477,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 1 + (Random() * 1)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,
 }
@@ -508,9 +519,9 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 1.5 + (Random() * 1.5) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -530,7 +541,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 1.2 + (Random() * 1.5)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,
 }
@@ -585,9 +596,9 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
     end,
 
     ScorchThread = function(self)
-        local army = self:GetArmy()
+        local army = CollisionBeamEntityGetArmy(self)
         local size = 3.5 + (Random() * 3.5) 
-        local CurrentPosition = self:GetPosition(1)
+        local CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         local LastPosition = Vector(0,0,0)
         local skipCount = 1
         -- local FriendlyFire = self.DamageData.DamageFriendly
@@ -608,7 +619,7 @@ OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
                 
             WaitSeconds( self.ScorchSplatDropTime )
             size = 3.2 + (Random() * 3.5)
-            CurrentPosition = self:GetPosition(1)
+            CurrentPosition = CollisionBeamEntityGetPosition(self, 1)
         end
     end,    
 }

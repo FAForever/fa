@@ -8,6 +8,22 @@
 -- This file is called on game start from gamemain.lua to fetch keybindings from prefs, or generate them from defaults
 -- It is also used by hotbuild.lua to fetch existing mappings
 
+local stringUpper = string.upper
+local tableEqual = table.equal
+local stringLen = string.len
+local STR_xtoi = STR_xtoi
+local stringFind = string.find
+local keyactionsUp = import('/lua/keymap/keyactions.lua')
+local next = next
+local ipairs = ipairs
+local tableEmpty = table.empty
+local tableGetsize = table.getsize
+local debugkeyactionsUp = import('/lua/keymap/debugKeyActions.lua')
+local LOG = LOG
+local keynamesUp = import('/lua/keymap/keynames.lua')
+local WARN = WARN
+local stringSub = string.sub
+
 local Prefs = import('/lua/user/prefs.lua')
 local KeyDescriptions = import('/lua/keymap/keydescriptions.lua').keyDescriptions
 
@@ -19,7 +35,7 @@ function GetActionName(action)
         name = LOC('<LOC kb_'..action..'>'..action)
     end
     -- check if action is meant to be mapped with a key modifier, e.g. attack vs shift_attack action
-    if string.find(action, 'shift_') == 1 then
+    if stringFind(action, 'shift_') == 1 then
         name = name .. ' - SHIFT version'
     end
     return name
@@ -151,8 +167,8 @@ function ResetUserKeyMapTo(newPreset)
     LOG('Keybindings Preset changed from "' .. oldPreset .. '" to "' .. newPreset .. '"')
     Prefs.SetToCurrentProfile("UserKeyMapName", newPreset)
     local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
-    if not table.empty(oldKeyMap) then
-        LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to 0')
+    if not tableEmpty(oldKeyMap) then
+        LOG('Keybindings Count changed from ' .. tableGetsize(oldKeyMap) .. ' to 0')
     end
      -- key maps must be nil until they are save by a user when existing keybinding UI otherwise UI will show incorrect info
     Prefs.SetToCurrentProfile("UserKeyMap", nil)
@@ -163,8 +179,8 @@ end
 function SaveUserKeyMap()
     local oldKeyMap = Prefs.GetFromCurrentProfile("UserKeyMap")
     local newKeyMap = GetCurrentKeyMap()
-    if table.getsize(oldKeyMap) ~= table.getsize(newKeyMap) then
-        LOG('Keybindings Count changed from ' .. table.getsize(oldKeyMap) .. ' to ' .. table.getsize(newKeyMap))
+    if tableGetsize(oldKeyMap) ~= tableGetsize(newKeyMap) then
+        LOG('Keybindings Count changed from ' .. tableGetsize(oldKeyMap) .. ' to ' .. tableGetsize(newKeyMap))
     end
     Prefs.SetToCurrentProfile("UserKeyMap", newKeyMap)
     Prefs.SetToCurrentProfile("UserDebugKeyMap", GetUserDebugKeyMap())
@@ -173,8 +189,8 @@ end
 function GetKeyActions()
     local ret = {}
 
-    local keyActions = import('/lua/keymap/keyactions.lua').keyActions
-    local debugKeyActions = import('/lua/keymap/debugKeyActions.lua').debugKeyActions
+    local keyActions = keyactionsUp.keyActions
+    local debugKeyActions = debugkeyactionsUp.debugKeyActions
 
     for k,v in keyActions do
         ret[k] = v
@@ -193,7 +209,7 @@ function GetKeyActions()
 
     -- remove invalid key actions
     for k,v in ret do
-        if string.find(k, '-') then
+        if stringFind(k, '-') then
             ret[k] = nil
         end
     end
@@ -238,7 +254,7 @@ function GetKeyMappingDetails()
             local info = {}
             info.name = GetActionName(action)
             info.action = keyActions[action]
-            info.category = string.upper(keyActions[action].category or 'none')
+            info.category = stringUpper(keyActions[action].category or 'none')
             info.key = key
             info.id = action
             ret[key] = info
@@ -295,7 +311,7 @@ end
 -- Returns a table of raw (windows) key codes mapped to key names
 function GetKeyCodeLookup()
     local ret = {}
-    local keyCodeTable = import('/lua/keymap/keynames.lua').keyNames
+    local keyCodeTable = keynamesUp.keyNames
     for k, v in keyCodeTable do
         local codeInt = STR_xtoi(k)
         ret[codeInt] = v
@@ -308,20 +324,20 @@ end
 -- Returns a table with modifier keys extracted
 function NormalizeKey(inKey)
     local retVal = {}
-    local keyNames = import('/lua/keymap/keyNames.lua').keyNames
+    local keyNames = keynamesUp.keyNames
     local modKeys = {[keyNames['11']] = true, -- ctrl
                      [keyNames['10']] = true, -- shift
                      [keyNames['12']] = true, -- alt
                     }
     local startpos = 1
     while startpos do
-        local fst, lst = string.find(inKey, "-", startpos)
+        local fst, lst = stringFind(inKey, "-", startpos)
         local str
         if fst then
-            str = string.sub(inKey, startpos, fst - 1)
+            str = stringSub(inKey, startpos, fst - 1)
             startpos = lst + 1
         else
-            str = string.sub(inKey, startpos, string.len(inKey))
+            str = stringSub(inKey, startpos, stringLen(inKey))
             startpos = nil
         end
         if modKeys[str] then
@@ -338,7 +354,7 @@ function IsKeyInMap(key, map)
     local compKeyCombo = NormalizeKey(key)
     for keyCombo, action in map do
         local curKeyCombo = NormalizeKey(keyCombo)
-        if table.equal(curKeyCombo, compKeyCombo) then
+        if tableEqual(curKeyCombo, compKeyCombo) then
             return true
         end
     end
@@ -381,7 +397,7 @@ function KeyCategory(key, map, actions)
     -- Return the category of a key
     for keyCombo, action in map do
         local curKeyCombo = NormalizeKey(keyCombo)
-        if table.equal(curKeyCombo, compKeyCombo) then
+        if tableEqual(curKeyCombo, compKeyCombo) then
             if actions[action] ~= nil then
                 if actions[action].category then
                     return actions[action].category

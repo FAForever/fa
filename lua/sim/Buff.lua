@@ -28,6 +28,35 @@
 
 --Function to apply a buff to a unit.
 --This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
+local mathAbs = math.abs
+local VDiff = VDiff
+local unit_methodsSetTurnMult = moho.unit_methods.SetTurnMult
+local error = error
+local unit_methodsSetStunned = moho.unit_methods.SetStunned
+local tableRemoveByValue = table.removeByValue
+local ipairs = ipairs
+local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
+local unit_methodsSetBuildRate = moho.unit_methods.SetBuildRate
+local mathMin = math.min
+local EntityCategoryContains = EntityCategoryContains
+local unit_methodsSetAccMult = moho.unit_methods.SetAccMult
+local tableCopy = table.copy
+local weapon_methodsChangeRateOfFire = moho.weapon_methods.ChangeRateOfFire
+local mathCeil = math.ceil
+local ForkThread = ForkThread
+local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
+local next = next
+local ParseEntityCategory = ParseEntityCategory
+local tableEmpty = table.empty
+local unit_methodsGetWeapon = moho.unit_methods.GetWeapon
+local mathMax = math.max
+local weapon_methodsChangeDamage = moho.weapon_methods.ChangeDamage
+local mathFloor = math.floor
+local LOG = LOG
+local WARN = WARN
+local unit_methodsSetSpeedMult = moho.unit_methods.SetSpeedMult
+local weapon_methodsChangeMaxRadius = moho.weapon_methods.ChangeMaxRadius
+
 function ApplyBuff(unit, buffName, instigator)
     if unit.Dead then
         return
@@ -78,7 +107,7 @@ function ApplyBuff(unit, buffName, instigator)
         ubt[def.BuffType] = {}
     end
 
-    if def.Stacks == 'IGNORE' and ubt[def.BuffType] and not table.empty(ubt[def.BuffType]) then
+    if def.Stacks == 'IGNORE' and ubt[def.BuffType] and not tableEmpty(ubt[def.BuffType]) then
         return
     end
 
@@ -224,25 +253,25 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             unit:SetRegen(val)
         elseif atype == 'Damage' then
             for i = 1, unit:GetWeaponCount() do
-                local wep = unit:GetWeapon(i)
+                local wep = unit_methodsGetWeapon(unit, i)
                 if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
                     local wepbp = wep:GetBlueprint()
                     local wepdam = wepbp.Damage
                     local val = BuffCalculate(unit, buffName, 'Damage', wepdam)
 
-                    if val >= (math.abs(val) + 0.5) then
-                        val = math.ceil(val)
+                    if val >= (mathAbs(val) + 0.5) then
+                        val = mathCeil(val)
                     else
-                        val = math.floor(val)
+                        val = mathFloor(val)
                     end
 
-                    wep:ChangeDamage(val)
+                    weapon_methodsChangeDamage(wep, val)
                 end
             end
         elseif atype == 'DamageRadius' then
             for i = 1, unit:GetWeaponCount() do
 
-                local wep = unit:GetWeapon(i)
+                local wep = unit_methodsGetWeapon(unit, i)
                 local wepbp = wep:GetBlueprint()
                 local weprad = wepbp.DamageRadius
                 local val = BuffCalculate(unit, buffName, 'DamageRadius', weprad)
@@ -252,28 +281,28 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         elseif atype == 'MaxRadius' then
             for i = 1, unit:GetWeaponCount() do
 
-                local wep = unit:GetWeapon(i)
+                local wep = unit_methodsGetWeapon(unit, i)
                 local wepbp = wep:GetBlueprint()
                 local weprad = wepbp.MaxRadius
                 local val = BuffCalculate(unit, buffName, 'MaxRadius', weprad)
 
-                wep:ChangeMaxRadius(val)
+                weapon_methodsChangeMaxRadius(wep, val)
             end
         elseif atype == 'MoveMult' then
             local val = BuffCalculate(unit, buffName, 'MoveMult', 1)
-            unit:SetSpeedMult(val)
-            unit:SetAccMult(val)
-            unit:SetTurnMult(val)
+            unit_methodsSetSpeedMult(unit, val)
+            unit_methodsSetAccMult(unit, val)
+            unit_methodsSetTurnMult(unit, val)
         elseif atype == 'Stun' and not afterRemove then
-            unit:SetStunned(buffDef.Duration or 1, instigator)
+            unit_methodsSetStunned(unit, buffDef.Duration or 1, instigator)
             if unit.Anims then
                 for k, manip in unit.Anims do
-                    manip:SetRate(0)
+                    AnimationManipulatorSetRate(manip, 0)
                 end
             end
         elseif atype == 'WeaponsEnable' then
             for i = 1, unit:GetWeaponCount() do
-                local wep = unit:GetWeapon(i)
+                local wep = unit_methodsGetWeapon(unit, i)
                 local val, bool = BuffCalculate(unit, buffName, 'WeaponsEnable', 0, true)
                 wep:SetWeaponEnabled(bool)
             end
@@ -309,7 +338,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             end
         elseif atype == 'BuildRate' then
             local val = BuffCalculate(unit, buffName, 'BuildRate', unit:GetBlueprint().Economy.BuildRate or 1)
-            unit:SetBuildRate(val)
+            unit_methodsSetBuildRate(unit, val)
         -------- ADJACENCY BELOW --------
         elseif atype == 'EnergyActive' then
             local val = BuffCalculate(unit, buffName, 'EnergyActive', 1)
@@ -338,7 +367,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
         elseif atype == 'EnergyWeapon' then
             local val = BuffCalculate(unit, buffName, 'EnergyWeapon', 1)
             for i = 1, unit:GetWeaponCount() do
-                local wep = unit:GetWeapon(i)
+                local wep = unit_methodsGetWeapon(unit, i)
                 if wep:WeaponUsesEnergy() then
                     wep.AdjEnergyMod = val
                 end
@@ -347,10 +376,10 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
 
             for i = 1, unit:GetWeaponCount() do
-                local wep = unit:GetWeapon(i)
+                local wep = unit_methodsGetWeapon(unit, i)
                 local bp = wep:GetBlueprint()
                 -- Set new rate of fire based on blueprint rate of fire
-                wep:ChangeRateOfFire(bp.RateOfFire / val)
+                weapon_methodsChangeRateOfFire(wep, bp.RateOfFire / val)
                 wep.AdjRoFMod = val
             end
         elseif atype ~= 'Stun' then
@@ -411,7 +440,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
                     for i=1,v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
+                        multsTotal = multsTotal + mathMin((v.Mult * maxHealth), ceil or 99999)
                     end
                 end
             else
@@ -429,7 +458,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     end
 
     -- Adds are calculated first, then the mults.
-    local returnVal = math.max((initialVal + adds + multsTotal) * mults, floor)
+    local returnVal = mathMax((initialVal + adds + multsTotal) * mults, floor)
 
     return returnVal, bool
 end
@@ -478,8 +507,8 @@ function RemoveBuff(unit, buffName, removeAllCounts, instigator)
     if def.Icon then
         -- If the user layer was displaying an icon, remove it from the sync table
         local newTable = unit.Sync.Buffs
-        table.removeByValue(newTable,buffName)
-        unit.Sync.Buffs = table.copy(newTable)
+        tableRemoveByValue(newTable,buffName)
+        unit.Sync.Buffs = tableCopy(newTable)
     end
 
     BuffAffectUnit(unit, buffName, unit, true)
@@ -502,7 +531,7 @@ function PlayBuffEffect(unit, buffName, trsh)
     for k, fx in def.Effects do
         local bufffx = CreateAttachedEmitter(unit, 0, unit.Army, fx)
         if def.EffectsScale then
-            bufffx:ScaleEmitter(def.EffectsScale)
+            IEffectScaleEmitter(bufffx, def.EffectsScale)
         end
         trsh:Add(bufffx)
         unit.Trash:Add(bufffx)

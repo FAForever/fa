@@ -4,6 +4,30 @@
 ---- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------
 
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local IssueUpgrade = IssueUpgrade
+local unit_methodsIsIdleState = moho.unit_methods.IsIdleState
+local tableRemove = table.remove
+local aibrain_methodsFindUnit = moho.aibrain_methods.FindUnit
+local error = error
+local unpack = unpack
+local aibrain_methodsFindUpgradeBP = moho.aibrain_methods.FindUpgradeBP
+local tableInsert = table.insert
+local ParseEntityCategory = ParseEntityCategory
+local ipairs = ipairs
+local next = next
+local unit_methodsSetCapturable = moho.unit_methods.SetCapturable
+local unit_methodsGiveNukeSiloAmmo = moho.unit_methods.GiveNukeSiloAmmo
+local unit_methodsGiveTacticalSiloAmmo = moho.unit_methods.GiveTacticalSiloAmmo
+local IssueClearCommands = IssueClearCommands
+local tableGetn = table.getn
+local type = type
+local unit_methodsIsBeingBuilt = moho.unit_methods.IsBeingBuilt
+local unit_methodsSetReclaimable = moho.unit_methods.SetReclaimable
+local EntityCategoryContains = EntityCategoryContains
+local Random = Random
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -266,7 +290,7 @@ BaseManager = Class {
     ConditionalBuild = function(self, sUnitName, bRetry, nNumEngineers, tPlatoonAIFunction, tPlatoonData,  fCondition, bKeepAlive)
         if type(fCondition) ~= 'function' then error('Parameter fCondition must be a function.') return end
 
-        table.insert(self.ConditionalBuildTable,
+        tableInsert(self.ConditionalBuildTable,
         {
             name = sUnitName,
             data =
@@ -291,8 +315,8 @@ BaseManager = Class {
 
         -- If it's a table of unit names, or a single unit name
         if (type(ptype) == 'table' and not ptype.Platoons)
-            or (type(ptype) == 'string' and ScenarioUtils.FindUnit(ptype, Scenario.Armies[self.AIBrain.Name].Units)) then
-                table.insert(self.ConditionalBuildTable,
+            or (type(ptype) == 'string' and aibrain_methodsFindUnit(ptype, Scenario.Armies[self.AIBrain.Name].Units)) then
+                tableInsert(self.ConditionalBuildTable,
                 {
                     name = ptype,
                     data = name,
@@ -353,7 +377,7 @@ BaseManager = Class {
     AddBuildGroup = function(self, groupName, priority, spawn, initial)
         -- Make sure the group exists
         if not self:FindGroup(groupName) then
-            table.insert(self.LevelNames, {Name = groupName, Priority = priority})
+            tableInsert(self.LevelNames, {Name = groupName, Priority = priority})
 
             -- Setup the brain base template for use in the base manager (Don't create so we can get a unitnames table)
             self.AIBrain.BaseTemplates[self.BaseName .. groupName] = {Template={}, List={}, UnitNames = {}, BuildCounter = {}}
@@ -431,13 +455,13 @@ BaseManager = Class {
     end,
 
     AddConstructionEngineer = function(self, unit)
-        table.insert(self.ConstructionEngineers, unit)
+        tableInsert(self.ConstructionEngineers, unit)
     end,
 
     RemoveConstructionEngineer = function(self, unit)
         for k, v in self.ConstructionEngineers do
             if v.EntityId == unit.EntityId then
-                table.remove(self.ConstructionEngineers, k)
+                tableRemove(self.ConstructionEngineers, k)
                 break
             end
         end
@@ -452,7 +476,7 @@ BaseManager = Class {
     end,
 
     GetConstructionEngineerCount = function(self)
-        return table.getn(self.ConstructionEngineers)
+        return tableGetn(self.ConstructionEngineers)
     end,
 
     SetConstructionAlwaysAssist = function(self, bool)
@@ -514,7 +538,7 @@ BaseManager = Class {
     end,
 
     NeedPermanentFactoryAssist = function(self)
-        if table.getn(self:GetAllBaseFactories()) >= 1 and self:GetPermanentAssistCount() > self:GetNumPermanentAssisting() then
+        if tableGetn(self:GetAllBaseFactories()) >= 1 and self:GetPermanentAssistCount() > self:GetNumPermanentAssisting() then
             return true
         end
         return false
@@ -532,10 +556,10 @@ BaseManager = Class {
                 self:SetTotalEngineerCount(count[1][ScenarioInfo.Options.Difficulty])
                 self:SetPermanentAssistCount(count[2][ScenarioInfo.Options.Difficulty])
             -- Table with 3 entries is a dificulty table
-            elseif table.getn(count) == 3 then
+            elseif tableGetn(count) == 3 then
                 self:SetTotalEngineerCount(count[ScenarioInfo.Options.Difficulty])
             -- Table with 2 entries means first is total engs, 2nd is num permanent assisting
-            elseif table.getn(count) == 2 then
+            elseif tableGetn(count) == 2 then
                 self:SetTotalEngineerCount(count[1])
                 self:SetPermanentAssistCount(count[2])
             -- Unknown number of entries
@@ -612,7 +636,7 @@ BaseManager = Class {
         local retFacs = {}
         for k, v in self.AIBrain:PBMGetAllFactories(self.BaseName) do
             if EntityCategoryContains(category, v) then
-                table.insert(retFacs, v)
+                tableInsert(retFacs, v)
             end
         end
 
@@ -629,7 +653,7 @@ BaseManager = Class {
             engQuantity = 1
         end
 
-        table.insert(self.ExpansionBaseData, {BaseName = baseName, Engineers = engQuantity, IncomingEngineers = 0})
+        tableInsert(self.ExpansionBaseData, {BaseName = baseName, Engineers = engQuantity, IncomingEngineers = 0})
         self.FunctionalityStates.ExpansionBases = true
         if baseData then
             -- Setup base here
@@ -655,11 +679,11 @@ BaseManager = Class {
             local units = {}
             if unitName == 'DefaultACU' then
                 for k, v in AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.COMMAND, self.Position, self.Radius) do
-                    table.insert(units, v)
+                    tableInsert(units, v)
                 end
             elseif unitName == 'DefaultSACU' then
                 for k, v in AIUtils.GetOwnUnitsAroundPoint(self.AIBrain, categories.SUBCOMMANDER, self.Position, self.Radius) do
-                    table.insert(units, v)
+                    tableInsert(units, v)
                 end
             end
 
@@ -727,14 +751,14 @@ BaseManager = Class {
     end,
 
     UpgradeCheckThread = function(self)
-        local armyIndex = self.AIBrain:GetArmyIndex()
+        local armyIndex = aibrain_methodsGetArmyIndex(self.AIBrain)
         while true do
             if self.Active then
                 for k, v in self.UpgradeTable do
                     local unit = ScenarioInfo.UnitNames[armyIndex][v.UnitName]
                     if unit and not unit.Dead then
                         -- Cybran engie stations are never in 'Idle' state but in 'AssistingCommander' state
-                        if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander')) and not unit:IsBeingBuilt() then
+                        if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and (unit_methodsIsIdleState(unit) or unit_methodsIsUnitState(unit, 'AssistingCommander')) and not unit_methodsIsBeingBuilt(unit) then
                             self:ForkThread(self.BaseManagerUpgrade, unit, v.UnitName)
                         end
                     end
@@ -748,7 +772,7 @@ BaseManager = Class {
     -- Sort build groups by priority
     SortGroupNames = function(self)
         local sortedList = {}
-        for i = 1, table.getn(self.LevelNames) do
+        for i = 1, tableGetn(self.LevelNames) do
             local highest, highPos
             for num, data in self.LevelNames do
                 if not highest or data.Priority > highest.Priority then
@@ -757,7 +781,7 @@ BaseManager = Class {
                 end
             end
             sortedList[i] = highest
-            table.remove(self.LevelNames, highPos)
+            tableRemove(self.LevelNames, highPos)
         end
         self.LevelNames = sortedList
     end,
@@ -786,16 +810,16 @@ BaseManager = Class {
             end
             self:DecrementUnitBuildCounter(v.UnitName)
             if uncapturable then
-                v:SetCapturable(false)
-                v:SetReclaimable(false)
+                unit_methodsSetCapturable(v, false)
+                unit_methodsSetReclaimable(v, false)
             end
             if EntityCategoryContains(categories.SILO, v) then
                 if ScenarioInfo.Options.Difficulty == 1 then
-                    v:GiveNukeSiloAmmo(1)
-                    v:GiveTacticalSiloAmmo(1)
+                    unit_methodsGiveNukeSiloAmmo(v, 1)
+                    unit_methodsGiveTacticalSiloAmmo(v, 1)
                 else
-                    v:GiveNukeSiloAmmo(2)
-                    v:GiveTacticalSiloAmmo(2)
+                    unit_methodsGiveNukeSiloAmmo(v, 2)
+                    unit_methodsGiveTacticalSiloAmmo(v, 2)
                 end
             end
         end
@@ -817,7 +841,7 @@ BaseManager = Class {
         for num, data in self.LevelNames do
             if data.Priority and data.Priority > 0 then
                 if ScenarioInfo.LoadBalance and ScenarioInfo.LoadBalance.Enabled then
-                    table.insert(ScenarioInfo.LoadBalance.SpawnGroups, {self, data.Name, uncapturable})
+                    tableInsert(ScenarioInfo.LoadBalance.SpawnGroups, {self, data.Name, uncapturable})
                 else
                     self:SpawnGroup(data.Name, uncapturable)
                 end
@@ -828,7 +852,7 @@ BaseManager = Class {
     StartDifficultyBase = function(self, groupNames, engineerNumber, uncapturable)
         local newNames = {}
         for k, v in groupNames do
-            table.insert(newNames, v .. '_D' .. ScenarioInfo.Options.Difficulty)
+            tableInsert(newNames, v .. '_D' .. ScenarioInfo.Options.Difficulty)
         end
         self:StartBase(newNames, engineerNumber, uncapturable)
     end,
@@ -864,8 +888,8 @@ BaseManager = Class {
     BaseManagerUpgrade = function(self, unit, unitName)
         local aiBrain = unit:GetAIBrain()
         local factionIndex = aiBrain:GetFactionIndex()
-        local armyIndex = aiBrain:GetArmyIndex()
-        local upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, StructureUpgradeTemplates[factionIndex])
+        local armyIndex = aibrain_methodsGetArmyIndex(aiBrain)
+        local upgradeID = aibrain_methodsFindUpgradeBP(aiBrain, unit.UnitId, StructureUpgradeTemplates[factionIndex])
         if upgradeID then
             IssueClearCommands({unit})
             IssueUpgrade({unit}, upgradeID)
@@ -908,7 +932,7 @@ BaseManager = Class {
             for i, unit in tblUnit do
                 for k, unitId in RebuildStructuresTemplate[factionIndex] do
                     if unit.type == unitId[1] then
-                        table.insert(self.UpgradeTable, {FinalUnit = unit.type, UnitName = i,})
+                        tableInsert(self.UpgradeTable, {FinalUnit = unit.type, UnitName = i,})
                         unit.buildtype = unitId[2]
                         break
                     end
@@ -927,14 +951,14 @@ BaseManager = Class {
                         local inserted = false
                         for k, section in template do -- Check each section of the template for the right type
                             if section[1][1] == buildList[1] then
-                                table.insert(section, unitPos) -- Add position of new unit if found
+                                tableInsert(section, unitPos) -- Add position of new unit if found
                                 list[unit.buildtype].AmountWanted = list[unit.buildtype].AmountWanted + 1 -- Increment num wanted if found
                                 inserted = true
                                 break
                             end
                         end
                         if not inserted then -- If section doesn't exist create new one
-                            table.insert(template, {{buildList[1]}, unitPos}) -- add new build type to list with new unit
+                            tableInsert(template, {{buildList[1]}, unitPos}) -- add new build type to list with new unit
                             list[unit.buildtype] =  {StructureType = buildList[1], StructureCategory = unit.buildtype, AmountNeeded = 0, AmountWanted = 1, CloseToBuilder = nil} -- add new section of build list with new unit type information
                         end
                         break

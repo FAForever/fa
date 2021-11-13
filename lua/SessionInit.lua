@@ -1,0 +1,23 @@
+# Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#
+
+# This is the user-side session specific top-level lua initialization
+# file.  It is loaded into a fresh lua state when a new session is
+# initialized.
+
+# Do global init
+local ipairs = ipairs
+local LOG = LOG
+local next = next
+local tableInsert = table.insert
+
+doscript '/lua/userInit.lua'
+
+# Add UI-only mods to the list of mods to use
+for i,m in ipairs(import('/lua/Mods.lua').GetUiMods()) do
+    tableInsert(__active_mods, m)
+end
+
+LOG('Active mods in session: ',repr(__active_mods))
+
+doscript '/lua/UserSync.lua'

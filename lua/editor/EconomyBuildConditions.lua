@@ -8,6 +8,15 @@
 #**
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
+local ipairs = ipairs
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local type = type
+local aibrain_methodsGetCurrentUnits = moho.aibrain_methods.GetCurrentUnits
+local WARN = WARN
+local error = error
+local next = next
+local ParseEntityCategory = ParseEntityCategory
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -258,7 +267,7 @@ function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
     if type(testCat) == 'string' then
         testCat = ParseEntityCategory(testCat)
     end
-    local unitCount = aiBrain:GetCurrentUnits(testCat)
+    local unitCount = aibrain_methodsGetCurrentUnits(aiBrain, testCat)
 
     # Find units of this type being built or about to be built
     unitCount = unitCount + aiBrain:GetEngineerManagerUnitsBeingBuilt(testCat)
@@ -273,7 +282,7 @@ function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
 
     # T1 Test
     local testCat = categories.TECH1 * categories.FACTORY
-    local unitCount = aiBrain:GetCurrentUnits(testCat)
+    local unitCount = aibrain_methodsGetCurrentUnits(aiBrain, testCat)
     # Find units of this type being built or about to be built
     unitCount = unitCount + aiBrain:GetEngineerManagerUnitsBeingBuilt(testCat)
 
@@ -281,13 +290,13 @@ function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
 
     # T2 Test
     testCat = categories.TECH2 * categories.FACTORY
-    unitCount = aiBrain:GetCurrentUnits(testCat)
+    unitCount = aibrain_methodsGetCurrentUnits(aiBrain, testCat)
 
     massTotal = massTotal + (unitCount * t2Drain)
 
     # T3 Test
     testCat = categories.TECH3 * categories.FACTORY
-    unitCount = aiBrain:GetCurrentUnits(testCat)
+    unitCount = aibrain_methodsGetCurrentUnits(aiBrain, testCat)
 
     massTotal = massTotal + (unitCount * t3Drain)
 
@@ -343,9 +352,9 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
         category = ParseEntityCategory(category)
     end
     if not idleReq then
-        numUnits = aiBrain:GetListOfUnits(category, false)
+        numUnits = aibrain_methodsGetListOfUnits(aiBrain, category, false)
     else
-        numUnits = aiBrain:GetListOfUnits(category, true)
+        numUnits = aibrain_methodsGetListOfUnits(aiBrain, category, true)
     end
     for k,v in numUnits do
         if v:GetFractionComplete() == 1 then

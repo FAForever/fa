@@ -7,6 +7,8 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aiutilitiesUp = import('/lua/ai/AIUtilities.lua')
+
 BaseBuilderTemplate {
     BaseTemplateName = 'RushExpansionLandFull',
     Builders = {
@@ -134,7 +136,7 @@ BaseBuilderTemplate {
         end
 
         local threatCutoff = 10 # value of overall threat that determines where enemy bases are
-        local distance = import('/lua/ai/AIUtilities.lua').GetThreatDistance(aiBrain, location, threatCutoff)
+        local distance = aiutilitiesUp.GetThreatDistance(aiBrain, location, threatCutoff)
         if not distance or distance > 1000 then
             return 10
         elseif distance > 500 then

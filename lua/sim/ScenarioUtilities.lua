@@ -6,6 +6,69 @@
 ----[             Created from examples provided by Jeff Petkau.                  ]--
 ----[                                                                             ]--
 ----[  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
+local unit_methodsHideBone = moho.unit_methods.HideBone
+local SetArmyColorIndex = SetArmyColorIndex
+local unit_methodsSetBlockCommandQueue = moho.unit_methods.SetBlockCommandQueue
+local SetArmyColor = SetArmyColor
+local mathAbs = math.abs
+local CreateAnimator = CreateAnimator
+local tableInsert = table.insert
+local AnimationManipulatorSetAnimationTime = moho.AnimationManipulator.SetAnimationTime
+local ListArmies = ListArmies
+local tableGetsize = table.getsize
+local SetAllianceOneWay = SetAllianceOneWay
+local CreateResourceDeposit = CreateResourceDeposit
+local WaitFor = WaitFor
+local IsAlly = IsAlly
+local SetAlliance = SetAlliance
+local stringSub = string.sub
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local ForkThread = ForkThread
+local unpack = unpack
+local SetArmyEconomy = SetArmyEconomy
+local next = next
+local GetArmyBrain = GetArmyBrain
+local tableEmpty = table.empty
+local pairs = pairs
+local factionsUp = import('/lua/factions.lua')
+local tableGetn = table.getn
+local stringGsub = string.gsub
+local Random = Random
+local GetSystemTimeSecondsOnlyForProfileUse = GetSystemTimeSecondsOnlyForProfileUse
+local SetArmyAIPersonality = SetArmyAIPersonality
+local ShouldCreateInitialArmyUnits = ShouldCreateInitialArmyUnits
+local CreateSplat = CreateSplat
+local tableDeepcopy = table.deepcopy
+local IsEnemy = IsEnemy
+local aibrain_methodsMakePlatoon = moho.aibrain_methods.MakePlatoon
+local error = error
+local unit_methodsSetCustomName = moho.unit_methods.SetCustomName
+local stringFind = string.find
+local ipairs = ipairs
+local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
+local type = type
+local mathMin = math.min
+local EntityCategoryContains = EntityCategoryContains
+local SetArmyPlans = SetArmyPlans
+local SetIgnoreArmyUnitCap = SetIgnoreArmyUnitCap
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local EulerToQuaternion = EulerToQuaternion
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local mathCeil = math.ceil
+local tableRemove = table.remove
+local CreateInitialArmyUnit = CreateInitialArmyUnit
+local GetTerrainHeight = GetTerrainHeight
+local mathMax = math.max
+local AnimationManipulatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local CreatePropHPR = CreatePropHPR
+local SetArmyStart = SetArmyStart
+local GenerateArmyStart = GenerateArmyStart
+local LOG = LOG
+local CreateUnitHPR = CreateUnitHPR
+local SetArmyFactionIndex = SetArmyFactionIndex
+local GetSurfaceHeight = GetSurfaceHeight
+local Rect = Rect
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 
 function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
@@ -33,14 +96,14 @@ function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
             local time = GetSystemTimeSecondsOnlyForProfileUse()
 
             --Spawn bases
-            while not table.empty(ScenarioInfo.LoadBalance.SpawnGroups) do
-                local base, name, uncapturable = unpack(table.remove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
+            while not tableEmpty(ScenarioInfo.LoadBalance.SpawnGroups) do
+                local base, name, uncapturable = unpack(tableRemove(ScenarioInfo.LoadBalance.SpawnGroups, 1))
                 base:SpawnGroup(name, uncapturable, true)
             end
 
             --Spawn units
-            while not table.empty(ScenarioInfo.LoadBalance.PlatoonGroups) do
-                local strArmy, strGroup, formation, callback = unpack(table.remove(ScenarioInfo.LoadBalance.PlatoonGroups, 1))
+            while not tableEmpty(ScenarioInfo.LoadBalance.PlatoonGroups) do
+                local strArmy, strGroup, formation, callback = unpack(tableRemove(ScenarioInfo.LoadBalance.PlatoonGroups, 1))
                 CreateArmyGroupAsPlatoonBalanced(strArmy, strGroup, formation, callback)
             end
 
@@ -65,7 +128,7 @@ function ChainToPositions(chainName)
     end
     local positionTable = {}
     for num, marker in chain.Markers do
-        table.insert(positionTable, Scenario.MasterChain._MASTERCHAIN_.Markers[marker]['position'])
+        tableInsert(positionTable, Scenario.MasterChain._MASTERCHAIN_.Markers[marker]['position'])
     end
     return positionTable
 end
@@ -152,7 +215,7 @@ function AssemblePlatoons(tblNode,tblResult)
     end
 
     if nil ~= tblNode.platoon and '' ~= tblNode.platoon then
-        table.insert(tblResult,tblNode.platoon)
+        tableInsert(tblResult,tblNode.platoon)
     end
 
     if 'GROUP' == tblNode.type then
@@ -196,7 +259,7 @@ function CreateArmyUnit(strArmy,strUnit)
     local tblUnit = FindUnit(strUnit,Scenario.Armies[strArmy].Units)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
     end
     if nil ~= tblUnit then
         local unit = CreateUnitHPR(
@@ -211,27 +274,27 @@ function CreateArmyUnit(strArmy,strUnit)
         local platoon
         if tblUnit.platoon ~= nil and tblUnit.platoon ~= '' then
             local i = 3
-            while i <= table.getn(Scenario.Platoons[tblUnit.platoon]) do
+            while i <= tableGetn(Scenario.Platoons[tblUnit.platoon]) do
                 if tblUnit.Type == currTemplate[i][1] then
-                    platoon = brain:MakePlatoon('None', 'None')
-                    brain:AssignUnitsToPlatoon(platoon, {unit}, currTemplate[i][4], currTemplate[i][5])
+                    platoon = aibrain_methodsMakePlatoon(brain, 'None', 'None')
+                    aibrain_methodsAssignUnitsToPlatoon(brain, platoon, {unit}, currTemplate[i][4], currTemplate[i][5])
                     break
                 end
                 i = i + 1
             end
         end
-        local armyIndex = brain:GetArmyIndex()
+        local armyIndex = aibrain_methodsGetArmyIndex(brain)
         if ScenarioInfo.UnitNames[armyIndex] then
             ScenarioInfo.UnitNames[armyIndex][strUnit] = unit
         end
         unit.UnitName = strUnit
         if not brain.IgnoreArmyCaps then
-            SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+            SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
         end
         return unit, platoon, tblUnit.platoon
     end
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
     end
     return nil
 end
@@ -279,7 +342,7 @@ function CreateArmySubGroup(strArmy,strGroup,...)
     local platoonList = {}
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
     end
     for strName, tblData in pairs(tblNode.Units) do
         if 'GROUP' == tblData.type then
@@ -293,7 +356,7 @@ function CreateArmySubGroup(strArmy,strGroup,...)
         end
     end
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
     end
     if tblResult == nil then
         error('SCENARIO UTILITIES WARNING: No units found for for Army- ' .. strArmy .. ' Group- ' .. strGroup, 2)
@@ -328,13 +391,13 @@ function CreateInitialArmyGroup(strArmy, createCommander)
     local tblGroup = CreateArmyGroup(strArmy, 'INITIAL')
     local cdrUnit = false
 
-    if createCommander and (tblGroup == nil or 0 == table.getn(tblGroup)) then
+    if createCommander and (tblGroup == nil or 0 == tableGetn(tblGroup)) then
         local factionIndex = GetArmyBrain(strArmy):GetFactionIndex()
-        local initialUnitName = import('/lua/factions.lua').Factions[factionIndex].InitialUnit
+        local initialUnitName = factionsUp.Factions[factionIndex].InitialUnit
         cdrUnit = CreateInitialArmyUnit(strArmy, initialUnitName)
         if EntityCategoryContains(categories.COMMAND, cdrUnit) then
             if ScenarioInfo.Options['PrebuiltUnits'] == 'Off' then
-                cdrUnit:HideBone(0, true)
+                unit_methodsHideBone(cdrUnit, 0, true)
                 ForkThread(CommanderWarpDelay, cdrUnit, 3, GetArmyBrain(strArmy))
             end
 
@@ -356,7 +419,7 @@ end
 
 function CommanderWarpDelay(cdrUnit, delay, ArmyBrain)
     if ArmyBrain.BrainType == 'Human' then
-        cdrUnit:SetBlockCommandQueue(true)
+        unit_methodsSetBlockCommandQueue(cdrUnit, true)
     end
     WaitSeconds(delay)
     cdrUnit:PlayCommanderWarpInEffect()
@@ -465,15 +528,15 @@ end
 function AnimateDeathThread(unit, deathAnim)
     local animBlock = unit:ChooseAnimBlock(deathAnim)
     local animator = CreateAnimator(unit)
-    animator:PlayAnim(animBlock.Animation)
+    AnimationManipulatorPlayAnim(animator, animBlock.Animation)
     local rate = unit.rate or 1
 
     if animBlock.AnimationRateMax and animBlock.AnimationRateMin then
         rate = Random(animBlock.AnimationRateMin * 10, animBlock.AnimationRateMax * 10) / 10
     end
 
-    animator:SetRate(rate)
-    animator:SetAnimationTime(1000)
+    AnimationManipulatorSetRate(animator, rate)
+    AnimationManipulatorSetAnimationTime(animator, 1000)
     unit.Trash:Add(animator)
 
     if animator then
@@ -552,7 +615,7 @@ function InitializeArmies()
                 local cdrUnit
                 tblGroups[strArmy], cdrUnit = CreateInitialArmyGroup(strArmy, commander)
                 if commander and cdrUnit and ArmyBrains[iArmy].Nickname then
-                    cdrUnit:SetCustomName(ArmyBrains[iArmy].Nickname)
+                    unit_methodsSetCustomName(cdrUnit, ArmyBrains[iArmy].Nickname)
                 end
             end
 
@@ -615,7 +678,7 @@ end
 function InitializeScenarioArmies()
     local tblGroups = {}
     local tblArmy = ListArmies()
-    local factions = import('/lua/factions.lua')
+    local factions = factionsUp
     local bCreateInitial = ShouldCreateInitialArmyUnits()
     local armies = {}
     for i, name in tblArmy do
@@ -636,10 +699,10 @@ function InitializeScenarioArmies()
             SetArmyEconomy(strArmy, tblData.Economy.mass, tblData.Economy.energy)
             if tblData.faction ~= nil then
                 if ScenarioInfo.ArmySetup[strArmy].Human or StringStartsWith(strArmy, "Player") then
-                    local factionIndex = math.min(math.max(ScenarioInfo.ArmySetup[strArmy].Faction, 1), table.getsize(factions.Factions))
+                    local factionIndex = mathMin(mathMax(ScenarioInfo.ArmySetup[strArmy].Faction, 1), tableGetsize(factions.Factions))
                     SetArmyFactionIndex(strArmy, factionIndex - 1)
                 else
-                    local factionIndex = math.min(math.max(tblData.faction, 0), table.getsize(factions.Factions))
+                    local factionIndex = mathMin(mathMax(tblData.faction, 0), tableGetsize(factions.Factions))
                     SetArmyFactionIndex(strArmy, factionIndex)
                     GetArmyBrain(strArmy):SetCurrentPlan()
                 end
@@ -705,7 +768,7 @@ function SpawnPlatoon(strArmy, strGroup)
 
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
     end
     local platoonName
     if nil ~= tblNode.platoon and '' ~= tblNode.platoon then
@@ -714,7 +777,7 @@ function SpawnPlatoon(strArmy, strGroup)
 
     local platoonList, tblResult, treeResult = CreatePlatoons(strArmy, tblNode)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
     end
     if tblResult == nil then
         error('SCENARIO UTILITIES WARNING: No units found for for Army- ' .. strArmy .. ' Group- ' .. strGroup, 2)
@@ -725,12 +788,12 @@ end
 function SpawnTableOfPlatoons(strArmy, strGroup)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
     end
     local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,
                                                               FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units))
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
     end
     if tblResult == nil then
         error('SCENARIO UTILITIES WARNING: No units found for for Army- ' .. strArmy .. ' Group- ' .. strGroup, 2)
@@ -766,7 +829,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
     end
 
     local brain = GetArmyBrain(strArmy)
-    local armyIndex = brain:GetArmyIndex()
+    local armyIndex = aibrain_methodsGetArmyIndex(brain)
     local currTemplate
     local numRows
     local reversePlatoon = false
@@ -776,14 +839,14 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
         and not platoonList[tblNode.platoon] then
         currTemplate = Scenario.Platoons[tblNode.platoon]
         if currTemplate then
-            platoonList[tblNode.platoon] = brain:MakePlatoon('', currTemplate[2])
+            platoonList[tblNode.platoon] = aibrain_methodsMakePlatoon(brain, '', currTemplate[2])
             platoonList[tblNode.platoon].squadCounter = {}
             currPlatoon = tblNode.platoon
         end
     end
     if currPlatoon then
         currTemplate = Scenario.Platoons[currPlatoon]
-        numRows = table.getn(currTemplate)
+        numRows = tableGetn(currTemplate)
     end
 
     local unit = nil
@@ -821,7 +884,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
             if unit:GetBlueprint().Physics.FlattenSkirt then
                 unit:CreateTarmac(true, true, true, false, false)
             end
-            table.insert(tblResult, unit)
+            tableInsert(tblResult, unit)
             treeResult[strName] = unit
             if ScenarioInfo.UnitNames[armyIndex] then
                 ScenarioInfo.UnitNames[armyIndex][strName] = unit
@@ -833,12 +896,12 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                 reverseTemplate = currTemplate
                 if not platoonList[tblData.platoon] then
                     currTemplate = Scenario.Platoons[tblData.platoon]
-                    platoonList[tblData.platoon] = brain:MakePlatoon('', currTemplate[2])
+                    platoonList[tblData.platoon] = aibrain_methodsMakePlatoon(brain, '', currTemplate[2])
                     platoonList[tblData.platoon].squadCounter = {}
                 end
                 currPlatoon = tblData.platoon
                 currTemplate = Scenario.Platoons[currPlatoon]
-                numRows = table.getn(currTemplate)
+                numRows = tableGetn(currTemplate)
             end
             if currPlatoon then
                 local i = 3
@@ -850,7 +913,7 @@ function CreatePlatoons(strArmy, tblNode, tblResult, platoonList, currPlatoon, t
                     if tblData.type == currTemplate[i][1] and
                             platoonList[currPlatoon].squadCounter[i] < currTemplate[i][3] then
                         platoonList[currPlatoon].squadCounter[i] = platoonList[currPlatoon].squadCounter[i] + 1
-                        brain:AssignUnitsToPlatoon(platoonList[currPlatoon],{unit},currTemplate[i][4],currTemplate[i][5])
+                        aibrain_methodsAssignUnitsToPlatoon(brain, platoonList[currPlatoon],{unit},currTemplate[i][4],currTemplate[i][5])
                         inserted = true
                     end
                     i = i + 1
@@ -887,13 +950,13 @@ end
 function CreateArmyGroup(strArmy,strGroup,wreckage, balance)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
     end
     local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,
                                                               FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units), nil, nil, nil, nil, balance)
 
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
     end
     if tblResult == nil and strGroup ~= 'INITIAL' then
         error('SCENARIO UTILITIES WARNING: No units found for for Army- ' .. strArmy .. ' Group- ' .. strGroup, 2)
@@ -913,12 +976,12 @@ end
 function CreateArmyTree(strArmy, strGroup)
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
     end
     local platoonList, tblResult, treeResult = CreatePlatoons(strArmy,
                                                               FindUnitGroup(strGroup, Scenario.Armies[strArmy].Units))
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
     end
     if tblResult == nil then
         error('SCENARIO UTILITIES WARNING: No units found for for Army- ' .. strArmy .. ' Group- ' .. strGroup, 2)
@@ -940,7 +1003,7 @@ end
 function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon, balance)
     if ScenarioInfo.LoadBalance.Enabled then
         --note that tblNode in this case is actually the callback function
-        table.insert(ScenarioInfo.LoadBalance.PlatoonGroups, {strArmy, strGroup, formation, tblNode})
+        tableInsert(ScenarioInfo.LoadBalance.PlatoonGroups, {strArmy, strGroup, formation, tblNode})
         return
     end
 
@@ -953,17 +1016,17 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
     end
     local brain = GetArmyBrain(strArmy)
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
     end
-    local platoon = platoon or brain:MakePlatoon('','')
-    local armyIndex = brain:GetArmyIndex()
+    local platoon = platoon or aibrain_methodsMakePlatoon(brain, '','')
+    local armyIndex = aibrain_methodsGetArmyIndex(brain)
 
     local unit = nil
     for strName, tblData in pairs(tblNode.Units) do
         if 'GROUP' == tblData.type then
             platoon = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblData, platoon)
             if not brain.IgnoreArmyCaps then
-                SetIgnoreArmyUnitCap(brain:GetArmyIndex(), true)
+                SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), true)
             end
         else
             unit = CreateUnitHPR(tblData.type,
@@ -978,7 +1041,7 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
                 ScenarioInfo.UnitNames[armyIndex][strName] = unit
             end
             unit.UnitName = strName
-            brain:AssignUnitsToPlatoon(platoon, {unit}, 'Attack', formation)
+            aibrain_methodsAssignUnitsToPlatoon(brain, platoon, {unit}, 'Attack', formation)
 
             if balance then
                 ScenarioInfo.LoadBalance.Accumulator = ScenarioInfo.LoadBalance.Accumulator + 1
@@ -991,7 +1054,7 @@ function CreateArmyGroupAsPlatoon(strArmy, strGroup, formation, tblNode, platoon
         end
     end
     if not brain.IgnoreArmyCaps then
-        SetIgnoreArmyUnitCap(brain:GetArmyIndex(), false)
+        SetIgnoreArmyUnitCap(aibrain_methodsGetArmyIndex(brain), false)
     end
     return platoon
 end
@@ -1000,7 +1063,7 @@ end
 function CreateArmyGroupAsPlatoonVeteran(strArmy, strGroup, formation, veteranLevel)
     local plat = CreateArmyGroupAsPlatoon(strArmy, strGroup, formation)
     veteranLevel = veteranLevel or 5
-    for k,v in plat:GetPlatoonUnits() do
+    for k,v in platoon_methodsGetPlatoonUnits(plat) do
         v:SetVeterancy(veteranLevel)
     end
     return plat
@@ -1013,7 +1076,7 @@ function FlattenTreeGroup(strArmy, strGroup, tblData, unitGroup)
         if 'GROUP' == tblData.type then
             FlattenTreeGroup(strArmy, strGroup, tblData, unitGroup)
         else
-            table.insert(unitGroup, tblData)
+            tableInsert(unitGroup, tblData)
         end
     end
     return unitGroup
@@ -1038,22 +1101,22 @@ function LoadArmyPBMBuilders(strArmy)
             if builderData.BuildConditions then
                 for num,conditionData in builderData.BuildConditions do
                     local tempBuildData = {}
-                    table.insert(tempBuildData,conditionData[1])
-                    table.insert(tempBuildData,conditionData[2])
-                    table.insert(tempBuildData,conditionData[3])
+                    tableInsert(tempBuildData,conditionData[1])
+                    tableInsert(tempBuildData,conditionData[2])
+                    tableInsert(tempBuildData,conditionData[3])
                     builderData.BuildConditions[num] = tempBuildData
                 end
             end
-            if string.sub(buildName, 1, 11) == 'OSB_Master_' or string.sub(buildName, 1, 10) == 'OSB_Child_' then
+            if stringSub(buildName, 1, 11) == 'OSB_Master_' or stringSub(buildName, 1, 10) == 'OSB_Child_' then
                 nonGlobalOSB[buildName] = builderData
-            elseif string.sub(buildName, 1, 4) == 'OSB_' then
+            elseif stringSub(buildName, 1, 4) == 'OSB_' then
                 LoadOSB(buildName, strArmy, builderData)
             elseif not builderData.PlatoonData.AMMasterPlatoon then
                 local spec = {}
                 for k, v in builderData do
                     spec[k] = v
                 end
-                spec.PlatoonTemplate = table.deepcopy(Scenario.Platoons[builderData.PlatoonTemplate])
+                spec.PlatoonTemplate = tableDeepcopy(Scenario.Platoons[builderData.PlatoonTemplate])
                 spec.BuilderName = buildName
                 spec.PlatoonData.BuilderName = buildName
                 if spec.BuildTimeOut and spec.BuildTimeOut < 0 then
@@ -1169,10 +1232,10 @@ function UpdateGivenOSB(builderEdit, builderData)
     if builderData.PlatoonData.PlatoonMultiplier and not builderEdit.PlatoonTemplate.MultiplierApplied then
         builderEdit.PlatoonTemplate.MultiplierApplied = true
         local squadNum = 3
-        while squadNum <= table.getn(builderEdit.PlatoonTemplate) do
+        while squadNum <= tableGetn(builderEdit.PlatoonTemplate) do
             if builderEdit.PlatoonTemplate[squadNum][2] < 0 then
                 local num = builderEdit.PlatoonTemplate[squadNum][2] * builderData.PlatoonData.PlatoonMultiplier
-                builderEdit.PlatoonTemplate[squadNum][2] = -(math.ceil(math.abs(num)))
+                builderEdit.PlatoonTemplate[squadNum][2] = -(mathCeil(mathAbs(num)))
             end
             squadNum = squadNum + 1
         end
@@ -1187,27 +1250,27 @@ function UpdateGivenOSB(builderEdit, builderData)
     if builderData.BuildConditions then
         for bcNum, bcData in builderData.BuildConditions do
             if childPart then
-                table.insert(builderEdit.BuildConditions, bcData)
+                tableInsert(builderEdit.BuildConditions, bcData)
             else
-                table.insert(builderEdit.AttackConditions, bcData)
+                tableInsert(builderEdit.AttackConditions, bcData)
             end
         end
     end
     if builderData.PlatoonBuildCallbacks then
         for buildNum, buildData in builderData.PlatoonBuildCallbacks do
             if childPart then
-                table.insert(builderEdit.PlatoonBuildCallbacks, buildData)
+                tableInsert(builderEdit.PlatoonBuildCallbacks, buildData)
             else
-                table.insert(builderEdit.DestroyCallbacks, buildData)
+                tableInsert(builderEdit.DestroyCallbacks, buildData)
             end
         end
     end
     if builderData.PlatoonAddFunctions then
         for addNum, addData in builderData.PlatoonAddFunctions do
             if childPart then
-                table.insert(builderEdit.PlatoonAddFunctions, buildData)
+                tableInsert(builderEdit.PlatoonAddFunctions, buildData)
             else
-                table.insert(builderEdit.FormCallbacks, buildData)
+                tableInsert(builderEdit.FormCallbacks, buildData)
             end
         end
     end
@@ -1271,7 +1334,7 @@ function LoadOSB(buildName, strArmy, builderData)
         if ScenarioInfo.OSPlatoonCounter[spec.BuilderName] then
             UpdateOSB(spec.BuilderName, strArmy, builderData)
         else
-            if string.sub(k, 1, 11) == 'OSB_Master_' then
+            if stringSub(k, 1, 11) == 'OSB_Master_' then
                 for name, data in builderData.PlatoonData do
                     if name ~= 'PlatoonMultiplier' and name ~= 'TransportCount' and name ~= 'PlatoonSize' then
                         spec.PlatoonData[name] = data
@@ -1282,13 +1345,13 @@ function LoadOSB(buildName, strArmy, builderData)
                 spec.PlatoonData.AMPlatoons = {}
                 for name, pName in pData.AMPlatoons do
                     local appendString = ''
-                    if string.sub(name, 1, 6) == 'APPEND' then
-                        appendString = string.sub(name, 7)
+                    if stringSub(name, 1, 6) == 'APPEND' then
+                        appendString = stringSub(name, 7)
                     end
                     if location then
-                        table.insert(spec.PlatoonData.AMPlatoons, pName..'_'..strArmy..'_'..location..appendString)
+                        tableInsert(spec.PlatoonData.AMPlatoons, pName..'_'..strArmy..'_'..location..appendString)
                     else
-                        table.insert(spec.PlatoonData.AMPlatoons, pName .. '_' .. strArmy .. appendString)
+                        tableInsert(spec.PlatoonData.AMPlatoons, pName .. '_' .. strArmy .. appendString)
                     end
                 end
             end
@@ -1313,26 +1376,26 @@ function LoadOSB(buildName, strArmy, builderData)
             spec.PlatoonType = v.PlatoonType
 
             -- Set platoon template
-            if Scenario.Platoons['OST_' .. string.sub(spec.BuilderName, 5)] then
-                spec.PlatoonTemplate = FactionConvert(table.deepcopy(Scenario.Platoons['OST_' .. string.sub(spec.BuilderName, 5)]), factionIndex)
+            if Scenario.Platoons['OST_' .. stringSub(spec.BuilderName, 5)] then
+                spec.PlatoonTemplate = FactionConvert(tableDeepcopy(Scenario.Platoons['OST_' .. stringSub(spec.BuilderName, 5)]), factionIndex)
             elseif Scenario.Platoons[v.PlatoonTemplate] then
                 if type(buildName) ~= "table" then
-                    spec.PlatoonTemplate = FactionConvert(table.deepcopy(Scenario.Platoons[v.PlatoonTemplate]), factionIndex)
+                    spec.PlatoonTemplate = FactionConvert(tableDeepcopy(Scenario.Platoons[v.PlatoonTemplate]), factionIndex)
                 else
-                    spec.PlatoonTemplate = table.deepcopy(Scenario.Platoons[v.PlatoonTemplate])
+                    spec.PlatoonTemplate = tableDeepcopy(Scenario.Platoons[v.PlatoonTemplate])
                 end
             else
                 if type(buildName) ~= "table" then
-                    spec.PlatoonTemplate = FactionConvert(table.deepcopy(platoons[v.PlatoonTemplate]), factionIndex)
+                    spec.PlatoonTemplate = FactionConvert(tableDeepcopy(platoons[v.PlatoonTemplate]), factionIndex)
                 else
-                    spec.PlatoonTemplate = table.deepcopy(platoons[v.PlatoonTemplate])
+                    spec.PlatoonTemplate = tableDeepcopy(platoons[v.PlatoonTemplate])
                 end
 
 
             end
             if builderData.PlatoonData.PlatoonMultiplier then
                 local squadNum = 3
-                while squadNum <= table.getn(spec.PlatoonTemplate) do
+                while squadNum <= tableGetn(spec.PlatoonTemplate) do
                     spec.PlatoonTemplate[squadNum][2] = spec.PlatoonTemplate[squadNum][2] * builderData.PlatoonData.PlatoonMultiplier
                     spec.PlatoonTemplate[squadNum][3] = spec.PlatoonTemplate[squadNum][3] * builderData.PlatoonData.PlatoonMultiplier
                     squadNum = squadNum + 1
@@ -1340,7 +1403,7 @@ function LoadOSB(buildName, strArmy, builderData)
             end
             if builderData.PlatoonData.PlatoonSize then
                 local squadNum = 3
-                while squadNum <= table.getn(spec.PlatoonTemplate) do
+                while squadNum <= tableGetn(spec.PlatoonTemplate) do
                     spec.PlatoonTemplate[squadNum][2] = 1
                     spec.PlatoonTemplate[squadNum][3] = builderData.PlatoonData.PlatoonSize
                     squadNum = squadNum + 1
@@ -1354,7 +1417,7 @@ function LoadOSB(buildName, strArmy, builderData)
             spec.BuildTimeOut = v.BuildTimeOut
 
             -- Add AI Function to OSB global if needed
-            if string.sub(k, 1, 11) == 'OSB_Master_' and builderData.PlatoonAIFunction then
+            if stringSub(k, 1, 11) == 'OSB_Master_' and builderData.PlatoonAIFunction then
                 spec.PlatoonAIFunction = builderData.PlatoonAIFunction
             elseif v.PlatoonAIFunction then
                 spec.PlatoonAIFunction = v.PlatoonAIFunction
@@ -1364,9 +1427,9 @@ function LoadOSB(buildName, strArmy, builderData)
             spec.BuildConditions = {}
             if v.BuildConditions then
                 for num, bCond in v.BuildConditions do
-                    local addCond = table.deepcopy(bCond)
+                    local addCond = tableDeepcopy(bCond)
                     for sNum, pVal in addCond[3] do
-                        if pVal == 'OSB_Master_' .. string.sub(buildNameNew,5) then
+                        if pVal == 'OSB_Master_' .. stringSub(buildNameNew,5) then
                             pVal = amMasterName
                         elseif pVal == 'default_master' then
                             addCond[3][sNum] = amMasterName
@@ -1384,7 +1447,7 @@ function LoadOSB(buildName, strArmy, builderData)
                             end
                         end
                     end
-                    table.insert(spec.BuildConditions, addCond)
+                    tableInsert(spec.BuildConditions, addCond)
                 end
             end
             -- Add build/form conditions to ALL builders
@@ -1393,11 +1456,11 @@ function LoadOSB(buildName, strArmy, builderData)
                     if bCond[3][1] == 'Remove' then
                         for bcNum,bcData in spec.BuildConditions do
                             if bcData[2] == bCond[2] then
-                                table.remove(spec.BuildConditions, bcNum)
+                                tableRemove(spec.BuildConditions, bcNum)
                             end
                         end
                     else
-                        local addCond = table.deepcopy(bCond)
+                        local addCond = tableDeepcopy(bCond)
                         for sNum, pVal in addCond[3] do
                             if pVal == buildNameNew then
                                 pVal = amMasterName
@@ -1417,7 +1480,7 @@ function LoadOSB(buildName, strArmy, builderData)
                                 end
                             end
                         end
-                        table.insert(spec.BuildConditions, addCond)
+                        tableInsert(spec.BuildConditions, addCond)
                     end
                 end
             end
@@ -1426,9 +1489,9 @@ function LoadOSB(buildName, strArmy, builderData)
                 if cond[2] == 'FactionIndex' then
                     local params = {}
                     for subNum, val in cond[3] do
-                        table.insert(params, val)
+                        tableInsert(params, val)
                     end
-                    table.remove(params, 1)
+                    tableRemove(params, 1)
                     insert = import(cond[1])[cond[2]](aiBrain, unpack(params))
                 end
             end
@@ -1437,11 +1500,11 @@ function LoadOSB(buildName, strArmy, builderData)
             spec.PlatoonBuildCallbacks = {}
             if v.PlatoonBuildCallbacks then
                 for num, pbCallback in v.PlatoonBuildCallbacks do
-                    table.insert(spec.PlatoonBuildCallbacks, pbCallback)
+                    tableInsert(spec.PlatoonBuildCallbacks, pbCallback)
                 end
             end
             -- Add DestroyCallbacks to Masters
-            if builderData.PlatoonBuildCallbacks and string.sub(k,1,11) == 'OSB_Master_' then
+            if builderData.PlatoonBuildCallbacks and stringSub(k,1,11) == 'OSB_Master_' then
                 FilterFunctions(spec.PlatoonBuildCallbacks, builderData.PlatoonBuildCallbacks)
             end
 
@@ -1449,24 +1512,24 @@ function LoadOSB(buildName, strArmy, builderData)
             spec.PlatoonAddFunctions = {}
             if v.PlatoonAddFunctions then
                 for fNum, fData in v.PlatoonAddFunctions do
-                    table.insert(spec.PlatoonAddFunctions, fData)
+                    tableInsert(spec.PlatoonAddFunctions, fData)
                 end
             end
-            if builderData.PlatoonAddFunctions and string.sub(k,1,11) == 'OSB_Master_' then
+            if builderData.PlatoonAddFunctions and stringSub(k,1,11) == 'OSB_Master_' then
                 FilterFunctions(spec.PlatoonAddFunctions, builderData.PlatoonAddFunctions)
             end
 
 
             -- Masters
             if pData.AMMasterPlatoon and insert then
-                if string.sub(k,1,26) == 'OSB_Master_LeftoverCleanup' then
+                if stringSub(k,1,26) == 'OSB_Master_LeftoverCleanup' then
                     spec.PlatoonName = spec.LocationType..'_LeftoverUnits'
                 else
                     spec.PlatoonName = spec.BuilderName
                 end
 
                 -- Add data to Masters
-                if builderData.PlatoonData and string.sub(k,1,11) == 'OSB_Master_' then
+                if builderData.PlatoonData and stringSub(k,1,11) == 'OSB_Master_' then
                     if aiBrain.AttackData['AttackManagerState'] ~= 'ACTIVE' then
                         aiBrain:InitializeAttackManager()
                     end
@@ -1507,7 +1570,7 @@ end
 -- TODO: This really ought to be hooked.... this file needs to be made game agnostic as it's in mohodata
 function FactionConvert(template, factionIndex)
     local i = 3
-    while i <= table.getn(template) do
+    while i <= tableGetn(template) do
         if factionIndex == 2 then
             if template[i][1] == 'uel0203' then
                 template[i][1] = 'xal0203'
@@ -1518,7 +1581,7 @@ function FactionConvert(template, factionIndex)
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xal0305'
             else
-                template[i][1] = string.gsub(template[i][1], 'ue', 'ua')
+                template[i][1] = stringGsub(template[i][1], 'ue', 'ua')
             end
         elseif factionIndex == 3 then
             if template[i][1] == 'uea0305' then
@@ -1534,7 +1597,7 @@ function FactionConvert(template, factionIndex)
             elseif template[i][1] == 'del0204' then
                 template[i][1] = 'drl0204'
             else
-                template[i][1] = string.gsub(template[i][1], 'ue', 'ur')
+                template[i][1] = stringGsub(template[i][1], 'ue', 'ur')
             end
         elseif factionIndex == 4 then
             if template[i][1] == 'uel0106' then
@@ -1542,7 +1605,7 @@ function FactionConvert(template, factionIndex)
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xsl0305'
             else
-                template[i][1] = string.gsub(template[i][1], 'ue', 'xs')
+                template[i][1] = stringGsub(template[i][1], 'ue', 'xs')
             end
         end
         i = i + 1
@@ -1554,32 +1617,32 @@ function SplitUpdateOSBName(buildName)
     -- OSB_<bname>_location
     local startCheck = 5
     local specificBuilder = false
-    if string.sub(buildName, 1, 11) == 'OSB_Master_' then
+    if stringSub(buildName, 1, 11) == 'OSB_Master_' then
         startCheck = 12
-    elseif string.sub(buildName, 1, 10) == 'OSB_Child_' then
+    elseif stringSub(buildName, 1, 10) == 'OSB_Child_' then
         startCheck = 11
     end
-    local pos = string.find(buildName, '_', startCheck)
+    local pos = stringFind(buildName, '_', startCheck)
     local location = false
     local retName = buildName
     local globName = false
     local childPart = false
     if pos then
-        globName = string.sub(buildName, startCheck, pos-1)
-        retName = string.sub(buildName, 1, pos-1)
+        globName = stringSub(buildName, startCheck, pos-1)
+        retName = stringSub(buildName, 1, pos-1)
     else
-        globName = string.sub(buildName, startCheck)
+        globName = stringSub(buildName, startCheck)
         retName = buildName
     end
     if startCheck <= 5 and pos then
-        location = string.sub(buildName, pos+1)
+        location = stringSub(buildName, pos+1)
     elseif pos then
-        local pos2 = string.find(buildName, '_', pos+1)
+        local pos2 = stringFind(buildName, '_', pos+1)
         if pos2 then
-            childPart = string.sub(buildName, pos+1, pos2-1)
-            location = string.sub(buildName, pos2+1)
+            childPart = stringSub(buildName, pos+1, pos2-1)
+            location = stringSub(buildName, pos2+1)
         else
-            childPart = string.sub(buildName, pos+1)
+            childPart = stringSub(buildName, pos+1)
         end
     end
     return retName, location, globName, childPart
@@ -1589,32 +1652,32 @@ function SplitOSBName(buildName)
     -- OSB_<bname>_location
     local startCheck = 5
     local specificBuilder = false
-    if string.sub(buildName, 1, 11) == 'OSB_Master_' then
+    if stringSub(buildName, 1, 11) == 'OSB_Master_' then
         startCheck = 12
-    elseif string.sub(buildName, 1, 10) == 'OSB_Child_' then
+    elseif stringSub(buildName, 1, 10) == 'OSB_Child_' then
         startCheck = 11
     end
-    local pos = string.find(buildName, '_', startCheck)
+    local pos = stringFind(buildName, '_', startCheck)
     local location = false
     local retName = buildName
     local globName = false
     local childPart = false
     if pos then
-        globName = string.sub(buildName, startCheck, pos-1)
-        retName = string.sub(buildName, 1, pos-1)
+        globName = stringSub(buildName, startCheck, pos-1)
+        retName = stringSub(buildName, 1, pos-1)
     else
-        globName = string.sub(buildName, startCheck)
+        globName = stringSub(buildName, startCheck)
         retName = buildName
     end
     if startCheck <= 5 and pos then
-        location = string.sub(buildName, pos+1)
+        location = stringSub(buildName, pos+1)
     elseif pos then
-        local pos2 = string.find(buildName, '_', pos+1)
+        local pos2 = stringFind(buildName, '_', pos+1)
         if pos2 then
-            location = string.sub(buildName, pos+1, pos2-1)
-            childPart = string.sub(buildName, pos2+1)
+            location = stringSub(buildName, pos+1, pos2-1)
+            childPart = stringSub(buildName, pos2+1)
         else
-            location = string.sub(buildName, pos+1)
+            location = stringSub(buildName, pos+1)
         end
     end
     return retName, location, globName, childPart
@@ -1625,11 +1688,11 @@ function FilterFunctions(tableOne, tableTwo)
         if t2Data[3][1] == 'Remove' then
             for t1Num,t1Data in tableOne do
                 if t2Data[2] == t1Data[2] then
-                    table.remove(tableOne, t1Num)
+                    tableRemove(tableOne, t1Num)
                 end
             end
         else
-            table.insert(tableOne, t2Data)
+            tableInsert(tableOne, t2Data)
         end
     end
     return tableOne

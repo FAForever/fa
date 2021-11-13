@@ -7,6 +7,8 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -24,7 +26,7 @@ local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 function AirAttackCondition(aiBrain, locationType, targetNumber)
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
 
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
 

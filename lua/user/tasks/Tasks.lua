@@ -1,5 +1,12 @@
 # Keeps some administrative values and has generic validation functions.
 
+local ipairs = ipairs
+local GetFocusArmy = GetFocusArmy
+local WARN = WARN
+local GetUnitById = GetUnitById
+local next = next
+local VDist2 = VDist2
+
 local AbilityDefinition = import('/lua/abilitydefinition.lua').abilities
 
 

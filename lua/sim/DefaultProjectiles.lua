@@ -4,6 +4,44 @@
 -- Summary  : Script for default projectiles
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+local projectile_methodsTrackTarget = moho.projectile_methods.TrackTarget
+local WARN = WARN
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
+local projectile_methodsStayUnderwater = moho.projectile_methods.StayUnderwater
+local projectile_methodsSetDestroyOnWater = moho.projectile_methods.SetDestroyOnWater
+local projectile_methodsGetPosition = moho.projectile_methods.GetPosition
+local tableInsert = table.insert
+local CreateTrail = CreateTrail
+local ipairs = ipairs
+local IsDestroyed = IsDestroyed
+local projectile_methodsBeenDestroyed = moho.projectile_methods.BeenDestroyed
+local CreateEconomyEvent = CreateEconomyEvent
+local RemoveEconomyEvent = RemoveEconomyEvent
+local projectile_methodsGetLauncher = moho.projectile_methods.GetLauncher
+local projectile_methodsGetCurrentTargetPosition = moho.projectile_methods.GetCurrentTargetPosition
+local mathMin = math.min
+local WaitFor = WaitFor
+local EntityCategoryContains = EntityCategoryContains
+local IsUnit = IsUnit
+local DamageRing = DamageRing
+local projectile_methodsSetAcceleration = moho.projectile_methods.SetAcceleration
+local projectile_methodsSetCollision = moho.projectile_methods.SetCollision
+local next = next
+local KillThread = KillThread
+local projectile_methodsGetBlueprint = moho.projectile_methods.GetBlueprint
+local projectile_methodsCreateProjectile = moho.projectile_methods.CreateProjectile
+local CreateAttachedEmitter = CreateAttachedEmitter
+local tableGetn = table.getn
+local mathFloor = math.floor
+local mathMax = math.max
+local LOG = LOG
+local projectile_methodsSetTurnRate = moho.projectile_methods.SetTurnRate
+local projectile_methodsPlaySound = moho.projectile_methods.PlaySound
+local VDist2 = VDist2
+local projectile_methodsSetCollisionShape = moho.projectile_methods.SetCollisionShape
+local Random = Random
+
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
@@ -67,24 +105,24 @@ MultiBeamProjectile = Class(EmitterProjectile) {
 -- Nukes
 NukeProjectile = Class(NullShell) {
     MovementThread = function(self)
-        local launcher = self:GetLauncher()
+        local launcher = projectile_methodsGetLauncher(self)
 		self.Nuke = true
         self.CreateEffects(self, self.InitialEffects, self.Army, 1)
-        self:TrackTarget(false)
+        projectile_methodsTrackTarget(self, false)
         WaitSeconds(2.5) -- Height
-        self:SetCollision(true)
+        projectile_methodsSetCollision(self, true)
         self.CreateEffects(self, self.LaunchEffects, self.Army, 1)
         WaitSeconds(2.5)
         self.CreateEffects(self, self.ThrustEffects, self.Army, 3)
         WaitSeconds(2.5)
-        self:TrackTarget(true) -- Turn ~90 degrees towards target
-        self:SetDestroyOnWater(true)
-        self:SetTurnRate(45)
+        projectile_methodsTrackTarget(self, true) -- Turn ~90 degrees towards target
+        projectile_methodsSetDestroyOnWater(self, true)
+        projectile_methodsSetTurnRate(self, 45)
         WaitSeconds(2) -- Now set turn rate to zero so nuke flies straight
-        self:SetTurnRate(0)
-        self:SetAcceleration(0.001)
+        projectile_methodsSetTurnRate(self, 0)
+        projectile_methodsSetAcceleration(self, 0.001)
         self.WaitTime = 0.5
-        while not self:BeenDestroyed() do
+        while not projectile_methodsBeenDestroyed(self) do
             self:SetTurnRateByDist()
             WaitSeconds(self.WaitTime)
         end
@@ -95,7 +133,7 @@ NukeProjectile = Class(NullShell) {
         -- Get the nuke as close to 90 deg as possible
         if dist > 150 then
             -- Freeze the turn rate as to prevent steep angles at long distance targets
-            self:SetTurnRate(0)
+            projectile_methodsSetTurnRate(self, 0)
         elseif dist > 75 and dist <= 150 then
             -- Increase check intervals
             self.WaitTime = 0.3
@@ -104,13 +142,13 @@ NukeProjectile = Class(NullShell) {
             self.WaitTime = 0.1
         elseif dist < 32 then
             -- Turn the missile down
-            self:SetTurnRate(50)
+            projectile_methodsSetTurnRate(self, 50)
         end
     end,
 
     GetDistanceToTarget = function(self)
-        local tpos = self:GetCurrentTargetPosition()
-        local mpos = self:GetPosition()
+        local tpos = projectile_methodsGetCurrentTargetPosition(self)
+        local mpos = projectile_methodsGetPosition(self)
         local dist = VDist2(mpos[1], mpos[3], tpos[1], tpos[3])
         return dist
     end,
@@ -124,7 +162,7 @@ NukeProjectile = Class(NullShell) {
 
     ForceThread = function(self)
         -- Knockdown force rings
-        local position = self:GetPosition()
+        local position = projectile_methodsGetPosition(self)
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
         WaitSeconds(0.1)
         DamageRing(self, position, 0.1, 45, 1, 'Force', true)
@@ -133,12 +171,12 @@ NukeProjectile = Class(NullShell) {
     OnImpact = function(self, TargetType, TargetEntity)
         if not TargetEntity or not EntityCategoryContains(categories.PROJECTILE * categories.ANTIMISSILE * categories.TECH_THREE, TargetEntity) then
             -- Play the explosion sound
-            local myBlueprint = self:GetBlueprint()
+            local myBlueprint = projectile_methodsGetBlueprint(self)
             if myBlueprint.Audio.NukeExplosion then
-                self:PlaySound(myBlueprint.Audio.NukeExplosion)
+                projectile_methodsPlaySound(self, myBlueprint.Audio.NukeExplosion)
             end
 
-            self.effectEntity = self:CreateProjectile(self.effectEntityPath, 0, 0, 0, nil, nil, nil):SetCollision(false)
+            self.effectEntity = projectile_methodsCreateProjectile(self, self.effectEntityPath, 0, 0, 0, nil, nil, nil):SetCollision(false)
             self.effectEntity:ForkThread(self.effectEntity.EffectThread)
             self:ForkThread(self.ForceThread)
         end
@@ -146,14 +184,14 @@ NukeProjectile = Class(NullShell) {
     end,
 
     LauncherCallbacks = function(self)
-        local launcher = self:GetLauncher()
+        local launcher = projectile_methodsGetLauncher(self)
         if launcher and not launcher.Dead and launcher.EventCallbacks.ProjectileDamaged then
             self.ProjectileDamaged = {}
             for k,v in launcher.EventCallbacks.ProjectileDamaged do
-                table.insert(self.ProjectileDamaged, v)
+                tableInsert(self.ProjectileDamaged, v)
             end
         end
-        self:SetCollisionShape('Sphere', 0, 0, 0, 2.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 2.0)
         self:ForkThread(self.MovementThread)
     end,
 
@@ -167,7 +205,7 @@ NukeProjectile = Class(NullShell) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-		local bp = self:GetBlueprint().Defense.MaxHealth
+		local bp = projectile_methodsGetBlueprint(self).Defense.MaxHealth
 			if bp then
 			self:DoTakeDamage(instigator, amount, vector, damageType)
 		else
@@ -203,12 +241,12 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
         if self.PolyTrails then
-            local NumPolyTrails = table.getn(self.PolyTrails)
+            local NumPolyTrails = tableGetn(self.PolyTrails)
 
             if self.RandomPolyTrails ~= 0 then
                 local index = nil
                 for i = 1, self.RandomPolyTrails do
-                    index = math.floor(Random(1, NumPolyTrails))
+                    index = mathFloor(Random(1, NumPolyTrails))
                     CreateTrail(self, -1, self.Army, self.PolyTrails[index]):OffsetEmitter(0, 0, self.PolyTrailOffset[index])
                 end
             else
@@ -294,8 +332,8 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
 
     OnEnterWater = function(self)
         Projectile.OnEnterWater(self)
-        self:TrackTarget(true)
-        self:StayUnderwater(true)
+        projectile_methodsTrackTarget(self, true)
+        projectile_methodsStayUnderwater(self, true)
         self.TTT1 = self:ForkThread(self.EnterWaterThread)
     end,
 
@@ -435,7 +473,7 @@ OverchargeProjectile = Class() {
             end
             local energyLimitDamage = self:EnergyAsDamage(energyLimit)
             -- Find max available damage
-            damage = math.min(data.maxDamage, energyLimitDamage)
+            damage = mathMin(data.maxDamage, energyLimitDamage)
             -- How much damage do we actually need to kill the unit?
             local idealDamage = targetEntity:GetHealth()
             local maxHP = self:UnitsDetection(targetType, targetEntity)
@@ -461,8 +499,8 @@ OverchargeProjectile = Class() {
             if targetCats.COMMAND and not maxHP then -- no units around ACU - min.damage
                 idealDamage = data.minDamage
             end
-            damage = math.min(damage, idealDamage)
-            damage = math.max(data.minDamage, damage)
+            damage = mathMin(damage, idealDamage)
+            damage = mathMax(data.minDamage, damage)
             -- prevents radars blinks if there is less than 5k e in storage when OC hits the target
             if energyAvailable < 5000 then
                 damage = energyLimitDamage
@@ -516,7 +554,7 @@ OverchargeProjectile = Class() {
             if EntityCategoryContains(categories.UEF, unit) and unit.MyShield._IsUp and unit.MyShield:GetMaxHealth() > maxHP then
                 maxHP = unit.MyShield:GetMaxHealth()
             elseif unit:GetHealth() > maxHP then
-                local distance = math.min(unit:GetBlueprint().SizeX, unit:GetBlueprint().SizeZ)
+                local distance = mathMin(unit:GetBlueprint().SizeX, unit:GetBlueprint().SizeZ)
                 if GetDistanceBetweenTwoEntities(unit, self) < distance + self.DamageData.DamageRadius then
                     maxHP = unit:GetHealth()
                 end

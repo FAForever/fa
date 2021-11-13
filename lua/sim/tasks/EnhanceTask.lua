@@ -3,6 +3,17 @@
 #*
 #* Copyright Š 2008 Gas Powered Games, Inc.  All rights reserved.
 #*****************************************************************************
+local unit_methodsGetNavigator = moho.unit_methods.GetNavigator
+local unit_methodsSetPaused = moho.unit_methods.SetPaused
+local ScriptTask_MethodsGetUnit = moho.ScriptTask_Methods.GetUnit
+local unit_methodsGetBuildRate = moho.unit_methods.GetBuildRate
+local unit_methodsIsMobile = moho.unit_methods.IsMobile
+local ScriptTask_MethodsSetAIResult = moho.ScriptTask_Methods.SetAIResult
+local SecondsPerTick = SecondsPerTick
+local unit_methodsSetWorkProgress = moho.unit_methods.SetWorkProgress
+local unit_methodsIsPaused = moho.unit_methods.IsPaused
+local unit_methodsGetResourceConsumed = moho.unit_methods.GetResourceConsumed
+
 local ScriptTask = import('/lua/sim/ScriptTask.lua').ScriptTask
 local TASKSTATUS = import('/lua/sim/ScriptTask.lua').TASKSTATUS
 local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
@@ -10,31 +21,31 @@ local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
 EnhanceTask = Class(ScriptTask) {
     OnCreate = function(self,commandData)
         ScriptTask.OnCreate(self,commandData)
-        self:GetUnit():SetWorkProgress(0.0)
-        self:GetUnit():SetUnitState('Enhancing',true)
-        self:GetUnit():SetUnitState('Upgrading',true)
+        ScriptTask_MethodsGetUnit(self):SetWorkProgress(0.0)
+        ScriptTask_MethodsGetUnit(self):SetUnitState('Enhancing',true)
+        ScriptTask_MethodsGetUnit(self):SetUnitState('Upgrading',true)
         self.LastProgress = 0
         ChangeState(self, self.Stopping)
     end,
 
     OnDestroy = function(self)
-        self:GetUnit():SetUnitState('Enhancing',false)
-        self:GetUnit():SetUnitState('Upgrading',false)
-        self:GetUnit():SetWorkProgress(0.0)
+        ScriptTask_MethodsGetUnit(self):SetUnitState('Enhancing',false)
+        ScriptTask_MethodsGetUnit(self):SetUnitState('Upgrading',false)
+        ScriptTask_MethodsGetUnit(self):SetWorkProgress(0.0)
         if self.Success then
-            self:SetAIResult(AIRESULT.Success)
+            ScriptTask_MethodsSetAIResult(self, AIRESULT.Success)
         else
-            self:SetAIResult(AIRESULT.Fail)
-            self:GetUnit():OnWorkFail(self.CommandData.Enhancement)
+            ScriptTask_MethodsSetAIResult(self, AIRESULT.Fail)
+            ScriptTask_MethodsGetUnit(self):OnWorkFail(self.CommandData.Enhancement)
         end
     end,
 
     Stopping = State {
         TaskTick = function(self)
-            local unit = self:GetUnit()
+            local unit = ScriptTask_MethodsGetUnit(self)
 
-            if unit:IsMobile() and unit:IsMoving() then
-                unit:GetNavigator():AbortMove()
+            if unit_methodsIsMobile(unit) and unit:IsMoving() then
+                unit_methodsGetNavigator(unit):AbortMove()
                 return TASKSTATUS.Wait
             else
                 -- check if enhancement was started (not restricted and met prerequisite)
@@ -52,13 +63,13 @@ EnhanceTask = Class(ScriptTask) {
 
     Enhancing = State {
         TaskTick = function(self)
-            local unit = self:GetUnit()
+            local unit = ScriptTask_MethodsGetUnit(self)
             local current = unit.WorkProgress
 
-            if not unit:IsPaused() then
-                local obtained = unit:GetResourceConsumed()
+            if not unit_methodsIsPaused(unit) then
+                local obtained = unit_methodsGetResourceConsumed(unit)
                 if obtained > 0 then
-                    local frac = (1 / (unit.WorkItemBuildTime / unit:GetBuildRate())) * obtained * SecondsPerTick()
+                    local frac = (1 / (unit.WorkItemBuildTime / unit_methodsGetBuildRate(unit))) * obtained * SecondsPerTick()
                     current = current + frac
                     unit.WorkProgress = current
                 end
@@ -71,7 +82,7 @@ EnhanceTask = Class(ScriptTask) {
             end
 
             self.LastProgress = current
-            unit:SetWorkProgress(current)
+            unit_methodsSetWorkProgress(unit, current)
 
             if(current < 1.0) then
                 return TASKSTATUS.Wait
@@ -79,8 +90,8 @@ EnhanceTask = Class(ScriptTask) {
 
             unit:OnWorkEnd(self.CommandData.Enhancement)
 
-            if unit:IsPaused() then
-                unit:SetPaused(false)
+            if unit_methodsIsPaused(unit) then
+                unit_methodsSetPaused(unit, false)
             end
 
             self.Success = true

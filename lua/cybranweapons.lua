@@ -8,6 +8,19 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+local ipairs = ipairs
+local mathRandom = math.random
+local DamageArea = DamageArea
+local CreateDecal = CreateDecal
+local CreateAttachedEmitter = CreateAttachedEmitter
+local weapon_methodsCreateProjectile = moho.weapon_methods.CreateProjectile
+local weapon_methodsGetBlueprint = moho.weapon_methods.GetBlueprint
+local CreateEmitterAtBone = CreateEmitterAtBone
+local CreateRotator = CreateRotator
+local RotateManipulatorSetTargetSpeed = moho.RotateManipulator.SetTargetSpeed
+local next = next
+local RotateManipulatorSetAccel = moho.RotateManipulator.SetAccel
+
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
@@ -54,7 +67,7 @@ CDFHeavyMicrowaveLaserGeneratorCom = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self:EconomySupportsBeam() then return end
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         for k, v in self.FxUpackingChargeEffects do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -81,8 +94,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
         end
 
         -- set their respective properties when firing
-        self.RotatorManip:SetTargetSpeed(500)
-        self.RotatorManip:SetAccel(200)
+        RotateManipulatorSetTargetSpeed(self.RotatorManip, 500)
+        RotateManipulatorSetAccel(self.RotatorManip, 200)
 
         DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
     end,
@@ -91,8 +104,8 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
 
         -- if it exists, then stop rotating
         if self.RotatorManip then
-            self.RotatorManip:SetTargetSpeed(0)
-            self.RotatorManip:SetAccel(90)
+            RotateManipulatorSetTargetSpeed(self.RotatorManip, 0)
+            RotateManipulatorSetAccel(self.RotatorManip, 90)
         end
 
         DefaultBeamWeapon.PlayFxBeamEnd(self, beam)
@@ -101,14 +114,14 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
     PlayFxWeaponUnpackSequence = function(self)
 
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             for k, v in self.FxUpackingChargeEffects do
                 for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
                 end
             end
             if self.RotatorManip then
-                self.RotatorManip:SetTargetSpeed(179)
+                RotateManipulatorSetTargetSpeed(self.RotatorManip, 179)
             end
             DefaultBeamWeapon.PlayFxWeaponUnpackSequence(self)
         end
@@ -134,7 +147,7 @@ CIFSmartCharge = Class(DefaultProjectileWeapon) {
         if not proj or proj:BeenDestroyed() then
             return proj
         end
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = weapon_methodsGetBlueprint(self).DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
@@ -150,9 +163,9 @@ CANNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     },
 
     CreateProjectileForWeapon = function(self, bone)
-        local projectile = self:CreateProjectile(bone)
+        local projectile = weapon_methodsCreateProjectile(self, bone)
         local damageTable = self:GetDamageTable()
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local data = {
             Instigator = self.unit,
             Damage = bp.DoTDamage,
@@ -255,9 +268,9 @@ CAABurstCloudFlakArtilleryWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlashScale = 1.5,
 
     CreateProjectileForWeapon = function(self, bone)
-        local projectile = self:CreateProjectile(bone)
+        local projectile = weapon_methodsCreateProjectile(self, bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = weapon_methodsGetBlueprint(self)
         local data = {
             Instigator = self.unit,
             Damage = blueprint.DoTDamage,
@@ -306,9 +319,9 @@ CIFNaniteTorpedoWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
 
     CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
+        local proj = weapon_methodsCreateProjectile(self, bone)
         local damageTable = self:GetDamageTable()
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local data = {
             Instigator = self.unit,
             Damage = bp.DoTDamage,
@@ -350,7 +363,7 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
@@ -400,7 +413,7 @@ CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
     OnCreate = function(self)
         DefaultBeamWeapon.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
         self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
         self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
@@ -455,7 +468,7 @@ CMobileKamikazeBombWeapon = Class(KamikazeWeapon){
         
         if not self.unit.transportDrop then
             local pos = self.unit:GetPosition()
-            local rotation = math.random(0, 6.28)
+            local rotation = mathRandom(0, 6.28)
             
             DamageArea( self.unit, pos, 6, 1, 'Force', true )
             DamageArea( self.unit, pos, 6, 1, 'Force', true )

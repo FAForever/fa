@@ -5,6 +5,25 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+local GetUnitsInRect = GetUnitsInRect
+local ForkThread = ForkThread
+local error = error
+local aibrain_methodsSetArmyStatsTrigger = moho.aibrain_methods.SetArmyStatsTrigger
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local tableGetn = table.getn
+local type = type
+local unit_methodsIsBeingBuilt = moho.unit_methods.IsBeingBuilt
+local mathFloor = math.floor
+local GetGameTimeSeconds = GetGameTimeSeconds
+local aibrain_methodsGetArmyStat = moho.aibrain_methods.GetArmyStat
+local VDist3 = VDist3
+local VDist2 = VDist2
+local EntityCategoryContains = EntityCategoryContains
+
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 function CreateAreaTrigger(callbackFunction, rectangle, category, onceOnly, invert, aiBrain, number, requireBuilt)
@@ -19,9 +38,9 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
     local recTable = {}
     for _, v in rectangleTable do
         if type(v) == 'string' then
-            table.insert(recTable, ScenarioUtils.AreaToRect(v))
+            tableInsert(recTable, ScenarioUtils.AreaToRect(v))
         else
-            table.insert(recTable, v)
+            tableInsert(recTable, v)
         end
     end
 
@@ -32,17 +51,17 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
             local entities = GetUnitsInRect(v)
             if entities then
                 for ke, ve in entities do
-                    totalEntities[table.getn(totalEntities) + 1] = ve
+                    totalEntities[tableGetn(totalEntities) + 1] = ve
                 end
             end
         end
         local triggered = false
         local triggeringEntity
-        local numEntities = table.getn(totalEntities)
+        local numEntities = tableGetn(totalEntities)
         if numEntities > 0 then
             for _, v in totalEntities do
                 local contains = EntityCategoryContains(category, v)
-                if contains and (aiBrain and v:GetAIBrain() == aiBrain) and (not requireBuilt or (requireBuilt and not v:IsBeingBuilt())) then
+                if contains and (aiBrain and v:GetAIBrain() == aiBrain) and (not requireBuilt or (requireBuilt and not unit_methodsIsBeingBuilt(v))) then
                     amount = amount + 1
                     -- If we want to trigger as soon as one of a type is in there, kick out immediately.
                     if not number then
@@ -55,7 +74,7 @@ function AreaTriggerThread(callbackFunction, rectangleTable, category, onceOnly,
                         if not triggeringEntity then
                             triggeringEntity = {}
                         end
-                        table.insert(triggeringEntity, v)
+                        tableInsert(triggeringEntity, v)
                     end
                 end
             end
@@ -88,7 +107,7 @@ end
 
 function ThreatTriggerAroundUnitThread(callbackFunction, aiBrain, unit, rings, onceOnly, value, greater, name)
     while not unit.Dead do
-        local threat = aiBrain:GetThreatAtPosition(unit:GetPosition(), rings, true)
+        local threat = aibrain_methodsGetThreatAtPosition(aiBrain, unit:GetPosition(), rings, true)
         if greater and threat >= value then
             if name then
                 callbackFunction(TriggerManager, name)
@@ -121,7 +140,7 @@ function ThreatTriggerAroundPositionThread(callbackFunction, aiBrain, posVector,
         posVector = ScenarioUtils.MarkerToPosition(posVector)
     end
     while true do
-        local threat = aiBrain:GetThreatAtPosition(posVector, rings, true)
+        local threat = aibrain_methodsGetThreatAtPosition(aiBrain, posVector, rings, true)
         if greater and threat >= value then
             if name then
                 callbackFunction(TriggerManager, name)
@@ -152,12 +171,12 @@ end
 function TimerTriggerThread(callbackFunction, seconds, name, displayBool, onTickFunc)
     if displayBool then
         local ticking = true
-        local targetTime = math.floor(GetGameTimeSeconds()) + seconds
+        local targetTime = mathFloor(GetGameTimeSeconds()) + seconds
 
         while ticking do
-            onTickFunc(targetTime - math.floor(GetGameTimeSeconds()))
+            onTickFunc(targetTime - mathFloor(GetGameTimeSeconds()))
 
-            if targetTime - math.floor(GetGameTimeSeconds()) < 0 then
+            if targetTime - mathFloor(GetGameTimeSeconds()) < 0 then
                 ticking = false
             end
 
@@ -237,17 +256,17 @@ function CreateArmyStatTrigger(callbackFunction, aiBrain, name, triggerTable)
     end
     for num, triggerData in triggerTable do
         if string.find (triggerData.StatType, "Economy_") then
-            aiBrain:GetArmyStat(triggerData.StatType, 0.0)
+            aibrain_methodsGetArmyStat(aiBrain, triggerData.StatType, 0.0)
         else
-            aiBrain:GetArmyStat(triggerData.StatType, 0)
+            aibrain_methodsGetArmyStat(aiBrain, triggerData.StatType, 0)
         end
         if triggerData.Category then
-            aiBrain:SetArmyStatsTrigger(triggerData.StatType, name, triggerData.CompareType, triggerData.Value, triggerData.Category)
+            aibrain_methodsSetArmyStatsTrigger(aiBrain, triggerData.StatType, name, triggerData.CompareType, triggerData.Value, triggerData.Category)
         else
-            aiBrain:SetArmyStatsTrigger(triggerData.StatType, name, triggerData.CompareType, triggerData.Value)
+            aibrain_methodsSetArmyStatsTrigger(aiBrain, triggerData.StatType, name, triggerData.CompareType, triggerData.Value)
         end
     end
-    table.insert(aiBrain.TriggerList, spec)
+    tableInsert(aiBrain.TriggerList, spec)
 end
 
 function CreateArmyIntelTrigger(callbackFunction, aiBrain, reconType, blip, value, category, onceOnly, targetAIBrain)
@@ -324,8 +343,8 @@ function CreateUnitNearTypeTriggerThread(callbackFunction, unit, brain, category
             return
         else
             local position = unit:GetPosition()
-            for k, catUnit in brain:GetListOfUnits(category, false) do
-                if VDist3(position, catUnit:GetPosition()) < distance and not catUnit:IsBeingBuilt() then
+            for k, catUnit in aibrain_methodsGetListOfUnits(brain, category, false) do
+                if VDist3(position, catUnit:GetPosition()) < distance and not unit_methodsIsBeingBuilt(catUnit) then
                     fired = true
                     if name then
                         callbackFunction(TriggerManager, name, unit, catUnit)

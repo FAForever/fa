@@ -7,6 +7,14 @@
 --*  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --******************************************************************************************************************
 
+local ipairs = ipairs
+local tostring = tostring
+local next = next
+local mathFloor = math.floor
+local unpack = unpack
+local tableInsert = table.insert
+local mathMod = math.mod
+
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 
 --To make life easier with factions not having identical naval units and such.
@@ -94,8 +102,8 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
     --Build the stuff
     for level = 1, levels do
         --Types of naval units in the platoon
-        local tier = math.floor((level-1)/levelsPerTier) + 1
-        local waveLevel = math.mod(level-1, levelsPerTier) + 1
+        local tier = mathFloor((level-1)/levelsPerTier) + 1
+        local waveLevel = mathMod(level-1, levelsPerTier) + 1
         local template = 'OST_' .. name .. '_' .. tostring(tier) .. '-' .. tostring(waveLevel) .. '_Template'
 
         local children = {'T' .. tostring(tier)} --, 'L' .. tostring(level)}
@@ -118,42 +126,42 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
             battAcc = battAcc + 1
         end
 
-        local numFrigates = math.floor(frigAcc)
-        local numDestroyers = math.floor(destAcc)
-        local numBattleships = math.floor(battAcc)
+        local numFrigates = mathFloor(frigAcc)
+        local numDestroyers = mathFloor(destAcc)
+        local numBattleships = mathFloor(battAcc)
 
         if numFrigates > 0 then
-            table.insert(Scenario.Platoons[template], {TIERS[1].CORE[faction], 1, numFrigates, 'attack', 'None'})
-            table.insert(children, 'Frigate')
+            tableInsert(Scenario.Platoons[template], {TIERS[1].CORE[faction], 1, numFrigates, 'attack', 'None'})
+            tableInsert(children, 'Frigate')
         end
         if (allEnabled or IsEnabledType('Destroyer', data)) and numDestroyers > 0 then
-            table.insert(Scenario.Platoons[template], {TIERS[2].CORE[faction], 1, numDestroyers, 'attack', 'None'})
-            table.insert(children, 'Destroyer')
+            tableInsert(Scenario.Platoons[template], {TIERS[2].CORE[faction], 1, numDestroyers, 'attack', 'None'})
+            tableInsert(children, 'Destroyer')
         end
         if (allEnabled or IsEnabledType('Battleship', data)) and numBattleships > 0 then
-            table.insert(Scenario.Platoons[template], {TIERS[3].CORE[faction], 1, numBattleships, 'attack', 'None'})
-            table.insert(children, 'Battleship')
+            tableInsert(Scenario.Platoons[template], {TIERS[3].CORE[faction], 1, numBattleships, 'attack', 'None'})
+            tableInsert(children, 'Battleship')
         end
 
         -- Do submarines.
         local numSubmarines = 0
         if (allEnabled or IsEnabledType('Submarine', data)) then
-            if tier == 1 then numSubmarines = math.floor(numFrigates / Conversions.CORE_TO_SUBS)
-            elseif tier >= 2 then numSubmarines = math.floor(numDestroyers / Conversions.CORE_TO_SUBS)
-            elseif tier >= 3 then numSubmarines = math.floor(numBattleships / Conversions.CORE_TO_SUBS) end
+            if tier == 1 then numSubmarines = mathFloor(numFrigates / Conversions.CORE_TO_SUBS)
+            elseif tier >= 2 then numSubmarines = mathFloor(numDestroyers / Conversions.CORE_TO_SUBS)
+            elseif tier >= 3 then numSubmarines = mathFloor(numBattleships / Conversions.CORE_TO_SUBS) end
             if numSubmarines > 0 then
 
                 local placed = false
                 if tier == 3 and not data.DisableTypes['T3Submarine'] then
-                    table.insert(Scenario.Platoons[template], {TIERS[3].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
-                    table.insert(children, 'T3Submarine')
+                    tableInsert(Scenario.Platoons[template], {TIERS[3].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
+                    tableInsert(children, 'T3Submarine')
                     placed = true
                 elseif tier >= 2 and not placed and not data.DisableTypes['T2Submarine'] then
-                    table.insert(Scenario.Platoons[template], {TIERS[2].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
-                    table.insert(children, 'T2Submarine')
+                    tableInsert(Scenario.Platoons[template], {TIERS[2].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
+                    tableInsert(children, 'T2Submarine')
                 elseif not placed and not data.DisableTypes['Submarine'] then
-                    table.insert(Scenario.Platoons[template], {TIERS[1].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
-                    table.insert(children, 'Submarine')
+                    tableInsert(Scenario.Platoons[template], {TIERS[1].SUBS[faction], 1, numSubmarines, 'guard', 'None'})
+                    tableInsert(children, 'Submarine')
                 end
             end
         end
@@ -161,62 +169,62 @@ function GenerateNavalOSB(name, levelsPerTier, minFrigates, maxFrigates, faction
         -- Do cruisers.
         local numCruisers = 0
         if (allEnabled or IsEnabledType('Cruiser', data)) then
-            if tier == 2 then numCruisers = math.floor(numDestroyers / Conversions.CORE_TO_CRUISERS)
-            elseif tier >= 3 then numCruisers = math.floor(numBattleships / Conversions.CORE_TO_CRUISERS) end
+            if tier == 2 then numCruisers = mathFloor(numDestroyers / Conversions.CORE_TO_CRUISERS)
+            elseif tier >= 3 then numCruisers = mathFloor(numBattleships / Conversions.CORE_TO_CRUISERS) end
             if numCruisers > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[tier].CRUISERS[faction], 1, numCruisers, 'guard', 'None'})
-                table.insert(children, 'Cruiser')
+                tableInsert(Scenario.Platoons[template], {TIERS[tier].CRUISERS[faction], 1, numCruisers, 'guard', 'None'})
+                tableInsert(children, 'Cruiser')
             end
         end
 
         -- Do light T1 boats only at T1. Note not every faction has light T1 boats
         local numLight = 0
         if (allEnabled or IsEnabledType('LightBoat', data)) then
-            if tier == 1 and TIERS[1].LIGHT[faction] then numLight = math.floor(numFrigates / Conversions.CORE_TO_LIGHT) end
+            if tier == 1 and TIERS[1].LIGHT[faction] then numLight = mathFloor(numFrigates / Conversions.CORE_TO_LIGHT) end
             if numLight > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[1].LIGHT[faction], 1, numLight, 'guard', 'None'})
-                table.insert(children, 'LightBoat')
+                tableInsert(Scenario.Platoons[template], {TIERS[1].LIGHT[faction], 1, numLight, 'guard', 'None'})
+                tableInsert(children, 'LightBoat')
             end
         end
 
         -- Do T2 utility boats. Cybran = stealth boat, UEF = shields. Note not every faction has a T2 utility boat.
         local numUtility = 0
         if (allEnabled or IsEnabledType('Utility', data)) then
-            if tier == 2 and TIERS[2].UTILITY[faction] then numUtility = math.floor(numDestroyers / Conversions.CORE_TO_UTILITY)
-            elseif tier >= 3 and TIERS[3].UTILITY[faction] then numUtility = math.floor(numBattleships / Conversions.CORE_TO_UTILITY) end
+            if tier == 2 and TIERS[2].UTILITY[faction] then numUtility = mathFloor(numDestroyers / Conversions.CORE_TO_UTILITY)
+            elseif tier >= 3 and TIERS[3].UTILITY[faction] then numUtility = mathFloor(numBattleships / Conversions.CORE_TO_UTILITY) end
             if numUtility > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].UTILITY[faction], 1, numUtility, 'guard', 'None'})
-                table.insert(children, 'Utility')
+                tableInsert(Scenario.Platoons[template], {TIERS[3].UTILITY[faction], 1, numUtility, 'guard', 'None'})
+                tableInsert(children, 'Utility')
             end
         end
 
         -- Do T3 fatties. battlecruiser, missile ship. Note Aeon and Cybran have no fatties.
         local numFatties = 0
         if (allEnabled or IsEnabledType('Fatty', data)) then
-            if tier >= 3 and TIERS[3].FATTIES[faction] then numFatties = math.floor(numBattleships / Conversions.CORE_TO_FATTIES) end
+            if tier >= 3 and TIERS[3].FATTIES[faction] then numFatties = mathFloor(numBattleships / Conversions.CORE_TO_FATTIES) end
             if numFatties > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].FATTIES[faction], 1, numFatties, 'guard', 'None'})
-                table.insert(children, 'Fatty')
+                tableInsert(Scenario.Platoons[template], {TIERS[3].FATTIES[faction], 1, numFatties, 'guard', 'None'})
+                tableInsert(children, 'Fatty')
             end
         end
 
         -- Do T3 carriers. Note UEF has no T3 carrier.
         local numCarriers = 0
         if (allEnabled or IsEnabledType('Carrier', data)) then
-            if tier >= 3 and TIERS[3].CARRIERS[faction] then numCarriers = math.floor(numBattleships / Conversions.CORE_TO_CARRIERS) end
+            if tier >= 3 and TIERS[3].CARRIERS[faction] then numCarriers = mathFloor(numBattleships / Conversions.CORE_TO_CARRIERS) end
             if numCarriers > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].CARRIERS[faction], 1, numCarriers, 'guard', 'None'})
-                table.insert(children, 'Carrier')
+                tableInsert(Scenario.Platoons[template], {TIERS[3].CARRIERS[faction], 1, numCarriers, 'guard', 'None'})
+                tableInsert(children, 'Carrier')
             end
         end
 
         -- Do nuke subs, only if allowed. Note Seraphim has no nuke sub.
         local numNukeSubs = 0
         if (not allEnabled and IsEnabledType('NukeSubmarine', data)) then
-            if tier >= 3 and TIERS[3].NUKESUBS[faction] then numNukeSubs = math.floor(numBattleships / Conversions.CORE_TO_NUKESUBS) end
+            if tier >= 3 and TIERS[3].NUKESUBS[faction] then numNukeSubs = mathFloor(numBattleships / Conversions.CORE_TO_NUKESUBS) end
             if numNukeSubs > 0 then
-                table.insert(Scenario.Platoons[template], {TIERS[3].NUKESUBS[faction], 1, numNukeSubs, 'guard', 'None'})
-                table.insert(children, 'NukeSubmarine')
+                tableInsert(Scenario.Platoons[template], {TIERS[3].NUKESUBS[faction], 1, numNukeSubs, 'guard', 'None'})
+                tableInsert(children, 'NukeSubmarine')
             end
         end
 

@@ -1,6 +1,8 @@
 -- This is a helper file that creates the little UI label for a key binding on a construction or order button
 -- It is called from construction.lua and orders.lua respectively
 
+local stringLen = string.len
+
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -14,7 +16,7 @@ function addLabel(control, parent, key)
     control.hotbuildKeyBg = Bitmap(parent)
     control.hotbuildKeyBg.Depth:Set(99)
     local width = 30
-    if string.len(key.key) <= 2 then
+    if stringLen(key.key) <= 2 then
         width = 20
     end
     LayoutHelpers.SetDimensions(control.hotbuildKeyBg, width, 20)

@@ -7,6 +7,13 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local aibrain_methodsGetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local aibrain_methodsGetCurrentEnemy = moho.aibrain_methods.GetCurrentEnemy
+local unitcountbuildconditionsUp = import('/lua/editor/UnitCountBuildConditions.lua')
+local sorianinstantbuildconditionsUp = import('/lua/editor/SorianInstantBuildConditions.lua')
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -30,20 +37,20 @@ local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
 
 function T4LandAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
-    local SInBC = import('/lua/editor/SorianInstantBuildConditions.lua')
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local UC = unitcountbuildconditionsUp
+    local SInBC = sorianinstantbuildconditionsUp
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
         return true
     end
-    if aiBrain:GetCurrentEnemy() then
-        local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-        local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    if aibrain_methodsGetCurrentEnemy(aiBrain) then
+        local estartX, estartZ = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyStartPos()
+        local enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
         #local enemyTML = aiBrain:GetNumUnitsAroundPoint(categories.TECH2 * categories.TACTICALMISSILEPLATFORM * categories.STRUCTURE, {estartX, 0, estartZ}, 100, 'Enemy')
-        local enemyT3PD = aiBrain:GetNumUnitsAroundPoint(categories.TECH3 * categories.DEFENSE * categories.DIRECTFIRE, {estartX, 0, estartZ}, 100, 'Enemy')
+        local enemyT3PD = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.TECH3 * categories.DEFENSE * categories.DIRECTFIRE, {estartX, 0, estartZ}, 100, 'Enemy')
         --targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSurface')
-        targetNumber = SUtils.GetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
+        targetNumber = aibrain_methodsGetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
         targetNumber = targetNumber + (enemyT3PD * 54)# + (enemyTML * 54)
     end
 
@@ -65,17 +72,17 @@ function T4LandAttackCondition(aiBrain, locationType, targetNumber)
 end
 
 function T4AirAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
-    local SInBC = import('/lua/editor/SorianInstantBuildConditions.lua')
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local UC = unitcountbuildconditionsUp
+    local SInBC = sorianinstantbuildconditionsUp
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
         return true
     end
-    if aiBrain:GetCurrentEnemy() then
-        local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-        local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
-        targetNumber = SUtils.GetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiAir', {'Air'}, enemyIndex)
+    if aibrain_methodsGetCurrentEnemy(aiBrain) then
+        local estartX, estartZ = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyStartPos()
+        local enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
+        targetNumber = aibrain_methodsGetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, 'AntiAir', {'Air'}, enemyIndex)
         #targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiAir')
     end
 

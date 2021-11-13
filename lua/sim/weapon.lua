@@ -8,6 +8,33 @@
 -- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+local weapon_methodsCreateProjectile = moho.weapon_methods.CreateProjectile
+local stringFind = string.find
+local CreateAimController = CreateAimController
+local error = error
+local tableInsert = table.insert
+local GetUnitBlueprintByName = GetUnitBlueprintByName
+local ipairs = ipairs
+local unit_methodsGiveTacticalSiloAmmo = moho.unit_methods.GiveTacticalSiloAmmo
+local AnimationManipulatorSetBoneEnabled = moho.AnimationManipulator.SetBoneEnabled
+local weapon_methodsSetFireTargetLayerCaps = moho.weapon_methods.SetFireTargetLayerCaps
+local type = type
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
+local AimManipulatorSetResetPoseTime = moho.AimManipulator.SetResetPoseTime
+local weapon_methodsSetFireControl = moho.weapon_methods.SetFireControl
+local weapon_methodsSetTargetingPriorities = moho.weapon_methods.SetTargetingPriorities
+local CreateSlaver = CreateSlaver
+local EntityCategoryContains = EntityCategoryContains
+local unpack = unpack
+local weapon_methodsPlaySound = moho.weapon_methods.PlaySound
+local next = next
+local ParseEntityCategory = ParseEntityCategory
+local weapon_methodsSetEnabled = moho.weapon_methods.SetEnabled
+local tableEmpty = table.empty
+local unit_methodsGiveNukeSiloAmmo = moho.unit_methods.GiveNukeSiloAmmo
+local weapon_methodsGetBlueprint = moho.weapon_methods.GetBlueprint
+local AimManipulatorSetFiringArc = moho.AimManipulator.SetFiringArc
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
 local Set = import('/lua/system/setutils.lua')
@@ -24,7 +51,7 @@ local function ParsePriorities()
         for weaponNum, weapon in weapons or {} do
             for line, priority in weapon.TargetPriorities or {} do
                 if not finalPriorities[priority] then
-                    if string.find(priority, '%(') then
+                    if stringFind(priority, '%(') then
                         finalPriorities[priority] = ParseEntityCategoryProperly(priority)
                     else
                         finalPriorities[priority] = ParseEntityCategory(priority)
@@ -46,7 +73,7 @@ Weapon = Class(moho.weapon_methods) {
             self.unit.Trash = TrashBag()
         end
         self:SetValidTargetsForCurrentLayer(self.unit.Layer)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if bp.Turreted == true then
             self:SetupTurret()
         end
@@ -73,14 +100,14 @@ Weapon = Class(moho.weapon_methods) {
     AmmoThread = function(self, nuke, amount)
         WaitSeconds(0.1)
         if nuke then
-            self.unit:GiveNukeSiloAmmo(amount)
+            unit_methodsGiveNukeSiloAmmo(self.unit, amount)
         else
-            self.unit:GiveTacticalSiloAmmo(amount)
+            unit_methodsGiveTacticalSiloAmmo(self.unit, amount)
         end
     end,
 
     SetupTurret = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local yawBone = bp.TurretBoneYaw
         local pitchBone = bp.TurretBonePitch
         local muzzleBone = bp.TurretBoneMuzzle
@@ -111,20 +138,20 @@ Weapon = Class(moho.weapon_methods) {
                 self.AimRight:SetPrecedence(precedence)
                 self.AimLeft:SetPrecedence(precedence)
                 if EntityCategoryContains(categories.STRUCTURE, self.unit) then
-                    self.AimControl:SetResetPoseTime(9999999)
+                    AimManipulatorSetResetPoseTime(self.AimControl, 9999999)
                 end
-                self:SetFireControl('Right')
+                weapon_methodsSetFireControl(self, 'Right')
                 self.unit.Trash:Add(self.AimControl)
                 self.unit.Trash:Add(self.AimRight)
                 self.unit.Trash:Add(self.AimLeft)
             else
                 self.AimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
                 if EntityCategoryContains(categories.STRUCTURE, self.unit) then
-                    self.AimControl:SetResetPoseTime(9999999)
+                    AimManipulatorSetResetPoseTime(self.AimControl, 9999999)
                 end
                 self.unit.Trash:Add(self.AimControl)
                 self.AimControl:SetPrecedence(precedence)
-                if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
+                if bp.RackSlavedToTurret and not tableEmpty(bp.RackBones) then
                     for k, v in bp.RackBones do
                         if v.RackBone ~= pitchBone then
                             local slaver = CreateSlaver(self.unit, v.RackBone, pitchBone)
@@ -165,12 +192,12 @@ Weapon = Class(moho.weapon_methods) {
             numbersexist = false
         end
         if numbersexist then
-            self.AimControl:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
+            AimManipulatorSetFiringArc(self.AimControl, turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
             if self.AimRight then
-                self.AimRight:SetFiringArc(turretyawmin/12, turretyawmax/12, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
+                AimManipulatorSetFiringArc(self.AimRight, turretyawmin/12, turretyawmax/12, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
             end
             if self.AimLeft then
-                self.AimLeft:SetFiringArc(turretyawmin/12, turretyawmax/12, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
+                AimManipulatorSetFiringArc(self.AimLeft, turretyawmin/12, turretyawmax/12, turretyawspeed, turretpitchmin, turretpitchmax, turretpitchspeed)
             end
         else
             local strg = '*ERROR: TRYING TO SETUP A TURRET WITHOUT ALL TURRET NUMBERS IN BLUEPRINT, ABORTING TURRET SETUP. WEAPON: ' .. bp.Label .. ' UNIT: '.. self.unit.UnitId
@@ -193,7 +220,7 @@ Weapon = Class(moho.weapon_methods) {
         local turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax()
         local turretpitchspeed = self:GetTurretPitchSpeed()
         if self.AimControl then
-            self.AimControl:SetFiringArc(turretyawmin, turretyawmax, speed, turretpitchmin, turretpitchmax, turretpitchspeed)
+            AimManipulatorSetFiringArc(self.AimControl, turretyawmin, turretyawmax, speed, turretpitchmin, turretpitchmax, turretpitchspeed)
         end
     end,
 
@@ -202,30 +229,30 @@ Weapon = Class(moho.weapon_methods) {
         local turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax()
         local turretpitchspeed = self:GetTurretYawSpeed()
         if self.AimControl then
-            self.AimControl:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, speed)
+            AimManipulatorSetFiringArc(self.AimControl, turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, speed)
         end
     end,
 
     GetTurretYawMinMax = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local turretyawmin = bp.TurretYaw - bp.TurretYawRange
         local turretyawmax = bp.TurretYaw + bp.TurretYawRange
         return turretyawmin, turretyawmax
     end,
 
     GetTurretYawSpeed = function(self)
-        return self:GetBlueprint().TurretYawSpeed
+        return weapon_methodsGetBlueprint(self).TurretYawSpeed
     end,
 
     GetTurretPitchMinMax = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local turretpitchmin = bp.TurretPitch - bp.TurretPitchRange
         local turretpitchmax = bp.TurretPitch + bp.TurretPitchRange
         return turretpitchmin, turretpitchmax
     end,
 
     GetTurretPitchSpeed = function(self)
-        return self:GetBlueprint().TurretPitchSpeed
+        return weapon_methodsGetBlueprint(self).TurretPitchSpeed
     end,
 
     OnFire = function(self)
@@ -239,7 +266,7 @@ Weapon = Class(moho.weapon_methods) {
     OnGotTarget = function(self)
         if self.DisabledFiringBones and self.unit.Animator then
             for key, value in self.DisabledFiringBones do
-                self.unit.Animator:SetBoneEnabled(value, false)
+                AnimationManipulatorSetBoneEnabled(self.unit.Animator, value, false)
             end
         end
         self.NumTargets = self.NumTargets + 1
@@ -248,7 +275,7 @@ Weapon = Class(moho.weapon_methods) {
     OnLostTarget = function(self)
         if self.DisabledFiringBones and self.unit.Animator then
             for key, value in self.DisabledFiringBones do
-                self.unit.Animator:SetBoneEnabled(value, true)
+                AnimationManipulatorSetBoneEnabled(self.unit.Animator, value, true)
             end
         end
 
@@ -267,19 +294,19 @@ Weapon = Class(moho.weapon_methods) {
         self:PlayWeaponSound('BarrelStop')
         self:StopWeaponAmbientSound('BarrelLoop')
         if EntityCategoryContains(categories.STRUCTURE, self.unit) then
-            self.AimControl:SetResetPoseTime(9999999)
+            AimManipulatorSetResetPoseTime(self.AimControl, 9999999)
         end
 
     end,
 
     PlayWeaponSound = function(self, sound)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if not bp.Audio[sound] then return end
-        self:PlaySound(bp.Audio[sound])
+        weapon_methodsPlaySound(self, bp.Audio[sound])
     end,
 
     PlayWeaponAmbientSound = function(self, sound)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if not bp.Audio[sound] then return end
         if not self.AmbientSounds then
             self.AmbientSounds = {}
@@ -296,7 +323,7 @@ Weapon = Class(moho.weapon_methods) {
     StopWeaponAmbientSound = function(self, sound)
         if not self.AmbientSounds then return end
         if not self.AmbientSounds[sound] then return end
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if not bp.Audio[sound] then return end
         self.AmbientSounds[sound]:Destroy()
         self.AmbientSounds[sound] = nil
@@ -306,7 +333,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     GetDamageTableInternal = function(self)
-        local weaponBlueprint = self:GetBlueprint()
+        local weaponBlueprint = weapon_methodsGetBlueprint(self)
         local damageTable = {}
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + (self.DamageRadiusMod or 0)
@@ -342,12 +369,12 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
+        local proj = weapon_methodsCreateProjectile(self, bone)
         local damageTable = self:GetDamageTable()
 
         if proj and not proj:BeenDestroyed() then
             proj:PassDamageData(damageTable)
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
 
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
                 bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
@@ -367,14 +394,14 @@ Weapon = Class(moho.weapon_methods) {
 
     SetValidTargetsForCurrentLayer = function(self, newLayer)
         -- LOG('SetValidTargetsForCurrentLayer, layer = ', newLayer)
-        local weaponBlueprint = self:GetBlueprint()
+        local weaponBlueprint = weapon_methodsGetBlueprint(self)
         if weaponBlueprint.FireTargetLayerCapsTable then
             if weaponBlueprint.FireTargetLayerCapsTable[newLayer] then
                 -- LOG('Setting Target Layer Caps to ', weaponBlueprint.FireTargetLayerCapsTable[newLayer])
-                self:SetFireTargetLayerCaps(weaponBlueprint.FireTargetLayerCapsTable[newLayer])
+                weapon_methodsSetFireTargetLayerCaps(self, weaponBlueprint.FireTargetLayerCapsTable[newLayer])
             else
                 -- LOG('Setting Target Layer Caps to None')
-                self:SetFireTargetLayerCaps('None')
+                weapon_methodsSetFireTargetLayerCaps(self, 'None')
             end
         end
     end,
@@ -389,39 +416,39 @@ Weapon = Class(moho.weapon_methods) {
         end
 
         if not priTable then
-            local bp = self:GetBlueprint().TargetPriorities
+            local bp = weapon_methodsGetBlueprint(self).TargetPriorities
             if bp then
                 local priorityTable = {}
                 for k, v in bp do
                     if cachedPriorities[v] then
-                        table.insert(priorityTable, cachedPriorities[v])
+                        tableInsert(priorityTable, cachedPriorities[v])
                     else
-                        if string.find(v, '%(') then
+                        if stringFind(v, '%(') then
                             cachedPriorities[v] = ParseEntityCategoryProperly(v)
-                            table.insert(priorityTable, cachedPriorities[v])
+                            tableInsert(priorityTable, cachedPriorities[v])
                         else
                             cachedPriorities[v] = ParseEntityCategory(v)
-                            table.insert(priorityTable, cachedPriorities[v])
+                            tableInsert(priorityTable, cachedPriorities[v])
                         end
                     end
                 end
-                self:SetTargetingPriorities(priorityTable)
+                weapon_methodsSetTargetingPriorities(self, priorityTable)
             end
         else
             if type(priTable[1]) == 'string' then
                 local priorityTable = {}
                 for k, v in priTable do
-                    table.insert(priorityTable, ParseEntityCategory(v))
+                    tableInsert(priorityTable, ParseEntityCategory(v))
                 end
-                self:SetTargetingPriorities(priorityTable)
+                weapon_methodsSetTargetingPriorities(self, priorityTable)
             else
-                self:SetTargetingPriorities(priTable)
+                weapon_methodsSetTargetingPriorities(self, priTable)
             end
         end
     end,
 
     WeaponUsesEnergy = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if bp.EnergyRequired and bp.EnergyRequired > 0 then
             return true
         end
@@ -439,7 +466,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnVeteranLevel = function(self, old, new)
-        local bp = self:GetBlueprint().Buffs
+        local bp = weapon_methodsGetBlueprint(self).Buffs
         if not bp then return end
 
         local lvlkey = 'VeteranLevel' .. new
@@ -465,7 +492,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     DoOnFireBuffs = function(self)
-        local data = self:GetBlueprint()
+        local data = weapon_methodsGetBlueprint(self)
         if data.Buffs then
             for k, v in data.Buffs do
                 if v.Add.OnFire == true then
@@ -524,20 +551,20 @@ Weapon = Class(moho.weapon_methods) {
     -- allowing it to try to be enabled or disabled.
     SetWeaponEnabled = function(self, enable)
         if not enable then
-            self:SetEnabled(enable)
+            weapon_methodsSetEnabled(self, enable)
             return
         end
-        local bp = self:GetBlueprint().EnabledByEnhancement
+        local bp = weapon_methodsGetBlueprint(self).EnabledByEnhancement
         if bp then
             for k, v in SimUnitEnhancements[self.unit.EntityId] or {} do
                 if v == bp then
-                    self:SetEnabled(enable)
+                    weapon_methodsSetEnabled(self, enable)
                     return
                 end
             end
             -- Enhancement needed but doesn't have it, don't allow weapon to be enabled.
             return
         end
-        self:SetEnabled(enable)
+        weapon_methodsSetEnabled(self, enable)
     end,
 }

@@ -72,6 +72,18 @@ State machines
 ]]
 
 
+local ipairs = ipairs
+local tostring = tostring
+local pairs = pairs
+local type = type
+local setfenv = setfenv
+local debugTraceback = debug.traceback
+local error = error
+local assert = assert
+local unpack = unpack
+local next = next
+local getfenv = getfenv
+
 local getmetatable = getmetatable
 local setmetatable = setmetatable
 local getn = table.getn
@@ -332,7 +344,7 @@ function ChangeState(obj, newstate)
 
     -- Ignore redundant state changes.
     if getmetatable(obj)==newstate then
-        debug.traceback(nil, "Ignoring no-op state change...")
+        debugTraceback(nil, "Ignoring no-op state change...")
         return
     end
 

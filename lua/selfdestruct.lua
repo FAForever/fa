@@ -1,3 +1,13 @@
+local ipairs = ipairs
+local OkayToMessWithArmy = OkayToMessWithArmy
+local tableEmpty = table.empty
+local KillThread = KillThread
+local unit_methodsGetWeapon = moho.unit_methods.GetWeapon
+local GetEntityById = GetEntityById
+local ForkThread = ForkThread
+local tableInsert = table.insert
+local next = next
+
 function ToggleSelfDestruct(data)
     -- Suppress self destruct in tutorial missions as they screw up the mission end
     if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
@@ -9,10 +19,10 @@ function ToggleSelfDestruct(data)
         for _, unitId in data.units do
             local unit = GetEntityById(unitId)
             if OkayToMessWithArmy(unit.Army) then
-                table.insert(unitEntities, unit)
+                tableInsert(unitEntities, unit)
             end
         end
-        if not table.empty(unitEntities) then
+        if not tableEmpty(unitEntities) then
             if data.noDelay then -- Kill these units instantly
                 for _, unit in unitEntities do
                     if unit:BeenDestroyed() or unit.Dead then return end
@@ -65,7 +75,7 @@ end
 function FireSelfdestructWeapons(unit)
     local wepCount = unit:GetWeaponCount()
     for i = 1, wepCount do
-        local wep = unit:GetWeapon(i)
+        local wep = unit_methodsGetWeapon(unit, i)
         local wepBP = wep:GetBlueprint()
         if wepBP.FireOnSelfDestruct then
             if wep.Fire then

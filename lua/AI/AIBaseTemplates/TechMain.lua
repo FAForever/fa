@@ -7,6 +7,10 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local GetMapSize = GetMapSize
+local Random = Random
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+
 BaseBuilderTemplate {
     BaseTemplateName = 'TechMain',
     Builders = {
@@ -184,7 +188,7 @@ BaseBuilderTemplate {
         end
 
         local mapSizeX, mapSizeZ = GetMapSize()
-        local startX, startZ = aiBrain:GetArmyStartPos()
+        local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
 
         #If we're playing on a 256 map
         if mapSizeX < 500 and mapSizeZ < 500 then

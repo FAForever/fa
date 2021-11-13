@@ -6,6 +6,21 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local unit_methodsCanBuild = moho.unit_methods.CanBuild
+local next = next
+local ParseEntityCategory = ParseEntityCategory
+local ipairs = ipairs
+local aibrain_methodsCanBuildStructureAt = moho.aibrain_methods.CanBuildStructureAt
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local tableEmpty = table.empty
+local VDist2 = VDist2
+local EntityCategoryContains = EntityCategoryContains
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -42,7 +57,7 @@ function NeedAnyStructure(aiBrain, baseName)
                     for num, location in v do
                         if category and num > 1 then
                             -- Check if it can be built and then build
-                            if aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]})
+                            if aibrain_methodsCanBuildStructureAt(aiBrain, category, {location[1], 0, location[2]})
                             and bManager:CheckUnitBuildCounter(location, buildCounter) then
                                 return true
                             end
@@ -65,7 +80,7 @@ function NumUnitsLessNearBase(aiBrain, baseName, category, varName)
         return false
     else
         local base = aiBrain.BaseManagers[baseName]
-        local unitList = aiBrain:GetUnitsAroundPoint(category, base:GetPosition(), base.Radius, 'Ally')
+        local unitList = aibrain_methodsGetUnitsAroundPoint(aiBrain, category, base:GetPosition(), base.Radius, 'Ally')
         local count = 0
         for i, unit in unitList do
             if unit:GetAIBrain() == aiBrain then
@@ -150,9 +165,9 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
     if not aiBrain.BaseManagers[baseName] then
         return false
     end
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local cdrUnit = false
-    for _, v in pool:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(pool) do
         if not v.Dead and EntityCategoryContains(categories.COMMAND, v) then
             cdrUnit = v
         end
@@ -176,11 +191,11 @@ function CDRInPoolNeedAnyStructure(aiBrain, baseName)
                         break
                     end
                 end
-                if category and cdrUnit:CanBuild(category) then
+                if category and unit_methodsCanBuild(cdrUnit, category) then
                     -- Iterate through build locations
                     for num, location in v do
                         -- Check if it can be built and then build
-                        if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) then
+                        if num > 1 and aibrain_methodsCanBuildStructureAt(aiBrain, category, {location[1], 0, location[2]}) then
                             return true
                         end
                     end
@@ -196,9 +211,9 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
         return false
     end
 
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local cdrUnit = false
-    for _, v in pool:GetPlatoonUnits() do
+    for _, v in platoon_methodsGetPlatoonUnits(pool) do
         if not v.Dead and EntityCategoryContains(categories.SUBCOMMANDER, v) then
             cdrUnit = v
         end
@@ -224,11 +239,11 @@ function SubCDRInPoolNeedAnyStructure(aiBrain, baseName)
                         break
                     end
                 end
-                if category and cdrUnit:CanBuild(category) then
+                if category and unit_methodsCanBuild(cdrUnit, category) then
                     -- Iterate through build locations
                     for num, location in v do
                         -- Check if it can be built and then build
-                        if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) then
+                        if num > 1 and aibrain_methodsCanBuildStructureAt(aiBrain, category, {location[1], 0, location[2]}) then
                             return true
                         end
                     end
@@ -250,9 +265,9 @@ function CategoriesBeingBuilt(aiBrain, baseName, catTable)
         return false
     end
 
-    local unitsBuilding = aiBrain:GetListOfUnits(categories.CONSTRUCTION, false)
+    local unitsBuilding = aibrain_methodsGetListOfUnits(aiBrain, categories.CONSTRUCTION, false)
     for unitNum, unit in unitsBuilding do
-        if not unit.Dead and unit:IsUnitState('Building') then
+        if not unit.Dead and unit_methodsIsUnitState(unit, 'Building') then
             local buildingUnit = unit.UnitBeingBuilt
             if buildingUnit and not buildingUnit.Dead then
                 for catNum, buildeeCat in catTable do
@@ -278,13 +293,13 @@ function HighestFactoryLevel(aiBrain, level, baseName)
 
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3, bManager:GetPosition(), bManager.Radius)
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2, bManager:GetPosition(), bManager.Radius)
-    if t3FacList and not table.empty(t3FacList) then
+    if t3FacList and not tableEmpty(t3FacList) then
         if level == 3 then
             return true
         else
             return false
         end
-    elseif t2FacList and not table.empty(t2FacList) then
+    elseif t2FacList and not tableEmpty(t2FacList) then
         if level == 2 then
             return true
         else
@@ -336,7 +351,7 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
         return false
     end
     -- Return out if the list is empty or all buildings are finished
-    if table.empty(bManager.UnfinishedBuildings) then
+    if tableEmpty(bManager.UnfinishedBuildings) then
         return false
     else
         local allFinished = true
@@ -352,9 +367,9 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
     end
 
     -- Check list
-    local armyIndex = bManager.AIBrain:GetArmyIndex()
+    local armyIndex = aibrain_methodsGetArmyIndex(bManager.AIBrain)
     local beingBuiltList = {}
-    local buildingEngs = bManager.AIBrain:GetListOfUnits(categories.ENGINEER, false)
+    local buildingEngs = aibrain_methodsGetListOfUnits(bManager.AIBrain, categories.ENGINEER, false)
     for _, v in buildingEngs do
         local buildingUnit = v.UnitBeingBuilt
         if buildingUnit and buildingUnit.UnitName then
@@ -389,13 +404,13 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
 
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3 * catCheck, bManager:GetPosition(), bManager.Radius)
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2 * catCheck, bManager:GetPosition(), bManager.Radius)
-    if t3FacList and not table.empty(t3FacList) then
+    if t3FacList and not tableEmpty(t3FacList) then
         if level == 3 then
             return true
         else
             return false
         end
-    elseif t2FacList and not table.empty(t2FacList) then
+    elseif t2FacList and not tableEmpty(t2FacList) then
         if level == 2 then
             return true
         else

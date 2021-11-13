@@ -5,6 +5,30 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 
+local mathMod = math.mod
+local weapon_methodsGetCurrentTarget = moho.weapon_methods.GetCurrentTarget
+local weapon_methodsCreateProjectile = moho.weapon_methods.CreateProjectile
+local unit_methodsSetDoNotTarget = moho.unit_methods.SetDoNotTarget
+local weapon_methodsResetTarget = moho.weapon_methods.ResetTarget
+local next = next
+local CreateSlider = CreateSlider
+local ipairs = ipairs
+local unit_methodsGetWeapon = moho.unit_methods.GetWeapon
+local KillThread = KillThread
+local weapon_methodsPlaySound = moho.weapon_methods.PlaySound
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
+local blip_methodsGetSource = moho.blip_methods.GetSource
+local weapon_methodsGetBlueprint = moho.weapon_methods.GetBlueprint
+local VDist3 = VDist3
+local CreateAttachedEmitter = CreateAttachedEmitter
+local AimManipulatorSetResetPoseTime = moho.AimManipulator.SetResetPoseTime
+local WaitFor = WaitFor
+local GetGameTick = GetGameTick
+local VDist2 = VDist2
+local EntityCategoryContains = EntityCategoryContains
+local IsUnit = IsUnit
+
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
@@ -45,7 +69,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     FxMuzzleFlash = {},
 
     PlayFxBeamStart = function(self, muzzle)
-        local target = self:GetCurrentTarget()
+        local target = weapon_methodsGetCurrentTarget(self)
         if not target or
             EntityCategoryContains(categories.STRUCTURE, target) or
             EntityCategoryContains(categories.COMMAND, target) or
@@ -79,9 +103,9 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     IsTargetAlreadyUsed = function(self, target)
         local weap
         for i = 1, self.unit:GetWeaponCount() do
-            weap = self.unit:GetWeapon(i)
+            weap = unit_methodsGetWeapon(self.unit, i)
             if (weap ~= self) then
-                if self:GetRealTarget(weap:GetCurrentTarget()) == target then
+                if self:GetRealTarget(weapon_methodsGetCurrentTarget(weap)) == target then
                     return true
                 end
             end
@@ -92,7 +116,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     -- Recon blip check
     GetRealTarget = function(self, target)
         if target and not IsUnit(target) then
-            local unitTarget = target:GetSource()
+            local unitTarget = blip_methodsGetSource(target)
             local unitPos = unitTarget:GetPosition()
             local reconPos = target:GetPosition()
             local dist = VDist2(unitPos[1], unitPos[3], reconPos[1], reconPos[3])
@@ -114,10 +138,10 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         local beam = self.Beams[1].Beam
         if not beam then return end
 
-        local muzzle = self:GetBlueprint().MuzzleSpecial
+        local muzzle = weapon_methodsGetBlueprint(self).MuzzleSpecial
         if not muzzle then return end
 
-        target:SetDoNotTarget(true)
+        unit_methodsSetDoNotTarget(target, true)
         local pos0 = beam:GetPosition(0)
         local pos1 = beam:GetPosition(1)
         local dist = VDist3(pos0, pos1)
@@ -128,11 +152,11 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         WaitFor(self.Slider)
 
         -- Just in case attach fails...
-        target:SetDoNotTarget(false)
+        unit_methodsSetDoNotTarget(target, false)
         target:AttachBoneTo(-1, self.unit, muzzle)
-        target:SetDoNotTarget(true)
+        unit_methodsSetDoNotTarget(target, true)
 
-        self.AimControl:SetResetPoseTime(10)
+        AimManipulatorSetResetPoseTime(self.AimControl, 10)
 
         self.Slider:SetSpeed(15)
         self.Slider:SetGoal(0, 0, 0)
@@ -151,7 +175,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
             target:Kill(self.unit, 'Damage', 100)
         end
 
-        self.AimControl:SetResetPoseTime(2)
+        AimManipulatorSetResetPoseTime(self.AimControl, 2)
     end,
 
     TractorWatchThread = function(self, target)
@@ -164,9 +188,9 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
             self.Slider:Destroy()
             self.Slider = nil
         end
-            self.unit:DetachAll(self:GetBlueprint().MuzzleSpecial or 0)
-            self:ResetTarget()
-            self.AimControl:SetResetPoseTime(2)
+            self.unit:DetachAll(weapon_methodsGetBlueprint(self).MuzzleSpecial or 0)
+            weapon_methodsResetTarget(self)
+            AimManipulatorSetResetPoseTime(self.AimControl, 2)
     end,
 }
 
@@ -181,13 +205,13 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
 
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             -- Align to a tick which is a multiple of 50
-            WaitTicks(51 - math.mod(GetGameTick(), 50))
+            WaitTicks(51 - mathMod(GetGameTick(), 50))
 
             while true do
                 if bp.Audio.Fire then
-                    self:PlaySound(bp.Audio.Fire)
+                    weapon_methodsPlaySound(self, bp.Audio.Fire)
                 end
                 self:DoOnFireBuffs()
                 self:PlayFxMuzzleSequence(1)
@@ -268,9 +292,9 @@ AIFArtilleryMiasmaShellWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
 
     CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
+        local proj = weapon_methodsCreateProjectile(self, bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = weapon_methodsGetBlueprint(self)
         local data = {
             Instigator = self.unit,
             Damage = blueprint.DoTDamage,
@@ -306,9 +330,9 @@ AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
 
     CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
+        local proj = weapon_methodsCreateProjectile(self, bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = weapon_methodsGetBlueprint(self)
         local data = {
             Army = self.unit.Army,
             Instigator = self.unit,
@@ -334,9 +358,9 @@ AANTorpedoCluster = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/aeon_torpedocluster_flash_01_emit.bp', },
 
     CreateProjectileForWeapon = function(self, bone)
-        local proj = self:CreateProjectile(bone)
+        local proj = weapon_methodsCreateProjectile(self, bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = weapon_methodsGetBlueprint(self)
         local data = {
             Army = self.unit.Army,
             Instigator = self.unit,
@@ -361,7 +385,7 @@ AANTorpedoCluster = Class(DefaultProjectileWeapon) {
 AIFSmartCharge = Class(DefaultProjectileWeapon) {
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = weapon_methodsGetBlueprint(self).DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
@@ -444,7 +468,7 @@ AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         for _, v in self.FxUpackingChargeEffects do
             for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -471,7 +495,7 @@ ADFPhasonLaser = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             for _, v in self.FxUpackingChargeEffects do
                 for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)

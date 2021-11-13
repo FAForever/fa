@@ -1,3 +1,8 @@
+local unit_methodsGetStat = moho.unit_methods.GetStat
+local unit_methodsGetWorkProgress = moho.unit_methods.GetWorkProgress
+local unit_methodsGetFuelRatio = moho.unit_methods.GetFuelRatio
+local unit_methodsGetShieldRatio = moho.unit_methods.GetShieldRatio
+
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
@@ -27,15 +32,15 @@ function GetUnitRolloverInfo(unit)
 
     info.maxHealth = unit:GetMaxHealth()
     info.health = unit:GetHealth()
-    info.fuelRatio = unit:GetFuelRatio()
-    info.shieldRatio = unit:GetShieldRatio()
-    info.workProgress = unit:GetWorkProgress()
+    info.fuelRatio = unit_methodsGetFuelRatio(unit)
+    info.shieldRatio = unit_methodsGetShieldRatio(unit)
+    info.workProgress = unit_methodsGetWorkProgress(unit)
 
     if unit:GetFocus() then
         info.focus = GetUnitRolloverInfo(unit:GetFocus())
     end
 
-    local killStat = unit:GetStat('KILLS')
+    local killStat = unit_methodsGetStat(unit, 'KILLS')
     info.kills = killStat.Value
 
     local missileInfo = unit:GetMissileInfo()

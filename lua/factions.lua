@@ -1,5 +1,17 @@
 -- Call these in your scripts where you need them
 
+local ipairs = ipairs
+local tableEmpty = table.empty
+local factionsUp = import('/lua/factions.lua')
+local mathMax = math.max
+local type = type
+local DiskFindFiles = DiskFindFiles
+local modsUp = import('/lua/mods.lua')
+local rawget = rawget
+local WARN = WARN
+local next = next
+local tableInsert = table.insert
+
 function GetFactions(AllowedMods)
     -- AllowedMods  -> a table of currently enabled mods, keyed by mod ID. Ignore if not used
     -- returns a list of factions. All 4 of the original factions are included plus all enabled custom factions.
@@ -18,14 +30,14 @@ end
 function GetNewFactionAIPlans(offset)
     -- Gets an AI plan for computer players. Offset is the key with which the table should begin, counting up from
     -- that value + 1.
-    if table.empty(NewFactionAiData) then
-        local x = import('/lua/factions.lua').Factions  -- to make sure NewFactionAiData contains something
+    if tableEmpty(NewFactionAiData) then
+        local x = factionsUp.Factions  -- to make sure NewFactionAiData contains something
     end
     if not offset then
         offset = 5  -- 5 for the 5 races
     end
     local aiplans = {}
-    offset = math.max(0, offset)
+    offset = mathMax(0, offset)
     for f,_ in NewFactionAiData do
         offset = offset + 1
         aiplans[ offset ] = NewFactionAiData[f].AIPlansList or { '/lua/AI/aiarchetype-managerloader.lua', }
@@ -60,7 +72,7 @@ function GetCustomFactions(FactionsTable, AllowedMods)
                     continue
                 end
                 t['IsCustomFaction'] = true
-                table.insert(FactionsTable, t)
+                tableInsert(FactionsTable, t)
                 NewFactionAiData[t.Key] = t.AI or {}
             end
         end
@@ -75,8 +87,8 @@ function GetSelectedMods(AllowedMods)
     local mods = {}
     if __modules['/lua/ui/dialogs/modmanager.lua'] or __modules['/lua/ui/campaign/campaignmanager.lua'] then
         -- Detect if we're in the main menu or loading the game
-        mods = import('/lua/mods.lua').GetSelectedMods()
-    elseif rawget(_G, '__active_mods') and not table.empty(__active_mods) then
+        mods = modsUp.GetSelectedMods()
+    elseif rawget(_G, '__active_mods') and not tableEmpty(__active_mods) then
         for k, mod in __active_mods do
             mods[mod.uid] = true
         end

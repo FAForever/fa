@@ -3,6 +3,13 @@
 -- to bind this as a hotkey in your game.prefs make an action like this:
 -- UI_Lua import("/lua/keymap/smartSelection.lua").smartSelect("AIR MOBILE +idle -TRANSPORTATION -BOMBER")
 
+local ipairs = ipairs
+local LOG = LOG
+local pcall = pcall
+local stringSub = string.sub
+local next = next
+local tableInsert = table.insert
+
 local utils = import('/lua/system/utils.lua')
 
 
@@ -51,12 +58,12 @@ function compile(strExpression)
 
     if utils.StringStartsWith(v, "-") then
       -- tokens with minus symbol are "negative"
-      local withoutSymbol = string.sub(v,2)
-      table.insert(result.negatives, withoutSymbol)
+      local withoutSymbol = stringSub(v,2)
+      tableInsert(result.negatives, withoutSymbol)
 
     else
       -- everything else is an "other". This includes categories (eg: AIR) and modifiers (eg: +idle)
-       table.insert(result.others, v)
+       tableInsert(result.others, v)
     end
 
   end

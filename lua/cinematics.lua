@@ -13,7 +13,16 @@
 -- may not handle it well.
 --
 
-SimCamera = import('/lua/simcamera.lua').SimCamera
+local ipairs = ipairs
+local GetFocusArmy = GetFocusArmy
+local GetUnitsInRect = GetUnitsInRect
+local type = type
+local CPrefetchSetReset = moho.CPrefetchSet.Reset
+local unit_methodsGetBlip = moho.unit_methods.GetBlip
+local tableInsert = table.insert
+local next = next
+
+local SimCamera = import('/lua/simcamera.lua').SimCamera
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
@@ -55,17 +64,17 @@ function SetInvincible(area, invinBool)
 
         if area and type(area) == 'table' then
             for _, v in area do
-                table.insert(checkAreas, ScenarioUtils.AreaToRect(v))
+                tableInsert(checkAreas, ScenarioUtils.AreaToRect(v))
             end
         elseif area then
-            table.insert(checkAreas, ScenarioUtils.AreaToRect(area))
+            tableInsert(checkAreas, ScenarioUtils.AreaToRect(area))
         end
 
         local unitTable = {}
 
         for _, v in checkAreas do
             for _, unit in GetUnitsInRect(v) do
-                table.insert(unitTable, unit)
+                tableInsert(unitTable, unit)
             end
         end
         for _, v in ScenarioInfo.HumanPlayers do
@@ -128,7 +137,7 @@ function CameraTrackEntities(units, zoom, seconds)
     if army ~= -1 then
         for i, v in units do
             if army ~= v.Army then
-                units[i] = v:GetBlip(army)
+                units[i] = unit_methodsGetBlip(v, army)
             end
         end
     end
@@ -182,7 +191,7 @@ end
 
 -- This will bring the camera to the highest zoomed-out level.
 function CameraReset()
-    ScenarioInfo.Camera:Reset()
+    CPrefetchSetReset(ScenarioInfo.Camera)
 end
 
 -- This will reset the azimuth back to default and change the rotation back to default as well

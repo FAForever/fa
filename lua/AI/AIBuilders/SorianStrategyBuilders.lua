@@ -7,6 +7,40 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aibrain_methodsGetCurrentEnemy = moho.aibrain_methods.GetCurrentEnemy
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local IssueUpgrade = IssueUpgrade
+local unit_methodsCanBuild = moho.unit_methods.CanBuild
+local IssueScript = IssueScript
+local IsEnemy = IsEnemy
+local aibrain_methodsMakePlatoon = moho.aibrain_methods.MakePlatoon
+local aibrain_methodsGetCurrentUnits = moho.aibrain_methods.GetCurrentUnits
+local aibrain_methodsFindUpgradeBP = moho.aibrain_methods.FindUpgradeBP
+local tableInsert = table.insert
+local ipairs = ipairs
+local aibrain_methodsPlatoonExists = moho.aibrain_methods.PlatoonExists
+local GetGameTimeSeconds = GetGameTimeSeconds
+local IssueTeleport = IssueTeleport
+local IsAlly = IsAlly
+local EntityCategoryContains = EntityCategoryContains
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local IssueStop = IssueStop
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local aibrain_methodsGetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local next = next
+local KillThread = KillThread
+local tableEmpty = table.empty
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local IssueClearCommands = IssueClearCommands
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local Vector = Vector
+local tableGetn = table.getn
+local LOG = LOG
+local ArmyIsCivilian = ArmyIsCivilian
+local Random = Random
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -44,17 +78,17 @@ function EconWatch(aiBrain)
     }
     repeat
         for _,cat in cats do
-            local units = aiBrain:GetListOfUnits(cat, false)
-            if table.empty(units) then continue end
+            local units = aibrain_methodsGetListOfUnits(aiBrain, cat, false)
+            if tableEmpty(units) then continue end
             for k, unit in units do
                 if unit.Dead then continue end
                 local upgradeID
                 if EntityCategoryContains(categories.MOBILE, unit) then
-                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, UnitUpgradeTemplates[factionIndex])
+                    upgradeID = aibrain_methodsFindUpgradeBP(aiBrain, unit.UnitId, UnitUpgradeTemplates[factionIndex])
                 else
-                    upgradeID = aiBrain:FindUpgradeBP(unit.UnitId, StructureUpgradeTemplates[factionIndex])
+                    upgradeID = aibrain_methodsFindUpgradeBP(aiBrain, unit.UnitId, StructureUpgradeTemplates[factionIndex])
                 end
-                if upgradeID and EntityCategoryContains(categories.STRUCTURE, unit) and not unit:CanBuild(upgradeID) then
+                if upgradeID and EntityCategoryContains(categories.STRUCTURE, unit) and not unit_methodsCanBuild(unit, upgradeID) then
                     continue
                 end
                 if upgradeID then
@@ -140,7 +174,7 @@ BuilderGroup {
         InterruptStrategy = true,
         OnStrategyActivate = function(self, aiBrain)
             Builders[self.BuilderName].Running = true
-            local x,z = aiBrain:GetArmyStartPos()
+            local x,z = aibrain_methodsGetArmyStartPos(aiBrain)
             local faction = aiBrain:GetFactionIndex()
             local upgrades
             local removes
@@ -152,13 +186,13 @@ BuilderGroup {
             local SCUs = {}
             local possSCUs = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.SUBCOMMANDER, {x,0,z}, 200)
             for k,v in possSCUs do
-                table.insert(SCUs, v)
-                if table.getn(SCUs) > 2 then
+                tableInsert(SCUs, v)
+                if tableGetn(SCUs) > 2 then
                     break
                 end
             end
             for k,v in SCUs do
-                if v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
+                if v.PlatoonHandle and aibrain_methodsPlatoonExists(aiBrain, v.PlatoonHandle) then
                     v.PlatoonHandle:RemoveEngineerCallbacksSorian()
                     v.PlatoonHandle:Stop()
                     v.PlatoonHandle:PlatoonDisbandNoAssign()
@@ -188,8 +222,8 @@ BuilderGroup {
                     IssueScript({v}, order)
                 end
             end
-            local plat = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(plat, SCUs, 'attack', 'None')
+            local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+            aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, SCUs, 'attack', 'None')
             for k,v in SCUs do
                 for x,z in upgrades do
                     if not v:HasEnhancement(z) then
@@ -207,11 +241,11 @@ BuilderGroup {
                 WaitSeconds(5)
                 allDead = true
                 upgradesFinished = true
-                if not aiBrain:PlatoonExists(plat) then
+                if not aibrain_methodsPlatoonExists(aiBrain, plat) then
                     Builders[self.BuilderName].Running = false
                     return
                 end
-                for k,v in plat:GetPlatoonUnits() do
+                for k,v in platoon_methodsGetPlatoonUnits(plat) do
                     if not v.Dead then
                         allDead = false
                     end
@@ -238,8 +272,8 @@ BuilderGroup {
             end
             local enemyIndex
             local returnval = 1
-            if aiBrain:GetCurrentEnemy() then
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
@@ -276,7 +310,7 @@ BuilderGroup {
         OnStrategyActivate = function(self, aiBrain)
             Builders[self.BuilderName].Running = true
             LOG('*AI DEBUG: Sorian Engy Drop Strategy Activated by '..aiBrain.Nickname..'!')
-            local x,z = aiBrain:GetArmyStartPos()
+            local x,z = aibrain_methodsGetArmyStartPos(aiBrain)
             local count = 0
             repeat
                 WaitSeconds(5)
@@ -287,23 +321,23 @@ BuilderGroup {
                     return
                 end
                 airfacs = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.AIR * categories.FACTORY, {x,0,z}, 150)
-            until not table.empty(airfacs)
-            local ex, ey = aiBrain:GetCurrentEnemy():GetArmyStartPos()
+            until not tableEmpty(airfacs)
+            local ex, ey = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyStartPos()
             local Engies = {}
             local possEngies = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.ENGINEER * categories.TECH1, {x,0,z}, 200)
             for k,v in possEngies do
-                table.insert(Engies, v)
-                if table.getn(Engies) > 3 then
+                tableInsert(Engies, v)
+                if tableGetn(Engies) > 3 then
                     break
                 end
             end
-            if table.getn(Engies) < 2 then
+            if tableGetn(Engies) < 2 then
                 Builders[self.BuilderName].Running = false
                 Builders[self.BuilderName].Done = true
                 return
             end
             for k,v in Engies do
-                if v.PlatoonHandle and aiBrain:PlatoonExists(v.PlatoonHandle) then
+                if v.PlatoonHandle and aibrain_methodsPlatoonExists(aiBrain, v.PlatoonHandle) then
                     v.PlatoonHandle:RemoveEngineerCallbacksSorian()
                     v.PlatoonHandle:Stop()
                     v.PlatoonHandle:PlatoonDisbandNoAssign()
@@ -320,14 +354,14 @@ BuilderGroup {
                 IssueStop({v})
                 IssueClearCommands({v})
             end
-            local plat = aiBrain:MakePlatoon('', '')
-            aiBrain:AssignUnitsToPlatoon(plat, Engies, 'support', 'None')
+            local plat = aibrain_methodsMakePlatoon(aiBrain, '', '')
+            aibrain_methodsAssignUnitsToPlatoon(aiBrain, plat, Engies, 'support', 'None')
             for x=-60, 60, 60 do
                 for y=-60, 60, 60 do
                     if not (x == 0 and y == 0) then
                         tempPos = {ex + x ,0, ey + y}
-                        local nextbase = (table.getn(aiBrain.TacticalBases) + 1)
-                        table.insert(aiBrain.TacticalBases,
+                        local nextbase = (tableGetn(aiBrain.TacticalBases) + 1)
+                        tableInsert(aiBrain.TacticalBases,
                             {
                             Position = tempPos,
                             Name = 'TacticalBase'..nextbase,
@@ -389,8 +423,8 @@ BuilderGroup {
             end
             local enemyIndex
             local returnval = 0
-            if aiBrain:GetCurrentEnemy() then
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
@@ -433,13 +467,13 @@ BuilderGroup {
         InterruptStrategy = true,
         OnStrategyActivate = function(self, aiBrain)
             Builders[self.BuilderName].Running = true
-            local x,z = aiBrain:GetArmyStartPos()
-            local ex, ez = aiBrain:GetCurrentEnemy():GetArmyStartPos()
+            local x,z = aibrain_methodsGetArmyStartPos(aiBrain)
+            local ex, ez = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyStartPos()
             local path, reason = AIAttackUtils.PlatoonGenerateSafePathTo(aiBrain, 'Land', {x,0,z}, {ex,0,ez}, 10)
             if path then
                 for pathnum,waypoint in path do
-                    local nextbase = (table.getn(aiBrain.TacticalBases) + 1)
-                    table.insert(aiBrain.TacticalBases,
+                    local nextbase = (tableGetn(aiBrain.TacticalBases) + 1)
+                    tableInsert(aiBrain.TacticalBases,
                         {
                         Position = waypoint,
                         Name = 'PDCreep'..nextbase,
@@ -456,8 +490,8 @@ BuilderGroup {
             end
             local enemyIndex
             local returnval = 0
-            if aiBrain:GetCurrentEnemy() then
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
@@ -558,20 +592,20 @@ BuilderGroup {
         PriorityFunction = function(self, aiBrain)
             local enemy, enemyIndex
             local returnval = 1
-            if aiBrain:GetCurrentEnemy() then
-                enemy = aiBrain:GetCurrentEnemy()
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
-            if not aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR * categories.TECH3) > 1 then
+            if not aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR * categories.TECH3) > 1 then
                 return returnval
             end
 
-            local StartX, StartZ = enemy:GetArmyStartPos()
+            local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
 
-            local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
-            local numEUnits = aiBrain:GetNumUnitsAroundPoint(categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
+            local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
+            local numEUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
 
             returnval = (enemyThreat * 1.5) - numEUnits
             return returnval
@@ -642,19 +676,19 @@ BuilderGroup {
         PriorityFunction = function(self, aiBrain)
             local enemyIndex
             local returnval = 1
-            if aiBrain:GetCurrentEnemy() then
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
 
-            local myFacs = aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR)
+            local myFacs = aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR)
 
-            if aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR * (categories.TECH3 + categories.TECH2)) > 0 or myFacs < 1 then
+            if aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR * (categories.TECH3 + categories.TECH2)) > 0 or myFacs < 1 then
                 return returnval
             end
 
-            local eUnits = aiBrain:GetUnitsAroundPoint(categories.AIR * categories.FACTORY, Vector(0,0,0), 100000, 'Enemy')
+            local eUnits = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.AIR * categories.FACTORY, Vector(0,0,0), 100000, 'Enemy')
             local count = 0
 
             for k,v in eUnits do
@@ -807,19 +841,19 @@ BuilderGroup {
         PriorityFunction = function(self, aiBrain)
             local enemyIndex
             local returnval = 1
-            if aiBrain:GetCurrentEnemy() then
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
 
-            local myFacs = aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR)
+            local myFacs = aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR)
 
-            if aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR * (categories.TECH3 + categories.TECH2)) > 0 or myFacs < 1 then
+            if aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR * (categories.TECH3 + categories.TECH2)) > 0 or myFacs < 1 then
                 return returnval
             end
 
-            local eUnits = aiBrain:GetUnitsAroundPoint(categories.AIR * categories.FACTORY, Vector(0,0,0), 100000, 'Enemy')
+            local eUnits = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.AIR * categories.FACTORY, Vector(0,0,0), 100000, 'Enemy')
             local count = 0
 
             for k,v in eUnits do
@@ -867,9 +901,9 @@ BuilderGroup {
             local enemies = 0
             local allies = 0
             for k,v in ArmyBrains do
-                if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+                if v.Result ~= "defeat" and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(v)) and IsEnemy(aibrain_methodsGetArmyIndex(v), aibrain_methodsGetArmyIndex(aiBrain)) then
                     enemies = enemies + 1
-                elseif v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+                elseif v.Result ~= "defeat" and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(v)) and IsAlly(aibrain_methodsGetArmyIndex(v), aibrain_methodsGetArmyIndex(aiBrain)) then
                     allies = allies + 1
                 end
             end
@@ -921,9 +955,9 @@ BuilderGroup {
             if aiBrain.Focus == 'rush arty' then
                 return 100
             end
-            local arties = aiBrain:GetCurrentUnits(categories.ARTILLERY * categories.STRUCTURE * categories.TECH3)
+            local arties = aibrain_methodsGetCurrentUnits(aiBrain, categories.ARTILLERY * categories.STRUCTURE * categories.TECH3)
 
-            local eUnits = aiBrain:GetNumUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE * categories.TECH3, Vector(0,0,0), 100000, 'Enemy')
+            local eUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.SHIELD * categories.STRUCTURE * categories.TECH3, Vector(0,0,0), 100000, 'Enemy')
 
             if arties - eUnits >= 3 then
                 return returnval
@@ -969,9 +1003,9 @@ BuilderGroup {
             if aiBrain.Focus == 'rush arty' then
                 return 100
             end
-            local arties = aiBrain:GetCurrentUnits(categories.ARTILLERY * categories.STRUCTURE * categories.TECH3)
+            local arties = aibrain_methodsGetCurrentUnits(aiBrain, categories.ARTILLERY * categories.STRUCTURE * categories.TECH3)
 
-            local eUnits = aiBrain:GetNumUnitsAroundPoint(categories.SHIELD * categories.STRUCTURE * categories.TECH3, Vector(0,0,0), 100000, 'Enemy')
+            local eUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.SHIELD * categories.STRUCTURE * categories.TECH3, Vector(0,0,0), 100000, 'Enemy')
 
             if arties - eUnits >= 3 then
                 return returnval
@@ -1018,17 +1052,17 @@ BuilderGroup {
         PriorityFunction = function(self, aiBrain)
             local enemy, enemyIndex
             local returnval = 1
-            if aiBrain:GetCurrentEnemy() then
-                enemy = aiBrain:GetCurrentEnemy()
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
 
-            local StartX, StartZ = enemy:GetArmyStartPos()
+            local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
 
             --local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, 'AntiSurface', enemyIndex)
-            local enemyThreat = SUtils.GetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
+            local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
 
             #If enemy base has more than 1750 anti-surface threat
             #T2 Arty, T1 PD, T2 PD, Bots, Tanks, Mobile Arty, Gunships, Bombers, ACU, SCUs.
@@ -1077,17 +1111,17 @@ BuilderGroup {
         PriorityFunction = function(self, aiBrain)
             local enemy, enemyIndex
             local returnval = 1
-            if aiBrain:GetCurrentEnemy() then
-                enemy = aiBrain:GetCurrentEnemy()
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
 
-            local StartX, StartZ = enemy:GetArmyStartPos()
+            local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
 
             --local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, 'AntiSurface', enemyIndex)
-            local enemyThreat = SUtils.GetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
+            local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, 'AntiSurface', {'Commander', 'Air', 'Experimental'}, enemyIndex)
 
             #If enemy base has more than 1750 anti-surface threat
             #T2 Arty, T1 PD, T2 PD, Bots, Tanks, Mobile Arty, Gunships, Bombers, ACU, SCUs.
@@ -1148,11 +1182,11 @@ BuilderGroup {
                 return 100
             end
             local antis = 0
-            local nukes = aiBrain:GetCurrentUnits(categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
+            local nukes = aibrain_methodsGetCurrentUnits(aiBrain, categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
 
             for k,v in ArmyBrains do
-                local eStartX, eStartZ = v:GetArmyStartPos()
-                local eUnits = aiBrain:GetNumUnitsAroundPoint(categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, {eStartX, 0, eStartZ}, 250, 'Enemy')
+                local eStartX, eStartZ = aibrain_methodsGetArmyStartPos(v)
+                local eUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, {eStartX, 0, eStartZ}, 250, 'Enemy')
                 if eUnits > antis then
                     antis = eUnits
                 end
@@ -1200,11 +1234,11 @@ BuilderGroup {
             local antis = 99999
             local returnval = 1
 
-            local nukes = aiBrain:GetCurrentUnits(categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
+            local nukes = aibrain_methodsGetCurrentUnits(aiBrain, categories.NUKE * categories.SILO * categories.STRUCTURE * categories.TECH3)
 
             for k,v in ArmyBrains do
-                local eStartX, eStartZ = v:GetArmyStartPos()
-                local eUnits = aiBrain:GetNumUnitsAroundPoint(categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, {eStartX, 0, eStartZ}, 250, 'Enemy')
+                local eStartX, eStartZ = aibrain_methodsGetArmyStartPos(v)
+                local eUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.ANTIMISSILE * categories.TECH3 * categories.STRUCTURE, {eStartX, 0, eStartZ}, 250, 'Enemy')
                 if eUnits < antis then
                     antis = eUnits
                 end
@@ -1239,13 +1273,13 @@ BuilderGroup {
         PriorityFunction = function(self, aiBrain)
             local enemyIndex
             local returnval = 1
-            if aiBrain:GetCurrentEnemy() then
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
 
-            local eUnits = aiBrain:GetUnitsAroundPoint(categories.ANTIMISSILE * categories.TECH2 * categories.STRUCTURE, Vector(0,0,0), 100000, 'Enemy')
+            local eUnits = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.ANTIMISSILE * categories.TECH2 * categories.STRUCTURE, Vector(0,0,0), 100000, 'Enemy')
 
             local count = 0
 
@@ -1294,20 +1328,20 @@ BuilderGroup {
             if aiBrain.Focus == 'air' then
                 return 100
             end
-            if aiBrain:GetCurrentEnemy() then
-                enemy = aiBrain:GetCurrentEnemy()
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
-            if aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR * (categories.TECH2 + categories.TECH3)) > 0 then
+            if aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR * (categories.TECH2 + categories.TECH3)) > 0 then
                 return returnval
             end
 
-            local StartX, StartZ = enemy:GetArmyStartPos()
+            local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
 
-            local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
-            local numEUnits = aiBrain:GetNumUnitsAroundPoint(categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
+            local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
+            local numEUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
 
             returnval = 90 - enemyThreat - numEUnits
             return returnval
@@ -1379,21 +1413,21 @@ BuilderGroup {
             if aiBrain.Focus == 'air' then
                 return 100
             end
-            if aiBrain:GetCurrentEnemy() then
-                enemy = aiBrain:GetCurrentEnemy()
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
-            if aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR * categories.TECH3) > 0 or
-            aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR * categories.TECH2) < 1 then
+            if aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR * categories.TECH3) > 0 or
+            aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR * categories.TECH2) < 1 then
                 return returnval
             end
 
-            local StartX, StartZ = enemy:GetArmyStartPos()
+            local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
 
-            local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
-            local numEUnits = aiBrain:GetNumUnitsAroundPoint(categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
+            local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
+            local numEUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
 
             returnval = 90 - (enemyThreat * 0.5) - numEUnits
             return returnval
@@ -1465,20 +1499,20 @@ BuilderGroup {
             if aiBrain.Focus == 'air' then
                 return 100
             end
-            if aiBrain:GetCurrentEnemy() then
-                enemy = aiBrain:GetCurrentEnemy()
-                enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+            if aibrain_methodsGetCurrentEnemy(aiBrain) then
+                enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+                enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
             else
                 return returnval
             end
-            if aiBrain:GetCurrentUnits(categories.FACTORY * categories.AIR * categories.TECH3) < 1 then
+            if aibrain_methodsGetCurrentUnits(aiBrain, categories.FACTORY * categories.AIR * categories.TECH3) < 1 then
                 return returnval
             end
 
-            local StartX, StartZ = enemy:GetArmyStartPos()
+            local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
 
-            local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
-            local numEUnits = aiBrain:GetNumUnitsAroundPoint(categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
+            local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, true, 'AntiAir', enemyIndex)
+            local numEUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.MOBILE * categories.AIR * categories.ANTIAIR - categories.BOMBER, Vector(0,0,0), 100000, 'Enemy')
 
             returnval = 90 - (enemyThreat * 0.15) - numEUnits
             return returnval

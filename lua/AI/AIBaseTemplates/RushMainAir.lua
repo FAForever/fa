@@ -7,6 +7,11 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aiutilitiesUp = import('/lua/AI/AIUtilities.lua')
+local GetMapSize = GetMapSize
+local Random = Random
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+
 BaseBuilderTemplate {
     BaseTemplateName = 'RushMainAir',
     Builders = {
@@ -198,11 +203,11 @@ BaseBuilderTemplate {
         end
 
         local mapSizeX, mapSizeZ = GetMapSize()
-        local startX, startZ = aiBrain:GetArmyStartPos()
+        local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
 
         #DUNCAN - Add island check
         local isIsland = false
-        local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
+        local islandMarker = aiutilitiesUp.AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
         end

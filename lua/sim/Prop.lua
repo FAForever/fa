@@ -5,6 +5,35 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+local prop_methodsDestroy = moho.prop_methods.Destroy
+local prop_methodsAdjustHealth = moho.prop_methods.AdjustHealth
+local prop_methodsGetPosition = moho.prop_methods.GetPosition
+local unit_methodsGetBuildRate = moho.unit_methods.GetBuildRate
+local error = error
+local tableInsert = table.insert
+local prop_methodsSetCollisionShape = moho.prop_methods.SetCollisionShape
+local ipairs = ipairs
+local tableGetsize = table.getsize
+local prop_methodsSetHealth = moho.prop_methods.SetHealth
+local type = type
+local prop_methodsGetBoneCount = moho.prop_methods.GetBoneCount
+local EntityCategoryContains = EntityCategoryContains
+local prop_methodsGetBlueprint = moho.prop_methods.GetBlueprint
+local prop_methodsBeenDestroyed = moho.prop_methods.BeenDestroyed
+local prop_methodsGetMaxHealth = moho.prop_methods.GetMaxHealth
+local prop_methodsKill = moho.prop_methods.Kill
+local prop_methodsGetFractionComplete = moho.prop_methods.GetFractionComplete
+local prop_methodsGetBoneName = moho.prop_methods.GetBoneName
+local prop_methodsPlaySound = moho.prop_methods.PlaySound
+local prop_methodsSetAmbientSound = moho.prop_methods.SetAmbientSound
+local next = next
+local GetTerrainHeight = GetTerrainHeight
+local mathMax = math.max
+local Warp = Warp
+local prop_methodsGetHealth = moho.prop_methods.GetHealth
+local prop_methodsSetMaxHealth = moho.prop_methods.SetMaxHealth
+local stringGsub = string.gsub
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectUtil = import('/lua/EffectUtilities.lua')
 
@@ -25,7 +54,7 @@ Prop = Class(moho.prop_methods, Entity) {
         }
         Entity.OnCreate(self)
         self.Trash = TrashBag()
-        local bp = self:GetBlueprint()
+        local bp = prop_methodsGetBlueprint(self)
         local economy = bp.Economy
 
         -- These values are used in world props like rocks / stones / trees
@@ -40,7 +69,7 @@ Prop = Class(moho.prop_methods, Entity) {
         end
 
         -- Correct to terrain, just to be sure
-        local pos = self:GetPosition()
+        local pos = prop_methodsGetPosition(self)
         local terrainAltitude = GetTerrainHeight(pos[1], pos[3])
         if pos[2] < terrainAltitude then -- Find props that, for some reason, are below ground at their central bone
             pos[2] = terrainAltitude
@@ -49,9 +78,9 @@ Prop = Class(moho.prop_methods, Entity) {
 
         self.CachePosition = pos
 
-        local max = math.max(50, bp.Defense.MaxHealth)
-        self:SetMaxHealth(max)
-        self:SetHealth(self, max)
+        local max = mathMax(50, bp.Defense.MaxHealth)
+        prop_methodsSetMaxHealth(self, max)
+        prop_methodsSetHealth(self, self, max)
         self:SetCanTakeDamage(not EntityCategoryContains(categories.INVULNERABLE, self))
         self:SetCanBeKilled(true)
     end,
@@ -61,7 +90,7 @@ Prop = Class(moho.prop_methods, Entity) {
             error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
             return
         end
-        table.insert(self.EventCallbacks[type], fn)
+        tableInsert(self.EventCallbacks[type], fn)
     end,
 
     DoPropCallbacks = function(self, type, param)
@@ -86,7 +115,7 @@ Prop = Class(moho.prop_methods, Entity) {
 
     -- Returns the cache position of the prop, since it doesn't move, it's a big optimization
     GetCachePosition = function(self)
-        return self.CachePosition or self:GetPosition()
+        return self.CachePosition or prop_methodsGetPosition(self)
     end,
 
     -- Sets if the unit can take damage.  val = true means it can take damage.
@@ -108,13 +137,13 @@ Prop = Class(moho.prop_methods, Entity) {
     OnKilled = function(self, instigator, type, exceessDamageRatio)
         if not self.CanBeKilled then return end
         self:DoPropCallbacks('OnKilled')
-        self:Destroy()
+        prop_methodsDestroy(self)
     end,
 
     OnReclaimed = function(self, entity)
         self:DoPropCallbacks('OnReclaimed', entity)
         self.CreateReclaimEndEffects(entity, self)
-        self:Destroy()
+        prop_methodsDestroy(self)
     end,
 
     CreateReclaimEndEffects = function(self, target)
@@ -139,7 +168,7 @@ Prop = Class(moho.prop_methods, Entity) {
         end
 
         local data = {}
-        if not self:BeenDestroyed() and mass >= minimumLabelMass then
+        if not prop_methodsBeenDestroyed(self) and mass >= minimumLabelMass then
             -- The prop is still around and has enough mass, update the label
             data.mass = mass
             data.position = self:GetCachePosition()
@@ -159,21 +188,21 @@ Prop = Class(moho.prop_methods, Entity) {
 
     OnDamage = function(self, instigator, amount, direction, damageType)
         if not self.CanTakeDamage then return end
-        local preAdjHealth = self:GetHealth()
-        self:AdjustHealth(instigator, -amount)
-        local health = self:GetHealth()
+        local preAdjHealth = prop_methodsGetHealth(self)
+        prop_methodsAdjustHealth(self, instigator, -amount)
+        local health = prop_methodsGetHealth(self)
         if health <= 0 then
             if damageType == 'Reclaimed' then
-                self:Destroy()
+                prop_methodsDestroy(self)
             else
                 local excessDamageRatio = 0.0
                 -- Calculate the excess damage amount
                 local excess = preAdjHealth - amount
-                local maxHealth = self:GetMaxHealth()
+                local maxHealth = prop_methodsGetMaxHealth(self)
                 if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
-                self:Kill(instigator, damageType, excessDamageRatio)
+                prop_methodsKill(self, instigator, damageType, excessDamageRatio)
             end
         else
             self:UpdateReclaimLeft()
@@ -199,11 +228,11 @@ Prop = Class(moho.prop_methods, Entity) {
     -- This function mimics the engine's behavior when calculating what value is left of a prop
     -- Called from OnDestroy, OnDamage, and OnCreate
     UpdateReclaimLeft = function(self)
-        if not self:BeenDestroyed() then
-            local max = self:GetMaxHealth()
-            local ratio = (max and max > 0 and self:GetHealth() / max) or 1
+        if not prop_methodsBeenDestroyed(self) then
+            local max = prop_methodsGetMaxHealth(self)
+            local ratio = (max and max > 0 and prop_methodsGetHealth(self) / max) or 1
             -- we have to take into account if the wreck has been partly reclaimed by an engineer
-            self.ReclaimLeft = ratio * self:GetFractionComplete()
+            self.ReclaimLeft = ratio * prop_methodsGetFractionComplete(self)
         end
 
         -- Notify UI about the mass change
@@ -220,9 +249,9 @@ Prop = Class(moho.prop_methods, Entity) {
         self.CollisionCenterZ = centerz
         self.CollisionShape = shape
         if radius and shape == 'Sphere' then
-            self:SetCollisionShape(shape, centerx, centery, centerz, radius)
+            prop_methodsSetCollisionShape(self, shape, centerx, centery, centerz, radius)
         else
-            self:SetCollisionShape(shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
+            prop_methodsSetCollisionShape(self, shape, centerx, centery + sizey, centerz, sizex, sizey, sizez)
         end
     end,
 
@@ -233,8 +262,8 @@ Prop = Class(moho.prop_methods, Entity) {
     -- Energy Time = energy reclaim value / buildrate of thing reclaiming it * BP set energy mult
     -- The time to reclaim is the highest of the two values above.
     GetReclaimCosts = function(self, reclaimer)
-        local time = self.TimeReclaim * (math.max(self.MaxMassReclaim, self.MaxEnergyReclaim) / reclaimer:GetBuildRate())
-        time = math.max(time / 10, 0.0001)  -- this should never be 0 or we'll divide by 0!
+        local time = self.TimeReclaim * (mathMax(self.MaxMassReclaim, self.MaxEnergyReclaim) / unit_methodsGetBuildRate(reclaimer))
+        time = mathMax(time / 10, 0.0001)  -- this should never be 0 or we'll divide by 0!
         return time, self.MaxEnergyReclaim, self.MaxMassReclaim
     end,
 
@@ -252,29 +281,29 @@ Prop = Class(moho.prop_methods, Entity) {
     -- You can pass an optional 'dirprefix' arg saying where to look for the child props.
     -- If not given, it defaults to one directory up from this prop's blueprint location.
     SplitOnBonesByName = function(self, dirprefix)
-        local bp = self:GetBlueprint()
+        local bp = prop_methodsGetBlueprint(self)
 
         if not dirprefix then
             -- default dirprefix to parent dir of our own blueprint
             -- trim ".../groups/blah_prop.bp" to just ".../"
-            dirprefix = string.gsub(bp.BlueprintId, "[^/]*/[^/]*$", "")
+            dirprefix = stringGsub(bp.BlueprintId, "[^/]*/[^/]*$", "")
         end
 
         local newprops = {}
 
-        for ibone = 1, self:GetBoneCount() - 1 do
-            local bone = self:GetBoneName(ibone)
+        for ibone = 1, prop_methodsGetBoneCount(self) - 1 do
+            local bone = prop_methodsGetBoneName(self, ibone)
 
             -- Construct name of replacement mesh from name of bone, trimming off optional _01 _02 etc
-            local btrim = string.gsub(bone, "_?[0-9]+$", "")
+            local btrim = stringGsub(bone, "_?[0-9]+$", "")
             local newbp = dirprefix .. btrim .. "_prop.bp"
             local p = safecall("Creating prop", self.CreatePropAtBone, self, ibone, newbp)
             if p then
-                table.insert(newprops, p)
+                tableInsert(newprops, p)
             end
         end
 
-        local n_props = table.getsize(newprops)
+        local n_props = tableGetsize(newprops)
         if n_props == 0 then return end
 
         local time
@@ -290,14 +319,14 @@ Prop = Class(moho.prop_methods, Entity) {
             p:SetMaxReclaimValues(perProp.time, perProp.mass, perProp.energy)
         end
 
-        self:Destroy()
+        prop_methodsDestroy(self)
         return newprops
     end,
 
     PlayPropSound = function(self, sound)
-        local bp = self:GetBlueprint().Audio
+        local bp = prop_methodsGetBlueprint(self).Audio
         if bp and bp[sound] then
-            self:PlaySound(bp[sound])
+            prop_methodsPlaySound(self, bp[sound])
             return true
         end
 
@@ -308,15 +337,15 @@ Prop = Class(moho.prop_methods, Entity) {
     -- AmbientRumble defined, play that too
     PlayPropAmbientSound = function(self, sound)
         if sound == nil then
-            self:SetAmbientSound(nil, nil)
+            prop_methodsSetAmbientSound(self, nil, nil)
             return true
         else
-            local bp = self:GetBlueprint().Audio
+            local bp = prop_methodsGetBlueprint(self).Audio
             if bp and bp[sound] then
                 if bp.Audio['AmbientRumble'] then
-                    self:SetAmbientSound(bp[sound], bp.Audio['AmbientRumble'])
+                    prop_methodsSetAmbientSound(self, bp[sound], bp.Audio['AmbientRumble'])
                 else
-                    self:SetAmbientSound(bp[sound], nil)
+                    prop_methodsSetAmbientSound(self, bp[sound], nil)
                 end
                 return true
             end

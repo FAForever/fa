@@ -1,3 +1,19 @@
+local tableFind = table.find
+local ForkThread = ForkThread
+local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local Vector = Vector
+local Warp = Warp
+local CreateEmitterAtBone = CreateEmitterAtBone
+local tableGetn = table.getn
+local mathFloor = math.floor
+local LOG = LOG
+local IEffectSetEmitterParam = moho.IEffect.SetEmitterParam
+local WARN = WARN
+local GetSurfaceHeight = GetSurfaceHeight
+
 local WeatherDefinition = import('/lua/weatherdefinitions.lua')
 local MapStyleList = WeatherDefinition.MapStyleList
 local MapWeatherList = WeatherDefinition.MapWeatherList
@@ -15,8 +31,8 @@ function CreateWeatherThread()
     -- read out the markers with regard to the weather
     local definitions, clusters = GetWeatherMarkerData(ScenarioInfo.size)
 
-    local nd = table.getn(definitions)
-    local nc = table.getn(clusters)
+    local nd = tableGetn(definitions)
+    local nc = tableGetn(clusters)
 
     -- early opt: no definitions, no clusters
     if nd == 0 and nc == 0 then
@@ -44,7 +60,7 @@ function CreateWeatherThread()
 
     -- early opt out: map style is unknown
     local style = definition.MapStyle
-    if not table.find(MapStyleList, style) then
+    if not tableFind(MapStyleList, style) then
         WARN(
             'Intention to generate weather but the chosen map style ' .. style .. ' is not known, aborting weather generation.',
             'A full list of available styles is: \r\n' .. repr(MapStyleList)
@@ -108,9 +124,9 @@ function GetWeatherMarkerData(mapScale)
     if markers then
         for _, marker in markers do
             if marker.type == 'Weather Generator' then
-                table.insert(generatorMarkers, marker)
+                tableInsert(generatorMarkers, marker)
             elseif marker.type == 'Weather Definition' then
-                table.insert(definitionMarkers, marker)
+                tableInsert(definitionMarkers, marker)
             end
         end
     end
@@ -118,7 +134,7 @@ function GetWeatherMarkerData(mapScale)
     -- transform the definition markers into a more useful, abstract format
     local definitions = {}
     for _, marker in definitionMarkers do
-        table.insert(definitions,
+        tableInsert(definitions,
             {
                 MapStyle = marker.MapStyle or "None",
                 WeatherTypes = {
@@ -145,7 +161,7 @@ function GetWeatherMarkerData(mapScale)
 
     -- transform the generator markers into a more useful, abstract format
     local clusters = {}
-    local defaultcloudclusterSpread = math.floor(((mapScale[1] + mapScale[2]) * 0.5) * 0.15)
+    local defaultcloudclusterSpread = mathFloor(((mapScale[1] + mapScale[2]) * 0.5) * 0.15)
     for _, marker in generatorMarkers do
         local cluster = {
             clusterSpread = marker.cloudSpread or defaultcloudclusterSpread,
@@ -166,7 +182,7 @@ function GetWeatherMarkerData(mapScale)
             cluster.visibleThroughFog = true
         end
 
-        table.insert( clusters, cluster)
+        tableInsert( clusters, cluster)
     end
 
     -- return it all
@@ -199,17 +215,17 @@ function SetClusterEffectData(weather, style, globalType, clusters)
     for _, cluster in clusters do
         if cluster.forceType == "None" then
             local emitters = weather[style][globalType]
-            cluster.effects = emitters[util.GetRandomInt(1,table.getn(emitters))]
+            cluster.effects = emitters[util.GetRandomInt(1,tableGetn(emitters))]
         else
             local emitters = weather[style][cluster.forceType]
-            cluster.effects = emitters[util.GetRandomInt(1,table.getn(emitters))]
+            cluster.effects = emitters[util.GetRandomInt(1,tableGetn(emitters))]
         end
     end
 end
 
 function ClustersToEmitters( clusters )
 
-    local nc = table.getn(clusters)
+    local nc = tableGetn(clusters)
 
     -- for each cluster...
     for _, cluster in clusters do
@@ -261,11 +277,11 @@ function ClustersToEmitters( clusters )
                     local emitter = CreateEmitterAtBone(entity, bone, army, effect)
 
                     -- scale it accordingly
-                    emitter:ScaleEmitter(util.GetRandomFloat( clusterEffectMaxScale, clusterEffectMinScale))
+                    IEffectScaleEmitter(emitter, util.GetRandomFloat( clusterEffectMaxScale, clusterEffectMinScale))
 
                     -- determine if it spawns without visibility
                     if cluster.visibleThroughFog then
-                        emitter:SetEmitterParam("EMITIFVISIBLE", 0)
+                        IEffectSetEmitterParam(emitter, "EMITIFVISIBLE", 0)
                     end
                 end
             end
@@ -323,7 +339,7 @@ function GenerateClusterCoords( xStart, zStart, xEnd, zEnd, numClusters )
             -- Insert random x/z coordinate into ClusterList\
             local newKey = { util.GetRandomInt( divisions[i][1], divisions[i][3] ) , 0, util.GetRandomInt( divisions[i][2], divisions[i][4] )}
             newKey[2] = GetSurfaceHeight(newKey[1],newKey[3])
-            table.insert( clusterList, newKey )
+            tableInsert( clusterList, newKey )
             --LOG( 'Inserting Cluster Area[', i .. '] Coords ', repr( divisions[i] ) )
         elseif clusterDensityMap[i] > 1 then
             --LOG( 'SubDivide Region[', i .. '] Coords ', repr( divisions[i] )  )
@@ -334,7 +350,7 @@ function GenerateClusterCoords( xStart, zStart, xEnd, zEnd, numClusters )
                 local addedclusterList = GenerateClusterCoords( divisions[i][1], divisions[i][2], divisions[i][3], divisions[i][4], clusterDensityMap[i] )
                 -- Insert any new clusters into our original list
                 for k, v in addedclusterList do
-                    table.insert(clusterList,v)
+                    tableInsert(clusterList,v)
                 end
             end
         end

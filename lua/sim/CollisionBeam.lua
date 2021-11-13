@@ -11,6 +11,33 @@
 -- CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
 -- that may or may not exist depending on how the simulation is executing.
 --
+local DamageArea = DamageArea
+local GetTerrainType = GetTerrainType
+local AttachBeamToEntity = AttachBeamToEntity
+local Damage = Damage
+local tableInsert = table.insert
+local ipairs = ipairs
+local CollisionBeamEntityInitIntel = moho.CollisionBeamEntity.InitIntel
+local CollisionBeamEntityGetArmy = moho.CollisionBeamEntity.GetArmy
+local CreateEmitterAtBone = CreateEmitterAtBone
+local EntityCategoryContains = EntityCategoryContains
+local IsUnit = IsUnit
+local CollisionBeamEntitySetBeamFx = moho.CollisionBeamEntity.SetBeamFx
+local CollisionBeamEntityEnableIntel = moho.CollisionBeamEntity.EnableIntel
+local CollisionBeamEntityGetPosition = moho.CollisionBeamEntity.GetPosition
+local unpack = unpack
+local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
+local next = next
+local ParseEntityCategory = ParseEntityCategory
+local tableEmpty = table.empty
+local CreateAttachedEmitter = CreateAttachedEmitter
+local tableGetn = table.getn
+local CollisionBeamEntityDisableIntel = moho.CollisionBeamEntity.DisableIntel
+local CollisionBeamEntityGetLauncher = moho.CollisionBeamEntity.GetLauncher
+local LOG = LOG
+local CreateBeamEmitter = CreateBeamEmitter
+local Random = Random
+
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
@@ -42,7 +69,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         self.LastTerrainType = nil
         self.BeamEffectsBag = {}
         self.TerrainEffectsBag = {}
-        self.Army = self:GetArmy()
+        self.Army = CollisionBeamEntityGetArmy(self)
         self.Trash = TrashBag()
     end,
 
@@ -101,23 +128,23 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             local radius = damageData.DamageRadius
             if radius and radius > 0 then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
-                    DamageArea(instigator, self:GetPosition(1), radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
+                    DamageArea(instigator, CollisionBeamEntityGetPosition(self, 1), radius, damage, damageData.DamageType or 'Normal', damageData.DamageFriendly or false)
                     -- If a missile is impacted, damage it directly because projectile entities are not
                     -- affected by DamageArea
                     if targetEntity and EntityCategoryContains(categories.MISSILE, targetEntity) then
-                        Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
+                        Damage(instigator, CollisionBeamEntityGetPosition(self), targetEntity, damage, damageData.DamageType)
                     end
                 else
-                    ForkThread(DefaultDamage.AreaDoTThread, instigator, self:GetPosition(1), damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), radius, damage, damageData.DamageType, damageData.DamageFriendly)
+                    ForkThread(DefaultDamage.AreaDoTThread, instigator, CollisionBeamEntityGetPosition(self, 1), damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), radius, damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             elseif targetEntity then
                 if not damageData.DoTTime or damageData.DoTTime <= 0 then
-                    Damage(instigator, self:GetPosition(), targetEntity, damage, damageData.DamageType)
+                    Damage(instigator, CollisionBeamEntityGetPosition(self), targetEntity, damage, damageData.DamageType)
                 else
                     ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, damageData.DoTPulses or 1, (damageData.DoTTime / (damageData.DoTPulses or 1)), damage, damageData.DamageType, damageData.DamageFriendly)
                 end
             else
-                DamageArea(instigator, self:GetPosition(1), 0.25, damage, damageData.DamageType, damageData.DamageFriendly)
+                DamageArea(instigator, CollisionBeamEntityGetPosition(self, 1), 0.25, damage, damageData.DamageType, damageData.DamageFriendly)
             end
         else
             LOG('*ERROR: THERE IS NO INSTIGATOR FOR DAMAGE ON THIS COLLISIONBEAM = ', repr(damageData))
@@ -127,24 +154,24 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     CreateBeamEffects = function(self)
         for k, y in self.FxBeamStartPoint do
             local fx = CreateAttachedEmitter(self, 0, self.Army, y):ScaleEmitter(self.FxBeamStartPointScale)
-            table.insert(self.BeamEffectsBag, fx)
+            tableInsert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
         for k, y in self.FxBeamEndPoint do
             local fx = CreateAttachedEmitter(self, 1, self.Army, y):ScaleEmitter(self.FxBeamEndPointScale)
-            table.insert(self.BeamEffectsBag, fx)
+            tableInsert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
-        if not table.empty(self.FxBeam) then
-            local fxBeam = CreateBeamEmitter(self.FxBeam[Random(1, table.getn(self.FxBeam))], self.Army)
+        if not tableEmpty(self.FxBeam) then
+            local fxBeam = CreateBeamEmitter(self.FxBeam[Random(1, tableGetn(self.FxBeam))], self.Army)
             AttachBeamToEntity(fxBeam, self, 0, self.Army)
 
             -- collide on start if it's a continuous beam
             local weaponBlueprint = self.Weapon:GetBlueprint()
             local bCollideOnStart = weaponBlueprint.BeamLifetime <= 0
-            self:SetBeamFx(fxBeam, bCollideOnStart)
+            CollisionBeamEntitySetBeamFx(self, fxBeam, bCollideOnStart)
 
-            table.insert(self.BeamEffectsBag, fxBeam)
+            tableInsert(self.BeamEffectsBag, fxBeam)
             self.Trash:Add(fxBeam)
         else
             LOG('*ERROR: THERE IS NO BEAM EMITTER DEFINED FOR THIS COLLISION BEAM ', repr(self.FxBeam))
@@ -165,7 +192,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         for k, v in EffectTable do
             emit = CreateEmitterAtBone(self,1,army,v)
             if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale)
+                IEffectScaleEmitter(emit, EffectScale)
             end
         end
     end,
@@ -174,9 +201,9 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         local emit = nil
         for k, v in EffectTable do
             emit = CreateAttachedEmitter(self,1,army,v)
-            table.insert(self.TerrainEffectsBag, emit)
+            tableInsert(self.TerrainEffectsBag, emit)
             if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale)
+                IEffectScaleEmitter(emit, EffectScale)
             end
         end
     end,
@@ -189,7 +216,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     end,
 
     UpdateTerrainCollisionEffects = function(self, TargetType)
-        local pos = self:GetPosition(1)
+        local pos = CollisionBeamEntityGetPosition(self, 1)
         local TerrainType = nil
 
         if self.TerrainImpactType ~= 'Default' then
@@ -214,8 +241,8 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
 
         self.exposingShooter = true
 
-        self:InitIntel(target.Army, 'Vision', 2)
-        self:EnableIntel('Vision')
+        CollisionBeamEntityInitIntel(self, target.Army, 'Vision', 2)
+        CollisionBeamEntityEnableIntel(self, 'Vision')
     end,
 
     HideBeamSource = function(self)
@@ -225,10 +252,10 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             self.exposingShooter = nil
             return
         end
-        self:DisableIntel('Vision')
+        CollisionBeamEntityDisableIntel(self, 'Vision')
 
         if self.needIntelClear then
-            ScenarioFramework.ClearIntel(self:GetPosition(), 2)
+            ScenarioFramework.ClearIntel(CollisionBeamEntityGetPosition(self), 2)
             self.needIntelClear = nil
         end
     end,
@@ -254,7 +281,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         --  'Shield'
 
         if impactType == 'Unit' or impactType == 'UnitAir' or impactType == 'UnitUnderwater' then
-            if not self:GetLauncher() then
+            if not CollisionBeamEntityGetLauncher(self) then
                 return
             end
 
@@ -275,7 +302,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
         end
 
         -- Do Damage
-        self:DoDamage(self:GetLauncher(), damageData, targetEntity)
+        self:DoDamage(CollisionBeamEntityGetLauncher(self), damageData, targetEntity)
 
         local ImpactEffects = {}
         local ImpactEffectScale = 1

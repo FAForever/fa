@@ -7,6 +7,11 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local aibrain_methodsGetCurrentEnemy = moho.aibrain_methods.GetCurrentEnemy
+local unitcountbuildconditionsUp = import('/lua/editor/UnitCountBuildConditions.lua')
+
 local BBTmplFile = '/lua/basetemplates.lua'
 local BuildingTmpl = 'BuildingTemplates'
 local BaseTmpl = 'BaseTemplates'
@@ -28,15 +33,15 @@ local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
 function AirAttackCondition(aiBrain, locationType, targetNumber)
-    local UC = import('/lua/editor/UnitCountBuildConditions.lua')
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local UC = unitcountbuildconditionsUp
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     if not engineerManager then
         return true
     end
-    if aiBrain:GetCurrentEnemy() then
-        local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-        targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiAir')
+    if aibrain_methodsGetCurrentEnemy(aiBrain) then
+        local estartX, estartZ = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyStartPos()
+        targetNumber = aibrain_methodsGetThreatAtPosition(aiBrain, {estartX, 0, estartZ}, 1, true, 'AntiAir')
     end
 
     local position = engineerManager:GetLocationCoords()

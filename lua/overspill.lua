@@ -4,6 +4,16 @@
 --  Summary  :  Module for handling shield overspill
 ----------------------------------------------------
 
+local ipairs = ipairs
+local IsUnit = IsUnit
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local mathAbs = math.abs
+local VDist3 = VDist3
+local tableRemove = table.remove
+local GetGameTick = GetGameTick
+local tableInsert = table.insert
+local next = next
+
 local Util = import('utilities.lua')
 local largestShieldDiameter = 120
 local overspills = {}
@@ -12,7 +22,7 @@ local overspills = {}
 function GetOverlappingShields(source)
     local adjacentShields = {}
     local brain = source.Owner:GetAIBrain()
-    local units = brain:GetUnitsAroundPoint((categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK, source.Owner:GetPosition(), largestShieldDiameter, 'Ally')
+    local units = aibrain_methodsGetUnitsAroundPoint(brain, (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK, source.Owner:GetPosition(), largestShieldDiameter, 'Ally')
     local pos = source:GetCachePosition()
     local OverlapRadius = 0.98 * (source.Size / 2) -- Size is diameter, dividing by 2 to get radius
 
@@ -28,7 +38,7 @@ function GetOverlappingShields(source)
             -- otherwise they do
             OverlapDist = OverlapRadius + oOverlapRadius
             if VDist3(pos, vspos) <= OverlapDist then
-                table.insert(adjacentShields, v.MyShield)
+                tableInsert(adjacentShields, v.MyShield)
             end
         end
     end
@@ -39,7 +49,7 @@ function RegisterDamage(shieldId, instigatorId, amount)
     if not overspills[shieldId] then
         overspills[shieldId] = {}
     end
-    table.insert(overspills[shieldId], {instigatorId = instigatorId,
+    tableInsert(overspills[shieldId], {instigatorId = instigatorId,
                                         amount = amount,
                                         tick = GetGameTick()})
 end
@@ -52,7 +62,7 @@ function DidTakeDamageAlready(shieldId, instigatorId, amount)
     else
         local currentTick = GetGameTick()
         for _, v in overspills[shieldId] do
-            if v.instigatorId == instigatorId and math.abs(v.amount - amount) < 0.1 and v.tick + 2 >= currentTick then
+            if v.instigatorId == instigatorId and mathAbs(v.amount - amount) < 0.1 and v.tick + 2 >= currentTick then
                 return true
             end
         end
@@ -65,7 +75,7 @@ function CleanupDamageTable()
     for shieldId, spills in overspills do
         for k, spill in spills do
             if spill.tick < GetGameTick() - 2 then
-                table.remove(spills, k)
+                tableRemove(spills, k)
             end
         end
     end

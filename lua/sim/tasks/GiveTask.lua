@@ -1,3 +1,8 @@
+local ipairs = ipairs
+local ScriptTask_MethodsGetUnit = moho.ScriptTask_Methods.GetUnit
+local next = next
+local tableInsert = table.insert
+
 local ScriptTask = import('/lua/sim/ScriptTask.lua').ScriptTask
 local TASKSTATUS = import('/lua/sim/ScriptTask.lua').TASKSTATUS
 local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
@@ -9,7 +14,7 @@ GiveTask = Class(ScriptTask) {
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)
 
-        local unit = self:GetUnit()
+        local unit = ScriptTask_MethodsGetUnit(self)
         local from = unit.Army
         local to = commandData.To
 
@@ -17,7 +22,7 @@ GiveTask = Class(ScriptTask) {
 
         transferList[from] = transferList[from] or {}
         transferList[from][to] = transferList[from][to] or {}
-        table.insert(transferList[from][to], unit)
+        tableInsert(transferList[from][to], unit)
 
         self.first = true
     end,
@@ -33,7 +38,7 @@ GiveTask = Class(ScriptTask) {
             local units = {}
             for _, unit in array do
                 if not unit.Dead and unit.Army == self.Army then
-                    table.insert(units, unit)
+                    tableInsert(units, unit)
                 end
             end
 

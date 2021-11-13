@@ -7,6 +7,23 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local mathCeil = math.ceil
+local tableRemove = table.remove
+local unpack = unpack
+local error = error
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local KillThread = KillThread
+local GetTerrainHeight = GetTerrainHeight
+local tableGetn = table.getn
+local debugGetinfo = debug.getinfo
+local GetGameTimeSeconds = GetGameTimeSeconds
+local WARN = WARN
+local stringGsub = string.gsub
+local GetSurfaceHeight = GetSurfaceHeight
+local Random = Random
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
@@ -64,7 +81,7 @@ BuilderManager = Class {
         end
         local sortedList = {}
         #Simple selection sort, this can be made faster later if we decide we need it.
-        for i = 1, table.getn(self.BuilderData[bType].Builders) do
+        for i = 1, tableGetn(self.BuilderData[bType].Builders) do
             local highest = -1
             local key, value
             for k, v in self.BuilderData[bType].Builders do
@@ -75,7 +92,7 @@ BuilderManager = Class {
                 end
             end
             sortedList[i] = value
-            table.remove(self.BuilderData[bType].Builders, key)
+            tableRemove(self.BuilderData[bType].Builders, key)
         end
         self.BuilderData[bType].Builders = sortedList
         self.BuilderData[bType].NeedSort = false
@@ -108,17 +125,17 @@ BuilderManager = Class {
             -- Warn the programmer that something is wrong. We can continue, hopefully the builder is not too important for the AI ;)
             -- But good for testing, and the case that a mod has bad builders.
             -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
-            WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: Invalid builder type: ' .. repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
+            WARN('['..stringGsub(debugGetinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debugGetinfo(1).currentline..'] *BUILDERMANAGER ERROR: Invalid builder type: ' .. repr(builderType) .. ' - in builder: ' .. newBuilder.BuilderName)
             return
         end
         if newBuilder then
             if not self.BuilderData[builderType] then
                 -- Warn the programmer that something is wrong here. Same here, we can continue.
                 -- Output: WARNING: [buildermanager.lua, line:xxx] *BUILDERMANAGER ERROR: No BuilderData for builder: T3 Air Scout
-                WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
+                WARN('['..stringGsub(debugGetinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debugGetinfo(1).currentline..'] *BUILDERMANAGER ERROR: No BuilderData for builder: ' .. newBuilder.BuilderName)
                 return
             end
-            table.insert(self.BuilderData[builderType].Builders, newBuilder)
+            tableInsert(self.BuilderData[builderType].Builders, newBuilder)
             self.BuilderData[builderType].NeedSort = true
             self.BuilderList = true
         end
@@ -258,14 +275,14 @@ BuilderManager = Class {
             if v.Priority >= 1 and self:BuilderParamCheck(v,params) and (not found or v.Priority == found) and v:GetBuilderStatus() then
                 if not self:IsPlattonBuildDelayed(v.DelayEqualBuildPlattons) then
                     found = v.Priority
-                    table.insert(possibleBuilders, k)
+                    tableInsert(possibleBuilders, k)
                 end
             elseif found and v.Priority < found then
                 break
             end
         end
         if found and found > 0 then
-            local whichBuilder = Random(1,table.getn(possibleBuilders))
+            local whichBuilder = Random(1,tableGetn(possibleBuilders))
             return self.BuilderData[bType].Builders[ possibleBuilders[whichBuilder] ]
         end
         return false
@@ -290,7 +307,7 @@ BuilderManager = Class {
     ManagerThread = function(self)
         while self.Active do
             self:ManagerThreadCleanup()
-            local numPerTick = math.ceil(self.NumBuilders / (self.BuilderCheckInterval * 10))
+            local numPerTick = mathCeil(self.NumBuilders / (self.BuilderCheckInterval * 10))
             local numTicks = 0
             local numTested = 0
             for bType,bTypeData in self.BuilderData do

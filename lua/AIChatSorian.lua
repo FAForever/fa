@@ -6,6 +6,13 @@
 #**  Summary  : AI Chat Functions
 #**  Version  : 0.1
 #****************************************************************************
+local ipairs = ipairs
+local tableInsert = table.insert
+local IsAlly = IsAlly
+local IsEnemy = IsEnemy
+local next = next
+local type = type
+
 local Chat = import('/lua/ui/game/chat.lua')
 local ChatTo = import('/lua/lazyvar.lua').Create()
 
@@ -36,7 +43,7 @@ function FindAllies(army)
     local result = {}
     for k,v in t.armiesTable do
         if IsAlly(k, army) and v.human then
-            table.insert(result, k)
+            tableInsert(result, k)
         end
     end
     return result
@@ -47,7 +54,7 @@ function FindEnemies(army)
     local result = {}
     for k,v in t.armiesTable do
         if IsEnemy(k, army) and v.human then
-            table.insert(result, k)
+            tableInsert(result, k)
         end
     end
     return result

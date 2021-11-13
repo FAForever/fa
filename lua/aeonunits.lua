@@ -10,6 +10,19 @@
 ----------------------------------------------------------------------------
 -- AEON DEFAULT UNITS
 ----------------------------------------------------------------------------
+local ipairs = ipairs
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local RotateManipulatorSetSpinDown = moho.RotateManipulator.SetSpinDown
+local unit_methodsGetBlueprint = moho.unit_methods.GetBlueprint
+local AnimationManipulatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local CreateAttachedEmitter = CreateAttachedEmitter
+local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
+local CreateAnimator = CreateAnimator
+local CreateRotator = CreateRotator
+local RotateManipulatorSetTargetSpeed = moho.RotateManipulator.SetTargetSpeed
+local next = next
+local unit_methodsGetFocusUnit = moho.unit_methods.GetFocusUnit
+
 local DefaultUnitsFile = import('defaultunits.lua')
 local FactoryUnit = DefaultUnitsFile.FactoryUnit
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
@@ -52,19 +65,19 @@ AFactoryUnit = Class(FactoryUnit) {
 
     OnPaused = function(self)
         -- When factory is paused take some action
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
+        if unit_methodsIsUnitState(self, 'Building') and self.unitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-            self:StartBuildFx(self:GetFocusUnit())
+            self:StartBuildFx(unit_methodsGetFocusUnit(self))
         end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
+        if unit_methodsIsUnitState(self, 'Building') and self.unitBeingBuilt then
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-            self:StartBuildFx(self:GetFocusUnit())
+            self:StartBuildFx(unit_methodsGetFocusUnit(self))
         end
     end,
 }
@@ -237,14 +250,14 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
             self.Rotator = CreateRotator(self, 'Pod', 'z', nil, 0, 50, 0)
             self.Trash:Add(self.Rotator)
         end
-        self.Rotator:SetSpinDown(false)
-        self.Rotator:SetTargetSpeed(self.RotateSpeed)
+        RotateManipulatorSetSpinDown(self.Rotator, false)
+        RotateManipulatorSetTargetSpeed(self.Rotator, self.RotateSpeed)
     end,
 
     OnShieldDisabled = function(self)
         ShieldStructureUnit.OnShieldDisabled(self)
         if self.Rotator then
-            self.Rotator:SetTargetSpeed(0)
+            RotateManipulatorSetTargetSpeed(self.Rotator, 0)
         end
     end,
 }
@@ -295,12 +308,12 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
 
     OnStopBeingBuilt = function(self, builder, layer)
         RadarJammerUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = unit_methodsGetBlueprint(self)
         local bpAnim = bp.Display.AnimationOpen
         if not bpAnim then return end
         if not self.OpenAnim then
             self.OpenAnim = CreateAnimator(self)
-            self.OpenAnim:PlayAnim(bpAnim)
+            AnimationManipulatorPlayAnim(self.OpenAnim, bpAnim)
             self.Trash:Add(self.OpenAnim)
         end
         if not self.Rotator then
@@ -312,23 +325,23 @@ ARadarJammerUnit = Class(RadarJammerUnit) {
     OnIntelEnabled = function(self)
         RadarJammerUnit.OnIntelEnabled(self)
         if self.OpenAnim then
-            self.OpenAnim:SetRate(1)
+            AnimationManipulatorSetRate(self.OpenAnim, 1)
         end
         if not self.Rotator then
             self.Rotator = CreateRotator(self, 'B02', 'z', nil, 0, 50, 0)
             self.Trash:Add(self.Rotator)
         end
-        self.Rotator:SetSpinDown(false)
-        self.Rotator:SetTargetSpeed(self.RotateSpeed)
+        RotateManipulatorSetSpinDown(self.Rotator, false)
+        RotateManipulatorSetTargetSpeed(self.Rotator, self.RotateSpeed)
     end,
 
     OnIntelDisabled = function(self)
         RadarJammerUnit.OnIntelDisabled(self)
         if self.OpenAnim then
-            self.OpenAnim:SetRate(-1)
+            AnimationManipulatorSetRate(self.OpenAnim, -1)
         end
         if self.Rotator then
-            self.Rotator:SetTargetSpeed(0)
+            RotateManipulatorSetTargetSpeed(self.Rotator, 0)
         end
     end,
 }

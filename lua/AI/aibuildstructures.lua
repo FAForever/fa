@@ -7,8 +7,39 @@
 #**
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
+local stringUpper = string.upper
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local mathAbs = math.abs
+local unit_methodsCanBuild = moho.unit_methods.CanBuild
+local stringLower = string.lower
+local aibrain_methodsFindUnit = moho.aibrain_methods.FindUnit
+local aibrain_methodsMakePlatoon = moho.aibrain_methods.MakePlatoon
+local stringFind = string.find
+local error = error
+local tableInsert = table.insert
+local gameUp = import('/lua/game.lua')
+local ipairs = ipairs
+local aibrain_methodsFindPlaceToBuild = moho.aibrain_methods.FindPlaceToBuild
+local type = type
+local aibrain_methodsBuildStructure = moho.aibrain_methods.BuildStructure
+local aibrain_methodsDecideWhatToBuild = moho.aibrain_methods.DecideWhatToBuild
+local GetFocusArmy = GetFocusArmy
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local IssueStop = IssueStop
+local next = next
+local aibrain_methodsCanBuildStructureAt = moho.aibrain_methods.CanBuildStructureAt
+local IssueClearCommands = IssueClearCommands
+local tableGetn = table.getn
+local mathFloor = math.floor
+local LOG = LOG
+local WARN = WARN
+local aibrain_methodsGetUnitBlueprint = moho.aibrain_methods.GetUnitBlueprint
+local SPEW = SPEW
+local Random = Random
+
 local BaseTmplFile = import('/lua/basetemplates.lua')
-local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
+local BaseTemplates = BaseTmplFile.BaseTemplates
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local Utils = import('/lua/utilities.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -33,10 +64,10 @@ function AIModEconomyNumbers(aiBrain, unitBP)
     #LOG('*AI DEBUG: MODDING ECON NUMBERS, BRAIN = ', repr(aiBrain), ' UNITBP = ', repr(unitBP))
     #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND BEFORE = ', repr(aiEconomy.EnergyTrend))
     #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGY USE OF UNIT = ', repr(aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy * 0.1))
-    aiEconomy.MassTrend = aiEconomy.MassTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
-    aiEconomy.MassIncome = aiEconomy.MassIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
-    aiEconomy.EnergyTrend = aiEconomy.EnergyTrend - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
-    aiEconomy.EnergyIncome = aiEconomy.EnergyIncome - (aiBrain:GetUnitBlueprint(unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
+    aiEconomy.MassTrend = aiEconomy.MassTrend - (aibrain_methodsGetUnitBlueprint(aiBrain, unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
+    aiEconomy.MassIncome = aiEconomy.MassIncome - (aibrain_methodsGetUnitBlueprint(aiBrain, unitBP).Economy.ActiveConsumptionPerSecondMass or 0) * 0.1
+    aiEconomy.EnergyTrend = aiEconomy.EnergyTrend - (aibrain_methodsGetUnitBlueprint(aiBrain, unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
+    aiEconomy.EnergyIncome = aiEconomy.EnergyIncome - (aibrain_methodsGetUnitBlueprint(aiBrain, unitBP).Economy.ActiveConsumptionPerSecondEnergy or 0) * 0.1
     #LOG('*AI DEBUG: MODDING ECON NUMBERS, ENERGYTREND AFTER = ', repr(aiEconomy.EnergyTrend * 0.1))
 end
 
@@ -50,7 +81,7 @@ function AIGetBuilder(aiBrain, techLevel)
         builderTechLevel = categories.COMMAND
     end
     #LOG('*AI DEBUG: AIGETBUILDER FINDING TECH LEVEL ', repr(techLevel))
-    local builder = aiBrain:FindUnit(builderTechLevel, true)
+    local builder = aibrain_methodsFindUnit(aiBrain, builderTechLevel, true)
     #LOG('*AI DEBUG: AIGETBUILDER RETURNING ', repr(builder))
     return builder
 end
@@ -84,11 +115,11 @@ function AddToBuildQueue(aiBrain, builder, whatToBuild, buildLocation, relative)
         AIUtils.EngineerTryReclaimCaptureArea(aiBrain, builder, BuildToNormalLocation(buildLocation))
     end
 
-    aiBrain:BuildStructure(builder, whatToBuild, buildLocation, false)
+    aibrain_methodsBuildStructure(aiBrain, builder, whatToBuild, buildLocation, false)
 
     local newEntry = {whatToBuild, buildLocation, relative}
 
-    table.insert(builder.EngineerBuildQueue, newEntry)
+    tableInsert(builder.EngineerBuildQueue, newEntry)
 end
 
 # Build locations (from FindPlaceToBuild) come in as {x,z,dist},
@@ -108,7 +139,7 @@ end
 local AntiSpamList = {}
 function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     local factionIndex = aiBrain:GetFactionIndex()
-    local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
+    local whatToBuild = aibrain_methodsDecideWhatToBuild(aiBrain, builder, buildingType, buildingTemplate)
     -- If the c-engine can't decide what to build, then search the build template manually.
     if not whatToBuild then
         if AntiSpamList[buildingType] then
@@ -174,7 +205,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         end
 
         HasFaction = builder.factionCategory
-        NeedFaction = string.upper(__blueprints[string.lower(BuildUnitWithID)].General.FactionName)
+        NeedFaction = stringUpper(__blueprints[stringLower(BuildUnitWithID)].General.FactionName)
         if HasFaction ~= NeedFaction then
             WARN('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', ('..HasFaction..') engineers can\'t build ('..NeedFaction..') structures!')
             return false
@@ -182,7 +213,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
             SPEW('*AIExecuteBuildStructure: AI-faction: '..AIFactionName..', Engineer with faction ('..HasFaction..') can build faction ('..NeedFaction..') - BuildUnitWithID: '..repr(BuildUnitWithID))
         end
 
-        local IsRestricted = import('/lua/game.lua').IsRestricted
+        local IsRestricted = gameUp.IsRestricted
         if IsRestricted(BuildUnitWithID, GetFocusArmy()) then
             WARN('*AIExecuteBuildStructure: Unit is Restricted!!! Building Type: '..repr(buildingType)..', faction: '..repr(builder.factionCategory)..' - Unit:'..BuildUnitWithID)
             AntiSpamList[buildingType] = true
@@ -200,19 +231,19 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
     elseif builder.BuilderManagerData and builder.BuilderManagerData.EngineerManager then
         relativeTo = builder.BuilderManagerData.EngineerManager:GetLocationCoords()
     else
-        local startPosX, startPosZ = aiBrain:GetArmyStartPos()
+        local startPosX, startPosZ = aibrain_methodsGetArmyStartPos(aiBrain)
         relativeTo = {startPosX, 0, startPosZ}
     end
     local location = false
     if IsResource(buildingType) then
-        location = aiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, 'Enemy', relativeTo[1], relativeTo[3], 5)
+        location = aibrain_methodsFindPlaceToBuild(aiBrain, buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, 'Enemy', relativeTo[1], relativeTo[3], 5)
     else
-        location = aiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
+        location = aibrain_methodsFindPlaceToBuild(aiBrain, buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
     end
     -- if it's a reference, look around with offsets
     if not location and reference then
         for num,offsetCheck in RandomIter({1,2,3,4,5,6,7,8}) do
-            location = aiBrain:FindPlaceToBuild(buildingType, whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
+            location = aibrain_methodsFindPlaceToBuild(aiBrain, buildingType, whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
             if location then
                 break
             end
@@ -223,7 +254,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         --LOG('*AIExecuteBuildStructure: Find no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.factionCategory..') Trying again with T1LandFactory and RandomIter. Searching near base...')
         relativeTo = builder.BuilderManagerData.EngineerManager:GetLocationCoords()
         for num,offsetCheck in RandomIter({1,2,3,4,5,6,7,8}) do
-            location = aiBrain:FindPlaceToBuild('T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
+            location = aibrain_methodsFindPlaceToBuild(aiBrain, 'T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
             if location then
                 --LOG('*AIExecuteBuildStructure: Yes! Found a place near base to Build! - buildingType '..repr(buildingType))
                 break
@@ -235,7 +266,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
         --LOG('*AIExecuteBuildStructure: Find still no place to Build! - buildingType '..repr(buildingType)..' - ('..builder.factionCategory..') Trying again with T1LandFactory and RandomIter. Searching near Engineer...')
         relativeTo = builder:GetPosition()
         for num,offsetCheck in RandomIter({1,2,3,4,5,6,7,8}) do
-            location = aiBrain:FindPlaceToBuild('T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
+            location = aibrain_methodsFindPlaceToBuild(aiBrain, 'T1LandFactory', whatToBuild, BaseTmplFile['MovedTemplates'..offsetCheck][factionIndex], relative, closeToBuilder, nil, relativeTo[1], relativeTo[3])
             if location then
                 --LOG('*AIExecuteBuildStructure: Yes! Found a place near engineer to Build! - buildingType '..repr(buildingType))
                 break
@@ -257,7 +288,7 @@ function AIExecuteBuildStructure(aiBrain, builder, buildingType, closeToBuilder,
 end
 
 function AIBuildBaseTemplate(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
-    local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
+    local whatToBuild = aibrain_methodsDecideWhatToBuild(aiBrain, builder, buildingType, buildingTemplate)
     if whatToBuild then
         for _,bType in baseTemplate do
             for n,bString in bType[1] do
@@ -282,8 +313,8 @@ function DoHackyLogic(buildingType, builder)
                 aiBrain = builder:GetAIBrain()
                 if unitInstance then
                     TriggerFile.CreateUnitStopBeingBuiltTrigger(function(unitBeingBuilt)
-                        local newPlatoon = aiBrain:MakePlatoon('', '')
-                        aiBrain:AssignUnitsToPlatoon(newPlatoon, {unitBeingBuilt}, 'Attack', 'None')
+                        local newPlatoon = aibrain_methodsMakePlatoon(aiBrain, '', '')
+                        aibrain_methodsAssignUnitsToPlatoon(aiBrain, newPlatoon, {unitBeingBuilt}, 'Attack', 'None')
                         newPlatoon:StopAI()
                         newPlatoon:ForkAIThread(newPlatoon.TacticalAI)
                     end, unitInstance)
@@ -298,7 +329,7 @@ end
 
 function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
     local factionIndex = aiBrain:GetFactionIndex()
-    local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
+    local whatToBuild = aibrain_methodsDecideWhatToBuild(aiBrain, builder, buildingType, buildingTemplate)
     if whatToBuild then
         if IsResource(buildingType) then
             return AIExecuteBuildStructure(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference)
@@ -307,7 +338,7 @@ function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuil
                 for m,bString in bType[1] do
                     if bString == buildingType then
                         for n,position in bType do
-                            if n > 1 and aiBrain:CanBuildStructureAt(whatToBuild, BuildToNormalLocation(position)) then
+                            if n > 1 and aibrain_methodsCanBuildStructureAt(aiBrain, whatToBuild, BuildToNormalLocation(position)) then
                                  AddToBuildQueue(aiBrain, builder, whatToBuild, position, false)
                                  return DoHackyLogic(buildingType, builder)
                             end # if n > 1 and can build structure at
@@ -329,8 +360,8 @@ function AIBuildBaseTemplateFromLocation(baseTemplate, location)
             for rowNum,rowData in template do # rowNum, rowData in template do
                 if type(rowData[1]) == 'number' then
                     baseT[templateNum][rowNum] = {}
-                    baseT[templateNum][rowNum][1] = math.floor(rowData[1] + location[1]) + 0.5
-                    baseT[templateNum][rowNum][2] = math.floor(rowData[2] + location[3]) + 0.5
+                    baseT[templateNum][rowNum][1] = mathFloor(rowData[1] + location[1]) + 0.5
+                    baseT[templateNum][rowNum][2] = mathFloor(rowData[2] + location[3]) + 0.5
                     baseT[templateNum][rowNum][3] = 0
                 else
                     baseT[templateNum][rowNum] = template[rowNum]
@@ -342,12 +373,12 @@ function AIBuildBaseTemplateFromLocation(baseTemplate, location)
 end
 
 function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relative, buildingTemplate, baseTemplate, reference, NearMarkerType)
-    local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
+    local whatToBuild = aibrain_methodsDecideWhatToBuild(aiBrain, builder, buildingType, buildingTemplate)
     if whatToBuild then
-        local unitSize = aiBrain:GetUnitBlueprint(whatToBuild).Physics
+        local unitSize = aibrain_methodsGetUnitBlueprint(aiBrain, whatToBuild).Physics
         local template = {}
-        table.insert(template, {})
-        table.insert(template[1], { buildingType })
+        tableInsert(template, {})
+        tableInsert(template[1], { buildingType })
         for k,v in reference do
             if not v.Dead then
                 local targetSize = v:GetBlueprint().Physics
@@ -360,10 +391,10 @@ function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relat
                     local testPos2 = { targetPos[1] + 1 + (i * 2), targetPos[3]+targetSize.SkirtSizeZ+(unitSize.SkirtSizeZ/2), 0 }
                     -- check if the buildplace is to close to the border or inside buildable area
                     if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
-                        table.insert(template[1], testPos)
+                        tableInsert(template[1], testPos)
                     end
                     if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
-                        table.insert(template[1], testPos2)
+                        tableInsert(template[1], testPos2)
                     end
                 end
                 -- Sides of unit
@@ -371,10 +402,10 @@ function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relat
                     local testPos = { targetPos[1]+targetSize.SkirtSizeX + (unitSize.SkirtSizeX/2), targetPos[3] + 1 + (i * 2), 0 }
                     local testPos2 = { targetPos[1]-(unitSize.SkirtSizeX/2), targetPos[3] + 1 + (i*2), 0 }
                     if testPos[1] > 8 and testPos[1] < ScenarioInfo.size[1] - 8 and testPos[2] > 8 and testPos[2] < ScenarioInfo.size[2] - 8 then
-                        table.insert(template[1], testPos)
+                        tableInsert(template[1], testPos)
                     end
                     if testPos2[1] > 8 and testPos2[1] < ScenarioInfo.size[1] - 8 and testPos2[2] > 8 and testPos2[2] < ScenarioInfo.size[2] - 8 then
-                        table.insert(template[1], testPos2)
+                        tableInsert(template[1], testPos2)
                     end
                 end
             end
@@ -384,7 +415,7 @@ function AIBuildAdjacency(aiBrain, builder, buildingType , closeToBuilder, relat
         if builder.BuildManagerData and builder.BuildManagerData.EngineerManager then
             baseLocation = builder.BuildManagerdata.EngineerManager.Location
         end
-        local location = aiBrain:FindPlaceToBuild(buildingType, whatToBuild, template, false, builder, baseLocation[1], baseLocation[3])
+        local location = aibrain_methodsFindPlaceToBuild(aiBrain, buildingType, whatToBuild, template, false, builder, baseLocation[1], baseLocation[3])
         if location then
             if location[1] > 8 and location[1] < ScenarioInfo.size[1] - 8 and location[2] > 8 and location[2] < ScenarioInfo.size[2] - 8 then
                 --LOG('Build '..repr(buildingType)..' at adjacency: '..repr(location) )
@@ -431,7 +462,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
                             pltnTable[dField] = data
                         end
                     end
-                    table.insert(aiBrain.PBM.Platoons[typeString], pltnTable)
+                    tableInsert(aiBrain.PBM.Platoons[typeString], pltnTable)
                     aiBrain.PBM.NeedSort[typeString] = true
                 end
             end
@@ -456,7 +487,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
         local highPri = false
         for templateName, baseData in BaseBuilderTemplates do
             local baseValue = baseData.ExpansionFunction(aiBrain, position, constructionData.NearMarkerType)
-            table.insert(baseValues, { Base = templateName, Value = baseValue })
+            tableInsert(baseValues, { Base = templateName, Value = baseValue })
             --SPEW('*AI DEBUG: AINewExpansionBase(): Scann next Base. baseValue= ' .. repr(baseValue) .. ' ('..repr(templateName)..')')
             if not highPri or baseValue > highPri then
                 --SPEW('*AI DEBUG: AINewExpansionBase(): Possible next Base. baseValue= ' .. repr(baseValue) .. ' ('..repr(templateName)..')')
@@ -468,15 +499,15 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
         local validNames = {}
         for k,v in baseValues do
             if v.Value == highPri then
-                table.insert(validNames, v.Base)
+                tableInsert(validNames, v.Base)
             end
         end
         --SPEW('*AI DEBUG: AINewExpansionBase(): validNames for Expansions ' .. repr(validNames))
-        local pick = validNames[ Random(1, table.getn(validNames)) ]
+        local pick = validNames[ Random(1, tableGetn(validNames)) ]
 
         # Error if no pick
         if not pick then
-            LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': Layer Preference - ' .. per .. ' - yielded no base types at - ' .. locationType)
+            LOG('*AI DEBUG: ARMY ' .. aibrain_methodsGetArmyIndex(aiBrain) .. ': Layer Preference - ' .. per .. ' - yielded no base types at - ' .. locationType)
         end
 
         # Setup base
@@ -484,7 +515,7 @@ function AINewExpansionBase(aiBrain, baseName, position, builder, constructionDa
         import('/lua/ai/AIAddBuilderTable.lua').AddGlobalBaseTemplate(aiBrain, baseName, pick)
 
         # If air base switch to building an air factory rather than land
-        if (string.find(pick, 'Air') or string.find(pick, 'Water')) then
+        if (stringFind(pick, 'Air') or stringFind(pick, 'Water')) then
             #if constructionData.BuildStructures[1] == 'T1LandFactory' then
             #    constructionData.BuildStructures[1] = 'T1AirFactory'
             #end
@@ -514,8 +545,8 @@ function CheckExpansionType(typeString, typeTable)
 end
 
 function FindNearestIntegers(pos)
-    local x = math.floor(pos[1])
-    local z = math.floor(pos[3])
+    local x = mathFloor(pos[1])
+    local z = mathFloor(pos[3])
     return { x, z }
 end
 
@@ -529,7 +560,7 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
         return
     end
     local i = 2
-    while i <= table.getn(points) do
+    while i <= tableGetn(points) do
         local point1 = FindNearestIntegers(points[i-1])
         local point2 = FindNearestIntegers(points[i])
         #### Horizontal line
@@ -539,8 +570,8 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
             if point1[1] < point2[1] then
                 xDir = 1
             end
-            for j = 1, math.abs(point1[1] - point2[1]) do
-                table.insert(buildTable, { point1[1] + (j * xDir) + .5, point1[2] + .5, 0 })
+            for j = 1, mathAbs(point1[1] - point2[1]) do
+                tableInsert(buildTable, { point1[1] + (j * xDir) + .5, point1[2] + .5, 0 })
             end
         #### Vertical line
         elseif point1[1] == point2[1] then
@@ -548,8 +579,8 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
             if point1[2] < point2[2] then
                 yDir = 1
             end
-            for j = 1, math.abs(point1[2] - point2[2]) do
-                table.insert(buildTable, { point1[1] + .5, point1[2] + (j * yDir) + .5, 0 })
+            for j = 1, mathAbs(point1[2] - point2[2]) do
+                tableInsert(buildTable, { point1[1] + .5, point1[2] + (j * yDir) + .5, 0 })
             end
         #### Angled line
         else
@@ -562,14 +593,14 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
             if point1[1] < point2[1] then
                 xDir = 1
             end
-            for j=1,math.abs(point1[1] - point2[1]) do
-                table.insert(buildTable, { point1[1] + (j * xDir) - .5, (point1[2] + math.floor((angle * xDir) * (j-1)) + .5), 0 })
+            for j=1,mathAbs(point1[1] - point2[1]) do
+                tableInsert(buildTable, { point1[1] + (j * xDir) - .5, (point1[2] + mathFloor((angle * xDir) * (j-1)) + .5), 0 })
             end
         end
         local faction = aiBrain:GetFactionIndex()
-        local whatToBuild = aiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
+        local whatToBuild = aibrain_methodsDecideWhatToBuild(aiBrain, builder, buildingType, buildingTemplate)
         for k,v in buildTable do
-            if aiBrain:CanBuildStructureAt(whatToBuild, BuildToNormalLocation(v)) then
+            if aibrain_methodsCanBuildStructureAt(aiBrain, whatToBuild, BuildToNormalLocation(v)) then
                 #aiBrain:BuildStructure(builder, whatToBuild, v, false)
                 AddToBuildQueue(aiBrain, builder, whatToBuild, v, false)
             end
@@ -583,7 +614,7 @@ function GetBuildingDirection(main, loc)
     local distance = Utils.XZDistanceTwoVectors(main, loc)
     local cutoff = distance / 2
     local direction = {}
-    if math.abs(loc[1] - main[1]) > cutoff then
+    if mathAbs(loc[1] - main[1]) > cutoff then
         if loc[1] > main[1] then
             direction[1] = 1
         else
@@ -592,7 +623,7 @@ function GetBuildingDirection(main, loc)
     else
         direction[1] = 0
     end
-    if math.abs(loc[3] - main[3]) > cutoff then
+    if mathAbs(loc[3] - main[3]) > cutoff then
         if loc[3] > main[3] then
             direction[2] = 1
         else
@@ -603,17 +634,17 @@ function GetBuildingDirection(main, loc)
     end
     local points = {}
     if direction[1] ~= 0 and direction[2] ~= 0 then
-        table.insert(points, { loc[1], loc[2], loc[3] + (direction[2] * 16) })
-        table.insert(points, { loc[1] + (direction[1] * 16), loc[2], loc[3] + (direction[2] * 16) })
-        table.insert(points, { loc[1] + (direction[1] * 16), loc[2], loc[3] })
+        tableInsert(points, { loc[1], loc[2], loc[3] + (direction[2] * 16) })
+        tableInsert(points, { loc[1] + (direction[1] * 16), loc[2], loc[3] + (direction[2] * 16) })
+        tableInsert(points, { loc[1] + (direction[1] * 16), loc[2], loc[3] })
     elseif direction[1] ~= 0 then
-        table.insert(points, { loc[1], loc[2], loc[3] + 16 })
-        table.insert(points, { loc[1] + (direction[1] * 16), loc[2], loc[3] })
-        table.insert(points, { loc[1], loc[2], loc[3] - 16 })
+        tableInsert(points, { loc[1], loc[2], loc[3] + 16 })
+        tableInsert(points, { loc[1] + (direction[1] * 16), loc[2], loc[3] })
+        tableInsert(points, { loc[1], loc[2], loc[3] - 16 })
     else
-        table.insert(points, { loc[1] + 16, loc[2], loc[3] })
-        table.insert(points, { loc[1], loc[2], loc[3] + (direction[1] * 16) })
-        table.insert(points, { loc[1] - 16, loc[2], loc[3] })
+        tableInsert(points, { loc[1] + 16, loc[2], loc[3] })
+        tableInsert(points, { loc[1], loc[2], loc[3] + (direction[1] * 16) })
+        tableInsert(points, { loc[1] - 16, loc[2], loc[3] })
     end
     return points
 end
@@ -658,14 +689,14 @@ function CreateBuildingTemplate(brain, army, name)
                     local inserted = false
                     for k,section in template do
                         if section[1][1] == buildList[1] then
-                            table.insert(section, unitPos)
+                            tableInsert(section, unitPos)
                             list[unit.buildtype].AmountWanted = list[unit.buildtype].AmountWanted + 1
                             inserted = true
                             break
                         end
                     end
                     if not inserted then
-                        table.insert(template, { {buildList[1]}, unitPos })
+                        tableInsert(template, { {buildList[1]}, unitPos })
                         list[unit.buildtype] =  { StructureType = buildList[1], StructureCategory = unit.buildtype, AmountNeeded = 0, AmountWanted = 1, CloseToBuilder = nil }
                     end
                     break
@@ -709,14 +740,14 @@ function AppendBuildingTemplate(brain, army, name, templateName)
                     local inserted = false
                     for k,section in template do # check each section of the template for the right type
                         if section[1][1] == buildList[1] then
-                            table.insert(section, unitPos) # add position of new unit if found
+                            tableInsert(section, unitPos) # add position of new unit if found
                             list[unit.buildtype].AmountWanted = list[unit.buildtype].AmountWanted + 1 # increment num wanted if found
                             inserted = true
                             break
                         end
                     end
                     if not inserted then # if section doesn't exist create new one
-                        table.insert(template, { {buildList[1]}, unitPos }) # add new build type to list with new unit
+                        tableInsert(template, { {buildList[1]}, unitPos }) # add new build type to list with new unit
                         list[unit.buildtype] =  { StructureType = buildList[1], StructureCategory = unit.buildtype, AmountNeeded = 0, AmountWanted = 1, CloseToBuilder = nil } # add new section of build list with new unit type information
                     end
                     break
@@ -727,7 +758,7 @@ function AppendBuildingTemplate(brain, army, name, templateName)
 end
 
 function StructureCheck(unitName)
-    local bp = ArmyBrains[1]:GetUnitBlueprint(unitName)
+    local bp = aibrain_methodsGetUnitBlueprint(ArmyBrains[1], unitName)
     if bp.CategoriesHash.BUILTBYTIER1ENGINEER then
         return true
     elseif bp.CategoriesHash.BUILTBYTIER2ENGINEER then
@@ -743,24 +774,24 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
         buildingTemplate = BuildingTemplates[aiBrain:GetFactionIndex()]
     end
     for k,v in brainBaseTemplate.List do
-        if builder:CanBuild(v.StructureCategory) then
+        if unit_methodsCanBuild(builder, v.StructureCategory) then
             if v.StructureType == 'Resource' or v.StructureType == 'T1HydroCarbon' or v.StructureType == 'T1Resource'
                 or v.StructureType == 'T2Resource' or v.StructureType == 'T3Resource' then
                 for l,type in brainBaseTemplate.Template do
                     if type[1][1] == v.StructureType then
                         for m,location in type do
                             if m > 1 then
-                                if aiBrain:CanBuildStructureAt(v.StructureCategory, BuildToNormalLocation(location)) then
+                                if aibrain_methodsCanBuildStructureAt(aiBrain, v.StructureCategory, BuildToNormalLocation(location)) then
                                     IssueStop({builder})
                                     IssueClearCommands({builder})
-                                    aiBrain:BuildStructure(builder, v.StructureCategory, location, false)
+                                    aibrain_methodsBuildStructure(aiBrain, builder, v.StructureCategory, location, false)
                                     return true
                                 end
                             end
                         end
                     end
                 end
-            elseif aiBrain:FindPlaceToBuild(v.StructureType, v.StructureCategory,  brainBaseTemplate.Template, false, v.CloseToBuilder) then
+            elseif aibrain_methodsFindPlaceToBuild(aiBrain, v.StructureType, v.StructureCategory,  brainBaseTemplate.Template, false, v.CloseToBuilder) then
                 IssueStop({builder})
                 IssueClearCommands({builder})
                 if AIExecuteBuildStructure(aiBrain, builder, v.StructureType , v.CloseToBuilder, false, buildingTemplate, brainBaseTemplate.Template) then

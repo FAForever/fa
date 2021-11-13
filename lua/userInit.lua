@@ -5,11 +5,21 @@
 
 -- Init our language from prefs. This applies to both front-end and session init; for
 -- the Sim init, the engine sets __language for us.
+local ipairs = ipairs
+local stringUpper = string.upper
+local mathMax = math.max
+local mathCeil = math.ceil
+local DiskFindFiles = DiskFindFiles
+local CreatePrefetchSet = CreatePrefetchSet
+local stringGsub = string.gsub
+local mathMin = math.min
+local next = next
+
 __language = GetPreference('options_overrides.language', '')
 -- Build language select options
 __installedlanguages = DiskFindFiles("/loc/", '*strings_db.lua')
 for index, language in __installedlanguages do
-    language =  string.upper(string.gsub(language, ".*/(.*)/.*","%1"))
+    language =  stringUpper(stringGsub(language, ".*/(.*)/.*","%1"))
     __installedlanguages[index] = {text = language, key = language}
 end
 
@@ -35,14 +45,14 @@ function WaitSeconds(n)
     local wait_frames
 
     repeat
-        wait_frames = math.ceil(math.max(1, AvgFPS*0.1, n * AvgFPS))
+        wait_frames = mathCeil(mathMax(1, AvgFPS*0.1, n * AvgFPS))
         WaitFrames(wait_frames)
         elapsed_frames = elapsed_frames + wait_frames
         elapsed_time = CurrentTime() - start
     until elapsed_time >= n
 
     if elapsed_time >= 3 then
-        AvgFPS = math.max(10, math.min(200, math.ceil(elapsed_frames / elapsed_time)))
+        AvgFPS = mathMax(10, mathMin(200, mathCeil(elapsed_frames / elapsed_time)))
     end
 end
 

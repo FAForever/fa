@@ -3,11 +3,15 @@
 -- Utility functions for working with this type of set.
 
 --- Returns a ∪ b as a new set
+local ipairs = ipairs
+local tablePrint = table.print
+local next = next
+
 function Union(a, b)
     local u = {}
 
-    table.print(a)
-    table.print(b)
+    tablePrint(a)
+    tablePrint(b)
 
     for k, v in a do
         u[k] = v or u[k]

@@ -9,6 +9,10 @@
 -- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
+local VDist3 = VDist3
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local VDist2 = VDist2
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
 --------------------------------------------------------------------------------------------------------------
@@ -26,7 +30,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 --------------------------------------------------------------------------------------------------------------
 function MarkerGreaterThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType)
     if not startX and not startZ then
-         startX, startZ = aiBrain:GetArmyStartPos()
+         startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
     end
     local loc
     if threatMin and threatMax and threatRings then
@@ -55,7 +59,7 @@ end
 --------------------------------------------------------------------------------------------------------------
 function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     if not startX and not startZ then
-         startX, startZ = aiBrain:GetArmyStartPos()
+         startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
     end
     local loc
     if threatMin and threatMax and threatRings then

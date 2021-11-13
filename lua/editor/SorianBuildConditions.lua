@@ -7,6 +7,36 @@
 #**             Build conditions always return true or false
 #**
 #****************************************************************************
+local tonumber = tonumber
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local aibrain_methodsGetCurrentEnemy = moho.aibrain_methods.GetCurrentEnemy
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local IsEnemy = IsEnemy
+local aibrain_methodsGetCurrentUnits = moho.aibrain_methods.GetCurrentUnits
+local GetMapSize = GetMapSize
+local unit_methodsGetGuards = moho.unit_methods.GetGuards
+local ipairs = ipairs
+local aibrain_methodsGetEconomyStoredRatio = moho.aibrain_methods.GetEconomyStoredRatio
+local GetGameTimeSeconds = GetGameTimeSeconds
+local type = type
+local IsAlly = IsAlly
+local VDist2Sq = VDist2Sq
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local aibrain_methodsGetNumUnitsAroundPoint = moho.aibrain_methods.GetNumUnitsAroundPoint
+local next = next
+local ParseEntityCategory = ParseEntityCategory
+local aibrain_methodsGetThreatAtPosition = moho.aibrain_methods.GetThreatAtPosition
+local tableEmpty = table.empty
+local aibrain_methodsCanBuildStructureAt = moho.aibrain_methods.CanBuildStructureAt
+local Vector = Vector
+local aibrain_methodsGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local tableGetn = table.getn
+local VDist3 = VDist3
+local ArmyIsCivilian = ArmyIsCivilian
+local VDist2 = VDist2
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -54,7 +84,7 @@ end
 ##############################################################################################################
 
 function IsWaterMap(aiBrain, bool)
-    local startX, startZ = aiBrain:GetArmyStartPos()
+    local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
     local navalMarker = AIUtils.AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
     if navalMarker and bool then
         return true
@@ -73,10 +103,10 @@ end
 ##############################################################################################################
 
 function IsIslandMap(aiBrain, bool)
-    local startX, startZ = aiBrain:GetArmyStartPos()
+    local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
     local enemyX, enemyZ
-    if aiBrain:GetCurrentEnemy() then
-        enemyX, enemyZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
+    if aibrain_methodsGetCurrentEnemy(aiBrain) then
+        enemyX, enemyZ = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyStartPos()
     else
         enemyX, enemyZ = SUtils.GetRandomEnemyPos(aiBrain)
     end
@@ -174,9 +204,9 @@ function EnemyToAllyRatioLessOrEqual(aiBrain, num)
     local enemies = 0
     local allies = 0
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        if v.Result ~= "defeat" and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(v)) and IsEnemy(aibrain_methodsGetArmyIndex(v), aibrain_methodsGetArmyIndex(aiBrain)) then
             enemies = enemies + 1
-        elseif v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsAlly(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
+        elseif v.Result ~= "defeat" and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(v)) and IsAlly(aibrain_methodsGetArmyIndex(v), aibrain_methodsGetArmyIndex(aiBrain)) then
             allies = allies + 1
         end
     end
@@ -193,7 +223,7 @@ function EnemyThreatLessThanValueAtBase(aiBrain, locationType, threatValue, thre
         return false
     end
     local position = FactoryManager:GetLocationCoords()
-    if aiBrain:GetThreatAtPosition(position, testRings, true, threatType or 'Overall') < threatValue then
+    if aibrain_methodsGetThreatAtPosition(aiBrain, position, testRings, true, threatType or 'Overall') < threatValue then
         return true
     end
     return false
@@ -207,18 +237,18 @@ end
 #
 ##############################################################################################################
 function ReclaimablesInArea(aiBrain, locType, threatValue, threatType, rings)
-    if aiBrain:GetEconomyStoredRatio('MASS') > .5 and aiBrain:GetEconomyStoredRatio('ENERGY') > .5 then
+    if aibrain_methodsGetEconomyStoredRatio(aiBrain, 'MASS') > .5 and aibrain_methodsGetEconomyStoredRatio(aiBrain, 'ENERGY') > .5 then
         return false
     end
 
     local testRings = rings or 0
 
     local ents = AIUtils.AIGetReclaimablesAroundLocation(aiBrain, locType)
-    if not ents or table.empty(ents) then
+    if not ents or tableEmpty(ents) then
         return false
     end
     for k,v in ents do
-        if not aiBrain.BadReclaimables[v] and aiBrain:GetThreatAtPosition(v:GetPosition(), testRings, true, threatType or 'Overall') <= threatValue then
+        if not aiBrain.BadReclaimables[v] and aibrain_methodsGetThreatAtPosition(aiBrain, v:GetPosition(), testRings, true, threatType or 'Overall') <= threatValue then
             return true
         end
     end
@@ -234,11 +264,11 @@ end
 #
 ##############################################################################################################
 function ClosestEnemyLessThan(aiBrain, distance)
-    local startX, startZ = aiBrain:GetArmyStartPos()
+    local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
     local closest
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
-            local estartX, estartZ = v:GetArmyStartPos()
+        if v.Result ~= "defeat" and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(v)) and IsEnemy(aibrain_methodsGetArmyIndex(v), aibrain_methodsGetArmyIndex(aiBrain)) then
+            local estartX, estartZ = aibrain_methodsGetArmyStartPos(v)
             local tempDistance = VDist2Sq(startX, startZ, estartX, estartZ)
             if not closest or tempDistance < closest then
                 closest = tempDistance
@@ -269,7 +299,7 @@ end
 
 function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threatMax, threatRings, threatType, startX, startZ)
     if not startX and not startZ then
-         startX, startZ = aiBrain:GetArmyStartPos()
+         startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
     end
     local loc
     if threatMin and threatMax and threatRings then
@@ -278,7 +308,7 @@ function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threat
         loc = AIUtils.AIGetClosestMarkerLocation(aiBrain, markerType, startX, startZ)
     end
     if loc and loc[1] and loc[3] then
-        if VDist2(startX, startZ, loc[1], loc[3]) < distance and aiBrain:CanBuildStructureAt('ueb1102', loc) then
+        if VDist2(startX, startZ, loc[1], loc[3]) < distance and aibrain_methodsCanBuildStructureAt(aiBrain, 'ueb1102', loc) then
             return true
         end
     end
@@ -351,24 +381,24 @@ end
 #
 ##############################################################################################################
 function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, uttype, divideby)
-    local pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
+    local pool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'ArmyPool')
     local engineerManager = aiBrain.BuilderManagers[locationType].EngineerManager
     local divby = divideby or 1
     if not engineerManager then
         return false
     end
 
-    if aiBrain:GetCurrentEnemy() then
-        enemy = aiBrain:GetCurrentEnemy()
-        enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    if aibrain_methodsGetCurrentEnemy(aiBrain) then
+        enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+        enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
     else
         return false
     end
-    local StartX, StartZ = enemy:GetArmyStartPos()
+    local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager.Radius
 
-    local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, ttype or 'Overall', enemyIndex)
+    local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, true, ttype or 'Overall', enemyIndex)
     local Threat = pool:GetPlatoonThreat(uttype or 'Overall', ucat, position, radius)
     if SUtils.Round((Threat / divby), 1) > enemyThreat then
         return true
@@ -385,16 +415,16 @@ end
 #
 ##############################################################################################################
 function LessThanThreatAtEnemyBase(aiBrain, ttype, number)
-    if aiBrain:GetCurrentEnemy() then
-        enemy = aiBrain:GetCurrentEnemy()
-        enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+    if aibrain_methodsGetCurrentEnemy(aiBrain) then
+        enemy = aibrain_methodsGetCurrentEnemy(aiBrain)
+        enemyIndex = aibrain_methodsGetCurrentEnemy(aiBrain):GetArmyIndex()
     else
         return false
     end
 
-    local StartX, StartZ = enemy:GetArmyStartPos()
+    local StartX, StartZ = aibrain_methodsGetArmyStartPos(enemy)
 
-    local enemyThreat = aiBrain:GetThreatAtPosition({StartX, 0, StartZ}, 1, true, ttype or 'Overall', enemyIndex)
+    local enemyThreat = aibrain_methodsGetThreatAtPosition(aiBrain, {StartX, 0, StartZ}, 1, true, ttype or 'Overall', enemyIndex)
     if number < enemyThreat then
         return true
     end
@@ -422,7 +452,7 @@ function GreaterThanEnemyUnitsAroundBase(aiBrain, locationtype, numUnits, unitCa
     if type(unitCat) == 'string' then
         unitCat = ParseEntityCategory(unitCat)
     end
-    local Units = aiBrain:GetNumUnitsAroundPoint(unitCat, engineerManager:GetLocationCoords(), radius, 'Enemy')
+    local Units = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, unitCat, engineerManager:GetLocationCoords(), radius, 'Enemy')
     if Units > numUnits then
         return true
     end
@@ -442,10 +472,10 @@ function UnfinishedUnits(aiBrain, locationType, category)
     if not engineerManager then
         return false
     end
-    local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
+    local unfinished = aibrain_methodsGetUnitsAroundPoint(aiBrain, category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in unfinished do
         donePercent = unit:GetFractionComplete()
-        if donePercent < 1 and SUtils.GetGuards(aiBrain, unit) < 1 then
+        if donePercent < 1 and unit_methodsGetGuards(aiBrain, unit) < 1 then
             return true
         end
     end
@@ -464,11 +494,11 @@ function ShieldDamaged(aiBrain, locationType)
     if not engineerManager then
         return false
     end
-    local shields = aiBrain:GetUnitsAroundPoint(categories.STRUCTURE * categories.SHIELD, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
+    local shields = aibrain_methodsGetUnitsAroundPoint(aiBrain, categories.STRUCTURE * categories.SHIELD, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in shields do
         if not unit.Dead and unit:ShieldIsOn() then
             shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
-            if shieldPercent < 1 and SUtils.GetGuards(aiBrain, unit) < 3 then
+            if shieldPercent < 1 and unit_methodsGetGuards(aiBrain, unit) < 3 then
                 return true
             end
         end
@@ -509,10 +539,10 @@ function HaveComparativeUnitsWithCategoryAndAlliance(aiBrain, greater, myCategor
     if type(myCategory) == 'string' then
         myCategory = ParseEntityCategory(myCategory)
     end
-    local myUnits = aiBrain:GetCurrentUnits(myCategory)
-    local numUnits = aiBrain:GetNumUnitsAroundPoint(eCategory, Vector(0,0,0), 100000, alliance)
+    local myUnits = aibrain_methodsGetCurrentUnits(aiBrain, myCategory)
+    local numUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, eCategory, Vector(0,0,0), 100000, alliance)
     if alliance == 'Ally' then
-        numUnits = numUnits - aiBrain:GetCurrentUnits(myCategory)
+        numUnits = numUnits - aibrain_methodsGetCurrentUnits(aiBrain, myCategory)
     end
     if numUnits > myUnits and greater then
         return true
@@ -529,10 +559,10 @@ function HaveRatioUnitsWithCategoryAndAlliance(aiBrain, less, ratio, myCategory,
     if type(myCategory) == 'string' then
         myCategory = ParseEntityCategory(myCategory)
     end
-    local myUnits = aiBrain:GetCurrentUnits(myCategory)
-    local numUnits = aiBrain:GetNumUnitsAroundPoint(eCategory, Vector(0,0,0), 100000, alliance)
+    local myUnits = aibrain_methodsGetCurrentUnits(aiBrain, myCategory)
+    local numUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, eCategory, Vector(0,0,0), 100000, alliance)
     if alliance == 'Ally' then
-        numUnits = numUnits - aiBrain:GetCurrentUnits(myCategory)
+        numUnits = numUnits - aibrain_methodsGetCurrentUnits(aiBrain, myCategory)
     end
     if numUnits / myUnits <= ratio and less then
         return true
@@ -553,10 +583,10 @@ function HaveComparativeUnitsWithCategoryAndAllianceAtLocation(aiBrain, location
     if not engineerManager then
         return false
     end
-    local myUnits = table.getn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, myCategory, engineerManager:GetLocationCoords(), engineerManager.Radius))
-    local numUnits = aiBrain:GetNumUnitsAroundPoint(eCategory, Vector(0,0,0), 100000, alliance)
+    local myUnits = tableGetn(AIUtils.GetOwnUnitsAroundPoint(aiBrain, myCategory, engineerManager:GetLocationCoords(), engineerManager.Radius))
+    local numUnits = aibrain_methodsGetNumUnitsAroundPoint(aiBrain, eCategory, Vector(0,0,0), 100000, alliance)
     if alliance == 'Ally' then
-        numUnits = numUnits - aiBrain:GetCurrentUnits(myCategory)
+        numUnits = numUnits - aibrain_methodsGetCurrentUnits(aiBrain, myCategory)
     end
     if numUnits > myUnits and greater then
         return true
@@ -574,7 +604,7 @@ end
 #
 ##############################################################################################################
 function CmdrHasUpgrade(aiBrain, upgrade, has)
-    local units = aiBrain:GetListOfUnits(categories.COMMAND, false)
+    local units = aibrain_methodsGetListOfUnits(aiBrain, categories.COMMAND, false)
     for k,v in units do
         if v:HasEnhancement(upgrade) and has then
             return true
@@ -586,10 +616,10 @@ function CmdrHasUpgrade(aiBrain, upgrade, has)
 end
 
 function SCUNeedsUpgrade(aiBrain, upgrade)
-    local units = aiBrain:GetListOfUnits(categories.SUBCOMMANDER, false)
+    local units = aibrain_methodsGetListOfUnits(aiBrain, categories.SUBCOMMANDER, false)
     local needsUpgrade = false
     for k,v in units do
-        if v:IsUnitState('Upgrading') then
+        if unit_methodsIsUnitState(v, 'Upgrading') then
             return false
         end
         if not v:HasEnhancement(upgrade) then
@@ -608,7 +638,7 @@ function T4ThreatExists(aiBrain, t4types, t4cats)
     if type(t4cats) == 'string' then
         t4cats = ParseEntityCategory(t4cats)
     end
-    if aiBrain:GetNumUnitsAroundPoint(categories.EXPERIMENTAL * t4cats, Vector(0,0,0), 100000, 'Enemy') > 0 then
+    if aibrain_methodsGetNumUnitsAroundPoint(aiBrain, categories.EXPERIMENTAL * t4cats, Vector(0,0,0), 100000, 'Enemy') > 0 then
         for k,v in t4types do
             aiBrain.T4ThreatFound[v] = true
         end
@@ -628,16 +658,16 @@ end
 
 function TargetHasLessThanUnitsWithCategory(aiBrain, numReq, category)
     local testCat = category
-    local enemyBrain = aiBrain:GetCurrentEnemy()
+    local enemyBrain = aibrain_methodsGetCurrentEnemy(aiBrain)
     local count = 0
     if not enemyBrain then
         return false
     end
-    local enemyIndex = enemyBrain:GetArmyIndex()
+    local enemyIndex = aibrain_methodsGetArmyIndex(enemyBrain)
     if type(category) == 'string' then
         testCat = ParseEntityCategory(category)
     end
-    local eUnits = aiBrain:GetUnitsAroundPoint(testCat, Vector(0,0,0), 100000, 'Enemy')
+    local eUnits = aibrain_methodsGetUnitsAroundPoint(aiBrain, testCat, Vector(0,0,0), 100000, 'Enemy')
     for k,v in eUnits do
         if v:GetAIBrain():GetArmyIndex() == enemyIndex then
             count = count + 1
@@ -651,16 +681,16 @@ end
 
 function TargetHasGreaterThanUnitsWithCategory(aiBrain, numReq, category)
     local testCat = category
-    local enemyBrain = aiBrain:GetCurrentEnemy()
+    local enemyBrain = aibrain_methodsGetCurrentEnemy(aiBrain)
     local count = 0
     if not enemyBrain then
         return false
     end
-    local enemyIndex = enemyBrain:GetArmyIndex()
+    local enemyIndex = aibrain_methodsGetArmyIndex(enemyBrain)
     if type(category) == 'string' then
         testCat = ParseEntityCategory(category)
     end
-    local eUnits = aiBrain:GetUnitsAroundPoint(testCat, Vector(0,0,0), 100000, 'Enemy')
+    local eUnits = aibrain_methodsGetUnitsAroundPoint(aiBrain, testCat, Vector(0,0,0), 100000, 'Enemy')
     for k,v in eUnits do
         if v:GetAIBrain():GetArmyIndex() == enemyIndex then
             count = count + 1
@@ -699,8 +729,8 @@ function EnemyInT3ArtilleryRange(aiBrain, locationtype, inrange)
         radius = 825 + offset
     end
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and not ArmyIsCivilian(v:GetArmyIndex()) and IsEnemy(v:GetArmyIndex(), aiBrain:GetArmyIndex()) then
-            local estartX, estartZ = v:GetArmyStartPos()
+        if v.Result ~= "defeat" and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(v)) and IsEnemy(aibrain_methodsGetArmyIndex(v), aibrain_methodsGetArmyIndex(aiBrain)) then
+            local estartX, estartZ = aibrain_methodsGetArmyStartPos(v)
             if (VDist2Sq(start[1], start[3], estartX, estartZ) <= radius * radius) and inrange then
                 return true
             elseif (VDist2Sq(start[1], start[3], estartX, estartZ) > radius * radius) and not inrange then
@@ -727,7 +757,7 @@ function AIOutnumbered(aiBrain, bool)
     end
 
     for k,v in ArmyBrains do
-        if v.Result ~= "defeat" and aiBrain:GetArmyIndex() ~= v:GetArmyIndex() and not ArmyIsCivilian(v:GetArmyIndex()) then
+        if v.Result ~= "defeat" and aibrain_methodsGetArmyIndex(aiBrain) ~= aibrain_methodsGetArmyIndex(v) and not ArmyIsCivilian(aibrain_methodsGetArmyIndex(v)) then
             local armyTeam = ScenarioInfo.ArmySetup[v.Name].Team
             #LOG('*AI DEBUG: '..v.Nickname..' is on team '..armyTeam)
             if v.CheatEnabled then

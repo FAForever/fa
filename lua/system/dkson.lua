@@ -33,6 +33,13 @@
 --SOFTWARE.
 
 -- global dependencies:
+local ipairs = ipairs
+local tostring = tostring
+local tonumber = tonumber
+local tableGetn = table.getn
+local next = next
+local type = type
+
 local pairs, type, tostring, tonumber, getmetatable, setmetatable, rawset =
 pairs, type, tostring, tonumber, getmetatable, setmetatable, rawset
 local error, require, pcall = error, require, pcall
@@ -187,7 +194,7 @@ end
 function json.addnewline (state)
     if state.indent then
         state.bufferlen = addnewline2 (state.level or 0,
-            state.buffer, state.bufferlen or table.getn(state.buffer))
+            state.buffer, state.bufferlen or tableGetn(state.buffer))
     end
 end
 
@@ -294,7 +301,7 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder, s
             local order = valmeta and valmeta.__jsonorder or globalorder
             if order then
                 local used = {}
-                n = table.getn(order)
+                n = tableGetn(order)
                 for i = 1, n do
                     local k = order[i]
                     local v = value[k]

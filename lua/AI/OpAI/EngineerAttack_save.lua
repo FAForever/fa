@@ -1,5 +1,10 @@
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local scenarioframeworkUp = import('/lua/scenarioframework.lua')
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local tableGetn = table.getn
+
 function EngineerAttackChildCount(aiBrain, master, number)
-    local ScenarioFramework = import('/lua/scenarioframework.lua')
+    local ScenarioFramework = scenarioframeworkUp
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
 
     if counter < 1 then
@@ -10,7 +15,7 @@ function EngineerAttackChildCount(aiBrain, master, number)
 end
 
 function EngineerAttackMasterCount(aiBrain, master, number)
-    local ScenarioFramework = import('/lua/scenarioframework.lua')
+    local ScenarioFramework = scenarioframeworkUp
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
 
     if counter >= 1 then
@@ -21,9 +26,9 @@ function EngineerAttackMasterCount(aiBrain, master, number)
 end
 
 function NeedEngineerTransports(aiBrain, masterName, locationName)
-    local transportPool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
+    local transportPool = aibrain_methodsGetPlatoonUniquelyNamed(aiBrain, 'TransportPool')
 
-    return not (transportPool and table.getn(transportPool:GetPlatoonUnits()) > 2)
+    return not (transportPool and tableGetn(platoon_methodsGetPlatoonUnits(transportPool)) > 2)
 end
 
 

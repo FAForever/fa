@@ -11,6 +11,9 @@
 #**
 #****************************************************************************
 
+local entity_methodsGetBlueprint = moho.entity_methods.GetBlueprint
+local WARN = WARN
+
 local Game = import('/lua/game.lua')
 local BuffField = import('/lua/sim/BuffField.lua').BuffField
 
@@ -18,7 +21,7 @@ DefaultBuffField = Class(BuffField) {
     FieldVisualEmitter = '/effects/emitters/seraphim_regenerative_aura_01_emit.bp',
 
     OnCreate = function(self)
-        local bp = self:GetBlueprint()
+        local bp = entity_methodsGetBlueprint(self)
         if bp.EnabledOnCreate then
             # a warning of obsoleteness. delete this in v5
             WARN('BuffField: obsolete blueprint variable "EnabledOnCreate" used in '..repr(self.Name)..'. Use "InitiallyEnabled" instead.')

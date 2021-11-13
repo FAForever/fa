@@ -16,13 +16,48 @@
 --     3b. The saved lua state is deserialized
 -- ==========================================================================================
 
--- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
+
+-- Do global initialization and set up common global functions
+local tableShuffle = table.shuffle
+local unitsrestrictionsUp = import('/lua/ui/lobby/UnitsRestrictions.lua')
+local entityUp = import('/lua/sim/Entity.lua')
+local tableFind = table.find
+local doscript = doscript
+local CPrefetchSetUpdate = moho.CPrefetchSet.Update
+local DiskFindFiles = DiskFindFiles
+local tableInsert = table.insert
+local ipairs = ipairs
+local scenarioutilitiesUp = import('/lua/sim/ScenarioUtilities.lua')
+local tablePrint = table.print
+local CreateEmitterAtBone = CreateEmitterAtBone
+local GetGameTimeSeconds = GetGameTimeSeconds
+local categoryutilsUp = import('/lua/sim/Categoryutils.lua')
+local SetAlliance = SetAlliance
+local InitializeArmyAI = InitializeArmyAI
+local GetFocusArmy = GetFocusArmy
+local IsGameOver = IsGameOver
+local effecttemplatesUp = import ('/lua/EffectTemplates.lua')
+local AddBuildRestriction = AddBuildRestriction
+local ArmyInitializePrebuiltUnits = ArmyInitializePrebuiltUnits
+local ForkThread = ForkThread
+local OrientFromDir = OrientFromDir
+local next = next
+local tableEmpty = table.empty
+local mathMax = math.max
+local Warp = Warp
+local tableGetn = table.getn
+local mathFloor = math.floor
+local stringFormat = string.format
+local LOG = LOG
+local CreatePrefetchSet = CreatePrefetchSet
+local lobbyoptionsUp = import('/lua/ui/lobby/lobbyOptions.lua')
+local SPEW = SPEW
 
 WaitTicks = coroutine.yield
 
 function WaitSeconds(n)
-    local ticks = math.max(1, n * 10)
+    local ticks = mathMax(1, n * 10)
     if ticks > 1 then
         ticks = ticks + 1
     end
@@ -51,8 +86,8 @@ function ShuffleStartPositions(syncNewPositions)
             end
         end
 
-        local shuffledGroup = table.shuffle(group)
-        for i = 1, table.getn(group) do
+        local shuffledGroup = tableShuffle(group)
+        for i = 1, tableGetn(group) do
             local pos = positions[shuffledGroup[i]].pos
             local name = positions[group[i]].name
             if pos and markers[name] then
@@ -115,7 +150,7 @@ function SetupSession()
 
     --Check if ShareOption is valid, and if not then set it to ShareUntilDeath
     local shareOption = ScenarioInfo.Options.Share
-    local globalOptions = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+    local globalOptions = lobbyoptionsUp.globalOpts
     local shareOptions = {}
     for _,globalOption in globalOptions do
         if globalOption.key == 'Share' then
@@ -134,8 +169,8 @@ function SetupSession()
 
     local restrictions = ScenarioInfo.Options.RestrictedCategories
     if restrictions then
-        table.print(restrictions, 'RestrictedCategories')
-        local presets = import('/lua/ui/lobby/UnitsRestrictions.lua').GetPresetsData()
+        tablePrint(restrictions, 'RestrictedCategories')
+        local presets = unitsrestrictionsUp.GetPresetsData()
         for index, restriction in restrictions do
 
             local preset = presets[restriction]
@@ -161,7 +196,7 @@ function SetupSession()
                 end
                 if preset.enhancements then
                     LOG('restriction.enhancement "'.. restriction .. '"')
-                    table.print(preset.enhancements, 'restriction.enhancements ')
+                    tablePrint(preset.enhancements, 'restriction.enhancements ')
                     for _, enhancement in preset.enhancements do
                         enhRestrictions[enhancement] = true
                     end
@@ -172,13 +207,13 @@ function SetupSession()
 
     if buildRestrictions then
         LOG('restriction.build '.. buildRestrictions)
-        buildRestrictions = import('/lua/sim/Categoryutils.lua').ParseEntityCategoryProperly(buildRestrictions)
+        buildRestrictions = categoryutilsUp.ParseEntityCategoryProperly(buildRestrictions)
         -- add global build restrictions for all armies
         import('/lua/game.lua').AddRestriction(buildRestrictions)
         ScenarioInfo.BuildRestrictions = buildRestrictions
     end
 
-    if not table.empty(enhRestrictions) then
+    if not tableEmpty(enhRestrictions) then
         --table.print(enhRestrictions, 'enhRestrictions ')
         import('/lua/enhancementcommon.lua').RestrictList(enhRestrictions)
     end
@@ -193,11 +228,11 @@ function SetupSession()
     Scenario = ScenarioInfo.Env.Scenario
 
     local spawn = ScenarioInfo.Options.TeamSpawn
-    if spawn and table.find({'random_reveal', 'balanced_reveal', 'balanced_flex_reveal'}, spawn) then
+    if spawn and tableFind({'random_reveal', 'balanced_reveal', 'balanced_flex_reveal'}, spawn) then
         -- Shuffles positions like normal but syncs the new positions to the UI
         syncStartPositions = {}
         ShuffleStartPositions(true)
-    elseif spawn and table.find({'random', 'balanced', 'balanced_flex'}, spawn) then
+    elseif spawn and tableFind({'random', 'balanced', 'balanced_flex'}, spawn) then
         -- Prevents players from knowing start positions at start
         ShuffleStartPositions(false)
     end
@@ -277,7 +312,7 @@ function BeginSession()
             if not teams[army.Team] then
                 teams[army.Team] = {}
             end
-            table.insert(teams[army.Team],army.ArmyIndex)
+            tableInsert(teams[army.Team],army.ArmyIndex)
         end
     end
 
@@ -299,9 +334,9 @@ function BeginSession()
     end
 
     -- Create any effect markers on map
-    local markers = import('/lua/sim/ScenarioUtilities.lua').GetMarkers()
-    local Entity = import('/lua/sim/Entity.lua').Entity
-    local EffectTemplate = import ('/lua/EffectTemplates.lua')
+    local markers = scenarioutilitiesUp.GetMarkers()
+    local Entity = entityUp.Entity
+    local EffectTemplate = effecttemplatesUp
     if markers then
         for k, v in markers do
             if v.type == 'Effect' then
@@ -331,10 +366,10 @@ function GameTimeLogger()
     local time
     while true do
         GTS = GetGameTimeSeconds()
-        hours   = math.floor(GTS / 3600);
-        minutes = math.floor((GTS - (hours * 3600)) / 60);
+        hours   = mathFloor(GTS / 3600);
+        minutes = mathFloor((GTS - (hours * 3600)) / 60);
         seconds = GTS - (hours * 3600) - (minutes * 60);
-        SPEW(string.format('Current gametime: %02d:%02d:%02d', hours, minutes, seconds))
+        SPEW(stringFormat('Current gametime: %02d:%02d:%02d', hours, minutes, seconds))
         WaitSeconds(30)
     end
 end
@@ -370,7 +405,7 @@ function DefaultPrefetchSet()
     return set
 end
 
-Prefetcher:Update(DefaultPrefetchSet())
+CPrefetchSetUpdate(Prefetcher, DefaultPrefetchSet())
 
 function AIModTemplatesPreloader()
     local simMods = __active_mods or {}

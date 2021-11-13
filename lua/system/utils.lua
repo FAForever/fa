@@ -6,6 +6,25 @@
 
 
 -- upvalue globals for performance
+local tostring = tostring
+local stringLen = string.len
+local mathAbs = math.abs
+local tableConcat = table.concat
+local stringLower = string.lower
+local tableInsert = table.insert
+local ipairs = ipairs
+local pairs = pairs
+local mathMax = math.max
+local stringFormat = string.format
+local mathFloor = math.floor
+local tableGetn = table.getn
+local LOG = LOG
+local stringSub = string.sub
+local WARN = WARN
+local stringGsub = string.gsub
+local mathPow = math.pow
+local mathMin = math.min
+
 local type = type 
 local pcall = pcall 
 local unpack = unpack 
@@ -285,7 +304,7 @@ end
 function table.concatkeys(t, sep)
     sep = sep or ", "
     local tt = table.keys(t)
-    return table.concat(tt,sep)
+    return tableConcat(tt,sep)
 end
 
 --- Iterates over a table in key-sorted order:
@@ -442,7 +461,7 @@ function table.binsert(t, value, cmp)
       local cmp = cmp or (function(a,b) return a < b end)
       local start, stop, mid, state = 1, table.getsize(t), 1, 0
       while start <= stop do
-         mid = math.floor((start + stop) / 2)
+         mid = mathFloor((start + stop) / 2)
          if cmp(value, t[mid]) then
             stop, state = mid - 1, 0
          else
@@ -552,14 +571,14 @@ end
 --- "explode" a string into a series of tokens, using a separator character `sep`
 function StringSplit(str, sep)
     local sep, fields = sep or ":", {}
-    local pattern = string.format("([^%s]+)", sep)
-    str:gsub(pattern, function(c) fields[table.getn(fields)+1] = c end)
+    local pattern = stringFormat("([^%s]+)", sep)
+    stringGsub(str, pattern, function(c) fields[tableGetn(fields)+1] = c end)
     return fields
 end
 
 --- Returns true if the string starts with the specified value
 function StringStartsWith(stringToMatch, valueToSeek)
-    return stringToMatch:sub(1, valueToSeek:len()) == valueToSeek
+    return stringSub(stringToMatch, 1, stringLen(valueToSeek)) == valueToSeek
 end
 
 --- Extracts a string between two specified strings
@@ -576,7 +595,7 @@ end
 function StringComma(value)
     local str = value or 0
     while true do
-      str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
+      str, k = stringGsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
       if k == 0 then
         break
       end
@@ -593,24 +612,24 @@ end
 --- Splits a string with camel case to a string with separate words
 --- e.g. StringSplitCamel('SupportCommanderUnit') -> 'Support Commander Unit'
 function StringSplitCamel(str)
-    local first = str:sub(1, 1)
-    local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
-    return split:gsub("^.", string.upper)
+    local first = stringSub(str, 1, 1)
+    local split = first .. stringSub(str, 2):gsub("[A-Z]", StringPrepend)
+    return stringGsub(split, "^.", string.upper)
 end
 
 --- Reverses order of letters for specified string
 --- e.g. StringReverse('abc123') --> 321cba
 function StringReverse(str)
     local tbl =  {}
-    str:gsub(".", function(c) table.insert(tbl,c) end)
+    stringGsub(str, ".", function(c) tableInsert(tbl,c) end)
     tbl = table.reverse(tbl)
-    return table.concat(tbl)
+    return tableConcat(tbl)
 end
 
 --- Capitalizes each word in specified string
 --- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
 function StringCapitalize(str)
-    return string.gsub(" "..str, "%W%l", string.upper):sub(2)
+    return stringGsub(" "..str, "%W%l", string.upper):sub(2)
 end
 
 --- Check if a given string starts with specified string
@@ -620,7 +639,7 @@ end
 
 --- Check if a given string ends with specified string
 function StringEnds(str, endString)
-   return endString == '' or str:sub(-endString:len()) == endString
+   return endString == '' or stringSub(str, -stringLen(endString)) == endString
 end
 
 --- Sorts two variables based on their numeric value or alpha order (strings)
@@ -629,14 +648,14 @@ function Sort(itemA, itemB)
 
     if type(itemA) == "string" or
        type(itemB) == "string" then
-        if itemA:lower() == itemB:lower() then
+        if stringLower(itemA) == stringLower(itemB) then
             return 0
         else
             -- sort string using alpha order
-            return itemA:lower() < itemB:lower()
+            return stringLower(itemA) < stringLower(itemB)
         end
     else
-       if math.abs(itemA - itemB) < 0.0001 then
+       if mathAbs(itemA - itemB) < 0.0001 then
             return 0
        else
             -- sort numbers in decreasing order
@@ -648,16 +667,16 @@ end
 -- Rounds a number to specified double precision
 function math.round(num,idp)
     if not idp then
-        return math.floor(num+.5)
+        return mathFloor(num+.5)
     end
 
-    idp = math.pow(10,idp)
-    return math.floor(num*idp+.5)/idp
+    idp = mathPow(10,idp)
+    return mathFloor(num*idp+.5)/idp
 end
 
 --- Clamps numeric value to specified Min and Max range
 function math.clamp(v, min, max)
-    return math.max(min, math.min(max, v))
+    return mathMax(min, mathMin(max, v))
 end
 
 -- Return a table parsed from key:value pairs passed on the command line
@@ -762,7 +781,7 @@ function CreateTimer()
             elseif not self.tasks[name].stop then
                 WARN('Timer cannot get time duration for not stopped task: ' ..  tostring(name))
             else
-                ret = string.format("%0.3f seconds", self.tasks[name].time)
+                ret = stringFormat("%0.3f seconds", self.tasks[name].time)
             end
             return ret
         end,
@@ -773,7 +792,7 @@ function CreateTimer()
             if not self.tasks[name].delta then
                 WARN('Timer cannot get time delta after just one profiling of task: ' ..  tostring(name))
             else
-                ret = string.format("%0.3f seconds", self.tasks[name].delta)
+                ret = stringFormat("%0.3f seconds", self.tasks[name].delta)
                 if self.tasks[name].delta > 0 then
                     ret = '+' .. ret
                 end
@@ -787,7 +806,7 @@ function CreateTimer()
             if not self.tasks[name].start then
                 WARN('Timer cannot get time total for not started task: ' ..  tostring(name))
             else
-                ret = string.format("%0.3f seconds", self.tasks[name].total)
+                ret = stringFormat("%0.3f seconds", self.tasks[name].total)
             end
             return ret
         end,

@@ -1,6 +1,25 @@
 -- This is the primary hotbuild file. It controls what happens when a hotbuild action is clicked
 -- It also controls the cycle UI
 
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local stringUpper = string.upper
+local tableDeepcopy = table.deepcopy
+local tableFind = table.find
+local ForkThread = ForkThread
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local KillThread = KillThread
+local tableEmpty = table.empty
+local tableGetsize = table.getsize
+local unitkeygroupsUp = import('/lua/keymap/unitkeygroups.lua')
+local type = type
+local tableGetn = table.getn
+local LOG = LOG
+local EntityCategoryGetUnitList = EntityCategoryGetUnitList
+local stringGsub = string.gsub
+local EntityCategoryContains = EntityCategoryContains
+
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
@@ -134,23 +153,23 @@ end
 
 -- Non state changing getters
 function getUnitKeyGroups()
-    local btSource = import('/lua/keymap/unitkeygroups.lua').unitkeygroups
+    local btSource = unitkeygroupsUp.unitkeygroups
     local groups = {}
     for name, values in btSource do
         groups[name] = {}
         for i, value in values do
             if nil ~= __blueprints[value] then
-                table.insert(groups[name], value)
+                tableInsert(groups[name], value)
             elseif nil ~= btSource[value] then
                 for i, realValue in btSource[value] do
                     if nil ~= __blueprints[realValue] then
-                        table.insert(groups[name], realValue)
+                        tableInsert(groups[name], realValue)
                     else
                         LOG("!!!!! Invalid indirect building value " .. value .. " -> " .. realValue)
                     end
                 end
             elseif value == '_upgrade' or value == '_templates' or value == '_factory_templates' then
-                table.insert(groups[name], value)
+                tableInsert(groups[name], value)
             else
                 LOG("!!!!! Invalid building value " .. value)
             end
@@ -161,7 +180,7 @@ end
 
 function addModifiers()
     -- generating modifiers shortcuts on the fly.
-    modifiersKeys = import('/lua/keymap/keymapper.lua').GenerateHotbuildModifiers()
+    modifiersKeys = KeyMapper.GenerateHotbuildModifiers()
     IN_AddKeyMapTable(modifiersKeys)
 end
 
@@ -241,12 +260,12 @@ function availableTemplate(allTemplates,buildable)
         for _, entry in template.templateData do
             if type(entry) == 'table' then
                 if entry.id then
-                    if not table.find(buildable, entry.id) then -- factory templates
+                    if not tableFind(buildable, entry.id) then -- factory templates
                         valid = false
                         break
                     end
                 else
-                    if not table.find(buildable, entry[1]) then -- build templates
+                    if not tableFind(buildable, entry[1]) then -- build templates
                         valid = false
                         break
                     end
@@ -255,8 +274,8 @@ function availableTemplate(allTemplates,buildable)
         end
         if valid then
             template.templateID = templateIndex
-            table.insert(effectiveTemplates, template)
-            table.insert(effectiveIcons, template.icon)
+            tableInsert(effectiveTemplates, template)
+            tableInsert(effectiveIcons, template.icon)
         end
     end
     return effectiveTemplates, effectiveIcons
@@ -321,7 +340,7 @@ function buildAction(name)
     local selection = GetSelectedUnits()
     if selection then
         -- If current selection is engineer or commander or megalith
-        if not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) or not table.empty(EntityCategoryFilterDown(categories.FACTORY * categories.EXPERIMENTAL * categories.CYBRAN, selection)) then
+        if not tableEmpty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE, selection)) or not tableEmpty(EntityCategoryFilterDown(categories.FACTORY * categories.EXPERIMENTAL * categories.CYBRAN, selection)) then
             buildActionBuilding(name, modifier)
         else -- Buildqueue or normal applying all the command
             buildActionUnit(name, modifier)
@@ -335,7 +354,7 @@ function buildActionBuilding(name, modifier)
     local allValues = unitkeygroups[name]
     local effectiveValues = {}
 
-    if table.find(allValues, "_templates") then
+    if tableFind(allValues, "_templates") then
         return buildActionTemplate(modifier)
     end
 
@@ -350,12 +369,12 @@ function buildActionBuilding(name, modifier)
     for _, value in allValues do
         for i, buildableValue in buildable do
             if value == buildableValue then
-                table.insert(effectiveValues, value)
+                tableInsert(effectiveValues, value)
             end
         end
     end
 
-    local maxPos = table.getsize(effectiveValues)
+    local maxPos = tableGetsize(effectiveValues)
     if maxPos == 0 then
         return
     end
@@ -379,7 +398,7 @@ function buildActionFactoryTemplate(modifier)
     -- Find all avaiable templates
     local allFactoryTemplates = FactoryTemplates.GetTemplates()
 
-    if (not allFactoryTemplates) or table.empty(allFactoryTemplates) then
+    if (not allFactoryTemplates) or tableEmpty(allFactoryTemplates) then
         return
     end
 
@@ -389,7 +408,7 @@ function buildActionFactoryTemplate(modifier)
 
     effectiveTemplates, effectiveIcons = availableTemplate(allFactoryTemplates, buildable)
 
-    local maxPos = table.getsize(effectiveTemplates)
+    local maxPos = tableGetsize(effectiveTemplates)
     if maxPos == 0 then
         return
     end
@@ -424,7 +443,7 @@ function buildActionTemplate(modifier)
     local effectiveIcons = {}
     local allTemplates = Templates.GetTemplates()
 
-    if (not allTemplates) or table.empty(allTemplates) then
+    if (not allTemplates) or tableEmpty(allTemplates) then
         return
     end
 
@@ -442,9 +461,9 @@ function buildActionTemplate(modifier)
                 ["CYBRAN"] = {"urb", "xrb", "drb"},
                 ["SERAPHIM"] = {"xsb", "usb", "dsb"},
             }
-            for i, prefix in prefixes[string.upper(currentFaction)] do
-                if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
-                    return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
+            for i, prefix in prefixes[stringUpper(currentFaction)] do
+                if tableFind(buildableUnits, stringGsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
+                    return stringGsub(BPID, "(%a+)(%d+)", prefix .. "%2")
                 end
             end
             return false
@@ -454,10 +473,10 @@ function buildActionTemplate(modifier)
             local converted = false
             for _, entry in template.templateData do
                 if type(entry) == 'table' then
-                    if not table.find(buildableUnits, entry[1]) then
+                    if not tableFind(buildableUnits, entry[1]) then
                         entry[1] = ConvertID(entry[1])
                         converted = true
-                        if not table.find(buildableUnits, entry[1]) then
+                        if not tableFind(buildableUnits, entry[1]) then
                             valid = false
                             break
                         end
@@ -469,15 +488,15 @@ function buildActionTemplate(modifier)
                     template.icon = ConvertID(template.icon)
                 end
                 template.templateID = templateIndex
-                table.insert(effectiveTemplates, template)
-            table.insert(effectiveIcons, template.icon)
+                tableInsert(effectiveTemplates, template)
+            tableInsert(effectiveIcons, template.icon)
             end
         end
     else
         effectiveTemplates, effectiveIcons = availableTemplate(allTemplates,buildableUnits)
     end
 
-    local maxPos = table.getsize(effectiveTemplates)
+    local maxPos = tableGetsize(effectiveTemplates)
     if maxPos == 0 then
         return
     end
@@ -495,16 +514,16 @@ function buildActionTemplate(modifier)
 
     if options.gui_template_rotator ~= 0 then
         -- Rotating templates
-        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+        local worldview = worldview
         local oldHandleEvent = worldview.HandleEvent
         worldview.HandleEvent = function(self, event)
             if event.Type == 'ButtonPress' then
                 if event.Modifiers.Middle then
                     ClearBuildTemplates()
-                    local tempTemplate = table.deepcopy(template.templateData)
+                    local tempTemplate = tableDeepcopy(template.templateData)
                     template.templateData[1] = tempTemplate[2]
                     template.templateData[2] = tempTemplate[1]
-                    for i = 3, table.getn(template.templateData) do
+                    for i = 3, tableGetn(template.templateData) do
                         local index = i
                         template.templateData[index][3] = 0 - tempTemplate[index][4]
                         template.templateData[index][4] = tempTemplate[index][3]
@@ -522,7 +541,7 @@ function buildActionUnit(name, modifier)
     local values = unitkeygroups[name]
     local factoryFlag = true
 
-    if table.find(values, "_factory_templates") then
+    if tableFind(values, "_factory_templates") then
         return buildActionFactoryTemplate(modifier)
     end
 
@@ -548,12 +567,12 @@ function buildActionUnit(name, modifier)
     for _, value in values do
         for i, buildableValue in buildable do
             if value == buildableValue then
-                table.insert(effectiveValues, value)
+                tableInsert(effectiveValues, value)
             end
         end
     end
 
-    local maxPos = table.getsize(effectiveValues)
+    local maxPos = tableGetsize(effectiveValues)
     if maxPos == 0 then
         return
     end

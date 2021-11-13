@@ -5,6 +5,15 @@
 --*
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
+local ipairs = ipairs
+local tostring = tostring
+local stringFormat = string.format
+local stringLower = string.lower
+local stringFind = string.find
+local stringGsub = string.gsub
+local stringSub = string.sub
+local next = next
+
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 local ItemList = import('/lua/maui/itemlist.lua').ItemList
@@ -25,7 +34,7 @@ function Toggle(section)
         return
     end
 
-    filter = string.lower(section)
+    filter = stringLower(section)
 
     dialog = Group(gameParent, 'Engine Stats')
     dialog.Depth:Set(1000)
@@ -48,10 +57,10 @@ function Toggle(section)
     -- Hide/Show children on doubleclick
     function statList.OnDoubleClick(self,row)
         local item i = self:GetItem(row)
-        i = string.gsub(i,"^%s*%[[+-]%]","")
-        local from,to = string.find(i,'%a+:')
+        i = stringGsub(i,"^%s*%[[+-]%]","")
+        local from,to = stringFind(i,'%a+:')
         if from then
-            i = string.sub(i,from,to-1)
+            i = stringSub(i,from,to-1)
         end
 
         hideItems[i] = not hideItems[i]
@@ -74,15 +83,15 @@ end
 
 function AddStats(parentCtrl, children, indent, add)
     for k,v in children do
-        local isFilter = string.lower(v.Name) == filter
+        local isFilter = stringLower(v.Name) == filter
         local addChildren = add or isFilter
 
-        local name = string.gsub(v.Name,"Moho::","")
+        local name = stringGsub(v.Name,"Moho::","")
 
         local value = ""
         if v.Value ~= nil then
             if v.Type == "Float" then
-                value = ": " .. string.format("%.4f",v.Value)
+                value = ": " .. stringFormat("%.4f",v.Value)
             elseif v.Type == "Integer" then
                 value = ": " .. tostring(v.Value)
             else

@@ -4,6 +4,51 @@
 -- Summary  :  Default definitions of weapons
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local unit_methodsIsOverchargePaused = moho.unit_methods.IsOverchargePaused
+local unit_methodsRecoilImpulse = moho.unit_methods.RecoilImpulse
+local unit_methodsRemoveNukeSiloAmmo = moho.unit_methods.RemoveNukeSiloAmmo
+local mathAbs = math.abs
+local DamageArea = DamageArea
+local error = error
+local CreateAnimator = CreateAnimator
+local weapon_methodsCanFire = moho.weapon_methods.CanFire
+local tableInsert = table.insert
+local CreateSlider = CreateSlider
+local ipairs = ipairs
+local tableGetsize = table.getsize
+local unit_methodsSetBusy = moho.unit_methods.SetBusy
+local mathRound = math.round
+local CreateEconomyEvent = CreateEconomyEvent
+local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
+local RemoveEconomyEvent = RemoveEconomyEvent
+local WaitFor = WaitFor
+local unit_methodsSetImmobile = moho.unit_methods.SetImmobile
+local weapon_methodsWeaponHasTarget = moho.weapon_methods.WeaponHasTarget
+local aibrain_methodsGetEconomyIncome = moho.aibrain_methods.GetEconomyIncome
+local unit_methodsSetOverchargePaused = moho.unit_methods.SetOverchargePaused
+local unit_methodsRemoveTacticalSiloAmmo = moho.unit_methods.RemoveTacticalSiloAmmo
+local projectile_methodsSetBallisticAcceleration = moho.projectile_methods.SetBallisticAcceleration
+local unit_methodsGetFireState = moho.unit_methods.GetFireState
+local weapon_methodsPlaySound = moho.weapon_methods.PlaySound
+local unit_methodsSetWorkProgress = moho.unit_methods.SetWorkProgress
+local next = next
+local unit_methodsShowBone = moho.unit_methods.ShowBone
+local projectile_methodsChangeDetonateAboveHeight = moho.projectile_methods.ChangeDetonateAboveHeight
+local weapon_methodsSetFiringRandomness = moho.weapon_methods.SetFiringRandomness
+local weapon_methodsResetTarget = moho.weapon_methods.ResetTarget
+local AnimationManipulatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local CreateAttachedEmitter = CreateAttachedEmitter
+local tableGetn = table.getn
+local weapon_methodsGetBlueprint = moho.weapon_methods.GetBlueprint
+local KillThread = KillThread
+local aibrain_methodsGetEconomyStored = moho.aibrain_methods.GetEconomyStored
+local weapon_methodsBeenDestroyed = moho.weapon_methods.BeenDestroyed
+local weapon_methodsGetCurrentTargetPos = moho.weapon_methods.GetCurrentTargetPos
+local VDist2 = VDist2
+local GetSurfaceHeight = GetSurfaceHeight
+local unit_methodsHideBone = moho.unit_methods.HideBone
+
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 local CollisionBeam = import('/lua/sim/CollisionBeam.lua').CollisionBeam
 local Game = import('/lua/game.lua')
@@ -27,7 +72,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         Weapon.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
 
         -- Save things that are often reused
         self.bpRateOfFire = bp.RateOfFire
@@ -65,19 +110,19 @@ DefaultProjectileWeapon = Class(Weapon) {
             local dist = bp.RackRecoilDistance
             if bp.RackBones[1].TelescopeRecoilDistance then
                 local tpDist = bp.RackBones[1].TelescopeRecoilDistance
-                if math.abs(tpDist) > math.abs(dist) then
+                if mathAbs(tpDist) > mathAbs(dist) then
                     dist = tpDist
                 end
             end
-            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs(dist / ((1 / rof) - (bp.MuzzleChargeDelay or 0))) * 1.25
+            self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or mathAbs(dist / ((1 / rof) - (bp.MuzzleChargeDelay or 0))) * 1.25
         end
 
         -- Ensure firing cycle is compatible internally
         self.NumMuzzles = 0
         for rk, rv in bp.RackBones do
-            self.NumMuzzles = self.NumMuzzles + table.getn(rv.MuzzleBones or 0)
+            self.NumMuzzles = self.NumMuzzles + tableGetn(rv.MuzzleBones or 0)
         end
-        self.NumMuzzles = self.NumMuzzles / table.getn(bp.RackBones)
+        self.NumMuzzles = self.NumMuzzles / tableGetn(bp.RackBones)
         local totalMuzzleFiringTime = (self.NumMuzzles - 1) * bp.MuzzleSalvoDelay
         if totalMuzzleFiringTime > (1 / rof) then
             local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
@@ -96,7 +141,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- Set the firing cycle progress bar to full if required
         if bp.RenderFireClock then
-            self.unit:SetWorkProgress(1)
+            unit_methodsSetWorkProgress(self.unit, 1)
         end
 
         ChangeState(self, self.IdleState)
@@ -110,22 +155,22 @@ DefaultProjectileWeapon = Class(Weapon) {
             return proj
         end
 
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if bp.DetonatesAtTargetHeight == true then
-            local pos = self:GetCurrentTargetPos()
+            local pos = weapon_methodsGetCurrentTargetPos(self)
             if pos then
                 local theight = GetSurfaceHeight(pos[1], pos[3])
                 local hght = pos[2] - theight
-                proj:ChangeDetonateAboveHeight(hght)
+                projectile_methodsChangeDetonateAboveHeight(proj, hght)
             end
         end
         if bp.Flare then
             proj:AddFlare(bp.Flare)
         end
         if self.unit.Layer == 'Water' and bp.Audio.FireUnderWater then
-            self:PlaySound(bp.Audio.FireUnderWater)
+            weapon_methodsPlaySound(self, bp.Audio.FireUnderWater)
         elseif bp.Audio.Fire then
-            self:PlaySound(bp.Audio.Fire)
+            weapon_methodsPlaySound(self, bp.Audio.Fire)
         end
 
         if bp.FixBombTrajectory then -- Check weapon blueprint for trajectory fix request
@@ -138,7 +183,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Used mainly for Bomb drop physics calculations
     CheckBallisticAcceleration = function(self, proj)
         local acc = CalculateBallisticAcceleration(self, proj)
-        proj:SetBallisticAcceleration(-acc) -- Change projectile trajectory so it hits the target
+        projectile_methodsSetBallisticAcceleration(proj, -acc) -- Change projectile trajectory so it hits the target
     end,
 
     -- Triggers when the weapon is moved horizontally, usually by owner's motion
@@ -146,7 +191,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         Weapon.OnMotionHorzEventChange(self, new, old)
 
         -- Handle weapons which must pack before moving
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if bp.WeaponUnpackLocksMotion == true and old == 'Stopped' then
             self:PackAndMove()
         end
@@ -154,10 +199,10 @@ DefaultProjectileWeapon = Class(Weapon) {
         -- Handle motion-triggered FiringRandomness changes
         if old == 'Stopped' then
             if bp.FiringRandomnessWhileMoving then
-                self:SetFiringRandomness(bp.FiringRandomnessWhileMoving)
+                weapon_methodsSetFiringRandomness(self, bp.FiringRandomnessWhileMoving)
             end
         elseif new == 'Stopped' and bp.FiringRandomnessWhileMoving then
-            self:SetFiringRandomness(bp.FiringRandomness)
+            weapon_methodsSetFiringRandomness(self, bp.FiringRandomness)
         end
     end,
 
@@ -229,41 +274,41 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Played when a rack salvo charges
     -- Do not wait in here or the sequence in the blueprint will be messed up. Fork a thread instead
     PlayFxRackSalvoChargeSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         for k, v in self.FxRackChargeMuzzleFlash do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxRackChargeMuzzleFlashScale)
             end
         end
         if bp.Audio.ChargeStart then
-            self:PlaySound(bp.Audio.ChargeStart)
+            weapon_methodsPlaySound(self, bp.Audio.ChargeStart)
         end
         if bp.AnimationCharge and not self.Animator then
             self.Animator = CreateAnimator(self.unit)
-            self.Animator:PlayAnim(bp.AnimationCharge):SetRate(bp.AnimationChargeRate or 1)
+            AnimationManipulatorPlayAnim(self.Animator, bp.AnimationCharge):SetRate(bp.AnimationChargeRate or 1)
         end
     end,
 
     -- Played when a rack salvo reloads
     -- Do not wait in here or the sequence in the blueprint will be messed up. Fork a thread instead
     PlayFxRackSalvoReloadSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if bp.AnimationReload and not self.Animator then
             self.Animator = CreateAnimator(self.unit)
-            self.Animator:PlayAnim(bp.AnimationReload):SetRate(bp.AnimationReloadRate or 1)
+            AnimationManipulatorPlayAnim(self.Animator, bp.AnimationReload):SetRate(bp.AnimationReloadRate or 1)
         end
     end,
 
     -- Played when a rack reloads. Mostly used for Recoil
     PlayFxRackReloadSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if bp.CameraShakeRadius and bp.CameraShakeMax and bp.CameraShakeMin and bp.CameraShakeDuration and
             bp.CameraShakeRadius > 0 and bp.CameraShakeMax > 0 and bp.CameraShakeMin >= 0 and bp.CameraShakeDuration > 0 then
             self.unit:ShakeCamera(bp.CameraShakeRadius, bp.CameraShakeMax, bp.CameraShakeMin, bp.CameraShakeDuration)
         end
         if bp.ShipRock == true then
             local ix,iy,iz = self.unit:GetBoneDirection(bp.RackBones[self.CurrentRackSalvoNumber].RackBone)
-            self.unit:RecoilImpulse(-ix,-iy,-iz)
+            unit_methodsRecoilImpulse(self.unit, -ix,-iy,-iz)
         end
         if bp.RackRecoilDistance ~= 0 then
             self:PlayRackRecoil({bp.RackBones[self.CurrentRackSalvoNumber]})
@@ -276,25 +321,25 @@ DefaultProjectileWeapon = Class(Weapon) {
         -- Deal with owner's audio cues
         local unitBP = self.unit:GetBlueprint()
         if unitBP.Audio.Activate then
-            self:PlaySound(unitBP.Audio.Activate)
+            weapon_methodsPlaySound(self, unitBP.Audio.Activate)
         end
         if unitBP.Audio.Open then
-            self:PlaySound(unitBP.Audio.Open)
+            weapon_methodsPlaySound(self, unitBP.Audio.Open)
         end
 
         -- Deal with the Weapon's audio and animations
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if bp.Audio.Unpack then
-            self:PlaySound(bp.Audio.Unpack)
+            weapon_methodsPlaySound(self, bp.Audio.Unpack)
         end
         if bp.WeaponUnpackAnimation and not self.UnpackAnimator then
             self.UnpackAnimator = CreateAnimator(self.unit)
-            self.UnpackAnimator:PlayAnim(bp.WeaponUnpackAnimation):SetRate(0)
+            AnimationManipulatorPlayAnim(self.UnpackAnimator, bp.WeaponUnpackAnimation):SetRate(0)
             self.UnpackAnimator:SetPrecedence(bp.WeaponUnpackAnimatorPrecedence or 0)
             self.unit.Trash:Add(self.UnpackAnimator)
         end
         if self.UnpackAnimator then
-            self.UnpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
+            AnimationManipulatorSetRate(self.UnpackAnimator, bp.WeaponUnpackAnimationRate)
             WaitFor(self.UnpackAnimator)
         end
     end,
@@ -302,13 +347,13 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Played when a weapon packs up
     -- There is no target, and all rack salvos are complete
     PlayFxWeaponPackSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local unitBP = self.unit:GetBlueprint()
         if unitBP.Audio.Close then
-            self:PlaySound(unitBP.Audio.Close)
+            weapon_methodsPlaySound(self, unitBP.Audio.Close)
         end
         if bp.WeaponUnpackAnimation and self.UnpackAnimator then
-            self.UnpackAnimator:SetRate(-bp.WeaponUnpackAnimationRate)
+            AnimationManipulatorSetRate(self.UnpackAnimator, -bp.WeaponUnpackAnimationRate)
         end
         if self.UnpackAnimator then
             WaitFor(self.UnpackAnimator)
@@ -317,17 +362,17 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Create the visual side of rack recoil
     PlayRackRecoil = function(self, rackList)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         for k, v in rackList do
             local tmpSldr = CreateSlider(self.unit, v.RackBone)
-            table.insert(self.RecoilManipulators, tmpSldr)
+            tableInsert(self.RecoilManipulators, tmpSldr)
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, bp.RackRecoilDistance)
             tmpSldr:SetSpeed(-1)
             self.unit.Trash:Add(tmpSldr)
             if v.TelescopeBone then
                 tmpSldr = CreateSlider(self.unit, v.TelescopeBone)
-                table.insert(self.RecoilManipulators, tmpSldr)
+                tableInsert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, v.TelescopeRecoilDistance or bp.RackRecoilDistance)
                 tmpSldr:SetSpeed(-1)
@@ -413,7 +458,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.WeaponIsEnabled = true
             self:SetWeaponEnabled(true)
         elseif not self.WeaponWantEnabled and self.WeaponIsEnabled then
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.CountedProjectile ~= true then
                 self.WeaponIsEnabled = false
                 self:SetWeaponEnabled(false)
@@ -438,19 +483,19 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         Main = function(self)
             if self.unit.Dead then return end
-            self.unit:SetBusy(false)
+            unit_methodsSetBusy(self.unit, false)
             self:WaitForAndDestroyManips()
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             for k, v in bp.RackBones do
                 if v.HideMuzzle == true then
                     for mk, mv in v.MuzzleBones do
-                        self.unit:ShowBone(mv, true)
+                        unit_methodsShowBone(self.unit, mv, true)
                     end
                 end
             end
             self:StartEconomyDrain()
-            if table.getn(bp.RackBones) > 1 and self.CurrentRackSalvoNumber > 1 then
+            if tableGetn(bp.RackBones) > 1 and self.CurrentRackSalvoNumber > 1 then
                 WaitSeconds(bp.RackReloadTimeout)
                 self:PlayFxRackSalvoReloadSequence()
                 self.CurrentRackSalvoNumber = 1
@@ -460,15 +505,15 @@ DefaultProjectileWeapon = Class(Weapon) {
         OnGotTarget = function(self)
             Weapon.OnGotTarget(self)
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
 
             -- Issue 43
             if self.unit then
                 self.unit:OnGotTarget(self)
             end
 
-            if bp.WeaponUnpackLockMotion ~= true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving')) then
-                if bp.CountedProjectile == true and not self:CanFire() then
+            if bp.WeaponUnpackLockMotion ~= true or (bp.WeaponUnpackLocksMotion == true and not unit_methodsIsUnitState(self.unit, 'Moving')) then
+                if bp.CountedProjectile == true and not weapon_methodsCanFire(self) then
                     return
                 end
                 if bp.WeaponUnpacks == true then
@@ -487,7 +532,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             if self.WeaponUnpacks then
                 ChangeState(self, self.WeaponUnpackingState)
             else
-                local bp = self:GetBlueprint()
+                local bp = weapon_methodsGetBlueprint(self)
                 if bp.RackSalvoChargeTime and bp.RackSalvoChargeTime > 0 then
                     ChangeState(self, self.RackSalvoChargeState)
 
@@ -507,16 +552,16 @@ DefaultProjectileWeapon = Class(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            self.unit:SetBusy(true)
+            unit_methodsSetBusy(self.unit, true)
             self:PlayFxRackSalvoChargeSequence()
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.NotExclusive then
-                self.unit:SetBusy(false)
+                unit_methodsSetBusy(self.unit, false)
             end
             WaitSeconds(bp.RackSalvoChargeTime)
             if bp.NotExclusive then
-                self.unit:SetBusy(true)
+                unit_methodsSetBusy(self.unit, true)
             end
 
             if bp.RackSalvoFiresAfterCharge == true then
@@ -540,11 +585,11 @@ DefaultProjectileWeapon = Class(Weapon) {
             -- The second part is a hack for units with reload animations.  They have the same problem
             -- they need a RackSalvoReloadTime that's 1/RateOfFire set to avoid firing twice on the first shot
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.CountedProjectile == true and bp.WeaponUnpacks == true then
-                self.unit:SetBusy(true)
+                unit_methodsSetBusy(self.unit, true)
             else
-                self.unit:SetBusy(false)
+                unit_methodsSetBusy(self.unit, false)
             end
 
             self.WeaponCanFire = true
@@ -559,8 +604,8 @@ DefaultProjectileWeapon = Class(Weapon) {
             -- Introduced to fix a bug where units with this bp flag would go straight to projectile creation
             -- from OnGotTarget, without waiting for OnFire() to be called from engine.
             if bp.CountedProjectile == true or bp.AnimationReload then
-                if self.unit:GetFireState() == 1 then
-                    while self.unit:GetFireState() == 1 do
+                if unit_methodsGetFireState(self.unit) == 1 then
+                    while unit_methodsGetFireState(self.unit) == 1 do
                         WaitTicks(1)
                     end
                 end
@@ -572,7 +617,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             WaitSeconds(5)
 
             -- Check if there is a better target nearby
-            self:ResetTarget()
+            weapon_methodsResetTarget(self)
         end,
 
         OnFire = function(self)
@@ -589,32 +634,32 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- Render the fire recharge bar
         RenderClockThread = function(self, rof)
-            local clockTime = math.round(10*rof)
+            local clockTime = mathRound(10*rof)
             local totalTime = clockTime
             while clockTime >= 0 and
-                  not self:BeenDestroyed() and
+                  not weapon_methodsBeenDestroyed(self) and
                   not self.unit.Dead do
-                self.unit:SetWorkProgress(1 - clockTime / totalTime)
+                unit_methodsSetWorkProgress(self.unit, 1 - clockTime / totalTime)
                 clockTime = clockTime - 1
                 WaitSeconds(0.1)
             end
         end,
 
         Main = function(self)
-            self.unit:SetBusy(true)
+            unit_methodsSetBusy(self.unit, true)
             self:DestroyRecoilManips()
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             local rof = self:GetWeaponRoF()
             local numRackFiring = self.CurrentRackSalvoNumber
 
             --This is done to make sure that when racks should fire together, they do
             if bp.RackFireTogether == true then
-                numRackFiring = table.getsize(bp.RackBones)
+                numRackFiring = tableGetsize(bp.RackBones)
             end
 
             -- Fork timer counter thread carefully
-            if not self:BeenDestroyed() and
+            if not weapon_methodsBeenDestroyed(self) and
                not self.unit.Dead then
                 if bp.RenderFireClock and rof > 0 then
                     self:ForkThread(self.RenderClockThread, 1/rof)
@@ -627,18 +672,18 @@ DefaultProjectileWeapon = Class(Weapon) {
                 local numMuzzlesFiring = bp.MuzzleSalvoSize
 
                 if bp.MuzzleSalvoDelay == 0 then
-                    numMuzzlesFiring = table.getn(rackInfo.MuzzleBones)
+                    numMuzzlesFiring = tableGetn(rackInfo.MuzzleBones)
                 end
 
                 if bp.FixedSpreadRadius then
                     local weaponPos = self.unit:GetPosition()
-                    local targetPos = self:GetCurrentTargetPos()
+                    local targetPos = weapon_methodsGetCurrentTargetPos(self)
                     local distance = VDist2(weaponPos[1], weaponPos[3], targetPos[1], targetPos[3])
 
                     -- This formula was obtained empirically and somehow it works :)
                     local randomness = bp.FixedSpreadRadius / (distance^2 / 12)
 
-                    self:SetFiringRandomness(randomness)
+                    weapon_methodsSetFiringRandomness(self, randomness)
                 end
 
                 local muzzleIndex = 1
@@ -649,28 +694,28 @@ DefaultProjectileWeapon = Class(Weapon) {
 
                     local muzzle = rackInfo.MuzzleBones[muzzleIndex]
                     if rackInfo.HideMuzzle == true then
-                        self.unit:ShowBone(muzzle, true)
+                        unit_methodsShowBone(self.unit, muzzle, true)
                     end
 
                     -- Deal with Muzzle charging sequence
                     if bp.MuzzleChargeDelay and bp.MuzzleChargeDelay > 0 then
                         if bp.Audio.MuzzleChargeStart then
-                            self:PlaySound(bp.Audio.MuzzleChargeStart)
+                            weapon_methodsPlaySound(self, bp.Audio.MuzzleChargeStart)
                         end
 
                         self:PlayFxMuzzleChargeSequence(muzzle)
                         if bp.NotExclusive then
-                            self.unit:SetBusy(false)
+                            unit_methodsSetBusy(self.unit, false)
                         end
                         WaitSeconds(bp.MuzzleChargeDelay)
                         if bp.NotExclusive then
-                            self.unit:SetBusy(true)
+                            unit_methodsSetBusy(self.unit, true)
                         end
                     end
                     self:PlayFxMuzzleSequence(muzzle)
 
                     if rackInfo.HideMuzzle == true then
-                        self.unit:HideBone(muzzle, true)
+                        unit_methodsHideBone(self.unit, muzzle, true)
                     end
 
                     if self.HaltFireOrdered then
@@ -684,33 +729,33 @@ DefaultProjectileWeapon = Class(Weapon) {
                             self.unit:NukeCreatedAtUnit()
 
                             -- Generate UI notification for automatic nuke ping
-                            local launchData = { army = self.unit.Army-1, location = self:GetCurrentTargetPos()}
+                            local launchData = { army = self.unit.Army-1, location = weapon_methodsGetCurrentTargetPos(self)}
                             if not Sync.NukeLaunchData then Sync.NukeLaunchData = {} end
-                            table.insert(Sync.NukeLaunchData, launchData)
-                            self.unit:RemoveNukeSiloAmmo(1)
+                            tableInsert(Sync.NukeLaunchData, launchData)
+                            unit_methodsRemoveNukeSiloAmmo(self.unit, 1)
                         else
-                            self.unit:RemoveTacticalSiloAmmo(1)
+                            unit_methodsRemoveTacticalSiloAmmo(self.unit, 1)
                         end
                     end
 
                     -- Deal with muzzle firing sequence
                     muzzleIndex = muzzleIndex + 1
-                    if muzzleIndex > table.getn(rackInfo.MuzzleBones) then
+                    if muzzleIndex > tableGetn(rackInfo.MuzzleBones) then
                         muzzleIndex = 1
                     end
                     if bp.MuzzleSalvoDelay > 0 then
                         if bp.NotExclusive then
-                            self.unit:SetBusy(false)
+                            unit_methodsSetBusy(self.unit, false)
                         end
                         WaitSeconds(bp.MuzzleSalvoDelay)
                         if bp.NotExclusive then
-                            self.unit:SetBusy(true)
+                            unit_methodsSetBusy(self.unit, true)
                         end
                     end
                 end
                 self:PlayFxRackReloadSequence()
 
-                if self.CurrentRackSalvoNumber <= table.getn(bp.RackBones) then
+                if self.CurrentRackSalvoNumber <= tableGetn(bp.RackBones) then
                     self.CurrentRackSalvoNumber = self.CurrentRackSalvoNumber + 1
                 end
             end
@@ -724,7 +769,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.HaltFireOrdered = false
 
             -- Deal with the rack firing sequence
-            if self.CurrentRackSalvoNumber > table.getn(bp.RackBones) then
+            if self.CurrentRackSalvoNumber > tableGetn(bp.RackBones) then
                 self.CurrentRackSalvoNumber = 1
 
                 if bp.RackSalvoReloadTime > 0 then
@@ -767,21 +812,21 @@ DefaultProjectileWeapon = Class(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            self.unit:SetBusy(true)
+            unit_methodsSetBusy(self.unit, true)
             self:PlayFxRackSalvoReloadSequence()
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.NotExclusive then
-                self.unit:SetBusy(false)
+                unit_methodsSetBusy(self.unit, false)
             end
             WaitSeconds(bp.RackSalvoReloadTime)
             self:WaitForAndDestroyManips()
 
             if bp.NotExclusive then
-                self.unit:SetBusy(true)
+                unit_methodsSetBusy(self.unit, true)
             end
-            local hasTarget = self:WeaponHasTarget()
-            local canFire = self:CanFire()
+            local hasTarget = weapon_methodsWeaponHasTarget(self)
+            local canFire = weapon_methodsCanFire(self)
             if hasTarget and bp.RackSalvoChargeTime > 0 and canFire then
                 ChangeState(self, self.RackSalvoChargeState)
             elseif hasTarget and canFire then
@@ -803,11 +848,11 @@ DefaultProjectileWeapon = Class(Weapon) {
         WeaponAimWantEnabled = false,
 
         Main = function(self)
-            self.unit:SetBusy(true)
+            unit_methodsSetBusy(self.unit, true)
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.WeaponUnpackLocksMotion then
-                self.unit:SetImmobile(true)
+                unit_methodsSetImmobile(self.unit, true)
             end
             self:PlayFxWeaponUnpackSequence()
 
@@ -829,15 +874,15 @@ DefaultProjectileWeapon = Class(Weapon) {
         WeaponAimWantEnabled = true,
 
         Main = function(self)
-            self.unit:SetBusy(true)
+            unit_methodsSetBusy(self.unit, true)
 
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             WaitSeconds(bp.WeaponRepackTimeout)
 
             self:AimManipulatorSetEnabled(false)
             self:PlayFxWeaponPackSequence()
             if bp.WeaponUnpackLocksMotion then
-                self.unit:SetImmobile(false)
+                unit_methodsSetImmobile(self.unit, false)
             end
             ChangeState(self, self.IdleState)
         end,
@@ -850,13 +895,13 @@ DefaultProjectileWeapon = Class(Weapon) {
                 self.unit:OnGotTarget(self)
             end
 
-            if not self:GetBlueprint().ForceSingleFire then
+            if not weapon_methodsGetBlueprint(self).ForceSingleFire then
                 ChangeState(self, self.WeaponUnpackingState)
             end
         end,
 
         OnFire = function(self)
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.CountedProjectile == true and not bp.ForceSingleFire then
                 ChangeState(self, self.WeaponUnpackingState)
             end
@@ -876,7 +921,7 @@ DefaultProjectileWeapon = Class(Weapon) {
 
 KamikazeWeapon = Class(Weapon) {
     OnFire = function(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = weapon_methodsGetBlueprint(self)
         DamageArea(self.unit, self.unit:GetPosition(), myBlueprint.DamageRadius, myBlueprint.Damage, myBlueprint.DamageType or 'Normal', myBlueprint.DamageFriendly or false)
         self.unit:PlayUnitSound('Destroyed')
         self.unit:Destroy()
@@ -887,7 +932,7 @@ BareBonesWeapon = Class(Weapon) {
     Data = {},
 
     OnFire = function(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = weapon_methodsGetBlueprint(self)
         local myProjectile = self.unit:CreateProjectile(myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         if self.Data then
             myProjectile:PassData(self.Data)
@@ -907,10 +952,10 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     -- Can we use the OC weapon?
     CanOvercharge = function(self)
-        return not self.unit:IsOverchargePaused() and self:HasEnergy() and not
+        return not unit_methodsIsOverchargePaused(self.unit) and self:HasEnergy() and not
             self:UnitOccupied() and not
-            self.unit:IsUnitState('Enhancing') and not
-            self.unit:IsUnitState('Upgrading')
+            unit_methodsIsUnitState(self.unit, 'Enhancing') and not
+            unit_methodsIsUnitState(self.unit, 'Upgrading')
     end,
 
     StartEconomyDrain = function(self) -- OverchargeWeapon drains energy on impact
@@ -918,19 +963,19 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     -- Returns true if the unit is doing something that shouldn't allow any weapon fire
     UnitOccupied = function(self)
-        return (self.unit:IsUnitState('Upgrading') and not self.unit:IsUnitState('Enhancing')) or -- Don't let us shoot if we're upgrading, unless it's an enhancement task
-            self.unit:IsUnitState('Building') or
-            self.unit:IsUnitState('Repairing') or
-            self.unit:IsUnitState('Reclaiming')
+        return (unit_methodsIsUnitState(self.unit, 'Upgrading') and not unit_methodsIsUnitState(self.unit, 'Enhancing')) or -- Don't let us shoot if we're upgrading, unless it's an enhancement task
+            unit_methodsIsUnitState(self.unit, 'Building') or
+            unit_methodsIsUnitState(self.unit, 'Repairing') or
+            unit_methodsIsUnitState(self.unit, 'Reclaiming')
     end,
 
     -- The Overcharge cool-down function
     PauseOvercharge = function(self)
-        if not self.unit:IsOverchargePaused() then
-            self.unit:SetOverchargePaused(true)
+        if not unit_methodsIsOverchargePaused(self.unit) then
+            unit_methodsSetOverchargePaused(self.unit, true)
             self:OnDisableWeapon()
             WaitSeconds(1 / self.bpRateOfFire)
-            self.unit:SetOverchargePaused(false)
+            unit_methodsSetOverchargePaused(self.unit, false)
             if self.AutoMode then
                 self.AutoThread = self:ForkThread(self.AutoEnable)
             end
@@ -965,11 +1010,11 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
 
     OnCreate = function(self)
         DefaultProjectileWeapon.OnCreate(self)
-        self.EnergyRequired = self:GetBlueprint().EnergyRequired
+        self.EnergyRequired = weapon_methodsGetBlueprint(self).EnergyRequired
         self:SetWeaponEnabled(false)
         self.AimControl:SetEnabled(false)
         self.AimControl:SetPrecedence(0)
-        self.unit:SetOverchargePaused(false)
+        unit_methodsSetOverchargePaused(self.unit, false)
     end,
 
     OnGotTarget = function(self)
@@ -993,7 +1038,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     end,
 
     OnEnableWeapon = function(self)
-        if self:BeenDestroyed() then return end
+        if weapon_methodsBeenDestroyed(self) then return end
         DefaultProjectileWeapon.OnEnableWeapon(self)
         self:SetWeaponEnabled(true)
         if self:CanOvercharge() then
@@ -1075,7 +1120,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         self.Beams = {}
 
         -- Ensure that the weapon blueprint is set up properly for beams
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if not bp.BeamCollisionDelay then
             local strg = '*ERROR: No BeamCollisionDelay specified for beam weapon, aborting setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
             error(strg, 2)
@@ -1098,7 +1143,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                     CollisionCheckInterval = bp.BeamCollisionDelay * 10,    -- Why is this multiplied by 10? IceDreamer
                 }
                 local beamTable = {Beam = beam, Muzzle = mv, Destroyables = {}}
-                table.insert(self.Beams, beamTable)
+                tableInsert(self.Beams, beamTable)
                 self.unit.Trash:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
@@ -1120,16 +1165,16 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
             self:PlayFxBeamStart(muzzle)
         end
 
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         if self.unit.Layer == 'Water' and bp.Audio.FireUnderWater then
-            self:PlaySound(bp.Audio.FireUnderWater)
+            weapon_methodsPlaySound(self, bp.Audio.FireUnderWater)
         elseif bp.Audio.Fire then
-            self:PlaySound(bp.Audio.Fire)
+            weapon_methodsPlaySound(self, bp.Audio.Fire)
         end
     end,
 
     PlayFxBeamStart = function(self, muzzle)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local beam
         local beamTable
         self.BeamDestroyables = {}
@@ -1159,7 +1204,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
         -- Deal with beam audio cues
         if bp.Audio.BeamStart then
-            self:PlaySound(bp.Audio.BeamStart)
+            weapon_methodsPlaySound(self, bp.Audio.BeamStart)
         end
         if bp.Audio.BeamLoop and self.Beams[1].Beam then
             self.Beams[1].Beam:SetAmbientSound(bp.Audio.BeamLoop, nil)
@@ -1172,7 +1217,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         while true do
             WaitSeconds(1)
             --if we're at hold fire, stop beam
-            if self.unit and (self.unit:GetFireState() == 1 or self.NumTargets == 0) then
+            if self.unit and (unit_methodsGetFireState(self.unit) == 1 or self.NumTargets == 0) then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end
@@ -1187,7 +1232,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     end,
 
     PlayFxWeaponUnpackSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         -- If it's not a continuous beam, or  if it's a continuous beam that's off
         if bp.BeamLifetime > 0 or (bp.BeamLifetime == 0 and not self.ContBeamOn) then
             DefaultProjectileWeapon.PlayFxWeaponUnpackSequence(self)
@@ -1198,9 +1243,9 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     -- Kill the beam
     PlayFxBeamEnd = function(self, beam)
         if not self.unit.Dead then
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.Audio.BeamStop and self.BeamStarted then
-                self:PlaySound(bp.Audio.BeamStop)
+                weapon_methodsPlaySound(self, bp.Audio.BeamStop)
             end
             if bp.Audio.BeamLoop and self.Beams[1].Beam then
                 self.Beams[1].Beam:SetAmbientSound(nil, nil)
@@ -1250,7 +1295,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     WeaponPackingState = State (DefaultProjectileWeapon.WeaponPackingState) {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = weapon_methodsGetBlueprint(self)
             if bp.BeamLifetime > 0 then
                 self:PlayFxBeamEnd()
             else
@@ -1278,8 +1323,8 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
     EconomySupportsBeam = function(self)
         local aiBrain = self.unit:GetAIBrain()
-        local energyIncome = aiBrain:GetEconomyIncome('ENERGY') * 10
-        local energyStored = aiBrain:GetEconomyStored('ENERGY')
+        local energyIncome = aibrain_methodsGetEconomyIncome(aiBrain, 'ENERGY') * 10
+        local energyStored = aibrain_methodsGetEconomyStored(aiBrain, 'ENERGY')
         local nrgReq = self:GetWeaponEnergyRequired()
         local nrgDrain = self:GetWeaponEnergyDrain()
 
@@ -1296,14 +1341,14 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
     end,
 
     Fire = function(self)
-        local bp = self:GetBlueprint()
+        local bp = weapon_methodsGetBlueprint(self)
         local proj = self.unit:CreateProjectile(bp.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         proj:ForkThread(proj.EffectThread)
 
         -- Play the explosion sound
         local projBp = proj:GetBlueprint()
         if projBp.Audio.NukeExplosion then
-            self:PlaySound(projBp.Audio.NukeExplosion)
+            weapon_methodsPlaySound(self, projBp.Audio.NukeExplosion)
         end
 
         proj.InnerRing = NukeDamage()
@@ -1328,7 +1373,7 @@ SCUDeathWeapon = Class(BareBonesWeapon) {
     end,
 
     Fire = function(self)
-        local myBlueprint = self:GetBlueprint()
+        local myBlueprint = weapon_methodsGetBlueprint(self)
         local myProjectile = self.unit:CreateProjectile(myBlueprint.ProjectileId, 0, 0, 0, nil, nil, nil):SetCollision(false)
         myProjectile:PassDamageData(self:GetDamageTable())
     end,

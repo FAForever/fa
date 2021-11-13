@@ -9,6 +9,21 @@
 
 
 -- This table contains a shadow copy of a subset of the real orders.
+local GetFocusArmy = GetFocusArmy
+local unit_methodsGetCommandQueue = moho.unit_methods.GetCommandQueue
+local tableRemove = table.remove
+local mathRandom = math.random
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local VDist3Sq = VDist3Sq
+local GetUnitById = GetUnitById
+local tableGetn = table.getn
+local mathFloor = math.floor
+local WARN = WARN
+local VDist2 = VDist2
+local mathMod = math.mod
+
 ShadowOrders = {}
 
 
@@ -72,7 +87,7 @@ function MakeShadowCopyOrders(command)
         if not ShadowOrders[unit:GetEntityId()]  then
             ShadowOrders[unit:GetEntityId()] = {}
         end
-        table.insert(ShadowOrders[unit:GetEntityId()],Order)
+        tableInsert(ShadowOrders[unit:GetEntityId()],Order)
     end
 
 end -- function MakeShadowCopyorders(command)
@@ -99,7 +114,7 @@ function FixOrders(unit)
         return
     end
 
-    local queue = unit:GetCommandQueue()
+    local queue = unit_methodsGetCommandQueue(unit)
     local filteredQueue = {}
     for _,command in ipairs(queue) do
         local Order = {
@@ -107,14 +122,14 @@ function FixOrders(unit)
             Position = command.position,
         }
         if Order.CommandType then
-            table.insert(filteredQueue, Order)
+            tableInsert(filteredQueue, Order)
         end
     end
 
-    local numOrders = table.getn(unitOrders)
+    local numOrders = tableGetn(unitOrders)
 
     -- We can't trust the shadow orders if commands were added without getting a copy.
-    if numOrders < table.getn(filteredQueue) then
+    if numOrders < tableGetn(filteredQueue) then
         WARN("Spreadattack: Command queue is longer than the shadow order list.")
         return
     end
@@ -144,7 +159,7 @@ function FixOrders(unit)
          if nextQueueIndex == queueIndex then
             -- Block not found.
             for i = nextOrderIndex - 1, orderIndex, -1 do
-                table.remove(unitOrders, i)
+                tableRemove(unitOrders, i)
                 numOrders = numOrders - 1
             end
             nextOrderIndex = orderIndex
@@ -182,7 +197,7 @@ function FixOrders(unit)
             if numEntityTargets == 0 then
                 -- With only position targets it doesn't matter which orders we delete.
                 while numDeletedOrders > 0 do
-                    table.remove(unitOrders, nextOrderIndex - 1)
+                    tableRemove(unitOrders, nextOrderIndex - 1)
                     numOrders = numOrders - 1
                     nextOrderIndex = nextOrderIndex - 1
                     numDeletedOrders = numDeletedOrders - 1
@@ -230,11 +245,11 @@ function FixOrders(unit)
                             match = j
                             priority = false
                             lastMatchQueueIndex = j
-                            lastMatchIndex = table.getn(Matches) + 1
+                            lastMatchIndex = tableGetn(Matches) + 1
                             break
                         end
                     end
-                    table.insert(Matches, {Match = match, Priority = priority})
+                    tableInsert(Matches, {Match = match, Priority = priority})
                 end
 
                 -- Delete unmatched commands by priority.
@@ -242,10 +257,10 @@ function FixOrders(unit)
                     if numDeletedOrders <= 0 then
                         break
                     end
-                    for i = table.getn(Matches), 1, -1 do
+                    for i = tableGetn(Matches), 1, -1 do
                         if Matches[i].Priority == priority then
-                            table.remove(Matches, i)
-                            table.remove(unitOrders, i + orderIndex - 1)
+                            tableRemove(Matches, i)
+                            tableRemove(unitOrders, i + orderIndex - 1)
                             numOrders = numOrders - 1
                             nextOrderIndex = nextOrderIndex - 1
                             numDeletedOrders = numDeletedOrders - 1
@@ -352,10 +367,10 @@ function SpreadAttack()
             -- Unit 1: 1, 4, 7, ?, ?, ?, ?, ?
             -- Unit 2: 2, 5, 8, ?, ?, ?, ?, ?
             -- Unit 3: 3, 6, ?, ?, ?, ?, ?, ?
-            local unitCount = table.getn(curSelection)
+            local unitCount = tableGetn(curSelection)
             local numOrders = endAction - beginAction + 1
             -- "and 1 or 0" is lua's ugly alternative to the ternary operator. Same as (...) ? 1 : 0
-            local stableTargetNum = math.floor(numOrders / unitCount) + ((math.mod(numOrders, unitCount) >= index) and 1 or 0)
+            local stableTargetNum = mathFloor(numOrders / unitCount) + ((mathMod(numOrders, unitCount) >= index) and 1 or 0)
             for i = 0, stableTargetNum - 1 do
                 -- For if the targets outnumber the units targeting them.
                 local targetBlock = i * unitCount
@@ -366,7 +381,7 @@ function SpreadAttack()
 
             -- Randomize the remaining mixable orders.
             for i = beginAction,endAction do
-                local randomorder = math.random(beginAction,endAction)
+                local randomorder = mathRandom(beginAction,endAction)
                 if randomorder ~= i then
                     unitOrders[i],unitOrders[randomorder] = unitOrders[randomorder],unitOrders[i]
                 end

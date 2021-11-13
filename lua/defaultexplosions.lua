@@ -8,6 +8,24 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+local CreateSplat = CreateSplat
+local projectile_methodsSetBallisticAcceleration = moho.projectile_methods.SetBallisticAcceleration
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local unpack = unpack
+local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local tableEmpty = table.empty
+local CreateLightParticle = CreateLightParticle
+local CreateDecal = CreateDecal
+local Warp = Warp
+local tableCat = table.cat
+local mathFloor = math.floor
+local CreateAttachedEmitter = CreateAttachedEmitter
+local IEffectSetEmitterParam = moho.IEffect.SetEmitterParam
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+
 local Entity = import('/lua/sim/entity.lua').Entity
 
 local util = import('utilities.lua')
@@ -404,7 +422,7 @@ function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
 end
 
 function CreateTimedStuctureUnitExplosion(obj)
-    local numExplosions = math.floor(GetAverageBoundingXYZRadius(obj) * GetRandomInt(2,5))
+    local numExplosions = mathFloor(GetAverageBoundingXYZRadius(obj) * GetRandomInt(2,5))
     local x,y,z = GetUnitSizes(obj)
     obj:ShakeCamera(30, 1, 0, 0.45 * numExplosions)
     for i = 0, numExplosions do
@@ -489,8 +507,8 @@ function _CreateScalableUnitExplosion(obj)
     EnvironmentalEffectTable = GetUnitEnvironmentalExplosionEffects(layer, scale)
 
     -- Merge resulting tables to final explosion emitter list
-    if not table.empty(EnvironmentalEffectTable) then
-        EffectTable = table.cat(BaseEffectTable, EnvironmentalEffectTable)
+    if not tableEmpty(EnvironmentalEffectTable) then
+        EffectTable = tableCat(BaseEffectTable, EnvironmentalEffectTable)
     else
         EffectTable = BaseEffectTable
     end
@@ -607,7 +625,7 @@ function CreateWreckageEffects(obj, prop)
         ScaleEmittersParam(emitters, 'LIFETIME', 100, 1000)
 
         for k, v in emitters do
-            v:ScaleEmitter(GetRandomFloat(0.25, 1))
+            IEffectScaleEmitter(v, GetRandomFloat(0.25, 1))
         end
     end
 end
@@ -672,7 +690,7 @@ end
 
 function CreateDestructionFire(object, scale)
     local proj = object:CreateProjectile('/effects/entities/DestructionFire01/DestructionFire01_proj.bp', 0, 0, 0, nil, nil, nil)
-    proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
+    projectile_methodsSetBallisticAcceleration(proj, GetRandomFloat(-2, -3)):SetCollision(false)
     CreateEmitterOnEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_fire_01_emit.bp'):ScaleEmitter(scale)
 end
 
@@ -680,7 +698,7 @@ function CreateDestructionSparks(object, scale)
     local proj
     for i = 1, GetRandomInt(5, 10) do
         proj = object:CreateProjectile('/effects/entities/DestructionSpark01/DestructionSpark01_proj.bp', 0, 0, 0, nil, nil, nil)
-        proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
+        projectile_methodsSetBallisticAcceleration(proj, GetRandomFloat(-2, -3)):SetCollision(false)
         CreateEmitterOnEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_sparks_02_emit.bp'):ScaleEmitter(scale)
     end
 end
@@ -689,12 +707,12 @@ function CreateFirePlume(object, scale)
     local proj
     for i = 1, GetRandomInt(4, 8) do
         proj = object:CreateProjectile('/effects/entities/DestructionFirePlume01/DestructionFirePlume01_proj.bp', 0, 0, 0, nil, nil, nil)
-        proj:SetBallisticAcceleration(GetRandomFloat(-2, -3)):SetCollision(false)
+        projectile_methodsSetBallisticAcceleration(proj, GetRandomFloat(-2, -3)):SetCollision(false)
         local emitter = CreateEmitterOnEntity(proj, proj.Army, '/effects/emitters/destruction_explosion_fire_plume_02_emit.bp')
 
         local lifetime = GetRandomFloat(12, 22)
-        emitter:SetEmitterParam('REPEATTIME', lifetime)
-        emitter:SetEmitterParam('LIFETIME', lifetime)
+        IEffectSetEmitterParam(emitter, 'REPEATTIME', lifetime)
+        IEffectSetEmitterParam(emitter, 'LIFETIME', lifetime)
     end
 end
 
@@ -709,8 +727,8 @@ function CreateExplosionProjectile(object, projectile, minnumber, maxnumber, eff
         proj = object:CreateProjectile(projectile, xpos, ypos, zpos, nil, nil, nil):SetBallisticAcceleration(yaccel):SetCollision(false)
         emitter = CreateEmitterOnEntity(proj, proj.Army, effect):ScaleEmitter(fxscale)
         if emitterparam then
-            emitter:SetEmitterParam('REPEATTIME', math.floor(12 * fxscale + 0.5))
-            emitter:SetEmitterParam('LIFETIME', math.floor(12 * fxscale + 0.5))
+            IEffectSetEmitterParam(emitter, 'REPEATTIME', mathFloor(12 * fxscale + 0.5))
+            IEffectSetEmitterParam(emitter, 'LIFETIME', mathFloor(12 * fxscale + 0.5))
         end
     end
 end
@@ -746,10 +764,10 @@ function CreateCompositeExplosionMeshes(object)
     local scalingmin = 0.065
     local scalingmax = 0.135
 
-    table.insert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_a_proj.bp', 0.4, 0.4, 0.4, GetRandomFloat(0.1, 0.2), GetRandomFloat(scalingmin, scalingmax), lifetime, 0.1, 0.1, 0.1, -45, 1, 0, 0))
-    table.insert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_b_proj.bp', -0.4, 0.4, 0.4, GetRandomFloat(0.1, 0.2), GetRandomFloat(scalingmin, scalingmax), lifetime, -0.1, 0.1, 0.1, -80, 1, 0, -1))
-    table.insert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_c_proj.bp', -0.2, 0.4, -0.4, GetRandomFloat(0.1, 0.2), GetRandomFloat(scalingmin, scalingmax), lifetime, -0.04, 0.1, -0.1, -90, -1, 0, 0))
-    table.insert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_d_proj.bp', 0.0, 0.7, 0.4, GetRandomFloat(0.1, 0.14), GetRandomFloat(scalingmin, scalingmax), lifetime, 0, 0.1, 0, 90, 1, 0, 0))
+    tableInsert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_a_proj.bp', 0.4, 0.4, 0.4, GetRandomFloat(0.1, 0.2), GetRandomFloat(scalingmin, scalingmax), lifetime, 0.1, 0.1, 0.1, -45, 1, 0, 0))
+    tableInsert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_b_proj.bp', -0.4, 0.4, 0.4, GetRandomFloat(0.1, 0.2), GetRandomFloat(scalingmin, scalingmax), lifetime, -0.1, 0.1, 0.1, -80, 1, 0, -1))
+    tableInsert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_c_proj.bp', -0.2, 0.4, -0.4, GetRandomFloat(0.1, 0.2), GetRandomFloat(scalingmin, scalingmax), lifetime, -0.04, 0.1, -0.1, -90, -1, 0, 0))
+    tableInsert(explosionMeshProjectiles, CreateExplosionMesh(object, '/effects/Explosion/Explosion01_d_proj.bp', 0.0, 0.7, 0.4, GetRandomFloat(0.1, 0.14), GetRandomFloat(scalingmin, scalingmax), lifetime, 0, 0.1, 0, 90, 1, 0, 0))
 
     -- Slow down scaling of secondary meshes
     WaitSeconds(0.3)

@@ -4,6 +4,20 @@
 --  Summary  :  Low level buff field class (version 3)
 ------------------------------------------------------
 
+local aibrain_methodsGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local tableRemove = table.remove
+local tableInsert = table.insert
+local ParseEntityCategory = ParseEntityCategory
+local ipairs = ipairs
+local tableEmpty = table.empty
+local next = next
+local KillThread = KillThread
+local entity_methodsGetBlueprint = moho.entity_methods.GetBlueprint
+local tableMerged = table.merged
+local type = type
+local WARN = WARN
+local tableSubtract = table.subtract
+
 local Buff = import('/lua/sim/Buff.lua')
 local Entity = import('/lua/sim/Entity.lua').Entity
 
@@ -17,7 +31,7 @@ BuffField = Class(Entity) {
     -- EVENTS
     OnCreated = function(self)
         -- Fires when the field is initalised
-        local bp = self:GetBlueprint()
+        local bp = entity_methodsGetBlueprint(self)
         if bp.InitiallyEnabled then
             self:Enable()
         end
@@ -32,7 +46,7 @@ BuffField = Class(Entity) {
                 Owner.BuffFieldEffectsBag = {}
             end
             self.Emitter = CreateAttachedEmitter(Owner, 0, Owner.Army, self.FieldVisualEmitter)
-            table.insert(Owner.BuffFieldEffectsBag, self.Emitter)
+            tableInsert(Owner.BuffFieldEffectsBag, self.Emitter)
         end
     end,
 
@@ -45,7 +59,7 @@ BuffField = Class(Entity) {
             for k, v in Owner.BuffFieldEffectsBag do
                 if v == self.Emitter then
                     v:Destroy()
-                    table.remove(Owner.BuffFieldEffectsBag, k)
+                    tableRemove(Owner.BuffFieldEffectsBag, k)
                     break
                 end
             end
@@ -67,13 +81,13 @@ BuffField = Class(Entity) {
 
     OnCreate = function(self)
         local Owner = self:GetOwner()
-        local bp = self:GetBlueprint()
+        local bp = entity_methodsGetBlueprint(self)
 
         -- Verifying blueprint
         if not bp.Name or type(bp.Name) ~= 'string' or bp.Name == '' then WARN('BuffField: Invalid name or name not set!') end
         if type(bp.AffectsUnitCategories) == 'string' then bp.AffectsUnitCategories = ParseEntityCategory(bp.AffectsUnitCategories) end
         if type(bp.Buffs) == 'string' then bp.Buffs = {bp.Buffs} end
-        if table.empty(bp.Buffs) then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
+        if tableEmpty(bp.Buffs) then WARN('BuffField: [..repr(bp.Name)..] no buffs specified!') end
 
         if not bp.Duration then
             WARN('BuffField: [..repr(bp.Name)..] Duration must be specified for a buff field buff.')
@@ -104,19 +118,19 @@ BuffField = Class(Entity) {
         if bp.AffectsOwnUnits and bp.AffectsAllies and bp.AffectsVisibleEnemies then
             -- Affect *all* the things!
             self.GetNearbyAffectableUnits = function()
-                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius)
+                return aibrain_methodsGetUnitsAroundPoint(aiBrain, AffectsUnitCategories, pos, Radius)
             end
         elseif bp.AffectsOwnUnits and bp.AffectsAllies then
             -- All friendlies, no enemies.
             self.GetNearbyAffectableUnits = function()
-                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally')
+                return aibrain_methodsGetUnitsAroundPoint(aiBrain, AffectsUnitCategories, pos, Radius, 'Ally')
             end
         elseif bp.AffectsOwnUnits and bp.AffectsVisibleEnemies then
             -- Self and enemies, not allies.
             self.GetNearbyAffectableUnits = function()
-                return table.merged(
+                return tableMerged(
                     aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally'),
-                    aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+                    aibrain_methodsGetUnitsAroundPoint(aiBrain, AffectsUnitCategories, pos, Radius, 'Enemy')
                 )
             end
         elseif bp.AffectsOwnUnits then
@@ -127,17 +141,17 @@ BuffField = Class(Entity) {
         elseif bp.AffectsVisibleEnemies then
             -- Enemies units only.
             self.GetNearbyAffectableUnits = function()
-                return aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
+                return aibrain_methodsGetUnitsAroundPoint(aiBrain, AffectsUnitCategories, pos, Radius, 'Enemy')
             end
         elseif bp.AffectsAllies then
             -- Allies only. This wasn't supported before and is stupid anyway, but until we change
             -- the configuration so it's unrepresentable let's do it anyway...
             self.GetNearbyAffectableUnits = function()
                 local mine = aiBrain:GetOwnUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Enemy')
-                local allied = aiBrain:GetUnitsAroundPoint(AffectsUnitCategories, pos, Radius, 'Ally')
+                local allied = aibrain_methodsGetUnitsAroundPoint(aiBrain, AffectsUnitCategories, pos, Radius, 'Ally')
 
                 -- Subtract mine from allied and you get the allies only.
-                return table.subtract(allied, mine)
+                return tableSubtract(allied, mine)
             end
         end
 
@@ -161,7 +175,7 @@ BuffField = Class(Entity) {
     end,
 
     GetBuffs = function(self)
-        return self:GetBlueprint().Buffs or nil
+        return entity_methodsGetBlueprint(self).Buffs or nil
     end,
 
     GetOwner = function(self)
@@ -171,7 +185,7 @@ BuffField = Class(Entity) {
     Enable = function(self)
         if not self:IsEnabled() then
             local Owner = self:GetOwner()
-            local bp = self:GetBlueprint()
+            local bp = entity_methodsGetBlueprint(self)
 
             self.ThreadHandle = self.Owner:ForkThread(self.FieldThread, self)
             Owner:SetEnergyMaintenanceConsumptionOverride(bp.MaintenanceConsumptionPerSecondEnergy or 0)
@@ -196,7 +210,7 @@ BuffField = Class(Entity) {
     -- Owner is the unit that carries the field. This is a bit weird to have it like this but its the result of
     -- of the forkthread in the enable function.
     FieldThread = function(Owner, self)
-        local bp = self:GetBlueprint()
+        local bp = entity_methodsGetBlueprint(self)
 
         while not Owner.Dead do
             local units = self.GetNearbyAffectableUnits()
@@ -250,7 +264,7 @@ function BuffFieldBlueprint(bpData)
             WARN('BuffFieldBlueprint: Trying to merge blueprint "'..bpData.Name..'" with a non-existing one.')
         else
             bpData.Merge = nil
-            BuffFieldBlueprints[bpData.Name] = table.merged(BuffFieldBlueprints[bpData.Name], bpData)
+            BuffFieldBlueprints[bpData.Name] = tableMerged(BuffFieldBlueprints[bpData.Name], bpData)
         end
     else
         -- Adding new blueprint if it doesn't exist yet

@@ -7,6 +7,15 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local ipairs = ipairs
+local debugGetinfo = debug.getinfo
+local type = type
+local error = error
+local WARN = WARN
+local stringGsub = string.gsub
+local next = next
+local tableInsert = table.insert
+
 function AddGlobalBaseTemplate(aiBrain, locationType, baseBuilderName)
     if not BaseBuilderTemplates[baseBuilderName] then
         error('*AI ERROR: Invalid BaseBuilderTemplate: none found named - ' .. baseBuilderName)
@@ -31,7 +40,7 @@ function AddGlobalBuilderGroup(aiBrain, locationType, builderGroupName)
     if BuilderGroups[builderGroupName] then
         AddBuilderTable(aiBrain, locationType, BuilderGroups[builderGroupName], builderGroupName)
     else
-        WARN('['..string.gsub(debug.getinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debug.getinfo(1).currentline..'] *AddGlobalBuilderGroup ERROR: BuilderGroup ' .. repr(builderGroupName) .. ' does not exist!' )
+        WARN('['..stringGsub(debugGetinfo(1).source, ".*\\(.*.lua)", "%1")..', line:'..debugGetinfo(1).currentline..'] *AddGlobalBuilderGroup ERROR: BuilderGroup ' .. repr(builderGroupName) .. ' does not exist!' )
     end
 end
 
@@ -66,7 +75,7 @@ function AddBuilderTable(aiBrain, locationType, builderTable, tableName)
             if not Builders[v] then
                 WARN('*AI ERROR: Invalid Builder named - ' .. v)
             end
-            table.insert(builders, managers[tableType]:AddBuilder(Builders[v], locationType))
+            tableInsert(builders, managers[tableType]:AddBuilder(Builders[v], locationType))
         end
     end
 end

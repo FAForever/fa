@@ -1,3 +1,7 @@
+local ipairs = ipairs
+local CreateAttachedEmitter = CreateAttachedEmitter
+local next = next
+
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon

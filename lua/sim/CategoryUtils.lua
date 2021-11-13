@@ -8,6 +8,15 @@
 -- There's not really any error handling. In the presence of malformed category expressions the
 -- behaviour is undefined, possibly resulting in native-code crashes due to invalid calls to the
 -- native category classes.
+local ipairs = ipairs
+local ParseEntityCategory = ParseEntityCategory
+local tableGetn = table.getn
+local debugTraceback = debug.traceback
+local stringGsub = string.gsub
+local WARN = WARN
+local next = next
+local tableInsert = table.insert
+
 function ParseEntityCategoryProperly(categoryExpression)
     local tokens = {}
 
@@ -35,21 +44,21 @@ function ParseEntityCategoryProperly(categoryExpression)
     -- Tokenise this thing...
     -- This routine isn't even _almost_ efficient.
     local currentIdentifier = ""
-    categoryExpression:gsub(".", function(c)
+    stringGsub(categoryExpression, ".", function(c)
     -- If we were collecting an identifier, we reached the end of it.
         if (OPERATORS[c] or c == " ") and currentIdentifier ~= "" then
-            table.insert(tokens, currentIdentifier)
+            tableInsert(tokens, currentIdentifier)
             currentIdentifier = ""
         end
 
         if OPERATORS[c] then
-            table.insert(tokens, c)
+            tableInsert(tokens, c)
         elseif c ~= " " then
             currentIdentifier = currentIdentifier .. c
         end
     end)
 
-    local numTokens = table.getn(tokens)
+    local numTokens = tableGetn(tokens)
 
     local function explode(error)
         WARN("Category parsing failed for expression:")
@@ -57,7 +66,7 @@ function ParseEntityCategoryProperly(categoryExpression)
         WARN("Tokeniser interpretation:")
         WARN(repr(tokens))
         WARN("Error from parser:")
-        WARN(debug.traceback(nil, error))
+        WARN(debugTraceback(nil, error))
     end
 
     --- Given the token list and an offset, find the index of the matching bracket.

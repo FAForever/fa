@@ -8,6 +8,17 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
+local ipairs = ipairs
+local aibrain_methodsCanBuildStructureAt = moho.aibrain_methods.CanBuildStructureAt
+local unit_methodsCanBuild = moho.unit_methods.CanBuild
+local unit_methodsGetGuardedUnit = moho.unit_methods.GetGuardedUnit
+local CreateUnitHPR = CreateUnitHPR
+local error = error
+local CreateUnit = CreateUnit
+local WARN = WARN
+local next = next
+local CheatsEnabled = CheatsEnabled
+
 local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
@@ -221,7 +232,7 @@ Callbacks.CapStructure = function(data, units)
             local blueprintID = ConstructBlueprintID(faction, data.id)
 
             -- check if this unit can build it
-            if unit:CanBuild(blueprintID) then
+            if unit_methodsCanBuild(unit, blueprintID) then
                 buildersByFaction[faction] = buildersByFaction[faction] or { }
                 TableInsert(buildersByFaction[faction], unit)
             else
@@ -279,7 +290,7 @@ Callbacks.CapStructure = function(data, units)
             buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
 
             -- order all builders to build if possible
-            if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+            if aibrain_methodsCanBuildStructureAt(brain, blueprintID, buildLocation) then 
                 for _, builder in builders do 
                     IssueBuildMobile({builder}, buildLocation, blueprintID, {})
                 end
@@ -420,10 +431,10 @@ end
 function IsInvalidAssist(unit, target)
     if target and target.EntityId == unit.EntityId then
         return true
-    elseif not target or not target:GetGuardedUnit() then
+    elseif not target or not unit_methodsGetGuardedUnit(target) then
         return false
     else
-        return IsInvalidAssist(unit, target:GetGuardedUnit())
+        return IsInvalidAssist(unit, unit_methodsGetGuardedUnit(target))
     end
 end
 

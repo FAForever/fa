@@ -8,6 +8,12 @@
 ----------------------------------------------------------------------------
 
 -- Global list of all buffs found in the system.
+local ipairs = ipairs
+local LOG = LOG
+local setmetatable = setmetatable
+local next = next
+local type = type
+
 PlatoonTemplates = {}
 
 --

@@ -7,6 +7,12 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aiutilitiesUp = import('/lua/AI/AIUtilities.lua')
+local aibrain_methodsGetMapWaterRatio = moho.aibrain_methods.GetMapWaterRatio
+local GetMapSize = GetMapSize
+local aibrain_methodsGetArmyStartPos = moho.aibrain_methods.GetArmyStartPos
+local Random = Random
+
 BaseBuilderTemplate {
     BaseTemplateName = 'RushMainNaval',
     Builders = {
@@ -142,7 +148,7 @@ BaseBuilderTemplate {
     end,
     FirstBaseFunction = function(aiBrain)
         local mapSizeX, mapSizeZ = GetMapSize()
-        local startX, startZ = aiBrain:GetArmyStartPos()
+        local startX, startZ = aibrain_methodsGetArmyStartPos(aiBrain)
 
         local per = ScenarioInfo.ArmySetup[aiBrain.Name].AIPersonality
         if not per then
@@ -154,14 +160,14 @@ BaseBuilderTemplate {
 
         #DUNCAN - Add island check
         local isIsland = false
-        local islandMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
+        local islandMarker = aiutilitiesUp.AIGetClosestMarkerLocation(aiBrain, 'Island', startX, startZ)
         if islandMarker then
             isIsland = true
         end
 
-        local navalMarker = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
-        local navalExclude = import('/lua/AI/AIUtilities.lua').AIGetClosestMarkerLocation(aiBrain, 'Naval Exclude', startX, startZ)
-        if not navalMarker or aiBrain:GetMapWaterRatio() < .5 or navalExclude then
+        local navalMarker = aiutilitiesUp.AIGetClosestMarkerLocation(aiBrain, 'Naval Area', startX, startZ)
+        local navalExclude = aiutilitiesUp.AIGetClosestMarkerLocation(aiBrain, 'Naval Exclude', startX, startZ)
+        if not navalMarker or aibrain_methodsGetMapWaterRatio(aiBrain) < .5 or navalExclude then
             return 0, 'rushnaval'
         end
 

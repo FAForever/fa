@@ -7,6 +7,8 @@
 -- **
 -- **  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
+local tableConcatenate = table.concatenate
+
 EmtBpPath = '/effects/emitters/'
 EmitterTempEmtBpPath = '/effects/emitters/temp/'
 
@@ -84,9 +86,9 @@ SmokePlumeMedDensitySml03 = { EmtBpPath .. 'destruction_explosion_smoke_11_emit.
 -- ---------------------------------------------------------------
 -- Wreckage Smoke Effects
 -- ---------------------------------------------------------------
-DefaultWreckageEffectsSml01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
-DefaultWreckageEffectsMed01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
-DefaultWreckageEffectsLrg01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsSml01 = tableConcatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsMed01 = tableConcatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsLrg01 = tableConcatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
 
 
 -- ---------------------------------------------------------------
@@ -112,13 +114,13 @@ ExplosionDebrisLrg01 = {
 -- ---------------------------------------------------------------
 -- Explosion Effects
 -- ---------------------------------------------------------------
-ExplosionEffectsSml01 = table.concatenate(FireShadowSml01, FlareSml01, FireCloudSml01, ExplosionDebrisSml01)
-ExplosionEffectsMed01 = table.concatenate(FireShadowMed01, SmokeMed01, FireCloudMed01, ExplosionDebrisMed01)
-ExplosionEffectsLrg01 = table.concatenate(FireShadowLrg01, SmokeLrg01, ExplosionDebrisLrg01)
+ExplosionEffectsSml01 = tableConcatenate(FireShadowSml01, FlareSml01, FireCloudSml01, ExplosionDebrisSml01)
+ExplosionEffectsMed01 = tableConcatenate(FireShadowMed01, SmokeMed01, FireCloudMed01, ExplosionDebrisMed01)
+ExplosionEffectsLrg01 = tableConcatenate(FireShadowLrg01, SmokeLrg01, ExplosionDebrisLrg01)
 ExplosionEffectsDefault01 = ExplosionEffectsMed01
 
-DefaultHitExplosion01 = table.concatenate(FireCloudMed01, FlashSml01, FlareSml01, SmokeSml01)
-DefaultHitExplosion02 = table.concatenate(FireCloudSml01, FlashSml01, FlareSml01, SmokeSml01)
+DefaultHitExplosion01 = tableConcatenate(FireCloudMed01, FlashSml01, FlareSml01, SmokeSml01)
+DefaultHitExplosion02 = tableConcatenate(FireCloudSml01, FlashSml01, FlareSml01, SmokeSml01)
 
 Splashy = {
     EmtBpPath .. 'Watersplash_s.bp',
@@ -205,7 +207,7 @@ op_fire_01 = {
 -- ---------------------------------------------------------------
 -- Default Projectile Impact Effects
 -- ---------------------------------------------------------------
-DefaultMissileHit01 = table.concatenate(FireCloudSml01, FlashSml01, FlareSml01)
+DefaultMissileHit01 = tableConcatenate(FireCloudSml01, FlashSml01, FlareSml01)
 DefaultProjectileAirUnitImpact = {
     EmtBpPath .. 'destruction_unit_hit_flash_01_emit.bp',
     EmtBpPath .. 'destruction_unit_hit_shrapnel_01_emit.bp',
@@ -261,7 +263,7 @@ DamageFire01 = {
     EmtBpPath .. 'destruction_damaged_fire_01_emit.bp',
     EmtBpPath .. 'destruction_damaged_fire_distort_01_emit.bp',
 }
-DamageFireSmoke01 = table.concatenate(DamageSmoke01, DamageFire01)
+DamageFireSmoke01 = tableConcatenate(DamageSmoke01, DamageFire01)
 
 DamageStructureSmoke01 = { EmtBpPath .. 'destruction_damaged_smoke_02_emit.bp',}
 DamageStructureFire01 = {
@@ -270,12 +272,12 @@ DamageStructureFire01 = {
     EmtBpPath .. 'destruction_damaged_fire_distort_02_emit.bp',
 }
 DamageStructureSparks01 = { EmtBpPath .. 'destruction_damaged_sparks_01_emit.bp',}
-DamageStructureFireSmoke01 = table.concatenate(DamageStructureSmoke01, DamageStructureFire01)
+DamageStructureFireSmoke01 = tableConcatenate(DamageStructureSmoke01, DamageStructureFire01)
 
 -- ---------------------------------------------------------------
 -- Ambient effects
 -- ---------------------------------------------------------------
-TreeBurning01 = table.concatenate(DamageFire01 ,{EmtBpPath .. 'forest_fire_smoke_01_emit.bp'})
+TreeBurning01 = tableConcatenate(DamageFire01 ,{EmtBpPath .. 'forest_fire_smoke_01_emit.bp'})
 
 
 -- ---------------------------------------------------------------
@@ -797,7 +799,7 @@ ACommanderOverchargeHit01 = {
 
 ADepthCharge01 = { EmtBpPath .. 'harmonic_depth_charge_resonance_01_emit.bp',}
 ADepthChargeHitUnit01 = DefaultProjectileUnderWaterImpact
-ADepthChargeHitUnderWaterUnit01 = table.concatenate(ADepthCharge01, DefaultProjectileUnderWaterImpact)
+ADepthChargeHitUnderWaterUnit01 = tableConcatenate(ADepthCharge01, DefaultProjectileUnderWaterImpact)
 
 ADisruptorCannonMuzzle01 = {
     EmtBpPath .. 'adisruptor_cannon_muzzle_01_emit.bp',
@@ -868,8 +870,8 @@ AHighIntensityLaserHit01 = {
     EmtBpPath .. 'laserturret_hit_flash_05_emit.bp',
     EmtBpPath .. 'laserturret_hit_flash_09_emit.bp',
 }
-AHighIntensityLaserHitUnit01 = table.concatenate(AHighIntensityLaserHit01, UnitHitShrapnel01)
-AHighIntensityLaserHitLand01 = table.concatenate(AHighIntensityLaserHit01)
+AHighIntensityLaserHitUnit01 = tableConcatenate(AHighIntensityLaserHit01, UnitHitShrapnel01)
+AHighIntensityLaserHitLand01 = tableConcatenate(AHighIntensityLaserHit01)
 AHighIntensityLaserFlash01   = {
     -- EmtBpPath .. 'aeon_laser_highintensity_flash_01_emit.bp',
     EmtBpPath .. 'aeon_laser_highintensity_flash_02_emit.bp',
@@ -887,12 +889,12 @@ ALaserBotHit01 = {
     EmtBpPath .. 'laserturret_hit_flash_04_emit.bp',
     EmtBpPath .. 'laserturret_hit_flash_05_emit.bp',
 }
-ALaserBotHitUnit01 = table.concatenate(ALaserBotHit01, UnitHitShrapnel01)
-ALaserBotHitLand01 = table.concatenate(ALaserBotHit01)
+ALaserBotHitUnit01 = tableConcatenate(ALaserBotHit01, UnitHitShrapnel01)
+ALaserBotHitLand01 = tableConcatenate(ALaserBotHit01)
 
 ALaserHit01 = { EmtBpPath .. 'laserturret_hit_flash_02_emit.bp',}
-ALaserHitUnit01 = table.concatenate(ALaserHit01, UnitHitShrapnel01)
-ALaserHitLand01 = table.concatenate(ALaserHit01)
+ALaserHitUnit01 = tableConcatenate(ALaserHit01, UnitHitShrapnel01)
+ALaserHitLand01 = tableConcatenate(ALaserHit01)
 
 ALightLaserHit01 = { EmtBpPath .. 'laserturret_hit_flash_07_emit.bp',}
 ALightLaserHit02 = {
@@ -900,7 +902,7 @@ ALightLaserHit02 = {
     EmtBpPath .. 'laserturret_hit_flash_08_emit.bp',
 }
 
-ALightLaserHitUnit01 = table.concatenate(ALightLaserHit02, UnitHitShrapnel01)
+ALightLaserHitUnit01 = tableConcatenate(ALightLaserHit02, UnitHitShrapnel01)
 
 ALightMortarHit01 = {
     EmtBpPath .. 'aeon_light_shell_01_emit.bp',
@@ -1146,9 +1148,9 @@ ASonanceWeaponHit02 = {
 }
 
 ASonicPulse01 = { EmtBpPath .. 'sonic_pulse_hit_flash_01_emit.bp',}
-ASonicPulseHitUnit01 = table.concatenate(ASonicPulse01, UnitHitShrapnel01)
+ASonicPulseHitUnit01 = tableConcatenate(ASonicPulse01, UnitHitShrapnel01)
 ASonicPulseHitAirUnit01 = ASonicPulseHitUnit01
-ASonicPulseHitLand01 = table.concatenate(ASonicPulse01)
+ASonicPulseHitLand01 = tableConcatenate(ASonicPulse01)
 
 ASonicPulsarMunition01 = {
     '/effects/emitters/sonic_pulsar_01_emit.bp',
@@ -1170,7 +1172,7 @@ ATorpedoHit_Bubbles = {
     EmtBpPath .. 'destruction_underwater_explosion_splash_01_emit.bp',
 }
 
-ATorpedoUnitHitUnderWater01 = table.concatenate(ATorpedoUnitHit01, ATorpedoHit_Bubbles)
+ATorpedoUnitHitUnderWater01 = tableConcatenate(ATorpedoUnitHit01, ATorpedoHit_Bubbles)
 
 ATorpedoPolyTrails01 =  EmtBpPath .. 'aeon_torpedocluster_polytrail_01_emit.bp'
 
@@ -1412,8 +1414,8 @@ CDisintegratorHit02 = {
     EmtBpPath .. 'disintegrator_hit_flashunit_07_emit.bp',
 }
 CDisintegratorHit03 = { EmtBpPath .. 'disintegrator_hit_flash_02_emit.bp',}
-CDisintegratorHitUnit01 = table.concatenate(CDisintegratorHit01, CDisintegratorHit02)
-CDisintegratorHitAirUnit01 = table.concatenate(CDisintegratorHit03, CDisintegratorHit02)
+CDisintegratorHitUnit01 = tableConcatenate(CDisintegratorHit01, CDisintegratorHit02)
+CDisintegratorHitAirUnit01 = tableConcatenate(CDisintegratorHit03, CDisintegratorHit02)
 CDisintegratorFxTrails01 = {
     EmtBpPath .. 'disintegrator_fxtrail_01_emit.bp'
 }
@@ -1438,7 +1440,7 @@ CHvyDisintegratorHit02 = {
     EmtBpPath .. 'disintegratorhvy_hit_flash_06_emit.bp',
     EmtBpPath .. 'disintegratorhvy_hit_flash_08_emit.bp',
 }
-CHvyDisintegratorHitUnit01 = table.concatenate(CHvyDisintegratorHit01, CHvyDisintegratorHit02)
+CHvyDisintegratorHitUnit01 = tableConcatenate(CHvyDisintegratorHit01, CHvyDisintegratorHit02)
 CHvyDisintegratorHitLand01 = CHvyDisintegratorHit01
 
 
@@ -1483,10 +1485,10 @@ CElectronBolterHit03 = {
     EmtBpPath .. 'electron_bolter_hit_flash_02_emit.bp',
     EmtBpPath .. 'electron_bolter_hit_05_emit.bp',
 }
-CElectronBolterHitUnit01 = table.concatenate(CElectronBolterHit01, CElectronBolterHit02, UnitHitShrapnel01)
+CElectronBolterHitUnit01 = tableConcatenate(CElectronBolterHit01, CElectronBolterHit02, UnitHitShrapnel01)
 CElectronBolterHitLand01 = CElectronBolterHit01
-CElectronBolterHitUnit02 = table.concatenate(CElectronBolterHit01, CElectronBolterHit02, CElectronBolterHit03, UnitHitShrapnel01)
-CElectronBolterHitLand02 = table.concatenate(CElectronBolterHit01, CElectronBolterHit03)
+CElectronBolterHitUnit02 = tableConcatenate(CElectronBolterHit01, CElectronBolterHit02, CElectronBolterHit03, UnitHitShrapnel01)
+CElectronBolterHitLand02 = tableConcatenate(CElectronBolterHit01, CElectronBolterHit03)
 CElectronBolterHit03 = {
     EmtBpPath .. 'electron_bolter_hit_02_emit.bp',
     EmtBpPath .. 'electron_bolter_hit_flash_01_emit.bp',
@@ -1523,7 +1525,7 @@ CLaserHit02 = {
     EmtBpPath .. 'cybran_laser_hit_sparks_01_emit.bp',
 }
 CLaserHitLand01 = CLaserHit01
-CLaserHitUnit01 = table.concatenate(CLaserHit02, UnitHitShrapnel01)
+CLaserHitUnit01 = tableConcatenate(CLaserHit02, UnitHitShrapnel01)
 CLaserMuzzleFlash01 = {
     EmtBpPath .. 'laser_muzzle_flash_02_emit.bp',
     EmtBpPath .. 'default_muzzle_flash_01_emit.bp',
@@ -1570,7 +1572,7 @@ CMissileHit02b = {
     EmtBpPath .. 'cybran_corsair_missile_glow_hit_unit_01_emit.bp',
 }
 
-CMissileHit02 = table.concatenate(FireCloudSml01, FlashSml01, FlareSml01, CMissileHit02a)
+CMissileHit02 = tableConcatenate(FireCloudSml01, FlashSml01, FlareSml01, CMissileHit02a)
 CMissileLOAHit01 = {
     EmtBpPath .. 'cybran_missile_hit_01_emit.bp',
     EmtBpPath .. 'cybran_missile_hit_02_emit.bp',
@@ -1640,8 +1642,8 @@ CNeutronClusterBombHitLand01 = CNeutronClusterBombHit01
 CNeutronClusterBombHitWater01 = CNeutronClusterBombHit01
 
 CParticleCannonHit01 = { EmtBpPath .. 'laserturret_hit_flash_01_emit.bp',}
-CParticleCannonHitUnit01 = table.concatenate(CParticleCannonHit01, UnitHitShrapnel01)
-CParticleCannonHitLand01 = table.concatenate(CParticleCannonHit01)
+CParticleCannonHitUnit01 = tableConcatenate(CParticleCannonHit01, UnitHitShrapnel01)
+CParticleCannonHitLand01 = tableConcatenate(CParticleCannonHit01)
 
 CProtonBombHit01 = {
     EmtBpPath .. 'proton_bomb_hit_01_emit.bp',
@@ -1674,7 +1676,7 @@ CHvyProtonCannonHit02 = {
     EmtBpPath .. 'hvyproton_cannon_hit_06_emit.bp',
     EmtBpPath .. 'hvyproton_cannon_hit_08_emit.bp',
 }
-CHvyProtonCannonHitLand = table.concatenate(CHvyProtonCannonHit01, CHvyProtonCannonHit02)
+CHvyProtonCannonHitLand = tableConcatenate(CHvyProtonCannonHit01, CHvyProtonCannonHit02)
 CHvyProtonCannonHitUnit01 = {
     EmtBpPath .. 'hvyproton_cannon_hitunit_01_emit.bp',
     EmtBpPath .. 'hvyproton_cannon_hit_02_emit.bp',
@@ -1688,7 +1690,7 @@ CHvyProtonCannonHitUnit01 = {
     EmtBpPath .. 'hvyproton_cannon_hit_10_emit.bp',
     EmtBpPath .. 'hvyproton_cannon_hit_distort_emit.bp',
 }
-CHvyProtonCannonHitUnit = table.concatenate(CHvyProtonCannonHitUnit01, UnitHitShrapnel01)
+CHvyProtonCannonHitUnit = tableConcatenate(CHvyProtonCannonHitUnit01, UnitHitShrapnel01)
 CHvyProtonCannonPolyTrail =  EmtBpPath .. 'hvyproton_cannon_polytrail_01_emit.bp'
 CHvyProtonCannonFXTrail01 =  { EmtBpPath .. 'hvyproton_cannon_fxtrail_01_emit.bp' }
 
@@ -1709,7 +1711,7 @@ CProtonArtilleryHit01 = {
     EmtBpPath .. 'shockwave_01_emit.bp',
 }
 
-CTorpedoUnitHit01 = table.concatenate(DefaultProjectileWaterImpact, DefaultProjectileUnderWaterImpact)
+CTorpedoUnitHit01 = tableConcatenate(DefaultProjectileWaterImpact, DefaultProjectileUnderWaterImpact)
 
 CZealotLaunch01 = {
     EmtBpPath .. 'muzzle_flash_01_emit.bp',
@@ -1794,7 +1796,7 @@ TAPDSHit01 = {
     EmtBpPath .. 'uef_t2_artillery_hit_07_emit.bp',
 }
 
-TAPDSHitUnit01 = table.concatenate(TAPDSHit01, UnitHitShrapnel01)
+TAPDSHitUnit01 = tableConcatenate(TAPDSHit01, UnitHitShrapnel01)
 
 
 -- ------------------------------------------------------------------------
@@ -1890,9 +1892,9 @@ TGaussCannonHit02 = {
     EmtBpPath .. 'gauss_cannon_hit_04_emit.bp',
     EmtBpPath .. 'gauss_cannon_hit_05_emit.bp',
 }
-TGaussCannonHitUnit01 = table.concatenate(TGaussCannonHit01, UnitHitShrapnel01)
+TGaussCannonHitUnit01 = tableConcatenate(TGaussCannonHit01, UnitHitShrapnel01)
 TGaussCannonHitLand01 = TGaussCannonHit01
-TGaussCannonHitUnit02 = table.concatenate(TGaussCannonHit02, UnitHitShrapnel01)
+TGaussCannonHitUnit02 = tableConcatenate(TGaussCannonHit02, UnitHitShrapnel01)
 TGaussCannonHitLand02 = TGaussCannonHit02
 TGaussCannonPolyTrail =  {
     EmtBpPath .. 'gauss_cannon_polytrail_01_emit.bp',
@@ -1955,9 +1957,9 @@ TLandGaussCannonHit01 = {
     EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
 }
 
-TShipGaussCannonHitUnit01 = table.concatenate(TShipGaussCannonHit01, UnitHitShrapnel01)
-TShipGaussCannonHitUnit02 = table.concatenate(TShipGaussCannonHit02, UnitHitShrapnel01)
-TLandGaussCannonHitUnit01 = table.concatenate(TLandGaussCannonHit01, UnitHitShrapnel01)
+TShipGaussCannonHitUnit01 = tableConcatenate(TShipGaussCannonHit01, UnitHitShrapnel01)
+TShipGaussCannonHitUnit02 = tableConcatenate(TShipGaussCannonHit02, UnitHitShrapnel01)
+TLandGaussCannonHitUnit01 = tableConcatenate(TLandGaussCannonHit01, UnitHitShrapnel01)
 
 -- ------------------------------------------------------------------------
 --  TERRAN GINSU BEAM EMITTERS
@@ -2057,8 +2059,8 @@ TPlasmaCannonHeavyHit03 = {
 TPlasmaCannonHeavyHit04 = {
     EmtBpPath .. 'heavy_plasma_cannon_hitunit_05_emit.bp',
 }
-TPlasmaCannonHeavyHit01 = table.concatenate(TPlasmaCannonHeavyHit02, TPlasmaCannonHeavyHit03)
-TPlasmaCannonHeavyHitUnit01 = table.concatenate(TPlasmaCannonHeavyHit02, TPlasmaCannonHeavyHit04, UnitHitShrapnel01)
+TPlasmaCannonHeavyHit01 = tableConcatenate(TPlasmaCannonHeavyHit02, TPlasmaCannonHeavyHit03)
+TPlasmaCannonHeavyHitUnit01 = tableConcatenate(TPlasmaCannonHeavyHit02, TPlasmaCannonHeavyHit04, UnitHitShrapnel01)
 
 TPlasmaCannonHeavyMunition = {
     EmtBpPath .. 'plasma_cannon_trail_02_emit.bp',
@@ -2087,7 +2089,7 @@ THeavyPlasmaGatlingCannonHit = {
 THeavyPlasmaGatlingCannonHit02 = {
 }
 
-THeavyPlasmaGatlingCannonHitUnit = table.concatenate(THeavyPlasmaGatlingCannonHit, THeavyPlasmaGatlingCannonHit02, UnitHitShrapnel01)
+THeavyPlasmaGatlingCannonHitUnit = tableConcatenate(THeavyPlasmaGatlingCannonHit, THeavyPlasmaGatlingCannonHit02, UnitHitShrapnel01)
 
 THeavyPlasmaGatlingCannonMuzzleFlash = {
     EmtBpPath .. 'heavy_plasma_gatling_cannon_laser_muzzle_flash_01_emit.bp',
@@ -2184,8 +2186,8 @@ TIonizedPlasmaGatlingCannonHit03 = {
     EmtBpPath .. 'ionized_plasma_gatling_cannon_laser_hitunit_03_emit.bp',
     EmtBpPath .. 'ionized_plasma_gatling_cannon_laser_hitunit_06_emit.bp',
 }
-TIonizedPlasmaGatlingCannonUnitHit = table.concatenate(TIonizedPlasmaGatlingCannonHit01, TIonizedPlasmaGatlingCannonHit03, UnitHitShrapnel01)
-TIonizedPlasmaGatlingCannonHit = table.concatenate(TIonizedPlasmaGatlingCannonHit01, TIonizedPlasmaGatlingCannonHit02)
+TIonizedPlasmaGatlingCannonUnitHit = tableConcatenate(TIonizedPlasmaGatlingCannonHit01, TIonizedPlasmaGatlingCannonHit03, UnitHitShrapnel01)
+TIonizedPlasmaGatlingCannonHit = tableConcatenate(TIonizedPlasmaGatlingCannonHit01, TIonizedPlasmaGatlingCannonHit02)
 TIonizedPlasmaGatlingCannonMuzzleFlash = {
     EmtBpPath .. 'ionized_plasma_gatling_cannon_laser_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'ionized_plasma_gatling_cannon_laser_muzzle_flash_02_emit.bp',
@@ -2314,13 +2316,13 @@ TRiotGunHit01 = {
      EmtBpPath .. 'riot_gun_hit_02_emit.bp',
      EmtBpPath .. 'riot_gun_hit_03_emit.bp',
 }
-TRiotGunHitUnit01 = table.concatenate(TRiotGunHit01, UnitHitShrapnel01)
+TRiotGunHitUnit01 = tableConcatenate(TRiotGunHit01, UnitHitShrapnel01)
 TRiotGunHit02 = {
      EmtBpPath .. 'riot_gun_hit_04_emit.bp',
      EmtBpPath .. 'riot_gun_hit_05_emit.bp',
      EmtBpPath .. 'riot_gun_hit_06_emit.bp',
 }
-TRiotGunHitUnit02 = table.concatenate(TRiotGunHit02, UnitHitShrapnel01)
+TRiotGunHitUnit02 = tableConcatenate(TRiotGunHit02, UnitHitShrapnel01)
 TRiotGunMuzzleFx = {
     EmtBpPath .. 'riotgun_muzzle_fire_01_emit.bp',
     EmtBpPath .. 'riotgun_muzzle_flash_01_emit.bp',
@@ -2490,7 +2492,7 @@ TMissileHit02 = {
 -- ------------------------------------------------------------------------
 --  TERRAN TORPEDO EMITTERS
 -- ------------------------------------------------------------------------
-TTorpedoHitUnit01 = table.concatenate(DefaultProjectileWaterImpact, DefaultProjectileUnderWaterImpact)
+TTorpedoHitUnit01 = tableConcatenate(DefaultProjectileWaterImpact, DefaultProjectileUnderWaterImpact)
 TTorpedoHitUnitUnderwater01 = DefaultProjectileUnderWaterImpact
 
 
@@ -2628,7 +2630,7 @@ SDFAireauWeaponHit02 = {
     EmtBpPath .. 'seraphim_aireau_autocannon_hitunit_05_emit.bp',
 }
 
-SDFAireauWeaponHitUnit = table.concatenate(SDFAireauWeaponHit01, SDFAireauWeaponHit02, UnitHitShrapnel01)
+SDFAireauWeaponHitUnit = tableConcatenate(SDFAireauWeaponHit01, SDFAireauWeaponHit02, UnitHitShrapnel01)
 
 -- ------------------------------------------------------------------------
 --  SERAPHIM SINN-UTHE CANNON
@@ -2668,8 +2670,8 @@ SDFSinnutheWeaponHit03 = {
     EmtBpPath .. 'seraphim_sinnuthe_hitunit_04_emit.bp',
 }
 
-SDFSinnutheWeaponHit = table.concatenate(SDFSinnutheWeaponHit01, SDFSinnutheWeaponHit02)
-SDFSinnutheWeaponHitUnit = table.concatenate(SDFSinnutheWeaponHit01, SDFSinnutheWeaponHit03, UnitHitShrapnel01)
+SDFSinnutheWeaponHit = tableConcatenate(SDFSinnutheWeaponHit01, SDFSinnutheWeaponHit02)
+SDFSinnutheWeaponHitUnit = tableConcatenate(SDFSinnutheWeaponHit01, SDFSinnutheWeaponHit03, UnitHitShrapnel01)
 
 SDFSinnutheWeaponFXTrails01 = {
     EmtBpPath .. 'seraphim_sinnuthe_fxtrails_01_emit.bp',
@@ -2714,7 +2716,7 @@ SDFExperimentalPhasonProjHit02 = {
     EmtBpPath .. 'seraphim_experimental_phasonproj_hitunit_08_emit.bp',
 }
 
-SDFExperimentalPhasonProjHitUnit = table.concatenate(SDFExperimentalPhasonProjHit01, SDFExperimentalPhasonProjHit02, UnitHitShrapnel01)
+SDFExperimentalPhasonProjHitUnit = tableConcatenate(SDFExperimentalPhasonProjHit01, SDFExperimentalPhasonProjHit02, UnitHitShrapnel01)
 
 SDFExperimentalPhasonProjFXTrails01 = {
     EmtBpPath .. 'seraphim_experimental_phasonproj_fxtrails_01_emit.bp',
@@ -3529,7 +3531,7 @@ SZthuthaamArtilleryHit= {
 SZthuthaamArtilleryHit02= {
     EmtBpPath .. 'seraphim_reviler_artillery_hit_06_emit.bp',
 }
-SZthuthaamArtilleryUnitHit = table.concatenate(SZthuthaamArtilleryHit, UnitHitShrapnel01, SZthuthaamArtilleryHit02)
+SZthuthaamArtilleryUnitHit = tableConcatenate(SZthuthaamArtilleryHit, UnitHitShrapnel01, SZthuthaamArtilleryHit02)
 SZthuthaamArtilleryMuzzleFlash= {
     EmtBpPath .. 'seraphim_reviler_artillery_muzzle_flash_01_emit.bp',
     EmtBpPath .. 'seraphim_reviler_artillery_muzzle_flash_02_emit.bp',
@@ -4280,7 +4282,7 @@ Aeon_HeavyDisruptorCannonHit01 = {
     EmtBpPath .. 'destruction_unit_hit_shrapnel_01_emit.bp',
 }
 
-Aeon_HeavyDisruptorCannonUnitHit = table.concatenate(Aeon_HeavyDisruptorCannonLandHit, Aeon_HeavyDisruptorCannonHit01)
+Aeon_HeavyDisruptorCannonUnitHit = tableConcatenate(Aeon_HeavyDisruptorCannonLandHit, Aeon_HeavyDisruptorCannonHit01)
 
 
 
@@ -4441,10 +4443,10 @@ TLaserHit03 = {
     EmtBpPath .. 'terran_commander_cannon_hitunit_06_emit.bp', -- darkening dot particles
     EmtBpPath .. 'terran_commander_cannon_hitunit_07_emit.bp', -- ring
 }
-TLaserHitUnit01 = table.concatenate(TLaserHit01, UnitHitShrapnel01)
-TLaserHitLand01 = table.concatenate(TLaserHit01)
-TLaserHitUnit02 = table.concatenate(TLaserHit03, UnitHitShrapnel01)
-TLaserHitLand02 = table.concatenate(TLaserHit02)
+TLaserHitUnit01 = tableConcatenate(TLaserHit01, UnitHitShrapnel01)
+TLaserHitLand01 = tableConcatenate(TLaserHit01)
+TLaserHitUnit02 = tableConcatenate(TLaserHit03, UnitHitShrapnel01)
+TLaserHitLand02 = tableConcatenate(TLaserHit02)
 
 
 -- -----------------------------------------------------------------------------------

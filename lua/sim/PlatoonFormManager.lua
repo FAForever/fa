@@ -7,6 +7,23 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local aibrain_methodsGetPlatoonUniquelyNamed = moho.aibrain_methods.GetPlatoonUniquelyNamed
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local platoon_methodsCanFormPlatoon = moho.platoon_methods.CanFormPlatoon
+local platoon_methodsGetPlatoonUnits = moho.platoon_methods.GetPlatoonUnits
+local error = error
+local unpack = unpack
+local unit_methodsGetGuards = moho.unit_methods.GetGuards
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local aipersonality_methodsGetPlatoonSize = moho.aipersonality_methods.GetPlatoonSize
+local tableGetn = table.getn
+local type = type
+local platoon_methodsFormPlatoon = moho.platoon_methods.FormPlatoon
+local WARN = WARN
+local EntityCategoryContains = EntityCategoryContains
+
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
@@ -54,7 +71,7 @@ PlatoonFormManager = Class(BuilderManager) {
                 templateData.Plan,
             }
             for k,v in templateData.FactionSquads do
-                table.insert(template, unpack(v))
+                tableInsert(template, unpack(v))
             end
         end
         return template
@@ -70,7 +87,7 @@ PlatoonFormManager = Class(BuilderManager) {
         for k,v in filterUnits do
 
             # Make sure the unit is building or upgrading
-            if not v:IsUnitState('Building') and not v:IsUnitState('Upgrading') then
+            if not unit_methodsIsUnitState(v, 'Building') and not unit_methodsIsUnitState(v, 'Upgrading') then
                 continue
             end
 
@@ -86,14 +103,14 @@ PlatoonFormManager = Class(BuilderManager) {
             end
 
             # Engineer doesn't want any more assistance
-            if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
+            if v.NumAssistees and tableGetn(unit_methodsGetGuards(v)) >= v.NumAssistees then
                 continue
             end
 
             # Check if valid economy exists for this assist
 
             # Unit had not problems; add to possible list
-            table.insert(retUnits, v)
+            tableInsert(retUnits, v)
         end
 
         return retUnits
@@ -104,7 +121,7 @@ PlatoonFormManager = Class(BuilderManager) {
         # Try to form all builders that pass
         if self.Brain.BuilderManagers[self.LocationType] and builder.Priority >= 1 and builder:CheckInstanceCount() then
             local personality = self.Brain:GetPersonality()
-            local poolPlatoon = self.Brain:GetPlatoonUniquelyNamed('ArmyPool')
+            local poolPlatoon = aibrain_methodsGetPlatoonUniquelyNamed(self.Brain, 'ArmyPool')
             local template = self:GetPlatoonTemplate(builder:GetPlatoonTemplate())
             builder:FormDebug()
             local radius = self.Radius
@@ -117,9 +134,9 @@ PlatoonFormManager = Class(BuilderManager) {
                 WARN('*Platoon Form: Could not find template named: ' .. builder:GetPlatoonTemplate())
                 return
             end
-            local formIt = poolPlatoon:CanFormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
+            local formIt = platoon_methodsCanFormPlatoon(poolPlatoon, template, aipersonality_methodsGetPlatoonSize(personality), self.Location, radius)
             if formIt and builder:GetBuilderStatus() then
-                local hndl = poolPlatoon:FormPlatoon(template, personality:GetPlatoonSize(), self.Location, radius)
+                local hndl = platoon_methodsFormPlatoon(poolPlatoon, template, aipersonality_methodsGetPlatoonSize(personality), self.Location, radius)
 
                 #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager Forming - ',repr(builder.BuilderName),': Location = ',self.LocationType)
                 #LOG('*AI DEBUG: ARMY ', repr(self.Brain:GetArmyIndex()),': Platoon Form Manager - Platoon Size = ', table.getn(hndl:GetPlatoonUnits()))
@@ -160,7 +177,7 @@ PlatoonFormManager = Class(BuilderManager) {
 
                 hndl:SetPlatoonData(builder:GetBuilderData(self.LocationType))
 
-                for k,v in hndl:GetPlatoonUnits() do
+                for k,v in platoon_methodsGetPlatoonUnits(hndl) do
                     if not v.PlatoonPlanName then
                         v.PlatoonHandle = hndl
                     end

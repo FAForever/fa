@@ -5,6 +5,34 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local unit_methodsGetBuildRate = moho.unit_methods.GetBuildRate
+local unit_methodsPlaySound = moho.unit_methods.PlaySound
+local unit_methodsCanBuild = moho.unit_methods.CanBuild
+local CreateAnimator = CreateAnimator
+local CreateSlider = CreateSlider
+local ipairs = ipairs
+local unit_methodsGetUnitId = moho.unit_methods.GetUnitId
+local unit_methodsGetFractionComplete = moho.unit_methods.GetFractionComplete
+local unit_methodsGetPosition = moho.unit_methods.GetPosition
+local AnimationManipulatorSetRate = moho.AnimationManipulator.SetRate
+local unit_methodsGetNumBuildOrders = moho.unit_methods.GetNumBuildOrders
+local mathMin = math.min
+local unit_methodsSetElevation = moho.unit_methods.SetElevation
+local WaitFor = WaitFor
+local IssueStop = IssueStop
+local mathCeil = math.ceil
+local unit_methodsSetProductionActive = moho.unit_methods.SetProductionActive
+local unit_methodsGetAIBrain = moho.unit_methods.GetAIBrain
+local unit_methodsDestroy = moho.unit_methods.Destroy
+local next = next
+local unit_methodsGetFocusUnit = moho.unit_methods.GetFocusUnit
+local unit_methodsGetBlueprint = moho.unit_methods.GetBlueprint
+local unit_methodsGetArmy = moho.unit_methods.GetArmy
+local AnimationManipulatorPlayAnim = moho.AnimationManipulator.PlayAnim
+local CreateAttachedEmitter = CreateAttachedEmitter
+local CreateUnitHPR = CreateUnitHPR
+
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -64,7 +92,7 @@ CConstructionTemplate = Class() {
     --- Prepares the values required to support bots
     OnCreate = function(self)
         -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
+        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or mathMin(mathCeil((10 + unit_methodsGetBuildRate(self)) / 15), 10)
     end,
 
     --- When dying, destroy everything.
@@ -209,7 +237,7 @@ CConstructionTemplate = Class() {
         for k = 1, buildBotTotal do 
             local bot = bots[k]
             if bot and not bot.Dead then
-                bot:SetElevation(1)
+                unit_methodsSetElevation(bot, 1)
             end
         end
 
@@ -317,8 +345,8 @@ CBuildBotUnit = Class(AirUnit) {
         UnitSetConsumptionActive(self, false)
 
         -- store the army in case AOE damage tries to hit the drone
-        self.Army = self:GetArmy()
-        self.UnitId = self:GetUnitId()
+        self.Army = unit_methodsGetArmy(self)
+        self.UnitId = unit_methodsGetUnitId(self)
     end,
 
     -- short-cut when being destroyed
@@ -337,7 +365,7 @@ CBuildBotUnit = Class(AirUnit) {
             self:CreateDestructionEffects(1.0)
         end
 
-        self:Destroy()
+        unit_methodsDestroy(self)
     end,
 
     -- prevent this type of operations
@@ -361,7 +389,7 @@ CBuildBotUnit = Class(AirUnit) {
         self:PlayUnitSound('Destroyed')
 
         -- make it gone
-        self:Destroy()
+        unit_methodsDestroy(self)
     end,
 }
 
@@ -370,7 +398,7 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitTicks(2)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, unit_methodsGetBlueprint(self).General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
@@ -379,15 +407,15 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            AnimationManipulatorPlayAnim(self.BuildAnimManip, unit_methodsGetBlueprint(self).Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
-        self.BuildAnimManip:SetRate(1)
+        AnimationManipulatorSetRate(self.BuildAnimManip, 1)
     end,
 
     StopBuildFx = function(self)
         if self.BuildAnimManip then
-            self.BuildAnimManip:SetRate(0)
+            AnimationManipulatorSetRate(self.BuildAnimManip, 0)
         end
     end,
 
@@ -398,8 +426,8 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 
     OnUnpaused = function(self)
         AirFactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') then
-            self:StartBuildFx(self:GetFocusUnit())
+        if unit_methodsIsUnitState(self, 'Building') then
+            self:StartBuildFx(unit_methodsGetFocusUnit(self))
         end
     end,
 }
@@ -454,7 +482,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self:GetBlueprint().Display.AnimationWater then
+        if unit_methodsGetBlueprint(self).Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -472,11 +500,11 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self:GetBlueprint().Display.AnimationWater)
-            self.TransformManipulator:SetRate(1)
+            AnimationManipulatorPlayAnim(self.TransformManipulator, unit_methodsGetBlueprint(self).Display.AnimationWater)
+            AnimationManipulatorSetRate(self.TransformManipulator, 1)
             self.TransformManipulator:SetPrecedence(0)
         else
-            self.TransformManipulator:SetRate(-1)
+            AnimationManipulatorSetRate(self.TransformManipulator, -1)
             self.TransformManipulator:SetPrecedence(0)
             WaitFor(self.TransformManipulator)
             self.TransformManipulator:Destroy()
@@ -505,39 +533,39 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, unit_methodsGetBlueprint(self).General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
         if not unitBeingBuilt then
-            unitBeingBuilt = self:GetFocusUnit()
+            unitBeingBuilt = unit_methodsGetFocusUnit(self)
         end
 
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            AnimationManipulatorPlayAnim(self.BuildAnimManip, unit_methodsGetBlueprint(self).Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
 
-        self.BuildAnimManip:SetRate(1)
+        AnimationManipulatorSetRate(self.BuildAnimManip, 1)
     end,
 
     StopBuildFx = function(self)
         if self.BuildAnimManip then
-            self.BuildAnimManip:SetRate(0)
+            AnimationManipulatorSetRate(self.BuildAnimManip, 0)
         end
     end,
 
     OnPaused = function(self)
         LandFactoryUnit.OnPaused(self)
-        self:StopBuildFx(self:GetFocusUnit())
+        self:StopBuildFx(unit_methodsGetFocusUnit(self))
     end,
 
     OnUnpaused = function(self)
         LandFactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') then
-            self:StartBuildFx(self:GetFocusUnit())
+        if unit_methodsIsUnitState(self, 'Building') then
+            self:StartBuildFx(unit_methodsGetFocusUnit(self))
         end
     end,
 }
@@ -569,7 +597,7 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
     end,
 
     OnPaused = function(self)
-        if not self.Dead and self:GetFractionComplete() == 1 then
+        if not self.Dead and unit_methodsGetFractionComplete(self) == 1 then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StopArmsMoving()
@@ -578,7 +606,7 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
     end,
 
     OnUnpaused = function(self)
-        if self:GetNumBuildOrders(categories.ALLUNITS) > 0 and not self:IsUnitState('Upgrading') and self:IsUnitState('Building') then
+        if unit_methodsGetNumBuildOrders(self, categories.ALLUNITS) > 0 and not unit_methodsIsUnitState(self, 'Upgrading') and unit_methodsIsUnitState(self, 'Building') then
             self:PlayUnitAmbientSound('ConstructLoop')
             self:StartBuildingEffects(self.UnitBeingBuilt)
             self:StartArmsMoving()
@@ -595,14 +623,14 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     OnStopBuild = function(self, unitBuilding)
         SeaFactoryUnit.OnStopBuild(self, unitBuilding)
-        if not self.Dead and self:GetFractionComplete() == 1 then
+        if not self.Dead and unit_methodsGetFractionComplete(self) == 1 then
             self:StopArmsMoving()
         end
     end,
 
     OnFailedToBuild = function(self)
         SeaFactoryUnit.OnFailedToBuild(self)
-        if not self.Dead and self:GetFractionComplete() == 1 then
+        if not self.Dead and unit_methodsGetFractionComplete(self) == 1 then
             self:StopArmsMoving()
         end
     end,
@@ -658,10 +686,10 @@ CRadarJammerUnit = Class(RadarJammerUnit) {}
 CConstructionEggUnit = Class(CStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = unit_methodsGetBlueprint(self)
         local buildUnit = bp.Economy.BuildUnit
-        local pos = self:GetPosition()
-        local aiBrain = self:GetAIBrain()
+        local pos = unit_methodsGetPosition(self)
+        local aiBrain = unit_methodsGetAIBrain(self)
 
         self.Spawn = CreateUnitHPR(
             buildUnit,
@@ -672,18 +700,18 @@ CConstructionEggUnit = Class(CStructureUnit) {
         self:ForkThread(function()
                 self.OpenAnimManip = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnimManip)
-                self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
-                self:PlaySound(bp.Audio['EggOpen'])
+                AnimationManipulatorPlayAnim(self.OpenAnimManip, unit_methodsGetBlueprint(self).Display.AnimationOpen, false):SetRate(0.1)
+                unit_methodsPlaySound(self, bp.Audio['EggOpen'])
 
                 WaitFor(self.OpenAnimManip)
 
                 self.EggSlider = CreateSlider(self, 0, 0, -20, 0, 5)
                 self.Trash:Add(self.EggSlider)
-                self:PlaySound(bp.Audio['EggSink'])
+                unit_methodsPlaySound(self, bp.Audio['EggSink'])
 
                 WaitFor(self.EggSlider)
 
-                self:Destroy()
+                unit_methodsDestroy(self)
             end
         )
     end,
@@ -704,7 +732,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         CStructureUnit.OnCreate(self)
         CConstructionTemplate.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = unit_methodsGetBlueprint(self)
 
         -- Construction stuff
         self.EffectsBag = {}
@@ -741,7 +769,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         CStructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
         CConstructionTemplate.OnPaused(self, 0)
 
-        self.AnimationManipulator:SetRate(-0.25)
+        AnimationManipulatorSetRate(self.AnimationManipulator, -0.25)
     end,
 
     OnUnpaused = function(self)
@@ -751,7 +779,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         local unitBeingBuilt = self.UnitBeingBuilt
         if unitBeingBuilt then 
             CStructureUnit.StartBuildingEffects(self, unitBeingBuilt, self.UnitBuildOrder)
-            self.AnimationManipulator:SetRate(1)
+            AnimationManipulatorSetRate(self.AnimationManipulator, 1)
         end
     end,
 
@@ -768,7 +796,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         CStructureUnit.OnStartBuild(self, unitBeingBuilt, order)
 
         -- play animation of the hive opening
-        self.AnimationManipulator:PlayAnim(self.BuildingOpenAnim, false):SetRate(1)
+        AnimationManipulatorPlayAnim(self.AnimationManipulator, self.BuildingOpenAnim, false):SetRate(1)
 
         -- keep track of who we are building
         self.UnitBeingBuilt = unitBeingBuilt
@@ -790,7 +818,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         CStructureUnit.OnStopBuild(self, unitBeingBuilt)
 
         -- revert animation
-        self.AnimationManipulator:SetRate(-0.25)
+        AnimationManipulatorSetRate(self.AnimationManipulator, -0.25)
 
         -- lose track of who we are building
         self.UnitBeingBuilt = nil
@@ -799,17 +827,17 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
     end,
 
     OnProductionPaused = function(self)
-        if self:IsUnitState('Building') then
+        if unit_methodsIsUnitState(self, 'Building') then
             self:SetMaintenanceConsumptionInactive()
         end
-        self:SetProductionActive(false)
+        unit_methodsSetProductionActive(self, false)
     end,
 
     OnProductionUnpaused = function(self)
-        if self:IsUnitState('Building') then
+        if unit_methodsIsUnitState(self, 'Building') then
             self:SetMaintenanceConsumptionActive()
         end
-        self:SetProductionActive(true)
+        unit_methodsSetProductionActive(self, true)
     end,
 
     OnStopBuilderTracking = function(self)
@@ -818,12 +846,12 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         if self.StoppedBuilding then
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
-            self.BuildingOpenAnimManip:SetRate(-(self:GetBlueprint().Display.AnimationBuildRate or 1))
+            AnimationManipulatorSetRate(self.BuildingOpenAnimManip, -(unit_methodsGetBlueprint(self).Display.AnimationBuildRate or 1))
         end
     end,
 
     CheckBuildRestriction = function(self, target_bp)
-        if self:CanBuild(target_bp.BlueprintId) then
+        if unit_methodsCanBuild(self, target_bp.BlueprintId) then
             return true
         else
             return false

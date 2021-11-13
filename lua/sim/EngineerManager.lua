@@ -4,6 +4,34 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
+local unit_methodsIsUnitState = moho.unit_methods.IsUnitState
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local unit_methodsGetConsumptionPerSecondEnergy = moho.unit_methods.GetConsumptionPerSecondEnergy
+local unit_methodsGetConsumptionPerSecondMass = moho.unit_methods.GetConsumptionPerSecondMass
+local error = error
+local aibrain_methodsMakePlatoon = moho.aibrain_methods.MakePlatoon
+local unit_methodsGetGuards = moho.unit_methods.GetGuards
+local tableInsert = table.insert
+local ipairs = ipairs
+local aibrain_methodsPlatoonExists = moho.aibrain_methods.PlatoonExists
+local aibrain_methodsDecideWhatToBuild = moho.aibrain_methods.DecideWhatToBuild
+local coroutineYield = coroutine.yield
+local EntityCategoryContains = EntityCategoryContains
+local IsUnit = IsUnit
+local aibrain_methodsAssignUnitsToPlatoon = moho.aibrain_methods.AssignUnitsToPlatoon
+local aibrain_methodsGetArmyIndex = moho.aibrain_methods.GetArmyIndex
+local tableRemove = table.remove
+local unit_methodsGetGuardedUnit = moho.unit_methods.GetGuardedUnit
+local unpack = unpack
+local EntityCategoryCount = EntityCategoryCount
+local next = next
+local KillThread = KillThread
+local tableEmpty = table.empty
+local tableGetn = table.getn
+local VDist3 = VDist3
+local LOG = LOG
+local aibrain_methodsGetUnitBlueprint = moho.aibrain_methods.GetUnitBlueprint
+
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
@@ -53,12 +81,12 @@ EngineerManager = Class(BuilderManager) {
         if not unit or unit.Dead or not IsUnit(unit) then
             return false
         end
-        if unit:IsUnitState('Building') then
+        if unit_methodsIsUnitState(unit, 'Building') then
             beingBuilt = unit.UnitBeingBuilt
             return false
-        elseif unit:IsUnitState('Guarding') then
-            local guardedUnit = unit:GetGuardedUnit()
-            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
+        elseif unit_methodsIsUnitState(unit, 'Guarding') then
+            local guardedUnit = unit_methodsGetGuardedUnit(unit)
+            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and unit_methodsIsUnitState(guardedUnit, 'Building') then
                 beingBuilt = guardedUnit.UnitBeingBuilt
             end
         end
@@ -75,9 +103,9 @@ EngineerManager = Class(BuilderManager) {
         if not unit or unit.Dead or not IsUnit(unit) then
             return false
         end
-        if unit:IsUnitState('Guarding') then
-            local guardedUnit = unit:GetGuardedUnit()
-            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and guardedUnit:IsUnitState('Building') then
+        if unit_methodsIsUnitState(unit, 'Guarding') then
+            local guardedUnit = unit_methodsGetGuardedUnit(unit)
+            if guardedUnit and not guardedUnit.Dead and IsUnit(guardedUnit) and unit_methodsIsUnitState(guardedUnit, 'Building') then
                 beingBuilt = guardedUnit.UnitBeingBuilt
             end
         end
@@ -134,7 +162,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     LowMassRepeatThread = function(self)
-        coroutine.yield(30)
+        coroutineYield(30)
         if self.Brain.LowMassMode then
             self:LowMass()
         end
@@ -162,7 +190,7 @@ EngineerManager = Class(BuilderManager) {
             if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
                 --LOG('*AI DEBUG: Disabling unit')
                 v.Unit:OnPaused()
-                pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondMass()
+                pauseVal = pauseVal + unit_methodsGetConsumptionPerSecondMass(v.Unit)
                 v.Status = false
             end
             if self:MassCheck(econ, pauseVal) then
@@ -190,7 +218,7 @@ EngineerManager = Class(BuilderManager) {
             if not v.Unit.Dead and not EntityCategoryContains(categories.COMMAND, v.Unit) and (not unitCheckFunc or unitCheckFunc(v.Unit, econ, pauseVal, category)) then
                 --LOG('*AI DEBUG: Disabling unit')
                 v.Unit:OnPaused()
-                pauseVal = pauseVal + v.Unit:GetConsumptionPerSecondEnergy()
+                pauseVal = pauseVal + unit_methodsGetConsumptionPerSecondEnergy(v.Unit)
                 v.Status = false
             end
             if self:EnergyCheck(econ, pauseVal) then
@@ -241,7 +269,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     LowEnergyRepeatThread = function(self)
-        coroutine.yield(30)
+        coroutineYield(30)
         if self.Brain.LowEnergyMode then
             self:LowEnergy()
         end
@@ -284,8 +312,8 @@ EngineerManager = Class(BuilderManager) {
         --LOG('+ AddUnit')
         for k,v in self.ConsumptionUnits do
             if EntityCategoryContains(v.Category, unit) then
-                table.insert(v.Units, { Unit = unit, Status = true })
-                table.insert(v.UnitsList, unit)
+                tableInsert(v.Units, { Unit = unit, Status = true })
+                tableInsert(v.UnitsList, unit)
                 v.Count = v.Count + 1
 
                 if not unit.BuilderManagerData then
@@ -354,7 +382,7 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     GetNumCategoryBeingBuilt = function(self, category, engCategory)
-        return table.getn(self:GetEngineersBuildingCategory(category, engCategory))
+        return tableGetn(self:GetEngineersBuildingCategory(category, engCategory))
     end,
 
     GetEngineersBuildingCategory = function(self, category, engCategory)
@@ -365,7 +393,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if not v:IsUnitState('Building') then
+            if not unit_methodsIsUnitState(v, 'Building') then
                 continue
             end
 
@@ -378,7 +406,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            tableInsert(units, v)
         end
         return units
     end,
@@ -413,10 +441,10 @@ EngineerManager = Class(BuilderManager) {
             if self:UnitFromCustomFaction(engineer) then
                 faction = self:UnitFromCustomFaction(engineer)
                 LOG('*AI DEBUG: GetBuildingId faction: '..faction)
-                return self.Brain:DecideWhatToBuild(engineer, buildingType, self.Brain.CustomFactions[faction])
+                return aibrain_methodsDecideWhatToBuild(self.Brain, engineer, buildingType, self.Brain.CustomFactions[faction])
             end
         else
-            return self.Brain:DecideWhatToBuild(engineer, buildingType, import('/lua/BuildingTemplates.lua').BuildingTemplates[faction])
+            return aibrain_methodsDecideWhatToBuild(self.Brain, engineer, buildingType, import('/lua/BuildingTemplates.lua').BuildingTemplates[faction])
         end
     end,
 
@@ -428,7 +456,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if not v.EngineerBuildQueue or table.empty(v.EngineerBuildQueue) then
+            if not v.EngineerBuildQueue or tableEmpty(v.EngineerBuildQueue) then
                 continue
             end
 
@@ -445,7 +473,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            tableInsert(units, v)
         end
         return units
     end,
@@ -458,11 +486,11 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if not v.EngineerBuildQueue or table.empty(v.EngineerBuildQueue) then
+            if not v.EngineerBuildQueue or tableEmpty(v.EngineerBuildQueue) then
                 continue
             end
             local buildName = v.EngineerBuildQueue[1][1]
-            local buildBp = self.Brain:GetUnitBlueprint(buildName)
+            local buildBp = aibrain_methodsGetUnitBlueprint(self.Brain, buildName)
             local buildingTypes = SUtils.split(buildingType, ' ')
             local found = false
             local count = 0
@@ -470,7 +498,7 @@ EngineerManager = Class(BuilderManager) {
                 if buildBp.CategoriesHash[z] then
                     count = count + 1
                 end
-                if table.getn(buildingTypes) == count then found = true end
+                if tableGetn(buildingTypes) == count then found = true end
                 if found then break end
             end
 
@@ -478,7 +506,7 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            table.insert(units, v)
+            tableInsert(units, v)
         end
         return units
     end,
@@ -492,11 +520,11 @@ EngineerManager = Class(BuilderManager) {
                 continue
             end
 
-            if v.NumAssistees and table.getn(v:GetGuards()) >= v.NumAssistees then
+            if v.NumAssistees and tableGetn(unit_methodsGetGuards(v)) >= v.NumAssistees then
                 continue
             end
 
-            table.insert(retUnits, v)
+            tableInsert(retUnits, v)
         end
         return retUnits
     end,
@@ -509,12 +537,12 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     RemoveUnit = function(self, unit)
-        local guards = unit:GetGuards()
+        local guards = unit_methodsGetGuards(unit)
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
-                if self.Brain.Sorian and self.Brain:PlatoonExists(v.AssistPlatoon) then
+                if self.Brain.Sorian and aibrain_methodsPlatoonExists(self.Brain, v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
-                elseif self.Brain:PlatoonExists(v.AssistPlatoon) then
+                elseif aibrain_methodsPlatoonExists(self.Brain, v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
                     v.AssistPlatoon = nil
@@ -527,8 +555,8 @@ EngineerManager = Class(BuilderManager) {
             if EntityCategoryContains(v.Category, unit) then
                 for num,sUnit in v.Units do
                     if sUnit.Unit == unit then
-                        table.remove(v.Units, num)
-                        table.remove(v.UnitsList, num)
+                        tableRemove(v.Units, num)
+                        tableRemove(v.UnitsList, num)
                         v.Count = v.Count - 1
                         found = true
                         break
@@ -570,18 +598,18 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     UnitConstructionFinished = function(self, unit, finishedUnit)
-        if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
+        if EntityCategoryContains(categories.FACTORY * categories.STRUCTURE, finishedUnit) and finishedUnit:GetAIBrain():GetArmyIndex() == aibrain_methodsGetArmyIndex(self.Brain) then
             self.Brain.BuilderManagers[self.LocationType].FactoryManager:AddFactory(finishedUnit)
         end
-        if finishedUnit:GetAIBrain():GetArmyIndex() == self.Brain:GetArmyIndex() then
+        if finishedUnit:GetAIBrain():GetArmyIndex() == aibrain_methodsGetArmyIndex(self.Brain) then
             self:AddUnit(finishedUnit)
         end
-        local guards = unit:GetGuards()
+        local guards = unit_methodsGetGuards(unit)
         for k,v in guards do
             if not v.Dead and v.AssistPlatoon then
-                if self.Brain.Sorian and self.Brain:PlatoonExists(v.AssistPlatoon) then
+                if self.Brain.Sorian and aibrain_methodsPlatoonExists(self.Brain, v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.SorianEconAssistBody)
-                elseif self.Brain:PlatoonExists(v.AssistPlatoon) then
+                elseif aibrain_methodsPlatoonExists(self.Brain, v.AssistPlatoon) then
                     v.AssistPlatoon:ForkThread(v.AssistPlatoon.EconAssistBody)
                 else
                     v.AssistPlatoon = nil
@@ -633,14 +661,14 @@ EngineerManager = Class(BuilderManager) {
     end,
 
     Wait = function(unit, manager, ticks)
-        coroutine.yield(ticks)
+        coroutineYield(ticks)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
     end,
 
     EngineerWaiting = function(manager, unit)
-        coroutine.yield(50)
+        coroutineYield(50)
         if not unit.Dead then
             manager:AssignEngineerTask(unit)
         end
@@ -668,8 +696,8 @@ EngineerManager = Class(BuilderManager) {
         if builder then
             -- Fork off the platoon here
             local template = self:GetEngineerPlatoonTemplate(builder:GetPlatoonTemplate())
-            local hndl = self.Brain:MakePlatoon(template[1], template[2])
-            self.Brain:AssignUnitsToPlatoon(hndl, {unit}, 'support', 'none')
+            local hndl = aibrain_methodsMakePlatoon(self.Brain, template[1], template[2])
+            aibrain_methodsAssignUnitsToPlatoon(self.Brain, hndl, {unit}, 'support', 'none')
             unit.PlatoonHandle = hndl
 
             --if EntityCategoryContains(categories.COMMAND, unit) then

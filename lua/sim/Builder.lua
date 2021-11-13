@@ -7,6 +7,15 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
+local ipairs = ipairs
+local tableDeepcopy = table.deepcopy
+local type = type
+local LOG = LOG
+local unpack = unpack
+local error = error
+local tableInsert = table.insert
+local next = next
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
 ## Root builder class
@@ -188,7 +197,7 @@ Builder = Class {
         if data.BuilderConditions then
             # Convert location type here
             for k,v in data.BuilderConditions do
-                local bCond = table.deepcopy(v)
+                local bCond = tableDeepcopy(v)
                 if type(bCond[1]) == 'function' then
                     for pNum,param in bCond[2] do
                         if param == 'LocationType' then
@@ -202,7 +211,7 @@ Builder = Class {
                         end
                     end
                 end
-                table.insert(tempConditions, self.Brain.ConditionsMonitor:AddCondition(unpack(bCond)))
+                tableInsert(tempConditions, self.Brain.ConditionsMonitor:AddCondition(unpack(bCond)))
             end
         end
         self.BuilderConditions = tempConditions
@@ -282,7 +291,7 @@ PlatoonBuilder = Class(Builder) {
         self.InstanceCount = {}
         local num = 1
         while num <= (data.InstanceCount or 1) do
-            table.insert(self.InstanceCount, { Status = 'Available', PlatoonHandle = false })
+            tableInsert(self.InstanceCount, { Status = 'Available', PlatoonHandle = false })
             num = num + 1
         end
         return true

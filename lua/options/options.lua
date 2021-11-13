@@ -42,6 +42,12 @@ the optionsOrder table is just an array of keys in to the option table, and thei
 order the tabs show in the dialog
 --]]
 
+local ForkThread = ForkThread
+local tostring = tostring
+local optionslogicUp = import('/lua/options/optionsLogic.lua')
+local tableGetn = table.getn
+local mathCeil = math.ceil
+
 optionsOrder = {
     "gameplay",
     "ui",
@@ -828,15 +834,15 @@ options = {
                 type = 'toggle',
                 default = 4,
                 update = function(control,value)
-                    logic = import('/lua/options/optionsLogic.lua')
+                    logic = optionslogicUp
 
                     aaoptions = GetAntiAliasingOptions()
 
                     aamax = 0
                     aamed = 0
-                    if 0 < table.getn(aaoptions) then
-                        aahigh = aaoptions[table.getn(aaoptions)]
-                        aamed = aaoptions[math.ceil(table.getn(aaoptions)/2)]
+                    if 0 < tableGetn(aaoptions) then
+                        aahigh = aaoptions[tableGetn(aaoptions)]
+                        aamed = aaoptions[mathCeil(tableGetn(aaoptions)/2)]
                     end
 
                     if 0 == value then

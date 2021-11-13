@@ -1,3 +1,11 @@
+local mathClamp = math.clamp
+local VMult = VMult
+local Vector = Vector
+local unit_methodsGetTargetEntity = moho.unit_methods.GetTargetEntity
+local mathPow = math.pow
+local GetSurfaceHeight = GetSurfaceHeight
+local IsUnit = IsUnit
+
 local XZDist = import('/lua/utilities.lua').XZDistanceTwoVectors
 
 -- This table stores last acceleration and numbers of bombs left in a cluster bomb run, as well as the original target
@@ -16,7 +24,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- Get projectile position and velocity
     -- velocity needs to multiplied by 10 due to being returned /tick instead of /s
     local proj = {pos=projectile:GetPosition(), vel=VMult(Vector(launcher:GetVelocity()), 10)}
-    local entity = launcher:GetTargetEntity()
+    local entity = unit_methodsGetTargetEntity(launcher)
 
     local target
     if entity and IsUnit(entity) then
@@ -54,7 +62,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
 
     if bp.DropBombShort then
         -- deliberately drop bomb short by % ratio, could be useful for torpedo bombers
-        dist.pos = dist.pos * math.clamp(1 - bp.DropBombShort, 0, 1)
+        dist.pos = dist.pos * mathClamp(1 - bp.DropBombShort, 0, 1)
     end
 
     if bomb_data[id] ~= nil then -- bomber will drop several bombs
@@ -87,7 +95,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- now we can calculate what acceleration we need to make it hit the target in the y-axis
     -- a = 2 * (1/t)^2 * x
 
-    acc = 2 * math.pow(1 / time , 2) * (proj.pos[2] - target.tpos[2])
+    acc = 2 * mathPow(1 / time , 2) * (proj.pos[2] - target.tpos[2])
 
     if bomb_data[id] then
         -- store last acceleration in case target dies in the middle of carpet bomb run

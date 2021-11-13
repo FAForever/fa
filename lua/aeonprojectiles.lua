@@ -11,6 +11,21 @@
 --------------------------------------------------------------------------
 --  AEON PROJECTILES SCRIPTS
 --------------------------------------------------------------------------
+local projectile_methodsTrackTarget = moho.projectile_methods.TrackTarget
+local DamageArea = DamageArea
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local DamageRing = DamageRing
+local CreateTrail = CreateTrail
+local projectile_methodsGetPosition = moho.projectile_methods.GetPosition
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local CreateLightParticle = CreateLightParticle
+local CreateDecal = CreateDecal
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local projectile_methodsSetCollisionShape = moho.projectile_methods.SetCollisionShape
+local projectile_methodsDestroy = moho.projectile_methods.Destroy
+
 local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
 local GetRandomFloat = import('utilities.lua').GetRandomFloat
 local EmitterProjectile = DefaultProjectileFile.EmitterProjectile
@@ -114,7 +129,7 @@ AGravitonBombProjectile = Class(SinglePolyTrailProjectile) { -- T1 bomber
 
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -268,7 +283,7 @@ AIMFlareProjectile = Class(EmitterProjectile) {
             if self.Trash then
                 self.Trash:Destroy()
             end
-            self:Destroy()
+            projectile_methodsDestroy(self)
         end
     end,
 }
@@ -435,7 +450,7 @@ AMissileCruiseSubProjectile = Class(EmitterProjectile) {
     FxImpactLand = EffectTemplate.AMissileHit01,
     FxImpactUnderWater = {},
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         SinglePolyTrailProjectile.OnCreate(self)
     end,
 }
@@ -454,13 +469,13 @@ AMissileSerpentineProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactUnderWater = {},
     
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         SingleCompositeEmitterProjectile.OnCreate(self)
     end,
     
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -491,7 +506,7 @@ AMissileSerpentine02Projectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactUnderWater = {},
     
     OnCreate = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         SingleCompositeEmitterProjectile.OnCreate(self)
     end,
 
@@ -509,7 +524,7 @@ AOblivionCannonProjectile = Class(EmitterProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -539,7 +554,7 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
 
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -569,7 +584,7 @@ AOblivionCannonProjectile03 = Class(EmitterProjectile) {
     
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -611,7 +626,7 @@ AQuantumDisruptorProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     FxImpactLand = EffectTemplate.AQuantumDisruptorHit01,
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -661,10 +676,10 @@ AAAQuantumDisplacementCannonProjectile = Class(NullShell) {
 
     CreateTrailFX = function(self)
         if(self.PolyTrail) then
-            table.insert(self.TrailEmitters, CreateTrail(self, -1, self.Army, self.PolyTrail))
+            tableInsert(self.TrailEmitters, CreateTrail(self, -1, self.Army, self.PolyTrail))
         end
         for i in self.FxTrails do
-            table.insert(self.TrailEmitters, CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]))
+            tableInsert(self.TrailEmitters, CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]))
         end
     end,
 
@@ -726,7 +741,7 @@ AQuarkBombProjectile = Class(EmitterProjectile) { -- Strategic bomber
 
     OnImpact = function(self, targetType, targetEntity)
         CreateLightParticle(self, -1, self.Army, 26, 6, 'sparkle_white_add_08', 'ramp_white_02')
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
@@ -775,7 +790,7 @@ AReactonCannonProjectile = Class(EmitterProjectile) { --SCU
     FxImpactLand = EffectTemplate.AReactonCannonHitLand01,
     
     OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
+        local pos = projectile_methodsGetPosition(self)
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly
         
@@ -925,16 +940,16 @@ ATorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
         OnWaterEntryEmitterProjectile.OnCreate(self,inWater)
         -- if we are starting in the water then immediately switch to tracking in water
         if inWater == true then
-            self:TrackTarget(true):StayUnderwater(true)
+            projectile_methodsTrackTarget(self, true):StayUnderwater(true)
             self:OnEnterWater(self)
         else
-            self:TrackTarget(false)
+            projectile_methodsTrackTarget(self, false)
         end
     end,
 
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
     end,
 
 }
@@ -957,7 +972,7 @@ ATorpedoSubProjectile = Class(EmitterProjectile) {
     FxNoneHitScale = 1,
     FxImpactNone = {},
     OnCreate = function(self, inWater)
-        self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
+        projectile_methodsSetCollisionShape(self, 'Sphere', 0, 0, 0, 1.0)
         EmitterProjectile.OnCreate(self, inWater)
     end,
 

@@ -7,6 +7,21 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+local stringLen = string.len
+local ForkThread = ForkThread
+local stringFind = string.find
+local tableRemove = table.remove
+local error = error
+local unpack = unpack
+local next = next
+local tableInsert = table.insert
+local ipairs = ipairs
+local tableEmpty = table.empty
+local tableGetn = table.getn
+local type = type
+local mathFloor = math.floor
+local stringSub = string.sub
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -57,7 +72,7 @@ OpAI = Class {
         end,
 
         FindChildren = function(self, force)
-            if self.ChildrenHandles and not table.empty(self.ChildrenHandles) and not force then
+            if self.ChildrenHandles and not tableEmpty(self.ChildrenHandles) and not force then
                 return true
             end
             self.ChildrenHandles = {}
@@ -65,7 +80,7 @@ OpAI = Class {
             for tNum,currType in types do
                 for name,builder in ScenarioInfo.BuilderTable[self.AIBrain.CurrentPlan][currType] do
                     if self:ChildNameCheck(name) then
-                        table.insert(self.ChildrenHandles, { ChildName=name, ChildBuilder=builder })
+                        tableInsert(self.ChildrenHandles, { ChildName=name, ChildBuilder=builder })
                     end
                 end
             end
@@ -84,7 +99,7 @@ OpAI = Class {
 
         ChildNameCheck = function(self,name)
             for k,v in self.ChildrenNames do
-                local found = string.find(v.BuilderName, name .. '_', 1, true)
+                local found = stringFind(v.BuilderName, name .. '_', 1, true)
                 if v.BuilderName == name or found then
                     return true
                 end
@@ -183,13 +198,13 @@ OpAI = Class {
 
             else
                 for i,v in defList do
-                    table.insert(priList, v)
+                    tableInsert(priList, v)
                 end
 
                 self.MasterData.PlatoonData.TargetPriorities = {}
 
                 for i,v in priList do
-                    table.insert(self.MasterData.PlatoonData.TargetPriorities, v)
+                    tableInsert(self.MasterData.PlatoonData.TargetPriorities, v)
                 end
 
                 --for k,v in priTable do
@@ -201,7 +216,7 @@ OpAI = Class {
 
             end
 
-            table.insert(self.MasterData.PlatoonAddFunctions, { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'PlatoonSetTargetPriorities' })
+            tableInsert(self.MasterData.PlatoonAddFunctions, { '/lua/ai/opai/BaseManagerPlatoonThreads.lua', 'PlatoonSetTargetPriorities' })
 
             return true
         end,
@@ -235,11 +250,11 @@ OpAI = Class {
                 if type(fData) == 'table' then
                     -- Check function data
                     for tNum,tName in childData[1] do
-                        table.insert(self.ChildMonitorData[tName], { FunctionInfo = fData })
+                        tableInsert(self.ChildMonitorData[tName], { FunctionInfo = fData })
                     end
                 elseif type(fData) == 'function' then
                     for tNum,tName in childData[1] do
-                        table.insert(self.ChildMonitorData[tName], { DirectFunction = fData })
+                        tableInsert(self.ChildMonitorData[tName], { DirectFunction = fData })
                     end
                 end
             end
@@ -273,7 +288,7 @@ OpAI = Class {
                     return false
                 elseif v.FunctionInfo then
                     if v.FunctionInfo[3][1] == "default_brain" then
-                        table.remove(v.FunctionInfo[3], 1)
+                        tableRemove(v.FunctionInfo[3], 1)
                     end
                     if not import(v.FunctionInfo[1])[v.FunctionInfo[2]](self.AIBrain, unpack(v.FunctionInfo[3])) then
                         self:SetChildActive(childName, false)
@@ -308,7 +323,7 @@ OpAI = Class {
             if type(childrenType) == 'table' then
                 removeTable = childrenType
             else
-                table.insert(removeTable, childrenType)
+                tableInsert(removeTable, childrenType)
             end
 
             for k,v in self.ChildrenNames do
@@ -347,7 +362,7 @@ OpAI = Class {
             if type(childrenType) == 'table' then
                 keepTable = childrenType
             else
-                table.insert(keepTable, childrenType)
+                tableInsert(keepTable, childrenType)
             end
 
             for k,v in self.ChildrenNames do
@@ -412,7 +427,7 @@ OpAI = Class {
                         end
                     end
                 else
-                    local overrideNum = math.floor(quantity / (table.getn(v.ChildBuilder.PlatoonTemplate) - 2))
+                    local overrideNum = mathFloor(quantity / (tableGetn(v.ChildBuilder.PlatoonTemplate) - 2))
                     for sNum,sData in v.ChildBuilder.PlatoonTemplate do
                         if sNum >= 3 then
                             sData[2] = 1
@@ -432,15 +447,15 @@ OpAI = Class {
                 local found
 
                 if bName and v.ChildBuilder.BuilderName then
-                    found = string.find(bName, v.ChildBuilder.BuilderName .. '_', 1, true)
+                    found = stringFind(bName, v.ChildBuilder.BuilderName .. '_', 1, true)
                 end
 
                 if not bName or bName == v.ChildBuilder.BuilderName or found then
-                    table.insert(v.ChildBuilder.BuildConditions, { fileName, funcName, parameters })
+                    tableInsert(v.ChildBuilder.BuildConditions, { fileName, funcName, parameters })
                 end
             end
             if not bName or bName == self.MasterName then
-                table.insert(self.MasterData.AttackConditions, { fileName, funcName, parameters })
+                tableInsert(self.MasterData.AttackConditions, { fileName, funcName, parameters })
             end
             return true
         end,
@@ -475,14 +490,14 @@ OpAI = Class {
             end
             for k,v in self.ChildrenHandles do
                 if not bName or bName == v.ChildBuilder.BuilderName then
-                    table.insert(v.ChildBuilder.PlatoonAddFunctions, { fileName, funcName })
+                    tableInsert(v.ChildBuilder.PlatoonAddFunctions, { fileName, funcName })
                 end
             end
             if not bName or bName == self.MasterName then
                 if type(fileName) == 'function' then
-                    table.insert(self.MasterData.FormCallbacks, fileName)
+                    tableInsert(self.MasterData.FormCallbacks, fileName)
                 else
-                    table.insert(self.MasterData.FormCallbacks, { fileName, funcName })
+                    tableInsert(self.MasterData.FormCallbacks, { fileName, funcName })
                 end
             end
             return true
@@ -526,11 +541,11 @@ OpAI = Class {
             end
             for k,v in self.ChildrenHandles do
                 if not bName or bName == v.ChildBuilder.BuilderName then
-                    table.insert(v.ChildBuilder.PlatoonBuildCallbacks, { fileName, funcName })
+                    tableInsert(v.ChildBuilder.PlatoonBuildCallbacks, { fileName, funcName })
                 end
             end
             if not bName or bName == self.MasterName then
-                table.insert(self.MasterData.DestroyCallbacks, { fileName, funcName })
+                tableInsert(self.MasterData.DestroyCallbacks, { fileName, funcName })
             end
             return true
         end,
@@ -746,18 +761,18 @@ OpAI = Class {
             end
             for k,v in builders do
                 local startCheck = false
-                if string.sub(k, 1, 10) == 'OSB_Child_' then
+                if stringSub(k, 1, 10) == 'OSB_Child_' then
                     startCheck = 11
                 end
                 if startCheck then
                     if type(self.BuilderType) == "string" then
-                        startCheck = startCheck + 1 + string.len(self.BuilderType)
+                        startCheck = startCheck + 1 + stringLen(self.BuilderType)
                     else
-                        startCheck = startCheck + 1 + string.len(self.BuilderType.Name)
+                        startCheck = startCheck + 1 + stringLen(self.BuilderType.Name)
                     end
-                    local cType = string.sub(k,startCheck)
+                    local cType = stringSub(k,startCheck)
 
-                    table.insert(self.ChildrenNames, { BuilderName = k..'_'..brain.Name..'_'..name, ChildrenType = v.ChildrenType })
+                    tableInsert(self.ChildrenNames, { BuilderName = k..'_'..brain.Name..'_'..name, ChildrenType = v.ChildrenType })
                     self:AddChildType(v.ChildrenType)
                 end
             end

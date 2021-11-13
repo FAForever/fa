@@ -6,6 +6,21 @@
 --**
 --**  Copyright 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+local prop_methodsGetCollisionExtents = moho.prop_methods.GetCollisionExtents
+local prop_methodsDestroy = moho.prop_methods.Destroy
+local prop_methodsAdjustHealth = moho.prop_methods.AdjustHealth
+local prop_methodsGetPosition = moho.prop_methods.GetPosition
+local unit_methodsCanBuild = moho.unit_methods.CanBuild
+local IssueBuildMobile = IssueBuildMobile
+local IssueGuard = IssueGuard
+local tableInsert = table.insert
+local next = next
+local ipairs = ipairs
+local CreateProp = CreateProp
+local prop_methodsGetHealth = moho.prop_methods.GetHealth
+local prop_methodsGetOrientation = moho.prop_methods.GetOrientation
+local IsUnit = IsUnit
+
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 Wreckage = Class(Prop) {
@@ -13,7 +28,7 @@ Wreckage = Class(Prop) {
     OnCreate = function(self)
         Prop.OnCreate(self)
         self.IsWreckage = true
-        self.OrientationCache = self:GetOrientation()
+        self.OrientationCache = prop_methodsGetOrientation(self)
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
@@ -22,12 +37,12 @@ Wreckage = Class(Prop) {
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        self:AdjustHealth(instigator, -amount)
-        local health = self:GetHealth()
+        prop_methodsAdjustHealth(self, instigator, -amount)
+        local health = prop_methodsGetHealth(self)
 
         if health <= 0 then
             self:DoPropCallbacks('OnKilled')
-            self:Destroy()
+            prop_methodsDestroy(self)
         else
             self:UpdateReclaimLeft()
         end
@@ -47,7 +62,7 @@ Wreckage = Class(Prop) {
     -- this means we have to calculate the health from the reclaim values, instead of going the
     -- other way.
     Clone = function(self)
-        local clone = CreateWreckage(__blueprints[self.AssociatedBP], self.CachePosition, self.OrientationCache, self.MaxMassReclaim, self.MaxEnergyReclaim, self.TimeReclaim, self:GetCollisionExtents())
+        local clone = CreateWreckage(__blueprints[self.AssociatedBP], self.CachePosition, self.OrientationCache, self.MaxMassReclaim, self.MaxEnergyReclaim, self.TimeReclaim, prop_methodsGetCollisionExtents(self))
 
         -- Figure out the health this wreck had before it was deleted. We can't use any native
         -- functions like GetHealth(), so we use the latest known value
@@ -64,15 +79,15 @@ Wreckage = Class(Prop) {
         local bpid = self.AssociatedBP
 
         for _, u in units do
-            if u:CanBuild(bpid) then
-                table.insert(rebuilders, u)
+            if unit_methodsCanBuild(u, bpid) then
+                tableInsert(rebuilders, u)
             else
-                table.insert(assisters, u)
+                tableInsert(assisters, u)
             end
         end
 
         if not rebuilders[1] then return end
-        local pos = self:GetPosition()
+        local pos = prop_methodsGetPosition(self)
         for _, u in rebuilders do
             IssueBuildMobile({u}, pos, bpid, {})
         end

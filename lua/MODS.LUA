@@ -199,6 +199,20 @@ Mod initialization issues
 '
 -------------------------------------------------------------------------------------------------------------------- ]]
 
+local tostring = tostring
+local DiskFindFiles = DiskFindFiles
+local Dirname = Dirname
+local tableInsert = table.insert
+local tableReverse = table.reverse
+local ipairs = ipairs
+local next = next
+local tableEmpty = table.empty
+local tableMap = table.map
+local LOG = LOG
+local pcall = pcall
+local WARN = WARN
+local SPEW = SPEW
+
 local SetUtils = import('/lua/system/setutils.lua')
 
 -- Table of all mods found on disk, indexed by id
@@ -333,7 +347,7 @@ local function ModTopSort(mods_to_sort)
         if _mod_cache[uid].before then
             for i,before_uid in _mod_cache[uid].before do
                 if mods_to_sort[before_uid] ~= nil then
-                    table.insert(required_for[uid], before_uid)
+                    tableInsert(required_for[uid], before_uid)
                 end
             end
         end
@@ -341,7 +355,7 @@ local function ModTopSort(mods_to_sort)
         if _mod_cache[uid].after then
             for i,after_uid in _mod_cache[uid].after do
                 if mods_to_sort[after_uid] ~= nil then
-                    table.insert(required_for[after_uid], uid)
+                    tableInsert(required_for[after_uid], uid)
                 end
             end
         end
@@ -367,7 +381,7 @@ local function ModTopSort(mods_to_sort)
 
         processing[uid] = false
         done_with[uid] = true
-        table.insert(result, mods_to_sort[uid])
+        tableInsert(result, mods_to_sort[uid])
         return 0
     end
 
@@ -380,7 +394,7 @@ local function ModTopSort(mods_to_sort)
         end
     end
 
-    return table.reverse(result)
+    return tableReverse(result)
 end
 
 -- Get a list of ingame UI mods that should be active, based on preferences.
@@ -404,7 +418,7 @@ local function GetActiveModsFiltered(filter, selected)
     if r == nil then
         r = {}
         for uid,m in filtered do
-            table.insert(r,m)
+            tableInsert(r,m)
         end
     end
 
@@ -449,7 +463,7 @@ function GetDependencies(uid)
 
         -- Exclusive mods conflict with everything.
         if allMods[uid].exclusive then
-            ret.conflicts = table.map(function() return true end, allMods)
+            ret.conflicts = tableMap(function() return true end, allMods)
         end
 
         -- check if any other mods list this mod as a conflict
@@ -473,7 +487,7 @@ function GetDependencies(uid)
             for i, required in allMods[uid].requires do
                 if allMods[required] then
                     ret.requires[required] = true
-                    table.insert(locReq, required)
+                    tableInsert(locReq, required)
                 else
                     ret.missing[required] = true
                 end
@@ -488,15 +502,15 @@ function GetDependencies(uid)
         RecurseDependencies(uid, ret)
     end
 
-    if table.empty(ret.requires) then ret.requires = nil end
-    if table.empty(ret.missing) then ret.missing = nil end
-    if table.empty(ret.conflicts) then ret.conflicts = nil end
+    if tableEmpty(ret.requires) then ret.requires = nil end
+    if tableEmpty(ret.missing) then ret.missing = nil end
+    if tableEmpty(ret.conflicts) then ret.conflicts = nil end
     return ret
 end
 
 function UpdateUIMods()
     __active_mods = {}
     for i,m in ipairs(GetUiMods()) do
-        table.insert(__active_mods, m)
+        tableInsert(__active_mods, m)
     end
 end

@@ -1,3 +1,18 @@
+local MATH_Lerp = MATH_Lerp
+local GetFocusArmy = GetFocusArmy
+local entityUp = import('/lua/sim/Entity.lua')
+local ForkThread = ForkThread
+local next = next
+local mathSin = math.sin
+local ipairs = ipairs
+local tableGetsize = table.getsize
+local Vector = Vector
+local KillThread = KillThread
+local Warp = Warp
+local tableInsert = table.insert
+local LOG = LOG
+local IsAlly = IsAlly
+
 local SUtils = import('/lua/ai/sorianutilities.lua')
 
 local PingLimit = 1 -- Maximum number of pings per army, within PingTimeout seconds
@@ -12,7 +27,7 @@ function AnimatePingMesh(entity)
     local time = 0
     local ascending = true
     while entity do
-        entity:SetScale(MATH_Lerp(math.sin(time), -.5, 0.5, .3, .5))
+        entity:SetScale(MATH_Lerp(mathSin(time), -.5, 0.5, .3, .5))
         time = time + .3
         WaitSeconds(.001)
     end
@@ -24,7 +39,7 @@ function SpawnPing(data)
     end
 
     if PingsRemaining[data.Owner] > 0 then
-        if data.Marker and PingMarkers[data.Owner] and table.getsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
+        if data.Marker and PingMarkers[data.Owner] and tableGetsize(PingMarkers[data.Owner]) >= MaxPingMarkers then
             return
         elseif data.Marker and not PingMarkers[data.Owner] then
             PingMarkers[data.Owner] = {}
@@ -35,7 +50,7 @@ function SpawnPing(data)
             data.ID = GetPingID(data.Owner)
             PingMarkers[data.Owner][data.ID] = data
         else
-            local Entity = import('/lua/sim/Entity.lua').Entity
+            local Entity = entityUp.Entity
             data.Location[2] = data.Location[2]+2
             local pingSpec = {Owner = data.Owner, Location = data.Location}
             local ping = Entity(pingSpec)
@@ -72,7 +87,7 @@ end
 
 function SpawnSpecialPing(data)
     --This function is used to generate automatic nuke pings
-    local Entity = import('/lua/sim/Entity.lua').Entity
+    local Entity = entityUp.Entity
     data.Location[2] = data.Location[2]+2
     local pingSpec = {Owner = data.Owner, Location = data.Location}
     local ping = Entity(pingSpec)
@@ -125,7 +140,7 @@ function OnArmyChange()
     LOG('syncing max ping markers: ', MaxPingMarkers)
     --Flush all of the current markers on the UI side
     if not Sync.Ping then Sync.Ping = {} end
-    table.insert(Sync.Ping, {Action = 'flush'})
+    tableInsert(Sync.Ping, {Action = 'flush'})
     --Add All of the relevant marker data on the next sync
     local focus = GetFocusArmy()
     if focus ~= -1 then
@@ -178,6 +193,6 @@ function SendData(data)
     local focus = GetFocusArmy()
     if focus ~= -1 and IsAlly(data.Owner+1, focus) then
         if not Sync.Ping then Sync.Ping = {} end
-        table.insert(Sync.Ping, data)
+        tableInsert(Sync.Ping, data)
     end
 end

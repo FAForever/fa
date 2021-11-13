@@ -8,6 +8,13 @@
 ----------------------------------------------------------------------------
 
 -- Global list of all BaseBuilderTemplates found in the system.
+local ipairs = ipairs
+local LOG = LOG
+local setmetatable = setmetatable
+local WARN = WARN
+local next = next
+local type = type
+
 BaseBuilderTemplates = {}
 
 --

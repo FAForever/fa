@@ -1,3 +1,21 @@
+local HasLocalizedVO = HasLocalizedVO
+local _TRACEBACK = _TRACEBACK
+local exists = exists
+local doscript = doscript
+local DiskFindFiles = DiskFindFiles
+local stringFind = string.find
+local unpack = unpack
+local next = next
+local ipairs = ipairs
+local tableAssimilate = table.assimilate
+local stringFormat = string.format
+local type = type
+local AudioSetLanguage = AudioSetLanguage
+local modsUp = import('/lua/mods.lua')
+local stringGsub = string.gsub
+local WARN = WARN
+local stringSub = string.sub
+
 local loc_table
 
 -- Special tokens that can be included in a loc string via {g Player} etc. The
@@ -26,7 +44,7 @@ local function okLanguage(la)
     end
 
     local dbfiles = DiskFindFiles('/loc', '*strings_db.lua')
-    la = string.gsub(dbfiles[1], ".*/(.*)/.*", "%1")
+    la = stringGsub(dbfiles[1], ".*/(.*)/.*", "%1")
     return la
 end
 
@@ -44,7 +62,7 @@ local function loadLanguage(la)
     __language = la
 
     if (la ~= 'us') and (usdb ~= {}) then
-        table.assimilate(loc_table, usdb)
+        tableAssimilate(loc_table, usdb)
     end
     -- load localisation from AI mods
     LocalisationAILobby()
@@ -59,7 +77,7 @@ end
 -- Add localisation strings from every AI mod to location table
 function LocalisationAILobby()
     -- get all sim mods installed in /mods/
-    local simMods = import('/lua/mods.lua').AllMods()
+    local simMods = modsUp.AllMods()
     local ModAIFiles
     local AILanguageFile
     local AILanguageText = {}
@@ -112,7 +130,7 @@ end
 -- Given some text from the loc DB, recursively apply formatting directives
 function LocExpand(s)
     -- Look for braces {} in text
-    return (string.gsub(s, "{(%w+) ([^{}]*)}", LocSubFn))
+    return (stringGsub(s, "{(%w+) ([^{}]*)}", LocSubFn))
 end
 
 -- If s is a string with a localization tag, like "<LOC HW1234>Hello World",
@@ -125,23 +143,23 @@ function LOC(s)
         return s
     end
 
-    if string.sub(s,1,5) ~= [[<LOC ]] then
+    if stringSub(s,1,5) ~= [[<LOC ]] then
         -- This string doesn't have a <LOC key> tag
         return LocExpand(s)
     end
 
-    local i = string.find(s,">")
+    local i = stringFind(s,">")
     if not i then
         -- Missing the second half of <LOC> tag
         WARN(_TRACEBACK('String has malformed loc tag: ',s))
         return s
     end
 
-    local key = string.sub(s,6,i-1)
+    local key = stringSub(s,6,i-1)
 
     local r = loc_table[key]
     if not r then
-        r = string.sub(s,i+1)
+        r = stringSub(s,i+1)
         if r=="" then
             r = key
         end
@@ -157,7 +175,7 @@ function LOCF(...)
             arg[k] = LOC(v)
         end
     end
-    return string.format(unpack(arg))
+    return stringFormat(unpack(arg))
 end
 
 -- Call LOC() on all elements of a table
