@@ -217,7 +217,7 @@ Window = Class(Group) {
         self.TitleGroup.Top:Set(self.tm.Top)
         self.TitleGroup.Left:Set(self.tl.Left)
         self.TitleGroup.Right:Set(self.tr.Right)
-        self.TitleGroup.Height:Set(30)
+        LayoutHelpers.SetHeight(self.TitleGroup, 30)
         self.TitleGroup.Depth:Set(function() return self._windowGroup.Depth() + 2 end)
 
         if icon then
