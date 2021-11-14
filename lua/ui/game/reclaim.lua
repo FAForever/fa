@@ -36,6 +36,9 @@ local ReclaimLabelsMade = 0
 local UpdateLeft = 0
 local UpdateTop = 0
 
+-- # sources
+-- 
+
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
 function UpdateReclaim(syncTable)
@@ -241,48 +244,7 @@ local Label = Class(Group) {
 function CreateReclaimLabel(root)
 
     ReclaimLabelsMade = ReclaimLabelsMade + 1
-    local label = Label(root)
 
-    local pixelScaleFactor = LayoutHelpers.GetPixelScaleFactor()
-
-    -- mass bitmap
-    label.mass = Bitmap(label)
-    label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-    label.mass.Left:SetValue(0)
-    label.mass.Top:SetValue(0)
-
-    label.mass.Width:SetValue(pixelScaleFactor * 14)
-    label.mass.Height:SetValue(pixelScaleFactor * 14)
-
-    -- text information
-    label.text = UIUtil.CreateText(label, "10", 10, UIUtil.bodyFont)
-    label.text:SetColor('ffc7ff8f')
-    label.text:SetDropShadow(true)
-    label.text.Left:SetValue(0)
-    label.text.Top:SetValue(0)
-
-    -- disable various settings
-    label:DisableHitTest(true)
-
-    -- display properties
-    label.DisplayReclaim = function(self, label)
-
-        -- show us 
-        if self:IsHidden() then
-            self:Show()
-        end
-
-        -- change our position
-        self.Position = label.position
-        self.Displayed = true
-
-        -- update mass
-        if label.mass ~= self.oldMass then
-            local mass = tostring(math.floor(0.5 + label.mass))
-            self.text:SetText(mass)
-            self.oldMass = label.mass
-        end
-    end
 
     return label
 end
@@ -357,10 +319,6 @@ function ShowReclaimThread()
     LOG("ShowReclaimThread")
     if not RootOfLabels then 
         RootOfLabels = RootLabel(GetFrame(0), view, camera)
-        RootOfLabels.Left:Set(0)
-        RootOfLabels.Top:Set(0)
-        RootOfLabels.Width:Set(1)
-        RootOfLabels.Height:Set(1)
         RootOfLabels:Show()
     end
 
@@ -419,3 +377,119 @@ function OnCommandGraphShow(bool)
         CommandGraphActive = false -- above coroutine runs until now
     end
 end
+
+-- # Initialization
+
+function AllocateAccelerationStructure(rows, columns)
+
+end
+
+function AllocateReclaimLabels(count, view, camera)
+
+    local pixelScaleFactor = LayoutHelpers.GetPixelScaleFactor()
+
+    -- construct the root
+    local root = RootLabel(GetFrame(0), view, camera)
+
+    -- common definitions for labels so that they are not duplicated unneccesarily
+    local texture = UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds')
+    local font = UIUtil.bodyFont
+
+    -- construct the labels
+    local cacheBitmap, cacheText = { }
+    for k = 1, count do 
+        -- bitmap
+        cacheBitmap[k] = Bitmap(root)
+        cacheBitmap[k]:SetTexture(texture)
+        cacheBitmap[k].Left:SetValue(0)
+        cacheBitmap[k].Top:SetValue(0)
+        cacheBitmap[k].Width:SetValue(pixelScaleFactor * 14)
+        cacheBitmap[k].Height:SetValue(pixelScaleFactor * 14)
+        cacheBitmap[k]:DisableHitTest(true)
+
+        -- text
+        cacheText[k] = UIUtil.CreateText(root, "10", 10, font)
+        cacheText[k]:SetColor('ffc7ff8f')
+        cacheText[k]:SetDropShadow(true)
+        cacheText[k].Left:SetValue(0)
+        cacheText[k].Top:SetValue(0)
+        cacheText[k]:DisableHitTest(true)
+    end
+
+    return root, cacheBitmap, cacheText
+end
+
+-- # Utility functions
+
+function UpdateLabel(self, data)
+    -- show us 
+    if self:IsHidden() then
+        self:Show()
+    end
+
+    -- change our position
+    self.Position = label.position
+    self.Displayed = true
+
+    -- update mass
+    if label.mass ~= self.oldMass then
+        local mass = tostring(math.floor(0.5 + label.mass))
+        self.text:SetText(mass)
+        self.oldMass = label.mass
+    end
+end
+
+--- Determines whether the given point is inside the provided polygon. Returns a true / false value.
+-- @param polygon A table of tables with edge coordinates, e.g., { {x1, ... xn}, {y1 ... yn} }.
+-- @param point A point, e.g., { [1], [2], [3] }.
+function PointInPolygon(polygon, point)
+    return false 
+end 
+
+--- Computes the barcy centric coordinates of the point given the triangle corners. Ouputs the u / v coordinates of the point.
+-- source: https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+-- @param t1 A point of the triangle, e.g., { [1], [2], [3] }
+-- @param t2 A point of the triangle, e.g., { [1], [2], [3] }
+-- @param t3 A point of the triangle, e.g., { [1], [2], [3] }
+-- @param point The point we wish to compute the barycentric coordinates of, e.g., { [1], [2], [3] }
+function ComputeBarycentricCoordinates(t1, t2, t3, point)
+
+    -- retrieve data from tables
+    local t1x = t1[1]
+    local t1z = t1[3]
+
+    local t2x = t2[1]
+    local t2z = t2[3]
+
+    local t3x = t3[1]
+    local t3z = t3[3]
+
+    local px = point[1]
+    local pz = point[3]
+
+    -- compute directions
+    local v0x = t2x - t1x 
+    local v0z = t2z - t1z 
+
+    local v1x = t3x - t1x 
+    local v1z = t3z - t1z 
+
+    local v2x = px - t1x 
+    local v2z = pz - t1z 
+
+    local d00 = v0x * v0x + v0z * voz 
+    local d01 = v0x * v1x + v0z * v1z 
+    local d11 = v1x * v1x + v1z * v1z 
+    local d20 = v2x * v0x + v2z * v0z 
+    local d21 = v2x * v1x + v2z * v1z 
+
+    local denom = d00 * d11 - d01 * d01
+
+    local v = (d11 * d20 - d01 * d21) / denom
+    local w = (d00 * d21 - d01 * d20) / denom
+    local u = 1.0 - v - w 
+
+    return u, v, w
+end
+
+-- # Deprecated functions
