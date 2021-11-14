@@ -5,7 +5,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
-local MaxLabels = options.maximum_reclaim_count or 1000 -- The maximum number of labels created in a game session
+local MaxLabels = 1000 -- options.maximum_reclaim_count or 100 -- The maximum number of labels created in a game session
 local MinAmount = options.minimum_reclaim_amount or 10
 
 local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
@@ -16,17 +16,22 @@ local ReclaimChanged = true
 local PlayableArea
 local OutsidePlayableAreaReclaim = {}
 
--- Used for computations that require a vector, but we don't want to allocate a new one
-local DummyVector = Vector(0, 0, 0)
+-- upvalue math operations for performance
+local MathSqrt = math.sqrt
+local MathFloor = math.floor
 
-local DummyCollection = { }
+-- Used for computations that require a vector, but we don't want to allocate a new one
+local CachedVector = Vector(0, 0, 0)
+
+local CachedCollection = { }
+local CachedSelected = { }
+local CachedUpper = { }
+local CachedCenter = { }
+local CachedLower = { }
 
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
 function UpdateReclaim(syncTable)
-
-    LOG("Changed elements: " .. tostring(table.getsize(syncTable)))
-
     ReclaimChanged = true
     for id, data in syncTable do
         if not data then
@@ -100,79 +105,91 @@ function InPlayableArea(pos)
 end
 
 local WorldLabel = Class(Group) {
-    __init = function(self, parent, position)
+    __init = function(self, parent)
         Group.__init(self, parent)
         self.parent = parent
-        self.proj = nil
-        self:SetPosition(position)
+        self.position = CachedVector
 
         self.Top:Set(0)
         self.Left:Set(0)
         LayoutHelpers.SetDimensions(self, 25, 25)
         self:SetNeedsFrameUpdate(true)
     end,
-
-    Update = function(self)
-    end,
-
-    SetPosition = function(self, position)
-        self.position = position or {}
-    end,
-
-    OnFrame = function(self, delta)
-        self:Update()
-    end
 }
 
 -- Creates an empty reclaim label
 function CreateReclaimLabel(view)
     local label = WorldLabel(view, Vector(0, 0, 0))
+    label.view = label.parent.view
 
     label.mass = Bitmap(label)
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-    LayoutHelpers.AtLeftIn(label.mass, label)
-    LayoutHelpers.AtVerticalCenterIn(label.mass, label)
-    LayoutHelpers.SetDimensions(label.mass, 14, 14)
+    label.mass.Top:Set(10)
+    label.mass.Left:Set(10)
+    label.mass.Width:Set(14)
+    label.mass.Height:Set(14)
+
+    -- LayoutHelpers.AtLeftIn(label.mass, label)
+    -- LayoutHelpers.AtVerticalCenterIn(label.mass, label)
+    -- LayoutHelpers.SetDimensions(label.mass, 14, 14)
 
     label.text = UIUtil.CreateText(label, "", 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
     label.text:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(label.text, label, 16)
-    LayoutHelpers.AtVerticalCenterIn(label.text, label)
+    label.text.Top:Set(10)
+    label.text.Left:Set(10)
+    label.text.Width:Set(14)
+    label.text.Height:Set(14)
 
     label:DisableHitTest(true)
     label.OnHide = function(self, hidden)
         self:SetNeedsFrameUpdate(not hidden)
     end
 
-    label.Update = function(self)
-        local view = self.parent.view
-        local proj = view:Project(self.position)
-        LayoutHelpers.AtLeftTopIn(self, self.parent, (proj.x - self.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (proj.y - self.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
-        self.proj = {x=proj.x, y=proj.y }
+    label.OnFrame = function(self)
+        local view = self.view
+        local proj = view.Project(view, self.position)
 
+        local px = proj.y
+        local py = proj.x
+
+        self.text.Top:Set(px + 10)
+        self.text.Left:Set(py)
+        self.text.Width:Set(16)
+        self.text.Height:Set(16)
+
+        self.mass.Top:Set(px)
+        self.mass.Left:Set(py)
+        self.mass.Width:Set(14)
+        self.mass.Height:Set(14)
     end
 
-    label.DisplayReclaim = function(self, r)
+    label.DisplayReclaim = function(self, label)
+
+        -- make sure we're shown
         if self:IsHidden() then
             self:Show()
         end
-        self:SetPosition(r.position)
-        if r.mass ~= self.oldMass then
-            local mass = tostring(math.floor(0.5 + r.mass))
-            self.text:SetText(mass)
-            self.oldMass = r.mass
-        end
-    end
 
-    label:Update()
+        -- change label
+        if label.mass ~= self.oldMass then
+            local mass = tostring(math.floor(0.5 + label.mass))
+            self.text:SetText(mass)
+            self.oldMass = label.mass
+        end
+
+        self.position = label.position
+    end
 
     return label
 end
 
-local function UpdateProjectedLocations(view, labels)
+--- Re-computes the label.projected property of each label.
+-- @param view The view we'll use for projection.
+-- @param labels The labels that we'll be projecting.
+local function UpdateProjectionOfLabels(view, labels)
     -- local reference to a vector that we can reuse
-    local vector = DummyVector
+    local vector = CachedVector
     local pos 
 
     -- for each known label
@@ -191,16 +208,18 @@ local function UpdateProjectedLocations(view, labels)
     end
 end
 
-local function ChooseLabels(view, labels)
-
-    -- update the screen positions of the labels
-    UpdateProjectedLocations(view, labels)
+--- Takes the hash-based labels and returns those that are on screen with an array-based table.
+-- @param view The view we'll use for projection.
+-- @param labels The labels that we'll be filtering.
+local function FindLabelsOnScreen(view, labels)
 
     -- collection of labels
-    local head = 1 
-    local collection = DummyCollection
+    local headCollection = 1 
+    local collection = CachedCollection
 
-    -- go over all known labels
+    -- go over all known labels to determine visibility
+    local viewWidth = view:Width()
+    local viewHeight = view:Height()
     for _, label in labels do
 
         -- check whether we're valuable enough
@@ -211,86 +230,200 @@ local function ChooseLabels(view, labels)
             if not (projected.x < 0 or projected.y < 0 or projected.x > viewWidth or projected.y > viewHeight) then 
 
                 -- add to collection
-                collection[head] = label
-                head = head + 1
+                collection[headCollection] = label
+                headCollection = headCollection + 1
             end
         end
     end
 
-    if head < MaxLabels then 
-        return 
+    return collection, headCollection - 1
+end
+
+--- Computes the mean and standard deviation of the collection of labels.
+-- @param collection An array-based table with labels.
+-- @param collectionHead the length of the 'collection' parameter.
+local function ComputeMeanAndDeviation(collection, collectionCount)
+
+    if collectionCount == 0 then 
+        return 0, 0
+    end
+
+    -- compute mean
+    local mean = 0 
+    for k = 1, collectionCount do 
+        mean = mean + collection[k].mass
+    end
+
+    mean = mean / collectionCount
+
+    -- compute sum of squares
+    local sumOfSquares = 0 
+    for k = 1, collectionCount do 
+        local sub = collection[k].mass - mean
+        sumOfSquares = sub * sub
+    end
+
+    sumOfSquares = sumOfSquares / collectionCount
+
+    -- compute deviation
+    local deviation = MathSqrt(sumOfSquares)
+
+    return mean, deviation
+end
+
+--- Adds all the elements of the origin table to the target table.
+-- @param origin The index-based array to copy from.
+-- @param originCount The number of elements in origin.
+-- @param destination The index-based array to copy to.
+-- @param destinationCount the number of elements in destination.
+-- @param limit The maximum number of elements allowed in the destination.
+local function AddToCollection(origin, originCount, destination, destinationCount, destinationLimit)
+    local destinationHead = destinationCount + 1
+    for k = 1, math.min(originCount, destinationLimit - destinationCount) do 
+        destination[destinationHead] = origin[k]
+        destinationHead = destinationHead + 1
+    end
+
+    return destination, destinationHead - 1
+end
+
+--- Filters the collection until the size criteria is met.
+-- @param collection The current array-based collection of labels.
+-- @param collectionCount The number of labels in the collection.
+-- @param selected The current array-based selected labels.
+-- @param selectedCount The number of selected labels.
+-- @param criteria The number of selected labels to aim for.
+local function FilterCollection(collection, collectionCount, selected, selectedCount, criteria, recursions)
+
+    -- # O(1): recursion protection, can't keep going ad infinitum
+
+    if recursions < 0 then 
+        return selected, selectedCount
+    end
+
+    -- # O(n): Early exit: collection is small enough for criteria - just append it
+
+    if collectionCount + selectedCount < criteria then 
+        return AddToCollection(collection, collectionCount, selected, selectedCount, criteria)
+    end
+
+    -- # O(n): Compute mean / std dev
+
+    local mean, deviation = ComputeMeanAndDeviation(collection, collectionCount)
+
+    -- # O(n) compute elements part of upper / lower / medium
+
+    local upper = CachedUpper
+    local upperHead = 1 
+
+    local center = CachedCenter
+    local centerHead = 1 
+
+    local lower = CachedLower
+    local lowerHead = 1
+
+    -- split up the set
+    for k = 1, collectionCount do 
+        local mass = collection[k].mass
+
+        -- upper half
+        if mass > mean + deviation then 
+            upper[upperHead] = collection[k]
+            upperHead = upperHead + 1
+
+        -- lower half
+        elseif mass < mean - deviation then 
+            lower[lowerHead] = collection[k]
+            lowerHead = lowerHead + 1
+
+        -- center half
+        else 
+            center[centerHead] = collection[k]
+            centerHead = centerHead + 1
+        end
+    end
+
+    -- see if we can append the upper end
+    local upperCount = upperHead - 1
+    if selectedCount + upperCount < criteria then 
+        selected, selectedCount = AddToCollection(upper, upperCount, selected, selectedCount, criteria)
+    else 
+        return FilterCollection(upper, upperCount, selected, selectedCount, criteria, recursions - 1)
+    end
+
+    -- amount of variance too low - it doesn't matter what we pick just return to the limit
+    if deviation < 0.01 then 
+        return AddToCollection(collection, collectionCount, selected, selectedCount, criteria)
+    end
+
+    -- see if we can append the center part
+    local centerCount = centerHead - 1
+    if selectedCount + centerCount < criteria then 
+        selected, selectedCount = AddToCollection(center, centerCount, selected, selectedCount, criteria)
+    else 
+        return FilterCollection(center, centerCount, selected, selectedCount, criteria, recursions - 1)
+    end
+
+    -- just look through this last part
+    local lowerCount = lowerHead - 1
+    return FilterCollection(lower, lowerCount, selected, selectedCount, criteria, recursions - 1)
+end
+
+local function FilterLabels(view, labels, criteria, updateProjections)
+
+    -- # O(n) Update projection locations on screen
+
+    -- update the screen positions of the labels
+    if updateProjections then 
+        UpdateProjectionOfLabels(view, labels)
+    end
+
+    -- # O(n) Determine labels that are on screen
+
+    collection, collectionCount = FindLabelsOnScreen(view, labels)
+
+    -- # O(n) Compute mean and standard deviation
+
+    local selected = CachedSelected
+    local selectedCount = 0
+    local recursions = 5
+
+    return FilterCollection(collection, collectionCount, selected, selectedCount, criteria, recursions)
 end
 
 function UpdateLabels()
-    LOG("Updating labels")
 
-    -- (0) O(n) filter out those not visible
-
-    -- (1.5) O(1) quick exit: if those that are visible are less than the maximum number of labels
-
-    -- (1) O(n) filter out those that are more than an upper threshold (we want those anyhow)
-
-    -- (2) O(n) compute mean and standard deviation
-
-    -- (3) O(n) drop those that are below 1 std from the mean
-    -- (4) O(n) take those that are above 1 std from the mean (we want those anyhow)
-
-    -- (4.5) O(1) quick exit: if our set is larger than 1000
-
-    -- (5) O(n) bin the remaining elements
-
-    -- (6) O(n) select from largest bins forward
-
+    -- import the view that we'll be using
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
-    local viewWidth = view:Width()
-    local viewHeight = view:Height()
 
-    -- upvalue for performance
-    local labels = Reclaim
-
-    -- update the screen positions of the labels
-    UpdateProjectedLocations(view, labels)
-
-    -- collection of labels
-    local head = 1 
-    local collection = DummyCollection
-
-    -- go over all known labels
-    for _, label in labels do
-
-        -- check whether we're valuable enough
-        if label.mass >= MinAmount then
-
-            -- check whether we're on screen
-            local projected = label.projected
-            if not (projected.x < 0 or projected.y < 0 or projected.x > viewWidth or projected.y > viewHeight) then 
-
-                -- add to collection
-                collection[head] = label
-                head = head + 1
-            end
-        end
-    end
-
-    LOG(table.getn(onScreenReclaims))
-    table.sort(onScreenReclaims, function(a, b) return a.mass > b.mass end)
+    -- determine labels that are visible
+    local collection, collectionCount = FilterLabels(view, Reclaim, MaxLabels, true)
 
     -- Create/Update as many reclaim labels as we need
     local labelIndex = 1
-    for _, r in onScreenReclaims do
+    for k = 1, collectionCount do
+
+        -- restrict number of labels
         if labelIndex > MaxLabels then
             break
         end
+
+        -- retrieve a label from the pool
         local label = LabelPool[labelIndex]
+
+        -- if the C object is destroyed then throw it away
         if label and IsDestroyed(label) then
             label = nil
         end
+        
+        -- if no label is retrieved, make a new one
         if not label then
-            label = CreateReclaimLabel(view.ReclaimGroup, r)
+            label = CreateReclaimLabel(view.ReclaimGroup)
             LabelPool[labelIndex] = label
         end
 
-        label:DisplayReclaim(r)
+        -- update the content of the label
+        label:DisplayReclaim(collection[k])
         labelIndex = labelIndex + 1
     end
 
