@@ -29,7 +29,14 @@
 --Function to apply a buff to a unit.
 --This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
 function ApplyBuff(unit, buffName, instigator)
+
+    -- do not buff dead units
     if unit.Dead then
+        return
+    end
+
+    -- do not buff insignificant / dummy units
+    if EntityCategoryContains(categories.INSIGNIFICANTUNIT, unit) then 
         return
     end
 
