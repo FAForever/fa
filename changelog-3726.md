@@ -103,7 +103,16 @@ Patch 3726 (26th November, 2021)
     Not all of the UI can manage this - please report issues in #game-general
     in the FAF discord when you find them.
  - (#3533) Change default settings of auto lobby to 1.5K unit cap and full share (used by ladder / team match making)
-
+ - (#3441) Introduction of insignificant or dummy units
+    This introduces a new unit class that can be used to fix
+    various bugs and glitches with the game. One such issues
+    is the long standing bug with the Aeon build animation where
+    the aim bones are underground at the start of construction.
+    
+    Sadly - this change is quite involved because a lot of the
+    functionality expects a full-fledged unit. We've tried to
+    catch some of these but there will be more issues that will
+    show up, especially with scripted maps.
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
  - (#3447) Remove old AI related code that was being run regardless of whether AIs were in-game
@@ -135,7 +144,7 @@ Patch 3726 (26th November, 2021)
  - Rowey (#3475, #3528, #3533)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
-        #3527, #3531, #3543))
+        #3527, #3531, #3543, #3411)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
