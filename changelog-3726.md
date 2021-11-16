@@ -48,6 +48,7 @@ Patch 3726 (26th November, 2021)
 
     Adds the ability to more easily block content that is integrated.
  - (#3527) Integrate the Nvidia Fix mod and block the mod from loading
+ - (#3543) Prevent applying bugs to insignificant units, like the Cybran build drone
 
 ### Bug
  - (#3522) Fix upvalue issue of patch 3721
@@ -133,7 +134,7 @@ Patch 3726 (26th November, 2021)
  - Rowey (#3475, #3528)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
-        #3527, #3531)
+        #3527, #3531, #3543))
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
