@@ -30,6 +30,10 @@ local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
+-- upvalue for performance
+local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local CategoriesNoInsignificant = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
+
 local observer = false
 local Points = {
     defeat = -10,
@@ -4102,4 +4106,31 @@ AIBrain = Class(moho.aibrain_methods) {
             end
         end
     end,
+
+    --- Retrieves all units that fit the criteria around some point.
+    -- @param category The categories the units should fit.
+    -- @param position The center point to start looking for units.
+    -- @param radius The radius of the circle we look for units in.
+    -- @param alliance The alliance status ('Ally', 'Enemy', 'Neutral') to those units.
+    -- @param excludeInsignificantUnits Whether or not we exclude insignificant units, defaults to true.
+    -- @return nil if none found or a table.
+    GetUnitsAroundPoint = function(self, category, position, radius, alliance, excludeInsignificantUnits)
+        local units = BrainGetUnitsAroundPoint(self, category, position, radius, alliance)
+
+        -- as it can return nil, check if we have any units
+        if units then 
+            -- if it isn't set, we try and exclude them anyhow
+            if excludeInsignificantUnits == nil then 
+                excludeInsignificantUnits = true 
+            end
+
+            -- check if we want to exclude them
+            if excludeInsignificantUnits then 
+                units = EntityCategoryFilterDown(CategoriesNoInsignificant, units)
+            end
+        end
+
+        return units
+    end
+
 }
