@@ -899,7 +899,7 @@ Unit = Class(moho.unit_methods) {
         local units = {}
         -- We need to check all the units assisting.
         for _, v in self:GetGuards() do
-            if not v.Dead and (v:IsUnitState('Building') or v:IsUnitState('Repairing')) then
+            if not v.Dead and (v:IsUnitState('Building') or v:IsUnitState('Repairing')) and not (EntityCategoryContains(categories.INSIGNIFICANTUNIT, v)) then
                 table.insert(units, v)
             end
         end
@@ -2538,7 +2538,7 @@ Unit = Class(moho.unit_methods) {
 
     CheckAssistersFocus = function(self)
         for _, u in self:GetGuards() do
-            if u:IsUnitState('Repairing') then
+            if u:IsUnitState('Repairing') and not EntityCategoryContains(categories.INSIGNIFICANTUNIT, u) then
                 u:CheckAssistFocus()
             end
         end
@@ -4446,4 +4446,55 @@ Unit = Class(moho.unit_methods) {
 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+}
+
+-- upvalied math functions for performance
+local MathMax = math.max
+
+-- upvalued globals for performance
+local EntityCategoryContains = EntityCategoryContains
+
+-- upvalued moho functions for performance
+local EntityGetArmy = _G.moho.entity_methods.GetArmy
+local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
+local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
+
+local UnitGetCurrentLayer = _G.moho.unit_methods.GetLayer
+local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
+
+-- upvalued categories for performance
+local CategoriesInsignificant = categories.INSIGNIFICANTUNIT
+
+InsignificantUnit = Class(moho.unit_methods) {
+    -- the only things we need
+    __init = function(self) end,
+    __post_init = function(self) end,
+    OnCreate = function(self) 
+
+        -- values that are expected on all units
+        self.EntityId = EntityGetEntityId(self)
+        self.UnitId = UnitGetUnitId(self)
+        self.Army = EntityGetArmy(self)
+        self.Layer = UnitGetCurrentLayer(self)
+        self.Blueprint = EntityGetBlueprint(self)
+        self.Footprint = self.Blueprint.Footprint
+
+        -- basic check if this insignificant unit is truely insignificant
+        if not EntityCategoryContains(CategoriesInsignificant, self) then 
+            WARN("Unit is insignificant but doesn't have the right categories set!")
+
+            -- todo: add more info for dev
+        end
+    
+    end,
+
+    --- Used in the formation script
+    GetFootPrintSize = function(self)
+        local fp = self.Footprint
+        return MathMax(fp.SizeX, fp.SizeZ)
+    end,
+
+    --- Typically called by functions
+    CheckAssistFocus = function(self) end,
+    UpdateAssistersConsumption = function (self) end,
 }
