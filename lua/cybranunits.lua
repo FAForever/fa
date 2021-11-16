@@ -5,6 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local InsignificantUnit = import('/lua/sim/unit.lua').InsignificantUnit
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -53,6 +54,9 @@ EntityFunctions = nil
 local UnitFunctions = _G.moho.unit_methods 
 local UnitSetConsumptionActive = UnitFunctions.SetConsumptionActive
 UnitFunctions = nil 
+
+-- upvalied math functions for performance
+MathMax = math.max
 
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
@@ -256,57 +260,12 @@ CConstructionTemplate = Class() {
 
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
-CBuildBotUnit = Class(AirUnit) {
+CBuildBotUnit = Class(InsignificantUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
 
-    -- do not perform the logic of these functions                      
-    OnMotionHorzEventChange = function(self, new, old) end,                     -- called a million times, keep it simple
-    OnMotionVertEventChange = function(self, new, old) end,                 
-    OnLayerChange = function(self, new, old) self.Layer = new end,
-
-    CreateBuildEffects = function(self, unitBeingBuilt, order) end,             -- do not make build effects (engineer / builder takes care of that)
-    StartBuildingEffects = function(self, built, order) end,
-    CreateBuildEffects = function(self, built, order) end,
-    StopBuildingEffects = function(self, built) end,
-
-    OnBuildProgress = function(self, unit, oldProg, newProg) end,               -- do not keep track of progress
-    OnStopBuild = function(self, unitBeingBuilt) end,
-
-    EnableUnitIntel = function(self, disabler, intel) end,                      -- do not bother doing intel
-    DisableUnitIntel = function(self, disabler, intel) end,
-    OnIntelEnabled = function(self) end,
-    OnIntelDisabled = function(self) end,
-    ShouldWatchIntel = function(self) end,
-    IntelWatchThread = function(self) end,
-
-    AddDetectedByHook = function(self, hook) end,                               -- do not bother keeping track of collision beams
-    RemoveDetectedByHook = function(self, hook) end,
-    OnDetectedBy = function(self, index) end,
-
-    CreateWreckage = function (self, overkillRatio) end,                        -- don't make wreckage
-    UpdateConsumptionValues = function(self) end,                               -- avoids junk in resource overlay
-    ShouldUseVetSystem = function(self) return false end,                       -- never use vet
-    OnStopBeingBuilt = function(self, builder, layer) end,                      -- do not perform this logic when being made
-    OnStartRepair = function(self, unit) end,                                   -- do not run this logic
-    OnKilled = function(self) end,                                              -- just fall out of the sky
-
-    OnCollisionCheck = function(self, other, firingWeapon) return false end,    -- we never collide
-    OnCollisionCheckWeapon = function(self, firingWeapon) return false end,
-
-    OnPrepareArmToBuild = function(self) end,
-
-    OnStartBuilderTracking = function(self) end,                                -- don't track anything
-    OnStopBuilderTracking = function(self) end,
-
-    DestroyUnit = function(self) end,                                           -- prevent misscalls
-    DestroyAllTrashBags = function(self) end,
-
-    OnStartSacrifice = function(self, target_unit) end,
-    OnStopSacrifice = function(self, target_unit) end,
-
-    -- only initialise what we need
+    -- only initialise what we need (drones typically have some aim functionality)
     OnPreCreate = function(self) 
         self.Trash = TrashBag()
     end,             
@@ -317,6 +276,7 @@ CBuildBotUnit = Class(AirUnit) {
         UnitSetConsumptionActive(self, false)
 
         -- store the army in case AOE damage tries to hit the drone
+        self.Footprint = self:GetBlueprint().Footprint
         self.Army = self:GetArmy()
         self.UnitId = self:GetUnitId()
     end,

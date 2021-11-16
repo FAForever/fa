@@ -29,6 +29,9 @@ function WaitSeconds(n)
     WaitTicks(ticks)
 end
 
+-- Hook some globals
+doscript '/lua/SimHooks.lua'
+
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
