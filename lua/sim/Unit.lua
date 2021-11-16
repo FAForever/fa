@@ -4446,6 +4446,10 @@ local EntityCategoryContains = EntityCategoryContains
 -- upvalued moho functions for performance
 local EntityGetArmy = _G.moho.entity_methods.GetArmy
 local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
+local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
+
+local UnitGetCurrentLayer = _G.moho.unit_methods.GetLayer
+local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 -- upvalued categories for performance
 local CategoriesInsignificant = categories.INSIGNIFICANTUNIT
@@ -4457,7 +4461,10 @@ InsignificantUnit = Class(moho.unit_methods) {
     OnCreate = function(self) 
 
         -- values that are expected on all units
+        self.EntityId = EntityGetEntityId(self)
+        self.UnitId = UnitGetUnitId(self)
         self.Army = EntityGetArmy(self)
+        self.Layer = UnitGetCurrentLayer(self)
         self.Blueprint = EntityGetBlueprint(self)
         self.Footprint = self.Blueprint.Footprint
 
@@ -4465,7 +4472,7 @@ InsignificantUnit = Class(moho.unit_methods) {
         if not EntityCategoryContains(CategoriesInsignificant, self) then 
             WARN("Unit is insignificant but doesn't have the right categories set!")
 
-            -- todo: add more info to dev
+            -- todo: add more info for dev
         end
     
     end,
