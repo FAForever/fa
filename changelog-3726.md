@@ -102,6 +102,7 @@ Patch 3726 (26th November, 2021)
 
     Not all of the UI can manage this - please report issues in #game-general
     in the FAF discord when you find them.
+ - (#3533) Change default settings of auto lobby to 1.5K unit cap and full share (used by ladder / team match making)
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -131,7 +132,7 @@ Patch 3726 (26th November, 2021)
  - Askaholic (#3417, #3440)
  - Madmax (#3420, #3419)
  - Uveso (#3477)
- - Rowey (#3475, #3528)
+ - Rowey (#3475, #3528, #3533)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543))
