@@ -156,11 +156,12 @@ function CreateReclaimLabel(view)
         local py = proj.y
 
         local size = self.size + 4
-        self.text.Left:Set(px + size + 2)
-        self.text.Top:Set(py)
+        local halfsize = 0.5 * size
+        self.text.Left:Set(px + size + 2 - halfsize)
+        self.text.Top:Set(py - halfsize)
 
-        self.mass.Left:Set(px)
-        self.mass.Top:Set(py)
+        self.mass.Left:Set(px - halfsize)
+        self.mass.Top:Set(py - halfsize)
         self.mass.Width:Set(size)
         self.mass.Height:Set(size)
     end
@@ -178,12 +179,12 @@ function CreateReclaimLabel(view)
             self.text:SetText(tostring(mass))
 
 
-            
+            local factor = LayoutHelpers.GetPixelScaleFactor()
             local color, size = ComputeLabelProperties(mass)
             self.text:SetColor(color)
-            self.text:SetFont(UIUtil.bodyFont, size)
+            self.text:SetFont(UIUtil.bodyFont, factor * size)
 
-            self.size = size
+            self.size = factor * size
             self.color = color
             self.oldMass = label.mass
         end
