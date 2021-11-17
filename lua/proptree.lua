@@ -236,7 +236,7 @@ Tree = Class(Prop) {
 
         -- add smoke effect removed when the tree is destroyed
         effect = CreateEmitterAtEntity(self, -1, FireEffects[3] )
-        EffectScaleEmitter(effect, 1 + Random())
+        EffectScaleEmitter(effect, 2 + Random())
         TrashAdd(trash, effect)
 
         -- fall down in a random direction if we didn't before

@@ -19,8 +19,8 @@ TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) {
         local radius = self.DamageData.DamageRadius
         local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
-        DamageArea( self, pos, 0.5 * radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, 0.5 * radius, 1, 'Force', FriendlyFire )
+        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
