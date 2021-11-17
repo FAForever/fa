@@ -229,7 +229,7 @@ UnitBlueprint {
             },
             FiringTolerance = 180,
             Label = 'Suicide',
-            MaxRadius = 2,
+            MaxRadius = 3,
             TargetCheckInterval = 999999,
             TargetPriorities = {
                 'MOBILE',
@@ -260,7 +260,7 @@ UnitBlueprint {
             FiringTolerance = 2,
             IgnoreIfDisabled = true,
             Label = 'DeathWeapon',
-            MaxRadius = 2,
+            MaxRadius = 3,
             MuzzleVelocity = 0,
             ProjectileId = '/projectiles/CIFEMP01/CIFEMP01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
