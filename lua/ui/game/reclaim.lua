@@ -18,6 +18,7 @@ local MathFloor = math.floor
 
 -- Used for computations that require a vector
 local CachedVector = Vector(0, 0, 0)
+local CachedVector2 = Vector2(0, 0)
 
 -- Used for computations where we require large tables transfers
 local CachedCollection = { }
@@ -87,30 +88,6 @@ end
 
 -- # Label utility functions
 
---- Re-computes the label.projected property of each label.
--- @param view The view we'll use for projection.
--- @param labels The labels that we'll be projecting.
-local function UpdateProjectionOfLabels(view, labels)
-    -- local reference to a vector that we can reuse
-    local vector = CachedVector
-    local pos 
-
-    -- for each known label
-    for k, v in labels do
-        
-        -- retrieve position
-        pos = v.position
-
-        -- transfer into dummy vector
-        vector[1] = pos[1]
-        vector[2] = pos[2]
-        vector[3] = pos[3]
-
-        -- use engine to compute projection
-        v.projected = view:Project(vector)
-    end
-end
-
 --- Takes the hash-based labels and returns those that are on screen with an array-based table.
 -- @param view The view we'll use for projection.
 -- @param labels The labels that we'll be filtering.
@@ -120,9 +97,38 @@ local function FindLabelsOnScreen(view, labels)
     local headCollection = 1 
     local collection = CachedCollection
 
-    -- go over all known labels to determine visibility
     local viewWidth = view:Width()
     local viewHeight = view:Height()
+
+    -- O(1): determine corners of view in world coordinates
+
+    local coords = CachedVector2
+    local p1, p2, p3, p4
+
+    coords[1] = 0
+    coords[2] = 0
+    p1 = view:UnProject(coords)
+
+    coords[1] = width 
+    coords[2] = 0 
+    p2 = view:UnProject(coords)
+
+    coords[1] = 0
+    coords[2] = height
+    p2 = view:UnProject(coords)
+
+    coords[1] = width 
+    coords[2] = height
+    p2 = view:UnProject(coords)
+
+    -- O(1): increase size of view in world coordinates 
+
+    local cx = 0.25 * (p1[1] + p2[1] + p3[1] + p4[1])
+    local cz = 0.25 * (p1[3] + p2[3] + p3[3] + p4[3])
+
+    -- O(n): determine for each label if it is in view
+
+    -- go over all known labels to determine visibility
     for _, label in labels do
 
         -- check whether we're valuable enough
@@ -297,7 +303,7 @@ end
 function UpdateLabels(root)
 
     -- import the view that we'll be using
-    local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
 
     -- determine labels that are visible
     local collection, collectionCount = FilterLabels(view, Reclaim, MaxLabels, true)
@@ -341,161 +347,6 @@ function UpdateLabels(root)
             end
         end
     end
-end
-
---- Called once at the start of a match to fill the caches.
--- TODO: needs to be called somewhere
-function OnInit()
-
-    local rows = 6
-    local columns = 6
-    AllocateAccelerationStructure(rows, columns)
-    
-    local count = 1000
-    local camera = GetCamera("WorldCamera")
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
-    function AllocateReclaimLabels(count, view, camera)
-
-end
-
---- Called each time labels are added, removed or adjusted by the simulation.
--- TODO: Rename from UpdateReclaim
-function OnUpdate(syncTable)
-    -- something changed, always reset the view
-    ReclaimChanged = true
-
-    -- for each label in the sync table
-    for id, data in syncTable do
-
-        -- if it is not set, then we throw it out
-        if not data then
-            Reclaim[id] = nil
-            ReclaimArchived[id] = nil
-
-        else
-            -- if it is set and in the playable area we keep track of it
-            data.inPlayableArea = InPlayableArea(data.position)
-            if data.inPlayableArea then
-                Reclaim[id] = data
-                ReclaimArchived[id] = nil
-
-            -- if it is set but not in the playable area we archive it
-            else
-                Reclaim[id] = nil
-                ReclaimArchived[id] = data
-            end
-        end
-    end
-end
-
---- Called each time the labels should be shown.
---@param isVisible Determines whether the labels should be visible.
--- TODO: Rename from OnCommandGraphShow
-function OnShow(isVisible)
-    if isVisible then 
-        RootOfLabels:Show()
-    else 
-        RootOfLabels:Hide()
-    end
-end
-
-function OnShowThread()
-
-    -- retrieve camera and view
-    local camera = GetCamera("WorldCamera")
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
-
-    -- internal state to detect changes
-    local OldZoom = false
-    local OldPosition = false
-    ReclaimChanged = true 
-
-    while true do
-
-        -- retrieve properties
-        local zoom = camera:GetZoom()
-        local position = camera:GetFocusPosition()
-
-        -- check if the properties changed
-        if ReclaimChanged
-            or OldZoom ~= zoom
-            or OldPosition[1] ~= position[1]
-            or OldPosition[2] ~= position[2]
-            or OldPosition[3] ~= position[3] then
-
-                -- update labels with regard to which ones we show
-                -- TODO: do this during onFrame
-                UpdateLabels(RootOfLabels)
-
-                -- update internal state
-                OldZoom = zoom
-                OldPosition = position
-                ReclaimChanged = false
-        end
-
-        -- wait one tick (1 tick = 1 + 1)
-        WaitTicks(2)
-    end
-end
-
--- # Utility functions
-
---- Updates the label with the data provided.
--- @param label The label to update
--- @param mass The mass value of the label
--- @param position The position of the label
-function UpdateLabel(label, position, mass)
-    -- show us when hidden
-    if label:IsHidden() then
-        label:Show()
-    end
-
-    -- update internal state
-    label.Position = position
-    label.Displayed = true
-
-    -- only update the mass value if it is different
-    if label.Mass ~= mass then
-        -- update text
-        label.Text:SetText(tostring(math.floor(0.5 + mass)))
-
-        -- update color / size based on mass
-        local factor = LayoutHelpers.GetPixelScaleFactor()
-        local color, size = ComputeLabelProperties(mass)
-        label.Text:SetColor(color)
-        label.Text:SetFont(UIUtil.bodyFont, factor * size)
-
-        -- update internal state
-        label.Size = factor * size
-        label.Color = color
-        label.Mass = mass
-    end
-end
-
--- # Initialization
-
-function AllocateAccelerationStructure(rows, columns)
-
-end
-
-function AllocateReclaimLabels(count, view, camera)
-
-    local pixelScaleFactor = LayoutHelpers.GetPixelScaleFactor()
-
-    -- construct the root
-    local root = RootLabel(GetFrame(0), view, camera)
-
-    -- common definitions for labels so that they are not duplicated unneccesarily
-    local texture = UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds')
-    local font = UIUtil.bodyFont
-
-    -- construct the labels
-    local cacheLabels = { }
-    for k = 1, count do 
-        cacheLabels[k] = Label(root, pixelScaleFactor)
-    end
-
-    return root, cacheLabels
 end
 
 -- # Classes
@@ -571,7 +422,8 @@ local RootLabel = Class(Group) {
 
         if update then 
 
-            -- LOG("update")
+            -- update what labels are on screen (hurr)
+            UpdateLabels(self)
 
             -- keep track of current zoom / position
             self.OldCameraZoom = zoom 
@@ -653,6 +505,121 @@ local RootLabel = Class(Group) {
         end
     end,
 }
+
+-- # Interface functions
+
+--- Called once at the start of a match to fill the caches.
+function OnInit()
+
+    local rows = 6
+    local columns = 6
+    AllocateAccelerationStructure(rows, columns)
+    
+    local count = 1000
+    local camera = GetCamera("WorldCamera")
+    local view = import('/lua/ui/game/worldview.lua').viewLeft
+    RootOfLabels, LabelPool = AllocateReclaimLabels(count, view, camera)
+
+end
+
+--- Called each time labels are added, removed or adjusted by the simulation.
+function OnUpdate(syncTable)
+    -- something changed, always reset the view
+    ReclaimChanged = true
+
+    -- for each label in the sync table
+    for id, data in syncTable do
+
+        -- if it is not set, then we throw it out
+        if not data then
+            Reclaim[id] = nil
+            ReclaimArchived[id] = nil
+
+        else
+            -- if it is set and in the playable area we keep track of it
+            data.inPlayableArea = InPlayableArea(data.position)
+            if data.inPlayableArea then
+                Reclaim[id] = data
+                ReclaimArchived[id] = nil
+
+            -- if it is set but not in the playable area we archive it
+            else
+                Reclaim[id] = nil
+                ReclaimArchived[id] = data
+            end
+        end
+    end
+end
+
+--- Called each time the labels should be shown.
+--@param isVisible Determines whether the labels should be visible.
+function OnShow(isVisible)
+    if isVisible then 
+        RootOfLabels:Show()
+    else 
+        RootOfLabels:Hide()
+    end
+end
+
+-- # Utility functions
+
+--- Updates the label with the data provided.
+-- @param label The label to update
+-- @param mass The mass value of the label
+-- @param position The position of the label
+function UpdateLabel(label, position, mass)
+    -- show us when hidden
+    if label:IsHidden() then
+        label:Show()
+    end
+
+    -- update internal state
+    label.Position = position
+    label.Displayed = true
+
+    -- only update the mass value if it is different
+    if label.Mass ~= mass then
+        -- update text
+        label.Text:SetText(tostring(math.floor(0.5 + mass)))
+
+        -- update color / size based on mass
+        local factor = LayoutHelpers.GetPixelScaleFactor()
+        local color, size = ComputeLabelProperties(mass)
+        label.Text:SetColor(color)
+        label.Text:SetFont(UIUtil.bodyFont, factor * size)
+
+        -- update internal state
+        label.Size = factor * size
+        label.Color = color
+        label.Mass = mass
+    end
+end
+
+-- # Initialization
+
+function AllocateAccelerationStructure(rows, columns)
+
+end
+
+function AllocateReclaimLabels(count, view, camera)
+
+    local pixelScaleFactor = LayoutHelpers.GetPixelScaleFactor()
+
+    -- construct the root
+    local root = RootLabel(GetFrame(0), view, camera)
+
+    -- common definitions for labels so that they are not duplicated unneccesarily
+    local texture = UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds')
+    local font = UIUtil.bodyFont
+
+    -- construct the labels
+    local cacheLabels = { }
+    for k = 1, count do 
+        cacheLabels[k] = Label(root, pixelScaleFactor)
+    end
+
+    return root, cacheLabels
+end
 
 -- # Deprecated functionality
 

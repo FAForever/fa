@@ -12,7 +12,7 @@ PreviousSync = {}
 UnitData = {}
 
 local reclaim = import('/lua/ui/game/reclaim.lua')
-local UpdateReclaim = reclaim.UpdateReclaim
+local OnUpdateReclaim = reclaim.OnUpdate
 local sendEnhancementMessage = import('/lua/ui/notify/notify.lua').sendEnhancementMessage
 local SetPlayableArea = reclaim.SetPlayableArea
 
@@ -65,7 +65,7 @@ function OnSync()
 
     -- Each sync, update the user-side data for any prop created, damaged, or destroyed
     if not table.empty(Sync.Reclaim) then
-        UpdateReclaim(Sync.Reclaim)
+        OnUpdateReclaim(Sync.Reclaim)
     end
 
     if Sync.Teamkill and not SessionIsReplay() then

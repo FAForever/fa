@@ -66,3 +66,6 @@ local oldEntityCategoryFilterOut = EntityCategoryFilterOut
 function EntityCategoryFilterOut(categories, units)
     return oldEntityCategoryFilterOut(categories, units or {})
 end
+
+-- initialize the reclaim labels
+import ("/lua/ui/game/reclaim.lua").OnInit()
