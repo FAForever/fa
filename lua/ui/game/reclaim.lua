@@ -107,6 +107,11 @@ local function FindLabelsOnScreen(view, labels)
     local coords = CachedVector2
     local p1, p2, p3, p4
 
+    LOG(view)
+    for k, v in view do 
+        LOG(k)
+    end
+
     coords[1] = 0
     coords[2] = 0
     p1 = view:UnProject(coords)
@@ -388,15 +393,15 @@ local Label = Class(Group) {
         self.Width:SetValue(25)
         self.Height:SetValue(25)
 
-        self.Bitmap = Bitmap(root)
-        self.Bitmap:SetTexture(texture)
+        self.Bitmap = Bitmap(parent)
+        self.Bitmap:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
         self.Bitmap.Left:SetValue(0)
         self.Bitmap.Top:SetValue(0)
         self.Bitmap.Width:SetValue(factor * 14)
         self.Bitmap.Height:SetValue(factor * 14)
         self.Bitmap:DisableHitTest(true)
 
-        self.Text = UIUtil.CreateText(root, "10", 10, font)
+        self.Text = UIUtil.CreateText(parent, "10", 10, UIUtil.bodyFont)
         self.Text:SetColor('ffc7ff8f')
         self.Text:SetDropShadow(true)
         self.Text.Left:SetValue(0)
