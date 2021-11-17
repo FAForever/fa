@@ -1,5 +1,6 @@
 
 --- Determines whether the given point is inside the provided polygon. Returns a true / false value.
+-- source: http://erich.realtimerendering.com/ptinpoly/
 -- @param ts A table of triangles, e.g. { { ax, ay, bx, by, cx, cy }, ...}
 -- @param n The number of triangles.
 -- @param px The x coordinate of the point to check
@@ -19,7 +20,6 @@ function PointInPolygon(ts, n, px, py)
 end 
 
 --- Computes the barcy centric coordinates of the point given the triangle corners. Ouputs the u / v coordinates of the point.
--- source: http://erich.realtimerendering.com/ptinpoly/
 -- source: https://blackpawn.com/texts/pointinpoly/default.html
 -- @param t1 A point of the triangle, e.g., { [1], [2] }
 -- @param t2 A point of the triangle, e.g., { [1], [2] }
