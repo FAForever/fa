@@ -9,6 +9,8 @@ local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 local LazyVar = import('/lua/lazyvar.lua')
 
+local PointInPolygon = import('/lua/shared/geometry.lua').PointInPolygon
+
 -- # Upvalues for performance
 
 local MathSqrt = math.sqrt
@@ -115,16 +117,37 @@ local function FindLabelsOnScreen(view, labels)
 
     coords[1] = 0
     coords[2] = height
-    p2 = view:UnProject(coords)
+    p3 = view:UnProject(coords)
 
     coords[1] = width 
     coords[2] = height
-    p2 = view:UnProject(coords)
+    p4 = view:UnProject(coords)
 
-    -- O(1): increase size of view in world coordinates 
+    -- O(1): increase size of view in world coordinates (inset)
 
+    -- compute center
+    local points = { p1, p2, p3, p4 }
     local cx = 0.25 * (p1[1] + p2[1] + p3[1] + p4[1])
     local cz = 0.25 * (p1[3] + p2[3] + p3[3] + p4[3])
+
+    local dx, dz
+    for k = 1, 4 do 
+        -- compute direction from center to point
+        local point = points[k]
+        dx = point[1] - cx 
+        dz = point[3] - dz
+
+        -- adjust point accordingly
+        point[1] = point[1] + 0.1 * dx 
+        point[3] = point[3] + 0.1 * dz
+    end
+
+    -- O(1): construct the two triangles that represent the quad
+    -- note: we drop the y-axis (up / down)
+
+    local t1 = { p1[1], p1[3], p2[1], p2[3], p3[1], p3[3] }
+    local t2 = { p4[1], p4[3], p2[1], p2[3], p3[1], p3[3] }
+    local triangles = { t1, t2 }
 
     -- O(n): determine for each label if it is in view
 
@@ -134,9 +157,12 @@ local function FindLabelsOnScreen(view, labels)
         -- check whether we're valuable enough
         if label.mass >= MinAmount then
 
-            -- check whether we're on screen
-            local projected = label.projected
-            if not (projected.x < 0 or projected.y < 0 or projected.x > viewWidth or projected.y > viewHeight) then 
+            -- drop y-axis (up / down)
+            local point = label.position 
+            point[2] = point[3]
+
+            -- check if we're in the polygon defined by the screen frustrum
+            if PointInPolygon(triangles, point) then 
 
                 -- add to collection
                 collection[headCollection] = label
@@ -279,13 +305,6 @@ local function FilterCollection(collection, collectionCount, selected, selectedC
 end
 
 local function FilterLabels(view, labels, criteria, updateProjections)
-
-    -- # O(n) Update projection locations on screen
-
-    -- update the screen positions of the labels
-    if updateProjections then 
-        UpdateProjectionOfLabels(view, labels)
-    end
 
     -- # O(n) Determine labels that are on screen
 
@@ -554,10 +573,12 @@ end
 --- Called each time the labels should be shown.
 --@param isVisible Determines whether the labels should be visible.
 function OnShow(isVisible)
-    if isVisible then 
-        RootOfLabels:Show()
-    else 
-        RootOfLabels:Hide()
+    if RootOfLabels then 
+        if isVisible then 
+            RootOfLabels:Show()
+        else 
+            RootOfLabels:Hide()
+        end
     end
 end
 
@@ -607,6 +628,7 @@ function AllocateReclaimLabels(count, view, camera)
 
     -- construct the root
     local root = RootLabel(GetFrame(0), view, camera)
+    root:Hide()
 
     -- common definitions for labels so that they are not duplicated unneccesarily
     local texture = UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds')

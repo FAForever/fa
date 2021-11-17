@@ -137,6 +137,18 @@ end
 
 function CreateUI(isReplay)
 
+    ForkThread(
+        function() 
+
+            -- give time for the sim to initialize
+            WaitSeconds(1.0)
+
+            -- initialize the reclaim labels
+            import ("/lua/ui/game/reclaim.lua").OnInit()
+
+        end
+    )
+
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')  
 

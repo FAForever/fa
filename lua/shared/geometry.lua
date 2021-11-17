@@ -25,7 +25,7 @@ end
 -- @param t2 A point of the triangle, e.g., { [1], [2] }
 -- @param t3 A point of the triangle, e.g., { [1], [2] }
 -- @param point The point we wish to compute the barycentric coordinates of, e.g., { [1], [2] }
-function PointInTriangle(ax, ay bx, by, cx, cy, px, py)
+function PointInTriangle(ax, ay, bx, by, cx, cy, px, py)
 
     -- compute directions
     local v0x = bx - ax 
