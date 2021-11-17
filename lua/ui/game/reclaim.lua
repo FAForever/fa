@@ -141,6 +141,8 @@ function CreateReclaimLabel(view)
     label.text.Width:Set(14)
     label.text.Height:Set(14)
 
+    label.size = 10
+
     label:DisableHitTest(true)
     label.OnHide = function(self, hidden)
         self:SetNeedsFrameUpdate(not hidden)
@@ -150,18 +152,17 @@ function CreateReclaimLabel(view)
         local view = self.view
         local proj = view.Project(view, self.position)
 
-        local px = proj.y
-        local py = proj.x
+        local px = proj.x
+        local py = proj.y
 
-        self.text.Top:Set(px + 10)
-        self.text.Left:Set(py)
-        self.text.Width:Set(16)
-        self.text.Height:Set(16)
+        local size = self.size + 4
+        self.text.Left:Set(px + size + 2)
+        self.text.Top:Set(py)
 
-        self.mass.Top:Set(px)
-        self.mass.Left:Set(py)
-        self.mass.Width:Set(14)
-        self.mass.Height:Set(14)
+        self.mass.Left:Set(px)
+        self.mass.Top:Set(py)
+        self.mass.Width:Set(size)
+        self.mass.Height:Set(size)
     end
 
     label.DisplayReclaim = function(self, label)
@@ -173,8 +174,17 @@ function CreateReclaimLabel(view)
 
         -- change label
         if label.mass ~= self.oldMass then
-            local mass = tostring(math.floor(0.5 + label.mass))
-            self.text:SetText(mass)
+            local mass = math.floor(0.5 + label.mass)
+            self.text:SetText(tostring(mass))
+
+
+            
+            local color, size = ComputeLabelProperties(mass)
+            self.text:SetColor(color)
+            self.text:SetFont(UIUtil.bodyFont, size)
+
+            self.size = size
+            self.color = color
             self.oldMass = label.mass
         end
 
@@ -528,4 +538,33 @@ function OnCommandGraphShow(bool)
     else
         CommandGraphActive = false -- above coroutine runs until now
     end
+end
+
+-- # Utility functions
+
+function ComputeLabelProperties(mass)
+
+    -- change color according to mass value
+    if mass < 100 then 
+        return 'ffd7ff05', 10
+    end
+
+    if mass < 300 then 
+        return 'ffffeb23', 12
+    end
+
+    if mass < 600 then 
+        return 'ffff9d23', 14
+    end
+
+    if mass < 1000 then 
+        return 'ffff7212', 16
+    end
+
+    if mass < 2000 then 
+        return 'fffb0303', 18
+    end
+
+    -- default color value
+    return 'ffc7ff8f', 20
 end

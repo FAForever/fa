@@ -12,7 +12,7 @@ EmitterBlueprint {
 	Flat = false,
 	LODCutoff = 180.00,
 	EmitIfVisible = true,
-	CatchupEmit = false,
+	CatchupEmit = true,
 	CreateIfVisible = false,
 	SnapToWaterline = true,
 	OnlyEmitOnWater = false,
