@@ -69,11 +69,11 @@ function ComputeLabelProperties(mass)
     end
 
     if mass < 300 then 
-        return 'ffffeb23', 12
+        return 'ffffeb23', 11
     end
 
     if mass < 600 then 
-        return 'ffff9d23', 14
+        return 'ffff9d23', 12
     end
 
     if mass < 1000 then 
@@ -81,11 +81,11 @@ function ComputeLabelProperties(mass)
     end
 
     if mass < 2000 then 
-        return 'fffb0303', 18
+        return 'fffb0303', 20
     end
 
     -- default color value
-    return 'ffc7ff8f', 20
+    return 'ffc7ff8f', 24
 end
 
 -- # Label utility functions
