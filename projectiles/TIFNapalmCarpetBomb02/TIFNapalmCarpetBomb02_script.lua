@@ -22,7 +22,7 @@ TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) {
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        self.DamageData.DamageAmount = self.DamageData  .DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)

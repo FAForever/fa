@@ -4,17 +4,27 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
+local LazyVar = import('/lua/lazyvar.lua')
 
 local MaxLabels = 1000 -- options.maximum_reclaim_count or 100 -- The maximum number of labels created in a game session
 local MinAmount = options.minimum_reclaim_amount or 10
 
-local Reclaim = {} -- int indexed list, sorted by mass, of all props that can show a label currently in the sim
-local LabelPool = {} -- Stores labels up too MaxLabels
 local OldZoom
 local OldPosition
 local ReclaimChanged = true
 local PlayableArea
 local OutsidePlayableAreaReclaim = {}
+
+-- # Lazy evaluation
+
+local RootOfLabels = false
+local LazyView = LazyVar.Create(false)
+
+-- # internal state
+
+local Thread = false
+local Reclaim = { }
+local LabelPool = { }
 
 -- upvalue math operations for performance
 local MathSqrt = math.sqrt
@@ -28,6 +38,12 @@ local CachedSelected = { }
 local CachedUpper = { }
 local CachedCenter = { }
 local CachedLower = { }
+
+-- # Debug properties
+
+local ReclaimLabelsMade = 0
+local UpdateLeft = 0
+local UpdateTop = 0
 
 -- Stores/updates a reclaim entity's data using EntityId as key
 -- called from /lua/UserSync.lua
@@ -92,11 +108,6 @@ function updateMaxLabels(value)
     end
 end
 
-function OnScreen(view, pos)
-    local proj = view:Project(Vector(pos[1], pos[2], pos[3]))
-    return not (proj.x < 0 or proj.y < 0 or proj.x > view.Width() or proj.y > view:Height())
-end
-
 function InPlayableArea(pos)
     if PlayableArea then
         return not (pos[1] < PlayableArea[1] or pos[3] < PlayableArea[2] or pos[1] > PlayableArea[3] or pos[3] > PlayableArea[4])
@@ -104,16 +115,135 @@ function InPlayableArea(pos)
     return true
 end
 
-local WorldLabel = Class(Group) {
+local RootLabel = Class(Group) {
+    __init = function(self, parent, view, camera)
+        Group.__init(self, parent)
+
+        -- Allows us to keep track of updating
+        self.View = view
+        self.Camera = camera
+        self.OldCameraPosition = camera:GetFocusPosition()
+        self.OldCameraZoom = camera:GetZoom()
+
+        -- default values
+        self.Top:Set(0)
+        self.Left:Set(0)
+        self.Width:Set(1)
+        self.Height:Set(1)
+    end,
+
+    -- stop updating when we're hidden
+    OnHide = function (self, hidden)
+        self:SetNeedsFrameUpdate(not hidden)
+    end,
+
+    -- update all labels 
+    OnFrame = function(self)
+        local zoom = self.Camera:GetZoom()
+        local position = self.Camera:GetFocusPosition()
+
+        local update = ReclaimChanged
+        update = update or (zoom ~= self.OldCameraZoom)
+        update = update or (position[1] ~= self.OldCameraPosition[1])
+        update = update or (position[2] ~= self.OldCameraPosition[2])
+        update = update or (position[3] ~= self.OldCameraPosition[3])
+
+        if update then 
+
+            -- LOG("update")
+
+            -- keep track of current zoom / position
+            self.OldCameraZoom = zoom 
+            self.OldCameraPosition = position
+
+            -- retrieve pixel factor
+            local pixelFactor = LayoutHelpers.GetPixelScaleFactor()
+
+            -- for each displayed label: project and position it
+            local view = self.View
+            -- local width = view:Width()
+            -- local height = view:Height()
+
+            local project = self.View.Project 
+            local label, projected, px, py
+            local left, top, width, height
+            local element
+
+            -- local DummyVector2 = Vector2(0, 0)
+            -- local topLeft, topRight, bottomLeft, bottomRight 
+
+            -- DummyVector2[1] = 0 
+            -- DummyVector2[2] = 0
+            -- topLeft = UnProject(view, DummyVector2)
+
+            -- DummyVector2[1] = width 
+            -- DummyVector2[2] = 0
+            -- topRight = UnProject(view, DummyVector2)
+
+            -- DummyVector2[1] = 0 
+            -- DummyVector2[2] = height
+            -- bottomLeft = UnProject(view, DummyVector2)
+
+            -- DummyVector2[1] = width 
+            -- DummyVector2[2] = height
+            -- bottomRight = UnProject(view, DummyVector2)
+
+            -- LOG("topLeft: " .. repr(topLeft))
+            -- LOG("topRight: " .. repr(topRight))
+            -- LOG("bottomLeft: " .. repr(bottomLeft))
+            -- LOG("bottomRight: " .. repr(bottomRight))
+            -- LOG("GetMouseScreenPos: " .. repr(GetMouseScreenPos()))
+            -- LOG("GetMouseWorldPos: " .. repr(GetMouseWorldPos()))
+
+            for k = 1, MaxLabels do 
+                label = LabelPool[k]
+                if label and label.Displayed then 
+
+                    -- determine projected position: this introduces a ton of small blocks!
+                    projected = project(view, label.Position)
+                    px = projected[1]
+                    py = projected[2]
+
+                    -- determine position and size of bitmap
+                    left = pixelFactor * (px - 12)
+                    top = pixelFactor * (py - 13)
+                    width = pixelFactor * 14 
+                    height = pixelFactor * 14 
+
+                    element = label.mass
+                    element.Left[1] = (left)
+                    element.Top[1] = (top)
+                    element.Right[1] = (left + width)
+                    element.Bottom[1] = (top + height)
+
+                    -- determine position and size of text
+                    left = pixelFactor * (px + 4)
+                    top = pixelFactor * (py - 13)
+                    width = pixelFactor * 25 
+                    height = pixelFactor * 25 
+
+                    element = label.text
+                    element.Left[1] = (left)
+                    element.Top[1] = (top)
+                    element.Right[1] = (left + width)
+                    element.Bottom[1] = (top + height)
+                end
+            end
+        end
+    end,
+
+local Label = Class(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
         self.parent = parent
-        self.position = CachedVector
 
-        self.Top:Set(0)
-        self.Left:Set(0)
-        LayoutHelpers.SetDimensions(self, 25, 25)
-        self:SetNeedsFrameUpdate(true)
+        -- default values
+        self.Top:SetValue(0)
+        self.Left:SetValue(0)
+        self.Right:SetValue(25)
+        self.Bottom:SetValue(25)
+        self.Width:SetValue(25)
+        self.Height:SetValue(25)
     end,
 }
 
@@ -402,7 +532,7 @@ local function FilterLabels(view, labels, criteria, updateProjections)
     return FilterCollection(collection, collectionCount, selected, selectedCount, criteria, recursions)
 end
 
-function UpdateLabels()
+function UpdateLabels(root)
 
     -- import the view that we'll be using
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
@@ -429,7 +559,7 @@ function UpdateLabels()
         
         -- if no label is retrieved, make a new one
         if not label then
-            label = CreateReclaimLabel(view.ReclaimGroup)
+            label = CreateReclaimLabel(root)
             LabelPool[labelIndex] = label
         end
 
@@ -451,91 +581,75 @@ function UpdateLabels()
     end
 end
 
-local ReclaimThread
 function ShowReclaim(show)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
-    view.ShowingReclaim = show
-
-    if show and not view.ReclaimThread then
-        view.ReclaimThread = ForkThread(ShowReclaimThread)
+    if show then 
+        if RootOfLabels then 
+            RootOfLabels:Show()
+        end
+    else 
+        if RootOfLabels then 
+            RootOfLabels:Hide()
+        end
     end
 end
 
-function InitReclaimGroup(view)
-    if not view.ReclaimGroup or IsDestroyed(view.ReclaimGroup) then
-        local rgroup = Group(view)
-        rgroup.view = view
-        rgroup:DisableHitTest()
-        LayoutHelpers.FillParent(rgroup, view)
-        rgroup:Show()
-
-        view.ReclaimGroup = rgroup
-        rgroup:SetNeedsFrameUpdate(true)
-    else
-        view.ReclaimGroup:Show()
-    end
-
-    view.NewViewing = true
-end
-
-function ShowReclaimThread(watch_key)
+function ShowReclaimThread()
     local view = import('/lua/ui/game/worldview.lua').viewLeft
     local camera = GetCamera("WorldCamera")
 
-    InitReclaimGroup(view)
+    LOG("ShowReclaimThread")
+    if not RootOfLabels then 
+        RootOfLabels = RootLabel(GetFrame(0), view, camera)
+        RootOfLabels:Show()
+    end
 
-    while view.ShowingReclaim and (not watch_key or IsKeyDown(watch_key)) do
-        if not IsDestroyed(camera) then
-            local zoom = camera:GetZoom()
-            local position = camera:GetFocusPosition()
-            if ReclaimChanged
-                or view.NewViewing
-                or OldZoom ~= zoom
-                or OldPosition[1] ~= position[1]
-                or OldPosition[2] ~= position[2]
-                or OldPosition[3] ~= position[3] then
-                    UpdateLabels()
-                    OldZoom = zoom
-                    OldPosition = position
-                    ReclaimChanged = false
-            end
+    while true do
+        local zoom = camera:GetZoom()
+        local position = camera:GetFocusPosition()
+        if ReclaimChanged
+            or OldZoom ~= zoom
+            or OldPosition[1] ~= position[1]
+            or OldPosition[2] ~= position[2]
+            or OldPosition[3] ~= position[3] then
 
-            view.NewViewing = false
+                -- update labels with regard to which ones we show
+                UpdateLabels(RootOfLabels)
+
+                OldZoom = zoom
+                OldPosition = position
+                ReclaimChanged = false
         end
         WaitSeconds(.1)
     end
-
-    if not IsDestroyed(view) then
-        view.ReclaimThread = nil
-        view.ReclaimGroup:Hide()
-    end
-end
-
-function ToggleReclaim()
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
-    ShowReclaim(not view.ShowingReclaim)
 end
 
 -- Called from commandgraph.lua:OnCommandGraphShow()
 local CommandGraphActive = false
 function OnCommandGraphShow(bool)
-    local view = import('/lua/ui/game/worldview.lua').viewLeft
-    if view.ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
 
     CommandGraphActive = bool
     if CommandGraphActive then
-        ForkThread(function()
-            local keydown
-            while CommandGraphActive do
-                keydown = IsKeyDown('Control')
-                if keydown ~= view.ShowingReclaim then -- state has changed
-                    ShowReclaim(keydown)
-                end
-                WaitSeconds(.1)
-            end
+        ForkThread(
+            function()
+                local keydown
+                while CommandGraphActive do
+                    keydown = IsKeyDown('Control')
+                    if keydown then 
+                        ShowReclaim(true)
 
-            ShowReclaim(false)
-        end)
+                        if not Thread then 
+                            Thread = ForkThread(ShowReclaimThread)
+                        end
+                    end
+
+                    WaitSeconds(.1)
+                end
+
+                ShowReclaim(false)
+                KillThread(Thread)
+                Thread = nil
+            end
+        )
     else
         CommandGraphActive = false -- above coroutine runs until now
     end
@@ -543,6 +657,8 @@ end
 
 -- # Utility functions
 
+--- Determines the color and size of the reclaim labels.
+-- @param mass The mass value to base the color and size on
 function ComputeLabelProperties(mass)
 
     -- change color according to mass value
@@ -569,3 +685,131 @@ function ComputeLabelProperties(mass)
     -- default color value
     return 'ffc7ff8f', 20
 end
+
+--- Updates the label with the data provided.
+-- @param label The label to update
+-- @param mass The mass value of the label
+-- @param position The position of the label
+function UpdateLabel(label, position, mass)
+    -- show us when hidden
+    if label:IsHidden() then
+        label:Show()
+    end
+
+    -- update internal state
+    label.Position = position
+    label.Displayed = true
+
+    -- only update the mass value if it is different
+    if label.Mass ~= mass then
+        -- update text
+        label.Text:SetText(tostring(math.floor(0.5 + mass)))
+
+        -- update color / size based on mass
+        local factor = LayoutHelpers.GetPixelScaleFactor()
+        local color, size = ComputeLabelProperties(mass)
+        label.Text:SetColor(color)
+        label.Text:SetFont(UIUtil.bodyFont, factor * size)
+
+        -- update internal state
+        label.Size = factor * size
+        label.Color = color
+        label.Mass = mass
+    end
+end
+
+--- Determines whether the given point is inside the provided polygon. Returns a true / false value.
+-- @param polygon A table of tables with edge coordinates, e.g., { {x1, ... xn}, {y1 ... yn} }.
+-- @param point A point, e.g., { [1], [2], [3] }.
+function PointInPolygon(polygon, point)
+    return false 
+end 
+
+--- Computes the barcy centric coordinates of the point given the triangle corners. Ouputs the u / v coordinates of the point.
+-- source: https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+-- @param t1 A point of the triangle, e.g., { [1], [2], [3] }
+-- @param t2 A point of the triangle, e.g., { [1], [2], [3] }
+-- @param t3 A point of the triangle, e.g., { [1], [2], [3] }
+-- @param point The point we wish to compute the barycentric coordinates of, e.g., { [1], [2], [3] }
+function ComputeBarycentricCoordinates(t1, t2, t3, point)
+
+    -- retrieve data from tables
+    local t1x = t1[1]
+    local t1z = t1[3]
+
+    local t2x = t2[1]
+    local t2z = t2[3]
+
+    local t3x = t3[1]
+    local t3z = t3[3]
+
+    local px = point[1]
+    local pz = point[3]
+
+    -- compute directions
+    local v0x = t2x - t1x 
+    local v0z = t2z - t1z 
+
+    local v1x = t3x - t1x 
+    local v1z = t3z - t1z 
+
+    local v2x = px - t1x 
+    local v2z = pz - t1z 
+
+    local d00 = v0x * v0x + v0z * voz 
+    local d01 = v0x * v1x + v0z * v1z 
+    local d11 = v1x * v1x + v1z * v1z 
+    local d20 = v2x * v0x + v2z * v0z 
+    local d21 = v2x * v1x + v2z * v1z 
+
+    local denom = d00 * d11 - d01 * d01
+
+    local v = (d11 * d20 - d01 * d21) / denom
+    local w = (d00 * d21 - d01 * d20) / denom
+    local u = 1.0 - v - w 
+
+    return u, v, w
+end
+
+-- # Initialization
+
+function AllocateAccelerationStructure(rows, columns)
+
+end
+
+function AllocateReclaimLabels(count, view, camera)
+
+    local pixelScaleFactor = LayoutHelpers.GetPixelScaleFactor()
+
+    -- construct the root
+    local root = RootLabel(GetFrame(0), view, camera)
+
+    -- common definitions for labels so that they are not duplicated unneccesarily
+    local texture = UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds')
+    local font = UIUtil.bodyFont
+
+    -- construct the labels
+    local cacheBitmap, cacheText = { }
+    for k = 1, count do 
+        -- bitmap
+        cacheBitmap[k] = Bitmap(root)
+        cacheBitmap[k]:SetTexture(texture)
+        cacheBitmap[k].Left:SetValue(0)
+        cacheBitmap[k].Top:SetValue(0)
+        cacheBitmap[k].Width:SetValue(pixelScaleFactor * 14)
+        cacheBitmap[k].Height:SetValue(pixelScaleFactor * 14)
+        cacheBitmap[k]:DisableHitTest(true)
+
+        -- text
+        cacheText[k] = UIUtil.CreateText(root, "10", 10, font)
+        cacheText[k]:SetColor('ffc7ff8f')
+        cacheText[k]:SetDropShadow(true)
+        cacheText[k].Left:SetValue(0)
+        cacheText[k].Top:SetValue(0)
+        cacheText[k]:DisableHitTest(true)
+    end
+
+    return root, cacheBitmap, cacheText
+end
+
+-- # Deprecated functions
