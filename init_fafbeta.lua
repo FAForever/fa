@@ -55,7 +55,6 @@ end
 
 -- mods that have been integrated, based on folder name 
 local integratedMods = { }
-integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
 -- typical FA packages
@@ -100,7 +99,7 @@ for k, v in faSounds do
     if v == '.' or v == '..' then 
         continue 
     end
-    soundsBlocked[StringLower(v)] = true
+    soundsBlocked[StringLower(v)] = "FA installation"
 end
 
 -- default movie files to prevent collisions
@@ -110,7 +109,7 @@ for k, v in faMovies do
     if v == '.' or v == '..' then 
         continue 
     end
-    moviesBlocked[StringLower(v)] = true
+    moviesBlocked[StringLower(v)] = "FA installation"
 end
 
 --- Mounts a directory or scd / zip file.
@@ -244,16 +243,21 @@ local function MountMapContent(dir)
                 -- find conflicting files
                 local conflictingFiles = { }
                 for _, file in IoDir(dir .. '/' .. map .. '/movies/*') do
-                    if moviesBlocked[StringLower(file)] then 
-                        TableInsert(conflictingFiles, file)
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if moviesBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = moviesBlocked[identifier] })
+                        else 
+                            moviesBlocked[identifier] = StringLower(map)
+                        end
                     end
                 end
                     
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
-                    LOG('Found conflicting movies with the base game for map, cannot mount movies for: ' .. map)
+                    LOG("Found conflicting movie banks for map: '" .. map .. "', cannot mount the movie bank(s):")
                     for k, v in conflictingFiles do 
-                        LOG(" - Conflicting movie file: " .. v )
+                        LOG(" - Conflicting movie bank: '" .. v.file .. "' of map '" .. map .. "' is conflicting with a movie bank from: '" .. v.conflict .. "'" )
                     end
                 -- else, mount folder
                 else
@@ -264,16 +268,21 @@ local function MountMapContent(dir)
                 -- find conflicting files
                 local conflictingFiles = { }
                 for _, file in IoDir(dir .. '/' .. map .. '/sounds/*') do
-                    if soundsBlocked[StringLower(file)] then 
-                        TableInsert(conflictingFiles, file)
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if soundsBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
+                        else 
+                            soundsBlocked[identifier] = StringLower(map)
+                        end
                     end
                 end
                     
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
-                    LOG('Found conflicting sounds with the base game for map, cannot mount sounds for: ' .. map)
+                    LOG("Found conflicting sound banks for map: '" .. map .. "', cannot mount the sound bank(s):")
                     for k, v in conflictingFiles do 
-                        LOG(" - Conflicting sound file: " .. v )
+                        LOG(" - Conflicting sound bank: '" .. v.file .. "' of map '" .. map .. "' is conflicting with a sound bank from: '" .. v.conflict .. "'" )
                     end
 
                 -- else, mount folder
@@ -348,16 +357,21 @@ local function MountModContent(dir)
                 -- find conflicting files
                 local conflictingFiles = { }
                 for _, file in IoDir(dir .. '/' .. mod .. '/sounds/*') do
-                    if soundsBlocked[StringLower(file)] then 
-                        TableInsert(conflictingFiles, file)
+                    if not (file == '.' or file == '..') then 
+                        local identifier = StringLower(file) 
+                        if soundsBlocked[identifier] then 
+                            TableInsert(conflictingFiles, { file = file, conflict = soundsBlocked[identifier] })
+                        else 
+                            soundsBlocked[identifier] = StringLower(mod)
+                        end
                     end
                 end
                     
                 -- report them if they exist and do not mount
                 if TableGetn(conflictingFiles) > 0 then 
-                    LOG('Found conflicting sounds with the base game for mod, cannot mount sounds for: ' .. mod)
+                    LOG("Found conflicting sound banks for mod: '" .. mod .. "', cannot mount the sound bank(s):")
                     for k, v in conflictingFiles do 
-                        LOG(" - Conflicting sound file: " .. v )
+                        LOG(" - Conflicting sound bank: '" .. v.file .. "' of mod '" .. mod .. "' is conflicting with a sound bank from: '" .. v.conflict .. "'" )
                     end
                 -- else, mount folder
                 else
