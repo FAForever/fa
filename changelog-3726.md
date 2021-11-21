@@ -23,7 +23,7 @@ Patch 3726 (26th November, 2021)
 
 ### Stability
  - (#3477) Prevent clearing critical state in AI functions
- - (#3490) Refactor the init files of the game
+ - (#3490, #3551) Refactor the init files of the game
     This is an involved change but one that was due. 
     
     The init files can no longer load in content that clash between
@@ -49,6 +49,7 @@ Patch 3726 (26th November, 2021)
     Adds the ability to more easily block content that is integrated.
  - (#3527) Integrate the Nvidia Fix mod and block the mod from loading
  - (#3543) Prevent applying bugs to insignificant units, like the Cybran build drone
+ - (#3550) Attempt to fix Rhino from missing its target 
 
 ### Bug
  - (#3522) Fix upvalue issue of patch 3721
@@ -146,7 +147,7 @@ Patch 3726 (26th November, 2021)
  - Rowey (#3475, #3528, #3533)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
-        #3527, #3531, #3543, #3411)
+        #3527, #3531, #3543, #3411, #3551, #3550)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
