@@ -223,6 +223,11 @@ Unit = Class(moho.unit_methods) {
 
         local bp = self:GetBlueprint()
 
+        -- Store build extents for performance
+        self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
+        self.BuildExtentsY = bp.Physics.MeshExtentsY or bp.Footprint.SizeY
+        self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
+
         -- Save common lookup info
         self.UnitId = self:GetUnitId()
         self.techCategory = bp.TechCategory
