@@ -113,6 +113,8 @@ Patch 3726 (26th November, 2021)
     functionality expects a full-fledged unit. We've tried to
     catch some of these but there will be more issues that will
     show up, especially with scripted maps.
+ - (#3552) Update regular expression of mod version removal
+
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
  - (#3447) Remove old AI related code that was being run regardless of whether AIs were in-game
@@ -148,6 +150,7 @@ Patch 3726 (26th November, 2021)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
+ - Balthazar (#3552)
 
 ### Reviewers
  - Balthazar (#3484)
