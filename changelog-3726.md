@@ -119,13 +119,16 @@ Patch 3726 (26th November, 2021)
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
  - (#3447) Remove old AI related code that was being run regardless of whether AIs were in-game
-    This also changes the behavior of assisting engineers: just make a chain of 10
-    engineers assisting each other where the first engineer is assisting a 
-    factory - the old behavior would cause all engineers to start helping the
-    same tick where as this 'new' (the real old behavior) updates the same way
-    the base game does. It prevents a lot of searching for units when a lot of
-    engineers are assisting various factories - typically engineers assist 
-    directly and therefore I suspect the gameplay consequence is minimal.
+    This change is involved performance-wise but does not impact gameplay.
+
+    As a practical example: chain ten engineers assisting one another and make the
+    first engineer assist a factory. With these changes they'll start assisting the
+    factory one by one as it takes one tick (simulation tick) to detect the unit
+    it is assisting has started working on something.
+
+    The previous behavior would be that all engineers get updated immediately. This
+    required it to search for engineers in its surrounding and all those it found
+    would need to look up its surroundings too. This can quickly get out of hand.
  - (#3502) Optimize the import function that is used by all files.
  - (#3512) Removes AI threat computations and fixes AI detection
     AI code was being run during every game even when no AI was present in
