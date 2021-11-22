@@ -2502,6 +2502,9 @@ function DisableSlot(slot, exceptReady)
     end
 end
 
+-- Used for the quick-swap feature
+local playersToSwap = false
+
 -- set up player "slots" which is the line representing a player and player specific options
 function CreateSlotsUI(makeLabel)
     local Combo = import('/lua/ui/controls/combo.lua').Combo
@@ -2588,11 +2591,36 @@ function CreateSlotsUI(makeLabel)
 
         -- Slot number
         local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
         newSlot:AddChild(slotNumber)
         newSlot.tooltipnumber = Tooltip.AddControlTooltip(slotNumber, 'slot_number')
-
+        slotNumber.id = i
+        slotNumber.HandleEvent = function(self,event)
+            if lobbyComm:IsHost() then
+                if event.Type == 'ButtonPress' then
+                    if playersToSwap then
+                        --same number clicked
+                        if self.id == playersToSwap then
+                            playersToSwap = false
+                            self:SetColor(UIUtil.fontColor)
+                        elseif gameInfo.PlayerOptions[playersToSwap] then
+                            HostUtils.SwapPlayers(playersToSwap, self.id)
+                            GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
+                            playersToSwap = false
+                        elseif gameInfo.PlayerOptions[self.id] then
+                            HostUtils.SwapPlayers(self.id, playersToSwap)
+                            GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
+                            playersToSwap = false
+                        end
+                    else
+                        self:SetColor('ff00ffff')
+                        playersToSwap = self.id
+                    end
+                end
+            end
+        end
         -- COUNTRY
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
         local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
