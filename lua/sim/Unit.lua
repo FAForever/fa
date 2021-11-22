@@ -2303,7 +2303,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StopBeingBuiltEffects = function(self, builder, layer)
-        LOG("StopBeingBuiltEffects")
         local bp = self:GetBlueprint().Display
         local useTerrainType = false
         if bp then

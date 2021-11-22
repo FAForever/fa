@@ -4,7 +4,6 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 -- globals as upvalues for performance
 local Warp = Warp
-local Random = Random
 local WaitTicks = coroutine.yield
 
 local CreateSlider = CreateSlider
@@ -58,7 +57,7 @@ function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, effe
     end
 end
 
---- Creates the seraphim factory building effects
+--- Creates the seraphim factory building effects.
 -- @param builder The factory that is building the unit.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param effectBones The bones of the factory to spawn effects for.
@@ -134,7 +133,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
     end
 end
 
---- Creates the seraphim build cube effect
+--- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
@@ -193,7 +192,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
 
 end
 
---- Creates the seraphim build cube effect
+--- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
@@ -201,7 +200,7 @@ function CreateSeraphimBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, 1)
 end
 
---- Creates the seraphim build cube effect
+--- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.

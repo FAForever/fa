@@ -652,7 +652,7 @@ end
 -- @param effectsBag The trashbag for effects.
 CreateSeraphimUnitEngineerBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimUnitEngineerBuildingEffects
 
---- Creates the seraphim factory building effects
+--- Creates the seraphim factory building effects.
 -- @param builder The factory that is building the unit.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param effectBones The bones of the factory to spawn effects for.
@@ -660,20 +660,20 @@ CreateSeraphimUnitEngineerBuildingEffects = import("/lua/EffectUtilitiesSeraphim
 -- @param effectsBag The trashbag for effects.
 CreateSeraphimFactoryBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimFactoryBuildingEffects
 
---- Creates the seraphim build cube effect
+--- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
 -- @param scaleFactor A scale factor for the effects.
 CreateSeraphimBuildThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildThread
 
---- Creates the seraphim build cube effect
+--- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
 CreateSeraphimBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildBaseThread
 
---- Creates the seraphim build cube effect
+--- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
