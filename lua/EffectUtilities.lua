@@ -645,220 +645,26 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     end
 end
 
-function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    for _, vBone in BuildEffectBones do
-        BuildEffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/seraphim_build_01_emit.bp'))
+--- Creates the seraphim factory building beam effects.
+-- @param builder The factory that is building the unit.
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param effectBones The bones of the factory to spawn effects for.
+-- @param effectsBag The trashbag for effects.
+CreateSeraphimUnitEngineerBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimUnitEngineerBuildingEffects
 
-        for _, v in EffectTemplate.SeraphimBuildBeams01 do
-            local beamEffect = AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, builder.Army, v)
-            BuildEffectsBag:Add(beamEffect)
-        end
-    end
-end
+--- Creates the seraphim factory building effects
+-- @param builder The factory that is building the unit.
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param effectBones The bones of the factory to spawn effects for.
+-- @param locationBone The main build bone where the unit spawns on top of.
+-- @param effectsBag The trashbag for effects.
+CreateSeraphimFactoryBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimFactoryBuildingEffects
 
-function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(builder:GetPosition(BuildBone))
-    local mul = 1
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
+CreateSeraphimBuildThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildThread
 
-    local slice = nil
+CreateSeraphimBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildBaseThread
 
-    -- Create a pool mercury that slow draws into the build unit
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    for _, vBone in BuildEffectBones do
-        EffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/seraphim_build_01_emit.bp'))
-        for _, vBeam in EffectTemplate.SeraphimBuildBeams01 do
-            EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, builder.Army, vBeam))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
-        end
-    end
-
-    local slider = CreateSlider(unitBeingBuilt, 0)
-    unitBeingBuilt.Trash:Add(slider)
-    EffectsBag:Add(slider)
-    slider:SetWorldUnits(true)
-    slider:SetGoal(0, 0, 0)
-    slider:SetSpeed(-1)
-    WaitFor(slider)
-
-    if not slider:BeenDestroyed() then
-        slider:SetGoal(0, -sy, 0)
-        slider:SetSpeed(0.05)
-    end
-
-    -- Wait till we are 80% done building, then snap our slider to
-    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
-        WaitSeconds(0.5)
-    end
-
-    if not unitBeingBuilt.Dead then
-        if not BuildBaseEffect:BeenDestroyed() then
-            BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-        end
-        if not slider:BeenDestroyed() then
-            slider:SetSpeed(1)
-        end
-        WaitSeconds(0.5)
-    end
-
-    if not BuildBaseEffect:BeenDestroyed() then
-        BuildBaseEffect:Destroy()
-    end
-end
-
-function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(builder:GetPosition(BuildBone))
-    local mul = 1
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
-    local sy_pause = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
-
-    local slice = nil
-
-    -- Create a pool mercury that slow draws into the build unit
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    for _, vBone in BuildEffectBones do
-        EffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/seraphim_build_01_emit.bp'))
-        for _, vBeam in EffectTemplate.SeraphimBuildBeams01 do
-            if not builder:IsPaused() then
-                EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, builder.Army, vBeam))
-            end
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
-        end
-    end
-
-    local slider = CreateSlider(unitBeingBuilt, 0)
-    unitBeingBuilt.Trash:Add(slider)
-    EffectsBag:Add(slider)
-    slider:SetWorldUnits(true)
-    if builder:IsPaused() then
-        slider:SetGoal(0, sy_pause, 0)
-        slider:SetSpeed(0)
-    else
-        slider:SetGoal(0, sy, 0)
-        slider:SetSpeed(-1)
-        WaitFor(slider)
-
-        if not slider:BeenDestroyed() then
-            slider:SetGoal(0, 0, 0)
-            slider:SetSpeed(0.05)
-        end
-
-        -- Wait till we are 80% done building, then snap our slider to
-        while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
-            WaitSeconds(0.5)
-        end
-
-        if not unitBeingBuilt.Dead then
-            if not BuildBaseEffect:BeenDestroyed() then
-                BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-            end
-            if not slider:BeenDestroyed() then
-                slider:SetSpeed(2)
-            end
-            WaitSeconds(0.5)
-        end
-
-        if not slider:BeenDestroyed() then
-            slider:Destroy()
-        end
-
-        if not BuildBaseEffect:BeenDestroyed() then
-            BuildBaseEffect:Destroy()
-        end
-    end
-end
-
-function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFactor)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    local mul = 0.5
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
-
-    local slice = nil
-    WaitSeconds(0.1)
-
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp(BuildBaseEffect, Vector(x, y, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    local BuildEffectBaseEmitters = {
-        '/effects/emitters/seraphim_being_built_ambient_01_emit.bp',
-    }
-
-    local BuildEffectsEmitters = {
-        '/effects/emitters/seraphim_being_built_ambient_02_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_03_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_04_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
-    }
-
-    local AdjustedEmitters = {}
-    local effect = nil
-    for _, vEffect in BuildEffectsEmitters do
-        effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect):ScaleEmitter(scaleFactor)
-        table.insert(AdjustedEmitters, effect)
-        EffectsBag:Add(effect)
-    end
-
-    for _, vEffect in BuildEffectBaseEmitters do
-        effect = CreateAttachedEmitter(BuildBaseEffect, -1, builder.Army, vEffect):ScaleEmitter(scaleFactor)
-        table.insert(AdjustedEmitters, effect)
-        EffectsBag:Add(effect)
-    end
-
-    -- Poll the unit being built every 0.5 a second to adjust the effects to match
-    local fractionComplete = unitBeingBuilt:GetFractionComplete()
-    local unitScaleMetric = unitBeingBuilt:GetFootPrintSize() * 0.65
-    while not unitBeingBuilt.Dead and fractionComplete < 1.0 do
-        WaitSeconds(0.5)
-        fractionComplete = unitBeingBuilt:GetFractionComplete()
-        for _, vEffect in AdjustedEmitters do
-            vEffect:ScaleEmitter(scaleFactor + (unitScaleMetric * fractionComplete))
-        end
-    end
-
-    CreateLightParticleIntel(unitBeingBuilt, -1, unitBeingBuilt.Army, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
-
-    WaitSeconds(0.5)
-    BuildBaseEffect:Destroy()
-end
-
-function CreateSeraphimBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 1)
-end
-
-function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 2)
-end
+CreateSeraphimExperimentalBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
     local info = {
