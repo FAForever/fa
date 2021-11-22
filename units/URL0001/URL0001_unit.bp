@@ -565,12 +565,12 @@ UnitBlueprint {
         },
         StealthGenerator = {
             BuildCostEnergy = 14000,
-            BuildCostMass = 600,
+            BuildCostMass = 650,
             BuildTime = 800,
             Icon = 'psg',
             MaintenanceConsumptionPerSecondEnergy = 50,
             Name = '<LOC enhancements_0101>Personal Stealth Generator',
-            NewHealth = 2500,
+            NewHealth = 2000,
             ShowBones = {
                 'Back_Upgrade',
             },
