@@ -134,66 +134,77 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
     end
 end
 
-function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFactor)
+--- Creates the seraphim build cube effect
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
+-- @param scaleFactor A scale factor for the effects.
+function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFactor)
 
     -- # initialize various info used throughout the function
 
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    local mul = 0.5
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
+    local effect = false
+    local army = builder.Army
 
-    local slice = nil
-    WaitSeconds(0.1)
+    -- # Create generic effects
 
-    -- # Create pool mercury
+    local effect = false
 
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp(BuildBaseEffect, Vector(x, y, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
+    -- matches with number of effects being made, pre-allocates the table
+    local emitters = { false, false, false, false, false }
+    local emittersHead = 1
 
-    -- # Create effects for each build bone
-
-    local AdjustedEmitters = {}
-    local effect = nil
     for _, vEffect in BuildEffectsEmitters do
-        effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect):ScaleEmitter(scaleFactor)
-        table.insert(AdjustedEmitters, effect)
-        EffectsBag:Add(effect)
+        effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
+        effect:ScaleEmitter(scaleFactor)
+
+        TrashBagAdd(effectsBag, effect)
+        emitters[emittersHead] = effect
+        emittersHead = emittersHead + 1
     end
 
     for _, vEffect in BuildEffectBaseEmitters do
-        effect = CreateAttachedEmitter(BuildBaseEffect, -1, builder.Army, vEffect):ScaleEmitter(scaleFactor)
-        table.insert(AdjustedEmitters, effect)
-        EffectsBag:Add(effect)
+        effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
+        effect:ScaleEmitter(scaleFactor)
+
+        TrashBagAdd(effectsBag, effect)
+        emitters[emittersHead] = effect
+        emittersHead = emittersHead + 1
     end
 
-    -- Poll the unit being built every 0.5 a second to adjust the effects to match
-    local fractionComplete = unitBeingBuilt:GetFractionComplete()
-    local unitScaleMetric = unitBeingBuilt:GetFootPrintSize() * 0.65
-    while not unitBeingBuilt.Dead and fractionComplete < 1.0 do
-        WaitSeconds(0.5)
-        fractionComplete = unitBeingBuilt:GetFractionComplete()
-        for _, vEffect in AdjustedEmitters do
-            vEffect:ScaleEmitter(scaleFactor + (unitScaleMetric * fractionComplete))
+    -- # Scale effects until the unit is finished
+
+    -- only naval factories are not square, use the Z axis to get largest axis
+    local unitScaleMetric = unitBeingBuilt.BuildExtentsZ * 0.75
+    local complete = UnitGetFractionComplete(unitBeingBuilt)
+    while not unitBeingBuilt.Dead and complete < 1.0 do
+
+        for k = 1, emittersHead - 1 do
+            emitters[k]:ScaleEmitter(scaleFactor + (unitScaleMetric * complete))
         end
+
+        complete = UnitGetFractionComplete(unitBeingBuilt)
+        WaitTicks(2)
     end
 
-    CreateLightParticleIntel(unitBeingBuilt, -1, unitBeingBuilt.Army, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
+    -- # Poof - we're finished and clean up
 
-    WaitSeconds(0.5)
-    BuildBaseEffect:Destroy()
+    CreateLightParticleIntel(unitBeingBuilt, -1, army, unitScaleMetric * 3.5, 8, 'glow_02', 'ramp_blue_22')
+
 end
 
-function CreateSeraphimBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 1)
+--- Creates the seraphim build cube effect
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
+function CreateSeraphimBuildBaseThread(unitBeingBuilt, builder, effectsBag)
+    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, 1)
 end
 
-function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 2)
+--- Creates the seraphim build cube effect
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
+function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, effectsBag)
+    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, 2)
 end
