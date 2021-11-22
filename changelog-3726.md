@@ -115,6 +115,12 @@ Patch 3726 (26th November, 2021)
     catch some of these but there will be more issues that will
     show up, especially with scripted maps.
  - (#3552) Update regular expression of mod version removal
+ - (#3554) Add quick-swap feature to lobby
+    As a host you can quickly swap two players by
+    left-clicking on the slot numbers of two players. It
+    highlights to teal (light / bright blue color) when
+    in swap modus. Click the highlighted slot number to
+    cancel.
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -155,6 +161,7 @@ Patch 3726 (26th November, 2021)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
  - Balthazar (#3552)
+ - 4z0t (#3554)
 
 ### Reviewers
  - Balthazar (#3484)
