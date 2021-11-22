@@ -2433,7 +2433,8 @@ function DisableSlot(slot, exceptReady)
     end
 end
 
-local playersToSwap = nil
+-- Used for the quick-swap feature
+local playersToSwap = false
 
 -- set up player "slots" which is the line representing a player and player specific options
 function CreateSlotsUI(makeLabel)
@@ -2533,16 +2534,16 @@ function CreateSlotsUI(makeLabel)
                     if playersToSwap then
                         --same number clicked
                         if self.id == playersToSwap then
-                            playersToSwap = nil
+                            playersToSwap = false
                             self:SetColor(UIUtil.fontColor)
                         elseif gameInfo.PlayerOptions[playersToSwap] then
                             HostUtils.SwapPlayers(playersToSwap, self.id)
                             GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
-                            playersToSwap = nil
+                            playersToSwap = false
                         elseif gameInfo.PlayerOptions[self.id] then
                             HostUtils.SwapPlayers(self.id, playersToSwap)
                             GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
-                            playersToSwap = nil
+                            playersToSwap = false
                         end
                     else
                         self:SetColor('ff00ffff')
