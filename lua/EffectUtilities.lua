@@ -660,10 +660,23 @@ CreateSeraphimUnitEngineerBuildingEffects = import("/lua/EffectUtilitiesSeraphim
 -- @param effectsBag The trashbag for effects.
 CreateSeraphimFactoryBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimFactoryBuildingEffects
 
+--- Creates the seraphim build cube effect
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
+-- @param scaleFactor A scale factor for the effects.
 CreateSeraphimBuildThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildThread
 
+--- Creates the seraphim build cube effect
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
 CreateSeraphimBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildBaseThread
 
+--- Creates the seraphim build cube effect
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
 CreateSeraphimExperimentalBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
