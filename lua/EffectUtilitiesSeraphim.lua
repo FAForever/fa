@@ -16,6 +16,7 @@ local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetGoal = moho.SlideManipulator.SetGoal 
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
 
+-- upvalue math functions for performance
 local MathMax = math.max
 
 -- upvalued trashbag functions for performance

@@ -34,7 +34,6 @@ local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects
-local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects
 
 -- FACTORIES
 SFactoryUnit = Class(FactoryUnit) {
