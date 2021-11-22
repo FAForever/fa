@@ -29,6 +29,8 @@ Patch 3725 (26th November, 2021)
     - Reduce detonation trigger distance when manually attacking a unit
 
 ### Air
+- T1 Transports
+    - Add dummy weapons which allows units inside to focus fire targets
 - Scorcher
     - Damage: 4 → 4.5
     - InitialDamage: 47.5 → 42.5
@@ -78,7 +80,6 @@ Patch 3725 (26th November, 2021)
     - Now have higher selection priority than buildings
 - UEF T3 Sonar
     - Add Jamming
-    - EnergyMaintenanceCost: 500 → 550
 - Paragon
     - Add a 100,000 E storage
 - T1 PDs
@@ -89,9 +90,9 @@ Patch 3725 (26th November, 2021)
 ### Miscellaneous
 - Cybran ACU Stealth Upgrade
     - EnergyCost: 5000 → 14000
-    - MassCost: 350 → 600
+    - MassCost: 350 → 650
     - BuildTime: 500 → 800
-    - Provides 2500 extra HP
+    - Provides 2000 extra HP
 - Sera ACU Regen Field Upgrade
     - Now provides regen to the ACU itself, 10 hp/s for the first upgrade and 20 hp/s for the second
     - Now uses different regen floor values for units depending on their tier: 
@@ -111,6 +112,7 @@ Patch 3725 (26th November, 2021)
 ### Contributors
 - Tagada
 - Petricpwnz
+- Uveso
 
 Patch 3724 (04th October, 2021)
 ============================
