@@ -6,6 +6,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Warp = Warp
 local WaitTicks = coroutine.yield
 
+local EntityCategoryContains = EntityCategoryContains
 local CreateSlider = CreateSlider
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
@@ -42,6 +43,8 @@ local BuildEffectsEmitters = {
     '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
 }
 
+local CategoriesHover = categories.HOVER
+
 --- Creates the seraphim factory building beam effects.
 -- @param builder The factory that is building the unit.
 -- @param unitBeingBuilt the unit that is being built by the factory.
@@ -67,16 +70,16 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     -- # initialize various info used throughout the function
 
-    local completed = UnitGetFractionComplete(unitBeingBuilt)
     local x, y, z = EntityGetPositionXYZ(builder, locationBone)
 
     local sx = unitBeingBuilt.BuildExtentsX
     local sz = unitBeingBuilt.BuildExtentsZ
     local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
-    sy = (1 - completed) * sy
 
     local effect = false
     local army = builder.Army
+
+    local offset = unitBeingBuilt.HoverElevation or 0
 
     -- # Create effects for each build bone
 
@@ -114,8 +117,8 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         unitBeingBuilt.ConstructionSlider = slider
 
         SliderSetWorldUnits(slider,true)
-        SliderSetGoal(slider, 0, sy, 0)
-        SliderSetSpeed(slider, 10)
+        SliderSetGoal(slider, 0, sy + offset, 0)
+        SliderSetSpeed(slider, 100)
 
         TrashBagAdd(unitBeingBuiltTrash, slider)
         TrashBagAdd(unitOnStopBeingBuiltTrash, slider)
@@ -127,7 +130,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     while not unitBeingBuilt.Dead do
         completed = UnitGetFractionComplete(unitBeingBuilt)
-        SliderSetGoal(slider, 0, (1 - completed) * sy, 0)
+        SliderSetGoal(slider, 0, (1 - completed) * sy + offset, 0)
         SliderSetSpeed(slider, completed * completed * completed)
         WaitTicks(2)
     end
