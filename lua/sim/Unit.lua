@@ -227,7 +227,7 @@ Unit = Class(moho.unit_methods) {
         self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
         self.BuildExtentsY = bp.Physics.MeshExtentsY or bp.Footprint.SizeY
         self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
-        self.HoverElevation = math.max(0, bp.Physics.Elevation)
+        self.Elevation = bp.Physics.Elevation
 
         -- Save common lookup info
         self.UnitId = self:GetUnitId()

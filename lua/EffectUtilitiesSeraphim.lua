@@ -3,27 +3,20 @@
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 -- globals as upvalues for performance
-local Warp = Warp
 local WaitTicks = coroutine.yield
 
 local EntityCategoryContains = EntityCategoryContains
 local CreateSlider = CreateSlider
-local CreateEmitterOnEntity = CreateEmitterOnEntity
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 
 -- moho functions as upvalues for performance
-local EntityGetPosition = moho.entity_methods.GetPosition
-local EntityBeenDestroyed = moho.entity_methods.BeenDestroyed
-local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
-local EntityGetOrientation = moho.entity_methods.GetOrientation
-
-local UnitRevertElevation = moho.unit_methods.RevertElevation
 local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
-local UnitCreateProjectile = moho.unit_methods.CreateProjectile
 
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetGoal = moho.SlideManipulator.SetGoal 
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
+
+local MathMax = math.max
 
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
@@ -70,16 +63,15 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     -- # initialize various info used throughout the function
 
-    local x, y, z = EntityGetPositionXYZ(builder, locationBone)
-
-    local sx = unitBeingBuilt.BuildExtentsX
-    local sz = unitBeingBuilt.BuildExtentsZ
-    local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
-
     local effect = false
     local army = builder.Army
+    local sy = unitBeingBuilt.BuildExtentsY or (unitBeingBuilt.BuildExtentsX + unitBeingBuilt.BuildExtentsZ) or 1
 
-    local offset = unitBeingBuilt.HoverElevation or 0
+    -- do not apply offsets for subs and air units
+    local offset = 0
+    if EntityCategoryContains(CategoriesHover, unitBeingBuilt) then 
+        offset = unitBeingBuilt.Elevation or 0
+    end
 
     -- # Create effects for each build bone
 
@@ -134,6 +126,11 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         SliderSetSpeed(slider, completed * completed * completed)
         WaitTicks(2)
     end
+
+    -- # Nillify temporary tables
+
+    unitBeingBuilt.ConstructionSlider = nil
+    unitBeingBuilt.ConstructionInitialised = nil
 end
 
 --- Creates the seraphim build cube effect.
@@ -186,7 +183,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
         end
 
         complete = UnitGetFractionComplete(unitBeingBuilt)
-        WaitTicks(2)
+        WaitTicks(4)
     end
 
     -- # Poof - we're finished and clean up
