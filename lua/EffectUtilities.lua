@@ -1758,3 +1758,9 @@ CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
 -- @param botBlueprint The blueprint to use for the bot.
 SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
 -- original: SpawnBuildBots
+
+CreateAeonBuildBaseThreadOpti = EffectUtilitiesOpti.CreateAeonBuildBaseThread
+
+CreateAeonConstructionUnitBuildingEffectsOpti = EffectUtilitiesOpti.CreateAeonConstructionUnitBuildingEffects
+
+CreateAeonFactoryBuildingEffectsOpti = EffectUtilitiesOpti.CreateAeonFactoryBuildingEffects
