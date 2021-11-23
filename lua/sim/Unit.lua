@@ -4465,7 +4465,7 @@ local EntityGetArmy = _G.moho.entity_methods.GetArmy
 local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
 local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 
-local UnitGetCurrentLayer = _G.moho.unit_methods.GetLayer
+local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 -- upvalued categories for performance

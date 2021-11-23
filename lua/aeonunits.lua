@@ -38,7 +38,7 @@ local WallStructureUnit = DefaultUnitsFile.WallStructureUnit
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
-local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffectsOpti
+local CreateAeonFactoryBuildingEffects = EffectUtil.CreateAeonFactoryBuildingEffects
 
 
 ---------------------------------------------------------------
@@ -108,7 +108,7 @@ AConcreteStructureUnit = Class(ConcreteStructureUnit) {
 ---------------------------------------------------------------
 AConstructionUnit = Class(ConstructionUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateAeonConstructionUnitBuildingEffectsOpti(self, unitBeingBuilt, self.BuildEffectsBag)
+        EffectUtil.CreateAeonConstructionUnitBuildingEffects(self, unitBeingBuilt, self.BuildEffectsBag)
     end,
 }
 

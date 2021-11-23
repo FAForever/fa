@@ -15,7 +15,7 @@ UAL0303 = Class(AWalkingLandUnit) {
     },
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        EffectUtil.CreateAeonCommanderBuildingEffectsOpti(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
+        EffectUtil.CreateAeonCommanderBuildingEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones.BuildEffectBones, self.BuildEffectsBag)
     end,
 }
 
