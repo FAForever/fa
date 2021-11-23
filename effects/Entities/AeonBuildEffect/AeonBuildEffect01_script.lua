@@ -1,12 +1,4 @@
-#
-# script for projectile BoneAttached
-#
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 
-AeonBuildEffect01 = Class(NullShell) {
-    OnDamage = function(self, instigator, amount, vector, damageType)
-    end,
-}
-
-TypeClass =AeonBuildEffect01
-
+local DummyProjectile = import('/lua/sim/projectile.lua').DummyProjectile
+AeonBuildEffect01 = Class(DummyProjectile) { }
+TypeClass = AeonBuildEffect01

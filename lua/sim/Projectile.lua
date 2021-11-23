@@ -486,11 +486,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 }
 
---- A dummy projectile that solely inherits what it needs. Useful for 
--- effects that require projectiles without additional overhead.
 DummyProjectile = Class(moho.projectile_methods, Entity) {
     -- the only things we need
-    __init = function(self, spec) end,
-    __post_init = function(self, spec) end,
-    OnCreate = function(self, inWater) end,
+    __init = function(self, spec)  end,
+    __post_init = function(self, spec)  end,
+    OnCreate = function(self, inWater)  end,
 }
