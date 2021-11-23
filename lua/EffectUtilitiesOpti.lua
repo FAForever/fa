@@ -284,7 +284,10 @@ local AeonBuildBeams02 = EffectTemplate.AeonBuildBeams02
 
 function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
 
-    -- hide the bones of the unit
+    -- reset the mesh of the unit and hide it immediately
+    local blueprint = EntityGetBlueprint(unitBeingBuilt)
+    local display = blueprint.Display
+    unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint)
     UnitHideBone(unitBeingBuilt, 0, true)
 
     WaitTicks(2)
@@ -296,7 +299,6 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
 
     -- retrieve and cache data right off the bat
     local emit = false
-    local blueprint = EntityGetBlueprint(unitBeingBuilt)
     local o = EntityGetPosition(unitBeingBuilt)
     local ox, oy, oz = o[1], o[2], o[3]
 
@@ -307,10 +309,6 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
     local sx = physics.MeshExtentsX or footprint.SizeX * 0.5
     local sz = physics.MeshExtentsZ or footprint.SizeZ * 0.5
     local sy = physics.MeshExtentsY or sx + sz
-
-    -- set the original mesh of the building we're making
-    local display = blueprint.Display
-    unitBeingBuilt.SetMesh(display.MeshBlueprint)
 
     -- create dummy entity for the build animation
     local entity = Entity()
@@ -408,14 +406,16 @@ end
 local TableCache = { }
 function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
 
-    -- hide original unit
+    -- reset the mesh of the unit and hide it immediately
+    local blueprint = EntityGetBlueprint(unitBeingBuilt)
+    local display = blueprint.Display
+    unitBeingBuilt.SetMesh(unitBeingBuilt, display.MeshBlueprint)
     UnitHideBone(unitBeingBuilt, 0, true)
 
     -- wait for the original unit to have the correct orientation
     WaitTicks(2)
 
     -- retrieve and cache data right off the bat
-    local blueprint = EntityGetBlueprint(unitBeingBuilt)
     local o = EntityGetPosition(builder, BuildBone)
     local ox, oy, oz = o[1], o[2], o[3]
 
@@ -430,11 +430,6 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     local sx = physics.MeshExtentsX or footprint.SizeX * 0.5
     local sz = 1.5 * (physics.MeshExtentsZ or footprint.SizeZ * 0.5)
     local sy = physics.MeshExtentsY or sx + sz
-
-
-    -- set the original mesh of the building we're making
-    local display = blueprint.Display
-    unitBeingBuilt.SetMesh(display.MeshBlueprint)
 
     -- create dummy entity for the build animation and 
     -- store it with the factory for re-use
@@ -451,8 +446,8 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBo
     vc[3] = oz 
     Warp(entity, vc)
     EntitySetOrientation(entity, orientation, true)
-    EntitySetScale(entity, blueprint.Display.UniformScale)
-    EntitySetMesh(entity, blueprint.Display.BuildMeshBlueprint, true)
+    EntitySetScale(entity, display.UniformScale)
+    EntitySetMesh(entity, display.BuildMeshBlueprint, true)
 
     -- Create a pool mercury that slow draws into the build unit
     local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 1, nil, nil, nil)
