@@ -408,7 +408,7 @@ StructureUnit = Class(Unit) {
             end
         elseif FactionName == 'Aeon' then
             if bp.General.UpgradesFrom ~= builder.UnitId then
-                ForkThread(EffectUtil.CreateAeonBuildBaseThreadOpti, self, self.OnBeingBuiltEffectsBag)
+                ForkThread(EffectUtil.CreateAeonBuildBaseThread, self, self.OnBeingBuiltEffectsBag)
             end
         elseif FactionName == 'Seraphim' then
             if bp.General.UpgradesFrom ~= builder.UnitId then
