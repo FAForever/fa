@@ -1314,9 +1314,9 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    float scale = 2 / worldMatrix._m00; //transPalette[anim.y + boneIndex[0]];
-    float buildTime = 1 - material.y;
-    position.y = position.y - scale * buildTime;
+    float scale = 1 / worldMatrix._m00; //transPalette[anim.y + boneIndex[0]];
+    float buildTime = 1 - min(1.0, (1.25 * material.y));
+    position.y = position.y - abs(scale * buildTime);
 
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);

@@ -73,6 +73,8 @@ local AeonBuildBeams02 = EffectTemplate.AeonBuildBeams02
 -- @param effectsBag The build effects bag containing the pool and emitters.
 function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
 
+    LOG("CreateAeonBuildBaseThread")
+
     -- reset the mesh of the unit and hide it immediately
     local blueprint = EntityGetBlueprint(unitBeingBuilt)
 
@@ -142,6 +144,9 @@ end
 -- @param unitBeingBuilt The unit we're building.
 -- @param buildEffectsBag The trash bag for the build effects.
 function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, buildEffectsBag)
+
+    LOG("CreateAeonConstructionUnitBuildingEffects")
+
     local army = builder.Army
     -- create effect on builder
     local effect = CreateEmitterOnEntity(builder, army, '/effects/emitters/aeon_build_01_emit.bp') 
@@ -162,6 +167,9 @@ end
 -- @param buildEffectBones The bone(s) of the commander where the effect starts.
 -- @param buildEffectsBag The trash bag for the build effects.
 function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
+
+    LOG("CreateAeonCommanderBuildingEffects")
+
     local effect = false 
     local army = builder.Army
     for _, vBone in buildEffectBones do
@@ -184,6 +192,8 @@ end
 -- @param buildBone The location where the unit is beint built.
 -- @param effectsBag The build effects bag.
 function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildBone, effectsBag)
+
+    LOG("CreateAeonFactoryBuildingEffects")
 
     -- reset the mesh of the unit and hide it immediately
     local blueprint = EntityGetBlueprint(unitBeingBuilt)
