@@ -119,6 +119,7 @@ gamePatches = {
             '- Tagada',
             '- Petricpwnz',
             '- Uveso',
+            '- Jip',
         },
     },
     {

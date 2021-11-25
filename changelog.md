@@ -115,6 +115,7 @@ Patch 3725 (26th November, 2021)
 - Tagada
 - Petricpwnz
 - Uveso
+- Jip
 
 Patch 3724 (04th October, 2021)
 ============================
