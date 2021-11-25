@@ -121,6 +121,7 @@ Patch 3726 (26th November, 2021)
     highlights to teal (light / bright blue color) when
     in swap modus. Click the highlighted slot number to
     cancel.
+ - #3558 Restrict t2 artillery orientation to 90 degree angles
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -148,6 +149,11 @@ Patch 3726 (26th November, 2021)
     range (sim wise) as the other engineers, without impacting their
     visual appearance too much. Disables the hover effects of these units
     all together when playing on low fidelity.
+ - (#3557) Fix and improve performance on Seraphim build animations
+    The old version had complicated logic and various
+    computations that were not required. The new version is 
+    better for performance and a lot more smooth with regards
+    to the build animation.
 
 ### Contributors
  - Askaholic (#3417, #3440)
@@ -156,7 +162,8 @@ Patch 3726 (26th November, 2021)
  - Rowey (#3475, #3528, #3533)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
-        #3527, #3531, #3543, #3411, #3551, #3550)
+        #3527, #3531, #3543, #3411, #3551, #3550, #3557
+        #3558)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
