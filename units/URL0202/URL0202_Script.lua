@@ -9,11 +9,12 @@
 #****************************************************************************
 
 local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
-local CDFParticleCannonWeapon = import('/lua/cybranweapons.lua').CDFParticleCannonWeapon
+local CDFLaserHeavyWeapon = import('/lua/cybranweapons.lua').CDFLaserHeavyWeapon
 
 URL0202 = Class(CLandUnit) {
     Weapons = {
-        MainGun = Class(CDFParticleCannonWeapon) {},
+        MainGun = Class(CDFLaserHeavyWeapon) {},
+        FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_02_emit.bp'},
     },
 }
 
