@@ -31,6 +31,8 @@ gamePatches = {
             '    - MaxAcceleration: 5 → 7',
             '    - TurnRate: 160 → 200',
             '    - Reduce detonation trigger distance when manually attacking a unit',
+            '- Rhino',
+            '    - Revert the weapon from a beam-type to a projectile-type to prevent misses when leading targets',
 '',
             '**Air**',
             '- T1 Transports',
