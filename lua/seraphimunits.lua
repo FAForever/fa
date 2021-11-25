@@ -54,7 +54,7 @@ SFactoryUnit = Class(FactoryUnit) {
         if self:IsUnitState('Building') and self.UnitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-        end
+        end 
         StructureUnit.OnPaused(self)
     end,
 

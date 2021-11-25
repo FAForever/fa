@@ -71,46 +71,38 @@ local AeonBuildBeams02 = EffectTemplate.AeonBuildBeams02
 --- The build animation for Aeon buildings in general.
 -- @param unitBeingBuilt The unit we're trying to build.
 -- @param effectsBag The build effects bag containing the pool and emitters.
-function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
+function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
 
     LOG("CreateAeonBuildBaseThread")
 
-    -- reset the mesh of the unit and hide it immediately
-    local blueprint = EntityGetBlueprint(unitBeingBuilt)
+    -- # Hold up for orientation to receive an update
 
-    -- wait one tick (= 2) to get the right orientation.
     WaitTicks(2)
 
-    -- always check after a wai
-    if unitBeingBuilt.Dead then 
+    -- always check after a wait
+    if (not unitBeingBuilt) or unitBeingBuilt.Dead then 
         return 
     end
 
-    -- retrieve and cache data right off the bat
-    local emit = false
-    local o = EntityGetPosition(unitBeingBuilt)
-    local ox, oy, oz = o[1], o[2], o[3]
+    -- # Initialize various info used throughout the function
 
+    local emit = false
     local army = unitBeingBuilt.Army
     local orientation = EntityGetOrientation(unitBeingBuilt)
-    local physics = blueprint.Physics
-    local footprint = blueprint.Footprint
-    local sx = physics.MeshExtentsX or footprint.SizeX * 0.5
-    local sz = physics.MeshExtentsZ or footprint.SizeZ * 0.5
-    local sy = physics.MeshExtentsY or sx + sz
+    local sx = unitBeingBuilt.BuildExtentsX
+    local sz = unitBeingBuilt.BuildExtentsZ
+    local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
 
-    -- FEATURE OF THE YEAR:
-    -- for larger units, when reclaiming hide random bones on X percentages
+    -- # Create pool of mercury
 
-    -- create a pool mercury that slow draws into the build unit
     local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
     TrashBagAdd(effectsBag, pool)
 
     EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, sy * 1.5, sz)
-    Warp(pool, o)
 
-    -- create effects for the build animation
+    -- # Create effects
+
     emit = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_01_emit.bp')
     EmitterSetEmitterCurveParam(emit, 'X_POSITION_CURVE', 0, sx * 1.5)
     EmitterSetEmitterCurveParam(emit, 'Z_POSITION_CURVE', 0, sz * 1.5)
@@ -118,14 +110,14 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, effectsBag)
     emit = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
     EmitterScaleEmitter(emit, (sx + sz) * 0.3)
 
-    -- move the dummy unit around
-    local vc = VectorCached
+    -- # Shrink pool of mercury over time
+
+    local frac, scale = false, false
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
     while not unitBeingBuilt.Dead and fraction < 1 do
         -- get current fraction and see if we progressed
-        local frac = UnitGetFractionComplete(unitBeingBuilt)
+        frac = UnitGetFractionComplete(unitBeingBuilt)
         if frac > fraction then 
-
             -- store updated value
             fraction = frac
 
@@ -144,20 +136,14 @@ end
 -- @param unitBeingBuilt The unit we're building.
 -- @param buildEffectsBag The trash bag for the build effects.
 function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, buildEffectsBag)
-
-    LOG("CreateAeonConstructionUnitBuildingEffects")
-
     local army = builder.Army
-    -- create effect on builder
-    local effect = CreateEmitterOnEntity(builder, army, '/effects/emitters/aeon_build_01_emit.bp') 
-    TrashBagAdd(buildEffectsBag, effect)
 
-    -- create beam between builder and unit being built
+    -- create effect on builder
+    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(builder, army, '/effects/emitters/aeon_build_01_emit.bp') )
+
+    -- create beam builder -> target
     for _, v in AeonBuildBeams01 do
-        -- create the beam and adjust it
-        effect = AttachBeamEntityToEntity(builder, -1, unitBeingBuilt, -1, army, v)
-        -- EmitterSetEmitterParam(effect, 'POSITION_Z', 0.45)
-        TrashBagAdd(buildEffectsBag, effect)
+        TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, -1, unitBeingBuilt, -1, army, v))
     end
 end
 
@@ -167,20 +153,13 @@ end
 -- @param buildEffectBones The bone(s) of the commander where the effect starts.
 -- @param buildEffectsBag The trash bag for the build effects.
 function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
-
-    LOG("CreateAeonCommanderBuildingEffects")
-
-    local effect = false 
     local army = builder.Army
-    for _, vBone in buildEffectBones do
-        -- create effect on builder bones
-        effect = CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/aeon_build_02_emit.bp')
-        TrashBagAdd(buildEffectsBag, effect)
 
+    -- create beam builder -> target
+    for _, vBone in buildEffectBones do
+        TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/aeon_build_02_emit.bp'))
         for _, v in AeonBuildBeams01 do
-            -- create the beam from builder bone to unit
-            effect = AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v)
-            TrashBagAdd(buildEffectsBag, effect)
+            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v))
         end
     end
 end
