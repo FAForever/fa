@@ -348,43 +348,33 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     local sz = 0.6 * unitBeingBuilt.BuildExtentsZ
     local sy = 1.5 * (unitBeingBuilt.BuildExtentsY or (sx + sz))
 
-    -- # Create pool of mercury
-
-    local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 0, nil, nil, nil)
-    TrashBagAdd(onDeathTrash, pool)
-    TrashBagAdd(onFinishedTrash, pool)
-
-    pool.sx = sx
-    pool.sy = sy
-    pool.sz = sz
-
-    EntitySetOrientation(pool, orientation, true)
-    ProjectileSetScale(pool, sx, 1.5 * sy, sz)
-
     -- # Create effects of pool
 
-    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
     EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
     EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
 
-    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    EmitterScaleEmitter(effect, sy)
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
+
+    effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    EmitterScaleEmitter(effect, 0.75 * sx)
+
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
 
     frac = false
     for k = 1, 10 do 
         frac = k / 10.0
-        effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
         EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
         EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
         EmitterScaleEmitter(effect, 2.0)
         effect:OffsetEmitter(0, 2 - 2 * frac, 0)
-    end
-
-    -- # Create a thread to scale the pool
-
-    local thread = ForkThread(SharedBuildThread, pool, unitBeingBuilt, onDeathTrash, onFinishedTrash)
-    TrashBagAdd(onDeathTrash, thread)
-    TrashBagAdd(onFinishedTrash, thread)
+        
+        TrashBagAdd(onDeathTrash, effect)
+        TrashBagAdd(onFinishedTrash, effect)
+    end 
     
 end
 
@@ -414,7 +404,7 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     TrashBagAdd(onFinishedTrash, effect)
 
     effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    EmitterScaleEmitter(effect, sx)
+    EmitterScaleEmitter(effect, 0.75 * sx)
 
     TrashBagAdd(onDeathTrash, effect)
     TrashBagAdd(onFinishedTrash, effect)
@@ -433,6 +423,5 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     end    
 
     -- # Apply build animation
-
 
 end
