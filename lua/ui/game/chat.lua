@@ -560,6 +560,86 @@ function FindClients(id)
     return result
 end
 
+function MatchPlayersNicknames(s)
+    --LOG('input: '.. s)
+    local function MatchStrings(s1, s2)
+        --LOG('comparing '..s1 .. ':' .. s2)
+        local str2 = string.lower(s2)
+        local slen1 = string.len(s1)
+        local slen2 = string.len(s2)
+        local res = 0 -- weight of match
+        local iter1 = 1 --iter for first string 
+        local iter2 = 1 --iter for second string 
+        local lastId = 1 -- last index where match was
+        while iter2 <= slen2 do
+            iter1 = lastId
+            while iter1 <= slen1 do
+                local ch1 = string.byte(s1, iter1)
+                local ch2 = string.byte(str2, iter2)
+                if ch1 == ch2 then
+                    --LOG('match '..ch1..':'..ch2)
+                    lastId = iter1 + 1
+                    res = res + math.pow(2, 16 - iter1)
+                    iter2 = iter2 + 1
+                end
+                iter1 = iter1 + 1
+            end
+            iter2 = iter2 + 1
+        end
+        --LOG('result :'..res)
+        return res
+    end
+    
+    local str = string.lower(s)
+    local match = 0
+    local resId = -1
+    local armiesTable = GetArmiesTable().armiesTable
+    for id, army in armiesTable do
+        if not army.civilian then
+            local   curMatch = MatchStrings(str, army.nickname)
+            if curMatch  > match then
+                match = curMatch
+                resId = id
+            end
+         end
+    end
+    return resId
+end
+
+function GetNickname(str)
+    local id = MatchPlayersNicknames(str)
+    if id == -1 then
+        return 'all' ,-1
+    else 
+        return GetArmiesTable().armiesTable[id].nickname,id
+    end
+end
+ 
+function CreateNicknameMatcher(str)
+    local id
+    local nickname
+    nickname,id = GetNickname(str)
+    if GUI.matcher then
+        GUI.matcher.id = id
+        GUI.matcher.text:SetText(nickname)
+        return
+    end
+    local matcher = Bitmap(GUI.chatEdit)
+    matcher:SetSolidColor('ff000000')
+    LayoutHelpers.Above(matcher, GUI.chatEdit.edit, 2)
+    LayoutHelpers.AtLeftIn(matcher, GUI.chatContainer)
+    LayoutHelpers.AtRightIn(matcher, GUI.chatContainer)
+    LayoutHelpers.DepthOverParent(matcher, GUI.chatContainer,100)
+    LayoutHelpers.SetHeight(matcher,20)
+    matcher.text = UIUtil.CreateText(matcher, nickname, 16, "Arial",true)
+    LayoutHelpers.AtLeftTopIn(matcher.text, matcher,2,2)
+    matcher.nickname = nickname
+    matcher.id = id
+    GUI.matcher = matcher
+end
+
+
+
 local RunChatCommand = import('/lua/ui/notify/commands.lua').RunChatCommand
 function CreateChatEdit()
     local parent = GUI.bg:GetClientGroup()
@@ -703,11 +783,44 @@ function CreateChatEdit()
             return true
         end
     end
-
+    group.edit.OnTextChanged = function(self, newText, oldText)
+        if   GUI.matcher and GUI.matcher.BeginPos then
+            if  GUI.matcher.BeginPos > self:GetCaretPosition() then
+                GUI.matcher:Destroy()
+                GUI.matcher = nil
+                return
+            end
+            local matchText = ''
+            if GUI.matcher.BeginPos < self:GetCaretPosition() then
+                matchText = STR_Utf8SubString(newText, GUI.matcher.BeginPos + 1, self:GetCaretPosition() - GUI.matcher.BeginPos)
+            end
+            CreateNicknameMatcher(matchText)
+        end
+    end
     group.edit.OnCharPressed = function(self, charcode)
+        -- 64 is '@' charcode
+        if charcode == 64  then
+            if GUI.matcher  then
+                GUI.matcher:Destroy()
+                GUI.matcher = nil
+            else
+                CreateNicknameMatcher('')
+                GUI.matcher.BeginPos = self:GetCaretPosition() + 1
+            end
+        end
         local charLim = self:GetMaxChars()
-        if charcode == 9 then
-            return true
+        if charcode == UIUtil.VK_TAB then
+            if GUI.matcher then 
+                if  GUI.matcher.id ~= -1 then
+                    ChatTo:Set(GUI.matcher.id)
+                else
+                    ChatTo:Set("all")
+                end
+                GUI.matcher:Destroy()
+                GUI.matcher = nil
+                self:ClearText()
+                return true
+            end
         end
         GUI.bg.curTime = 0
         if STR_Utf8Len(self:GetText()) >= charLim then
