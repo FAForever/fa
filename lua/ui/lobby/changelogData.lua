@@ -1,5 +1,22 @@
-last_version = 3726
+last_version = 3727
 gamePatches = {
+    {
+        version = 3727,
+        name = "Hotfix 3727",
+        description = {
+           '  ### Bug ',
+           '  - (#3571) Fix tree groups when they split',
+           '     Fixes some of the props that were introduced with the 3721 patch.',
+           '  - (#3569) Fix strategic bomber not dropping their bombs',
+           '  - (#3570) Fix Seraphim regen aura buff',
+           '',
+           ' ### Contributors',
+           '  - Madmax (#3571)',
+           '  - Tagada (#3569)',
+           '  - Petric (#3570)',
+           '  - Jip (#3570)',
+        }
+    },
     {
         version = 3726,
         name = "Hotfix 3726",
