@@ -1645,3 +1645,5 @@ CreateAeonCommanderBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").Crea
 -- @param effectsBag The build effects bag.
 CreateAeonFactoryBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonFactoryBuildingEffects
 -- original: CreateAeonFactoryBuildingEffects
+
+CreateAeonColossusBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonColossusBuildingEffects

@@ -12,12 +12,19 @@ local ADFTractorClaw = WeaponsFile.ADFTractorClaw
 local utilities = import('/lua/utilities.lua')
 local explosion = import('/lua/defaultexplosions.lua')
 
+local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
+
 UAL0401 = Class(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = Class(ADFPhasonLaser) {},
         RightArmTractor = Class(ADFTractorClaw) {},
         LeftArmTractor = Class(ADFTractorClaw) {},
     },
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
+        CreateAeonColossusBuildingEffects(self)
+    end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
         AWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
