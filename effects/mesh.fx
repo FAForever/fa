@@ -1314,7 +1314,9 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    float scale = 1 / worldMatrix._m00; //transPalette[anim.y + boneIndex[0]];
+
+    // part of build animation: move the mesh up from underground
+    float scale = 1 / worldMatrix._m11;
     float buildTime = 1 - min(1.0, (1.25 * material.y));
     position.y = position.y - abs(scale * buildTime);
 
