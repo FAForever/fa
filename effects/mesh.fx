@@ -1367,7 +1367,11 @@ VERTEXNORMAL_VERTEX AeonBuildLoFiVS(
     CompatSwizzle(color);
 
     float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
-    position *= max(material.y, 0.75);
+
+    // part of build animation: move the mesh up from underground
+    float scale = 1 / worldMatrix._m11;
+    float buildTime = 1 - min(1.0, (1.25 * material.y));
+    position.y = position.y - abs(scale * buildTime);
 
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth = vertex.position.y - surfaceElevation;
@@ -2943,16 +2947,15 @@ float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
 
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
+    float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 3) * specular.g;
     float3 phongMultiplicative = specular.r * environment;
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
     float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
     light = 0.6 * lightMultiplier * light + ( 1 - light ) * shadowFill;
+
     float emissive = glowMultiplier * specular.b;
-
     float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
-
     float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
 
     return float4( color, alpha);
