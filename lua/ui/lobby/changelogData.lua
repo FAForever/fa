@@ -1,5 +1,20 @@
-last_version = 3725
+last_version = 3726
 gamePatches = {
+    {
+        version = 3726,
+        name = "Hotfix 3726",
+        description = {
+            '### Bug ',
+            '- (#3565) Reverts changes to the buff mechanic',
+            '    This introduced a minimal value to each buff, where as some',
+            '    buffs are negative such as adjacency bonusses. This change',
+            '    was intended for solely the Seraphim Regeneration field, where',
+            '    as it affected all buffs.',
+            '',
+            '### Contributors',
+            '- Jip (#3565)',
+        }
+    },
     {
         version = 3725,
         name = "Game version 3725",
