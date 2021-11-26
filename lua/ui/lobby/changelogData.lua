@@ -49,7 +49,7 @@ gamePatches = {
             '    - BuildTime: 80 → 60',
             '- Mole',
             '    - BuildCostEnergy: 80 → 60',
-            '    - EnergyMaintenanceCost: 5 → 1'
+            '    - EnergyMaintenanceCost: 5 → 1',
             '- Spirit',
             '    - BuildCostEnergy: 40 → 60',
             '- Selen',
