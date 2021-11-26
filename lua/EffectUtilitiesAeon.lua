@@ -14,6 +14,7 @@ local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local EntityGetOrientation = moho.entity_methods.GetOrientation
 local EntitySetOrientation = moho.entity_methods.SetOrientation
 local EntityCreateProjectile = moho.entity_methods.CreateProjectile
+local EntityCreateProjectileAtBone = moho.entity_methods.CreateProjectileAtBone
 
 local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
 
@@ -254,4 +255,61 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         TrashBagAdd(unitBeingBuiltTrash, thread)
         TrashBagAdd(unitOnStopBeingBuiltTrash, thread)
     end
+end
+
+local function CreateColossusPool(colossus, bone)
+
+    -- # Initialize various info used throughout the function
+
+    local effect = false
+    local army = colossus.Army
+    local trash = colossus.Trash
+    local onStopBeingBuiltTrash = colossus.OnBeingBuiltEffectsBag
+    local orientation = EntityGetOrientation(colossus)
+    local sx = colossus.BuildExtentsX
+    local sz = colossus.BuildExtentsZ
+    local sy = colossus.BuildExtentsY or (sx + sz)
+
+    -- # Create pool of mercury
+
+    local pool = EntityCreateProjectileAtBone(colossus, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
+    TrashBagAdd(trash, pool)
+    TrashBagAdd(onStopBeingBuiltTrash, pool)
+
+    EntitySetOrientation(pool, orientation, true)
+    ProjectileSetScale(pool, sx, 1.5 * sy, sz)
+
+    -- # Create effects of pool
+
+    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 1)
+    EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 1)
+
+    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    EmitterScaleEmitter(effect, 0.5)
+
+    return pool
+end
+
+function CreateAeonColossusBuildingEffects(colossus)
+
+    local trash = colossus.Trash
+    local onStopBeingBuiltTrash = colossus.OnBeingBuiltEffectsBag
+
+    -- # Create pools of mercury
+
+    local poolRight = CreateColossusPool(colossus, "Right_Footfall")
+    local poolLeft = CreateColossusPool(colossus, "Left_Footfall") 
+
+    local thread = false
+    thread = ForkThread(SharedBuildThread, poolRight, colossus, trash, onStopBeingBuiltTrash)
+    TrashBagAdd(trash, thread)
+    TrashBagAdd(onStopBeingBuiltTrash, thread)
+
+    thread = ForkThread(SharedBuildThread, poolLeft, colossus, trash, onStopBeingBuiltTrash)
+    TrashBagAdd(trash, thread)
+    TrashBagAdd(onStopBeingBuiltTrash, thread)
+
+    -- # Apply build animation
+    
 end
