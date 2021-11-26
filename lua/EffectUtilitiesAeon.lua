@@ -114,6 +114,8 @@ local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unit
     end
 
     -- set correct shader of unitBeingBuilt?
+    -- ooofff
+    unitBeingBuilt:SetMesh(unitBeingBuilt:GetBlueprint().Display.MeshBlueprint)
 end
 
 local function ConstructPool(unitBeingBuilt, unitBeingBuiltTrash, unitBeingBuiltOnStopBeingBuiltTrash)
