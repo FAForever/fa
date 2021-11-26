@@ -1,3 +1,16 @@
+Hotfix 3726 (26th November, 2021)
+============================
+
+### Bug 
+ - (#3565) Reverts changes to the buff mechanic
+    This introduced a minimal value to each buff, where as some
+    buffs are negative such as adjacency bonusses. This change
+    was intended for solely the Seraphim Regeneration field, where
+    as it affected all buffs.
+
+### Contributors
+- Jip (#3565)
+
 Patch 3725 (26th November, 2021)
 ============================
 ### Land
