@@ -8,7 +8,7 @@ gamePatches = {
            '  - (#3571) Fix tree groups when they split',
            '     Fixes some of the props that were introduced with the 3721 patch.',
            '  - (#3569) Fix strategic bomber not dropping their bombs',
-           '  - (#3570) Fix Seraphim regen aura buff',
+           '  - (#3570) Fix Seraphim regen aura buff to match stats of 3725.',
            '',
            ' **Contributors**',
            '  - Madmax (#3571)',
@@ -49,6 +49,7 @@ gamePatches = {
             '    - BuildTime: 80 → 60',
             '- Mole',
             '    - BuildCostEnergy: 80 → 60',
+            '    - EnergyMaintenanceCost: 5 → 1'
             '- Spirit',
             '    - BuildCostEnergy: 40 → 60',
             '- Selen',
