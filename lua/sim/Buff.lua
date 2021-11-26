@@ -366,15 +366,22 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
     local mults = 1.0
     local multsTotal = 0 -- Used only for regen buffs
     local bool = initialBool or false
-    local floor = 0
     local ceil = 0
-    -- Dynamic ceilings with fallback values for sera regen field
+    local floor = 0
+    -- Dynamic ceilings and floors with fallback values for sera regen field
     local ceilings = {
         TECH1 = 10,
         TECH2 = 15,
         TECH3 = 25,
         EXPERIMENTAL = 40,
         SUBCOMMANDER = 30
+    }
+    local floors = {
+        TECH1 = 3,
+        TECH2 = 8,
+        TECH3 = 15,
+        EXPERIMENTAL = 25,
+        SUBCOMMANDER = 15
     }
 
     if not unit.Buffs.Affects[affectType] then return initialVal, bool end
@@ -384,11 +391,8 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             adds = adds + (v.Add * v.Count)
         end
 
-        if v.Floor then
-            floor = v.Floor
-        end
-
         -- Take regen values from bp, keys have to match techCategory options
+
         if v.BPCeilings then
             for k_, v_ in ceilings do
                 if v.BPCeilings[k_] then
@@ -397,7 +401,18 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
             end
         end
 
-        ceil = ceilings[unit.techCategory]
+        if v.BPFloors then
+            for k_, v_ in floors do
+                if v.BPFloors[k_] then
+                    floors[k_] = v.BPFloors[k_]
+                end
+            end
+            floor = floors[unit.techCategory] or 0
+        elseif v.Floor then
+            floor = v.Floor
+        end
+
+        ceil = ceilings[unit.techCategory] or 99999
 
         if v.Mult then
             if affectType == 'Regen' then
@@ -411,7 +426,7 @@ function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
                 if v.Mult ~= 1 then
                     local maxHealth = unit:GetBlueprint().Defense.MaxHealth
                     for i=1,v.Count do
-                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil or 99999)
+                        multsTotal = multsTotal + math.min((v.Mult * maxHealth), ceil)
                     end
                 end
             else
