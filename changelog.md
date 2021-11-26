@@ -40,6 +40,7 @@ Patch 3725 (26th November, 2021)
     - BuildTime: 80 → 60
 - Mole
     - BuildCostEnergy: 80 → 60
+    - EnergyMaintenanceCost: 5 → 1
 - Spirit
     - BuildCostEnergy: 40 → 60
 - Selen
