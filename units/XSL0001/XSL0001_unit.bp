@@ -392,6 +392,7 @@ UnitBlueprint {
             Prerequisite = 'RegenAura',
             Radius = 35,
             MaxHealthFactor = 1.2,
+            NewRegenRate = 20, --this one is for the ACU itself
             RegenFloor = 15,
             RegenCeilingT1 = 20,
             RegenCeilingT2 = 50,
@@ -608,6 +609,7 @@ UnitBlueprint {
             Name = '<LOC enhancements_0125>Restoration Field',
             Radius = 30,
             MaxHealthFactor = 1.1,
+            NewRegenRate = 10, --this one is for the ACU itself
             RegenFloor = 3,
             RegenCeilingT1 = 10,
             RegenCeilingT2 = 15,
