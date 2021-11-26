@@ -75,9 +75,9 @@ local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unit
 
     -- # Initialize various info used throughout the function
 
-    local sx = unitBeingBuilt.BuildExtentsX
-    local sz = unitBeingBuilt.BuildExtentsZ
-    local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
+    local sx = pool.sx
+    local sy = pool.sy
+    local sz = pool.sz
 
     -- # Determine offset for hover units
 
@@ -169,6 +169,10 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     TrashBagAdd(unitBeingBuiltTrash, pool)
     TrashBagAdd(unitOnStopBeingBuiltTrash, pool)
 
+    pool.sx = sx
+    pool.sy = sy
+    pool.sz = sz
+
     EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, sy * 1.5, sz)
 
@@ -237,6 +241,10 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         TrashBagAdd(unitBeingBuiltTrash, pool)
         TrashBagAdd(unitOnStopBeingBuiltTrash, pool)
 
+        pool.sx = sx
+        pool.sy = sy
+        pool.sz = sz
+
         EntitySetOrientation(pool, orientation, true)
         ProjectileSetScale(pool, sx, sy * 1.5, sz)
 
@@ -257,24 +265,98 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
     end
 end
 
-local function CreateColossusPool(colossus, bone)
+--- A helper function to create the pools of the Colossus.
+-- @param unitBeingBuilt The Colossus that is being built.
+-- @param bone The bone to create the pool at.
+local function CreateColossusPool(unitBeingBuilt, bone)
 
     -- # Initialize various info used throughout the function
 
     local effect = false
-    local army = colossus.Army
-    local trash = colossus.Trash
-    local onStopBeingBuiltTrash = colossus.OnBeingBuiltEffectsBag
-    local orientation = EntityGetOrientation(colossus)
-    local sx = colossus.BuildExtentsX
-    local sz = colossus.BuildExtentsZ
-    local sy = colossus.BuildExtentsY or (sx + sz)
+    local army = unitBeingBuilt.Army
+    local trash = unitBeingBuilt.Trash
+    local onStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+    local orientation = EntityGetOrientation(unitBeingBuilt)
+
+    local sx = 1
+    local sy = 2
+    local sz = 1
 
     -- # Create pool of mercury
 
-    local pool = EntityCreateProjectileAtBone(colossus, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
+    local pool = EntityCreateProjectileAtBone(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
     TrashBagAdd(trash, pool)
     TrashBagAdd(onStopBeingBuiltTrash, pool)
+
+    pool.sx = sx
+    pool.sy = sy
+    pool.sz = sz
+
+    EntitySetOrientation(pool, orientation, true)
+    ProjectileSetScale(pool, sx, sy, sz)
+
+    -- # Create effects of pool
+
+    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
+    EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
+
+    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    EmitterScaleEmitter(effect, sy)
+
+    return pool
+end
+
+--- Creates the Aeon Tempest build effects, including particles and an animation.
+-- @param unitBeingBuilt The Colossus that is being built.
+function CreateAeonColossusBuildingEffects(unitBeingBuilt)
+
+    local onDeathTrash = unitBeingBuilt.Trash
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+
+    -- # Create pools of mercury
+
+    local poolRight = CreateColossusPool(unitBeingBuilt, "Right_Footfall")
+    local poolLeft = CreateColossusPool(unitBeingBuilt, "Left_Footfall") 
+
+    local thread = false
+    thread = ForkThread(SharedBuildThread, poolRight, unitBeingBuilt, onDeathTrash, onFinishedTrash)
+    TrashBagAdd(onDeathTrash, thread)
+    TrashBagAdd(onFinishedTrash, thread)
+
+    thread = ForkThread(SharedBuildThread, poolLeft, unitBeingBuilt, onDeathTrash, onFinishedTrash)
+    TrashBagAdd(onDeathTrash, thread)
+    TrashBagAdd(onFinishedTrash, thread)
+
+    -- # Apply build animation
+    
+end
+
+--- Creates the Aeon CZAR build effects, including particles.
+-- @param unitBeingBuilt The CZAR that is being built.
+function CreateAeonCZARBuildingEffects(unitBeingBuilt)
+
+    -- # Initialize various info used throughout the function
+
+    local effect = false
+    local army = unitBeingBuilt.Army
+    local onDeathTrash = unitBeingBuilt.Trash
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+    local orientation = EntityGetOrientation(unitBeingBuilt)
+
+    local sx = 0.6 * unitBeingBuilt.BuildExtentsX
+    local sz = 0.6 * unitBeingBuilt.BuildExtentsZ
+    local sy = 1.5 * (unitBeingBuilt.BuildExtentsY or (sx + sz))
+
+    -- # Create pool of mercury
+
+    local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 0, nil, nil, nil)
+    TrashBagAdd(onDeathTrash, pool)
+    TrashBagAdd(onFinishedTrash, pool)
+
+    pool.sx = sx
+    pool.sy = sy
+    pool.sz = sz
 
     EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, 1.5 * sy, sz)
@@ -282,34 +364,75 @@ local function CreateColossusPool(colossus, bone)
     -- # Create effects of pool
 
     effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-    EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 1)
-    EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 1)
+    EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
+    EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
 
     effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    EmitterScaleEmitter(effect, 0.5)
+    EmitterScaleEmitter(effect, sy)
 
-    return pool
+    frac = false
+    for k = 1, 10 do 
+        frac = k / 10.0
+        effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
+        EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
+        EmitterScaleEmitter(effect, 2.0)
+        effect:OffsetEmitter(0, 2 - 2 * frac, 0)
+    end
+
+    -- # Create a thread to scale the pool
+
+    local thread = ForkThread(SharedBuildThread, pool, unitBeingBuilt, onDeathTrash, onFinishedTrash)
+    TrashBagAdd(onDeathTrash, thread)
+    TrashBagAdd(onFinishedTrash, thread)
+    
 end
 
-function CreateAeonColossusBuildingEffects(colossus)
+--- Creates the Aeon Tempest build effects, including particles and an animation.
+-- @param unitBeingBuilt The tempest that is being built.
+function CreateAeonTempestBuildingEffects(unitBeingBuilt)
 
-    local trash = colossus.Trash
-    local onStopBeingBuiltTrash = colossus.OnBeingBuiltEffectsBag
+    -- # Initialize various info used throughout the function
 
-    -- # Create pools of mercury
+    local effect = false
+    local army = unitBeingBuilt.Army
+    local onDeathTrash = unitBeingBuilt.Trash
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+    local orientation = EntityGetOrientation(unitBeingBuilt)
 
-    local poolRight = CreateColossusPool(colossus, "Right_Footfall")
-    local poolLeft = CreateColossusPool(colossus, "Left_Footfall") 
+    local sx = 0.55 * unitBeingBuilt.BuildExtentsX
+    local sz = 0.55 * unitBeingBuilt.BuildExtentsZ
+    local sy = 3 * unitBeingBuilt.BuildExtentsY or (sx + sz)
 
-    local thread = false
-    thread = ForkThread(SharedBuildThread, poolRight, colossus, trash, onStopBeingBuiltTrash)
-    TrashBagAdd(trash, thread)
-    TrashBagAdd(onStopBeingBuiltTrash, thread)
+    -- # Create effects of build animation
 
-    thread = ForkThread(SharedBuildThread, poolLeft, colossus, trash, onStopBeingBuiltTrash)
-    TrashBagAdd(trash, thread)
-    TrashBagAdd(onStopBeingBuiltTrash, thread)
+    effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
+    EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
+
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
+
+    effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    EmitterScaleEmitter(effect, sx)
+
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
+
+    frac = false
+    for k = 1, 10 do 
+        frac = k / 10.0
+        effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
+        EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
+        EmitterScaleEmitter(effect, 2.0)
+        effect:OffsetEmitter(0, 2 - 2 * frac, 0)
+        
+        TrashBagAdd(onDeathTrash, effect)
+        TrashBagAdd(onFinishedTrash, effect)
+    end    
 
     -- # Apply build animation
-    
+
+
 end
