@@ -1,31 +1,24 @@
 
-
 -- imports for functionality
-local Entity = import('/lua/sim/Entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
+local AeonBuildBeams01 = import('/lua/EffectTemplates.lua').AeonBuildBeams01
+local AeonBuildBeams02 = import('/lua/EffectTemplates.lua').AeonBuildBeams02
 
 -- globals as upvalues for performance
 local WaitTicks = coroutine.yield
 
+local CreateAttachedEmitter = CreateAttachedEmitter
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 
 -- moho functions as upvalues for performance
-local EntityBeenDestroyed = moho.entity_methods.BeenDestroyed
-local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
 local EntityGetOrientation = moho.entity_methods.GetOrientation
 local EntitySetOrientation = moho.entity_methods.SetOrientation
 local EntityCreateProjectile = moho.entity_methods.CreateProjectile
-local EntitySetVizToAllies = moho.entity_methods.SetVizToAllies
-local EntitySetVizToEnemies = moho.entity_methods.SetVizToEnemies
-local EntitySetVizToNeutrals = moho.entity_methods.SetVizToNeutrals
 
-local UnitRevertElevation = moho.unit_methods.RevertElevation
 local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
 
 local ProjectileSetScale = moho.projectile_methods.SetScale
 
-local EmitterSetEmitterParam = moho.IEffect.SetEmitterParam
 local EmitterSetEmitterCurveParam = moho.IEffect.SetEmitterCurveParam
 local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
 
@@ -33,23 +26,50 @@ local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetGoal = moho.SlideManipulator.SetGoal 
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
 
--- math functions as upvalues for performance
-local MathPi = math.pi
-local MathMax = math.max
-local MathSin = math.sin 
-local MathCos = math.cos
-local MathPow = math.pow
-
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
 local CategoriesHover = categories.HOVER
 
--- cache as upvalue to prevent table operation
-local AeonBuildBeams01 = EffectTemplate.AeonBuildBeams01
-local AeonBuildBeams02 = EffectTemplate.AeonBuildBeams02
+--- The build animation of an engineer.
+-- @param builder The engineer in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectsBag The trash bag for the build effects.
+function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, buildEffectsBag)
+    local army = builder.Army
 
+    -- create effect on builder
+    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(builder, army, '/effects/emitters/aeon_build_01_emit.bp') )
+
+    -- create beam builder -> target
+    for _, v in AeonBuildBeams01 do
+        TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, -1, unitBeingBuilt, -1, army, v))
+    end
+end
+
+--- The build animation of the commander.
+-- @param builder The commander in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectBones The bone(s) of the commander where the effect starts.
+-- @param buildEffectsBag The trash bag for the build effects.
+function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
+    local army = builder.Army
+
+    -- create beam builder -> target
+    for _, vBone in buildEffectBones do
+        TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/aeon_build_02_emit.bp'))
+        for _, v in AeonBuildBeams01 do
+            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v))
+        end
+    end
+end
+
+--- The shared functionality between building structures and units
+-- @param pool The mercury pool for the build effect.
+-- @param unitBeingBuilt The unit that is being made.
+-- @param unitBeingBuiltTrash The generic trashbag of the unit.
+-- @param unitBeingBuiltOnStopBeingBuiltTrash The OnStopBeingBuilt trashbag of the unit.
 local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unitBeingBuiltOnStopBeingBuiltTrash)
 
     -- # Initialize various info used throughout the function
@@ -113,21 +133,14 @@ local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unit
         WaitTicks(2)
     end
 
-    -- set correct shader of unitBeingBuilt?
-    -- ooofff
-    unitBeingBuilt:SetMesh(unitBeingBuilt:GetBlueprint().Display.MeshBlueprint)
-end
-
-local function ConstructPool(unitBeingBuilt, unitBeingBuiltTrash, unitBeingBuiltOnStopBeingBuiltTrash)
-
+    -- set correct shader of unitBeingBuilt so that it happens instantly after finishing
+    unitBeingBuilt:SetMesh(unitBeingBuilt.MeshBlueprint)
 end
 
 --- The build animation for Aeon buildings in general.
 -- @param unitBeingBuilt The unit we're trying to build.
 -- @param effectsBag The build effects bag containing the pool and emitters.
 function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
-
-    LOG("CreateAeonBuildBaseThread")
 
     -- # Hold up for orientation to receive an update
 
@@ -174,39 +187,6 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     TrashBagAdd(unitOnStopBeingBuiltTrash, thread)
 end
 
---- The build animation of an engineer.
--- @param builder The engineer in question.
--- @param unitBeingBuilt The unit we're building.
--- @param buildEffectsBag The trash bag for the build effects.
-function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, buildEffectsBag)
-    local army = builder.Army
-
-    -- create effect on builder
-    TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(builder, army, '/effects/emitters/aeon_build_01_emit.bp') )
-
-    -- create beam builder -> target
-    for _, v in AeonBuildBeams01 do
-        TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, -1, unitBeingBuilt, -1, army, v))
-    end
-end
-
---- The build animation of the commander.
--- @param builder The commander in question.
--- @param unitBeingBuilt The unit we're building.
--- @param buildEffectBones The bone(s) of the commander where the effect starts.
--- @param buildEffectsBag The trash bag for the build effects.
-function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
-    local army = builder.Army
-
-    -- create beam builder -> target
-    for _, vBone in buildEffectBones do
-        TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/aeon_build_02_emit.bp'))
-        for _, v in AeonBuildBeams01 do
-            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v))
-        end
-    end
-end
-
 --- The build animation for Aeon factories, including the pool and dummy unit.
 -- @param builder The factory that is building the unit.
 -- @param unitBeingBuilt The unit we're trying to build.
@@ -214,8 +194,6 @@ end
 -- @param buildBone The location where the unit is beint built.
 -- @param effectsBag The build effects bag.
 function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildBone, effectsBag)
-
-    LOG("CreateAeonFactoryBuildingEffects")
 
     -- # Hold up for orientation to receive an update
 
