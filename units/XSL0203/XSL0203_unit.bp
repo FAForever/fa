@@ -275,7 +275,7 @@ UnitBlueprint {
     SizeX = 0.9,
     SizeY = 0.5,
     SizeZ = 1.2,
-    StrategicIconName = 'icon_land2_directfire',
+    StrategicIconName = 'icon_land2_amphibian',
     StrategicIconSortPriority = 125,
     Transport = {
         TransportClass = 2,
