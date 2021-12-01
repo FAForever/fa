@@ -278,20 +278,21 @@ local function CreateColossusPool(unitBeingBuilt, bone)
     local onStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
     local orientation = EntityGetOrientation(unitBeingBuilt)
 
-    local sx = 1
-    local sy = 2
-    local sz = 1
+    local sx = 2
+    local sy = 3
+    local sz = 2
 
     -- # Create pool of mercury
 
     local pool = EntityCreateProjectileAtBone(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
     TrashBagAdd(trash, pool)
     TrashBagAdd(onStopBeingBuiltTrash, pool)
-
+    
     pool.sx = sx
     pool.sy = sy
     pool.sz = sz
-
+    
+    pool:AttachTo(unitBeingBuilt, bone)
     EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, sy, sz)
 
@@ -307,6 +308,51 @@ local function CreateColossusPool(unitBeingBuilt, bone)
     return pool
 end
 
+local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator)
+
+    WaitTicks(2)
+
+    -- # Create pools of mercury
+
+    local poolRight = CreateColossusPool(unitBeingBuilt, "Right_Footfall")
+    local poolLeft = CreateColossusPool(unitBeingBuilt, "Left_Footfall") 
+
+    local sx = poolLeft.sx
+    local sy = poolLeft.sy
+    local sz = poolLeft.sz
+
+    local cFraction, progress = false, false
+    local fraction = UnitGetFractionComplete(unitBeingBuilt)
+    while fraction < 1 do
+
+        -- only update when we make progress
+        cFraction = UnitGetFractionComplete(unitBeingBuilt)
+        if cFraction > fraction then 
+
+            -- store updated value
+            fraction = cFraction
+
+            -- only adjust pool when more than 80% complete to match the shader animation
+            if fraction > 0.8 then 
+
+                progress = 5 * (fraction - 0.8)
+                if progress < 0 then 
+                    progress = 0 
+                end
+    
+                scale = 1 - progress * progress
+
+                ProjectileSetScale(poolLeft, sx * scale, 1.5 * sy * scale, sz * scale)
+                ProjectileSetScale(poolRight, sx * scale, 1.5 * sy * scale, sz * scale)
+                animator:SetAnimationFraction(progress * progress * progress)
+            end
+        end
+
+        -- wait a tick
+        WaitTicks(2)
+    end
+end
+
 --- Creates the Aeon Tempest build effects, including particles and an animation.
 -- @param unitBeingBuilt The Colossus that is being built.
 function CreateAeonColossusBuildingEffects(unitBeingBuilt)
@@ -314,22 +360,20 @@ function CreateAeonColossusBuildingEffects(unitBeingBuilt)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
-    -- # Create pools of mercury
-
-    local poolRight = CreateColossusPool(unitBeingBuilt, "Right_Footfall")
-    local poolLeft = CreateColossusPool(unitBeingBuilt, "Left_Footfall") 
-
-    local thread = false
-    thread = ForkThread(SharedBuildThread, poolRight, unitBeingBuilt, onDeathTrash, onFinishedTrash)
-    TrashBagAdd(onDeathTrash, thread)
-    TrashBagAdd(onFinishedTrash, thread)
-
-    thread = ForkThread(SharedBuildThread, poolLeft, unitBeingBuilt, onDeathTrash, onFinishedTrash)
-    TrashBagAdd(onDeathTrash, thread)
-    TrashBagAdd(onFinishedTrash, thread)
-
     -- # Apply build animation
-    
+
+    local animator = CreateAnimator(unitBeingBuilt, false)
+    TrashBagAdd(onDeathTrash, animator)
+    TrashBagAdd(onFinishedTrash, animator)
+
+    animator:PlayAnim('/units/UAL0401/UAL0401_aactivate.sca', false)
+    animator:SetRate(0)
+    animator:SetAnimationFraction(0)    
+
+    local thread = ForkThread(CreateAeonColossusBuildingEffectsThread, unitBeingBuilt, animator)
+    TrashBagAdd(onDeathTrash, thread)
+    TrashBagAdd(onFinishedTrash, thread)
+
 end
 
 --- Creates the Aeon CZAR build effects, including particles.
@@ -378,6 +422,25 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     
 end
 
+local function CreateAeonTempestBuildingEffectsThread(unitBeingBuilt, animator)
+    local cFraction, progress = false, false
+    local fraction = UnitGetFractionComplete(unitBeingBuilt)
+    while fraction < 1 do
+
+        -- only update when we make progress
+        cFraction = UnitGetFractionComplete(unitBeingBuilt)
+        if cFraction > fraction then 
+
+            -- store updated value
+            fraction = cFraction
+            animator:SetAnimationFraction(fraction)
+        end
+
+        -- wait a tick
+        WaitTicks(2)
+    end
+end
+
 --- Creates the Aeon Tempest build effects, including particles and an animation.
 -- @param unitBeingBuilt The tempest that is being built.
 function CreateAeonTempestBuildingEffects(unitBeingBuilt)
@@ -423,5 +486,29 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     end    
 
     -- # Apply build animation
+
+    local animator = CreateAnimator(unitBeingBuilt)
+    TrashBagAdd(onDeathTrash, animator)
+    TrashBagAdd(onFinishedTrash, animator)
+
+    animator:PlayAnim('/units/uas0401/uas0401_build.sca', false)
+    animator:SetRate(0)
+    animator:SetAnimationFraction(1)    
+
+    local thread = ForkThread(CreateAeonTempestBuildingEffectsThread, unitBeingBuilt, animator)
+    TrashBagAdd(onDeathTrash, thread)
+    TrashBagAdd(onFinishedTrash, thread)
+
+    -- # Apply splashes
+
+    local detector = CreateCollisionDetector(unitBeingBuilt)
+    detector:WatchBone("Torpedo_Muzzle01")
+    detector:WatchBone("Torpedo_Muzzle02")
+    detector:WatchBone("Torpedo_Muzzle03")
+    detector:WatchBone("Torpedo_Muzzle04")
+    detector:WatchBone("Torpedo_Muzzle05")
+    detector:WatchBone("Torpedo_Muzzle06")
+    detector:EnableTerrainCheck(true)
+    detector:Enable()
 
 end

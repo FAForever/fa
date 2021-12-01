@@ -1492,6 +1492,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCollisionCheck = function(self, other, firingWeapon)
+
         if self.DisallowCollisions then
             return false
         end
@@ -2300,6 +2301,8 @@ Unit = Class(moho.unit_methods) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         local BuildMeshBp = self:GetBlueprint().Display.BuildMeshBlueprint
+        LOG(BuildMeshBp)
+        LOG(repr(__blueprints[BuildMeshBp]))
         if BuildMeshBp then
             self:SetMesh(BuildMeshBp, true)
         end

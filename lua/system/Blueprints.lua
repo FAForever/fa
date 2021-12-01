@@ -381,6 +381,27 @@ function ExtractWreckageBlueprint(bp)
     MeshBlueprint(wreckbp)
 end
 
+local function ColossusBuildMeshBlueprint(bp, shadername)
+    if string.lower(bp.BlueprintId) == "ual0401" then 
+        return "AeonBuildNoAnimation"
+    end 
+
+    return shadername 
+end
+
+local function TempestBuildMeshBlueprint(bp, shadername)
+    if string.lower(bp.BlueprintId) == "uas0401" then 
+        return "AeonBuildNoAnimation"
+    end 
+
+    return shadername 
+end
+
+local uniqueBuildAnimations = {
+      ColossusBuildMeshBlueprint
+    , TempestBuildMeshBlueprint
+}
+
 function ExtractBuildMeshBlueprint(bp)
     local FactionName = bp.General.FactionName
 
@@ -392,6 +413,10 @@ function ExtractBuildMeshBlueprint(bp)
         if not meshbp then return end
 
         local shadername = FactionName .. 'Build'
+        for k, uniqueBuildShader in uniqueBuildAnimations do 
+            shadername = uniqueBuildShader(bp, shadername)
+        end
+
         local secondaryname = '/textures/effects/' .. FactionName .. 'BuildSpecular.dds'
 
         local buildmeshbp = table.deepcopy(meshbp)

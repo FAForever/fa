@@ -1340,6 +1340,50 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     return vertex;
 }
 
+/// AeonBuildNoAnimationVS
+///
+/// Aeon build Vertex Shader
+NORMALMAPPED_VERTEX AeonBuildNoAnimationVS(
+    float3 position : POSITION0,
+    float3 normal : NORMAL0,
+    float3 tangent : TANGENT0,
+    float3 binormal : BINORMAL0,
+    float4 texcoord0 : TEXCOORD0,
+    int boneIndex[4] : BLENDINDICES,
+    float3 row0 : TEXCOORD1,
+    float3 row1 : TEXCOORD2,
+    float3 row2 : TEXCOORD3,
+    float3 row3 : TEXCOORD4,
+    anim_t anim : TEXCOORD5,
+    float4 material : TEXCOORD6,
+    float4 color : COLOR0
+)
+{
+    NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
+    CompatSwizzle(color);
+
+    float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
+
+    vertex.position = mul( float4(position,1), worldMatrix);
+    vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
+    vertex.shadow = ComputeShadowTexcoord( vertex.position);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
+
+    vertex.viewDirection = normalize( vertex.position.xyz / vertex.position.w);
+    vertex.viewDirection = mul( viewMatrix, vertex.viewDirection);
+
+    vertex.texcoord0 = texcoord0;
+    vertex.color = color;
+    vertex.material = float4( time - material.x, material.yzw);
+
+    float3x3 rotationMatrix = (float3x3)worldMatrix;
+    vertex.normal = mul( normal, rotationMatrix);
+    vertex.tangent = mul( tangent, rotationMatrix);
+    vertex.binormal = mul( binormal, rotationMatrix);
+
+    return vertex;
+}
+
 VERTEXNORMAL_VERTEX AeonBuildLoFiVS(
     float3 position : POSITION0,
     float3 normal : NORMAL0,
@@ -1395,6 +1439,58 @@ VERTEXNORMAL_VERTEX AeonBuildLoFiVS(
 
     return vertex;
 }
+
+VERTEXNORMAL_VERTEX AeonBuildNoAnimationLoFiVS(
+    float3 position : POSITION0,
+    float3 normal : NORMAL0,
+    float4 texcoord0 : TEXCOORD0,
+    float3 UnusedNormal : NORMAL,	// tighten up the linkages for D3D10
+    float3 UnusedTangent : TANGENT,
+    float3 UnusedBinormal : BINORMAL,
+    int boneIndex[4] : BLENDINDICES,
+    float3 row0 : TEXCOORD1,
+    float3 row1 : TEXCOORD2,
+    float3 row2 : TEXCOORD3,
+    float3 row3 : TEXCOORD4,
+    anim_t anim : TEXCOORD5,
+    float4 material : TEXCOORD6,
+    float4 color : COLOR0,
+    uniform float texScale0,
+    uniform float texScale1,
+    uniform float texXshift0,
+    uniform float texYshift0,
+    uniform float texXshift1,
+    uniform float texYshift1
+)
+{
+    VERTEXNORMAL_VERTEX vertex = (VERTEXNORMAL_VERTEX)0;
+    CompatSwizzle(color);
+
+    float4x4 worldMatrix = ComputeWorldMatrix( anim.y + boneIndex[0], row0, row1, row2, row3);
+
+    vertex.position = mul( float4(position,1), worldMatrix);
+    vertex.depth = vertex.position.y - surfaceElevation;
+    vertex.shadow = ComputeShadowTexcoord( vertex.position);
+    vertex.position = mul( vertex.position, mul( viewMatrix, projMatrix));
+    vertex.color = color;
+
+    vertex.texcoord0 = ( anim.w > 0.5 ) ? ComputeScrolledTexcoord( texcoord0, material) : texcoord0;
+    vertex.material = float4( time - material.x, material.yzw);
+
+    vertex.normal = normalize( mul( normal, (float3x3)worldMatrix));
+
+    // Texture coordinate modification for PS
+    vertex.shadow.xy = vertex.texcoord0.xy;
+    vertex.texcoord0.xy *= texScale0;
+    vertex.shadow.xy *= texScale1;
+    vertex.texcoord0.x += (vertex.material.x * texXshift0);
+    vertex.texcoord0.y += (vertex.material.x * texYshift0);
+    vertex.shadow.x += (vertex.material.x * texXshift1);
+    vertex.shadow.y += (vertex.material.x * texYshift1);
+
+    return vertex;
+}
+
 
 // SeraphimBuildVS
 ///
@@ -5688,6 +5784,86 @@ technique AeonBuild_LowFidelity
         RasterizerState( Rasterizer_Cull_CW )
 
         VertexShader = compile vs_1_1 AeonBuildLoFiVS(1,1,0,0,0,0);
+        PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
+    }
+}
+
+
+/// AeonBuildNoAnimation
+///
+///
+technique AeonBuildNoAnimation_HighFidelity
+<
+    string abstractTechnique = "AeonBuildNoAnimation";
+    int fidelity = FIDELITY_HIGH;
+
+    string cartographicTechnique = "CartographicBuild";
+    int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+
+        VertexShader = compile vs_1_1 AeonBuildNoAnimationVS();
+        PixelShader = compile ps_2_a AeonBuildPS(true);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 AeonBuildNoAnimationVS();
+        PixelShader = compile ps_2_0 AeonBuildOverlayPS();
+    }
+}
+
+technique AeonBuildNoAnimation_MedFidelity
+<
+    string abstractTechnique = "AeonBuildNoAnimation";
+    int fidelity = FIDELITY_MEDIUM;
+
+    string cartographicTechnique = "CartographicBuild";
+    int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        RasterizerState( Rasterizer_Cull_CW )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
+
+        VertexShader = compile vs_1_1 AeonBuildNoAnimationVS();
+        PixelShader = compile ps_2_0 AeonBuildPS(false);
+    }
+    pass P1
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 AeonBuildNoAnimationVS();
+        PixelShader = compile ps_2_0 AeonBuildOverlayPS();
+    }
+}
+
+technique AeonBuildNoAnimation_LowFidelity
+<
+    string abstractTechnique = "AeonBuildNoAnimation";
+    int fidelity = FIDELITY_LOW;
+
+    string cartographicTechnique = "CartographicBuild";
+    int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int parameter = PARAM_FRACTIONCOMPLETE;
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
+        RasterizerState( Rasterizer_Cull_CW )
+
+        VertexShader = compile vs_1_1 AeonBuildNoAnimationLoFiVS(1,1,0,0,0,0);
         PixelShader = compile ps_2_0 ColorMaskPS_LowFidelity();
     }
 }
