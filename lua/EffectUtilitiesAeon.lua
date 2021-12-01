@@ -308,9 +308,26 @@ local function CreateColossusPool(unitBeingBuilt, bone)
     return pool
 end
 
+local ColossusEffectBones = {
+    "Left_Footfall"
+  , "Left_Leg_B01"
+  , "Left_Leg_B02"
+  , "Right_Leg_B02"
+  , "Right_Leg_B01"
+  , "Right_Footfall"
+  , "Right_Arm_Muzzle01"
+  , "Left_Arm_Muzzle101"
+}
+
 local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator)
 
     WaitTicks(2)
+
+    -- # Store information used throughout the function
+
+    local army = unitBeingBuilt.Army
+    local onDeathTrash = unitBeingBuilt.Trash
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag 
 
     -- # Create pools of mercury
 
@@ -320,6 +337,20 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator)
     local sx = poolLeft.sx
     local sy = poolLeft.sy
     local sz = poolLeft.sz
+
+    -- # Apply build effects
+
+    for k, v in ColossusEffectBones do 
+        effect = CreateEmitterAtBone(unitBeingBuilt, k, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 1)
+        EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 1)
+        EmitterScaleEmitter(effect, 1.0)
+        
+        TrashBagAdd(onDeathTrash, effect)
+        TrashBagAdd(onFinishedTrash, effect)
+    end   
+
+    -- # Apply a manual animation
 
     local cFraction, progress = false, false
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
@@ -357,8 +388,9 @@ end
 -- @param unitBeingBuilt The Colossus that is being built.
 function CreateAeonColossusBuildingEffects(unitBeingBuilt)
 
+    local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
-    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag 
 
     -- # Apply build animation
 
