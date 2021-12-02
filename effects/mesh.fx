@@ -1307,7 +1307,8 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     float3 row3 : TEXCOORD4,
     anim_t anim : TEXCOORD5,
     float4 material : TEXCOORD6,
-    float4 color : COLOR0
+    float4 color : COLOR0,
+    uniform float offset
 )
 {
     NORMALMAPPED_VERTEX vertex = (NORMALMAPPED_VERTEX)0;
@@ -1319,6 +1320,9 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     float scale = 1 / worldMatrix._m11;
     float buildTime = 1 - min(1.0, (1.25 * material.y));
     position.y = position.y - abs(scale * buildTime);
+
+    // part of build animation: start off small
+    position = position * max(0.75, material.y);
 
     vertex.position = mul( float4(position,1), worldMatrix);
     vertex.depth.xy = float2(vertex.position.y - surfaceElevation,material.x);
@@ -1336,6 +1340,9 @@ NORMALMAPPED_VERTEX AeonBuildVS(
     vertex.normal = mul( normal, rotationMatrix);
     vertex.tangent = mul( tangent, rotationMatrix);
     vertex.binormal = mul( binormal, rotationMatrix);
+
+    // part of build animation: turn mesh slightly inwards to allow the overlay to work properly
+    vertex.position = vertex.position + offset * float4(vertex.normal, 0);
 
     return vertex;
 }
@@ -3043,7 +3050,7 @@ float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
 
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 3) * specular.g;
+    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
     float3 phongMultiplicative = specular.r * environment;
 
     float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
@@ -5727,7 +5734,7 @@ technique AeonBuild_HighFidelity
         RasterizerState( Rasterizer_Cull_CW )
         AlphaState( AlphaBlend_Disable_Write_RGB )
 
-        VertexShader = compile vs_1_1 AeonBuildVS();
+        VertexShader = compile vs_1_1 AeonBuildVS(0.0);
         PixelShader = compile ps_2_a AeonBuildPS(true);
     }
     pass P1
@@ -5735,7 +5742,7 @@ technique AeonBuild_HighFidelity
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
         RasterizerState( Rasterizer_Cull_CW )
 
-        VertexShader = compile vs_1_1 AeonBuildVS();
+        VertexShader = compile vs_1_1 AeonBuildVS(0);
         PixelShader = compile ps_2_0 AeonBuildOverlayPS();
     }
 }
@@ -5755,7 +5762,7 @@ technique AeonBuild_MedFidelity
         RasterizerState( Rasterizer_Cull_CW )
         AlphaState( AlphaBlend_Disable_Write_RGB )
 
-        VertexShader = compile vs_1_1 AeonBuildVS();
+        VertexShader = compile vs_1_1 AeonBuildVS(0.0);
         PixelShader = compile ps_2_0 AeonBuildPS(false);
     }
     pass P1
@@ -5763,7 +5770,7 @@ technique AeonBuild_MedFidelity
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
         RasterizerState( Rasterizer_Cull_CW )
 
-        VertexShader = compile vs_1_1 AeonBuildVS();
+        VertexShader = compile vs_1_1 AeonBuildVS(0);
         PixelShader = compile ps_2_0 AeonBuildOverlayPS();
     }
 }

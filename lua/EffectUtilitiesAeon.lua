@@ -3,6 +3,8 @@
 local AeonBuildBeams01 = import('/lua/EffectTemplates.lua').AeonBuildBeams01
 local AeonBuildBeams02 = import('/lua/EffectTemplates.lua').AeonBuildBeams02
 
+local CachedVector = Vector(0, 0, 0)
+
 -- globals as upvalues for performance
 local WaitTicks = coroutine.yield
 
@@ -265,10 +267,39 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
     end
 end
 
+local ColossusEffectBones = {
+    "Left_Footfall"
+  , "Left_Leg_B01"
+  , "Left_Leg_B02"
+  , "Right_Leg_B02"
+  , "Right_Leg_B01"
+  , "Right_Footfall"
+  , "Right_Arm_Muzzle01"
+  , "Left_Arm_Muzzle101"
+}
+
+local ColossusAnimations = { 
+      '/units/UAL0401/UAL0401_aactivate.sca'
+    , '/units/UAL0401/UAL0401_aactivate_alt.sca'
+}
+
+local ColossusPuddleBones = { 
+    {
+          "Right_Footfall"
+        , "Left_Footfall"
+        , "Left_Leg_B02"
+    },
+    {
+          "Right_Footfall"
+        , "Left_Footfall"
+        , "Right_Leg_B02"
+    }
+}
+
 --- A helper function to create the pools of the Colossus.
 -- @param unitBeingBuilt The Colossus that is being built.
 -- @param bone The bone to create the pool at.
-local function CreateColossusPool(unitBeingBuilt, bone)
+local function CreateColossusPool(unitBeingBuilt, bone, sx, sy, sz)
 
     -- # Initialize various info used throughout the function
 
@@ -278,21 +309,20 @@ local function CreateColossusPool(unitBeingBuilt, bone)
     local onStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
     local orientation = EntityGetOrientation(unitBeingBuilt)
 
-    local sx = 2
-    local sy = 3
-    local sz = 2
-
     -- # Create pool of mercury
 
     local pool = EntityCreateProjectileAtBone(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
     TrashBagAdd(trash, pool)
     TrashBagAdd(onStopBeingBuiltTrash, pool)
     
-    pool.sx = sx
-    pool.sy = sy
-    pool.sz = sz
-    
-    pool:AttachTo(unitBeingBuilt, bone)
+    local x, y, z = unitBeingBuilt:GetPositionXYZ(bone)
+    y = GetTerrainHeight(x, z)
+
+    local vector = CachedVector
+    vector[1] = x 
+    vector[2] = y 
+    vector[3] = z 
+    Warp(pool, vector)
     EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, sy, sz)
 
@@ -308,22 +338,15 @@ local function CreateColossusPool(unitBeingBuilt, bone)
     return pool
 end
 
-local ColossusEffectBones = {
-    "Left_Footfall"
-  , "Left_Leg_B01"
-  , "Left_Leg_B02"
-  , "Right_Leg_B02"
-  , "Right_Leg_B01"
-  , "Right_Footfall"
-  , "Right_Arm_Muzzle01"
-  , "Left_Arm_Muzzle101"
-}
-
-local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator)
+local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator, bones)
 
     WaitTicks(2)
 
     -- # Store information used throughout the function
+
+    local sx = 1.25
+    local sy = 2.25
+    local sz = 1.25
 
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
@@ -331,12 +354,9 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator)
 
     -- # Create pools of mercury
 
-    local poolRight = CreateColossusPool(unitBeingBuilt, "Right_Footfall")
-    local poolLeft = CreateColossusPool(unitBeingBuilt, "Left_Footfall") 
-
-    local sx = poolLeft.sx
-    local sy = poolLeft.sy
-    local sz = poolLeft.sz
+    local poolA = CreateColossusPool(unitBeingBuilt, bones[1], sx, sy, sz)
+    local poolB = CreateColossusPool(unitBeingBuilt, bones[2], sx, sy, sz) 
+    local poolC = CreateColossusPool(unitBeingBuilt, bones[3], sx, sy, sz) 
 
     -- # Apply build effects
 
@@ -373,8 +393,9 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator)
     
                 scale = 1 - progress * progress
 
-                ProjectileSetScale(poolLeft, sx * scale, 1.5 * sy * scale, sz * scale)
-                ProjectileSetScale(poolRight, sx * scale, 1.5 * sy * scale, sz * scale)
+                ProjectileSetScale(poolA, sx * scale, 1.5 * sy * scale, sz * scale)
+                ProjectileSetScale(poolB, sx * scale, 1.5 * sy * scale, sz * scale)
+                ProjectileSetScale(poolC, sx * scale, 1.5 * sy * scale, sz * scale)
                 animator:SetAnimationFraction(progress * progress * progress)
             end
         end
@@ -398,11 +419,12 @@ function CreateAeonColossusBuildingEffects(unitBeingBuilt)
     TrashBagAdd(onDeathTrash, animator)
     TrashBagAdd(onFinishedTrash, animator)
 
-    animator:PlayAnim('/units/UAL0401/UAL0401_aactivate.sca', false)
+    local index = Random(1, 2)
+    animator:PlayAnim(ColossusAnimations[index], false)
     animator:SetRate(0)
     animator:SetAnimationFraction(0)    
 
-    local thread = ForkThread(CreateAeonColossusBuildingEffectsThread, unitBeingBuilt, animator)
+    local thread = ForkThread(CreateAeonColossusBuildingEffectsThread, unitBeingBuilt, animator, ColossusPuddleBones[index])
     TrashBagAdd(onDeathTrash, thread)
     TrashBagAdd(onFinishedTrash, thread)
 
