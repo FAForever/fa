@@ -381,6 +381,7 @@ function ExtractWreckageBlueprint(bp)
     MeshBlueprint(wreckbp)
 end
 
+-- TODO: add support commanders
 --- Allows us to specify build shaders on a per-unit basis
 local uniqueBuildAnimations = { }
 uniqueBuildAnimations["ual0401"] = "AeonBuildNoAnimation"
