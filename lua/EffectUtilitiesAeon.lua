@@ -73,13 +73,7 @@ end
 -- @param unitBeingBuilt The unit that is being made.
 -- @param unitBeingBuiltTrash The generic trashbag of the unit.
 -- @param unitBeingBuiltOnStopBeingBuiltTrash The OnStopBeingBuilt trashbag of the unit.
-local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unitBeingBuiltOnStopBeingBuiltTrash)
-
-    -- # Initialize various info used throughout the function
-
-    local sx = pool.sx
-    local sy = pool.sy
-    local sz = pool.sz
+local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unitBeingBuiltOnStopBeingBuiltTrash, sx, sy, sz)
 
     -- # Determine offset for hover units
 
@@ -171,10 +165,6 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     TrashBagAdd(unitBeingBuiltTrash, pool)
     TrashBagAdd(unitOnStopBeingBuiltTrash, pool)
 
-    pool.sx = sx
-    pool.sy = sy
-    pool.sz = sz
-
     EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, sy * 1.5, sz)
 
@@ -189,7 +179,12 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
 
     -- # Create a thread to scale the pool
 
-    local thread = ForkThread(SharedBuildThread, pool, unitBeingBuilt, unitBeingBuiltTrash, unitOnStopBeingBuiltTrash)
+    local thread = ForkThread(SharedBuildThread, 
+        pool, unitBeingBuilt, 
+        unitBeingBuiltTrash, unitOnStopBeingBuiltTrash, 
+        sx, sy, sz
+    )
+
     TrashBagAdd(unitBeingBuiltTrash, thread)
     TrashBagAdd(unitOnStopBeingBuiltTrash, thread)
 end
@@ -243,10 +238,6 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         TrashBagAdd(unitBeingBuiltTrash, pool)
         TrashBagAdd(unitOnStopBeingBuiltTrash, pool)
 
-        pool.sx = sx
-        pool.sy = sy
-        pool.sz = sz
-
         EntitySetOrientation(pool, orientation, true)
         ProjectileSetScale(pool, sx, sy * 1.5, sz)
 
@@ -261,12 +252,18 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
 
         -- # Create a thread to scale the pool and move the unit accordingly
 
-        local thread = ForkThread(SharedBuildThread, pool, unitBeingBuilt, unitBeingBuiltTrash, unitOnStopBeingBuiltTrash)
+        local thread = ForkThread(SharedBuildThread, 
+            pool, unitBeingBuilt, 
+            unitBeingBuiltTrash, unitOnStopBeingBuiltTrash,
+            sx, sy, sz
+        )
+
         TrashBagAdd(unitBeingBuiltTrash, thread)
         TrashBagAdd(unitOnStopBeingBuiltTrash, thread)
     end
 end
 
+--- Bones where the sparkles spawn at
 local ColossusEffectBones = {
     "Left_Footfall"
   , "Left_Leg_B01"
@@ -278,21 +275,21 @@ local ColossusEffectBones = {
   , "Left_Arm_Muzzle101"
 }
 
+--- Possible animations of the colossus, prevents a blueprint lookup
 local ColossusAnimations = { 
       '/units/UAL0401/UAL0401_aactivate.sca'
     , '/units/UAL0401/UAL0401_aactivate_alt.sca'
 }
 
+--- Puddle locations of the colossus
 local ColossusPuddleBones = { 
     {
           "Right_Footfall"
         , "Left_Footfall"
-        , "Left_Leg_B02"
     },
     {
           "Right_Footfall"
         , "Left_Footfall"
-        , "Right_Leg_B02"
     }
 }
 
@@ -314,15 +311,7 @@ local function CreateColossusPool(unitBeingBuilt, bone, sx, sy, sz)
     local pool = EntityCreateProjectileAtBone(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
     TrashBagAdd(trash, pool)
     TrashBagAdd(onStopBeingBuiltTrash, pool)
-    
-    local x, y, z = unitBeingBuilt:GetPositionXYZ(bone)
-    y = GetTerrainHeight(x, z)
 
-    local vector = CachedVector
-    vector[1] = x 
-    vector[2] = y 
-    vector[3] = z 
-    Warp(pool, vector)
     EntitySetOrientation(pool, orientation, true)
     ProjectileSetScale(pool, sx, sy, sz)
 
@@ -338,7 +327,11 @@ local function CreateColossusPool(unitBeingBuilt, bone, sx, sy, sz)
     return pool
 end
 
-local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator, bones)
+--- A helper function for the full build animation of the Colossus.
+-- @param unitBeingBuilt The Colossus that is being built.
+-- @param animator The animator that is applied.
+-- @param puddleBones The set of bones to use for puddles.
+local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator, puddleBones)
 
     WaitTicks(2)
 
@@ -354,9 +347,10 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
 
     -- # Create pools of mercury
 
-    local poolA = CreateColossusPool(unitBeingBuilt, bones[1], sx, sy, sz)
-    local poolB = CreateColossusPool(unitBeingBuilt, bones[2], sx, sy, sz) 
-    local poolC = CreateColossusPool(unitBeingBuilt, bones[3], sx, sy, sz) 
+    local pools = { false, false }
+    for k, v in puddleBones do 
+        pools[k] = CreateColossusPool(unitBeingBuilt, v, sx, sy, sz)
+    end
 
     -- # Apply build effects
 
@@ -393,9 +387,12 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
     
                 scale = 1 - progress * progress
 
-                ProjectileSetScale(poolA, sx * scale, 1.5 * sy * scale, sz * scale)
-                ProjectileSetScale(poolB, sx * scale, 1.5 * sy * scale, sz * scale)
-                ProjectileSetScale(poolC, sx * scale, 1.5 * sy * scale, sz * scale)
+                -- progress pool
+                for k, pool in pools do 
+                    ProjectileSetScale(pool, sx * scale, 1.5 * sy * scale, sz * scale)
+                end
+
+                -- progress animation
                 animator:SetAnimationFraction(progress * progress * progress)
             end
         end
@@ -446,7 +443,7 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     local sz = 0.6 * unitBeingBuilt.BuildExtentsZ
     local sy = 1.5 * (unitBeingBuilt.BuildExtentsY or (sx + sz))
 
-    -- # Create effects of pool
+    -- # Create generic build effects
 
     effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
     EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
@@ -460,6 +457,8 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
 
     TrashBagAdd(onDeathTrash, effect)
     TrashBagAdd(onFinishedTrash, effect)
+
+    -- # Create additional sparkles
 
     frac = false
     for k = 1, 10 do 
@@ -476,6 +475,9 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     
 end
 
+--- A helper function for the full build animation of the Tempest.
+-- @param unitBeingBuilt The Tempest that is being built.
+-- @param animator The animator that is applied.
 local function CreateAeonTempestBuildingEffectsThread(unitBeingBuilt, animator)
     local cFraction, progress = false, false
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
@@ -526,6 +528,8 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     TrashBagAdd(onDeathTrash, effect)
     TrashBagAdd(onFinishedTrash, effect)
 
+    -- # Create additional sparkles
+
     frac = false
     for k = 1, 10 do 
         frac = k / 10.0
@@ -553,16 +557,88 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     TrashBagAdd(onDeathTrash, thread)
     TrashBagAdd(onFinishedTrash, thread)
 
-    -- # Apply splashes
+end
 
-    local detector = CreateCollisionDetector(unitBeingBuilt)
-    detector:WatchBone("Torpedo_Muzzle01")
-    detector:WatchBone("Torpedo_Muzzle02")
-    detector:WatchBone("Torpedo_Muzzle03")
-    detector:WatchBone("Torpedo_Muzzle04")
-    detector:WatchBone("Torpedo_Muzzle05")
-    detector:WatchBone("Torpedo_Muzzle06")
-    detector:EnableTerrainCheck(true)
-    detector:Enable()
+--- A helper function for the full build animation of the Paragon.
+-- @param unitBeingBuilt The Paragon that is being built.
+-- @param animator The animator that is applied.
+local function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, animator)
+    local cFraction, progress = false, false
+    local fraction = UnitGetFractionComplete(unitBeingBuilt)
+    while fraction < 1 do
+
+        -- only update when we make progress
+        cFraction = UnitGetFractionComplete(unitBeingBuilt)
+        if cFraction > fraction then 
+
+            -- store updated value
+            fraction = cFraction
+            animator:SetAnimationFraction(fraction)
+        end
+
+        -- wait a tick
+        WaitTicks(2)
+    end
+end
+
+--- Creates the Aeon Paragon build effects, including particles and an animation.
+-- @param unitBeingBuilt The tempest that is being built.
+function CreateAeonParagonBuildingEffects(unitBeingBuilt)
+
+    -- # Initialize various info used throughout the function
+
+    local effect = false
+    local army = unitBeingBuilt.Army
+    local onDeathTrash = unitBeingBuilt.Trash
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+    local orientation = EntityGetOrientation(unitBeingBuilt)
+
+    local sx = 0.55 * unitBeingBuilt.BuildExtentsX
+    local sz = 0.55 * unitBeingBuilt.BuildExtentsZ
+    local sy = 3 * unitBeingBuilt.BuildExtentsY or (sx + sz)
+
+    -- # Create effects of build animation
+
+    effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
+    EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
+
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
+
+    effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    EmitterScaleEmitter(effect, 0.75 * sx)
+
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
+
+    -- # Create additional sparkles
+
+    frac = false
+    for k = 1, 10 do 
+        frac = k / 10.0
+        effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
+        EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
+        EmitterScaleEmitter(effect, 2.0)
+        effect:OffsetEmitter(0, 2 - 2 * frac, 0)
+        
+        TrashBagAdd(onDeathTrash, effect)
+        TrashBagAdd(onFinishedTrash, effect)
+    end    
+
+    -- # Apply build animation
+
+    local animator = CreateAnimator(unitBeingBuilt)
+    TrashBagAdd(onDeathTrash, animator)
+    TrashBagAdd(onFinishedTrash, animator)
+
+    animator:PlayAnim('/units/uas0401/uas0401_build.sca', false)
+    animator:SetRate(0)
+    animator:SetAnimationFraction(1)    
+
+    local thread = ForkThread(CreateAeonTempestBuildingEffectsThread, unitBeingBuilt, animator)
+    TrashBagAdd(onDeathTrash, thread)
+    TrashBagAdd(onFinishedTrash, thread)
 
 end
