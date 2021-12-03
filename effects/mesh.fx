@@ -2824,7 +2824,7 @@ float4 AeonPS_02( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR
 
     float4 albedo = tex2D( albedoSampler, vertex.texcoord0.xy);
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
-      float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
+    float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
     //albedo.rgb = (0.8 * specular.r) -  albedo.rgb;
 
@@ -3032,8 +3032,8 @@ float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
 ///
 float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
+
     if ( 1 == mirrored ) clip(vertex.depth.x);
-    float percentComplete = vertex.material.y;
 
     float3x3 rotationMatrix = float3x3( vertex.binormal, vertex.tangent, vertex.normal);
     float3 normal = ComputeNormal( normalsSampler, vertex.texcoord0.zw, rotationMatrix);
@@ -3043,25 +3043,30 @@ float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COL
     float4 specular = tex2D( specularSampler, vertex.texcoord0.xy);
     float3 environment = texCUBE( environmentSampler, reflect( -vertex.viewDirection, normal));
 
-    // Fade in team color at 90% complete
-    float3 teamColor = vertex.color.rgb;
-    teamColor *= (percentComplete >= 0.90) ? (percentComplete - 0.9) * 10 : 0.0;
-    albedo.rgb = lerp( teamColor, albedo.rgb, 1 - specular.a );
+    // Calculate lighting and shadows
+    float3 light = ComputeLight_02( dotLightNormal, ComputeShadow( vertex.shadow, hiDefShadows));
 
+    light = (light * 0.5) * pow((1 - specular.a), 8);
+
+    // Calculate Specular and Reflection
     float3 reflection = reflect( sunDirection, normal);
     float phongAmount = saturate( dot( reflection, -vertex.viewDirection));
-    float3 phongAdditive = pow( phongAmount, 8) * specular.g;
-    float3 phongMultiplicative = specular.r * environment;
+    float3 phongAdditive = AeonPhongCoeff * pow( phongAmount, 5) * light *  specular.g * pow((1 - (specular.a * 0.5) ), 8) * 2;
+    float3 phongMultiplicative = specular.r * light * environment * (1 - specular.a) * 1.2;
+    float phongMultiplicativeGlow = (phongMultiplicative.r + phongMultiplicative.g + phongMultiplicative.b)/3;
+    float phongAdditiveGlow = (phongAdditive.r + phongAdditive.g + phongAdditive.b)/3;
 
-    float shadow = ComputeShadow( vertex.shadow, hiDefShadows);
-    float3 light = sunDiffuse * saturate( dotLightNormal ) * shadow + sunAmbient;
-    light = 0.6 * lightMultiplier * light + ( 1 - light ) * shadowFill;
-
+    // Does the rest of the stuff
     float emissive = glowMultiplier * specular.b;
-    float3 color = albedo.rgb * ( emissive.r + light + phongMultiplicative ) + phongAdditive.rgb;
-    float alpha = mirrored ? 0.5 : specular.b + glowMinimum;
+    float3 color = (albedo.rgb * 0.125) + (emissive + (light * albedo.rgb)) + phongAdditive + phongMultiplicative;
 
-    return float4( color, alpha);
+    float teamColorFactor = (vertex.material.y >= 0.90) ? (vertex.material.y - 0.9) * 10 : 0.0;
+    color += teamColorFactor * (vertex.color.rgb * specular.a);
+    float teamColGlowCompensation = teamColorFactor * ((vertex.color.r + vertex.color.g + vertex.color.b) / 3);
+    float alpha = mirrored ? 0.5 : specular.b + glowMinimum + (pow(specular.a * 1.5, 2) * 0.07 * (1.4 - teamColGlowCompensation)) + ((phongMultiplicativeGlow + phongAdditiveGlow) * 0.05);
+
+    return float4( color, alpha );
+
 }
 
 float4 AeonBuildOverlayPS( NORMALMAPPED_VERTEX vertex) : COLOR0
@@ -5725,14 +5730,14 @@ technique AeonBuild_HighFidelity
     int fidelity = FIDELITY_HIGH;
 
     string cartographicTechnique = "CartographicBuild";
-    int renderStage = STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
+    int renderStage = STAGE_DEPTH + STAGE_REFLECTION + STAGE_PREWATER + STAGE_PREEFFECT;
     int parameter = PARAM_FRACTIONCOMPLETE;
 >
 {
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        AlphaState( AlphaBlend_Disable_Write_RGB )
+        // AlphaState( AlphaBlend_Disable_Write_RGB )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0.0);
         PixelShader = compile ps_2_a AeonBuildPS(true);
@@ -5763,7 +5768,7 @@ technique AeonBuild_MedFidelity
         AlphaState( AlphaBlend_Disable_Write_RGB )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0.0);
-        PixelShader = compile ps_2_0 AeonBuildPS(false);
+        PixelShader = compile ps_2_a AeonBuildPS(false);
     }
     pass P1
     {
@@ -5843,7 +5848,7 @@ technique AeonBuildNoAnimation_MedFidelity
         AlphaState( AlphaBlend_Disable_Write_RGB )
 
         VertexShader = compile vs_1_1 AeonBuildNoAnimationVS();
-        PixelShader = compile ps_2_0 AeonBuildPS(false);
+        PixelShader = compile ps_2_a AeonBuildPS(false);
     }
     pass P1
     {

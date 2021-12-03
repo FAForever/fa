@@ -1651,3 +1651,5 @@ CreateAeonColossusBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").Creat
 CreateAeonCZARBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonCZARBuildingEffects
 
 CreateAeonTempestBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonTempestBuildingEffects
+
+CreateAeonParagonBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonParagonBuildingEffects

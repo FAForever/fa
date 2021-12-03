@@ -860,7 +860,7 @@ technique TTerrain <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS( true );
-        PixelShader = compile ps_2_0 TerrainPS( true);
+        PixelShader = compile ps_2_a TerrainPS( true);
     }
 }
 
@@ -875,7 +875,7 @@ technique TTerrainXP <
         DepthState( Depth_Enable )
 
         VertexShader = compile vs_1_1 TerrainVS(true);
-        PixelShader = compile ps_2_0 TerrainAlbedoXP();
+        PixelShader = compile ps_2_a TerrainAlbedoXP();
     }
 }
 

@@ -561,8 +561,18 @@ end
 
 --- A helper function for the full build animation of the Paragon.
 -- @param unitBeingBuilt The Paragon that is being built.
--- @param animator The animator that is applied.
-local function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, animator)
+function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, sx, sy, sz)
+
+    -- # Initialize various info used throughout the function
+
+    local effect = false
+    local army = unitBeingBuilt.Army
+    local onDeathTrash = unitBeingBuilt.Trash
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+
+    -- # Add various effects over time
+
+    local k = 0.1
     local cFraction, progress = false, false
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
     while fraction < 1 do
@@ -570,10 +580,22 @@ local function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, animator)
         -- only update when we make progress
         cFraction = UnitGetFractionComplete(unitBeingBuilt)
         if cFraction > fraction then 
+            if k < cFraction then 
+                frac = (1.1 - k) / 1
+                effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+                EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
+                EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
+                EmitterScaleEmitter(effect, 2.0)
+                effect:OffsetEmitter(0, 2 - 2 * frac, 0)
+                
+                TrashBagAdd(onDeathTrash, effect)
+                TrashBagAdd(onFinishedTrash, effect)
+
+                k = k + 0.08
+            end
 
             -- store updated value
             fraction = cFraction
-            animator:SetAnimationFraction(fraction)
         end
 
         -- wait a tick
@@ -593,9 +615,9 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
     local orientation = EntityGetOrientation(unitBeingBuilt)
 
-    local sx = 0.55 * unitBeingBuilt.BuildExtentsX
-    local sz = 0.55 * unitBeingBuilt.BuildExtentsZ
-    local sy = 3 * unitBeingBuilt.BuildExtentsY or (sx + sz)
+    local sx = 1 * unitBeingBuilt.BuildExtentsX
+    local sz = 1 * unitBeingBuilt.BuildExtentsZ
+    local sy = 2 * unitBeingBuilt.BuildExtentsY or (sx + sz)
 
     -- # Create effects of build animation
 
@@ -614,31 +636,7 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
 
     -- # Create additional sparkles
 
-    frac = false
-    for k = 1, 10 do 
-        frac = k / 10.0
-        effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-        EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
-        EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
-        EmitterScaleEmitter(effect, 2.0)
-        effect:OffsetEmitter(0, 2 - 2 * frac, 0)
-        
-        TrashBagAdd(onDeathTrash, effect)
-        TrashBagAdd(onFinishedTrash, effect)
-    end    
-
-    -- # Apply build animation
-
-    local animator = CreateAnimator(unitBeingBuilt)
-    TrashBagAdd(onDeathTrash, animator)
-    TrashBagAdd(onFinishedTrash, animator)
-
-    animator:PlayAnim('/units/uas0401/uas0401_build.sca', false)
-    animator:SetRate(0)
-    animator:SetAnimationFraction(1)    
-
-    local thread = ForkThread(CreateAeonTempestBuildingEffectsThread, unitBeingBuilt, animator)
+    local thread = ForkThread(CreateAeonParagonBuildingEffectsThread, unitBeingBuilt, sx, sy, sz)
     TrashBagAdd(onDeathTrash, thread)
     TrashBagAdd(onFinishedTrash, thread)
-
 end
