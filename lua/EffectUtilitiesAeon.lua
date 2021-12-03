@@ -34,6 +34,7 @@ local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
 local CategoriesHover = categories.HOVER
+local CategoriesLand = categories.LAND
 
 --- The build animation of an engineer.
 -- @param builder The engineer in question.
@@ -227,7 +228,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         local effect = false
         local unitBeingBuiltTrash = unitBeingBuilt.Trash
         local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-        local orientation = EntityGetOrientation(unitBeingBuilt)
+
         local sx = unitBeingBuilt.BuildExtentsX
         local sz = unitBeingBuilt.BuildExtentsZ
         local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
@@ -238,8 +239,11 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         TrashBagAdd(unitBeingBuiltTrash, pool)
         TrashBagAdd(unitOnStopBeingBuiltTrash, pool)
 
-        EntitySetOrientation(pool, orientation, true)
         ProjectileSetScale(pool, sx, sy * 1.5, sz)
+        if EntityCategoryContains(CategoriesLand, builder) then 
+            local orientation = EntityGetOrientation(unitBeingBuilt)
+            EntitySetOrientation(pool, orientation, true)
+        end
 
         -- # Create effects of pool
 

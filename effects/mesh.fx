@@ -3027,11 +3027,18 @@ float4 LowFiUnitFalloffPS( NORMALMAPPED_VERTEX vertex) : COLOR0
     return float4(color.rgb,0);
 }
 
+// directx 9
+// ps_2.0 -> limited set of 64 instructions
+// ps_2.0_a -> limited set of 256 instructions
+
 /// AeonBuildPS
 ///
 ///
 float4 AeonBuildPS( NORMALMAPPED_VERTEX vertex, uniform bool hiDefShadows) : COLOR0
 {
+
+    // +, -, /, * = 1
+    // pow = 4
 
     if ( 1 == mirrored ) clip(vertex.depth.x);
 
@@ -5737,7 +5744,7 @@ technique AeonBuild_HighFidelity
     pass P0
     {
         RasterizerState( Rasterizer_Cull_CW )
-        // AlphaState( AlphaBlend_Disable_Write_RGB )
+        AlphaState( AlphaBlend_Disable_Write_RGB )
 
         VertexShader = compile vs_1_1 AeonBuildVS(0.0);
         PixelShader = compile ps_2_a AeonBuildPS(true);
