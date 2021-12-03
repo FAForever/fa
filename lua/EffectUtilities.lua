@@ -1646,10 +1646,18 @@ CreateAeonCommanderBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").Crea
 CreateAeonFactoryBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonFactoryBuildingEffects
 -- original: CreateAeonFactoryBuildingEffects
 
+--- Creates the Aeon Tempest build effects, including particles and an animation.
+-- @param unitBeingBuilt The Colossus that is being built.
 CreateAeonColossusBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonColossusBuildingEffects
 
+--- Creates the Aeon CZAR build effects, including particles.
+-- @param unitBeingBuilt The CZAR that is being built.
 CreateAeonCZARBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonCZARBuildingEffects
 
+--- Creates the Aeon Tempest build effects, including particles and an animation.
+-- @param unitBeingBuilt The tempest that is being built.
 CreateAeonTempestBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonTempestBuildingEffects
 
+--- Creates the Aeon Paragon build effects, including particles and an animation.
+-- @param unitBeingBuilt The tempest that is being built.
 CreateAeonParagonBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonParagonBuildingEffects

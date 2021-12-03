@@ -565,7 +565,7 @@ end
 
 --- A helper function for the full build animation of the Paragon.
 -- @param unitBeingBuilt The Paragon that is being built.
-function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, sx, sy, sz)
+local function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, sx, sy, sz)
 
     -- # Initialize various info used throughout the function
 
