@@ -155,11 +155,16 @@ function CreateReclaimLabel(view)
     return label
 end
 
+local LabelRes = 25
+
 function UpdateLabels()
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
 
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
+
+    local heightRes = math.floor(view.Height() / LabelRes)
+    local reclaimMatrix = {}
 
     -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
     for _, r in Reclaim do
@@ -172,23 +177,61 @@ function UpdateLabels()
 
     table.sort(onScreenReclaims, function(a, b) return a.mass > b.mass end)
 
+    local function sumReclaim(r1, r2)
+        local massSum = r1.mass + r2.mass
+        local r = {
+            mass = massSum,
+            count = r1.count + 1
+        }
+        r.position = Vector((r1.mass * r1.position[1] + r2.mass * r2.position[1]) / massSum, r1.position[2],
+            (r1.mass * r1.position[3] + r2.mass * r2.position[3]) / massSum)
+        return r
+
+    end
+    for _, r in onScreenReclaims do
+        local proj = view:Project(r.position)
+        local rx = math.floor(proj.x / LabelRes)
+        local ry = math.floor(proj.y / LabelRes)
+        if reclaimMatrix[ry] then
+            if reclaimMatrix[ry][rx] then
+                reclaimMatrix[ry][rx] = sumReclaim(reclaimMatrix[ry][rx], r)
+            else
+                reclaimMatrix[ry][rx] = {
+                    mass = r.mass,
+                    position = r.position,
+                    count = 1,
+                }
+            end
+        else
+            reclaimMatrix[ry] = {}
+            reclaimMatrix[ry][rx] = {
+                mass = r.mass,
+                position = r.position,
+                count = 1,
+            }
+        end
+    end
+
     -- Create/Update as many reclaim labels as we need
     local labelIndex = 1
-    for _, r in onScreenReclaims do
-        if labelIndex > MaxLabels then
-            break
-        end
-        local label = LabelPool[labelIndex]
-        if label and IsDestroyed(label) then
-            label = nil
-        end
-        if not label then
-            label = CreateReclaimLabel(view.ReclaimGroup, r)
-            LabelPool[labelIndex] = label
-        end
+    for _, line in reclaimMatrix do
+        for _, recl in line do
+            if labelIndex > MaxLabels then
+                break
+            end
 
-        label:DisplayReclaim(r)
-        labelIndex = labelIndex + 1
+            local label = LabelPool[labelIndex]
+            if label and IsDestroyed(label) then
+                label = nil
+            end
+            if not label then
+                label = CreateReclaimLabel(view.ReclaimGroup, recl)
+                LabelPool[labelIndex] = label
+            end
+
+            label:DisplayReclaim(recl)
+            labelIndex = labelIndex + 1
+        end
     end
 
     -- Hide labels we didn't use
