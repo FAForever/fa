@@ -2,7 +2,7 @@
 #**  File     :  /lua/sim/Entity.lua
 #**  Summary  : The Entity lua module
 #**
-#**  Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 Entity = Class(moho.entity_methods) {
