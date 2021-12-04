@@ -885,6 +885,65 @@ float4 TerrainAlbedoXP( VS_OUTPUTAlt pixel) : COLOR
     return float4(albedo.rgb, 0.01f);
 }
 
+float4 TerrainAlbedoAlt( VS_OUTPUTAlt pixel) : COLOR
+{
+    float4 position = TerrainScale * pixel.mTexWT;
+    float4 height = TerrainScale * pixel.mWorld.y;
+    float3 coords = float3(position.x, height.y, position.y);
+
+    float3 normal = normalize(2*SampleScreen(NormalSampler,pixel.mTexSS).xyz-1);
+
+    float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
+    float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
+
+    float4 lowerAlbedo = tex2Dproj(LowerAlbedoSampler,position*LowerAlbedoTile);
+    float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
+    float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
+    float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
+
+    float3 blending = ComputeTriplanarBlending(normal);
+    float4 xAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.yz);
+    float4 yAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xz);
+    float4 zAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xy);
+    float4 stratum3Albedo = xAxis * blending.x + yAxis * blending.y + zAxis * blending.z;
+    //stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
+
+    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum3AlbedoTile);
+    float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
+    float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
+    float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
+    float4 upperAlbedo = tex2Dproj(UpperAlbedoSampler,position*UpperAlbedoTile);
+
+    float4 albedo = lowerAlbedo;
+    albedo = BlendLayers(albedo, stratum0Albedo, mask0.x);
+    albedo = BlendLayers(albedo, stratum1Albedo, mask0.y);
+    albedo = BlendLayers(albedo, stratum2Albedo, mask0.z);
+    albedo = BlendLayers(albedo, stratum3Albedo, mask0.w);
+    albedo = BlendLayers(albedo, stratum4Albedo, mask1.x);
+    albedo = BlendLayers(albedo, stratum5Albedo, mask1.y);
+    albedo = BlendLayers(albedo, stratum6Albedo, mask1.z);
+    albedo = BlendLayers(albedo, stratum7Albedo, mask1.w);
+    albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
+
+
+    
+    float3 r = reflect(normalize(pixel.mViewDirection),normal);
+    float3 specular = pow(saturate(dot(r,SunDirection)),80)*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
+
+    float dotSunNormal = dot(SunDirection,normal);
+
+    float shadow = tex2D(ShadowSampler,pixel.mShadow.xy).g;
+    float3 light = SunColor*saturate(dotSunNormal)*shadow + SunAmbience;
+    light = LightingMultiplier*light + ShadowFillColor*(1-light);
+    albedo.rgb = light * ( albedo.rgb + specular.rgb );
+
+    float waterDepth = tex2Dproj(UtilitySamplerC,pixel.mTexWT*TerrainScale).g;
+    float4 water = tex1D(WaterRampSampler,waterDepth);
+    albedo.rgb = lerp(albedo.rgb,water.rgb,water.a);
+
+    return float4(albedo.rgb, 0.01f);
+}
+
 float4 TerrainGlowPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
 {
     // sample all the textures we'll need
@@ -992,6 +1051,21 @@ technique TTerrainXP <
 
         VertexShader = compile vs_1_1 TerrainVSAlt(true);
         PixelShader = compile ps_2_a TerrainAlbedoXP();
+    }
+}
+
+technique TTerrainAlt <
+    string usage = "composite";
+    string normals = "TTerrainNormalsXP";
+>
+{
+    pass P0
+    {
+        AlphaState( AlphaBlend_Disable_Write_RGBA )
+        DepthState( Depth_Enable )
+
+        VertexShader = compile vs_1_1 TerrainVSAlt(true);
+        PixelShader = compile ps_2_a TerrainAlbedoAlt();
     }
 }
 
