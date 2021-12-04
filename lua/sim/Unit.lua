@@ -231,6 +231,15 @@ Unit = Class(moho.unit_methods) {
         self.MeshBlueprint = bp.Display.MeshBlueprint
         self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
 
+        -- Store weapon information for performance
+        self.WeaponCount = self:GetWeaponCount()
+        self.Weapons = { }
+        for k = 1, self.WeaponCount do 
+            local weapon = self:GetWeapon(k)
+            self.Weapons[weapon.Label] = weapon
+            self.Weapons[k] = weapon
+        end
+
         -- Save common lookup info
         self.UnitId = self:GetUnitId()
         self.techCategory = bp.TechCategory
@@ -360,16 +369,16 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetTargetPriorities = function(self, priTable)
-        for i = 1, self:GetWeaponCount() do
-            local wep = self:GetWeapon(i)
-            wep:SetWeaponPriorities(priTable)
+        for i = 1, self.WeaponCount do
+            self.Weapons[i]:SetWeaponPriorities(priTable)
         end
     end,
 
     SetLandTargetPriorities = function(self, priTable)
-        for i = 1, self:GetWeaponCount() do
-            local wep = self:GetWeapon(i)
+        LOG("SetLandTargetPriorities")
+        for i = 1, self.WeaponCount do
 
+            local wep = self.Weapons[i]
             for onLayer, targetLayers in wep:GetBlueprint().FireTargetLayerCapsTable do
                 if string.find(targetLayers, 'Land') then
                     wep:SetWeaponPriorities(priTable)
@@ -1482,7 +1491,7 @@ Unit = Class(moho.unit_methods) {
             if v.Label == 'DeathWeapon' then
                 if v.FireOnDeath == true then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
-                    self:GetWeaponByLabel('DeathWeapon'):Fire()
+                    self.Weapons['DeathWeapon']:Fire()
                 else
                     self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
                 end
@@ -2045,44 +2054,41 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetAllWeaponsEnabled = function(self, enable)
-        for i = 1, self:GetWeaponCount() do
-            local wep = self:GetWeapon(i)
+        for i = 1, self.WeaponCount do
+            local wep = self.Weapons[i]
             wep:SetWeaponEnabled(enable)
             wep:AimManipulatorSetEnabled(enable)
         end
     end,
 
     SetWeaponEnabledByLabel = function(self, label, enable)
-        local wep = self:GetWeaponByLabel(label)
-        if not wep then return end
+
+        local weapon = self.Weapons[label]
+        if not weapon then return end
 
         if not enable then
-            wep:OnLostTarget()
+            weapon:OnLostTarget()
         end
-        wep:SetWeaponEnabled(enable)
-        wep:AimManipulatorSetEnabled(enable)
+        weapon:SetWeaponEnabled(enable)
+        weapon:AimManipulatorSetEnabled(enable)
     end,
 
     GetWeaponManipulatorByLabel = function(self, label)
-        local wep = self:GetWeaponByLabel(label)
-        return wep:GetAimManipulator()
+        local weapon = self.Weapons[label]
+        if weapon then 
+            return weapon:GetAimManipulator()
+        end
     end,
 
     GetWeaponByLabel = function(self, label)
-        local wep
-        for i = 1, self:GetWeaponCount() do
-            wep = self:GetWeapon(i)
-            if wep:GetBlueprint().Label == label then
-                return wep
-            end
-        end
-
-        return nil
+        return self.Weapons[label]
     end,
 
     ResetWeaponByLabel = function(self, label)
-        local wep = self:GetWeaponByLabel(label)
-        wep:ResetTarget()
+        local weapon = self.Weapons[label]
+        if weapon then 
+            weapon:ResetTarget()
+        end
     end,
 
     SetDeathWeaponEnabled = function(self, enable)
@@ -3105,8 +3111,8 @@ Unit = Class(moho.unit_methods) {
         -- for example, will throw an error.
         if self.Dead then return end
 
-        for i = 1, self:GetWeaponCount() do
-            self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
+        for i = 1, self.WeaponCount do
+            self.Weapons[i]:SetValidTargetsForCurrentLayer(new)
         end
 
         if (old == 'Seabed' or old == 'Water' or old == 'Sub' or old == 'None') and new == 'Land' then
@@ -3191,9 +3197,9 @@ Unit = Class(moho.unit_methods) {
             self:DoOnHorizontalStartMoveCallbacks()
         end
 
-        for i = 1, self:GetWeaponCount() do
-            local wep = self:GetWeapon(i)
-            wep:OnMotionHorzEventChange(new, old)
+        -- update weapon capabilities
+        for k = 1, self.WeaponCount do
+            self.Weapons[k]:OnMotionHorzEventChange(new, old)
         end
     end,
 
@@ -4081,16 +4087,14 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Reset weapons to ensure torso centres and unit survives drop
-        for i = 1, self:GetWeaponCount() do
-            local wep = self:GetWeapon(i)
-            wep:ResetTarget()
+        for i = 1, self.WeaponCount do
+            self.Weapon[i]:ResetTarget()
         end
     end,
 
     MarkWeaponsOnTransport = function(self, bool)
-        for i = 1, self:GetWeaponCount() do
-            local wep = self:GetWeapon(i)
-            wep:SetOnTransport(bool)
+        for i = 1, self.WeaponCount do
+            self.Weapon[i]:SetOnTransport(bool)
         end
     end,
 
