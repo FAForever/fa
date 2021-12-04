@@ -132,7 +132,8 @@ local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unit
     end
 
     -- set correct shader of unitBeingBuilt so that it happens instantly after finishing
-    unitBeingBuilt:SetMesh(unitBeingBuilt.MeshBlueprint)
+    -- this causes a bunch of errors as all animators (or other attached bone manipulators) are thrown out :sad_cowboy:
+    -- unitBeingBuilt:SetMesh(unitBeingBuilt.MeshBlueprint)
 end
 
 --- The build animation for Aeon buildings in general.
