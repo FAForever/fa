@@ -2064,7 +2064,9 @@ Unit = Class(moho.unit_methods) {
     SetWeaponEnabledByLabel = function(self, label, enable)
 
         local weapon = self.Weapons[label]
-        if not weapon then return end
+        if not weapon then 
+            return 
+        end
 
         if not enable then
             weapon:OnLostTarget()
