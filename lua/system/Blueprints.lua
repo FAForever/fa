@@ -381,19 +381,56 @@ function ExtractWreckageBlueprint(bp)
     MeshBlueprint(wreckbp)
 end
 
+local aeonBuildNoAnimation = "AeonBuildNoAnimation"
+
+--- Allows us to specify build shaders on a per-unit basis
+local uniqueBuildAnimations = { }
+uniqueBuildAnimations["ual0401"] = aeonBuildNoAnimation
+uniqueBuildAnimations["uas0401"] = aeonBuildNoAnimation
+
+--- Extracts the build mesh blueprint information. Adds the Display.BuildMeshBlueprint field to the blueprint and registers the build mesh.
+-- @param bp The blueprint to generate the build mesh for.
 function ExtractBuildMeshBlueprint(bp)
+
+    -- # useful information to make distinctions
+
     local FactionName = bp.General.FactionName
+    local isSubCommander = false 
+
+    for k, v in bp.Categories do 
+        if v == 'SUBCOMMANDER' then 
+            isSubCommander = true 
+            break 
+        end
+    end
+
+    -- # determine build mesh blueprint and add it to the game
 
     if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then
+
+        -- no reason to have a build mesh if you have no mesh at all
         local meshid = bp.Display.MeshBlueprint
         if not meshid then return end
 
+        -- no reason to have a build mesh if regular mesh is not defined properly
         local meshbp = original_blueprints.Mesh[meshid]
         if not meshbp then return end
 
+        -- default shader name
         local shadername = FactionName .. 'Build'
+
+        -- shader for specific unit BPs
+        shadername = uniqueBuildAnimations[string.lower(bp.BlueprintId)] or shadername
+
+        -- shader for specific SACUs
+        if isSubCommander and (FactionName == 'Aeon') then 
+            shadername = aeonBuildNoAnimation
+        end
+
+        -- build effects
         local secondaryname = '/textures/effects/' .. FactionName .. 'BuildSpecular.dds'
 
+        -- copy over original content and switch up elements
         local buildmeshbp = table.deepcopy(meshbp)
         if buildmeshbp.LODs then
             for i,lod in buildmeshbp.LODs do
@@ -404,6 +441,8 @@ function ExtractBuildMeshBlueprint(bp)
                 end
             end
         end
+
+        -- set its blueprint id and register it
         buildmeshbp.BlueprintId = meshid .. '_build'
         bp.Display.BuildMeshBlueprint = buildmeshbp.BlueprintId
         MeshBlueprint(buildmeshbp)

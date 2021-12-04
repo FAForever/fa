@@ -228,6 +228,8 @@ Unit = Class(moho.unit_methods) {
         self.BuildExtentsY = bp.Physics.MeshExtentsY or bp.Footprint.SizeY
         self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
         self.Elevation = bp.Physics.Elevation
+        self.MeshBlueprint = bp.Display.MeshBlueprint
+        self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
 
         -- Save common lookup info
         self.UnitId = self:GetUnitId()
@@ -4465,7 +4467,7 @@ local EntityGetArmy = _G.moho.entity_methods.GetArmy
 local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
 local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
 
-local UnitGetCurrentLayer = _G.moho.unit_methods.GetLayer
+local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 -- upvalued categories for performance

@@ -12,6 +12,8 @@ local ADFCannonOblivionWeapon = WeaponsFile.ADFCannonOblivionWeapon02
 local AANChronoTorpedoWeapon = WeaponsFile.AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = WeaponsFile.AIFQuasarAntiTorpedoWeapon
 
+local CreateAeonTempestBuildingEffects = import("/lua/effectutilities.lua").CreateAeonTempestBuildingEffects
+
 UAS0401 = Class(ASeaUnit) {
     BuildAttachBone = 'Attachpoint01',
 
@@ -26,6 +28,12 @@ UAS0401 = Class(ASeaUnit) {
         AntiTorpedo01 = Class(AIFQuasarAntiTorpedoWeapon) {},
         AntiTorpedo02 = Class(AIFQuasarAntiTorpedoWeapon) {},
     },
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        ASeaUnit.StartBeingBuiltEffects(self, builder, layer)
+        CreateAeonTempestBuildingEffects(self)
+    end,
+
 
     OnStopBeingBuilt = function(self, builder, layer)
         self:SetWeaponEnabledByLabel('MainGun', true)
