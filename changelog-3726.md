@@ -72,6 +72,7 @@ Patch 3726 (26th November, 2021)
     attracts a lot of fire, but because its aim bones are still
     underground all the attacking units shoot at the ground. No
     more!
+ - (#3581) Fire Beetle properly applies EMP / stun buffs
     
 ### Other
  - (#3523) Switch off debug utilities by default
@@ -173,7 +174,7 @@ Patch 3726 (26th November, 2021)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
-        #3558, #3582)
+        #3558, #3582, #3581)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
