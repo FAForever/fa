@@ -236,9 +236,6 @@ Unit = Class(moho.unit_methods) {
         self.WeaponAccess = { }
         for k = 1, self.WeaponCount do 
             local weapon = self:GetWeapon(k)
-            LOG(weapon)
-            LOG(weapon.Label)
-            LOG(weapon.Fire)
             self.WeaponAccess[weapon.Label] = weapon
             self.WeaponAccess[k] = weapon
         end
@@ -382,9 +379,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetLandTargetPriorities = function(self, priTable)
-        LOG("SetLandTargetPriorities")
         for i = 1, self.WeaponCount do
-
             local wep = self.WeaponAccess[i]
             for onLayer, targetLayers in wep:GetBlueprint().FireTargetLayerCapsTable do
                 if string.find(targetLayers, 'Land') then
@@ -1498,8 +1493,6 @@ Unit = Class(moho.unit_methods) {
             if v.Label == 'DeathWeapon' then
                 if v.FireOnDeath == true then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
-                    LOG(self.Weapons['DeathWeapon'])
-                    LOG(self.Weapons['DeathWeapon']:BeenDestroyed())
                     self.Weapons['DeathWeapon']:Fire()
                 else
                     self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
@@ -2080,9 +2073,9 @@ Unit = Class(moho.unit_methods) {
         if not enable then
             weapon:OnLostTarget()
         end
+
         weapon:SetWeaponEnabled(enable)
         weapon:AimManipulatorSetEnabled(enable)
-        LOG("Enabled!")
     end,
 
     GetWeaponManipulatorByLabel = function(self, label)
