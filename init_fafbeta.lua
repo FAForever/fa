@@ -408,6 +408,12 @@ end
 
 -- END OF COPY --
 
+-- Clears out the shader cache as it takes a release to reset the shaders
+local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+for k, file in IoDir(shaderCache .. '/*') do
+    os.remove(shaderCache .. '/' .. file)
+end
+
 -- typical FAF packages
 local allowedAssetsNxy = { }
 allowedAssetsNxy["effects.nx4"] = true
