@@ -123,6 +123,17 @@ struct VS_OUTPUT
     float4 mTexDecal            : TEXCOORD5;
 };
 
+struct VS_OUTPUTAlt
+{
+    float4 mPos                    : POSITION0;
+    float4 mWorld                : TEXCOORD6;
+    float4 mTexWT                : TEXCOORD1;
+    float4 mTexSS                : TEXCOORD2;
+    float4 mShadow              : TEXCOORD3;
+    float3 mViewDirection        : TEXCOORD4;
+    float4 mTexDecal            : TEXCOORD5;
+};
+
 struct TERRAIN_DEPTH
 {
     float4 mPos         : POSITION0;
@@ -461,13 +472,50 @@ VS_OUTPUT TerrainVS( position_t p : POSITION0, uniform bool shadowed)
     VS_OUTPUT result;
 
     float4 position = float4(p);
+    position.y = position.y * HeightScale;
+
+    // calculate output position
+    result.mPos = calculateHomogenousCoordinate(position);
+
+    // calculate 0..1 uv based on size of map
+    result.mTexWT = float4(position.xzyw);
+    // caluclate screen space coordinate for sample a frame buffer of this size
+    result.mTexSS = result.mPos;
+    result.mTexDecal = float4(0,0,0,0);
+
+    result.mViewDirection = normalize(position.xyz-CameraPosition.xyz);
+
+    // if we have shadows enabled fill in the tex coordinate for the shadow projection
+    if ( shadowed && ( 1 == ShadowsEnabled ))
+    {
+        result.mShadow = mul(position,ShadowMatrix);
+        result.mShadow.x = ( +result.mShadow.x + result.mShadow.w ) * 0.5;
+        result.mShadow.y = ( -result.mShadow.y + result.mShadow.w ) * 0.5;
+        result.mShadow.z -= 0.01f; // put epsilon in vs to save ps instruction
+    }
+    else
+    {
+        result.mShadow = float4( 0, 0, 0, 1);
+    }
+
+    return result;
+}
+
+VS_OUTPUTAlt TerrainVSAlt( position_t p : POSITION0, uniform bool shadowed)
+{
+    VS_OUTPUTAlt result;
+
+    result.mWorld = float4(p);
+    result.mWorld.y *= HeightScale;
+
+    float4 position = float4(p);
     position.y *= HeightScale;
 
     // calculate output position
     result.mPos = calculateHomogenousCoordinate(position);
 
     // calculate 0..1 uv based on size of map
-    result.mTexWT = position.xzyw;
+    result.mTexWT = float4(position.xzyw);
     // caluclate screen space coordinate for sample a frame buffer of this size
     result.mTexSS = result.mPos;
     result.mTexDecal = float4(0,0,0,0);
@@ -610,7 +658,7 @@ float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
     return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
 }
 
-float4 TerrainNormalsXP( VS_OUTPUT pixel ) : COLOR
+float4 TerrainNormalsXP( VS_OUTPUTAlt pixel ) : COLOR
 {
     float4 mask0 = tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale);
     float4 mask1 = tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale);
@@ -690,6 +738,14 @@ float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
     return tex_source00.xxwy;
 }
 
+float3 ComputeTriplanarBlending(float3 normal)
+{
+    float3 blending = abs( normal );
+    blending = normalize(max(blending, 0.00001));
+    float b = (blending.x + blending.y + blending.z);
+    blending /= float3(b, b, b);
+    return blending;
+}
 
 float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
 {
@@ -721,9 +777,13 @@ float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
     return outColor;
 }
 
-float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
+float4 TerrainAlbedoXP( VS_OUTPUTAlt pixel) : COLOR
 {
-    float4 position = TerrainScale*pixel.mTexWT;
+    float4 position = TerrainScale * pixel.mTexWT;
+    float4 height = TerrainScale * pixel.mWorld.y; //TerrainScale * pixel.mTexSS.xzyw;
+    float3 coords = float3(position.x, height.y, position.y);
+
+    float3 normal = normalize(2*SampleScreen(NormalSampler,pixel.mTexSS).xyz-1);
 
     float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
     float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
@@ -732,8 +792,15 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
     float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
     float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
     float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
-    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
+
+    float factor = 30;
+    float3 blending = ComputeTriplanarBlending(normal);
+    float4 xAxis = tex2D(Stratum3AlbedoSampler, factor * coords.yz);
+    float4 yAxis = tex2D(Stratum3AlbedoSampler, factor * coords.xz);
+    float4 zAxis = tex2D(Stratum3AlbedoSampler, factor * coords.xy);
+    float4 stratum3Albedo = xAxis * blending.x + yAxis * blending.y + zAxis * blending.z;
+
+    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum3AlbedoTile);
     float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
     float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
     float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
@@ -750,7 +817,7 @@ float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
     albedo = lerp(albedo,stratum7Albedo,mask1.w);
     albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
-    float3 normal = normalize(2*SampleScreen(NormalSampler,pixel.mTexSS).xyz-1);
+
     
     float3 r = reflect(normalize(pixel.mViewDirection),normal);
     float3 specular = pow(saturate(dot(r,SunDirection)),80)*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
@@ -874,7 +941,7 @@ technique TTerrainXP <
         AlphaState( AlphaBlend_Disable_Write_RGBA )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainVS(true);
+        VertexShader = compile vs_1_1 TerrainVSAlt(true);
         PixelShader = compile ps_2_a TerrainAlbedoXP();
     }
 }
@@ -917,7 +984,7 @@ technique TTerrainNormalsXP
         AlphaState( AlphaBlend_Disable_Write_RG )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainVS( false );
+        VertexShader = compile vs_1_1 TerrainVSAlt( false );
         PixelShader = compile ps_2_0 TerrainNormalsXP();
     }
 }
@@ -955,7 +1022,7 @@ technique TTerrainOverlay
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainVS(false);
+        VertexShader = compile vs_1_1 TerrainVSAlt(false);
         PixelShader = compile ps_2_0 TerrainOverlayPS();
     }
 }
