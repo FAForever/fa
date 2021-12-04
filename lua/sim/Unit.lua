@@ -69,7 +69,7 @@ SyncMeta = {
 }
 
 Unit = Class(moho.unit_methods) {
-    WeaponAccess = {},
+    Weapons = {},
 
     FxScale = 1,
     FxDamageScale = 1,
