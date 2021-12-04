@@ -67,6 +67,11 @@ Patch 3726 (26th November, 2021)
     restricted and instead there is a dedicated lobby option to unrate the
     game.
  - (#3525) Fix the unpathable skirts of the Seraphim Quantum Gateway
+ - (#3582) Fix Aeon aim bones being underground when building
+    This fixes the famous issue where an unfinished t1 pd 
+    attracts a lot of fire, but because its aim bones are still
+    underground all the attacking units shoot at the ground. No
+    more!
     
 ### Other
  - (#3523) Switch off debug utilities by default
@@ -121,7 +126,11 @@ Patch 3726 (26th November, 2021)
     highlights to teal (light / bright blue color) when
     in swap modus. Click the highlighted slot number to
     cancel.
- - #3558 Restrict t2 artillery orientation to 90 degree angles
+ - (#3558) Restrict t2 artillery orientation to 90 degree angles
+ - (#3582) Fixed various issues with the Aeon build animation
+    As an example, hover units no longer jump to their hover
+    elevation when they're finished. All experimentals have
+    unique build animations that fit the style of the faction.
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -154,21 +163,23 @@ Patch 3726 (26th November, 2021)
     computations that were not required. The new version is 
     better for performance and a lot more smooth with regards
     to the build animation.
+ - (#3582) Prevent unneccessary allocations during the Aeon build animation
 
 ### Contributors
  - Askaholic (#3417, #3440)
- - Madmax (#3420, #3419)
+ - Madmax (#3420, #3419, #3582)
  - Uveso (#3477)
  - Rowey (#3475, #3528, #3533)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
-        #3558)
+        #3558, #3582)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
  - Balthazar (#3552)
  - 4z0t (#3554)
+ - Marlo (#3582)
 
 ### Reviewers
  - Balthazar (#3484)
