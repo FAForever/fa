@@ -299,8 +299,6 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
 
         self.Repairers = {}
-
-        self.Created = true
     end,
 
     OnGotTarget = function(self, Weapon)
