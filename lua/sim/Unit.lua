@@ -162,7 +162,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCreate = function(self)
-        Entity.OnCreate(self)
+        Entity.OnCreate(self)   
 
         -- cache commonly used values from the engine
         -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
@@ -232,11 +232,13 @@ Unit = Class(moho.unit_methods) {
         self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
 
         -- Store weapon information for performance
-        self.WeaponCount = self:GetWeaponCount()
+        self.WeaponCount = self:GetWeaponCount() or 0
         self.Weapons = { }
         for k = 1, self.WeaponCount do 
             local weapon = self:GetWeapon(k)
-            self.Weapons[weapon.Label] = weapon
+            if weapon.Label then 
+                self.Weapons[weapon.Label] = weapon
+            end
             self.Weapons[k] = weapon
         end
 
@@ -297,6 +299,8 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
 
         self.Repairers = {}
+
+        self.Created = true
     end,
 
     OnGotTarget = function(self, Weapon)
@@ -3100,6 +3104,8 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     OnLayerChange = function(self, new, old)
 
+        -- this function is called _before_ OnCreate is called --
+
         -- This function is called when:
         -- - A unit changes layer (heh)
         -- - For all units part of a transport, when the transport changes layer (e.g., land units can become 'Air')
@@ -3113,8 +3119,14 @@ Unit = Class(moho.unit_methods) {
         -- for example, will throw an error.
         if self.Dead then return end
 
-        for i = 1, self.WeaponCount do
-            self.Weapons[i]:SetValidTargetsForCurrentLayer(new)
+        if self.Created then 
+            for i = 1, self.WeaponCount do
+                self.Weapons[i]:SetValidTargetsForCurrentLayer(new)
+            end
+        else 
+            for i = 1, self:GetWeaponCount() do
+                self:GetWeapon(i):SetValidTargetsForCurrentLayer(new)
+            end
         end
 
         if (old == 'Seabed' or old == 'Water' or old == 'Sub' or old == 'None') and new == 'Land' then
@@ -4090,13 +4102,13 @@ Unit = Class(moho.unit_methods) {
 
         -- Reset weapons to ensure torso centres and unit survives drop
         for i = 1, self.WeaponCount do
-            self.Weapon[i]:ResetTarget()
+            self.Weapons[i]:ResetTarget()
         end
     end,
 
     MarkWeaponsOnTransport = function(self, bool)
         for i = 1, self.WeaponCount do
-            self.Weapon[i]:SetOnTransport(bool)
+            self.Weapons[i]:SetOnTransport(bool)
         end
     end,
 
