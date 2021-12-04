@@ -32,7 +32,6 @@ DefaultProjectileWeapon = Class(Weapon) {
         self.WeaponUnpackLocksMotion = bp.WeaponUnpackLocksMotion
         self.FiringRandomnessWhileMoving = bp.FiringRandomnessWhileMoving
         self.FiringRandomness = bp.FiringRandomness
-        self.Label = bp.Label
         self.bpRateOfFire = bp.RateOfFire
         self.EnergyRequired = bp.EnergyRequired
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
