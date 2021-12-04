@@ -1493,7 +1493,7 @@ Unit = Class(moho.unit_methods) {
             if v.Label == 'DeathWeapon' then
                 if v.FireOnDeath == true then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
-                    self.Weapons['DeathWeapon']:Fire()
+                    self.WeaponAccess['DeathWeapon']:Fire()
                 else
                     self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
                 end
