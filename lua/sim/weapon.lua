@@ -47,6 +47,13 @@ Weapon = Class(moho.weapon_methods) {
 
         -- Store weapon information for performance
         self.Label = bp.Label
+        self.WeaponUnpackLocksMotion = bp.WeaponUnpackLocksMotion
+        self.FiringRandomnessWhileMoving = bp.FiringRandomnessWhileMoving
+        self.FiringRandomness = bp.FiringRandomness
+        self.bpRateOfFire = bp.RateOfFire
+        self.EnergyRequired = bp.EnergyRequired
+        self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
+        self.WeaponUnpacks = bp.WeaponUnpacks
 
         if not self.unit.Trash then
             self.unit.Trash = TrashBag()

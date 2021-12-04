@@ -28,15 +28,6 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         local bp = self:GetBlueprint()
 
-        -- Store weapon information for performance
-        self.WeaponUnpackLocksMotion = bp.WeaponUnpackLocksMotion
-        self.FiringRandomnessWhileMoving = bp.FiringRandomnessWhileMoving
-        self.FiringRandomness = bp.FiringRandomness
-        self.bpRateOfFire = bp.RateOfFire
-        self.EnergyRequired = bp.EnergyRequired
-        self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
-        self.WeaponUnpacks = bp.WeaponUnpacks
-
         self.WeaponCanFire = true
         if bp.RackRecoilDistance ~= 0 then
             self.RecoilManipulators = {}
