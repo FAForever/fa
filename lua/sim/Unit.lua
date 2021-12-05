@@ -233,11 +233,11 @@ Unit = Class(moho.unit_methods) {
 
         -- Store weapon information for performance
         self.WeaponCount = self:GetWeaponCount() or 0
-        self.WeaponAccess = { }
+        self.WeaponInstances = { }
         for k = 1, self.WeaponCount do 
             local weapon = self:GetWeapon(k)
-            self.WeaponAccess[weapon.Label] = weapon
-            self.WeaponAccess[k] = weapon
+            self.WeaponInstances[weapon.Label] = weapon
+            self.WeaponInstances[k] = weapon
         end
 
         -- Store common accessed information for performance
@@ -372,13 +372,13 @@ Unit = Class(moho.unit_methods) {
 
     SetTargetPriorities = function(self, priTable)
         for i = 1, self.WeaponCount do
-            self.WeaponAccess[i]:SetWeaponPriorities(priTable)
+            self.WeaponInstances[i]:SetWeaponPriorities(priTable)
         end
     end,
 
     SetLandTargetPriorities = function(self, priTable)
         for i = 1, self.WeaponCount do
-            local wep = self.WeaponAccess[i]
+            local wep = self.WeaponInstances[i]
             for onLayer, targetLayers in wep:GetBlueprint().FireTargetLayerCapsTable do
                 if string.find(targetLayers, 'Land') then
                     wep:SetWeaponPriorities(priTable)
@@ -1491,7 +1491,7 @@ Unit = Class(moho.unit_methods) {
             if v.Label == 'DeathWeapon' then
                 if v.FireOnDeath == true then
                     self:SetWeaponEnabledByLabel('DeathWeapon', true)
-                    self.WeaponAccess['DeathWeapon']:Fire()
+                    self.WeaponInstances['DeathWeapon']:Fire()
                 else
                     self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
                 end
@@ -2055,7 +2055,7 @@ Unit = Class(moho.unit_methods) {
 
     SetAllWeaponsEnabled = function(self, enable)
         for i = 1, self.WeaponCount do
-            local wep = self.WeaponAccess[i]
+            local wep = self.WeaponInstances[i]
             wep:SetWeaponEnabled(enable)
             wep:AimManipulatorSetEnabled(enable)
         end
@@ -2063,7 +2063,7 @@ Unit = Class(moho.unit_methods) {
 
     SetWeaponEnabledByLabel = function(self, label, enable)
 
-        local weapon = self.WeaponAccess[label]
+        local weapon = self.WeaponInstances[label]
         if not weapon then 
             return 
         end
@@ -2077,18 +2077,18 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetWeaponManipulatorByLabel = function(self, label)
-        local weapon = self.WeaponAccess[label]
+        local weapon = self.WeaponInstances[label]
         if weapon then 
             return weapon:GetAimManipulator()
         end
     end,
 
     GetWeaponByLabel = function(self, label)
-        return self.WeaponAccess[label]
+        return self.WeaponInstances[label]
     end,
 
     ResetWeaponByLabel = function(self, label)
-        local weapon = self.WeaponAccess[label]
+        local weapon = self.WeaponInstances[label]
         if weapon then 
             weapon:ResetTarget()
         end
@@ -3118,7 +3118,7 @@ Unit = Class(moho.unit_methods) {
 
         if self.Created then 
             for i = 1, self.WeaponCount do
-                self.WeaponAccess[i]:SetValidTargetsForCurrentLayer(new)
+                self.WeaponInstances[i]:SetValidTargetsForCurrentLayer(new)
             end
         else 
             for i = 1, self:GetWeaponCount() do
@@ -3210,7 +3210,7 @@ Unit = Class(moho.unit_methods) {
 
         -- update weapon capabilities
         for k = 1, self.WeaponCount do
-            self.WeaponAccess[k]:OnMotionHorzEventChange(new, old)
+            self.WeaponInstances[k]:OnMotionHorzEventChange(new, old)
         end
     end,
 
@@ -4107,13 +4107,13 @@ Unit = Class(moho.unit_methods) {
 
         -- Reset weapons to ensure torso centres and unit survives drop
         for i = 1, self.WeaponCount do
-            self.WeaponAccess[i]:ResetTarget()
+            self.WeaponInstances[i]:ResetTarget()
         end
     end,
 
     MarkWeaponsOnTransport = function(self, bool)
         for i = 1, self.WeaponCount do
-            self.WeaponAccess[i]:SetOnTransport(bool)
+            self.WeaponInstances[i]:SetOnTransport(bool)
         end
     end,
 
