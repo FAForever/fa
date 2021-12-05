@@ -2088,7 +2088,7 @@ Unit = Class(moho.unit_methods) {
 
     GetWeaponByLabel = function(self, label)
 
-        -- if we're destroyed then we can't return weapons, their c-object are deallocated
+        -- if we're destroyed then we can't return weapons: the c-object is deallocated
         if self.Dead then 
             return nil 
         end
