@@ -165,6 +165,7 @@ Patch 3726 (26th November, 2021)
     better for performance and a lot more smooth with regards
     to the build animation.
  - (#3582) Prevent unneccessary allocations during the Aeon build animation
+ - (#3587, #3589) Optimize most common called unit functions
 
 ### Contributors
  - Askaholic (#3417, #3440)
@@ -174,7 +175,7 @@ Patch 3726 (26th November, 2021)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
-        #3558, #3582, #3581)
+        #3558, #3582, #3581, #3587, #3589)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
@@ -183,7 +184,7 @@ Patch 3726 (26th November, 2021)
  - Marlo (#3582)
 
 ### Reviewers
- - Balthazar (#3484)
+ - Balthazar (#3484, #3587)
  - Relent0r (#3512)
 
 ### Translators
