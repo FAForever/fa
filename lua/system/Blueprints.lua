@@ -676,7 +676,7 @@ function PreModBlueprints(all_bps)
         if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not bp.CategoriesHash.POD then -- excluding Build Drones
+            if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
                 bp.CategoriesHash.OVERLAYMISC = true
             end
         end
@@ -700,7 +700,9 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        -- Create new keys so that unit scripting can more easily reference the most common data needed
+        -- # Add common values for easier lookup
+
+        -- Add tech category
         for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
             if bp.CategoriesHash[category] then
                 bp.TechCategory = category
@@ -708,7 +710,25 @@ function PreModBlueprints(all_bps)
             end
         end
 
+        -- Add layer category
+        for _, category in {'LAND', 'AIR', 'NAVAL'} do
+            if bp.CategoriesHash[category] then
+                bp.LayerCategory = category
+                break
+            end
+        end
+
+        -- Add faction category
+        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
+
+        -- # Adjust weapon blueprints
+        
         for i, w in bp.Weapon or {} do
+
+            -- add in weapon blueprint id
+            w.BlueprintId = bp.BlueprintId .. "-" .. w.Label
+
+            -- add in target priorities
             if w.TargetPriorities then
 
                 local newPriorities = {}
@@ -728,15 +748,6 @@ function PreModBlueprints(all_bps)
                 w.TargetPriorities = newPriorities
             end
         end
-
-        for _, category in {'LAND', 'AIR', 'NAVAL'} do
-            if bp.CategoriesHash[category] then
-                bp.LayerCategory = category
-                break
-            end
-        end
-
-        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
 
         -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
         -- Takes ACU/SCU enhancements into account
