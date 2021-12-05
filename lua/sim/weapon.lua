@@ -36,6 +36,8 @@ local function ParsePriorities()
     return finalPriorities
 end
 
+local WeaponBlueprintCache = { }
+
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit
@@ -45,24 +47,37 @@ Weapon = Class(moho.weapon_methods) {
 
         local bp = self:GetBlueprint()
 
-        -- Store weapon information for performance
-        self.Label = bp.Label
-        self.WeaponUnpackLocksMotion = bp.WeaponUnpackLocksMotion
-        self.FiringRandomnessWhileMoving = bp.FiringRandomnessWhileMoving
-        self.FiringRandomness = bp.FiringRandomness
-        self.bpRateOfFire = bp.RateOfFire
-        self.EnergyRequired = bp.EnergyRequired
-        self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
-        self.WeaponUnpacks = bp.WeaponUnpacks
-
+        -- defensive programming 
         if not self.unit.Trash then
             self.unit.Trash = TrashBag()
         end
+
+        -- Store weapon information for performance
+        self.Label = bp.Label
+        self.Audio = bp.Audio 
+
+        self.bpRateOfFire = bp.RateOfFire
+
+        self.EnergyRequired = bp.EnergyRequired
+        self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
+
+        self.WeaponUnpacks = bp.WeaponUnpacks
+        self.WeaponUnpackLocksMotion = bp.WeaponUnpackLocksMotion
+
+        self.FiringRandomness = bp.FiringRandomness
+        self.FiringRandomnessWhileMoving = bp.FiringRandomnessWhileMoving
+
+        -- store other information
+        self.Trash = self.unit.Trash
+        self.Brain = self.unit.Brain
+        self.Army = self.unit.Army
+
         self:SetValidTargetsForCurrentLayer(self.unit.Layer)
 
         if bp.Turreted == true then
-            self:SetupTurret()
+            self:SetupTurret(bp)
         end
+
         self:SetWeaponPriorities()
         self.DisabledBuffs = {}
         self.DamageMod = 0
@@ -92,14 +107,19 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
-    SetupTurret = function(self)
-        local bp = self:GetBlueprint()
+    SetupTurret = function(self, bp)
+
+        -- defensive programming
+        bp = bp or self:GetBlueprint()
+
+
         local yawBone = bp.TurretBoneYaw
         local pitchBone = bp.TurretBonePitch
         local muzzleBone = bp.TurretBoneMuzzle
         local precedence = bp.AimControlPrecedence or 10
         local pitchBone2
         local muzzleBone2
+
         if bp.TurretBoneDualPitch and bp.TurretBoneDualPitch ~= '' then
             pitchBone2 = bp.TurretBoneDualPitch
         end
@@ -151,29 +171,28 @@ Weapon = Class(moho.weapon_methods) {
             error('*ERROR: Trying to setup a turreted weapon but there are yaw bones, pitch bones or muzzle bones missing from the blueprint.', 2)
         end
 
-
         local numbersexist = true
         local turretyawmin, turretyawmax, turretyawspeed
         local turretpitchmin, turretpitchmax, turretpitchspeed
 
         -- SETUP MANIPULATORS AND SET TURRET YAW, PITCH AND SPEED
         if bp.TurretYaw and bp.TurretYawRange then
-            turretyawmin, turretyawmax = self:GetTurretYawMinMax()
+            turretyawmin, turretyawmax = self:GetTurretYawMinMax(bp)
         else
             numbersexist = false
         end
         if bp.TurretYawSpeed then
-            turretyawspeed = self:GetTurretYawSpeed()
+            turretyawspeed = self:GetTurretYawSpeed(bp)
         else
             numbersexist = false
         end
         if bp.TurretPitch and bp.TurretPitchRange then
-            turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax()
+            turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax(bp)
         else
             numbersexist = false
         end
         if bp.TurretPitchSpeed then
-            turretpitchspeed = self:GetTurretPitchSpeed()
+            turretpitchspeed = self:GetTurretPitchSpeed(bp)
         else
             numbersexist = false
         end
@@ -210,35 +229,60 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
-    SetTurretPitchSpeed = function(self, speed)
-        local turretyawmin, turretyawmax = self:GetTurretYawMinMax()
-        local turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax()
-        local turretpitchspeed = self:GetTurretYawSpeed()
+    SetTurretPitchSpeed = function(self, speed, bp)
+        -- backwards compatibility for mods
+        bp = bp or self:GetBlueprint()
+
+        local turretyawmin, turretyawmax = self:GetTurretYawMinMax(bp)
+        local turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax(bp)
+        local turretpitchspeed = self:GetTurretYawSpeed(bp)
         if self.AimControl then
             self.AimControl:SetFiringArc(turretyawmin, turretyawmax, turretyawspeed, turretpitchmin, turretpitchmax, speed)
         end
     end,
 
-    GetTurretYawMinMax = function(self)
-        local bp = self:GetBlueprint()
+    --- Retrieves the min / max yaw values of the weapon.
+    -- @param self The weapon itself.
+    -- @param bp Optional blueprint value that is manually retrieved if not present.
+    GetTurretYawMinMax = function(self, bp)
+        -- backwards compatibility for mods
+        bp = bp or self:GetBlueprint()
+
         local turretyawmin = bp.TurretYaw - bp.TurretYawRange
         local turretyawmax = bp.TurretYaw + bp.TurretYawRange
         return turretyawmin, turretyawmax
     end,
 
-    GetTurretYawSpeed = function(self)
-        return self:GetBlueprint().TurretYawSpeed
+    --- Retrieves the yaw speed of the weapon.
+    -- @param self The weapon itself.
+    -- @param bp Optional blueprint value that is manually retrieved if not present.
+    GetTurretYawSpeed = function(self, bp)
+        -- backwards compatibility for mods
+        bp = bp or self:GetBlueprint()
+
+        return bp.TurretYawSpeed
     end,
 
-    GetTurretPitchMinMax = function(self)
-        local bp = self:GetBlueprint()
+    --- Retrieves the min / max pitch values of the weapon.
+    -- @param self The weapon itself.
+    -- @param bp Optional blueprint value that is manually retrieved if not present.
+    GetTurretPitchMinMax = function(self, bp)
+        -- backwards compatibility for mods
+        bp = bp or self:GetBlueprint()
+
         local turretpitchmin = bp.TurretPitch - bp.TurretPitchRange
         local turretpitchmax = bp.TurretPitch + bp.TurretPitchRange
         return turretpitchmin, turretpitchmax
     end,
 
-    GetTurretPitchSpeed = function(self)
-        return self:GetBlueprint().TurretPitchSpeed
+    --- Retrieves the pitch speed of the weapon.
+    -- @param self The weapon itself.
+    -- @param bp Optional blueprint value that is manually retrieved if not present.
+    GetTurretPitchSpeed = function(self, bp)
+        -- backwards compatibility for mods
+        bp = bp or self:GetBlueprint()
+
+        return bp.TurretPitchSpeed
     end,
 
     OnFire = function(self)
@@ -286,14 +330,12 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     PlayWeaponSound = function(self, sound)
-        local bp = self:GetBlueprint()
-        if not bp.Audio[sound] then return end
-        self:PlaySound(bp.Audio[sound])
+        if not self.Audio[sound] then return end
+        self:PlaySound(self.Audio[sound])
     end,
 
     PlayWeaponAmbientSound = function(self, sound)
-        local bp = self:GetBlueprint()
-        if not bp.Audio[sound] then return end
+        if not self.Audio[sound] then return end
         if not self.AmbientSounds then
             self.AmbientSounds = {}
         end
@@ -303,14 +345,13 @@ Weapon = Class(moho.weapon_methods) {
             self.unit.Trash:Add(sndEnt)
             sndEnt:AttachTo(self.unit,-1)
         end
-        self.AmbientSounds[sound]:SetAmbientSound(bp.Audio[sound], nil)
+        self.AmbientSounds[sound]:SetAmbientSound(self.Audio[sound], nil)
     end,
 
     StopWeaponAmbientSound = function(self, sound)
         if not self.AmbientSounds then return end
         if not self.AmbientSounds[sound] then return end
-        local bp = self:GetBlueprint()
-        if not bp.Audio[sound] then return end
+        if not self.Audio[sound] then return end
         self.AmbientSounds[sound]:Destroy()
         self.AmbientSounds[sound] = nil
     end,
@@ -434,8 +475,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     WeaponUsesEnergy = function(self)
-        local bp = self:GetBlueprint()
-        if bp.EnergyRequired and bp.EnergyRequired > 0 then
+        if self.EnergyRequired and self.EnergyRequired > 0 then
             return true
         end
         return false

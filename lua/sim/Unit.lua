@@ -2066,7 +2066,7 @@ Unit = Class(moho.unit_methods) {
 
     SetWeaponEnabledByLabel = function(self, label, enable)
 
-        local weapon = self.WeaponInstances[label]
+        local weapon = self:GetWeaponByLabel(label)
         if not weapon then 
             return 
         end
@@ -2080,18 +2080,25 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetWeaponManipulatorByLabel = function(self, label)
-        local weapon = self.WeaponInstances[label]
+        local weapon = self:GetWeaponByLabel(label)
         if weapon then 
             return weapon:GetAimManipulator()
         end
     end,
 
     GetWeaponByLabel = function(self, label)
+
+        -- if we're destroyed then we can't return weapons: the c-object is deallocated
+        if self.Dead then 
+            return nil 
+        end
+
+        -- return the instanced weapon
         return self.WeaponInstances[label]
     end,
 
     ResetWeaponByLabel = function(self, label)
-        local weapon = self.WeaponInstances[label]
+        local weapon = self:GetWeaponByLabel(label)
         if weapon then 
             weapon:ResetTarget()
         end

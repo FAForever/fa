@@ -641,31 +641,33 @@ function ExtractCloakMeshBlueprint(bp)
     MeshBlueprint(cloakmeshbp)
 end
 
--- Mod unit blueprints before allowing mods to modify it as well, to pass the most correct unit blueprint to mods
+--- Adapts all unit blueprints before they're passed onto mods.
+-- @param all_bps All the blueprints of the game.
 function PreModBlueprints(all_bps)
-
-    -- Brute51: Modified code for ship wrecks and added code for SCU presets.
-    -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
     for _, bp in all_bps.Unit do
 
         ExtractCloakMeshBlueprint(bp)
 
-        -- skip units without categories
+        -- # Units with no categories are skipped
+
         if not bp.Categories then
             continue
         end
 
-        -- saving Categories as a hash table for later usage by sim/ui functions
+        -- # Construct hash-based categories
+
         bp.CategoriesHash = table.hash(bp.Categories)
 
-        -- adding or deleting categories on the fly
+        -- # Allow to add or delete categories for mods
+
         if bp.DelCategories then
             for k, v in bp.DelCategories do
                 bp.CategoriesHash[v] = false
             end
             bp.DelCategories = nil
         end
+
         if bp.AddCategories then
             for k, v in bp.AddCategories do
                 bp.CategoriesHash[v] = true
@@ -673,17 +675,74 @@ function PreModBlueprints(all_bps)
             bp.AddCategories = nil
         end
 
+        -- # Build range overlay
+
         if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
             bp.AI.StagingPlatformScanRadius = (bp.Economy.MaxBuildDistance or 5) + 2
-            if not bp.CategoriesHash.POD then -- excluding Build Drones
+            if not (bp.CategoriesHash.POD or bp.CategoriesHash.INSIGNIFICANTUNIT) then -- excluding Build Drones
                 bp.CategoriesHash.OVERLAYMISC = true
             end
         end
 
+        -- # Add common category values for easier lookup
+
+        -- Add tech category
+        for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
+            if bp.CategoriesHash[category] then
+                bp.TechCategory = category
+                break
+            end
+        end
+
+        -- Add layer category
+        for _, category in {'LAND', 'AIR', 'NAVAL'} do
+            if bp.CategoriesHash[category] then
+                bp.LayerCategory = category
+                break
+            end
+        end
+
+        -- Add faction category
+        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
+
+        -- # Adjust weapon blueprints
+        
+        for i, w in bp.Weapon or {} do
+
+            -- add in weapon blueprint id
+            local label = w.Label or "Unlabelled"
+            w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
+
+            -- add in adjusted target priorities
+            if w.TargetPriorities then
+
+                local priorities = {}
+                local prioritiesHead = 1
+                
+                for g, transcendentPritority in w.TranscendentPriorities or {} do
+                    priorities[prioritiesHead] = transcendentPritority
+                    prioritiesHead = prioritiesHead + 1
+                end
+
+                priorities[prioritiesHead] = 'SPECIALHIGHPRI'
+                prioritiesHead = prioritiesHead + 1
+
+                for _, priority in w.TargetPriorities do
+                    priorities[prioritiesHead] = priority
+                    prioritiesHead = prioritiesHead + 1
+                end
+
+                priorities[prioritiesHead] = 'SPECIALLOWPRI'
+                prioritiesHead = prioritiesHead + 1
+
+                w.TargetPriorities = priorities
+            end
+        end
+
+        -- # Hotfix for naval wrecks
+
         if bp.CategoriesHash.NAVAL and not bp.Wreckage then
-            -- Add naval wreckage
-            --LOG("Adding wreckage information to ", bp.Description)
             bp.Wreckage = {
                 Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
                 EnergyMult = 0,
@@ -700,43 +759,7 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        -- Create new keys so that unit scripting can more easily reference the most common data needed
-        for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
-            if bp.CategoriesHash[category] then
-                bp.TechCategory = category
-                break
-            end
-        end
-
-        for i, w in bp.Weapon or {} do
-            if w.TargetPriorities then
-
-                local newPriorities = {}
-
-                for g, transcendentPritority in w.TranscendentPriorities or {} do
-                    table.insert(newPriorities, transcendentPritority)
-                end
-
-                table.insert(newPriorities, 'SPECIALHIGHPRI')
-
-                for _, priority in w.TargetPriorities do
-                    table.insert(newPriorities, priority)
-                end
-
-                table.insert(newPriorities, 'SPECIALLOWPRI')
-
-                w.TargetPriorities = newPriorities
-            end
-        end
-
-        for _, category in {'LAND', 'AIR', 'NAVAL'} do
-            if bp.CategoriesHash[category] then
-                bp.LayerCategory = category
-                break
-            end
-        end
-
-        bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
+        -- # Hotfix for Guard Scan Radius value
 
         -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
         -- Takes ACU/SCU enhancements into account
@@ -789,7 +812,9 @@ function PreModBlueprints(all_bps)
                 end
             end
         end
-        -- synchronizing bp.Categories with bp.CategoriesHash for compatibility
+
+        -- # Synchronize hashed categories with actual categories
+
         bp.Categories = table.unhash(bp.CategoriesHash)
 
         BlueprintLoaderUpdateProgress()
