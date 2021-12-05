@@ -641,37 +641,41 @@ function ExtractCloakMeshBlueprint(bp)
     MeshBlueprint(cloakmeshbp)
 end
 
--- Mod unit blueprints before allowing mods to modify it as well, to pass the most correct unit blueprint to mods
+--- Adapts all unit blueprints before they're passed onto mods.
+-- @param all_bps All the blueprints of the game.
 function PreModBlueprints(all_bps)
-
-    -- Brute51: Modified code for ship wrecks and added code for SCU presets.
-    -- removed the pairs() function call in the for loops for better efficiency and because it is not necessary.
 
     for _, bp in all_bps.Unit do
 
         ExtractCloakMeshBlueprint(bp)
 
-        -- skip units without categories
+        -- # Units with no categories are skipped
+
         if not bp.Categories then
             continue
         end
 
-        -- saving Categories as a hash table for later usage by sim/ui functions
+        -- # Construct hash-based categories
+
         bp.CategoriesHash = table.hash(bp.Categories)
 
-        -- adding or deleting categories on the fly
+        -- # Allow to add or delete categories for mods
+
         if bp.DelCategories then
             for k, v in bp.DelCategories do
                 bp.CategoriesHash[v] = false
             end
             bp.DelCategories = nil
         end
+
         if bp.AddCategories then
             for k, v in bp.AddCategories do
                 bp.CategoriesHash[v] = true
             end
             bp.AddCategories = nil
         end
+
+        -- # Build range overlay
 
         if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
@@ -681,26 +685,7 @@ function PreModBlueprints(all_bps)
             end
         end
 
-        if bp.CategoriesHash.NAVAL and not bp.Wreckage then
-            -- Add naval wreckage
-            --LOG("Adding wreckage information to ", bp.Description)
-            bp.Wreckage = {
-                Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
-                EnergyMult = 0,
-                HealthMult = 0.9,
-                MassMult = 0.9,
-                ReclaimTimeMultiplier = 1,
-                WreckageLayers = {
-                    Air = false,
-                    Land = false,
-                    Seabed = true,
-                    Sub = true,
-                    Water = true,
-                },
-            }
-        end
-
-        -- # Add common values for easier lookup
+        -- # Add common category values for easier lookup
 
         -- Add tech category
         for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
@@ -726,28 +711,55 @@ function PreModBlueprints(all_bps)
         for i, w in bp.Weapon or {} do
 
             -- add in weapon blueprint id
-            w.BlueprintId = bp.BlueprintId .. "-" .. w.Label
+            local label = w.Label or "Unlabelled"
+            w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
 
-            -- add in target priorities
+            -- add in adjusted target priorities
             if w.TargetPriorities then
 
-                local newPriorities = {}
-
+                local priorities = {}
+                local prioritiesHead = 1
+                
                 for g, transcendentPritority in w.TranscendentPriorities or {} do
-                    table.insert(newPriorities, transcendentPritority)
+                    priorities[prioritiesHead] = transcendentPritority
+                    prioritiesHead = prioritiesHead + 1
                 end
 
-                table.insert(newPriorities, 'SPECIALHIGHPRI')
+                priorities[prioritiesHead] = 'SPECIALHIGHPRI'
+                prioritiesHead = prioritiesHead + 1
 
                 for _, priority in w.TargetPriorities do
-                    table.insert(newPriorities, priority)
+                    priorities[prioritiesHead] = priority
+                    prioritiesHead = prioritiesHead + 1
                 end
 
-                table.insert(newPriorities, 'SPECIALLOWPRI')
+                priorities[prioritiesHead] = 'SPECIALLOWPRI'
+                prioritiesHead = prioritiesHead + 1
 
-                w.TargetPriorities = newPriorities
+                w.TargetPriorities = priorities
             end
         end
+
+        -- # Hotfix for naval wrecks
+
+        if bp.CategoriesHash.NAVAL and not bp.Wreckage then
+            bp.Wreckage = {
+                Blueprint = '/props/DefaultWreckage/DefaultWreckage_prop.bp',
+                EnergyMult = 0,
+                HealthMult = 0.9,
+                MassMult = 0.9,
+                ReclaimTimeMultiplier = 1,
+                WreckageLayers = {
+                    Air = false,
+                    Land = false,
+                    Seabed = true,
+                    Sub = true,
+                    Water = true,
+                },
+            }
+        end
+
+        -- # Hotfix for Guard Scan Radius value
 
         -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
         -- Takes ACU/SCU enhancements into account
@@ -800,7 +812,9 @@ function PreModBlueprints(all_bps)
                 end
             end
         end
-        -- synchronizing bp.Categories with bp.CategoriesHash for compatibility
+
+        -- # Synchronize hashed categories with actual categories
+
         bp.Categories = table.unhash(bp.CategoriesHash)
 
         BlueprintLoaderUpdateProgress()
