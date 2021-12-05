@@ -1623,6 +1623,14 @@ WalkingLandUnit = Class(MobileUnit) {
     DeathAnim = false,
     DisabledBones = {},
 
+    OnCreate = function(self, spec)
+        MobileUnit.OnCreate(self, spec)
+
+        local blueprint = self:GetBlueprint()
+        self.AnimationWalk = blueprint.Display.AnimationWalk
+        self.AnimationWalkRate = blueprint.Display.AnimationWalkRate
+    end,
+
     OnMotionHorzEventChange = function(self, new, old)
         MobileUnit.OnMotionHorzEventChange(self, new, old)
 
@@ -1631,10 +1639,9 @@ WalkingLandUnit = Class(MobileUnit) {
                 self.Animator = CreateAnimator(self, true)
             end
 
-            local bpDisplay = self:GetBlueprint().Display
-            if bpDisplay.AnimationWalk then
-                self.Animator:PlayAnim(bpDisplay.AnimationWalk, true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate or 1)
+            if self.AnimationWalk then
+                self.Animator:PlayAnim(self.AnimationWalk, true)
+                self.Animator:SetRate(self.AnimationWalkRate or 1)
             end
         elseif new == 'Stopped' then
             -- Only keep the animator around if we are dying and playing a death anim

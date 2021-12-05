@@ -42,11 +42,24 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnCreate = function(self)
+
+        local bp = self:GetBlueprint()
+
+        -- Store weapon information for performance
+        self.Label = bp.Label
+        self.WeaponUnpackLocksMotion = bp.WeaponUnpackLocksMotion
+        self.FiringRandomnessWhileMoving = bp.FiringRandomnessWhileMoving
+        self.FiringRandomness = bp.FiringRandomness
+        self.bpRateOfFire = bp.RateOfFire
+        self.EnergyRequired = bp.EnergyRequired
+        self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
+        self.WeaponUnpacks = bp.WeaponUnpacks
+
         if not self.unit.Trash then
             self.unit.Trash = TrashBag()
         end
         self:SetValidTargetsForCurrentLayer(self.unit.Layer)
-        local bp = self:GetBlueprint()
+
         if bp.Turreted == true then
             self:SetupTurret()
         end

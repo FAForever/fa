@@ -107,7 +107,6 @@ DEA0202 = Class(TAirUnit) {
         local airTargetRight
         local airTargetLeft
         while self and not self.Dead do
-            WaitSeconds(1)
             local airTargetWeapon = self:GetWeaponByLabel('RightBeam')
             if airTargetWeapon then     
                 airTargetRight = airTargetWeapon:GetCurrentTarget()
@@ -124,6 +123,8 @@ DEA0202 = Class(TAirUnit) {
             else
                 self:RotateWings(nil)
             end
+            
+            WaitSeconds(1)
         end
     end,
 }

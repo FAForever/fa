@@ -24,16 +24,9 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Called when the weapon is created, almost always when the owning unit is created
     OnCreate = function(self)
-
         Weapon.OnCreate(self)
 
         local bp = self:GetBlueprint()
-
-        -- Save things that are often reused
-        self.bpRateOfFire = bp.RateOfFire
-        self.EnergyRequired = bp.EnergyRequired
-        self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
-        self.WeaponUnpacks = bp.WeaponUnpacks
 
         self.WeaponCanFire = true
         if bp.RackRecoilDistance ~= 0 then
@@ -146,18 +139,17 @@ DefaultProjectileWeapon = Class(Weapon) {
         Weapon.OnMotionHorzEventChange(self, new, old)
 
         -- Handle weapons which must pack before moving
-        local bp = self:GetBlueprint()
-        if bp.WeaponUnpackLocksMotion == true and old == 'Stopped' then
+        if self.WeaponUnpackLocksMotion == true and old == 'Stopped' then
             self:PackAndMove()
         end
 
         -- Handle motion-triggered FiringRandomness changes
         if old == 'Stopped' then
-            if bp.FiringRandomnessWhileMoving then
-                self:SetFiringRandomness(bp.FiringRandomnessWhileMoving)
+            if self.FiringRandomnessWhileMoving then
+                self:SetFiringRandomness(self.FiringRandomnessWhileMoving)
             end
-        elseif new == 'Stopped' and bp.FiringRandomnessWhileMoving then
-            self:SetFiringRandomness(bp.FiringRandomness)
+        elseif new == 'Stopped' and self.FiringRandomnessWhileMoving then
+            self:SetFiringRandomness(self.FiringRandomness)
         end
     end,
 
