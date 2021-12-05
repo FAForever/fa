@@ -3105,7 +3105,7 @@ Unit = Class(moho.unit_methods) {
     OnLayerChange = function(self, new, old)
 
         -- this function is called _before_ OnCreate is called. 
-        -- You can identify this original call by checking whether 'old' is set.
+        -- You can identify this original call by checking whether 'old' is set to 'None'.
 
         -- This function is called when:
         -- - A unit changes layer (heh)
@@ -3121,8 +3121,8 @@ Unit = Class(moho.unit_methods) {
         if self.Dead then return end
 
         -- set valid targets for weapons
-        -- if old is not defined then OnCreate hasn't been called yet - do it the old way.
-        if old then 
+        -- if old is defined as 'None' then OnCreate hasn't been called yet - do it the old way.
+        if old ~= 'None' then 
             for i = 1, self.WeaponCount do
                 self.WeaponInstances[i]:SetValidTargetsForCurrentLayer(new)
             end
