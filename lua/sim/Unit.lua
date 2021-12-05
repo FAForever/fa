@@ -240,6 +240,9 @@ Unit = Class(moho.unit_methods) {
             self.WeaponInstances[k] = weapon
         end
 
+        -- Store animations for performance
+        self.AnimationWater = bp.Display.AnimationWater
+
         -- Store common accessed information for performance
         self.Audio = bp.Audio
         self.UnitId = self:GetUnitId()
@@ -3101,7 +3104,8 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     OnLayerChange = function(self, new, old)
 
-        -- this function is called _before_ OnCreate is called --
+        -- this function is called _before_ OnCreate is called. 
+        -- You can identify this original call by checking whether 'old' is set.
 
         -- This function is called when:
         -- - A unit changes layer (heh)
@@ -3116,7 +3120,9 @@ Unit = Class(moho.unit_methods) {
         -- for example, will throw an error.
         if self.Dead then return end
 
-        if self.Created then 
+        -- set valid targets for weapons
+        -- if old is not defined then OnCreate hasn't been called yet - do it the old way.
+        if old then 
             for i = 1, self.WeaponCount do
                 self.WeaponInstances[i]:SetValidTargetsForCurrentLayer(new)
             end
