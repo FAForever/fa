@@ -3663,7 +3663,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetWeaponClass = function(self, label)
-        return self.WeaponAccess[label] or import('/lua/sim/Weapon.lua').Weapon
+        return self.Weapons[label] or import('/lua/sim/Weapon.lua').Weapon
     end,
 
     -- Return the total time in seconds, cost in energy, and cost in mass to build the given target type.
