@@ -58,10 +58,10 @@ Weapon = Class(moho.weapon_methods) {
         self.EnergyRequired = bp.EnergyRequired
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
-        -- cache information of unit
+        -- cache information of unit, weapons get created before unit.OnCreate is called
         self.Trash = self.unit.Trash
-        self.Brain = self.unit.Brain
-        self.Army = self.unit.Army
+        self.Brain = self.unit:GetAIBrain()
+        self.Army = self.unit:GetArmy()
 
         self:SetValidTargetsForCurrentLayer(self.unit.Layer)
 
