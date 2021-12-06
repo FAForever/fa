@@ -209,14 +209,14 @@ DefaultProjectileWeapon = Class(Weapon) {
     -- Played when a muzzle is fired. Mostly used for muzzle flashes
     PlayFxMuzzleSequence = function(self, muzzle)
         for k, v in self.FxMuzzleFlash do
-            CreateAttachedEmitter(self.unit, muzzle, self.unit.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
+            CreateAttachedEmitter(self.unit, muzzle, self.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
         end
     end,
 
     -- Played during the beginning of the MuzzleChargeDelay time when a muzzle in a rack is fired.
     PlayFxMuzzleChargeSequence = function(self, muzzle)
         for k, v in self.FxChargeMuzzleFlash do
-            CreateAttachedEmitter(self.unit, muzzle, self.unit.Army, v):ScaleEmitter(self.FxChargeMuzzleFlashScale)
+            CreateAttachedEmitter(self.unit, muzzle, self.Army, v):ScaleEmitter(self.FxChargeMuzzleFlashScale)
         end
     end,
 
@@ -226,7 +226,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         local bp = self.Blueprint
         for k, v in self.FxRackChargeMuzzleFlash do
             for ek, ev in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
-                CreateAttachedEmitter(self.unit, ev, self.unit.Army, v):ScaleEmitter(self.FxRackChargeMuzzleFlashScale)
+                CreateAttachedEmitter(self.unit, ev, self.Army, v):ScaleEmitter(self.FxRackChargeMuzzleFlashScale)
             end
         end
         if bp.Audio.ChargeStart then
@@ -677,7 +677,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                             self.unit:NukeCreatedAtUnit()
 
                             -- Generate UI notification for automatic nuke ping
-                            local launchData = { army = self.unit.Army-1, location = self:GetCurrentTargetPos()}
+                            local launchData = { army = self.Army-1, location = self:GetCurrentTargetPos()}
                             if not Sync.NukeLaunchData then Sync.NukeLaunchData = {} end
                             table.insert(Sync.NukeLaunchData, launchData)
                             self.unit:RemoveNukeSiloAmmo(1)

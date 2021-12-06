@@ -403,8 +403,8 @@ Weapon = Class(moho.weapon_methods) {
 
                 -- Need to store these three for later, in case the missile lands after the launcher dies
                 proj.Launcher = self.unit
-                proj.Army = self.unit.Army
-                proj.Brain = self.unit:GetAIBrain()
+                proj.Army = self.Army
+                proj.Brain = self.Brain
             end
         end
         return proj
