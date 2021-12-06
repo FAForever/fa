@@ -245,6 +245,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Store common accessed information for performance
         self.Audio = bp.Audio
+        self.Brain = self:GetAIBrain()
         self.UnitId = self:GetUnitId()
         self.techCategory = bp.TechCategory
         self.layerCategory = bp.LayerCategory
