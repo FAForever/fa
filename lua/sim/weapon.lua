@@ -43,7 +43,7 @@ Weapon = Class(moho.weapon_methods) {
 
     OnCreate = function(self)
 
-        -- defensive programming 
+        -- make sure unit has a trashbag
         if not self.unit.Trash then
             self.unit.Trash = TrashBag()
         end
@@ -58,7 +58,7 @@ Weapon = Class(moho.weapon_methods) {
         self.EnergyRequired = bp.EnergyRequired
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
-        -- store other information
+        -- cache information of unit
         self.Trash = self.unit.Trash
         self.Brain = self.unit.Brain
         self.Army = self.unit.Army
@@ -138,22 +138,22 @@ Weapon = Class(moho.weapon_methods) {
                     self.AimControl:SetResetPoseTime(9999999)
                 end
                 self:SetFireControl('Right')
-                self.unit.Trash:Add(self.AimControl)
-                self.unit.Trash:Add(self.AimRight)
-                self.unit.Trash:Add(self.AimLeft)
+                self.Trash:Add(self.AimControl)
+                self.Trash:Add(self.AimRight)
+                self.Trash:Add(self.AimLeft)
             else
                 self.AimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
                 if EntityCategoryContains(categories.STRUCTURE, self.unit) then
                     self.AimControl:SetResetPoseTime(9999999)
                 end
-                self.unit.Trash:Add(self.AimControl)
+                self.Trash:Add(self.AimControl)
                 self.AimControl:SetPrecedence(precedence)
                 if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
                     for k, v in bp.RackBones do
                         if v.RackBone ~= pitchBone then
                             local slaver = CreateSlaver(self.unit, v.RackBone, pitchBone)
                             slaver:SetPrecedence(precedence-1)
-                            self.unit.Trash:Add(slaver)
+                            self.Trash:Add(slaver)
                         end
                     end
                 end
@@ -333,7 +333,7 @@ Weapon = Class(moho.weapon_methods) {
         if not self.AmbientSounds[sound] then
             local sndEnt = Entity {}
             self.AmbientSounds[sound] = sndEnt
-            self.unit.Trash:Add(sndEnt)
+            self.Trash:Add(sndEnt)
             sndEnt:AttachTo(self.unit,-1)
         end
         self.AmbientSounds[sound]:SetAmbientSound(self.Audio[sound], nil)
@@ -475,7 +475,7 @@ Weapon = Class(moho.weapon_methods) {
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
-            self.unit.Trash:Add(thread)
+            self.Trash:Add(thread)
             return thread
         else
             return nil

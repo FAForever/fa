@@ -285,7 +285,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.UnpackAnimator = CreateAnimator(self.unit)
             self.UnpackAnimator:PlayAnim(bp.WeaponUnpackAnimation):SetRate(0)
             self.UnpackAnimator:SetPrecedence(bp.WeaponUnpackAnimatorPrecedence or 0)
-            self.unit.Trash:Add(self.UnpackAnimator)
+            self.Trash:Add(self.UnpackAnimator)
         end
         if self.UnpackAnimator then
             self.UnpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
@@ -318,14 +318,14 @@ DefaultProjectileWeapon = Class(Weapon) {
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, bp.RackRecoilDistance)
             tmpSldr:SetSpeed(-1)
-            self.unit.Trash:Add(tmpSldr)
+            self.Trash:Add(tmpSldr)
             if v.TelescopeBone then
                 tmpSldr = CreateSlider(self.unit, v.TelescopeBone)
                 table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, v.TelescopeRecoilDistance or bp.RackRecoilDistance)
                 tmpSldr:SetSpeed(-1)
-                self.unit.Trash:Add(tmpSldr)
+                self.Trash:Add(tmpSldr)
             end
         end
         self:ForkThread(self.PlayRackRecoilReturn, rackList)
@@ -1094,7 +1094,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                 }
                 local beamTable = {Beam = beam, Muzzle = mv, Destroyables = {}}
                 table.insert(self.Beams, beamTable)
-                self.unit.Trash:Add(beam)
+                self.Trash:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
             end
@@ -1142,7 +1142,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
         if beam:IsEnabled() then return end
         beam:Enable()
-        self.unit.Trash:Add(beam)
+        self.Trash:Add(beam)
 
         -- Deal with continuous and non-continuous beams
         if bp.BeamLifetime > 0 then
