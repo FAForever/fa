@@ -897,7 +897,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     EnergyRequired = nil,
 
     HasEnergy = function(self)
-        return self.unit:GetAIBrain():GetEconomyStored('ENERGY') >= self.EnergyRequired
+        return self.Brain:GetEconomyStored('ENERGY') >= self.EnergyRequired
     end,
 
     -- Can we use the OC weapon?
@@ -1272,7 +1272,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     },
 
     EconomySupportsBeam = function(self)
-        local aiBrain = self.unit:GetAIBrain()
+        local aiBrain = self.Brain
         local energyIncome = aiBrain:GetEconomyIncome('ENERGY') * 10
         local energyStored = aiBrain:GetEconomyStored('ENERGY')
         local nrgReq = self:GetWeaponEnergyRequired()
