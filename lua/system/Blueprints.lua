@@ -397,10 +397,12 @@ function ExtractBuildMeshBlueprint(bp)
     local FactionName = bp.General.FactionName
     local isSubCommander = false 
 
-    for k, v in bp.Categories do 
-        if v == 'SUBCOMMANDER' then 
-            isSubCommander = true 
-            break 
+    if bp.Categories then 
+        for k, v in bp.Categories do 
+            if v == 'SUBCOMMANDER' then 
+                isSubCommander = true 
+                break 
+            end
         end
     end
 
