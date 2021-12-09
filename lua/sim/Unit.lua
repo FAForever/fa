@@ -1969,6 +1969,10 @@ Unit = Class(moho.unit_methods) {
         for _, v in self.TransportBeamEffectsBag or {} do
             v:Destroy()
         end
+
+        for k = 1, self.WeaponCount do 
+            self.WeaponInstances[k].Trash:Destroy();
+        end
     end,
 
     OnDestroy = function(self)

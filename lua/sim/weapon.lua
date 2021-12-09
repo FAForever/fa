@@ -36,6 +36,29 @@ local function ParsePriorities()
     return finalPriorities
 end
 
+--- A collection of functions that are most often called. Is not in any specific order.
+-- These functions should be cached during OnCreate to improve the access pattern. See also
+-- the benchmark about metatables.
+local FunctionsToCache = { 
+    "GetDamageTable"
+
+  , "OnStartTracking"
+  , "OnStopTracking"
+  , "OnGotTarget"
+  , "OnLostTarget"
+
+  , "PlayWeaponSound"
+  , "PlayWeaponAmbientSound"
+  , "StopWeaponAmbientSound"
+
+  , "ForkThread"
+
+  , "OnMotionHorzEventChange"
+
+  , "DoOnFireBuffs"
+  , "CreateProjectileForWeapon"
+}
+
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit
@@ -43,12 +66,12 @@ Weapon = Class(moho.weapon_methods) {
 
     OnCreate = function(self)
 
-        -- make sure unit has a trashbag
-        if not self.unit.Trash then
-            self.unit.Trash = TrashBag()
+        -- Cache access patterns, see benchmark on metatables
+        for k, identifier in FunctionsToCache do 
+            self[identifier] = self[identifier]
         end
 
-        -- Store blueprint as a whole for performance
+        -- Store blueprint for improved access pattern, see benchmark on blueprints
         self.Blueprint = self:GetBlueprint()
         local bp = self.Blueprint
 
@@ -59,7 +82,7 @@ Weapon = Class(moho.weapon_methods) {
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
         -- cache information of unit, weapons get created before unit.OnCreate is called
-        self.Trash = self.unit.Trash
+        self.Trash = TrashBag();
         self.Brain = self.unit:GetAIBrain()
         self.Army = self.unit:GetArmy()
 
