@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: UI for the multifunction display
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -107,7 +107,7 @@ function CreateMinimap(parent)
         borderColor = 'ff415055',
     }
     local defPosition = {Left = 10, Top = 157, Bottom = 367, Right = 237}
-    controls.displayGroup = Window(GetFrame(0), nil, nil, false, false, false, false, 'mini_ui_minimap',
+    controls.displayGroup = Window(GetFrame(0), nil, nil, true, false, false, false, 'mini_ui_minimap',
         defPosition, windowTextures)
     controls.displayGroup.Depth:Set(4)
     controls.displayGroup.window_m:SetRenderPass(UIUtil.UIRP_UnderWorld)
@@ -130,13 +130,18 @@ function CreateMinimap(parent)
         end
         frameCount = frameCount + 1
     end
+    controls.displayGroup.OnPinCheck = function(control, checked)
+        control:SetSizeLock(checked)
+        control:SetPositionLock(checked)
+        -- add save pin in prefs
+    end
 
     controls.displayGroup.resetBtn = Button(controls.displayGroup.TitleGroup,
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_down.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_over.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
-    LayoutHelpers.LeftOf(controls.displayGroup.resetBtn, controls.displayGroup._closeBtn)
+    LayoutHelpers.LeftOf(controls.displayGroup.resetBtn, controls.displayGroup._pinBtn )
     controls.displayGroup.resetBtn.OnClick = function(modifiers)
         for index, val in defPosition do
             local i = index
