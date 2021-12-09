@@ -1769,6 +1769,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartSinking = function(self, callback)
+
+        -- add flag to identify a unit died but is sinking before it is destroyed
+        self.Sinking = true 
+
         local bp = self:GetBlueprint()
         local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
         local bone = 0
@@ -2089,9 +2093,9 @@ Unit = Class(moho.unit_methods) {
 
     GetWeaponByLabel = function(self, label)
 
-        -- if we're destroyed then we can't return weapons: the c-object is deallocated
-        if self.BeenDestroyed(self) then 
-            return nil 
+        -- if we're sinking then all death weapons should already have been applied
+        if self.Sinking or self.BeenDestroyed(self) then 
+            return nil
         end
 
         -- return the instanced weapon
