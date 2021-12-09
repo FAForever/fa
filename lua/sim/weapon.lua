@@ -39,25 +39,25 @@ end
 --- A collection of functions that are most often called. Is not in any specific order.
 -- These functions should be cached during OnCreate to improve the access pattern. See also
 -- the benchmark about metatables.
-local FunctionsToCache = { 
-    "GetDamageTable"
+-- local FunctionsToCache = { 
+--     "GetDamageTable"
 
-  , "OnStartTracking"
-  , "OnStopTracking"
-  , "OnGotTarget"
-  , "OnLostTarget"
+--   , "OnStartTracking"
+--   , "OnStopTracking"
+--   , "OnGotTarget"
+--   , "OnLostTarget"
 
-  , "PlayWeaponSound"
-  , "PlayWeaponAmbientSound"
-  , "StopWeaponAmbientSound"
+--   , "PlayWeaponSound"
+--   , "PlayWeaponAmbientSound"
+--   , "StopWeaponAmbientSound"
 
-  , "ForkThread"
+--   , "ForkThread"
 
-  , "OnMotionHorzEventChange"
+--   , "OnMotionHorzEventChange"
 
-  , "DoOnFireBuffs"
-  , "CreateProjectileForWeapon"
-}
+--   , "DoOnFireBuffs"
+--   , "CreateProjectileForWeapon"
+-- }
 
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
@@ -66,10 +66,10 @@ Weapon = Class(moho.weapon_methods) {
 
     OnCreate = function(self)
 
-        -- Cache access patterns, see benchmark on metatables
-        for k, identifier in FunctionsToCache do 
-            self[identifier] = self[identifier]
-        end
+        -- -- Cache access patterns, see benchmark on metatables
+        -- for k, identifier in FunctionsToCache do 
+        --     self[identifier] = self[identifier]
+        -- end
 
         -- Store blueprint for improved access pattern, see benchmark on blueprints
         self.Blueprint = self:GetBlueprint()
