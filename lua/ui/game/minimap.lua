@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: UI for the multifunction display
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright  2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -135,6 +135,7 @@ function CreateMinimap(parent)
         control:SetPositionLock(checked)
         -- add save pin in prefs
     end
+    Tooltip.AddButtonTooltip(controls.displayGroup._pinBtn, 'minimap_pin')
 
     controls.displayGroup.resetBtn = Button(controls.displayGroup.TitleGroup,
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
