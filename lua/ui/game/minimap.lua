@@ -123,10 +123,10 @@ function CreateMinimap(parent)
     local frameCount = 0
     controls.miniMap.OnFrame = function(self, elapsedTime)
         if frameCount == 1 then
-            controls.miniMap:EnableResourceRendering(minimap_resources)
-            controls.miniMap:CameraReset()
-            GetCamera(controls.miniMap._cameraName):SetMaxZoomMult(1.0)
-            controls.miniMap.OnFrame = nil  -- we want the control to continue to get frame updates in the engine, but not in Lua. PLEASE DON'T CHANGE THIS OR IT BREAKS CAMERA DRAGGING
+            self:EnableResourceRendering(minimap_resources)
+            self:CameraReset()
+            GetCamera(self._cameraName):SetMaxZoomMult(1.0)
+            self.OnFrame = nil  -- we want the control to continue to get frame updates in the engine, but not in Lua. PLEASE DON'T CHANGE THIS OR IT BREAKS CAMERA DRAGGING
         end
         frameCount = frameCount + 1
     end
@@ -143,7 +143,7 @@ function CreateMinimap(parent)
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_over.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
     LayoutHelpers.LeftOf(controls.displayGroup.resetBtn, controls.displayGroup._pinBtn )
-    controls.displayGroup.resetBtn.OnClick = function(modifiers)
+    controls.displayGroup.resetBtn.OnClick = function(self, modifiers)
         for index, val in defPosition do
             local i = index
             local v = val
@@ -184,7 +184,7 @@ function CreateMinimap(parent)
 end
 
 function ToggleMinimap()
-    # disable when in Screen Capture mode
+    --# disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end
