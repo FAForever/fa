@@ -36,7 +36,28 @@ local function ParsePriorities()
     return finalPriorities
 end
 
-local WeaponBlueprintCache = { }
+--- A collection of functions that are most often called. Is not in any specific order.
+-- These functions should be cached during OnCreate to improve the access pattern. See also
+-- the benchmark about metatables.
+local FunctionsToCache = { 
+    "GetDamageTable"
+
+  , "OnStartTracking"
+  , "OnStopTracking"
+  , "OnGotTarget"
+  , "OnLostTarget"
+
+  , "PlayWeaponSound"
+  , "PlayWeaponAmbientSound"
+  , "StopWeaponAmbientSound"
+
+  , "ForkThread"
+
+  , "OnMotionHorzEventChange"
+
+  , "DoOnFireBuffs"
+  , "CreateProjectileForWeapon"
+}
 
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
@@ -45,32 +66,25 @@ Weapon = Class(moho.weapon_methods) {
 
     OnCreate = function(self)
 
-        local bp = self:GetBlueprint()
-
-        -- defensive programming 
-        if not self.unit.Trash then
-            self.unit.Trash = TrashBag()
+        -- Cache access patterns, see benchmark on metatables
+        for k, identifier in FunctionsToCache do 
+            self[identifier] = self[identifier]
         end
 
-        -- Store weapon information for performance
+        -- Store blueprint for improved access pattern, see benchmark on blueprints
+        self.Blueprint = self:GetBlueprint()
+        local bp = self.Blueprint
+
+        -- Legacy information stored for backwards compatibility
         self.Label = bp.Label
-        self.Audio = bp.Audio 
-
         self.bpRateOfFire = bp.RateOfFire
-
         self.EnergyRequired = bp.EnergyRequired
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
-        self.WeaponUnpacks = bp.WeaponUnpacks
-        self.WeaponUnpackLocksMotion = bp.WeaponUnpackLocksMotion
-
-        self.FiringRandomness = bp.FiringRandomness
-        self.FiringRandomnessWhileMoving = bp.FiringRandomnessWhileMoving
-
-        -- store other information
-        self.Trash = self.unit.Trash
-        self.Brain = self.unit.Brain
-        self.Army = self.unit.Army
+        -- cache information of unit, weapons get created before unit.OnCreate is called
+        self.Trash = TrashBag();
+        self.Brain = self.unit:GetAIBrain()
+        self.Army = self.unit:GetArmy()
 
         self:SetValidTargetsForCurrentLayer(self.unit.Layer)
 
@@ -110,7 +124,7 @@ Weapon = Class(moho.weapon_methods) {
     SetupTurret = function(self, bp)
 
         -- defensive programming
-        bp = bp or self:GetBlueprint()
+        bp = bp or self.Blueprint
 
 
         local yawBone = bp.TurretBoneYaw
@@ -147,22 +161,22 @@ Weapon = Class(moho.weapon_methods) {
                     self.AimControl:SetResetPoseTime(9999999)
                 end
                 self:SetFireControl('Right')
-                self.unit.Trash:Add(self.AimControl)
-                self.unit.Trash:Add(self.AimRight)
-                self.unit.Trash:Add(self.AimLeft)
+                self.Trash:Add(self.AimControl)
+                self.Trash:Add(self.AimRight)
+                self.Trash:Add(self.AimLeft)
             else
                 self.AimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
                 if EntityCategoryContains(categories.STRUCTURE, self.unit) then
                     self.AimControl:SetResetPoseTime(9999999)
                 end
-                self.unit.Trash:Add(self.AimControl)
+                self.Trash:Add(self.AimControl)
                 self.AimControl:SetPrecedence(precedence)
                 if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
                     for k, v in bp.RackBones do
                         if v.RackBone ~= pitchBone then
                             local slaver = CreateSlaver(self.unit, v.RackBone, pitchBone)
                             slaver:SetPrecedence(precedence-1)
-                            self.unit.Trash:Add(slaver)
+                            self.Trash:Add(slaver)
                         end
                     end
                 end
@@ -231,7 +245,7 @@ Weapon = Class(moho.weapon_methods) {
 
     SetTurretPitchSpeed = function(self, speed, bp)
         -- backwards compatibility for mods
-        bp = bp or self:GetBlueprint()
+        bp = bp or self.Blueprint
 
         local turretyawmin, turretyawmax = self:GetTurretYawMinMax(bp)
         local turretpitchmin, turretpitchmax = self:GetTurretPitchMinMax(bp)
@@ -246,7 +260,7 @@ Weapon = Class(moho.weapon_methods) {
     -- @param bp Optional blueprint value that is manually retrieved if not present.
     GetTurretYawMinMax = function(self, bp)
         -- backwards compatibility for mods
-        bp = bp or self:GetBlueprint()
+        bp = bp or self.Blueprint
 
         local turretyawmin = bp.TurretYaw - bp.TurretYawRange
         local turretyawmax = bp.TurretYaw + bp.TurretYawRange
@@ -258,7 +272,7 @@ Weapon = Class(moho.weapon_methods) {
     -- @param bp Optional blueprint value that is manually retrieved if not present.
     GetTurretYawSpeed = function(self, bp)
         -- backwards compatibility for mods
-        bp = bp or self:GetBlueprint()
+        bp = bp or self.Blueprint
 
         return bp.TurretYawSpeed
     end,
@@ -268,7 +282,7 @@ Weapon = Class(moho.weapon_methods) {
     -- @param bp Optional blueprint value that is manually retrieved if not present.
     GetTurretPitchMinMax = function(self, bp)
         -- backwards compatibility for mods
-        bp = bp or self:GetBlueprint()
+        bp = bp or self.Blueprint
 
         local turretpitchmin = bp.TurretPitch - bp.TurretPitchRange
         local turretpitchmax = bp.TurretPitch + bp.TurretPitchRange
@@ -280,7 +294,7 @@ Weapon = Class(moho.weapon_methods) {
     -- @param bp Optional blueprint value that is manually retrieved if not present.
     GetTurretPitchSpeed = function(self, bp)
         -- backwards compatibility for mods
-        bp = bp or self:GetBlueprint()
+        bp = bp or self.Blueprint
 
         return bp.TurretPitchSpeed
     end,
@@ -342,7 +356,7 @@ Weapon = Class(moho.weapon_methods) {
         if not self.AmbientSounds[sound] then
             local sndEnt = Entity {}
             self.AmbientSounds[sound] = sndEnt
-            self.unit.Trash:Add(sndEnt)
+            self.Trash:Add(sndEnt)
             sndEnt:AttachTo(self.unit,-1)
         end
         self.AmbientSounds[sound]:SetAmbientSound(self.Audio[sound], nil)
@@ -360,7 +374,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     GetDamageTableInternal = function(self)
-        local weaponBlueprint = self:GetBlueprint()
+        local weaponBlueprint = self.Blueprint
         local damageTable = {}
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + (self.DamageRadiusMod or 0)
@@ -401,7 +415,7 @@ Weapon = Class(moho.weapon_methods) {
 
         if proj and not proj:BeenDestroyed() then
             proj:PassDamageData(damageTable)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
 
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
                 bp.NukeInnerRingDamage and bp.NukeInnerRingRadius and bp.NukeInnerRingTicks and bp.NukeInnerRingTotalTime then
@@ -412,8 +426,8 @@ Weapon = Class(moho.weapon_methods) {
 
                 -- Need to store these three for later, in case the missile lands after the launcher dies
                 proj.Launcher = self.unit
-                proj.Army = self.unit.Army
-                proj.Brain = self.unit:GetAIBrain()
+                proj.Army = self.Army
+                proj.Brain = self.Brain
             end
         end
         return proj
@@ -421,7 +435,7 @@ Weapon = Class(moho.weapon_methods) {
 
     SetValidTargetsForCurrentLayer = function(self, newLayer)
         -- LOG('SetValidTargetsForCurrentLayer, layer = ', newLayer)
-        local weaponBlueprint = self:GetBlueprint()
+        local weaponBlueprint = self.Blueprint
         if weaponBlueprint.FireTargetLayerCapsTable then
             if weaponBlueprint.FireTargetLayerCapsTable[newLayer] then
                 -- LOG('Setting Target Layer Caps to ', weaponBlueprint.FireTargetLayerCapsTable[newLayer])
@@ -443,7 +457,7 @@ Weapon = Class(moho.weapon_methods) {
         end
 
         if not priTable then
-            local bp = self:GetBlueprint().TargetPriorities
+            local bp = self.Blueprint.TargetPriorities
             if bp then
                 local priorityTable = {}
                 for k, v in bp do
@@ -484,7 +498,7 @@ Weapon = Class(moho.weapon_methods) {
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
-            self.unit.Trash:Add(thread)
+            self.Trash:Add(thread)
             return thread
         else
             return nil
@@ -492,7 +506,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     OnVeteranLevel = function(self, old, new)
-        local bp = self:GetBlueprint().Buffs
+        local bp = self.Blueprint.Buffs
         if not bp then return end
 
         local lvlkey = 'VeteranLevel' .. new
@@ -518,7 +532,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     DoOnFireBuffs = function(self)
-        local data = self:GetBlueprint()
+        local data = self.Blueprint
         if data.Buffs then
             for k, v in data.Buffs do
                 if v.Add.OnFire == true then
@@ -580,7 +594,7 @@ Weapon = Class(moho.weapon_methods) {
             self:SetEnabled(enable)
             return
         end
-        local bp = self:GetBlueprint().EnabledByEnhancement
+        local bp = self.Blueprint.EnabledByEnhancement
         if bp then
             for k, v in SimUnitEnhancements[self.unit.EntityId] or {} do
                 if v == bp then

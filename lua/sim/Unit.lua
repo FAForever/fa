@@ -245,6 +245,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Store common accessed information for performance
         self.Audio = bp.Audio
+        self.Brain = self:GetAIBrain()
         self.UnitId = self:GetUnitId()
         self.techCategory = bp.TechCategory
         self.layerCategory = bp.LayerCategory
@@ -1768,6 +1769,10 @@ Unit = Class(moho.unit_methods) {
     end,
 
     StartSinking = function(self, callback)
+
+        -- add flag to identify a unit died but is sinking before it is destroyed
+        self.Sinking = true 
+
         local bp = self:GetBlueprint()
         local scale = ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
         local bone = 0
@@ -1964,6 +1969,10 @@ Unit = Class(moho.unit_methods) {
         for _, v in self.TransportBeamEffectsBag or {} do
             v:Destroy()
         end
+
+        for k = 1, self.WeaponCount do 
+            self.WeaponInstances[k].Trash:Destroy();
+        end
     end,
 
     OnDestroy = function(self)
@@ -2088,9 +2097,9 @@ Unit = Class(moho.unit_methods) {
 
     GetWeaponByLabel = function(self, label)
 
-        -- if we're destroyed then we can't return weapons: the c-object is deallocated
-        if self.Dead then 
-            return nil 
+        -- if we're sinking then all death weapons should already have been applied
+        if self.Sinking or self.BeenDestroyed(self) then 
+            return nil
         end
 
         -- return the instanced weapon
