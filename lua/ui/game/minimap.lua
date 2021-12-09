@@ -135,7 +135,7 @@ function CreateMinimap(parent)
         control:SetPositionLock(checked)
         -- add save pin in prefs
     end
-    Tooltip.AddButtonTooltip(controls.displayGroup._pinBtn, 'minimap_pin')
+    Tooltip.AddCheckboxTooltip(controls.displayGroup._pinBtn, 'minimap_pin')
 
     controls.displayGroup.resetBtn = Button(controls.displayGroup.TitleGroup,
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
