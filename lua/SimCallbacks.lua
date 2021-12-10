@@ -20,6 +20,8 @@ local TableGetn = table.getn
 local TableRemove = table.remove
 local TableMerged = table.merged
 
+local MathAbs = math.abs
+
 -- upvalue globals for performance
 local type = type
 local Vector = Vector
@@ -197,7 +199,7 @@ Callbacks.CapStructure = function(data, units)
 
     -- check if we have a structure
     local structure = GetEntityById(data.target)
-    if not structure then return end 
+    if (not structure) or (not structure.Army) then return end 
 
     -- check if we're allowed to mess with this structure
     if not OkayToMessWithArmy(structure.Army) then return end
@@ -209,11 +211,14 @@ Callbacks.CapStructure = function(data, units)
     local units = EntityCategoryFilterDown(CategoriesEngineer, SecureUnits(units))
     if not units[1] then return end
 
+    -- check if it is our structure
+    if structure.Army ~= units[1].Army then return end
+
     -- check if we have buildings we want to use for capping
     if (not data.id) or (not data.layer) then return end 
 
     -- populate faction table
-    local others = { }
+    local otherBuilders = { }
     local buildersByFaction = { }
 
     -- determine of all units in selection what they can build
@@ -229,7 +234,7 @@ Callbacks.CapStructure = function(data, units)
                 buildersByFaction[faction] = buildersByFaction[faction] or { }
                 TableInsert(buildersByFaction[faction], unit)
             else
-                TableInsert(others, unit)
+                TableInsert(otherBuilders, unit)
             end
         end
     end 
@@ -257,7 +262,7 @@ Callbacks.CapStructure = function(data, units)
     for k, engineers in buildersByFaction do 
         if k ~= faction then 
             for k, engineer in engineers do 
-                TableInsert(others, engineer)
+                TableInsert(otherBuilders, engineer)
             end
         end
     end
@@ -265,7 +270,8 @@ Callbacks.CapStructure = function(data, units)
     -- compute / retrieve information for capping
     local brain = builders[1]:GetAIBrain()
     local blueprintID = ConstructBlueprintID(faction, data.id)
-    local skirtSize = structure:GetBlueprint().Physics.SkirtSizeX
+    local blueprint = structure:GetBlueprint()
+    local skirtSize = blueprint.Physics.SkirtSizeX
 
     -- compute the layer locations
     local layer = RetrieveNthStructureLayer(skirtSize, data.layer)
@@ -274,16 +280,51 @@ Callbacks.CapStructure = function(data, units)
     if layer then 
 
         -- compute build locations and issue the capping
-        local center = structure:GetPosition()
+        local cx, cy, cz = structure:GetPositionXYZ()
+    
+        -- full extent of search rectangle for other buildings
+        local x1 = cx - (skirtSize + 10)
+        local z1 = cz - (skirtSize + 10)
+        local x2 = cx + (skirtSize + 10)
+        local z2 = cz + (skirtSize + 10)
+        local rect = Rect(x1, z1, x2, z2)
+        -- find all units that may prevent us from building
+        local structures = GetUnitsInRect(rect)
+        structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
+
+        -- replace unit -> skirt to prevent allocating a new table
+        for k, unit in structures do 
+            local blueprint = unit:GetBlueprint()
+            local px, py, pz = unit:GetPositionXYZ()
+            local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
+            local rect = { px - sx, pz - sz, px + sx, pz + sz }
+            structures[k] = rect
+        end
+
+        -- name convention
+        local skirts = structures
+
+        -- loop over build locations in given layer
         for k, location in layer do 
 
             -- determine build location using cached value
-            buildLocation[1] = center[1] + location[1]
-            buildLocation[3] = center[3] + location[2]
+            buildLocation[1] = cx + location[1]
+            buildLocation[3] = cz + location[2]
             buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
 
-            -- order all builders to build if possible
-            if brain:CanBuildStructureAt(blueprintID, buildLocation) then 
+            -- check all skirts manually
+            local freeToBuild = true
+            for k, skirt in skirts do 
+                if buildLocation[1] > skirt[1] and buildLocation[1] < skirt[3] then 
+                    if buildLocation[3] > skirt[2] and buildLocation[3] < skirt[4] then 
+                        freeToBuild = false 
+                        break 
+                    end
+                end
+            end
+
+            -- issue if we can build here
+            if freeToBuild then
                 for _, builder in builders do 
                     IssueBuildMobile({builder}, buildLocation, blueprintID, {})
                 end
@@ -291,7 +332,7 @@ Callbacks.CapStructure = function(data, units)
         end
 
         -- assist for all other builders
-        IssueGuard(others, builders[1])
+        IssueGuard(otherBuilders, builders[1])
     end
 end
 
