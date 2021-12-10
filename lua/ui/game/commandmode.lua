@@ -246,7 +246,7 @@ function CapStructure(command)
             end
 
         -- if we have a t3 fabricator, create storages around it
-        elseif structure:IsInCategory('MASSFABRICATION') and isTech3 and isDoubleTapped then 
+        elseif structure:IsInCategory('MASSFABRICATION') and isTech3 then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
 
             -- reset state
@@ -255,7 +255,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a t2 artillery, create t1 pgens around it
-        elseif structure:IsInCategory('ARTILLERY') and isTech2 and isDoubleTapped then 
+        elseif structure:IsInCategory('ARTILLERY') and isTech2 then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
             -- reset state
@@ -264,7 +264,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a radar, create t1 pgens around it
-        elseif ((structure:IsInCategory('RADAR') and (isTech2 or (isTech1 and isUpgrading))) or structure:IsInCategory('OMNI')) and isDoubleTapped then 
+        elseif structure:IsInCategory('RADAR') and ((isTech1 and isUpgrading and isDoubleTapped) or isTech2 or structure:IsInCategory('OMNI'))  then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
             -- reset state
