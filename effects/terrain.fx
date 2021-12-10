@@ -1684,6 +1684,21 @@ technique LowFidelityLighting
 
 /*   #   Terrain Baked shaders   #   */
 
+// |  | Albedo stratum                                              | Normal stratum
+// |L | R           | G             | B             | A             | R             | G             | B             | A                 |
+// ----            ---             ---             ---             ---             ---             ---             ---                 ---
+// |0 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// |1 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// |2 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// |3 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// |4 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// ----            ---             ---             ---             ---             ---             ---             ---                 ---
+// |5 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// |6 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// |7 | Map R         Map G           Map B           Map alpha     | Map X           Map Y           Map Z           Map alpha
+// |8 | Map wetness   Map shadows     Map Ambient     Map metallic  | 
+// |9 | ?
+
 /// VerticesBaked
 // Vertex output / input struct for the communication between the 
 // vertex shader and the fragment shader (synonym: pixel shader)
