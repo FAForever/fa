@@ -299,10 +299,10 @@ Callbacks.CapStructure = function(data, units)
             local px, py, pz = unit:GetPositionXYZ()
             local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
             local rect = { 
-                px - sx - 0.5 * skirtSize, -- top left
-                pz - sz - 0.5 * skirtSize, -- top left
-                px + sx + 0.5 * skirtSize, -- bottom right
-                pz + sz + 0.5 * skirtSize  -- bottom right
+                px - sx - 1, -- top left
+                pz - sz - 1, -- top left
+                px + sx + 1, -- bottom right
+                pz + sz + 1  -- bottom right
             }
 
             structures[k] = rect
