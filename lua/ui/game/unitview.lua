@@ -22,6 +22,7 @@ local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRollov
 local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
 local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
 local Grid = import('/lua/maui/grid.lua').Grid
+local Construction = import('/lua/ui/game/construction.lua')
 
 local selectedUnit = nil
 local updateThread = nil
@@ -522,8 +523,8 @@ function UpdateWindow(info)
         CreateQueueGrid(controls.bg)
         --TODO: unit category better check!!!!!!!!!
         if not table.empty(EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY,
-         {info.userUnit})) and
-          not selectedUnit then
+        {info.userUnit})) and
+        selectedUnit~= info.userUnit then
             controls.queueGrid:Show()
             controls.queueGrid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit) or {})
         end
