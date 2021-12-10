@@ -7794,6 +7794,7 @@ OPTIONS_0243 = "Forzare la visualizzazione delle barre di vita delle unità nemi
 OPTIONS_0244 = "Mostra i dettagli dell'armamento nel menu di costruzione"
 tooltipui0692 = "Mostra informazioni dettagliate sulle armi delle unità dal menu di costruzione"
 OPTIONS_0245 = "Migliora la desezione delle unità"
+OPTIONS_0246 = "Show Factory Queue on Hover"
 OPTIONS_0247="Enable Cycle Preview for Hotbuild"
 OPTIONS_0248="When on, you can cycle the Hotbuild preview"
 OPTIONS_0251="Cycle reset time"

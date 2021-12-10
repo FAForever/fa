@@ -541,6 +541,19 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
+                key = 'gui_queue_on_hover',
+                type = 'toggle',
+                default = 1,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0232>Middle Click Avatars",
                 key = 'gui_idle_engineer_avatars',
                 type = 'toggle',
@@ -603,6 +616,8 @@ options = {
                     },
                 },
             },
+
+            
 
             {
                 title = "<LOC OPTIONS_0238>Seperate Idle Builders",
