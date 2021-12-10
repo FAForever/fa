@@ -207,8 +207,8 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
 
     -- create a beam from each build effect bone of the builder
     if not stationary then 
-        if builder.buildEffectBones then 
-            for k, bone in builder.buildEffectBones do 
+        if builder.BuildEffectBones then 
+            for k, bone in builder.BuildEffectBones do 
                 TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, bone, beamEndBuilder, -1, army, BeamBuildEmtBp))
             end
         end
