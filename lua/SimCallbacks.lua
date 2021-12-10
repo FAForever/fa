@@ -293,16 +293,23 @@ Callbacks.CapStructure = function(data, units)
         local structures = GetUnitsInRect(rect)
         structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
 
+        -- determine offset to enlarge unit skirt to include structure we're trying to use to cap
+        -- this is a hard-coded fix to make walls work
+        local offset = 1
+        if skirtSize == 1 then 
+            offset = 0.5 
+        end
+
         -- replace unit -> skirt to prevent allocating a new table
         for k, unit in structures do 
             local blueprint = unit:GetBlueprint()
             local px, py, pz = unit:GetPositionXYZ()
             local sx, sz = 0.5 * blueprint.Physics.SkirtSizeX, 0.5 * blueprint.Physics.SkirtSizeZ
             local rect = { 
-                px - sx - 1, -- top left
-                pz - sz - 1, -- top left
-                px + sx + 1, -- bottom right
-                pz + sz + 1  -- bottom right
+                px - sx - offset, -- top left
+                pz - sz - offset, -- top left
+                px + sx + offset, -- bottom right
+                pz + sz + offset  -- bottom right
             }
 
             structures[k] = rect
