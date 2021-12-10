@@ -216,14 +216,14 @@ function CapStructure(command)
     local isTech3 = structure:IsInCategory('TECH3')
 
     -- are we a structure and are we holding shift?
-    if structure:IsInCategory('STRUCTURE') and IsKeyDown('Shift') and isDoubleTapped then 
+    if structure:IsInCategory('STRUCTURE') and IsKeyDown('Shift') then 
 
         -- try and create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then 
 
             -- check what type of buildings we'd like to make
-            local buildStorages = (isTech1 and isUpgrading) or isTech2 or isTech3
-            local buildFabs = (isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isTripleTapped)
+            local buildStorages = (isTech1 and isUpgrading and isDoubleTapped) or isTech2 or isTech3
+            local buildFabs = (isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isDoubleTapped)
 
             if buildStorages then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
@@ -264,7 +264,7 @@ function CapStructure(command)
             pStructure2 = nil
 
         -- if we have a radar, create t1 pgens around it
-        elseif ((structure:IsInCategory('RADAR') and (isTech2 or (isTech1 and isUpgrading))) or structure:IsInCategory('OMNI')) then 
+        elseif structure:IsInCategory('RADAR') and ((isTech1 and isUpgrading and isDoubleTapped) or isTech2 or structure:IsInCategory('OMNI'))  then 
             SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
             -- reset state
