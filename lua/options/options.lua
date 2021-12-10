@@ -547,8 +547,8 @@ options = {
                 default = 1,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        {text = "<LOC _Off>", key = false },
+                        {text = "<LOC _On>", key = true },
                     },
                 },
             },

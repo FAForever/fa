@@ -522,13 +522,16 @@ function UpdateWindow(info)
         if info.userUnit then
             unitQueue = info.userUnit:GetCommandQueue()
         end
-        CreateQueueGrid(controls.bg)
+
 
         -- # Build queue upon hovering of unit
 
-        if EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) then
-            controls.queueGrid:Show()
-            controls.queueGrid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit) or {})
+        if options.gui_queue_on_hover then 
+            if EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) then
+                CreateQueueGrid(controls.bg)
+                controls.queueGrid:Show()
+                controls.queueGrid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit) or {})
+            end
         end
 
         if info.focus then
