@@ -223,7 +223,7 @@ function CapStructure(command)
 
             -- check what type of buildings we'd like to make
             local buildStorages = (isTech1 and isUpgrading and isDoubleTapped) or isTech2 or isTech3
-            local buildFabs = (isTech2 and isUpgrading and isDoubleTapped) or (isTech3 and isDoubleTapped)
+            local buildFabs = (isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isDoubleTapped)
 
             if buildStorages then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
