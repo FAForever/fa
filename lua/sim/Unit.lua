@@ -1195,6 +1195,11 @@ Unit = Class(moho.unit_methods) {
         local layer = self.Layer
         self.Dead = true
 
+        -- destroy all weapon effects
+        for k = 1, self.WeaponCount do 
+            self.WeaponInstances[k].Trash:Destroy();
+        end
+
         -- Units killed while being invisible because they're teleporting should show when they're killed
         if self.TeleportFx_IsInvisible then
             self:ShowBone(0, true)
