@@ -566,6 +566,7 @@ function buildActionUnit(name, modifier)
 
     if maxPos == 1 then
         IssueBlueprintCommand("UNITCOMMAND_BuildFactory", unit, count)
+        Construction.RefreshUI()
     else
         factoryHotkey(unit, count)
     end

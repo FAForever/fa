@@ -1130,6 +1130,7 @@ function OnRolloverHandler(button, state)
                                 count = 5
                             end
                             IncreaseBuildCountInQueue(item.position, count)
+                            RefreshUI()
                         end
                         if self.dragMarker then
                             self.dragMarker:Destroy()
@@ -1552,9 +1553,11 @@ function OnClickHandler(button, modifiers)
 
         if modifiers.Left then
             IncreaseBuildCountInQueue(item.position, count)
+            
         elseif modifiers.Right then
             DecreaseBuildCountInQueue(item.position, count)
         end
+        RefreshUI()
     end
 end
 
