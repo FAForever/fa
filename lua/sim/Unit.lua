@@ -3008,6 +3008,7 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
+
         self.WorkItem = tempEnhanceBp
         self.WorkItemBuildCostEnergy = tempEnhanceBp.BuildCostEnergy
         self.WorkItemBuildCostMass = tempEnhanceBp.BuildCostEnergy

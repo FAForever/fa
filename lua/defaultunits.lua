@@ -2450,6 +2450,18 @@ CommandUnit = Class(WalkingLandUnit) {
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
     end,
+
+    OnWorkBegin = function(self, work)
+        if WalkingLandUnit.OnWorkBegin(self, work) then 
+
+            -- Prevent consumption bug where two enhancements in a row prevents assisting units from
+            -- updating their consumption costs based on the new build rate values.
+            self:UpdateAssistersConsumption()
+
+            -- Inform EnhanceTask that enhancement is not restricted
+            return true
+        end
+    end,
 }
 
 ACUUnit = Class(CommandUnit) {
