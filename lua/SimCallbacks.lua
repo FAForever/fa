@@ -39,7 +39,7 @@ local IssueFerry = IssueFerry
 
 -- upvalue categories for performance
 local CategoriesTransportation = categories.TRANSPORTATION
-local CategoriesEngineer = categories.ENGINEER
+local CategoriesEngineer = categories.ENGINEER - categories.INSIGNIFICANTUNIT
 
 --- Used to warn users (mainly developers) once for invalid use of functionality 
 local Warnings = { }
