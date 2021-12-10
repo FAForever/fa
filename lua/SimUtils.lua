@@ -68,6 +68,10 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         shareUpgrades = true
     end
 
+    -- do not gift insignificant units
+    units = EntityCategoryFilterDown(categories.ALLUNITS - categories.INSIGNIFICANTUNIT, units)
+
+    -- gift most valuable units first
     table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
 
     local newUnits = {}
