@@ -233,7 +233,9 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
 
         unit.IsBeingTransferred = false
 
-        v:OnGiven(unit)
+        if v.OnGiven then 
+            v:OnGiven(unit)
+        end
     end
 
     if not captured then
