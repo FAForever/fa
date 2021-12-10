@@ -32,6 +32,8 @@ controls = import('/lua/ui/controls.lua').Get()
 -- shared between sim and ui
 local OverchargeShared = import('/lua/shared/overcharge.lua')
 
+local UpdateWindowShowQueueOfUnit = (categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY
+
 function OverchargeCanKill()
     if unitHP[1] and unitHP.blueprintId then
         local selected = GetSelectedUnits()
@@ -521,13 +523,14 @@ function UpdateWindow(info)
             unitQueue = info.userUnit:GetCommandQueue()
         end
         CreateQueueGrid(controls.bg)
-        --TODO: unit category better check!!!!!!!!!
-        if not table.empty(EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY,
-        {info.userUnit})) and
-        selectedUnit~= info.userUnit then
+
+        -- # Build queue upon hovering of unit
+
+        if EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) then
             controls.queueGrid:Show()
             controls.queueGrid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit) or {})
         end
+
         if info.focus then
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
                 controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true))
