@@ -268,7 +268,6 @@ Callbacks.CapStructure = function(data, units)
     end
 
     -- compute / retrieve information for capping
-    local brain = builders[1]:GetAIBrain()
     local blueprintID = ConstructBlueprintID(faction, data.id)
     local blueprint = structure:GetBlueprint()
     local skirtSize = blueprint.Physics.SkirtSizeX
@@ -288,6 +287,7 @@ Callbacks.CapStructure = function(data, units)
         local x2 = cx + (skirtSize + 10)
         local z2 = cz + (skirtSize + 10)
         local rect = Rect(x1, z1, x2, z2)
+
         -- find all units that may prevent us from building
         local structures = GetUnitsInRect(rect)
         structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
@@ -303,7 +303,7 @@ Callbacks.CapStructure = function(data, units)
                 px + sx + 0.5 * skirtSize, -- bottom right
                 pz + sz + 0.5 * skirtSize  -- bottom right
             }
-            
+
             structures[k] = rect
         end
 
@@ -318,7 +318,7 @@ Callbacks.CapStructure = function(data, units)
             buildLocation[3] = cz + location[2]
             buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
 
-            -- check all skirts manually
+            -- check all skirts manually as brain:CanBuildStructureAt(...) is unreliable when structures have been upgraded
             local freeToBuild = true
             for k, skirt in skirts do 
                 if buildLocation[1] > skirt[1] and buildLocation[1] < skirt[3] then 
