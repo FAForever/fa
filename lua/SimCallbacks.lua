@@ -50,7 +50,7 @@ function DoCallback(name, data, units)
     if fn then
         fn(data, units)
     else
-        error('No callback named ' .. repr(name))
+        SPEW('No callback named: ' .. repr(name))
     end
 end
 
@@ -72,6 +72,10 @@ local function SecureUnits(units)
     end
 
     return secure
+end
+
+--- Empty callback for ui mods to communicate
+Callbacks.EmptyCallback = function(data, units)
 end
 
 Callbacks.AutoOvercharge = function(data, units)
