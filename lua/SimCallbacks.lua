@@ -198,6 +198,7 @@ end
 Callbacks.CapStructure = function(data, units)
 
     -- check if we have a structure
+    -- if army is not set then the structure is not 'our' structure (e.g., we're trying to cap an allied or hostile extractor)
     local structure = GetEntityById(data.target)
     if (not structure) or (not structure.Army) then return end 
 
@@ -224,7 +225,7 @@ Callbacks.CapStructure = function(data, units)
     -- determine of all units in selection what they can build
     for _, unit in units do
         -- make sure we're allowed to mess with this unit, if not we exclude
-        if OkayToMessWithArmy(unit.Army) then 
+        if unit.Army and OkayToMessWithArmy(unit.Army) then 
             -- compute blueprint id
             local faction = unit.factionCategory
             local blueprintID = ConstructBlueprintID(faction, data.id)
