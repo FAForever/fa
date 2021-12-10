@@ -217,7 +217,7 @@ UnitBlueprint {
             MaxRadius = 24,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 400,
+            MuzzleVelocity = 100,
             ProjectilesPerOnFire = 1,
             ProjectileId = '/projectiles/CDFLaserHeavy02/CDFLaserHeavy02_proj.bp',
             RackBones = {
