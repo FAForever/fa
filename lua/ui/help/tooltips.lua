@@ -2053,6 +2053,10 @@ Tooltips = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',
         description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
     },
+    options_gui_queue_on_hover = {
+        title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
+        description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
+    },
     options_gui_idle_engineer_avatars = {
         title = '<LOC OPTIONS_0232>Middle Click Avatars',
         description = '<LOC OPTIONS_0259>Allows middle clicking idle engineer avatars to select all idle engineers on screen.',

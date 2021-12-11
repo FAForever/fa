@@ -21,6 +21,8 @@ local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
 local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
 local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
+local Grid = import('/lua/maui/grid.lua').Grid
+local Construction = import('/lua/ui/game/construction.lua')
 
 local selectedUnit = nil
 local updateThread = nil
@@ -29,6 +31,8 @@ controls = import('/lua/ui/controls.lua').Get()
 
 -- shared between sim and ui
 local OverchargeShared = import('/lua/shared/overcharge.lua')
+
+local UpdateWindowShowQueueOfUnit = (categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY
 
 function OverchargeCanKill()
     if unitHP[1] and unitHP.blueprintId then
@@ -254,6 +258,54 @@ local statFuncs = {
     end,
 }
 
+
+function CreateQueueGrid(parent)
+	controls.queue = Bitmap(parent)
+    controls.queue.grid = Bitmap(controls.queue)
+	controls.queue.grid.items = {}	
+	controls.queue.bg = Bitmap(controls.queue)	
+    controls.queue:DisableHitTest()
+	
+	controls.queue.bg.leftBracket = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.rightGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowBottom = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.leftGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowBottom = Bitmap(controls.queue.bg)
+	
+	local function CreateGridUnitIcon(parent)
+        local item =  Bitmap(parent)
+        item.icon = Bitmap(item)
+        item.text = UIUtil.CreateText(item, "", 16, 'Arial Black', true)
+        return item
+    end
+	
+	for id = 1, 7 do
+		controls.queue.grid.items[id] = CreateGridUnitIcon(controls.queue.grid)
+	end
+	
+    controls.queue.grid.UpdateQueue = function (self, queue)
+		if not queue then
+			controls.queue:Hide()
+		else
+            controls.queue:Show()
+			for id, item in self.items do
+				if queue[id] then
+					item:Show()
+					item.icon:SetTexture( UIUtil.UIFile('/icons/units/' ..  queue[id].id .. '_icon.dds', true))
+					item.text:SetText(tostring(queue[id].count))
+				else
+					item:Hide()
+				end
+			end
+		end
+    end	
+    controls.queue:Hide()
+end
+
 function UpdateWindow(info)
     if info.blueprintId == 'unknown' then
         controls.name:SetText(LOC('<LOC rollover_0000>Unknown Unit'))
@@ -464,7 +516,7 @@ function UpdateWindow(info)
                     else
                         text = massKilledTrue
                     end
-
+					
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
@@ -476,6 +528,20 @@ function UpdateWindow(info)
         if info.userUnit then
             unitQueue = info.userUnit:GetCommandQueue()
         end
+
+
+        -- # Build queue upon hovering of unit
+
+        if Prefs.GetFromCurrentProfile('options.gui_queue_on_hover') > 0 then 
+            if info.userUnit ~= nil and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and info.userUnit ~= selectedUnit then
+                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit))
+            else 
+                controls.queue:Hide()
+            end
+        else 
+            controls.queue:Hide()
+        end
+
         if info.focus then
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
                 controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true))
@@ -732,6 +798,7 @@ function CreateUI()
     LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+	CreateQueueGrid(controls.bg)
 end
 
 function OnSelection(units)
