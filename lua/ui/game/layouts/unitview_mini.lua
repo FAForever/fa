@@ -26,22 +26,24 @@ local iconTextures = {
 }
 function SetLayout()
     local controls = import('/lua/ui/game/unitview.lua').controls
-	
+    
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
-	
-	controls.queue.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
-	
+    
+    controls.queue.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
+    
     LayoutHelpers.SetDimensions(controls.queue, 316, 48)
-	LayoutHelpers.Above(controls.queue, controls.bg, 10)
+    LayoutHelpers.Above(controls.queue, controls.bg, 10)
     LayoutHelpers.AtLeftIn(controls.queue, controls.bg, 3)
-	
-	LayoutHelpers.FillParent(controls.queue.bg, controls.queue)
-	LayoutHelpers.FillParent(controls.queue.grid, controls.queue)
-    controls.queue:DisableHitTest()
-	
+    
+    LayoutHelpers.FillParent(controls.queue.bg, controls.queue)
+    LayoutHelpers.FillParent(controls.queue.grid, controls.queue)
 
+    controls.queue:DisableHitTest()
+    controls.queue.grid:DisableHitTest()
+    controls.queue.bg:DisableHitTest()
+    
 	for id, item in controls.queue.grid.items do
 		if id > 1 then
 		   local before = controls.queue.grid.items[id-1]
@@ -49,13 +51,13 @@ function SetLayout()
 		else
 		   LayoutHelpers.AtLeftTopIn(item, controls.queue.grid, 2)
 		end
+        item:DisableHitTest()
 		item:SetTexture(UIUtil.UIFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
         LayoutHelpers.DepthOverParent(item.icon, item)
         LayoutHelpers.FillParentFixedBorder(item.icon, item, 6)
         LayoutHelpers.DepthOverParent(item.text, item.icon)
         LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
 	end
-	
 	
     controls.queue.bg.leftBracket:SetTexture(UIUtil.UIFile('/game/filter-ping-panel/bracket-left_bmp.dds'))
 	
