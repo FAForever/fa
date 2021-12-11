@@ -522,7 +522,7 @@ function UpdateWindow(info)
 
         -- # Build queue upon hovering of unit
         if options.gui_queue_on_hover ~=0 then 
-            if EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) then
+            if info.userUnit ~= nil and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and info.userUnit ~= selectedUnit then
                 controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit))
             else
 				controls.queue:Hide()
