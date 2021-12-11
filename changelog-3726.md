@@ -2,19 +2,23 @@ Patch 3726 (26th November, 2021)
 ============================
 
 ### Features
- - (#3484, #3500, #3535) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
-    Extractors
-    - 2 clicks + shift to mass storage an upgrading t1 extractor
-    - 2 clicks + shift to mass storage a t2 / t3 extractor
-    - 3 clicks + shift to mass fab an upgrading t2 extractor
-    - 3 clicks + shift to mass fab cap a t3 extractor
+ - (#3484, #3500, #3535, #3600) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
+   This changes the capping behavior to:
+    - 2 clicks + shift to mass storage an upgrading t1 (or t2) extractor
+    - 1 click (+ shift) to mass storage a (finished) t2 / t3 extractor
+    - 3 clicks + shift to mass fab cap an upgrading t2 extractor
+    - 2 clicks + shift to mass fab cap a t3 extractor
 
-    Other structures
-    - 2 clicks + shift to t1 power gen cap an upgrading t1 radar
-    - 2 clicks + shift to t1 power gen cap a t2 / t3 radar
-    - 2 clicks + shift to t1 power gen cap a t2 artillery
-    - 2 clicks + shift to wall cap a t1 point defense
-    - 2 clicks + shift to mass storage cap a t3 fabricator
+    - 1 clicks + shift to mass storage a t3 fabricator
+    - 1 clicks + shift to pgen an artillery
+    - 2 clicks + shift to pgen an upgrading t1 radar
+    - 1 clicks + shift to pgen an radar, t2 radar or t3 radar
+    - 1 click + shift to wall a t1 pd
+   
+   General rule of thumb:
+    - Typical: shift + 1 click
+    - Upgrading: shift + 2 click
+    - Dangerous: shift + (regular click count + 1)
     
     Assisting behavior
     - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
@@ -73,6 +77,7 @@ Patch 3726 (26th November, 2021)
     underground all the attacking units shoot at the ground. No
     more!
  - (#3581) Fire Beetle properly applies EMP / stun buffs
+ - (#3601) Fix Seraphim t3 MAA from zapping through shields
     
 ### Other
  - (#3523) Switch off debug utilities by default
@@ -175,7 +180,7 @@ Patch 3726 (26th November, 2021)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
-        #3558, #3582, #3581, #3587, #3589)
+        #3558, #3582, #3581, #3587, #3589, #3601, #3600)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
