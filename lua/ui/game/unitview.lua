@@ -292,8 +292,8 @@ function CreateQueueGrid(parent)
 				end
 			end
 		end
-    end
-    controls.queueGrid:Hide()
+    end	
+    controls.queue:Hide()
 end
 
 function UpdateWindow(info)
@@ -506,7 +506,7 @@ function UpdateWindow(info)
                     else
                         text = massKilledTrue
                     end
-
+					
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
@@ -785,6 +785,7 @@ function CreateUI()
     LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+	CreateQueueGrid(controls.bg)
 end
 
 function OnSelection(units)
