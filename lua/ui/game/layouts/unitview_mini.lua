@@ -54,7 +54,7 @@ function SetLayout()
         item:DisableHitTest()
 		item:SetTexture(UIUtil.UIFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
         LayoutHelpers.DepthOverParent(item.icon, item)
-        LayoutHelpers.FillParentFixedBorder(item.icon, item, 6)
+        LayoutHelpers.FillParentFixedBorder(item.icon, item, 8)
         LayoutHelpers.DepthOverParent(item.text, item.icon)
         LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
 	end
