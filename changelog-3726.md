@@ -80,6 +80,8 @@ Patch 3726 (26th November, 2021)
  - (#3601) Fix Seraphim t3 MAA from zapping through shields
  - (#3599) Fix consumption bug introduced by #3447
  - (#3598) Fix Rhino overshooting its target.
+ - (#3596) Fix typo that prevents cybran build beams from spawning
+
 ### Other
  - (#3523) Switch off debug utilities by default
     This is only useful for developers, but it did cause
