@@ -41,17 +41,19 @@ function SetLayout()
 	LayoutHelpers.FillParent(controls.queue.grid, controls.queue)
     controls.queue:DisableHitTest()
 	
-	for id, item in controls.queue.grid._items[1] do
-		LOG(id..' - '..tostring(item:IsHidden()))
+
+	for id, item in controls.queue.grid.items do
+		if id > 1 then
+		   local before = controls.queue.grid.items[id-1]
+		   LayoutHelpers.RightOf(item, before, -6) 
+		else
+		   LayoutHelpers.AtLeftTopIn(item, controls.queue.grid)
+		end
 		item:SetTexture(UIUtil.SkinnableFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
-		item:Hide()
-		LOG(id..' - '..tostring(item:IsHidden()))
-		-- LOG(repr(item))
-        -- LayoutHelpers.DepthOverParent(item.icon, item)
-        -- LayoutHelpers.FillParentFixedBorder(item.icon, item, 6)
-        -- LayoutHelpers.DepthOverParent(item.text, item.icon)
-        -- LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
-		-- item:Hide()
+        LayoutHelpers.DepthOverParent(item.icon, item)
+        LayoutHelpers.FillParentFixedBorder(item.icon, item, 6)
+        LayoutHelpers.DepthOverParent(item.text, item.icon)
+        LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
 	end	
 
     controls.bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
