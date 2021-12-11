@@ -260,18 +260,31 @@ local statFuncs = {
 
 
 function CreateQueueGrid(parent)
-	controls.queue = Bitmap(parent)
-    controls.queue.grid = Grid(controls.queue, 44, 44)
-	controls.queue.bg = Bitmap(controls.queue)
-	
-    controls.queue.grid:AppendRows(1, true)
-	controls.queue.grid._lines["Horz"] = 7
-	
-    controls.queue:DisableHitTest()
-	
-	local function CreateGridUnitIcon(parent)
-        local item =  Bitmap(parent)
-		item:Hide()
+    if controls.queueGrid then
+        controls.queueGrid:Hide()
+        return
+    end
+    controls.queueGrid = Grid(parent, 44, 44)
+    controls.queueGrid:DisableHitTest()
+    LayoutHelpers.SetHeight(controls.queueGrid, 50)
+    LayoutHelpers.AnchorToTop(controls.queueGrid, parent)
+    LayoutHelpers.AtLeftIn(controls.queueGrid, parent)
+    LayoutHelpers.AtRightIn(controls.queueGrid, parent)
+    controls.queueGrid:AppendRows(1, true)
+    controls.queueGrid:AppendCols(controls.queueGrid._visible["Horz"]())
+    controls.queueGrid.UpdateQueue = function (self, queue)
+        for id, item in self._items[1] do
+            if queue[id] then
+                item:Show()
+                item.icon:SetTexture( UIUtil.UIFile('/icons/units/' ..  queue[id].id .. '_icon.dds', true))
+                item.text:SetText(tostring(queue[id].count))
+            else
+                item:Hide()
+            end
+        end
+    end
+    local function CreateGridUnitIcon(parent)
+        local item =  Bitmap(parent, UIUtil.SkinnableFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
         item.icon = Bitmap(item)
         LayoutHelpers.DepthOverParent(item.icon, item)
         LayoutHelpers.FillParentFixedBorder(item.icon, item, 6)
@@ -279,31 +292,12 @@ function CreateQueueGrid(parent)
         item.text = UIUtil.CreateText(item, "", 16, 'Arial Black', true)
         LayoutHelpers.DepthOverParent(item.text, item.icon)
         LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
-		item:Hide()
         return item
     end
-	
-	for id = 1, 7 do
-		controls.queue.grid._items[1][id] =  CreateGridUnitIcon(controls.queue.grid)
-	end
-    controls.queue.grid.UpdateQueue = function (self, queue)
-		if not queue then
-			controls.queue:Hide()
-		else
-            controls.queue:Show()
-			for id, item in self._items[1] do
-				if queue[id] then
-					item:Show()
-					item.icon:SetTexture( UIUtil.UIFile('/icons/units/' ..  queue[id].id .. '_icon.dds', true))
-					item.text:SetText(tostring(queue[id].count))
-				else
-					item:Hide()
-				end
-			end
-		end
+    for id = 1, controls.queueGrid._lines["Horz"] do
+        controls.queueGrid:SetItem(CreateGridUnitIcon(controls.queueGrid),id,1)
     end
-	
-    controls.queue:Hide()
+    controls.queueGrid:Hide()
 end
 
 function UpdateWindow(info)
@@ -516,7 +510,7 @@ function UpdateWindow(info)
                     else
                         text = massKilledTrue
                     end
-					
+
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
@@ -534,12 +528,10 @@ function UpdateWindow(info)
 
         if options.gui_queue_on_hover then 
             if EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) then
-                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit))
-            else
-				if controls.queue then
-					controls.queue:Hide()
-				end
-			end
+                CreateQueueGrid(controls.bg)
+                controls.queueGrid:Show()
+                controls.queueGrid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit) or {})
+            end
         end
 
         if info.focus then
@@ -798,7 +790,6 @@ function CreateUI()
     LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
-	CreateQueueGrid(controls.bg)
 end
 
 function OnSelection(units)

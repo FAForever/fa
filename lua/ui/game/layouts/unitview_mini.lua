@@ -24,35 +24,12 @@ local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/fuel.dds'),
     UIUtil.UIFile('/game/unit_view_icons/build.dds'),
 }
+
 function SetLayout()
     local controls = import('/lua/ui/game/unitview.lua').controls
-	
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
-	
-	controls.queue.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/queue_back.dds'))
-	
-    LayoutHelpers.SetDimensions(controls.queue, 316, 48)
-	LayoutHelpers.Above(controls.queue, controls.bg, 10)
-    LayoutHelpers.AtLeftIn(controls.queue, controls.bg, 3)
-	
-	LayoutHelpers.FillParent(controls.queue.bg, controls.queue)
-	LayoutHelpers.FillParent(controls.queue.grid, controls.queue)
-    controls.queue:DisableHitTest()
-	
-	for id, item in controls.queue.grid._items[1] do
-		LOG(id..' - '..tostring(item:IsHidden()))
-		item:SetTexture(UIUtil.SkinnableFile('/game/avatar-factory-panel/avatar-s-e-f_bmp.dds'))
-		item:Hide()
-		LOG(id..' - '..tostring(item:IsHidden()))
-		-- LOG(repr(item))
-        -- LayoutHelpers.DepthOverParent(item.icon, item)
-        -- LayoutHelpers.FillParentFixedBorder(item.icon, item, 6)
-        -- LayoutHelpers.DepthOverParent(item.text, item.icon)
-        -- LayoutHelpers.AtRightBottomIn(item.text, item, 4, 4)
-		-- item:Hide()
-	end	
 
     controls.bracket:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/bracket-unit_bmp.dds'))
     LayoutHelpers.AtLeftTopIn(controls.bracket, controls.bg, -18, -2)
