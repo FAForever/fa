@@ -141,6 +141,9 @@ Patch 3726 (26th November, 2021)
     As an example, hover units no longer jump to their hover
     elevation when they're finished. All experimentals have
     unique build animations that fit the style of the faction.
+ - (#3586) Force shader re-compilation on development branches
+ - (#3583) Update URLs to https instead of http
+ - (#3567) Fix graphicals of Summit and Fatboy
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -175,17 +178,18 @@ Patch 3726 (26th November, 2021)
     to the build animation.
  - (#3582) Prevent unneccessary allocations during the Aeon build animation
  - (#3587, #3589) Optimize most common called unit functions
+ - (#3595, #3590, #3588) Optimize weapons
 
 ### Contributors
  - Askaholic (#3417, #3440)
  - Madmax (#3420, #3419, #3582)
  - Uveso (#3477)
- - Rowey (#3475, #3528, #3533)
+ - Rowey (#3475, #3528, #3533, ##3583)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
         #3558, #3582, #3581, #3587, #3589, #3601, #3600
-        #3599, #3598)
+        #3599, #3598, #3595, #3590, #3588, #3586, #3567)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
