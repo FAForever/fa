@@ -78,7 +78,8 @@ Patch 3726 (26th November, 2021)
     more!
  - (#3581) Fire Beetle properly applies EMP / stun buffs
  - (#3601) Fix Seraphim t3 MAA from zapping through shields
-    
+ - (#3599) Fix consumption bug introduced by #3447
+ - (#3598) Fix Rhino overshooting its target.
 ### Other
  - (#3523) Switch off debug utilities by default
     This is only useful for developers, but it did cause
@@ -180,7 +181,8 @@ Patch 3726 (26th November, 2021)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
-        #3558, #3582, #3581, #3587, #3589, #3601, #3600)
+        #3558, #3582, #3581, #3587, #3589, #3601, #3600
+        #3599, #3598)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
