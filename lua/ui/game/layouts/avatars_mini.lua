@@ -49,7 +49,7 @@ function LayoutAvatars()
             LayoutHelpers.AtRightIn(control, prevControl)
             height = height + (control.Bottom() - prevControl.Bottom())
         else
-            LayoutHelpers.AtRightTopIn(control, controls.avatarGroup, rightOffset, topOffset)
+            LayoutHelpers.AtRightTopIn(control, controls.avatarGroup, 16, 14)
             height = control.Height()
         end
         prevControl = control
@@ -58,7 +58,7 @@ function LayoutAvatars()
         if prevControl then
             controls.idleEngineers.prevControl = prevControl
             LayoutHelpers.AnchorToBottom(controls.idleEngineers, controls.idleEngineers.prevControl, space)
-            LayoutHelpers.AtRightIn(controls.idleEngineers, controls.idleEngineers.prevControl)
+            LayoutHelpers.AtRightIn(controls.idleEngineers, controls.idleEngineers.prevControl, -4)
             height = height + (controls.idleEngineers.Bottom() - controls.idleEngineers.prevControl.Bottom())
         else
             LayoutHelpers.AtRightTopIn(controls.idleEngineers, controls.avatarGroup, rightOffset, topOffset)
