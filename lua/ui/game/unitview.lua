@@ -266,6 +266,16 @@ function CreateQueueGrid(parent)
 	controls.queue.bg = Bitmap(controls.queue)	
     controls.queue:DisableHitTest()
 	
+	controls.queue.bg.leftBracket = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.rightGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowBottom = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.leftGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowBottom = Bitmap(controls.queue.bg)
+	
 	local function CreateGridUnitIcon(parent)
         local item =  Bitmap(parent)
         item.icon = Bitmap(item)
