@@ -24,9 +24,9 @@ local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/fuel.dds'),
     UIUtil.UIFile('/game/unit_view_icons/build.dds'),
 }
+
 function SetLayout()
     local controls = import('/lua/ui/game/unitview.lua').controls
-	
     controls.bg:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/build-over-back_bmp.dds'))
     LayoutHelpers.AtLeftIn(controls.bg, controls.parent)
     LayoutHelpers.AtBottomIn(controls.bg, controls.parent)
