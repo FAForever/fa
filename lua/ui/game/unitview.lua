@@ -567,6 +567,9 @@ function UpdateWindow(info)
             if controls.abilities:IsHidden() then
                 controls.abilities:Show()
             end
+            if controls.abilityBG and controls.abilityBG:IsHidden() then
+                controls.abilityBG:Show()
+            end
         elseif not controls.abilities:IsHidden() then
             controls.abilities:Hide()
         end
