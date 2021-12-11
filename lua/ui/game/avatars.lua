@@ -150,8 +150,8 @@ function CreateAvatar(unit)
         true, "avatar RO Shield Status Bar")
 
 
-    LayoutHelpers.AtLeftIn(bg.healthbar, bg, 8)
-    LayoutHelpers.AtRightBottomIn(bg.healthbar, bg, 14, 5)
+    LayoutHelpers.AtLeftIn(bg.healthbar, bg, 11)
+    LayoutHelpers.AtRightBottomIn(bg.healthbar, bg, 14, 4)
     LayoutHelpers.AnchorToBottom(bg.healthbar, bg.healthbar, -10)
     bg.healthbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
     bg.healthbar.Width:Set(function() return bg.healthbar.Right() - bg.healthbar.Left() end)
