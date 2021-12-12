@@ -534,7 +534,20 @@ function UpdateWindow(info)
 
         if Prefs.GetFromCurrentProfile('options.gui_queue_on_hover') > 0 then 
             if info.userUnit ~= nil and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and info.userUnit ~= selectedUnit then
-                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(info.userUnit))
+
+                -- find the main factory we're using the queue of
+                local mainFactory
+                local factory = info.userUnit
+                while true do 
+                    mainFactory = factory:GetGuardedEntity()
+                    if mainFactory == nil then 
+                        break
+                    end
+                    factory = mainFactory
+                end
+                
+                -- show that queue
+                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
             else 
                 controls.queue:Hide()
             end
