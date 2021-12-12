@@ -402,7 +402,10 @@ Tooltips = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
     },
-
+    minimap_pin = {
+        title = "<LOC tooltipui0800>Pin Minimap Window",
+        description = "<LOC tooltipui0801>Locks the position and layout of the minimap window",
+    },
     toggle_cartographic = {
         title = "<LOC tooltipui0415>Cartographic Mode",
         description = "<LOC tooltipui0416>Display the terrain using a topographic visualization",
