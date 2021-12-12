@@ -9,6 +9,7 @@ local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Edit = import('/lua/maui/edit.lua').Edit
+local options = import('/lua/user/prefs.lua').GetFromCurrentProfile('options')
 
 local dialog, nameDialog, defaultEditField
 local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
