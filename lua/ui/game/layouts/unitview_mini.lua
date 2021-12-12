@@ -131,9 +131,8 @@ function SetBG(controls)
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_vert_r.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_horz_um.dds'),
         UIUtil.UIFile('/game/filter-ping-list-panel/panel_brd_lm.dds')
-)
-    
-    if controls.bg:GetAlpha() == 0 then controls.abilityBG:Hide() else controls.abilityBG:Show() end
+)   
+    if controls.bg:GetAlpha() == 0 or controls.bg:IsHidden() then controls.abilityBG:Hide() else controls.abilityBG:Show() end
 
     controls.abilityBG:Surround(controls.abilities, 3, 5)
     LayoutHelpers.DepthUnderParent(controls.abilityBG, controls.abilities)
