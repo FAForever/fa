@@ -678,11 +678,17 @@ function CreateDialog(x, y)
     local veterancyLevel = Edit(dialog)
     numImputSettings(veterancyLevel, veterancyLabel, '0')
 
+    local orientLabel = UIUtil.CreateText(count, 'Yaw:', 12, UIUtil.bodyFont)
+    LayoutHelpers.RightOf(orientLabel, veterancyLevel, 5)
+    local orientation = Edit(dialog)
+    numImputSettings(orientation, orientLabel, '0')
+
     if SpawnThread then KillThread(SpawnThread) end
 
     local function spreadSpawn(id, count, vet)
         count = tonumber(count:GetText()) or 1
         vet = tonumber(vet:GetText()) or 0
+        local ori = (tonumber(orientation:GetText()) or 0) / 57.295779513
 
         import('/lua/ui/game/commandmode.lua').StartCommandMode("build", { name = id })
         local function callbackargs() return {
@@ -692,7 +698,8 @@ function CreateDialog(x, y)
                 count = count,
                 army = currentArmy,
                 pos = GetMouseWorldPos(),
-                veterancy = vet
+                veterancy = vet,
+                yaw = ori,
             }
         } end
 
@@ -718,7 +725,7 @@ function CreateDialog(x, y)
 
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
-    LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
+    LayoutHelpers.LeftOf(createBtn, cancelBtn, 5)
     createBtn.OnClick = function(button)
         for unitID, _ in CreationList do
             SpawnThread = ForkThread(spreadSpawn, unitID, count, veterancyLevel)
@@ -872,13 +879,18 @@ function CreateDialog(x, y)
         end
     end
 
-    local saveFilterSet = UIUtil.CreateButton(dialog,
-        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-        'Save Filter', 10)
-    saveFilterSet.label:SetFont(UIUtil.bodyFont, 10)
+    local function CreateToggleButton(text)
+        local btn = UIUtil.CreateButton(dialog,
+            '/dialogs/toggle_btn/toggle-d_btn_up.dds',
+            '/dialogs/toggle_btn/toggle-d_btn_down.dds',
+            '/dialogs/toggle_btn/toggle-d_btn_over.dds',
+            '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
+            text, 10)
+        btn.label:SetFont(UIUtil.bodyFont, 10)
+        return btn
+    end
+
+    local saveFilterSet = CreateToggleButton 'Save Filter'
     LayoutHelpers.RightOf(saveFilterSet, filterSetCombo)
     LayoutHelpers.AtVerticalCenterIn(saveFilterSet, filterSetCombo)
     saveFilterSet.OnClick = function(self, modifiers)
@@ -895,13 +907,7 @@ function CreateDialog(x, y)
         end)
     end
 
-    local delFilterSet = UIUtil.CreateButton(dialog,
-        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-        'Delete Filter', 10)
-    delFilterSet.label:SetFont(UIUtil.bodyFont, 10)
+    local delFilterSet = CreateToggleButton 'Delete Filter'
     LayoutHelpers.RightOf(delFilterSet, saveFilterSet)
     LayoutHelpers.AtVerticalCenterIn(delFilterSet, filterSetCombo)
     delFilterSet.OnClick = function(self, modifiers)
@@ -918,13 +924,7 @@ function CreateDialog(x, y)
        end
     end
 
-    local propSwapBtn = UIUtil.CreateButton(dialog,
-        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-        'Prop mode', 10
-    )
+    local propSwapBtn = CreateToggleButton 'Prop mode'
     LayoutHelpers.Below(propSwapBtn, armiesGroup, 5)
     LayoutHelpers.RightOf(propSwapBtn, delFilterSet, 9)
     propSwapBtn.OnClick = function(button)
