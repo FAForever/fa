@@ -4117,8 +4117,10 @@ AIBrain = Class(moho.aibrain_methods) {
     GetUnitsAroundPoint = function(self, category, position, radius, alliance, excludeInsignificantUnits)
         local units
         if alliance then 
+            -- call where we do care about alliance
             units = BrainGetUnitsAroundPoint(self, category, position, radius, alliance)
         else 
+            -- call where we do not, which is different from providing nil (as there would be a fifth argument then)
             units = BrainGetUnitsAroundPoint(self, category, position, radius)
         end
 
