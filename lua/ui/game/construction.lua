@@ -2420,7 +2420,10 @@ function SetSecondaryDisplay(type)
             end
             controls.secondaryProgress:SetAlpha(0, true)
         end
-        controls.secondaryChoices:Refresh(data)
+        controls.secondaryChoices:Refresh(data)--refreshes hidden UI when unit queue updated and shows its elements
+        if controls.secondaryChoices:IsHidden() then
+            for _, item  in controls.secondaryChoices.Items do item:Hide() end
+        end
     else
         updateQueue = true
     end
