@@ -217,7 +217,7 @@ function CapStructure(command)
     local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
     local isTripleTapped = structure ~= nil and (pStructure1 == structure) and (pStructure2 == structure) 
 
-    local isUpgrading = structure:GetFocus() ~= nil
+    local isUpgrading = structure:GetFocus() ~= nil and isShiftDown
 
     local isTech1 = structure:IsInCategory('TECH1')
     local isTech2 = structure:IsInCategory('TECH2')
