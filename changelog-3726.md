@@ -24,7 +24,7 @@ Patch 3726 (26th November, 2021)
     - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
     - When you have engineers of two or more factions, one must assist the other as they can't build the same storages.
     - When you have engineers of one faction and units that can't build the storage (kennel drones, ACU) then they must assist an engineer as they can't build the storages themselves.
- - (#3597) View factory queue on hover
+ - (#3597, #3605) View factory queue on hover
     This allows you to get a quick overview of the factory queue by
     just hovering over the unit. Especially useful for casters as
     you can now view the factory queue without switching to the army
@@ -203,7 +203,7 @@ Patch 3726 (26th November, 2021)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
  - Balthazar (#3552)
- - 4z0t (#3554, #3597)
+ - 4z0t (#3554, #3597, #3605)
  - Marlo (#3582)
  - Eternal (#3597)
 
