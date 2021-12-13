@@ -242,3 +242,4 @@ Patch 3728 (20th of December, 2021)
 
 ### Translators
  - Lenkin (#3440)
+ - 4z0t (#3597)
