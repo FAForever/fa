@@ -2,7 +2,7 @@ Patch 3726 (26th November, 2021)
 ============================
 
 ### Features
- - (#3484, #3500, #3535, #3600) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
+ - (#3484, #3500, #3535, #3600, #3604) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
     This changes the capping behavior to:
     - 2 clicks + shift to mass storage an upgrading t1 (or t2) extractor
     - 1 click (+ shift) to mass storage a (finished) t2 / t3 extractor
@@ -24,7 +24,7 @@ Patch 3726 (26th November, 2021)
     - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
     - When you have engineers of two or more factions, one must assist the other as they can't build the same storages.
     - When you have engineers of one faction and units that can't build the storage (kennel drones, ACU) then they must assist an engineer as they can't build the storages themselves.
- - (#3597, #3605) View factory queue on hover
+ - (#3597, #3604, #3605) View factory queue on hover
     This allows you to get a quick overview of the factory queue by
     just hovering over the unit. Especially useful for casters as
     you can now view the factory queue without switching to the army
@@ -72,7 +72,7 @@ Patch 3726 (26th November, 2021)
     Megalith: only when fully complete as it sits
     Colossus: when complete 50% or more
     Ythotha: when complete 50% or more
- - (#3440) Removes the dummy drone from the unit restriction list
+ - (#3440, #3604) Removes the dummy drone from the unit restriction list
     This drone was often misintepreted as an easy way to unrate a game. In
     contrast to what the name suggests it does have a function: to help gift
     units when a player dies and full share is on. The drone can no longer be
