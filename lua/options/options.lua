@@ -547,8 +547,9 @@ options = {
                 default = 1,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        {text = "<LOC _Off>Off", key = 'off' },
+                        {text = "<LOC _Obs>Only when observing", key = 'only-obs' },
+                        {text = "<LOC _Always>Always", key = 'always' },
                     },
                 },
             },
