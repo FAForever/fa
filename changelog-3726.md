@@ -33,7 +33,7 @@ Patch 3728 (20th of December, 2021)
     - Only mass storages and extractors
     - Full suite
 
- - (#3597, #3604, #3605) View factory queue on hover
+ - (#3597, #3604, #3605, #3607) View factory queue on hover
     This allows you to get a quick overview of the factory queue by
     just hovering over the unit. Especially useful for casters as
     you can now view the factory queue without switching to the army
@@ -45,7 +45,7 @@ Patch 3728 (20th of December, 2021)
     - Only on when observing
     - Always
 
-  - (#3531) Add an option to scale down the UI (to 80%) for low resolution monitors
+ - (#3531) Add an option to scale down the UI (to 80%) for low resolution monitors
     This doesn't appear to be an issue at first due to the infinite 
     zoom but when the score board takes up 50% of your screen due to a
     1024x720 resolution then it suddenly is.
@@ -53,7 +53,7 @@ Patch 3728 (20th of December, 2021)
     Not all of the UI can manage this - please report issues in #game-general
     in the FAF discord when you find them.
 
-  - (#3554) Add quick-swap feature to lobby for the host
+ - (#3554) Add quick-swap feature to lobby for the host
     As a host you can quickly swap two players by
     left-clicking on the slot numbers of two players. It
     highlights to teal (light / bright blue color) when
@@ -176,6 +176,7 @@ Patch 3728 (20th of December, 2021)
  - (#3583) Update URLs to https instead of http
  - (#3567) Fix graphicals of Summit and Fatboy
  - (#3606) Fix (build) icon of Seraphim T3 MAA
+ - (#3607) Fix Cybran ACU not having the right amount of build bots when enhanced
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -226,12 +227,12 @@ Patch 3728 (20th of December, 2021)
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
         #3558, #3582, #3581, #3587, #3589, #3601, #3600
         #3599, #3598, #3595, #3590, #3588, #3586, #3567
-        #3604)
+        #3604, #3607)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
  - Balthazar (#3552)
- - 4z0t (#3554, #3597, #3605)
+ - 4z0t (#3554, #3597, #3605, #3607)
  - Marlo (#3582)
  - Eternal (#3597)
 
