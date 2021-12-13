@@ -194,6 +194,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
         -- T2 Engineering
         elseif enh =='AdvancedEngineering' then
+            self.BuildBots = 3
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
@@ -223,6 +224,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
         elseif enh =='AdvancedEngineeringRemove' then
+            self.BuildBots = 2
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
@@ -232,6 +234,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
         -- T3 Engineering
         elseif enh =='T3Engineering' then
+            self.BuildBots = 4
             local bp = self:GetBlueprint().Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
@@ -261,6 +264,12 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
             Buff.ApplyBuff(self, 'CybranACUT3BuildRate')
         elseif enh =='T3EngineeringRemove' then
+
+            -- we do not know the order for sure when both build enhancements are removed at once
+            if self.BuildBots == 4 then 
+                self.BuildBots = 3
+            end
+
             local bp = self:GetBlueprint().Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
