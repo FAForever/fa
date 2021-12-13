@@ -4,8 +4,8 @@ Patch 3726 (26th November, 2021)
 ### Features
  - (#3484, #3500, #3535, #3600, #3604) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
     This changes the capping behavior to:
-    - 2 clicks + shift to mass storage an upgrading t1 (or t2) extractor
-    - 1 click to mass storage a (finished) t2 / t3 extractor
+    - 2 clicks + shift to mass storage an upgrading t1 extractor
+    - 1 click to mass storage a t2 / t3 extractor
     - 3 clicks to shift + mass fab cap an upgrading t2 extractor
     - 2 clicks to shift + mass fab cap a t3 extractor
 
