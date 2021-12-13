@@ -111,7 +111,7 @@ Patch 3726 (26th November, 2021)
  - (#3475) Fix capitalisation consistency
  - (#3443) Allow trashbag to be re-used for effects
  - (#3489) Fix UI description of teleport
- - (#3491) Fix the attack animation of the Monkey Lord
+ - (#3491) Fix the attack animation of the Monkeylord
  - (#3349) Updates the readme with the most recent dependencies
  - (#3461) Remove game quality computations for games with more than two teams
     The Trueskill system is not designed to compute the quality of a game 
@@ -133,7 +133,7 @@ Patch 3726 (26th November, 2021)
     is the long standing bug with the Aeon build animation where
     the aim bones are underground at the start of construction.
     
-    Sadly - this change is quite involved because a lot of the
+    Sadly, this change is quite involved because a lot of the
     functionality expects a full-fledged unit. We've tried to
     catch some of these but there will be more issues that will
     show up, especially with scripted maps.
@@ -155,7 +155,7 @@ Patch 3726 (26th November, 2021)
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
- - (#3447) Remove old AI related code that was being run regardless of whether AIs were in-game
+ - (#3447) Removed old AI related code that was being run regardless of whether AIs were in-game
     This change is involved performance-wise but does not impact gameplay.
 
     As a practical example: chain ten engineers assisting one another and make the
@@ -192,7 +192,7 @@ Patch 3726 (26th November, 2021)
  - Askaholic (#3417, #3440)
  - Madmax (#3420, #3419, #3582)
  - Uveso (#3477)
- - Rowey (#3475, #3528, #3533, ##3583)
+ - Rowey (#3475, #3528, #3533, #3583)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
