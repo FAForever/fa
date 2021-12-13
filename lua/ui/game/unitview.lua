@@ -533,9 +533,9 @@ function UpdateWindow(info)
 
         -- # Build queue upon hovering of unit
 
-        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover') == 'always'
+        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_01') == 'always'
         local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
-        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover') == 'only-obs'
+        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_01') == 'only-obs'
 
         if always or (whenObserving and isObserver) then 
             if info.userUnit ~= nil and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and info.userUnit ~= selectedUnit then

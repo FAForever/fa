@@ -806,7 +806,7 @@ Tooltips = {
         title = "<LOC OPTIONS_0212>Accept Build Templates",
         description = "<LOC OPTIONS_0217>Allows other players to send you build templates over the network",
     },
-    options_structure_capping_feature = {
+    options_structure_capping_feature_01 = {
         title = "<LOC OPTIONS_0273>Automated Structure Encircling",
         description = "<LOC OPTIONS_0274>Assist a structure to cap it with adjacency-friendly structures. As an example: storages surrounding a tech 2 or tech 3 mass extractor.",
     },
@@ -2056,7 +2056,7 @@ Tooltips = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',
         description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
     },
-    options_gui_queue_on_hover = {
+    options_gui_queue_on_hover_01 = {
         title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
         description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
     },

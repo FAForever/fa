@@ -196,7 +196,7 @@ local pStructure2 = nil
 function CapStructure(command)
 
     -- retrieve the option in question
-    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature')
+    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
 
     -- bail out - we're not interested
     if option == 'off' then 

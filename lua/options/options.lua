@@ -258,7 +258,7 @@ options = {
             },
             {
                 title = "<LOC OPTIONS_0273>Automated Structure Encircling",
-                key = 'structure_capping_feature',
+                key = 'structure_capping_feature_01',
                 type = 'toggle',
                 default = true,
                 custom = {
@@ -543,7 +543,7 @@ options = {
 
             {
                 title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
-                key = 'gui_queue_on_hover',
+                key = 'gui_queue_on_hover_01',
                 type = 'toggle',
                 default = 1,
                 custom = {
