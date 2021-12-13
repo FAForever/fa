@@ -257,7 +257,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0273>Structure Capping Feature",
+                title = "<LOC OPTIONS_0273>Automated Structure Encircling",
                 key = 'structure_capping_feature',
                 type = 'toggle',
                 default = true,
