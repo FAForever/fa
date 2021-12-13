@@ -530,7 +530,6 @@ function UpdateWindow(info)
             unitQueue = info.userUnit:GetCommandQueue()
         end
 
-
         -- # Build queue upon hovering of unit
 
         local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_01') == 'always'
@@ -553,6 +552,7 @@ function UpdateWindow(info)
                 
                 -- show that queue
                 controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
+                ClearCurrentFactoryForQueueDisplay()
             else 
                 controls.queue:Hide()
             end
