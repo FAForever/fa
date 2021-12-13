@@ -257,14 +257,15 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
-                key = 'assist_mex',
+                title = "<LOC OPTIONS_0273>Automated Structure Encircling",
+                key = 'structure_capping_feature_01',
                 type = 'toggle',
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = false},
-                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>Off",                                            key = "off"},
+                        {text = "<LOC _OnlyExtractors>Only mass storages and extractors",   key = "only-storages-extractors"},
+                        {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
                     },
                 },
             },
@@ -542,13 +543,14 @@ options = {
 
             {
                 title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
-                key = 'gui_queue_on_hover',
+                key = 'gui_queue_on_hover_01',
                 type = 'toggle',
                 default = 1,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = 0 },
-                        {text = "<LOC _On>", key = 1 },
+                        {text = "<LOC _Off>Off", key = 'off' },
+                        {text = "<LOC _Obs>Only when observing", key = 'only-obs' },
+                        {text = "<LOC _Always>Always", key = 'always' },
                     },
                 },
             },

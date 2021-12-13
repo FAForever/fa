@@ -268,6 +268,17 @@ Callbacks.CapStructure = function(data, units)
         end
     end
 
+    -- -- only keep at most six builders due to performance
+    -- local allBuilders = builders
+    -- builders = { }
+    -- for k, engineer in allBuilders do 
+    --     if k < 7 then 
+    --         builders[k] = engineer 
+    --     else 
+    --         TableInsert(otherBuilders, engineer)
+    --     end
+    -- end
+
     -- compute / retrieve information for capping
     local blueprintID = ConstructBlueprintID(faction, data.id)
     local blueprint = structure:GetBlueprint()
@@ -345,8 +356,19 @@ Callbacks.CapStructure = function(data, units)
             end
         end
 
-        -- assist for all other builders
-        IssueGuard(otherBuilders, builders[1])
+        -- assist for all other builders, spread over the number of actual builders
+        local t = { }
+        local builderIndex = 1
+        local builderCount = TableGetn(builders)
+        for k, builder in otherBuilders do 
+            t[1] = builder 
+            IssueGuard(t, builders[builderIndex])
+
+            builderIndex = builderIndex + 1 
+            if builderIndex > builderCount then 
+                builderIndex = 1 
+            end
+        end
     end
 end
 

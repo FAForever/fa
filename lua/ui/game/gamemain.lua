@@ -58,6 +58,8 @@ gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
 
+OriginalFocusArmy = -1
+
 function KillWaitingDialog()
     if waitingDialog then
         waitingDialog:Destroy()
@@ -142,6 +144,9 @@ function CreateUI(isReplay)
 
     -- keep track of the original focus army
     import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
+    OriginalFocusArmy = GetFocusArmy()
+
+
 
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
