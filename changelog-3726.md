@@ -5,33 +5,60 @@ Patch 3726 (26th November, 2021)
  - (#3484, #3500, #3535, #3600, #3604) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
     This changes the capping behavior to:
     - 2 clicks + shift to mass storage an upgrading t1 (or t2) extractor
-    - 1 click (+ shift) to mass storage a (finished) t2 / t3 extractor
-    - 3 clicks + shift to mass fab cap an upgrading t2 extractor
-    - 2 clicks + shift to mass fab cap a t3 extractor
+    - 1 click to mass storage a (finished) t2 / t3 extractor
+    - 3 clicks to shift + mass fab cap an upgrading t2 extractor
+    - 2 clicks to shift + mass fab cap a t3 extractor
 
-    - 1 clicks + shift to mass storage a t3 fabricator
-    - 1 clicks + shift to pgen an artillery
+    - 1 clicks to mass storage a t3 fabricator
+    - 1 clicks to pgen an artillery
     - 2 clicks + shift to pgen an upgrading t1 radar
-    - 1 clicks + shift to pgen an radar, t2 radar or t3 radar
-    - 1 click + shift to wall a t1 pd
+    - 1 clicks to pgen an t2 radar or t3 radar
+    - 1 click to wall a t1 pd
    
     General rule of thumb:
-    - Typical: shift + 1 click
+    - Typical: click
     - Upgrading: shift + 2 click
     - Dangerous: shift + (regular click count + 1)
+
+    Shift was already part of the feature and is extended to prevent unintended capping.
     
     Assisting behavior
     - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
     - When you have engineers of two or more factions, one must assist the other as they can't build the same storages.
     - When you have engineers of one faction and units that can't build the storage (kennel drones, ACU) then they must assist an engineer as they can't build the storages themselves.
+
+    This option can be adjusted in options -> gameplay. Search for
+    the field 'Automated Structure Encircling'. Options are:
+    - Off
+    - Only mass storages and extractors
+    - Full suite
+
  - (#3597, #3604, #3605) View factory queue on hover
     This allows you to get a quick overview of the factory queue by
     just hovering over the unit. Especially useful for casters as
     you can now view the factory queue without switching to the army
     in question.
 
-    Can be turned off in the options. See the 
-    field 'Show Factory Queue on Hover'.
+    Can be adjusted in the options -> interface. Search for the 
+    field 'Show Factory Queue on Hover'. Options are:
+    - Off
+    - Only on when observing
+    - Always
+
+  - (#3531) Add an option to scale down the UI (to 80%) for low resolution monitors
+    This doesn't appear to be an issue at first due to the infinite 
+    zoom but when the score board takes up 50% of your screen due to a
+    1024x720 resolution then it suddenly is.
+
+    Not all of the UI can manage this - please report issues in #game-general
+    in the FAF discord when you find them.
+
+  - (#3554) Add quick-swap feature to lobby for the host
+    As a host you can quickly swap two players by
+    left-clicking on the slot numbers of two players. It
+    highlights to teal (light / bright blue color) when
+    in swap modus. Click the highlighted slot number to
+    cancel.
 
 ### Stability
  - (#3477) Prevent clearing critical state in AI functions
@@ -59,6 +86,7 @@ Patch 3726 (26th November, 2021)
     Adds icon support to FAF Beta.
 
     Adds the ability to more easily block content that is integrated.
+
  - (#3527) Integrate the Nvidia Fix mod and block the mod from loading
  - (#3543) Prevent applying bugs to insignificant units, like the Cybran build drone
  - (#3550) Attempt to fix Rhino from missing its target 
@@ -72,18 +100,21 @@ Patch 3726 (26th November, 2021)
     Megalith: only when fully complete as it sits
     Colossus: when complete 50% or more
     Ythotha: when complete 50% or more
+
  - (#3440, #3604) Removes the dummy drone from the unit restriction list
     This drone was often misintepreted as an easy way to unrate a game. In
     contrast to what the name suggests it does have a function: to help gift
     units when a player dies and full share is on. The drone can no longer be
     restricted and instead there is a dedicated lobby option to unrate the
     game.
+
  - (#3525) Fix the unpathable skirts of the Seraphim Quantum Gateway
  - (#3582) Fix Aeon aim bones being underground when building
     This fixes the famous issue where an unfinished t1 pd 
     attracts a lot of fire, but because its aim bones are still
     underground all the attacking units shoot at the ground. No
     more!
+
  - (#3581) Fire Beetle properly applies EMP / stun buffs
  - (#3601) Fix Seraphim t3 MAA from zapping through shields
  - (#3599) Fix consumption bug introduced by #3447
@@ -100,6 +131,7 @@ Patch 3726 (26th November, 2021)
     this as a developer by adding
     `debug = { enable_debug_facilities = true }`
     to your preference file
+
  - (#3417) Add unit tests for generic utility functions
  - (#3420) Fix small issues for units of the Cybran faction.
  - (#3492) Remove greyness when deviation is high
@@ -107,7 +139,8 @@ Patch 3726 (26th November, 2021)
     games people played across the board (ladder / tmm / globals)
     it should become easier for people to 'get into' custom games
     without being called a noob beforehand or a smurf afterwards (never
-     played custom games, but played a lot of ladder).
+    played custom games, but played a lot of ladder).
+
  - (#3475) Fix capitalisation consistency
  - (#3443) Allow trashbag to be re-used for effects
  - (#3489) Fix UI description of teleport
@@ -117,15 +150,9 @@ Patch 3726 (26th November, 2021)
     The Trueskill system is not designed to compute the quality of a game 
     when more than (or less than) two teams are involved. Hence, the 
     computation is gibberish anyhow.
+
  - (#3526) Remove the curated maps button until an alternative is available
  - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is
- - (#3531) Add an option to scale down the UI (to 80%) for low resolution monitors
-    This doesn't appear to be an issue at first due to the infinite 
-    zoom but when the score board takes up 50% of your screen due to a
-    1024x720 resolution then it suddenly is.
-
-    Not all of the UI can manage this - please report issues in #game-general
-    in the FAF discord when you find them.
  - (#3533) Change default settings of auto lobby to 1.5K unit cap and full share (used by ladder / team match making)
  - (#3441) Introduction of insignificant or dummy units
     This introduces a new unit class that can be used to fix
@@ -137,18 +164,14 @@ Patch 3726 (26th November, 2021)
     functionality expects a full-fledged unit. We've tried to
     catch some of these but there will be more issues that will
     show up, especially with scripted maps.
+
  - (#3552) Update regular expression of mod version removal
- - (#3554) Add quick-swap feature to lobby
-    As a host you can quickly swap two players by
-    left-clicking on the slot numbers of two players. It
-    highlights to teal (light / bright blue color) when
-    in swap modus. Click the highlighted slot number to
-    cancel.
  - (#3558) Restrict t2 artillery orientation to 90 degree angles
  - (#3582) Fixed various issues with the Aeon build animation
     As an example, hover units no longer jump to their hover
     elevation when they're finished. All experimentals have
     unique build animations that fit the style of the faction.
+
  - (#3586) Force shader re-compilation on development branches
  - (#3583) Update URLs to https instead of http
  - (#3567) Fix graphicals of Summit and Fatboy
@@ -167,11 +190,13 @@ Patch 3726 (26th November, 2021)
     The previous behavior would be that all engineers get updated immediately. This
     required it to search for engineers in its surrounding and all those it found
     would need to look up its surroundings too. This can quickly get out of hand.
+
  - (#3502) Optimize the import function that is used by all files.
  - (#3512) Removes AI threat computations and fixes AI detection
     AI code was being run during every game even when no AI was present in
     said game. After discussing it with the AI devs this pull requests
     completely removes the threat computations.
+
  - (#3419) Reduce impact on sim of common hover emitter effects
     Effects have an impact on the sim, in particular when they create a 
     particle. Once the particles exist they appear to be free of charge. 
@@ -180,11 +205,13 @@ Patch 3726 (26th November, 2021)
     range (sim wise) as the other engineers, without impacting their
     visual appearance too much. Disables the hover effects of these units
     all together when playing on low fidelity.
+
  - (#3557) Fix and improve performance on Seraphim build animations
     The old version had complicated logic and various
     computations that were not required. The new version is 
     better for performance and a lot more smooth with regards
     to the build animation.
+
  - (#3582) Prevent unneccessary allocations during the Aeon build animation
  - (#3587, #3589) Optimize most common called unit functions
  - (#3595, #3590, #3588) Optimize weapons
@@ -198,7 +225,8 @@ Patch 3726 (26th November, 2021)
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
         #3558, #3582, #3581, #3587, #3589, #3601, #3600
-        #3599, #3598, #3595, #3590, #3588, #3586, #3567)
+        #3599, #3598, #3595, #3590, #3588, #3586, #3567
+        #3604)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
