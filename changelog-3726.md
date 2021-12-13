@@ -152,6 +152,7 @@ Patch 3726 (26th November, 2021)
  - (#3586) Force shader re-compilation on development branches
  - (#3583) Update URLs to https instead of http
  - (#3567) Fix graphicals of Summit and Fatboy
+ - (#3606) Fix (build) icon of Seraphim T3 MAA
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -192,7 +193,7 @@ Patch 3726 (26th November, 2021)
  - Askaholic (#3417, #3440)
  - Madmax (#3420, #3419, #3582)
  - Uveso (#3477)
- - Rowey (#3475, #3528, #3533, #3583)
+ - Rowey (#3475, #3528, #3533, #3583, #3606)
  - Jip (#3443, #3316, #3491, #3447, #3484, #3492, #3500, 
         #3522, #3512, #3440, #3419, #3525, #3526, #3490,
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
