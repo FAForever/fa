@@ -257,7 +257,7 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0273>Structure capping feature",
+                title = "<LOC OPTIONS_0273>Structure Capping Feature",
                 key = 'structure_capping_feature',
                 type = 'toggle',
                 default = true,
