@@ -10,7 +10,7 @@ Patch 3728 (20th of December, 2021)
     - 2 clicks to shift + mass fab cap a t3 extractor
 
     - 1 clicks to mass storage a t3 fabricator
-    - 1 clicks to pgen an artillery
+    - 1 clicks to pgen an t2 artillery
     - 2 clicks + shift to pgen an upgrading t1 radar
     - 1 clicks to pgen an t2 radar or t3 radar
     - 1 click to wall a t1 pd
@@ -152,7 +152,7 @@ Patch 3728 (20th of December, 2021)
     computation is gibberish anyhow.
 
  - (#3526) Remove the curated maps button until an alternative is available
- - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is
+ - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is selected
  - (#3533) Change default settings of auto lobby to 1.5K unit cap and full share (used by ladder / team match making)
  - (#3441) Introduction of insignificant or dummy units
     This introduces a new unit class that can be used to fix
