@@ -23,6 +23,7 @@ local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
 local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
 local Grid = import('/lua/maui/grid.lua').Grid
 local Construction = import('/lua/ui/game/construction.lua')
+local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local selectedUnit = nil
 local updateThread = nil
@@ -532,7 +533,11 @@ function UpdateWindow(info)
 
         -- # Build queue upon hovering of unit
 
-        if Prefs.GetFromCurrentProfile('options.gui_queue_on_hover') > 0 then 
+        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover') == 'always'
+        local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
+        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover') == 'only-obs'
+
+        if always or (whenObserving and isObserver) then 
             if info.userUnit ~= nil and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and info.userUnit ~= selectedUnit then
 
                 -- find the main factory we're using the queue of
