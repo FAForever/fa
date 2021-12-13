@@ -195,6 +195,14 @@ local pStructure1 = nil
 local pStructure2 = nil
 function CapStructure(command)
 
+    -- retrieve the option in question
+    local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature')
+
+    -- bail out - we're not interested
+    if option == 'off' then 
+        return 
+    end
+
     -- check if we have engineers
     local units = EntityCategoryFilterDown(categories.ENGINEER, command.Units)
     if not units[1] then return end
@@ -216,7 +224,7 @@ function CapStructure(command)
     local isTech3 = structure:IsInCategory('TECH3')
 
     -- are we a structure and are we holding shift?
-    if structure:IsInCategory('STRUCTURE') and IsKeyDown('Shift') then 
+    if structure:IsInCategory('STRUCTURE') then 
 
         -- try and create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then 
@@ -245,41 +253,45 @@ function CapStructure(command)
                 pStructure2 = nil
             end
 
-        -- if we have a t3 fabricator, create storages around it
-        elseif structure:IsInCategory('MASSFABRICATION') and isTech3 then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
+        -- only apply these if we're interested in them
+        elseif option == 'full-suite' then 
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+            -- if we have a t3 fabricator, create storages around it
+            if structure:IsInCategory('MASSFABRICATION') and isTech3 then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
 
-        -- if we have a t2 artillery, create t1 pgens around it
-        elseif structure:IsInCategory('ARTILLERY') and isTech2 then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+            -- if we have a t2 artillery, create t1 pgens around it
+            elseif structure:IsInCategory('ARTILLERY') and isTech2 then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
-        -- if we have a radar, create t1 pgens around it
-        elseif structure:IsInCategory('RADAR') and ((isTech1 and isUpgrading and isDoubleTapped) or isTech2 or structure:IsInCategory('OMNI'))  then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+            -- if we have a radar, create t1 pgens around it
+            elseif structure:IsInCategory('RADAR') and ((isTech1 and isUpgrading and isDoubleTapped) or isTech2 or structure:IsInCategory('OMNI'))  then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
-        -- if we have a t1 point defense, create walls around it
-        elseif structure:IsInCategory('DIRECTFIRE') and isTech1 then 
-            SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b5101" }}, true)
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
 
-            -- reset state
-            structure = nil
-            pStructure1 = nil
-            pStructure2 = nil
+            -- if we have a t1 point defense, create walls around it
+            elseif structure:IsInCategory('DIRECTFIRE') and isTech1 then 
+                SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b5101" }}, true)
+
+                -- reset state
+                structure = nil
+                pStructure1 = nil
+                pStructure2 = nil
+            end
         end
     end
 
@@ -326,8 +338,7 @@ function OnCommandIssued(command)
 
         -- see if we can cap a structure
         if EntityCategoryContains(categoriesStructure, command.Blueprint) then
-            local options = Prefs.GetFromCurrentProfile('options')
-            if options['assist_mex'] then CapStructure(command) end
+            CapStructure(command)
         end
 
     -- called when:

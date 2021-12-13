@@ -257,14 +257,15 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
-                key = 'assist_mex',
+                title = "<LOC OPTIONS_0273>Structure capping feature",
+                key = 'structure_capping_feature',
                 type = 'toggle',
                 default = true,
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = false},
-                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>Off",                                            key = "off"},
+                        {text = "<LOC _OnlyExtractors>Only mass storages and extractors",   key = "only-storages-extractors"},
+                        {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
                     },
                 },
             },
