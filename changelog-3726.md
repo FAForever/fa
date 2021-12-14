@@ -123,6 +123,7 @@ Patch 3728 (20th of December, 2021)
  - (#3596) Fix typo that prevents cybran build beams from spawning
 
 ### Other
+ - (#3480) Update visuals for the UEF T2 PD and Destroyer
  - (#3523) Switch off debug utilities by default
     This is only useful for developers, but it did cause
     a (slight) drain on resources when it was turned on
@@ -235,6 +236,7 @@ Patch 3728 (20th of December, 2021)
  - 4z0t (#3554, #3597, #3605, #3607)
  - Marlo (#3582)
  - Eternal (#3597)
+ - Tagada (#3480)
 
 ### Reviewers
  - Balthazar (#3484, #3587)
