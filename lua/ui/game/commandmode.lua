@@ -237,10 +237,11 @@ function CapStructure(command)
                 or isTech3
 
             local buildFabs = 
-                (
+                option == 'full-suite'
+                and (
                     (isTech2 and isUpgrading and isTripleTapped and isShiftDown) 
-                    or (isTech3 and isDoubleTapped)
-                ) and option == 'full-suite'
+                    or (isTech3 and isDoubleTapped and isShiftDown)
+                )  
 
             if buildStorages then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
@@ -256,14 +257,6 @@ function CapStructure(command)
             if buildFabs then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 2, id = "b1104" }}, true)
                 
-                -- reset state
-                structure = nil
-                pStructure1 = nil
-                pStructure2 = nil
-            end
-
-            -- prevent building up state when upgrading but shift isn't pressed
-            if isUpgrading and not isShiftDown then 
                 -- reset state
                 structure = nil
                 pStructure1 = nil
@@ -323,6 +316,13 @@ function CapStructure(command)
     -- keep track of previous structure to identify a 2nd / 3rd click
     pStructure2 = pStructure1
     pStructure1 = structure
+
+    -- prevent building up state when upgrading but shift isn't pressed
+    if isUpgrading and not isShiftDown then 
+        structure = nil
+        pStructure1 = nil
+        pStructure2 = nil
+    end
 end
 
 -- cached category strings for performance
