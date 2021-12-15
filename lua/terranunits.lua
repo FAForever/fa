@@ -458,6 +458,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)
         self.PodData[podName].PodHandle:SetParent(self, podName)
         self.PodData[podName].Active = true
+        return self.PodData[podName].PodHandle
     end,
 
     OnTransportAttach = function(self, bone, attachee)
@@ -483,7 +484,6 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
 
     OnTransportDetach = function(self, bone, attachee)
-        attachee:SetDoNotTarget(false)
         self:PlayUnitSound('Open')
         self:RequestRefreshUI()
         if not self.OpeningAnimationStarted then
@@ -502,25 +502,31 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
+    InitializeTower = function(self, forceAnimation)
+        -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
+        -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
+        -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
+        self.TowerCaptured = nil
+        local bp = self:GetBlueprint()
+        for _, v in bp.Economy.EngineeringPods do
+            if v.CreateWithUnit and not self.PodData[v.PodName].Active then
+                if not self.PodData then
+                    self.PodData = {}
+                end
+                self.PodData[v.PodName] = table.copy(v)
+                self:OnTransportDetach(false, self:CreatePod(v.PodName))
+            end
+        end
+
+        self.InitializedTower = true
+    end,
+
     FinishedBeingBuilt = State {
         Main = function(self)
             -- Wait one tick to make sure this wasn't captured and we don't create an extra pod
             coroutine.yield(1)
 
-            -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
-            -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
-            -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
-            self.TowerCaptured = nil
-            local bp = self:GetBlueprint()
-            for _, v in bp.Economy.EngineeringPods do
-                if v.CreateWithUnit and not self.PodData[v.PodName].Active then
-                    if not self.PodData then
-                        self.PodData = {}
-                    end
-                    self.PodData[v.PodName] = table.copy(v)
-                    self:CreatePod(v.PodName)
-                end
-            end
+            self:InitializeTower()
 
             ChangeState(self, self.MaintainPodsState)
         end,
@@ -619,7 +625,12 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:StopRocking()
+
+            -- catch case when tower is immediately upgraded during build
+            if not self.InitializedTower then 
+                self:InitializeTower()
+            end
+
             local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
