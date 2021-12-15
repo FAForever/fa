@@ -121,6 +121,7 @@ Patch 3728 (20th of December, 2021)
  - (#3598) Fix Rhino overshooting its target.
  - (#3598) Fix errors on gifting when full share is enabled
  - (#3596) Fix typo that prevents cybran build beams from spawning
+ - (#3609) Fix inconsistency with SACU presets that prevent them from having custom strategic icons
 
 ### Other
  - (#3480) Update visuals for the UEF T2 PD and Destroyer
@@ -228,7 +229,7 @@ Patch 3728 (20th of December, 2021)
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
         #3558, #3582, #3581, #3587, #3589, #3601, #3600
         #3599, #3598, #3595, #3590, #3588, #3586, #3567
-        #3604, #3607, #3610)
+        #3604, #3607, #3610, #3609)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
