@@ -2,8 +2,8 @@ Patch 3728 (20th of December, 2021)
 ============================
 
 ### Features
- - (#3484, #3500, #3535, #3600, #3604) Allow more structures to be cap-able using a similar mechanic to storages for extractors:
-    This changes the capping behavior to:
+ - (#3484, #3500, #3535, #3600, #3604, #3610) Allow more structures to be cap-able using a similar mechanic to storages for extractors.
+    This changes the ringing behavior to:
     - 2 clicks + shift to mass storage an upgrading t1 extractor
     - 1 click to mass storage a t2 / t3 extractor
     - 3 clicks to shift + mass fab cap an upgrading t2 extractor
@@ -20,7 +20,7 @@ Patch 3728 (20th of December, 2021)
     - Upgrading: shift + 2 click
     - Dangerous: shift + (regular click count + 1)
 
-    Shift was already part of the feature and is extended to prevent unintended capping.
+    Shift was already part of the feature and is extended to prevent unintended ringing.
     
     Assisting behavior
     - When all engineers are of the same faction, they can all build the same storage. No assisting happening.
@@ -228,7 +228,7 @@ Patch 3728 (20th of December, 2021)
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
         #3558, #3582, #3581, #3587, #3589, #3601, #3600
         #3599, #3598, #3595, #3590, #3588, #3586, #3567
-        #3604, #3607)
+        #3604, #3607, #3610)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
