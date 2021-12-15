@@ -195,9 +195,9 @@ local pStructure1 = nil
 local pStructure2 = nil
 function CapStructure(command)
 
-    -- retrieve the option in question
+    -- retrieve the option in question, can have values: 'off', 'only-storages-extractors' and 'full-suite'
     local option = Prefs.GetFromCurrentProfile('options.structure_capping_feature_01')
-
+    
     -- bail out - we're not interested
     if option == 'off' then 
         return 
@@ -231,7 +231,7 @@ function CapStructure(command)
 
             -- check what type of buildings we'd like to make
             local buildStorages = (isTech1 and isUpgrading and isDoubleTapped) or isTech2 or isTech3
-            local buildFabs = (isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isDoubleTapped)
+            local buildFabs = ((isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isDoubleTapped) and option == 'full-suite')
 
             if buildStorages then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
@@ -275,7 +275,7 @@ function CapStructure(command)
                 pStructure2 = nil
 
             -- if we have a radar, create t1 pgens around it
-            elseif structure:IsInCategory('RADAR') and ((isTech1 and isUpgrading and isDoubleTapped) or isTech2 or structure:IsInCategory('OMNI'))  then 
+            elseif (structure:IsInCategory('RADAR') and ((isTech1 and isUpgrading and isDoubleTapped) or isTech2)) or structure:IsInCategory('OMNI')  then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
                 -- reset state

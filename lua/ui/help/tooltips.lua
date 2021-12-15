@@ -807,7 +807,7 @@ Tooltips = {
         description = "<LOC OPTIONS_0217>Allows other players to send you build templates over the network",
     },
     options_structure_capping_feature_01 = {
-        title = "<LOC OPTIONS_0273>Automated Structure Encircling",
+        title = "<LOC OPTIONS_0273>Automated Structure Ringing",
         description = "<LOC OPTIONS_0274>Assist a structure to cap it with adjacency-friendly structures. As an example: storages surrounding a tech 2 or tech 3 mass extractor.",
     },
     options_automex = {

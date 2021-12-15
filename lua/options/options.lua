@@ -257,10 +257,10 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0273>Automated Structure Encircling",
+                title = "<LOC OPTIONS_0273>Automated Structure Ringing",
                 key = 'structure_capping_feature_01',
                 type = 'toggle',
-                default = true,
+                default = "full-suite",
                 custom = {
                     states = {
                         {text = "<LOC _Off>Off",                                            key = "off"},
