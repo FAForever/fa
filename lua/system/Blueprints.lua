@@ -591,7 +591,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
 
             -- change other things relevant things as well
             tempBp.BaseBlueprintId = tempBp.BlueprintId
-            tempBp.BlueprintId = tempBp.BlueprintId .. '_' .. name
+            tempBp.BlueprintId = string.lower(tempBp.BlueprintId .. '_' .. name)
             tempBp.BuildIconSortPriority = preset.BuildIconSortPriority or tempBp.BuildIconSortPriority or 0
             tempBp.General.UnitName = preset.UnitName or tempBp.General.UnitName
             tempBp.Interface.HelpText = preset.HelpText or tempBp.Interface.HelpText
@@ -604,7 +604,7 @@ function HandleUnitWithBuildPresets(bps, all_bps)
             -- synchronizing Categories with CategoriesHash for compatibility
             tempBp.Categories = table.unhash(tempBp.CategoriesHash)
 
-            table.insert(all_bps.Unit, tempBp)
+            all_bps.Unit[tempBp.BlueprintId] = tempBp
 
             BlueprintLoaderUpdateProgress()
         end
