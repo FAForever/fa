@@ -223,7 +223,7 @@ function CapStructure(command)
     local isTech2 = structure:IsInCategory('TECH2')
     local isTech3 = structure:IsInCategory('TECH3')
 
-    -- are we a structure and are we holding shift?
+    -- only run logic for structures
     if structure:IsInCategory('STRUCTURE') then 
 
         -- try and create storages and / or fabricators around it
@@ -334,7 +334,7 @@ local categoriesStructure = categories.STRUCTURE
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
 
-    -- ???
+    -- unknown when set, do not understand when this applies yet. In other words: ???
     if not command.Clear then
         issuedOneCommand = true
     else
