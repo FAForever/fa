@@ -217,21 +217,31 @@ function CapStructure(command)
     local isDoubleTapped = structure ~= nil and (pStructure1 == structure)
     local isTripleTapped = structure ~= nil and (pStructure1 == structure) and (pStructure2 == structure) 
 
-    local isUpgrading = structure:GetFocus() ~= nil and isShiftDown
+    local isUpgrading = structure:GetFocus() ~= nil
 
     local isTech1 = structure:IsInCategory('TECH1')
     local isTech2 = structure:IsInCategory('TECH2')
     local isTech3 = structure:IsInCategory('TECH3')
 
-    -- are we a structure and are we holding shift?
+    -- only run logic for structures
     if structure:IsInCategory('STRUCTURE') then 
 
         -- try and create storages and / or fabricators around it
         if structure:IsInCategory('MASSEXTRACTION') then 
 
             -- check what type of buildings we'd like to make
-            local buildStorages = (isTech1 and isUpgrading and isDoubleTapped) or isTech2 or isTech3
-            local buildFabs = ((isTech2 and isUpgrading and isTripleTapped) or (isTech3 and isDoubleTapped) and option == 'full-suite')
+            local buildStorages = 
+                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown) 
+                or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
+                or (isTech2 and not isUpgrading)
+                or isTech3
+
+            local buildFabs = 
+                option == 'full-suite'
+                and (
+                    (isTech2 and isUpgrading and isTripleTapped and isShiftDown) 
+                    or (isTech3 and isDoubleTapped and isShiftDown)
+                )  
 
             if buildStorages then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
@@ -275,7 +285,15 @@ function CapStructure(command)
                 pStructure2 = nil
 
             -- if we have a radar, create t1 pgens around it
-            elseif (structure:IsInCategory('RADAR') and ((isTech1 and isUpgrading and isDoubleTapped) or isTech2)) or structure:IsInCategory('OMNI')  then 
+            elseif 
+                structure:IsInCategory('RADAR')  
+                and (
+                       (isTech1 and isUpgrading and isDoubleTapped and isShiftDown) 
+                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown) 
+                    or (isTech2 and not isUpgrading)
+                    )
+                or structure:IsInCategory('OMNI') 
+                then 
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id =  "b1101" }}, true)
 
                 -- reset state
@@ -298,6 +316,13 @@ function CapStructure(command)
     -- keep track of previous structure to identify a 2nd / 3rd click
     pStructure2 = pStructure1
     pStructure1 = structure
+
+    -- prevent building up state when upgrading but shift isn't pressed
+    if isUpgrading and not isShiftDown then 
+        structure = nil
+        pStructure1 = nil
+        pStructure2 = nil
+    end
 end
 
 -- cached category strings for performance
@@ -309,7 +334,7 @@ local categoriesStructure = categories.STRUCTURE
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
 
-    -- ???
+    -- unknown when set, do not understand when this applies yet. In other words: ???
     if not command.Clear then
         issuedOneCommand = true
     else
