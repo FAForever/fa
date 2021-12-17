@@ -703,23 +703,28 @@ function CreateDialog(x, y)
             }
         } end
 
+        local function IsCancelKeyDown() return IsKeyDown('ESCAPE') or IsKeyDown(2) end
+
         WaitSeconds(0.15)
         local shift
         while not dialog do
-            if IsKeyDown('ESCAPE') then break end
+            if IsCancelKeyDown() then break end
             if IsKeyDown(1) then
+                while IsKeyDown(1) do -- do on release
+                    if IsCancelKeyDown() then return end
+                    WaitSeconds(0.01)
+                end
                 SimCallback(callbackargs(), true)
                 if IsKeyDown('SHIFT') then
                     shift = true
-                    WaitSeconds(0.02)
                 else
                     break
                 end
             end
-            WaitSeconds(0.07)
             if shift and not IsKeyDown('SHIFT') then
                break
             end
+            WaitSeconds(0.1)
         end
     end
 
