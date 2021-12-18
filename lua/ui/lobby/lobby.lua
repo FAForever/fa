@@ -3795,7 +3795,7 @@ local snowFlakesGroup
 local snowFlakePath = "/textures/ui/events/snow/snowflake.dds"
 local snowFlakeWidth = 10
 local snowFlakeHeight = 10
-local snowFlakeCount = 500
+local snowFlakeCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
 local Math_Random = math.random
 local Math_Cos = math.cos
 local Math_Sin = math.sin
