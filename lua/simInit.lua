@@ -253,6 +253,9 @@ end
 function BeginSession()
     SPEW('Active mods in sim: ', repr(__active_mods))
 
+    -- pass options to the UI
+    Sync.LobbyOptions = ScenarioInfo.Options
+
     GameOverListeners = {}
     ForkThread(function()
         while not IsGameOver() do
