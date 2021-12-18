@@ -57,7 +57,7 @@ end
 gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
-lobbyOptions = false
+LobbyOptions = false
 
 OriginalFocusArmy = -1
 
