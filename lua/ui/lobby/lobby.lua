@@ -3791,6 +3791,7 @@ function CreateUI(maxPlayers)
     CreateSnowFlakes ()
 end
 
+local snowFlakesGroup
 local snowFlakePath = "/textures/ui/events/snow/snowflake.dds"
 local snowFlakeWidth = 10
 local snowFlakeHeight = 10
@@ -3801,7 +3802,12 @@ local Math_Sin = math.sin
 local Math_Floor = math.floor
 
 function CreateSnowFlakes()
-    local parent = GUI
+    if not snowFlakesGroup then
+        snowFlakesGroup = Group(GUI)
+        LayoutHelpers.FillParent(snowFlakesGroup,GUI)
+        snowFlakesGroup:DisableHitTest()
+    end
+    local parent = snowFlakesGroup
     for i = 1, snowFlakeCount do
         CreateSnowFlake(parent, 100, math.random() * 2, math.random(parent.Width()),
             math.random(parent.Height()))
@@ -5795,7 +5801,7 @@ end
 
 function ShowLobbyOptionsDialog()
     local dialogContent = Group(GUI)
-    LayoutHelpers.SetDimensions(dialogContent, 420, 260)
+    LayoutHelpers.SetDimensions(dialogContent, 420, 310)
 
     local dialog = Popup(GUI, dialogContent)
     GUI.lobbyOptionsDialog = dialog
@@ -5858,6 +5864,29 @@ function ShowLobbyOptionsDialog()
             GUI.chatPanel:ScrollToBottom()
         end
     end
+    --snowflakes count
+    local currentSnowFlakesCount = Prefs.GetFromCurrentProfile('SnowFlakesCount') or 100
+    local slider_SnowFlakes_Count_TEXT = UIUtil.CreateText(dialogContent,'Snowflakes count '.. currentSnowFlakesCount, 14, 'Arial', true)
+    LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count_TEXT, dialogContent, 27, 202)
+
+    -- slider for changing chat font size
+    local slider_SnowFlakes_Count = Slider(dialogContent, false, 100, 1000,
+        UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+        UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+        UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+        UIUtil.SkinnableFile('/slider02/slider-back_bmp.dds'))
+        LayoutHelpers.AtRightTopIn(slider_SnowFlakes_Count, dialogContent, 20, 222)
+    slider_SnowFlakes_Count:SetValue(currentSnowFlakesCount)
+    slider_SnowFlakes_Count.OnValueChanged = function(self, newValue)
+        local sliderValue = math.floor(newValue)
+        slider_SnowFlakes_Count_TEXT:SetText('Snowflakes count '.. sliderValue)
+        Prefs.SetToCurrentProfile('SnowFlakesCount', sliderValue)
+        snowFlakesGroup:ClearChildren()
+        snowFlakeCount = sliderValue
+        CreateSnowFlakes()
+    end
+
+
     --
     local cbox_WindowedLobby = UIUtil.CreateCheckbox(dialogContent, '/CHECKBOX/', LOC("<LOC lobui_0402>Windowed mode"))
     LayoutHelpers.AtRightTopIn(cbox_WindowedLobby, dialogContent, 20, 42)
