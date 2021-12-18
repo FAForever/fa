@@ -57,6 +57,8 @@ end
 gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
+
+-- lobby options as set by the host in the lobby
 LobbyOptions = false
 
 OriginalFocusArmy = -1

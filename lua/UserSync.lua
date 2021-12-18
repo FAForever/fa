@@ -109,7 +109,6 @@ function OnSync()
     end
 
     if Sync.LobbyOptions then 
-        LOG(repr(Sync.LobbyOptions))
         import('/lua/ui/game/gamemain.lua').LobbyOptions = table.deepcopy(Sync.LobbyOptions)
     end
 end

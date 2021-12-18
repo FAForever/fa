@@ -97,7 +97,8 @@ local function CreateDialog(clients)
         slot.eject:Disable() -- Disable all temporarily so they can't be misclicked, then unlock a few seconds later
     end
 
-    local disconnectionDelay = GameMain.LobbyOptions.DisconnectionDelay or 90
+    -- retrieve disconnection delay and reduce it by five (that is how long it takes for the window to show)
+    local disconnectionDelay = (GameMain.LobbyOptions.DisconnectionDelay - 5) or 85
     local canEject = false
     local canEjectTime = disconnectionDelay
     local forceEject = false
