@@ -14,10 +14,17 @@ do
     -- @param brx Bottom right x coordinate.
     -- @param brz Bottom right z coordinate.
     -- @return nil if none found or a table.
-    _G.GetUnitsInRect = function(...)
+    _G.GetUnitsInRect = function(rtlx, tlz, brx, brz)
 
-        -- retrieve the units 
-        local units = oldGetUnitsInRect(unpack(arg))
+        -- try and retrieve units
+        local units 
+        if tlz then 
+            LOG("Numbers!")
+            units = oldGetUnitsInRect(rtlx, tlz, brx, brz)
+        else
+            LOG("rectangle!")
+            units = oldGetUnitsInRect(rtlx)
+        end
 
         -- as it can return nil, check if we have any units
         if units then 

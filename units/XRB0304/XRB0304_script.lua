@@ -16,7 +16,7 @@ XRB0304 = Class(CConstructionStructureUnit) {
         -- We might be being rebuild by the slightly bugtacular SCU REBUILDER behaviour, in which
         -- case we want to show all our bones anyway.
         local upos = self:GetPosition()
-        local candidates = GetUnitsInRect(Rect(upos[1], upos[3], upos[1], upos[3]))
+        local candidates = GetUnitsInRect(upos[1], upos[3], upos[1], upos[3])
         for k, v in candidates do
             if target == v:GetBlueprint().BlueprintId then
                 self:HideBone('xrb0304', true)

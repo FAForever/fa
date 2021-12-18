@@ -2071,8 +2071,10 @@ function GenerateOffMapAreas()
 end
 
 function AntiOffMapMainThread()
+
     WaitTicks(11)
     GenerateOffMapAreas()
+    local WaitTicks = coroutine.yield
     local OffMapAreas = {}
     local UnitsThatAreOffMap = {}
 
@@ -2090,7 +2092,10 @@ function AntiOffMapMainThread()
                     end
                 else
             end
+            WaitTicks(11)
         end
+
+        WaitTicks(11)
         local NumberOfUnitsOffMap = table.getn(NewUnitsThatAreOffMap)
         for index, NewUnitThatIsOffMap in NewUnitsThatAreOffMap do
             if not NewUnitThatIsOffMap.IAmOffMap then
@@ -2107,7 +2112,7 @@ function AntiOffMapMainThread()
                 end
             end
         end
-        WaitSeconds(1)
+
         NewUnitsThatAreOffMap = nil
     end
 end
