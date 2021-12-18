@@ -18,7 +18,7 @@ do
 
         -- try and retrieve units
         local units 
-        if tlz then 
+        if brx then 
             units = oldGetUnitsInRect(rtlx, tlz, brx, brz)
         else
             units = oldGetUnitsInRect(rtlx)
