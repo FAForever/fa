@@ -298,10 +298,9 @@ Callbacks.CapStructure = function(data, units)
         local z1 = cz - (skirtSize + 10)
         local x2 = cx + (skirtSize + 10)
         local z2 = cz + (skirtSize + 10)
-        local rect = Rect(x1, z1, x2, z2)
 
         -- find all units that may prevent us from building
-        local structures = GetUnitsInRect(rect)
+        local structures = GetUnitsInRect(x1, z1, x2, z2)
         structures = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, structures)
 
         -- determine offset to enlarge unit skirt to include structure we're trying to use to cap

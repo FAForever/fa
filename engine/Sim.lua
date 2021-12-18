@@ -460,8 +460,14 @@ end
 function GetUnitById(id)
 end
 
---- Return a table with units inside the given rectangle.
--- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+--- Retrieves all units in a rectangle, Excludes insignificant units, such as the Cybran Drone, by default.
+-- @param rectangle The rectangle to look for units in {x0, z0, x1, z1}.
+-- OR
+-- @param tlx Top left x coordinate.
+-- @param tlz Top left z coordinate.
+-- @param brx Bottom right x coordinate.
+-- @param brz Bottom right z coordinate.
+-- @return nil if none found or a table.
 function GetUnitsInRect(rectangle)
 end
 

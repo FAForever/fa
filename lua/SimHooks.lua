@@ -7,25 +7,26 @@ do
     local oldGetUnitsInRect = GetUnitsInRect
 
     --- Retrieves all units in a rectangle, Excludes insignificant units, such as the Cybran Drone, by default.
-    -- @param rectangle The rectangle to look for units in.
-    -- @param excludeInsignificantUnits Whether or not we exclude insignificant units, defaults to true. 
+    -- @param rectangle The rectangle to look for units in {x0, z0, x1, z1}.
+    -- OR
+    -- @param tlx Top left x coordinate.
+    -- @param tlz Top left z coordinate.
+    -- @param brx Bottom right x coordinate.
+    -- @param brz Bottom right z coordinate.
     -- @return nil if none found or a table.
-    _G.GetUnitsInRect = function(rectangle, excludeInsignificantUnits)
+    _G.GetUnitsInRect = function(rtlx, tlz, brx, brz)
 
-        -- retrieve the units 
-        local units = oldGetUnitsInRect(rectangle)
+        -- try and retrieve units
+        local units 
+        if brx then 
+            units = oldGetUnitsInRect(rtlx, tlz, brx, brz)
+        else
+            units = oldGetUnitsInRect(rtlx)
+        end
 
         -- as it can return nil, check if we have any units
         if units then 
-            -- if it isn't set, we try and exclude them anyhow
-            if excludeInsignificantUnits == nil then 
-                excludeInsignificantUnits = true 
-            end
-
-            -- check if we want to exclude them
-            if excludeInsignificantUnits then 
-                units = EntityCategoryFilterDown(CategoriesNoInsignificant, units)
-            end
+            units = EntityCategoryFilterDown(CategoriesNoInsignificant, units)
         end
 
         return units
