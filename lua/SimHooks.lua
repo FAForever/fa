@@ -18,11 +18,9 @@ do
 
         -- try and retrieve units
         local units 
-        if tlz then 
-            LOG("Numbers!")
+        if brx then 
             units = oldGetUnitsInRect(rtlx, tlz, brx, brz)
         else
-            LOG("rectangle!")
             units = oldGetUnitsInRect(rtlx)
         end
 
