@@ -1,7 +1,7 @@
 -----------------------------------------------------------------
 -- File     :  /cdimage/units/XSL0101/XSL0101_script.lua
 -- Summary  :  Seraphim Land Scout Script
--- Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
