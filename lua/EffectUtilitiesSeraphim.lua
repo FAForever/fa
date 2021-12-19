@@ -45,6 +45,12 @@ local CategoriesHover = categories.HOVER
 -- @param effectBones The bones of the factory to spawn effects for.
 -- @param effectsBag The trashbag for effects.
 function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, effectBones, effectsBag)
+
+    -- do not create beams if things turn out to be destroyed
+    if builder.Dead or unitBeingBuilt.Dead then 
+        return 
+    end
+
     local army = builder.Army
     for _, vBone in effectBones do
         TrashBagAdd(effectsBag, CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/seraphim_build_01_emit.bp'))
