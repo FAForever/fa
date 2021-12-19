@@ -107,4 +107,8 @@ function OnSync()
     if Sync.GameEnded then
         GpgNetSend('GameEnded')
     end
+
+    if Sync.LobbyOptions then 
+        import('/lua/ui/game/gamemain.lua').LobbyOptions = table.deepcopy(Sync.LobbyOptions)
+    end
 end
