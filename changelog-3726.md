@@ -70,6 +70,14 @@ Patch 3728 (20th of December, 2021)
     The exit dialog is now on top of the disconnection dialog, 
     instead of the other way around.
 
+ - (#3602) Overhaul of the cheat spawn menu
+    Adds a basic prop spawn mode. Units are spawned using the 
+    command feedback on the spawn location. If spawning 
+    multiple units they spawn in a box formation. Multi column 
+    support and customizable in the game options. Dynamic 
+    support for custom factions. Adds in a toggle for 
+    revealing hidden-from-spawn-menu units
+
 ### Stability
  - (#3477) Prevent clearing critical state in AI functions
  - (#3490, #3551) Refactor the init files of the game
@@ -246,7 +254,7 @@ Patch 3728 (20th of December, 2021)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
- - Balthazar (#3552)
+ - Balthazar (#3552, #3602)
  - 4z0t (#3554, #3597, #3605, #3607)
  - Marlo (#3582)
  - Eternal (#3597)
