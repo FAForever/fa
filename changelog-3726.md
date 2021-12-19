@@ -2,7 +2,8 @@ Patch 3728 (20th of December, 2021)
 ============================
 
 ### Features
- - (#3484, #3500, #3535, #3600, #3604, #3610) Allow more structures to be cap-able using a similar mechanic to storages for extractors.
+ - (#3484, #3500, #3535, #3600, #3604, #3610, #3611) 
+    Allow more structures to be cap-able using a similar mechanic to storages for extractors.
     This changes the ringing behavior to:
     - 2 clicks + shift to mass storage an upgrading t1 extractor
     - 1 click to mass storage a t2 / t3 extractor
@@ -33,7 +34,7 @@ Patch 3728 (20th of December, 2021)
     - Only mass storages and extractors
     - Full suite
 
- - (#3597, #3604, #3605, #3607) View factory queue on hover
+ - (#3597, #3604, #3605, #3607) Add factory queue on hover
     This allows you to get a quick overview of the factory queue by
     just hovering over the unit. Especially useful for casters as
     you can now view the factory queue without switching to the army
@@ -59,6 +60,15 @@ Patch 3728 (20th of December, 2021)
     highlights to teal (light / bright blue color) when
     in swap modus. Click the highlighted slot number to
     cancel.
+
+ - (#3616) Expands the disconnection dialog
+    A host can now set a lobby option to change the
+    delay required during a disconnection dialog. This defaults
+    to the current behavior but can be set to 10 and 
+    30 seconds.
+
+    The exit dialog is now on top of the disconnection dialog, 
+    instead of the other way around.
 
 ### Stability
  - (#3477) Prevent clearing critical state in AI functions
@@ -119,9 +129,10 @@ Patch 3728 (20th of December, 2021)
  - (#3601) Fix Seraphim t3 MAA from zapping through shields
  - (#3599) Fix consumption bug introduced by #3447
  - (#3598) Fix Rhino overshooting its target.
- - (#3598) Fix errors on gifting when full share is enabled
- - (#3596) Fix typo that prevents cybran build beams from spawning
+ - (#3598, #3614) Fix errors on gifting when full share is enabled
+ - (#3596, #3617) Fix typo that prevents cybran build beams from spawning
  - (#3609) Fix inconsistency with SACU presets that prevent them from having custom strategic icons
+ - (#3612) Fix kennels not spawning their drone when you immediately queue up an upgrade
 
 ### Other
  - (#3480) Update visuals for the UEF T2 PD and Destroyer
@@ -156,7 +167,7 @@ Patch 3728 (20th of December, 2021)
  - (#3526) Remove the curated maps button until an alternative is available
  - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is selected
  - (#3533) Change default settings of auto lobby to 1.5K unit cap and full share (used by ladder / team match making)
- - (#3441) Introduction of insignificant or dummy units
+ - (#3441, #3614) Introduction of insignificant or dummy units
     This introduces a new unit class that can be used to fix
     various bugs and glitches with the game. One such issues
     is the long standing bug with the Aeon build animation where
@@ -176,9 +187,10 @@ Patch 3728 (20th of December, 2021)
 
  - (#3586) Force shader re-compilation on development branches
  - (#3583) Update URLs to https instead of http
- - (#3567) Fix graphicals of Summit and Fatboy
+ - (#3567) Fix graphics of Summit and Fatboy
  - (#3606) Fix (build) icon of Seraphim T3 MAA
  - (#3607) Fix Cybran ACU not having the right amount of build bots when enhanced
+ - (#3613) Add a hotkey to select all idle scouts
 
 ### Performance
  - (#3417) Add minor performance improvements for generic utility functions
@@ -209,7 +221,7 @@ Patch 3728 (20th of December, 2021)
     visual appearance too much. Disables the hover effects of these units
     all together when playing on low fidelity.
 
- - (#3557) Fix and improve performance on Seraphim build animations
+ - (#3557, #3617) Fix and improve performance on Seraphim build animations
     The old version had complicated logic and various
     computations that were not required. The new version is 
     better for performance and a lot more smooth with regards
@@ -217,7 +229,7 @@ Patch 3728 (20th of December, 2021)
 
  - (#3582) Prevent unneccessary allocations during the Aeon build animation
  - (#3587, #3589) Optimize most common called unit functions
- - (#3595, #3590, #3588) Optimize weapons
+ - (#3595, #3590, #3588, #3617) Optimize weapons
 
 ### Contributors
  - Askaholic (#3417, #3440)
@@ -229,7 +241,8 @@ Patch 3728 (20th of December, 2021)
         #3527, #3531, #3543, #3411, #3551, #3550, #3557
         #3558, #3582, #3581, #3587, #3589, #3601, #3600
         #3599, #3598, #3595, #3590, #3588, #3586, #3567
-        #3604, #3607, #3610, #3609)
+        #3604, #3607, #3610, #3609, #3611, #3612, #3613
+        #3614, #3616, #3617)
  - KionX (#3486, #3489, #3523, #3349)
  - Crotalus (#3432)
  - Benzi-Junior (#3461)
