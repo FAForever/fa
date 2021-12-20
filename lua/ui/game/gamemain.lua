@@ -143,6 +143,17 @@ end
 
 function CreateUI(isReplay)
 
+    -- ensure logger is turned off for the average user
+    if not GetPreference('debug.enable_debug_facilities') then
+        SetPreference('Options.Log', {
+            Debug = false,
+            Info = false,
+            Warn = false,
+            Error = false,
+            Custom = false,
+            Filter = '*debug:'})
+    end
+
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')  
 
