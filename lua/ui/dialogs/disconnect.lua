@@ -98,7 +98,7 @@ local function CreateDialog(clients)
     end
 
     -- retrieve disconnection delay and reduce it by five (that is how long it takes for the window to show)
-    local disconnectionDelay = (tonumber(GameMain.LobbyOptions.DisconnectionDelay) - 5) or 85
+    local disconnectionDelay = (tonumber(GameMain.LobbyOptions.DisconnectionDelay02) - 5) or 85
     local canEject = false
     local canEjectTime = disconnectionDelay
     local forceEject = false

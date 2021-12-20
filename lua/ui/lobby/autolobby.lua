@@ -51,7 +51,7 @@ local gameInfo = {
         PrebuiltUnits = 'Off',
         Share = 'FullShare',
         ShareUnitCap = 'allies',
-        DisconnectionDelay = '90',
+        DisconnectionDelay02 = '90',
 
         -- yep, great
         Ranked = true,

@@ -237,7 +237,7 @@ globalOpts = {
         default = 3,
         label = "Disconnection delay",
         help = "Sets the disconnect delay when a player has trouble connecting.",
-        key = 'DisconnectionDelay',
+        key = 'DisconnectionDelay02',
         mponly = true,
         values = {
             {
