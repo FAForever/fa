@@ -237,23 +237,23 @@ globalOpts = {
         default = 3,
         label = "Disconnection delay",
         help = "Sets the disconnect delay when a player has trouble connecting.",
-        key = 'DisconnectionDelay',
+        key = 'DisconnectionDelay02',
         mponly = true,
         values = {
             {
                 text = "Tournament",
                 help = "The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically.",
-                key = 10,
+                key = '10',
             },
             {
                 text = "Quick",
                 help = "The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically.",
-                key = 30,
+                key = '30',
             },
             {
                 text = "Regular",
                 help = "The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically.",
-                key = 90,
+                key = '90',
             },
         },
     },

@@ -420,40 +420,45 @@ function GiveOrders(Data)
 
     if OkayToMessWithArmy(Data.From) then --Check for cheats/exploits
         local unit = GetEntityById(Data.unit_id)
-        -- Skip units with no valid shadow orders.
-        if not Data.unit_orders or not Data.unit_orders[1] then
-            return
-        end
 
-        if unit:GetBlueprint().CategoriesHash.BOMBER then
-            for key, order in Data.unit_orders or {} do
-                if order.CommandType == "Move" then
-                    local bomberPosition = unit:GetPosition()
+        -- add guard if unit died
+        if unit and not unit.Dead then 
+            
+            -- Skip units with no valid shadow orders.
+            if not Data.unit_orders or not Data.unit_orders[1] then
+                return
+            end
 
-                    --reject all move orders that are closer than 20
-                    if VDist2(bomberPosition[1], bomberPosition[3], order.Position[1], order.Position[3]) < 20 then
-                        table.remove (Data.unit_orders, key)
+            if unit:GetBlueprint().CategoriesHash.BOMBER then
+                for key, order in Data.unit_orders or {} do
+                    if order.CommandType == "Move" then
+                        local bomberPosition = unit:GetPosition()
+
+                        --reject all move orders that are closer than 20
+                        if VDist2(bomberPosition[1], bomberPosition[3], order.Position[1], order.Position[3]) < 20 then
+                            table.remove (Data.unit_orders, key)
+                        end
                     end
                 end
             end
-        end
 
-        -- All orders will be re-issued, so all existing orders have to be cleared first.
-        IssueClearCommands({ unit })
+            -- All orders will be re-issued, so all existing orders have to be cleared first.
+            IssueClearCommands({ unit })
 
-        -- Re-issue all orders.
-        for _,order in ipairs(Data.unit_orders) do
-            local Function = IssueOrderFunctions[order.CommandType]
-            if not Function then
-                continue
-            end
+            -- Re-issue all orders.
+            for _,order in ipairs(Data.unit_orders) do
+                local Function = IssueOrderFunctions[order.CommandType]
+                if not Function then
+                    continue
+                end
 
-            local target = order.Position
-            if order.EntityId then
-                target = GetEntityById(order.EntityId)
-            end
-            if target then
-                Function({ unit }, target)
+                local target = order.Position
+                if order.EntityId then
+                    target = GetEntityById(order.EntityId)
+                end
+                if target then
+                    Function({ unit }, target)
+                end
             end
         end
     end

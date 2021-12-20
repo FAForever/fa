@@ -48,10 +48,14 @@ local gameInfo = {
         GameSpeed = 'normal',
         FogOfWar = 'explored',
         UnitCap = '1500',
-        Ranked = true,
         PrebuiltUnits = 'Off',
         Share = 'FullShare',
         ShareUnitCap = 'allies',
+        DisconnectionDelay02 = '90',
+
+        -- yep, great
+        Ranked = true,
+        Unranked = 'No',
     },
     PlayerOptions = {},
     Observers = {},
