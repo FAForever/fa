@@ -2,7 +2,7 @@ Patch 3729 (20th of December, 2021)
 ===================================
 
 ### Features
- - (#3615) Happy Christmas ^_^
+ - (#3615) Happy Christmas (in advance) ^_^
 
 ### Bug fixes
  - (#3618) Fix scale of Seraphim build effects

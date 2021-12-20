@@ -1,8 +1,27 @@
-last_version = 3728
+last_version = 3729
 gamePatches = {
-
     {
-        version = 3728,
+        version = 3729,
+        name = "Game version 3729",
+        description = {
+            "Patch 3729 (20th of December, 2021)",
+            "===================================",
+            "",
+            "### Features",
+            " - (#3615) Happy Christmas (in advance) ^_^",
+            "",
+            "### Bug fixes",
+            " - (#3618) Fix scale of Seraphim build effects",
+            " - (#3618) Fix issue with disconnection window for auto lobbies (ladder / tmm)",
+            " - (#3618) Revert removed effect template for backwards compatibility with mods",
+            "",
+            "### Contributors",
+            " - 4z0t (#3615)",
+            " - Jip (#3618)",
+        }
+    },
+    {
+        version = 3729,
         name = "Game version 3728",
         description = {
 "",
