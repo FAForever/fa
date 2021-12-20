@@ -6,7 +6,7 @@ gamePatches = {
         name = "Game version 3728",
         description = {
             "Patch 3728 (20th of December, 2021)",
-            "============================",
+            "==============================",
 
             "A quick FAQ:",
             "- I lost all my mods, where did they go?",
