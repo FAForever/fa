@@ -212,5 +212,5 @@ end
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
 function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, effectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, 2)
+    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, 1.5)
 end
