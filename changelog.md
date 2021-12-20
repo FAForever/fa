@@ -1,3 +1,18 @@
+Patch 3729 (20th of December, 2021)
+===================================
+
+### Features
+ - (#3615) Happy Christmas ^_^
+
+### Bug fixes
+ - (#3618) Fix scale of Seraphim build effects
+ - (#3618) Fix issue with disconnection window for auto lobbies (ladder / tmm)
+ - (#3618) Revert removed effect template for backwards compatibility with mods
+
+### Contributors
+ - 4z0t (#3615)
+ - Jip (#3618)
+
 Patch 3728 (20th of December, 2021)
 ===================================
 
