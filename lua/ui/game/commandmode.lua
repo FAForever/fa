@@ -250,7 +250,7 @@ function CapStructure(command)
                 -- prevent consecutive calls 
                 local gametime = GetGameTimeSeconds()
                 if structure.RingStoragesStamp then 
-                    if structure.RingStoragesStamp + 1.5 > gametime then
+                    if structure.RingStoragesStamp + 0.75 > gametime then
                         return 
                     end
                 end
@@ -272,7 +272,7 @@ function CapStructure(command)
                 -- prevent consecutive calls 
                 local gametime = GetGameTimeSeconds()
                 if structure.RingFabsStamp then 
-                    if structure.RingFabsStamp + 1.5 > gametime then
+                    if structure.RingFabsStamp + 0.75 > gametime then
                         return 
                     end
                 end
@@ -293,7 +293,7 @@ function CapStructure(command)
                 -- prevent consecutive calls 
                 local gametime = GetGameTimeSeconds()
                 if structure.RingStamp then 
-                    if structure.RingStamp + 1.5 > gametime then
+                    if structure.RingStamp + 0.75 > gametime then
                         return 
                     end
                 end
