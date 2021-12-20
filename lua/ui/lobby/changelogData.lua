@@ -12,10 +12,11 @@ gamePatches = {
             " - (#3618) Fix scale of Seraphim build effects",
             " - (#3618) Fix issue with disconnection window for auto lobbies (ladder / tmm)",
             " - (#3618) Revert removed effect template for backwards compatibility with mods",
+            " - (#3620) Add 0.75 seconds delay to ringing feature to prevent malicious intent",
             "",
             "### Contributors",
             " - 4z0t (#3615)",
-            " - Jip (#3618)",
+            " - Jip (#3618, #3620)",
         }
     },
     {

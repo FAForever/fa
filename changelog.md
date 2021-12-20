@@ -8,10 +8,11 @@ Patch 3729 (20th of December, 2021)
  - (#3618) Fix scale of Seraphim build effects
  - (#3618) Fix issue with disconnection window for auto lobbies (ladder / tmm)
  - (#3618) Revert removed effect template for backwards compatibility with mods
+ - (#3620) Add delay to ringing feature to prevent malicious intent
 
 ### Contributors
  - 4z0t (#3615)
- - Jip (#3618)
+ - Jip (#3618, #3620)
 
 Patch 3728 (20th of December, 2021)
 ===================================
