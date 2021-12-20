@@ -28,78 +28,45 @@ Patch 3728 (20th of December, 2021)
     - When you have engineers of two or more factions, one must assist the other as they can't build the same storages.
     - When you have engineers of one faction and units that can't build the storage (kennel drones, ACU) then they must assist an engineer as they can't build the storages themselves.
 
-    This option can be adjusted in options -> gameplay. Search for
-    the field 'Automated Structure Encircling'. Options are:
+    This option can be adjusted in options -> gameplay. Search for the field 'Automated Structure Encircling'. Options are:
     - Off
     - Only mass storages and extractors
     - Full suite
 
  - (#3597, #3604, #3605, #3607) Add factory queue on hover
-    This allows you to get a quick overview of the factory queue by
-    just hovering over the unit. Especially useful for casters as
-    you can now view the factory queue without switching to the army
-    in question.
+    This allows you to get a quick overview of the factory queue by just hovering over the unit. Especially useful for casters as you can now view the factory queue without switching to the army in question.
 
-    Can be adjusted in the options -> interface. Search for the 
-    field 'Show Factory Queue on Hover'. Options are:
+    Can be adjusted in the options -> interface. Search for the field 'Show Factory Queue on Hover'. Options are:
     - Off
     - Only on when observing
     - Always
 
  - (#3531) Add an option to scale down the UI (to 80%) for low resolution monitors
-    This doesn't appear to be an issue at first due to the infinite 
-    zoom but when the score board takes up 50% of your screen due to a
-    1024x720 resolution then it suddenly is.
+    This doesn't appear to be an issue at first due to the infinite zoom but when the score board takes up 50% of your screen due to a 1024x720 resolution then it suddenly is.
 
-    Not all of the UI can manage this - please report issues in #game-general
-    in the FAF discord when you find them.
+    Not all of the UI can manage this - please report issues in #game-general in the FAF discord when you find them.
 
  - (#3554) Add quick-swap feature to lobby for the host
-    As a host you can quickly swap two players by
-    left-clicking on the slot numbers of two players. It
-    highlights to teal (light / bright blue color) when
-    in swap modus. Click the highlighted slot number to
-    cancel.
+    As a host you can quickly swap two players by left-clicking on the slot numbers of two players. It highlights to teal (light / bright blue color) when in swap modus. Click the highlighted slot number to cancel.
 
  - (#3616) Expands the disconnection dialog
-    A host can now set a lobby option to change the
-    delay required during a disconnection dialog. This defaults
-    to the current behavior but can be set to 10 and 
-    30 seconds.
+    A host can now set a lobby option to change the delay required during a disconnection dialog. This defaults to the current behavior but can be set to 10 and  30 seconds.
 
-    The exit dialog is now on top of the disconnection dialog, 
-    instead of the other way around.
+    The exit dialog is now on top of the disconnection dialog, instead of the other way around.
 
  - (#3602) Overhaul of the cheat spawn menu
-    Adds a basic prop spawn mode. Units are spawned using the 
-    command feedback on the spawn location. If spawning 
-    multiple units they spawn in a box formation. Multi column 
-    support and customizable in the game options. Dynamic 
-    support for custom factions. Adds in a toggle for 
-    revealing hidden-from-spawn-menu units
+    Adds a basic prop spawn mode. Units are spawned using the command feedback on the spawn location. If spawning multiple units they spawn in a box formation. Multi column support and customizable in the game options. Dynamic support for custom factions. Adds in a toggle for revealing hidden-from-spawn-menu units
 
 ### Stability
  - (#3477) Prevent clearing critical state in AI functions
  - (#3490, #3551) Refactor the init files of the game
     This is an involved change but one that was due. 
     
-    The init files can no longer load in content that clash between
-    the base game files or between older versions of the same mod.
-    This could also occur when the mod was not activated for sound
-    and / or movie files.
+    The init files can no longer load in content that clash between the base game files or between older versions of the same mod. This could also occur when the mod was not activated for sound and / or movie files.
 
-    The client supports loading content from a separate vault
-    location, the init files need to support this functionality
-    accordingly. The init files of the game types FAF, FAF Beta
-    and FAF Develop support this functionality. Other game types 
-    need to be updated accordingly.
+    The client supports loading content from a separate vault location, the init files need to support this functionality accordingly. The init files of the game types FAF, FAF Beta and FAF Develop support this functionality. Other game types need to be updated accordingly.
 
-    The vault location determined by the client is used to load in
-    content (maps / mods). Any other location is no longer read and
-    therefore any map / mod in the other locations are not found
-    by the game. If after this patch you 'lost' a few of your
-    maps and / or mods it means that they were in an old vault 
-    location - you'd need to move those manually.
+    The vault location determined by the client is used to load in content (maps / mods). Any other location is no longer read and therefore any map / mod in the other locations are not found by the game. If after this patch you 'lost' a few of your maps and / or mods it means that they were in an old vault location - you'd need to move those manually.
 
     Adds icon support to FAF Beta.
 
@@ -120,18 +87,11 @@ Patch 3728 (20th of December, 2021)
     Ythotha: when complete 50% or more
 
  - (#3440, #3604) Removes the dummy drone from the unit restriction list
-    This drone was often misintepreted as an easy way to unrate a game. In
-    contrast to what the name suggests it does have a function: to help gift
-    units when a player dies and full share is on. The drone can no longer be
-    restricted and instead there is a dedicated lobby option to unrate the
-    game.
+    This drone was often misintepreted as an easy way to unrate a game. In contrast to what the name suggests it does have a function: to help gift units when a player dies and full share is on. The drone can no longer be restricted and instead there is a dedicated lobby option to unrate the game.
 
  - (#3525) Fix the unpathable skirts of the Seraphim Quantum Gateway
  - (#3582) Fix Aeon aim bones being underground when building
-    This fixes the famous issue where an unfinished t1 pd 
-    attracts a lot of fire, but because its aim bones are still
-    underground all the attacking units shoot at the ground. No
-    more!
+    This fixes the famous issue where an unfinished t1 pd attracts a lot of fire, but because its aim bones are still underground all the attacking units shoot at the ground. Fix is applied to all Aeon units. Aeon build animations are now done through the shader.
 
  - (#3581) Fire Beetle properly applies EMP / stun buffs
  - (#3601) Fix Seraphim t3 MAA from zapping through shields
@@ -145,22 +105,12 @@ Patch 3728 (20th of December, 2021)
 ### Other
  - (#3480) Update visuals for the UEF T2 PD and Destroyer
  - (#3523) Switch off debug utilities by default
-    This is only useful for developers, but it did cause
-    a (slight) drain on resources when it was turned on
-    even though you're not looking at the logs. It turns it
-    off by default during each startup, you can prevent 
-    this as a developer by adding
-    `debug = { enable_debug_facilities = true }`
-    to your preference file
+    This is only useful for developers, but it did cause a drain on resources when it was turned on even though you're not looking at the logs. It turns it off by default during each startup, you can prevent this as a developer by adding `debug = { enable_debug_facilities = true }` to your preference file
 
  - (#3417) Add unit tests for generic utility functions
  - (#3420) Fix small issues for units of the Cybran faction.
  - (#3492) Remove greyness when deviation is high
-    In combination with other work, such as combining the number of
-    games people played across the board (ladder / tmm / globals)
-    it should become easier for people to 'get into' custom games
-    without being called a noob beforehand or a smurf afterwards (never
-    played custom games, but played a lot of ladder).
+    In combination with other work, such as combining the number of games people played across the board (ladder / tmm / globals) it should become easier for people to 'get into' custom games without being called a noob beforehand or a smurf afterwards (never played custom games, but played a lot of ladder).
 
  - (#3475) Fix capitalisation consistency
  - (#3443) Allow trashbag to be re-used for effects
@@ -168,30 +118,20 @@ Patch 3728 (20th of December, 2021)
  - (#3491) Fix the attack animation of the Monkeylord
  - (#3349) Updates the readme with the most recent dependencies
  - (#3461) Remove game quality computations for games with more than two teams
-    The Trueskill system is not designed to compute the quality of a game 
-    when more than (or less than) two teams are involved. Hence, the 
-    computation is gibberish anyhow.
+    The Trueskill system is not designed to compute the quality of a game when more than (or less than) two teams are involved. Hence, the computation is gibberish anyhow.
 
  - (#3526) Remove the curated maps button until an alternative is available
  - (#3528) Fix T2 seraphim sonar being restricted when t3 base spam is selected
  - (#3533) Change default settings of auto lobby to 1.5K unit cap and full share (used by ladder / team match making)
  - (#3441, #3614) Introduction of insignificant or dummy units
-    This introduces a new unit class that can be used to fix
-    various bugs and glitches with the game. One such issues
-    is the long standing bug with the Aeon build animation where
-    the aim bones are underground at the start of construction.
+    This introduces a new unit class that can be used to fix various bugs and glitches with the game. One such issues is the long standing bug with the Aeon build animation where the aim bones are underground at the start of construction.
     
-    Sadly, this change is quite involved because a lot of the
-    functionality expects a full-fledged unit. We've tried to
-    catch some of these but there will be more issues that will
-    show up, especially with scripted maps.
+    Sadly, this change is quite involved because a lot of the functionality expects a full-fledged unit. We've tried to catch some of these but there will be more issues that will show up, especially with scripted maps.
 
  - (#3552) Update regular expression of mod version removal
  - (#3558) Restrict t2 artillery orientation to 90 degree angles
  - (#3582) Fixed various issues with the Aeon build animation
-    As an example, hover units no longer jump to their hover
-    elevation when they're finished. All experimentals have
-    unique build animations that fit the style of the faction.
+    As an example, hover units no longer jump to their hover elevation when they're finished. All experimentals have unique build animations that fit the style of the faction.
 
  - (#3586) Force shader re-compilation on development branches
  - (#3583) Update URLs to https instead of http
@@ -205,35 +145,19 @@ Patch 3728 (20th of December, 2021)
  - (#3447) Removed old AI related code that was being run regardless of whether AIs were in-game
     This change is involved performance-wise but does not impact gameplay.
 
-    As a practical example: chain ten engineers assisting one another and make the
-    first engineer assist a factory. With these changes they'll start assisting the
-    factory one by one as it takes one tick (simulation tick) to detect the unit
-    it is assisting has started working on something.
+    As a practical example: chain ten engineers assisting one another and make the first engineer assist a factory. With these changes they'll start assisting the factory one by one as it takes one tick (simulation tick) to detect the unit it is assisting has started working on something.
 
-    The previous behavior would be that all engineers get updated immediately. This
-    required it to search for engineers in its surrounding and all those it found
-    would need to look up its surroundings too. This can quickly get out of hand.
+    The previous behavior would be that all engineers get updated immediately. This required it to search for engineers in its surrounding and all those it found would need to look up its surroundings too. This can quickly get out of hand.
 
  - (#3502) Optimize the import function that is used by all files.
  - (#3512) Removes AI threat computations and fixes AI detection
-    AI code was being run during every game even when no AI was present in
-    said game. After discussing it with the AI devs this pull requests
-    completely removes the threat computations.
+    AI code was being run during every game even when no AI was present in said game. After discussing it with the AI devs this pull requests completely removes the threat computations.
 
  - (#3419) Reduce impact on sim of common hover emitter effects
-    Effects have an impact on the sim, in particular when they create a 
-    particle. Once the particles exist they appear to be free of charge. 
-    With this PR we reduced the number of particles created for various 
-    units such as the Aeon T1 engineer to bring them into the same cost
-    range (sim wise) as the other engineers, without impacting their
-    visual appearance too much. Disables the hover effects of these units
-    all together when playing on low fidelity.
+    Effects have an impact on the sim, in particular when they create a particle. Once the particles exist they appear to be free of charge. With this PR we reduced the number of particles created for various units such as the Aeon T1 engineer to bring them into the same cost range (sim wise) as the other engineers, without impacting their visual appearance too much. Disables the hover effects of these units all together when playing on low fidelity.
 
  - (#3557, #3617) Fix and improve performance on Seraphim build animations
-    The old version had complicated logic and various
-    computations that were not required. The new version is 
-    better for performance and a lot more smooth with regards
-    to the build animation.
+    The old version had complicated logic and various computations that were not required. The new version is better for performance and a lot more smooth with regards to the build animation.
 
  - (#3582) Prevent unneccessary allocations during the Aeon build animation
  - (#3587, #3589) Optimize most common called unit functions
