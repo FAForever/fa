@@ -4,8 +4,6 @@ gamePatches = {
         version = 3729,
         name = "Game version 3729",
         description = {
-            "Patch 3729 (20th of December, 2021)",
-            "===================================",
             "",
             "### Features",
             " - (#3615) Happy Christmas (in advance) ^_^",
