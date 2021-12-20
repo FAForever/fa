@@ -1980,8 +1980,20 @@ TBigLandGaussCannonHit01 = {
     EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
 }
 
+TLandGaussCannonHit01 = { 
+    EmtBpPath .. 'landgauss_cannon_hit_01_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_02_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_03_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_04_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_05_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_06_emit.bp',
+    -- EmtBpPath .. 'shipgauss_cannon_hit_07_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
+}
+
 TShipGaussCannonHitUnit01 = table.concatenate(TShipGaussCannonHit01, UnitHitShrapnel01)
 TShipGaussCannonHitUnit02 = table.concatenate(TShipGaussCannonHit02, UnitHitShrapnel01)
+TLandGaussCannonHitUnit01 = table.concatenate(TLandGaussCannonHit01, UnitHitShrapnel01)
 TBigLandGaussCannonHitUnit01 = table.concatenate(TBigLandGaussCannonHit01, UnitHitShrapnel01)
 TMediumLandGaussCannonHitUnit01 = table.concatenate(TMediumLandGaussCannonHit01, UnitHitShrapnel01)
 TMediumShipGaussCannonHitUnit01 = table.concatenate(TMediumShipGaussCannonHit01, UnitHitShrapnel01)
