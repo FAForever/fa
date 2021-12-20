@@ -98,11 +98,15 @@ local function CreateDialog(clients)
     end
 
     -- retrieve disconnection delay and reduce it by five (that is how long it takes for the window to show)
-    local disconnectionDelay = (tonumber(GameMain.LobbyOptions.DisconnectionDelay02) - 5) or 85
+    local disconnectionDelay = 85
+    if GameMain.LobbyOptions.DisconnectionDelay02 then 
+        disconnectionDelay = tonumber(GameMain.LobbyOptions.DisconnectionDelay02) - 5
+    end
+
     local canEject = false
     local canEjectTime = disconnectionDelay
     local forceEject = false
-    local forceEjectTime = math.max(disconnectionDelay * 2, 90)
+    local forceEjectTime = math.max(disconnectionDelay * 2, 85)
 
     parent.OnFrame = function(self, delta)
         self.time = self.time + delta
