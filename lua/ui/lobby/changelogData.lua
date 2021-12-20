@@ -1,8 +1,26 @@
-last_version = 3728
+last_version = 3729
 gamePatches = {
-
     {
-        version = 3728,
+        version = 3729,
+        name = "Game version 3729",
+        description = {
+            "",
+            "### Features",
+            " - (#3615) Happy Christmas (in advance) ^_^",
+            "",
+            "### Bug fixes",
+            " - (#3618) Fix scale of Seraphim build effects",
+            " - (#3618) Fix issue with disconnection window for auto lobbies (ladder / tmm)",
+            " - (#3618) Revert removed effect template for backwards compatibility with mods",
+            " - (#3620) Add 0.75 seconds delay to ringing feature to prevent malicious intent",
+            "",
+            "### Contributors",
+            " - 4z0t (#3615)",
+            " - Jip (#3618, #3620)",
+        }
+    },
+    {
+        version = 3729,
         name = "Game version 3728",
         description = {
 "",
