@@ -230,12 +230,6 @@ function CapStructure(command)
         if structure:IsInCategory('MASSEXTRACTION') then 
 
             -- check what type of buildings we'd like to make
-            local buildStorages = 
-                (isTech1 and isUpgrading and isDoubleTapped and isShiftDown) 
-                or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
-                or (isTech2 and not isUpgrading)
-                or isTech3
-
             local buildFabs = 
                 option == 'full-suite'
                 and (
@@ -243,7 +237,26 @@ function CapStructure(command)
                     or (isTech3 and isDoubleTapped and isShiftDown)
                 )  
 
+            local buildStorages = 
+                (
+                    (isTech1 and isUpgrading and isDoubleTapped and isShiftDown) 
+                    or (isTech2 and isUpgrading and isDoubleTapped and isShiftDown)
+                    or (isTech2 and not isUpgrading)
+                    or isTech3
+                ) and not buildFabs
+
             if buildStorages then 
+
+                -- prevent consecutive calls 
+                local gametime = GetGameTimeSeconds()
+                if structure.RingStoragesStamp then 
+                    if structure.RingStoragesStamp + 0.75 > gametime then
+                        return 
+                    end
+                end
+
+                structure.RingStoragesStamp = gametime
+
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 1, id = "b1106" }}, true)
 
                 -- only clear state if we can't make fabricators 
@@ -255,6 +268,17 @@ function CapStructure(command)
             end
 
             if buildFabs then 
+
+                -- prevent consecutive calls 
+                local gametime = GetGameTimeSeconds()
+                if structure.RingFabsStamp then 
+                    if structure.RingFabsStamp + 0.75 > gametime then
+                        return 
+                    end
+                end
+
+                structure.RingFabsStamp = gametime
+
                 SimCallback({Func = 'CapStructure', Args = {target = command.Target.EntityId, layer = 2, id = "b1104" }}, true)
                 
                 -- reset state
@@ -265,6 +289,16 @@ function CapStructure(command)
 
         -- only apply these if we're interested in them
         elseif option == 'full-suite' then 
+
+                -- prevent consecutive calls 
+                local gametime = GetGameTimeSeconds()
+                if structure.RingStamp then 
+                    if structure.RingStamp + 0.75 > gametime then
+                        return 
+                    end
+                end
+
+                structure.RingStamp = gametime
 
             -- if we have a t3 fabricator, create storages around it
             if structure:IsInCategory('MASSFABRICATION') and isTech3 then 
