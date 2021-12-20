@@ -52,6 +52,7 @@ local gameInfo = {
         PrebuiltUnits = 'Off',
         Share = 'FullShare',
         ShareUnitCap = 'allies',
+        DisconnectionDelay = 90,
     },
     PlayerOptions = {},
     Observers = {},
