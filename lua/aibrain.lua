@@ -32,6 +32,7 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesNoInsignificant = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
 
 local observer = false
@@ -4140,4 +4141,16 @@ AIBrain = Class(moho.aibrain_methods) {
         return units
     end
 
+    --- Returns list of units by category.
+    -- @param category Unit's category, example: categories.TECH2 .
+    -- @param needToBeIdle true/false Unit has to be idle.
+    -- @param requireBuilt true/false defaults to false which excludes units that are NOT finished.
+    -- @return tblUnits Table containing units.
+    GetListOfUnits = function(self, categories, needToBeIdle, requireBuilt)
+        -- defaults to false, prevent sending nil
+        requireBuilt = requireBuilt or false 
+
+        -- retrieve units, excluding insignificant units
+        return BrainGetListOfUnits(self, categories - categories.INSIGNIFICANTUNIT, needToBeIdle, requireBuilt)
+    end
 }
