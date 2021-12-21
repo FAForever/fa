@@ -4139,7 +4139,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         return units
-    end
+    end,
 
     --- Returns list of units by category.
     -- @param category Unit's category, example: categories.TECH2 .
@@ -4152,5 +4152,5 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- retrieve units, excluding insignificant units
         return BrainGetListOfUnits(self, categories - categories.INSIGNIFICANTUNIT, needToBeIdle, requireBuilt)
-    end
+    end,
 }
