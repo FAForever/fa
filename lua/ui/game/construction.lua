@@ -1428,6 +1428,7 @@ function OnClickHandler(button, modifiers)
                 DecreaseBuildCountInQueue(unitIndex, count)
             end
         end
+        RefreshUI()
     elseif item.type == 'unitstack' then
         if modifiers.Left then
             SelectUnits(item.units)
@@ -1557,8 +1558,8 @@ function OnClickHandler(button, modifiers)
         elseif modifiers.Right then
             DecreaseBuildCountInQueue(item.position, count)
         end
+        RefreshUI()
     end
-    RefreshUI()
 end
 
 local warningtext = false
