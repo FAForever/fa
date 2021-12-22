@@ -88,6 +88,7 @@ allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
 -- typical backwards compatible packages
 local allowedAssetsNxt = { }
+allowedAssetsNxt["kyros.nxt"] = true
 allowedAssetsNxt["texturepack.nxt"] = true
 allowedAssetsNxt["advanced strategic icons.nxt"] = true
 allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
