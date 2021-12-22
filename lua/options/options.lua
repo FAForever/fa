@@ -40,6 +40,28 @@ Each tab has:
 
 the optionsOrder table is just an array of keys in to the option table, and their order will determine what
 order the tabs show in the dialog
+
+Note the behavior of the default value:
+ - map / mod / lobby options: the index of the value we're interested in
+ - game options: the key of the value that we're interested in
+
+As an example:
+
+{
+    title = "<LOC OPTIONS_0212>Accept Build Templates",
+    key = 'accept_build_templates',
+    type = 'toggle',
+    default = 'yes',                                    <-------- This is set to the actual value (instead of 1, which would be the index)
+    set = function(key,value,startup)
+    end,
+    custom = {
+        states = {
+            {text = "<LOC _On>", key = 'yes' },         <-------- That is defined here as key
+            {text = "<LOC _Off>", key = 'no' },
+        },
+    },
+},
+
 --]]
 
 optionsOrder = {
@@ -543,9 +565,9 @@ options = {
 
             {
                 title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
-                key = 'gui_queue_on_hover_01',
+                key = 'gui_queue_on_hover_02',
                 type = 'toggle',
-                default = 1,
+                default = 'only-obs',
                 custom = {
                     states = {
                         {text = "<LOC _Off>Off", key = 'off' },
