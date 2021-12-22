@@ -1,5 +1,32 @@
-last_version = 3729
+last_version = 3730
 gamePatches = {
+    {
+        version = 3730,
+        name = "Game version 3730",
+        description = {
+            "",
+            "Games using the featured mod Nomads will break when playing the Aeon ",
+            "faction until Nomads has been updated by its maintainer.",
+            "",
+            "### Features",
+            " - (#3627) Whitelist Kyro's lobby",
+            "    The file `kyros.nxt` is now white listed. If you intent to",
+            "    work on this lobby, please consider working on the lobby",
+            "    of the repository instead.",
+            "",
+            "### Bug fixes",
+            " - (#3628) Fix inconsistency with hover queue",
+            " - (#3626) Fix issue with insignificant units and campaign levels",
+            " - (#3625) Force recompilation of shaders due to Nomads shaders",
+            " - (#3624) Fix highlight of selected units to drop in transport",
+            " - (#3624) Fix template menu that allows you to rename / delete templates",
+            "",
+            "### Contributors",
+            " - 4z0t (#3624)",
+            " - Jip (#3627, #3628, #3626, #3625)",
+        }
+    },
+
     {
         version = 3729,
         name = "Game version 3729",
