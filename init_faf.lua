@@ -408,6 +408,30 @@ end
 
 -- END OF COPY --
 
+-- -- minimum viable shader version - should be bumped to the next release version when we change the shaders
+-- local minimumShaderVersion = 3729
+
+-- -- look for unviable shaders and remove them
+-- local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+-- for k, file in IoDir(shaderCache .. '/*') do
+--     if file != '.' and file != '..' then 
+--         local version = tonumber(string.sub(file, -4))
+--         if not version or version < minimumShaderVersion then 
+--             LOG("Force shader recompilation of: " .. file)
+--             os.remove(shaderCache .. '/' .. file)
+--         end
+--     end
+-- end
+
+-- Clears out the shader cache as it takes a release to reset the shaders
+-- This is a temporary solution until Nomads updated their shaders
+local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
+for k, file in IoDir(shaderCache .. '/*') do
+    if file != '.' and file != '..' then 
+        os.remove(shaderCache .. '/' .. file)
+    end
+end
+
 -- typical FAF packages
 local allowedAssetsNxy = { }
 allowedAssetsNxy["effects.nx2"] = true
