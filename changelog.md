@@ -1,6 +1,9 @@
 Patch 3730 (23th of December, 2021)
 ===================================
 
+Games using the featured mod Nomads will break when playing the Aeon 
+faction until Nomads has been updated by its maintainer.
+
 ### Features
  - (#3627) Whitelist Kyro's lobby
     The file `kyros.nxt` is now white listed. If you intent to
@@ -12,7 +15,7 @@ Patch 3730 (23th of December, 2021)
  - (#3626) Fix issue with insignificant units and campaign levels
  - (#3625) Force recompilation of shaders due to Nomads shaders
  - (#3624) Fix highlight of selected units to drop in transport
- - (#3624) Fix template menu to rename / delete
+ - (#3624) Fix template menu that allows you to rename / delete templates
 
 ### Contributors
  - 4z0t (#3624)
