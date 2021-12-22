@@ -4146,11 +4146,11 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param needToBeIdle true/false Unit has to be idle.
     -- @param requireBuilt true/false defaults to false which excludes units that are NOT finished.
     -- @return tblUnits Table containing units.
-    GetListOfUnits = function(self, categories, needToBeIdle, requireBuilt)
+    GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
         -- defaults to false, prevent sending nil
-        requireBuilt = requireBuilt or false 
+        requireBuilt = requireBuilt or false
 
         -- retrieve units, excluding insignificant units
-        return BrainGetListOfUnits(self, categories - categories.INSIGNIFICANTUNIT, needToBeIdle, requireBuilt)
+        return BrainGetListOfUnits(self, cats - categories.INSIGNIFICANTUNIT, needToBeIdle, requireBuilt)
     end,
 }
