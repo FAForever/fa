@@ -543,9 +543,9 @@ options = {
 
             {
                 title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
-                key = 'gui_queue_on_hover_01',
+                key = 'gui_queue_on_hover_02',
                 type = 'toggle',
-                default = 1,
+                default = 'only-obs',
                 custom = {
                     states = {
                         {text = "<LOC _Off>Off", key = 'off' },

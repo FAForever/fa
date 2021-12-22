@@ -532,12 +532,12 @@ function UpdateWindow(info)
 
         -- # Build queue upon hovering of unit
 
-        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_01') == 'always'
+        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
         local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
-        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_01') == 'only-obs'
+        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
 
         if always or (whenObserving and isObserver) then 
-            if info.userUnit ~= nil and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and info.userUnit ~= selectedUnit then
+            if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and (info.userUnit ~= selectedUnit) then
 
                 -- find the main factory we're using the queue of
                 local mainFactory
@@ -791,7 +791,7 @@ function CreateUI()
 
     controls.bg.OnFrame = function(self, delta)
         local info = GetRolloverInfo()
-        if not info and selectedUnit then
+        if not info and selectedUnit and options.gui_enhanced_unitview ~= 0 then
             info = GetUnitRolloverInfo(selectedUnit)
         end
 
@@ -820,10 +820,7 @@ function CreateUI()
 end
 
 function OnSelection(units)
-    if options.gui_enhanced_unitview == 0 then
-        return
-    end
-
+    -- set if we have one unit selected, useful for state management for information to show
     if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else

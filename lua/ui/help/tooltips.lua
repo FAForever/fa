@@ -2056,7 +2056,7 @@ Tooltips = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',
         description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
     },
-    options_gui_queue_on_hover_01 = {
+    options_gui_queue_on_hover_02 = {
         title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
         description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
     },
