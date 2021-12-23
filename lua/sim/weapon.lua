@@ -77,14 +77,14 @@ Weapon = Class(moho.weapon_methods) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self.Blueprint
+            meta.Blueprint = self:GetBlueprint()
             meta.MetaCachePrepared = true
 
             SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
         end
 
         -- Store blueprint for improved access pattern, see benchmark on blueprints
-        self.Blueprint = self.Blueprint
+        self.Blueprint = self:GetBlueprint()
         local bp = self.Blueprint
 
         -- Legacy information stored for backwards compatibility
