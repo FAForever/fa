@@ -11,6 +11,12 @@ local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
 Projectile = Class(moho.projectile_methods, Entity) {
+
+    -- # Cache via meta table
+    
+    MetaCachePrepared = false,
+    Blueprint = false,
+
     PassDamageData = function(self, DamageData)
         self.DamageData.DamageRadius = DamageData.DamageRadius
         self.DamageData.DamageAmount = DamageData.DamageAmount
@@ -121,6 +127,17 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCreate = function(self, inWater)
+
+        -- # Cache via meta table
+
+        if not self.MetaCachePrepared then 
+            local meta = getmetatable(self)
+            meta.Blueprint = self:GetBlueprint()
+            meta.MetaCachePrepared = true
+
+            SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
+        end
+
         self.DamageData = {
             DamageRadius = nil,
             DamageAmount = nil,
@@ -489,8 +506,21 @@ Projectile = Class(moho.projectile_methods, Entity) {
 --- A dummy projectile that solely inherits what it needs. Useful for 
 -- effects that require projectiles without additional overhead.
 DummyProjectile = Class(moho.projectile_methods, Entity) {
+
     -- the only things we need
     __init = function(self, spec) end,
     __post_init = function(self, spec) end,
-    OnCreate = function(self, inWater) end,
+    OnCreate = function(self, inWater)
+
+        -- # Cache on meta table level
+
+        if not self.MetaCachePrepared then 
+            local meta = getmetatable(self)
+            meta.Blueprint = self:GetBlueprint()
+            meta.MetaCachePrepared = true
+        end
+
+        self.Army = self:GetArmy()
+    
+    end,
 }

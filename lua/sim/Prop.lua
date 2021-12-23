@@ -11,6 +11,13 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local minimumLabelMass = 10
 
 Prop = Class(moho.prop_methods, Entity) {
+
+    -- # Cache via meta table
+    
+    MetaCachePrepared = false,
+    Blueprint = false,
+
+
     -- Do not call the base class __init and __post_init, we already have a c++ object
     __init = function(self, spec)
     end,
@@ -19,13 +26,24 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnCreate = function(self)
+
+        -- # Cache via meta table
+
+        if not self.MetaCachePrepared then 
+            local meta = getmetatable(self)
+            meta.Blueprint = self.Blueprint
+            meta.MetaCachePrepared = true
+
+            SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
+        end
+
         self.EventCallbacks = {
             OnKilled = {},
             OnReclaimed = {},
         }
         Entity.OnCreate(self)
         self.Trash = TrashBag()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local economy = bp.Economy
 
         -- These values are used in world props like rocks / stones / trees
@@ -252,7 +270,7 @@ Prop = Class(moho.prop_methods, Entity) {
     -- You can pass an optional 'dirprefix' arg saying where to look for the child props.
     -- If not given, it defaults to one directory up from this prop's blueprint location.
     SplitOnBonesByName = function(self, dirprefix)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         if not dirprefix then
             -- default dirprefix to parent dir of our own blueprint
@@ -295,7 +313,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     PlayPropSound = function(self, sound)
-        local bp = self:GetBlueprint().Audio
+        local bp = self.Blueprint.Audio
         if bp and bp[sound] then
             self:PlaySound(bp[sound])
             return true
@@ -311,7 +329,7 @@ Prop = Class(moho.prop_methods, Entity) {
             self:SetAmbientSound(nil, nil)
             return true
         else
-            local bp = self:GetBlueprint().Audio
+            local bp = self.Blueprint.Audio
             if bp and bp[sound] then
                 if bp.Audio['AmbientRumble'] then
                     self:SetAmbientSound(bp[sound], bp.Audio['AmbientRumble'])

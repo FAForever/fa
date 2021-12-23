@@ -60,19 +60,31 @@ end
 -- }
 
 Weapon = Class(moho.weapon_methods) {
+
+    -- # Cache via meta table
+    
+    MetaCachePrepared = false,
+    Blueprint = false,
+
+
     __init = function(self, unit)
         self.unit = unit
     end,
 
     OnCreate = function(self)
 
-        -- -- Cache access patterns, see benchmark on metatables
-        -- for k, identifier in FunctionsToCache do 
-        --     self[identifier] = self[identifier]
-        -- end
+        -- # Cache via meta table
+
+        if not self.MetaCachePrepared then 
+            local meta = getmetatable(self)
+            meta.Blueprint = self.Blueprint
+            meta.MetaCachePrepared = true
+
+            SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
+        end
 
         -- Store blueprint for improved access pattern, see benchmark on blueprints
-        self.Blueprint = self:GetBlueprint()
+        self.Blueprint = self.Blueprint
         local bp = self.Blueprint
 
         -- Legacy information stored for backwards compatibility
