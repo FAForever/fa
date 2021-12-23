@@ -38,7 +38,23 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
     TerrainImpactType = 'Default',
     TerrainImpactScale = 1,
 
+    -- # Cache via meta table
+    
+    MetaCachePrepared = false,
+    Blueprint = false,
+
     OnCreate = function(self)
+
+        -- # Cache via meta table
+
+        if not self.MetaCachePrepared then 
+            local meta = getmetatable(self)
+            meta.Blueprint = self:GetBlueprint()
+            meta.MetaCachePrepared = true
+
+            SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
+        end
+
         self.LastTerrainType = nil
         self.BeamEffectsBag = {}
         self.TerrainEffectsBag = {}

@@ -14,8 +14,24 @@ BuffField = Class(Entity) {
     -- Change these in an inheriting class if you want
     FieldVisualEmitter = '', -- the FX on the unit that carries the buff field
 
+    -- # Cache via meta table
+    
+    MetaCachePrepared = false,
+    Blueprint = false,
+
     -- EVENTS
     OnCreated = function(self)
+
+        -- # Cache via meta table
+
+        if not self.MetaCachePrepared then 
+            local meta = getmetatable(self)
+            meta.Blueprint = self:GetBlueprint()
+            meta.MetaCachePrepared = true
+
+            SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
+        end
+
         -- Fires when the field is initalised
         local bp = self:GetBlueprint()
         if bp.InitiallyEnabled then
