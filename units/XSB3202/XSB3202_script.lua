@@ -39,7 +39,7 @@ XSB3202 = Class(SSubUnit) {
     end,
     
     OnMotionVertEventChange = function(self, new, old)
-        local mult = self:GetBlueprint().Physics.SubSpeedMultiplier
+        local mult = self.Blueprint.Physics.SubSpeedMultiplier
         SSubUnit.OnMotionVertEventChange(self, new, old)
         if new == 'Top' then
             self:SetSpeedMult(1)

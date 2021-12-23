@@ -30,7 +30,7 @@ XSL0305 = Class(SLandUnit) {
         SLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('SniperGun', false)
         
-        local wepBp = self:GetBlueprint().Weapon
+        local wepBp = self.Blueprint.Weapon
         self.sniperRange = 75
         self.normalRange = 65
         for k, v in wepBp do
@@ -45,7 +45,7 @@ XSL0305 = Class(SLandUnit) {
     OnScriptBitSet = function(self, bit)
         SLandUnit.OnScriptBitSet(self, bit)
         if bit == 1 then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self:SetSpeedMult(bp.Physics.LandSpeedMultiplier * 0.75)
 
             self:SetWeaponEnabledByLabel('SniperGun', true)
@@ -68,7 +68,7 @@ XSL0305 = Class(SLandUnit) {
         SLandUnit.OnScriptBitClear(self, bit)
         if bit == 1 then
             -- Reset movement speed
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             self:SetSpeedMult(bp.Physics.LandSpeedMultiplier)
 
             self:SetWeaponEnabledByLabel('SniperGun', false)

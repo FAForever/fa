@@ -27,7 +27,7 @@ UES0103 = Class(TSeaUnit) {
         self.Trash:Add(CreateRotator(self, 'Spinner03', 'y', nil, -180, 0, -180))
         self.RadarEnt = Entity {}
         self.Trash:Add(self.RadarEnt)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.RadarEnt:InitIntel(self.Army, 'Radar', bp.Intel.RadarRadius or 75)
         self.RadarEnt:EnableIntel('Radar')
         self.RadarEnt:InitIntel(self.Army, 'Sonar', bp.Intel.SonarRadius or 75)

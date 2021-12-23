@@ -180,7 +180,7 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     end
     self.Dead = true
 
-    local bp = self:GetBlueprint()
+    local bp = self.Blueprint
     if self.Layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
         self:PlayUnitSound('HoverKilledOnWater')
     end
@@ -2190,7 +2190,7 @@ function IAmABadUnit(self)
 end
 
 function GetTimeIAmAllowedToBeOffMap(self)
-    local airspeed = self:GetBlueprint().Air.MaxAirspeed
+    local airspeed = self.Blueprint.Air.MaxAirspeed
     local value = airspeed
 
     if EntityCategoryContains(categories.BOMBER, self) then

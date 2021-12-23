@@ -12,7 +12,7 @@ local SSeaFactoryUnit = import('/lua/seraphimunits.lua').SSeaFactoryUnit
 XSB0303 = Class(SSeaFactoryUnit) {
     OnCreate = function(self)
         SSeaFactoryUnit.OnCreate(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Rotator1 = CreateRotator(self, 'Pod01', 'y', nil, 5, 0, 0)
         self.Trash:Add(self.Rotator1)
 
@@ -22,7 +22,7 @@ XSB0303 = Class(SSeaFactoryUnit) {
         self.Rotator3 = CreateRotator(self, 'Pod03', 'y', nil, -3, 0, 0)
         self.Trash:Add(self.Rotator3)
 
-        self.BuildPointSlider = CreateSlider(self, self:GetBlueprint().Display.BuildAttachBone or 0, -15, 0, 0, -1)
+        self.BuildPointSlider = CreateSlider(self, self.Blueprint.Display.BuildAttachBone or 0, -15, 0, 0, -1)
         self.Trash:Add(self.BuildPointSlider)
     end,
 

@@ -24,7 +24,7 @@ URB0102 = Class(CAirFactoryUnit) {
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
             self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)		--Change: SetRate(4)

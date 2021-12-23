@@ -41,7 +41,7 @@ UEL0401 = Class(TMobileFactoryUnit) {
         TMobileFactoryUnit.OnStopBeingBuilt(self, builder, layer)
         self.EffectsBag = {}
         self.PrepareToBuildManipulator = CreateAnimator(self)
-        self.PrepareToBuildManipulator:PlayAnim(self:GetBlueprint().Display.AnimationBuild, false):SetRate(0)
+        self.PrepareToBuildManipulator:PlayAnim(self.Blueprint.Display.AnimationBuild, false):SetRate(0)
         self.ReleaseEffectsBag = {}
         self.AttachmentSliderManip = CreateSlider(self, self.BuildAttachBone)
         ChangeState(self, self.IdleState)

@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/XSB2401/XSB2401_script.lua
 -- Author(s):  John Comes, David Tomandl, Matt Vainio
 -- Summary  :  Seraphim Tactical Missile Launcher Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
@@ -29,7 +29,7 @@ XSB2401 = Class(SStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         SStructureUnit.OnStopBeingBuilt(self, builder, layer)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.Trash:Add(CreateAnimator(self):PlayAnim(bp.Display.AnimationOpen))
         self:ForkThread(self.PlayArmSounds)
         local missileBone = bp.Display.MissileBone
@@ -62,7 +62,7 @@ XSB2401 = Class(SStructureUnit) {
             self.MissileEffect = {}
         end
 
-        local effectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local effectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         for bidx, bone in effectBones do
             for k, v in EffectTemplate.SJammerCrystalAmbient do
                 if not self.MissileEffect[bidx] then
@@ -76,7 +76,7 @@ XSB2401 = Class(SStructureUnit) {
     end,
 
     StopBuildEffects = function(self)
-        local effectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        local effectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         for bidx, bone in effectBones do
             for k, v in EffectTemplate.SJammerCrystalAmbient do
                 self.MissileEffect[bidx][k]:Destroy()
@@ -90,7 +90,7 @@ XSB2401 = Class(SStructureUnit) {
         self.NotCancelled = true
         WaitSeconds(0.5)
 
-        local missileBone = self:GetBlueprint().Display.MissileBone
+        local missileBone = self.Blueprint.Display.MissileBone
         if missileBone and self.NotCancelled then
             self:ShowBone(missileBone, true)
             if self.MissileSlider then
@@ -106,7 +106,7 @@ XSB2401 = Class(SStructureUnit) {
     end,
 
     RetractMissile = function(self)
-        local missileBone = self:GetBlueprint().Display.MissileBone
+        local missileBone = self.Blueprint.Display.MissileBone
         if missileBone then
             self:HideBone(missileBone, true)
             if self.MissileSlider then

@@ -41,7 +41,7 @@ URL0301 = Class(CCommandUnit) {
         self:HideBone('Torpedo', true)
         self:HideBone('Turbine', true)
         self:SetWeaponEnabledByLabel('NMissile', false)
-        if self:GetBlueprint().General.BuildBones then
+        if self.Blueprint.General.BuildBones then
             self:SetupBuildBones()
         end
         self.IntelButtonSet = true
@@ -66,7 +66,7 @@ URL0301 = Class(CCommandUnit) {
     -- Enhancements
     CreateEnhancement = function(self, enh)
         CCommandUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         if enh == 'CloakingGenerator' then
             self.StealthEnh = false
@@ -123,7 +123,7 @@ URL0301 = Class(CCommandUnit) {
             self:SetWeaponEnabledByLabel('NMissile', false)
         elseif enh == 'SelfRepairSystem' then
             CCommandUnit.CreateEnhancement(self, enh)
-            local bpRegenRate = self:GetBlueprint().Enhancements.SelfRepairSystem.NewRegenRate or 0
+            local bpRegenRate = self.Blueprint.Enhancements.SelfRepairSystem.NewRegenRate or 0
             if not Buffs['CybranSCURegenerateBonus'] then
                BuffBlueprint {
                     Name = 'CybranSCURegenerateBonus',
@@ -149,11 +149,11 @@ URL0301 = Class(CCommandUnit) {
                 Buff.RemoveBuff(self, 'CybranSCURegenerateBonus')
             end
         elseif enh =='ResourceAllocation' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh =='Switchback' then
@@ -167,7 +167,7 @@ URL0301 = Class(CCommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                     },
@@ -185,8 +185,8 @@ URL0301 = Class(CCommandUnit) {
             wep:ChangeMaxRadius(bp.NewMaxRadius or 35)
         elseif enh == 'FocusConvertorRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:AddDamageMod(-self:GetBlueprint().Enhancements['FocusConvertor'].NewDamageMod)
-            wep:ChangeMaxRadius(self:GetBlueprint().Weapon[1].MaxRadius or 25)
+            wep:AddDamageMod(-self.Blueprint.Enhancements['FocusConvertor'].NewDamageMod)
+            wep:ChangeMaxRadius(self.Blueprint.Weapon[1].MaxRadius or 25)
         elseif enh == 'EMPCharge' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
             wep:ReEnableBuff('STUN')
@@ -199,7 +199,7 @@ URL0301 = Class(CCommandUnit) {
     -- Death
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp
-        for k, v in self:GetBlueprint().Buffs do
+        for k, v in self.Blueprint.Buffs do
             if v.Add.OnDeath then
                 bp = v
             end
@@ -261,14 +261,14 @@ URL0301 = Class(CCommandUnit) {
     OnIntelEnabled = function(self)
         CCommandUnit.OnIntelEnabled(self)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
-            self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
                 self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
-            self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}

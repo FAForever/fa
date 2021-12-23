@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Aeon Quantic Cluster Fragmentation Sensor shell script,XAB2307
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local AArtilleryFragmentationSensorShellProjectile = import('/lua/aeonprojectiles.lua').AArtilleryFragmentationSensorShellProjectile
@@ -15,7 +15,7 @@ AIFFragmentationSensorShell01 = Class(AArtilleryFragmentationSensorShellProjecti
                
     OnImpact = function(self, TargetType, TargetEntity) 
         local FxFragEffect = EffectTemplate.Aeon_QuanticClusterFrag01
-        local bp = self:GetBlueprint().Physics
+        local bp = self.Blueprint.Physics
         
         # Split effects
         for k, v in FxFragEffect do

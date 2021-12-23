@@ -11,7 +11,7 @@ TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
     OnImpact = function(self, TargetType, TargetEntity) 
         
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag 
-        local bp = self:GetBlueprint().Physics
+        local bp = self.Blueprint.Physics
               
         
         # Split effects

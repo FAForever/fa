@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Cybran Gunship Script
 --#**
---#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CDFRocketIridiumWeapon = import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon
@@ -90,9 +90,9 @@ URA0401 = Class(CAirUnit) {
         if ((new == 'Top' or new == 'Up') and old == 'Down') then
             self.AnimManip:SetRate(-1)
         elseif (new == 'Down') then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationLand, false):SetRate(1.5)
+            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationLand, false):SetRate(1.5)
         elseif (new == 'Up') then
-            self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationTakeOff, false):SetRate(1)
+            self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationTakeOff, false):SetRate(1)
         end
     end,
 }

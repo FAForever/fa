@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Mobile Light Artillery Script
 --#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TIFHighBallisticMortarWeapon = import('/lua/terranweapons.lua').TIFHighBallisticMortarWeapon
@@ -15,7 +15,7 @@ UEL0103 = Class(TLandUnit) {
         MainGun = Class(TIFHighBallisticMortarWeapon) {
             CreateProjectileAtMuzzle = function(self, muzzle)
                 local proj = TIFHighBallisticMortarWeapon.CreateProjectileAtMuzzle(self, muzzle)
-                local bp = self:GetBlueprint()
+                local bp = self.Blueprint
                 local data = {
                     Radius = bp.CameraVisionRadius or 5,
                     Lifetime = bp.CameraLifetime or 5,

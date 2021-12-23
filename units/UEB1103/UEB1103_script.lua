@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  UEF Tier 1 Mass Extractor Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local TMassCollectionUnit = import('/lua/terranunits.lua').TMassCollectionUnit
@@ -26,7 +26,7 @@ UEB1103 = Class(TMassCollectionUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
-        self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationOpen, true)
+        self.AnimationManipulator:PlayAnim(self.Blueprint.Display.AnimationOpen, true)
     end,
 
     OnProductionPaused = function(self)

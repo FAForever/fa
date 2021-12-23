@@ -47,7 +47,7 @@ XSL0301 = Class(CommandUnit) {
 
     CreateEnhancement = function(self, enh)
         CommandUnit.CreateEnhancement(self, enh)
-        local bp = self:GetBlueprint().Enhancements[enh]
+        local bp = self.Blueprint.Enhancements[enh]
         if not bp then return end
         -- Teleporter
         if enh == 'Teleporter' then
@@ -95,7 +95,7 @@ XSL0301 = Class(CommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                     },
@@ -146,7 +146,7 @@ XSL0301 = Class(CommandUnit) {
             local aoc = self:GetWeaponByLabel('AutoOverCharge')
             aoc:ChangeMaxRadius(35)
         elseif enh == 'EnhancedSensorsRemove' then
-            local bpIntel = self:GetBlueprint().Intel
+            local bpIntel = self.Blueprint.Intel
             self:SetIntelRadius('Vision', bpIntel.VisionRadius or 26)
             self:SetIntelRadius('Omni', bpIntel.OmniRadius or 16)
             local wep = self:GetWeaponByLabel('LightChronatronCannon')

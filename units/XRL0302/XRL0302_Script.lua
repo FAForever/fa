@@ -19,7 +19,7 @@ local DeathWeaponKamikaze = Class(Weapon) {
     OnFire = function(self)
 
         -- get information
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local position = self.unit:GetPosition()
 
         -- do emitters
@@ -59,7 +59,7 @@ local DeathWeaponEMP = Class(Weapon) {
     end,
 
     Fire = function(self)
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
                    blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
@@ -111,7 +111,7 @@ XRL0302 = Class(CWalkingLandUnit) {
     --- Adds the cloaking mesh to the unit to hide it
     HideUnit = function(self)
         WaitTicks(1)
-        self:SetMesh(self:GetBlueprint().Display.CloakMeshBlueprint, true)
+        self:SetMesh(self.Blueprint.Display.CloakMeshBlueprint, true)
     end,
 
     -- This is the Denotate button - triggers the weapon but without an instigator so that it doesn't get called twice.
@@ -172,7 +172,7 @@ XRL0302 = Class(CWalkingLandUnit) {
 
         -- Now handle our special buff
         local bp
-        for k, v in self:GetBlueprint().Buffs do
+        for k, v in self.Blueprint.Buffs do
             if v.Add.OnDeath then
                 bp = v
             end

@@ -54,13 +54,13 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         self:SetCapturable(false)
         self:HideBone('Back_Upgrade', true)
         self:HideBone('Right_Upgrade', true)
-        if self:GetBlueprint().General.BuildBones then
+        if self.Blueprint.General.BuildBones then
             self:SetupBuildBones()
         end
         -- Restrict what enhancements will enable later
         self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         
-        local wepBp = self:GetBlueprint().Weapon
+        local wepBp = self.Blueprint.Weapon
         self.normalRange = 22
         self.torpRange = 60
         for k, v in wepBp do
@@ -104,7 +104,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             RemoveUnitEnhancement(self, 'TeleporterRemove')
             self:RemoveCommandCap('RULEUCC_Teleport')
         elseif enh == 'StealthGenerator' then
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             self:AddToggleCap('RULEUTC_CloakToggle')
             if self.IntelEffectsBag then
                 EffectUtil.CleanupEffectBag(self, 'IntelEffectsBag')
@@ -145,17 +145,17 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 Buff.RemoveBuff(self, 'CybranACUStealthBonus')
             end
         elseif enh == 'ResourceAllocation' then
-            local bp = self:GetBlueprint().Enhancements[enh]
-            local bpEcon = self:GetBlueprint().Economy
+            local bp = self.Blueprint.Enhancements[enh]
+            local bpEcon = self.Blueprint.Economy
             if not bp then return end
             self:SetProductionPerSecondEnergy(bp.ProductionPerSecondEnergy + bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bp.ProductionPerSecondMass + bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'ResourceAllocationRemove' then
-            local bpEcon = self:GetBlueprint().Economy
+            local bpEcon = self.Blueprint.Economy
             self:SetProductionPerSecondEnergy(bpEcon.ProductionPerSecondEnergy or 0)
             self:SetProductionPerSecondMass(bpEcon.ProductionPerSecondMass or 0)
         elseif enh == 'CloakingGenerator' then
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             if not bp then return end
             self.StealthEnh = false
             self.CloakEnh = true
@@ -195,7 +195,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         -- T2 Engineering
         elseif enh =='AdvancedEngineering' then
             self.BuildBotTotal = 3
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -208,7 +208,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -225,7 +225,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             Buff.ApplyBuff(self, 'CybranACUT2BuildRate')
         elseif enh =='AdvancedEngineeringRemove' then
             self.BuildBotTotal = 2
-            local bp = self:GetBlueprint().Economy.BuildRate
+            local bp = self.Blueprint.Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
@@ -235,7 +235,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         -- T3 Engineering
         elseif enh =='T3Engineering' then
             self.BuildBotTotal = 4
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             if not bp then return end
             local cat = ParseEntityCategory(bp.BuildableCategoryAdds)
             self:RemoveBuildRestriction(cat)
@@ -248,7 +248,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                     Duration = -1,
                     Affects = {
                         BuildRate = {
-                            Add =  bp.NewBuildRate - self:GetBlueprint().Economy.BuildRate,
+                            Add =  bp.NewBuildRate - self.Blueprint.Economy.BuildRate,
                             Mult = 1,
                         },
                         MaxHealth = {
@@ -270,7 +270,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 self.BuildBotTotal = 3
             end
 
-            local bp = self:GetBlueprint().Economy.BuildRate
+            local bp = self.Blueprint.Economy.BuildRate
             if not bp then return end
             self:RestoreBuildRestrictions()
             if Buff.HasBuff(self, 'CybranACUT3BuildRate') then
@@ -278,7 +278,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
             self:AddBuildRestriction(categories.CYBRAN * (categories.BUILTBYTIER2COMMANDER + categories.BUILTBYTIER3COMMANDER))
         elseif enh =='CoolingUpgrade' then
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             local wep = self:GetWeaponByLabel('RightRipper')
             wep:ChangeMaxRadius(bp.NewMaxRadius or 30)
             self.normalRange = bp.NewMaxRadius or 30
@@ -294,7 +294,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
             end
         elseif enh == 'CoolingUpgradeRemove' then
             local wep = self:GetWeaponByLabel('RightRipper')
-            local wepBp = self:GetBlueprint().Weapon
+            local wepBp = self.Blueprint.Weapon
             for k, v in wepBp do
                 if v.Label == 'RightRipper' then
                     wep:ChangeRateOfFire(v.RateOfFire or 1)
@@ -315,7 +315,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
         elseif enh == 'MicrowaveLaserGeneratorRemove' then
             self:SetWeaponEnabledByLabel('MLG', false)
         elseif enh == 'NaniteTorpedoTube' then
-            local bp = self:GetBlueprint().Enhancements[enh]
+            local bp = self.Blueprint.Enhancements[enh]
             self:SetWeaponEnabledByLabel('Torpedo', true)
             self:SetIntelRadius('Sonar', bp.NewSonarRadius or 60)
             self:EnableUnitIntel('Enhancement', 'Sonar')
@@ -323,7 +323,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
                 self:GetWeaponByLabel('DummyWeapon'):ChangeMaxRadius(self.torpRange)
             end
         elseif enh == 'NaniteTorpedoTubeRemove' then
-            local bpIntel = self:GetBlueprint().Intel
+            local bpIntel = self.Blueprint.Intel
             self:SetWeaponEnabledByLabel('Torpedo', false)
             self:SetIntelRadius('Sonar', bpIntel.SonarRadius or 26)
             self:DisableUnitIntel('Enhancement', 'Sonar')
@@ -382,14 +382,14 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     OnIntelEnabled = function(self)
         ACUUnit.OnIntelEnabled(self)
         if self.CloakEnh and self:IsIntelEnabled('Cloak') then
-            self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['CloakingGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
                 self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
         elseif self.StealthEnh and self:IsIntelEnabled('RadarStealth') and self:IsIntelEnabled('SonarStealth') then
-            self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
+            self:SetEnergyMaintenanceConsumptionOverride(self.Blueprint.Enhancements['StealthGenerator'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()
             if not self.IntelEffectsBag then
                 self.IntelEffectsBag = {}
@@ -414,7 +414,7 @@ URL0001 = Class(ACUUnit, CCommandUnit) {
     -- Death
     OnKilled = function(self, instigator, type, overkillRatio)
         local bp
-        for k, v in self:GetBlueprint().Buffs do
+        for k, v in self.Blueprint.Buffs do
             if v.Add.OnDeath then
                 bp = v
             end

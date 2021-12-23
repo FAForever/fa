@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  UEF T1 Air Factory Script
 #**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
@@ -46,7 +46,7 @@ UEB0102 = Class(TAirFactoryUnit) {
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAnim = bp.Display.AnimationFinishBuildLand
         if bpAnim and EntityCategoryContains(categories.LAND, unitBeingBuilt) then
             self.RollOffAnim = CreateAnimator(self):PlayAnim(bpAnim):SetRate(10)        --Change: SetRate(4)

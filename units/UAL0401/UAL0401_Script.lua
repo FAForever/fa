@@ -66,10 +66,10 @@ UAL0401 = Class(AWalkingLandUnit) {
         end
 
         -- only apply death damage when the unit is sufficiently build
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local FractionThreshold = bp.General.FractionThreshold or 0.5
         if self:GetFractionComplete() >= FractionThreshold then 
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             local position = self:GetPosition()
             local qx, qy, qz, qw = unpack(self:GetOrientation())
             local a = math.atan2(2.0 * (qx * qz + qw * qy), qw * qw + qx * qx - qz * qz - qy * qy)

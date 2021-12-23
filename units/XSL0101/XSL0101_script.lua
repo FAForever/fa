@@ -67,7 +67,7 @@ XSL0101 = Class(SWalkingLandUnit) {
     HideUnit = function(self)
         if not self.Dead and self:GetFractionComplete() == 1 and self.Sync.LowPriority then
             self.WaitingForCloak = true
-            WaitSeconds(self:GetBlueprint().Intel.StealthWaitTime)
+            WaitSeconds(self.Blueprint.Intel.StealthWaitTime)
             if self.Dead or self:IsMoving() or self:IsUnitState("Attacking") then
                 self.WaitingForCloak = false
                 return

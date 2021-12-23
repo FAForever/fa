@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Cybran Land Scout Script
 --#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -14,7 +14,7 @@ URL0101 = Class(CWalkingLandUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
         --entity used for radar
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self.RadarEnt = Entity {}
         self.Trash:Add(self.RadarEnt)
         self.RadarEnt:InitIntel(self.Army, 'Radar', bp.Intel.RadarRadius)

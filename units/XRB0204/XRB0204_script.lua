@@ -10,7 +10,7 @@ XRB0204 = Class(CConstructionStructureUnit) {
     OnStartBeingBuilt = function(self, builder, layer)
         CConstructionStructureUnit.OnStartBeingBuilt(self, builder, layer)
 
-        local target = self:GetBlueprint().General.UpgradesFrom
+        local target = self.Blueprint.General.UpgradesFrom
 
         -- Check if we're really being built on top of another unit (as an upgrade).
         -- We might be being rebuild by the slightly bugtacular SCU REBUILDER behaviour, in which

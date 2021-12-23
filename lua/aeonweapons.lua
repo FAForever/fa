@@ -114,7 +114,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         local beam = self.Beams[1].Beam
         if not beam then return end
 
-        local muzzle = self:GetBlueprint().MuzzleSpecial
+        local muzzle = self.Blueprint.MuzzleSpecial
         if not muzzle then return end
 
         target:SetDoNotTarget(true)
@@ -164,7 +164,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
             self.Slider:Destroy()
             self.Slider = nil
         end
-            self.unit:DetachAll(self:GetBlueprint().MuzzleSpecial or 0)
+            self.unit:DetachAll(self.Blueprint.MuzzleSpecial or 0)
             self:ResetTarget()
             self.AimControl:SetResetPoseTime(2)
     end,
@@ -181,7 +181,7 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
 
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             -- Align to a tick which is a multiple of 50
             WaitTicks(51 - math.mod(GetGameTick(), 50))
 
@@ -270,7 +270,7 @@ AIFArtilleryMiasmaShellWeapon = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local data = {
             Instigator = self.unit,
             Damage = blueprint.DoTDamage,
@@ -308,7 +308,7 @@ AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local data = {
             Army = self.unit.Army,
             Instigator = self.unit,
@@ -336,7 +336,7 @@ AANTorpedoCluster = Class(DefaultProjectileWeapon) {
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
         local damageTable = self:GetDamageTable()
-        local blueprint = self:GetBlueprint()
+        local blueprint = self.Blueprint
         local data = {
             Army = self.unit.Army,
             Instigator = self.unit,
@@ -361,7 +361,7 @@ AANTorpedoCluster = Class(DefaultProjectileWeapon) {
 AIFSmartCharge = Class(DefaultProjectileWeapon) {
     CreateProjectileAtMuzzle = function(self, muzzle)
         local proj = DefaultProjectileWeapon.CreateProjectileAtMuzzle(self, muzzle)
-        local tbl = self:GetBlueprint().DepthCharge
+        local tbl = self.Blueprint.DepthCharge
         proj:AddDepthCharge(tbl)
     end,
 }
@@ -444,7 +444,7 @@ AQuantumBeamGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffectScale = 1,
 
     PlayFxWeaponUnpackSequence = function(self)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         for _, v in self.FxUpackingChargeEffects do
             for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                 CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)
@@ -471,7 +471,7 @@ ADFPhasonLaser = Class(DefaultBeamWeapon) {
 
     PlayFxWeaponUnpackSequence = function(self)
         if not self.ContBeamOn then
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for _, v in self.FxUpackingChargeEffects do
                 for i, j in bp.RackBones[self.CurrentRackSalvoNumber].MuzzleBones do
                     CreateAttachedEmitter(self.unit, j, self.unit.Army, v):ScaleEmitter(self.FxUpackingChargeEffectScale)

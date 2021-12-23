@@ -126,10 +126,10 @@ XSL0401 = Class(SWalkingLandUnit) {
         end
 
         -- only apply death damage when the unit is sufficiently build
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local FractionThreshold = bp.General.FractionThreshold or 0.5
         if self:GetFractionComplete() >= FractionThreshold then 
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
                     DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)

@@ -23,7 +23,7 @@ URL0107 = Class(CWalkingLandUnit) {
 
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
-        self.BuildEffectBones = self:GetBlueprint().General.BuildBones.BuildEffectBones
+        self.BuildEffectBones = self.Blueprint.General.BuildBones.BuildEffectBones
         if self.BuildEffectBones then
             self:SetupBuildBones()
         end

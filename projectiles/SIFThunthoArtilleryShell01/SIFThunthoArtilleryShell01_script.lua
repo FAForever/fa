@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Thuntho Artillery Shell Projectile script, XSL0103
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -18,7 +18,7 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
     OnImpact = function(self, TargetType, TargetEntity) 
         
         local FxFragEffect = EffectTemplate.SThunderStormCannonProjectileSplitFx 
-        local bp = self:GetBlueprint().Physics
+        local bp = self.Blueprint.Physics
               
         ### Split effects
         for k, v in FxFragEffect do

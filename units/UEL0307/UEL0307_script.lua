@@ -27,7 +27,7 @@ UEL0307 = Class(TShieldLandUnit) {
         self.ShieldEffectsBag = {}
         
         self.TargetPointer = self:GetWeapon(1) --save the pointer weapon for later - this is extra clever since the pointer weapon has to be first!
-        self.TargetLayerCaps = self:GetBlueprint().Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
+        self.TargetLayerCaps = self.Blueprint.Weapon[1].FireTargetLayerCapsTable --we save this to the unit table so dont have to call every time.
         self.PointerEnabled = true --a flag to let our thread know whether we should turn on our pointer.
     end,
     
@@ -41,7 +41,7 @@ UEL0307 = Class(TShieldLandUnit) {
         self.RotatorManipulator:SetAccel( 5 )
         self.RotatorManipulator:SetTargetSpeed( 30 )
         if not self.AnimationManipulator then
-            local myBlueprint = self:GetBlueprint()
+            local myBlueprint = self.Blueprint
             --LOG( 'it is ', repr(myBlueprint.Display.AnimationOpen) )
             self.AnimationManipulator = CreateAnimator(self)
             self.AnimationManipulator:PlayAnim( myBlueprint.Display.AnimationOpen )

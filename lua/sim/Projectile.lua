@@ -132,7 +132,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self:GetBlueprint()
+            meta.Blueprint = self.Blueprint
             meta.MetaCachePrepared = true
 
             SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
@@ -148,7 +148,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         }
         self.Army = self:GetArmy()
         self.Trash = TrashBag()
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         self:SetMaxHealth(bp.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
         local snd = bp.Audio.ExistLoop
@@ -193,7 +193,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        local bp = self:GetBlueprint().Defense.MaxHealth
+        local bp = self.Blueprint.Defense.MaxHealth
         if bp then
             self:DoTakeDamage(instigator, amount, vector, damageType)
         else
@@ -223,7 +223,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
                 -- Calculate the excess damage amount
                 local excess = health - amount
-                local maxHealth = self:GetBlueprint().Defense.MaxHealth or 10
+                local maxHealth = self.Blueprint.Defense.MaxHealth or 10
                 if excess < 0 and maxHealth > 0 then
                     excessDamageRatio = -excess / maxHealth
                 end
@@ -336,7 +336,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         --  'ProjectileUnderWater
         local ImpactEffects = {}
         local ImpactEffectScale = 1
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local bpAud = bp.Audio
 
         -- Sounds for all other impacts, ie: Impact<TargetTypeName>
@@ -450,14 +450,14 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnExitWater = function(self)
-        local bp = self:GetBlueprint().Audio['ExitWater']
+        local bp = self.Blueprint.Audio['ExitWater']
         if bp then
             self:PlaySound(bp)
         end
     end,
 
     OnEnterWater = function(self)
-        local bp = self:GetBlueprint().Audio['EnterWater']
+        local bp = self.Blueprint.Audio['EnterWater']
         if bp then
             self:PlaySound(bp)
         end
@@ -492,7 +492,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnLostTarget = function(self)
-        local bp = self:GetBlueprint().Physics
+        local bp = self.Blueprint.Physics
         if bp.TrackTarget and bp.TrackTarget == true then
             if bp.OnLostTargetLifetime then
                 self:SetLifetime(bp.OnLostTargetLifetime)
@@ -516,7 +516,7 @@ DummyProjectile = Class(moho.projectile_methods, Entity) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self:GetBlueprint()
+            meta.Blueprint = self.Blueprint
             meta.MetaCachePrepared = true
         end
 

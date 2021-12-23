@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Terran Power Generator Script
 --#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
 
@@ -49,7 +49,7 @@ UEB1101 = Class(TEnergyCreationUnit) {
 
     OpeningState = State {
         Main = function(self)
-            local bp = self:GetBlueprint()
+            local bp = self.Blueprint
             if bp.Audio.Activate then
                 self:PlaySound(bp.Audio.Activate)
             end

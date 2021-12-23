@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Aeon Mass Fabricator
 --#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
 
@@ -35,7 +35,7 @@ UAB1104 = Class(AMassFabricationUnit) {
 
             if not self.Open then
                 self.Open = true
-                self.AnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen):SetRate(1)
+                self.AnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen):SetRate(1)
                 WaitFor(self.AnimManip)
             end
 

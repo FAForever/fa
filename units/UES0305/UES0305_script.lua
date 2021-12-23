@@ -66,7 +66,7 @@ UES0305 = Class(TSeaUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:HideBone(0, true)
         self.BeingBuiltShowBoneTriggered = false
-        if self:GetBlueprint().General.UpgradesFrom ~= builder.UnitId then
+        if self.Blueprint.General.UpgradesFrom ~= builder.UnitId then
             self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
         end
     end,

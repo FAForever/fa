@@ -68,7 +68,7 @@ CConstructionTemplate = Class() {
     --- Prepares the values required to support bots
     OnCreate = function(self)
         -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
+        self.BuildBotTotal = self.Blueprint.BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
     end,
 
     --- When dying, destroy everything.
@@ -276,7 +276,7 @@ CBuildBotUnit = Class(InsignificantUnit) {
         UnitSetConsumptionActive(self, false)
 
         -- store the army in case AOE damage tries to hit the drone
-        self.Footprint = self:GetBlueprint().Footprint
+        self.Footprint = self.Blueprint.Footprint
         self.Army = self:GetArmy()
         self.UnitId = self:GetUnitId()
     end,
@@ -330,7 +330,7 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitTicks(2)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
@@ -339,7 +339,7 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            self.BuildAnimManip:PlayAnim(self.Blueprint.Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
         self.BuildAnimManip:SetRate(1)
@@ -465,7 +465,7 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
         WaitSeconds(0.1)
-        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self:GetBlueprint().General.BuildBones, self.BuildEffectsBag)
+        EffectUtil.CreateCybranFactoryBuildEffects(self, unitBeingBuilt, self.Blueprint.General.BuildBones, self.BuildEffectsBag)
     end,
 
     StartBuildFx = function(self, unitBeingBuilt)
@@ -476,7 +476,7 @@ CLandFactoryUnit = Class(LandFactoryUnit) {
         -- Start build process
         if not self.BuildAnimManip then
             self.BuildAnimManip = CreateAnimator(self)
-            self.BuildAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationBuild, true):SetRate(0)
+            self.BuildAnimManip:PlayAnim(self.Blueprint.Display.AnimationBuild, true):SetRate(0)
             self.Trash:Add(self.BuildAnimManip)
         end
 
@@ -618,7 +618,7 @@ CRadarJammerUnit = Class(RadarJammerUnit) {}
 CConstructionEggUnit = Class(CStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local buildUnit = bp.Economy.BuildUnit
         local pos = self:GetPosition()
         local aiBrain = self:GetAIBrain()
@@ -632,7 +632,7 @@ CConstructionEggUnit = Class(CStructureUnit) {
         self:ForkThread(function()
                 self.OpenAnimManip = CreateAnimator(self)
                 self.Trash:Add(self.OpenAnimManip)
-                self.OpenAnimManip:PlayAnim(self:GetBlueprint().Display.AnimationOpen, false):SetRate(0.1)
+                self.OpenAnimManip:PlayAnim(self.Blueprint.Display.AnimationOpen, false):SetRate(0.1)
                 self:PlaySound(bp.Audio['EggOpen'])
 
                 WaitFor(self.OpenAnimManip)
@@ -664,7 +664,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         CStructureUnit.OnCreate(self)
         CConstructionTemplate.OnCreate(self)
 
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
 
         -- Construction stuff
         self.EffectsBag = {}
@@ -778,7 +778,7 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
         if self.StoppedBuilding then
             self.StoppedBuilding = false
             self.BuildArmManipulator:Disable()
-            self.BuildingOpenAnimManip:SetRate(-(self:GetBlueprint().Display.AnimationBuildRate or 1))
+            self.BuildingOpenAnimManip:SetRate(-(self.Blueprint.Display.AnimationBuildRate or 1))
         end
     end,
 
