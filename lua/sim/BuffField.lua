@@ -26,11 +26,13 @@ BuffField = Class(Entity) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self.Blueprint
+            meta.Blueprint = self:GetBlueprint()
             meta.MetaCachePrepared = true
 
             SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
         end
+
+        self.Blueprint = self.Blueprint
 
         -- Fires when the field is initalised
         local bp = self.Blueprint

@@ -31,11 +31,13 @@ Prop = Class(moho.prop_methods, Entity) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self.Blueprint
+            meta.Blueprint = self:GetBlueprint()
             meta.MetaCachePrepared = true
 
             SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
         end
+
+        self.Blueprint = self.Blueprint
 
         self.EventCallbacks = {
             OnKilled = {},

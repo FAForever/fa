@@ -173,11 +173,13 @@ Unit = Class(moho.unit_methods) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self.Blueprint
+            meta.Blueprint = self:GetBlueprint()
             meta.MetaCachePrepared = true
 
             SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
         end
+
+        self.Blueprint = self.Blueprint
 
         -- cache commonly used values from the engine
         -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
@@ -4554,11 +4556,13 @@ InsignificantUnit = Class(moho.unit_methods) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self.Blueprint
+            meta.Blueprint = self:GetBlueprint()
             meta.MetaCachePrepared = true
 
             SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
         end
+
+        self.Blueprint = self.Blueprint
         
         -- values that are expected on all units
         self.EntityId = EntityGetEntityId(self)

@@ -132,11 +132,13 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self.Blueprint
+            meta.Blueprint = self:GetBlueprint()
             meta.MetaCachePrepared = true
 
             SPEW("Cached class: " .. meta.Blueprint.BlueprintId)
         end
+
+        self.Blueprint = self.Blueprint
 
         self.DamageData = {
             DamageRadius = nil,
@@ -507,6 +509,11 @@ Projectile = Class(moho.projectile_methods, Entity) {
 -- effects that require projectiles without additional overhead.
 DummyProjectile = Class(moho.projectile_methods, Entity) {
 
+    -- # Cache via meta table
+    
+    MetaCachePrepared = false,
+    Blueprint = false,
+
     -- the only things we need
     __init = function(self, spec) end,
     __post_init = function(self, spec) end,
@@ -516,10 +523,11 @@ DummyProjectile = Class(moho.projectile_methods, Entity) {
 
         if not self.MetaCachePrepared then 
             local meta = getmetatable(self)
-            meta.Blueprint = self.Blueprint
+            meta.Blueprint = self:GetBlueprint()
             meta.MetaCachePrepared = true
         end
 
+        self.Blueprint = self.Blueprint
         self.Army = self:GetArmy()
     
     end,
