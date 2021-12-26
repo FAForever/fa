@@ -484,7 +484,7 @@ function SetupPlayerLines()
         previous = group.MapName
 
         -- ui for ranked icon
-        local rankedOffset = 16
+        local rankedOffset = 32
         if data.Ranked then
             group.RankedIcon = Bitmap(group)
             group.RankedIcon:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
@@ -541,10 +541,11 @@ function SetupPlayerLines()
     mapData.Ranked = sessionInfo.Options.Ranked or false
 
     -- construct UI elements
-    controls.armyLines[index] = CreateMapNameLine(mapData)
+    local mapUI = CreateMapNameLine(mapData)
+    controls.armyLines[index] = mapUI
 
     resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⃝', 13, 'Calibri')
-    resModeSwitch.icon.Depth:Set(resModeSwitch.icon.Depth() + 1)
+    resModeSwitch.icon.Depth:Set(mapUI.Depth() + 1)
     LayoutHelpers.AtLeftTopIn(resModeSwitch.icon, controls.armyLines[table.getn(controls.armyLines) - 1], 0, -1)
     LayoutHelpers.AtHorizontalCenterIn(resModeSwitch.icon, controls.armyLines[1].energy)
     resModeSwitch.text = UIUtil.CreateText(resModeSwitch.icon, 'I', 10, UIUtil.bodyFont)
@@ -691,7 +692,7 @@ function _OnBeat()
                 line = data
             end
         end
-        LayoutHelpers.Below(resModeSwitch.icon, line.energy, -1)
+        LayoutHelpers.Below(resModeSwitch.icon, line.energy, 1)
         currentScores = false -- dont render score UI until next score update
     end
 
