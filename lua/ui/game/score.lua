@@ -476,8 +476,6 @@ function SetupPlayerLines()
         previous = group.Size
         previous = AddDash()
 
-
-
         -- ui for map name
         group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont)
         Tooltip.AddForcedControlTooltipManual(group.MapName, data.MapTitle, data.MapDescription)
