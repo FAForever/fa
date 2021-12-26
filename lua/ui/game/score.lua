@@ -457,11 +457,16 @@ function SetupPlayerLines()
     end
 
     mapData = {}
+    if (sessionInfo.Options.Share == 'FullShare') then
+        mapData.shareCondition = 'Full Share'
+    else
+        mapData.shareCondition = 'No Share'
+    end
     mapData.Sizekm = {Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2)}
-    mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)..' ('..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..')'
+    mapData.mapname = mapData.shareCondition..' - '..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..' - '..LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
     local replayID = UIUtil.GetReplayId()
     if replayID then
-        mapData.mapname = mapData.mapname..', ID: '..replayID
+        mapData.mapname = mapData.mapname..' - ID: '..replayID
     end
 
     controls.armyLines[index] = CreateMapNameLine(mapData)
