@@ -437,8 +437,16 @@ function SetupPlayerLines()
     local function CreateMapNameLine(data)
         local group = Group(controls.bgStretch)
 
-        local offset = 4
+        local offset = 0
         local previous = false
+
+        local function AddDash()
+            local dash = UIUtil.CreateText(group, " - ", 10, UIUtil.bodyFont)
+            LayoutHelpers.RightOf(dash, previous)
+            LayoutHelpers.AtVerticalCenterIn(dash, previous)
+            dash:SetColor('ffffffff')
+            return dash
+        end
 
         -- ui for share conditions
         group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
@@ -447,6 +455,7 @@ function SetupPlayerLines()
         LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
         group.ShareConditions:SetColor('ffffffff')
         previous = group.ShareConditions
+        previous = AddDash()
 
         -- ui for map name
         group.Size = UIUtil.CreateText(group, tostring(data.Size.Width) .. "x" .. tostring(data.Size.Height), 10, UIUtil.bodyFont)
@@ -454,6 +463,7 @@ function SetupPlayerLines()
         LayoutHelpers.AtVerticalCenterIn(group.Size, group)
         group.Size:SetColor('ffffffff')
         previous = group.Size
+        previous = AddDash()
 
         -- ui for replay id if available
         if data.ReplayID then 
@@ -462,6 +472,7 @@ function SetupPlayerLines()
             LayoutHelpers.AtVerticalCenterIn(group.ReplayID, group)
             group.ReplayID:SetColor('ffffffff')
             previous = group.ReplayID
+            previous = AddDash()
         end
 
         -- ui for map name
@@ -520,7 +531,10 @@ function SetupPlayerLines()
 
     -- add map title / description to the scoreboard
     mapData.MapTitle = LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
-    mapData.MapDescription = sessionInfo.description
+    mapData.MapDescription = sessionInfo.description or "No description set by the author."
+    if mapData.MapDescription == "" then 
+        mapData.MapDescription = "No description set by the author."
+    end
 
     -- add replay ID to the scoreboard if available
     mapData.ReplayID = UIUtil.GetReplayId() or false
