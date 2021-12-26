@@ -449,7 +449,7 @@ function SetupPlayerLines()
             return dash
         end
 
-        if data.ReplayID then 
+        if SessionIsReplay() and data.ReplayID then 
             -- ui for replay id if available
             group.ReplayID = UIUtil.CreateText(group, tostring(data.ReplayID), 10, UIUtil.bodyFont)
             LayoutHelpers.AtLeftIn(group.ReplayID, group)

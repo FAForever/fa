@@ -339,7 +339,7 @@ TTransportBeaconUnit = Class(TransportBeaconUnit) {}
 --------------------------------------------------------------
 --  WALKING LAND UNITS
 --------------------------------------------------------------
-TWalkingLandUnit = Class(WalkingLandUnit) {}
+TWalkingLandUnit = Class(WalkingLandUnit) { }
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
