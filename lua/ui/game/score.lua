@@ -473,13 +473,13 @@ function SetupPlayerLines()
         previous = group.MapName
 
         -- ui for ranked icon
-        local rankedOffset = 0
+        local rankedOffset = 16
         if data.Ranked then
             group.RankedIcon = Bitmap(group)
             group.RankedIcon:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
             LayoutHelpers.SetDimensions(group.RankedIcon, 16, 16)
             LayoutHelpers.AtRightTopIn(group.RankedIcon, group, -1)
-            rankedOffset = 16
+            rankedOffset = 32
         end
 
         -- make it extent and clip text
