@@ -524,7 +524,7 @@ function SetupPlayerLines()
 
     -- add replay ID to the scoreboard if available
     mapData.ReplayID = UIUtil.GetReplayId() or false
-    mapData.Ranked = sessionInfo.Options.Ranked or true
+    mapData.Ranked = sessionInfo.Options.Ranked or false
 
     -- construct UI elements
     controls.armyLines[index] = CreateMapNameLine(mapData)
