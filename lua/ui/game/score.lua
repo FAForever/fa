@@ -430,8 +430,9 @@ function SetupPlayerLines()
     -- data = {
     --     ShareConditionsTitle :: String 
     --     ShareConditionsDescription :: String
-    --     Sizekm :: String
-    --     mapname :: String
+    --     Size :: String
+    --     MapTitle :: String
+    --     MapDescription :: String
     -- }
 
     local function CreateMapNameLine(data)
@@ -448,37 +449,39 @@ function SetupPlayerLines()
             return dash
         end
 
-        -- ui for share conditions
-        group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
-        Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
-        LayoutHelpers.AtLeftIn(group.ShareConditions, group)
-        LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
-        group.ShareConditions:SetColor('ffffffff')
-        previous = group.ShareConditions
-        previous = AddDash()
+        if data.ReplayID then 
+            -- ui for replay id if available
+            group.ReplayID = UIUtil.CreateText(group, tostring(data.ReplayID), 10, UIUtil.bodyFont)
+            LayoutHelpers.AtLeftIn(group.ReplayID, group)
+            LayoutHelpers.AtVerticalCenterIn(group.ReplayID, group)
+            group.ReplayID:SetColor('ffffffff')
+            previous = group.ReplayID
+            previous = AddDash()
+        else
+            -- ui for share conditions
+            group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
+            Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
+            LayoutHelpers.AtLeftIn(group.ShareConditions, group)
+            LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
+            group.ShareConditions:SetColor('ffffffff')
+            previous = group.ShareConditions
+            previous = AddDash()
+        end
 
         -- ui for map name
         group.Size = UIUtil.CreateText(group, tostring(data.Size.Width) .. "x" .. tostring(data.Size.Height), 10, UIUtil.bodyFont)
-        LayoutHelpers.RightOf(group.Size, previous, offset)
+        LayoutHelpers.RightOf(group.Size, previous)
         LayoutHelpers.AtVerticalCenterIn(group.Size, group)
         group.Size:SetColor('ffffffff')
         previous = group.Size
         previous = AddDash()
 
-        -- ui for replay id if available
-        if data.ReplayID then 
-            group.ReplayID = UIUtil.CreateText(group, "(" .. tostring(data.ReplayID) .. ")", 10, UIUtil.bodyFont)
-            LayoutHelpers.RightOf(group.ReplayID, previous, offset)
-            LayoutHelpers.AtVerticalCenterIn(group.ReplayID, group)
-            group.ReplayID:SetColor('ffffffff')
-            previous = group.ReplayID
-            previous = AddDash()
-        end
+
 
         -- ui for map name
         group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont)
         Tooltip.AddForcedControlTooltipManual(group.MapName, data.MapTitle, data.MapDescription)
-        LayoutHelpers.RightOf(group.MapName, previous, offset)
+        LayoutHelpers.RightOf(group.MapName, previous)
         LayoutHelpers.AtVerticalCenterIn(group.MapName, group)
         group.MapName:SetColor('ffffffff')
         previous = group.MapName
@@ -537,7 +540,7 @@ function SetupPlayerLines()
     end
 
     -- add replay ID to the scoreboard if available
-    mapData.ReplayID = UIUtil.GetReplayId() or false
+    mapData.ReplayID = UIUtil.GetReplayId() or false or "1528974593"
     mapData.Ranked = sessionInfo.Options.Ranked or false
 
     -- construct UI elements
