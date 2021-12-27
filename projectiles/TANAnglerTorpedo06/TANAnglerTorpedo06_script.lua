@@ -10,19 +10,9 @@ TANAnglerTorpedo06 = Class(TTorpedoShipProjectile)
         TTorpedoShipProjectile.OnCreate(self, inWater)
         
         -- change it up a bit but keep same magnitude
-        -- self:SetVelocity(vx, vy - 0.1, vz)
-        -- self:SetScaleVelocity(m)
-        -- local launcher = self:GetLauncher()
-        -- local vx, vy, vz = launcher:GetVelocity()
-        -- self:SetVelocity(vx, vy - 1, vz)
-
-        -- don't track the target while we're in the air
-        -- self:TrackTarget(false)
-
-        -- local meta = getmetatable(self)
-        -- for k, v in meta do
-        --     LOG(k)
-        -- end
+        local launcher = self:GetLauncher()
+        local vx, vy, vz = launcher:GetVelocity()
+        self:SetVelocity(vx, vy - 1, vz)
     end,
 
     OnEnterWater = function(self)
