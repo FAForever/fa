@@ -6,6 +6,25 @@ local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShip
 TANAnglerTorpedo06 = Class(TTorpedoShipProjectile) 
 {
 
+    OnCreate = function(self, inWater)
+        TTorpedoShipProjectile.OnCreate(self, inWater)
+        
+        -- change it up a bit but keep same magnitude
+        -- self:SetVelocity(vx, vy - 0.1, vz)
+        -- self:SetScaleVelocity(m)
+        -- local launcher = self:GetLauncher()
+        -- local vx, vy, vz = launcher:GetVelocity()
+        -- self:SetVelocity(vx, vy - 1, vz)
+
+        -- don't track the target while we're in the air
+        -- self:TrackTarget(false)
+
+        -- local meta = getmetatable(self)
+        -- for k, v in meta do
+        --     LOG(k)
+        -- end
+    end,
+
     OnEnterWater = function(self)
         -- set a collision shape to make them easier to hit for defenses
         -- can't be too big (e.g., 1.0) because then torpedo bombers are worthless in shallow water
@@ -45,7 +64,6 @@ TANAnglerTorpedo06 = Class(TTorpedoShipProjectile)
         self:SetTurnRate(80)
         WaitSeconds(0.25)
     end,
-
 }
 
 TypeClass = TANAnglerTorpedo06
