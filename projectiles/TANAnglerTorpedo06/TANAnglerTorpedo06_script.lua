@@ -8,14 +8,20 @@ TANAnglerTorpedo06 = Class(TTorpedoShipProjectile)
 
     OnCreate = function(self, inWater)
         TTorpedoShipProjectile.OnCreate(self, inWater)
-        
-        -- change it up a bit but keep same magnitude
+
+        -- make them point towards the water
         local launcher = self:GetLauncher()
         local vx, vy, vz = launcher:GetVelocity()
-        self:SetVelocity(vx, vy - 1, vz)
+        self:SetVelocity(vx, vy - 0.05, vz)
     end,
 
     OnEnterWater = function(self)
+
+        if self.DropBehavior then 
+            KillThread(self.DropBehavior)
+            self.DropBehavior = false 
+        end
+
         -- set a collision shape to make them easier to hit for defenses
         -- can't be too big (e.g., 1.0) because then torpedo bombers are worthless in shallow water
         self:SetCollisionShape('Sphere', 0, 0, 0, 0.5)
