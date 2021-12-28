@@ -4522,9 +4522,9 @@ local UnitGetCurrentLayer = _G.moho.unit_methods.GetCurrentLayer
 local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 
 -- upvalued categories for performance
-local CategoriesInsignificant = categories.INSIGNIFICANTUNIT
+local CategoriesDummyUnit = categories.DUMMYUNIT
 
-InsignificantUnit = Class(moho.unit_methods) {
+DummyUnit = Class(moho.unit_methods) {
     -- the only things we need
     __init = function(self) end,
     __post_init = function(self) end,
@@ -4539,8 +4539,8 @@ InsignificantUnit = Class(moho.unit_methods) {
         self.Footprint = self.Blueprint.Footprint
 
         -- basic check if this insignificant unit is truely insignificant
-        if not EntityCategoryContains(CategoriesInsignificant, self) then 
-            WARN("Unit is insignificant but doesn't have the right categories set!")
+        if not EntityCategoryContains(CategoriesDummyUnit, self) then 
+            WARN("Unit " .. tostring(self.UnitId) .. " is a dummy unit but doesn't have the right categories set!")
 
             -- todo: add more info for dev
         end
