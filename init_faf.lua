@@ -88,6 +88,7 @@ allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
 -- typical backwards compatible packages
 local allowedAssetsNxt = { }
+allowedAssetsNxt["kyros.nxt"] = true
 allowedAssetsNxt["texturepack.nxt"] = true
 allowedAssetsNxt["advanced strategic icons.nxt"] = true
 allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
@@ -175,7 +176,9 @@ local function MountMapContent(dir)
         end
 
         -- do not load archives as maps
-        if StringSub(map, -4) == ".zip" or StringSub(map, -4) == ".scd"  or StringSub(map, -4) == ".rar" then
+        local extension = StringSub(map, -4)
+        if extension == ".zip" or extension == ".scd" or extension == ".rar" then
+            LOG("Prevented loading a map inside a zip / scd / rar file: " .. dir .. "/" .. map)
             continue 
         end
 
@@ -198,22 +201,22 @@ local function MountMapContent(dir)
 
         -- check if it has a scenario file
         if not scenarioFile then 
-            LOG("Map doesn't have a scenario file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no scenario file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not scmapFile then 
-            LOG("Map doesn't have a scmap file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no scmap file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not saveFile then 
-            LOG("Map doesn't have a save file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no save file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not scriptFile then 
-            LOG("Map doesn't have a script file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no script file: " .. dir .. "/" .. map)
             continue 
         end
 
@@ -315,12 +318,14 @@ local function MountModContent(dir)
 
         -- do not load integrated mods
         if integratedMods[mod] then 
-            _ALERT("Blocked mod that is integrated: " .. mod )
+            LOG("Blocked mod that is integrated: " .. mod )
             continue 
         end 
 
         -- do not load archives as mods
-        if StringFind(mod, ".zip") or StringFind(mod, ".scd") or StringFind(mod, ".rar") then
+        local extension = StringSub(mod, -4)
+        if extension == ".zip" or extension == ".scd" or extension == ".rar" then
+            LOG("Prevented loading a mod inside a zip / scd / rar file: " .. dir .. "/" .. mod)
             continue 
         end
 
@@ -334,7 +339,7 @@ local function MountModContent(dir)
 
         -- check if it has a scenario file
         if not infoFile then 
-            _ALERT("Mod doesn't have an info file: " .. dir .. "/" .. mod)
+            LOG("Mod doesn't have an info file: " .. dir .. "/" .. mod)
             continue 
         end
 
