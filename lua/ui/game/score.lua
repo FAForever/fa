@@ -469,7 +469,6 @@ function SetupPlayerLines()
         -- ui for map name
         group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont)
         Tooltip.AddForcedControlTooltipManual(group.MapName, data.MapTitle, data.MapDescription)
-        LOG(data.MapDescription)
         LayoutHelpers.RightOf(group.MapName, previous)
         LayoutHelpers.AtVerticalCenterIn(group.MapName, group)
         group.MapName:SetColor('ffffffff')
