@@ -33,7 +33,7 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 -- upvalue for performance
 local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
-local CategoriesNoInsignificant = categories.ALLUNITS - categories.INSIGNIFICANTUNIT
+local CategoriesDummyUnit = categories.DUMMYUNIT
 
 local observer = false
 local Points = {
@@ -4108,40 +4108,23 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    --- Retrieves all units that fit the criteria around some point.
+    --- Retrieves all units that fit the criteria around some point. Excludes dummy units.
     -- @param category The categories the units should fit.
     -- @param position The center point to start looking for units.
     -- @param radius The radius of the circle we look for units in.
     -- @param alliance The alliance status ('Ally', 'Enemy', 'Neutral') to those units.
-    -- @param excludeInsignificantUnits Whether or not we exclude insignificant units, defaults to true.
     -- @return nil if none found or a table.
-    GetUnitsAroundPoint = function(self, category, position, radius, alliance, excludeInsignificantUnits)
-        local units
+    GetUnitsAroundPoint = function(self, category, position, radius, alliance)
         if alliance then 
             -- call where we do care about alliance
-            units = BrainGetUnitsAroundPoint(self, category, position, radius, alliance)
+            return BrainGetUnitsAroundPoint(self, category - CategoriesDummyUnit, position, radius, alliance)
         else 
             -- call where we do not, which is different from providing nil (as there would be a fifth argument then)
-            units = BrainGetUnitsAroundPoint(self, category, position, radius)
+            return BrainGetUnitsAroundPoint(self, category - CategoriesDummyUnit, position, radius)
         end
-
-        -- as it can return nil, check if we have any units
-        if units then 
-            -- if it isn't set, we try and exclude them anyhow
-            if excludeInsignificantUnits == nil then 
-                excludeInsignificantUnits = true 
-            end
-
-            -- check if we want to exclude them
-            if excludeInsignificantUnits then 
-                units = EntityCategoryFilterDown(CategoriesNoInsignificant, units)
-            end
-        end
-
-        return units
     end,
 
-    --- Returns list of units by category.
+    --- Returns list of units by category. Excludes dummy units.
     -- @param category Unit's category, example: categories.TECH2 .
     -- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
     -- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
@@ -4151,6 +4134,6 @@ AIBrain = Class(moho.aibrain_methods) {
         requireBuilt = requireBuilt or false
 
         -- retrieve units, excluding insignificant units
-        return BrainGetListOfUnits(self, cats - categories.INSIGNIFICANTUNIT, needToBeIdle, requireBuilt)
+        return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 }
