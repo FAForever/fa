@@ -449,24 +449,14 @@ function SetupPlayerLines()
             return dash
         end
 
-        if SessionIsReplay() and data.ReplayID then 
-            -- ui for replay id if available
-            group.ReplayID = UIUtil.CreateText(group, tostring(data.ReplayID), 10, UIUtil.bodyFont)
-            LayoutHelpers.AtLeftIn(group.ReplayID, group)
-            LayoutHelpers.AtVerticalCenterIn(group.ReplayID, group)
-            group.ReplayID:SetColor('ffffffff')
-            previous = group.ReplayID
-            previous = AddDash()
-        else
-            -- ui for share conditions
-            group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
-            Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
-            LayoutHelpers.AtLeftIn(group.ShareConditions, group)
-            LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
-            group.ShareConditions:SetColor('ffffffff')
-            previous = group.ShareConditions
-            previous = AddDash()
-        end
+        -- ui for share conditions
+        group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
+        Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
+        LayoutHelpers.AtLeftIn(group.ShareConditions, group)
+        LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
+        group.ShareConditions:SetColor('ffffffff')
+        previous = group.ShareConditions
+        previous = AddDash()
 
         -- ui for map name
         group.Size = UIUtil.CreateText(group, tostring(data.Size.Width) .. "x" .. tostring(data.Size.Height), 10, UIUtil.bodyFont)
@@ -479,6 +469,7 @@ function SetupPlayerLines()
         -- ui for map name
         group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont)
         Tooltip.AddForcedControlTooltipManual(group.MapName, data.MapTitle, data.MapDescription)
+        LOG(data.MapDescription)
         LayoutHelpers.RightOf(group.MapName, previous)
         LayoutHelpers.AtVerticalCenterIn(group.MapName, group)
         group.MapName:SetColor('ffffffff')
@@ -526,19 +517,22 @@ function SetupPlayerLines()
     -- add share information to the score board
     mapData.ShareConditionsTitle = LOC("<LOC " .. ShareNameLookup[sessionInfo.Options.Share] .. ">")
     mapData.ShareConditionsDescription = LOC("<LOC " .. ShareDescriptionLookup[sessionInfo.Options.Share] .. ">")
+    mapData.ShareConditionsDescription = mapData.ShareConditionsDescription .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
 
     -- add size to the score board
     mapData.Size = { Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2) }
 
     -- add map title / description to the scoreboard
     mapData.MapTitle = LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
-    mapData.MapDescription = sessionInfo.description or "No description set by the author."
-    if mapData.MapDescription == "" then 
-        mapData.MapDescription = "No description set by the author."
+    local description = sessionInfo.description
+    if not description or description == "" then 
+        description = "No description set by the author."
     end
 
-    -- add replay ID to the scoreboard if available
-    mapData.ReplayID = UIUtil.GetReplayId() or false
+    -- add replay ID
+    mapData.MapDescription = LOC(description) .. "\r\n\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
+
+    -- add ladder icon
     mapData.Ranked = sessionInfo.Options.Ranked or false
 
     -- construct UI elements
