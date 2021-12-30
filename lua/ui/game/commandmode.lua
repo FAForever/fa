@@ -62,6 +62,8 @@ local startBehaviors = {}
 --- Behavior to run when exiting command mode. If f is a function, it is called as f(commandMode, modeData).
 local endBehaviors = {}
 
+local ferryRoute= {}
+
 --- Adds a starting behavior.
 -- @param behavior The behavior to add, called as behavior(commandMode, modeData).
 function AddStartBehavior(behavior)
@@ -359,6 +361,11 @@ function CapStructure(command)
     end
 end
 
+local function PersistFerryRoute() 
+    SimCallback({ Func = 'PersistFerry', Args = { route = ferryRoute} }, true)
+    ferryRoute = {}
+end
+
 -- cached category strings for performance
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
@@ -474,6 +481,15 @@ function OnCommandIssued(command)
 
     -- used by spread attack to keep track of the orders of units
     import('/lua/spreadattack.lua').MakeShadowCopyOrders(command)
+
+    if command.CommandType == 'Ferry' then
+        local pos = command.Target.Position
+        table.insert(ferryRoute, {pos[1], pos[2], pos[3]})
+    end
+        
+    if not IsKeyDown('Shift') and table.getsize(ferryRoute) > 1 then
+        PersistFerryRoute()
+    end
 end
 
 --- ???
@@ -481,6 +497,10 @@ end
 function OnCommandModeBeat()
     if issuedOneCommand and not IsKeyDown('Shift') then
         EndCommandMode(true)
+    end
+
+    if not IsKeyDown('Shift') and table.getsize(ferryRoute) > 1 then
+        PersistFerryRoute()
     end
 end
 

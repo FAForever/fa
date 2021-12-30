@@ -95,6 +95,7 @@ Callbacks.PersistFerry = function(data, units)
 
     -- function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer])
     local helper = CreateUnit('hel0001', units[1].Army, start[1], start[2], start[3], 1, 1, 1, 1, 'Air')
+
     TableInsert (units, helper)
     IssueClearCommands(units)
     for _, r in data.route do

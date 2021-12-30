@@ -76,4 +76,11 @@ UnitBlueprint {
     SizeY = 0,
     SizeZ = 0,
     StrategicIconSortPriority = 0,
+    Transport = {
+        AirClass = true,
+        Class2AttachSize = 0,
+        Class3AttachSize = 0,
+        Class1Capacity = 0,
+        TransportClass = 1,
+    },
 }
