@@ -8,6 +8,10 @@
 -- imports fa_path to determine where it is installed
 dofile(InitFileDir .. '/../fa_path.lua')
 
+LOG("Client version: " .. tostring(ClientVersion))
+LOG("Game version: " .. tostring(GameVersion))
+LOG("Game type: " .. tostring(GameType))
+
 -- upvalued performance
 local dofile = dofile
 
