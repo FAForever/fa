@@ -426,7 +426,7 @@ for k, file in IoDir(shaderCache .. '/*') do
     if file != '.' and file != '..' then 
         local version = tonumber(string.sub(file, -4))
         if not version or version < minimumShaderVersion then 
-            LOG("Force shader recompilation of: " .. file)
+            LOG("Removed incompatible shader: " .. file)
             os.remove(shaderCache .. '/' .. file)
         end
     end
