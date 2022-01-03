@@ -1515,6 +1515,7 @@ TransportBeaconUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self)
         self:SetCapturable(false)
         self:SetReclaimable(false)
+        self.CanBeKilled = false
     end,
 }
 
