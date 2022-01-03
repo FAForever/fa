@@ -7,6 +7,7 @@ HEL0001 = Class(moho.unit_methods) {
         self:SetReclaimable(false)
         self:SetIsValidTarget(false)
         self:SetCollisionShape('None')
+        self.CanBeKilled = false
 
         ForkThread(self.KillHelperWhenIdle, self)
     end,

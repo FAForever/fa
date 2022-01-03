@@ -3,8 +3,9 @@ UnitBlueprint {
         --BeaconName = 'UAB5102'
     },
     Categories = {
+        'DUMMYUNIT',
         'UNTARGETABLE',
-        'TRANSPORTATION',
+        'TRANSPORTATION'
     },
     Defense = {
         AirThreatLevel = 0,
