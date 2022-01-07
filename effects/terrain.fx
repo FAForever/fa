@@ -123,17 +123,6 @@ struct VS_OUTPUT
     float4 mTexDecal            : TEXCOORD5;
 };
 
-struct VS_OUTPUTAlt
-{
-    float4 mPos                    : POSITION0;
-    float4 mWorld                : TEXCOORD6;
-    float4 mTexWT                : TEXCOORD1;
-    float4 mTexSS                : TEXCOORD2;
-    float4 mShadow              : TEXCOORD3;
-    float3 mViewDirection        : TEXCOORD4;
-    float4 mTexDecal            : TEXCOORD5;
-};
-
 struct TERRAIN_DEPTH
 {
     float4 mPos         : POSITION0;
@@ -332,31 +321,6 @@ VS_OUT FixedFuncVS( VS_IN In )
     return Out;
 }
 
-// Advanced terrain texture splatting technique
-// https://www.gamedeveloper.com/programming/advanced-terrain-texture-splatting
-float4 BlendLayers(float4 texture1, float4 texture2, float a2)
-{
-    float a1 = 1 - a2;
-    float depth = 0.2;
-    float ma = max(texture1.a + a1, texture2.a + a2) - depth;
-
-    float b1 = max(texture1.a + a1 - ma, 0);
-    float b2 = max(texture2.a + a2 - ma, 0);
-
-    return (texture1.rgba * b1 + texture2.rgba * b2) / (b1 + b2);
-
-    // return texture1.a + (1 - a2) > texture2.a + a2 ? texture1.rgba : texture2.rgba;
-}
-
-float3 ComputeTriplanarBlending(float3 normal)
-{
-    float3 blending = abs( normal );
-    blending = normalize(max(blending, 0.00001));
-    float b = (blending.x + blending.y + blending.z);
-    blending /= float3(b, b, b);
-    return blending;
-}
-
 // sample a texture that is another buffer the same size as the one
 // we are rendering into and with the viewport setup the same way.
 float4 SampleScreen(sampler inSampler, float4 inTex)
@@ -497,50 +461,13 @@ VS_OUTPUT TerrainVS( position_t p : POSITION0, uniform bool shadowed)
     VS_OUTPUT result;
 
     float4 position = float4(p);
-    position.y = position.y * HeightScale;
-
-    // calculate output position
-    result.mPos = calculateHomogenousCoordinate(position);
-
-    // calculate 0..1 uv based on size of map
-    result.mTexWT = float4(position.xzyw);
-    // caluclate screen space coordinate for sample a frame buffer of this size
-    result.mTexSS = result.mPos;
-    result.mTexDecal = float4(0,0,0,0);
-
-    result.mViewDirection = normalize(position.xyz-CameraPosition.xyz);
-
-    // if we have shadows enabled fill in the tex coordinate for the shadow projection
-    if ( shadowed && ( 1 == ShadowsEnabled ))
-    {
-        result.mShadow = mul(position,ShadowMatrix);
-        result.mShadow.x = ( +result.mShadow.x + result.mShadow.w ) * 0.5;
-        result.mShadow.y = ( -result.mShadow.y + result.mShadow.w ) * 0.5;
-        result.mShadow.z -= 0.01f; // put epsilon in vs to save ps instruction
-    }
-    else
-    {
-        result.mShadow = float4( 0, 0, 0, 1);
-    }
-
-    return result;
-}
-
-VS_OUTPUTAlt TerrainVSAlt( position_t p : POSITION0, uniform bool shadowed)
-{
-    VS_OUTPUTAlt result;
-
-    result.mWorld = float4(p);
-    result.mWorld.y *= HeightScale;
-
-    float4 position = float4(p);
     position.y *= HeightScale;
 
     // calculate output position
     result.mPos = calculateHomogenousCoordinate(position);
 
     // calculate 0..1 uv based on size of map
-    result.mTexWT = float4(position.xzyw);
+    result.mTexWT = position.xzyw;
     // caluclate screen space coordinate for sample a frame buffer of this size
     result.mTexSS = result.mPos;
     result.mTexDecal = float4(0,0,0,0);
@@ -683,63 +610,30 @@ float4 TerrainNormalsPS( VS_OUTPUT inV ) : COLOR
     return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
 }
 
-float4 TerrainNormalsXP( VS_OUTPUTAlt pixel ) : COLOR
+float4 TerrainNormalsXP( VS_OUTPUT pixel ) : COLOR
 {
-    // retrieve x / y / z terrain coordinates
-    float4 position = TerrainScale * pixel.mTexWT;
-    float4 height = TerrainScale * pixel.mWorld.y;
-    float3 coords = float3(position.x, height.y, position.y);
+    float4 mask0 = tex2D(UtilitySamplerA,pixel.mTexWT*TerrainScale);
+    float4 mask1 = tex2D(UtilitySamplerB,pixel.mTexWT*TerrainScale);
 
-    // retrieve plane coordinates   
-    float2 uvX = coords.zy; // x facing plane
-    float2 uvY = coords.xz; // y facing plane
-    float2 uvZ = coords.xy; // z facing plane
-
-    // pre-fetch mask information
-    float4 mask0 = tex2D(UtilitySamplerA, position);
-    float4 mask1 = tex2D(UtilitySamplerB, position);
-
-    // sample screen for basic normal information
-    float3 terrainNormal = normalize(SampleScreen(NormalSampler,pixel.mTexSS).xyz);
-
-    float4 lowerNormal = tex2D(LowerNormalSampler, position * LowerNormalTile) * 2 - 1;
-    float4 stratum0Normal = tex2D(Stratum0NormalSampler, position * Stratum0NormalTile) * 2 - 1;
-    float4 stratum1Normal = tex2D(Stratum1NormalSampler, position * Stratum1NormalTile) * 2 - 1;
-    float4 stratum2Normal = tex2D(Stratum2NormalSampler, position * Stratum2NormalTile) * 2 - 1;
-    float4 stratum3Normal = tex2D(Stratum3NormalSampler, position * Stratum3NormalTile) * 2 - 1;
-
-    // float3 tnormalX = tex2D(Stratum3NormalSampler, Stratum3NormalTile.x * uvX).xyz;
-    // float3 tnormalY = tex2D(Stratum3NormalSampler, Stratum3NormalTile.x * uvY).xyz;
-    // float3 tnormalZ = tex2D(Stratum3NormalSampler, Stratum3NormalTile.x * uvZ).xyz;
-
-    // tnormalX = float3(tnormalX.xz + terrainNormal.zy, terrainNormal.x);
-    // tnormalY = float3(tnormalY.xz + terrainNormal.xz, terrainNormal.y);
-    // tnormalZ = float3(tnormalZ.xz + terrainNormal.xy, terrainNormal.z);
-
-    // float3 blendWeights = pow (abs(terrainNormal), 2);
-    // blendWeights = blendWeights / (blendWeights.x + blendWeights.y + blendWeights.z);
-
-    // float3 blend = ComputeTriplanarBlending(terrainNormal);
-    // float3 stratum3Normal = (normalize(
-    //     tnormalX.zyx * blend.x +
-    //     tnormalY.xzy * blend.y +
-    //     tnormalZ.xyz * blend.z
-    //     ));    
-
-    float4 stratum4Normal = tex2D(Stratum4NormalSampler, position * Stratum4NormalTile) * 2 - 1;
-    float4 stratum5Normal = tex2D(Stratum5NormalSampler, position * Stratum5NormalTile) * 2 - 1;
-    float4 stratum6Normal = tex2D(Stratum6NormalSampler, position * Stratum6NormalTile) * 2 - 1;
-    float4 stratum7Normal = tex2D(Stratum7NormalSampler, position * Stratum7NormalTile) * 2 - 1;
+    float4 lowerNormal = tex2D(LowerNormalSampler,pixel.mTexWT*TerrainScale*LowerNormalTile)*2-1;
+    float4 stratum0Normal = tex2D(Stratum0NormalSampler,pixel.mTexWT*TerrainScale*Stratum0NormalTile)*2-1;
+    float4 stratum1Normal = tex2D(Stratum1NormalSampler,pixel.mTexWT*TerrainScale*Stratum1NormalTile)*2-1;
+    float4 stratum2Normal = tex2D(Stratum2NormalSampler,pixel.mTexWT*TerrainScale*Stratum2NormalTile)*2-1;
+    float4 stratum3Normal = tex2D(Stratum3NormalSampler,pixel.mTexWT*TerrainScale*Stratum3NormalTile)*2-1;
+    float4 stratum4Normal = tex2D(Stratum4NormalSampler,pixel.mTexWT*TerrainScale*Stratum4NormalTile)*2-1;
+    float4 stratum5Normal = tex2D(Stratum5NormalSampler,pixel.mTexWT*TerrainScale*Stratum5NormalTile)*2-1;
+    float4 stratum6Normal = tex2D(Stratum6NormalSampler,pixel.mTexWT*TerrainScale*Stratum6NormalTile)*2-1;
+    float4 stratum7Normal = tex2D(Stratum7NormalSampler,pixel.mTexWT*TerrainScale*Stratum7NormalTile)*2-1;
 
     float4 normal = lowerNormal;
-    normal = BlendLayers(normal,stratum0Normal,mask0.x);
-    normal = BlendLayers(normal,stratum1Normal,mask0.y);
-    normal = BlendLayers(normal,stratum2Normal,mask0.z);
-    normal = BlendLayers(normal,stratum3Normal,mask0.w);
-    normal = BlendLayers(normal,stratum4Normal,mask1.x);
-    normal = BlendLayers(normal,stratum5Normal,mask1.y);
-    normal = BlendLayers(normal,stratum6Normal,mask1.z);
-    normal = BlendLayers(normal,stratum7Normal,mask1.w);
+    normal = lerp(normal,stratum0Normal,mask0.x);
+    normal = lerp(normal,stratum1Normal,mask0.y);
+    normal = lerp(normal,stratum2Normal,mask0.z);
+    normal = lerp(normal,stratum3Normal,mask0.w);
+    normal = lerp(normal,stratum4Normal,mask1.x);
+    normal = lerp(normal,stratum5Normal,mask1.y);
+    normal = lerp(normal,stratum6Normal,mask1.z);
+    normal = lerp(normal,stratum7Normal,mask1.w);
     normal.xyz = normalize( normal.xyz );
 
     return float4( (normal.xyz * 0.5 + 0.5) , normal.w);
@@ -796,6 +690,7 @@ float4 TerrainBasisPSBiCubic( VS_OUTPUT inV ) : COLOR
     return tex_source00.xxwy;
 }
 
+
 float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
 {
     // sample all the textures we'll need
@@ -826,13 +721,9 @@ float4 TerrainPS( VS_OUTPUT inV, uniform bool inShadows ) : COLOR
     return outColor;
 }
 
-float4 TerrainAlbedoXP( VS_OUTPUTAlt pixel) : COLOR
+float4 TerrainAlbedoXP( VS_OUTPUT pixel) : COLOR
 {
-    float4 position = TerrainScale * pixel.mTexWT;
-    float4 height = TerrainScale * pixel.mWorld.y;
-    float3 coords = float3(position.x, height.y, position.y);
-
-    float3 normal = normalize(2*SampleScreen(NormalSampler,pixel.mTexSS).xyz-1);
+    float4 position = TerrainScale*pixel.mTexWT;
 
     float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
     float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
@@ -841,32 +732,25 @@ float4 TerrainAlbedoXP( VS_OUTPUTAlt pixel) : COLOR
     float4 stratum0Albedo = tex2Dproj(Stratum0AlbedoSampler,position*Stratum0AlbedoTile);
     float4 stratum1Albedo = tex2Dproj(Stratum1AlbedoSampler,position*Stratum1AlbedoTile);
     float4 stratum2Albedo = tex2Dproj(Stratum2AlbedoSampler,position*Stratum2AlbedoTile);
-
-    float3 blending = ComputeTriplanarBlending(normal);
-    float4 xAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.yz);
-    float4 yAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xz);
-    float4 zAxis = tex2D(Stratum3AlbedoSampler, Stratum3AlbedoTile.x * coords.xy);
-    float4 stratum3Albedo = xAxis * blending.x + yAxis * blending.y + zAxis * blending.z;
-    //stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
-
-    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum3AlbedoTile);
+    float4 stratum3Albedo = tex2Dproj(Stratum3AlbedoSampler,position*Stratum3AlbedoTile);
+    float4 stratum4Albedo = tex2Dproj(Stratum4AlbedoSampler,position*Stratum4AlbedoTile);
     float4 stratum5Albedo = tex2Dproj(Stratum5AlbedoSampler,position*Stratum5AlbedoTile);
     float4 stratum6Albedo = tex2Dproj(Stratum6AlbedoSampler,position*Stratum6AlbedoTile);
     float4 stratum7Albedo = tex2Dproj(Stratum7AlbedoSampler,position*Stratum7AlbedoTile);
     float4 upperAlbedo = tex2Dproj(UpperAlbedoSampler,position*UpperAlbedoTile);
 
     float4 albedo = lowerAlbedo;
-    albedo = lerp(albedo, stratum0Albedo, mask0.x);
-    albedo = lerp(albedo, stratum1Albedo, mask0.y);
-    albedo = lerp(albedo, stratum2Albedo, mask0.z);
-    albedo = lerp(albedo, stratum3Albedo, mask0.w);
-    albedo = lerp(albedo, stratum4Albedo, mask1.x);
-    albedo = lerp(albedo, stratum5Albedo, mask1.y);
-    albedo = lerp(albedo, stratum6Albedo, mask1.z);
-    albedo = lerp(albedo, stratum7Albedo, mask1.w);
+    albedo = lerp(albedo,stratum0Albedo,mask0.x);
+    albedo = lerp(albedo,stratum1Albedo,mask0.y);
+    albedo = lerp(albedo,stratum2Albedo,mask0.z);
+    albedo = lerp(albedo,stratum3Albedo,mask0.w);
+    albedo = lerp(albedo,stratum4Albedo,mask1.x);
+    albedo = lerp(albedo,stratum5Albedo,mask1.y);
+    albedo = lerp(albedo,stratum6Albedo,mask1.z);
+    albedo = lerp(albedo,stratum7Albedo,mask1.w);
     albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
-
+    float3 normal = normalize(2*SampleScreen(NormalSampler,pixel.mTexSS).xyz-1);
     
     float3 r = reflect(normalize(pixel.mViewDirection),normal);
     float3 specular = pow(saturate(dot(r,SunDirection)),80)*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
@@ -990,7 +874,7 @@ technique TTerrainXP <
         AlphaState( AlphaBlend_Disable_Write_RGBA )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainVSAlt(true);
+        VertexShader = compile vs_1_1 TerrainVS(true);
         PixelShader = compile ps_2_a TerrainAlbedoXP();
     }
 }
@@ -1033,8 +917,8 @@ technique TTerrainNormalsXP
         AlphaState( AlphaBlend_Disable_Write_RG )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainVSAlt( false );
-        PixelShader = compile ps_2_a TerrainNormalsXP();
+        VertexShader = compile vs_1_1 TerrainVS( false );
+        PixelShader = compile ps_2_0 TerrainNormalsXP();
     }
 }
 
@@ -1071,7 +955,7 @@ technique TTerrainOverlay
         AlphaState( AlphaBlend_SrcAlpha_InvSrcAlpha_Write_RGB )
         DepthState( Depth_Enable )
 
-        VertexShader = compile vs_1_1 TerrainVSAlt(false);
+        VertexShader = compile vs_1_1 TerrainVS(false);
         PixelShader = compile ps_2_0 TerrainOverlayPS();
     }
 }
@@ -1682,26 +1566,43 @@ technique LowFidelityLighting
     }
 }
 
-/*   #   Terrain Baked shaders   #   */
+
+/*   # Terrain Basic PBR #   */
+
 
 // |  | Albedo stratum                                              | Normal stratum
 // |L | R           | G             | B             | A             | R             | G             | B             | A                 |
 // ----            ---             ---             ---             ---             ---             ---             ---                 ---
-// |0 | R             G               B               Height        | X               Y               Occlusion       Roughness
-// |1 | R             G               B               Height        | X               Y               Occlusion       Roughness
-// |2 | R             G               B               Height        | X               Y               Occlusion       Roughness
-// |3 | R             G               B               Height        | X               Y               Occlusion       Roughness
-// |4 | R             G               B               Height        | X               Y               Occlusion       Roughness
+// |0 | R             G               B               ?             | X               Y               Z               ?                   
+// |1 | R             G               B               ?             | X               Y               Z               ?                   
+// |2 | R             G               B               ?             | X               Y               Z               ?                   
+// |3 | R             G               B               ?             | X               Y               Z               ?                   
+// |4 | R             G               B               ?             | X               Y               Z               ?                   
 // ----            ---             ---             ---             ---             ---             ---             ---                 ---
-// |5 | R             G               B               Height        | X               Y               Occlusion       Roughness
-// |6 | R             G               B               Height        | X               Y               Occlusion       Roughness
-// |7 | Map R         Map G           Map B           Map alpha     | Map X           Map Y           Map Z           Map alpha
-// |8 | Map wetness   Map shadows     Map Ambient     Map metallic  | 
-// |9 | ?
+// |5 | R             G               B               ?             | X               Y               Z               ?                   
+// |6 | R             G               B               ?             | X               Y               Z               ?   
+// ---------------------------------------------------------------------------------------------------------------------------------------
+// # Map wide assets #
+// ---------------------------------------------------------------------------------------------------------------------------------------               
+// |7 | Map R         Map G           Map B           Shadows       | Map X           Map Y           Map Z           Ambient occlusion
+// |8 | Map wetness   Map shadows     Map Ambient     Map metallic  | RGB Alpha       Normals Alpha                   Shadows
+// |9 | ?             ?               ?               ?               ?               ?               ?               ?
 
-/// VerticesBaked
-// Vertex output / input struct for the communication between the 
-// vertex shader and the fragment shader (synonym: pixel shader)
+// Advanced terrain texture splatting technique
+// https://www.gamedeveloper.com/programming/advanced-terrain-texture-splatting
+float4 BlendLayersBaked(float4 texture1, float4 texture2, float a2)
+{
+    float a1 = 1 - a2;
+    float depth = 0.2;
+    float ma = max(texture1.a + a1, texture2.a + a2) - depth;
+
+    float b1 = max(texture1.a + a1 - ma, 0);
+    float b2 = max(texture2.a + a2 - ma, 0);
+
+    return ((texture1.rgba * b1 + texture2.rgba * b2) / (b1 + b2));
+
+    // return texture1.a + (1 - a2) > texture2.a + a2 ? texture1.rgba : texture2.rgba;
+}
 
 struct VerticesBaked
 {
@@ -1789,8 +1690,10 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     float4 mask1 = tex2D(UtilitySamplerB, position);
 
     // sample screen for basic normal information
-    float4 rgba             = tex2D(Stratum7NormalSampler,coords.xz);
-    float3 terrainNormal    = normalize(SampleScreen(NormalSampler,pixel.mTexSS).xyz);
+    float4 rgba             = tex2D       (Stratum7NormalSampler,coords.xz);
+    float3 highNormal       = normalize (2 * rgba.xyz - 1);
+    float highMask          = rgba.a;
+    float3 terrainNormal    = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
     float4 lowerNormal      = tex2D(LowerNormalSampler,    position * LowerNormalTile   );
     float4 stratum0Normal   = tex2D(Stratum0NormalSampler, position * Stratum0NormalTile);
@@ -1801,18 +1704,18 @@ float4 TerrainNormalsBakedPS( VerticesBaked pixel ) : COLOR
     float4 stratum4Normal   = tex2D(Stratum4NormalSampler, position * Stratum4NormalTile);
     float4 stratum5Normal   = tex2D(Stratum5NormalSampler, position * Stratum5NormalTile);
     float4 stratum6Normal   = tex2D(Stratum6NormalSampler, position * Stratum6NormalTile);
-    float4 stratum7Normal   = tex2D(Stratum7NormalSampler, position * Stratum7NormalTile);
 
-    float4 normal = lowerNormal;
-    normal = lerp(normal,stratum0Normal,mask0.x);
-    normal = lerp(normal,stratum1Normal,mask0.y);
-    normal = lerp(normal,stratum2Normal,mask0.z);
-    normal = lerp(normal,stratum3Normal,mask0.w);
-    normal = lerp(normal,stratum4Normal,mask1.x);
-    normal = lerp(normal,stratum5Normal,mask1.y);
+    float4 normal = float4(highNormal.xyz, 0);
+    normal = lerp(normal, 2 * stratum0Normal - 1, mask0.x);
+    normal = lerp(normal, 2 * stratum1Normal - 1, mask0.y);
+    normal = lerp(normal, 2 * stratum2Normal - 1, mask0.z);
+    normal = lerp(normal, 2 * stratum3Normal - 1, mask0.w);
+    normal = lerp(normal, 2 * stratum4Normal - 1, mask1.x);
+    normal = lerp(normal, 2 * stratum5Normal - 1, mask1.y);
+    normal = lerp(normal, float4(highNormal, 0), highMask);
     normal.xyz = normalize( normal.xyz );
 
-    return float4( (terrainNormal.xyz) , 1);
+    return float4( 0.5 + 0.5 * normal.xyz, 1);
 }
 
 /// TerrainBakedPS
@@ -1824,7 +1727,8 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     float4 height = TerrainScale * pixel.mWorld.y;
     float3 coords = float3(position.x, height.y, position.y);
 
-    float3 normal = normalize(SampleScreen(NormalSampler,pixel.mTexSS).xyz);
+    // do arthmetics to get range from (0, 1) to (-1, 1) as normal maps store their values as (0, 1)
+    float3 normal = normalize(2 * SampleScreen(NormalSampler,pixel.mTexSS).xyz - 1);
 
     float4 mask0 = saturate(tex2Dproj(UtilitySamplerA,position)*2-1);
     float4 mask1 = saturate(tex2Dproj(UtilitySamplerB,position)*2-1);
@@ -1860,7 +1764,9 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     float4 albedo = lowerAlbedo;
     albedo = lerp(albedo, stratum0Albedo, mask0.x);
     albedo = lerp(albedo, stratum1Albedo, mask0.y);
-    albedo = lerp(albedo, stratum2Albedo, mask0.z);
+
+
+    albedo = BlendLayersBaked(albedo, stratum2Albedo, mask0.z);
     albedo = lerp(albedo, stratum3Albedo, mask0.w);
     albedo = lerp(albedo, stratum4Albedo, mask1.x);
     albedo = lerp(albedo, stratum5Albedo, mask1.y);
@@ -1868,19 +1774,22 @@ float4 TerrainAlbedoBakedPS( VerticesBaked pixel) : COLOR
     albedo = lerp(albedo, rgba, 0.75 * rgba.a);
     albedo.rgb = lerp(albedo.xyz,upperAlbedo.xyz,upperAlbedo.w);
 
-    float3 r = reflect(normalize(pixel.mViewDirection),normal);
-    float3 specular = pow(saturate(dot(r,SunDirection)), 80 )*albedo.aaa*SpecularColor.a*SpecularColor.rgb;
+    // compute specular
+    float3 r = reflect(normalize(pixel.mViewDirection), normal);
+    float3 specular = 0.04 * pow(saturate(dot(r, SunDirection)), 80);
 
-    float dotSunNormal = dot(SunDirection,normal);
-
+    // compute shadow (unit + shadow map)
     float shadow = min(tex2D(ShadowSampler, pixel.mShadow.xy).g, shadows);
-    float3 light = SunColor * saturate(dotSunNormal) * shadow * ambient;
-    light = 1.75 * LightingMultiplier * light + ShadowFillColor*(1-light);
-    albedo.rgb = light * ( albedo.rgb + specular.rgb );
 
+    // compute generic light
+    float3 light = SunColor * dot(SunDirection, normal) * shadow * ambient;
+    light = LightingMultiplier * light + ShadowFillColor * ( 1 - light );
+    albedo.rgb = light * (albedo.rgb + specular.rgb);
+
+    // compute water color
     float waterDepth = tex2Dproj(UtilitySamplerC, pixel.mTexWT * TerrainScale).g - 0.15;
-    float4 water = tex1D(WaterRampSampler,waterDepth);
-    albedo.rgb = lerp(albedo.rgb,water.rgb,water.a);
+    float4 water = tex1D(WaterRampSampler, waterDepth);
+    albedo.rgb = lerp(albedo.rgb, water.rgb, water.a);
 
     return float4(albedo.rgb, 0.01f); //float4(albedo.rgb, 0.01f);
 }
@@ -1901,7 +1810,7 @@ technique TTerrainNormalsBaked
 }
 
 /// TTerrainAlbedoBaked
-// The technique used to render the final color of the terrain.
+// The technique used to render the final color of the terrain. s
 
 technique TTerrainBa <
     string usage = "composite";
