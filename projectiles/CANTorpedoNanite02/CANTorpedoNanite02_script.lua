@@ -1,13 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/CANTorpedoNanite02/CANTorpedoNanite02_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
-#**
-#**  Summary  :  Cybran Anti-Navy Nanite Torpedo Script
-#                Nanite Torpedo releases tiny nanites that do DoT
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/CANTorpedoNanite02/CANTorpedoNanite02_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+--**
+--**  Summary  :  Cybran Anti-Navy Nanite Torpedo Script
+--                Nanite Torpedo releases tiny nanites that do DoT
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CTorpedoShipProjectile = import('/lua/cybranprojectiles.lua').CTorpedoShipProjectile
 local Entity = import('/lua/sim/Entity.lua').Entity
 local defaultDamage = import('/lua/sim/defaultdamage.lua')

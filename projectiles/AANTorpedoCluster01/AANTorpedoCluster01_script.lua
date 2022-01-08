@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/AANTorpedoCluster01/AANTorpedoCluster01_script.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/AANTorpedoCluster01/AANTorpedoCluster01_script.lua
+--**  Author(s):  Gordon Duclos
+--**
+--**  Summary  :  Aeon Torpedo Cluster Projectile script, XAA0306
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
@@ -45,7 +45,7 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
             proj = self:CreateChildProjectile(ChildProjectileBP)
             proj:PassDamageData(self.DamageData)
             mul = RandomFloat(1,3)
-            #proj:SetVelocity( x * mul, Vely * mul, z * mul )
+            --proj:SetVelocity( x * mul, Vely * mul, z * mul )
         end            
         
         local pos = self:GetPosition()

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/AIFGuidedMissile01/AIFGuidedMissile01_script.lua
-#**  Author(s):  Matt Vainio, Gordon Duclos
-#**
-#**  Summary  :  Aeon Guided Missile, DAA0206
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/AIFGuidedMissile01/AIFGuidedMissile01_script.lua
+--**  Author(s):  Matt Vainio, Gordon Duclos
+--**
+--**  Summary  :  Aeon Guided Missile, DAA0206
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AGuidedMissileProjectile = import('/lua/aeonprojectiles.lua').AGuidedMissileProjectile
 local RandF = import('/lua/utilities.lua').GetRandomFloat
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -23,21 +23,21 @@ AIFGuidedMissile = Class(AGuidedMissileProjectile) {
 
     SplitThread = function(self)
 		
-        ###Create/play the split effects.
+        ------Create/play the split effects.
 		for k,v in EffectTemplate.AMercyGuidedMissileSplit do
             CreateEmitterOnEntity(self,self:GetArmy(),v)
         end
         
         
 		WaitSeconds( 0.1 )
-		# Create several other projectiles in a dispersal pattern
+		-- Create several other projectiles in a dispersal pattern
         local vx, vy, vz = self:GetVelocity()
         local velocity = 16		
         local numProjectiles = 8
         local angle = (2*math.pi) / numProjectiles
         local angleInitial = RandF( 0, angle )
         local ChildProjectileBP = '/projectiles/AIFGuidedMissile02/AIFGuidedMissile02_proj.bp'          
-        local spreadMul = 0.4 # Adjusts the width of the dispersal        
+        local spreadMul = 0.4 -- Adjusts the width of the dispersal        
        
         local xVec = 0 
         local yVec = vy*0.8
@@ -46,10 +46,10 @@ AIFGuidedMissile = Class(AGuidedMissileProjectile) {
         
        
         
-        # Adjust damage by number of split projectiles
+        -- Adjust damage by number of split projectiles
         self.DamageData.DamageAmount = self.DamageData.DamageAmount / numProjectiles
 
-        # Launch projectiles at semi-random angles away from split location
+        -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles -1) do
             xVec = vx + math.sin(angleInitial + (i*angle) ) * spreadMul * RandF( 0.6, 1.3 )
             zVec = vz + math.cos(angleInitial + (i*angle) ) * spreadMul * RandF( 0.6, 1.3 )

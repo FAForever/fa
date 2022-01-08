@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/AIMFlare01/AIMFlare01_script.lua
-#**  Author(s):  John Comes
-#**
-#**  Summary  : Aeon Flare
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/AIMFlare01/AIMFlare01_script.lua
+--**  Author(s):  John Comes
+--**
+--**  Summary  : Aeon Flare
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 local AIMFlareProjectile = import('/lua/aeonprojectiles.lua').AIMFlareProjectile
 
@@ -14,8 +14,8 @@ AIMFlare01 = Class(AIMFlareProjectile) {
 
     OnCreate = function(self)
         AIMFlareProjectile.OnCreate(self)
-        #LOG('*DEBUG: FLARE CREATED')
-        #self:SetCollisionShape('Sphere', 0, 0, 0, self:GetBlueprint().Physics.FlareRadius)
+        --LOG('*DEBUG: FLARE CREATED')
+        --self:SetCollisionShape('Sphere', 0, 0, 0, self:GetBlueprint().Physics.FlareRadius)
 
         self.MyShield = Flare {
             Owner = self,
@@ -26,10 +26,10 @@ AIMFlare01 = Class(AIMFlareProjectile) {
         self:SetVelocity(0, -1, 0)
     end,
 
-    # We only destroy when we hit the ground/water.
+    -- We only destroy when we hit the ground/water.
     OnImpact = function(self,type,other)
         if type == 'Terrain' or type == 'Water' then
-            #LOG('*DEBUG FLARE IMPACT ', repr(type))
+            --LOG('*DEBUG FLARE IMPACT ', repr(type))
             AIMFlareProjectile.OnImpact(self,type,other)
         end
     end,

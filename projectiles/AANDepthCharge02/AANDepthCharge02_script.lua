@@ -1,6 +1,6 @@
-#
-# Depth Charge Script
-#
+--
+-- Depth Charge Script
+--
 local ADepthChargeProjectile = import('/lua/aeonprojectiles.lua').ADepthChargeProjectile
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 

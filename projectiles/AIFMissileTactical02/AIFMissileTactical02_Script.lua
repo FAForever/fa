@@ -1,6 +1,6 @@
-#
-# Aeon Land-Based Tactical Missile
-#
+--
+-- Aeon Land-Based Tactical Missile
+--
 local AMissileSerpentineProjectile = import('/lua/aeonprojectiles.lua').AMissileSerpentineProjectile
 
 AIFMissileTactical02 = Class(AMissileSerpentineProjectile) {

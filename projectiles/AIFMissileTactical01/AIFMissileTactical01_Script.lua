@@ -1,6 +1,6 @@
-#
-# Aeon Land-Based Tactical Missile
-#
+--
+-- Aeon Land-Based Tactical Missile
+--
 local AMissileSerpentineProjectile = import('/lua/aeonprojectiles.lua').AMissileSerpentineProjectile
 
 AIFMissileTactical01 = Class(AMissileSerpentineProjectile) {
@@ -23,22 +23,22 @@ AIFMissileTactical01 = Class(AMissileSerpentineProjectile) {
 
     SetTurnRateByDist = function(self)
         local dist = self:GetDistanceToTarget()
-        #Get the nuke as close to 90 deg as possible
+        --Get the nuke as close to 90 deg as possible
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            --Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(20)
         elseif dist > 128 and dist <= 213 then
-						# Increase check intervals
+						-- Increase check intervals
 						self:SetTurnRate(30)
 						WaitSeconds(1.5)
             self:SetTurnRate(30)
         elseif dist > 43 and dist <= 107 then
-						# Further increase check intervals
+						-- Further increase check intervals
             WaitSeconds(0.3)
             self:SetTurnRate(50)
 				elseif dist > 0 and dist <= 43 then
-						# Further increase check intervals            
+						-- Further increase check intervals            
             self:SetTurnRate(100)   
             KillThread(self.MoveThread)         
         end

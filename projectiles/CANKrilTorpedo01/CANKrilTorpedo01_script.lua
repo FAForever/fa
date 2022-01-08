@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/CANKrilTorpedo01/CANKrilTorpedo01_script.lua
-#**  Author(s):  Gordon Duclos, Matt Vainio
-#**
-#**  Summary  :  Kril Torpedo Projectile script, XRB2308
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/CANKrilTorpedo01/CANKrilTorpedo01_script.lua
+--**  Author(s):  Gordon Duclos, Matt Vainio
+--**
+--**  Summary  :  Kril Torpedo Projectile script, XRB2308
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CKrilTorpedo = import('/lua/cybranprojectiles.lua').CKrilTorpedo
 
 CANKrilTorpedo01 = Class(CKrilTorpedo) {
@@ -23,7 +23,7 @@ CANKrilTorpedo01 = Class(CKrilTorpedo) {
     OnEnterWater = function(self)
         CKrilTorpedo.OnEnterWater(self)
         local army = self:GetArmy()
-        for i in self.FxEnterWater do #splash
+        for i in self.FxEnterWater do --splash
             CreateEmitterAtEntity(self,army,self.FxEnterWater[i])
         end
     end,    

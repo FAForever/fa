@@ -1,6 +1,6 @@
-#
-# Seraphim Energy Being Laser
-#
+--
+-- Seraphim Energy Being Laser
+--
 local SEnergyLaser = import('/lua/seraphimprojectiles.lua').SEnergyLaser
 SDFEnergyLaser01 = Class(SEnergyLaser) {
 
