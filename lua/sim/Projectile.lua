@@ -48,6 +48,7 @@ local ForkThread = _G.ForkThread
 local GetTerrainType = _G.GetTerrainType
 local GetSurfaceHeight = _G.GetSurfaceHeight
 
+local getmetatable = getmetatable
 local EntityCategoryContains = EntityCategoryContains
 local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
@@ -110,11 +111,12 @@ end
 
 Projectile = Class(ProjectileMethods, Entity) {
 
+    -- # Values # --
+
     -- Cached in the meta table
     Cached = false,
     Blueprint = false, 
     DoNotCollideListParsed = false,
-
 
     -- Prevent calling these functions as we already have a C object
     __init = false,
@@ -155,19 +157,7 @@ Projectile = Class(ProjectileMethods, Entity) {
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
 
-    -- Performance-wise this function just hurts and is not needed
-    ForkThread = function(self, fn, ...)
-
-        LOG("Projectile forkthread called at: " .. repr(debug.getinfo(2)))
-
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            TrashBagAdd(self.Trash, thread)
-            return thread
-        else
-            return nil
-        end
-    end,
+    -- # Functions called by the engine # --
 
     -- Called by engine when made 
     OnCreate = function(self, inWater)
@@ -209,75 +199,21 @@ Projectile = Class(ProjectileMethods, Entity) {
         self.Trash = TrashBag()
     end,
 
-    --- Passes the damage data in a shallow manner (reference copy instead of deep copy).
-    ShallowPassDamageData = function(self, data)
-        self.DamageData = data
-        self.CollideFriendly = data.CollideFriendly
+    -- Called by the engine when a projectile should be de-allocated
+    OnDestroy = function(self)
+        TrashBagDestroy(self.Trash)
     end,
 
-    --- Passes the damage data in a shallow manner (deep copy instead of reference).
-    PassDamageData = function(self, data)
-        -- only copy data that is present
-        local SelfDamageData = self.DamageData
-        for k, value in data do 
-            SelfDamageData[k] = value
-        end
-
-        -- additional copy
-        self.CollideFriendly = data.CollideFriendly
-    end,
-
-    -- Called when a projectile should apply its damage
-    DoDamage = function(self, instigator, DamageData, targetEntity)
-        local damage = DamageData.DamageAmount
-        if damage and damage > 0 then
-            local position = EntityGetPosition(self)
-            local radius = DamageData.DamageRadius
-            if radius and radius > 0 then
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    DamageArea(instigator, position, radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
-                else
-                    -- DoT damage - check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
-                    if initialDmg > 0 then
-                        if radius > 0 then
-                            DamageArea(instigator, position, radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
-                        elseif targetEntity then
-                            Damage(instigator, position, targetEntity, initialDmg, DamageData.DamageType)
-                        end
-                    end
-
-                    ForkThread(DefaultDamage.AreaDoTThread, instigator, position, DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), radius, damage, DamageData.DamageType, DamageData.DamageFriendly)
-                end
-            -- ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
-            elseif DamageData.DamageAmount and targetEntity then
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    Damage(instigator, position, targetEntity, DamageData.DamageAmount, DamageData.DamageType)
-                else
-                    -- DoT damage - check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
-                    if initialDmg > 0 then
-                        if radius > 0 then
-                            DamageArea(instigator, position, radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
-                        elseif targetEntity then
-                            Damage(instigator, position, targetEntity, initialDmg, DamageData.DamageType)
-                        end
-                    end
-
-                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), damage, DamageData.DamageType, DamageData.DamageFriendly)
-                end
-            end
-        end
-        if self.InnerRing and self.OuterRing then
-            local pos = self:GetPosition()
-            self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
-            self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
+    -- Called by the engine when a tracking projectile loses its target, called by the engine
+    OnLostTarget = function(self)
+        local physics = self.Blueprint.Physics
+        if physics.TrackTarget then
+            ProjectileSetLifetime(self, physics.OnLostTargetLifetime)
         end
     end,
 
     -- Called by the engine when a projectile hits some other entity
     OnCollisionCheck = function(self, other)
-
         -- do not hit our own
         if self.Army == other.Army then 
             return false 
@@ -322,120 +258,6 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- Called by the engine when a projectile should be de-allocated
-    OnDestroy = function(self)
-        TrashBagDestroy(self.Trash)
-    end,
-
-    -- Called when a projectile takes damage
-    DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        -- Check for valid projectile
-        if not self or self:BeenDestroyed() then
-            return
-        end
-
-        EntityAdjustHealth(self, instigator, -amount)
-        local health = EntityGetHealth(self)
-        if health <= 0 then
-            if damageType == 'Reclaimed' then
-                EntityDestroy(self)
-            else
-                local excessDamageRatio = 0.0
-
-                -- Calculate the excess damage amount
-                local excess = health - amount
-                local maxHealth = self.BlueprintDefenseMaxHealth
-                if excess < 0 and maxHealth > 0 then
-                    excessDamageRatio = -excess / maxHealth
-                end
-                self.OnKilled(self, instigator, damageType, excessDamageRatio)
-            end
-        end
-    end,
-
-    -- Called by the engine when the projectile is killed
-    OnKilled = function(self, instigator, type, overkillRatio)
-        self.CreateImpactEffects(self, self.Army, self.FxOnKilled, self.FxOnKilledScale)
-        EntityDestroy(self)
-    end,
-
-    -- ??
-    DoMetaImpact = function(self, damageData)
-        if damageData.MetaImpactRadius and damageData.MetaImpactAmount then
-            local x, y, z = EntityGetPositionXYZ(self)
-            y = GetSurfaceHeight(x, z)
-            MetaImpact(self, { x, y, z }, damageData.MetaImpactRadius, damageData.MetaImpactAmount)
-        end
-    end,
-
-    -- Creates the impact effects of the projectile itself
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        -- default values
-        EffectScale = EffectScale or 1
-
-        -- caching
-        local fxImpactTrajectoryAligned = self.FxImpactTrajectoryAligned
-
-        -- create the emitters
-        local emit
-        if EffectTable then 
-            for _, v in EffectTable do
-
-                -- construct emitter
-                if fxImpactTrajectoryAligned then
-                    emit = CreateEmitterAtBone(self, -2, army, v)
-                else
-                    emit = CreateEmitterAtEntity(self, army, v)
-                end
-
-                EmitterScaleEmitter(emit, EffectScale)
-            end
-        end
-    end,
-
-    -- Creates generic terrain effects that always spawn
-    CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
-        -- default values
-        EffectScale = EffectScale or 1
-
-        for _, v in EffectTable do
-            local emit = CreateEmitterAtBone(self, -2, army, v)
-            EmitterScaleEmitter(emit, EffectScale )
-        end
-    end,
-
-    -- Retrieves the generic terrain effects
-    GetTerrainEffects = function(self, TargetType, ImpactEffectType)
-        -- default value
-        ImpactEffectType = ImpactEffectType or 'Default'
-
-        -- get x / z position
-        local x, y, z = EntityGetPositionXYZ(self)
-    
-        -- get terrain at that location and try and get some effects
-        local TerrainType = GetTerrainType(x, z)
-        local TerrainEffect = TerrainType.FXImpact[TargetType][ImpactEffectType] or DefaultTerrainTypeFxImpact[TargetType][ImpactEffectType] or { }
-        return TerrainEffect
-    end,
-
-    -- Called by the engine, checks ... ?
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
-            return false
-        end
-
-        -- If this unit category is on the weapon's do-not-collide list, skip!
-        local weaponBP = EntityGetBlueprint(firingWeapon)
-        if weaponBP.DoNotCollideList then
-            for k, v in weaponBP.DoNotCollideList do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then -- TODO: Parsing!!
-                    return false
-                end
-            end
-        end
-        return true
-    end,
-
     -- Called by the engine when a projectile hits something - time for explosions!
     OnImpact = function(self, targetType, targetEntity)
         
@@ -447,9 +269,6 @@ Projectile = Class(ProjectileMethods, Entity) {
 
         -- Do Damage
         self.DoDamage(self, instigator, damageData, targetEntity)
-
-        -- Meta-Impact
-        -- self.DoMetaImpact(self, damageData) -- this doesn't do anything, just takes up cycles
 
         -- Buffs (Stun, etc)
         self.DoUnitImpactBuffs(self, targetEntity)
@@ -532,6 +351,173 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
+    -- Called by the engine when the projectile exits the water
+    OnExitWater = function(self)
+        -- no projectile blueprint has this value set
+        local snd = self.Blueprint.Audio.ExitWater
+        if snd then
+            EntityPlaySound(self, snd)
+        end
+    end,
+
+    -- Called by the engine when the projectile enters the water 
+    OnEnterWater = function(self)
+        local snd = self.BlueprintAudio.EnterWater
+        if snd then
+            EntityPlaySound(self, snd)
+        end
+    end,
+
+    -- # Various Lua functions # --
+
+    --- Passes the damage data in a shallow manner (reference copy instead of deep copy).
+    ShallowPassDamageData = function(self, data)
+        self.DamageData = data
+        self.CollideFriendly = data.CollideFriendly
+    end,
+
+    --- Passes the damage data in a shallow manner (deep copy instead of reference).
+    PassDamageData = function(self, data)
+        -- only copy data that is present
+        local SelfDamageData = self.DamageData
+        for k, value in data do 
+            SelfDamageData[k] = value
+        end
+
+        -- additional copy
+        self.CollideFriendly = data.CollideFriendly
+    end,
+
+    -- Called when a projectile should apply its damage
+    DoDamage = function(self, instigator, DamageData, targetEntity)
+        local damage = DamageData.DamageAmount
+        if damage and damage > 0 then
+            local position = EntityGetPosition(self)
+            local radius = DamageData.DamageRadius
+            if radius and radius > 0 then
+                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+                    DamageArea(instigator, position, radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                else
+                    -- DoT damage - check for initial damage
+                    local initialDmg = DamageData.InitialDamageAmount or 0
+                    if initialDmg > 0 then
+                        if radius > 0 then
+                            DamageArea(instigator, position, radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                        elseif targetEntity then
+                            Damage(instigator, position, targetEntity, initialDmg, DamageData.DamageType)
+                        end
+                    end
+
+                    ForkThread(DefaultDamage.AreaDoTThread, instigator, position, DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), radius, damage, DamageData.DamageType, DamageData.DamageFriendly)
+                end
+            -- ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
+            elseif DamageData.DamageAmount and targetEntity then
+                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+                    Damage(instigator, position, targetEntity, DamageData.DamageAmount, DamageData.DamageType)
+                else
+                    -- DoT damage - check for initial damage
+                    local initialDmg = DamageData.InitialDamageAmount or 0
+                    if initialDmg > 0 then
+                        if radius > 0 then
+                            DamageArea(instigator, position, radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                        elseif targetEntity then
+                            Damage(instigator, position, targetEntity, initialDmg, DamageData.DamageType)
+                        end
+                    end
+
+                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), damage, DamageData.DamageType, DamageData.DamageFriendly)
+                end
+            end
+        end
+        if self.InnerRing and self.OuterRing then
+            local pos = self:GetPosition()
+            self.InnerRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
+            self.OuterRing:DoNukeDamage(self.Launcher, pos, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
+        end
+    end,
+
+    -- Called when a projectile takes damage
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        -- Check for valid projectile
+        if not self or self:BeenDestroyed() then
+            return
+        end
+
+        EntityAdjustHealth(self, instigator, -amount)
+        local health = EntityGetHealth(self)
+        if health <= 0 then
+            if damageType == 'Reclaimed' then
+                EntityDestroy(self)
+            else
+                local excessDamageRatio = 0.0
+
+                -- Calculate the excess damage amount
+                local excess = health - amount
+                local maxHealth = self.BlueprintDefenseMaxHealth
+                if excess < 0 and maxHealth > 0 then
+                    excessDamageRatio = -excess / maxHealth
+                end
+                self.OnKilled(self, instigator, damageType, excessDamageRatio)
+            end
+        end
+    end,
+
+    -- Called by the engine when the projectile is killed
+    OnKilled = function(self, instigator, type, overkillRatio)
+        self.CreateImpactEffects(self, self.Army, self.FxOnKilled, self.FxOnKilledScale)
+        EntityDestroy(self)
+    end,
+
+    -- Creates the impact effects of the projectile itself
+    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
+        -- default values
+        EffectScale = EffectScale or 1
+
+        -- caching
+        local fxImpactTrajectoryAligned = self.FxImpactTrajectoryAligned
+
+        -- create the emitters
+        local emit
+        if EffectTable then 
+            for _, v in EffectTable do
+
+                -- construct emitter
+                if fxImpactTrajectoryAligned then
+                    emit = CreateEmitterAtBone(self, -2, army, v)
+                else
+                    emit = CreateEmitterAtEntity(self, army, v)
+                end
+
+                EmitterScaleEmitter(emit, EffectScale)
+            end
+        end
+    end,
+
+    -- Creates generic terrain effects that always spawn
+    CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
+        -- default values
+        EffectScale = EffectScale or 1
+
+        for _, v in EffectTable do
+            local emit = CreateEmitterAtBone(self, -2, army, v)
+            EmitterScaleEmitter(emit, EffectScale )
+        end
+    end,
+
+    -- Retrieves the generic terrain effects
+    GetTerrainEffects = function(self, TargetType, ImpactEffectType)
+        -- default value
+        ImpactEffectType = ImpactEffectType or 'Default'
+
+        -- get x / z position
+        local x, y, z = EntityGetPositionXYZ(self)
+    
+        -- get terrain at that location and try and get some effects
+        local TerrainType = GetTerrainType(x, z)
+        local TerrainEffect = TerrainType.FXImpact[TargetType][ImpactEffectType] or DefaultTerrainTypeFxImpact[TargetType][ImpactEffectType] or { }
+        return TerrainEffect
+    end,
+
     -- An instantanious destroy for the typical projectile
     OnImpactDestroy = function(self, targetType, targetEntity)
         local destroyOnImpact = self.DestroyOnImpact
@@ -575,23 +561,6 @@ Projectile = Class(ProjectileMethods, Entity) {
         end
     end,
 
-    -- Called by the engine when the projectile exits the water
-    OnExitWater = function(self)
-        -- no projectile blueprint has this value set
-        local snd = self.Blueprint.Audio.ExitWater
-        if snd then
-            EntityPlaySound(self, snd)
-        end
-    end,
-
-    -- Called by the engine when the projectile enters the water 
-    OnEnterWater = function(self)
-        local snd = self.BlueprintAudio.EnterWater
-        if snd then
-            EntityPlaySound(self, snd)
-        end
-    end,
-
     -- Adds a flare, used by uab4201 (Aeon t2 TMD) and uas0202 (Aeon T2 Cruiser) and uas0302 (Aeon t3 Battleship)
     AddFlare = function(self, tbl)
         if not tbl then return end
@@ -621,15 +590,21 @@ Projectile = Class(ProjectileMethods, Entity) {
         TrashBagAdd(self.Trash, self.MyFlare)
     end,
 
-    -- when a tracking projectile loses its target, called by the engine
-    OnLostTarget = function(self)
-        local physics = self.Blueprint.Physics
-        if physics.TrackTarget then
-            ProjectileSetLifetime(self, physics.OnLostTargetLifetime)
+    -- # Deprecated functionality # --
+
+    -- Performance-wise this function just hurts and is not needed
+    ForkThread = function(self, fn, ...)
+
+        LOG("Projectile forkthread called at: " .. repr(debug.getinfo(2)))
+
+        if fn then
+            local thread = ForkThread(fn, self, unpack(arg))
+            TrashBagAdd(self.Trash, thread)
+            return thread
+        else
+            return nil
         end
     end,
-
-    -- DEPRECATED --
 
     --- This should never be called - use the actual function.
     GetCachePosition = function(self)
