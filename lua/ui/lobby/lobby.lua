@@ -5553,6 +5553,10 @@ end
 function ShowTitleDialog()
     CreateInputDialog(GUI, "Game Title",
         function(self, text)
+            -- remove new lines from the text
+            text = text:gsub("\r", "")
+            text = text:gsub("\n", "")
+            
             SetGameOption("Title", text, true)
             SetGameTitleText(text)
         end, gameInfo.GameOptions.Title
