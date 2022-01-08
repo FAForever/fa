@@ -689,5 +689,3 @@ THiroLaser = Class(SinglePolyTrailProjectile) {
     FxTrails = EffectTemplate.THiroLaserFxtrails,
     PolyTrail = EffectTemplate.THiroLaserPolytrail,
 }
-
-

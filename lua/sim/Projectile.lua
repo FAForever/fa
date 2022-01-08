@@ -86,7 +86,35 @@ local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FxImpact
 
 local DeprecatedWarnings = { }
 
+local OnCollisionCheckTableCache = { {false, false}, {false, false} }
+
+local function CacheViaMetatable(projectile)
+
+    local meta = getmetatable(projectile)
+    local blueprint = projectile:GetBlueprint()
+
+    meta.Cached = true
+
+    -- cache the blueprint
+    meta.Blueprint = blueprint
+
+    -- cache parsed version of the do not collide lists
+    meta.DoNotCollideListParsed = false
+    if blueprint.DoNotCollideList then 
+        meta.DoNotCollideListParsed = { }
+        for k, v in blueprint.DoNotCollideList do 
+            meta.DoNotCollideListParsed[k] = ParseEntityCategory(v)
+        end
+    end
+end
+
 Projectile = Class(ProjectileMethods, Entity) {
+
+    -- Cached in the meta table
+    Cached = false,
+    Blueprint = false, 
+    DoNotCollideListParsed = false,
+
 
     -- Prevent calling these functions as we already have a C object
     __init = false,
@@ -143,6 +171,10 @@ Projectile = Class(ProjectileMethods, Entity) {
 
     -- Called by engine when made 
     OnCreate = function(self, inWater)
+
+        if not self.Cached then 
+            CacheViaMetatable(self)
+        end
 
         -- get blueprint into local scope for performance
         local blueprint = EntityGetBlueprint(self)
@@ -246,29 +278,36 @@ Projectile = Class(ProjectileMethods, Entity) {
     -- Called by the engine when a projectile hits some other entity
     OnCollisionCheck = function(self, other)
 
-        -- if we return false the thing hitting us has no idea that it came into contact with us
-        if self.Army == other.Army then return false end
+        -- do not hit our own
+        if self.Army == other.Army then 
+            return false 
+        end
 
-        -- pass the default do-not-collide categories
+        -- do not hit what we're not interested in
         if EntityCategoryContains(DoNotCollideCategories, self) and EntityCategoryContains(DoNotCollideCategories, other) then
             return false
+        end
+
+        -- check for specific do-not-collide entities, such as for strategic missiles not hitting air
+        local doNotCollideList = false
+        OnCollisionCheckTableCache[1][1] = self 
+        OnCollisionCheckTableCache[1][2] = other 
+        OnCollisionCheckTableCache[2][1] = other
+        OnCollisionCheckTableCache[2][2] = self 
+        for _, p in OnCollisionCheckTableCache do
+            doNotCollideList= p[1].DoNotCollideListParsed
+            if doNotCollideList then
+                for _, v in doNotCollideList do
+                    if EntityCategoryContains(v, p[2]) then
+                        return false
+                    end
+                end
+            end
         end
 
         -- if it should only hit a specific target and we're not the one being tracked
         if other.Blueprint.Physics.HitAssignedTarget and ProjectileGetTrackingTarget(other) ~= self then
             return false
-        end
-
-        -- check for specific do-not-collide entities, such as for strategic missiles not hitting air
-        for _, p in {{self, other}, {other, self}} do -- TODO: table creation!
-            local dnc = p[1].BlueprintDoNotCollideList
-            if dnc then
-                for _, v in dnc do
-                    if EntityCategoryContains(categories[v], p[2]) then
-                        return false
-                    end
-                end
-            end
         end
 
         return true
@@ -622,8 +661,33 @@ Projectile = Class(ProjectileMethods, Entity) {
 --- A dummy projectile that solely inherits what it needs. Useful for 
 -- effects that require projectiles without additional overhead.
 DummyProjectile = Class(moho.projectile_methods, Entity) {
-    -- the only things we need
-    __init = function(self, spec) end,
-    __post_init = function(self, spec) end,
-    OnCreate = function(self, inWater) end,
+
+    -- Cached in the meta table
+    Cached = false,
+    Blueprint = false, 
+    DoNotCollideListParsed = false,
+
+    -- Prevent calling these functions as we already have a C object
+    __init = false,
+    __post_init = false,
+
+    -- Called when the projectile is created
+    OnCreate = function(self, inWater) 
+
+        if not self.Cached then 
+            CacheViaMetatable(self)
+        end
+
+        -- store values for direct access to prevent hashing / engine calls
+        self.Army = self:GetArmy()
+        self.Launcher = self:GetLauncher()
+        
+        -- prepare trashbag
+        self.Trash = TrashBag()
+    end,
+
+    -- Called when the projectile is destroyed
+    OnDestroy = function(self)
+        self.Trash:Destroy()
+    end,
 }
