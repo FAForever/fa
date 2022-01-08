@@ -1,0 +1,48 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'X_Impact_Land_Gen_Seraphim',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'X_Impact_Land_Gen_Seraphim',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'SERAPHIM',
+        'PROJECTILE',
+        'DIRECTFIRE',
+    },
+    Display = {
+        ImpactEffects = {
+            Type = 'Small01',
+        },
+        StrategicIconSize = 1,
+    },
+    General = {
+        Category = 'Direct Fire',
+        Faction = 'Seraphim',
+        TechLevel = 1,
+        Weapon = 'Phasic Autogun',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 14.6,
+        InitialSpeedRange = 3,
+        InitialSpeedReduceDistance = 30,
+        LeadTarget = false,
+        TurnRate = 360,
+        VelocityAlign = true,
+    },
+}
