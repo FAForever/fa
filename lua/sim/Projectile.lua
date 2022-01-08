@@ -88,16 +88,16 @@ local DeprecatedWarnings = { }
 
 Projectile = Class(ProjectileMethods, Entity) {
 
-    -- Do not call the base class __init and __post_init, we already have a c++ object
-    __init = function(self, spec)
-    end,
+    -- Prevent calling these functions as we already have a C object
+    __init = false,
+    __post_init = false,
 
-    -- Do not call the base class __init and __post_init, we already have a c++ object
-    __post_init = function(self, spec)
-    end,
-
-    DestroyOnImpact = true,
-    FxImpactTrajectoryAligned = true,
+    -- these values are used throughout the code but we no longer load
+    -- them by default. This reduces the memory footprint. There are
+    -- hundreds of unique projectiles and therefore hundreds of
+    -- unique meta tables that hold these values by default. Instead,
+    -- we check in the code whether the value exists. If it doesn't, 
+    -- we use the default.
 
     -- FxImpactAirUnit = false,
     -- FxImpactLand = false,
@@ -123,9 +123,9 @@ Projectile = Class(ProjectileMethods, Entity) {
     -- FxWaterHitScale = 1,
     -- FxOnKilledScale = 1,
 
-    -- this is always false
-    -- FxImpactLandScorch = false,
-    -- FxImpactLandScorchScale = 1.0,
+    -- Due to legacy reasons we can not apply the same logic to these ^^
+    DestroyOnImpact = true,
+    FxImpactTrajectoryAligned = true,
 
     -- Performance-wise this function just hurts and is not needed
     ForkThread = function(self, fn, ...)
