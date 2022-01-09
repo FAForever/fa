@@ -87,7 +87,38 @@ local DefaultTerrainTypeFxImpact = GetTerrainType(-1, -1).FxImpact
 
 local DeprecatedWarnings = { }
 
+local VectorCache = Vector(0, 0, 0)
 local OnCollisionCheckTableCache = { {false, false}, {false, false} }
+
+local OnImpactDecals = {
+    -- radius of at most 2
+    {
+        -- albedo
+    },
+    -- radius of at most 4
+    {
+        -- albedo
+        -- normals
+    },
+    -- radius of at most 6
+    {
+        -- albedo
+        -- normals
+    },
+    -- radius of at most 8
+    {
+        -- albedo
+        -- normals
+        -- normals (large)
+    },
+    -- radius of 8 or more
+    {
+        -- albedo
+        -- albedo (large)
+        -- normals
+        -- normals (large) 
+    },
+}
 
 local function CacheViaMetatable(projectile)
 
@@ -251,6 +282,12 @@ Projectile = Class(ProjectileMethods, Entity) {
 
     -- Called by the engine when a projectile receives damage
     OnDamage = function(self, instigator, amount, vector, damageType)
+
+        -- This type of damage is used to knock over trees
+        if damageType == 'KnockOverTree' then 
+            return 
+        end
+
         if self.BlueprintDefenseMaxHealth then
             self.DoTakeDamage(self, instigator, amount, vector, damageType)
         else
@@ -266,28 +303,22 @@ Projectile = Class(ProjectileMethods, Entity) {
         local army = self.Army
         local instigator = self.Launcher or self 
         local damageData = self.DamageData
+        local px, py, pz = self:GetPositionXYZ()
 
-        -- Do Damage
+        -- Do the damage of this projectile
         self.DoDamage(self, instigator, damageData, targetEntity)
 
-        -- Buffs (Stun, etc)
-        self.DoUnitImpactBuffs(self, targetEntity)
+        -- Make trees fall down, needs to be applied after damage is to ensure the tree group is broken
+        local radius = damageData.Radius or 0
+        if radius > 0 then 
+            VectorCache[1] = px
+            VectorCache[2] = py 
+            VectorCache[3] = pz
+            DamageArea(self, VectorCache, 0.80 * radius, 1, 'KnockOverTree', false)
+        end
 
-        -- Possible 'target' values are:
-        --  'Unit'
-        --  'Terrain'
-        --  'Water'
-        --  'Air'
-        --  'Prop'
-        --  'Shield'
-        --  'UnitAir'
-        --  'UnderWater'
-        --  'UnitUnderwater'
-        --  'Projectile'
-        --  'ProjectileUnderWater
-        local ImpactEffects = false
-        local ImpactEffectScale = 1
-        local blueprint = self.Blueprint
+        -- Apply buffs of this projectile
+        self.DoUnitImpactBuffs(self, targetEntity)
 
         -- Sounds for all other impacts, ie: Impact<TargetTypeName>
         local blueprintAudio = self.BlueprintAudio
@@ -299,7 +330,16 @@ Projectile = Class(ProjectileMethods, Entity) {
             EntityPlaySound(self, blueprintAudio.Impact)
         end
 
-        -- ImpactEffects
+        -- Possible 'target type' values are:
+        --  'Unit', 'Terrain', 'Water'
+        --  'Air', 'Prop', 'Shield'
+        --  'UnitAir', 'UnderWater', 'UnitUnderwater'
+        --  'Projectile', 'ProjectileUnderWater
+        local ImpactEffects = false
+        local ImpactEffectScale = 1
+        local blueprint = self.Blueprint
+
+        -- Determine effects
         if targetType == 'Terrain' then
             ImpactEffects = self.FxImpactLand
             ImpactEffectScale = self.FxLandHitScale

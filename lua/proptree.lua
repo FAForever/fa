@@ -32,6 +32,10 @@ Tree = Class(Prop) {
             local bp = self:GetBlueprint()
             self:SetMesh(bp.Display.MeshBlueprintWrecked)
             ChangeState(self, self.FallingState)
+        if type == 'KnockOverTree' then
+            self.Motor = self.Motor or self:FallDown()
+            self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
+            ChangeState(self, self.FallingState)
         elseif type == 'Nuke' then
             if Random(1, 250) < 5 then
                 ChangeState(self, self.BurningState)

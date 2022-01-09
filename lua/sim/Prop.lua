@@ -158,6 +158,12 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnDamage = function(self, instigator, amount, direction, damageType)
+        
+        -- This type of damage is used to knock over trees
+        if damageType == 'KnockOverTree' then 
+            return 
+        end
+
         if not self.CanTakeDamage then return end
         local preAdjHealth = self:GetHealth()
         self:AdjustHealth(instigator, -amount)

@@ -1059,6 +1059,12 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+
+        -- This type of damage is used to knock over trees
+        if damageType == 'KnockOverTree' then 
+            return 
+        end
+
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 
