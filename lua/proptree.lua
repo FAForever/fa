@@ -25,7 +25,6 @@ Tree = Class(Prop) {
     end,
 
     OnDamage = function(self, instigator, armormod, direction, type)
-        LOG(type)
         -- Prop.OnDamage(self, instigator, armormod, direction, type)
         if type == 'Force' then
             self.Motor = self.Motor or self:FallDown()
