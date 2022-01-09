@@ -25,14 +25,15 @@ Tree = Class(Prop) {
     end,
 
     OnDamage = function(self, instigator, armormod, direction, type)
-        Prop.OnDamage(self, instigator, armormod, direction, type)
+        LOG(type)
+        -- Prop.OnDamage(self, instigator, armormod, direction, type)
         if type == 'Force' then
             self.Motor = self.Motor or self:FallDown()
             self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
             local bp = self:GetBlueprint()
             self:SetMesh(bp.Display.MeshBlueprintWrecked)
             ChangeState(self, self.FallingState)
-        if type == 'KnockOverTree' then
+        elseif type == 'KnockOverTree' then
             self.Motor = self.Motor or self:FallDown()
             self.Motor:Whack(direction[1], direction[2], direction[3], 1, true)
             ChangeState(self, self.FallingState)
@@ -211,13 +212,7 @@ TreeGroup = Class(Prop) {
     end,
 
     OnDamage = function(self, instigator, armormod, direction, type)
-        if type != 'Force' then
-            if Random(1, 10) <= 1 then
-                self:Breakup()
-            end
-        else
-            self:Breakup()
-        end
+        self:Breakup()
     end,
 
     Breakup = function(self)

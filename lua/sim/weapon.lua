@@ -378,6 +378,7 @@ Weapon = Class(moho.weapon_methods) {
         local damageTable = {}
         damageTable.InitialDamageAmount = weaponBlueprint.InitialDamage or 0
         damageTable.DamageRadius = weaponBlueprint.DamageRadius + (self.DamageRadiusMod or 0)
+        damageTable.KnockOverTreeRadius = weaponBlueprint.KnockOverTreeRadius or damageTable.DamageRadius
         damageTable.DamageAmount = weaponBlueprint.Damage + (self.DamageMod or 0)
         damageTable.DamageType = weaponBlueprint.DamageType
         damageTable.DamageFriendly = weaponBlueprint.DamageFriendly

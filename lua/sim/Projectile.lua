@@ -309,12 +309,12 @@ Projectile = Class(ProjectileMethods, Entity) {
         self.DoDamage(self, instigator, damageData, targetEntity)
 
         -- Make trees fall down, needs to be applied after damage is to ensure the tree group is broken
-        local radius = damageData.Radius or 0
-        if radius > 0 then 
+        local knockOverTreeRadius = damageData.KnockOverTreeRadius or (0.5 * damageData.DamageRadius)
+        if knockOverTreeRadius > 0 then 
             VectorCache[1] = px
             VectorCache[2] = py 
             VectorCache[3] = pz
-            DamageArea(self, VectorCache, 0.80 * radius, 1, 'KnockOverTree', false)
+            DamageArea(self, VectorCache, knockOverTreeRadius, 1, 'KnockOverTree', false)
         end
 
         -- Apply buffs of this projectile
