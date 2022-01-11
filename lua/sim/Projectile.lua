@@ -122,6 +122,8 @@ local OnImpactDecals = {
 
 local function CacheViaMetatable(projectile)
 
+    SPEW("Caching: " .. blueprint.BlueprintId)
+
     local meta = getmetatable(projectile)
     local blueprint = projectile:GetBlueprint()
 
@@ -138,6 +140,9 @@ local function CacheViaMetatable(projectile)
             meta.DoNotCollideListParsed[k] = ParseEntityCategory(v)
         end
     end
+
+    -- cache whether this projectile can take damage
+    meta.CanTakeDamage = (self.Blueprint.Defense.MaxHealth and true) or false
 end
 
 Projectile = Class(ProjectileMethods, Entity) {
@@ -147,11 +152,8 @@ Projectile = Class(ProjectileMethods, Entity) {
     -- Cached in the meta table
     Cached = false,
     Blueprint = false, 
+    CanTakeDamage = false,
     DoNotCollideListParsed = false,
-
-    -- Prevent calling these functions as we already have a C object
-    __init = false,
-    __post_init = false,
 
     -- these values are used throughout the code but we no longer load
     -- them by default. This reduces the memory footprint. There are
@@ -190,6 +192,10 @@ Projectile = Class(ProjectileMethods, Entity) {
 
     -- # Functions called by the engine # --
 
+    -- Prevent calling these functions as we already have a C object
+    __init = false,
+    __post_init = false,
+
     -- Called by engine when made 
     OnCreate = function(self, inWater)
 
@@ -201,23 +207,26 @@ Projectile = Class(ProjectileMethods, Entity) {
         local blueprint = EntityGetBlueprint(self)
 
         -- store original blueprint for functions that need it
-        self.Blueprint = blueprint
         self.BlueprintAudio = blueprint.Audio
 
         -- store values for direct access to prevent hashing / engine calls
         self.Army = EntityGetArmy(self)
         self.Launcher = ProjectileGetLauncher(self)
 
-        -- used when colliding or taking damage, cached for efficiency
-        self.BlueprintDoNotCollideList = blueprint.DoNotCollideList
-        self.BlueprintDefenseMaxHealth = blueprint.Defense.MaxHealth or 1
+        -- pre-allocate damage data
+        self.DamageData = {
+            DamageRadius = false, 
+            InitialDamageAmount = false,
+            DamageAmount = false,
+            DamageType = false,
+            DamageFriendly = false, 
+            CollideFriendly = false,
+         }
 
-        -- allocate damage data
-        self.DamageData = { }
-
-        -- set original health
-        EntitySetMaxHealth(self, self.BlueprintDefenseMaxHealth)
-        EntitySetHealth(self, self, self.BlueprintDefenseMaxHealth) -- 2nd self is instigator
+        -- set health of projectile
+        local health = blueprint.Defense.MaxHealth or 1
+        EntitySetMaxHealth(self, health)
+        EntitySetHealth(self, self, health)
 
         -- update target if we track
         if blueprint.Physics.TrackTargetGround then
@@ -288,8 +297,10 @@ Projectile = Class(ProjectileMethods, Entity) {
             return 
         end
 
-        if self.BlueprintDefenseMaxHealth then
+        -- if we have health, try and survive
+        if self.CanTakeDamage then
             self.DoTakeDamage(self, instigator, amount, vector, damageType)
+        -- if we have no health, just kill us
         else
             self.OnKilled(self, instigator, damageType)
         end
@@ -309,7 +320,7 @@ Projectile = Class(ProjectileMethods, Entity) {
         self.DoDamage(self, instigator, damageData, targetEntity)
 
         -- Make trees fall down, needs to be applied after damage is to ensure the tree group is broken
-        local knockOverTreeRadius = damageData.KnockOverTreeRadius or (0.5 * damageData.DamageRadius)
+        local knockOverTreeRadius = damageData.KnockOverTreeRadius or (0.5 * (damageData.DamageRadius or 0))
         if knockOverTreeRadius > 0 then 
             VectorCache[1] = px
             VectorCache[2] = py 
@@ -322,12 +333,9 @@ Projectile = Class(ProjectileMethods, Entity) {
 
         -- Sounds for all other impacts, ie: Impact<TargetTypeName>
         local blueprintAudio = self.BlueprintAudio
-        local snd = blueprintAudio['Impact' .. targetType]
-        if snd then
-            EntityPlaySound(self, snd)
-            -- Generic Impact Sound
-        elseif blueprintAudio.Impact then
-            EntityPlaySound(self, blueprintAudio.Impact)
+        local impactSound = blueprintAudio['Impact' .. targetType] or blueprintAudio.Impact
+        if impactSound then
+            EntityPlaySound(self, impactSound)
         end
 
         -- Possible 'target type' values are:
@@ -335,52 +343,52 @@ Projectile = Class(ProjectileMethods, Entity) {
         --  'Air', 'Prop', 'Shield'
         --  'UnitAir', 'UnderWater', 'UnitUnderwater'
         --  'Projectile', 'ProjectileUnderWater
-        local ImpactEffects = false
-        local ImpactEffectScale = 1
+        local impactEffects = false
+        local impactEffectScale = 1
         local blueprint = self.Blueprint
 
         -- Determine effects
         if targetType == 'Terrain' then
-            ImpactEffects = self.FxImpactLand
-            ImpactEffectScale = self.FxLandHitScale
+            impactEffects = self.FxImpactLand
+            impactEffectScale = self.FxLandHitScale
         elseif targetType == 'Water' then
-            ImpactEffects = self.FxImpactWater
-            ImpactEffectScale = self.FxWaterHitScale
+            impactEffects = self.FxImpactWater
+            impactEffectScale = self.FxWaterHitScale
         elseif targetType == 'Shield' then
-            ImpactEffects = self.FxImpactShield
-            ImpactEffectScale = self.FxShieldHitScale
+            impactEffects = self.FxImpactShield
+            impactEffectScale = self.FxShieldHitScale
         elseif targetType == 'Unit' then
-            ImpactEffects = self.FxImpactUnit
-            ImpactEffectScale = self.FxUnitHitScale
+            impactEffects = self.FxImpactUnit
+            impactEffectScale = self.FxUnitHitScale
         elseif targetType == 'UnitAir' then
-            ImpactEffects = self.FxImpactAirUnit
-            ImpactEffectScale = self.FxAirUnitHitScale
+            impactEffects = self.FxImpactAirUnit
+            impactEffectScale = self.FxAirUnitHitScale
         elseif targetType == 'Air' then
-            ImpactEffects = self.FxImpactNone
-            ImpactEffectScale = self.FxNoneHitScale
+            impactEffects = self.FxImpactNone
+            impactEffectScale = self.FxNoneHitScale
         elseif targetType == 'Projectile' then
-            ImpactEffects = self.FxImpactProjectile
-            ImpactEffectScale = self.FxProjectileHitScale
+            impactEffects = self.FxImpactProjectile
+            impactEffectScale = self.FxProjectileHitScale
         elseif targetType == 'ProjectileUnderwater' then
-            ImpactEffects = self.FxImpactProjectileUnderWater
-            ImpactEffectScale = self.FxProjectileUnderWaterHitScale
+            impactEffects = self.FxImpactProjectileUnderWater
+            impactEffectScale = self.FxProjectileUnderWaterHitScale
         elseif targetType == 'Prop' then
-            ImpactEffects = self.FxImpactProp
-            ImpactEffectScale = self.FxPropHitScale
+            impactEffects = self.FxImpactProp
+            impactEffectScale = self.FxPropHitScale
         elseif targetType == 'Underwater' or targetType == 'UnitUnderwater' then
-            ImpactEffects = self.FxImpactUnderWater
-            ImpactEffectScale = self.FxUnderWaterHitScale or 0.25
+            impactEffects = self.FxImpactUnderWater
+            impactEffectScale = self.FxUnderWaterHitScale or 0.25
         else
             LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
         end
 
         -- default values
-        ImpactEffects = ImpactEffects or { }
-        ImpactEffectScale = ImpactEffectScale or 1
+        impactEffects = impactEffects or { }
+        impactEffectScale = impactEffectScale or 1
 
-        local BlueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
+        local BlueprintDisplayImpactEffects = blueprint.Display.impactEffects
         local TerrainEffects = self.GetTerrainEffects(self, targetType, BlueprintDisplayImpactEffects.Type)
-        self.CreateImpactEffects(self, army, ImpactEffects, ImpactEffectScale)
+        self.CreateImpactEffects(self, army, impactEffects, impactEffectScale)
         self.CreateTerrainEffects(self, army, TerrainEffects, BlueprintDisplayImpactEffects.Scale or 1)
 
         local timeout = blueprint.Physics.ImpactTimeout
@@ -483,26 +491,15 @@ Projectile = Class(ProjectileMethods, Entity) {
             return
         end
 
+        -- adjust health of projectile
         EntityAdjustHealth(self, instigator, -amount)
         local health = EntityGetHealth(self)
         if health <= 0 then
-            if damageType == 'Reclaimed' then
-                EntityDestroy(self)
-            else
-                local excessDamageRatio = 0.0
-
-                -- Calculate the excess damage amount
-                local excess = health - amount
-                local maxHealth = self.BlueprintDefenseMaxHealth
-                if excess < 0 and maxHealth > 0 then
-                    excessDamageRatio = -excess / maxHealth
-                end
-                self.OnKilled(self, instigator, damageType, excessDamageRatio)
-            end
+            self.OnKilled(self, instigator, damageType)
         end
     end,
 
-    -- Called by the engine when the projectile is killed
+    -- Called when the projectile is killed after taking damage
     OnKilled = function(self, instigator, type, overkillRatio)
         self.CreateImpactEffects(self, self.Army, self.FxOnKilled, self.FxOnKilledScale)
         EntityDestroy(self)
