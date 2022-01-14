@@ -2237,7 +2237,6 @@ local function UpdateGame()
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
 
-        UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         UIUtil.setEnabled(GUI.factionSelector, notReady)
         if notReady then
             UpdateFactionSelector()
@@ -3093,7 +3092,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftTopIn(GUI.mapView, GUI.mapPanel, -1, -1)
     LayoutHelpers.DepthOverParent(GUI.mapView, GUI.mapPanel, -1)
 
-    GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GetFrame(0), '/BUTTON/zoom/', "")
+    GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
     LayoutHelpers.SetDimensions(GUI.LargeMapPreview, 30, 30)
     LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
     LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
