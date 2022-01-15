@@ -29,7 +29,7 @@ To:
 FADeepProbe.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log"
 ```
 
-The arguments are passed along. When the game crashes the debugger will try and inform you in the log what happened.
+The arguments are passed along by the debugger. The change to the bash script is similar. When the game crashes the debugger will try and inform you in the log what happened.
 
 Work environment
 ----------------
@@ -55,7 +55,7 @@ Useful extensions if you intent to work with shaders:
 
 Note that I do not recommend the Lua language server. The game uses a slightly adjusted version of Lua. The syntax doesn't match. We also have a different import system. The Lua language server generates dozens of errors. And it is not equipped to work with our import system.
 
-All the files
+All other the files
 -------------
 
 The repository doesn't contain all the base game blueprint and / or script files. This is due to licensing issues. You can see this pattern in the initialisation files:
