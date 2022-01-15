@@ -44,9 +44,9 @@ Other useful information:
 Shortcuts can significantly improve your workflow. You do not need to familiarize yourself with each and every shortcut. We recommend you to look at this sheet every month and see if there is a common action that you've been doing that can be done by a shortcut instead. 
 
 Useful extensions in general:
- - [Git graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph)
- - [Gitlens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
- - [Peacock](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock)
+ - [Git graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph): useful for graph visualizations
+ - [Gitlens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens): useful for seeing who made what change
+ - [Peacock](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock): useful for coloring your workspaces when you have multiple
 
 Useful extensions if you intent to work with shaders:
  - [Shader languages support for VS Code](https://marketplace.visualstudio.com/items?itemName=slevesque.shader)
@@ -83,7 +83,7 @@ You can extract the remaining files by unpacking the relevant files in the gamed
  - `moholua.scd`
  - `schook.scd`
 
-You can copy the file, change the extension to `zip` and unpack it using your favorite compression software. We recommend you to create a separate folder that contains the output. We define `base-repository` to be that folder. You can launch a separate instance of Visual Studio Code to search through the base game code. You can also add an additional folder to a workspace in Visual Studio Code if you do not want multiple instances.
+You can copy the file, change the extension to `zip` and unpack it using your favorite compression software. We recommend you to create a separate folder that stores the unpacked folders. You can launch a separate instance of Visual Studio Code to search through the base game code. You can also add an additional folder to a workspace in Visual Studio Code if you do not want multiple instances.
 
 Frequently asked Questions (FAQ)
 --------------------------------
