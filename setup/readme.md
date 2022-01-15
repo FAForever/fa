@@ -88,7 +88,7 @@ You can copy the file, change the extension to `zip` and unpack it using your fa
 Frequently asked Questions (FAQ)
 --------------------------------
 
-_What is Git?_
+ - What is Git?
 
 Git is software for tracking changes in a set of files. This is particular useful for source files. It is an industry standard. It is a good time investment to familiarize yourself with it. A few sources to learn Git from:
  - Git via the [command line](https://www.w3schools.com/git/git_intro.asp?remote=github)
@@ -97,6 +97,6 @@ Git is software for tracking changes in a set of files. This is particular usefu
 
 At first it is important to understand what a fork is, how to stage, commit or push your files and how you can make a pull request. More advanced topics like merging stratgies or rebasing get relevant as you become more involved with the project.
 
-_Can I play the game with other people that include my changes?_
+ - Can I play the game with other people that include my changes?
 
 You can not - this will cause a desync.
