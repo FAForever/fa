@@ -4,7 +4,7 @@ Running the game with your changes
 _There is a section about Git in the FAQ if you're unfamilar with it._
 
 Fork the repository. Clone your fork to your system using your favorite Git tool. We define the `repository` directory to be the location of your repository on your system. We define the `bin` directory to be the `bin` folder in the installation folder of the client. By default this is:
- - `C:\ProgramData\FAForever\bin`
+ - `C:/ProgramData/FAForever/bin`
 
 Copy the content of `repository/setup/bin` into the `bin` folder. Open up `init_dev.lua` that now resides in the `bin` folder. At the top it states:
 
@@ -16,8 +16,8 @@ local locationOfRepository = 'your-fa-repository-location'
 
 Change that to match the path to the repository on your system. You can start the game by calling `start_dev.bat` or `start_dev.sh`. You can inspect them to find out what they do.When you use the scripts the game will start with your `repository` as a source. 
 
-All the other files
--------------------
+Base game files
+---------------
 
 The repository doesn't contain all the base game blueprint and / or script files. This is due to licensing issues. You'll need the remaining files when you work with the repository. This is useful to search for a file that is being imported or to search for examples. You can see this pattern in the initialisation file you copied in the previous step:
 
@@ -92,6 +92,24 @@ FADeepProbe.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log"
 
 The arguments are passed along by the debugger. The change to the bash script is similar. When the game crashes the debugger will try and inform you in the log what happened.
 
+Running a replay
+----------------
+
+A hard crash may only show up in a replay. You'll need to use the debugger to investigate. You want to run the replay using the debugger. This requires two steps: match the game version of the replay and acquire the replay itself.
+
+The game version depends on the game type. Checkout the repository to the correct branch:  
+ - FAF: deploy/faf
+ - FAF Beta: deploy/fafbeta
+ - FAF Develop: deploy/fafdevelop
+
+You can find the replay by starting it with the client once and immediately closing it. The replay is stored in the cache of the client:
+ - `C:/ProgramData/FAForever/cache/temp.scfareplay`
+
+Copy that replay to the replays folder of the game:
+ - `C:/Users/%USER_NAME%/Documents/My Games/Gas Powered Games/Supreme Commander Forged Alliance/replays/%PROFILE_NAME%`
+
+Note that the last path is incomplete: you need replace `%USER_NAME%` with your systems profile name and `%PROFILE_NAME%` with the profile name you use in the game. You can launch the game using the bat files as described earlier.
+
 Frequently asked Questions (FAQ)
 --------------------------------
 
@@ -110,6 +128,6 @@ At first it is important to understand what a fork is, how to stage, commit or p
 
 You can not - this will cause a desync.
 
- - - I have no nx5 files, what now?
+ - - I have no .nx5 files.
 
 Launch a game with the client using FAF Develop as your game type.
