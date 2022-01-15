@@ -1,3 +1,4 @@
+#! /bin/sh
 
 # arguments are not taken into account, does anyone know why?
 ./ForgedAlliance.exe "/init" "init_dev.lua" "/EnableDiskWatch" "/showlog" "/log" "dev.log"

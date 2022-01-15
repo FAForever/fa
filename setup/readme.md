@@ -46,10 +46,15 @@ You can extract the remaining files by unpacking the relevant files in the gamed
 
 You can copy the file, change the extension to `zip` and unpack it using your favorite compression software. We recommend you to create a separate folder that stores the unpacked folders. You can launch a separate instance of Visual Studio Code to search through the base game code. You can also add an additional folder to a workspace in Visual Studio Code if you do not want multiple instances.
 
+Branching
+---------
+
+We have two type of patches: a balance patch and a development patch. The former is done by the balance team and they branch from deploy/fafbeta. The latter is done by the game team and they branch from deploy/fafdevelop. 
+
 Work environment
 ----------------
 
-When you're a novel programmer then you may not have a work environment. This is often referred to as an Integrated Development Environment (IDE). We recommend you to use [Visual Studio Code](https://code.visualstudio.com/) (VSC)
+When you're new to programming then you may not have a work environment. This is often referred to as an Integrated Development Environment (IDE). We recommend you to use [Visual Studio Code](https://code.visualstudio.com/) (VSC).
 
 If you're unfamiliar with Visual Studio Code then it will save you time to familiarize yourself with it. There is an excellent [introductionary series](https://code.visualstudio.com/docs/getstarted/introvideos) provided by Visual Studio Code themselves. Note that you do **not** need to do what the videos tell you to do. As an example, you do **not** need to install Python. We don't use Python for the game repository. The videos show you what is possible - it shows you how the tool works.
 
@@ -69,11 +74,6 @@ Useful extensions if you intent to work with shaders:
  - [Hex editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)
 
 Note that I do not recommend the Lua language server. The game uses a slightly adjusted version of Lua. The syntax doesn't match. We also have a different import system. The Lua language server generates dozens of errors. And it is not equipped to work with our import system.
-
-Branching
----------
-
-We have two type of patches: a balance patch and a development patch. The former is done by the balance team and they branch from deploy/fafbeta. The latter is done by the game team and they branch from deploy/fafdevelop. 
 
 Attaching the debugger
 ----------------------
