@@ -529,7 +529,9 @@ function SetupPlayerLines()
     end
 
     -- add replay ID
-    mapData.MapDescription = LOC(description) .. "\r\n\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
+    mapData.MapDescription = LOC(description) .. 
+        "\r\n\r\n" .. LOC("<LOC map_version>Map version") .. ": " .. tostring(sessionInfo.map_version) ..
+        "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
 
     -- add ladder icon
     mapData.Ranked = sessionInfo.Options.Ranked or false
