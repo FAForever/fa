@@ -1,7 +1,7 @@
 
 FAF Gametype | FAF Develop game type | FAF Beta balance gametype
  ------------ | ------------- | -----------
-[![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=deploy/faf)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=deploy/fafdevelop)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=deploy/fafbeta)](https://travis-ci.org/FAForever/fa)
+[example event parameter](https://github.com/FAForever/fa/blob/deploy/fafdevelop/.github/workflows/build.yaml/badge.svg?event=push)
 
 Changelog
 ---------
