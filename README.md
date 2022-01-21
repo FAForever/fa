@@ -8,9 +8,9 @@ About Forged Alliance Forever
 
 ![Impression of the game](/images/impression-a.jpg)
 
-Forged Alliance Forever is a community-driven project designed to facilitate online play for Supreme Commander: Forged Alliance. Together we are a thriving community with a self-made [client](https://github.com/FAForever/downlords-faf-client), [backend](https://github.com/FAForever/server) and [website](https://github.com/FAForever/website). As an example we make an extensive library of community made maps, mods and co-op scenarios easily accessible and introduced a rating system based on [TrueSkill](https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/) to provide a competitive environment through 1 vs 1, 2 vs 2 and 4 vs 4 matchmaking. 
+Forged Alliance Forever is a community-driven project designed to facilitate online play for Supreme Commander: Forged Alliance. Together we are a thriving community with a self-made [client](https://github.com/FAForever/downlords-faf-client), [backend](https://github.com/FAForever/server) and [website](https://github.com/FAForever/website). As an example we make an extensive library of community made maps, mods and co-op scenarios easily accessible and introduced a rating system based on [TrueSkill](https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/) to provide a competitive environment through matchmaking queues. 
 
-You can download the client through our [website](https://faforever.com/). In order to registrate you'll need to sync your account with Steam to proof you have a copy of [Supreme Commander: Forged Aliance](https://store.steampowered.com/app/9420/Supreme_Commander_Forged_Alliance/). You can get in touch with the community through the [forums](https://forum.faforever.com/) and the official [Discord server](https://discord.gg/mXahVSKGVb). The developers environment can be found on [Zulip](https://zulip.com/) - you can be granted access by the admin of this repository.
+You can download the client through our [website](https://faforever.com/). In order to registrate you'll need to sync your account with Steam to proof you have a copy of [Supreme Commander: Forged Aliance](https://store.steampowered.com/app/9420/Supreme_Commander_Forged_Alliance/). You can get in touch with the community through the [forums](https://forum.faforever.com/) and the official [Discord server](https://discord.gg/mXahVSKGVb). The developers environment can be found on [Zulip](https://zulip.com/) - you can be granted access by the admin of this repository. We financially live due to donations, one source being our 
 
 About this repository
 ---------------------
@@ -51,23 +51,4 @@ You can find the complete [changelog](changelog.md) in a separate file. There is
 Contributing
 ------------
 
-There are installation instructions [in English](setup/readme.md) and [in Russian](setup/readme-russian.md) to help you set up your development environment. It is useful to read the [contribution guidelines](CONTRIBUTING.md) before contributing. In particular commit messages are relevant.
-
-Translation guidelines
-----------------------
-
-The translation of both the game and the faf patch should be written in the way that they follow those guidelines. 
-This goes for both future and past work on the SCFA translation and for all languages.
-
-1) *Compliance with the game's UI*
-- Text should never overflow from anywhere
-- As much as possible, try to keep a few pixels of margin between the text and its parent element boundaries
-- Use obvious abbreviations if a shorter translation is impossible, but the abbreviation should be made in a way that it is clear and obvious. Keywords from the game should never be abbreviated.
-
-2) *Gender-neutral writing*
-- The translation should never adopt gendered formulations when addressing the player directly, and should respect gender-neutral writing everywhere possible
-- Median point and/or parentheses, or gendering a word twice, should be avoided to the maximum.
-
-3) *Consistency of keywords*
-- Game specific keywords, like unit names and building names, should always be translated in the same manner consistently across the whole game.
-- If a new keyword appears, that is not translated elsewhere, it should be translated in a consistent manner regarding the other translated keywords.
+There are installation instructions [in English](setup/readme.md) and [in Russian](setup/readme-russian.md) to help you set up your development environment. It is useful to read the [contribution guidelines](contributing.md) before contributing. In particular commit messages are relevant. Potential translations should follow the [translation guidelines](loc/guidelines.md). 
