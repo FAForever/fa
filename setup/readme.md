@@ -1,3 +1,8 @@
+Instructions to set up your development environment
+---------------------------------------------------
+
+A collection of useful fragments of information to help you set up your development environment.
+
 Running the game with your changes
 ----------------------------------
 
