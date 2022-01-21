@@ -3,7 +3,7 @@ Running the game with your changes
 
 _There is a section about Git in the FAQ if you're unfamilar with it._
 
-Fork the repository. Clone your fork to your system using your favorite Git tool. We define the `repository` directory to be the location of your repository on your system. We define the `bin` directory to be the `bin` folder in the installation folder of the client. By default this is:
+Fork the repository. Clone your fork to your system using your favorite Git tool. We refer to the `repository` directory to the location of your repository on your system. We refer to the `bin` directory to the `bin` folder in the installation folder of the client. By default this is:
  - `C:/ProgramData/FAForever/bin`
 
 Copy the content of `repository/setup/bin` into the `bin` folder. Open up `init_dev.lua` that now resides in the `bin` folder. At the top it states:
@@ -14,7 +14,7 @@ Copy the content of `repository/setup/bin` into the `bin` folder. Open up `init_
 local locationOfRepository = 'your-fa-repository-location'
 ```
 
-Change that to match the path to the repository on your system. You can start the game by calling `start_dev.bat` or `start_dev.sh`. You can inspect them to find out what they do.When you use the scripts the game will start with your `repository` as a source. 
+Change that to match the path to the `repository` on your system. You can start the game by calling `start_dev.bat` or `start_dev.sh`. You can inspect them to find out what they do. When you use the scripts the game will start with your `repository` as a source. 
 
 Base game files
 ---------------
@@ -49,7 +49,7 @@ You can copy the file, change the extension to `zip` and unpack it using your fa
 Branching
 ---------
 
-We have two type of patches: a balance patch and a development patch. The former is done by the balance team and they branch from deploy/fafbeta. The latter is done by the game team and they branch from deploy/fafdevelop. 
+We have two type of patches: a balance patch and a development patch. The former is done by the balance team and they branch from deploy/fafbeta. The latter is done by the game team and they branch from deploy/fafdevelop. The `fafbeta` branch is used for balance changes, a typical example is the tweaking of statistics of units. The `fafdevelop` branch is used for game changes in general, such as performance improvements, fixing of bugs and the introduction of (new) mechanics.
 
 Work environment
 ----------------
@@ -73,7 +73,7 @@ Useful extensions if you intent to work with shaders:
  - [HLSL Tools](https://marketplace.visualstudio.com/items?itemName=TimGJones.hlsltools)
  - [Hex editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)
 
-Note that I do not recommend the Lua language server. The game uses a slightly adjusted version of Lua. The syntax doesn't match. We also have a different import system. The Lua language server generates dozens of errors. And it is not equipped to work with our import system.
+Note that we do not recommend the Lua language server. The game uses a slightly adjusted version of Lua. The syntax doesn't match. We also have a different import system. The Lua language server generates dozens of errors. And it is not equipped to work with our import system.
 
 Attaching the debugger
 ----------------------
@@ -115,19 +115,13 @@ Frequently asked Questions (FAQ)
 
 There is more specific information on the [wiki](https://github.com/FAForever/fa/wiki) about the structure of the repository or how a release works.
 
- - - What is Git?
+<dl>
+<dt> What is Git? </dt>
+<dd> Git is software for tracking changes in a set of files. This is particular useful for source files. It is an industry standard. It is a good time investment to familiarize yourself with it. There are various sources to learn git. You can learn using Git via the [command line](https://www.w3schools.com/git/git_intro.asp?remote=github), via [Github Desktop](https://desktop.github.com/) or via [Visual Studio Code](https://code.visualstudio.com/docs/introvideos/versioncontrol) At first it is important to understand what a fork is, how to stage, commit or push your files and how you can make a pull request. More advanced topics like merging stratgies or rebasing get relevant as you become more involved with the project. </dd>
 
-Git is software for tracking changes in a set of files. This is particular useful for source files. It is an industry standard. It is a good time investment to familiarize yourself with it. A few sources to learn Git from:
- - Git via the [command line](https://www.w3schools.com/git/git_intro.asp?remote=github)
- - Git via [Github Desktop](https://desktop.github.com/)
- - Git via [Visual Studio Code](https://code.visualstudio.com/docs/introvideos/versioncontrol)
+<dt> Can I play the game with other people that include my changes? </dt>
+<dd> You can not - this will cause a desync. </dd>
 
-At first it is important to understand what a fork is, how to stage, commit or push your files and how you can make a pull request. More advanced topics like merging stratgies or rebasing get relevant as you become more involved with the project.
-
- - - Can I play the game with other people that include my changes?
-
-You can not - this will cause a desync.
-
- - - I have no .nx5 files.
-
-Launch a game with the client using FAF Develop as your game type.
+<dt> I have no .nx5 files. </dt>
+<dd> Launch a game with the client using FAF Develop as your game type. </dd>
+</dl>
