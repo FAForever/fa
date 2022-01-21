@@ -1,7 +1,7 @@
 
-master|develop
- ------------ | -------------
-[![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=master)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=develop)](https://travis-ci.org/FAForever/fa)
+Main branch | Main development branch | Main balance branch
+ ------------ | ------------- | -----------
+[![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=deploy/faf)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=deploy/fafdevelop)](https://travis-ci.org/FAForever/fa)[![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=deploy/fafbeta)](https://travis-ci.org/FAForever/fa)
 
 Changelog
 ---------
