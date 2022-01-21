@@ -1,17 +1,19 @@
-FAF LUA Code
-------------
+
 master|develop
  ------------ | -------------
 [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=master)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=develop)](https://travis-ci.org/FAForever/fa)
 
-The [changelog](changelog.md) can be found in a separate file. 
+Changelog
+---------
+
+You can find the complete [changelog](changelog.md) in a separate file. There is an [alternative changelog](http://patchnotes.faforever.com/) particular for balance patches in a more user-friendly format. 
 
 Contributing
 ------------
 
 There are installation instructions [in English](setup/readme.md) and [in Russian](setup/readme-russian.md) to help you set up your development environment. It is useful to read the [contribution guidelines](CONTRIBUTING.md) before contributing. In particular commit messages are relevant.
 
-Other related repositories:
+Related repositories:
  - The [executable patcher](https://github.com/FAForever/FA_Patcher)
  - The [executable patches](https://github.com/FAForever/FA-Binary-Patches)
  - A [Lua profiler](https://github.com/FAForever/FAFProfiler)
@@ -19,7 +21,7 @@ Other related repositories:
  - A [debugger](https://github.com/FAForever/FADeepProbe) to help with exceptions 
 
 Translation guidelines
-----------------------------------
+----------------------
 
 The translation of both the game and the faf patch should be written in the way that they follow those guidelines. 
 This goes for both future and past work on the SCFA translation and for all languages.
