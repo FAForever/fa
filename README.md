@@ -6,7 +6,7 @@ FAF Gametype | FAF Develop game type | FAF Beta balance gametype
 About Forged Alliance Forever
 -----------------------------
 
-![](images/impression-a.jpg)
+![](/images/impression-a.jpg)
 
 Forged Alliance Forever is a community-driven project designed to facilitate online play for Supreme Commander: Forged Alliance. Together we are a thriving community with a self-made [client](https://github.com/FAForever/downlords-faf-client), [backend](https://github.com/FAForever/server) and [website](https://github.com/FAForever/website). As an example we make an extensive library of community made maps, mods and co-op scenarios easily accessible and introduced a rating system based on [TrueSkill](https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/) to provide a competitive environment through 1 vs 1, 2 vs 2 and 4 vs 4 matchmaking. 
 
