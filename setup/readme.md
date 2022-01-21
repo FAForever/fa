@@ -110,6 +110,30 @@ Copy that replay to the replays folder of the game:
 
 Note that the last path is incomplete: you need replace `%USER_NAME%` with your systems profile name and `%PROFILE_NAME%` with the profile name you use in the game. You can launch the game using the bat files as described earlier.
 
+Multiple instances
+------------------
+
+You can start several processes at once when the debug facilities are enabled. You can do this by adding the following line to your preference file:
+ - `debug = { enable_debug_facilities = true }`
+
+The preference file can be found here:
+ - `%userprofile%\AppData\Local\Gas Powered Games\Supreme Commander Forged Alliance\Game.prefs`
+
+Hooking
+-------
+
+All files in the `schook` directory hook files in the `lua` folder. A mod applies a similar hooking strategy. Hooking means concatenating files: one file is appended to the next. This allows you to add code to a file. As an example, say we have this base game file:
+ - `lua/sim/unit.lua`
+
+And say we are trying to hook it with both:
+ - `schook/lua/unit.lua`
+ - `mods/my-mod/hook/lua/unit.lua`
+
+Then what happens is:
+ - `lua/sim/unit.lua` = `lua/sim/unit.lua` + `schook/lua/unit.lua` + `mods/my-mod/hook/lua/unit.lua`
+
+Where the addition operator should be interpreted as appending one text (source) file to the other text (source) file. this extents the unit file. This hooking is done when a file is imported for the first time. The directory that is used for hooks can be configured in the initialization files.
+
 Frequently asked Questions (FAQ)
 --------------------------------
 
@@ -124,4 +148,7 @@ There is more specific information on the [wiki](https://github.com/FAForever/fa
 
 <dt> I have no .nx5 files. </dt>
 <dd> Launch a game with the client using FAF Develop as your game type. </dd>
+
+<dt> My moholog settings keep resetting </dt>
+<dd> This is done on purpose - you will need to enable debug facilities to prevent this. See the section on running multiple instances. </dd>
 </dl>
