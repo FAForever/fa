@@ -146,13 +146,13 @@ There is more specific information on the [wiki](https://github.com/FAForever/fa
 
 <dl>
 <dt> What is Git? </dt>
-<dd> Git is software for tracking changes in a set of files. This is particular useful for source files. It is an industry standard. It is a good time investment to familiarize yourself with it. There are various sources to learn git. You can learn using Git via the [command line](https://www.w3schools.com/git/git_intro.asp?remote=github), via [Github Desktop](https://desktop.github.com/) or via [Visual Studio Code](https://code.visualstudio.com/docs/introvideos/versioncontrol) At first it is important to understand what a fork is, how to stage, commit or push your files and how you can make a pull request. More advanced topics like merging stratgies or rebasing get relevant as you become more involved with the project. </dd>
+<dd> Git is software for tracking changes in a set of files. This is particular useful for source files. It is an industry standard. It is a good time investment to familiarize yourself with it. There are various sources to learn git. You can learn using Git via the <a href="https://www.w3schools.com/git/git_intro.asp?remote=github">command line</a>, via <a href="https://desktop.github.com/">Github Desktop</a>[Github Desktop](https://desktop.github.com/) or via <a href="https://code.visualstudio.com/docs/introvideos/versioncontrol">Visual Studio Code</a>. At first it is important to understand what a fork is, how to stage, commit or push your files and how you can make a pull request. More advanced topics like merging stratgies or rebasing get relevant as you become more involved with the project. </dd>
 
 <dt> Can I play the game with other people that include my changes? </dt>
-<dd> You can not - this will cause a desync. </dd>
+<dd> You can not - this will cause a desync. As an example: if one changes the amount of damage that is applied then that happens only on your version of the simulation.</dd>
 
 <dt> I have no .nx5 files. </dt>
-<dd> Launch a game with the client using FAF Develop as your game type. </dd>
+<dd> Launch a game with the client using FAF Develop as your game type. An .nx5 file is part of the FAF Develop game type. The client will download them accordingly. This may take a while. </dd>
 
 <dt> My moholog settings keep resetting </dt>
 <dd> This is done on purpose - you will need to enable debug facilities to prevent this. See the section on running multiple instances. </dd>
