@@ -28,7 +28,7 @@ Folder          | Description
 `meshes`        | Various meshes that do not belong to props, units or projectiles. An example is the world border
 `projectiles`   | Various blueprint files, textures and meshes of projectiles
 `props`         | Various blueprint files, textures and meshes of props
-`schook`        | Legacy - the *s*upreme *c*ommander *h*ook folder that was used due to licensing issues
+`schook`        | Legacy - the **s**upreme **c**ommander **hook** folder that was used due to licensing issues
 `testmaps*`     | Various test maps. As an example the benchmark map that shipped with the game
 `tests*`        | Unit tests that run on various engine-oblivion functions. An example is the testing of string operations
 `textures`      | Various textures used by the engine (as fallback) or by the UI
