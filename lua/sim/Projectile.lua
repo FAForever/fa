@@ -321,13 +321,9 @@ Projectile = Class(ProjectileMethods, Entity) {
         self.DoUnitImpactBuffs(self, targetEntity)
 
         -- Sounds for all other impacts, ie: Impact<TargetTypeName>
-        local blueprintAudio = self.BlueprintAudio
-        local snd = blueprintAudio['Impact' .. targetType]
-        if snd then
-            EntityPlaySound(self, snd)
-            -- Generic Impact Sound
-        elseif blueprintAudio.Impact then
-            EntityPlaySound(self, blueprintAudio.Impact)
+        local sound = self.BlueprintAudio['Impact' .. targetType] or self.BlueprintAudio.Impact
+        if sound then
+            EntityPlaySound(self, sound)
         end
 
         -- Possible 'target type' values are:
@@ -335,52 +331,52 @@ Projectile = Class(ProjectileMethods, Entity) {
         --  'Air', 'Prop', 'Shield'
         --  'UnitAir', 'UnderWater', 'UnitUnderwater'
         --  'Projectile', 'ProjectileUnderWater
-        local ImpactEffects = false
-        local ImpactEffectScale = 1
+        local impactEffect = false
+        local impactEffectScale = 1
         local blueprint = self.Blueprint
 
         -- Determine effects
         if targetType == 'Terrain' then
-            ImpactEffects = self.FxImpactLand
-            ImpactEffectScale = self.FxLandHitScale
+            impactEffect = self.FxImpactLand
+            impactEffectScale = self.FxLandHitScale
         elseif targetType == 'Water' then
-            ImpactEffects = self.FxImpactWater
-            ImpactEffectScale = self.FxWaterHitScale
+            impactEffect = self.FxImpactWater
+            impactEffectScale = self.FxWaterHitScale
         elseif targetType == 'Shield' then
-            ImpactEffects = self.FxImpactShield
-            ImpactEffectScale = self.FxShieldHitScale
+            impactEffect = self.FxImpactShield
+            impactEffectScale = self.FxShieldHitScale
         elseif targetType == 'Unit' then
-            ImpactEffects = self.FxImpactUnit
-            ImpactEffectScale = self.FxUnitHitScale
+            impactEffect = self.FxImpactUnit
+            impactEffectScale = self.FxUnitHitScale
         elseif targetType == 'UnitAir' then
-            ImpactEffects = self.FxImpactAirUnit
-            ImpactEffectScale = self.FxAirUnitHitScale
+            impactEffect = self.FxImpactAirUnit
+            impactEffectScale = self.FxAirUnitHitScale
         elseif targetType == 'Air' then
-            ImpactEffects = self.FxImpactNone
-            ImpactEffectScale = self.FxNoneHitScale
+            impactEffect = self.FxImpactNone
+            impactEffectScale = self.FxNoneHitScale
         elseif targetType == 'Projectile' then
-            ImpactEffects = self.FxImpactProjectile
-            ImpactEffectScale = self.FxProjectileHitScale
+            impactEffect = self.FxImpactProjectile
+            impactEffectScale = self.FxProjectileHitScale
         elseif targetType == 'ProjectileUnderwater' then
-            ImpactEffects = self.FxImpactProjectileUnderWater
-            ImpactEffectScale = self.FxProjectileUnderWaterHitScale
+            impactEffect = self.FxImpactProjectileUnderWater
+            impactEffectScale = self.FxProjectileUnderWaterHitScale
         elseif targetType == 'Prop' then
-            ImpactEffects = self.FxImpactProp
-            ImpactEffectScale = self.FxPropHitScale
+            impactEffect = self.FxImpactProp
+            impactEffectScale = self.FxPropHitScale
         elseif targetType == 'Underwater' or targetType == 'UnitUnderwater' then
-            ImpactEffects = self.FxImpactUnderWater
-            ImpactEffectScale = self.FxUnderWaterHitScale or 0.25
+            impactEffect = self.FxImpactUnderWater
+            impactEffectScale = self.FxUnderWaterHitScale or 0.25
         else
             LOG('*ERROR: Projectile:OnImpact(): UNKNOWN TARGET TYPE ', repr(targetType))
         end
 
         -- default values
-        ImpactEffects = ImpactEffects or { }
-        ImpactEffectScale = ImpactEffectScale or 1
+        impactEffect = impactEffect or { }
+        impactEffectScale = impactEffectScale or 1
 
         local BlueprintDisplayImpactEffects = blueprint.Display.ImpactEffects
         local TerrainEffects = self.GetTerrainEffects(self, targetType, BlueprintDisplayImpactEffects.Type)
-        self.CreateImpactEffects(self, army, ImpactEffects, ImpactEffectScale)
+        self.CreateImpactEffects(self, army, impactEffect, impactEffectcale)
         self.CreateTerrainEffects(self, army, TerrainEffects, BlueprintDisplayImpactEffects.Scale or 1)
 
         local timeout = blueprint.Physics.ImpactTimeout
