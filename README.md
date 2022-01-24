@@ -21,7 +21,7 @@ Folder          | Description
 --------------- | -----------
 `effects`       | Blueprints, textures and meshes of effects and HLSL shaders that are used to render the game
 `engine*`       | Extensive engine documentation: all objects and their functions are documented
-`env`           | Various props, decals, splats, stratum layer and environmental effects
+`env`           | Props, decals, splats, stratum layer and environmental effects
 `etc*`          | Legacy - a rudimentary implementation of versioning control 
 `loc`           | Localization files for the game, see the translation guidelines
 `lua`           | Various lua files that represent the game and its interactions. It describes all the behavior outside of the simulation
