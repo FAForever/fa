@@ -3,8 +3,8 @@ Translation guidelines
 ----------------------
 
 1) *Compliance with the game's UI*
-- Text should never overflow from anywhere
-- As much as possible, try to keep a few pixels of margin between the text and its parent element boundaries
+- Text should never overflow
+- Maintain a few pixels of margin between the text and its parent element boundaries
 - Use obvious abbreviations if a shorter translation is impossible, but the abbreviation should be made in a way that it is clear and obvious. Keywords from the game should never be abbreviated.
 
 2) *Gender-neutral writing*

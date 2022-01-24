@@ -20,21 +20,21 @@ This repository contains the changes to the Lua side of the game, such as balanc
 Folder          | Description
 --------------- | -----------
 `effects`       | Blueprints, textures and meshes of effects and HLSL shaders that are used to render the game
-`engine*`       | Extensive engine documentation: all objects and their functions are documented
+`engine*`       | Engine documentation: all objects and their functions are documented
 `env`           | Props, decals, splats, stratum layer and environmental effects
 `etc*`          | Legacy - a rudimentary implementation of versioning control 
 `loc`           | Localization files for the game, see the translation guidelines
-`lua`           | Various lua files that represent the game and its interactions. It describes all the behavior outside of the simulation
-`meshes`        | Various meshes that do not belong to props, units or projectiles. An example is the world border
-`projectiles`   | Various blueprint files, textures and meshes of projectiles
-`props`         | Various blueprint files, textures and meshes of props
+`lua`           | Lua files that control all the behavior outside of the physics simulation
+`meshes`        | Meshes that do not belong to props, units or projectiles. E.g. the world border
+`projectiles`   | Blueprint files, textures and meshes of projectiles
+`props`         | Blueprint files, textures and meshes of props
 `schook`        | Legacy - the **s**upreme **c**ommander **hook** folder that was used due to licensing issues
-`testmaps*`     | Various test maps. As an example the benchmark map that shipped with the game
-`tests*`        | Unit tests that run on various engine-oblivion functions. An example is the testing of string operations
-`textures`      | Various textures used by the engine (as fallback) or by the UI
-`units`         | Various blueprint files, textures and meshes of units
+`testmaps*`     | Test maps. E.g. the benchmark map shipped with the game
+`tests*`        | Unit tests that run on engine-oblivion functions. E.g. Testing string operations
+`textures`      | Textures used by the engine (as fallback) and UI
+`units`         | Blueprint files, textures and meshes of units
 
-These folders are not complete. Files that are unchanged are retrieved from the base game. Folders with an asterisk (*) are not shipped to the user with the client. See the installation instructions in the contribution section for more information.
+Files that are unchanged are retrieved from the base game. Folders with an asterisk (*) are not shipped to the user with the client. See the installation instructions in the contribution section for more information.
 
 Repositories that are directly related to the game:
  - A [Lua profiler](https://github.com/FAForever/FAFProfiler)
@@ -46,9 +46,9 @@ Repositories that are directly related to the game:
 Changelog
 ---------
 
-You can find the complete [changelog](changelog.md) in a separate file. There is an [alternative changelog](http://patchnotes.faforever.com/) particular for balance patches in a more user-friendly format. 
+Here is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) particularly for balance patches in a user-friendly. 
 
 Contributing
 ------------
 
-There are instructions [in English](setup/readme.md) and [in Russian](setup/readme-russian.md) to help you set up a development environment. It is useful to read the [contribution guidelines](CONTRIBUTING.md) and the [translation guidelines](loc/guidelines.md) if you introduce translations.
+There are instructions [in English](setup/readme.md) and [in Russian](setup/readme-russian.md) to help you set up a development environment. Please read the [contribution guidelines](CONTRIBUTING.md) and the [translation guidelines](loc/guidelines.md) prior to your first PR.
