@@ -56,7 +56,7 @@ Branching
 
 We have two type of patches: a balance patch and a development patch. The former is done by the balance team and they branch from deploy/fafbeta. The latter is done by the game team and they branch from deploy/fafdevelop. The `fafbeta` branch is used for balance changes, a typical example is the tweaking of statistics of units. The `fafdevelop` branch is used for game changes in general, such as performance improvements, fixing of bugs and the introduction of (new) mechanics.
 
-Work environment
+Development environment
 ----------------
 
 When you're new to programming then you may not have a work environment. This is often referred to as an Integrated Development Environment (IDE). We recommend you to use [Visual Studio Code](https://code.visualstudio.com/) (VSC).
@@ -83,7 +83,7 @@ Note that we do not recommend the Lua language server. The game uses a slightly 
 Attaching the debugger
 ----------------------
 
-_This step is optional and only required if you intent to investigate an exception / crash to desktop._
+_This step is optional and only required when you intend to investigate an exception / crash to desktop._
 
 With thanks to KionX we have a [debugger](https://github.com/FAForever/FADeepProbe). When an exception occurs it can trace the exception to a line of Lua code. A compiled executable is available in each [release](https://github.com/FAForever/FADeepProbe/releases). Store the executable in your `bin` folder. This is the same `bin` folder as defined earlier. We need to adapt the bat / bash files to use the debugger. As an example we change the bat file from:
 
