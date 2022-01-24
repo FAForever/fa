@@ -54,7 +54,7 @@ You can copy the file, change the extension to `zip` and unpack it using your fa
 Branching
 ---------
 
-We have two type of patches: a balance patch and a development patch. The former is done by the balance team and they branch from deploy/fafbeta. The latter is done by the game team and they branch from deploy/fafdevelop. The `fafbeta` branch is used for balance changes, a typical example is the tweaking of statistics of units. The `fafdevelop` branch is used for game changes in general, such as performance improvements, fixing of bugs and the introduction of (new) mechanics.
+We have two type of patches: a balance patch and a development patch. The former is done by the balance team and they branch from `deploy/fafbeta`. The latter is done by the game team and they branch from `deploy/fafdevelop`. The `fafbeta` branch is used for balance changes, a typical example is the tweaking of statistics of units such as hitpoints, movement speed and damage. The `fafdevelop` branch is used for game changes in general, such as performance improvements, fixing of bugs and the introduction of (new) mechanics.
 
 Development environment
 ----------------
@@ -103,9 +103,9 @@ Running a replay
 A hard crash may only show up in a replay. You'll need to use the debugger to investigate. You want to run the replay using the debugger. This requires two steps: match the game version of the replay and acquire the replay itself.
 
 The game version depends on the game type. Checkout the repository to the correct branch:  
- - FAF: deploy/faf
- - FAF Beta: deploy/fafbeta
- - FAF Develop: deploy/fafdevelop
+ - `FAF`: `deploy/faf`
+ - `FAF Beta`: `deploy/fafbeta`
+ - `FAF Develop`: `deploy/fafdevelop`
 
 You can find the replay by starting it with the client once and immediately closing it. The replay is stored in the cache of the client:
  - `C:/ProgramData/FAForever/cache/temp.scfareplay`
