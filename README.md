@@ -15,7 +15,7 @@ You can download the client on our [website](https://faforever.com/). In order t
 About this repository
 ---------------------
 
-This repository represents the updates to the Lua side of the game. Examples are balance changes, performance improvements and the introduction of additional features to the game. The repository mimics the organisation of the base game. A quick reference guide:
+This repository contains the changes to the Lua side of the game, such as balance changes, performance improvements, and additional features. The repository mimics the organization of the base game. A quick reference guide:
 
 Folder          | Description
 --------------- | -----------
