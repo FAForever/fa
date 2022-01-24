@@ -19,7 +19,7 @@ This repository contains the changes to the Lua side of the game, such as balanc
 
 Folder          | Description
 --------------- | -----------
-`effects`       | Various blueprints, textures and meshes of effects and various HLSL shaders that are used to render the game
+`effects`       | Blueprints, textures and meshes of effects and HLSL shaders that are used to render the game
 `engine*`       | Extensive engine documentation: all objects and their functions are documented
 `env`           | Various props, decals, splats, stratum layer and environmental effects
 `etc*`          | Legacy - a rudimentary implementation of versioning control 
