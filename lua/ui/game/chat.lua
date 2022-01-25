@@ -926,7 +926,7 @@ end
 
 function ActivateChat(modifiers)
     if type(ChatTo()) ~= 'number' then
-        if modifiers.Shift then
+        if modifiers.Shift~=ChatOptions['send_type'] then
             ChatTo:Set('allies')
         else
             ChatTo:Set('all')
@@ -1309,6 +1309,7 @@ function CreateConfigWindow()
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
                 {type = 'splitter'},
+                {type = 'filter', name = 'Default send type', key = 'send_type', tooltip = 'chat_send_type'},
                 {type = 'filter', name = '<LOC chat_0014>Show Feed Background', key = 'feed_background', tooltip = 'chat_feed_background'},
                 {type = 'filter', name = '<LOC chat_0015>Persist Feed Timeout', key = 'feed_persist', tooltip = 'chat_feed_persist'},
         },
