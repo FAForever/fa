@@ -926,7 +926,7 @@ end
 
 function ActivateChat(modifiers)
     if type(ChatTo()) ~= 'number' then
-        if (not modifiers.Shift)==ChatOptions['send_type'] then
+        if (not modifiers.Shift) == (ChatOptions['send_type'] or false) then
             ChatTo:Set('allies')
         else
             ChatTo:Set('all')
