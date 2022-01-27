@@ -8056,4 +8056,4 @@ aireplace_0003="If a player disconnects and the ACU is still active, an AI will 
 aireplace_0004="A disconnected player will cause the destruction of their units based on share conditions."
 
 no_singleplayer_netlag_title="Remove command delay when playing alone"
-no_singleplayer_netlag_description="When playing with other people a delay is applied before user interaction is applied to the simulation. As an example, when a user issues a command (such as a move order) it takes an additional 500 miliseconds before the command is processed. When the ping of a user exceeds this delay the simulation will lag start to lag. When enabled the console command wld_RunWithTheWind does not function properly."
+no_singleplayer_netlag_description="When playing with other people a delay is applied before user interaction is applied to the simulation. \r\nAs an example, when a user issues a command (such as a move order) it takes an additional 500 miliseconds before the command is processed. When the ping of a user exceeds this delay the simulation will lag start to lag. \r\n\r\nWhen enabled the console command wld_RunWithTheWind does not function properly."

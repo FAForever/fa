@@ -234,7 +234,7 @@ function CreateUI(isReplay)
         -- check if we should reduce network delay / lag
         local clients = GetSessionClients()
         if table.getsize(clients) <= 1 then
-            local option = Prefs.GetFromCurrentProfile('options.no_singleplayer_netlag')
+            local option = Prefs.GetFromCurrentProfile('options')['no_singleplayer_netlag']
             if option == "yes" then 
                 ConExecute('net_lag 0')
             end
