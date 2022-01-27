@@ -8061,6 +8061,9 @@ aireplace_0002="Toggle AI Replacement if a player disconnects."
 aireplace_0003="If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected."
 aireplace_0004="A disconnected player will cause the destruction of their units based on share conditions."
 
+chat_send_type_title="Default recipient: allies"
+chat_send_type_description="When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed."
+
 -- unranked lobby option
 lobui_0802="Unrate"
 lobui_0803="Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated."
