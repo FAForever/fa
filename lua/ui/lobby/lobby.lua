@@ -3939,7 +3939,7 @@ function RefreshOptionDisplayData(scenarioInfo)
 
         local descriptionSimMods = { "", }
         if modNum > 0 then 
-            table.insert(descriptionSimMods, "The host enabled the following sim mods: ")
+            table.insert(descriptionSimMods, LOC("<LOC enabled_sim_mods>The host enabled the following sim mods:"))
             for k, mod in Mods.GetGameMods() do 
                 table.insert(descriptionSimMods, "\r\n - " .. tostring(mod.name))
             end
@@ -3949,13 +3949,26 @@ function RefreshOptionDisplayData(scenarioInfo)
 
         local descriptionUIMods = { "", }
         if modNumUI > 0 then 
-            table.insert(descriptionUIMods, "You have enabled the following UI mods: ")
+            table.insert(descriptionUIMods, LOC("<LOC enabled_ui_mods>You have enabled the following UI mods:"))
             for k, mod in Mods.GetUiMods() do 
                 table.insert(descriptionUIMods, "\r\n - " .. tostring(mod.name))
             end
         end
 
-        description = tostring(table.concat(descriptionSimMods)) .. tostring(table.concat(descriptionUIMods))
+        descriptionSimMods = tostring(table.concat(descriptionSimMods))
+        descriptionUIMods = tostring(table.concat(descriptionUIMods))
+
+        if modNum > 0 and modNumUI > 0 then 
+            description = tostring(table.concat({descriptionSimMods, "\r\n", descriptionUIMods}))
+        else 
+            if modNum > 0 then 
+                description = descriptionSimMods
+            end 
+
+            if modNumUI > 0 then 
+                description = descriptionUIMods
+            end
+        end
     end
 
     if modStr then
