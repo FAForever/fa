@@ -3,6 +3,8 @@ FAF Gametype | FAF Develop game type | FAF Beta balance gametype
  ------------ | ------------- | -----------
 [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffaf)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafdevelop)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafbeta)](https://github.com/FAForever/fa/actions/workflows/build.yaml)
 
+Read this in other languages: [English](README.md), [Russian](README-russian.md)
+
 About Forged Alliance Forever
 -----------------------------
 
@@ -51,4 +53,4 @@ Here is the complete [changelog](changelog.md). There is an [alternative changel
 Contributing
 ------------
 
-There are instructions [in English](setup/readme.md) and [in Russian](setup/readme-russian.md) to help you set up a development environment. Please read the [contribution guidelines](CONTRIBUTING.md) and the [translation guidelines](loc/guidelines.md) prior to your first PR.
+There are instructions [in English](setup/setup-english.md) and [in Russian](setup/setup-russian.md) to help you set up a development environment. Please read the [contribution guidelines](CONTRIBUTING.md) and the [translation guidelines](loc/guidelines.md) prior to your first PR.

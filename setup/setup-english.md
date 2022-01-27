@@ -3,6 +3,8 @@ Instructions to set up your development environment
 
 A collection of useful information to help you set up your development environment.
 
+Read this in other languages: [English](setup-english.md), [Russian](setup-russian.md)
+
 Running the game with your changes
 ----------------------------------
 
