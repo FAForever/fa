@@ -280,7 +280,7 @@ options = {
                         {text = "<LOC _MaxTech>", key = 'maxTech'},
                     },
                 },
-            }
+            },
             {
                 title = "<LOC no_singleplayer_netlag_title>Remove command delay when playing alone",
                 key = 'no_singleplayer_netlag',
