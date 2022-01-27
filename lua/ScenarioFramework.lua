@@ -181,11 +181,11 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self.Dead = true
 
     local bp = self:GetBlueprint()
-    if self:GetCurrentLayer() == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
+    if self.Layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
         self:PlayUnitSound('HoverKilledOnWater')
     end
 
-    if self:GetCurrentLayer() == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
+    if self.Layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
         self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
     else
         self:PlayUnitSound('Killed')
@@ -224,6 +224,10 @@ function OverrideKilled(self, instigator, type, overkillRatio)
 end
 
 function GiveUnitToArmy(unit, newArmyIndex, triggerOnGiven)
+    -- Shared army mod will result in different players having the same army number.
+    if unit.Army == newArmyIndex then
+        return unit
+    end
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
     unit.IsBeingTransferred = true
@@ -2067,8 +2071,10 @@ function GenerateOffMapAreas()
 end
 
 function AntiOffMapMainThread()
+
     WaitTicks(11)
     GenerateOffMapAreas()
+    local WaitTicks = coroutine.yield
     local OffMapAreas = {}
     local UnitsThatAreOffMap = {}
 
@@ -2086,7 +2092,10 @@ function AntiOffMapMainThread()
                     end
                 else
             end
+            WaitTicks(11)
         end
+
+        WaitTicks(11)
         local NumberOfUnitsOffMap = table.getn(NewUnitsThatAreOffMap)
         for index, NewUnitThatIsOffMap in NewUnitsThatAreOffMap do
             if not NewUnitThatIsOffMap.IAmOffMap then
@@ -2103,7 +2112,7 @@ function AntiOffMapMainThread()
                 end
             end
         end
-        WaitSeconds(1)
+
         NewUnitsThatAreOffMap = nil
     end
 end

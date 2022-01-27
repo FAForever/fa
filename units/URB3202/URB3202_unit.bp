@@ -174,7 +174,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.45,
     SelectionThickness = 0.88,
     SizeX = 0.5,
-    SizeY = 0.5,
+    SizeY = 0.6,
     SizeZ = 0.5,
     StrategicIconName = 'icon_structure2_intel',
     StrategicIconSortPriority = 230,

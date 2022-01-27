@@ -179,7 +179,7 @@ WorldView = Class(moho.UIWorldView, Control) {
             self.zoomed = true
         end
         if (event.Type == 'MouseMotion') and (not CommandMode.GetCommandMode()[1] or self.AutoBuild) then
-            local option = Prefs.GetFromCurrentProfile('options')['automex']
+            local option = Prefs.GetFromCurrentProfile('options.automex')
             if option ~= 'off' then
                 local Units = GetSelectedUnits()
                 if Units and not GetRolloverInfo() then

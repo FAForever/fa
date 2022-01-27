@@ -145,6 +145,10 @@ XSL0001 = Class(ACUUnit) {
                             Add = bp.ACUAddHealth,
                             Mult = 1,
                         },
+                        Regen = {
+                            Add = bp.NewRegenRate,
+                            Mult = 1,
+                        },
                     },
                 }
             end

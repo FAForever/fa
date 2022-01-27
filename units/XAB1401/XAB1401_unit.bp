@@ -154,6 +154,7 @@ UnitBlueprint {
         BuildTime = 325000,
         MaxEnergy = 1000000,
         MaxMass = 10000,
+        StorageEnergy = 100000,
         RebuildBonusIds = {
             'xab1401',
         },

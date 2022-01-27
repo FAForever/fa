@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Seraphim Hydrocarbon Power Plant Script
 --#**
---#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
 XSB1102 = Class(SEnergyCreationUnit) {
@@ -23,10 +23,10 @@ XSB1102 = Class(SEnergyCreationUnit) {
         local bones = {}
         local scale = 0.75
 
-        if self:GetCurrentLayer() == 'Land' then
+        if self.Layer == 'Land' then
             effects = self.AirEffects
             bones = self.AirEffectsBones
-        elseif self:GetCurrentLayer() == 'Seabed' then
+        elseif self.Layer == 'Seabed' then
             effects = self.WaterEffects
             bones = self.WaterEffectsBones
             scale = 3

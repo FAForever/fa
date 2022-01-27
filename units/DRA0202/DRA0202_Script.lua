@@ -101,7 +101,6 @@ DRA0202 = Class(CAirUnit) {
     MonitorWings = function(self)
         local airTarget
         while self and not self.Dead do
-            WaitSeconds(1)
             local airTargetWeapon = self:GetWeaponByLabel('AntiAirMissiles')
             if airTargetWeapon then     
                 airTarget = airTargetWeapon:GetCurrentTarget()
@@ -112,6 +111,8 @@ DRA0202 = Class(CAirUnit) {
             else
                 self:RotateWings(nil)
             end
+            
+            WaitSeconds(1)
         end
     end, 
     

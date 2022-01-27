@@ -1,3 +1,4 @@
+
 -- The global sync table is copied from the sim layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
 Sync = {}
@@ -105,5 +106,9 @@ function OnSync()
 
     if Sync.GameEnded then
         GpgNetSend('GameEnded')
+    end
+
+    if Sync.LobbyOptions then 
+        import('/lua/ui/game/gamemain.lua').LobbyOptions = table.deepcopy(Sync.LobbyOptions)
     end
 end

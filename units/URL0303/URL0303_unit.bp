@@ -162,9 +162,9 @@ UnitBlueprint {
         UniformScale = 0.15,
     },
     Economy = {
-        BuildCostEnergy = 5400,
+        BuildCostEnergy = 5250,
         BuildCostMass = 480,
-        BuildTime = 2400,
+        BuildTime = 2160,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -274,6 +274,19 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_LowArc',
+            Buffs = {
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 1.5,
+                    Radius = 0,
+                    TargetAllow = 'TECH1,TECH2',
+                    TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,NAVAL,STRUCTURE',
+                },
+            },
             CollideFriendly = false,
             Damage = 150,
             DamageType = 'Normal',

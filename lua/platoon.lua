@@ -216,7 +216,6 @@ Platoon = Class(moho.platoon_methods) {
             v.AssistSet = nil
             v.AssistPlatoon = nil
             v.UnitBeingAssist = nil
-            v.UnitBeingBuilt = nil
             v.ReclaimInProgress = nil
             v.CaptureInProgress = nil
             if v:IsPaused() then
@@ -641,7 +640,7 @@ Platoon = Class(moho.platoon_methods) {
                     WaitSeconds(5)
 
                     if self.PlatoonData.EngineerGuardTimeLimit and guardTime >= self.PlatoonData.EngineerGuardTimeLimit
-                    or (not unitToGuard.Dead and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
+                    or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
                         break
                     end
                 end
@@ -705,7 +704,7 @@ Platoon = Class(moho.platoon_methods) {
                 WaitSeconds(5)
 
                 if self.PlatoonData.GuardTimeLimit and guardTime >= self.PlatoonData.GuardTimeLimit
-                or (not unitToGuard.Dead and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
+                or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
                     break
                 end
             end
@@ -2895,7 +2894,7 @@ Platoon = Class(moho.platoon_methods) {
                 continue
             end
 
-            if v:GetCurrentLayer() != 'Sub' then
+            if v.Layer != 'Sub' then
                 continue
             end
 
@@ -4744,7 +4743,7 @@ Platoon = Class(moho.platoon_methods) {
                 continue
             end
 
-            if v:GetCurrentLayer() == 'Sub' then
+            if v.Layer == 'Sub' then
                 continue
             end
 
@@ -4954,7 +4953,7 @@ Platoon = Class(moho.platoon_methods) {
                 end
 
                 if self.PlatoonData.T4GuardTimeLimit and guardTime >= self.PlatoonData.T4GuardTimeLimit
-                or (not unitToGuard.Dead and unitToGuard:GetCurrentLayer() == 'Seabed' and self.MovementLayer == 'Land') then
+                or (not unitToGuard.Dead and unitToGuard.Layer == 'Seabed' and self.MovementLayer == 'Land') then
                     break
                 end
             end
@@ -5324,7 +5323,7 @@ Platoon = Class(moho.platoon_methods) {
                 continue
             end
 
-            if v:GetCurrentLayer() == 'Sub' then
+            if v.Layer == 'Sub' then
                 continue
             end
 

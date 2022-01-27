@@ -41,7 +41,7 @@ UES0401 = Class(AircraftCarrier) {
             self.Trash:Add(v)
         end
 
-        if self:GetCurrentLayer() == 'Water' then
+        if self.Layer == 'Water' then
             self:PlayAllOpenAnims(true)
         end
     end,

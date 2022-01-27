@@ -29,6 +29,9 @@ function WaitSeconds(n)
     WaitTicks(ticks)
 end
 
+-- Hook some globals
+doscript '/lua/SimHooks.lua'
+
 -- Set up the sync table and some globals for use by scenario functions
 doscript '/lua/SimSync.lua'
 
@@ -70,10 +73,31 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    -- assume there are no AIs
+    ScenarioInfo.GameHasAIs = false
+
+    -- if the AI replacement is on then there may be AIs
+    if ScenarioInfo.Options.AIReplacement == 'On' then 
+        ScenarioInfo.GameHasAIs = true 
+        SPEW("Detected ai replacement option being enabled: enabling AI functionality")
+    end
+
+    -- if we're doing a campaign / special map then there may be AIs
+    if ScenarioInfo.type ~= 'skirmish' then 
+        ScenarioInfo.GameHasAIs = true 
+        SPEW("Detected a non-skirmish type map: enabling AI functionality")
+    end
+
+    -- if the map maker explicitly tells us
+    if ScenarioInfo.requiresAiFunctionality then 
+        ScenarioInfo.GameHasAIs = true 
+        SPEW("Detected the 'requiresAiFunctionality' field set by the map: enabling AI functionality")
+    end
+
     -- LOG('SetupSession: ', repr(ScenarioInfo))
 
     ArmyBrains = {}
-
+    
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
     -- needed by our scenario.
@@ -209,9 +233,14 @@ function OnCreateArmyBrain(index, brain, name, nickname)
         AddBuildRestriction(index, ScenarioInfo.BuildRestrictions)
     end
 
-    --brain:InitializePlatoonBuildManager()
-    --ScenarioUtils.LoadArmyPBMBuilders(name)
-    --LOG('*SCENARIO DEBUG: ON POP, ARMY BRAINS = ', repr(ArmyBrains))
+    -- check if this brain is an active AI by checking its type and whether 
+    -- skirmish systems are setup (prevents detecting NEUTRAL_CIVILIAN or ARMY_17)
+    local brainType = brain.BrainType 
+    local brainSkirmishSystems = brain.SkirmishSystems 
+    if brainType == 'AI' and brainSkirmishSystems then 
+        ScenarioInfo.GameHasAIs = true
+        SPEW("Detected an AI with skirmish systems: " .. brain.Name .. ", enabling AI functionality") 
+    end
 end
 
 function InitializePrebuiltUnits(name)
@@ -222,8 +251,10 @@ end
 -- any units yet) and we're ready to start the game. It's responsible for setting up
 -- the initial units and any other gameplay state we need.
 function BeginSession()
-    LOG('BeginSession...')
     SPEW('Active mods in sim: ', repr(__active_mods))
+
+    -- pass options to the UI
+    Sync.LobbyOptions = ScenarioInfo.Options
 
     GameOverListeners = {}
     ForkThread(function()

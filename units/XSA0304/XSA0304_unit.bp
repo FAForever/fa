@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 90,
     },
     Air = {
         AutoLandTime = 1,
@@ -282,6 +282,13 @@ UnitBlueprint {
         Level4 = 48,
         Level5 = 60,
     },
+    VeteranMass = {
+        4200,
+        4200,
+        4200,
+        4200,
+        4200,
+    },
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -296,9 +303,9 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
             CollideFriendly = false,
-            Damage = 3250,
+            Damage = 3000,
             DamageFriendly = true,
-            DamageRadius = 5,
+            DamageRadius = 6,
             DamageType = 'Normal',
             Display = 'Zhanasee Strategic Bomb',
             DisplayName = 'Zhanasee Strategic Bomb',

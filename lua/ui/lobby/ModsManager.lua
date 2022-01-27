@@ -392,30 +392,13 @@ end
 -- Gets a name and actual version for specified mod
 function GetModNameVersion(mod)
     local name = mod.name
+
     -- remove old mod version from mod name
-    name = name:gsub(" %[", " ")
-    name = name:gsub("%]", "")
-    name = name:gsub(" V", " ")
-    name = name:gsub(" v", " ")
-    name = name:gsub(" %(V", " ")
-    name = name:gsub(" %(v", " ")
-    name = name:gsub("%d%)", "")
-    name = name:gsub(" %d%_%d%_%d", "")
-    name = name:gsub(" %d%.%d%d%d", "")
-    name = name:gsub(" %d%.%d%d", "")
-    name = name:gsub(" %d%.%d", "")
-    name = name:gsub(" %d%.", "")
-    name = name:gsub(" %d", "")
-    -- cleanup name
-    name = name:gsub(" %(%)", "")
-    name = name:gsub("%)", "")
-    name = name:gsub(" %-", " ")
-    name = name:gsub("%- ", "")
-    name = name:gsub("%-", " ", 1)
-    name = name:gsub("%_", " ")
-    name = name:gsub(" %(", " - ")
+    name = string.gsub(name, '[%[%<%{%(%s]+[vV]+%s*%d+[%.%d]*[%]%>%}%)%s]*', '')
+
     name = StringCapitalize(name)
 
+    -- append new mod version to mod name
     if not mod.version then
         name = name .. ' ---- (v1.0)'
     elseif type(mod.version) == 'number' then

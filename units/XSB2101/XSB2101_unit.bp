@@ -1,10 +1,4 @@
 UnitBlueprint {
-    AI = {
-        TargetBones = {
-            'Turret',
-            'Barrel01',
-        },
-    },
     Audio = {
         Destroyed = Sound {
             Bank = 'XSL_Destroy',
@@ -175,9 +169,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.35,
     SelectionThickness = 1.1,
-    SizeX = 0.5,
-    SizeY = 0.9,
-    SizeZ = 0.5,
+    SizeX = 0.6, #from 0.5
+    SizeY = 0.8, #from 0.9
+    SizeZ = 0.6, #from 0.5
     StrategicIconName = 'icon_structure1_directfire',
     StrategicIconSortPriority = 205,
     Veteran = {

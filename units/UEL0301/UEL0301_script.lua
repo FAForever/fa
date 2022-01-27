@@ -179,7 +179,7 @@ UEL0301 = Class(CommandUnit) {
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()

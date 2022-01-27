@@ -106,7 +106,7 @@ SDFThauCannon = Class(DefaultProjectileWeapon) {
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         local pos = self.unit:GetPosition()
         local TerrainType = GetTerrainType(pos.x,pos.z)
-        local effectTable = TerrainType.FXOther[self.unit:GetCurrentLayer()][self.FxMuzzleTerrainTypeName]
+        local effectTable = TerrainType.FXOther[self.unit.Layer][self.FxMuzzleTerrainTypeName]
         if effectTable ~= nil then
             local army = self.unit.Army
             for k, v in effectTable do

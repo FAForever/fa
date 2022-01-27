@@ -24,6 +24,9 @@ local CreateScaledBoom = function(unit, overkill, bone)
 )
 end
 
+-- allows us to skip ai-specific functionality
+local GameHasAIs = ScenarioInfo.GameHasAIs
+
 -- MISC UNITS
 DummyUnit = Class(Unit) {
     OnStopBeingBuilt = function(self, builder, layer)
@@ -33,7 +36,7 @@ DummyUnit = Class(Unit) {
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL)
+local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
 
 -- STRUCTURE UNITS
@@ -51,7 +54,7 @@ StructureUnit = Class(Unit) {
         Unit.OnCreate(self)
         self.WeaponMod = {}
         self.FxBlinkingLightsBag = {}
-        if self:GetCurrentLayer() == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
+        if self.Layer == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
             self:FlattenSkirt()
         end
     end,
@@ -165,7 +168,7 @@ StructureUnit = Class(Unit) {
     end,
 
     CreateTarmac = function(self, albedo, normal, glow, orientation, specTarmac, lifeTime)
-        if self:GetCurrentLayer() ~= 'Land' then return end
+        if self.Layer ~= 'Land' then return end
         local tarmac
         local bp = self:GetBlueprint().Display.Tarmacs
         if not specTarmac then
@@ -381,11 +384,10 @@ StructureUnit = Class(Unit) {
             Unit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
 
-            if self.AnimatorUpgradeManip then self.AnimatorUpgradeManip:Destroy() end
-
-            if self:GetCurrentLayer() == 'Water' then
-                self:StartRocking()
+            if self.AnimatorUpgradeManip then 
+                self.AnimatorUpgradeManip:Destroy() 
             end
+            
             self:PlayUnitSound('UpgradeFailed')
             self:PlayActiveAnimation()
             self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)
@@ -1399,7 +1401,7 @@ RadarJammerUnit = Class(StructureUnit) {
         StructureUnit.OnIntelEnabled(self)
         if self.IntelEffects and not self.IntelFxOn then
             self.IntelEffectsBag = {}
-            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+            self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle', self.Layer, nil, self.IntelEffectsBag)
             self.IntelFxOn = true
         end
     end,
@@ -1426,7 +1428,7 @@ SonarUnit = Class(StructureUnit) {
     end,
 
     TimedIdleSonarEffects = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local pos = self:GetPosition()
 
         if self.TimedSonarTTIdleEffects then
@@ -1543,48 +1545,7 @@ MobileUnit = Class(Unit) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        -- Add unit's threat to our influence map
-        local threat = 5
-        local decay = 0.1
-        local currentLayer = self:GetCurrentLayer()
-        if instigator then
-            local unit = false
-            if IsUnit(instigator) then
-                unit = instigator
-            elseif IsProjectile(instigator) or IsCollisionBeam(instigator) then
-                unit = instigator.unit
-            end
-
-            if unit then
-                local unitPos = unit:GetCachePosition()
-                if EntityCategoryContains(categories.STRUCTURE, unit) then
-                    decay = 0.01
-                end
-
-                if unitPos then
-                    if currentLayer == 'Sub' then
-                        threat = self:GetAIBrain():GetThreatAtPosition(unitPos, 0, true, 'AntiSub')
-                    elseif currentLayer == 'Air' then
-                        threat = self:GetAIBrain():GetThreatAtPosition(unitPos, 0, true, 'AntiAir')
-                    else
-                        threat = self:GetAIBrain():GetThreatAtPosition(unitPos, 0, true, 'AntiSurface')
-                    end
-                    threat = threat / 2
-                end
-            end
-        end
-
-        if currentLayer == 'Sub' then
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay * 10, 'AntiSub')
-        elseif currentLayer == 'Air' then
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay, 'AntiAir')
-        elseif currentLayer == 'Water' then
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay * 10, 'AntiSurface')
-        else
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay, 'AntiSurface')
-        end
-
-        -- This unit was in a transport
+        -- This unit was in a transport and should create a wreck on crash
         if self.killedInTransport then
             self.killedInTransport = false
         else
@@ -1662,6 +1623,14 @@ WalkingLandUnit = Class(MobileUnit) {
     DeathAnim = false,
     DisabledBones = {},
 
+    OnCreate = function(self, spec)
+        MobileUnit.OnCreate(self, spec)
+
+        local blueprint = self:GetBlueprint()
+        self.AnimationWalk = blueprint.Display.AnimationWalk
+        self.AnimationWalkRate = blueprint.Display.AnimationWalkRate
+    end,
+
     OnMotionHorzEventChange = function(self, new, old)
         MobileUnit.OnMotionHorzEventChange(self, new, old)
 
@@ -1670,10 +1639,9 @@ WalkingLandUnit = Class(MobileUnit) {
                 self.Animator = CreateAnimator(self, true)
             end
 
-            local bpDisplay = self:GetBlueprint().Display
-            if bpDisplay.AnimationWalk then
-                self.Animator:PlayAnim(bpDisplay.AnimationWalk, true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate or 1)
+            if self.AnimationWalk then
+                self.Animator:PlayAnim(self.AnimationWalk, true)
+                self.Animator:SetRate(self.AnimationWalkRate or 1)
             end
         elseif new == 'Stopped' then
             -- Only keep the animator around if we are dying and playing a death anim
@@ -1818,7 +1786,7 @@ AirUnit = Class(MobileUnit) {
     end,
 
     ShallSink = function(self)
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local shallSink = (
             self.shallSink or -- Only the case when a bounced plane hits water. Overrides the fact that the layer is 'Air'
             ((layer == 'Water' or layer == 'Sub') and  -- In a layer for which sinking is meaningful
@@ -1844,7 +1812,7 @@ AirUnit = Class(MobileUnit) {
 
         -- Additional stupidity: An idle transport, bot loaded and unloaded, counts as 'Land' layer so it would die with the wreck hovering.
         -- It also wouldn't call this code, and hence the cargo destruction. Awful!
-        if self:GetFractionComplete() == 1 and (self:GetCurrentLayer() == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
+        if self:GetFractionComplete() == 1 and (self.Layer == 'Air' or EntityCategoryContains(categories.TRANSPORTATION, self)) then
             self.CreateUnitAirDestructionEffects(self, 1.0)
             self:DestroyTopSpeedEffects()
             self:DestroyBeamExhaust()
@@ -2223,7 +2191,10 @@ HoverLandUnit = Class(MobileUnit) {}
 
 SlowHoverLandUnit = Class(HoverLandUnit) {
     OnLayerChange = function(self, new, old)
+
+        -- call base class to make sure self.layer is set
         HoverLandUnit.OnLayerChange(self, new, old)
+
         -- Slow these units down when they transition from land to water
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
@@ -2242,6 +2213,10 @@ AmphibiousLandUnit = Class(MobileUnit) {}
 
 SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
     OnLayerChange = function(self, new, old)
+
+        -- call base class to make sure self.layer is set
+        HoverLandUnit.OnLayerChange(self, new, old)
+
         local mult = self:GetBlueprint().Physics.WaterSpeedMultiplier
         if new == 'Seabed'  then
             self:SetSpeedMult(mult)
@@ -2474,6 +2449,18 @@ CommandUnit = Class(WalkingLandUnit) {
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
+    end,
+
+    OnWorkBegin = function(self, work)
+        if WalkingLandUnit.OnWorkBegin(self, work) then 
+
+            -- Prevent consumption bug where two enhancements in a row prevents assisting units from
+            -- updating their consumption costs based on the new build rate values.
+            self:UpdateAssistersConsumption()
+
+            -- Inform EnhanceTask that enhancement is not restricted
+            return true
+        end
     end,
 }
 

@@ -246,7 +246,7 @@ UnitBlueprint {
                     MuzzleBones = {
                         'Turret_Muzzle',
                     },
-                    RackBone = 'Turret_Barrel',
+                    RackBone = 'Turret_Recoil',
                 },
             },
             RackFireTogether = false,

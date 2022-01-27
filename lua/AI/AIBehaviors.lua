@@ -160,8 +160,8 @@ function CDROverCharge(aiBrain, cdr)
                     for k, v in priList do
                         target = plat:FindClosestUnit('Support', 'Enemy', true, v)
                         if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) <= searchRadius then
-                            local cdrLayer = cdr:GetCurrentLayer()
-                            local targetLayer = target:GetCurrentLayer()
+                            local cdrLayer = cdr.Layer
+                            local targetLayer = target.Layer
                             if not (cdrLayer == 'Land' and (targetLayer == 'Air' or targetLayer == 'Sub' or targetLayer == 'Seabed')) and
                                not (cdrLayer == 'Seabed' and (targetLayer == 'Air' or targetLayer == 'Water')) then
                                 break
@@ -1790,8 +1790,8 @@ function CDROverChargeSorian(aiBrain, cdr)
                 for _, v in priList do
                     target = plat:FindClosestUnit('Support', 'Enemy', true, v)
                     if target and Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) < maxRadius then
-                        local cdrLayer = cdr:GetCurrentLayer()
-                        local targetLayer = target:GetCurrentLayer()
+                        local cdrLayer = cdr.Layer
+                        local targetLayer = target.Layer
                         if not (cdrLayer == 'Land' and (targetLayer == 'Air' or targetLayer == 'Sub' or targetLayer == 'Seabed')) and
                            not (cdrLayer == 'Seabed' and (targetLayer == 'Air' or targetLayer == 'Water')) then
                             break
@@ -2290,7 +2290,7 @@ CommanderOverrideCheckSorian = function(self)
     local aiBrain = self:GetBrain()
     local commanders = aiBrain:GetUnitsAroundPoint(categories.COMMAND, self:GetPlatoonPosition(), weaponRange, 'Enemy')
 
-    if table.empty(commanders) or commanders[1].Dead or commanders[1]:GetCurrentLayer() == 'Seabed' then
+    if table.empty(commanders) or commanders[1].Dead or commanders[1].Layer == 'Seabed' then
         return false
     end
 

@@ -111,7 +111,7 @@ UEL0307 = Class(TShieldLandUnit) {
             -- if not gooner, check whether we need to enable our weapon to keep reasonable distance
             if not self:GetGuardedUnit() then
                 self.PointerEnabled = true
-                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self:GetCurrentLayer()]) --this resets the stop feature - note that its reset on layer change!
+                self.TargetPointer:SetFireTargetLayerCaps(self.TargetLayerCaps[self.Layer]) --this resets the stop feature - note that its reset on layer change!
             end
         end
     end,

@@ -12,6 +12,7 @@ local Button = import('/lua/maui/button.lua').Button
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
 local LazyVar = import('/lua/lazyvar.lua').Create
+local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local parent = false
 local myIndex = ''
@@ -31,7 +32,7 @@ local function CreateDialog(clients)
     DestroyDialog()
 
     parent = Group(GetFrame(0), "diconnectDialogParentGroup")
-    parent.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
+    parent.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     parent:SetNeedsFrameUpdate(true)
     parent.time = 0
 
@@ -96,10 +97,16 @@ local function CreateDialog(clients)
         slot.eject:Disable() -- Disable all temporarily so they can't be misclicked, then unlock a few seconds later
     end
 
+    -- retrieve disconnection delay and reduce it by five (that is how long it takes for the window to show)
+    local disconnectionDelay = 85
+    if GameMain.LobbyOptions.DisconnectionDelay02 then 
+        disconnectionDelay = tonumber(GameMain.LobbyOptions.DisconnectionDelay02) - 5
+    end
+
     local canEject = false
-    local canEjectTime = 90
+    local canEjectTime = disconnectionDelay
     local forceEject = false
-    local forceEjectTime = 180
+    local forceEjectTime = math.max(disconnectionDelay * 2, 85)
 
     parent.OnFrame = function(self, delta)
         self.time = self.time + delta

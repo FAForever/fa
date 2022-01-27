@@ -26,7 +26,7 @@ function CanBuildInSpot(originUnit, unitId, pos)
     local z2 = pos.z + zDiff
 
     -- Find all the units in that rectangle
-    local units = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local units = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Filter it down to structures and experimentals only
     units = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, units)
@@ -65,7 +65,7 @@ function GetEnemyUnitsInSphere(unit, position, radius)
     local x2 = position.x + radius
     local y2 = position.y + radius
     local z2 = position.z + radius
-    local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local UnitsinRec = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Check for empty rectangle
     if not UnitsinRec then
@@ -91,7 +91,7 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
     local x2 = position.x + radius
     local y2 = position.y + radius
     local z2 = position.z + radius
-    local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local UnitsinRec = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Check for empty rectangle
     if not UnitsinRec then

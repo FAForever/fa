@@ -40,6 +40,28 @@ Each tab has:
 
 the optionsOrder table is just an array of keys in to the option table, and their order will determine what
 order the tabs show in the dialog
+
+Note the behavior of the default value:
+ - map / mod / lobby options: the index of the value we're interested in
+ - game options: the key of the value that we're interested in
+
+As an example:
+
+{
+    title = "<LOC OPTIONS_0212>Accept Build Templates",
+    key = 'accept_build_templates',
+    type = 'toggle',
+    default = 'yes',                                    <-------- This is set to the actual value (instead of 1, which would be the index)
+    set = function(key,value,startup)
+    end,
+    custom = {
+        states = {
+            {text = "<LOC _On>", key = 'yes' },         <-------- That is defined here as key
+            {text = "<LOC _Off>", key = 'no' },
+        },
+    },
+},
+
 --]]
 
 optionsOrder = {
@@ -257,19 +279,20 @@ options = {
                 },
             },
             {
-                title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
-                key = 'assist_mex',
+                title = "<LOC OPTIONS_0273>Automated Structure Ringing",
+                key = 'structure_capping_feature_01',
                 type = 'toggle',
-                default = true,
+                default = "full-suite",
                 custom = {
                     states = {
-                        {text = "<LOC _Off>", key = false},
-                        {text = "<LOC _On>", key = true},
+                        {text = "<LOC _Off>Off",                                            key = "off"},
+                        {text = "<LOC _OnlyExtractors>Only mass storages and extractors",   key = "only-storages-extractors"},
+                        {text = "<LOC _FullSuite>Full suite",                               key = "full-suite"},
                     },
                 },
             },
             {
-                title = "<LOC OPTIONS_0285>Automatic extractor selection",
+                title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
                 key = 'automex',
                 type = 'toggle',
                 default = 'onlyT1',
@@ -319,6 +342,7 @@ options = {
                 default = 1.0,
                 custom = {
                     states = {
+                        {text = "80%", key = 0.8,},
                         {text = "100%", key = 1.0,},
                         {text = "125%", key = 1.25,},
                         {text = "150%", key = 1.5,},
@@ -554,6 +578,20 @@ options = {
             },
 
             {
+                title = "<LOC OPTIONS_0246>Show Factory Queue on Hover",
+                key = 'gui_queue_on_hover_02',
+                type = 'toggle',
+                default = 'only-obs',
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>Off", key = 'off' },
+                        {text = "<LOC _Obs>Only when observing", key = 'only-obs' },
+                        {text = "<LOC _Always>Always", key = 'always' },
+                    },
+                },
+            },
+
+            {
                 title = "<LOC OPTIONS_0232>Middle Click Avatars",
                 key = 'gui_idle_engineer_avatars',
                 type = 'toggle',
@@ -616,6 +654,8 @@ options = {
                     },
                 },
             },
+
+            
 
             {
                 title = "<LOC OPTIONS_0238>Seperate Idle Builders",
@@ -763,6 +803,88 @@ options = {
                     states = {
                         {text = "<LOC _On>", key = true},
                         {text = "<LOC _Off>", key = false},
+                    },
+                },
+            },
+            {
+                title = "<LOC spawnmenu001>Spawn Menu: Team Columns",
+                key = 'spawn_menu_team_columns',
+                type = 'slider',
+                default = 4,
+                custom = {
+                    min = 1,
+                    max = 10,
+                    inc = 1,
+                },
+            },
+            {
+                title = "<LOC spawnmenu002>Spawn Menu: Filter Columns",
+                key = 'spawn_menu_filter_columns',
+                type = 'slider',
+                default = 6,
+                custom = {
+                    min = 1,
+                    max = 15,
+                    inc = 1,
+                },
+            },
+            {
+                title = "<LOC spawnmenu003>Spawn Menu: Split Sources",
+                key = 'spawn_menu_split_sources',
+                type = 'toggle',
+                default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+            {
+                title = "<LOC spawnmenu004>Spawn Menu: Type Filter Mode",
+                key = 'spawn_menu_type_filter_mode',
+                type = 'toggle',
+                default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC spawnmenu004phs>Physics Motion Type", key = 0 },
+                        {text = "<LOC spawnmenu004cat>Blueprint Category", key = 1 },
+                    },
+                },
+            },
+            {
+                title = "<LOC spawnmenu005>Spawn Menu: Include No-tech Filter",
+                key = 'spawn_menu_notech_filter',
+                type = 'toggle',
+                default = 1,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+            {
+                title = "<LOC spawnmenu006>Spawn Menu: Include ACU/Paragon Filter",
+                key = 'spawn_menu_paragon_filter',
+                type = 'toggle',
+                default = 0,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
+                    },
+                },
+            },
+            {
+                title = "<LOC spawnmenu007>Spawn Menu: Filter By Menu Sort",
+                key = 'spawn_menu_filter_menu_sort',
+                type = 'toggle',
+                default = 1,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0 },
+                        {text = "<LOC _On>", key = 1 },
                     },
                 },
             },

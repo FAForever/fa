@@ -7,9 +7,52 @@
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local CMobileKamikazeBombWeapon = import('/lua/cybranweapons.lua').CMobileKamikazeBombWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
+
 local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
-local EMPDeathWeapon = Class(Weapon) {
+--- A unique death weapon for the Fire Beetle
+local DeathWeaponKamikaze = Class(Weapon) {
+
+    FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
+
+    OnFire = function(self)
+
+        -- get information
+        local blueprint = self:GetBlueprint()
+        local position = self.unit:GetPosition()
+
+        -- do emitters
+        local army = self.unit.Army
+        for k, v in self.FxDeath do
+            CreateEmitterAtBone(self.unit, -2, army, v)
+        end
+        
+        -- do a decal
+        if not self.unit.transportDrop then
+            
+            local rotation = math.random(0, 6.28)
+            
+            DamageArea( self.unit, position, 6, 1, 'Force', true )
+            DamageArea( self.unit, position, 6, 1, 'Force', true )
+            
+            CreateDecal( position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
+        end
+
+        -- do regular death weapon of unit if we didn't already
+        if not self.unit.Dead then 
+            self.unit:DoDeathWeapon()
+        end
+
+        -- do damage
+        DamageArea(self.unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal', blueprint.DamageFriendly or false)
+        self.unit:PlayUnitSound('Destroyed')
+        self.unit:Destroy()
+    end,
+}
+
+--- A unique death weapon for the Fire Beetle
+local DeathWeaponEMP = Class(Weapon) {
     OnCreate = function(self)
         Weapon.OnCreate(self)
         self:SetWeaponEnabled(false)
@@ -37,8 +80,8 @@ XRL0302 = Class(CWalkingLandUnit) {
     },
 
     Weapons = {
-        Suicide = Class(CMobileKamikazeBombWeapon) {},
-        DeathWeapon = Class(EMPDeathWeapon) {},
+        Suicide = Class(DeathWeaponKamikaze) {},
+        DeathWeapon = Class(DeathWeaponEMP) {},
     },
 
     AmbientExhaustBones = {
@@ -49,36 +92,55 @@ XRL0302 = Class(CWalkingLandUnit) {
         '/effects/emitters/cannon_muzzle_smoke_12_emit.bp',
     },
 
+    --- Called when the unit is created, initialises some logic such as the effects
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
 
         self.EffectsBag = {}
         self.AmbientExhaustEffectsBag = {}
-        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self:GetCurrentLayer(), nil, self.EffectsBag)
+        self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
 
-    -- Allow the trigger button to blow the weapon, resulting in OnKilled instigator 'nil'
+    --- Called when the unit is done building, adds the cloak shader
+    OnStopBeingBuilt = function(self, builder, layer)
+        CWalkingLandUnit.OnStopBeingBuilt(self, builder, layer)
+        self:ForkThread(self.HideUnit, self)
+    end,
+
+    --- Adds the cloaking mesh to the unit to hide it
+    HideUnit = function(self)
+        WaitTicks(1)
+        self:SetMesh(self:GetBlueprint().Display.CloakMeshBlueprint, true)
+    end,
+
+    -- This is the Denotate button - triggers the weapon but without an instigator so that it doesn't get called twice.
     OnProductionPaused = function(self)
         self:GetWeaponByLabel('Suicide'):FireWeapon()
     end,
     
+    --- Periodically creates effects
     EmitPeriodicEffects = function(self)
-        while not self.Dead do
-            local army = self:GetArmy()
 
-            for kE, vE in self.AmbientLandExhaustEffects do
-                for kB, vB in self.AmbientExhaustBones do
-                    table.insert(self.AmbientExhaustEffectsBag, CreateAttachedEmitter(self, vB, army, vE))
+        -- cache information for the while loop
+        local army = self.Army
+        local ambientLandExhaustEffects = self.AmbientLandExhaustEffects
+        local ambientExhaustBones = self.AmbientExhaustBones
+
+        while not self.Dead do
+
+            -- create the effects
+            for kE, vE in ambientLandExhaustEffects do
+                for kB, vB in ambientExhaustBones do
+                    CreateAttachedEmitter(self, vB, army, vE)
                 end
             end
 
             WaitSeconds(3)
-            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
-
         end
     end,
 
+    --- Called when the unit dies - if it dies to some instigator then the suicide weapon is activated.
     OnKilled = function(self, instigator, type, overkillRatio)
         CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
         if instigator then
@@ -86,9 +148,15 @@ XRL0302 = Class(CWalkingLandUnit) {
         end
     end,
     
+    --- Called when the unit dies by Unit.OnKilled.
     DoDeathWeapon = function(self)
+
         if self:IsBeingBuilt() then return end
 
+        -- handle regular death weapon procedures
+        CWalkingLandUnit.DoDeathWeapon(self)
+
+        -- clean up some effects
         if self.EffectsBag then
             EffectUtil.CleanupEffectBag(self, 'EffectsBag')
             self.EffectsBag = nil
@@ -97,9 +165,10 @@ XRL0302 = Class(CWalkingLandUnit) {
             EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
             self.AmbientExhaustEffectsBag = nil
         end
+
+        -- stop the periodice effects
         self.PeriodicFXThread:Destroy()
         self.PeriodicFXThread = nil
-        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
 
         -- Now handle our special buff
         local bp
@@ -113,11 +182,7 @@ XRL0302 = Class(CWalkingLandUnit) {
         if bp ~= nil then
             self:AddBuff(bp)
         end
-    end,
-    
-    OnDestroy = function(self)
-        CWalkingLandUnit.OnDestroy(self)
-    end,
+    end, 
 }
 
 TypeClass = XRL0302

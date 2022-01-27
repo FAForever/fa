@@ -398,11 +398,18 @@ Tooltips = {
         title = "Persist Chat Feed Timeout",
         description = "Allows chat to timeout normally in the chat feed after closing the chat window",
     },
+    chat_send_type = {
+        title = "<LOC chat_send_type_title>Default recipient: allies",
+        description = "<LOC chat_send_type_description>When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed.",
+    },
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
     },
-
+    minimap_pin = {
+        title = "<LOC tooltipui0800>Pin Minimap Window",
+        description = "<LOC tooltipui0801>Locks the position and layout of the minimap window",
+    },
     toggle_cartographic = {
         title = "<LOC tooltipui0415>Cartographic Mode",
         description = "<LOC tooltipui0416>Display the terrain using a topographic visualization",
@@ -803,12 +810,12 @@ Tooltips = {
         title = "<LOC OPTIONS_0212>Accept Build Templates",
         description = "<LOC OPTIONS_0217>Allows other players to send you build templates over the network",
     },
-    options_assist_mex = {
-        title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
-        description = "<LOC OPTIONS_0274>Assist a T2 or T3 massextractor with engineer(s) to build surrounding mass storages. If mex currently is upgrading, you need to shift-right click twice on the mex to build mass storages.",
+    options_structure_capping_feature_01 = {
+        title = "<LOC OPTIONS_0273>Automated Structure Ringing",
+        description = "<LOC OPTIONS_0274>Assist a structure to cap it with adjacency-friendly structures. As an example: storages surrounding a tech 2 or tech 3 mass extractor.",
     },
     options_automex = {
-        title = "<LOC OPTIONS_0285>Automatic extractor selection",
+        title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
         description = "<LOC OPTIONS_0286>After selecting an engineer, hover the mouse over a mass extractor spot to autopreselect a mass extractor for building",
     },
     options_show_attached_unit_lifebars = {
@@ -2052,6 +2059,10 @@ Tooltips = {
     options_gui_draggable_queue = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',
         description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
+    },
+    options_gui_queue_on_hover_02 = {
+        title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
+        description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
     },
     options_gui_idle_engineer_avatars = {
         title = '<LOC OPTIONS_0232>Middle Click Avatars',

@@ -10,6 +10,8 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
+local DeprecatedWarnings = { }
+
 function CreateEffects(obj, army, EffectTable)
     local emitters = {}
     for _, v in EffectTable do
@@ -332,51 +334,15 @@ function CreateDefaultBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Buil
     end
 end
 
-function CreateAeonBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    local mul = 0.5
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
+function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
 
-    local slice = nil
-    WaitSeconds(0.1)
-
-    -- Create a pool mercury that slow draws into the build unit
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, sy * 1.5, sz)
-    Warp(BuildBaseEffect, Vector(x, y, z))
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    CreateEmitterOnEntity(BuildBaseEffect, builder.Army, '/effects/emitters/aeon_being_built_ambient_01_emit.bp')
-    :SetEmitterCurveParam('X_POSITION_CURVE', 0, sx * 1.5)
-    :SetEmitterCurveParam('Z_POSITION_CURVE', 0, sz * 1.5)
-
-    CreateEmitterOnEntity(BuildBaseEffect, builder.Army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    :ScaleEmitter((sx + sz) * 0.3)
-
-    local slider = CreateSlider(unitBeingBuilt, 0)
-    slider:SetWorldUnits(true)
-    slider:SetGoal(0, -sy, 0)
-    slider:SetSpeed(-1)
-
-    local fraction = unitBeingBuilt:GetFractionComplete()
-    while not unitBeingBuilt.Dead and fraction < 1 do
-        scale = 1.2 - math.pow(fraction, 4)
-        BuildBaseEffect:SetScale(sx * scale, 1.5 * sy * scale, sz * scale)
-        slider:SetGoal(0, (fraction * sy - sy), 0)
-        WaitSeconds(0.1)
-        fraction = unitBeingBuilt:GetFractionComplete()
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.CreateCybranBuildBeams then 
+        DeprecatedWarnings.CreateCybranBuildBeams = true 
+        WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
     end
 
-    slider:Destroy()
-    BuildBaseEffect:Destroy()
-end
-
-function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
     WaitSeconds(0.2)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
     local BeamEndEntities = {}
@@ -407,6 +373,14 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Build
 end
 
 function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.SpawnBuildBots then 
+        DeprecatedWarnings.SpawnBuildBots = true 
+        WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
+    end
+
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
     -- clamped to a max of 10 to avoid insane FPS drop
     -- with mods that modify BP
@@ -464,6 +438,14 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
 end
 
 function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildEffectsBag)
+
+    -- deprecation warning for more effcient alternative
+    if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
+        DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
+        WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
+        WARN("Source: " .. repr(debug.getinfo(2)))
+    end
+
     -- Create build constant build effect for each build effect bone defined
     if BuildBones and BuildBots then
         for _, vBone in BuildBones do
@@ -489,15 +471,16 @@ function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildE
     end
 end
 
+local BuildEffects = {
+    '/effects/emitters/sparks_03_emit.bp',
+    '/effects/emitters/flashes_01_emit.bp',
+}
+local UnitBuildEffects = {
+    '/effects/emitters/build_cybran_spark_flash_04_emit.bp',
+    '/effects/emitters/build_sparks_blue_02_emit.bp',
+}
+
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, BuildEffectsBag)
-    local BuildEffects = {
-        '/effects/emitters/sparks_03_emit.bp',
-        '/effects/emitters/flashes_01_emit.bp',
-    }
-    local UnitBuildEffects = {
-        '/effects/emitters/build_cybran_spark_flash_04_emit.bp',
-        '/effects/emitters/build_sparks_blue_02_emit.bp',
-    }
 
     CreateCybranBuildBeams(builder, unitBeingBuilt, BuildBones.BuildEffectBones, BuildEffectsBag)
 
@@ -520,318 +503,39 @@ function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, Bu
     end
 end
 
-function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, BuildEffectsBag)
-    BuildEffectsBag:Add(CreateEmitterOnEntity(builder, builder.Army, '/effects/emitters/aeon_build_01_emit.bp'))
+--- Creates the seraphim factory building beam effects.
+-- @param builder The factory that is building the unit.
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param effectBones The bones of the factory to spawn effects for.
+-- @param effectsBag The trashbag for effects.
+CreateSeraphimUnitEngineerBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimUnitEngineerBuildingEffects
 
-    local beamEnd = Entity()
-    BuildEffectsBag:Add(beamEnd)
-    Warp(beamEnd, unitBeingBuilt:GetPosition())
+--- Creates the seraphim factory building effects.
+-- @param builder The factory that is building the unit.
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param effectBones The bones of the factory to spawn effects for.
+-- @param locationBone The main build bone where the unit spawns on top of.
+-- @param effectsBag The trashbag for effects.
+CreateSeraphimFactoryBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimFactoryBuildingEffects
 
-    for _, v in EffectTemplate.AeonBuildBeams01 do
-        local beamEffect = AttachBeamEntityToEntity(builder, 0, beamEnd, -1, builder.Army, v)
-        beamEffect:SetEmitterParam('POSITION_Z', 0.45)
-        BuildEffectsBag:Add(beamEffect)
-    end
-end
+--- Creates the seraphim build cube effect.
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
+-- @param scaleFactor A scale factor for the effects.
+CreateSeraphimBuildThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildThread
 
-function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local beamEnd = Entity()
-    BuildEffectsBag:Add(beamEnd)
-    Warp(beamEnd, unitBeingBuilt:GetPosition())
+--- Creates the seraphim build cube effect.
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
+CreateSeraphimBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildBaseThread
 
-    for _, vBone in BuildEffectBones do
-        BuildEffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/aeon_build_02_emit.bp'))
-
-        for _, v in EffectTemplate.AeonBuildBeams01 do
-            local beamEffect = AttachBeamEntityToEntity(builder, vBone, beamEnd, -1, builder.Army, v)
-            BuildEffectsBag:Add(beamEffect)
-        end
-    end
-end
-
-function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(builder:GetPosition(BuildBone))
-    local mul = 1
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
-
-    local slice = nil
-
-    -- Create a pool mercury that slow draws into the build unit
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 1, nil, nil, nil)
-    if builder:IsPaused() then
-        local fraction = unitBeingBuilt:GetFractionComplete()
-        local scale = 1 - math.pow(fraction, 2)
-        BuildBaseEffect:SetScale(sx * scale, 1.5 * sy * scale, sz * scale)
-    else
-        BuildBaseEffect:SetScale(sx, 1.5 * sy, sz)
-    end
-    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    if not builder:IsPaused() then
-        CreateEmitterOnEntity(BuildBaseEffect, builder.Army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-        :SetEmitterCurveParam('X_POSITION_CURVE', 0, sx * 1.5)
-        :SetEmitterCurveParam('Z_POSITION_CURVE', 0, sz * 1.5)
-
-        CreateEmitterOnEntity(BuildBaseEffect, builder.Army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-        :ScaleEmitter((sx + sz) * 0.3)
-
-        for _, vBone in BuildEffectBones do
-            EffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/aeon_build_03_emit.bp'))
-            for _, vBeam in EffectTemplate.AeonBuildBeams02 do
-                local beamEffect = AttachBeamEntityToEntity(builder, vBone, builder, BuildBone, builder.Army, vBeam)
-                EffectsBag:Add(beamEffect)
-            end
-        end
-    end
-
-    local slider = CreateSlider(unitBeingBuilt, 0)
-    unitBeingBuilt.Trash:Add(slider)
-    EffectsBag:Add(slider)
-    slider:SetWorldUnits(true)
-    if builder:IsPaused() then
-        local fraction = unitBeingBuilt:GetFractionComplete()
-        slider:SetSpeed(0)
-        slider:SetGoal(0, 0.5 * (fraction * sy - sy), 0)
-    else
-        slider:SetSpeed(-1)
-        slider:SetGoal(0, -sy * 0.5, 0)
-    end
-
-    if not builder:IsPaused() then
-        local fraction = unitBeingBuilt:GetFractionComplete()
-        local scale
-        while not unitBeingBuilt.Dead and fraction < 1 and not IsDestroyed(slider) do
-            scale = 1 - math.pow(fraction, 2)
-            BuildBaseEffect:SetScale(sx * scale, 1.5 * sy * scale, sz * scale)
-            slider:SetGoal(0, 0.5 * (fraction * sy - sy), 0)
-            WaitSeconds(0.1)
-            fraction = unitBeingBuilt:GetFractionComplete()
-        end
-
-        slider:Destroy()
-        BuildBaseEffect:Destroy()
-    end
-end
-
-function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    for _, vBone in BuildEffectBones do
-        BuildEffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/seraphim_build_01_emit.bp'))
-
-        for _, v in EffectTemplate.SeraphimBuildBeams01 do
-            local beamEffect = AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, builder.Army, v)
-            BuildEffectsBag:Add(beamEffect)
-        end
-    end
-end
-
-function CreateSeraphimFactoryBuildingEffectsUnPause(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(builder:GetPosition(BuildBone))
-    local mul = 1
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
-
-    local slice = nil
-
-    -- Create a pool mercury that slow draws into the build unit
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    for _, vBone in BuildEffectBones do
-        EffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/seraphim_build_01_emit.bp'))
-        for _, vBeam in EffectTemplate.SeraphimBuildBeams01 do
-            EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, builder.Army, vBeam))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
-        end
-    end
-
-    local slider = CreateSlider(unitBeingBuilt, 0)
-    unitBeingBuilt.Trash:Add(slider)
-    EffectsBag:Add(slider)
-    slider:SetWorldUnits(true)
-    slider:SetGoal(0, 0, 0)
-    slider:SetSpeed(-1)
-    WaitFor(slider)
-
-    if not slider:BeenDestroyed() then
-        slider:SetGoal(0, -sy, 0)
-        slider:SetSpeed(0.05)
-    end
-
-    -- Wait till we are 80% done building, then snap our slider to
-    while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
-        WaitSeconds(0.5)
-    end
-
-    if not unitBeingBuilt.Dead then
-        if not BuildBaseEffect:BeenDestroyed() then
-            BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-        end
-        if not slider:BeenDestroyed() then
-            slider:SetSpeed(1)
-        end
-        WaitSeconds(0.5)
-    end
-
-    if not BuildBaseEffect:BeenDestroyed() then
-        BuildBaseEffect:Destroy()
-    end
-end
-
-function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, BuildEffectBones, BuildBone, EffectsBag)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(builder:GetPosition(BuildBone))
-    local mul = 1
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
-    local sy_pause = (1 - unitBeingBuilt:GetFractionComplete()) * bp.Physics.MeshExtentsY or (1 - unitBeingBuilt:GetFractionComplete()) * sx + sz
-
-    local slice = nil
-
-    -- Create a pool mercury that slow draws into the build unit
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp(BuildBaseEffect, Vector(x, y - 0.05, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    for _, vBone in BuildEffectBones do
-        EffectsBag:Add(CreateAttachedEmitter(builder, vBone, builder.Army, '/effects/emitters/seraphim_build_01_emit.bp'))
-        for _, vBeam in EffectTemplate.SeraphimBuildBeams01 do
-            if not builder:IsPaused() then
-                EffectsBag:Add(AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, builder.Army, vBeam))
-            end
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_02_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_03_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_04_emit.bp'))
-            EffectsBag:Add(CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, '/effects/emitters/seraphim_being_built_ambient_05_emit.bp'))
-        end
-    end
-
-    local slider = CreateSlider(unitBeingBuilt, 0)
-    unitBeingBuilt.Trash:Add(slider)
-    EffectsBag:Add(slider)
-    slider:SetWorldUnits(true)
-    if builder:IsPaused() then
-        slider:SetGoal(0, sy_pause, 0)
-        slider:SetSpeed(0)
-    else
-        slider:SetGoal(0, sy, 0)
-        slider:SetSpeed(-1)
-        WaitFor(slider)
-
-        if not slider:BeenDestroyed() then
-            slider:SetGoal(0, 0, 0)
-            slider:SetSpeed(0.05)
-        end
-
-        -- Wait till we are 80% done building, then snap our slider to
-        while not unitBeingBuilt.Dead and unitBeingBuilt:GetFractionComplete() < 0.8 do
-            WaitSeconds(0.5)
-        end
-
-        if not unitBeingBuilt.Dead then
-            if not BuildBaseEffect:BeenDestroyed() then
-                BuildBaseEffect:SetScaleVelocity(-0.6, -0.6, -0.6)
-            end
-            if not slider:BeenDestroyed() then
-                slider:SetSpeed(2)
-            end
-            WaitSeconds(0.5)
-        end
-
-        if not slider:BeenDestroyed() then
-            slider:Destroy()
-        end
-
-        if not BuildBaseEffect:BeenDestroyed() then
-            BuildBaseEffect:Destroy()
-        end
-    end
-end
-
-function CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, scaleFactor)
-    local bp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    local mul = 0.5
-    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX * mul
-    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ * mul
-    local sy = bp.Physics.MeshExtentsY or sx + sz
-
-    local slice = nil
-    WaitSeconds(0.1)
-
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/entities/SeraphimBuildEffect01/SeraphimBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
-    BuildBaseEffect:SetScale(sx, 1, sz)
-    BuildBaseEffect:SetOrientation(unitBeingBuilt:GetOrientation(), true)
-    Warp(BuildBaseEffect, Vector(x, y, z))
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    EffectsBag:Add(BuildBaseEffect)
-
-    local BuildEffectBaseEmitters = {
-        '/effects/emitters/seraphim_being_built_ambient_01_emit.bp',
-    }
-
-    local BuildEffectsEmitters = {
-        '/effects/emitters/seraphim_being_built_ambient_02_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_03_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_04_emit.bp',
-        '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
-    }
-
-    local AdjustedEmitters = {}
-    local effect = nil
-    for _, vEffect in BuildEffectsEmitters do
-        effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect):ScaleEmitter(scaleFactor)
-        table.insert(AdjustedEmitters, effect)
-        EffectsBag:Add(effect)
-    end
-
-    for _, vEffect in BuildEffectBaseEmitters do
-        effect = CreateAttachedEmitter(BuildBaseEffect, -1, builder.Army, vEffect):ScaleEmitter(scaleFactor)
-        table.insert(AdjustedEmitters, effect)
-        EffectsBag:Add(effect)
-    end
-
-    -- Poll the unit being built every 0.5 a second to adjust the effects to match
-    local fractionComplete = unitBeingBuilt:GetFractionComplete()
-    local unitScaleMetric = unitBeingBuilt:GetFootPrintSize() * 0.65
-    while not unitBeingBuilt.Dead and fractionComplete < 1.0 do
-        WaitSeconds(0.5)
-        fractionComplete = unitBeingBuilt:GetFractionComplete()
-        for _, vEffect in AdjustedEmitters do
-            vEffect:ScaleEmitter(scaleFactor + (unitScaleMetric * fractionComplete))
-        end
-    end
-
-    CreateLightParticleIntel(unitBeingBuilt, -1, unitBeingBuilt.Army, unitBeingBuilt:GetFootPrintSize() * 7, 8, 'glow_02', 'ramp_blue_22')
-
-    WaitSeconds(0.5)
-    BuildBaseEffect:Destroy()
-end
-
-function CreateSeraphimBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 1)
-end
-
-function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, EffectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, EffectsBag, 2)
-end
+--- Creates the seraphim build cube effect.
+-- @param unitBeingBuilt the unit that is being built by the factory.
+-- @param builder The factory that is building the unit.
+-- @param effectsBag The trashbag for effects.
+CreateSeraphimExperimentalBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
 function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
     local info = {
@@ -1881,3 +1585,79 @@ function DestroyRemainingTeleportChargingEffects(unit, EffectsBag)
         unit.TeleportCybranSphere:Destroy()
     end
 end
+
+--- Optimized functions --
+
+local EffectUtilitiesOpti = import('/lua/EffectUtilitiesOpti.lua')
+
+--- Creates tracker beams between the builder and its build bots. The
+-- bots keep the tracker in their trashbag.
+-- @param builder The builder / tracking entity of the build bots.
+-- @param buildBones The bones to use as the origin of the beams.
+-- @param buildBots The build bots that we're tracking.
+-- @param total The number of build bots / bones. The 1st bone will track the 1st bot, etc.
+CreateCybranEngineerBuildEffectsOpti = EffectUtilitiesOpti.CreateCybranEngineerBuildEffects
+-- original: CreateCybranEngineerBuildEffects
+
+--- Creates the beams and welding points of the builder and its bots. The
+-- bots share the welding point which each other, as does the builder with
+-- itself.
+-- @param builder A builder with builder.BuildEffectBones set. 
+-- @param bots The bots of the builder.
+-- @param unitBeingBuilt The unit that we're building.
+-- @param buildEffectsBag The bag that we use to store / trash all effects.
+-- @param stationary Whether or not the builder is a building.
+CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
+-- original: CreateCybranBuildBeams
+
+--- Creates the build drones for the (cybran) builder in question. Expects  
+-- the builder.BuildBotTotal value to be set.
+-- @param builder A cybran builder such as an engineer, hive or commander.
+-- @param botBlueprint The blueprint to use for the bot.
+SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
+-- original: SpawnBuildBots
+
+--- The build animation for Aeon buildings in general.
+-- @param unitBeingBuilt The unit we're trying to build.
+-- @param effectsBag The build effects bag containing the pool and emitters.
+CreateAeonBuildBaseThread = import("/lua/EffectUtilitiesAeon.lua").CreateAeonBuildBaseThread
+
+--- The build animation of an engineer.
+-- @param builder The engineer in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectsBag The trash bag for the build effects.
+CreateAeonConstructionUnitBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonConstructionUnitBuildingEffects
+-- original: CreateAeonConstructionUnitBuildingEffects
+
+--- The build animation of the commander.
+-- @param builder The commander in question.
+-- @param unitBeingBuilt The unit we're building.
+-- @param buildEffectBones The bone(s) of the commander where the effect starts.
+-- @param buildEffectsBag The trash bag for the build effects.
+CreateAeonCommanderBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonCommanderBuildingEffects
+-- original: CreateAeonCommanderBuildingEffects
+
+--- The build animation for Aeon factories, including the pool and dummy unit.
+-- @param builder The factory that is building the unit.
+-- @param unitBeingBuilt The unit we're trying to build.
+-- @param buildEffectBones The arms of the factory where the build beams come from.
+-- @param buildBone The location where the unit is beint built.
+-- @param effectsBag The build effects bag.
+CreateAeonFactoryBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonFactoryBuildingEffects
+-- original: CreateAeonFactoryBuildingEffects
+
+--- Creates the Aeon Tempest build effects, including particles and an animation.
+-- @param unitBeingBuilt The Colossus that is being built.
+CreateAeonColossusBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonColossusBuildingEffects
+
+--- Creates the Aeon CZAR build effects, including particles.
+-- @param unitBeingBuilt The CZAR that is being built.
+CreateAeonCZARBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonCZARBuildingEffects
+
+--- Creates the Aeon Tempest build effects, including particles and an animation.
+-- @param unitBeingBuilt The tempest that is being built.
+CreateAeonTempestBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonTempestBuildingEffects
+
+--- Creates the Aeon Paragon build effects, including particles and an animation.
+-- @param unitBeingBuilt The tempest that is being built.
+CreateAeonParagonBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonParagonBuildingEffects

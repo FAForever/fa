@@ -460,8 +460,14 @@ end
 function GetUnitById(id)
 end
 
---- Return a table with units inside the given rectangle.
--- @param rectangle Map area created by function Rect(x0, z0, x1, z1).
+--- Retrieves all units in a rectangle, Excludes insignificant units, such as the Cybran Drone, by default.
+-- @param rectangle The rectangle to look for units in {x0, z0, x1, z1}.
+-- OR
+-- @param tlx Top left x coordinate.
+-- @param tlz Top left z coordinate.
+-- @param brx Bottom right x coordinate.
+-- @param brz Bottom right z coordinate.
+-- @return nil if none found or a table.
 function GetUnitsInRect(rectangle)
 end
 
@@ -553,12 +559,12 @@ end
 function IssueBuildFactory(tblUnits, blueprintID, count)
 end
 
---- Orders a group of engineers to build a unit at target position.
+--- Orders a group of engineers to build the nearest structures to them. 
 -- Example: IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z-2), msid, {}).
 -- @param tblUnits Table containing engineers.
 -- @param position Table with position {x, y, z}.
 -- @param blueprintID ID of the unit to build, example: 'ueb0103'.
--- @param table (Two element table - TODO: find out what it is) or empty table.
+-- @param table ListOfCells, format is { {x, z}, ... }. Similar to brain:BuildStructure, used to determine alternative positions. Doesn't appear to function properly.
 -- @return Returns the issued command.
 function IssueBuildMobile(tblUnits, position, blueprintID, table)
 end

@@ -268,6 +268,7 @@ keyDescriptions = {
     ['select_bombers'] = '<LOC key_desc_0228>Select all Bombers',
     ['select_anti_air_fighters'] = '<LOC key_desc_0229>Select all Air Fighters',
     ['select_nearest_idle_airscout'] = '<LOC key_desc_0230>Select nearest idle Air Scout',
+    ['select_all_idle_airscouts'] = '<LOC key_desc_0230_all>Select all idle Air Scouts',
     ['select_all_tml'] = '<LOC key_desc_0231>Select all TML',
     ['select_all_stationdrones'] = '<LOC key_desc_0232>Select all Drones',
     ['select_all_t2_podstations'] = '<LOC key_desc_0233>Select all T2 Engineering Podstations',

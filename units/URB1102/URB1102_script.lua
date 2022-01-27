@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Cybran Hydrocarbon Power Plant Script
 --#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
 
@@ -33,10 +33,10 @@ URB1102 = Class(CEnergyCreationUnit) {
                 self:PlaySound(myBlueprint.Audio.Activate)
             end
 
-            if self:GetCurrentLayer() == 'Land' then
+            if self.Layer == 'Land' then
                 effects = self.AirEffects
                 bones = self.AirEffectsBones
-            elseif self:GetCurrentLayer() == 'Seabed' then
+            elseif self.Layer == 'Seabed' then
                 effects = self.WaterEffects
                 bones = self.WaterEffectsBones
                 scale = 2

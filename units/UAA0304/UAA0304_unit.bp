@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 90,
     },
     Air = {
         AutoLandTime = 1,
@@ -262,6 +262,13 @@ UnitBlueprint {
         Level4 = 48,
         Level5 = 60,
     },
+    VeteranMass = {
+        4200,
+        4200,
+        4200,
+        4200,
+        4200,
+    },
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -275,10 +282,23 @@ UnitBlueprint {
             AutoInitiateAttackCommand = true,
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
+            Buffs = {
+                {
+                    Add = {
+                        OnImpact = true,
+                    },
+                    AppliedToTarget = true,
+                    BuffType = 'STUN',
+                    Duration = 3,
+                    Radius = 5.8, -- this is the closest approximation in order to make the stun range the same as DamageRadius (5.25)
+                    TargetAllow = 'ALLUNITS',
+                    TargetDisallow = 'EXPERIMENTAL,COMMAND,WALL',
+                },
+            },
             CollideFriendly = false,
-            Damage = 3450,
+            Damage = 3000,
             DamageFriendly = true,
-            DamageRadius = 4,
+            DamageRadius = 5.25,
             DamageType = 'Normal',
             Display = 'Quark Bomb',
             DisplayName = 'Quark Bomb',

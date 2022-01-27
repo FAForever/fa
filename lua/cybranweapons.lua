@@ -72,38 +72,34 @@ CDFHeavyMicrowaveLaserGenerator = Class(DefaultBeamWeapon) {
     FxUpackingChargeEffects = EffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 1,
 
-    IdleState = State(DefaultBeamWeapon.IdleState) {
-        Main = function(self)
-            if self.RotatorManip then
-                self.RotatorManip:SetTargetSpeed(0)
-                self.RotatorManip:SetAccel(90)
-            end
-            if self.SliderManip then
-                self.SliderManip:SetGoal(0,0,0)
-                self.SliderManip:SetSpeed(2)
-            end
-            DefaultBeamWeapon.IdleState.Main(self)
-        end,
-    },
+    PlayFxBeamStart = function(self, muzzle)
 
-    CreateProjectileAtMuzzle = function(self, muzzle)
-        if not self.SliderManip then
-            self.SliderManip = CreateSlider(self.unit, 'Center_Turret_Barrel')
-            self.unit.Trash:Add(self.SliderManip)
-        end
+        -- create rotator if it doesn't exist
         if not self.RotatorManip then
             self.RotatorManip = CreateRotator(self.unit, 'Center_Turret_Barrel', 'z')
             self.unit.Trash:Add(self.RotatorManip)
         end
+
+        -- set their respective properties when firing
         self.RotatorManip:SetTargetSpeed(500)
         self.RotatorManip:SetAccel(200)
-        self.SliderManip:SetPrecedence(11)
-        self.SliderManip:SetGoal(0, 0, -1)
-        self.SliderManip:SetSpeed(-1)
-        DefaultBeamWeapon.CreateProjectileAtMuzzle(self, muzzle)
+
+        DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
+    end,
+
+    PlayFxBeamEnd = function(self, beam)
+
+        -- if it exists, then stop rotating
+        if self.RotatorManip then
+            self.RotatorManip:SetTargetSpeed(0)
+            self.RotatorManip:SetAccel(90)
+        end
+
+        DefaultBeamWeapon.PlayFxBeamEnd(self, beam)
     end,
 
     PlayFxWeaponUnpackSequence = function(self)
+
         if not self.ContBeamOn then
             local bp = self:GetBlueprint()
             for k, v in self.FxUpackingChargeEffects do
@@ -389,6 +385,51 @@ CAMZapperWeapon = Class(DefaultBeamWeapon) {
 CAMZapperWeapon02 = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.ZapperCollisionBeam,
     FxMuzzleFlash = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',},
+}
+
+CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
+
+    BeamType = CollisionBeamFile.ZapperCollisionBeam,
+    FxMuzzleFlash = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',},
+
+    SphereEffectIdleMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere01_mesh',
+    SphereEffectActiveMesh = '/effects/entities/cybranphalanxsphere01/cybranphalanxsphere02_mesh',
+    SphereEffectBp = '/effects/emitters/zapper_electricity_02_emit.bp',
+    SphereEffectBone = 'Turret_Muzzle',
+
+    OnCreate = function(self)
+        DefaultBeamWeapon.OnCreate(self)
+
+        local bp = self:GetBlueprint()
+        self.SphereEffectEntity = import('/lua/sim/Entity.lua').Entity()
+        self.SphereEffectEntity:AttachBoneTo(-1, self.unit, bp.RackBones[1].MuzzleBones[1])
+        self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
+        self.SphereEffectEntity:SetDrawScale(0.28)
+        self.SphereEffectEntity:SetVizToAllies('Intel')
+        self.SphereEffectEntity:SetVizToNeutrals('Intel')
+        self.SphereEffectEntity:SetVizToEnemies('Intel')
+
+        local emit = CreateAttachedEmitter(self.unit, bp.RackBones[1].MuzzleBones[1], self.unit.Army, self.SphereEffectBp)
+
+        self.unit.Trash:Add(self.SphereEffectEntity)
+        self.unit.Trash:Add(emit)
+    end,
+
+    IdleState = State (DefaultBeamWeapon.IdleState) {
+        Main = function(self)
+            DefaultBeamWeapon.IdleState.Main(self)
+        end,
+
+        OnGotTarget = function(self)
+            DefaultBeamWeapon.IdleState.OnGotTarget(self)
+            self.SphereEffectEntity:SetMesh(self.SphereEffectActiveMesh)
+        end,
+    },
+
+    OnLostTarget = function(self)
+        DefaultBeamWeapon.OnLostTarget(self)
+        self.SphereEffectEntity:SetMesh(self.SphereEffectIdleMesh)
+    end,
 }
 
 CCannonMolecularWeapon = Class(DefaultProjectileWeapon) {

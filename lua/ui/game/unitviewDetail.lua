@@ -330,7 +330,7 @@ IsAbilityExist = {
         return bp.Display.MovementEffects.Land.Footfall.Damage.Amount > 0
            and bp.Display.MovementEffects.Land.Footfall.Damage.Radius > 0
     end,
-    ability_teleport = function(bp)
+    ability_personal_teleporter = function(bp)
         return DecimalToBinary(bp.General.CommandCaps)[12] == 1 -- RULEUCC_Teleport
     end
 }
@@ -406,7 +406,8 @@ GetAbilityDesc = {
             bp.Display.MovementEffects.Land.Footfall.Damage.Amount,
             bp.Display.MovementEffects.Land.Footfall.Damage.Radius)
     end,
-    ability_teleport = function(bp)
+    ability_personal_teleporter = function(bp)
+        if not bp.General.TeleportDelay then return '' end
         return LOCF('<LOC uvd_Delay>', bp.General.TeleportDelay)
     end
 }
@@ -448,9 +449,8 @@ function WrapAndPlaceText(bp, builder, descID, control)
                 if GetAbilityDesc[id] then
                     local desc = GetAbilityDesc[id](bp)
                     if desc ~= '' then
-                        desc = ' - '..desc
+                        ability = ability..' - '..desc
                     end
-                    ability = ability..desc
                 end
                 table.insert(lines, ability)
             end

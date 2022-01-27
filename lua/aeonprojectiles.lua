@@ -115,7 +115,7 @@ AGravitonBombProjectile = Class(SinglePolyTrailProjectile) { -- T1 bomber
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -461,7 +461,7 @@ AMissileSerpentineProjectile = Class(SingleCompositeEmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -510,7 +510,7 @@ AOblivionCannonProjectile = Class(EmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -540,7 +540,7 @@ AOblivionCannonProjectile02 = Class(SinglePolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -570,7 +570,7 @@ AOblivionCannonProjectile03 = Class(EmitterProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -612,7 +612,8 @@ AQuantumDisruptorProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
@@ -727,7 +728,7 @@ AQuarkBombProjectile = Class(EmitterProjectile) { -- Strategic bomber
         CreateLightParticle(self, -1, self.Army, 26, 6, 'sparkle_white_add_08', 'ramp_white_02')
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
         DamageArea(self, pos, radius, 1, 'Force', FriendlyFire)
@@ -781,6 +782,7 @@ AReactonCannonProjectile = Class(EmitterProjectile) { --SCU
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
         if radius == 0 then
+            local FriendlyFire = false
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
             DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
             

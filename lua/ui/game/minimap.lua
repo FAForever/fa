@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: UI for the multifunction display
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright  2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -107,7 +107,7 @@ function CreateMinimap(parent)
         borderColor = 'ff415055',
     }
     local defPosition = {Left = 10, Top = 157, Bottom = 367, Right = 237}
-    controls.displayGroup = Window(GetFrame(0), nil, nil, false, false, false, false, 'mini_ui_minimap',
+    controls.displayGroup = Window(GetFrame(0), nil, nil, true, false, false, false, 'mini_ui_minimap',
         defPosition, windowTextures)
     controls.displayGroup.Depth:Set(4)
     controls.displayGroup.window_m:SetRenderPass(UIUtil.UIRP_UnderWorld)
@@ -123,21 +123,27 @@ function CreateMinimap(parent)
     local frameCount = 0
     controls.miniMap.OnFrame = function(self, elapsedTime)
         if frameCount == 1 then
-            controls.miniMap:EnableResourceRendering(minimap_resources)
-            controls.miniMap:CameraReset()
-            GetCamera(controls.miniMap._cameraName):SetMaxZoomMult(1.0)
-            controls.miniMap.OnFrame = nil  -- we want the control to continue to get frame updates in the engine, but not in Lua. PLEASE DON'T CHANGE THIS OR IT BREAKS CAMERA DRAGGING
+            self:EnableResourceRendering(minimap_resources)
+            self:CameraReset()
+            GetCamera(self._cameraName):SetMaxZoomMult(1.0)
+            self.OnFrame = nil  -- we want the control to continue to get frame updates in the engine, but not in Lua. PLEASE DON'T CHANGE THIS OR IT BREAKS CAMERA DRAGGING
         end
         frameCount = frameCount + 1
     end
+    controls.displayGroup.OnPinCheck = function(control, checked)
+        control:SetSizeLock(checked)
+        control:SetPositionLock(checked)
+        -- add save pin in prefs
+    end
+    Tooltip.AddCheckboxTooltip(controls.displayGroup._pinBtn, 'minimap_pin')
 
     controls.displayGroup.resetBtn = Button(controls.displayGroup.TitleGroup,
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_up.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_down.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_over.dds'),
         UIUtil.SkinnableFile('/game/menu-btns/default_btn_dis.dds'))
-    LayoutHelpers.LeftOf(controls.displayGroup.resetBtn, controls.displayGroup._closeBtn)
-    controls.displayGroup.resetBtn.OnClick = function(modifiers)
+    LayoutHelpers.LeftOf(controls.displayGroup.resetBtn, controls.displayGroup._pinBtn )
+    controls.displayGroup.resetBtn.OnClick = function(self, modifiers)
         for index, val in defPosition do
             local i = index
             local v = val
@@ -178,7 +184,7 @@ function CreateMinimap(parent)
 end
 
 function ToggleMinimap()
-    # disable when in Screen Capture mode
+    --# disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end

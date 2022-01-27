@@ -8,7 +8,7 @@ CDFRocketIridium01 = Class(CIridiumRocketProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
