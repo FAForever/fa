@@ -9076,6 +9076,10 @@ adaptive_lightning_key_2_help = "Normal lightning settings."
 adaptive_lightning_key_3 = "enabled - more"
 adaptive_lightning_key_3_help = "Lightning storm."
 
+enabled_sim_mods="Хост активировал следующие СИМ моды:"
+enabled_ui_mods="Вы активировали следующие UI моды:"
+enabled_no_mods="Моды не выбраны"
+
 aireplace_0001="Замена ИИ"
 aireplace_0002="Переключить замену ИИ, если игрок отключился."
 aireplace_0003="Если игрок отключается, а БМК все еще активен, будет создан ИИ, чтобы взять под контроль юниты, принадлежавшие отключившемуся игроку."

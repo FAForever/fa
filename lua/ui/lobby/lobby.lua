@@ -3439,6 +3439,12 @@ function CreateUI(maxPlayers)
                 Tooltip.AddControlTooltip(line.bg, data.tooltip)
                 Tooltip.AddControlTooltip(line.bg2, data.valueTooltip)
             end
+
+            if data.manualTooltipTitle then 
+                Tooltip.AddControlTooltipManual(line.bg, data.manualTooltipTitle, data.manualTooltipDescription )
+                Tooltip.AddControlTooltipManual(line.bg2, data.manualTooltipTitle, data.manualTooltipDescription )
+            end
+
         end
 
         local optionsToUse
@@ -3925,13 +3931,54 @@ function RefreshOptionDisplayData(scenarioInfo)
             modStr = modNumUI..' UI Mod'
         end
     end
+
+    local description = "No mods enabled."
+
+    if modNum + modNumUI > 0 then 
+        description = ""
+
+        local descriptionSimMods = { "", }
+        if modNum > 0 then 
+            table.insert(descriptionSimMods, LOC("<LOC enabled_sim_mods>The host enabled the following sim mods:"))
+            for k, mod in Mods.GetGameMods() do 
+                table.insert(descriptionSimMods, "\r\n - " .. tostring(mod.name))
+            end
+
+            table.insert(descriptionSimMods, "\r\n")
+        end
+
+        local descriptionUIMods = { "", }
+        if modNumUI > 0 then 
+            table.insert(descriptionUIMods, LOC("<LOC enabled_ui_mods>You have enabled the following UI mods:"))
+            for k, mod in Mods.GetUiMods() do 
+                table.insert(descriptionUIMods, "\r\n - " .. tostring(mod.name))
+            end
+        end
+
+        descriptionSimMods = tostring(table.concat(descriptionSimMods))
+        descriptionUIMods = tostring(table.concat(descriptionUIMods))
+
+        if modNum > 0 and modNumUI > 0 then 
+            description = tostring(table.concat({descriptionSimMods, "\r\n", descriptionUIMods}))
+        else 
+            if modNum > 0 then 
+                description = descriptionSimMods
+            end 
+
+            if modNumUI > 0 then 
+                description = descriptionUIMods
+            end
+        end
+    end
+
     if modStr then
         local option = {
             text = modStr,
             value = LOC('<LOC lobby_0003>Check Mod Manager'),
             mod = true,
-            tooltip = 'Lobby_Mod_Option',
-            valueTooltip = 'Lobby_Mod_Option'
+            
+            manualTooltipTitle = 'Enabled mods',
+            manualTooltipDescription = description
         }
 
         table.insert(formattedOptions, option)

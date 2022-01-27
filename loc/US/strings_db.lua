@@ -8056,6 +8056,10 @@ adaptive_lightning_key_2_help = "Normal lightning settings."
 adaptive_lightning_key_3 = "enabled - more"
 adaptive_lightning_key_3_help = "Lightning storm."
 
+enabled_sim_mods="The host enabled the following sim mods:"
+enabled_ui_mods="You have enabled the following UI mods:"
+enabled_no_mods="No mods enabled."
+
 aireplace_0001="AI Replacement"
 aireplace_0002="Toggle AI Replacement if a player disconnects."
 aireplace_0003="If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected."
