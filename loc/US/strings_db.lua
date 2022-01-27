@@ -8054,3 +8054,6 @@ aireplace_0001="AI Replacement"
 aireplace_0002="Toggle AI Replacement if a player disconnects."
 aireplace_0003="If a player disconnects and the ACU is still active, an AI will be created to take control of units that belonged to the player who disconnected."
 aireplace_0004="A disconnected player will cause the destruction of their units based on share conditions."
+
+no_singleplayer_netlag_title="Remove command delay when playing alone"
+no_singleplayer_netlag_description="При игре с другими людьми применяется задержка, прежде чем к симуляции будет применено взаимодействие с пользователем. В качестве примера, когда пользователь выдает команду (например, приказ о перемещении), требуется дополнительно 500 миллисекунд, прежде чем команда будет обработана. Когда пинг пользователя превысит эту задержку, симуляция начнет зависать. При использовании консольной команды wld_RunWithTheWind, данная функция не работает"

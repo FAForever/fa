@@ -231,10 +231,13 @@ function CreateUI(isReplay)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
     else
+        -- check if we should reduce network delay / lag
         local clients = GetSessionClients()
         if table.getsize(clients) <= 1 then
-            -- No need for unnecessary lag when playing alone
-            ConExecute('net_lag 0')
+            local option = Prefs.GetFromCurrentProfile('options.no_singleplayer_netlag')
+            if option == "yes" then 
+                ConExecute('net_lag 0')
+            end
         end
     end
 
