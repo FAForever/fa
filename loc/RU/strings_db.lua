@@ -9075,5 +9075,5 @@ aireplace_0002="Переключить замену ИИ, если игрок о
 aireplace_0003="Если игрок отключается, а БМК все еще активен, будет создан ИИ, чтобы взять под контроль юниты, принадлежавшие отключившемуся игроку."
 aireplace_0004="Отключенный игрок вызовет уничтожение своих юнитов в зависимости от условий совместного использования."
 
-no_singleplayer_netlag_title="Remove command delay when playing alone"
-no_singleplayer_netlag_description="When playing with other people a delay is applied before user interaction is applied to the simulation. As an example, when a user issues a command (such as a move order) it takes an additional 500 miliseconds before the command is processed. When the ping of a user exceeds this delay the simulation will lag start to lag. When enabled the console command wld_RunWithTheWind does not function properly."
+no_singleplayer_netlag_title="Отключить задержку команд при игре в одиночку"
+no_singleplayer_netlag_description="При игре с другими людьми применяется задержка, прежде чем к симуляции будет применено взаимодействие с пользователем. В качестве примера, когда пользователь выдает команду (например, приказ о перемещении), требуется дополнительно 500 миллисекунд, прежде чем команда будет обработана. Когда пинг пользователя превысит эту задержку, симуляция начнет зависать. При использовании консольной команды wld_RunWithTheWind, данная функция не работает."
