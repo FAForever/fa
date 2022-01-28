@@ -712,8 +712,9 @@ function RefreshOptions(skipRefresh)
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
         OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
         OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
+        OptionSource[4] = {title = "<LOC uilobby_0004>Mod Options", options = import('/lua/ui/lobby/lobbyOptions.lua').modOptions}
     end
-    OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+    OptionSource[5] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
 
     Options = {}
 
