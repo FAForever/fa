@@ -118,7 +118,7 @@ function ImportModOptions()
     local alreadyStored
     for Index, ModData in simMods do
         if IsModEnabled(ModData) and exists(ModData.location..'/options.lua') then
-            OptionData = import(ModData.location..'/options.lua').Options
+            OptionData = import(ModData.location..'/options.lua').options
             for s, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
