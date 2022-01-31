@@ -811,14 +811,19 @@ function CreateChatEdit()
         local charLim = self:GetMaxChars()
         if charcode == UIUtil.VK_TAB then
             if GUI.matcher then 
-                if  GUI.matcher.id ~= -1 then
+                if GUI.matcher.id ~= -1 then
                     ChatTo:Set(GUI.matcher.id)
                 else
                     ChatTo:Set("all")
                 end
+                local text = self:GetText()
+                local caretPos = self:GetCaretPosition()
+                local beginPos = GUI.matcher.BeginPos
+                local newText = STR_Utf8SubString(text, 1, beginPos-1)--..STR_Utf8SubString(text,caretPos + 1, string.len(text))
                 GUI.matcher:Destroy()
                 GUI.matcher = nil
-                self:ClearText()
+                self:SetText(newText)
+                self:SetCaretPosition(beginPos + 1)
                 return true
             end
         end
