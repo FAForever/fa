@@ -402,6 +402,10 @@ Tooltips = {
         title = "<LOC chat_send_type_title>Default recipient: allies",
         description = "<LOC chat_send_type_description>When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed.",
     },
+    chat_DM_feature = {
+        title = "<LOC chat_DM_feature_title>Direct messages with @ sign",
+        description = "<LOC chat_DM_feature_description>Allows you to quickly DM player with @ sign, press tab to confirm match",
+    },
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
