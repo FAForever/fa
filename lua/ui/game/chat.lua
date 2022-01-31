@@ -784,7 +784,7 @@ function CreateChatEdit()
         end
     end
     group.edit.OnTextChanged = function(self, newText, oldText)
-        if   GUI.matcher and GUI.matcher.BeginPos then
+        if ChatOptions['DM_feature'] and GUI.matcher and GUI.matcher.BeginPos then
             if  GUI.matcher.BeginPos > self:GetCaretPosition() then
                 GUI.matcher:Destroy()
                 GUI.matcher = nil
@@ -799,8 +799,8 @@ function CreateChatEdit()
     end
     group.edit.OnCharPressed = function(self, charcode)
         -- 64 is '@' charcode
-        if charcode == 64  then
-            if GUI.matcher  then
+        if charcode == 64 and ChatOptions['DM_feature'] then
+            if GUI.matcher then
                 GUI.matcher:Destroy()
                 GUI.matcher = nil
             else
@@ -1428,6 +1428,7 @@ function CreateConfigWindow()
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
                 {type = 'splitter'},
                 {type = 'filter', name = '<LOC chat_send_type_title>Default recipient: allies', key = 'send_type', tooltip = 'chat_send_type'},
+                {type = 'filter', name = '<LOC chat_DM_feature>Allow DM with @ sign', key = 'DM_feature', tooltip = 'chat_DM_feature'},
                 {type = 'filter', name = '<LOC chat_0014>Show Feed Background', key = 'feed_background', tooltip = 'chat_feed_background'},
                 {type = 'filter', name = '<LOC chat_0015>Persist Feed Timeout', key = 'feed_persist', tooltip = 'chat_feed_persist'},
         },
