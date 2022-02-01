@@ -79,46 +79,26 @@ end
 
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-local modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
+AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
+modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 local ActiveMods = GetPreference('active_mods') or {}
 
--- Add lobby options from AI mods
-function ImportModAIOptions()
-    local simMods = import('/lua/mods.lua').AllMods()
-    local OptionData
-    local alreadyStored
-    for Index, ModData in simMods do
-        if IsModEnabled(ModData) and exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then
-            OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
-            for s, t in OptionData do
-                -- check, if we have this option already stored
-                alreadyStored = false
-                for k, v in AIOpts do
-                    if v.key == t.key then
-                        alreadyStored = true
-                        break
-                    end
-                end
-                if not alreadyStored then
-                    table.insert(AIOpts, t)
-                end
-            end
-        end
-    end
-end
 
--- Add lobby options from regular mods
+-- Add lobby options from sim mods
 function ImportModOptions()
     local simMods = import('/lua/mods.lua').AllMods()
     local OptionData
     local alreadyStored
     for Index, ModData in simMods do
-        if IsModEnabled(ModData) and exists(ModData.location..'/options.lua') then
-            OptionData = import(ModData.location..'/options.lua').options
+        if IsEnabledSimMod(ModData) then
+            if exists(ModData.location..'/mod_options.lua') then
+                OptionData = import(ModData.location..'/mod_options.lua').options
+            elseif exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then 
+                OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
+            end
             for s, t in OptionData do
                 -- check, if we have this option already stored
                 alreadyStored = false
@@ -136,17 +116,15 @@ function ImportModOptions()
     end
 end
 
---IsModEnabled
-function IsModEnabled(mod)
-	for UID, ActiveMod in ActiveMods do 
-		if mod.uid == UID then 
+--IsEnabledSimMod
+function IsEnabledSimMod(mod)
+	for UID, ActiveMod in ActiveMods do
+		if mod.uid == UID and not mod.ui_only == true then 
 			return true
 		end
 	end
 	return false
 end
-
-ImportModAIOptions()
 
 ImportModOptions()
 
@@ -2471,6 +2449,11 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
         GUI.AIFillCombo:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
         UpdateGame()
     end
+    
+    modOptions = {}
+    ActiveMods = simMods
+    ImportModOptions()
+    import('/lua/ui/dialogs/mapselect.lua').RefreshOptions(false)
 end
 
 function GetAvailableColor()
@@ -3944,7 +3927,6 @@ function RefreshOptionDisplayData(scenarioInfo)
     local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
     local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
     local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-    local modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
     if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     end

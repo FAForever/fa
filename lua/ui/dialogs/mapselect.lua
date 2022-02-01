@@ -711,9 +711,9 @@ function RefreshOptions(skipRefresh)
     if skipRefresh then
         OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
         OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-        OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts}
-        OptionSource[4] = {title = "<LOC uilobby_0004>Mod Options", options = import('/lua/ui/lobby/lobbyOptions.lua').modOptions}
     end
+    OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobby.lua').AIOpts}
+    OptionSource[4] = {title = "<LOC uilobby_0004>Mod Options", options = import('/lua/ui/lobby/lobby.lua').modOptions}
     OptionSource[5] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
 
     Options = {}
@@ -744,7 +744,7 @@ function RefreshOptions(skipRefresh)
     if not skipRefresh then
         -- Remove all info about advancedOptions in changedOptions
         -- So we have a clean slate regarding the advanced options each map switch
-        for _,optionData in OptionSource[4].options do
+        for _,optionData in OptionSource[5].options do
             changedOptions[optionData.key] = nil
         end
 
