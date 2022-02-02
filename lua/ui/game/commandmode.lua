@@ -391,7 +391,7 @@ local categoriesStructure = categories.STRUCTURE
 function OnCommandIssued(command)
 
     -- part of the cheat menu
-    if modeData.cheat and command.CommandType == "BuildMobile" and (not command.Units[1]) then
+    if modeData.cheat and command.CommandType == "BuildMobile" then
         CheatSpawn(command, modeData)
         return
     end
