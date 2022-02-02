@@ -88,8 +88,9 @@ local ActiveMods = GetPreference('active_mods') or {}
 
 
 --Add given lobby mod options if not already stored
-local function AddModOptions(OptionData)
+local function AddModOptions(OptionData, modName)
     local alreadyStored
+    local optionsInThisMod = {}
     for s, t in OptionData do
         -- check, if we have this option already stored
         alreadyStored = false
@@ -100,9 +101,10 @@ local function AddModOptions(OptionData)
             end
         end
         if not alreadyStored then
-            table.insert(modOptions, t)
+            table.insert(optionsInThisMod, t)
         end
     end
+    table.insert(modOptions, {optionsInThisMod, modName})
 end
 
 -- Add lobby options from sim mods
@@ -111,10 +113,10 @@ function ImportModOptions()
     for Index, ModData in simMods do
         if IsEnabledSimMod(ModData) then
             if exists(ModData.location..'/mod_options.lua') then
-                AddModOptions(import(ModData.location..'/mod_options.lua').options)
+                AddModOptions(import(ModData.location..'/mod_options.lua').options, ModData.name)
             end
             if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then 
-                AddModOptions(import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts)
+                AddModOptions(import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts, ModData.name)
             end
         end
     end
@@ -2422,8 +2424,10 @@ local OptionUtils = {
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
 
-        for index, option in modOptions do
-            options[option.key] = option.values[option.default].key or option.values[option.default]
+        for i, mod in modOptions do 
+            for index, option in mod[1] do
+                options[option.key] = option.values[option.default].key or option.values[option.default]
+            end
         end
 
         options.RestrictedCategories = {}
@@ -4094,7 +4098,10 @@ function RefreshOptionDisplayData(scenarioInfo)
     addOptionsFrom(globalOpts)
     addOptionsFrom(teamOptions)
     addOptionsFrom(AIOpts)
-    addOptionsFrom(modOptions)
+    for i, mod in modOptions do 
+        addOptionsFrom(mod[1])
+    end
+    
 
     -- Add options from the scenario object, if any are provided.
     if scenarioInfo.options then
@@ -5060,8 +5067,10 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
             setOptionsFromPref(option)
         end
 
-        for index, option in modOptions do
-            setOptionsFromPref(option)
+        for i, mod in modOptions do 
+            for index, option in mod[1] do
+                setOptionsFromPref(option)
+            end
         end
 
         -- The key, LastScenario, is referred to from GPG code we don't hook.

@@ -708,13 +708,16 @@ function RefreshOptions(skipRefresh)
     -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
     -- so we'll use this flag to reset the options sources so they can set up for multiplayer
-    if skipRefresh then
-        OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-        OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-    end
+    
+    OptionSource = {}
+    OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
+    OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
     OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobby.lua').AIOpts}
-    OptionSource[4] = {title = "<LOC uilobby_0004>Mod Options", options = import('/lua/ui/lobby/lobby.lua').modOptions}
-    OptionSource[5] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+    OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+    local modOptions = import('/lua/ui/lobby/lobby.lua').modOptions
+    for i, mod in modOptions do 
+        OptionSource[i + 4] = {title = mod[2], options = mod[1]}
+    end
 
     Options = {}
 
@@ -744,7 +747,7 @@ function RefreshOptions(skipRefresh)
     if not skipRefresh then
         -- Remove all info about advancedOptions in changedOptions
         -- So we have a clean slate regarding the advanced options each map switch
-        for _,optionData in OptionSource[5].options do
+        for _,optionData in OptionSource[4].options do
             changedOptions[optionData.key] = nil
         end
 
