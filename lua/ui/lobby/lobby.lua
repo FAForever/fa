@@ -87,30 +87,34 @@ local numOpenSlots = LobbyComm.maxPlayerSlots
 local ActiveMods = GetPreference('active_mods') or {}
 
 
+--Add given lobby mod options if not already stored
+local function AddModOptions(OptionData)
+    local alreadyStored
+    for s, t in OptionData do
+        -- check, if we have this option already stored
+        alreadyStored = false
+        for k, v in modOptions do
+            if v.key == t.key then
+                alreadyStored = true
+                break
+            end
+        end
+        if not alreadyStored then
+            table.insert(modOptions, t)
+        end
+    end
+end
+
 -- Add lobby options from sim mods
 function ImportModOptions()
     local simMods = import('/lua/mods.lua').AllMods()
-    local OptionData
-    local alreadyStored
     for Index, ModData in simMods do
         if IsEnabledSimMod(ModData) then
             if exists(ModData.location..'/mod_options.lua') then
-                OptionData = import(ModData.location..'/mod_options.lua').options
-            elseif exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then 
-                OptionData = import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts
+                AddModOptions(import(ModData.location..'/mod_options.lua').options)
             end
-            for s, t in OptionData do
-                -- check, if we have this option already stored
-                alreadyStored = false
-                for k, v in modOptions do
-                    if v.key == t.key then
-                        alreadyStored = true
-                        break
-                    end
-                end
-                if not alreadyStored then
-                    table.insert(modOptions, t)
-                end
+            if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then 
+                AddModOptions(import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts)
             end
         end
     end
