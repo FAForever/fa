@@ -112,6 +112,11 @@ function EndCommandMode(isCancel)
         return
     end
 
+    -- regain selection if we were cheating in units
+    if modeData.cheat and modeData.selection then 
+        SelectUnits(modeData.selection)
+    end
+
     -- add information to modeData for end behavior
     modeData.isCancel = isCancel or false
 
@@ -393,7 +398,8 @@ function OnCommandIssued(command)
     -- part of the cheat menu
     if modeData.cheat and command.CommandType == "BuildMobile" then
         CheatSpawn(command, modeData)
-        return
+        command.Units = { }
+        return false
     end
 
     -- unknown when set, do not understand when this applies yet. In other words: ???

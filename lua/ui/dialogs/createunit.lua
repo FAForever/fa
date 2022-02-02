@@ -687,6 +687,9 @@ function CreateDialog(x, y)
 
     local function spreadSpawn(id, count, vet)
 
+        local selection = GetSelectedUnits()
+        SelectUnits(nil);
+
         -- enables command mode for spawning units
         import('/lua/ui/game/commandmode.lua').StartCommandMode(
             "build", 
@@ -703,6 +706,7 @@ function CreateDialog(x, y)
                 vet = tonumber(vet:GetText()) or 0,
                 yaw = (tonumber(orientation:GetText()) or 0) / 57.295779513,
                 army = currentArmy,
+                selection = selection,
             }
         )
 
