@@ -359,6 +359,28 @@ function CapStructure(command)
     end
 end
 
+--- Creates a callback to spawn a unit triggered by the cheat menu.
+-- @param command Command that contains the position of the click
+-- @param data A shallow copy of the modeData to make the function pure data-wise
+local function CheatSpawn(command, data)
+    SimCallback({
+        Func = 'BoxFormationSpawn',
+        Args = {
+            bpId = data.bpId,
+            count = data.count,
+            army = data.army,
+            pos = command.Target.Position,
+            veterancy = data.vet,
+            yaw = data.yaw,
+        }
+    }, true)
+
+    -- if we hold shift then we get to place another unit!
+    if not IsKeyDown('Shift') then 
+        EndCommandMode(true)
+    end
+end
+
 -- cached category strings for performance
 local categoriesFactories = categories.STRUCTURE * categories.FACTORY
 local categoriesShields = categories.MOBILE * categories.SHIELD
@@ -367,6 +389,12 @@ local categoriesStructure = categories.STRUCTURE
 --- Called by the engine when a new command has been issued by the player.
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
+
+    -- part of the cheat menu
+    if modeData.cheat and command.CommandType == "BuildMobile" and (not command.Units[1]) then
+        CheatSpawn(command, modeData)
+        return
+    end
 
     -- unknown when set, do not understand when this applies yet. In other words: ???
     if not command.Clear then

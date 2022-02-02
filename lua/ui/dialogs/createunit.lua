@@ -686,43 +686,36 @@ function CreateDialog(x, y)
     if SpawnThread then KillThread(SpawnThread) end
 
     local function spreadSpawn(id, count, vet)
-        count = tonumber(count:GetText()) or 1
-        vet = tonumber(vet:GetText()) or 0
-        local ori = (tonumber(orientation:GetText()) or 0) / 57.295779513
 
-        import('/lua/ui/game/commandmode.lua').StartCommandMode("build", { name = id })
-        local function callbackargs() return {
-            Func = 'BoxFormationSpawn',
-            Args = {
+        -- enables command mode for spawning units
+        import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            "build", 
+            { 
+                -- default information required
+                name = id, 
+
+                -- inform this is part of a cheat
+                cheat = true, 
+
+                -- information for spawning
                 bpId = id,
-                count = count,
+                count = tonumber(count:GetText()) or 1,
+                vet = tonumber(vet:GetText()) or 0,
+                yaw = (tonumber(orientation:GetText()) or 0) / 57.295779513,
                 army = currentArmy,
-                pos = GetMouseWorldPos(),
-                veterancy = vet,
-                yaw = ori,
             }
-        } end
+        )
 
+        -- options for user to exit the spawn mode
         local function IsCancelKeyDown() return IsKeyDown('ESCAPE') or IsKeyDown(2) end
 
         WaitSeconds(0.15)
-        local shift
+
+        -- check if user wants to exit
         while not dialog do
-            if IsCancelKeyDown() then break end
-            if IsKeyDown(1) then
-                while IsKeyDown(1) do -- do on release
-                    if IsCancelKeyDown() then return end
-                    WaitSeconds(0.01)
-                end
-                SimCallback(callbackargs(), true)
-                if IsKeyDown('SHIFT') then
-                    shift = true
-                else
-                    break
-                end
-            end
-            if shift and not IsKeyDown('SHIFT') then
-               break
+            if IsCancelKeyDown() then 
+                import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+                break 
             end
             WaitSeconds(0.1)
         end
