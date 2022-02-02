@@ -687,6 +687,8 @@ function CreateDialog(x, y)
 
     local function spreadSpawn(id, count, vet)
 
+        -- store selection so that units do not go of and try to build the unit we're 
+        -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
         local selection = GetSelectedUnits()
         SelectUnits(nil);
 
