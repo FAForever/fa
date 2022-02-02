@@ -114,6 +114,16 @@ function LayoutResourceGroup(group, groupType)
     LayoutHelpers.AtTopIn(group.income, group)
     group.income:SetColor('ffb7e75f')
 
+    LayoutHelpers.AtRightIn(group.eta, group, 83)
+    LayoutHelpers.AtTopIn(group.eta, group)
+    group.eta:SetColor('ffb7e75f')
+
+    LayoutHelpers.AtHorizontalCenterIn(group.etaValue, group.eta)
+    LayoutHelpers.AtBottomIn(group.etaValue, group)
+    group.etaValue:SetColor('ffb7e75f')
+
+
+
     LayoutHelpers.AtRightIn(group.expense, group, 2)
     LayoutHelpers.AtBottomIn(group.expense, group)
     LayoutHelpers.ResetTop(group.expense)

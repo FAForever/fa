@@ -138,8 +138,15 @@ function CreateUI()
 
         group.income = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
         group.income:SetDropShadow(true)
+
         group.expense = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
         group.expense:SetDropShadow(true)
+
+        group.eta = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
+        group.eta:SetDropShadow(true)
+
+        group.etaValue = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
+        group.etaValue:SetDropShadow(true)
 
         group.reclaimDelta = UIUtil.CreateText(group.warningBG, '', 10, UIUtil.bodyFont)
         group.reclaimDelta:SetDropShadow(true)
@@ -166,6 +173,8 @@ function CommonLogic()
             -- animation has taken place.
             group.income:SetHidden(hidden)
             group.expense:SetHidden(hidden)
+            group.eta:SetHidden(hidden)
+            group.etaValue:SetHidden(hidden)
             group.reclaimDelta:SetHidden(hidden)
             group.reclaimTotal:SetHidden(hidden)
 
@@ -309,8 +318,12 @@ function ConfigureBeatFunction()
         local maxStorage = GUI.maxStorage
         local incomeTxt = GUI.income
         local expenseTxt = GUI.expense
+        local etaTxt = GUI.eta
+        local etaValueTxt = GUI.etaValue
         local rateTxt = GUI.rate
         local warningBG = GUI.warningBG
+
+        etaTxt:SetText("ETA")
 
         local reclaimDelta = GUI.reclaimDelta
         local reclaimTotal = GUI.reclaimTotal
@@ -416,6 +429,8 @@ function ConfigureBeatFunction()
             incomeTxt:SetText(string.format("+%d", fmtnum(generatedIncome)))
             expenseTxt:SetText(string.format("-%d", fmtnum(expense)))
 
+
+
             -- Store this tick's reclaimRate for next tick
             lastReclaimRate = reclaimRate
 
@@ -437,14 +452,71 @@ function ConfigureBeatFunction()
             if States[viewState] == 2 then
                 rateTxt:SetText(string.format("%d%%", math.min(effVal, 100)))
             else
-                rateTxt:SetText(string.format("%+d", rateVal))
+                -- default value
+                local str = string.format("%+d", rateVal)
+
+                -- in case it is more than 1000
+                if math.abs(rateVal) > 1000 then 
+                    local num = rateVal
+                    num = num / 100
+                    num = math.floor(num)
+                    num = num / 10
+                    str = string.format('%+.1fk',num)
+                end
+
+                -- in case it is more than 10000
+                if math.abs(rateVal) > 10000 then 
+                    local num = rateVal
+                    num = num / 1000
+                    num = math.floor(num)
+                    str = string.format('%+.fk',num)
+                end
+
+                rateTxt:SetText(str)
             end
 
-            rateTxt:SetColor(getRateColour(rateVal, storedVal, maxStorageVal))
+            local rateColor = getRateColour(rateVal, storedVal, maxStorageVal)
+            rateTxt:SetColor(rateColor)
 
             if not UIState then
                 return
             end
+
+            -- Deal with economy ETA
+
+            -- default value
+            local str = "~"
+
+            -- decreasing storage storage
+            if rateVal < 0 then  
+                local time = math.abs(storedVal / rateVal)
+                local seconds = math.floor(time)
+                local minutes = math.floor(seconds / 60)
+                seconds = (seconds - (minutes * 60))
+                str = string.format("%02d:%02d", minutes, seconds)
+
+                if minutes > 99 or time == 0 then 
+                    str = "~"
+                end
+            end
+
+            -- increasing storage
+            if rateVal > 0 then  
+                local time = math.abs((maxStorageVal - storedVal) / rateVal)
+                local seconds = math.floor(time)
+                local minutes = math.floor(seconds / 60)
+                seconds = seconds - (minutes * 60)
+                str = string.format("%02d:%02d", minutes, seconds)
+
+                if minutes > 99 or time == 0 then 
+                    str = "~"
+                end
+            end
+
+            -- set the text and color
+            etaValueTxt:SetText(str)
+            etaValueTxt:SetColor(rateColor)
+            etaTxt:SetColor(rateColor)
 
             ShowUIWarnings(effVal, storedVal, maxStorageVal)
         end
