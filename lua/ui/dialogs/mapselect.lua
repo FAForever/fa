@@ -709,14 +709,14 @@ function RefreshOptions(skipRefresh)
     -- it also means it's a flag that tells you this is the first time the dialog has been opened
     -- so we'll use this flag to reset the options sources so they can set up for multiplayer
     
-    OptionSource = {}
-    OptionSource[1] = {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions}
-    OptionSource[2] = {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts}
-    OptionSource[3] = {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobby.lua').AIOpts}
-    OptionSource[4] = {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}
+    OptionSource = {
+    {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions},
+    {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts},
+    {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobby.lua').AIOpts},
+    {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}}
     local modOptions = import('/lua/ui/lobby/lobby.lua').modOptions
     for i, mod in modOptions do 
-        OptionSource[i + 4] = {title = mod[2], options = mod[1]}
+        table.insert(OptionSource, {title = mod[2], options = mod[1]})
     end
 
     Options = {}
