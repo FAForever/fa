@@ -55,7 +55,7 @@ keyActions = {
         category = 'ui', order = 25,},
     ['toggle_main_menu'] = {action = 'UI_Lua import("/lua/ui/game/tabs.lua").ToggleTab("main")',
         category = 'ui', order = 4,},
-    ['toggle_disconnect_screen'] = {action = 'UI_Lua import("/lua/ui/game/connectivity.lua").CreateUI()',
+    ['toggle_disconnect_screen'] = {action = 'UI_Lua import("/lua/ui/game/connectivity.lua").OpenWindow()',
         category = 'ui', order = 21,},
     ['toggle_reclaim_labels'] = {action = 'UI_Lua import("/lua/ui/game/reclaim.lua").ToggleReclaim()',
         category = 'ui'},

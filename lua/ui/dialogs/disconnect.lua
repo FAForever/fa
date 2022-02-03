@@ -236,6 +236,32 @@ function Update()
 
 end
 
+-- --- General update function that is run each frame, called from uimain.lua
+-- function Update()
+--     CheckToOpenDialogue()
+-- end
+
+-- local ConnectedClients = { }
+-- local ConnectedClientsHead = 1
+
+-- local QuietClients = { }
+-- local QuietClientsHead = 1
+
+-- local SecondsSinceLastCheck = 0
+-- local SecondsCheckInterval = 0.5
+
+-- --- Checks if the dialogue should open up
+-- function CheckToOpenDialogue()
+--     -- only check every x seconds
+--     local time = GetSystemTimeSeconds()
+--     if time - SecondsSinceLastCheck > SecondsCheckInterval then 
+--         SecondsSinceLastCheck = time 
+
+--     end
+
+--     return false 
+-- end
+
 function CreateBorder(parent)
     local tbl = {}
     tbl.tl = Bitmap(parent, UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_ul.dds'))
