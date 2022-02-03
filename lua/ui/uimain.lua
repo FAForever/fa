@@ -18,7 +18,7 @@ local alreadySetup = false
 
 --* Initialize the UI states, this is always called on startup
 function SetupUI()
-    
+
     -- SetCursor needs to happen anytime this function is called because we
     -- could be switching lua states.
     local c = UIUtil.CreateCursor()

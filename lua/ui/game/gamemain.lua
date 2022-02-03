@@ -143,6 +143,10 @@ end
 
 function CreateUI(isReplay)
 
+    -- override some UI globals
+    import("/lua/ui/override/ArmiesTable.lua").Setup()
+    import("/lua/ui/override/SessionClients.lua").Setup()
+
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then
         SetPreference('Options.Log', {
