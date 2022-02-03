@@ -2,11 +2,12 @@
 -- upvalue for performance
 local TableInsert = table.insert
 
-
 -- setup for a basic meta table
 local ObservableMeta = {}
 ObservableMeta.__index = ObservableMeta
 
+--- Adds an observer that is updated when the value is subject is set.
+-- @param callback A function that receives the value as its first argument.
 function ObservableMeta:AddObserver(callback)
     TableInsert(self.Listeners, callback)
 end
