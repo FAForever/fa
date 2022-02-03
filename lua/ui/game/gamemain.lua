@@ -143,9 +143,14 @@ end
 
 function CreateUI(isReplay)
 
+<<<<<<< HEAD
     -- override some UI globals
     import("/lua/ui/override/ArmiesTable.lua").Setup()
     import("/lua/ui/override/SessionClients.lua").Setup()
+=======
+    import("/lua/ui/clients-data.lua").Setup()
+    import("/lua/ui/game/connectivity.lua")
+>>>>>>> Refactoring connectivity window
 
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then

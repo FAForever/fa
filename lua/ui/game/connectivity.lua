@@ -6,13 +6,51 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+-- upvalue for performance
+local TableInsert = table.insert
+
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local GameMain = import('/lua/ui/game/gamemain.lua')
 
+<<<<<<< HEAD
 local SessionClients = import("/lua/ui/override/SessionClients.lua")
+=======
+local ClientsData = import("/lua/ui/clients-data.lua")
+local Statistics = import("/lua/shared/statistics.lua")
+
+-- {
+--   currentline=-1,
+--   func=doscript,
+--   linedefined=-1,
+--   name="doscript",
+--   namewhat="global",
+--   nups=0,
+--   short_src="[C]",
+--   source="=[C]",
+--   what="C"
+-- }
+
+local armiesTableCount = 0
+local sessionsCount = 0
+
+function CheckHook()
+    local info = debug.getinfo(2)
+    if info.name == "GetArmiesTable" then 
+        armiesTableCount = armiesTableCount + 1
+        LOG("Armies table: " .. tostring(armiesTableCount))
+    end
+
+    if info.name == "GetSessionClients" then 
+        sessionsCount = sessionsCount + 1
+        LOG("GetSessionClients: " .. tostring(sessionsCount))
+    end
+end
+
+debug.sethook(CheckHook, "c")
+>>>>>>> Refactoring connectivity window
 
 local GUI = {
     slots = {},
@@ -21,16 +59,136 @@ local GUI = {
     group = false,
 }
 
-
--- local State = {
---      
+-- {
+--   {
+--     authorizedCommandSources={ 1 },
+--     connected=true,
+--     ejectedBy={ },
+--     local=true,
+--     name="rwerw",
+--     ping=0,
+--     quiet=0,
+--     uid="0"
+--   }
 -- }
 
-local State = {
-    Open = false       -- whether or not the window is open
+local WindowIsOpen = false
 
+local SampleHead = 1
+local SampleCount = 100
+
+local Model = {
+    LocalID = -1,
+    Players = {
+        -- {
+            -- Connected = true
+            -- QuietTotal = -1,
+            -- Ping = -1,
+            -- PingMin = -1,
+            -- PingMax = -1,
+            -- PingAvg = -1
+            -- PingDev = -1
+
+            -- SamplesTime = { },
+            -- SamplesPing = { },
+        -- }
+    },
+    GUI = false,
 } 
 
+--- Constructs the initial model
+local function InitializeModel(model, clients)
+
+    -- get the clients once like this
+    local clients = GetSessionClients()
+
+    -- this initialisation is our first sample
+    SampleHead = 2
+
+    -- populate clients table
+    for k, client in clients do 
+
+        -- keep track of who we are
+        if client["local"] then 
+            model.LocalID = k 
+        end
+
+        -- keep track of player-specific information
+        local player = { 
+            QuietTotal = client.quiet,
+
+            PingMin = client.ping,
+            PingMax = client.ping,
+            PingDev = client.ping,
+            PingAvg = client.ping,
+            PingDev = 0,
+
+            SamplesTime = { 0.5 },
+            SamplesPing = { client.ping },
+
+            Connected = client.connected,
+        }
+
+        TableInsert(model.Players, player)
+    end
+end
+
+local function InitializeView(model, clients)
+
+end
+
+-- Construct initial model / view
+InitializeModel(Model)
+InitializeView(Model)
+
+--- Updates the model with new data
+-- @param model Model to update
+-- @param clients Client information to update the model with
+local function Controller(model, clients)
+
+    -- wrap around with our samples
+    if SampleHead > SampleCount then 
+        SampleHead = 1 
+    end
+
+    -- update each client
+    for k, client in clients do 
+
+        -- retrieve client state
+        local state = Model.Players[k]
+
+        -- update scalars
+        state.QuietTotal = state.QuietTotal + client.quiet
+        state.PingMin = math.min(state.PingMin, client.ping)
+        state.PingMax = math.max(state.PingMax, client.ping)
+        state.Ping = client.ping 
+
+        -- update samples
+        state.SamplesTime[SampleHead] = ClientsData.GetInterval()
+        state.SamplesPing[SampleHead] = client.ping 
+
+        -- update scalars depending on samples
+        state.PingAvg = Statistics.ComputeMean(state.SamplesPing, false)
+        state.PingDev = Statistics.ComputeDeviation(state.SamplesPing, false, state.PingAvg)
+    end
+end
+
+--- Visualises the model
+-- @param model Model to visualize
+local function View(model)
+    LOG("View state!")
+end
+
+--- Attaches us to the 
+ClientsData.ObsClient:AddObserver(
+    function(clients)
+        Controller(Model, clients)
+
+        if WindowIsOpen then 
+            View(Model)
+        end
+    end
+)
 
 local updateThread = nil
 
@@ -172,7 +330,7 @@ local function PopulateDialogue()
         CloseWindow()
     end
 
-    AddInputCapture(GUI.group)
+    -- AddInputCapture(GUI.group)
     GUI.group.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' then
             if event.KeyCode == UIUtil.VK_ESCAPE or event.KeyCode == UIUtil.VK_ENTER or event.KeyCode == 352 then
@@ -257,6 +415,8 @@ function OpenWindow()
         return 
     end
 
+    ClientsData.FastInterval()
+
     -- populate the dialogue 
     PopulateDialogue()
 
@@ -275,8 +435,13 @@ function CloseWindow()
     -- - The escape / enter keys
     -- - When opening the window when it is already open
 
+<<<<<<< HEAD
     SessionClients.ResetInterval()
 
+=======
+    ClientsData.ResetInterval()
+    
+>>>>>>> Refactoring connectivity window
     if updateThread then
         KillThread(updateThread)
         updateThread = nil

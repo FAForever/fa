@@ -71,6 +71,8 @@ function Setup()
     end
 end
 
+function 
+
 --- A getter to return the check interval
 function GetInterval()
     return TickInterval
