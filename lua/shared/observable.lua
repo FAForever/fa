@@ -1,4 +1,7 @@
 
+-- implementation of the observable pattern as described on:
+--  - https://en.wikipedia.org/wiki/Observer_pattern
+
 -- upvalue for performance
 local TableInsert = table.insert
 
