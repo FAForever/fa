@@ -47,7 +47,6 @@ end
 
 --- Override global function to return our cache
 _G.GetSessionClients = function()
-    LOG("Returning cache of GetSessionClients:" .. tostring(Cached))
     return Cached
 end
 

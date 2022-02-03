@@ -47,7 +47,6 @@ end
 
 --- Override global function to return our cache
 _G.GetArmiesTable = function()
-    LOG("Returning cache of GetArmiesTable:" .. tostring(Cached))
     return Cached
 end
 

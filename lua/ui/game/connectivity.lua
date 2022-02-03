@@ -12,6 +12,8 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local GameMain = import('/lua/ui/game/gamemain.lua')
 
+local SessionClients = import("/lua/ui/override/SessionClients.lua")
+
 local GUI = {
     slots = {},
     bgTop = false,
@@ -95,6 +97,8 @@ function CreateUI()
     local _,isSession = UIUtil.GetNetworkBool()
     if not isSession then return end
 
+    SessionClients.FastInterval()
+
     GUI.group = Bitmap(GetFrame(0), UIUtil.UIFile('/scx_menu/panel-brd/panel_brd_m.dds'))
     GUI.group.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
 
@@ -176,6 +180,9 @@ function CreateUI()
 end
 
 function CloseWindow()
+
+    SessionClients.ResetInterval()
+
     if updateThread then
         KillThread(updateThread)
         updateThread = nil
