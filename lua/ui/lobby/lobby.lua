@@ -66,8 +66,6 @@ function GetAITypes()
 end
 GetAITypes()
 
---This is a special table that allows us to pass data to blueprints.lua, before the rest of the game is loaded.
--- do not use this for anything that doesnt do blueprint modding, use GameOptions for that instead, which will load it into sim.
 
 local IsSyncReplayServer = false
 

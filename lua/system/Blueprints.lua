@@ -56,13 +56,16 @@ local here = getinfo(1).source
 local original_blueprints
 local current_mod
 
+local PrefsPreGameData = false
+local OptionChoices
+
 -- upvalue for performance
 pcall = pcall 
 doscript = doscript
 DiskFindFiles = DiskFindFiles
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
-local function LoadPreGameData()
+local function LoadPrefsData()
 
     -- load in the prefs file
     local file = DiskFindFiles("/preferences", "Game.prefs")[1]
@@ -72,12 +75,12 @@ local function LoadPreGameData()
     end
 
     -- try and load the pre game data of prefs file
-    local preGameData = false 
     ok, msg = pcall(
         function() 
             local data = { }
             doscript(file, data)
-            preGameData = data.PreGameData 
+            PrefsPreGameData = data.PreGameData 
+            OptionChoices = data.profile.profiles[data.profile.current].LobbyPresets[1].GameOptions
         end 
     )
 
@@ -86,8 +89,6 @@ local function LoadPreGameData()
         WARN("Blueprints.lua - Preferences file is locked or corrupt. Skipping pre game data.")
         WARN(msg)
     end
-
-    return preGameData
 end
 
 --- Attempts to assign icons to units if they exist.
@@ -135,10 +136,9 @@ local function FindCustomStrategicIcons(all_bps)
 
     -- STRATEGIC ICON REPLACEMENT --
 
-    -- try and load in pre game data
-    local preGameData = LoadPreGameData()
-    if preGameData and preGameData.IconReplacements then 
-        for _, info in preGameData.IconReplacements do 
+    -- try to use pre game data
+    if PrefsPreGameData and PrefsPreGameData.IconReplacements then 
+        for _, info in PrefsPreGameData.IconReplacements do 
 
             -- data that is set in the lobby
             -- info.Name = mod.name 
@@ -823,6 +823,8 @@ function PreModBlueprints(all_bps)
     end
 end
 
+LoadPrefsData()
+
 -- Hook for mods to manipulate the entire blueprint table
 function ModBlueprints(all_bps)
 end
@@ -924,11 +926,10 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     stats.UnitsOrg = table.getsize(original_blueprints.Unit)
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
-    -- try and load in pre game data for current map directory
-    local preGameData = LoadPreGameData()
-    if preGameData and preGameData.CurrentMapDir then
+    -- try to use pre game data for current map directory
+    if PrefsPreGameData and PrefsPreGameData.CurrentMapDir then
         task = 'Blueprints Loading: Blueprints from current map'
-        files = DiskFindFiles(preGameData.CurrentMapDir, pattern)
+        files = DiskFindFiles(PrefsPreGameData.CurrentMapDir, pattern)
         for k,file in files do
             BlueprintLoaderUpdateProgress()
             -- update UnitManager UI via taskNotifier only if it exists
