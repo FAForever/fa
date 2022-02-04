@@ -15,9 +15,8 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local GameMain = import('/lua/ui/game/gamemain.lua')
 
-<<<<<<< HEAD
 local SessionClients = import("/lua/ui/override/SessionClients.lua")
-=======
+
 local ClientsData = import("/lua/ui/clients-data.lua")
 local Statistics = import("/lua/shared/statistics.lua")
 
@@ -50,7 +49,6 @@ function CheckHook()
 end
 
 debug.sethook(CheckHook, "c")
->>>>>>> Refactoring connectivity window
 
 local GUI = {
     slots = {},
