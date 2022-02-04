@@ -14,10 +14,13 @@ local Group = import('/lua/maui/group.lua').Group
 local LazyVar = import('/lua/lazyvar.lua').Create
 local GameMain = import('/lua/ui/game/gamemain.lua')
 
+local SessionClients = import("/lua/ui/override/SessionClients.lua")
+
 local parent = false
 local myIndex = ''
 
 function DestroyDialog()
+    SessionClients.ResetInterval()
     if parent then
         parent:Destroy()
         parent = false
@@ -25,6 +28,7 @@ function DestroyDialog()
 end
 
 local function CreateDialog(clients)
+    SessionClients.FastInterval()
     import('/lua/ui/game/worldview.lua').UnlockInput()
     import('/lua/ui/game/gamemain.lua').KillWaitingDialog()
 
