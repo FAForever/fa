@@ -17,38 +17,7 @@ local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local SessionClients = import("/lua/ui/override/SessionClients.lua")
 
-local ClientsData = import("/lua/ui/clients-data.lua")
 local Statistics = import("/lua/shared/statistics.lua")
-
--- {
---   currentline=-1,
---   func=doscript,
---   linedefined=-1,
---   name="doscript",
---   namewhat="global",
---   nups=0,
---   short_src="[C]",
---   source="=[C]",
---   what="C"
--- }
-
-local armiesTableCount = 0
-local sessionsCount = 0
-
-function CheckHook()
-    local info = debug.getinfo(2)
-    if info.name == "GetArmiesTable" then 
-        armiesTableCount = armiesTableCount + 1
-        LOG("Armies table: " .. tostring(armiesTableCount))
-    end
-
-    if info.name == "GetSessionClients" then 
-        sessionsCount = sessionsCount + 1
-        LOG("GetSessionClients: " .. tostring(sessionsCount))
-    end
-end
-
-debug.sethook(CheckHook, "c")
 
 local GUI = {
     slots = {},
@@ -162,7 +131,7 @@ local function Controller(model, clients)
         state.Ping = client.ping 
 
         -- update samples
-        state.SamplesTime[SampleHead] = ClientsData.GetInterval()
+        state.SamplesTime[SampleHead] = SessionClients.GetInterval()
         state.SamplesPing[SampleHead] = client.ping 
 
         -- update scalars depending on samples
@@ -178,7 +147,7 @@ local function View(model)
 end
 
 --- Attaches us to the 
-ClientsData.ObsClient:AddObserver(
+SessionClients.Observable:AddObserver(
     function(clients)
         Controller(Model, clients)
 
@@ -413,7 +382,7 @@ function OpenWindow()
         return 
     end
 
-    ClientsData.FastInterval()
+    SessionClients.FastInterval()
 
     -- populate the dialogue 
     PopulateDialogue()
@@ -433,13 +402,8 @@ function CloseWindow()
     -- - The escape / enter keys
     -- - When opening the window when it is already open
 
-<<<<<<< HEAD
     SessionClients.ResetInterval()
 
-=======
-    ClientsData.ResetInterval()
-    
->>>>>>> Refactoring connectivity window
     if updateThread then
         KillThread(updateThread)
         updateThread = nil
