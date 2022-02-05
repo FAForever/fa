@@ -37,6 +37,10 @@ end
 --- Represents a cache of markers to prevent re-populating tables
 local MarkerCache = { }
 
+-- Pre-enable the caching of resource markers, to support adaptive maps
+MarkerCache["Mass"] = { Count = 0, Markers = { } }
+MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } }
+
 --- Retrieves all markers of a given type. This is a shallow copy,
 -- which means the reference is copied but the values are not. If you
 -- need a copy with unique values use GetMarkerByTypeDeep instead.
@@ -97,12 +101,25 @@ end
 -- existing references.
 -- @param type The type to flush.
 function FlushMarkerCacheByType(type)
+
+    -- give developer a warning, you can't do this
+    if type == "Mass" or type == "Hydrocarbon" then 
+        WARN("Unable to flush resource markers from the cache - it can cause issues for adaptive maps.")
+        return
+    end
+
     MarkerCache[type] = false
 end
 
 --- Flushes the entire marker cache. Does not remove existing references.
 function FlushMarkerCache()
-    MarkerCache = { }
+
+    -- copy over mass / hydro for consistency with adaptive maps
+    local cache = { }
+    cache.Mass = MarkerCache.Mass
+    cache.Hydrocarbon = MarkerCache.Hydrocarbon
+
+    MarkerCache = cache
 end
 
 -- CHAINS --
@@ -384,9 +401,6 @@ do
                 position = Vector(x, y, z),
             }
         end
-
-        -- add it to global table (on the array part of the table)
-        table.insert(AllMarkers, marker)
 
         -- make sure cache exists
         local markers, count = GetMarkersByType(type)

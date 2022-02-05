@@ -95,8 +95,6 @@ function OpenWindow()
         -- iteratively populate the window
         for k, group in State.EnabledMarkerTypes do 
 
-            local elements = { }
-
             -- create title of group
             local groupUI = UIUtil.CreateText(parent, k, 16, UIUtil.titleFont, false)
             LayoutHelpers.Below(groupUI, lastElement, 8)
@@ -118,22 +116,17 @@ function OpenWindow()
 
                 local identifier = l
                 checkUI.OnCheck = function (self, checked)
-                    SimCallback({
-                        Func = 'ToggleDebugMarkersByType', 
-                        Args = { Type = identifier }
-                    }
+                        SimCallback({
+                            Func = 'ToggleDebugMarkersByType', 
+                            Args = { Type = identifier }
+                        }
                     )
                 end
 
+                -- allows the next element to be below the last element
                 lastElement = typeUI
-
             end
-
-            parent[k] = elements
         end
-
-        
-
     else
         State.GUI:Show()
     end
