@@ -14,6 +14,8 @@
 -- Supports crazyrush-like maps.
 -----------------------------------------------------------------
 
+local StringSplit = import('/lua/system/utils.lua').StringSplit
+
 -- MARKERS --
 
 --- Contains all the markers that are part of the map, including markers of chains
@@ -226,6 +228,16 @@ function ToggleDebugMarkersByType(type)
                     for k = 1, count do 
                         local marker = markers[k]
                         DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
+
+                        -- useful for pathing markers
+                        if marker.adjacentTo then 
+                            for k, neighbour in StringSplit(marker.adjacentTo, " ") do 
+                                local neighbour = AllMarkers[neighbour]
+                                if neighbour then 
+                                    DrawLine(marker.position, neighbour.position, marker.color or 'ffffffff')
+                                end
+                            end
+                        end
                     end
     
                     WaitTicks(2)

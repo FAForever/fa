@@ -265,6 +265,8 @@ Unit = Class(moho.unit_methods) {
         self:InitBuffFields()
         self:OnCreated()
 
+        import("/lua/sim/MarkerUtilities.lua").ToggleDebugMarkersByType("Land Path Node")
+
         -- Ensure transport slots are available
         self.attachmentBone = nil
 
