@@ -5,6 +5,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Window = import('/lua/maui/window.lua')
 local GameMain = import('/lua/ui/game/gamemain.lua')
+local Text = import('/lua/maui/text.lua').Text
 
 -- complete state of this window
 local State = {
@@ -62,12 +63,73 @@ function OpenWindow()
 
         -- create the window
         State.GUI = Window.CreateDefaultWindow(
-            GetFrame(0), "Marker utilities", false, false, false, true, false, "marker-utilities-window"
+            GetFrame(0), 
+            "Marker utilities", 
+            false, 
+            false, 
+            false, 
+            true, 
+            false, 
+            "marker-utilities-window13",
+            10,
+            300, 
+            830,
+            360
         )
+
+        State.GUI.Border = UIUtil.SurroundWithBorder(State.GUI, '/scx_menu/lan-game-lobby/frame/')
 
         -- functionality of exit button
         State.GUI.OnClose = function(self)
             CloseWindow()
+        end
+
+        -- create group that will become the parent of all the elements
+        State.GUI.Groups = Group(State.GUI)
+        LayoutHelpers.FillParent(State.GUI.Groups, State.GUI.TitleGroup)
+
+        -- initialize state
+        local parent = State.GUI.Groups
+        local lastElement = parent
+
+        -- iteratively populate the window
+        for k, group in State.EnabledMarkerTypes do 
+
+            local elements = { }
+
+            -- create title of group
+            local groupUI = UIUtil.CreateText(parent, k, 16, UIUtil.titleFont, false)
+            LayoutHelpers.Below(groupUI, lastElement, 8)
+            LayoutHelpers.AtLeftIn(groupUI, parent, 12)
+
+            lastElement = groupUI 
+
+            -- create markers of group
+            for l, type in group do 
+
+                local typeUI = UIUtil.CreateText(parent, l, 14, UIUtil.bodyFont, false)
+                LayoutHelpers.Below(typeUI, lastElement, 8)
+                LayoutHelpers.AtLeftIn(typeUI, groupUI, 12)
+
+                local checkUI = UIUtil.CreateCheckboxStd(parent, '/dialogs/check-box_btn/radio')
+                LayoutHelpers.DepthOverParent(checkUI, State.GUI, 10)
+                LayoutHelpers.AtCenterIn(checkUI, typeUI)
+                LayoutHelpers.AtLeftIn(checkUI, parent, 300)
+
+                local identifier = l
+                checkUI.OnCheck = function (self, checked)
+                    SimCallback({
+                        Func = 'ToggleDebugMarkersByType', 
+                        Args = { Type = identifier }
+                    }
+                    )
+                end
+
+                lastElement = typeUI
+
+            end
+
+            parent[k] = elements
         end
 
         

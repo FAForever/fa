@@ -286,5 +286,6 @@ Callbacks.ToggleDebugChainByName = function (data, units)
 end
 
 Callbacks.ToggleDebugMarkersByType = function (data, units)
-    LOG("ToggleDebugMarkersByType")
+    LOG(repr(data))
+    import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
 end
