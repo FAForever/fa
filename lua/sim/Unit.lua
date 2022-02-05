@@ -1325,9 +1325,11 @@ Unit = Class(moho.unit_methods) {
         ArmyBrains[self.Army]:AddUnitStat(unitKilled.UnitId, "kills", 1)
     end,
 
-    CalculateVeterancyLevel = function(self, massKilled)
-        -- Limit the veterancy gain from one kill to one level worth
-        massKilled = math.min(massKilled, self.Sync.myValue or self.Sync.manualVeterancy[self.Sync.VeteranLevel + 1])
+    CalculateVeterancyLevel = function(self, massKilled, noLimit)
+        if not noLimit then 
+            -- Limit the veterancy gain from one kill to one level worth
+            massKilled = math.min(massKilled, self.Sync.myValue or self.Sync.manualVeterancy[self.Sync.VeteranLevel + 1])
+        end
 
         -- Total up the mass the unit has killed overall, and store it
         self.Sync.totalMassKilled = math.floor(self.Sync.totalMassKilled + massKilled)
@@ -1387,9 +1389,9 @@ Unit = Class(moho.unit_methods) {
         if not self.gainsVeterancy then return end
 
         if self.Sync.myValue then
-            self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel)
+            self:CalculateVeterancyLevel(self.Sync.myValue * veteranLevel, true)
         else
-            self:CalculateVeterancyLevel(self.Sync.manualVeterancy[veteranLevel])
+            self:CalculateVeterancyLevel(self.Sync.manualVeterancy[veteranLevel], true)
         end
     end,
 
