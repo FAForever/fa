@@ -39,7 +39,7 @@ local MarkerCache = { }
 
 -- Pre-enable the caching of resource markers, to support adaptive maps
 MarkerCache["Mass"] = { Count = 0, Markers = { } }
-MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } }
+MarkerCache["Hydrocarbon"] = { Count = 0, Markers = { } } 
 
 --- Retrieves all markers of a given type. This is a shallow copy,
 -- which means the reference is copied but the values are not. If you
