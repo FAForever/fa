@@ -38,6 +38,13 @@ local MarkerCache = { }
 --- Retrieves all markers of a given type. This is a shallow copy,
 -- which means the reference is copied but the values are not. If you
 -- need a copy with unique values use GetMarkerByTypeDeep instead.
+-- Common marker types are: 
+-- - "Mass", "Hydrocarbon"
+-- - "Air Path Node", "Land Path Node", "Water Path Node", "Amphibious Path Node"
+-- - "Transport Marker", "Naval Area", "Naval Link", "Rally Point", "Expansion Area"
+-- - "Protected Experimental Construction"
+-- The list is not limited to these marker types - any marker that has a 'type' property
+-- can be cached. You can find them in the <map>_save.lua file.
 -- @param type The type of marker to retrieve.
 -- returns A table with markers and its length.
 function GetMarkersByType(type)
@@ -61,7 +68,7 @@ function GetMarkersByType(type)
     end
 
     -- tell us about it, for now
-    LOG("Caching " .. n - 1 .. " markers of type " .. type .. "!")
+    SPEW("Caching " .. n - 1 .. " markers of type " .. type .. "!")
 
     -- construct the cache
     cache = {
@@ -198,6 +205,8 @@ local DebugMarkerSuspend = { }
 -- @param type The type of markers you wish to debug.
 function ToggleDebugMarkersByType(type)
 
+    SPEW("Toggled type to debug: " .. type)
+
     -- get the thread if it exists
     local thread = DebugMarkerThreads[type]
     if not thread then 
@@ -216,7 +225,7 @@ function ToggleDebugMarkersByType(type)
                     local markers, count = GetMarkersByType(type)
                     for k = 1, count do 
                         local marker = markers[k]
-                        DrawCircle(marker.position, marker.size, marker.color)
+                        DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
                     end
     
                     WaitTicks(2)
@@ -268,6 +277,8 @@ local DebugChainSuspend = { }
 -- @param type The name of the chain you wish to debug.
 function ToggleDebugChainByName(name)
 
+    SPEW("Toggled chain to debug: " .. name)
+
     -- get the thread if it exists
     local thread = DebugChainThreads[name]
     if not thread then 
@@ -295,7 +306,7 @@ function ToggleDebugChainByName(name)
                     else 
                         if count == 1 then 
                             local marker = markers[1]
-                            DrawCircle(marker.position, marker.size, marker.color)
+                            DrawCircle(marker.position, marker.size or 1, marker.color or 'ffffffff')
                         else 
                             WARN("Trying to debug draw an empty chain: " .. name)
                         end
