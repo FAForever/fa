@@ -399,13 +399,15 @@ Callbacks.BoxFormationSpawn = function(data)
     end
 
     local function RoundToSkirt(axe, val)
+        LOG(axe)
+        LOG(val)
         return unitbp.Physics.MotionType ~= 'RULEUMT_None'
         and val
         or math.floor(val) + (math.mod(FootprintSize(axe),2) == 1 and 0.5 or 0)
     end
 
-    local posX = math.floor(data.pos[1])
-    local posZ = math.floor(data.pos[3])
+    local posX = (data.pos[1])
+    local posZ = (data.pos[3])
     local offsetX = unitbp.SizeX or 1
     local offsetZ = unitbp.SizeZ or 1
 
@@ -419,6 +421,7 @@ Callbacks.BoxFormationSpawn = function(data)
     local startOffsetX = (squareX-1) * 0.5 * offsetX
     local startOffsetZ = (squareZ-1) * 0.5 * offsetZ
 
+    LOG("BoxFormationSpawn")
     for i = 1, data.count do
         local x = RoundToSkirt('x', posX - startOffsetX + math.mod(i,squareX) * offsetX)
         local z = RoundToSkirt('z', posZ - startOffsetZ + math.mod(math.floor(i/squareX), squareZ) * offsetZ)
