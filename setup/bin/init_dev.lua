@@ -314,8 +314,6 @@ local loadedMods = { }
 local function MountModContent(dir)
     -- get all directories / mods at the mount point
     for _, mod in io.dir(dir..'/*.*') do
-        
-        LOG(mod)
 
         -- prevent capital letters messing things up
         mod = StringLower(mod)
@@ -331,14 +329,10 @@ local function MountModContent(dir)
             continue 
         end 
 
-        LOG(mod, " not integrated")
-
         -- do not load archives as mods
         if StringFind(mod, ".zip") or StringFind(mod, ".scd") or StringFind(mod, ".rar") then
             continue 
         end
-
-        LOG(mod, " not zipped")
 
         -- check if the folder contains a _info.lua
         local infoFile = false 
@@ -347,8 +341,6 @@ local function MountModContent(dir)
                 infoFile = file 
             end
         end
-
-        LOG(mod, " not has info")
 
         -- check if it has a scenario file
         if not infoFile then 
@@ -364,8 +356,6 @@ local function MountModContent(dir)
 
         -- consider this one loaded
         loadedMods[mod] = true 
-
-        LOG(mod, " is loaded")
 
         -- mount the mod
         MountDirectory(dir .. "/" .. mod, "/mods/" .. mod)
