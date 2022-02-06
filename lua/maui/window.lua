@@ -58,6 +58,8 @@
 --#    cursorFunc = UIUtil.GetCursor,
 --#}
 --#################################################
+
+local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import('/lua/maui/text.lua').Text
@@ -71,11 +73,11 @@ styles = {}
 
 Window = Class(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
-        Group.__init(self, parent, 'window')
+        Group.__init(self, parent, tostring(title) .. "-window")
 
         self:DisableHitTest()
 
-        self._resizeGroup = Group(parent, 'window resize group')
+        self._resizeGroup = Group(self, 'window resize group')
         LayoutHelpers.FillParent(self._resizeGroup, self)
         self._resizeGroup.Depth:Set(function() return self.Depth() + 100 end)
         self._resizeGroup:DisableHitTest()
@@ -550,6 +552,61 @@ Window = Class(Group) {
 
     OnMouseWheel = function(self, rotation) end,
 
-    OnClose = function(self) end,
-    OnHideWindow = function(self, hidden) end,
+    OnClose = function(control) end,
+    OnHideWindow = function(control, hidden) end,
 }
+
+local windowTextures = {
+    tl = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_ul.dds'),
+    tr = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_ur.dds'),
+    tm = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_horz_um.dds'),
+    ml = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_vert_l.dds'),
+    m = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_m.dds'),
+    mr = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_vert_r.dds'),
+    bl = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_ll.dds'),
+    bm = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_lm.dds'),
+    br = UIUtil.UIFile('/game/mini-map-brd/mini-map_brd_lr.dds'),
+    borderColor = 'ff415055',
+}
+
+--- Constructs a default window.
+-- @param parent Parent of the window, defaults to GetFrame(0)
+-- @param title Title of the window
+-- @param icon Path to the icon to use for the window, defaults to false (in other words: no icon) 
+-- @param pin Toggle for the pin button, override window.OnPinCheck(self, checked) to set the behavior
+-- @param config Toggle for configuration button, override window.OnConfigClick(self) to set the behavior
+-- @Param lockSize Toggle to allow the user to adjust the size of the window.
+-- @param lockPosition Toggle to allow the user to adjust the position of the window.
+-- @param preferenceID Identifier used in the preference file to remember where this window was located last
+-- @param defaultLeft The default left boundary of the window, defaults to 10
+-- @param defaultTop The default top boundary of the window, defaults to 300
+-- @param defaultBottom The default bottom boundary of the window, defaults to 600
+-- @param defaultRight The default right boundary of the window, defaults to 210
+function CreateDefaultWindow(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
+
+    -- allow for optionals
+    parent = parent or GetFrame(0)
+
+    defaultLeft = defaultLeft or 10
+    defaultTop = defaultTop or 300
+    defaultBottom = defaultBottom or 600
+    defaultRight = defaultRight or 210
+
+    -- setup data
+    local defaults = { Left = defaultLeft, Top = defaultTop, Bottom = defaultBottom, Right = defaultRight }
+
+    -- create and return window
+    return Window(
+        parent,          -- parent
+        title,           -- title
+        icon,            -- icon
+        pin,             -- pin
+        config,          -- config
+        lockSize,        -- lockSize
+        lockPosition,    -- lockPosition
+        preferenceID,    -- prefID
+        defaults,        -- default position
+        windowTextures   -- textureTable
+    )
+
+end

@@ -580,3 +580,11 @@ Callbacks.FlagShield = function(data, units)
 end
 
 Callbacks.WeaponPriorities = import('/lua/WeaponPriorities.lua').SetWeaponPriorities
+
+Callbacks.ToggleDebugChainByName = function (data, units)
+    LOG("ToggleDebugChainByName")
+end
+
+Callbacks.ToggleDebugMarkersByType = function (data, units)
+    import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
+end

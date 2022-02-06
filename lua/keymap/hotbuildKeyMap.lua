@@ -36,6 +36,7 @@ defaultKeyMap = {
     ['F10']                 = 'toggle_main_menu',
     ['F11']                 = 'toggle_disconnect_screen',
     ['F12']                 = 'show_objective_screen',
+    ['K']            = 'toggle_markers_screen',
 
     ['1']                   = 'group1',
     ['2']                   = 'group2',
