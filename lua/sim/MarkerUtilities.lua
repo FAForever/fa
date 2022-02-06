@@ -18,7 +18,10 @@
 -- Supports crazyrush-like maps.
 -----------------------------------------------------------------
 
+-- imports and upvalues
+
 local StringSplit = import('/lua/system/utils.lua').StringSplit
+local TableDeepCopy = table.deepcopy
 
 -- MARKERS --
 
@@ -98,7 +101,7 @@ end
 -- returns A table with markers and its length.
 function GetMarkersByTypeDeep(type)
     local cache = GetMarkersByType(type)
-    return table.deepcopy(cache.Markers), cache.Count
+    return TableDeepCopy(cache.Markers), cache.Count
 end
 
 --- Flushes the cache of a certain type. Does not remove
@@ -182,7 +185,7 @@ end
 -- returns A table with markers and its length.
 function GetMarkersInChainDeep(type)
     local cache = GetMarkersInChain(type)
-    return table.deepcopy(cache.Markers), cache.Count
+    return TableDeepCopy(cache.Markers), cache.Count
 end
 
 --- Flushes the chain cache of a certain type. Does not 
