@@ -8,6 +8,10 @@
 -- of markers and returns a reference, unless you explicitly
 -- want a new table with unique values.
 
+-- Extractor / hydrocarbon markers are setup different from the other
+-- markers. As an example, you can not flush these markers. This 
+-- is done to support adaptive maps and the crazy rush mode.
+
 -- Contains various debug facilities to help understand the
 -- state that is stored in this file.
 
