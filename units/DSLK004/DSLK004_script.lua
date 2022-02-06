@@ -67,8 +67,11 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
 
     DoDamage = function(self, instigator, damageData, targetEntity)
 
+        -- fix me: beam weapons shouldn't be used. Instead, use a projectile based weapon that looks like a beam weapon.
         if self.TargetEntity then
-            targetEntity = self.TargetEntity
+            if EntityCategoryContains(categories.AIR, self.TargetEntity) then 
+                targetEntity = self.TargetEntity
+            end
         end
 
         local damage = damageData.DamageAmount or 0

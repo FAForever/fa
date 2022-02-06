@@ -130,6 +130,7 @@ UnitBlueprint {
             '<LOC ability_torpedo>Torpedoes',
             '<LOC ability_submersible>Submersible',
         },
+        AnimationBuild = '/units/uas0401/uas0401_build.sca',
         AnimationDeath = {
             {
                 Animation = '/units/uas0401/uas0401_adeath01.sca',

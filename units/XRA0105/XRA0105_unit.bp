@@ -280,18 +280,18 @@ UnitBlueprint {
             Damage = 15,
             DamageType = 'Normal',
             DisplayName = 'Heavy Laser Autogun',
-            DamageRadius = 0.15,
+            DamageRadius = 0,
             FireTargetLayerCapsTable = {
                 Air = 'Air|Land|Water|Seabed',
                 Land = 'Air|Land|Water|Seabed',
             },
             FiringTolerance = 2,
             Label = 'MainGun',
-            MaxRadius = 20, # 16 = to make it better in patrol / ground attack mode
+            MaxRadius = 20, -- 16 = to make it better in patrol / ground attack mode
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 55,
-            ProjectileId = '/projectiles/CDFLaserHeavy01/CDFLaserHeavy01_proj.bp',
+            ProjectileId = '/projectiles/CDFLaserHeavy03/CDFLaserHeavy03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 1,
             RackBones = {

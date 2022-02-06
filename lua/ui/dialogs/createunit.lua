@@ -9,109 +9,329 @@ local RadioGroup = import('/lua/maui/mauiutil.lua').RadioGroup
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Edit = import('/lua/maui/edit.lua').Edit
+local options = import('/lua/user/prefs.lua').GetFromCurrentProfile('options')
 
-local dialog = false
-local nameDialog = false
-local activeFilters = {}
-local activeFilterTypes = {}
-local specialFilterControls = {}
-local filterSet = {}
-local UnitList = {}
-local CreationList = {}
+local ssub, gsub, upper, lower, find, slen, format = string.sub, string.gsub, string.upper, string.lower, string.find, string.len, string.format
+local mmin, mmax, floor = math.min, math.max, math.floor
 
-local defaultEditField = false
-
+local dialog, nameDialog, defaultEditField
+local EscThread, SpawnThread
+local activeFilters, activeFilterTypes, specialFilterControls, filterSet = {}, {}, {}, {}
+local UnitList, CreationList = {}, {}
 local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
 local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')
 
-local ModListTabs = function()
-    local listicle = {
-        {
-            title = 'SC',
-            key = 'sc1',
-            sortFunc = function(unitID, modloc)
-                return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) == 'u'
-            end,
-        },
-        {
-            title = 'SC-FA',
-            key = 'scx1',
-            sortFunc = function(unitID, modloc)
-                return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) == 'x'
-            end,
-        },
-        {
-            title = 'SC Patch',
-            key = 'dlc',
-            sortFunc = function(unitID, modloc)
-                return string.sub(__blueprints[unitID].Source, 1, 7) == "/units/" and string.sub(unitID, 1, 1) ~= 'u' and string.sub(unitID, 1, 1) ~= 'x' and string.sub(unitID, 1, 1) ~= 'o'
-            end,
+local NumArmies = GetArmiesTable().numArmies
+
+local ChoiceColumns = options.spawn_menu_filter_columns or 5
+local TeamColumns = mmin(options.spawn_menu_team_columns or 3, NumArmies)
+
+local function SourceListTabs()
+    local NameMaxLengthChars = 12
+
+    local function ShouldGiveTab(mod)
+        local dirlen = slen(mod.location)
+        for id, bp in __blueprints do
+            if mod.location..'/' == ssub(bp.Source, 1, dirlen+1) then
+                return true
+            end
+        end
+    end
+
+    local function NameIsShortEnough(name) return slen(name) <= NameMaxLengthChars end
+    local function ForWordsIn(text, operation) return gsub(text, '[%a\']+', operation) end
+    local function Initialise(text) return gsub(text, '[%a\'%&]+%s*', function(s) return upper(ssub(s,1,1)) end ) end
+    local function Abreviate(word)
+        local words = {
+            Additional = 'Add',
+            Advanced = 'Adv',
+            Balance = 'Bal',
+            BlackOps = 'BO',
+            BrewLAN = 'BL',
+            Command = 'Com',
+            Commander = 'Cdr',
+            Commanders = 'Cdrs',
+            Experiment = 'Exp',
+            Experimental = 'Exp',
+            Experimentals = 'Exps',
+            Infrastructure = 'Infr',
+            Supreme = 'Sup',
+            Veterancy = 'Vet',
         }
-    }
+        return words[gsub(word,'\'','')] or word
+    end
+
+    local function titleFit(name)
+        local l = NameMaxLengthChars
+
+        --Removes version numbers and any brackets around them. Restrictive to reduce false positives
+        name = gsub(name, '[%[%<%{%(%s]+[vV]+%s*%d+[_%.%d]*[%]%>%}%)%s]*', '') --Requires v or V at start
+        name = gsub(name, '[%[%<%{%(%s]+%d+[_%.]+[_%.%d]+[%]%>%}%)%s]*', '') --Requres one or more decimal point or _ between numbers
+
+        if NameIsShortEnough(name) then return name end
+
+        -- Remove anything between brackets, and any space before them
+        name = gsub(name, '%s*%b()', '')
+        name = gsub(name, '%s*%b[]', '')
+        name = gsub(name, '%s*%b<>', '')
+        name = gsub(name, '%s*%b{}', '')
+
+        if NameIsShortEnough(name) then return name end
+
+        name = ForWordsIn(name, Abreviate)
+
+        if NameIsShortEnough(name) then return name end
+
+        if not find(ssub(name, l), ' ') then --If we wouldn't lose any entire words, cutoff.
+            return ssub(name, 1, l)
+
+        else -- If there are words that would be entirely cut off, initialise after the first
+            local FirstSpaceIndex = find(name, ' ')
+            local name = ssub(name, 1, FirstSpaceIndex) .. Initialise(ssub(name, FirstSpaceIndex+1))
+
+            if NameIsShortEnough(name) then
+                return name
+
+            else --If it still isn't short enough, just initialise the rest as well, and trim the result just in case
+                name = Initialise(ssub(name, 1, FirstSpaceIndex)) .. ssub(name, FirstSpaceIndex+1)
+                return ssub(name, 1, mmin(l, slen(name)))
+            end
+        end
+    end
+
+    local listicle
+
+    if options.spawn_menu_split_sources == 1 then
+        listicle = {
+            {
+                title = 'SC',
+                key = 'sc1',
+                sortFunc = function(unitID, modloc)
+                    return ssub(__blueprints[unitID].Source, 1, 8) == "/units/u"
+                end,
+            },
+            {
+                title = 'SC-FA',
+                key = 'scx1',
+                sortFunc = function(unitID, modloc)
+                    return ssub(__blueprints[unitID].Source, 1, 8) == "/units/x"
+                end,
+            },
+            {
+                title = 'SC Patch',
+                key = 'dlc',
+                sortFunc = function(unitID, modloc)
+                    return ssub(__blueprints[unitID].Source, 1, 7) == "/units/" and ssub(unitID, 1, 1) ~= 'u' and ssub(unitID, 1, 1) ~= 'x' and ssub(unitID, 1, 1) ~= 'o'
+                end,
+            }
+        }
+    else
+        listicle = {
+            {
+                title = 'Core Game',
+                key = 'vanilla',
+                sortFunc = function(unitID, modloc)
+                    return ssub(__blueprints[unitID].Source, 1, 7) == "/units/"
+                end,
+            }
+        }
+    end
 
     for i, mod in __active_mods do
         if mod.name then
-            local givetab = false
-            local dirlen = string.len(mod.location)
-            for id, bp in __blueprints do
-                if mod.location == string.sub(bp.Source, 1, dirlen) and string.sub(bp.Source, dirlen + 1, dirlen + 1) == "/" then
-                    givetab = true
-                    break
-                end
-            end
-            if givetab then
-                local key = string.gsub(string.lower(mod.name),"%s+", "_")
-                local titleFit = function(name)
-                    local l = 12
-                    if string.len(name) <= l then return name end --If it's short, just gief
-
-                    name = string.gsub(name, "%([^()]*%)", "") --Remove any brackets
-                    name = string.gsub(name, "[ %s]+$", "") --Remove trailing spaces, because I can't be arsed to work out how to do both in one regex
-                    if string.len(name) <= l then return name end
-
-                    local commonlong = { --Shrink some common long words to be recognisble
-                        Additional = 'Add',
-                        Advanced = 'Adv',
-                        Balance = 'Bal',
-                        BlackOps = 'BO',
-                        Command = 'Com',
-                        Commander = 'Cdr',
-                        Commanders = 'Cdrs',
-                        Experiment = 'Exp',
-                        Experimental = 'Exp',
-                        Infrastructure = 'Infr',
-                        Supreme = 'Sup',
-                        Veterancy = 'Vet',
-                    }
-                    for long, short in commonlong do name = string.gsub(name, long, short) end
-                    if string.len(name) <= l then return name end
-
-                    if string.find(string.sub(name, l+1, -1), " ") then -- If there are words that would be entirely cut off, initialise after the first
-                        local fsp = string.find(name, " ")
-                        local name = string.sub(name, 1, fsp) .. string.gsub(string.sub(name, fsp+1, -1), "[a-z]+", "")
-                        if string.len(name) <= l then
-                            return name
-                        else --If it still isn't short enough, just initialise everything.
-                            return string.gsub(name, "[a-z]+", "")
-                        end
-                    else--If there are no spaces after the cutoff, cutoff.
-                        return string.sub(name, 1, l)
-                    end
-                end
-
+            if ShouldGiveTab(mod) then
+                local key = gsub(lower(mod.name),"%s+", "_")
                 specialFilterControls[key] = mod.location
                 table.insert(listicle, {
                     title = titleFit(mod.name),
                     key = key,
-                    sortFunc = function(unitID, modloc)
-                        local modloclen = string.len(modloc)
-                        return modloc == string.sub(__blueprints[unitID].Source, 1, modloclen) and string.sub(__blueprints[unitID].Source, modloclen + 1, modloclen + 1) == "/"
-                    end,
+                    sortFunc = function(unitID, modloc) return modloc..'/' == ssub(__blueprints[unitID].Source, 1, slen(modloc)+1) end,
                 })
             end
         end
     end
     return listicle
+end
+
+local function HasCat(id, cat)
+    return __blueprints[id].CategoriesHash and __blueprints[id].CategoriesHash[cat]
+    or __blueprints[id].Categories and table.find(__blueprints[id].Categories, cat)
+end
+
+local function FactionListTabs()
+    local flisticle = {}
+    local allFactionCats = {}
+
+    for i, faction in import('/lua/factions.lua').Factions do
+        local key = 'faction'..faction.Category
+        specialFilterControls[key] = faction.Category
+        table.insert(allFactionCats, faction.Category)
+        table.insert(flisticle, {
+            title = faction.DisplayName,
+            key = key,
+            sortFunc = HasCat
+        })
+    end
+
+    table.insert(flisticle, {
+        title = 'Other',
+        key = 'otherfaction',
+        sortFunc = function(unitID)
+            for i, cat in allFactionCats do
+                if HasCat(unitID, cat) then return end
+            end
+            return true
+        end,
+    })
+
+    return flisticle
+end
+
+local function TypeListTabs()
+    if options.spawn_menu_type_filter_mode == 1 then
+        return {
+            {
+                title = 'Land',
+                key = 'land',
+                sortFunc = function(unitID) return HasCat(unitID, 'LAND') end,
+            },
+            {
+                title = 'Air',
+                key = 'air',
+                sortFunc = function(unitID) return HasCat(unitID, 'AIR') end,
+            },
+            {
+                title = 'Naval',
+                key = 'naval',
+                sortFunc = function(unitID) return HasCat(unitID, 'NAVAL') end,
+            },
+            {
+                title = 'Amphibious',
+                key = 'amph',
+                sortFunc = function(unitID)
+                    return HasCat(unitID, 'AMPHIBIOUS') or HasCat(unitID, 'HOVER')
+                end,
+            },
+            {
+                title = 'Base',
+                key = 'base',
+                sortFunc = function(unitID)
+                    return __blueprints[unitID].Physics.MotionType == 'RULEUMT_None'
+                end,
+            },
+        }
+    else
+        local list = {
+            {
+                title = 'Land',
+                key = 'land',
+                sortFunc = function(unitID)
+                    local MT = __blueprints[unitID].Physics.MotionType
+                    return (MT == 'RULEUMT_Amphibious' or MT == 'RULEUMT_Land') and __blueprints[unitID].ScriptClass ~= 'ResearchItem'
+                end,
+            },
+            {
+                title = 'Surface',
+                key = 'surface',
+                sortFunc = function(unitID)
+                    local MT = __blueprints[unitID].Physics.MotionType
+                    return MT == 'RULEUMT_AmphibiousFloating' or MT == 'RULEUMT_Hover'
+                end,
+            },
+            {
+                title = 'Naval',
+                key = 'naval',
+                sortFunc = function(unitID)
+                    local MT = __blueprints[unitID].Physics.MotionType
+                    return MT == 'RULEUMT_Water' or MT == 'RULEUMT_SurfacingSub'
+                end,
+            },
+            {
+                title = 'Air',
+                key = 'air',
+                sortFunc = function(unitID)
+                    return __blueprints[unitID].Physics.MotionType == 'RULEUMT_Air'
+                end,
+            },
+            {
+                title = 'Base',
+                key = 'base',
+                sortFunc = function(unitID)
+                    return __blueprints[unitID].Physics.MotionType == 'RULEUMT_None'
+                end,
+            },
+        }
+
+        for i, mod in __active_mods do
+            if mod.showresearch then
+                table.insert(list, {
+                    title = 'Research',
+                    key = 'rnd',
+                    sortFunc = function(unitID)
+                        return __blueprints[unitID].ScriptClass == 'ResearchItem'
+                    end,
+                })
+                break
+            end
+        end
+
+        return list
+    end
+end
+
+local function TechListTabs()
+    local list = {
+        {
+            title = 'T1',
+            key = 't1',
+            sortFunc = function(unitID)
+                return HasCat(unitID, 'TECH1')
+            end,
+        },
+        {
+            title = 'T2',
+            key = 't2',
+            sortFunc = function(unitID)
+                return HasCat(unitID, 'TECH2')
+            end,
+        },
+        {
+            title = 'T3',
+            key = 't3',
+            sortFunc = function(unitID)
+                return HasCat(unitID, 'TECH3')
+            end,
+        },
+        {
+            title = 'Exp.',
+            key = 't4',
+            sortFunc = function(unitID)
+                return HasCat(unitID, 'EXPERIMENTAL')
+            end,
+        },
+    }
+    if options.spawn_menu_notech_filter ~= 0 then
+        table.insert(list, 1, {
+            title = 'No Tech',
+            key = 'civ',
+            sortFunc = function(unitID)
+                return not (HasCat(unitID, 'TECH1') or HasCat(unitID, 'TECH2')
+                or HasCat(unitID, 'TECH3') or HasCat(unitID, 'EXPERIMENTAL'))
+            end,
+        })
+    end
+    if options.spawn_menu_paragon_filter == 1 then
+        table.insert(list, {
+            title = 'ACU+',
+            key = 'acu',
+            sortFunc = function(unitID)
+                return HasCat(unitID, 'COMMAND') -- Show ACU's
+                or find(unitID, 'l0301_Engineer') -- Show SCU's
+                or find(unitID, 'xab1401') -- Show Paragon
+            end,
+        })
+    end
+    return list
 end
 
 local nameFilters = {
@@ -120,253 +340,130 @@ local nameFilters = {
         key = 'custominput',
         sortFunc = function(unitID, text)
             local bp = __blueprints[unitID]
-            local desc = string.lower(LOC(bp.Description or ''))
-            local name = string.lower(LOC(bp.General.UnitName or ''))
-            text = string.lower(text)
-            if string.find(unitID, text) or string.find(desc, text) or string.find(name, text) then
-                return true
-            end
+            local desc = lower(LOC(bp.Description or ''))
+            local name = lower(LOC(bp.General.UnitName or ''))
+            text = lower(text)
+            return find(unitID, text) or find(desc, text) or find(name, text)
         end,
     },
     {
         title = 'Faction',
         key = 'faction',
-        choices = {
-            {
-                title = 'UEF',
-                key = 'uef',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.UEF
-                end,
-            },
-            {
-                title = 'Aeon',
-                key = 'aeon',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.AEON
-                end,
-            },
-            {
-                title = 'Cybran',
-                key = 'cybran',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.CYBRAN
-                end,
-            },
-            {
-                title = 'Seraphim',
-                key = 'seraphim',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.SERAPHIM
-                end,
-            },
-            {
-                title = 'other faction',
-                key = '3rdParty',
-                sortFunc = function(unitID)
-                    if not __blueprints[unitID].CategoriesHash.UEF
-                    and not __blueprints[unitID].CategoriesHash.AEON
-                    and not __blueprints[unitID].CategoriesHash.CYBRAN
-                    and not __blueprints[unitID].CategoriesHash.SERAPHIM
-                    then
-                        return true
-                    end
-                    return false
-                end,
-            },
-        },
-    },--[[
-    {
-        title = 'Product',
-        key = 'product',
-        choices = {
-            {
-                title = 'SC',
-                key = 'sc1',
-                sortFunc = function(unitID)
-                    return string.sub(unitID, 1, 1) == 'u'
-                end,
-            },
-            {
-                title = 'SC-FA',
-                key = 'scx1',
-                sortFunc = function(unitID)
-                    return string.sub(unitID, 1, 1) == 'x'
-                end,
-            },
-            {
-                title = 'Mods',
-                key = 'dl',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].Mod
-                end,
-            },
-            {
-                title = 'Operation',
-                key = 'ops',
-                sortFunc = function(unitID)
-                    return string.sub(unitID, 1, 1) == 'o' or __blueprints[unitID].CategoriesHash.OPERATION
-                end,
-            },
-            {
-                title = 'Civilian',
-                key = 'civ',
-                sortFunc = function(unitID)
-                    return string.sub(unitID, 3, 3) == 'c' or __blueprints[unitID].CategoriesHash.CIVILIAN
-                end,
-            },
-        },
+        choices = FactionListTabs(),
     },
-    ]]
     {
         title = 'Source',
         key = 'mod',
-        choices = ModListTabs(),
+        choices = SourceListTabs(),
     },
     {
         title = 'Type',
         key = 'type',
-        choices = {
-            {
-                title = 'Land',
-                key = 'land',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.LAND
-                end,
-            },
-            {
-                title = 'Air',
-                key = 'air',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.AIR
-                end,
-            },
-            {
-                title = 'Naval',
-                key = 'naval',
-                sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.NAVAL
-                end,
-            },
-            {
-                title = 'Amphibious',
-                key = 'amph',
-                sortFunc = function(unitID)
-                    if __blueprints[unitID].CategoriesHash.AMPHIBIOUS
-                    or __blueprints[unitID].CategoriesHash.HOVER
-                    then
-                        return true
-                    end
-                    return false
-                end,
-            },
-            {
-                title = 'Base',
-                key = 'base',
-                sortFunc = function(unitID)
-                    if string.sub(unitID, 3, 3) == 'b' then
-                        return true
-                    end
-                    return false
-                end,
-            },
-        },
+        choices = TypeListTabs(),
     },
     {
         title = 'Tech Level',
         key = 'tech',
+        choices = TechListTabs(),
+    },
+}
+
+if options.spawn_menu_filter_menu_sort ~= 0 then
+    table.insert(nameFilters, {
+        title = 'Menu Sort',
+        key = 'sort',
         choices = {
             {
-                title = 'Tech 1',
-                key = 't1',
+                title = 'Construction',
+                key = 'const',
                 sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.TECH1
+                    return HasCat(unitID, 'SORTCONSTRUCTION')
                 end,
             },
             {
-                title = 'Tech 2',
-                key = 't2',
+                title = 'Economy',
+                key = 'eco',
                 sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.TECH2
+                    return HasCat(unitID, 'SORTECONOMY')
                 end,
             },
             {
-                title = 'Tech 3',
-                key = 't3',
+                title = 'Defense',
+                key = 'fence',
                 sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.TECH3
+                    return HasCat(unitID, 'SORTDEFENSE')
                 end,
             },
             {
-                title = 'Experimental',
-                key = 't4',
+                title = 'Strategic',
+                key = 'strat',
                 sortFunc = function(unitID)
-                    return __blueprints[unitID].CategoriesHash.EXPERIMENTAL
+                    return HasCat(unitID, 'SORTSTRATEGIC')
                 end,
             },
             {
-                title = 'ACU+',
-                key = 'acu',
+                title = 'Intel',
+                key = 'inside',
                 sortFunc = function(unitID)
-                    -- Show ACU's
-                    if __blueprints[unitID].CategoriesHash.COMMAND then
-                        return true
-                    end
-                    -- Show SCU's
-                    if string.find(unitID, 'l0301_Engineer') then
-                        return true
-                    end
-                    -- Show Paragon
-                    if string.find(unitID, 'xab1401') then
-                        return true
-                    end
+                    return HasCat(unitID, 'SORTINTEL')
+                end,
+            },
+            {
+                title = 'Other',
+                key = 'othersort',
+                sortFunc = function(unitID)
+                    return HasCat(unitID, 'SORTOTHER') or not (
+                        HasCat(unitID, 'SORTCONSTRUCTION') or
+                        HasCat(unitID, 'SORTECONOMY') or
+                        HasCat(unitID, 'SORTDEFENSE') or
+                        HasCat(unitID, 'SORTSTRATEGIC') or
+                        HasCat(unitID, 'SORTINTEL')
+                    )
                 end,
             },
         },
-    },
-}
---[[
---
-do
-    local killmodslist
-    for i, filter in nameFilters do
-        if filter.key == 'mod' then
-            if filter.choices and table.empty(filter.choices) then
-                killmodslist = i
-            end
-            break
-        end
-    end
-    if killmodslist then
-        table.remove(nameFilters, killmodslist)
-        killmodslist = nil
-    end
-end]]
-
-local function getItems()
-    local idlist
-    if categories.UNSPAWNABLE then
-        idlist = EntityCategoryGetUnitList(categories.ALLUNITS - categories.UNSPAWNABLE)
-    else
-        idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
-    end
-    table.sort(idlist)
-
-    return idlist
+    })
 end
+
+if categories.UNSPAWNABLE then
+    table.insert(nameFilters, 2,
+        {
+            title = 'Visibility',
+            key = 'spawnable',
+            choices = {
+                {
+                    title = '',
+                    key = 'spawnable',
+                    sortFunc = function(unitID)
+                        return not HasCat(unitID, 'UNSPAWNABLE')
+                    end,
+                },
+                {
+                    title = '',
+                    key = 'unspawnable',
+                    sortFunc = function(unitID)
+                        return HasCat(unitID, 'UNSPAWNABLE')
+                    end,
+                },
+            }
+        }
+    )
+end
+
+local function getItems() return EntityCategoryGetUnitList(categories.ALLUNITS) end
 
 local function CreateNameFilter(data)
     local group = Group(dialog)
     group.Width:Set(dialog.Width)
-    if data.choices and data.choices[1] and table.getn(data.choices) > 5 then
-        LayoutHelpers.SetHeight(group, 30 + math.floor((table.getn(data.choices) - 1)/5) * 25)
+    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
+        LayoutHelpers.SetHeight(group, 30 + floor((table.getn(data.choices)-1)/ChoiceColumns) * 25)
     else
         LayoutHelpers.SetHeight(group, 30)
     end
 
     group.check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
     LayoutHelpers.AtLeftIn(group.check, group)
-    if data.choices and data.choices[1] and table.getn(data.choices) > 5 then
+    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.check, group, 2)
     else
         LayoutHelpers.AtVerticalCenterIn(group.check, group)
@@ -374,7 +471,7 @@ local function CreateNameFilter(data)
 
     group.check.key = data.key
     if filterSet[data.key] == nil then
-        filterSet[data.key] = {value = false, choices = {}}
+        filterSet[data.key] = {value = data.key == 'spawnable', choices = {}}
     end
     if activeFilters[data.key] == nil then
         activeFilters[data.key] = {}
@@ -382,7 +479,7 @@ local function CreateNameFilter(data)
 
     group.label = UIUtil.CreateText(group, data.title, 14, UIUtil.bodyFont)
     LayoutHelpers.RightOf(group.label, group.check)
-    if data.choices and data.choices[1] and table.getn(data.choices) > 5 then
+    if data.choices and data.choices[1] and table.getn(data.choices) > ChoiceColumns then
         LayoutHelpers.AtTopIn(group.label, group, 7)
     else
         LayoutHelpers.AtVerticalCenterIn(group.label, group)
@@ -392,15 +489,15 @@ local function CreateNameFilter(data)
         group.items = {}
         for i, v in data.choices do
             local index = i
-            group.items[index] = UIUtil.CreateCheckboxStd(group, '/dialogs/toggle_btn/toggle')
+            group.items[index] = UIUtil.CreateCheckboxStd(group, data.key == 'spawnable' and '/dialogs/check-box_btn/radio' or '/dialogs/toggle_btn/toggle')
             if index == 1 then
                 LayoutHelpers.AtLeftTopIn(group.items[index], group, 95)
-            elseif index < 6 then
+            elseif index < ChoiceColumns+1 then
                 LayoutHelpers.RightOf(group.items[index], group.items[index-1])
             else
-                LayoutHelpers.Below(group.items[index], group.items[index-5])
+                LayoutHelpers.Below(group.items[index], group.items[index-ChoiceColumns])
             end
-            if index < 6 then
+            if index < ChoiceColumns+1 then
                 LayoutHelpers.AtTopIn(group.items[index], group)
             end
 
@@ -420,7 +517,7 @@ local function CreateNameFilter(data)
                     end
                     activeFilters[self.key][self.filterKey] = self.sortFunc
                 elseif activeFilters[self.key][self.filterKey] then
-                    local otherChecked = false
+                    local otherChecked
                     for _, control in group.items do
                         if control ~= self then
                             if control:IsChecked() then
@@ -437,7 +534,7 @@ local function CreateNameFilter(data)
                 RefreshList()
             end
             if filterSet[data.key].choices[v.key] == nil then
-                filterSet[data.key].choices[v.key] = false
+                filterSet[data.key].choices[v.key] = data.key == 'spawnable' and v.key == 'spawnable'
             end
             group.items[index]:SetCheck(filterSet[data.key].choices[v.key])
             if activeFilters[data.key] == nil then activeFilters[data.key] = {} end
@@ -448,7 +545,7 @@ local function CreateNameFilter(data)
         group.edit:SetBackgroundColor('ff333333')
         group.edit:SetHighlightForegroundColor(UIUtil.highlightColor)
         group.edit:SetHighlightBackgroundColor("880085EF")
-        LayoutHelpers.SetDimensions(group.edit, 400, 15)
+        LayoutHelpers.SetDimensions(group.edit, (ChoiceColumns-2)*82+15, 15)
         group.edit:SetText(filterSet[data.key].editText or '')
         group.edit:SetFont(UIUtil.bodyFont, 12)
         group.edit:SetMaxChars(20)
@@ -507,25 +604,26 @@ end
 function CreateDialog(x, y)
     if dialog then
         dialog:Destroy()
-        dialog = false
+        dialog = nil
         return
     end
 
     local currentArmy = GetFocusArmy()
-    if currentArmy < 1 then
-        currentArmy = 1
-    end
 
     CreationList = {}
 
     dialog = Bitmap(GetFrame(0))
     dialog:SetSolidColor('CC000000')
-    local NoArmies = math.ceil(GetArmiesTable().numArmies / 2) + 1
-    local NoMods = math.floor((table.getn(nameFilters[3].choices) - 1)/5)
-    -- set window high. 400 pixel for the window + 30 pixel for every army line + 25 for every extra source row
-    LayoutHelpers.SetDimensions(dialog, 510, 450 + 30 * NoArmies + NoMods * 25)
-    dialog.Left:Set(function() return math.max(math.min(x - dialog.Width() / 2, GetFrame(0).Right() - dialog.Width()), 0) end)
-    dialog.Top:Set(function() return math.max(math.min(y - dialog.Height() / 2, GetFrame(0).Bottom() - dialog.Height()), 0) end)
+
+    local NoArmies = math.ceil(NumArmies / TeamColumns)
+    local NoMods = floor((table.getn(nameFilters[3].choices) - 1)/ChoiceColumns)
+
+    LayoutHelpers.SetDimensions(dialog,
+        90 + 83 * ChoiceColumns, -- Width
+        450 + NoArmies*30 + NoMods*25 -- Height
+    )
+    dialog.Left:Set(function() return mmax(mmin(x - dialog.Width() / 2, GetFrame(0).Right() - dialog.Width()), 0) end)
+    dialog.Top:Set(function() return mmax(mmin(y - 160, GetFrame(0).Bottom() - dialog.Height()), 0) end)
     dialog.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 
     local cancelBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Cancel", 12)
@@ -533,110 +631,109 @@ function CreateDialog(x, y)
     LayoutHelpers.AtRightIn(cancelBtn, dialog)
     cancelBtn.OnClick = function(button)
         dialog:Destroy()
-        dialog = false
+        dialog = nil
+        if EscThread then KillThread(EscThread) end
     end
 
-    ForkThread(function()
+    EscThread = ForkThread(function()
         while dialog do
             if IsKeyDown('ESCAPE') then
                 cancelBtn.OnClick()
-                return
+                break
             end
             WaitSeconds(0.05)
         end
     end)
 
+    local function numImputSettings(element, label, startval)
+        element.StartVal = startval
+        element:SetForegroundColor(UIUtil.fontColor)
+        element:SetBackgroundColor('ff333333')
+        element:SetHighlightForegroundColor(UIUtil.highlightColor)
+        element:SetHighlightBackgroundColor("880085EF")
+        element.Width:Set(30)
+        element.Height:Set(15)
+        element:SetFont(UIUtil.bodyFont, 12)
+        element:SetMaxChars(4)
+        element:SetText(startval)
+        LayoutHelpers.RightOf(element, label, 5)
+        element.OnCharPressed = function(self, charcode)
+            return (charcode < 48) or (charcode > 57) -- between 0 and 9
+        end
+        element.OnNonTextKeyPressed = function(self, keycode, modifiers) end
+        element.OnKeyboardFocusChange = function(self)
+            local text = self:GetText()
+            self:SetText(text == '' and self.StartVal or text)
+        end
+    end
+
     local countLabel = UIUtil.CreateText(dialog, 'Count:', 12, UIUtil.bodyFont)
-    LayoutHelpers.AtBottomIn(countLabel, dialog,10)
+    LayoutHelpers.AtBottomIn(countLabel, dialog, 10)
     LayoutHelpers.AtLeftIn(countLabel, dialog, 5)
-
     local count = Edit(dialog)
-    count:SetForegroundColor(UIUtil.fontColor)
-    count:SetBackgroundColor('ff333333')
-    count:SetHighlightForegroundColor(UIUtil.highlightColor)
-    count:SetHighlightBackgroundColor("880085EF")
-    LayoutHelpers.SetDimensions(count, 30, 15)
-    count:SetFont(UIUtil.bodyFont, 12)
-    count:SetMaxChars(4)
-    count:SetText('1')
-    LayoutHelpers.RightOf(count, countLabel, 5)
-    count.OnCharPressed = function(self, charcode)
-        if (charcode < 48) or (charcode > 57) then -- between 0 and 9
-            return true
-        end
-    end
-    count.OnNonTextKeyPressed = function(self, keycode, modifiers)
-    end
-    count.OnKeyboardFocusChange = function(self)
-        if self:GetText() == '' then
-            self:SetText('1')
-        end
-    end
+    numImputSettings(count, countLabel, '1')
 
-    local veterancyLabel = UIUtil.CreateText(count, 'Veterancy:', 12, UIUtil.bodyFont)
+    local veterancyLabel = UIUtil.CreateText(count, 'Vet:', 12, UIUtil.bodyFont)
     LayoutHelpers.RightOf(veterancyLabel, count, 5)
-
     local veterancyLevel = Edit(dialog)
-    veterancyLevel:SetForegroundColor(UIUtil.fontColor)
-    veterancyLevel:SetBackgroundColor('ff333333')
-    veterancyLevel:SetHighlightForegroundColor(UIUtil.highlightColor)
-    veterancyLevel:SetHighlightBackgroundColor("880085EF")
-    LayoutHelpers.SetDimensions(veterancyLevel, 30, 15)
-    veterancyLevel:SetFont(UIUtil.bodyFont, 12)
-    veterancyLevel:SetMaxChars(1)
-    veterancyLevel:SetText('0')
-    LayoutHelpers.RightOf(veterancyLevel, veterancyLabel, 5)
-    veterancyLevel.OnCharPressed = function(self, charcode)
-        if (charcode < 48) or (charcode > 53) then -- between 0 and 5
-            return true
-        end
-        self:ClearText()
-    end
-    veterancyLevel.OnNonTextKeyPressed = function(self, keycode, modifiers)
-    end
-    veterancyLevel.OnKeyboardFocusChange = function(self)
-        if self:GetText() == '' then
-            self:SetText('0')
-        end
-    end
+    numImputSettings(veterancyLevel, veterancyLabel, '0')
 
-    local function spawnUnits(creationList, targetArmy, fast)
-        if table.empty(creationList) then return end
-        local numUnits = tonumber(count:GetText())
-        local vetLvl = tonumber(veterancyLevel:GetText())
-        if fast then
-            SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
-                Args = { bpId = creationList, count = numUnits,
-                army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
-        else
-            WaitSeconds(0.15)
-            local shiftPressed = false
-            while not dialog do
-                if IsKeyDown('ESCAPE') then return end
-                if IsKeyDown(1) then -- Left mouse button
-                    SimCallback( { Func = 'SpawnAndSetVeterancyUnit',
-                        Args = { bpId = creationList, count = numUnits,
-                        army = targetArmy, pos = GetMouseWorldPos(), veterancy = vetLvl }, }, true)
-                    if IsKeyDown('SHIFT') then
-                        shiftPressed = true
-                        WaitSeconds(0.02)
-                    else
-                        return
-                    end
-                end
-                WaitSeconds(0.07)
-                if shiftPressed and (not IsKeyDown('SHIFT')) then
-                   return
-                end
+    local orientLabel = UIUtil.CreateText(count, 'Yaw:', 12, UIUtil.bodyFont)
+    LayoutHelpers.RightOf(orientLabel, veterancyLevel, 5)
+    local orientation = Edit(dialog)
+    numImputSettings(orientation, orientLabel, '0')
+
+    if SpawnThread then KillThread(SpawnThread) end
+
+    local function spreadSpawn(id, count, vet)
+
+        -- store selection so that units do not go of and try to build the unit we're 
+        -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
+        local selection = GetSelectedUnits()
+        SelectUnits(nil);
+
+        -- enables command mode for spawning units
+        import('/lua/ui/game/commandmode.lua').StartCommandMode(
+            "build", 
+            { 
+                -- default information required
+                name = id, 
+
+                -- inform this is part of a cheat
+                cheat = true, 
+
+                -- information for spawning
+                bpId = id,
+                count = tonumber(count:GetText()) or 1,
+                vet = tonumber(vet:GetText()) or 0,
+                yaw = (tonumber(orientation:GetText()) or 0) / 57.295779513,
+                army = currentArmy,
+                selection = selection,
+            }
+        )
+
+        -- options for user to exit the spawn mode
+        local function IsCancelKeyDown() return IsKeyDown('ESCAPE') or IsKeyDown(2) end
+
+        WaitSeconds(0.15)
+
+        -- check if user wants to exit
+        while not dialog do
+            if IsCancelKeyDown() then 
+                import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+                break 
             end
+            WaitSeconds(0.1)
         end
     end
 
     local createBtn = UIUtil.CreateButtonStd(dialog, '/widgets/small', "Create", 12)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
-    LayoutHelpers.AtHorizontalCenterIn(createBtn, dialog)
+    LayoutHelpers.LeftOf(createBtn, cancelBtn, 5)
     createBtn.OnClick = function(button)
-        ForkThread(spawnUnits, CreationList, currentArmy, IsKeyDown(0))
+        for unitID, _ in CreationList do
+            SpawnThread = ForkThread(spreadSpawn, unitID, count, veterancyLevel)
+        end
         cancelBtn.OnClick()
     end
 
@@ -644,7 +741,6 @@ function CreateDialog(x, y)
         for filterGroup, groupControls in filterGroups do
             local key = groupControls.check.key
             if filterTable[key] ~= nil then
-                LOG('setting key: ', key, ' to: ', filterTable[key].value)
                 if groupControls.check:IsChecked() ~= filterTable[key].value then
                     groupControls.check:SetCheck(filterTable[key].value)
                 end
@@ -665,7 +761,7 @@ function CreateDialog(x, y)
     local function CreateArmySelectionSlot(parent, index, armyData)
         local group = Bitmap(parent)
         LayoutHelpers.SetHeight(group, 30)
-        group.Width:Set(function() return parent.Width() / 2 end)
+        group.Width:Set(function() return parent.Width() / TeamColumns end)
 
         local iconBG = Bitmap(group)
         LayoutHelpers.SetDimensions(iconBG, 30, 30)
@@ -682,7 +778,7 @@ function CreateDialog(x, y)
         LayoutHelpers.FillParent(icon, iconBG)
         icon:DisableHitTest()
 
-        -- Player / Ai name
+        -- Army name
         local name = UIUtil.CreateText(group, armyData.nickname, 12, UIUtil.bodyFont)
         LayoutHelpers.RightOf(name, icon, 2)
         LayoutHelpers.AtTopIn(name, group)
@@ -729,19 +825,27 @@ function CreateDialog(x, y)
     armiesGroup.Width:Set(dialog.Width)
     LayoutHelpers.AtLeftTopIn(armiesGroup, dialog)
 
-    armiesGroup.armySlots = {}
-    local lowestControl = false
-    for i, val in GetArmiesTable().armiesTable do
+    local function IsColumnHead(teamI)
+        if TeamColumns <= 1 then return false end
+        for i = 1, TeamColumns-1 do
+            if teamI == floor(NumArmies / TeamColumns * i) + 1 then
+                return true
+            end
+        end
+    end
 
+    armiesGroup.armySlots = {}
+    local lowestControl
+    local WorkingColumnHead = 1
+    for i, val in GetArmiesTable().armiesTable do
         armiesGroup.armySlots[i] = CreateArmySelectionSlot(armiesGroup, i, val)
-        -- set the layout to left at the first army
         if i == 1 then
             LayoutHelpers.AtLeftTopIn(armiesGroup.armySlots[i],armiesGroup)
             lowestControl = armiesGroup.armySlots[i]
-        -- Change layout to right after half army count
-        elseif i == NoArmies then
-            LayoutHelpers.RightOf(armiesGroup.armySlots[i],armiesGroup.armySlots[1])
+        elseif IsColumnHead(i) then
+            LayoutHelpers.RightOf(armiesGroup.armySlots[i],armiesGroup.armySlots[WorkingColumnHead])
             LayoutHelpers.AtTopIn(armiesGroup.armySlots[i],armiesGroup)
+            WorkingColumnHead = i
         else
             LayoutHelpers.Below(armiesGroup.armySlots[i],armiesGroup.armySlots[i-1])
         end
@@ -753,7 +857,7 @@ function CreateDialog(x, y)
     armiesGroup.Height:Set(function() return lowestControl.Bottom() - armiesGroup.armySlots[1].Top() end)
 
     local filterSetCombo = Combo(dialog, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
-    LayoutHelpers.SetWidth(filterSetCombo, 340)
+    LayoutHelpers.SetWidth(filterSetCombo, 250)
     LayoutHelpers.Below(filterSetCombo, armiesGroup, 5)
     filterSetCombo.OnClick = function(self, index, text, skipUpdate)
         SetFilters(self.keyMap[index])
@@ -771,7 +875,7 @@ function CreateDialog(x, y)
                 if filterName == defName then
                     default = index
                 end
-                filterSetCombo.itemArray[index] = string.format('%s', filterName)
+                filterSetCombo.itemArray[index] = format('%s', filterName)
                 filterSetCombo.keyMap[index] = filter
                 index = index + 1
             end
@@ -779,13 +883,18 @@ function CreateDialog(x, y)
         end
     end
 
-    local saveFilterSet = UIUtil.CreateButton(dialog,
-        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-        'Save Filter', 10)
-    saveFilterSet.label:SetFont(UIUtil.bodyFont, 10)
+    local function CreateToggleButton(text)
+        local btn = UIUtil.CreateButton(dialog,
+            '/dialogs/toggle_btn/toggle-d_btn_up.dds',
+            '/dialogs/toggle_btn/toggle-d_btn_down.dds',
+            '/dialogs/toggle_btn/toggle-d_btn_over.dds',
+            '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
+            text, 10)
+        btn.label:SetFont(UIUtil.bodyFont, 10)
+        return btn
+    end
+
+    local saveFilterSet = CreateToggleButton 'Save Filter'
     LayoutHelpers.RightOf(saveFilterSet, filterSetCombo)
     LayoutHelpers.AtVerticalCenterIn(saveFilterSet, filterSetCombo)
     saveFilterSet.OnClick = function(self, modifiers)
@@ -802,13 +911,7 @@ function CreateDialog(x, y)
         end)
     end
 
-    local delFilterSet = UIUtil.CreateButton(dialog,
-        '/dialogs/toggle_btn/toggle-d_btn_up.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_down.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_over.dds',
-        '/dialogs/toggle_btn/toggle-d_btn_dis.dds',
-        'Delete Filter', 10)
-    delFilterSet.label:SetFont(UIUtil.bodyFont, 10)
+    local delFilterSet = CreateToggleButton 'Delete Filter'
     LayoutHelpers.RightOf(delFilterSet, saveFilterSet)
     LayoutHelpers.AtVerticalCenterIn(delFilterSet, filterSetCombo)
     delFilterSet.OnClick = function(self, modifiers)
@@ -825,6 +928,14 @@ function CreateDialog(x, y)
        end
     end
 
+    local propSwapBtn = CreateToggleButton 'Prop mode'
+    LayoutHelpers.Below(propSwapBtn, armiesGroup, 5)
+    LayoutHelpers.RightOf(propSwapBtn, delFilterSet, 9)
+    propSwapBtn.OnClick = function(button)
+        ConExecuteSave('ui_lua import("/lua/ui/dialogs/createprop.lua").CreateDialog('..x..','..y..')')
+        cancelBtn.OnClick()
+    end
+
     RefreshFilterList()
 
     filterGroups = {}
@@ -834,6 +945,10 @@ function CreateDialog(x, y)
         if filtIndex == 1 then
             LayoutHelpers.Below(filterGroups[index], filterSetCombo)
             LayoutHelpers.AtLeftIn(filterGroups[index], dialog)
+        elseif categories.UNSPAWNABLE and filtIndex == 2 then
+            LayoutHelpers.RightOf(filterGroups[index], filterGroups[1], -150)
+        elseif categories.UNSPAWNABLE and filtIndex == 3 then
+            LayoutHelpers.Below(filterGroups[index], filterGroups[1])
         else
             LayoutHelpers.Below(filterGroups[index], filterGroups[index-1])
         end
@@ -879,7 +994,7 @@ function CreateDialog(x, y)
         mouseover.Left:Set(x+20)
         mouseover.Top:Set(y+20)
         mouseover.Height:Set(function() return mouseover.img.Height() + 4 end)
-        mouseover.Width:Set(function() return mouseover.img.Width() + math.max(mouseover.name.Width(), mouseover.desc.Width()) + 8 end)
+        mouseover.Width:Set(function() return mouseover.img.Width() + mmax(mouseover.name.Width(), mouseover.desc.Width()) + 8 end)
         mouseover.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     end
     local function MoveMouseover(x,y)
@@ -932,12 +1047,8 @@ function CreateDialog(x, y)
                         CreationList[self.unitID] = true
                         self:SetSolidColor(LineColors.Sel_Up)
                     end
-                elseif event.Type == 'ButtonPress' and event.Modifiers.Right then
-                    CreationList[self.unitID] = true
-                    ForkThread(spawnUnits, CreationList, currentArmy, true)
-                    cancelBtn:OnClick()
                 elseif event.Type == 'ButtonDClick' and event.Modifiers.Left then
-                    ForkThread(spawnUnits, {[self.unitID] = true}, currentArmy, false)
+                    SpawnThread = ForkThread(spreadSpawn, self.unitID, count, veterancyLevel)
                     cancelBtn:OnClick()
                 elseif event.Type == 'MouseMotion' then
                     MoveMouseover(event.MouseX,event.MouseY)
@@ -972,26 +1083,25 @@ function CreateDialog(x, y)
     -- aixs can be "Vert" or "Horz"
     dialog.unitList.GetScrollValues = function(self, axis)
         local size = DataSize()
-        --LOG(size, ":", self.top, ":", math.min(self.top + numLines, size))
-        return 0, size, self.top, math.min(self.top + numLines(), size)
+        return 0, size, self.top, mmin(self.top + numLines(), size)
     end
 
     -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
     dialog.unitList.ScrollLines = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta))
+        self:ScrollSetTop(axis, self.top + floor(delta))
     end
 
     -- called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
     dialog.unitList.ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self.top + math.floor(delta) * numLines())
+        self:ScrollSetTop(axis, self.top + floor(delta) * numLines())
     end
 
     -- called when the scrollbar wants to set a new visible top line
     dialog.unitList.ScrollSetTop = function(self, axis, top)
-        top = math.floor(top)
+        top = floor(top)
         if top == self.top then return end
         local size = DataSize()
-        self.top = math.max(math.min(size - numLines() , top), 0)
+        self.top = mmax(mmin(size - numLines() , top), 0)
         self:CalcVisible()
     end
 
@@ -1011,7 +1121,7 @@ function CreateDialog(x, y)
                 line:SetSolidColor(LineColors.Up)
             end
             line.unitID = data.id
-            line.id:SetText(string.format('%s %5s %s', data.id, ' ', data.desc))
+            line.id:SetText(format('%s %5s %s', data.id, ' ', data.desc))
         end
         for i, v in dialog.unitEntries do
             if UnitList[i + self.top] then
@@ -1020,7 +1130,6 @@ function CreateDialog(x, y)
                 v:Hide()
             end
         end
-        --LOG(repr(ObjectiveLogData))
     end
 
     dialog.unitList.HandleEvent = function(control, event)
@@ -1087,7 +1196,7 @@ function NameSet(callback)
     cancelButton.Left:Set(function() return nameDialog.Left() + (((nameDialog.Width() / 4) * 1) - (cancelButton.Width() / 2)) end)
     cancelButton.OnClick = function(self, modifiers)
         nameDialog:Destroy()
-        nameDialog = false
+        nameDialog = nil
     end
 
     --TODO this should be in layout
@@ -1106,7 +1215,7 @@ function NameSet(callback)
         local newName = nameEdit:GetText()
         callback(newName)
         nameDialog:Destroy()
-        nameDialog = false
+        nameDialog = nil
     end
 
     nameEdit.OnEnterPressed = function(self, text)

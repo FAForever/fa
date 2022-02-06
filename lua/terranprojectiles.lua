@@ -93,7 +93,7 @@ TArtilleryAntiMatterProjectile = Class(SinglePolyTrailProjectile) {
         -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -213,7 +213,7 @@ TDFGeneralGaussCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactUnderWater = {},
 }
 
-TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
+TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UEB2301) UEF Triad and (UES0103) UEF Frigate and (UES0202) UEF Cruiser and (UEl0201) UEF Striker and (UEL0202) UEF Pillar
     FxImpactUnit = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TGaussCannonHitUnit01,
     FxImpactLand = EffectTemplate.TGaussCannonHitLand01,
@@ -241,7 +241,37 @@ TDFGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) {
     end,
 }
 
-TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES0302 (UEF battleship)
+TDFMediumShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- (UES0201) UEF Destroyer
+    FxImpactTrajectoryAligned = false,
+    FxImpactUnit = EffectTemplate.TMediumShipGaussCannonHitUnit01,
+    FxImpactProp = EffectTemplate.TMediumShipGaussCannonHit01,
+    FxImpactLand = EffectTemplate.TMediumShipGaussCannonHit01, --
+
+    OnImpact = function(self, targetType, targetEntity)
+        local radius = self.DamageData.DamageRadius
+        
+        if radius > 0 then
+            local pos = self:GetPosition()
+            local FriendlyFire = self.DamageData.DamageFriendly
+            
+            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+            
+            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+            
+            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+                local rotation = RandomFloat(0,2*math.pi)
+                local army = self.Army
+                
+                CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2.5, radius * 2.5, 70, 15, army)
+            end
+        end
+        
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
+}
+
+TDFBigShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES0302 (UEF Battleship)
     FxImpactTrajectoryAligned = false,
     FxImpactUnit = EffectTemplate.TShipGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TShipGaussCannonHit01,
@@ -272,11 +302,41 @@ TDFShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UES03
     end,
 }
 
-TDFLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- fatboy & UEB2301 (uef T2 pd) & UES0201 (UEF destroyer)
+TDFMediumLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- Triad (T2 PD)
     FxImpactTrajectoryAligned = false,
-    FxImpactUnit = EffectTemplate.TLandGaussCannonHitUnit01,
-    FxImpactProp = EffectTemplate.TLandGaussCannonHit01,
-    FxImpactLand = EffectTemplate.TLandGaussCannonHit01,
+    FxImpactUnit = EffectTemplate.TMediumLandGaussCannonHitUnit01,
+    FxImpactProp = EffectTemplate.TMediumLandGaussCannonHit01,
+    FxImpactLand = EffectTemplate.TMediumLandGaussCannonHit01,
+    
+    OnImpact = function(self, targetType, targetEntity)
+        local radius = self.DamageData.DamageRadius
+        
+        if radius > 0 then
+            local pos = self:GetPosition()
+            local FriendlyFire = self.DamageData.DamageFriendly
+            
+            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+
+            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+            
+            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
+                local rotation = RandomFloat(0,2*math.pi)
+                local army = self.Army
+                
+                CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius, radius, 70, 15, army)
+            end
+        end
+
+        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
+    end,
+}
+
+TDFBigLandGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- Fatboy
+    FxImpactTrajectoryAligned = false,
+    FxImpactUnit = EffectTemplate.TBigLandGaussCannonHitUnit01,
+    FxImpactProp = EffectTemplate.TBigLandGaussCannonHit01,
+    FxImpactLand = EffectTemplate.TBigLandGaussCannonHit01,
     
     OnImpact = function(self, targetType, targetEntity)
         local radius = self.DamageData.DamageRadius
@@ -345,7 +405,7 @@ TIFSmallYieldNuclearBombProjectile = Class(EmitterProjectile) { -- strategic bom
         -- CreateLightParticle(self, -1, self.Army, 16, 6, 'glow_03', 'ramp_antimatter_02')
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -379,7 +439,7 @@ TLaserBotProjectile = Class(MultiPolyTrailProjectile) { -- ACU
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2 -- doesn't work when OCing structure/ACU
         
@@ -515,13 +575,12 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
 
         self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        LOG(radius)
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
             local rotation = RandomFloat(0,2*math.pi)
             local army = self.Army
@@ -563,7 +622,7 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
@@ -823,7 +882,8 @@ TIonizedPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- percival
     
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
-        local FriendlyFire = self.DamageData.DamageFriendly
+        local radius = self.DamageData.DamageRadius
+        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
         DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
@@ -858,12 +918,12 @@ THeavyPlasmaGatlingCannon = Class(SinglePolyTrailProjectile) { -- ravager
     OnImpact = function(self, targetType, targetEntity)
         local pos = self:GetPosition()
         local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly
+        -- local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        -- DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
+        -- DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
 
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
+        -- self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
         
         if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
             local rotation = RandomFloat(0,2*math.pi)

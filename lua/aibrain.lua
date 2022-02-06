@@ -30,6 +30,11 @@ local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
 local Factions = import('/lua/factions.lua').GetFactions(true)
 
+-- upvalue for performance
+local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local CategoriesDummyUnit = categories.DUMMYUNIT
+
 local observer = false
 local Points = {
     defeat = -10,
@@ -4101,5 +4106,34 @@ AIBrain = Class(moho.aibrain_methods) {
                 break
             end
         end
+    end,
+
+    --- Retrieves all units that fit the criteria around some point. Excludes dummy units.
+    -- @param category The categories the units should fit.
+    -- @param position The center point to start looking for units.
+    -- @param radius The radius of the circle we look for units in.
+    -- @param alliance The alliance status ('Ally', 'Enemy', 'Neutral') to those units.
+    -- @return nil if none found or a table.
+    GetUnitsAroundPoint = function(self, category, position, radius, alliance)
+        if alliance then 
+            -- call where we do care about alliance
+            return BrainGetUnitsAroundPoint(self, category - CategoriesDummyUnit, position, radius, alliance)
+        else 
+            -- call where we do not, which is different from providing nil (as there would be a fifth argument then)
+            return BrainGetUnitsAroundPoint(self, category - CategoriesDummyUnit, position, radius)
+        end
+    end,
+
+    --- Returns list of units by category. Excludes dummy units.
+    -- @param category Unit's category, example: categories.TECH2 .
+    -- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
+    -- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
+    -- @return tblUnits Table containing units.
+    GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
+        -- defaults to false, prevent sending nil
+        requireBuilt = requireBuilt or false
+
+        -- retrieve units, excluding insignificant units
+        return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 }

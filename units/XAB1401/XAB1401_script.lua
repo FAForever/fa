@@ -5,17 +5,24 @@
 #**
 #**  Summary  :  Aeon Quantum Resource Generator
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright Â© 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local FxAmbient = import('/lua/effecttemplates.lua').AResourceGenAmbient
 local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
+
+local CreateAeonParagonBuildingEffects = import("/lua/effectutilities.lua").CreateAeonParagonBuildingEffects
 
 XAB1401 = Class(AStructureUnit) {
 
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},
     },
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        AStructureUnit.StartBeingBuiltEffects(self, builder, layer)
+        CreateAeonParagonBuildingEffects(self)
+    end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         AStructureUnit.OnStopBeingBuilt(self, builder, layer)

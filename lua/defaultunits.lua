@@ -24,6 +24,9 @@ local CreateScaledBoom = function(unit, overkill, bone)
 )
 end
 
+-- allows us to skip ai-specific functionality
+local GameHasAIs = ScenarioInfo.GameHasAIs
+
 -- MISC UNITS
 DummyUnit = Class(Unit) {
     OnStopBeingBuilt = function(self, builder, layer)
@@ -33,7 +36,7 @@ DummyUnit = Class(Unit) {
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
-local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH3 + categories.EXPERIMENTAL)
+local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
 local StructureUnitOnStartBeingBuiltRotateBuildings = categories.STRUCTURE * (categories.DIRECTFIRE + categories.INDIRECTFIRE) * (categories.DEFENSE + categories.ARTILLERY)
 
 -- STRUCTURE UNITS
@@ -1542,48 +1545,7 @@ MobileUnit = Class(Unit) {
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
-        -- Add unit's threat to our influence map
-        local threat = 5
-        local decay = 0.1
-        local currentLayer = self.Layer
-        if instigator then
-            local unit = false
-            if IsUnit(instigator) then
-                unit = instigator
-            elseif IsProjectile(instigator) or IsCollisionBeam(instigator) then
-                unit = instigator.unit
-            end
-
-            if unit then
-                local unitPos = unit:GetCachePosition()
-                if EntityCategoryContains(categories.STRUCTURE, unit) then
-                    decay = 0.01
-                end
-
-                if unitPos then
-                    if currentLayer == 'Sub' then
-                        threat = self:GetAIBrain():GetThreatAtPosition(unitPos, 0, true, 'AntiSub')
-                    elseif currentLayer == 'Air' then
-                        threat = self:GetAIBrain():GetThreatAtPosition(unitPos, 0, true, 'AntiAir')
-                    else
-                        threat = self:GetAIBrain():GetThreatAtPosition(unitPos, 0, true, 'AntiSurface')
-                    end
-                    threat = threat / 2
-                end
-            end
-        end
-
-        if currentLayer == 'Sub' then
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay * 10, 'AntiSub')
-        elseif currentLayer == 'Air' then
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay, 'AntiAir')
-        elseif currentLayer == 'Water' then
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay * 10, 'AntiSurface')
-        else
-            self:GetAIBrain():AssignThreatAtPosition(self:GetPosition(), threat, decay, 'AntiSurface')
-        end
-
-        -- This unit was in a transport
+        -- This unit was in a transport and should create a wreck on crash
         if self.killedInTransport then
             self.killedInTransport = false
         else
@@ -1661,6 +1623,14 @@ WalkingLandUnit = Class(MobileUnit) {
     DeathAnim = false,
     DisabledBones = {},
 
+    OnCreate = function(self, spec)
+        MobileUnit.OnCreate(self, spec)
+
+        local blueprint = self:GetBlueprint()
+        self.AnimationWalk = blueprint.Display.AnimationWalk
+        self.AnimationWalkRate = blueprint.Display.AnimationWalkRate
+    end,
+
     OnMotionHorzEventChange = function(self, new, old)
         MobileUnit.OnMotionHorzEventChange(self, new, old)
 
@@ -1669,10 +1639,9 @@ WalkingLandUnit = Class(MobileUnit) {
                 self.Animator = CreateAnimator(self, true)
             end
 
-            local bpDisplay = self:GetBlueprint().Display
-            if bpDisplay.AnimationWalk then
-                self.Animator:PlayAnim(bpDisplay.AnimationWalk, true)
-                self.Animator:SetRate(bpDisplay.AnimationWalkRate or 1)
+            if self.AnimationWalk then
+                self.Animator:PlayAnim(self.AnimationWalk, true)
+                self.Animator:SetRate(self.AnimationWalkRate or 1)
             end
         elseif new == 'Stopped' then
             -- Only keep the animator around if we are dying and playing a death anim
@@ -2480,6 +2449,18 @@ CommandUnit = Class(WalkingLandUnit) {
         self:SetImmobile(false)
         self.UnitBeingTeleported = nil
         self.TeleportThread = nil
+    end,
+
+    OnWorkBegin = function(self, work)
+        if WalkingLandUnit.OnWorkBegin(self, work) then 
+
+            -- Prevent consumption bug where two enhancements in a row prevents assisting units from
+            -- updating their consumption costs based on the new build rate values.
+            self:UpdateAssistersConsumption()
+
+            -- Inform EnhanceTask that enhancement is not restricted
+            return true
+        end
     end,
 }
 

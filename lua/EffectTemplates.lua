@@ -1076,6 +1076,8 @@ AQuarkBombHit01 = {
     EmtBpPath .. 'quark_bomb_explosion_05_emit.bp',
     EmtBpPath .. 'quark_bomb_explosion_07_emit.bp',
     EmtBpPath .. 'quark_bomb_explosion_08_emit.bp',
+    EmtBpPath .. 'quark_bomb_chrono_effect_01_emit.bp',
+    EmtBpPath .. 'quark_bomb_chrono_effect_02_emit.bp',
 }
 AQuarkBombHit02 = {
     EmtBpPath .. 'quark_bomb_explosion_03_emit.bp',
@@ -1932,6 +1934,18 @@ TShipGaussCannonHit01 = {
     EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
 }
 
+TMediumShipGaussCannonHit01 = {
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_01_emit.bp', -- white glow
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_02_emit.bp', -- particles
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_03_emit.bp', -- muzzle blaze
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_04_emit.bp', -- fire
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_05_emit.bp', -- black fire/smoke
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_06_emit.bp', -- orange glow
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_07_emit.bp', -- single big air distortion ring
+    -- EmtBpPath .. 'shipgauss_cannon_hit_08_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_medium_09_emit.bp', -- many smaller air distortion rings
+}
+
 TShipGaussCannonHit02 = {
     EmtBpPath .. 'shipgauss_cannon_hit_01_emit.bp',
     EmtBpPath .. 'shipgauss_cannon_hit_02_emit.bp',
@@ -1944,7 +1958,29 @@ TShipGaussCannonHit02 = {
     EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
 }
 
-TLandGaussCannonHit01 = {
+TMediumLandGaussCannonHit01 = {
+    EmtBpPath .. 'landgauss_cannon_hit_medium_01_emit.bp', -- white glow
+    EmtBpPath .. 'landgauss_cannon_hit_medium_02_emit.bp', -- particles
+    EmtBpPath .. 'landgauss_cannon_hit_medium_03_emit.bp', -- muzzle blaze
+    EmtBpPath .. 'landgauss_cannon_hit_medium_04_emit.bp', -- fire
+    EmtBpPath .. 'landgauss_cannon_hit_medium_05_emit.bp', -- black fire/smoke
+    EmtBpPath .. 'landgauss_cannon_hit_medium_06_emit.bp', -- orange glow
+    --EmtBpPath .. 'shipgauss_cannon_hit_07_emit.bp', -- single big air distortion ring
+    EmtBpPath .. 'landgauss_cannon_hit_medium_09_emit.bp', -- many smaller air distortion rings
+}
+
+TBigLandGaussCannonHit01 = {
+    EmtBpPath .. 'landgauss_cannon_hit_01_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_02_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_03_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_04_emit.bp',
+    EmtBpPath .. 'landgauss_cannon_hit_05_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_06_emit.bp',
+    -- EmtBpPath .. 'shipgauss_cannon_hit_07_emit.bp',
+    EmtBpPath .. 'shipgauss_cannon_hit_09_emit.bp',
+}
+
+TLandGaussCannonHit01 = { 
     EmtBpPath .. 'landgauss_cannon_hit_01_emit.bp',
     EmtBpPath .. 'shipgauss_cannon_hit_02_emit.bp',
     EmtBpPath .. 'landgauss_cannon_hit_03_emit.bp',
@@ -1958,6 +1994,9 @@ TLandGaussCannonHit01 = {
 TShipGaussCannonHitUnit01 = table.concatenate(TShipGaussCannonHit01, UnitHitShrapnel01)
 TShipGaussCannonHitUnit02 = table.concatenate(TShipGaussCannonHit02, UnitHitShrapnel01)
 TLandGaussCannonHitUnit01 = table.concatenate(TLandGaussCannonHit01, UnitHitShrapnel01)
+TBigLandGaussCannonHitUnit01 = table.concatenate(TBigLandGaussCannonHit01, UnitHitShrapnel01)
+TMediumLandGaussCannonHitUnit01 = table.concatenate(TMediumLandGaussCannonHit01, UnitHitShrapnel01)
+TMediumShipGaussCannonHitUnit01 = table.concatenate(TMediumShipGaussCannonHit01, UnitHitShrapnel01)
 
 -- ------------------------------------------------------------------------
 --  TERRAN GINSU BEAM EMITTERS

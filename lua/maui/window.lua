@@ -507,50 +507,50 @@ Window = Class(Group) {
         return self.ClientGroup
     end,
 
-    SetSizeLock = function(control, locked)
-        self._lockSize(locked)
+    SetSizeLock = function(self, locked)
+        self._lockSize = locked
     end,
 
-    SetPositionLock = function(control, locked)
-        self._lockPosition(locked)
+    SetPositionLock = function(self, locked)
+        self._lockPosition = locked
     end,
 
-    SetMinimumResize = function(control, xDimension, yDimension)
-        control._xMin = LayoutHelpers.ScaleNumber(xDimension) or 0
-        control._yMin = LayoutHelpers.ScaleNumber(yDimension) or 0
+    SetMinimumResize = function(self, xDimension, yDimension)
+        self._xMin = LayoutHelpers.ScaleNumber(xDimension) or 0
+        self._yMin = LayoutHelpers.ScaleNumber(yDimension) or 0
     end,
 
-    SetWindowAlpha = function(control, alpha)
-        control._windowGroup:SetAlpha(alpha, true)
+    SetWindowAlpha = function(self, alpha)
+        self._windowGroup:SetAlpha(alpha, true)
     end,
 
-    SetTitle = function(control,text)
-        control._title:SetText(LOC(text))
+    SetTitle = function(self, text)
+        self._title:SetText(LOC(text))
     end,
 
-    IsPinned = function(control)
-        if control._pinBtn then
-            return control._pinBtn:IsChecked()
+    IsPinned = function(self)
+        if self._pinBtn then
+            return self._pinBtn:IsChecked()
         else
             return false
         end
     end,
 
-    OnDestroy = function(control)
-        control._resizeGroup:Destroy()
+    OnDestroy = function(self)
+        self._resizeGroup:Destroy()
     end,
 
     -- The following are functions that can be overloaded
-    OnResize = function(control, x, y, firstFrame) end,
-    OnResizeSet = function(control) end,
+    OnResize = function(self, x, y, firstFrame) end,
+    OnResizeSet = function(self) end,
 
-    OnMove = function(control, x, y, firstFrame) end,
-    OnMoveSet = function(control) end,
+    OnMove = function(self, x, y, firstFrame) end,
+    OnMoveSet = function(self) end,
 
-    OnPinCheck = function(control, checked) end,
-    OnConfigClick = function(control) end,
+    OnPinCheck = function(self, checked) end,
+    OnConfigClick = function(self) end,
 
-    OnMouseWheel = function(control, rotation) end,
+    OnMouseWheel = function(self, rotation) end,
 
     OnClose = function(control) end,
     OnHideWindow = function(control, hidden) end,

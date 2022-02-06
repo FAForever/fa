@@ -1,7 +1,7 @@
 UnitBlueprint {
     ResolvePath = true,
     AI = {
-        GuardScanRadius = 40, --RadarRadius
+        GuardScanRadius = 26, -- Same as other T1 scouts (UEF & Cybran), this scout will suicide into T1 tanks because it's weapon range is too small and changing it would have too big of an impact on the gameplay
     },
     Audio = {
         AmbientMove = Sound {
@@ -153,7 +153,7 @@ UnitBlueprint {
         BuildCostEnergy = 80,
         BuildCostMass = 20,
         BuildTime = 90,
-        MaintenanceConsumptionPerSecondEnergy = 0,
+        MaintenanceConsumptionPerSecondEnergy = 1,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -197,7 +197,7 @@ UnitBlueprint {
         RadarRadius = 40,
         RadarStealth = true,
         VisionRadius = 24,
-        StealthWaitTime = 1,
+        StealthWaitTime = 3,
     },
     Interface = {
         HelpText = '<LOC xsl0101_help>Combat Scout',

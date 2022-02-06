@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 90,
     },
     Air = {
         AutoLandTime = 1,
@@ -281,6 +281,13 @@ UnitBlueprint {
         Level4 = 48,
         Level5 = 60,
     },
+    VeteranMass = {
+        4200,
+        4200,
+        4200,
+        4200,
+        4200,
+    },
     Weapon = {
         {
             AboveWaterTargetsOnly = true,
@@ -295,9 +302,9 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             BombDropThreshold = 3.5,
             CollideFriendly = false,
-            Damage = 3000,
+            Damage = 3100,
             DamageFriendly = true,
-            DamageRadius = 6,
+            DamageRadius = 5.5,
             DamageType = 'Normal',
             DisplayName = 'Small Yield Nuclear Bomb',
             EffectiveRadius = 25,

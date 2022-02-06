@@ -234,6 +234,21 @@ local function ResourceClickProcessing(self, event, uiGroup, resType)
     end
 end
 
+-- table to convert key to LOC value
+local ShareNameLookup = { }
+ShareNameLookup["FullShare"] = "lobui_0742"
+ShareNameLookup["ShareUntilDeath"] = "lobui_0744"
+ShareNameLookup["TransferToKiller"] = "lobui_0762"
+ShareNameLookup["Defectors"] = "lobui_0766"
+ShareNameLookup["CivilianDeserter"] = "lobui_0764"
+
+local ShareDescriptionLookup = { }
+ShareDescriptionLookup["FullShare"] = "lobui_0743"
+ShareDescriptionLookup["ShareUntilDeath"] = "lobui_0745"
+ShareDescriptionLookup["TransferToKiller"] = "lobui_0763"
+ShareDescriptionLookup["Defectors"] = "lobui_0767"
+ShareDescriptionLookup["CivilianDeserter"] = "lobui_0765"
+
 function SetupPlayerLines()
     local function CreateArmyLine(data, armyIndex)
         local group = Group(controls.bgStretch)
@@ -412,28 +427,68 @@ function SetupPlayerLines()
         observerLine.speedSlider:SetValue(gameSpeed)
     end
 
+    -- data = {
+    --     ShareConditionsTitle :: String 
+    --     ShareConditionsDescription :: String
+    --     Size :: String
+    --     MapTitle :: String
+    --     MapDescription :: String
+    -- }
+
     local function CreateMapNameLine(data)
         local group = Group(controls.bgStretch)
 
-        group.name = UIUtil.CreateText(group, data.mapname, 10, UIUtil.bodyFont)
-        group.name:DisableHitTest()
-        LayoutHelpers.AtLeftIn(group.name, group)
-        LayoutHelpers.AtVerticalCenterIn(group.name, group)
-        group.name:SetColor('ffffffff')
+        local offset = 0
+        local previous = false
 
-        if sessionInfo.Options.Ranked then
-            group.ranked = Bitmap(group)
-            group.ranked:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
-            LayoutHelpers.SetDimensions(group.ranked, 16, 16)
-            group.ranked:DisableHitTest()
-            LayoutHelpers.AtRightTopIn(group.ranked, group, -1)
+        local function AddDash()
+            local dash = UIUtil.CreateText(group, " - ", 10, UIUtil.bodyFont)
+            LayoutHelpers.RightOf(dash, previous)
+            LayoutHelpers.AtVerticalCenterIn(dash, previous)
+            dash:SetColor('ffffffff')
+            return dash
         end
 
-        group.name.Right:Set(group.Right)
-        group.name:SetClipToWidth(true)
+        -- ui for share conditions
+        group.ShareConditions = UIUtil.CreateText(group, data.ShareConditionsTitle, 10, UIUtil.bodyFont)
+        Tooltip.AddForcedControlTooltipManual(group.ShareConditions, data.ShareConditionsTitle, data.ShareConditionsDescription)
+        LayoutHelpers.AtLeftIn(group.ShareConditions, group)
+        LayoutHelpers.AtVerticalCenterIn(group.ShareConditions, group)
+        group.ShareConditions:SetColor('ffffffff')
+        previous = group.ShareConditions
+        previous = AddDash()
+
+        -- ui for map name
+        group.Size = UIUtil.CreateText(group, tostring(data.Size.Width) .. "x" .. tostring(data.Size.Height), 10, UIUtil.bodyFont)
+        LayoutHelpers.RightOf(group.Size, previous)
+        LayoutHelpers.AtVerticalCenterIn(group.Size, group)
+        group.Size:SetColor('ffffffff')
+        previous = group.Size
+        previous = AddDash()
+
+        -- ui for map name
+        group.MapName = UIUtil.CreateText(group, data.MapTitle, 10, UIUtil.bodyFont)
+        Tooltip.AddForcedControlTooltipManual(group.MapName, data.MapTitle, data.MapDescription)
+        LayoutHelpers.RightOf(group.MapName, previous)
+        LayoutHelpers.AtVerticalCenterIn(group.MapName, group)
+        group.MapName:SetColor('ffffffff')
+        previous = group.MapName
+
+        -- ui for ranked icon
+        local rankedOffset = 32
+        if data.Ranked then
+            group.RankedIcon = Bitmap(group)
+            group.RankedIcon:SetTexture("/textures/ui/powerlobby/rankedscore.dds")
+            LayoutHelpers.SetDimensions(group.RankedIcon, 16, 16)
+            LayoutHelpers.AtRightTopIn(group.RankedIcon, group, -1)
+            rankedOffset = 32
+        end
+
+        -- make it extent and clip text
+        group.MapName.Right:Set(function() return group.Right() - rankedOffset end)
+        group.MapName:SetClipToWidth(true)
         LayoutHelpers.SetHeight(group, 19)
         group.Width:Set(controls.armyGroup.Width)
-        group:DisableHitTest()
 
         return group
     end
@@ -456,18 +511,37 @@ function SetupPlayerLines()
         line.name:SetText(playerClan .. playerName .. playerRating)
     end
 
-    mapData = {}
-    mapData.Sizekm = {Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2)}
-    mapData.mapname = LOCF("<LOC gamesel_0002>Map: %s", sessionInfo.name)..' ('..mapData.Sizekm.Width..' x '..mapData.Sizekm.Height..')'
-    local replayID = UIUtil.GetReplayId()
-    if replayID then
-        mapData.mapname = mapData.mapname..', ID: '..replayID
+    local mapData = {}
+
+    -- add share information to the score board
+    mapData.ShareConditionsTitle = LOC("<LOC " .. ShareNameLookup[sessionInfo.Options.Share] .. ">")
+    mapData.ShareConditionsDescription = LOC("<LOC " .. ShareDescriptionLookup[sessionInfo.Options.Share] .. ">")
+    mapData.ShareConditionsDescription = mapData.ShareConditionsDescription .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
+
+    -- add size to the score board
+    mapData.Size = { Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2) }
+
+    -- add map title / description to the scoreboard
+    mapData.MapTitle = LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
+    local description = sessionInfo.description
+    if not description or description == "" then 
+        description = "No description set by the author."
     end
 
-    controls.armyLines[index] = CreateMapNameLine(mapData)
+    -- add replay ID
+    mapData.MapDescription = LOC(description) .. 
+        "\r\n\r\n" .. LOC("<LOC map_version>Map version") .. ": " .. tostring(sessionInfo.map_version) ..
+        "\r\n" .. LOC("<LOC replay_id>Replay ID") .. ": " .. tostring(UIUtil.GetReplayId())
+
+    -- add ladder icon
+    mapData.Ranked = sessionInfo.Options.Ranked or false
+
+    -- construct UI elements
+    local mapUI = CreateMapNameLine(mapData)
+    controls.armyLines[index] = mapUI
 
     resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⃝', 13, 'Calibri')
-    resModeSwitch.icon.Depth:Set(resModeSwitch.icon.Depth() + 1)
+    resModeSwitch.icon.Depth:Set(mapUI.Depth() + 1)
     LayoutHelpers.AtLeftTopIn(resModeSwitch.icon, controls.armyLines[table.getn(controls.armyLines) - 1], 0, -1)
     LayoutHelpers.AtHorizontalCenterIn(resModeSwitch.icon, controls.armyLines[1].energy)
     resModeSwitch.text = UIUtil.CreateText(resModeSwitch.icon, 'I', 10, UIUtil.bodyFont)
@@ -614,7 +688,7 @@ function _OnBeat()
                 line = data
             end
         end
-        LayoutHelpers.Below(resModeSwitch.icon, line.energy, -1)
+        LayoutHelpers.Below(resModeSwitch.icon, line.energy, 1)
         currentScores = false -- dont render score UI until next score update
     end
 

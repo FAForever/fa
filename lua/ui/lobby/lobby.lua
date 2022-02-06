@@ -33,6 +33,8 @@ local Text = import('/lua/maui/text.lua').Text
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Border = import('/lua/ui/controls/border.lua').Border
 
+local utils = import('/lua/system/utils.lua')
+
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = Trueskill.round
 local Player = Trueskill.Player
@@ -66,7 +68,6 @@ GetAITypes()
 
 --This is a special table that allows us to pass data to blueprints.lua, before the rest of the game is loaded.
 -- do not use this for anything that doesnt do blueprint modding, use GameOptions for that instead, which will load it into sim.
-PreGameData = {}
 
 local IsSyncReplayServer = false
 
@@ -840,30 +841,6 @@ function GetPlayerDisplayName(playerInfo)
     end
 end
 
---- Players with a higher deviation have their rating colour tarnished, to make smurfs easier to
--- detect.
-function GetRatingColour(deviation)
-    if deviation < 100 then
-        return "ffffffff"
-    end
-
-    if deviation > 150 then
-        return "ff333333"
-    end
-
-    -- Linear scale of greyness in between.
-
-    -- Fraction of the way between 100 and 150 we are.
-    local greynessFraction = (deviation - 100) / 50
-
-    -- Grey colour value we want (value between 0 and 255). 51 is 0x33.
-    local greyness = 51 + (1 - greynessFraction) * 204
-
-    -- Shoehorn that into a colour value string. Madly, because Lua.
-    local value = string.format('%02x', greyness)
-    return "ff" .. value .. value .. value
-end
-
 local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
 
 -- update the data in a player slot
@@ -977,7 +954,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     slot.ratingText:Show()
     slot.ratingText:SetText(playerInfo.PL)
-    slot.ratingText:SetColor(GetRatingColour(playerInfo.DEV))
+    slot.ratingText:SetColor("ffffffff")
 
     -- dynamic tooltip to show rating and deviation for each player
     local tooltipText = {}
@@ -2056,7 +2033,7 @@ local function TryLaunch(skipNoObserversCheck)
                     gameInfo.GameOptions[option.key] = keyVersion or valueVersion
 
                     -- Can be removed once this code leaves the develop branch
-                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
+                    SPEW("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
                 end
             end
         end
@@ -2081,8 +2058,7 @@ local function TryLaunch(skipNoObserversCheck)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
-        PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
-        SetPreference('PreGameData',PreGameData)
+        -- launch the game
         lobbyComm:LaunchGame(gameInfo)
     end
 
@@ -2149,9 +2125,97 @@ local function UpdateGame()
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
 
-            -- prefetch the session to make loading screen shorter
-            local mods = Mods.GetGameMods(gameInfo.GameMods)
-            PrefetchSession(scenarioInfo.map, mods, true)
+            -- contains information that is available during blueprint loading
+            local preGameData = {}
+
+            -- MAP ASSETS LOADING -- 
+
+            -- store the (selected) map directory so that we can load individual blueprints from it
+            preGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
+
+            -- STRATEGIC ICON REPLACEMENT --
+
+            -- icon replacements
+            local iconReplacements = { }
+
+            -- retrieve all (selected) mods
+            local allMods = Mods.AllMods()
+            local selectedMods = Mods.GetSelectedMods()
+
+            -- loop over selected mods identifiers
+            for uid, _ in selectedMods do 
+
+                -- get the mod, determine path to icon configuration file
+                local mod = allMods[uid]
+
+                -- check for mod integrity
+                if not (mod.name and mod.author) then 
+                    WARN("Unable to load icons from mod '" .. uid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
+                end
+
+                -- path to configuration file
+                local iconConfigurationPath = mod.location .. "/mod_icons.lua"
+
+                -- see if it exists
+                if DiskGetFileInfo(iconConfigurationPath) then 
+
+                    -- see if we can import it
+                    local ok, msg = pcall(
+                        function()
+
+                            -- attempt to load the file
+                            local env = { }
+                            doscript(iconConfigurationPath, env)
+
+                            -- syntax errors are caught internally and instead it just returns the table untouched
+                            if not (env.UnitIconAssignments or env.ScriptedIconAssignments) then
+                                error("Lobby.lua - can not import the icon configuration file at '" .. iconConfigurationPath .. "'. This could be due to missing functionality functionality or a parsing error.")
+                            end
+                        end
+                    )
+
+                    -- if it passes this basic check, then continue
+                    if ok then 
+                        local info = { }
+                        info.Name = mod.name 
+                        info.Author = mod.author 
+                        info.Location = mod.location
+                        info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+                        info.UID = uid
+                        table.insert(iconReplacements, info)
+                    -- tell us (and then spam the author, not the dev) if it failed
+                    else 
+                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN(msg)
+                    end
+                end
+            end
+
+            preGameData.IconReplacements = iconReplacements
+
+            -- try and set the preferences - it may crash when running multiple instances on a single machine that all try and start at the same time.
+            local ok, msg = pcall(
+                function() 
+                    -- store in preferences so that we can retrieve it during blueprint loading
+                    SetPreference('PreGameData', preGameData)
+                end 
+            )
+
+            if not ok then 
+                WARN("Unable to update preferences. Are you running multiple instances on the same machine?" )
+                WARN(msg)
+            end
+
+            -- PREFETCHING -- 
+
+            -- we can't prefetch in combination with PreGameData as the prefs file
+            -- is not updated accordingly, as a result when it is retrieved in
+            -- blueprints.lua it may use the old values. As it is more relevant
+            -- to have custom icon support over having a slightly faster loading
+            -- time we skip the prefetching
+
+            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
+            -- PrefetchSession(scenarioInfo.map, mods, true)
 
         else
             AlertHostMapMissing()
@@ -2173,7 +2237,6 @@ local function UpdateGame()
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
 
-        UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         UIUtil.setEnabled(GUI.factionSelector, notReady)
         if notReady then
             UpdateFactionSelector()
@@ -2301,8 +2364,8 @@ function ShowGameQuality()
         end
     end
 
-    -- Nothing to do if we have only one team...
-    if table.getn(teams:getTeams()) < 2 then
+    -- Rating only meaningful in games with 2 teams
+    if table.getn(teams:getTeams()) ~= 2 then
         return
     end
 
@@ -2438,6 +2501,9 @@ function DisableSlot(slot, exceptReady)
     end
 end
 
+-- Used for the quick-swap feature
+local playersToSwap = false
+
 -- set up player "slots" which is the line representing a player and player specific options
 function CreateSlotsUI(makeLabel)
     local Combo = import('/lua/ui/controls/combo.lua').Combo
@@ -2524,11 +2590,36 @@ function CreateSlotsUI(makeLabel)
 
         -- Slot number
         local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
         newSlot:AddChild(slotNumber)
         newSlot.tooltipnumber = Tooltip.AddControlTooltip(slotNumber, 'slot_number')
-
+        slotNumber.id = i
+        slotNumber.HandleEvent = function(self,event)
+            if lobbyComm:IsHost() then
+                if event.Type == 'ButtonPress' then
+                    if playersToSwap then
+                        --same number clicked
+                        if self.id == playersToSwap then
+                            playersToSwap = false
+                            self:SetColor(UIUtil.fontColor)
+                        elseif gameInfo.PlayerOptions[playersToSwap] then
+                            HostUtils.SwapPlayers(playersToSwap, self.id)
+                            GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
+                            playersToSwap = false
+                        elseif gameInfo.PlayerOptions[self.id] then
+                            HostUtils.SwapPlayers(self.id, playersToSwap)
+                            GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
+                            playersToSwap = false
+                        end
+                    else
+                        self:SetColor('ff00ffff')
+                        playersToSwap = self.id
+                    end
+                end
+            end
+        end
         -- COUNTRY
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
         local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
@@ -3002,6 +3093,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.mapView, GUI.mapPanel, -1)
 
     GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
+    LayoutHelpers.SetDimensions(GUI.LargeMapPreview, 30, 30)
     LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
     LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
     LayoutHelpers.DepthOverParent(GUI.LargeMapPreview, GUI.mapPanel, 2)
@@ -3023,13 +3115,15 @@ function CreateUI(maxPlayers)
     end
 
     -- curated Maps
-    GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-    Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-    LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-    GUI.curatedmapsButton.OnClick = function()
-        OpenURL('http://forum.faforever.com/topic/347')
-    end
+    -- GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
+    -- Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
+    -- LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
+    -- LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
+    -- GUI.curatedmapsButton.OnClick = function()
+    --     OpenURL('http://forum.faforever.com/topic/347')
+    -- end
+
+    -- GUI.curatedmapsButton:Disable()
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -3345,6 +3439,12 @@ function CreateUI(maxPlayers)
                 Tooltip.AddControlTooltip(line.bg, data.tooltip)
                 Tooltip.AddControlTooltip(line.bg2, data.valueTooltip)
             end
+
+            if data.manualTooltipTitle then 
+                Tooltip.AddControlTooltipManual(line.bg, data.manualTooltipTitle, data.manualTooltipDescription )
+                Tooltip.AddControlTooltipManual(line.bg2, data.manualTooltipTitle, data.manualTooltipDescription )
+            end
+
         end
 
         local optionsToUse
@@ -3831,13 +3931,54 @@ function RefreshOptionDisplayData(scenarioInfo)
             modStr = modNumUI..' UI Mod'
         end
     end
+
+    local description = "No mods enabled."
+
+    if modNum + modNumUI > 0 then 
+        description = ""
+
+        local descriptionSimMods = { "", }
+        if modNum > 0 then 
+            table.insert(descriptionSimMods, LOC("<LOC enabled_sim_mods>The host enabled the following sim mods:"))
+            for k, mod in Mods.GetGameMods() do 
+                table.insert(descriptionSimMods, "\r\n - " .. tostring(mod.name))
+            end
+
+            table.insert(descriptionSimMods, "\r\n")
+        end
+
+        local descriptionUIMods = { "", }
+        if modNumUI > 0 then 
+            table.insert(descriptionUIMods, LOC("<LOC enabled_ui_mods>You have enabled the following UI mods:"))
+            for k, mod in Mods.GetUiMods() do 
+                table.insert(descriptionUIMods, "\r\n - " .. tostring(mod.name))
+            end
+        end
+
+        descriptionSimMods = tostring(table.concat(descriptionSimMods))
+        descriptionUIMods = tostring(table.concat(descriptionUIMods))
+
+        if modNum > 0 and modNumUI > 0 then 
+            description = tostring(table.concat({descriptionSimMods, "\r\n", descriptionUIMods}))
+        else 
+            if modNum > 0 then 
+                description = descriptionSimMods
+            end 
+
+            if modNumUI > 0 then 
+                description = descriptionUIMods
+            end
+        end
+    end
+
     if modStr then
         local option = {
             text = modStr,
             value = LOC('<LOC lobby_0003>Check Mod Manager'),
             mod = true,
-            tooltip = 'Lobby_Mod_Option',
-            valueTooltip = 'Lobby_Mod_Option'
+            
+            manualTooltipTitle = 'Enabled mods',
+            manualTooltipDescription = description
         }
 
         table.insert(formattedOptions, option)
@@ -5459,6 +5600,10 @@ end
 function ShowTitleDialog()
     CreateInputDialog(GUI, "Game Title",
         function(self, text)
+            -- remove new lines from the text
+            text = text:gsub("\r", "")
+            text = text:gsub("\n", "")
+            
             SetGameOption("Title", text, true)
             SetGameTitleText(text)
         end, gameInfo.GameOptions.Title

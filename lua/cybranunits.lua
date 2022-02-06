@@ -5,6 +5,7 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local DummyUnit = import('/lua/sim/unit.lua').DummyUnit
 local DefaultUnitsFile = import('defaultunits.lua')
 local AirFactoryUnit = DefaultUnitsFile.AirFactoryUnit
 local AirStagingPlatformUnit = DefaultUnitsFile.AirStagingPlatformUnit
@@ -54,6 +55,9 @@ local UnitFunctions = _G.moho.unit_methods
 local UnitSetConsumptionActive = UnitFunctions.SetConsumptionActive
 UnitFunctions = nil 
 
+-- upvalied math functions for performance
+MathMax = math.max
+
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
@@ -64,7 +68,7 @@ CConstructionTemplate = Class() {
     --- Prepares the values required to support bots
     OnCreate = function(self)
         -- cache the total amount of drones
-        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + builder:GetBuildRate()) / 15), 10)
+        self.BuildBotTotal = self:GetBlueprint().BuildBotTotal or math.min(math.ceil((10 + self:GetBuildRate()) / 15), 10)
     end,
 
     --- When dying, destroy everything.
@@ -141,16 +145,20 @@ CConstructionTemplate = Class() {
 
     --- When making build effects, try and make the bots.
     CreateBuildEffects = function(self, unitBeingBuilt, order, stationary)
+        -- check if the unit still exists, this can happen when: 
+        -- pause during construction, constructing unit dies, unpause
+        if unitBeingBuilt then 
 
-        -- Prevent an AI from (ab)using the bots for other purposes than building
-        local builderArmy = self.Army
-        local unitBeingBuiltArmy = unitBeingBuilt.Army
-        if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
-            SpawnBuildBotsOpti(self)
-            if stationary then 
-                CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+            -- Prevent an AI from (ab)using the bots for other purposes than building
+            local builderArmy = self.Army
+            local unitBeingBuiltArmy = unitBeingBuilt.Army
+            if builderArmy == unitBeingBuiltArmy or ArmyBrains[builderArmy].BrainType == "Human" then
+                SpawnBuildBotsOpti(self)
+                if stationary then 
+                    CreateCybranEngineerBuildEffectsOpti(self, self.BuildEffectBones, self.BuildBots, self.BuildBotTotal, self.BuildEffectsBag)
+                end
+                CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
             end
-            CreateCybranBuildBeamsOpti(self, self.BuildBots, unitBeingBuilt, self.BuildEffectsBag, stationary)
         end
     end,
 
@@ -252,57 +260,12 @@ CConstructionTemplate = Class() {
 
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
-CBuildBotUnit = Class(AirUnit) {
+CBuildBotUnit = Class(DummyUnit) {
 
     -- Keep track of the builder that made the bot
     SpawnedBy = false,
 
-    -- do not perform the logic of these functions                      
-    OnMotionHorzEventChange = function(self, new, old) end,                     -- called a million times, keep it simple
-    OnMotionVertEventChange = function(self, new, old) end,                 
-    OnLayerChange = function(self, new, old) self.Layer = new end,
-
-    CreateBuildEffects = function(self, unitBeingBuilt, order) end,             -- do not make build effects (engineer / builder takes care of that)
-    StartBuildingEffects = function(self, built, order) end,
-    CreateBuildEffects = function(self, built, order) end,
-    StopBuildingEffects = function(self, built) end,
-
-    OnBuildProgress = function(self, unit, oldProg, newProg) end,               -- do not keep track of progress
-    OnStopBuild = function(self, unitBeingBuilt) end,
-
-    EnableUnitIntel = function(self, disabler, intel) end,                      -- do not bother doing intel
-    DisableUnitIntel = function(self, disabler, intel) end,
-    OnIntelEnabled = function(self) end,
-    OnIntelDisabled = function(self) end,
-    ShouldWatchIntel = function(self) end,
-    IntelWatchThread = function(self) end,
-
-    AddDetectedByHook = function(self, hook) end,                               -- do not bother keeping track of collision beams
-    RemoveDetectedByHook = function(self, hook) end,
-    OnDetectedBy = function(self, index) end,
-
-    CreateWreckage = function (self, overkillRatio) end,                        -- don't make wreckage
-    UpdateConsumptionValues = function(self) end,                               -- avoids junk in resource overlay
-    ShouldUseVetSystem = function(self) return false end,                       -- never use vet
-    OnStopBeingBuilt = function(self, builder, layer) end,                      -- do not perform this logic when being made
-    OnStartRepair = function(self, unit) end,                                   -- do not run this logic
-    OnKilled = function(self) end,                                              -- just fall out of the sky
-
-    OnCollisionCheck = function(self, other, firingWeapon) return false end,    -- we never collide
-    OnCollisionCheckWeapon = function(self, firingWeapon) return false end,
-
-    OnPrepareArmToBuild = function(self) end,
-
-    OnStartBuilderTracking = function(self) end,                                -- don't track anything
-    OnStopBuilderTracking = function(self) end,
-
-    DestroyUnit = function(self) end,                                           -- prevent misscalls
-    DestroyAllTrashBags = function(self) end,
-
-    OnStartSacrifice = function(self, target_unit) end,
-    OnStopSacrifice = function(self, target_unit) end,
-
-    -- only initialise what we need
+    -- only initialise what we need (drones typically have some aim functionality)
     OnPreCreate = function(self) 
         self.Trash = TrashBag()
     end,             
@@ -313,14 +276,19 @@ CBuildBotUnit = Class(AirUnit) {
         UnitSetConsumptionActive(self, false)
 
         -- store the army in case AOE damage tries to hit the drone
+        self.Footprint = self:GetBlueprint().Footprint
         self.Army = self:GetArmy()
+        self.UnitId = self:GetUnitId()
     end,
 
     -- short-cut when being destroyed
     OnDestroy = function(self) 
         self.Dead = true 
         self.Trash:Destroy()
-        self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+
+        if self.SpawnedBy then 
+            self.SpawnedBy.BuildBotsNext = self.SpawnedBy.BuildBotsNext - 1
+        end
     end,
 
     Kill = function(self)
@@ -446,7 +414,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self:GetBlueprint().Display.AnimationWater then
+        if self.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -464,7 +432,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self:GetBlueprint().Display.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else
@@ -738,9 +706,13 @@ CConstructionStructureUnit = Class(CStructureUnit, CConstructionTemplate) {
 
     OnUnpaused = function(self)
         CStructureUnit.OnUnpaused(self)
-        CStructureUnit.StartBuildingEffects(self, self.UnitBeingBuilt, self.UnitBuildOrder)
 
-        self.AnimationManipulator:SetRate(1)
+        -- make sure the unit is still there
+        local unitBeingBuilt = self.UnitBeingBuilt
+        if unitBeingBuilt then 
+            CStructureUnit.StartBuildingEffects(self, unitBeingBuilt, self.UnitBuildOrder)
+            self.AnimationManipulator:SetRate(1)
+        end
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)

@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: faforever/lua:v5.0-0
+    container: faforever/lua:v5.0-1
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

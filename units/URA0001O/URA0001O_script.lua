@@ -19,19 +19,17 @@ local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
 local CBuildBotUnit = import('/lua/cybranunits.lua').CBuildBotUnit
-URA0003 = Class(CBuildBotUnit) { 
+URA0001O = Class(CBuildBotUnit) { 
 
     OnCreate = function(self)
         CBuildBotUnit.OnCreate(self)
 
-        local trash = self.Trash
-
         -- make the drone aim for the target
-        local BuildArmManipulator = CreateBuilderArmController(self, 'URA0003' , 'URA0003', 0)
+        local BuildArmManipulator = CreateBuilderArmController(self, 'URA0001' , 'URA0001', 0)
         BuilderArmManipulatorSetAimingArc(BuildArmManipulator, -180, 180, 360, -90, 90, 360)
         BuilderArmManipulatorSetPrecedence(BuildArmManipulator, 5)
-        TrashBagAdd(trash, BuildArmManipulator)
+        TrashBagAdd(self.Trash, BuildArmManipulator)
     end,
 
 }
-TypeClass = URA0003
+TypeClass = URA0001O

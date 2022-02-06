@@ -58,6 +58,12 @@ gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
 
+-- Lobby options as set by the host in the lobby
+LobbyOptions = false
+
+-- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
+OriginalFocusArmy = -1
+
 function KillWaitingDialog()
     if waitingDialog then
         waitingDialog:Destroy()
@@ -136,6 +142,31 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
+    -- override some UI globals
+    import("/lua/ui/override/ArmiesTable.lua").Setup()
+    import("/lua/ui/override/SessionClients.lua").Setup()
+
+    -- ensure logger is turned off for the average user
+    if not GetPreference('debug.enable_debug_facilities') then
+        SetPreference('Options.Log', {
+            Debug = false,
+            Info = false,
+            Warn = false,
+            Error = false,
+            Custom = false,
+            Filter = '*debug:'})
+    end
+
+    -- prevents the nvidia stuttering bug with their more recent drivers
+    ConExecute('d3d_WindowsCursor on')  
+
+    -- keep track of the original focus army
+    import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
+    OriginalFocusArmy = GetFocusArmy()
+
+
+
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 

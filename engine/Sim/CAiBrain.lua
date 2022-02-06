@@ -266,8 +266,8 @@ end
 
 --- Returns list of units by category.
 -- @param category Unit's category, example: categories.TECH2 .
--- @param needToBeIdle true/false Unit has to be idle.
--- @param requireBuilt true/false defaults to false which excludes units that are NOT finished.
+-- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
+-- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
 -- @return tblUnits Table containing units.
 function CAiBrain:GetListOfUnits(category,  needToBeIdle,  requireBuilt)
 end

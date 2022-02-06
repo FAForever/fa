@@ -84,6 +84,7 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_sonar>Sonar',
             '<LOC ability_torpedo>Torpedoes',
+            '<LOC ability_jamming>Jamming',
         },
         IdleEffects = {
             Water = {
@@ -162,7 +163,7 @@ UnitBlueprint {
         OrderOverrides = {
             RULEUTC_IntelToggle = {
                 bitmapId = 'sonar',
-                helpText = 'toggle_sonar',
+                helpText = 'Toggle Sonar and Jamming on/off',
             },
         },
         TechLevel = 'RULEUTL_Secret',
@@ -179,6 +180,11 @@ UnitBlueprint {
         SonarRadius = 450,
         VisionRadius = 32,
         WaterVisionRadius = 24,
+        JamRadius = {
+            Max = 70,
+            Min = 70,
+        },
+        JammerBlips = 20,
     },
     Interface = {
         HelpText = '<LOC ues0305_help>Sonar Platform',

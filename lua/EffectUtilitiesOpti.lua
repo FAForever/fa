@@ -3,7 +3,10 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
--- upvalued cache - do not use after waiting
+-- upvalued cached vector. Prevents various table allocations
+-- throughout the code. Use carefully: the state of the vector
+-- is different after a wait because another function can have
+-- used it in between.
 local VectorCached = Vector(0, 0, 0)
 
 -- globals as upvalues for performance
@@ -23,17 +26,36 @@ local IssueClearCommands = IssueClearCommands
 local IssueGuard = IssueGuard
 
 -- moho functions as upvalues for performance
+local EntityDestroy = moho.entity_methods.Destroy
+local EntitySetMesh = moho.entity_methods.SetMesh 
+local EntitySetScale = moho.entity_methods.SetScale
 local EntityGetPosition = moho.entity_methods.GetPosition
+local EntityGetBlueprint = moho.entity_methods.GetBlueprint
 local EntityBeenDestroyed = moho.entity_methods.BeenDestroyed
 local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
 local EntityGetOrientation = moho.entity_methods.GetOrientation
+local EntitySetOrientation = moho.entity_methods.SetOrientation
+local EntityCreateProjectile = moho.entity_methods.CreateProjectile
+local EntitySetVizToAllies = moho.entity_methods.SetVizToAllies
+local EntitySetVizToEnemies = moho.entity_methods.SetVizToEnemies
+local EntitySetVizToNeutrals = moho.entity_methods.SetVizToNeutrals
 
 local UnitRevertElevation = moho.unit_methods.RevertElevation
+local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
+local UnitShowBone = moho.unit_methods.ShowBone
+local UnitHideBone = moho.unit_methods.HideBone
+
+local ProjectileSetScale = moho.projectile_methods.SetScale
+
+local EmitterSetEmitterParam = moho.IEffect.SetEmitterParam
+local EmitterSetEmitterCurveParam = moho.IEffect.SetEmitterCurveParam
+local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
 
 -- math functions as upvalues for performance
 local MathPi = math.pi
 local MathSin = math.sin 
 local MathCos = math.cos
+local MathPow = math.pow
 
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
@@ -43,9 +65,9 @@ local TrashBagAdd = TrashBag.Add
 
 -- all possible bot blueprint values
 local CybranBuildBotBlueprints = {
-    'ura0001',
-    'ura0002',
-    'ura0003',
+    'ura0001o',
+    'ura0002o',
+    'ura0003o',
     -- 'ura0004'
 }
 
@@ -106,7 +128,7 @@ function SpawnBuildBots(builder)
             zVec = MathCos(angleInitial + (k * angle)) * VecMul
 
             -- make the bot
-            local botBlueprint = CybranBuildBotBlueprints[k] or 'ura0001'
+            local botBlueprint = CybranBuildBotBlueprints[k] or 'ura0001o'
             bot = CreateUnit(botBlueprint, builderArmy, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air')
 
             -- make build bots unkillable
@@ -143,7 +165,7 @@ local CybranBuildFlash01 = EffectTemplate.CybranBuildFlash01
 --- Creates the beams and welding points of the builder and its bots. The
 -- bots share the welding point which each other, as does the builder with
 -- itself.
--- @param builder A builder with builder.BuildEffectBones set. 
+-- @param builder A builder with builder.buildEffectBones set. 
 -- @param bots The bots of the builder.
 -- @param unitBeingBuilt The unit that we're building.
 -- @param buildEffectsBag The bag that we use to store / trash all effects.
@@ -154,7 +176,7 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
     WaitTicks(2 + Random(1, 4))
 
     -- early out - make sure everything is still alive
-    if builder.Dead or unitBeingBuilt.Dead then 
+    if builder.Dead or (not unitBeingBuilt) or unitBeingBuilt.Dead then 
         return 
     end
 

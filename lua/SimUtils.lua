@@ -68,6 +68,10 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
         shareUpgrades = true
     end
 
+    -- do not gift insignificant units
+    units = EntityCategoryFilterDown(categories.ALLUNITS - categories.INSIGNIFICANTUNIT, units)
+
+    -- gift most valuable units first
     table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
 
     local newUnits = {}
@@ -229,7 +233,9 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
 
         unit.IsBeingTransferred = false
 
-        v:OnGiven(unit)
+        if v.OnGiven then 
+            v:OnGiven(unit)
+        end
     end
 
     if not captured then
@@ -378,17 +384,26 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
                 failedToTransfer[ID].DefaultProgress = math.floor(progress * 1000)
                 failedToTransfer[ID].Orientation = unit:GetOrientation()
 
-
-                for _, reclaim in GetReclaimablesInRect(unit:GetSkirtRect()) do --wrecks can prevent drone from starting construction
-                    if reclaim.IsWreckage then
-                        reclaim:SetCollisionShape('None') --so we set collision shape 'None'
-                        table.insert(modifiedWrecks, reclaim) --and save wrecks to revert our changes later
+                -- wrecks can prevent drone from starting construction
+                local wrecks = GetReclaimablesInRect(unit:GetSkirtRect()) -- returns nil instead of empty table when empty
+                if wrecks then 
+                    for _, reclaim in wrecks do 
+                        if reclaim.IsWreckage then
+                            -- collision shape to none to prevent it from blocking, keep track to revert later
+                            reclaim:SetCollisionShape('None')
+                            table.insert(modifiedWrecks, reclaim)
+                        end
                     end
                 end
 
-                for _,u in GetUnitsInRect(unit:GetSkirtRect()) do --same as for wrecks
-                    u:SetCollisionShape('None')
-                    table.insert(modifiedUnits, u)
+                -- units can prevent drone from starting construction
+                local units = GetUnitsInRect(unit:GetSkirtRect()) -- returns nil instead of empty table when empty
+                if units then 
+                    for _,u in units do
+                        -- collision shape to none to prevent it from blocking, keep track to revert later
+                        u:SetCollisionShape('None')
+                        table.insert(modifiedUnits, u)
+                    end
                 end
 
                 if progress > 0.5 then --if transfer failed, we have to create wreck manually. progress should be more than 50%

@@ -157,11 +157,7 @@ function CheckForAndHandleTaunt(text, sender)
     if (string.len(text) > 1) and (string.sub(text, 1, 1) == "/") then
         local tauntIndex = tonumber(string.sub(text, 2))
         if tauntIndex and taunts[tauntIndex] then
-            if sender then
-                SendTaunt(tauntIndex, sender)
-            else
-                SendTaunt(tauntIndex)
-            end
+            SendTaunt(tauntIndex, sender)
             return true
         end
     end

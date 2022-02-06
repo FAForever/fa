@@ -377,6 +377,8 @@ keyActions = {
         category = 'selection', order = 42,},
     ['select_nearest_idle_airscout'] = {action = 'UI_SelectByCategory AIR INTELLIGENCE +nearest +idle',
         category = 'selection', order = 42,},
+    ['select_all_idle_airscouts'] = {action = 'UI_SelectByCategory AIR INTELLIGENCE +idle',
+        category = 'selection', order = 42,},
     ['select_all_tml'] = {action = 'UI_SelectByCategory STRUCTURE TACTICALMISSILEPLATFORM',
         category = 'selection', order = 43,},
     ['select_all_stationdrones'] = {action = 'UI_SelectByCategory AIR STATIONASSISTPOD',

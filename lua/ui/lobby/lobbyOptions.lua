@@ -111,6 +111,24 @@ teamOptions =
 
 globalOpts = {
     {
+        default = 1,
+        label = "<LOC lobui_0802>Unrate",
+        help = "<LOC lobui_0803>Provides a toggle to unrate a game. Note that if this is set to no the game can still be unrated due to other lobby options, unrated sim mods and / or the map being unrated.",
+        key = 'Unranked',
+        values = {
+            {
+                  text = "<LOC lobui_0804>No",
+                  help = "<LOC lobui_0805>This game will be rated if all the criteria for a rated game are met.",
+                  key = 'No',
+              },
+              {
+                  text = "<LOC lobui_0806>Yes",
+                  help = "<LOC lobui_0807>This game will not be rated.",
+                  key = 'Yes',
+              },
+          },
+    },
+    {
         default = 8,
         label = "<LOC lobui_0102>Unit Cap",
         help = "<LOC lobui_0103>Set the maximum number of units that can be in play",
@@ -212,6 +230,30 @@ globalOpts = {
                 text = "<LOC lobui_0248>Infinite",
                 help = "<LOC lobui_0249>There is no limit on timeouts",
                 key = '-1',
+            },
+        },
+    },
+    {
+        default = 3,
+        label = "Disconnection delay",
+        help = "Sets the disconnect delay when a player has trouble connecting.",
+        key = 'DisconnectionDelay02',
+        mponly = true,
+        values = {
+            {
+                text = "Tournament",
+                help = "The eject delay is set to 10 seconds and after 90 seconds the player is ejected automatically.",
+                key = '10',
+            },
+            {
+                text = "Quick",
+                help = "The eject delay is set to 30 seconds and after 90 seconds the player is ejected automatically.",
+                key = '30',
+            },
+            {
+                text = "Regular",
+                help = "The eject delay is set to 90 seconds and after 180 seconds the player is ejected automatically.",
+                key = '90',
             },
         },
     },
