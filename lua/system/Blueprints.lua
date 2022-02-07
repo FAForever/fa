@@ -61,6 +61,8 @@ pcall = pcall
 doscript = doscript
 DiskFindFiles = DiskFindFiles
 
+doscript("/lua/system/blueprints-ai.lua")
+
 --- Load in the pre game data that is defined in the lobby through the preference file.
 local function LoadPreGameData()
 
@@ -867,6 +869,15 @@ function PostModBlueprints(all_bps)
     -- we do before releasing the blueprint values to the game as we want to catch all
     -- units, even those included by mods.
     FindCustomStrategicIcons(all_bps)
+
+    local ok, msg = pcall(function()
+        CheckAllUnitThreatValues(all_bps.Unit)
+        end 
+    )
+
+    LOG(ok)
+    LOG(msg)
+
 end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
