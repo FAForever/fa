@@ -10,7 +10,7 @@ Read this in other languages: [English](setup-english.md), [Russian](setup-russi
 
 _В ЧаВо есть раздел о Git, если вы с ним не знакомы._
 
-Форкните репозиторий. Клонируйте свой форк в свою систему с помощью вашего инструмента Git. Далее `репозиторий` - каталог вашего репозитория в вашей системе, а каталог `bin` - папка в ​​папке установки клиента. По умолчанию это:
+Форкните репозиторий. Клонируйте свой форк в свою систему с помощью вашего инструмента Git. Далее `репозиторий` - каталог вашего репозитория в вашей системе, а каталог `bin` - папка в папке установки клиента. По умолчанию это:
  - `C:/ProgramData/FAForever/bin`
 
 Скопируйте содержимое `repository/setup/bin` в папку `bin`. Откройте `init_dev.lua`, который теперь находится в папке `bin`. В верхней части указано:
@@ -71,9 +71,9 @@ MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 Горячие клавиши могут значительно улучшить ваш рабочий процесс. Вам не нужно знакомиться с каждой из них. Мы рекомендуем вам просматривать этот лист каждый месяц и проверять, есть ли обычное действие, которое вы выполняли, которое можно было бы выполнить с помощью них.
 
 Полезные расширения в целом:
- - [Git graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph): useful for graph visualizations
- - [Gitlens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens): useful for seeing who made what change
- - [Peacock](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock): useful for coloring your workspaces when you have multiple
+ - [Git graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph): Визуализация графов
+ - [Gitlens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens): Отображает кем было сделано изменение
+ - [Peacock](https://marketplace.visualstudio.com/items?itemName=johnpapa.vscode-peacock): Окрашивает рабочие простанства, если у вас их несколько
 
 Полезные расширения, если вы собираетесь работать с шейдерами:
  - [Поддержка языков шейдеров для VS Code](https://marketplace.visualstudio.com/items?itemName=slevesque.shader)
@@ -149,7 +149,7 @@ FADeepProbe.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log"
 
 <dl>
 <dt> Что такое Git? </dt>
-<dd> Git — это программа для отслеживания изменений в наборе файлов, особенно полезная для исходных файлов. Отраслевой стандарт и хорошая инвестиция времени, чтобы ознакомиться с ней. Существуют различные источники для изучения git. Вы можете научиться использовать Git через <a href="https://www.w3schools.com/git/git_intro.asp?remote=github">командную строку</a>, через <a href="https:// desktop.github.com/">Github Desktop</a>[Github Desktop](https://desktop.github.com/) или через <a href="https://code.visualstudio.com/docs/introvideos /versioncontrol">Код Visual Studio</a>. Сначала важно понять, что такое форк, как размещать, коммитить(commit) или отправлять(push) файлы и как делать пулл-реквесты(PR). Более сложные темы, такие как слияние(megre) или перебазирование(rebase), становятся актуальными по мере того, как вы становитесь более вовлеченными в проект. </dd>
+<dd> Git — это программа для отслеживания изменений в наборе файлов, особенно полезная для исходных файлов. Отраслевой стандарт и хорошая инвестиция времени, чтобы ознакомиться с ней. Существуют различные источники для изучения git. Вы можете научиться использовать Git через <a href="https://www.w3schools.com/git/git_intro.asp?remote=github">командную строку</a>, через <a href="https:// desktop.github.com/">Github Desktop</a>[Github Desktop](https://desktop.github.com/) или через <a href="https://code.visualstudio.com/docs/introvideos /versioncontrol">Код Visual Studio</a>. Сначала важно понять, что такое форк, как размещать, коммитить(commit) или отправлять(push) файлы и как делать пулл-реквесты(PR). Более сложные темы, такие как слияние(merge) или перебазирование(rebase), становятся актуальными по мере того, как вы становитесь более вовлеченными в проект. </dd>
 
 <dt> Могу ли я играть в игру с другими людьми, в которую включены мои изменения? </dt>
 <dd> Нельзя - это вызовет рассинхронизацию. Например: если изменить количество наносимого урона, это произойдет только в вашей версии симуляции.</dd>
