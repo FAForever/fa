@@ -744,6 +744,7 @@ function RefreshOptions(skipRefresh)
             end
         end
     end
+
     if not skipRefresh then
         -- Remove all info about advancedOptions in changedOptions
         -- So we have a clean slate regarding the advanced options each map switch
@@ -751,7 +752,8 @@ function RefreshOptions(skipRefresh)
             changedOptions[optionData.key] = nil
         end
 
-        OptionContainer:CalcVisible()
+        -- attempt to scroll zero elements to make reset the view
+        OptionContainer:ScrollLines(nil, 0)
     end
 end
 
@@ -843,10 +845,17 @@ function SetupOptionsPanel(parent, curOptions)
 
     -- called when the scrollbar wants to set a new visible top line
     OptionContainer.ScrollSetTop = function(self, axis, top)
-        top = math.floor(top)
-        if top == self.top then return end
+
+        -- compute new top value
         local size = DataSize()
-        self.top = math.max(math.min(size - numLines() , top), 0)
+        top = math.max(math.min(size - numLines() , math.floor(top)), 0)
+
+        -- do not re-compute visible elements if we didn't change
+        if top == self.top then 
+            return 
+        end
+
+        self.top = top
         self:CalcVisible()
     end
 
