@@ -56,7 +56,9 @@ local here = getinfo(1).source
 local original_blueprints
 local current_mod
 
-local PrefsPreGameData = false
+-- LoadPrefsData() attempts to populate PreGameData and OptionChoices with data from the prefs file
+-- We could change LoadPrefsData() to load other things from the prefs file for modding or otherwise if desired
+local PreGameData = false
 local OptionChoices
 
 -- upvalue for performance
@@ -74,12 +76,12 @@ local function LoadPrefsData()
         return 
     end
 
-    -- try and load the pre game data of prefs file
+    -- try and load the pre game data and lobby option choices form the prefs file
     ok, msg = pcall(
         function() 
             local data = { }
             doscript(file, data)
-            PrefsPreGameData = data.PreGameData 
+            PreGameData = data.PreGameData 
             OptionChoices = data.profile.profiles[data.profile.current].LobbyPresets[1].GameOptions
         end 
     )
@@ -90,6 +92,8 @@ local function LoadPrefsData()
         WARN(msg)
     end
 end
+
+LoadPrefsData()
 
 --- Attempts to assign icons to units if they exist.
 -- @units All unit blueprints.
@@ -137,8 +141,8 @@ local function FindCustomStrategicIcons(all_bps)
     -- STRATEGIC ICON REPLACEMENT --
 
     -- try to use pre game data
-    if PrefsPreGameData and PrefsPreGameData.IconReplacements then 
-        for _, info in PrefsPreGameData.IconReplacements do 
+    if PreGameData and PreGameData.IconReplacements then 
+        for _, info in PreGameData.IconReplacements do 
 
             -- data that is set in the lobby
             -- info.Name = mod.name 
@@ -823,9 +827,38 @@ function PreModBlueprints(all_bps)
     end
 end
 
-LoadPrefsData()
+-- BLUEPRINT MOD OPTIONS INFORMATION
+-- Mods can make lobby options by creating a mod_options.lua file in the mod's primary folder and putting options
+-- in that file using the same options format that scripted maps' (ie: many adapative maps') options files use.
+-- A commented example of what mod_options.lua can look like is provided below (between the MOD OPTIONS EXAMPLE lines).
+-- These options can be accessed in the normal way via with ScenarioInfo in other places.  However, in the Blueprints.lua
+-- file, they can be accessed via OptionChoices since ScenarioInfo is not yet available.  So, mods can get the results
+-- of which lobby options were picked (for both regular lobby options and options from active sim mods) by doing 
+-- OptionChoices.[OptionName] (ie: something like OptionChoices.MaxHealthMultiplier) in Blueprints.lua
+-- (the same file that ModBlueprints is in).
 
--- Hook for mods to manipulate the entire blueprint table
+-- MOD OPTIONS EXAMPLE
+-- options ={
+
+-- {
+	-- default = 2,
+	-- label = 'Max Health Multiplier',
+	-- help = 'The maximum health of all units is multiplied by this value',
+	-- key = 'MaxHealthMultiplier',
+	-- pref = 'MaxHealthMultiplier',
+	-- values = {        
+		-- { text = '1/2', help = 'Units have 1/2 their normal maximum health', key = 0.5, },
+		-- { text = '1', help = 'Units have their normal maximum healths', key = 1, },
+		-- { text = '3', help = 'Units have triple their normal maximum health', key = 3, },
+		-- { text = '5', help = 'Units have five times their normal maximum health', key = 5, },
+		-- { text = '10', help = 'Units have ten times their normal maximum health', key = 10, },
+	-- },
+-- },
+
+-- };
+-- MOD OPTIONS EXAMPLE
+
+-- Hook for mods to manipulate the entire blueprint table (mod options information for blueprints is provided above)
 function ModBlueprints(all_bps)
 end
 
@@ -927,9 +960,9 @@ function LoadBlueprints(pattern, directories, mods, skipGameFiles, skipExtractio
     stats.ProjsOrg = table.getsize(original_blueprints.Projectile)
 
     -- try to use pre game data for current map directory
-    if PrefsPreGameData and PrefsPreGameData.CurrentMapDir then
+    if PreGameData and PreGameData.CurrentMapDir then
         task = 'Blueprints Loading: Blueprints from current map'
-        files = DiskFindFiles(PrefsPreGameData.CurrentMapDir, pattern)
+        files = DiskFindFiles(PreGameData.CurrentMapDir, pattern)
         for k,file in files do
             BlueprintLoaderUpdateProgress()
             -- update UnitManager UI via taskNotifier only if it exists

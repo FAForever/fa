@@ -85,42 +85,78 @@ local numOpenSlots = LobbyComm.maxPlayerSlots
 local ActiveMods = GetPreference('active_mods') or {}
 
 
---Add given lobby mod options if not already stored
-local function AddModOptions(OptionData, modName)
+-- Add lobby options from an options file given the mod's location, 
+-- the mod's name, and a binary indicating if the options file uses 
+-- the AI Options workaround. 
+-- (This function's storage check could be changed to check for
+-- duplicates in all active mods' options.)  Each time this function 
+-- is called, it inserts a table that will be used to create a new 
+-- section in the lobby options.  That table consists of another table
+-- that consists of options (OptionData) from the options file followed 
+-- by the mod's name (modName).
+function AddModOptions(ModLocation, modName, IsAIOptionsFile)
+    local OptionData
     local alreadyStored
-    local optionsInThisMod = {}
-    for s, t in OptionData do
-        -- check, if we have this option already stored
-        alreadyStored = false
-        for k, v in modOptions do
-            if v.key == t.key then
-                alreadyStored = true
-                break
+    local optionsInThisOptionsFile = {}
+
+    -- try and load the option data from the mod's relevant options file
+    ok, msg = pcall(
+        function() 
+            local file
+            local data = { }
+            if IsAIOptionsFile then
+                doscript(ModLocation..'/lua/AI/LobbyOptions/lobbyoptions.lua', data)
+                OptionData = data.AIOpts 
+            else
+                doscript(ModLocation..'/mod_options.lua', data)
+                OptionData = data.options 
+            end
+        end 
+    )
+
+    -- tell us if something went wrong
+    if not ok then 
+        WARN("lobby.lua -" .. modName .. "'s options file is locked or corrupt. Skipping it.")
+        WARN(msg)
+    else
+        for s, t in OptionData do
+            -- check, if we have this option already stored
+            alreadyStored = false
+            for k, v in modOptions do
+                if v.key == t.key then
+                    alreadyStored = true
+                    break
+                end
+            end
+            if not alreadyStored then
+                table.insert(optionsInThisOptionsFile, t)
             end
         end
-        if not alreadyStored then
-            table.insert(optionsInThisMod, t)
-        end
+        table.insert(modOptions, {optionsInThisOptionsFile, modName})
     end
-    table.insert(modOptions, {optionsInThisMod, modName})
 end
 
 -- Add lobby options from sim mods
+-- This checks each mod in the mods folder.  If the mod is an enabled sim mod, 
+-- it checks the mod for options files via the old AI Options workaround as well
+-- as via the newer mod_options.lua file in the mod's primary folder.
+-- It then calls AddModOptions once per options file (in active sim mod(s)).
+-- So, each options file gets its own section in the Lobby Options list.
 function ImportModOptions()
     local simMods = import('/lua/mods.lua').AllMods()
     for Index, ModData in simMods do
         if IsEnabledSimMod(ModData) then
             if exists(ModData.location..'/mod_options.lua') then
-                AddModOptions(import(ModData.location..'/mod_options.lua').options, ModData.name)
+                AddModOptions(ModData.location, ModData.name, false)
             end
             if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then 
-                AddModOptions(import(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua').AIOpts, ModData.name)
+                AddModOptions(ModData.location, ModData.name, true)
             end
         end
     end
 end
 
---IsEnabledSimMod
+-- returns true if a given mod is both enabled and a sim mod (ui_only is not set to true)
 function IsEnabledSimMod(mod)
 	for UID, ActiveMod in ActiveMods do
 		if mod.uid == UID and not mod.ui_only == true then 
