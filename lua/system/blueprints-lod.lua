@@ -16,7 +16,7 @@ local function CalculateLODOfProp(prop)
     -- 5 -> ~ 750
     -- 6 -> ~ 820
     -- https://www.desmos.com/calculator/amw5fi5569 (1.5 * sqrt(100 * 500 * x))
-    local lod = 1.5 * MathSqrt(100 * 500 * weighted)
+    local lod = 1.45 * MathSqrt(100 * 500 * weighted)
     
     if prop.Display and prop.Display.Mesh and prop.Display.Mesh.LODs then
 
