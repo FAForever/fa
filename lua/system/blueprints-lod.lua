@@ -1,6 +1,8 @@
 
 local MathSqrt = math.sqrt
 
+--- Calculates the LODs of a single prop
+-- @param props Prop to compute the LODs for
 local function CalculateLODOfProp(prop)
     local sx = prop.SizeX or 1 
     local sy = prop.SizeY or 1
@@ -43,12 +45,16 @@ local function CalculateLODOfProp(prop)
     end
 end
 
+--- Calculates the LODs of a list of props
+-- @param props List of props to tweak the LODs for
 local function CalculateLODsOfProps(props)
     for k, prop in props do 
         CalculateLODOfProp(prop)
     end
 end
 
+--- Calculates the LODs of all entities
+-- @param bps All available blueprints
 function CalculateLODs(bps)
     CalculateLODsOfProps(bps.Prop)
 end
