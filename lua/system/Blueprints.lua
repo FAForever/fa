@@ -870,6 +870,7 @@ function PostModBlueprints(all_bps)
     -- units, even those included by mods.
     FindCustomStrategicIcons(all_bps)
 
+    -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
     CalculateLODs(all_bps)
 end
 -----------------------------------------------------------------------------------------------
