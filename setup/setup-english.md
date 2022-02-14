@@ -109,7 +109,7 @@ The game version depends on the game type. Checkout the repository to the correc
  - `FAF Beta`: `deploy/fafbeta`
  - `FAF Develop`: `deploy/fafdevelop`
 
-You can find the replay by starting it with the client once and immediately closing it. The replay is stored in the cache of the client:
+Unlike the `.fafreplay` files you can get from and view with the faf client, the base game which you will run to test and debug only recognizes the `.scfareplay` extension for replays. To convert a `.fafreplay` to the `.scfareplay` extension you can start the replay with the faf client and immediately close it. The client will have created a temporary  version of your replay with the `.scfareplay` format in the cache folder of the client:
  - `C:/ProgramData/FAForever/cache/temp.scfareplay`
 
 Copy that replay to the replays folder of the game:
