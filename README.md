@@ -48,7 +48,7 @@ Repositories that are directly related to the game:
 Changelog
 ---------
 
-Here is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) particularly for balance patches in a user-friendly. 
+Here is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
 
 Contributing
 ------------
