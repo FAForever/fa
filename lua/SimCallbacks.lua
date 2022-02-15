@@ -469,7 +469,7 @@ Callbacks.DiplomacyHandler = import('/lua/SimDiplomacy.lua').DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
-    if not wreck.AssociatedBP then return end
+    if not wreck or not wreck.AssociatedBP then return end
     local units = SecureUnits(units)
     if not units[1] then return end
     if data.Clear then
@@ -505,7 +505,10 @@ Callbacks.OnControlGroupAssign = function(units)
         -- add units to list
         local entities = {}
         for k,v in units do
-            TableInsert(entities, GetEntityById(v))
+            unit = GetEntityById(v)
+            if unit then
+                TableInsert(entities, unit)
+            end
         end
         ScenarioInfo.ControlGroupUnits = TableMerged(ScenarioInfo.ControlGroupUnits, entities)
 
