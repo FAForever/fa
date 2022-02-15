@@ -505,7 +505,7 @@ Callbacks.OnControlGroupAssign = function(units)
         -- add units to list
         local entities = {}
         for k,v in units do
-            unit = GetEntityById(v)
+            local unit = GetEntityById(v)
             if unit then
                 TableInsert(entities, unit)
             end
