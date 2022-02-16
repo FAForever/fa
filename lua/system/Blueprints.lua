@@ -62,6 +62,7 @@ doscript = doscript
 DiskFindFiles = DiskFindFiles
 
 doscript("/lua/system/blueprints-ai.lua")
+doscript("/lua/system/blueprints-lod.lua")
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
 local function LoadPreGameData()
@@ -874,6 +875,8 @@ function PostModBlueprints(all_bps)
     -- of a units capabilities
     SetUnitThreatValues(all_bps.Unit)
 
+    -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
+    CalculateLODs(all_bps)
 end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
