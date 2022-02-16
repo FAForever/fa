@@ -91,39 +91,6 @@ BlueprintConversion.Transport = function(blueprint)
     end
 end
 
-BlueprintConversion.Weapon = function(blueprint)
-    for key, weapon in blueprint.Weapon do 
-        AddTuple(false, weapon.DisplayName, 0)
-        AddTuple("WeaponCategory", weapon.WeaponCategory, 4)
-        AddTuple("Damage", tostring(weapon.Damage), 4)
-        AddTuple("Radius", tostring(weapon.Radius), 4)
-
-        AddTuple(false, "FireTargetLayerCapsTable", 4)
-        if weapon.FireTargetLayerCapsTable then 
-        for k, caps in weapon.FireTargetLayerCapsTable do 
-            AddTuple(tostring(k), tostring(caps), 8)
-        end
-        else 
-            AddTuple(false, "No pre-defined fire target layers", 8)
-        end
-
-        AddTuple(false, "TargetPriorities", 4)
-        if weapon.TargetPriorities then 
-            for k, cats in weapon.TargetPriorities do 
-                AddTuple(false, tostring(cats), 8)
-            end
-        else 
-            AddTuple(false, "No pre-defined target categories", 8)
-        end
-    end
-end
-
--- BlueprintConversion.Transport = function(blueprint)
---     for key, val in blueprint.Transport do 
---         AddTuple(key, tostring(val), 0)
---     end
--- end
-
 --- Updates the UI elements of the window
 function UpdateViewOfWindow()
 
@@ -148,12 +115,12 @@ function UpdateViewOfWindow()
 
         -- acknowledge that we have multiple units
         if count > 1 then 
-            State.GUI.Info:SetText("Multiple units - AI info of: " .. LOC(blueprint.Description))
+            State.GUI.Info:SetText("Multiple units - " .. LOC(blueprint.Description))
         end
 
         -- acknowledge that we have one unit
         if count == 1 then 
-            State.GUI.Info:SetText("AI information of: " .. LOC(blueprint.Description))
+            State.GUI.Info:SetText(LOC(blueprint.Description))
         end
 
         -- reset and populate cache
@@ -248,9 +215,17 @@ function OpenWindow()
         State.GUI.Groups = Group(State.GUI)
         LayoutHelpers.FillParent(State.GUI.Groups, State.GUI.TitleGroup)
 
+        State.GUI.Extensive1 = UIUtil.CreateText(State.GUI.Groups, "With cheats enabled, Hold Shift + F6 for a more", 14, UIUtil.bodyFont, false)
+        LayoutHelpers.Below(State.GUI.Extensive1, State.GUI.Groups, 4)
+        LayoutHelpers.AtLeftIn(State.GUI.Extensive1, State.GUI.Groups, 12)
+
+        State.GUI.Extensive2 = UIUtil.CreateText(State.GUI.Groups, "extensive blueprint viewer", 14, UIUtil.bodyFont, false)
+        LayoutHelpers.Below(State.GUI.Extensive2, State.GUI.Extensive1, 4)
+        LayoutHelpers.AtLeftIn(State.GUI.Extensive2, State.GUI.Extensive1, 0)
+
         State.GUI.Info = UIUtil.CreateText(State.GUI.Groups, "No unit selected", 14, UIUtil.bodyFont, false)
-        LayoutHelpers.Below(State.GUI.Info, State.GUI.Groups, 4)
-        LayoutHelpers.AtLeftIn(State.GUI.Info, State.GUI.Groups, 12)
+        LayoutHelpers.Below(State.GUI.Info, State.GUI.Extensive2, 18)
+        LayoutHelpers.AtLeftIn(State.GUI.Info, State.GUI.Extensive2, 0)
 
         State.GUI.Combo = Combo(State.GUI.Groups, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
         LayoutHelpers.Below(State.GUI.Combo, State.GUI.Info, 4)
@@ -268,46 +243,6 @@ function OpenWindow()
         end
 
         State.GUI.Elements = { }
-
-        -- -- initialize state
-        -- local parent = State.GUI.Groups
-        -- local lastElement = parent
-
-        -- -- iteratively populate the window
-        -- for k, group in State.EnabledMarkerTypes do 
-
-        --     -- create title of group
-        --     local groupUI = UIUtil.CreateText(parent, k, 16, UIUtil.titleFont, false)
-        --     LayoutHelpers.Below(groupUI, lastElement, 8)
-        --     LayoutHelpers.AtLeftIn(groupUI, parent, 12)
-
-        --     lastElement = groupUI 
-
-        --     -- create markers of group
-        --     for l, type in group do 
-
-        --         local typeUI = UIUtil.CreateText(parent, l, 14, UIUtil.bodyFont, false)
-        --         LayoutHelpers.Below(typeUI, lastElement, 8)
-        --         LayoutHelpers.AtLeftIn(typeUI, groupUI, 12)
-
-        --         local checkUI = UIUtil.CreateCheckboxStd(parent, '/dialogs/check-box_btn/radio')
-        --         LayoutHelpers.DepthOverParent(checkUI, State.GUI, 10)
-        --         LayoutHelpers.AtCenterIn(checkUI, typeUI)
-        --         LayoutHelpers.AtLeftIn(checkUI, parent, 300)
-
-        --         local identifier = l
-        --         checkUI.OnCheck = function (self, checked)
-        --                 SimCallback({
-        --                     Func = 'ToggleDebugMarkersByType', 
-        --                     Args = { Type = identifier }
-        --                 }
-        --             )
-        --         end
-
-        --         -- allows the next element to be below the last element
-        --         lastElement = typeUI
-        --     end
-        -- end
     else
         State.GUI:Show()
     end
