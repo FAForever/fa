@@ -870,14 +870,9 @@ function PostModBlueprints(all_bps)
     -- units, even those included by mods.
     FindCustomStrategicIcons(all_bps)
 
-    local ok, msg = pcall(
-    function()
-        CheckAllUnitThreatValues(all_bps.Unit)
-        end 
-    )
-
-    LOG(ok)
-    LOG(msg)
+    -- dynamically compute the unit threat values that are used by the AI to make sense
+    -- of a units capabilities
+    SetUnitThreatValues(all_bps.Unit)
 
 end
 -----------------------------------------------------------------------------------------------

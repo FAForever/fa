@@ -72,7 +72,7 @@ local function CalculatedDPS(weapon)
 end
 
 
-function CheckAllUnitThreatValues(unitBPs)
+function SetUnitThreatValues(unitBPs)
     
     local cache = { }
 
@@ -81,10 +81,10 @@ function CheckAllUnitThreatValues(unitBPs)
         -- used for debugging
         -- LOG(tostring(bp.BlueprintId) .. ": " .. tostring(bp.Description))
 
-        -- if not bp.Defense then 
-        --     LOG("Skipped!")
-        --     continue 
-        -- end
+        -- not all units have this table set, an example is a Cybran build bot.
+        if not bp.Defense then 
+            continue 
+        end
 
         --  default to 0
         cache.AirThreatLevel = 0
