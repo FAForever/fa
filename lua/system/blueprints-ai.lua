@@ -10,23 +10,21 @@ local MathFloor = math.floor
 
 local StringFind = string.find
 
+local TrueCats = {
+    'FACTORY',
+    'ENGINEER',
+    'FIELDENGINEER',
+    'CONSTRUCTION',
+    'ENGINEERSTATION',
+}
 
 local function TakeIntoAccountBuildrate(bp)
-    if not bp.Economy.BuildRate then
+    if not bp.Economy.BuildRate or bp.CategoriesHash['WALL'] then
         return false
     end
-    if TableFind(bp.Categories, 'HEAVYWALL') then
-        return false
-    end
-    local TrueCats = {
-        'FACTORY',
-        'ENGINEER',
-        'FIELDENGINEER',
-        'CONSTRUCTION',
-        'ENGINEERSTATION',
-    }
+
     for i, v in TrueCats do
-        if TableFind(bp.Categories, v) then
+        if bp.CategoriesHash[v] then
             return true
         end
     end
@@ -74,15 +72,31 @@ end
 
 function SetUnitThreatValues(unitBPs)
     
+    -- localize for performance
+    local TableFind = TableFind
+    local TableGetn = TableGetn
+    
+    local MathMax = MathMax
+    local MathFloor = MathFloor
+    
+    local StringFind = StringFind
+
+    -- re-use for performance
     local cache = { }
 
     for id, bp in unitBPs do
 
         -- used for debugging
-        -- LOG(tostring(bp.BlueprintId) .. ": " .. tostring(bp.Description))
+        if ReportIssues then 
+            LOG(tostring(bp.BlueprintId) .. ": " .. tostring(bp.Description))
+        end
 
         -- not all units have this table set, an example is a Cybran build bot.
         if not bp.Defense then 
+            if ReportIssues then 
+                LOG(tostring(bp.BlueprintId) .. ": has no defense table in blueprint, skipped")
+            end
+
             continue 
         end
 
