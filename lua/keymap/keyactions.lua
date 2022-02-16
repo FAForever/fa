@@ -291,6 +291,8 @@ keyActions = {
         category = 'selection', order = 100},
     ['show_objective_screen'] = {action = 'UI_Lua import("/lua/ui/game/objectiveDetail.lua").ToggleDisplay()',
         category = 'ui', order = 23},
+    ['toggle_ai_screen'] = {action = 'UI_Lua import("/lua/ui/dialogs/AIUtilitiesView.lua").OpenWindow()',
+        category = 'ui', order = 24},
     ['toggle_repeat_build'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild()',
         category = 'orders', order = 1,},
     ['show_enemy_life'] = {action = 'UI_ForceLifbarsOnEnemy',

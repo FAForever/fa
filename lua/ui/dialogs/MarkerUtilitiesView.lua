@@ -7,6 +7,8 @@ local Window = import('/lua/maui/window.lua')
 local GameMain = import('/lua/ui/game/gamemain.lua')
 local Text = import('/lua/maui/text.lua').Text
 
+local sessionInfo = SessionGetScenarioInfo()
+
 -- complete state of this window
 local State = {
     WindowIsOpen = false,
@@ -45,6 +47,12 @@ end
 
 --- Opens up the window
 function OpenWindow()
+
+    -- prevent it from opening when cheats are enabled
+    if not sessionInfo.Options.CheatsEnabled then 
+        WARN("Unable to open marker utilities window: cheats are disabled")
+        return 
+    end
 
     -- make hotkey act as a toggle
     if State.WindowIsOpen then 
