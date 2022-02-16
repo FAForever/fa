@@ -77,6 +77,15 @@ function CheckAllUnitThreatValues(unitBPs)
     local cache = { }
 
     for id, bp in unitBPs do
+
+        -- used for debugging
+        -- LOG(tostring(bp.BlueprintId) .. ": " .. tostring(bp.Description))
+
+        -- if not bp.Defense then 
+        --     LOG("Skipped!")
+        --     continue 
+        -- end
+
         --  default to 0
         cache.AirThreatLevel = 0
         cache.EconomyThreatLevel = 0
@@ -224,20 +233,12 @@ function CheckAllUnitThreatValues(unitBPs)
         end
 
         -- Sanitise the table
-        checkthreat = 0
         for i, v in cache do
             -- Round appropriately
             if v < 1 then
                 cache[i] = 0
             else
                 cache[i] = MathFloor(v + 0.5)
-            end
-            -- Only report numbers if they aren't the same as on file.
-            if cache[i] == (cache[i] or 0) then
-                cache[i] = nil
-            end
-            if cache[i] then
-                checkthreat = checkthreat + cache[i]
             end
         end
 

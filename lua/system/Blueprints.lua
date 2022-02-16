@@ -870,7 +870,8 @@ function PostModBlueprints(all_bps)
     -- units, even those included by mods.
     FindCustomStrategicIcons(all_bps)
 
-    local ok, msg = pcall(function()
+    local ok, msg = pcall(
+    function()
         CheckAllUnitThreatValues(all_bps.Unit)
         end 
     )
