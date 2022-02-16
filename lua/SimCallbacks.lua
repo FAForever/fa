@@ -12,7 +12,7 @@ local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
 local SUtils = import('/lua/ai/sorianutilities.lua')
-
+local SecureUnits = import ('/lua/SimCallbacksUtilities.lua').SecureUnits
 -- upvalue table operations for performance
 local TableInsert = table.insert
 local TableEmpty = table.empty
@@ -56,33 +56,14 @@ function DoCallback(name, data, units)
     end
 end
 
---- Common utility function to retrieve the actual units.
-local function SecureUnits(units)
-    local secure = {}
-    if units and type(units) ~= 'table' then
-        units = {units}
-    end
-
-    for _, u in units or {} do
-        if not IsEntity(u) then
-            u = GetEntityById(u)
-        end
-
-        if IsEntity(u) and OkayToMessWithArmy(u.Army) then
-            TableInsert(secure, u)
-        end
-    end
-
-    return secure
-end
-
 --- Empty callback for ui mods to communicate
 Callbacks.EmptyCallback = function(data, units)
 end
 
 Callbacks.AutoOvercharge = function(data, units)
-    for _, u in units or {} do
-        if IsEntity(u) and OkayToMessWithArmy(u.Army) and u.SetAutoOvercharge then
+    local units = SecureUnits(units)
+    for _, u in units do
+        if u.SetAutoOvercharge then
             u:SetAutoOvercharge(data.auto == true)
         end
     end
@@ -200,9 +181,7 @@ Callbacks.CapStructure = function(data, units)
     -- check if we have a structure
     -- if army is not set then the structure is not 'our' structure (e.g., we're trying to cap an allied or hostile extractor)
     local structure = GetEntityById(data.target)
-    if (not structure) or (not structure.Army) then return end 
-
-    -- check if we're allowed to mess with this structure
+    if not IsEntity(structure) then return end
     if not OkayToMessWithArmy(structure.Army) then return end
 
     -- we can't cap an extractor that is on the ocean floor
@@ -214,6 +193,8 @@ Callbacks.CapStructure = function(data, units)
 
     -- check if it is our structure
     if structure.Army ~= units[1].Army then return end
+    -- this might be equivalent to the OkayToMessWithArmy already ran on both?
+    -- could be removed from other funcs as a duplicate check as well if so.
 
     -- check if we have buildings we want to use for capping
     if (not data.id) or (not data.layer) then return end 
@@ -224,8 +205,6 @@ Callbacks.CapStructure = function(data, units)
 
     -- determine of all units in selection what they can build
     for _, unit in units do
-        -- make sure we're allowed to mess with this unit, if not we exclude
-        if unit.Army and OkayToMessWithArmy(unit.Army) then 
             -- compute blueprint id
             local faction = unit.factionCategory
             local blueprintID = ConstructBlueprintID(faction, data.id)
@@ -236,7 +215,6 @@ Callbacks.CapStructure = function(data, units)
                 TableInsert(buildersByFaction[faction], unit)
             else
                 TableInsert(otherBuilders, unit)
-            end
         end
     end 
 
@@ -469,9 +447,11 @@ Callbacks.DiplomacyHandler = import('/lua/SimDiplomacy.lua').DiplomacyHandler
 
 Callbacks.Rebuild = function(data, units)
     local wreck = GetEntityById(data.entity)
-    if not wreck or not wreck.AssociatedBP then return end
+    if not IsEntity(wreck) then return end
+
+    if not wreck.AssociatedBP then return end
     local units = SecureUnits(units)
-    if not units[1] then return end
+    if not units[1] then return end -- probably unnecessary, if ClearCommands can handle empty table
     if data.Clear then
         IssueClearCommands(units)
     end
@@ -502,18 +482,13 @@ Callbacks.OnControlGroupAssign = function(units)
             ScenarioInfo.ControlGroupUnits = {}
         end
 
-        -- add units to list
-        local entities = {}
-        for k,v in units do
-            local unit = GetEntityById(v)
-            if unit then
-                TableInsert(entities, unit)
-            end
-        end
+        -- get valid units and assign to controlgroup
+        -- this one skipped the OkayToMessWithArmy check, unsure if intentional
+        local entities = SecureUnits(units, false)
         ScenarioInfo.ControlGroupUnits = TableMerged(ScenarioInfo.ControlGroupUnits, entities)
 
         -- remove units on death
-        for k,v in entities do
+        for _, v in entities do
             SimTriggers.CreateUnitDeathTrigger(OnUnitKilled, v)
             SimTriggers.CreateUnitReclaimedTrigger(OnUnitKilled, v) --same as killing for our purposes
         end
@@ -539,14 +514,14 @@ Callbacks.PingGroupClick = import('/lua/SimPingGroup.lua').OnClickCallback
 Callbacks.GiveOrders = import('/lua/spreadattack.lua').GiveOrders
 
 Callbacks.ValidateAssist = function(data, units)
-    units = SecureUnits(units)
     local target = GetEntityById(data.target)
-    if units and target then
-        for k, u in units do
-            if IsEntity(u) and u.Army == target.Army and IsInvalidAssist(u, target) then
+    if not IsEntity(target) then return end
+
+    units = SecureUnits(units)
+    for _, u in units do
+        if u.Army == target.Army and IsInvalidAssist(u, target) then
                 IssueClearCommands({target})
                 return
-            end
         end
     end
 end
@@ -570,14 +545,14 @@ end
 
 --tells a unit to toggle its pointer
 Callbacks.FlagShield = function(data, units)
-    units = SecureUnits(units)
     local target = GetEntityById(data.target)
-    if units and target then
-        for k, u in units do
-            if IsEntity(u) and u.PointerEnabled == true then
+    if not IsEntity(target) then return end
+
+    units = SecureUnits(units)
+    for _, u in units do
+        if u.PointerEnabled == true then
                 u.PointerEnabled = false --turn the pointer flag off
                 u:DisablePointer() --turn the pointer off
-            end
         end
     end
 end

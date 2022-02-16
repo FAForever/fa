@@ -1,5 +1,6 @@
 local parsedPriorities
 local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
+local SecureUnits = import ('/lua/SimCallbacksUtilities.lua').SecureUnits
 
 --we are loading an arbitrary string that a user can send to us on the sim side.
 --in order to not break things, we sanitize the input first before doing anything with it.
@@ -63,20 +64,11 @@ function SetWeaponPriorities(data)
         name = data.name
     end
 
-    if GetEntityById(selectedUnits[1]).Army == GetFocusArmy() and not data.hideMsg then
+    -- check if select units are valid
+    local units = SecureUnits(selectedUnits)
+    if units[1] and not data.hideMsg then 
         --send the message to the owner of the army
         print('Target Priority:', name)
-    end
-
-    local units = {}
-
-    -- prevent tampering
-    for _, unitId in selectedUnits do
-        local unit = GetEntityById(unitId)
-
-        if unit and OkayToMessWithArmy(unit.Army) then
-            table.insert(units, unit)
-        end
     end
 
     local preparedPrioTables = {}

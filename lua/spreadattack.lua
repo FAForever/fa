@@ -420,9 +420,10 @@ function GiveOrders(Data)
 
     if OkayToMessWithArmy(Data.From) then --Check for cheats/exploits
         local unit = GetEntityById(Data.unit_id)
+        if not IsEntity(unit) then return end
 
         -- add guard if unit died
-        if unit and not unit.Dead then 
+        if not unit.Dead then 
             
             -- Skip units with no valid shadow orders.
             if not Data.unit_orders or not Data.unit_orders[1] then
@@ -451,13 +452,14 @@ function GiveOrders(Data)
                 if not Function then
                     continue
                 end
-
-                local target = order.Position
+                -- either an attack or move order
                 if order.EntityId then
-                    target = GetEntityById(order.EntityId)
-                end
-                if target then
-                    Function({ unit }, target)
+                    local target = GetEntityById(order.EntityId)
+                    if IsEntity(target) then
+                        Function({ unit }, target)
+                    end
+                elseif order.Position then
+                    Function({ unit }, order.Position)
                 end
             end
         end

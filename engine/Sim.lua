@@ -389,6 +389,8 @@ end
 
 --- Get entity by entity id.
 -- This ID is unique for each entity.
+-- Needs to be used with care, result can be nil if the id is no longer valid
+-- (like when part of a selection dies), or the returned entitity may be dead.
 function GetEntityById(id)
 end
 
