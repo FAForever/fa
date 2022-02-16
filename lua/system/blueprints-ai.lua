@@ -179,6 +179,12 @@ function SetUnitThreatValues(unitBPs)
         -- Weapons
         if bp.Weapon then
             for i, weapon in bp.Weapon do
+
+                -- skip disabled weapons by default
+                if weapon.EnabledByEnhancement then 
+                    continue 
+                end
+
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
                     cache.AirThreatLevel = cache.AirThreatLevel + CalculatedDPS(weapon) / 10
                 elseif weapon.RangeCategory == 'UWRC_AntiNavy' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Navy') then
