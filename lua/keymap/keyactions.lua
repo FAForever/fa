@@ -59,8 +59,6 @@ keyActions = {
         category = 'ui', order = 21,},
     ['toggle_markers_screen'] = {action = 'UI_Lua import("/lua/ui/dialogs/MarkerUtilitiesView.lua").OpenWindow()',
         category = 'ui', order = 21,},
-    ['scan_terrain'] = {action = 'UI_Lua import("/lua/ui/game/ScanTerrain.lua").ToggleTerrainScan()',
-        category = 'ui', order = 21,},
     ['toggle_reclaim_labels'] = {action = 'UI_Lua import("/lua/ui/game/reclaim.lua").ToggleReclaim()',
         category = 'ui'},
     ['group1'] = {action = 'UI_ApplySelectionSet 1',

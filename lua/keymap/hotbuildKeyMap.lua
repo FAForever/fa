@@ -38,7 +38,6 @@ defaultKeyMap = {
     ['F12']                 = 'show_objective_screen',
     ['K']                   = 'toggle_markers_screen',
     ['Y']                   = 'toggle_ai_screen',
-    ['T']                   = 'scan_terrain',
 
     ['1']                   = 'group1',
     ['2']                   = 'group2',

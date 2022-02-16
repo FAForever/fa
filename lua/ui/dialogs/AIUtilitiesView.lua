@@ -8,6 +8,7 @@ local Window = import('/lua/maui/window.lua')
 local GameMain = import('/lua/ui/game/gamemain.lua')
 local Text = import('/lua/maui/text.lua').Text
 
+local sessionInfo = SessionGetScenarioInfo()
 
 local cachedSelection = { }
 cachedSelection.oldSelection = { }
@@ -25,7 +26,12 @@ local State = {
 --- Observe selection changes
 GameMain.ObserveSelection:AddObserver(
     function(cache)
-        cachedSelection = cache
+        -- copy over references
+        cachedSelection.oldSelection = cache.oldSelection
+        cachedSelection.newSelection = cache.newSelection
+        cachedSelection.added = cache.added
+        cachedSelection.removed = cache.removed
+
         UpdateViewOfWindow()
     end
 )
@@ -33,6 +39,7 @@ GameMain.ObserveSelection:AddObserver(
 local cHead = 1
 local cTuples = { }
 
+--- Adds a tuple with a given key, value and depth to allow for indenting
 local function AddTuple(key, value, depth)
     local tuple = cTuples[cHead] or { }
     tuple.key = key
@@ -43,6 +50,7 @@ local function AddTuple(key, value, depth)
     cHead = cHead + 1
 end
 
+--- Formats the tuple, if there is no key then only the value is shown
 local function FormatTuple(tuple)
     local result = ""
     if tuple.key then
@@ -54,40 +62,55 @@ local function FormatTuple(tuple)
     return result 
 end
 
+--- Tuple extraction for various blueprint categories
 local BlueprintConversion = { }
 BlueprintConversion.Categories = function(blueprint)
-    for k, cat in blueprint.Categories do 
-        AddTuple(false, cat, 0)
+    if blueprint.Categories then 
+        for k, cat in blueprint.Categories do 
+            AddTuple(false, cat, 0)
+        end
+    else 
+        AddTuple(false, "No categories table", 0)
     end
 end
 
 BlueprintConversion.Defense = function(blueprint)
-    for key, val in blueprint.Defense do 
-        AddTuple(key, tostring(val), 0)
-    end
-end
-
-BlueprintConversion.Defense = function(blueprint)
-    for key, val in blueprint.Defense do 
-        AddTuple(key, tostring(val), 0)
+    if blueprint.Defense then 
+        for key, val in blueprint.Defense do 
+            AddTuple(key, tostring(val), 0)
+        end
+    else 
+        AddTuple(false, "No defense table", 0)
     end
 end
 
 BlueprintConversion.Economy = function(blueprint)
-    for key, val in blueprint.Economy do 
-        AddTuple(key, tostring(val), 0)
+    if blueprint.Economy then 
+        for key, val in blueprint.Economy do 
+            AddTuple(key, tostring(val), 0)
+        end
+    else 
+        AddTuple(false, "No economy table", 0)
     end
 end
 
 BlueprintConversion.Intel = function(blueprint)
-    for key, val in blueprint.Intel do 
-        AddTuple(key, tostring(val), 0)
+    if blueprint.Intel then 
+        for key, val in blueprint.Intel do 
+            AddTuple(key, tostring(val), 0)
+        end
+    else 
+        AddTuple(false, "No intel table", 0)
     end
 end
 
 BlueprintConversion.Transport = function(blueprint)
-    for key, val in blueprint.Transport do 
-        AddTuple(key, tostring(val), 0)
+    if blueprint.Transport then 
+        for key, val in blueprint.Transport do 
+            AddTuple(key, tostring(val), 0)
+        end
+    else 
+        AddTuple(false, "No transport table", 0)
     end
 end
 
@@ -167,11 +190,16 @@ function UpdateViewOfWindow()
             end
         end
     end
-
 end
 
 --- Opens up the window
 function OpenWindow()
+
+    -- prevent it from opening when cheats are enabled
+    if not sessionInfo.Options.CheatsEnabled then 
+        WARN("Unable to open AI utilities window: cheats are disabled")
+        return 
+    end
 
     -- make hotkey act as a toggle
     if State.WindowIsOpen then 
@@ -179,14 +207,14 @@ function OpenWindow()
         return
     end
 
-    SPEW("Opening marker utilities window")
+    SPEW("Opening AI utilities window")
 
     State.WindowIsOpen = true 
 
     -- populate the GUI
     if not State.GUI then 
 
-        SPEW("Created marker utilities window")
+        SPEW("Created AI utilities window")
 
         -- create the window
         State.GUI = Window.CreateDefaultWindow(
@@ -215,6 +243,7 @@ function OpenWindow()
         State.GUI.Groups = Group(State.GUI)
         LayoutHelpers.FillParent(State.GUI.Groups, State.GUI.TitleGroup)
 
+        -- extensive info text 1 / 2
         State.GUI.Extensive1 = UIUtil.CreateText(State.GUI.Groups, "With cheats enabled, Hold Shift + F6 for a more", 14, UIUtil.bodyFont, false)
         LayoutHelpers.Below(State.GUI.Extensive1, State.GUI.Groups, 4)
         LayoutHelpers.AtLeftIn(State.GUI.Extensive1, State.GUI.Groups, 12)
@@ -223,10 +252,12 @@ function OpenWindow()
         LayoutHelpers.Below(State.GUI.Extensive2, State.GUI.Extensive1, 4)
         LayoutHelpers.AtLeftIn(State.GUI.Extensive2, State.GUI.Extensive1, 0)
 
+        -- info text about selected unit
         State.GUI.Info = UIUtil.CreateText(State.GUI.Groups, "No unit selected", 14, UIUtil.bodyFont, false)
         LayoutHelpers.Below(State.GUI.Info, State.GUI.Extensive2, 18)
         LayoutHelpers.AtLeftIn(State.GUI.Info, State.GUI.Extensive2, 0)
 
+        -- combo box to select info from categories
         State.GUI.Combo = Combo(State.GUI.Groups, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
         LayoutHelpers.Below(State.GUI.Combo, State.GUI.Info, 4)
         LayoutHelpers.AtLeftIn(State.GUI.Combo, State.GUI.Info, 0)
@@ -254,7 +285,7 @@ end
 --- Closes the window
 function CloseWindow()
 
-    SPEW("Closing marker utilities window")
+    SPEW("Closing AI utilities window")
 
     State.WindowIsOpen = false
 
