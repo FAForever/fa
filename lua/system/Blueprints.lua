@@ -872,7 +872,7 @@ function PostModBlueprints(all_bps)
     FindCustomStrategicIcons(all_bps)
 
     -- dynamically compute the unit threat values that are used by the AI to make sense
-    -- of a units capabilities
+    -- of a units capabilities.
     SetUnitThreatValues(all_bps.Unit)
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
