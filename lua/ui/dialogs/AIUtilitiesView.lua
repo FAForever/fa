@@ -20,7 +20,7 @@ cachedSelection.removed = { }
 local State = {
     WindowIsOpen = false,
     GUI = false,
-    SelectedTable = "Categories",
+    SelectedTable = "Defense",
 }
 
 --- Observe selection changes
@@ -265,7 +265,15 @@ function OpenWindow()
         LayoutHelpers.DepthOverParent(State.GUI.Combo, State.GUI.Groups, 10000)
 
         local keys = table.keys(BlueprintConversion)
-        State.GUI.Combo:AddItems(keys, 1, 1)
+
+        local i = 1
+        for k, key in keys do 
+            if key == State.SelectedTable then 
+                i = k 
+            end
+        end
+
+        State.GUI.Combo:AddItems(keys, i, i)
 
         State.GUI.Combo.OnClick = function(self, index, text)
             local keys = table.keys(BlueprintConversion)
