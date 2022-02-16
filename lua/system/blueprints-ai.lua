@@ -1,4 +1,10 @@
 
+--------------------------------------------------------------------------------
+-- Supreme Commander mod threat calculator
+-- Copyright 2018-2022 Sean 'Balthazar' Wheeldon                       Lua 5.4.2
+--------------------------------------------------------------------------------
+-- Note this is largely unchanged from https://github.com/The-Balthazar/BrewLAN/blob/806a689792fa14e071ed679ee37b3e34d55ecbbf/mods/BrewLAN_Plenae/Logger/hook/lua/system/Blueprints.lua#L345
+
 local ReportIssues = false 
 
 -- upvalue for performance
