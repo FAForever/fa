@@ -1,9 +1,7 @@
--- local references, for some performance benefit?
--- SimCallbacks.lua used this, not sure if it still holds for imports?
+-- upvalue globals for performance
 local IsEntity = IsEntity
 local GetEntityById = GetEntityById
 local OkayToMessWithArmy = OkayToMessWithArmy
-local TableInsert = table.insert
 
 --- Utility function to retrieve actual unit entities.
 -- @units Unit ids or unit entities to check. 
@@ -18,6 +16,7 @@ function SecureUnits(units, checkarmy)
         units = {units}
     end
 
+    local index = 1
     for _, u in units or {} do
         if not IsEntity(u) then
             u = GetEntityById(u)
@@ -26,10 +25,12 @@ function SecureUnits(units, checkarmy)
         if IsEntity(u) then
             if checkarmy then
                 if OkayToMessWithArmy(u.Army) then
-                    TableInsert(secure, u)
+                    secure[index] = u
+                    index = index + 1
                 end
             else
-                TableInsert(secure, u)
+                secure[index] = u
+                index = index + 1
             end
         end
     end
