@@ -355,7 +355,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	// -- Water crests
 
 	// take into account the water depth to prevent hard-edges on shore lines
-    float waveCrest = 2 * min(1, 2 * waterDepth) * saturate( sum.a - waveCrestThreshold );
+    float waveCrest = saturate(4 * min(1, 2 * waterDepth) * (sum.a - waveCrestThreshold) );
 
 	// -- Screen position
 
@@ -426,7 +426,6 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // Lerp in a wave crest
     refractedPixels.xyz = lerp( refractedPixels.xyz, waveCrestColor, ( 1 - waterTexture.a ) * waveCrest);
 
-	refractedPixels.a = 1 - mask;
     return refractedPixels; 
 }
 
@@ -478,7 +477,7 @@ float4 WaterLayAlphaMaskPS( MASK_OUTPUT inV,
 						    uniform int alphaRef ) : COLOR
 {
 	float4 output = tex2D( MaskSampler, inV.mTexUV0 );
-    return float4(0,0,0,output.b);
+    return float4(0,0,0,0);
 }
 
 technique TWaterLayAlphaMask
