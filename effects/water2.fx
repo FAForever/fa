@@ -18,12 +18,12 @@ float4      ViewportScaleOffset;
 float4      TerrainScale;
 texture     WaterRamp;
 
-float waveCrestThreshold = 1;
+float  waveCrestThreshold = 1;
 float3 waveCrestColor = float3( 1, 1, 1);
 
 float4x4		WorldToView;
 float4x4		Projection;
-texture		UtilityTextureC;
+texture			UtilityTextureC;
 
 samplerCUBE SkySampler = sampler_state
 {
@@ -331,94 +331,80 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 					   uniform int alphaFunc, 
 					   uniform int alphaRef ) : COLOR
 {
-    //
-    // calculate the depth of water at this pixel, we use this to decide
-    // how to shade and it should become lesser as we get shallower
-    // so that we don't have a sharp line
-    //
+
+	// -- Lookups
+
+	// UtilitySamplerC
+	// r = flatness mask
+	// g = water depth
+	// b = shore line
+	// a = always 0
+
     float4 waterTexture = tex2D( UtilitySamplerC, inV.mTexUV );
     float waterDepth =  waterTexture.g;
-  
-    //waterDepth *= 50;
+	float waterDepthMask = min(1, 8 * waterDepth);
+	float shorelineDepth = waterTexture.b;
 
-//    if( waterDepth > 0 )
-//        waterDepth = 1;
+	// -- Normal
 
-  //  return waterDepth;
-
-	//return waterTexture.r;
-
-
-    //
-    // calculate the correct viewvector
-    //
-    float3 viewVector = normalize(inV.mViewVec);
-
-    //
-    // get perspective correct coordinate for sampling from the other textures
-    //
-    float OneOverW = 1.0 / inV.mScreenPos.w;
-    inV.mScreenPos.xyz *= OneOverW;
-    float2 screenPos = inV.mScreenPos.xy * ViewportScaleOffset.xy;
-    screenPos += ViewportScaleOffset.zw;
-
-    //
-    // calculate the background pixel
-    //
-    float4 backGroundPixels = tex2D( RefractionSampler, screenPos );
-    float mask = saturate(backGroundPixels.a * 255);
-
-    //
-    // calculate the normal we will be using for the water surface
-    //
+    // sample normals
     float4 W0 = tex2D( NormalSampler0, inV.mLayer0 );
 	float4 W1 = tex2D( NormalSampler1, inV.mLayer1 );
 	float4 W2 = tex2D( NormalSampler2, inV.mLayer2 );
 	float4 W3 = tex2D( NormalSampler3, inV.mLayer3 );
 
+	// bluntly add normals together
     float4 sum = W0 + W1 + W2 + W3;
-    float waveCrest = saturate( sum.a - waveCrestThreshold );
     
-    // average, scale, bias and normalize
+    // average, scale and bias
     float3 N = 2.0 * sum.xyz - 4.0;
     
-    // flatness
+    // take into account flatness mask
     N = normalize(N.xzy); 
     float3 up = float3(0,1,0);
-    N = lerp(up, N, waterTexture.r);
+    N = normalize(lerp(up, N, waterTexture.r));
         
-    // 
-    // calculate the reflection vector
-    //
+	// -- Water crests
+
+	// take into account the water depth to prevent hard-edges on shore lines
+    float waveCrest = min(1, 2 * waterDepth) * saturate( sum.a - waveCrestThreshold );
+
+	// -- Screen position
+
+    // compute screen position
+    float OneOverW = 1.0 / inV.mScreenPos.w;
+    inV.mScreenPos.xyz *= OneOverW;
+    float2 screenPos = inV.mScreenPos.xy * ViewportScaleOffset.xy;
+    screenPos += ViewportScaleOffset.zw;
+
+    float2 screenOffsetPos = screenPos;
+    screenOffsetPos -=  refractionScale * N.xz * OneOverW;
+
+    // -- Refraction
+
+	// sample default and refracted pixel
+    float4 backGroundPixels = tex2D( RefractionSampler, screenPos );
+    float4 refractedPixels = tex2D( RefractionSampler, screenOffsetPos);
+
+	// lerp them together based on water depth to prevent hard-edges on shore lines
+	refractedPixels = lerp (refractedPixels, backGroundPixels, 1 - waterDepthMask);
+
+    float mask = saturate(backGroundPixels.a * 255);
+
+	// -- Reflection
+
+    // normalize view vector
+    float3 viewVector = normalize(inV.mViewVec);
+
+	// calculate the reflection vector
 	float3 R = reflect( viewVector, N );
 
-    //
     // calculate the sky reflection color
-    //
 	float4 skyReflection = texCUBE( SkySampler, R );
 
-    //
-    // get the correct coordinate for sampling refraction and reflection
-    //
-    float2 refractionPos = screenPos;
-//    refractionPos *= ViewportScaleOffset.xy;
-//    refractionPos += ViewportScaleOffset.zw;
-    refractionPos -=  refractionScale * N.xz * OneOverW;
 
-    //
-    // calculate the refract pixel, corrected for fetching a non-refractable pixel
-    //
-    float4 refractedPixels = tex2D( RefractionSampler, refractionPos);
-    // because the range of the alpha value that we use for the water is very small
-    // we multiply by a large number and then saturate
-    // this will also help in the case where we filter to an intermediate value
-    refractedPixels.xyz = lerp(refractedPixels, backGroundPixels, saturate(refractedPixels.w * 255) ).xyz;
-
-
-    // 
     // calculate the reflected value at this pixel
-    //
-	float4 reflectedPixels = tex2D( ReflectionSampler, refractionPos);
+	float4 reflectedPixels = tex2D( ReflectionSampler, screenOffsetPos);
 
 
     //
@@ -474,7 +460,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     //
     // return the pixels masked out by the water mask
     //
-#if 1    
+#if 0    
     // use alphablend, don't get any glow
     float4 returnPixels = refractedPixels;
     returnPixels.a = 1 - mask;
@@ -514,7 +500,7 @@ technique Water_HighFidelity
 #endif
 
 		VertexShader = compile vs_1_1 WaterVS();
-		PixelShader = compile ps_2_0 HighFidelityPS( true, d3d_NotEqual, 0 );
+		PixelShader = compile ps_2_a HighFidelityPS( true, d3d_NotEqual, 0 );
 	}
 }
 
