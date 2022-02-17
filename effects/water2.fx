@@ -333,6 +333,14 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	float waterDepthMask = min(1, 8 * waterDepth);
 	float shorelineDepth = waterTexture.b;
 
+	float depth1 = tex2D( UtilitySamplerC, inV.mTexUV + float2(0.02, 0.02) ).g;
+	float depth2 = tex2D( UtilitySamplerC, inV.mTexUV + float2(-0.02, 0.02) ).g;
+	float depth3 = tex2D( UtilitySamplerC, inV.mTexUV + float2(0.02, -0.02) ).g;
+	float depth4 = tex2D( UtilitySamplerC, inV.mTexUV + float2(-0.02, -0.02) ).g;
+	float depthMin = min(depth1, min(depth2, min(depth3, depth4)));
+	float depthMax = max(depth1, max(depth2, max(depth3, depth4)));
+	float depthDiff = depthMax - depthMin;
+
 	// -- Normal
 
     // sample normals
@@ -376,6 +384,14 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 
 	// lerp them together based on water depth to prevent hard-edges on shore lines
 	refractedPixels = lerp (refractedPixels, backGroundPixels, 1 - waterDepthMask);
+
+	float navalDepth = 2.0;
+	float diff = 1 - min(1, abs((WaterElevation - navalDepth) - (1 - waterDepth) * WaterElevation) / 0.25);
+	float shoreFactor = (1 - shorelineDepth);
+	float depthFactor = 1 * max(0, (1 - 8 * depthDiff * depthDiff));
+	float elevationFactor = (diff * diff * diff * diff);
+	float directionFactor = pow(dot(N, up), 10);
+	refractedPixels = lerp(refractedPixels, 5 * backGroundPixels, directionFactor * shoreFactor * depthFactor * elevationFactor);
 
     float mask = saturate(backGroundPixels.a * 255);
 
