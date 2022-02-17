@@ -84,7 +84,6 @@ local function LoadPrefsData()
             local data = { }
             doscript(file, data)
             PreGameData = data.PreGameData 
-            PreGameData.Options = data.profile.profiles[data.profile.current].LobbyPresets[1].GameOptions
         end 
     )
 
@@ -837,9 +836,9 @@ end
 -- in that file using the same options format that scripted maps' (ie: many adapative maps') options files use.
 -- A commented example of what mod_options.lua can look like is provided below (between the MOD OPTIONS EXAMPLE lines).
 -- These options can be accessed in the normal way via with ScenarioInfo in other places.  However, in the Blueprints.lua
--- file, they can be accessed via PreGameData.Options since ScenarioInfo is not yet available.  So, mods can get the results
+-- file, they can be accessed via PreGameData.LobbyOptions since ScenarioInfo is not yet available.  So, mods can get the results
 -- of which lobby options were picked (for both regular lobby options and options from active sim mods) by doing 
--- PreGameData.Options.[OptionName] (ie: something like PreGameData.Options.MaxHealthMultiplier) in Blueprints.lua
+-- PreGameData.LobbyOptions.[OptionName] (ie: something like PreGameData.LobbyOptions.MaxHealthMultiplier) in Blueprints.lua
 -- (the same file that ModBlueprints is in).
 
 -- MOD OPTIONS EXAMPLE

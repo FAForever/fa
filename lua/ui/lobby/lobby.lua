@@ -2061,42 +2061,6 @@ local function TryLaunch(skipNoObserversCheck)
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
-        -- Load in the default map options if they are not set manually
-
-        -- Not all maps have options
-        if scenarioInfo.options then
-
-            -- If we don't validate them first then the people using the default
-            -- as a value instead of the index of the value will mess us up
-            MapUtil.ValidateScenarioOptions(scenarioInfo.options)
-
-            -- For every option, if it's not set yet then add its default value
-            for _, option in scenarioInfo.options do
-                if not gameInfo.GameOptions[option.key] then
-                    -- When the value data of the option is formatted as:
-                    -- values = {
-                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },
-                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },
-                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },
-                    --     { text = "Legendary", help = "We're being dropped in the middle of it - we knew it was a suicide mission when we signed up for it.", key = 4, },
-                    -- },
-                    local keyVersion = option.values[option.default].key
-
-                    -- When the value data of the option is formatted as:
-                    -- values = {
-                    --     '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'
-                    -- }
-                    local valueVersion = option.values[option.default]
-
-                    -- Expect a key version, fall back on a value version
-                    gameInfo.GameOptions[option.key] = keyVersion or valueVersion
-
-                    -- Can be removed once this code leaves the develop branch
-                    SPEW("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
-                end
-            end
-        end
-
         if scenarioInfo.AdaptiveMap then
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
@@ -2251,6 +2215,7 @@ local function UpdateGame()
             end
 
             preGameData.IconReplacements = iconReplacements
+            preGameData.LobbyOptions = table.deepcopy(gameInfo.GameOptions)
 
             -- try and set the preferences - it may crash when running multiple instances on a single machine that all try and start at the same time.
             local ok, msg = pcall(
@@ -3524,6 +3489,8 @@ function CreateUI(maxPlayers)
             optionsToUse = formattedOptions
         end
 
+        LOG(table.getn(optionsToUse))
+
         for i, v in GUI.OptionDisplay do
             if optionsToUse[i + self.top] then
                 SetTextLine(v, optionsToUse[i + self.top], i + self.top)
@@ -3972,6 +3939,8 @@ function RefreshOptionDisplayData(scenarioInfo)
     if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     end
+    LOG("RefreshOptionDisplayData")
+
     formattedOptions = {}
     nonDefaultFormattedOptions = {}
 
@@ -4123,6 +4092,14 @@ function RefreshOptionDisplayData(scenarioInfo)
 
     local function addOptionsFrom(optionObject)
         for index, optData in optionObject do
+
+            -- if this game option doesn't exist yet, populate it with default
+            if not gameInfo.GameOptions[optData.key] then 
+                SPEW("Missing lobby option: " .. tostring(optData.key))
+                gameInfo.GameOptions[optData.key] = OptionUtil.FindDefaultValueOfOption(optData)
+            end
+
+            -- format it accordingly
             local gameOption = gameInfo.GameOptions[optData.key]
             addFormattedOption(optData, gameOption)
         end
@@ -4132,21 +4109,20 @@ function RefreshOptionDisplayData(scenarioInfo)
     addOptionsFrom(globalOpts)
     addOptionsFrom(teamOptions)
     addOptionsFrom(AIOpts)
+
+    -- Add mod options
     for i, mod in modOptions do 
         addOptionsFrom(mod[1])
     end
     
-
-    -- Add options from the scenario object, if any are provided.
+    -- Add map options, if available
     if scenarioInfo.options then
         if not MapUtil.ValidateScenarioOptions(scenarioInfo.options, true) then
             AddChatText(LOC('<LOC lobui_0397>The options included in this map specified invalid defaults. See moholog for details.'))
             AddChatText(LOC('<LOC lobui_0398>An arbitrary option has been selected for now: check the game options screen!'))
         end
 
-        for index, optData in scenarioInfo.options do
-            addFormattedOption(optData, gameInfo.GameOptions[optData.key])
-        end
+        addOptionsFrom(scenarioInfo.options)
     end
 
     GUI.OptionContainer:CalcVisible()
