@@ -288,6 +288,7 @@ struct VS_OUTPUT
     float2 mLayer3      : TEXCOORD4;	
 	float3 mViewVec     : TEXCOORD5;
 	float4 mScreenPos	: TEXCOORD6;
+	float3 mWorldPos : TEXCOORD7;
 	//float3 mLightVector	: TEXCOORD6;
 };
 
@@ -305,11 +306,12 @@ float4 inPos : POSITION,
 
 	float4x4 wvp = mul( WorldToView, Projection );
 	result.mPos = mul( float4(inPos.xyz,1), wvp );
-	
+
 	// output the map coordinate so we can sample the water texture
 	result.mTexUV = inTexUV;
 	// output the screen position so we can sample the reflection / mask
 	result.mScreenPos = result.mPos; 
+	result.mWorldPos = inPos.xyz;
 
     // calculate the texture coordinates for all 3 layers of water
     result.mLayer0 = (inPos.xz + (normal1Movement * Time)) * normalRepeatRate.x;
@@ -431,7 +433,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // we want to lerp in some of the water color based on depth, but
     // not totally on depth as it gets clamped
     //
-    float waterLerp = clamp(waterDepth, waterLerp.x, waterLerp.y);
+    float waterLerp = clamp(waterDepth, waterLerp.x+ 0.05, waterLerp.y + 0.1);
 
     //
     // lerp in the color
