@@ -3,28 +3,32 @@
 #define     FIDELITY_MEDIUM 0x01
 #define     FIDELITY_HIGH   0x02
 
-float3		ViewPosition;
-float		WaterElevation;
-float       Time;
-texture		SkyMap;
-texture		NormalMap0;
-texture		NormalMap1;
-texture		NormalMap2;
-texture		NormalMap3;
-texture		RefractionMap;
-texture		ReflectionMap;
-texture		FresnelLookup;
+// ???
 float4      ViewportScaleOffset;
 float4      TerrainScale;
 texture     WaterRamp;
 
+// To world matrix
+float4x4		WorldToView;
+
+// To clip space matrix
+float4x4		Projection;
+
+// Position of the camera
+float3		ViewPosition;
+
+// Time variable that keeps increasing
+float       Time;
+
+// wave crest information, can not be set by map
 float  waveCrestThreshold = 1;
 float3 waveCrestColor = float3( 1, 1, 1);
 
-float4x4		WorldToView;
-float4x4		Projection;
-texture			UtilityTextureC;
+// Water elevation, as set by map
+float		WaterElevation;
 
+// Cube map for sky reflections, as set by map
+texture		SkyMap;
 samplerCUBE SkySampler = sampler_state
 {
 	Texture   = <SkyMap>;
@@ -36,7 +40,24 @@ samplerCUBE SkySampler = sampler_state
 	AddressW  = WRAP;
 };
 
+// -- Waves
 
+// Repeat rates for waves, as set by map
+float4  normalRepeatRate = float4(0.0009, 0.009, 0.05, 0.5);
+
+// Movement direction for waves, as set by map
+float2 normal1Movement = float2(0.5, -0.95);
+float2 normal2Movement = float2(0.05, -0.095);
+float2 normal3Movement = float2(0.01, 0.03);
+float2 normal4Movement = float2(0.0005, 0.0009);
+
+// Wave textures, as set by map
+texture	NormalMap0;
+texture	NormalMap1;
+texture	NormalMap2;
+texture	NormalMap3;
+
+// Wave samplers
 sampler NormalSampler0 = sampler_state
 {
 	Texture   = <NormalMap0>;
@@ -74,7 +95,7 @@ sampler NormalSampler3 = sampler_state
 	AddressV  = WRAP;
 };
 
-
+texture	FresnelLookup;
 sampler FresnelSampler = sampler_state
 {
 	Texture   = <FresnelLookup>;
@@ -85,6 +106,12 @@ sampler FresnelSampler = sampler_state
 	AddressV  = CLAMP;
 };
 
+// Final rendered image before water is applied
+// r = red color component
+// g = green color component
+// b = blue color component
+// a = 1 bit value that indicates water is below terrain (1) or on top (0)
+texture RefractionMap;
 sampler RefractionSampler = sampler_state
 {
 	Texture   = <RefractionMap>;
@@ -95,7 +122,8 @@ sampler RefractionSampler = sampler_state
 	AddressV  = CLAMP;
 };
 
-
+// Final rendered image before water is applied, but reversed
+texture	ReflectionMap;
 sampler ReflectionSampler = sampler_state
 {
 	Texture   = <ReflectionMap>;
@@ -106,6 +134,13 @@ sampler ReflectionSampler = sampler_state
 	AddressV  = CLAMP;
 };
 
+// Some utility textures
+// r = flatness mask (as set by map)
+// g = water depth
+// b = shore line
+// a = always 0
+
+texture	UtilityTextureC;
 sampler2D UtilitySamplerC = sampler_state
 {
 	Texture   = (UtilityTextureC);
@@ -126,67 +161,36 @@ sampler2D MaskSampler = sampler_state
 	AddressV  = CLAMP;	
 };
 
-//
-// surface water color
-//
+// Various values
+
+// Surface water color, as set by map
 float3 waterColor = float3(0,0.7,1.5);
 float3 waterColorLowFi = float3(0.7647,0.8784,0.9647);
 
-// 
-// surface water lerp amount
-//
+// Surface water lerp amount, as set by map
 float2 waterLerp = 0.3;
 
-//
-// scale of the refraction
-//
+// Scale of the refraction, as set by map
 float refractionScale = 0.015;
 
-//
-// fresnel parameters
-//
+// Fresnel parameters, as set by map
 float fresnelBias = 0.1;
 float fresnelPower = 1.5;
 
-
-//
-// reflection amount
-// 
+// Reflection amount, as set by map
 float unitreflectionAmount = 0.5;
 
-//
-// sky reflection amount
-//
+// Sky reflection amount, as set by map
 float skyreflectionAmount = 1.5;
 
-
-
-//
-// 3 repeat rate for 3 texture layers
-//
-float4  normalRepeatRate = float4(0.0009, 0.009, 0.05, 0.5);
-
-
-//
-// 3 vectors of normal movements
-float2 normal1Movement = float2(0.5, -0.95);
-float2 normal2Movement = float2(0.05, -0.095);
-float2 normal3Movement = float2(0.01, 0.03);
-float2 normal4Movement = float2(0.0005, 0.0009);
-//float2 normal2Movement = float2(0.3, 0.9);
-//float2 normal3Movement = float2(0.03, -0.09);
-
-
-// sun parameters
+// Sun parameters, as set by map
 float		SunShininess = 50;
 float3		SunDirection = normalize(float3( 0.1 ,   -0.967, 0.253));
 float3		SunColor = normalize(float3( 1.2, 0.7, 0.5 ));
 float       sunReflectionAmount = 5;
 float       SunGlow;
 
-///
-///
-///
+// -- Low fidelity
 
 struct LOWFIDELITY_VERTEX
 {
@@ -274,10 +278,8 @@ technique Water_LowFidelity
     }
 }
 
-///
-///
-///
-                                
+// -- High fidelity
+
 struct VS_OUTPUT
 {
 	float4 mPos			: POSITION;
@@ -293,12 +295,7 @@ struct VS_OUTPUT
 };
 
 VS_OUTPUT WaterVS(
-#ifdef DIRECT3D10
-// stricter shader linkages require that this match the input layout
-float3 inPos : POSITION,
-#else
-float4 inPos : POSITION, 
-#endif
+	float4 inPos : POSITION, 
 	float2 inTexUV	: TEXCOORD0 )
 {
 	inPos.y = WaterElevation;
@@ -321,9 +318,6 @@ float4 inPos : POSITION,
     
     // calculate the view vector
     result.mViewVec = inPos.xyz - ViewPosition;   
-    
-//    float3 SunPosition = float3(175, 100, 0);     
-//    result.mLightVector = inPos.xyz - SunPosition;
 
 	return result;
 }
@@ -335,12 +329,6 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 {
 
 	// -- Lookups
-
-	// UtilitySamplerC
-	// r = flatness mask
-	// g = water depth
-	// b = shore line
-	// a = always 0
 
     float4 waterTexture = tex2D( UtilitySamplerC, inV.mTexUV );
     float waterDepth =  waterTexture.g;
@@ -369,7 +357,7 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 	// -- Water crests
 
 	// take into account the water depth to prevent hard-edges on shore lines
-    float waveCrest = min(1, 2 * waterDepth) * saturate( sum.a - waveCrestThreshold );
+    float waveCrest = 2 * min(1, 2 * waterDepth) * saturate( sum.a - waveCrestThreshold );
 
 	// -- Screen position
 
@@ -404,83 +392,44 @@ float4 HighFidelityPS( VS_OUTPUT inV,
     // calculate the sky reflection color
 	float4 skyReflection = texCUBE( SkySampler, R );
 
-
     // calculate the reflected value at this pixel
 	float4 reflectedPixels = tex2D( ReflectionSampler, screenOffsetPos);
 
-
-    //
     // calculate the fresnel term from a lookup texture
-    //
     float fresnel;    
     float  NDotL = saturate( dot(-viewVector, N) );
 	fresnel = tex2D( FresnelSampler, float2(waterDepth, NDotL ) ).r;
 
-
-    //
 	// figure out the sun reflection
-	//
 	// moved this to a texture and no speedup.. already texture bwidth bound I think
     float3 sunReflection = pow( saturate(dot(-R, SunDirection)), SunShininess) * SunColor;
 
-
-    //
     // lerp the reflections together
-    //
     reflectedPixels = lerp( skyReflection, reflectedPixels, saturate(unitreflectionAmount * reflectedPixels.w));
 
-    //
     // we want to lerp in some of the water color based on depth, but
     // not totally on depth as it gets clamped
-    //
     float waterLerp = clamp(waterDepth, waterLerp.x+ 0.05, waterLerp.y + 0.1);
 
-    //
     // lerp in the color
-    //
     refractedPixels.xyz = lerp( refractedPixels.xyz, waterColor, waterLerp);
    
     // implement the water depth into the reflection
     float depthReflectionAmount = 10;
     skyreflectionAmount *= saturate(waterDepth * depthReflectionAmount);
    
-    //
-    // lerp the reflection into the refraction   
-    //        
+    // lerp the reflection into the refraction        
     refractedPixels = lerp( refractedPixels, reflectedPixels, saturate(skyreflectionAmount * fresnel));
 
-    //
     // add in the sky reflection
-    //
     sunReflection = sunReflection * fresnel;
     refractedPixels.xyz +=  sunReflection;
-
 
     // Lerp in a wave crest
     refractedPixels.xyz = lerp( refractedPixels.xyz, waveCrestColor, ( 1 - waterTexture.a ) * waveCrest);
 
-    //
-    // return the pixels masked out by the water mask
-    //
-#if 0    
-    // use alphablend, don't get any glow
-    float4 returnPixels = refractedPixels;
-    returnPixels.a = 1 - mask;
-#ifdef DIRECT3D10
-	//if( alphaTestEnable )
-	//	AlphaTestD3D10( returnPixels.a, alphaFunc, alphaRef );
-#endif
-    return returnPixels;
-#else    
-    // use lerp, do get glow
-    refractedPixels.w = sunReflection.r * SunGlow;
-    float4 returnPixels = lerp( refractedPixels, backGroundPixels, mask);
-#ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( returnPixels.a, alphaFunc, alphaRef );
-#endif
-    return returnPixels;    
-#endif    
+	refractedPixels.a = 1 - mask;
+    return refractedPixels; 
 }
 
 technique Water_HighFidelity
@@ -494,12 +443,7 @@ technique Water_HighFidelity
 	    AlphaState( AlphaBlend_Disable_Write_RGB )
 		DepthState( Depth_Enable_LessEqual_Write_None )
 		RasterizerState( Rasterizer_Cull_CW )
-		
-#ifndef DIRECT3D10
-        AlphaTestEnable = true;
-        AlphaRef = 0x00;
-        AlphaFunc = NotEqual;
-#endif
+	
 
 		VertexShader = compile vs_1_1 WaterVS();
 		PixelShader = compile ps_2_a HighFidelityPS( true, d3d_NotEqual, 0 );
@@ -515,12 +459,7 @@ struct MASK_OUTPUT
 
 
 MASK_OUTPUT WaterAlphaMaskVS(
-#ifdef DIRECT3D10
-// stricter shader linkages require that this match the input layout
-float3 inPos : POSITION,
-#else
-float4 inPos : POSITION0, 
-#endif
+	float4 inPos : POSITION0, 
 	float2 inTexUV0	: TEXCOORD0 )
 {
 	MASK_OUTPUT result = (MASK_OUTPUT) 0;
@@ -541,10 +480,6 @@ float4 WaterLayAlphaMaskPS( MASK_OUTPUT inV,
 						    uniform int alphaRef ) : COLOR
 {
 	float4 output = tex2D( MaskSampler, inV.mTexUV0 );
-#ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( output, alphaFunc, alphaRef );
-#endif
     return float4(0,0,0,output.b);
 }
 
@@ -555,12 +490,6 @@ technique TWaterLayAlphaMask
 		AlphaState( AlphaBlend_Disable_Write_A )
 		DepthState( Depth_Enable_Less_Write_None )
 		RasterizerState( Rasterizer_Cull_CW )
-       
-#ifndef DIRECT3D10
-		AlphaTestEnable = true;
-		AlphaFunc = Equal;
-		AlphaRef = 0;
-#endif
 
 		VertexShader = compile vs_1_1 WaterAlphaMaskVS();
 		PixelShader = compile ps_2_0 WaterLayAlphaMaskPS( true, d3d_Equal, 0 );
@@ -590,10 +519,6 @@ float4 ShorelinePS( SHORELINE_VERTEX vertex,
 					uniform int alphaRef ) : COLOR0
 {
 	float4 output = float4(0,0,0,0);
-#ifdef DIRECT3D10
-	if( alphaTestEnable )
-		AlphaTestD3D10( output.a, alphaFunc, alphaRef );
-#endif
     return output;
 }
 
@@ -604,12 +529,6 @@ technique TShoreline
 		AlphaState( AlphaBlend_Disable_Write_A )
 		DepthState( Depth_Enable_Less_Write_None )
 		RasterizerState( Rasterizer_Cull_CCW )
-        
-#ifndef DIRECT3D10
-		AlphaTestEnable = true;
-		AlphaFunc = Equal;
-		AlphaRef = 0;
-#endif
 
         VertexShader = compile vs_1_1 ShorelineVS();
         PixelShader = compile ps_2_0 ShorelinePS( true, d3d_Equal, 0 );
