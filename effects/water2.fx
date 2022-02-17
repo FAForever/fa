@@ -1,34 +1,61 @@
 
-#define     FIDELITY_LOW    0x00
-#define     FIDELITY_MEDIUM 0x01
-#define     FIDELITY_HIGH   0x02
+#define FIDELITY_LOW    0x00
+#define FIDELITY_MEDIUM 0x01
+#define FIDELITY_HIGH   0x02
 
 // ???
-float4      ViewportScaleOffset;
-float4      TerrainScale;
-texture     WaterRamp;
+float4 ViewportScaleOffset;
+float4 TerrainScale;
+texture WaterRamp;
 
 // To world matrix
-float4x4		WorldToView;
+float4x4 WorldToView;
 
 // To clip space matrix
-float4x4		Projection;
+float4x4 Projection;
 
 // Position of the camera
-float3		ViewPosition;
+float3 ViewPosition;
 
 // Time variable that keeps increasing
-float       Time;
+float Time;
 
 // wave crest information, can not be set by map
-float  waveCrestThreshold = 1;
+float waveCrestThreshold = 1;
 float3 waveCrestColor = float3( 1, 1, 1);
 
 // Water elevation, as set by map
-float		WaterElevation;
+float WaterElevation;
+
+// Surface water color, as set by map
+float3 waterColor = float3(0,0.7,1.5);
+float3 waterColorLowFi = float3(0.7647,0.8784,0.9647);
+
+// Surface water lerp amount, as set by map
+float2 waterLerp = 0.3;
+
+// Scale of the refraction, as set by map
+float refractionScale = 0.015;
+
+// Fresnel parameters, as set by map
+float fresnelBias = 0.1;
+float fresnelPower = 1.5;
+
+// Reflection amount, as set by map
+float unitreflectionAmount = 0.5;
+
+// Sky reflection amount, as set by map
+float skyreflectionAmount = 1.5;
+
+// Sun parameters, as set by map
+float		SunShininess = 50;
+float3		SunDirection = normalize(float3( 0.1 ,   -0.967, 0.253));
+float3		SunColor = normalize(float3( 1.2, 0.7, 0.5 ));
+float       sunReflectionAmount = 5;
+float       SunGlow;
 
 // Cube map for sky reflections, as set by map
-texture		SkyMap;
+texture SkyMap;
 samplerCUBE SkySampler = sampler_state
 {
 	Texture   = <SkyMap>;
@@ -43,7 +70,7 @@ samplerCUBE SkySampler = sampler_state
 // -- Waves
 
 // Repeat rates for waves, as set by map
-float4  normalRepeatRate = float4(0.0009, 0.009, 0.05, 0.5);
+float4 normalRepeatRate = float4(0.0009, 0.009, 0.05, 0.5);
 
 // Movement direction for waves, as set by map
 float2 normal1Movement = float2(0.5, -0.95);
@@ -160,35 +187,6 @@ sampler2D MaskSampler = sampler_state
 	AddressU  = CLAMP;
 	AddressV  = CLAMP;	
 };
-
-// Various values
-
-// Surface water color, as set by map
-float3 waterColor = float3(0,0.7,1.5);
-float3 waterColorLowFi = float3(0.7647,0.8784,0.9647);
-
-// Surface water lerp amount, as set by map
-float2 waterLerp = 0.3;
-
-// Scale of the refraction, as set by map
-float refractionScale = 0.015;
-
-// Fresnel parameters, as set by map
-float fresnelBias = 0.1;
-float fresnelPower = 1.5;
-
-// Reflection amount, as set by map
-float unitreflectionAmount = 0.5;
-
-// Sky reflection amount, as set by map
-float skyreflectionAmount = 1.5;
-
-// Sun parameters, as set by map
-float		SunShininess = 50;
-float3		SunDirection = normalize(float3( 0.1 ,   -0.967, 0.253));
-float3		SunColor = normalize(float3( 1.2, 0.7, 0.5 ));
-float       sunReflectionAmount = 5;
-float       SunGlow;
 
 // -- Low fidelity
 
