@@ -47,26 +47,28 @@
 --   default to its old value, not to 0 or its normal default.
 --
 
+-- upvalue for performance
 local sub = string.sub
 local gsub = string.gsub
 local lower = string.lower
 local getinfo = debug.getinfo
 local here = getinfo(1).source
 
+-- upvalue for performance
+local pcall = pcall 
+local doscript = doscript
+local DiskFindFiles = DiskFindFiles
+
 local original_blueprints
 local current_mod
 
--- LoadPrefsData() attempts to populate PreGameData and OptionChoices with data from the prefs file
--- We could change LoadPrefsData() to load other things from the prefs file for modding or otherwise if desired
-local PreGameData = false
-local OptionChoices
+-- Represents data that is defined in the lobby and send to us by the preference file
+--  - IconReplacements: List of mods that replace strategic icons
+--  - CurrentMapDir: Path to the map that we're playing
+--  - Options: All of the lobby options, including options of sim mods
+local PreGameData = false 
 
--- upvalue for performance
-pcall = pcall 
-doscript = doscript
-DiskFindFiles = DiskFindFiles
-
---- Load in the pre game data that is defined in the lobby through the preference file.
+--- Load in the pre game data that is defined in the lobby through the preference file
 local function LoadPrefsData()
 
     -- load in the prefs file
@@ -82,7 +84,7 @@ local function LoadPrefsData()
             local data = { }
             doscript(file, data)
             PreGameData = data.PreGameData 
-            OptionChoices = data.profile.profiles[data.profile.current].LobbyPresets[1].GameOptions
+            PreGameData.Options = data.profile.profiles[data.profile.current].LobbyPresets[1].GameOptions
         end 
     )
 
@@ -91,9 +93,9 @@ local function LoadPrefsData()
         WARN("Blueprints.lua - Preferences file is locked or corrupt. Skipping pre game data.")
         WARN(msg)
     end
-end
 
-LoadPrefsData()
+    LOG(repr(PreGameData))
+end
 
 --- Attempts to assign icons to units if they exist.
 -- @units All unit blueprints.
@@ -651,6 +653,9 @@ end
 -- @param all_bps All the blueprints of the game.
 function PreModBlueprints(all_bps)
 
+    -- load in data from the lobby through the preference file
+    LoadPrefsData()
+
     for _, bp in all_bps.Unit do
 
         ExtractCloakMeshBlueprint(bp)
@@ -832,9 +837,9 @@ end
 -- in that file using the same options format that scripted maps' (ie: many adapative maps') options files use.
 -- A commented example of what mod_options.lua can look like is provided below (between the MOD OPTIONS EXAMPLE lines).
 -- These options can be accessed in the normal way via with ScenarioInfo in other places.  However, in the Blueprints.lua
--- file, they can be accessed via OptionChoices since ScenarioInfo is not yet available.  So, mods can get the results
+-- file, they can be accessed via PreGameData.Options since ScenarioInfo is not yet available.  So, mods can get the results
 -- of which lobby options were picked (for both regular lobby options and options from active sim mods) by doing 
--- OptionChoices.[OptionName] (ie: something like OptionChoices.MaxHealthMultiplier) in Blueprints.lua
+-- PreGameData.Options.[OptionName] (ie: something like PreGameData.Options.MaxHealthMultiplier) in Blueprints.lua
 -- (the same file that ModBlueprints is in).
 
 -- MOD OPTIONS EXAMPLE
