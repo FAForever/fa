@@ -77,8 +77,8 @@ end
 
 local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
+local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
+local modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
@@ -143,6 +143,7 @@ end
 -- It then calls AddModOptions once per options file (in active sim mod(s)).
 -- So, each options file gets its own section in the Lobby Options list.
 function ImportModOptions()
+    modOptions = { }
     local simMods = import('/lua/mods.lua').AllMods()
     for Index, ModData in simMods do
         if IsEnabledSimMod(ModData) then
@@ -2061,6 +2062,8 @@ local function TryLaunch(skipNoObserversCheck)
 
         scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
 
+
+
         if scenarioInfo.AdaptiveMap then
             gameInfo.GameOptions["SpawnMex"] = gameInfo.SpawnMex
         end
@@ -2079,6 +2082,7 @@ local function TryLaunch(skipNoObserversCheck)
 
         SetWindowedLobby(false)
 
+        OptionUtils.SetDefaults()
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
         -- launch the game
@@ -2215,7 +2219,9 @@ local function UpdateGame()
             end
 
             preGameData.IconReplacements = iconReplacements
-            preGameData.LobbyOptions = table.deepcopy(gameInfo.GameOptions)
+
+            -- This is retrieved elsewhere: from the last game preset
+            -- preGameData.LobbyOptions = table.deepcopy(gameInfo.GameOptions)
 
             -- try and set the preferences - it may crash when running multiple instances on a single machine that all try and start at the same time.
             local ok, msg = pcall(
@@ -2406,9 +2412,13 @@ local OptionUtils = {
     -- Set all game options to their default values.
     SetDefaults = function()
         local options = {}
+
+        -- team options
         for index, option in teamOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
+
+        -- global options
         for index, option in globalOpts do
             -- Exception to make AllowObservers work because the engine requires
             -- the keys to be bool. Custom options should use 'True' or 'False'
@@ -2419,12 +2429,26 @@ local OptionUtils = {
             end
         end
 
+        -- AI options        
         for index, option in AIOpts do
             options[option.key] = option.values[option.default].key or option.values[option.default]
         end
 
+        -- mod options
         for i, mod in modOptions do 
             for index, option in mod[1] do
+                options[option.key] = option.values[option.default].key or option.values[option.default]
+            end
+        end
+
+        -- map options
+        if scenarioInfo.options then
+            if not MapUtil.ValidateScenarioOptions(scenarioInfo.options, true) then
+                AddChatText(LOC('<LOC lobui_0397>The options included in this map specified invalid defaults. See moholog for details.'))
+                AddChatText(LOC('<LOC lobui_0398>An arbitrary option has been selected for now: check the game options screen!'))
+            end
+
+            for index, option in scenarioInfo.options do
                 options[option.key] = option.values[option.default].key or option.values[option.default]
             end
         end
@@ -4092,13 +4116,6 @@ function RefreshOptionDisplayData(scenarioInfo)
 
     local function addOptionsFrom(optionObject)
         for index, optData in optionObject do
-
-            -- if this game option doesn't exist yet, populate it with default
-            if not gameInfo.GameOptions[optData.key] then 
-                SPEW("Missing lobby option: " .. tostring(optData.key))
-                gameInfo.GameOptions[optData.key] = OptionUtil.FindDefaultValueOfOption(optData)
-            end
-
             -- format it accordingly
             local gameOption = gameInfo.GameOptions[optData.key]
             addFormattedOption(optData, gameOption)

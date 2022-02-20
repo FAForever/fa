@@ -712,9 +712,9 @@ function RefreshOptions(skipRefresh)
     OptionSource = {
     {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions},
     {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts},
-    {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobby.lua').AIOpts},
+    {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts},
     {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}}
-    local modOptions = import('/lua/ui/lobby/lobby.lua').modOptions
+    local modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
     for i, mod in modOptions do 
         table.insert(OptionSource, {title = mod[2], options = mod[1]})
     end

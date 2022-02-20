@@ -84,6 +84,7 @@ local function LoadPrefsData()
             local data = { }
             doscript(file, data)
             PreGameData = data.PreGameData 
+            PreGameData.LobbyOptions = data.profile.profiles[data.profile.current].LobbyPresets[1].GameOptions
         end 
     )
 
