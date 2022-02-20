@@ -3316,7 +3316,7 @@ Unit = Class(moho.unit_methods) {
 
     OnAnimCollision = function(self, bone, x, y, z)
         local layer = self.Layer
-        local movementEffects = self.MovementEffects and self.MovementEffects[layer] and self.MovementEffectsExist.Footfall
+        local movementEffects = self.MovementEffects and self.MovementEffects[layer] and self.MovementEffects[layer].Footfall
 
         if movementEffects then
             local effects = {}
