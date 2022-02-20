@@ -456,6 +456,24 @@ function CreateMapDropout(parent)
                 Borders.SplitMapGroup(splitOnCheck)
             end
             LayoutHelpers.Below(group.toggles[3], group.toggles[2])
+        elseif camName == 'MiniMap' then
+            local disableMinimapMesh = Prefs.GetFromCurrentProfile('disableMinimapMesh')
+            local wording = 'Disable meshes'
+            group.toggles[3] = CreateToggleItem(group, wording)
+            if disableMinimapMesh == false then
+                group.toggles[3]:SetCheck(false)
+            end
+            group.toggles[3].OnCheck = function(self, checked)
+                if checked then
+                    Prefs.SetToCurrentProfile('disableMinimapMesh', true)
+                    ConExecute("cam_DefaultMiniLOD 0")
+                else
+                    Prefs.SetToCurrentProfile('disableMinimapMesh', false)
+                    ConExecute("cam_DefaultMiniLOD 1.8")
+                end
+            end
+            Tooltip.AddCheckboxTooltip(group.toggles[3], "minimap_mesh")
+            LayoutHelpers.Below(group.toggles[3], group.toggles[2])
         end
 
         LayoutHelpers.AtLeftTopIn(group.toggles[1], group, 0, 20)
