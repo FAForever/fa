@@ -1195,9 +1195,9 @@ Unit = Class(moho.unit_methods) {
         local layer = self.Layer
         self.Dead = true
 
-        -- destroy all weapon effects
+        -- Clear out any remaining projectiles
         for k = 1, self.WeaponCount do 
-            self.WeaponInstances[k].Trash:Destroy();
+            self.WeaponInstances[k]:ClearProjectileTrash();
         end
 
         -- Units killed while being invisible because they're teleporting should show when they're killed
@@ -1977,6 +1977,7 @@ Unit = Class(moho.unit_methods) {
             v:Destroy()
         end
 
+        -- destroy remaining trash of weapon
         for k = 1, self.WeaponCount do 
             self.WeaponInstances[k].Trash:Destroy();
         end
@@ -1984,6 +1985,12 @@ Unit = Class(moho.unit_methods) {
 
     OnDestroy = function(self)
         self.Dead = true
+
+        -- clear out all manipulators, at this point the wreck has been made
+        for k = 1, self.WeaponCount do 
+            self.WeaponInstances[k]:ClearProjectileTrash();
+            self.WeaponInstances[k]:ClearManipulatorTrash();
+        end
 
         if self:GetFractionComplete() < 1 then
             self:SendNotifyMessage('cancelled')
