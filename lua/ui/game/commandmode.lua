@@ -395,6 +395,13 @@ local categoriesStructure = categories.STRUCTURE
 -- @param command Information surrounding the command that has been issued, such as its CommandType or its Target.
 function OnCommandIssued(command)
 
+    -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
+    if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
+        if not IsKeyDown('Shift') then 
+            SimCallback({ Func = 'UpgradeHive', Args = { UpgradeTo = command.Blueprint } }, true )
+        end
+    end
+        
     -- part of the cheat menu
     if modeData.cheat and command.CommandType == "BuildMobile" and (not command.Units[1]) then
         CheatSpawn(command, modeData)
