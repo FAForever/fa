@@ -32,7 +32,7 @@ function AirAttackCondition(aiBrain, locationType, targetNumber)
     local radius = engineerManager.Radius
 
     local surfaceThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
-    local airThreat = pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    local airThreat = pool:GetPlatoonThreat('Air', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
     if (surfaceThreat + airThreat) > targetNumber then
         return true
     end

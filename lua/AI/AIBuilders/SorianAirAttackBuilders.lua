@@ -44,7 +44,7 @@ function AirAttackCondition(aiBrain, locationType, targetNumber)
 
     --local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
     local surfaceThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE)
-    local airThreat = 0 #pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    local airThreat = 0 #pool:GetPlatoonThreat('Air', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
     if (surfaceThreat + airThreat) >= targetNumber then
         return true
     elseif UC.UnitCapCheckGreater(aiBrain, .95) then

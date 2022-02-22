@@ -46,7 +46,7 @@ function LandAttackCondition(aiBrain, locationType, targetNumber)
 
     --local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
     local surThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER)
-    local airThreat = 0 #pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
+    local airThreat = 0 #pool:GetPlatoonThreat('Air', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
     local adjustForTime = 1 + (math.floor(GetGameTimeSeconds()/60) * .01)
     --LOG("*AI DEBUG: Pool Threat: "..surThreat.." adjustment: "..adjustForTime.." Enemy Threat: "..targetNumber)
     if (surThreat + airThreat) >= targetNumber and targetNumber > 0 then
@@ -244,7 +244,7 @@ BuilderGroup {
         PlatoonAddBehaviors = { 'AirLandToggleSorian' },
         Priority = 900,
         BuilderConditions = {
-            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH1 } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH2, FACTORY TECH3' }},
@@ -513,7 +513,7 @@ BuilderGroup {
         Priority = 900,
         BuilderConditions = {
             #{ TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
-            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH3' }},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH2 } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
@@ -584,7 +584,7 @@ BuilderGroup {
             { SBC, 'NoRushTimeCheck', { 600 }},
             { UCBC, 'HaveUnitRatio', { 0.15, categories.LAND * categories.ANTIAIR * categories.MOBILE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE}},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
-            #{ TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            #{ TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
         },
         BuilderType = 'Land',
     },
@@ -655,7 +655,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH3 } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
-            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.05 }},
             { SBC, 'NoRushTimeCheck', { 600 }},
         },
