@@ -130,7 +130,7 @@ end
 
 --- Toggles the profiler on / off in the simulation, sends along the army that initiated the call
 function ToggleProfiler()
-
+    SimCallback( { Func = "ToggleProfiler", Args = { Army = GameMain.OriginalFocusArmy, ForceEnable = false } } )
 end
 
 list = false
