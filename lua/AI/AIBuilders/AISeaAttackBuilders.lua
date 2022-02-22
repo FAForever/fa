@@ -34,7 +34,7 @@ function SeaAttackCondition(aiBrain, locationType, targetNumber)
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager.Radius
 
-    local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.NAVAL, position, radius)
+    local surfaceThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.NAVAL, position, radius)
     local subThreat = pool:GetPlatoonThreat('AntiSub', categories.MOBILE * categories.NAVAL, position, radius)
     if (surfaceThreat + subThreat) > targetNumber then
         return true

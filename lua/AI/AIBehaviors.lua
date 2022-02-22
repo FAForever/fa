@@ -148,7 +148,7 @@ function CDROverCharge(aiBrain, cdr)
         local target
         local continueFighting = true
         local counter = 0
-        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 75
+        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 60
         local enemyThreat
         repeat
             overCharging = false
@@ -1780,7 +1780,7 @@ function CDROverChargeSorian(aiBrain, cdr)
         local target
         local continueFighting = true
         local counter = 0
-        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 75
+        local cdrThreat = cdr:GetBlueprint().Defense.SurfaceThreatLevel or 60
         local enemyThreat
         repeat
             overCharging = false
