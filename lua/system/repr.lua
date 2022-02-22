@@ -138,7 +138,7 @@ end
 # form if possible.
 #
 function repr(obj, maxwidth, mindepth)
-    maxwidth = maxwidth or 80
+    maxwidth = maxwidth or 160
     local r1,r2 = _repr(obj, '', maxwidth, mindepth or 1, nil)
     if len(r1) <= maxwidth then
         return r1

@@ -94,6 +94,8 @@ function SetupSession()
         SPEW("Detected the 'requiresAiFunctionality' field set by the map: enabling AI functionality")
     end
 
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+
     -- LOG('SetupSession: ', repr(ScenarioInfo))
 
     ArmyBrains = {}

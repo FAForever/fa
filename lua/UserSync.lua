@@ -18,6 +18,24 @@ local SetPlayableArea = reclaim.SetPlayableArea
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
+
+    if Sync.ProfilerData then 
+        import("/lua/ui/game/Profiler.lua").ReceiveData(Sync.ProfilerData)
+    end
+
+    if Sync.Benchmarks then 
+        import("/lua/ui/game/Profiler.lua").ReceiveBenchmarks(Sync.Benchmarks)
+    end
+
+    if Sync.BenchmarkOutput then 
+        import("/lua/ui/game/Profiler.lua").ReceiveBenchmarkOutput(Sync.BenchmarkOutput)
+    end
+
+    if Sync.GameHasAIs ~= nil then 
+        LOG("Hi!")
+        import("/lua/ui/game/gamemain.lua").GameHasAIs = Sync.GameHasAIs
+    end
+
     if Sync.RequestingExit then
         ExitGame()
     end
