@@ -33,7 +33,7 @@ defaultKeyMap = {
     ['F11']                 = 'toggle_disconnect_screen',
     ['F12']                 = 'show_objective_screen',
     ['K']                   = 'toggle_markers_screen',
-    ['Y']                   = 'toggle_ai_screen',
+    ['K']                   = 'toggle_ai_screen',
 
     ['1']                   = 'group1',
     ['2']                   = 'group2',

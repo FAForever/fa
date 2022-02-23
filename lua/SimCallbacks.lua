@@ -660,3 +660,19 @@ do
         end
     end
 end
+
+Callbacks.MapResoureCheck = function(data)
+    import("/lua/sim/MapUtilities.lua").ResourceCheck()
+end
+
+Callbacks.ChangeThreatPerspective = function(data)
+    import("/lua/sim/MapUtilities.lua").ChangeThreatPerspective(data.Army)
+end
+
+Callbacks.ToggleAIGrid = function(data)
+    import("/lua/sim/MapUtilities.lua").ToggleAIGrid()
+end
+
+Callbacks.GridToggleThreatRendering = function(data)
+    import("/lua/sim/MapUtilities.lua").GridToggleThreatRendering(data.Identifier)
+end

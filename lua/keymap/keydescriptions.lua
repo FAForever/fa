@@ -221,6 +221,7 @@ keyDescriptions = {
     ['show_objective_screen'] = '<LOC key_desc_0184>Show Scenario Options/Objectives Window',
     ['toggle_ai_screen'] = 'Toggle AI blueprint information window, requires cheats to be enabled',
     ['toggle_markers_screen'] = 'Toggle marker information window, requires cheats to be enabled',
+    ['toggle_map_utilities_window'] = 'Toggle map utilities window, requires cheats to be enabled',
 
     -- GAZUI
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
