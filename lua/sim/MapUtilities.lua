@@ -153,7 +153,7 @@ function ToggleAIGrid()
                 local color = "ffffff"
                 local a = Vector(0, 0, 0)
                 local b = Vector(0, 0, 0)
-                local GetSurfaceHeight = GetSurfaceHeight
+                local GetTerrainHeight = GetTerrainHeight
                 local DrawLine = DrawLine 
                 local sqrt = math.sqrt
 
@@ -204,7 +204,7 @@ function ToggleAIGrid()
                                 -- DrawCircle(a, 0.25 * sqrt(1600), "000000")
 
                                 if threadRendering[info.identifier] then 
-                                    local threat = brain:GetThreatAtPosition(a, 1, true, info.identifier)
+                                    local threat = brain:GetThreatAtPosition(a, 0, true, info.identifier)
                                     if threat > 0 then 
                                         DrawCircle(a, 0.25 * sqrt(threat), info.color)
                                     end
@@ -212,9 +212,6 @@ function ToggleAIGrid()
                             end
                         end
                     end
-
-                    -- threat per cell
-
                     WaitTicks(2)
                 end
             end
