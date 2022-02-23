@@ -1,13 +1,9 @@
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+
 local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Window = import('/lua/maui/window.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local Text = import('/lua/maui/text.lua').Text
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
-local Combo = import('/lua/ui/controls/combo.lua').Combo
 
 local sessionInfo = SessionGetScenarioInfo()
 
@@ -19,33 +15,9 @@ local State = {
     ActiveTab = "Resources",
     GUITabs = { },
 
-    EnabledMarkerTypes = {
-        Resources = { },
-        Pathing = { },
-        AI = { },
-    },
-
     GridEnabled = false,
     GridArmy = 1,
 }
-
--- populate marker types
-State.EnabledMarkerTypes.Resources["Mass"] = false
-State.EnabledMarkerTypes.Resources["Hydrocarbon"] = false
-State.EnabledMarkerTypes.Pathing["Land Path Node"] = false
-State.EnabledMarkerTypes.Pathing["Air Path Node"] = false
-State.EnabledMarkerTypes.Pathing["Water Path Node"] = false
-State.EnabledMarkerTypes.Pathing["Amphibious Path Node"] = false
-State.EnabledMarkerTypes.AI["Rally Point"] = false
-State.EnabledMarkerTypes.AI["Expansion Area"] = false
-State.EnabledMarkerTypes.AI["Large Expansion Area"] = false
-State.EnabledMarkerTypes.AI["Naval Area"] = false
-State.EnabledMarkerTypes.AI["Naval Link"] = false
-State.EnabledMarkerTypes.AI["Protected Experimental Construction"] = false
-State.EnabledMarkerTypes.AI["Defensive Point"] = false
-State.EnabledMarkerTypes.AI["Transport Marker"] = false
-State.EnabledMarkerTypes.AI["Combat Zone"] = false
-State.EnabledMarkerTypes.AI["Island"] = false
 
 local function SwitchTab(target)
 

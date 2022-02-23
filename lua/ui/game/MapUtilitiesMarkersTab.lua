@@ -4,17 +4,47 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
 local Group = import('/lua/maui/group.lua').Group
 
+--- Various marker types in categories that we support
+local EnabledMarkerTypes = {
+    Resources = { },
+    Pathing = { },
+    AI = { },
+},
+
+--- Populate marker types
+EnabledMarkerTypes.Resources["Mass"] = false
+EnabledMarkerTypes.Resources["Hydrocarbon"] = false
+EnabledMarkerTypes.Pathing["Land Path Node"] = false
+EnabledMarkerTypes.Pathing["Air Path Node"] = false
+EnabledMarkerTypes.Pathing["Water Path Node"] = false
+EnabledMarkerTypes.Pathing["Amphibious Path Node"] = false
+EnabledMarkerTypes.AI["Rally Point"] = false
+EnabledMarkerTypes.AI["Expansion Area"] = false
+EnabledMarkerTypes.AI["Large Expansion Area"] = false
+EnabledMarkerTypes.AI["Naval Area"] = false
+EnabledMarkerTypes.AI["Naval Link"] = false
+EnabledMarkerTypes.AI["Protected Experimental Construction"] = false
+EnabledMarkerTypes.AI["Defensive Point"] = false
+EnabledMarkerTypes.AI["Transport Marker"] = false
+EnabledMarkerTypes.AI["Combat Zone"] = false
+EnabledMarkerTypes.AI["Island"] = false
+
+--- Maps the keys of the marker types to more user-friendly names
 local LookUpNames = {
     Resources = "Resource markers"
   , Pathing = "Pathing markers"
   , AI = "AI Markers"
 }
 
-function CreateUI(state, window, lastElement)
+--- Creates the UI for the markers tab
+-- @param state Complete state of the window
+-- @param area The area that we have been given to work in
+-- @param lastElement Vertically speaking, the element before this element
+function CreateUI(state, area, lastElement)
 
-    local group = Group(window)
-    group.Left:Set(function() return window.Left() + LayoutHelpers.ScaleNumber(10) end )
-    group.Right:Set(function() return window.Right() end )
+    local group = Group(area)
+    group.Left:Set(function() return area.Left() + LayoutHelpers.ScaleNumber(10) end )
+    group.Right:Set(function() return area.Right() end )
     group.Top:Set(function() return lastElement.Bottom() + LayoutHelpers.ScaleNumber(8) end )
     group.Bottom:Set(function() return lastElement.Bottom() + LayoutHelpers.ScaleNumber(100) end )  
 
@@ -26,8 +56,8 @@ function CreateUI(state, window, lastElement)
         lastElement.Top:Set(function() return group.Top() end )
         lastElement.Bottom:Set(function() return group.Top() end )  
 
-        -- iteratively populate the window
-        for k, category in state.EnabledMarkerTypes do 
+        -- iteratively populate the area
+        for k, category in EnabledMarkerTypes do 
 
             -- create title of group
             local groupUI = UIUtil.CreateText(group, LookUpNames[k], 14, UIUtil.bodyFont, false)
@@ -44,7 +74,7 @@ function CreateUI(state, window, lastElement)
                 LayoutHelpers.AtLeftIn(typeUI, group, 12)
 
                 local checkUI = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
-                LayoutHelpers.DepthOverParent(checkUI, window, 10)
+                LayoutHelpers.DepthOverParent(checkUI, area, 10)
                 LayoutHelpers.AtCenterIn(checkUI, typeUI)
                 checkUI.Left:Set(function() return group.Right() - (checkUI.Width() + LayoutHelpers.ScaleNumber(8)) end )
 
@@ -62,6 +92,7 @@ function CreateUI(state, window, lastElement)
             end
         end
 
+        -- match bottom of group with that of the last element
         group.Bottom:Set(function() return lastElement.Bottom() + LayoutHelpers.ScaleNumber(10) end )  
     end
 

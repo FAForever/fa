@@ -9,7 +9,11 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
 local ThreatInformation = import("/lua/shared/MapUtilities.lua").ThreatInformation
 
-function CreateUI(state, window, lastElement)
+--- Creates the UI for the iMAP grid tab
+-- @param state Complete state of the window
+-- @param area The area that we have been given to work in
+-- @param lastElement Vertically speaking, the element before this element
+function CreateUI(state, area, lastElement)
 
     -- determine nicknames of non-civilian armies
     local nonCivs = { }
@@ -21,9 +25,9 @@ function CreateUI(state, window, lastElement)
         end
     end
 
-    local group = Group(window)
-    group.Left:Set(function() return window.Left() + LayoutHelpers.ScaleNumber(10) end )
-    group.Right:Set(function() return window.Right() end )
+    local group = Group(area)
+    group.Left:Set(function() return area.Left() + LayoutHelpers.ScaleNumber(10) end )
+    group.Right:Set(function() return area.Right() end )
     group.Top:Set(function() return lastElement.Bottom() + LayoutHelpers.ScaleNumber(10) end )
     group.Bottom:Set(function() return lastElement.Bottom() + LayoutHelpers.ScaleNumber(100) end ) -- dummy value 
 
@@ -36,7 +40,7 @@ function CreateUI(state, window, lastElement)
         local combo = Combo(group, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
 
         local checkbox = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
-        LayoutHelpers.DepthOverParent(checkbox, window, 10)
+        LayoutHelpers.DepthOverParent(checkbox, area, 10)
         LayoutHelpers.AtCenterIn(checkbox, label)
         checkbox.Left:Set(function() return group.Right() - (checkbox.Width() + LayoutHelpers.ScaleNumber(10)) end )
         checkbox.OnCheck = function (self, checked)
@@ -88,7 +92,7 @@ function CreateUI(state, window, lastElement)
         LayoutHelpers.Below(lastElement, description)
         LayoutHelpers.AtLeftIn(lastElement, description)
 
-        -- iteratively populate the window
+        -- iteratively populate the area
         for k, threat in ThreatInformation do 
 
             local bitmap = Bitmap(group)
@@ -103,7 +107,7 @@ function CreateUI(state, window, lastElement)
             name.Left:Set(function() return bitmap.Right() + LayoutHelpers.ScaleNumber(8) end)
 
             local check = UIUtil.CreateCheckboxStd(group, '/dialogs/check-box_btn/radio')
-            LayoutHelpers.DepthOverParent(check, window, 10)
+            LayoutHelpers.DepthOverParent(check, area, 10)
             LayoutHelpers.AtCenterIn(check, bitmap)
             check.Left:Set(function() return group.Right() - (check.Width() + LayoutHelpers.ScaleNumber(8)) end )
 
@@ -121,6 +125,7 @@ function CreateUI(state, window, lastElement)
             lastElement = name
         end
 
+        -- match bottom of group with that of the last element
         group.Bottom:Set(function() return lastElement.Bottom() + LayoutHelpers.ScaleNumber(10) end)
     end
 
