@@ -51,7 +51,7 @@ XRB2308 = Class(CStructureUnit) {
     CreateNewHarmsWithDelay = function(self, armySelf, pos, spottedByArmy, fireState) 
         WaitTicks(1) --wait 1 tick to determine HARMS target
         
-        if not self:IsDead() then
+        if not self.Dead then
             local health = self:GetHealth()
             local target = self:GetTargetEntity()
             

@@ -57,7 +57,7 @@ Tree = Class(Prop) {
     end,
 
     PlayUprootingEffect = function(self, instigator)
-		local pos = self:GetCachePosition()
+		local pos = self:GetPosition()
 		local army = -1
         if instigator then
             army = instigator.Army
@@ -108,14 +108,14 @@ Tree = Class(Prop) {
                 end
                 WaitSeconds(3 + Random(1, 10) * 0.1)
                 if not self.BurnFromNuke and i == 3 then
-                    DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)
+                    DamageArea(self, self:GetPosition(), 1, 1, 'Fire', true)
                 end
             end
             self.Motor = self.Motor or self:FallDown()
             self.Motor:Whack(GetRandomFloat(-1, 1), 0, GetRandomFloat(-1, 1), 0.25, true)
             WaitSeconds(5)
             DefaultExplosions.CreateScorchMarkSplat( self, 0.5, -1 )
-            DamageArea(self, self:GetCachePosition(), 1, 1, 'Fire', true)
+            DamageArea(self, self:GetPosition(), 1, 1, 'Fire', true)
             self:PlayPropAmbientSound(nil)
             for k, v in effects do
                 v:Destroy()

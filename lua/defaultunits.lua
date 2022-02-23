@@ -161,7 +161,7 @@ StructureUnit = Class(Unit) {
     end,
 
     FlattenSkirt = function(self)
-        local x, y, z = unpack(self:GetCachePosition())
+        local x, y, z = unpack(self:GetPosition())
         local x0, z0, x1, z1 = self:GetSkirtRect()
         x0, z0, x1, z1 = math.floor(x0), math.floor(z0), math.ceil(x1), math.ceil(z1)
         FlattenMapRect(x0, z0, x1 - x0, z1 - z0, y)

@@ -271,8 +271,8 @@ Unit = Class(moho.unit_methods) {
         local bpVision = bp.Intel.VisionRadius
         self:SetIntelRadius('Vision', bpVision or 0)
 
-        self:SetCanTakeDamage(true)
-        self:SetCanBeKilled(true)
+        self.CanTakeDamage = true
+        self.CanBeKilled = true
 
         local bpDeathAnim = bp.Display.AnimationDeath
         if bpDeathAnim and not table.empty(bpDeathAnim) then
@@ -314,18 +314,7 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     ---- MISC FUNCTIONS
     -------------------------------------------------------------------------------------------
-    SetDead = function(self)
-        self.Dead = true
-    end,
-
-    IsDead = function(self)
-        return self.Dead
-    end,
-
-    GetCachePosition = function(self)
-        return self:GetPosition()
-    end,
-
+    
     GetFootPrintSize = function(self)
         local fp = self:GetBlueprint().Footprint
         return math.max(fp.SizeX, fp.SizeZ)
@@ -419,25 +408,6 @@ Unit = Class(moho.unit_methods) {
         -- if there is some T2 HQ - allow t2 engineers
         elseif aiBrain:CountHQsAllLayers(faction, "TECH2") > 0 then 
             self:RemoveBuildRestriction(categories.TECH2 * categories.MOBILE * categories.CONSTRUCTION)
-        end
-    end,
-
-    -- Deprecation / refactored warning for mods.
-    updateBuildRestrictions = function(self)
-        if not DeprecatedWarnings.updateBuildRestrictions then 
-            WARN("updateBuildRestrictions is refactored since PR #3319. Call UpdateBuildRestrictions instead.")
-            DeprecatedWarnings.updateBuildRestrictions = true 
-        end
-
-        -- call the old function
-        self.UpdateBuildRestrictions(self)
-    end,
-
-    -- Deprecation warning for mods.
-    FindHQType = function(aiBrain, category)
-        if not DeprecatedWarnings.FindHQType then 
-            WARN("FindHQType is deprecated since PR #3319.")
-            DeprecatedWarnings.FindHQType = true 
         end
     end,
 
@@ -1050,13 +1020,6 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- DAMAGE
     -------------------------------------------------------------------------------------------
-    SetCanTakeDamage = function(self, val)
-        self.CanTakeDamage = val
-    end,
-
-    CheckCanTakeDamage = function(self)
-        return self.CanTakeDamage
-    end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
         if self.CanTakeDamage then
@@ -1186,10 +1149,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    CheckCanBeKilled = function(self, other)
-        return self.CanBeKilled
-    end,
-
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self.Layer
@@ -1248,11 +1207,6 @@ Unit = Class(moho.unit_methods) {
         self:ForkThread(self.DeathThread, overkillRatio , instigator)
 
         ArmyBrains[self.Army]:AddUnitStat(self.UnitId, "lost", 1)
-    end,
-
-    -- Argument val is true or false. False = cannot be killed
-    SetCanBeKilled = function(self, val)
-        self.CanBeKilled = val
     end,
 
     -- This section contains functions used by the new mass-based veterancy system
@@ -1914,8 +1868,8 @@ Unit = Class(moho.unit_methods) {
         if self.buildBots then
             for _, bot in self.buildBots do
                 if not bot:BeenDestroyed() then
-                    bot:SetCanTakeDamage(true)
-                    bot:SetCanBeKilled(true)
+                    bot.CanTakeDamage = true
+                    bot.CanBeKilled = true
 
                     bot:Kill(nil, "Normal", 1)
                 end
@@ -2260,7 +2214,7 @@ Unit = Class(moho.unit_methods) {
             local newHealthAmount = builder:GetMaxHealth() * (1 - damagePercent) -- HP for upgraded building
             builder:SetHealth(builder, newHealthAmount) -- Seems like the engine uses builder to determine new HP
             self.DisallowCollisions = false
-            self:SetCanTakeDamage(true)
+            self.CanTakeDamage = true
             self:RevertCollisionShape()
             self.IsUpgrade = nil
         end
@@ -2640,7 +2594,7 @@ Unit = Class(moho.unit_methods) {
 
         if order == 'Upgrade' and bp.General.UpgradesFrom == self.UnitId then
             built.DisallowCollisions = true
-            built:SetCanTakeDamage(false)
+            built.CanTakeDamage = false
             built:SetCollisionShape('None')
             built.IsUpgrade = true
 
@@ -4163,7 +4117,7 @@ Unit = Class(moho.unit_methods) {
             self:ShowBone(0, true)
         end
 
-        self:SetCanTakeDamage(not loading)
+        self.CanTakeDamage = not loading
         self:SetDoNotTarget(loading)
         self:SetReclaimable(not loading)
         self:SetCapturable(not loading)
@@ -4500,7 +4454,99 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --- Deprecated functionality
+    -------------------------------------------------------------------------------------------
+    ---- DEPRECATED FUNCTIONS
+    -------------------------------------------------------------------------------------------
+    
+    ---- MISC FUNCTIONS
+
+    -- Deprecation / refactored warning for mods.
+    updateBuildRestrictions = function(self)
+        if not DeprecatedWarnings.updateBuildRestrictions then 
+            WARN("updateBuildRestrictions is refactored since PR #3319. Call UpdateBuildRestrictions instead.")
+            DeprecatedWarnings.updateBuildRestrictions = true 
+        end
+
+        -- call the old function
+        self.UpdateBuildRestrictions(self)
+    end,
+
+    -- Deprecation warning for mods.
+    FindHQType = function(aiBrain, category)
+        if not DeprecatedWarnings.FindHQType then 
+            WARN("FindHQType is deprecated since PR #3319.")
+            DeprecatedWarnings.FindHQType = true 
+        end
+    end,
+
+    SetDead = function(self)
+        if not DeprecatedWarnings.SetDead then 
+            DeprecatedWarnings.SetDead = true 
+            WARN("SetDead is deprecated: use unit.Dead = val instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        self.Dead = true
+    end,
+
+    IsDead = function(self)
+        if not DeprecatedWarnings.IsDead then 
+            DeprecatedWarnings.IsDead = true 
+            WARN("IsDead is deprecated: use unit.Dead instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self.Dead
+    end,
+
+    GetCachePosition = function(self)
+        if not DeprecatedWarnings.GetCachePosition then 
+            DeprecatedWarnings.GetCachePosition = true 
+            WARN("GetCachePosition is deprecated: use unit:GetPosition() instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self:GetPosition()
+    end,
+
+    --- DAMAGE
+
+    SetCanTakeDamage = function(self, val)
+        if not DeprecatedWarnings.SetCanTakeDamage then 
+            DeprecatedWarnings.SetCanTakeDamage = true 
+            WARN("SetCanTakeDamage is deprecated: use unit.CanTakeDamage = val instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        self.CanTakeDamage = val
+    end,
+
+    CheckCanTakeDamage = function(self)
+        if not DeprecatedWarnings.CheckCanTakeDamage then 
+            DeprecatedWarnings.CheckCanTakeDamage = true 
+            WARN("CheckCanTakeDamage is deprecated: use unit.CanTakeDamage instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self.CanTakeDamage
+    end,
+
+    CheckCanBeKilled = function(self, other)
+        if not DeprecatedWarnings.CheckCanBeKilled then 
+            DeprecatedWarnings.CheckCanBeKilled = true 
+            WARN("CheckCanBeKilled is deprecated: use unit.CanBeKilled instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self.CanBeKilled
+    end,
+    
+    -- Argument val is true or false. False = cannot be killed
+    SetCanBeKilled = function(self, val)
+        if not DeprecatedWarnings.SetCanBeKilled then 
+            DeprecatedWarnings.SetCanBeKilled = true 
+            WARN("SetCanBeKilled is deprecated: use unit.CanBeKilled = val instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        self.CanBeKilled = val
+    end,
+
+    --- OTHER
+
     GetUnitBeingBuilt = function(self)
         if not GetUnitBeingBuiltWarning then
             WARN("Deprecated function GetUnitBeingBuilt called at")
@@ -4516,7 +4562,7 @@ Unit = Class(moho.unit_methods) {
     OnShieldDisabled = function(self) end,
 }
 
--- upvalied math functions for performance
+-- upvalued math functions for performance
 local MathMax = math.max
 
 -- upvalued globals for performance
@@ -4566,3 +4612,4 @@ DummyUnit = Class(moho.unit_methods) {
     CheckAssistFocus = function(self) end,
     UpdateAssistersConsumption = function (self) end,
 }
+

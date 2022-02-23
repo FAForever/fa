@@ -421,8 +421,8 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
                 local bot = CreateUnit('ura0001', builder.Army, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air')
 
                 -- Make build bots unkillable
-                bot:SetCanTakeDamage(false)
-                bot:SetCanBeKilled(false)
+                bot.CanTakeDamage = false
+                bot.CanBeKilled = false
                 bot.spawnedBy = builder
 
                 table.insert(builder.buildBots, bot)

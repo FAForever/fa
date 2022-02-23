@@ -559,7 +559,7 @@ function CommonLogic()
     controls.secondaryProgress:SetNeedsFrameUpdate(true)
     controls.secondaryProgress.OnFrame = function(self, delta)
         local frontOfQueue = sortedOptions.selection[1]
-        if not frontOfQueue or frontOfQueue:IsDead() then
+        if not frontOfQueue or frontOfQueue.Dead then
             return
         end
 

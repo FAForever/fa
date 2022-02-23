@@ -572,8 +572,8 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     OnCreate = function(self)
         SHoverLandUnit.OnCreate(self)
-        self:SetCanTakeDamage(false)
-        self:SetCanBeKilled(false)
+        self.CanTakeDamage = false
+        self.CanBeKilled = false
         self:PlayUnitSound('Spawn')
         ChangeState(self, self.KillingState)
     end,
@@ -648,7 +648,7 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     DeathState = State {
         Main = function(self)
-            self:SetCanBeKilled(true)
+            self.CanBeKilled = true
             if self.Layer == 'Water' then
                 self:PlayUnitSound('HoverKilledOnWater')
             end

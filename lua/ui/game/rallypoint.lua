@@ -43,7 +43,7 @@ end
 
 local function OnBeat()
     for index, mesh in meshes do
-        if not mesh.unit:IsDead() then
+        if not mesh.unit.Dead then
             local commandQueue = mesh.unit:GetCommandQueue()
             mesh:SetStance(commandQueue[table.getn(commandQueue)].position)
         end

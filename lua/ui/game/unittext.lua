@@ -2,7 +2,7 @@
 #* File: lua/ui/game/unittext.lua
 #* Summary: Floating text above a unit
 #*
-#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+#* Copyright ï¿½ 2008 Gas Powered Games, Inc.  All rights reserved.
 #*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -74,7 +74,7 @@ function StartCountdown(entryData)
         text:SetAlpha(1)
         text:SetNeedsFrameUpdate(true)
         text.UpdateTick = function(self)
-            if self.userEntity and not self.userEntity:IsDead() then
+            if self.userEntity and not self.userEntity.Dead then
                 self.position = self.userEntity:GetPosition()
                 self:SetAlpha(1)
                 self:SetText(self.curTime)
