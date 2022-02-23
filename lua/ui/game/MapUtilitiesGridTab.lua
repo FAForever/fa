@@ -48,7 +48,7 @@ function CreateUI(state, area, lastElement)
 
             -- inform sim about changes
             SimCallback({
-                Func = 'ToggleAIGrid', Args = { Checked = state.GridEnabled }
+                Func = 'iMapToggleRendering', Args = { Checked = state.GridEnabled }
             })
 
             if checked then 
@@ -68,7 +68,7 @@ function CreateUI(state, area, lastElement)
 
             -- inform sim about changes
             SimCallback({
-                Func = 'ChangeThreatPerspective', Args = { Army = state.GridArmy }
+                Func = 'iMapSwitchPerspective', Args = { Army = state.GridArmy }
             })
         end
 
@@ -115,7 +115,7 @@ function CreateUI(state, area, lastElement)
             local identifier = threat.identifier
             check.OnCheck = function (self, checked)
                     SimCallback({
-                        Func = 'GridToggleThreatRendering', 
+                        Func = 'iMapToggleThreat', 
                         Args = { Identifier = identifier }
                     }
                 )

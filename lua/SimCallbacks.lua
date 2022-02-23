@@ -662,17 +662,17 @@ do
 end
 
 Callbacks.MapResoureCheck = function(data)
-    import("/lua/sim/MapUtilities.lua").ResourceCheck()
+    import("/lua/sim/MapUtilities.lua").MapResourceCheck()
 end
 
-Callbacks.ChangeThreatPerspective = function(data)
-    import("/lua/sim/MapUtilities.lua").ChangeThreatPerspective(data.Army)
+Callbacks.iMapSwitchPerspective = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapSwitchPerspective(data.Army)
 end
 
-Callbacks.ToggleAIGrid = function(data)
-    import("/lua/sim/MapUtilities.lua").ToggleAIGrid()
+Callbacks.iMapToggleRendering = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapToggleRendering()
 end
 
-Callbacks.GridToggleThreatRendering = function(data)
-    import("/lua/sim/MapUtilities.lua").GridToggleThreatRendering(data.Identifier)
+Callbacks.iMapToggleThreat = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapToggleThreat(data.Identifier)
 end

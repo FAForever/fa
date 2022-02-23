@@ -1,9 +1,11 @@
 
 local MarkerUtilities = import("/lua/sim/MarkerUtilities.lua")
 
-local ResourceCheckApplied = false
+local MapResourceCheckApplied = false
 
-function ResourceCheck(checked)
+--- Attempts to spawn in extractors and hydrocarbons on each marker that is enabled in the game. Attempts 
+-- to ring each extractor with storages and fabricators, similar to how the ringing feature works.
+function MapResourceCheck()
 
     -- perform UI checks on sim to prevent cheating
     local count = 0
@@ -13,7 +15,7 @@ function ResourceCheck(checked)
         end
     end
 
-    local onePlayer = count <= 1
+    local onePlayer = count == 1
     local cheatsEnabled = CheatsEnabled()
 
     -- prevent it from working
@@ -22,12 +24,12 @@ function ResourceCheck(checked)
         return 
     end
 
-    if ResourceCheckApplied then 
+    if MapResourceCheckApplied then 
         WARN("Restart the session before running the resource check again.")
         return 
     end
 
-    ResourceCheckApplied = true 
+    MapResourceCheckApplied = true 
 
     -- get an arbitrary brain
     local brain = ArmyBrains[1]
@@ -94,23 +96,28 @@ function ResourceCheck(checked)
 end
 
 --- Keeps track of all marker debugging threads
-local GridFromPerspectiveOfArmy = 1
+local iMapArmyPerspective = 1
 local DebugThreads = { }
 local DebugSuspend = { }
 
-local threatIdentifiers = import("/lua/shared/MapUtilities.lua").ThreatInformation
-local threadRendering = { }
+--- Various threat identifiers and corresponding colors, shared between the UI and the sim
+local ThreatInformation = import("/lua/shared/MapUtilities.lua").ThreatInformation
+
+--- If the key of a threat identifier has a truthy value in this table it will be rendered
+local ThreatRendering = { }
+
 --- Changes the perspective of the threat values measured
-function ChangeThreatPerspective(army)
-    GridFromPerspectiveOfArmy = army 
+function iMapSwitchPerspective(army)
+    iMapArmyPerspective = army 
 end
 
 --- Toggles rendering a threat circle
-function GridToggleThreatRendering(identifier)
-    threadRendering[identifier]= not threadRendering[identifier]
+function iMapToggleThreat(identifier)
+    ThreatRendering[identifier]= not ThreatRendering[identifier]
 end
 
-function ToggleAIGrid()
+--- Toggles the visualisation of the iMAP grid that is used by the AI. The grid can be tweaked using 'iMapSwitchPerspective' and 'iMapToggleThreat'
+function iMapToggleRendering()
 
     -- perform UI checks on sim to prevent cheating
     local count = 0
@@ -170,7 +177,7 @@ function ToggleAIGrid()
 
                 while true do 
 
-                    local brain = ArmyBrains[GridFromPerspectiveOfArmy]
+                    local brain = ArmyBrains[iMapArmyPerspective]
 
                     -- check if we should suspend ourselves
                     if DebugSuspend[type] then 
@@ -199,11 +206,11 @@ function ToggleAIGrid()
                             a[3] = cz
 
                             -- draw individual threat values of cell
-                            for k, info in threatIdentifiers do 
+                            for k, info in ThreatInformation do 
 
                                 -- DrawCircle(a, 0.25 * sqrt(1600), "000000")
 
-                                if threadRendering[info.identifier] then 
+                                if ThreatRendering[info.identifier] then 
                                     local threat = brain:GetThreatAtPosition(a, 0, true, info.identifier)
                                     if threat > 0 then 
                                         DrawCircle(a, 0.25 * sqrt(threat), info.color)
