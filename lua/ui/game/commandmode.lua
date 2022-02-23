@@ -398,7 +398,7 @@ function OnCommandIssued(command)
     -- if we're trying to upgrade hives then this allows us to force the upgrade to happen immediately
     if command.CommandType == "Upgrade" and (command.Blueprint == "xrb0204" or command.Blueprint == "xrb0304") then 
         if not IsKeyDown('Shift') then 
-            SimCallback({ Func = 'UpgradeHive', Args = { UpgradeTo = command.Blueprint } }, true )
+            SimCallback({ Func = 'ImmediateHiveUpgrade', Args = { UpgradeTo = command.Blueprint } }, true )
         end
     end
         

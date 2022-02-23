@@ -597,10 +597,10 @@ local IssueUpgrade = IssueUpgrade
 local cxrb0104 = categories.xrb0104
 local cxrb0204 = categories.xrb0204
 
---- Force hives in the selection to upgrade immediately
--- @param data A table { UpgradeTo :: String } that tells us what we want to upgrade to
+--- Forces hives in the selection to upgrade immediately
+-- @param data A table { UpgradeTo :: String } that tells us what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
 -- @param units A table of the selected units
-Callbacks.UpgradeHive = function(data, units)
+Callbacks.ImmediateHiveUpgrade = function(data, units)
 
     -- make sure we have valid units
     units = SecureUnits(units)
