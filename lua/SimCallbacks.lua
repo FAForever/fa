@@ -588,3 +588,75 @@ end
 Callbacks.ToggleDebugMarkersByType = function (data, units)
     import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
 end
+
+do
+    -- upvalue for performance
+    local EntityCategoryFilterDown = EntityCategoryFilterDown
+    local IssueClearCommands = IssueClearCommands
+    local IssueUpgrade = IssueUpgrade
+
+    local cxrb0104 = categories.xrb0104
+    local cxrb0204 = categories.xrb0204
+
+    --- Forces hives in the selection to upgrade immediately
+    -- @param data A table { UpgradeTo :: String } that tells us what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
+    -- @param units A table of the selected units
+    Callbacks.ImmediateHiveUpgrade = function(data, units)
+
+        -- make sure we have valid units
+        units = SecureUnits(units)
+
+        -- find t1 / t2 hives
+        local xrb0104 = EntityCategoryFilterDown(cxrb0104, units)
+        local xrb0204 = EntityCategoryFilterDown(cxrb0204, units)
+
+        -- upgrade tech 1 hives
+        if xrb0104[1] then 
+
+            -- oof for performance, but this doesn't get run that often
+            local notUpgradingh = 1
+            local notUpgrading = { }
+            
+            local upgradingh = 1 
+            local upgrading = { }
+
+            -- split between upgrading / and not upgrading hives for different behavior
+            for k, unit in xrb0104 do 
+                if not unit:IsUnitState('Upgrading') then 
+                    notUpgrading[notUpgradingh] = unit 
+                    notUpgradingh = notUpgradingh + 1
+                else 
+                    upgrading[upgradingh] = unit 
+                    upgradingh = upgradingh + 1
+                end
+            end
+
+            -- always clear things out
+            IssueClearCommands(notUpgrading)
+
+            -- upgrading to t2 from t1
+            if data.UpgradeTo == "xrb0204" then 
+                IssueUpgrade( notUpgrading, "xrb0204")
+            
+            -- upgrading to t3 from t1
+            elseif data.UpgradeTo == "xrb0304" then 
+                IssueUpgrade( notUpgrading, "xrb0204")
+                IssueUpgrade( xrb0104, "xrb0304")
+            end
+        end
+
+        -- upgrade tech 2 hives
+        if xrb0204[1] then 
+
+            -- always clear things out
+            if data.ClearCommands then 
+                IssueClearCommands(xrb0204)
+            end
+
+            -- upgrading to t3 form t1
+            if data.UpgradeTo == "xrb0304" then 
+                IssueUpgrade( xrb0204, "xrb0304")
+            end
+        end
+    end
+end
