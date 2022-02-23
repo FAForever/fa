@@ -40,7 +40,7 @@ function OpenWindow()
 
     -- prevent it from opening when cheats are enabled
     if not sessionInfo.Options.CheatsEnabled then 
-        WARN("Unable to open marker utilities window: cheats are disabled")
+        WARN("Unable to open map utilities window: cheats are disabled")
         return 
     end
 
@@ -50,14 +50,14 @@ function OpenWindow()
         return
     end
 
-    SPEW("Opening marker utilities window")
+    SPEW("Opening map utilities window")
 
     State.WindowIsOpen = true 
 
     -- populate the GUI
     if not State.GUI then 
 
-        SPEW("Created marker utilities window")
+        SPEW("Created map utilities window")
 
         -- create the window
         State.GUI = Window.CreateDefaultWindow(
@@ -82,15 +82,10 @@ function OpenWindow()
             CloseWindow()
         end
 
-        -- create group that will become the parent of all the elements
-        State.GUI.Groups = Group(State.GUI)
-        LayoutHelpers.FillParent(State.GUI.Groups, State.GUI.TitleGroup)
-
         -- initialize state
         local window = State.GUI
 
         -- construct navigation header
-
         local groupNavigation = Group(window)
         groupNavigation.Left:Set(function() return window.Left() end )
         groupNavigation.Right:Set(function() return window.Right() end)
@@ -99,35 +94,35 @@ function OpenWindow()
 
         do 
 
-            local buttonResources = UIUtil.CreateButtonStd(groupNavigation, '/widgets02/small', "Resources", 16, 2)
-            LayoutHelpers.AtTopIn(buttonResources, groupNavigation, 4)
-            LayoutHelpers.FromLeftIn(buttonResources, groupNavigation, 0.010)
-            LayoutHelpers.DepthOverParent(buttonResources, window, 10)
-            buttonResources.OnClick = function (self)
+            local resources = UIUtil.CreateButtonStd(groupNavigation, '/widgets02/small', "Resources", 16, 2)
+            LayoutHelpers.AtTopIn(resources, groupNavigation, 4)
+            LayoutHelpers.FromLeftIn(resources, groupNavigation, 0.010)
+            LayoutHelpers.DepthOverParent(resources, window, 10)
+            resources.OnClick = function (self)
                 SwitchTab("Resources")
             end
 
-            local buttonGrid = UIUtil.CreateButtonStd(groupNavigation, '/widgets02/small', "Grid", 16, 2)
-            LayoutHelpers.AtTopIn(buttonGrid, groupNavigation, 4)
-            LayoutHelpers.FromLeftIn(buttonGrid, groupNavigation, 0.340)
-            LayoutHelpers.DepthOverParent(buttonGrid, window, 10)
-            buttonGrid.OnClick = function (self)
+            local imap = UIUtil.CreateButtonStd(groupNavigation, '/widgets02/small', "Grid", 16, 2)
+            LayoutHelpers.AtTopIn(imap, groupNavigation, 4)
+            LayoutHelpers.FromLeftIn(imap, groupNavigation, 0.340)
+            LayoutHelpers.DepthOverParent(imap, window, 10)
+            imap.OnClick = function (self)
                 SwitchTab("Grid")
             end
 
-            local buttonMarkers = UIUtil.CreateButtonStd(groupNavigation, '/widgets02/small', "Markers", 16, 2)
-            LayoutHelpers.AtTopIn(buttonMarkers, groupNavigation, 4)
-            LayoutHelpers.FromLeftIn(buttonMarkers, groupNavigation, 0.670)
-            LayoutHelpers.DepthOverParent(buttonMarkers, window, 10)
-            buttonMarkers.OnClick = function (self)
+            local markers = UIUtil.CreateButtonStd(groupNavigation, '/widgets02/small', "Markers", 16, 2)
+            LayoutHelpers.AtTopIn(markers, groupNavigation, 4)
+            LayoutHelpers.FromLeftIn(markers, groupNavigation, 0.670)
+            LayoutHelpers.DepthOverParent(markers, window, 10)
+            markers.OnClick = function (self)
                 SwitchTab("Markers")
             end
 
-            groupNavigation.Bottom:Set(function() return buttonResources.Bottom() end )
+            groupNavigation.Bottom:Set(function() return resources.Bottom() end )
 
         end
 
-        -- -- add various content
+        -- -- add various content to the tabs
         State.GUITabs.Resources = import("/lua/ui/game/MapUtilitiesResourcesTab.lua").CreateUI(State, window, groupNavigation)
         State.GUITabs.Grid = import("/lua/ui/game/MapUtilitiesGridTab.lua").CreateUI(State, window, groupNavigation)
         State.GUITabs.Markers = import("/lua/ui/game/MapUtilitiesMarkersTab.lua").CreateUI(State, window, groupNavigation)
@@ -147,11 +142,9 @@ end
 --- Closes the window
 function CloseWindow()
 
-    SPEW("Closing marker utilities window")
+    SPEW("Closing map utilities window")
 
+    -- close us up
     State.WindowIsOpen = false
-
-    if State.GUI then 
-        State.GUI:Hide()
-    end
+    State.GUI:Hide()
 end
