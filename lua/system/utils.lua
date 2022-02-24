@@ -551,19 +551,8 @@ rawset(string, 'match', function(input, exp, init)
     end
 end)
 
--- Lua 5.0 implementation of the Lua 5.1 function string.gmatch
--- Iterator function, returns each sequential match from a string
-rawset(string, 'gmatch', function(input, exp)
-    local matches = {}
-    string.gsub(input, exp, function(...) table.insert(matches, arg) end)
-    local i=0
-    return function()
-        i=i+1
-        if matches[i] then
-            return unpack(matches[i])
-        end
-    end
-end)
+-- gfind was renamed to gmatch in Lua 5.1. added gmatch for additional compatibility
+rawset(string, 'gmatch', string.gfind)
 
 --- Returns items as a single string, separated by the delimiter
 function StringJoin(items, delimiter)
