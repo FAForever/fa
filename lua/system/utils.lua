@@ -546,7 +546,9 @@ end
 rawset(string, 'match', function(input, exp, init)
     local match
     string.gsub(input:sub(init or 1), exp, function(...) match = arg end, 1)
-    return unpack(match)
+    if match then
+        return unpack(match)
+    end
 end)
 
 -- Lua 5.0 implementation of the Lua 5.1 function string.gmatch
