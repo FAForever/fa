@@ -476,7 +476,6 @@ Window = Class(Group) {
 
             -- new version in preference file that does support UI scaling
             else 
-                LOG(repr(location))
                 local top = location.top 
                 local left = location.left 
                 local width = location.width 
@@ -513,7 +512,7 @@ Window = Class(Group) {
                     top = self.Top(), 
                     left = self.Left(), 
 
-                    -- invert the scale on these numbers, as we apply the scale again when we're reading it from the preference file
+                    -- invert the scale on these numbers, that allows us to apply the scale again when we read it from the preference file
                     width = LayoutHelpers.InvScaleNumber(self.Width()), 
                     height = LayoutHelpers.InvScaleNumber(self.Height())
                 }
