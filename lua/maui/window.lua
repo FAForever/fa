@@ -476,13 +476,14 @@ Window = Class(Group) {
 
             -- new version in preference file that does support UI scaling
             else 
+                LOG(repr(location))
                 local top = location.top 
                 local left = location.left 
                 local width = location.width 
                 local height = location.height 
 
-                self.Left:Set(location.Left)
-                self.Top:Set(location.Top)
+                self.Left:Set(left)
+                self.Top:Set(top)
 
                 -- we can scale these accordingly as we applied the inverse on saving
                 self.Width:Set(LayoutHelpers.ScaleNumber(width))
