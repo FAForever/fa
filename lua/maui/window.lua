@@ -460,7 +460,7 @@ Window = Class(Group) {
         if location then
 
             -- old version in preference file that doesn't support UI scaling
-            if location.right and location.bottom then 
+            if not (location.width and location.height) then 
                 local oldHeight = location.bottom - location.top
                 local oldWidth = location.right - location.left
                 self.Top:Set(math.max(location.top, parent.Top()))
@@ -511,6 +511,10 @@ Window = Class(Group) {
                 {
                     top = self.Top(), 
                     left = self.Left(), 
+
+                    -- backwards compatibility with the FAF branch
+                    right = self.Right(),
+                    bottom = self.Bottom(),
 
                     -- invert the scale on these numbers, that allows us to apply the scale again when we read it from the preference file
                     width = LayoutHelpers.InvScaleNumber(self.Width()), 
