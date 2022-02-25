@@ -4482,7 +4482,7 @@ Unit = Class(moho.unit_methods) {
     SetDead = function(self)
         if not DeprecatedWarnings.SetDead then 
             DeprecatedWarnings.SetDead = true 
-            WARN("SetDead is deprecated: use unit.Dead = val instead.")
+            WARN("SetDead is deprecated: use unit.Dead = true instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
         end
         self.Dead = true
