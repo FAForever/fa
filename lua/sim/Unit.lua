@@ -170,6 +170,17 @@ Unit = Class(moho.unit_methods) {
         -- Turn off land bones if this unit has them.
         self:HideLandBones()
 
+
+        local bp = self:GetBlueprint()
+
+        -- Store size information for performance
+        self.FootPrintSize = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
+        self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
+        self.SkirtOffset = { OffsetX = bp.Physics.SkirtOffsetX, OffsetZ = bp.Physics.SkirtOffsetZ }
+        self.SkirtSize = { SizeX = bp.Physics.SkirtSizeX, SizeZ = bp.Physics.SkirtSizeZ }
+        self.Size = { SizeX = bp.SizeX, SizeY = bp.SizeY, SizeZ = bp.SizeZ }
+        self.CollisionOffsetY = bp.CollisionOffsetY
+
         -- Set number of effects per damage depending on its volume
         local x, y, z = self:GetUnitSizes()
         local vol = x * y * z
@@ -220,8 +231,6 @@ Unit = Class(moho.unit_methods) {
         self.totalDamageTaken = 0
 
         self.debris_Vector = Vector(0, 0, 0)
-
-        local bp = self:GetBlueprint()
 
         -- Store build information for performance
         self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
@@ -322,30 +331,33 @@ Unit = Class(moho.unit_methods) {
 
     -- Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
     GetSkirtRect = function(self)
-        local bp = self:GetBlueprint()
-        local x, y, z = unpack(self:GetPosition())
-        local fx = x - bp.Footprint.SizeX * .5
-        local fz = z - bp.Footprint.SizeZ * .5
-        local sx = fx + bp.Physics.SkirtOffsetX
-        local sz = fz + bp.Physics.SkirtOffsetZ
+        local x, y, z = self:GetPositionXYZ()
+        local fx = x - self.Footprint.SizeX * .5
+        local fz = z - self.Footprint.SizeZ * .5
+        local sx = fx + self.SkirtOffset.OffsetX
+        local sz = fz + self.SkirtOffset.OffsetZ
 
-        return sx, sz, sx + bp.Physics.SkirtSizeX, sz + bp.Physics.SkirtSizeZ
+        return sx, sz, sx + self.SkirtSize.SizeX, sz + self.SkirtSize.SizeZ
     end,
 
     -- Returns collision box size
     GetUnitSizes = function(self)
-        local bp = self:GetBlueprint()
-        return bp.SizeX, bp.SizeY, bp.SizeZ
+        if not DeprecatedWarnings.GetUnitSizes then 
+            DeprecatedWarnings.GetUnitSizes = true 
+            WARN("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
     end,
 
     GetRandomOffset = function(self, scalar)
-        local sx, sy, sz = self:GetUnitSizes()
+        local sx, sy, sz = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
         local heading = self:GetHeading()
         sx = sx * scalar
         sy = sy * scalar
         sz = sz * scalar
         local rx = Random() * sx - (sx * 0.5)
-        local y  = Random() * sy + (self:GetBlueprint().CollisionOffsetY or 0)
+        local y  = Random() * sy + (self.CollisionOffsetY or 0)
         local rz = Random() * sz - (sz * 0.5)
         local x = math.cos(heading) * rx - math.sin(heading) * rz
         local z = math.sin(heading) * rx - math.cos(heading) * rz
