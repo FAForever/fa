@@ -88,7 +88,7 @@ XSL0401 = Class(SWalkingLandUnit) {
                                 'Left_Leg_B17', 'Left_Leg_B14', 'Left_Leg_B15'}
 
         explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ})
         WaitSeconds(2)
 
         local RandBoneIter = RandomIter(explosionBones)

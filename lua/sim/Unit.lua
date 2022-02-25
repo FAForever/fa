@@ -182,7 +182,7 @@ Unit = Class(moho.unit_methods) {
         self.CollisionOffsetY = bp.CollisionOffsetY
 
         -- Set number of effects per damage depending on its volume
-        local x, y, z = self:GetUnitSizes()
+        local x, y, z = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
         local vol = x * y * z
 
         self:ShowPresetEnhancementBones()
@@ -1683,7 +1683,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SinkDestructionEffects = function(self)
-        local sx, sy, sz = self:GetUnitSizes()
+        local sx, sy, sz = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
         local vol = sx * sy * sz
         local numBones = self:GetBoneCount() - 1
         local pos = self:GetPosition()
@@ -4521,7 +4521,7 @@ Unit = Class(moho.unit_methods) {
         end
         return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
     end,
-    
+
     --- DAMAGE
 
     SetCanTakeDamage = function(self, val)

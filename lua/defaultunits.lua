@@ -1800,7 +1800,7 @@ AirUnit = Class(MobileUnit) {
         explosion.CreateDefaultHitExplosion(self, scale)
 
         if self.ShowUnitDestructionDebris then
-            explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
+            explosion.CreateDebrisProjectiles(self, scale, {self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ})
         end
     end,
 
