@@ -324,11 +324,6 @@ Unit = Class(moho.unit_methods) {
     ---- MISC FUNCTIONS
     -------------------------------------------------------------------------------------------
     
-    GetFootPrintSize = function(self)
-        local fp = self:GetBlueprint().Footprint
-        return math.max(fp.SizeX, fp.SizeZ)
-    end,
-
     -- Returns 4 numbers: skirt x0, skirt z0, skirt.x1, skirt.z1
     GetSkirtRect = function(self)
         local x, y, z = self:GetPositionXYZ()
@@ -338,16 +333,6 @@ Unit = Class(moho.unit_methods) {
         local sz = fz + self.SkirtOffset.OffsetZ
 
         return sx, sz, sx + self.SkirtSize.SizeX, sz + self.SkirtSize.SizeZ
-    end,
-
-    -- Returns collision box size
-    GetUnitSizes = function(self)
-        if not DeprecatedWarnings.GetUnitSizes then 
-            DeprecatedWarnings.GetUnitSizes = true 
-            WARN("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
     end,
 
     GetRandomOffset = function(self, scalar)
@@ -4517,7 +4502,26 @@ Unit = Class(moho.unit_methods) {
         end
         return self:GetPosition()
     end,
-
+    
+    GetFootPrintSize = function(self)
+        if not DeprecatedWarnings.GetFootPrintSize then 
+            DeprecatedWarnings.GetFootPrintSize = true 
+            WARN("GetFootPrintSize is deprecated: use unit.FootPrintSize instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self.FootPrintSize
+    end,
+    
+    -- Returns collision box size
+    GetUnitSizes = function(self)
+        if not DeprecatedWarnings.GetUnitSizes then 
+            DeprecatedWarnings.GetUnitSizes = true 
+            WARN("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
+    end,
+    
     --- DAMAGE
 
     SetCanTakeDamage = function(self, val)
