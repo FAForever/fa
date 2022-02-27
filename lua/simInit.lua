@@ -94,8 +94,6 @@ function SetupSession()
         SPEW("Detected the 'requiresAiFunctionality' field set by the map: enabling AI functionality")
     end
 
-    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
-
     -- LOG('SetupSession: ', repr(ScenarioInfo))
 
     ArmyBrains = {}
@@ -253,6 +251,10 @@ end
 -- any units yet) and we're ready to start the game. It's responsible for setting up
 -- the initial units and any other gameplay state we need.
 function BeginSession()
+
+    -- brains can have adjusted this value by now, ready to sync
+    Sync.GameHasAIs = ScenarioInfo.GameHasAIs
+
     SPEW('Active mods in sim: ', repr(__active_mods))
 
     -- pass options to the UI

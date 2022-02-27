@@ -32,7 +32,6 @@ function OnSync()
     end
 
     if Sync.GameHasAIs ~= nil then 
-        LOG("Hi!")
         import("/lua/ui/game/gamemain.lua").GameHasAIs = Sync.GameHasAIs
     end
 

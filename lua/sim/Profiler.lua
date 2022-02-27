@@ -22,6 +22,15 @@ local data = CreateEmptyProfilerTable()
 --- Toggles the profiler on / off
 function ToggleProfiler(army, forceEnable)
 
+    -- Inform us in case of abuse
+    SPEW("Profiler has been toggled on by army: " .. tostring(army))
+
+    -- if we're not the ones that initiated this call, get out
+    if GetFocusArmy() ~= army then 
+        return 
+    end
+
+    -- allows us to remain enabled
     if forceEnable and isProfiling then 
         return 
     end
@@ -29,9 +38,6 @@ function ToggleProfiler(army, forceEnable)
     if not isProfiling then 
 
         isProfiling = true 
-
-        -- Inform us in case of abuse
-        SPEW("Profiler has been toggled on by army: " .. tostring(army))
 
         -- Thread to sync information gathered to the UI
         if not thread then 
@@ -55,13 +61,13 @@ function ToggleProfiler(army, forceEnable)
                 -- i.linedefined    = The line of the source where the function was defined
 
                 -- count the function call
-                local source = tostring(i.what)
-                local scope = tostring(i.namewhat)
-                local name = tostring(i.name)
+                local source = i.what or "unknown"
+                local scope = i.namewhat or "unknown"
+                local name = i.name or "lambda"
 
                 -- prevent an empty scope
                 if scope == "" then 
-                    scope = "other"
+                    scope = "unknown"
                 end
 
                 -- keep track 
