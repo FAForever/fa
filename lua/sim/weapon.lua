@@ -82,7 +82,10 @@ Weapon = Class(moho.weapon_methods) {
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
         -- cache information of unit, weapons get created before unit.OnCreate is called
-        self.Trash = TrashBag();
+        self.Trash = TrashBag()
+        self.TrashProjectiles = TrashBag()
+        self.TrashManipulators = TrashBag()
+
         self.Brain = self.unit:GetAIBrain()
         self.Army = self.unit:GetArmy()
 
@@ -161,22 +164,22 @@ Weapon = Class(moho.weapon_methods) {
                     self.AimControl:SetResetPoseTime(9999999)
                 end
                 self:SetFireControl('Right')
-                self.Trash:Add(self.AimControl)
-                self.Trash:Add(self.AimRight)
-                self.Trash:Add(self.AimLeft)
+                self.TrashManipulators:Add(self.AimControl)
+                self.TrashManipulators:Add(self.AimRight)
+                self.TrashManipulators:Add(self.AimLeft)
             else
                 self.AimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
                 if EntityCategoryContains(categories.STRUCTURE, self.unit) then
                     self.AimControl:SetResetPoseTime(9999999)
                 end
-                self.Trash:Add(self.AimControl)
+                self.TrashManipulators:Add(self.AimControl)
                 self.AimControl:SetPrecedence(precedence)
                 if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
                     for k, v in bp.RackBones do
                         if v.RackBone ~= pitchBone then
                             local slaver = CreateSlaver(self.unit, v.RackBone, pitchBone)
                             slaver:SetPrecedence(precedence-1)
-                            self.Trash:Add(slaver)
+                            self.TrashManipulators:Add(slaver)
                         end
                     end
                 end
@@ -447,7 +450,18 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
+
     OnDestroy = function(self)
+    end,
+
+    --- Clears out the trash of projectiles, such as beams. Called by the owning unit
+    ClearProjectileTrash = function(self)
+        self.TrashProjectiles:Destroy()
+    end,
+
+    --- Clears out the manipulators. Called by the owning unit
+    ClearManipulatorTrash = function(self)
+        self.TrashManipulators:Destroy()
     end,
 
     SetWeaponPriorities = function(self, priTable)

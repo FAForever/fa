@@ -915,37 +915,7 @@ function PlaySacrificeEffects(unit, target_unit)
     end
 end
 
-function PlayReclaimEffects(reclaimer, reclaimed, BuildEffectBones, EffectsBag)
-    local pos = reclaimed:GetPosition()
-    pos[2] = GetTerrainHeight(pos[1], pos[3])
 
-    local beamEnd = Entity()
-    EffectsBag:Add(beamEnd)
-    Warp(beamEnd, pos)
-
-    for _, vBone in BuildEffectBones do
-        for _, vEmit in EffectTemplate.ReclaimBeams do
-            local beamEffect = AttachBeamEntityToEntity(reclaimer, vBone, beamEnd, -1, reclaimer.Army, vEmit)
-            EffectsBag:Add(beamEffect)
-        end
-    end
-
-    for _, v in EffectTemplate.ReclaimObjectAOE do
-        EffectsBag:Add(CreateEmitterOnEntity(reclaimed, reclaimer.Army, v))
-    end
-end
-
-function PlayReclaimEndEffects(reclaimer, reclaimed)
-    local army = -1
-    if reclaimer then
-        army = reclaimer.Army
-    end
-    for _, v in EffectTemplate.ReclaimObjectEnd do
-        CreateEmitterAtEntity(reclaimed, army, v)
-    end
-
-    CreateLightParticleIntel(reclaimed, -1, army, 4, 6, 'glow_02', 'ramp_flare_02')
-end
 
 function PlayCaptureEffects(capturer, captive, BuildEffectBones, EffectsBag)
     for _, vBone in BuildEffectBones do
@@ -1661,3 +1631,15 @@ CreateAeonTempestBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").Create
 --- Creates the Aeon Paragon build effects, including particles and an animation.
 -- @param unitBeingBuilt The tempest that is being built.
 CreateAeonParagonBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonParagonBuildingEffects
+
+--- Played when reclaiming starts.
+-- @param reclaimer Unit that is reclaiming
+-- @param reclaimed Unit that is reclaimed 
+-- @param buildEffectBones Bones of the reclaimer to create beams from towards the reclaimed
+-- @param effectsBag Trashbag that stores the effects
+PlayReclaimEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEffects
+
+--- Played when reclaiming has been completed.
+-- @param reclaimer Unit that is reclaiming
+-- @param reclaimed Unit that is reclaimed (and no longer exists after this effect)
+PlayReclaimEndEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEndEffects
