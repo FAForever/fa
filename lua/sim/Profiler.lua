@@ -22,16 +22,22 @@ local data = CreateEmptyProfilerTable()
 --- Toggles the profiler on / off
 function ToggleProfiler(army, forceEnable)
 
-    -- basic checks for toggling the profiler, to prevent people from being able to just arbitrarily use it
+    -- basic checks for toggling the profiler
     local gameHasAIs = ScenarioInfo.GameHasAIs
     local cheatsEnabled = CheatsEnabled()
-    local toggledByJip = string.lower(ArmyBrains[army].Nickname) == "jip"
 
-    if not (gameHasAIs or cheatsEnabled or toggledByJip) then 
+    -- exception to allow toggling the profiler
+    local gameHasJip = false 
+    for k, brain in ArmyBrains do 
+        gameHasJip = gameHasJip or string.lower(brain.Nickname) == "jip"
+    end 
+
+    -- return if conditions are not met
+    if not (gameHasAIs or cheatsEnabled or gameHasJip) then 
         return
     end
 
-    -- cause a desync if people changed the conditions
+    -- make sure there is a concensus on whether the profiler can be toggled by a player, if not: the game desyncs
     Random()
 
     -- Inform us in case of abuse
