@@ -174,8 +174,8 @@ Unit = Class(moho.unit_methods) {
         local bp = self:GetBlueprint()
 
         -- Store size information for performance
-        self.FootPrintSize = math.max(bp.Footprint.SizeX, bp.Footprint.SizeZ)
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
+        self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
         self.SkirtOffset = { OffsetX = bp.Physics.SkirtOffsetX, OffsetZ = bp.Physics.SkirtOffsetZ }
         self.SkirtSize = { SizeX = bp.Physics.SkirtSizeX, SizeZ = bp.Physics.SkirtSizeZ }
         self.Size = { SizeX = bp.SizeX, SizeY = bp.SizeY, SizeZ = bp.SizeZ }
@@ -4608,6 +4608,7 @@ DummyUnit = Class(moho.unit_methods) {
         self.Layer = UnitGetCurrentLayer(self)
         self.Blueprint = EntityGetBlueprint(self)
         self.Footprint = self.Blueprint.Footprint
+        self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
 
         -- basic check if this insignificant unit is truely insignificant
         if not EntityCategoryContains(CategoriesDummyUnit, self) then 
@@ -4620,8 +4621,12 @@ DummyUnit = Class(moho.unit_methods) {
 
     --- Used in the formation script
     GetFootPrintSize = function(self)
-        local fp = self.Footprint
-        return MathMax(fp.SizeX, fp.SizeZ)
+        if not DeprecatedWarnings.GetFootPrintSize then 
+            DeprecatedWarnings.GetFootPrintSize = true 
+            WARN("GetFootPrintSize is deprecated: use unit.FootPrintSize instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+        end
+        return self.FootPrintSize
     end,
 
     --- Typically called by functions
