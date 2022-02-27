@@ -69,7 +69,7 @@ local function CalculatedDPS(weapon)
         -- Uncontinuous beam. Interval from start to next start.
         DamageInterval = DamageInterval + weapon.BeamLifetime
         -- Damage is calculated as a single glob, beam weapons are typically underappreciated
-        Damage = 1.5 * Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
+        Damage = Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
     end
 
     return Damage * (1 / DamageInterval) or 0
