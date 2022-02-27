@@ -64,6 +64,8 @@ LobbyOptions = false
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
 
+GameHasAIs = false
+
 function KillWaitingDialog()
     if waitingDialog then
         waitingDialog:Destroy()

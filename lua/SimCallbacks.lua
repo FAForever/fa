@@ -589,6 +589,21 @@ Callbacks.ToggleDebugMarkersByType = function (data, units)
     import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
 end
 
+--- Toggles the profiler on / off
+Callbacks.ToggleProfiler = function (data)
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false )
+end
+
+-- Allows searching for benchmarks
+Callbacks.FindBenchmarks = function (data)
+    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+end
+
+-- Allows a benchmark to be run in the sim
+Callbacks.RunBenchmarks = function (data)
+    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+end
+
 do
     -- upvalue for performance
     local EntityCategoryFilterDown = EntityCategoryFilterDown
