@@ -63,9 +63,10 @@ UAA0310 = Class(AirTransport) {
     end,
 
     OnAnimTerrainCollision = function(self, bone,x,y,z)
+        local size = self.Size
         DamageArea(self, {x,y,z}, 5, 1000, 'Default', true, false)
         explosion.CreateDefaultHitExplosionAtBone(self, bone, 5.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)

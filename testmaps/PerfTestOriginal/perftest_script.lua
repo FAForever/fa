@@ -2,7 +2,7 @@
 -- File     :  /maps/perftest/perftest_script.lua
 -- Author(s):  Marc Scattergood
 -- Summary  :  perftest Demo Map
--- Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local ScenarioFramework = import('/lua/scenarioframework.lua')

@@ -336,7 +336,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetRandomOffset = function(self, scalar)
-        local sx, sy, sz = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
+        local size = self.Size
+        local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
         local heading = self:GetHeading()
         sx = sx * scalar
         sy = sy * scalar
@@ -1683,7 +1684,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SinkDestructionEffects = function(self)
-        local sx, sy, sz = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
+        local size = self.Size
+        local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
         local vol = sx * sy * sz
         local numBones = self:GetBoneCount() - 1
         local pos = self:GetPosition()
