@@ -31,6 +31,9 @@ function ToggleProfiler(army, forceEnable)
         return
     end
 
+    -- cause a desync if people changed the conditions
+    Random()
+
     -- Inform us in case of abuse
     SPEW("Profiler has been toggled on by army: " .. tostring(army))
 
