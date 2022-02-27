@@ -77,7 +77,7 @@ end
 
 
 function SetUnitThreatValues(unitBPs)
-    
+
     -- localize for performance
     local TableFind = TableFind
     local TableGetn = TableGetn
@@ -103,6 +103,11 @@ function SetUnitThreatValues(unitBPs)
                 LOG(tostring(bp.BlueprintId) .. ": has no defense table in blueprint, skipped")
             end
 
+            continue 
+        end
+
+        -- not all units need dynamic threat calculations, such as the commanders
+        if bp.Defense.SkipDynamicThreatCalculations then 
             continue 
         end
 
@@ -136,10 +141,12 @@ function SetUnitThreatValues(unitBPs)
             -- Mass prod + 5% of health
             cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondMass * 10 + (cache.HealthThreat + cache.PersonalShieldThreat) * 5
         end
+
         if bp.Economy.ProductionPerSecondEnergy then
             -- Energy prod + 1% of health
             cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondEnergy * 0.1 + cache.HealthThreat + cache.PersonalShieldThreat
         end
+
         -- 0 off the personal health values if we alreaady used them
         if bp.Economy.ProductionPerSecondMass or bp.Economy.ProductionPerSecondEnergy then
             cache.HealthThreat = 0
@@ -166,6 +173,7 @@ function SetUnitThreatValues(unitBPs)
         if bp.Economy.StorageEnergy then
             cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.StorageEnergy * 0.001 + cache.HealthThreat + cache.PersonalShieldThreat
         end
+
         -- 0 off the personal health values if we alreaady used them
         if bp.Economy.StorageMass or bp.Economy.StorageEnergy then
             cache.HealthThreat = 0
