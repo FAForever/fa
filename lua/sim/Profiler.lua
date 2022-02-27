@@ -37,6 +37,19 @@ function ToggleProfiler(army, forceEnable)
         return
     end
 
+    -- inform us why profiler can be toggled
+    if gameHasAIs then 
+        SPEW("Profiler can be toggled: game has AIs")
+    end
+
+    if cheatsEnabled then 
+        SPEW("Profiler can be toggled: game has cheats enabled")
+    end
+
+    if gameHasJip then 
+        SPEW("Profiler can be toggled: a game developer is in the game")
+    end
+
     -- make sure there is a concensus on whether the profiler can be toggled by a player, if not: the game desyncs
     Random()
 
