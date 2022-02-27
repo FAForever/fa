@@ -34,5 +34,16 @@ function CreateEmptyProfilerTable()
             , ["field"]     = { }
             , ["other"]     = { }
         },
+
+        -- what
+        unknown = {
+          -- namewhat
+            ["global"]    = { }
+          , ["upval"]     = { }
+          , ["local"]     = { }
+          , ["method"]    = { }
+          , ["field"]     = { }
+          , ["other"]     = { }
+      },
     }
 end

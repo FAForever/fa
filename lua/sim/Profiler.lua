@@ -22,6 +22,15 @@ local data = CreateEmptyProfilerTable()
 --- Toggles the profiler on / off
 function ToggleProfiler(army, forceEnable)
 
+    -- basic checks for toggling the profiler, to prevent people from being able to just arbitrarily use it
+    local gameHasAIs = ScenarioInfo.GameHasAIs
+    local cheatsEnabled = CheatsEnabled()
+    local toggledByJip = string.lower(ArmyBrains[army].Nickname) == "jip"
+
+    if not (gameHasAIs or cheatsEnabled or toggledByJip) then 
+        return
+    end
+
     -- Inform us in case of abuse
     SPEW("Profiler has been toggled on by army: " .. tostring(army))
 
@@ -62,12 +71,12 @@ function ToggleProfiler(army, forceEnable)
 
                 -- count the function call
                 local source = i.what or "unknown"
-                local scope = i.namewhat or "unknown"
+                local scope = i.namewhat or "other"
                 local name = i.name or "lambda"
 
                 -- prevent an empty scope
                 if scope == "" then 
-                    scope = "unknown"
+                    scope = "other"
                 end
 
                 -- keep track 
