@@ -426,6 +426,17 @@ function CreateWindow()
         StateSwitchHeader("Overview")
     end
 
+    tabs.TimersButton = UIUtil.CreateButtonStd(tabs, '/widgets02/small', "Timers", 16, 2)
+    LayoutHelpers.Below(tabs.TimersButton, tabs, 4)
+    LayoutHelpers.FromLeftIn(tabs.TimersButton, tabs, 0.210)
+    LayoutHelpers.DepthOverParent(tabs.TimersButton, State.GUI, 10)
+    tabs.TimersButton.OnClick = function (self)
+        StateSwitchHeader("Timers")
+    end
+
+    -- TODO
+    tabs.TimersButton:Disable()
+
     tabs.StampsButton = UIUtil.CreateButtonStd(tabs, '/widgets02/small', "Stamps", 16, 2)
     LayoutHelpers.Below(tabs.StampsButton, tabs, 4)
     LayoutHelpers.FromLeftIn(tabs.StampsButton, tabs, 0.410)
