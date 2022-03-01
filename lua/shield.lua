@@ -57,6 +57,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.ImpactEffects = {}
         end
 
+        LOG(spec.Size)
         self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self, spec.ShieldMaxHealth)
@@ -318,20 +319,19 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- allow us to bail out if there are too many impact effects for this shield
-        local r = Random(1, 50)
+        local r = Random(1, 2 * self.Size)
         if 
             -- always spawn if we have less than 10 live impact entities
             (self.LiveImpactEntities > 10) and 
 
             -- spawn based on chance, always give us a tiny chance
-            (r >= 5 and r < self.LiveImpactEntities)
+            (r >= 0.2 * self.Size and r < self.LiveImpactEntities)
         then 
             return 
         end
 
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
-        LOG(self.LiveImpactEntities)
 
         -- cache values
         local effect
@@ -368,8 +368,9 @@ Shield = Class(moho.shield_methods, Entity) {
         -- hold up a bit
         WaitSeconds(2 + 0.05 * r)
 
-        -- take out the entity
+        -- take out the entity again
         entity:Destroy()
+        
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
