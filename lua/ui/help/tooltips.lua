@@ -2043,6 +2043,9 @@ Tooltips = {
         title = "<LOC tooltipui0629>Save Template",
         description = "<LOC tooltipui0630>Creates construction template by saving units/structures and their position",
     },
+    minimap_mesh = {
+        description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
+    },
 
     -- **********************
     -- ** GazUI
