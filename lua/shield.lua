@@ -10,6 +10,10 @@ local Overspill = import('/lua/overspill.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
+local VectorCached = Vector(0, 0, 0)
+local MathSqrt = math.sqrt
+
+
 -- Default values for a shield specification table (to be passed to native code)
 local DEFAULT_OPTIONS = {
     Mesh = '',
@@ -85,6 +89,9 @@ Shield = Class(moho.shield_methods, Entity) {
         elseif ownerCategories.COMMAND then
             self.CommandShield = true
         end
+
+        -- impact management
+        self.LiveImpactEntities = 0
 
         ChangeState(self, self.OnState)
     end,
@@ -174,7 +181,7 @@ Shield = Class(moho.shield_methods, Entity) {
     OnDamage = function(self, instigator, amount, vector, dmgType)
         -- Only called when a shield is directly impacted, so not for Personal Shields
         -- This means personal shields never have ApplyDamage called with doOverspill as true
-        self:ApplyDamage(instigator, amount, vector, dmgType, true)
+        self:ApplyDamage(instigator, amount, vector, dmgType, false)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
@@ -193,9 +200,12 @@ Shield = Class(moho.shield_methods, Entity) {
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
-            self:AdjustHealth(instigator, -absorbed)
+            -- self:AdjustHealth(instigator, -absorbed)
             self:UpdateShieldRatio(-1)
+
             ForkThread(self.CreateImpactEffect, self, vector)
+
+
             if self.RegenThread then
                 KillThread(self.RegenThread)
                 self.RegenThread = nil
@@ -301,23 +311,66 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     CreateImpactEffect = function(self, vector)
-        if not self or self.Owner.Dead then return end
-        local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactMesh = Entity {Owner = self.Owner}
-        Warp(ImpactMesh, self:GetPosition())
 
+        -- bail out if we're a gooner
+        if not self or self.Owner.Dead then 
+            return 
+        end
+
+        -- allow us to bail out if there are too many impact effects for this shield
+        local r = Random(1, 50)
+        if 
+            -- always spawn if we have less than 10 live impact entities
+            (self.LiveImpactEntities > 10) and 
+
+            -- spawn based on chance, always give us a tiny chance
+            (r >= 5 and r < self.LiveImpactEntities)
+        then 
+            return 
+        end
+
+        -- keep track of this entity
+        self.LiveImpactEntities = self.LiveImpactEntities + 1
+        LOG(self.LiveImpactEntities)
+
+        -- cache values
+        local effect
+        local army = self.Army
+        local vc = VectorCached
+
+        -- compute distance to offset effect
+        local x = vector[1]
+        local y = vector[2]
+        local z = vector[3]
+        local d = MathSqrt(x * x + y * y + z * z)
+
+        -- allocate an entity
+        local entity = Entity()
+        Warp(entity, self:GetPosition())
+
+        -- set the impact mesh and scale it accordingly
         if self.ImpactMeshBp ~= '' then
-            ImpactMesh:SetMesh(self.ImpactMeshBp)
-            ImpactMesh:SetDrawScale(self.Size)
-            ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
+            entity:SetMesh(self.ImpactMeshBp)
+            entity:SetDrawScale(self.Size)
+
+            vc[1] = -x
+            vc[2] = -y 
+            vc[3] = -z 
+            entity:SetOrientation(OrientFromDir(vc), true)
         end
 
+        -- spawn additional effects
         for _, v in self.ImpactEffects do
-            CreateEmitterAtBone(ImpactMesh, -1, self.Army, v):OffsetEmitter(0, 0, OffsetLength)
+            effect = CreateEmitterAtBone(entity, -1, army, v)
+            effect:OffsetEmitter(0, 0, d)
         end
 
-        WaitSeconds(5)
-        ImpactMesh:Destroy()
+        -- hold up a bit
+        WaitSeconds(2 + 0.05 * r)
+
+        -- take out the entity
+        entity:Destroy()
+        self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
     OnDestroy = function(self)
