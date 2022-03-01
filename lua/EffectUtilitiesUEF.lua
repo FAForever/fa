@@ -7,6 +7,7 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 -- upvalue for performance
 local Random = Random
 local VectorCached = Vector(0, 0, 0)
+local yield = coroutine.yield
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateEmitterOnEntity = CreateEmitterOnEntity
@@ -40,19 +41,19 @@ function CreateDefaultBuildBeams(
 
     CreateEmitterOnEntity(BeamEndEntity, builder.Army, '/effects/emitters/sparks_08_emit.bp')
 
-    local waitTime = 0.3 + Random() * 1.2
+    -- cache orientation
+
+    local waitTime = Random(3, 15)
     while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
         local x, y, z = builder.GetRandomOffset(unitBeingBuilt, 1)
+
+        -- use orientation
 
         vc[1] = ox + x
         vc[2] = oy + y
         vc[3] = oz + z 
 
-        WaitSeconds(waitTime)
-
-        -- oof
         Warp(BeamEndEntity, vc)
+        yield(waitTime)
     end
-
-    -- deallocated here
 end
