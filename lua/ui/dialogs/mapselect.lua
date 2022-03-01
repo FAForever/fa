@@ -699,59 +699,27 @@ function CreateDialog(selectBehavior, exitBehavior, over, singlePlayer, defaultS
 
     PopulateMapList()
 
-
     return popup
 end
 
 
+
+
 function RefreshOptions(skipRefresh)
-    -- a little weird, but the "skip refresh" is set to prevent calc visible from being called before the control is properly setup
-    -- it also means it's a flag that tells you this is the first time the dialog has been opened
-    -- so we'll use this flag to reset the options sources so they can set up for multiplayer
-    
-    OptionSource = {
-    {title = "<LOC uilobby_0001>Team Options", options = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions},
-    {title = "<LOC uilobby_0002>Game Options", options = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts},
-    {title = "<LOC uilobby_0003>AI Options", options = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts},
-    {title = "<LOC lobui_0164>Advanced", options = advOptions or {}}}
-    local modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
-    for i, mod in modOptions do 
-        table.insert(OptionSource, {title = mod[2], options = mod[1]})
-    end
 
-    Options = {}
+    local OptionUtilities = import("/lua/ui/optionutil.lua")
 
-    --- Check that the given option source has at least one option with at least 2 possibilities, or
-    -- there's no need to draw the UI. Maps/mods can cause whole categories to vanish, and we don't
-    -- want to leave a dangling title.
-    local function ShouldShowOptionCategory(options)
-        for k, optionData in options do
-            if table.getn(optionData.values) > 1 then
-                return true
-            end
-        end
+    -- gather sources that may contain additional options
+    local map = selectedScenario or { }
+    local mods = Mods.GetGameMods(Mods.GetSelectedMods())
 
-        return false
-    end
+    -- gather all options
+    local hierarchy = OptionUtilities.GetOptions(map, mods)
 
-    for _, OptionTable in OptionSource do
-        if ShouldShowOptionCategory(OptionTable.options) then
-            table.insert(Options, {type = 'title', text = OptionTable.title})
-            for optionIndex, optionData in OptionTable.options do
-                if not(isSinglePlayer and optionData.mponly == true) and table.getn(optionData.values) > 1 then
-                    table.insert(Options, {type = 'option', text = optionData.label, data = optionData, default = optionData.default}) -- option1 for teamOptions for exemple
-                end
-            end
-        end
-    end
+    -- format them to how the map dialogue likes them
+    Options = OptionUtilities.ToMapDialogueOptions(hierarchy, isSinglePlayer)
 
     if not skipRefresh then
-        -- Remove all info about advancedOptions in changedOptions
-        -- So we have a clean slate regarding the advanced options each map switch
-        for _,optionData in OptionSource[4].options do
-            changedOptions[optionData.key] = nil
-        end
-
         -- attempt to scroll zero elements to make reset the view
         OptionContainer:ScrollLines(nil, 0)
     end

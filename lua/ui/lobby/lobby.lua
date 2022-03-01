@@ -36,7 +36,6 @@ local Border = import('/lua/ui/controls/border.lua').Border
 local utils = import('/lua/system/utils.lua')
 
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
-local round = Trueskill.round
 local Player = Trueskill.Player
 local Rating = Trueskill.Rating
 local ModBlacklist = import('/etc/faf/blacklist.lua').Blacklist
@@ -47,6 +46,9 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
+
+local OptionUtilities = import("/lua/ui/optionutil.lua")
+
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
@@ -75,99 +77,10 @@ if HasCommandLineArg("/syncreplay") and HasCommandLineArg("/gpgnet") then
     IsSyncReplayServer = true
 end
 
-local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
-local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-local modOptions = import('/lua/ui/lobby/lobbyOptions.lua').modOptions
 local gameColors = import('/lua/gameColors.lua').GameColors
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 local ActiveMods = GetPreference('active_mods') or {}
-
-
--- Add lobby options from an options file given the mod's location, 
--- the mod's name, and a binary indicating if the options file uses 
--- the AI Options workaround. 
--- (This function's storage check could be changed to check for
--- duplicates in all active mods' options.)  Each time this function 
--- is called, it inserts a table that will be used to create a new 
--- section in the lobby options.  That table consists of another table
--- that consists of options (OptionData) from the options file followed 
--- by the mod's name (modName).
-function AddModOptions(ModLocation, modName, IsAIOptionsFile)
-    local OptionData
-    local alreadyStored
-    local optionsInThisOptionsFile = {}
-
-    -- try and load the option data from the mod's relevant options file
-    ok, msg = pcall(
-        function() 
-            local file
-            local data = { }
-            if IsAIOptionsFile then
-                doscript(ModLocation..'/lua/AI/LobbyOptions/lobbyoptions.lua', data)
-                OptionData = data.AIOpts 
-            else
-                doscript(ModLocation..'/mod_options.lua', data)
-                OptionData = data.options 
-            end
-        end 
-    )
-
-    -- tell us if something went wrong
-    if not ok then 
-        WARN("lobby.lua -" .. modName .. "'s options file is locked or corrupt. Skipping it.")
-        WARN(msg)
-    else
-        for s, t in OptionData do
-            -- check, if we have this option already stored
-            alreadyStored = false
-            for k, v in modOptions do
-                if v.key == t.key then
-                    alreadyStored = true
-                    break
-                end
-            end
-            if not alreadyStored then
-                table.insert(optionsInThisOptionsFile, t)
-            end
-        end
-        table.insert(modOptions, {optionsInThisOptionsFile, modName})
-    end
-end
-
--- Add lobby options from sim mods
--- This checks each mod in the mods folder.  If the mod is an enabled sim mod, 
--- it checks the mod for options files via the old AI Options workaround as well
--- as via the newer mod_options.lua file in the mod's primary folder.
--- It then calls AddModOptions once per options file (in active sim mod(s)).
--- So, each options file gets its own section in the Lobby Options list.
-function ImportModOptions()
-    modOptions = { }
-    local simMods = import('/lua/mods.lua').AllMods()
-    for Index, ModData in simMods do
-        if IsEnabledSimMod(ModData) then
-            if exists(ModData.location..'/mod_options.lua') then
-                AddModOptions(ModData.location, ModData.name, false)
-            end
-            if exists(ModData.location..'/lua/AI/LobbyOptions/lobbyoptions.lua') then 
-                AddModOptions(ModData.location, ModData.name, true)
-            end
-        end
-    end
-end
-
--- returns true if a given mod is both enabled and a sim mod (ui_only is not set to true)
-function IsEnabledSimMod(mod)
-	for UID, ActiveMod in ActiveMods do
-		if mod.uid == UID and not mod.ui_only == true then 
-			return true
-		end
-	end
-	return false
-end
-
-ImportModOptions()
 
 -- Maps faction identifiers to their names.
 local FACTION_NAMES = {[1] = "uef", [2] = "aeon", [3] = "cybran", [4] = "seraphim", [5] = "random" }
@@ -2082,7 +1995,21 @@ local function TryLaunch(skipNoObserversCheck)
 
         SetWindowedLobby(false)
 
-        OptionUtils.SetDefaults()
+        -- gather all options
+        local hierarchy = OptionUtilities.GetOptions(
+            scenarioInfo or { }, 
+            Mods.GetGameMods(Mods.GetSelectedMods())
+        )
+        local flatten = OptionUtilities.FlattenOptions(hierarchy)
+        local defaults = OptionUtilities.GetDefaultValues(flatten)
+
+        -- set the defaults
+        for key, value in defaults do 
+            if gameInfo.GameOptions[k] == nil then 
+                gameInfo.GameOptions[k] = value
+            end
+        end
+
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
         -- launch the game
@@ -3513,8 +3440,6 @@ function CreateUI(maxPlayers)
             optionsToUse = formattedOptions
         end
 
-        LOG(table.getn(optionsToUse))
-
         for i, v in GUI.OptionDisplay do
             if optionsToUse[i + self.top] then
                 SetTextLine(v, optionsToUse[i + self.top], i + self.top)
@@ -3632,9 +3557,25 @@ function CreateUI(maxPlayers)
         GUI.defaultOptions.OnClick = function()
             UIUtil.QuickDialog(GUI, LOC('<LOC options_0002>Are you sure you want to reset to default values?'),
                 "<LOC _Yes>", function()
-                    -- Return all options to their default values.
-                    OptionUtils.SetDefaults()
+
+                    -- gather all options
+                    local hierarchy = OptionUtilities.GetOptions(
+                        scenarioInfo or { },                        -- maps
+                        Mods.GetGameMods(Mods.GetSelectedMods())    -- mods
+                    )
+
+                    local flatten = OptionUtilities.FlattenOptions(hierarchy)
+                    local defaults = OptionUtilities.GetDefaultValues(flatten)
+
+                    -- set the defaults
+                    for key, value in defaults do 
+                        gameInfo.GameOptions[k] = value
+                    end
+
+                    -- unready all players
                     lobbyComm:BroadcastData({ Type = "SetAllPlayerNotReady" })
+
+                    -- sync the game
                     UpdateGame()
                 end,
 
@@ -3653,8 +3594,6 @@ function CreateUI(maxPlayers)
         GUI.randMap:Hide()
     else
         GUI.randMap.OnClick = function()
-            local randomMap
-            local mapSelectDialog
 
             autoRandMap = false
 
@@ -3957,18 +3896,11 @@ function setupChatEdit(chatPanel)
 end
 
 function RefreshOptionDisplayData(scenarioInfo)
-    local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
-    local teamOptions = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-    local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
-    if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
-        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
-    end
-    LOG("RefreshOptionDisplayData")
 
-    formattedOptions = {}
-    nonDefaultFormattedOptions = {}
+    -- captures unique 'options'
+    local preset = { }
 
-    -- Show a summary of the number of active mods.
+    -- Summary of active mods
     local modStr = false
     local modNum = table.getn(Mods.GetGameMods(gameInfo.GameMods)) or 0
     local modNumUI = table.getn(Mods.GetUiMods()) or 0
@@ -4044,11 +3976,10 @@ function RefreshOptionDisplayData(scenarioInfo)
             manualTooltipDescription = description
         }
 
-        table.insert(formattedOptions, option)
-        table.insert(nonDefaultFormattedOptions, option)
+        table.insert(preset, option)
     end
 
-    -- Update the unit restrictions display.
+    -- Unit restrictions warning
     if gameInfo.GameOptions.RestrictedCategories ~= nil then
         local restrNum = table.getn(gameInfo.GameOptions.RestrictedCategories)
         if restrNum ~= 0 then
@@ -4067,81 +3998,25 @@ function RefreshOptionDisplayData(scenarioInfo)
                 valueTooltip = 'Lobby_BuildRestrict_Option'
             }
 
-            table.insert(formattedOptions, option)
-            table.insert(nonDefaultFormattedOptions, option)
+            table.insert(preset, option)
         end
     end
 
-    -- Add an option to the formattedOption lists
-    local function addFormattedOption(optData, gameOption)
-        -- Don't show multiplayer-only options in single-player
-        if optData.mponly and singlePlayer then
-            return
-        end
-
-        -- Don't bother for options with only one value. These are usually someone trying to do
-        -- something clever with a mod or such, not "real" options we care about.
-        if table.getn(optData.values) <= 1 then
-            return
-        end
-
-        local option = {
-            text = optData.label,
-            tooltip = { text = optData.label, body = optData.help }
-        }
-
-        -- Options are stored as keys from the values array in optData. We want to display the
-        -- descriptive string in the UI, so let's go dig it out.
-
-        -- Scan the values array to find the one with the key matching our value for that option.
-        for k, val in optData.values do
-            local key = val.key or val
-
-            if key == gameOption then
-                option.key = key
-                option.value = val.text or optData.value_text
-                option.valueTooltip = {text = optData.label, body = val.help or optData.value_help}
-
-                table.insert(formattedOptions, option)
-
-                -- Add this option to the non-default set for the UI.
-                if k ~= optData.default then
-                    table.insert(nonDefaultFormattedOptions, option)
-                end
-
-                break
-            end
-        end
+    -- attempt to load a map if there isn't one
+    if not scenarioInfo and gameInfo.GameOptions.ScenarioFile and (gameInfo.GameOptions.ScenarioFile ~= "") then
+        scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
     end
 
-    local function addOptionsFrom(optionObject)
-        for index, optData in optionObject do
-            -- format it accordingly
-            local gameOption = gameInfo.GameOptions[optData.key]
-            addFormattedOption(optData, gameOption)
-        end
-    end
+    -- format the options
+    local hierarchy = OptionUtilities.GetOptions(
+        scenarioInfo or { }, 
+        Mods.GetGameMods(Mods.GetSelectedMods())
+    )
 
-    -- Add the core options to the formatted option lists
-    addOptionsFrom(globalOpts)
-    addOptionsFrom(teamOptions)
-    addOptionsFrom(AIOpts)
+    local flatten = OptionUtilities.FlattenOptions(hierarchy)
+    formattedOptions, nonDefaultFormattedOptions = OptionUtilities.ToLobbyOptions(flatten, gameInfo.GameOptions, preset, singlePlayer)
 
-    -- Add mod options
-    for i, mod in modOptions do 
-        addOptionsFrom(mod[1])
-    end
-    
-    -- Add map options, if available
-    if scenarioInfo.options then
-        if not MapUtil.ValidateScenarioOptions(scenarioInfo.options, true) then
-            AddChatText(LOC('<LOC lobui_0397>The options included in this map specified invalid defaults. See moholog for details.'))
-            AddChatText(LOC('<LOC lobui_0398>An arbitrary option has been selected for now: check the game options screen!'))
-        end
-
-        addOptionsFrom(scenarioInfo.options)
-    end
-
+    -- recompute visibility of options
     GUI.OptionContainer:CalcVisible()
 end
 
