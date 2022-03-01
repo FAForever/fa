@@ -305,35 +305,6 @@ function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectB
     end
 end
 
-function CreateDefaultBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
-    local ox, oy, oz = unpack(unitBeingBuilt:GetPosition())
-    local BeamEndEntity = Entity()
-    BuildEffectsBag:Add(BeamEndEntity)
-    Warp(BeamEndEntity, Vector(ox, oy, oz))
-
-    local BuildBeams = {}
-
-    -- Create build beams
-    if BuildEffectBones ~= nil then
-        local beamEffect = nil
-        for i, BuildBone in BuildEffectBones do
-            local beamEffect = AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, BeamBuildEmtBp)
-            table.insert(BuildBeams, beamEffect)
-            BuildEffectsBag:Add(beamEffect)
-        end
-    end
-
-    CreateEmitterOnEntity(BeamEndEntity, builder.Army, '/effects/emitters/sparks_08_emit.bp')
-    local waitTime = util.GetRandomFloat(0.3, 1.5)
-
-    while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
-        local x, y, z = builder.GetRandomOffset(unitBeingBuilt, 1)
-        Warp(BeamEndEntity, Vector(ox + x, oy + y, oz + z))
-        WaitSeconds(waitTime)
-    end
-end
-
 function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
 
     -- deprecation warning for more effcient alternative
@@ -1643,3 +1614,5 @@ PlayReclaimEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEffect
 -- @param reclaimer Unit that is reclaiming
 -- @param reclaimed Unit that is reclaimed (and no longer exists after this effect)
 PlayReclaimEndEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEndEffects
+
+CreateDefaultBuildBeams = import("/lua/EffectUtilitiesUEF.lua").CreateDefaultBuildBeams

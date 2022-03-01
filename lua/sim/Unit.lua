@@ -345,8 +345,12 @@ Unit = Class(moho.unit_methods) {
         local rx = Random() * sx - (sx * 0.5)
         local y  = Random() * sy + (self.CollisionOffsetY or 0)
         local rz = Random() * sz - (sz * 0.5)
-        local x = math.cos(heading) * rx - math.sin(heading) * rz
-        local z = math.sin(heading) * rx - math.cos(heading) * rz
+
+        local cosh = math.cos(heading)
+        local sinh = math.sin(heading)
+
+        local x = cosh * rx - sinh * rz
+        local z = sinh * rx - cosh * rz
 
         return x, y, z
     end,
@@ -4493,6 +4497,7 @@ Unit = Class(moho.unit_methods) {
             WARN("IsDead is deprecated: use unit.Dead instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
         end
+
         return self.Dead
     end,
 
