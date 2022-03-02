@@ -129,18 +129,17 @@ Shield = Class(moho.shield_methods, Entity) {
             self.CommandShield = true
         end
 
-        -- impact management
+        -- manage impact entities
         self.LiveImpactEntities = 0
 
-        -- management of overlapping shields
+        -- manage overlapping shields
         self.OverlappingShields = { }
         self.OverlappingShieldsc = 0
         self.OverlappingShieldsTick = -1
 
-        ForkThread(function()
-            WaitSeconds(1.0)
-            self:GetOverlappingShields()
-        end)
+        -- manage overspill 
+        self.DamageReduction = { }
+        self.DamageReductionTick = { }
 
         ChangeState(self, self.OnState)
     end,
@@ -334,12 +333,40 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
+
+        -- cache information used throughout the function
+        
+        local tick = GetGameTick()
+
+        -- correction for overspill damage when splash damage is involved
+
+        local instigatorId = (instigator and instigator.EntityId) or false
+        if instigatorId then 
+
+            -- check if source has applied damage this tick
+            if self.DamageReductionTick[instigatorId] == tick then 
+
+                -- if it did, reduce it from the damage that we're doing
+                amount = amount - self.DamageReduction[instigatorId]
+
+                -- if nothing is left, bail out
+                if amount < 0 then 
+                    return 
+                end
+
+            -- otherwise, inform us that we're applying damage this tick
+            else 
+                self.DamageReduction[instigatorId] = amount 
+                self.DamageReductionTick[instigatorId] = tick
+            end
+        end
+
         -- check for UnitId, so we only check the ACU Overcharge damage and not shield overspill damage
         -- when UnitId is false and EntityId is true, then we got overspill from a shield that was impacted
         -- by the splat damage of an ACU overcharge weapon.
 
         -- damage correction for overcharge
-
+        
         if dmgType == 'Overcharge' and instigator.UnitId then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
@@ -402,13 +429,13 @@ Shield = Class(moho.shield_methods, Entity) {
             local spillAmount = self.SpillOverDmgMod * amount
 
             -- retrieve shields that overlap with us
-            local others, count = self:GetOverlappingShields()
+            local others, count = self:GetOverlappingShields(tick)
 
             -- apply spill damage to neighbour shields
             for k = 1, count do 
                  
                 others[k]:ApplyDamage(
-                    self,               -- instigator
+                    instigator,         -- instigator
                     spillAmount,        -- amount
                     nil,                -- vector
                     "spill"             -- type
@@ -416,7 +443,6 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
     end,
-
 
     RegenStartThread = function(self)
         --ActiveConsumption means shield is upgrading. Upgrade has highest priority than regen and engies always assist it first
