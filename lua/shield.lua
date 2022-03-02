@@ -335,7 +335,7 @@ Shield = Class(moho.shield_methods, Entity) {
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
 
         -- cache information used throughout the function
-        
+
         local tick = GetGameTick()
 
         -- correction for overspill damage when splash damage is involved
@@ -367,7 +367,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
         -- damage correction for overcharge
         
-        if dmgType == 'Overcharge' and instigator.UnitId then
+        if dmgType == 'Overcharge' and dmgType ~= "ShieldSpill" then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
                 amount = wep:GetBlueprint().Overcharge.structureDamage * 2
@@ -388,8 +388,8 @@ Shield = Class(moho.shield_methods, Entity) {
             -- adjust shield bar
             self:UpdateShieldRatio(-1)
 
-            -- spawn impact effect, if we're not spill damage
-            if dmgType ~= "spill" then 
+            -- spawn impact effect, if we're not overspill damage
+            if dmgType ~= "ShieldSpill" then 
                 ForkThread(self.CreateImpactEffect, self, vector)
             end
 
@@ -414,7 +414,7 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- spill damage checks
+        -- overspill damage checks
 
         if 
             -- personal shields do not have overspill damage
@@ -423,22 +423,22 @@ Shield = Class(moho.shield_methods, Entity) {
             and IsEntity(instigator) 
             -- we consider damage that is 1 or lower irrelevant, typically force events
             and amount > 1 
-            -- do not recursively apply spill damage
-            and dmgType ~= "spill"
+            -- do not recursively apply overspill damage
+            and dmgType ~= "ShieldSpill"
         then 
             local spillAmount = self.SpillOverDmgMod * amount
 
             -- retrieve shields that overlap with us
             local others, count = self:GetOverlappingShields(tick)
 
-            -- apply spill damage to neighbour shields
+            -- apply overspill damage to neighbour shields
             for k = 1, count do 
                  
                 others[k]:ApplyDamage(
                     instigator,         -- instigator
                     spillAmount,        -- amount
                     nil,                -- vector
-                    "spill"             -- type
+                    "ShieldSpill"             -- type
                 )
             end
         end
