@@ -7,6 +7,10 @@
 
 Entity = Class(moho.entity_methods) {
 
+    --- Called when the entity is created
+    -- @param self The entity itself
+    -- @param spec The specifications of the entity
+    -- -  if 'spec.Owner' is set to a unit then the visibility of the entity matches that of the unit 
     __init = function(self,spec)
         _c_CreateEntity(self,spec)
     end,
