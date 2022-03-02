@@ -109,6 +109,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
         -- manage impact entities
         self.LiveImpactEntities = 0
+        self.ImpactEntitySpecs = { Owner = self.Owner }
 
         -- manage overlapping shields
         self.OverlappingShields = { }
@@ -532,7 +533,7 @@ Shield = Class(moho.shield_methods, Entity) {
         local d = MathSqrt(x * x + y * y + z * z)
 
         -- allocate an entity
-        local entity = Entity()
+        local entity = Entity( self.ImpactEntitySpecs )
         Warp(entity, self:GetPosition())
 
         -- set the impact mesh and scale it accordingly
