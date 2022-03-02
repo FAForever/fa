@@ -251,6 +251,9 @@ Shield = Class(moho.shield_methods, Entity) {
         self.ShieldVerticalOffset = offset
     end,
 
+    --- Property to set the diameter of the shield
+    -- @param self A shield
+    -- @param size The new diameter of the shield
     SetSize = function(self, size)
         self.Size = size
     end,
