@@ -47,27 +47,6 @@ end
 -- cache categories computation for overspill calculations
 local CategoriesOverspill = (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK
 
--- test, remove when done
-local debugCenter = {0, 0, 0}
-local debugDiameter = 0
-local debugUnits = { }
-local thread = false 
-
-local function RenderCirclesOnUnits()
-    LOG("RenderCirclesOnUnits")
-    while true do 
-
-        DrawCircle(debugCenter, 0.5 * debugDiameter, "aaaaaa")
-
-        for k, unit in debugUnits do 
-            DrawCircle(unit:GetPosition(), 5, "ffffff")
-        end
-
-        WaitSeconds(0.1)
-    end
-end
-
-
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
@@ -147,10 +126,6 @@ Shield = Class(moho.shield_methods, Entity) {
     -- @param self A shield that we're computing the overlapping shields for
     -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cash
     GetOverlappingShields = function(self, tick)
-
-        -- if not thread then 
-        --     thread = ForkThread(RenderCirclesOnUnits)
-        -- end
 
         -- allow the game tick to be send to us, saves cycles
         tick = tick or GetGameTick()
