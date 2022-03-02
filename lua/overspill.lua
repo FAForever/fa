@@ -10,9 +10,16 @@ local overspills = {}
 
 -- Find all shields overlapping the source entity
 function GetOverlappingShields(source)
-    local adjacentShields = {}
+
+    if not thread then 
+        thread = ForkThread(RenderCirclesOnUnits)
+    end
+
+    local adjacentShields = { }
     local brain = source.Owner:GetAIBrain()
     local units = brain:GetUnitsAroundPoint((categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK, source.Owner:GetPosition(), largestShieldDiameter, 'Ally')
+    debugUnits = units 
+    
     local pos = source:GetCachePosition()
     local OverlapRadius = 0.98 * (source.Size / 2) -- Size is diameter, dividing by 2 to get radius
 

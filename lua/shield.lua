@@ -30,6 +30,45 @@ local DEFAULT_OPTIONS = {
     PassOverkillDamage = false,
 }
 
+-- scan blueprints for the largest shield radius
+LargestShieldDiameter = 0
+for k, bp in __blueprints do 
+    -- check for blueprints that have a shield and a shield size set
+    if bp.Defense and bp.Defense.Shield and bp.Defense.Shield.ShieldSize then 
+        -- skip Aeon palace and UEF shield boat as they skew the results
+        if not (bp.BlueprintId == "xac2101" or bp.BlueprintId == "xes0205") then 
+            local size = bp.Defense.Shield.ShieldSize
+            if size > LargestShieldDiameter then 
+                LargestShieldDiameter = size
+            end
+        end
+    end
+end
+
+-- cache categories computation for overspill calculations
+local CategoriesOverspill = (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK
+
+-- test, remove when done
+local debugCenter = {0, 0, 0}
+local debugDiameter = 0
+local debugUnits = { }
+local thread = false 
+
+local function RenderCirclesOnUnits()
+    LOG("RenderCirclesOnUnits")
+    while true do 
+
+        DrawCircle(debugCenter, 0.5 * debugDiameter, "aaaaaa")
+
+        for k, unit in debugUnits do 
+            DrawCircle(unit:GetPosition(), 5, "ffffff")
+        end
+
+        WaitSeconds(0.1)
+    end
+end
+
+
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
@@ -57,7 +96,6 @@ Shield = Class(moho.shield_methods, Entity) {
             self.ImpactEffects = {}
         end
 
-        LOG(spec.Size)
         self:SetSize(spec.Size)
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self, spec.ShieldMaxHealth)
@@ -94,7 +132,114 @@ Shield = Class(moho.shield_methods, Entity) {
         -- impact management
         self.LiveImpactEntities = 0
 
+        -- management of overlapping shields
+        self.OverlappingShields = { }
+        self.OverlappingShieldsc = 0
+        self.OverlappingShieldsTick = -1
+
+        ForkThread(function()
+            WaitSeconds(1.0)
+            self:GetOverlappingShields()
+        end)
+
         ChangeState(self, self.OnState)
+    end,
+
+    --- Retrieves allied shields that overlap with this shield, caches the results per tick
+    -- @param self A shield that we're computing the overlapping shields for
+    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cash
+    GetOverlappingShields = function(self, tick)
+
+        -- if not thread then 
+        --     thread = ForkThread(RenderCirclesOnUnits)
+        -- end
+
+        -- allow the game tick to be send to us, saves cycles
+        tick = tick or GetGameTick()
+
+        -- see if we need to re-compute the overlapping shields as the information we're requesting is of a different tick
+        if tick ~= self.OverlappingShieldsTick then 
+            self.OverlappingShieldsTick = tick 
+
+            local brain = self.Owner:GetAIBrain()
+            local position = self.Owner:GetPosition() -- why not self:GetPosition()?
+            -- debugCenter = position 
+
+            -- diameter where other shields overlap with us or are contained by us
+            local diameter = LargestShieldDiameter + self.Size
+            -- debugDiameter = diameter
+
+            -- retrieve candidate units
+            local units = brain:GetUnitsAroundPoint(CategoriesOverspill, position, 0.5 * diameter, 'Ally')
+
+            if units then 
+
+                -- allocate locals once
+                local shieldOther
+                local radiusOther
+                local distanceToOverlap
+                local osx, osy, osz
+                local d, dx, dy, dz 
+                
+                -- compute our information only once
+                local psx, psy, psz = self:GetPositionXYZ()
+                local radius = 0.5 * self.Size
+
+                local head = 1 
+                for k, other in units do 
+
+                    -- store reference to reduce table lookups
+                    shieldOther = other.MyShield
+
+                    -- check if it is a different unti and that it has an active shield with a radius
+                    -- larger than 0, as engine defaults shield table to 0
+                    if      shieldOther 
+                        and shieldOther:IsUp()
+                        and shieldOther.Size
+                        and shieldOther.Size > 0 
+                        and self.Owner.EntityId ~= other.EntityId 
+                    then 
+
+                        -- compute radius of shield
+                        radiusOther = 0.5 * shieldOther.Size
+
+                        -- compute total distance to overlap and square it to prevent a square root
+                        distanceToOverlap = radius + radiusOther 
+                        distanceToOverlap = distanceToOverlap * distanceToOverlap
+
+                        -- retrieve position of other shield
+                        osx, osy, osz = shieldOther:GetPositionXYZ()
+
+                        -- compute vector from self to other
+                        dx = osx - psx 
+                        dy = osy - psy 
+                        dz = osz - psz
+
+                        -- compute squared distance and check it
+                        d = dx * dx + dy * dy + dz * dz
+                        if d < distanceToOverlap then 
+                            self.OverlappingShields[head] = shieldOther 
+                            head = head + 1
+                        end
+                    end
+                end
+
+                -- debugging
+                -- debugUnits = { }
+                -- for k = 1, head - 1 do 
+                --     debugUnits[k] = self.OverlappingShields[k]
+                -- end 
+
+                -- keep track of the number of adjacent shields
+                self.OverlappingShieldsc = head - 1
+            else 
+                -- no units found
+                self.OverlappingShieldsc = 0
+            end
+        end
+
+        -- return the shields in question
+        return self.OverlappingShields, self.OverlappingShieldsc
     end,
 
     SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
@@ -182,13 +327,16 @@ Shield = Class(moho.shield_methods, Entity) {
     OnDamage = function(self, instigator, amount, vector, dmgType)
         -- Only called when a shield is directly impacted, so not for Personal Shields
         -- This means personal shields never have ApplyDamage called with doOverspill as true
-        self:ApplyDamage(instigator, amount, vector, dmgType, false)
+        self:ApplyDamage(instigator, amount, vector, dmgType, true)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
         -- check for UnitId, so we only check the ACU Overcharge damage and not shield overspill damage
         -- when UnitId is false and EntityId is true, then we got overspill from a shield that was impacted
         -- by the splat damage of an ACU overcharge weapon.
+
+        -- damage correction for overcharge
+
         if dmgType == 'Overcharge' and instigator.UnitId then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
@@ -198,21 +346,34 @@ Shield = Class(moho.shield_methods, Entity) {
                 amount = wep:GetBlueprint().Overcharge.commandDamage
             end
         end
+
+        -- do damage logic, but we can't do self-damage
+
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
-            -- self:AdjustHealth(instigator, -absorbed)
+            -- take some damage
+            self:AdjustHealth(instigator, -absorbed)
+
+            -- adjust shield bar
             self:UpdateShieldRatio(-1)
 
-            ForkThread(self.CreateImpactEffect, self, vector)
+            -- spawn impact effect, if we're not spill damage
+            if dmgType ~= "spill" then 
+                ForkThread(self.CreateImpactEffect, self, vector)
+            end
 
-
+            -- stop us from regenerating, we took damage
             if self.RegenThread then
                 KillThread(self.RegenThread)
                 self.RegenThread = nil
             end
+
+            -- if we have no health, collapse
             if self:GetHealth() <= 0 then
                 ChangeState(self, self.DamageRechargeState)
+
+            -- if we do have health, start the delay before we regenerate health
             elseif self.OffHealth < 0 then
                 if self.RegenRate > 0 then
                     self.RegenThread = ForkThread(self.RegenStartThread, self)
@@ -223,13 +384,36 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- Only do overspill on events where we have an instigator.
-        -- "Force" damage events from stratbombs are one example
-        -- where we don't.
-        if doOverspill and IsEntity(instigator) then
-            Overspill.DoOverspill(self, instigator, amount, dmgType, self.SpillOverDmgMod)
+        -- spill damage checks
+
+        if 
+            -- personal shields do not have overspill damage
+            doOverspill 
+            -- we consider damage without an instigator irrelevant, typically force events
+            and IsEntity(instigator) 
+            -- we consider damage that is 1 or lower irrelevant, typically force events
+            and amount > 1 
+            -- do not recursively apply spill damage
+            and dmgType ~= "spill"
+        then 
+            local spillAmount = self.SpillOverDmgMod * amount
+
+            -- retrieve shields that overlap with us
+            local others, count = self:GetOverlappingShields()
+
+            -- apply spill damage to neighbour shields
+            for k = 1, count do 
+                 
+                others[k]:ApplyDamage(
+                    self,               -- instigator
+                    spillAmount,        -- amount
+                    nil,                -- vector
+                    "spill"             -- type
+                )
+            end
         end
     end,
+
 
     RegenStartThread = function(self)
         --ActiveConsumption means shield is upgrading. Upgrade has highest priority than regen and engies always assist it first
