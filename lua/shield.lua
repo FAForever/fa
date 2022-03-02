@@ -6,7 +6,6 @@
 ------------------------------------------------------------------
 
 local Entity = import('/lua/sim/Entity.lua').Entity
-local Overspill = import('/lua/overspill.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
@@ -338,7 +337,19 @@ Shield = Class(moho.shield_methods, Entity) {
 
         local tick = GetGameTick()
 
-        -- correction for overspill damage when splash damage is involved
+        -- damage correction for overcharge
+        
+        if dmgType == 'Overcharge' and dmgType ~= "ShieldSpill" then
+            local wep = instigator:GetWeaponByLabel('OverCharge')
+            if self.StaticShield then -- fixed damage for static shields
+                amount = wep:GetBlueprint().Overcharge.structureDamage * 2
+                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
+            elseif self.CommandShield then --fixed damage for all ACU shields
+                amount = wep:GetBlueprint().Overcharge.commandDamage
+            end
+        end
+
+        -- damage correction for overspill
 
         local instigatorId = (instigator and instigator.EntityId) or false
         if instigatorId then 
@@ -364,23 +375,7 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- check for UnitId, so we only check the ACU Overcharge damage and not shield overspill damage
-        -- when UnitId is false and EntityId is true, then we got overspill from a shield that was impacted
-        -- by the splat damage of an ACU overcharge weapon.
-
-        -- damage correction for overcharge
-        
-        if dmgType == 'Overcharge' and dmgType ~= "ShieldSpill" then
-            local wep = instigator:GetWeaponByLabel('OverCharge')
-            if self.StaticShield then -- fixed damage for static shields
-                amount = wep:GetBlueprint().Overcharge.structureDamage * 2
-                -- Static shields absorbing 50% OC damage somehow, I don't want to change anything anywhere so just *2.
-            elseif self.CommandShield then --fixed damage for all ACU shields
-                amount = wep:GetBlueprint().Overcharge.commandDamage
-            end
-        end
-
-        -- do damage logic, but we can't do self-damage
+        -- do damage logic for shield
 
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
