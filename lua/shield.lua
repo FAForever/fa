@@ -354,6 +354,9 @@ Shield = Class(moho.shield_methods, Entity) {
                     return 
                 end
 
+                -- further reduce future damage
+                self.DamageReduction[instigatorId] = self.DamageReduction[instigatorId] + amount 
+
             -- otherwise, inform us that we're applying damage this tick
             else 
                 self.DamageReduction[instigatorId] = amount 
@@ -438,7 +441,8 @@ Shield = Class(moho.shield_methods, Entity) {
                     instigator,         -- instigator
                     spillAmount,        -- amount
                     nil,                -- vector
-                    "ShieldSpill"             -- type
+                    "ShieldSpill",      -- type
+                    false               -- do overspill
                 )
             end
         end
