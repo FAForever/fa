@@ -113,7 +113,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
         -- manage overlapping shields
         self.OverlappingShields = { }
-        self.OverlappingShieldsc = 0
+        self.OverlappingShieldsCount = 0
         self.OverlappingShieldsTick = -1
 
         -- manage overspill 
@@ -205,15 +205,15 @@ Shield = Class(moho.shield_methods, Entity) {
                 -- end 
 
                 -- keep track of the number of adjacent shields
-                self.OverlappingShieldsc = head - 1
+                self.OverlappingShieldsCount = head - 1
             else 
                 -- no units found
-                self.OverlappingShieldsc = 0
+                self.OverlappingShieldsCount = 0
             end
         end
 
         -- return the shields in question
-        return self.OverlappingShields, self.OverlappingShieldsc
+        return self.OverlappingShields, self.OverlappingShieldsCount
     end,
 
     SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
@@ -507,7 +507,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- allow us to bail out if there are too many impact effects for this shield
-        local r = Random(1, 2 * self.Size)
+        local r = Random(1, self.Size)
         if 
             -- always spawn if we have less than 10 live impact entities
             (self.LiveImpactEntities > 10) and 
