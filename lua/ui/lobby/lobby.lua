@@ -2365,7 +2365,7 @@ function ShowGameQuality()
     end
 
     -- Rating only meaningful in games with 2 teams
-    if table.getn(teams:getTeams()) ~= 2 then
+    if table.getsize(teams:getTeams()) ~= 2 then
         return
     end
 
