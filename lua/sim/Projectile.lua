@@ -10,7 +10,25 @@ local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
+local function PopulateProjectileCache(projectile, blueprint)
+
+    -- populate the cache
+    local cache = { }
+    cache.Blueprint = blueprint 
+    cache.Categories = table.hash(blueprint.Categories)
+    cache.CollideFriendlyShield = blueprint.Physics.CollideFriendlyShield
+
+    -- store the result
+    local meta = getmetatable(projectile)
+    meta.BlueprintCache = cache
+
+    SPEW("Populated meta cache for projectile: " .. tostring(blueprint.BlueprintId))
+end
+
 Projectile = Class(moho.projectile_methods, Entity) {
+
+    BlueprintCache = false,
+
     PassDamageData = function(self, DamageData)
         self.DamageData.DamageRadius = DamageData.DamageRadius
         self.DamageData.DamageAmount = DamageData.DamageAmount
@@ -121,6 +139,17 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCreate = function(self, inWater)
+
+        local bp = self:GetBlueprint()
+
+        -- populate blueprint cache if we haven't done that yet
+        if not self.BlueprintCache then 
+            PopulateProjectileCache(self, bp)
+        end
+
+        -- copy reference from meta table to inner table
+        self.BlueprintCache = self.BlueprintCache
+
         self.DamageData = {
             DamageRadius = nil,
             DamageAmount = nil,
@@ -129,9 +158,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
             MetaImpactAmount = nil,
             MetaImpactRadius = nil,
         }
+
         self.Army = self:GetArmy()
         self.Trash = TrashBag()
-        local bp = self:GetBlueprint()
         self:SetMaxHealth(bp.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
         local snd = bp.Audio.ExistLoop
@@ -489,8 +518,24 @@ Projectile = Class(moho.projectile_methods, Entity) {
 --- A dummy projectile that solely inherits what it needs. Useful for 
 -- effects that require projectiles without additional overhead.
 DummyProjectile = Class(moho.projectile_methods, Entity) {
-    -- the only things we need
+
+    BlueprintCache = false,
+
     __init = function(self, spec) end,
     __post_init = function(self, spec) end,
-    OnCreate = function(self, inWater) end,
+    OnCreate = function(self, inWater) 
+
+        local bp = self:GetBlueprint()
+
+        -- populate blueprint cache if we haven't done that yet
+        if not self.BlueprintCache then 
+            PopulateProjectileCache(self, bp)
+        end
+
+        -- copy reference from meta table to inner table
+        self.BlueprintCache = self.BlueprintCache
+
+        -- expected to be cached by all projectiles
+        self.Army = self:GetArmy()
+    end,
 }

@@ -263,26 +263,6 @@ Shield = Class(moho.shield_methods, Entity) {
         return math.min(self:GetHealth(), amount)
     end,
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
-                return false
-            end
-        end
-        -- Check DNC list
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
-
     GetOverkill = function(self, instigator, amount, type)
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
@@ -553,12 +533,20 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     -- Return true to process this collision, false to ignore it.
+    -- @param self Shield we're checking the collision for
+    -- @param other Projectile that we're checking the collision with
     OnCollisionCheck = function(self, other)
+
+        -- neutral projectiles never collide
         if other.Army == -1 then
             return false
         end
 
-        if EntityCategoryContains(categories.SHIELDCOLLIDE, other) then
+        -- cache categories of projectile for performance
+        local otherCategories = other.BlueprintCache.Categories 
+
+        -- special behavior for projectiles attached to planes
+        if otherCategories['SHIELDCOLLIDE'] then
             if other.ShieldImpacted then
                 return false
             else
@@ -569,16 +557,17 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- Allow strategic nuke missile to penetrate shields
-        if EntityCategoryContains(categories.STRATEGIC, other) and
-            EntityCategoryContains(categories.MISSILE, other) then
+        -- special behavior for projectiles that represent strategic missiles
+        if otherCategories['STRATEGIC'] and otherCategories['MISSILE'] then
             return false
         end
 
-        if other:GetBlueprint().Physics.CollideFriendlyShield then
+        -- special behavior for projectiles that always collide with shields
+        if other.CollideFriendlyShield then
             return true
         end
 
+        -- otherwise, only collide if we're hostile to the other army
         return IsEnemy(self.Army, other.Army)
     end,
 
@@ -832,6 +821,29 @@ Shield = Class(moho.shield_methods, Entity) {
             return false
         end,
     },
+
+    --- Deprecated functionality
+    -- Various functionality of shields that is deprecated or appears to be deprecated
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        local weaponBP = firingWeapon:GetBlueprint()
+        local collide = weaponBP.CollideFriendly
+        if collide == false then
+            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
+                return false
+            end
+        end
+        -- Check DNC list
+        if weaponBP.DoNotCollideList then
+            for _, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end,
 }
 
 --- A bubble shield attached to a single unit.
