@@ -187,9 +187,10 @@ Projectile = Class(moho.projectile_methods, Entity) {
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
-        -- If we return false the thing hitting us has no idea that it came into contact with us.
-        -- By default, anything hitting us should know about it so we return true.
-        if self.Army == other.Army then return false end
+        -- bail out immediately
+        if self.Army == other.Army then 
+            return false 
+        end
 
         if EntityCategoryContains(CategoriesDoNotCollide, self) and EntityCategoryContains(CategoriesDoNotCollide, other) then
             return false

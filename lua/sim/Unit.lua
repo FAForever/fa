@@ -3809,62 +3809,41 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    GetSoundEntity = function(self, type)
-        -- these may not be initialised yet
-        self.Sounds = self.Sounds or { }
-        self.SoundEntities = self.SoundEntities or { }
+    -------------------------------------------------------------------------------------------
+    -- Sound
+    -------------------------------------------------------------------------------------------
 
-        local entity = self.Sounds[type]
-        if not self.Sounds[type] then
-            if self.SoundEntities[1] then
-                entity = table.remove(self.SoundEntities, 1)
-            else
-                entity = Entity()
-                Warp(entity, self:GetPosition())
-                entity:AttachTo(self, -1)
-                self.Trash:Add(entity)
-            end
-            self.Sounds[type] = entity
-        end
-
-        return self.Sounds[type]
-    end,
-
+    --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
+    -- @param self A unit
+    -- @param sound A string identifier that represents the sound to be played.
     PlayUnitSound = function(self, sound)
         local audio = self.Audio[sound]
         if not audio then 
-            return 
+            return false
         end
 
-        self:GetSoundEntity('UnitSound'):PlaySound(audio)
-
+        self:PlaySound(audio)
         return true
     end,
 
+    --- Plays an ambient sound using the unit as a source. Returns true if successful, false otherwise
+    -- @param self A unit
+    -- @param sound A string identifier that represents the ambient sound to be played.
     PlayUnitAmbientSound = function(self, sound)
         local audio = self.Audio[sound]
         if not audio then 
-            return 
+            return false
         end
 
-        self:GetSoundEntity('Ambient' .. sound):SetAmbientSound(audio, nil)
+        self:SetAmbientSound(audio, nil)
+        return true 
     end,
 
-    StopUnitAmbientSound = function(self, sound)
-        -- these may not be initialised yet
-        self.Sounds = self.Sounds or { }
-        self.SoundEntities = self.SoundEntities or { }
-
-        if not self.Audio[sound] then return end
-
-        local type = 'Ambient' .. sound
-        local entity = self:GetSoundEntity(type)
-        if entity and not entity:BeenDestroyed() then
-            self.Sounds[type] = nil
-            entity:SetAmbientSound(nil, nil)
-            self.SoundEntities = self.SoundEntities
-            table.insert(self.SoundEntities, entity)
-        end
+    --- Stops playing the ambient sound that is currently being played.
+    -- @param self A unit
+    StopUnitAmbientSound = function(self)
+        self:SetAmbientSound(nil, nil)
+        return true
     end,
 
     -------------------------------------------------------------------------------------------
