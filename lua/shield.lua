@@ -10,7 +10,10 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
 local VectorCached = Vector(0, 0, 0)
+
+-- upvalue for performance
 local MathSqrt = math.sqrt
+local IsEnemy = IsEnemy
 
 
 -- Default values for a shield specification table (to be passed to native code)
