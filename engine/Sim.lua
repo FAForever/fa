@@ -285,7 +285,11 @@ function DebugGetSelection()
 end
 
 --- Draw a 3d circle at a with size s and color c.
--- TODO.
+
+-- Draws a circle at a given location with a given diameter and color
+-- @param position An array-based table { 0, 0, 0 } that represents a position
+-- @param diameter Diameter of the circle
+-- @param color Color of the circle
 function DrawCircle()
 end
 
