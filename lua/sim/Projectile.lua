@@ -25,6 +25,9 @@ local function PopulateProjectileCache(projectile, blueprint)
     SPEW("Populated meta cache for projectile: " .. tostring(blueprint.BlueprintId))
 end
 
+-- cache categories computations
+local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
+
 Projectile = Class(moho.projectile_methods, Entity) {
 
     BlueprintCache = false,
@@ -176,8 +179,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         -- By default, anything hitting us should know about it so we return true.
         if self.Army == other.Army then return false end
 
-        local dnc_cats = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
-        if EntityCategoryContains(dnc_cats, self) and EntityCategoryContains(dnc_cats, other) then
+        if EntityCategoryContains(CategoriesDoNotCollide, self) and EntityCategoryContains(CategoriesDoNotCollide, other) then
             return false
         end
 

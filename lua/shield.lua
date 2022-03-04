@@ -44,7 +44,7 @@ for k, bp in __blueprints do
     end
 end
 
--- cache categories computation for overspill calculations
+-- cache categories computations
 local CategoriesOverspill = (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK
 
 Shield = Class(moho.shield_methods, Entity) {
