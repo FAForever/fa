@@ -198,12 +198,6 @@ Shield = Class(moho.shield_methods, Entity) {
                     end
                 end
 
-                -- debugging
-                -- debugUnits = { }
-                -- for k = 1, head - 1 do 
-                --     debugUnits[k] = self.OverlappingShields[k]
-                -- end 
-
                 -- keep track of the number of adjacent shields
                 self.OverlappingShieldsCount = head - 1
             else 
@@ -362,8 +356,12 @@ Shield = Class(moho.shield_methods, Entity) {
             -- adjust shield bar
             self:UpdateShieldRatio(-1)
 
-            -- spawn impact effect, if we're not overspill damage
-            if dmgType ~= "ShieldSpill" then 
+            -- check to spawn impact effect
+            local r = Random(1, self.Size)
+            if  dmgType ~= "ShieldSpill"
+                and not (       self.LiveImpactEntities > 10
+                            and (r >= 0.2 * self.Size and r < self.LiveImpactEntities))
+            then 
                 ForkThread(self.CreateImpactEffect, self, vector)
             end
 
@@ -407,7 +405,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- apply overspill damage to neighbour shields
             for k = 1, count do 
-                 
                 others[k]:ApplyDamage(
                     instigator,         -- instigator
                     spillAmount,        -- amount
@@ -501,23 +498,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
     CreateImpactEffect = function(self, vector)
 
-        -- bail out if we're a gooner
-        if not self or self.Owner.Dead then 
-            return 
-        end
-
-        -- allow us to bail out if there are too many impact effects for this shield
-        local r = Random(1, self.Size)
-        if 
-            -- always spawn if we have less than 10 live impact entities
-            (self.LiveImpactEntities > 10) and 
-
-            -- spawn based on chance, always give us a tiny chance
-            (r >= 0.2 * self.Size and r < self.LiveImpactEntities)
-        then 
-            return 
-        end
-
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -554,7 +534,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- hold up a bit
-        WaitSeconds(2 + 0.05 * r)
+        WaitSeconds(2)
 
         -- take out the entity again
         entity:Destroy()
@@ -1034,6 +1014,10 @@ PersonalShield = Class(Shield){
 
         self.PassOverkillDamage = spec.PassOverkillDamage
 
+        -- manage impact entities
+        self.LiveImpactEntities = 0
+        self.ImpactEntitySpecs = { Owner = self.Owner }
+
         ChangeState(self, self.OnState)
     end,
 
@@ -1051,6 +1035,9 @@ PersonalShield = Class(Shield){
     end,
 
     CreateImpactEffect = function(self, vector)
+
+        self.LiveImpactEntities = self.LiveImpactEntities + 1
+
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactEnt = Entity {Owner = self.Owner}
 
@@ -1063,6 +1050,7 @@ PersonalShield = Class(Shield){
         WaitSeconds(1)
 
         ImpactEnt:Destroy()
+        self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
     CreateShieldMesh = function(self)
@@ -1172,12 +1160,18 @@ CzarShield = Class(PersonalShield) {
 
         self.PassOverkillDamage = spec.PassOverkillDamage
 
+        -- manage impact entities
+        self.LiveImpactEntities = 0
+        self.ImpactEntitySpecs = { Owner = self.Owner }
+
         ChangeState(self, self.OnState)
     end,
 
 
     CreateImpactEffect = function(self, vector)
-        if not self or self.Owner.Dead then return end
+
+        self.LiveImpactEntities = self.LiveImpactEntities + 1
+
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
@@ -1213,6 +1207,7 @@ CzarShield = Class(PersonalShield) {
 
         WaitSeconds(5)
         ImpactMesh:Destroy()
+        self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
     CreateShieldMesh = function(self)
