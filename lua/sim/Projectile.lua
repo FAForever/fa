@@ -37,8 +37,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.DamageData.CollideFriendly = DamageData.CollideFriendly
         self.DamageData.DoTTime = DamageData.DoTTime
         self.DamageData.DoTPulses = DamageData.DoTPulses
-        self.DamageData.MetaImpactAmount = DamageData.MetaImpactAmount
-        self.DamageData.MetaImpactRadius = DamageData.MetaImpactRadius
         self.DamageData.Buffs = DamageData.Buffs
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
@@ -154,9 +152,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
             DamageRadius = nil,
             DamageAmount = nil,
             DamageType = nil,
-            DamageFriendly = nil,
-            MetaImpactAmount = nil,
-            MetaImpactRadius = nil,
+            DamageFriendly = nil
         }
 
         self.Army = self:GetArmy()
@@ -249,14 +245,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self:Destroy()
     end,
 
-    DoMetaImpact = function(self, damageData)
-        if damageData.MetaImpactRadius and damageData.MetaImpactAmount then
-            local pos = self:GetPosition()
-            pos[2] = GetSurfaceHeight(pos[1], pos[3])
-            MetaImpact(self, pos, damageData.MetaImpactRadius, damageData.MetaImpactAmount)
-        end
-    end,
-
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -327,9 +315,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         -- Do Damage
         self:DoDamage(instigator, damageData, targetEntity)
-
-        -- Meta-Impact
-        self:DoMetaImpact(damageData)
 
         -- Buffs (Stun, etc)
         self:DoUnitImpactBuffs(targetEntity)
