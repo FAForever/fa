@@ -543,10 +543,10 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- cache categories of projectile for performance
-        local otherCategories = other.BlueprintCache.HashedCats
+        local otherHashedCats = other.BlueprintCache.HashedCats
 
         -- special behavior for projectiles attached to planes
-        if otherCategories['SHIELDCOLLIDE'] then
+        if otherHashedCats['SHIELDCOLLIDE'] then
             if other.ShieldImpacted then
                 return false
             else
@@ -558,7 +558,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- special behavior for projectiles that represent strategic missiles
-        if otherCategories['STRATEGIC'] and otherCategories['MISSILE'] then
+        if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
             return false
         end
 

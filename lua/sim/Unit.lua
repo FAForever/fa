@@ -32,9 +32,11 @@ local DeprecatedWarnings = { }
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
--- Localised category operations for performance
+-- cached categories for performance
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
+-- upvalues for performance
+local IsAlly = IsAlly
 
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
@@ -1556,10 +1558,8 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- if we're allied, check if we allow allied collisions
-        if other.BlueprintCache.HashedCats['PROJECTILE'] then
-            if IsAlly(self.Army, other.Army) then
-                return other.CollideFriendly
-            end
+        if self.Army == other.Army or IsAlly(self.Army, other.Army) then
+            return other.CollideFriendly
         end
 
         -- check for exclusions from projectile perspective
