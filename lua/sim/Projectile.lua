@@ -10,19 +10,27 @@ local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
-local function PopulateProjectileCache(projectile, blueprint)
+local function PopulateBlueprintCache(projectile, blueprint)
 
     -- populate the cache
     local cache = { }
     cache.Blueprint = blueprint 
-    cache.Categories = table.hash(blueprint.Categories)
+
+    cache.Cats = blueprint.Categories or { }
+    cache.CatsCount = table.getn(cache.Cats)
+    cache.HashedCats = table.hash(cache.Cats)
+
+    cache.DoNotCollideCats = blueprint.DoNotCollideList or { }
+    cache.DoNotCollideCatsCount = table.getn(cache.DoNotCollideCats)
+    cache.HashedDoNotCollideCats = table.hash(cache.DoNotCollideCats)
+
     cache.CollideFriendlyShield = blueprint.Physics.CollideFriendlyShield
 
     -- store the result
     local meta = getmetatable(projectile)
     meta.BlueprintCache = cache
 
-    SPEW("Populated meta cache for projectile: " .. tostring(blueprint.BlueprintId))
+    SPEW("Populated blueprint cache for projectile: " .. tostring(blueprint.BlueprintId))
 end
 
 -- cache categories computations
@@ -145,7 +153,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         -- populate blueprint cache if we haven't done that yet
         if not self.BlueprintCache then 
-            PopulateProjectileCache(self, bp)
+            PopulateBlueprintCache(self, bp)
         end
 
         -- copy reference from meta table to inner table
@@ -174,14 +182,24 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
     end,
 
+    --- Called when a projectile collides with another projectile to check if the collision is valid. An example is a tactical missile defense
+    -- @param self The projectile we're checking the collision for
+    -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
+        LOG("OnCollisionCheck")
+
         -- If we return false the thing hitting us has no idea that it came into contact with us.
         -- By default, anything hitting us should know about it so we return true.
         if self.Army == other.Army then return false end
 
+
+        LOG(repr(other:GetBlueprint().BlueprintId))
+
         if EntityCategoryContains(CategoriesDoNotCollide, self) and EntityCategoryContains(CategoriesDoNotCollide, other) then
             return false
         end
+
+
 
         if other:GetBlueprint().Physics.HitAssignedTarget and other:GetTrackingTarget() ~= self then
             return false
@@ -289,6 +307,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
+        LOG("OnCollisionCheckWeapon")
         if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
             return false
         end
@@ -516,7 +535,7 @@ DummyProjectile = Class(moho.projectile_methods, Entity) {
 
         -- populate blueprint cache if we haven't done that yet
         if not self.BlueprintCache then 
-            PopulateProjectileCache(self, bp)
+            PopulateBlueprintCache(self, bp)
         end
 
         -- copy reference from meta table to inner table

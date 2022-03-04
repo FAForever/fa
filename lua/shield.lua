@@ -532,9 +532,9 @@ Shield = Class(moho.shield_methods, Entity) {
         ChangeState(self, self.DeadState)
     end,
 
-    -- Return true to process this collision, false to ignore it.
-    -- @param self Shield we're checking the collision for
-    -- @param other Projectile that we're checking the collision with
+    --- Called when a shield collides with a projectile to check if the collision is valid
+    -- @param self The shield we're checking the collision for
+    -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
         -- neutral projectiles never collide
@@ -543,7 +543,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- cache categories of projectile for performance
-        local otherCategories = other.BlueprintCache.Categories 
+        local otherCategories = other.BlueprintCache.HashedCats
 
         -- special behavior for projectiles attached to planes
         if otherCategories['SHIELDCOLLIDE'] then
