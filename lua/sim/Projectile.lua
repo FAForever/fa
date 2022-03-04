@@ -10,7 +10,7 @@ local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
-local function PopulateBlueprintCache(projectile, blueprint)
+local function PopulateBlueprintCache(entity, blueprint)
 
     -- populate the cache
     local cache = { }
@@ -27,7 +27,7 @@ local function PopulateBlueprintCache(projectile, blueprint)
     cache.CollideFriendlyShield = blueprint.Physics.CollideFriendlyShield
 
     -- store the result
-    local meta = getmetatable(projectile)
+    local meta = getmetatable(entity)
     meta.BlueprintCache = cache
 
     SPEW("Populated blueprint cache for projectile: " .. tostring(blueprint.BlueprintId))

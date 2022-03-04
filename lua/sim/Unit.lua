@@ -1556,7 +1556,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- if we're allied, check if we allow allied collisions
-        if other.BlueprintCache.Categories['PROJECTILE'] then
+        if other.BlueprintCache.HashedCats['PROJECTILE'] then
             if IsAlly(self.Army, other.Army) then
                 return other.CollideFriendly
             end
