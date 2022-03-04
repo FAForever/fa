@@ -186,20 +186,14 @@ Projectile = Class(moho.projectile_methods, Entity) {
     -- @param self The projectile we're checking the collision for
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-        LOG("OnCollisionCheck")
 
         -- If we return false the thing hitting us has no idea that it came into contact with us.
         -- By default, anything hitting us should know about it so we return true.
         if self.Army == other.Army then return false end
 
-
-        LOG(repr(other:GetBlueprint().BlueprintId))
-
         if EntityCategoryContains(CategoriesDoNotCollide, self) and EntityCategoryContains(CategoriesDoNotCollide, other) then
             return false
         end
-
-
 
         if other:GetBlueprint().Physics.HitAssignedTarget and other:GetTrackingTarget() ~= self then
             return false
