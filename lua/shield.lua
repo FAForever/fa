@@ -552,7 +552,13 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        if      -- our projectiles do not collide with our shields, with the exception of air planes that are crashing
+        -- special behavior for projectiles that always collide with 
+        -- shields, like the seraphim storm when the Ythotha dies
+        if other.CollideFriendlyShield then
+            return true
+        end
+
+        if      -- our projectiles do not collide with our shields
                 self.Army == other.Army
                 -- neutral projectiles do not collide with any shields
             or  other.Army == -1 
@@ -560,10 +566,7 @@ Shield = Class(moho.shield_methods, Entity) {
             return false
         end
 
-        -- special behavior for projectiles that always collide with shields
-        if other.CollideFriendlyShield then
-            return true
-        end
+
 
         -- special behavior for projectiles that represent strategic missiles
         local otherHashedCats = other.BlueprintCache.HashedCats
