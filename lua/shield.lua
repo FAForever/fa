@@ -541,9 +541,9 @@ Shield = Class(moho.shield_methods, Entity) {
     OnCollisionCheck = function(self, other)
 
         if 
-                -- projectiles with a matching army do not collide, early exit as that happens often
+                -- our projectiles do not collide with our shields
                 other.Army == self.Army  
-                -- neutral projectiles do not collide by default
+                -- neutral projectiles do not collide with any shields
             or  other.Army == -1 then
             return false
         end
