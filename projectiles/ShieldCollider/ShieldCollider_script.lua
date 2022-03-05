@@ -13,6 +13,8 @@ ShieldCollider = Class(Projectile) {
     OnCreate = function(self)
         Projectile.OnCreate(self)
 
+        self.CrashingAirplaneShieldCollisionLogic = true 
+
         self:SetVizToFocusPlayer('Never') -- Set to 'Always' to see a nice box
         self:SetVizToAllies('Never')
         self:SetVizToNeutrals('Never')

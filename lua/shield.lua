@@ -540,19 +540,8 @@ Shield = Class(moho.shield_methods, Entity) {
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
-        if 
-                -- our projectiles do not collide with our shields
-                other.Army == self.Army  
-                -- neutral projectiles do not collide with any shields
-            or  other.Army == -1 then
-            return false
-        end
-
-        -- cache categories of projectile for performance
-        local otherHashedCats = other.BlueprintCache.HashedCats
-
-        -- special behavior for projectiles attached to planes
-        if otherHashedCats['SHIELDCOLLIDE'] then
+        -- special logic when it is a projectile to simulate air crashes
+        if other.CrashingAirplaneShieldCollisionLogic then 
             if other.ShieldImpacted then
                 return false
             else
@@ -563,8 +552,11 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- special behavior for projectiles that represent strategic missiles
-        if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
+        if      -- our projectiles do not collide with our shields, with the exception of air planes that are crashing
+                self.Army == other.Army
+                -- neutral projectiles do not collide with any shields
+            or  other.Army == -1 
+        then
             return false
         end
 
@@ -572,7 +564,13 @@ Shield = Class(moho.shield_methods, Entity) {
         if other.CollideFriendlyShield then
             return true
         end
-        
+
+        -- special behavior for projectiles that represent strategic missiles
+        local otherHashedCats = other.BlueprintCache.HashedCats
+        if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
+            return false
+        end
+
         -- otherwise, only collide if we're hostile to the other army
         return IsEnemy(self.Army, other.Army)
     end,
