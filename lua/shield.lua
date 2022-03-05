@@ -374,8 +374,10 @@ Shield = Class(moho.shield_methods, Entity) {
         -- overspill damage checks
 
         if 
-            -- personal shields do not have overspill damage
+            -- prevent recursively applying overspill
             doOverspill 
+            -- personal shields do not have overspill damage
+            and self.ShieldType ~= "Personal"
             -- we consider damage without an instigator irrelevant, typically force events
             and IsEntity(instigator) 
             -- we consider damage that is 1 or lower irrelevant, typically force events
