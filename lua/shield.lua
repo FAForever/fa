@@ -540,8 +540,11 @@ Shield = Class(moho.shield_methods, Entity) {
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
-        -- our own or neutral projectiles never collide with shields
-        if other.Army == -1 or other.Army == self.Army then
+        if 
+                -- projectiles with a matching army do not collide, early exit as that happens often
+                other.Army == self.Army  
+                -- neutral projectiles do not collide by default
+            or  other.Army == -1 then
             return false
         end
 
@@ -569,7 +572,7 @@ Shield = Class(moho.shield_methods, Entity) {
         if other.CollideFriendlyShield then
             return true
         end
-
+        
         -- otherwise, only collide if we're hostile to the other army
         return IsEnemy(self.Army, other.Army)
     end,
