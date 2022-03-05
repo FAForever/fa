@@ -681,8 +681,10 @@ Shield = Class(moho.shield_methods, Entity) {
     OnState = State {
         Main = function(self)
 
-            -- inform 
-            self.RegenThreadState = "On"
+            -- unsuspend the regeneration thread
+            if self.RegenThreadSuspended then 
+                ResumeThread(self.RegenThread)
+            end
 
             if self.DamageRecharge then
                 self.Owner:SetMaintenanceConsumptionActive()
@@ -704,12 +706,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
                 self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
                 self.OnStateCharging = nil
-
-                -- If the shield has less than full health, allow the shield to begin regening
-                -- if self:GetHealth() < self:GetMaxHealth() and self.RegenRate > 0 then
-                --     self.RegenThread = ForkThread(self.RegenStartThread, self)
-                --     self.Owner.Trash:Add(self.RegenThread)
-                -- end
             end
             self.Owner:OnShieldEnabled()
 
