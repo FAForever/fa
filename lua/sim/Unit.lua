@@ -85,7 +85,7 @@ local function PopulateBlueprintCache(projectile, blueprint)
     cache.HashedDoNotCollideCats = table.hash(blueprint.DoNotCollideList)
 
     cache.Audio = blueprint.Audio
-
+  
     -- store the result
     local meta = getmetatable(projectile)
     meta.BlueprintCache = cache
@@ -1585,33 +1585,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         return true 
-    end,
-
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        LOG("UnitOnCollisionCheckWeapon")
-        if self.DisallowCollisions then
-            return false
-        end
-
-        -- Skip friendly collisions
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if IsAlly(self.Army, firingWeapon.unit.Army) then
-                return false
-            end
-        end
-
-        -- Check for specific non-collisions
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
     end,
 
     ChooseAnimBlock = function(self, bp)
@@ -4538,6 +4511,35 @@ Unit = Class(moho.unit_methods) {
 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    --- Deprecated functionality
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        if self.DisallowCollisions then
+            return false
+        end
+
+        -- Skip friendly collisions
+        local weaponBP = firingWeapon:GetBlueprint()
+        local collide = weaponBP.CollideFriendly
+        if collide == false then
+            if IsAlly(self.Army, firingWeapon.unit.Army) then
+                return false
+            end
+        end
+
+        -- Check for specific non-collisions
+        if weaponBP.DoNotCollideList then
+            for _, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end,
+
 }
 
 -- upvalied math functions for performance

@@ -539,17 +539,8 @@ Shield = Class(moho.shield_methods, Entity) {
     -- @param self The shield we're checking the collision for
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-
-        -- neutral projectiles never collide
-        if other.Army == -1 then
-            return false
-        end
-
-        -- cache categories of projectile for performance
-        local otherHashedCats = other.BlueprintCache.HashedCats
-
-        -- special behavior for projectiles attached to planes
-        if otherHashedCats['SHIELDCOLLIDE'] then
+        -- special logic when it is a projectile to simulate air crashes
+        if other.CrashingAirplaneShieldCollisionLogic then 
             if other.ShieldImpacted then
                 return false
             else
@@ -559,15 +550,24 @@ Shield = Class(moho.shield_methods, Entity) {
                 end
             end
         end
+        -- special behavior for projectiles that always collide with 
+        -- shields, like the seraphim storm when the Ythotha dies
+        if other.CollideFriendlyShield then
+            return true
+        end
 
-        -- special behavior for projectiles that represent strategic missiles
-        if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
+        if      -- our projectiles do not collide with our shields
+                self.Army == other.Army
+                -- neutral projectiles do not collide with any shields
+            or  other.Army == -1 
+        then
             return false
         end
 
-        -- special behavior for projectiles that always collide with shields
-        if other.CollideFriendlyShield then
-            return true
+        -- special behavior for projectiles that represent strategic missiles
+        local otherHashedCats = other.BlueprintCache.HashedCats
+        if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
+            return false
         end
 
         -- otherwise, only collide if we're hostile to the other army
@@ -826,7 +826,6 @@ Shield = Class(moho.shield_methods, Entity) {
     },
 
     --- Deprecated functionality
-    -- Various functionality of shields that is deprecated or appears to be deprecated
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local weaponBP = firingWeapon:GetBlueprint()
