@@ -84,6 +84,8 @@ local function PopulateBlueprintCache(projectile, blueprint)
     cache.DoNotCollideCatsCount = table.getn(blueprint.DoNotCollideList or { })
     cache.HashedDoNotCollideCats = table.hash(blueprint.DoNotCollideList)
 
+    cache.Audio = blueprint.Audio
+
     -- store the result
     local meta = getmetatable(projectile)
     meta.BlueprintCache = cache
@@ -199,6 +201,11 @@ Unit = Class(moho.unit_methods) {
 
         -- copy reference from meta table to inner table
         self.BlueprintCache = self.BlueprintCache
+
+        -- copy frequently used values from cache to reduce table look ups
+        self.Audio = self.BlueprintCache.Audio
+
+        -- the entity that produces sound, by default ourself
         self.SoundEntity = self
 
         -- cache commonly used values from the engine
