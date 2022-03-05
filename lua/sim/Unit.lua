@@ -199,6 +199,7 @@ Unit = Class(moho.unit_methods) {
 
         -- copy reference from meta table to inner table
         self.BlueprintCache = self.BlueprintCache
+        self.SoundEntity = self
 
         -- cache commonly used values from the engine
         -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
@@ -3822,7 +3823,7 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
-        self:PlaySound(audio)
+        self.SoundEntity:PlaySound(audio)
         return true
     end,
 
@@ -3835,14 +3836,14 @@ Unit = Class(moho.unit_methods) {
             return false
         end
 
-        self:SetAmbientSound(audio, nil)
+        self.SoundEntity:SetAmbientSound(audio, nil)
         return true 
     end,
 
     --- Stops playing the ambient sound that is currently being played.
     -- @param self A unit
     StopUnitAmbientSound = function(self)
-        self:SetAmbientSound(nil, nil)
+        self.SoundEntity:SetAmbientSound(nil, nil)
         return true
     end,
 

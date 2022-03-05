@@ -1678,39 +1678,6 @@ SubUnit = Class(MobileUnit) {
         Warp(self.SoundEntity, self:GetPosition())
         self.SoundEntity:AttachTo(self,-1)
     end,
-
-    --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
-    -- @param self A unit
-    -- @param sound A string identifier that represents the sound to be played.
-    PlayUnitSound = function(self, sound)
-        local audio = self.Audio[sound]
-        if not audio then 
-            return false
-        end
-
-        self.SoundEntity:PlaySound(audio)
-        return true
-    end,
-
-    --- Plays an ambient sound using the unit as a source. Returns true if successful, false otherwise
-    -- @param self A unit
-    -- @param sound A string identifier that represents the ambient sound to be played.
-    PlayUnitAmbientSound = function(self, sound)
-        local audio = self.Audio[sound]
-        if not audio then 
-            return false
-        end
-
-        self.SoundEntity:SetAmbientSound(audio, nil)
-        return true 
-    end,
-
-    --- Stops playing the ambient sound that is currently being played.
-    -- @param self A unit
-    StopUnitAmbientSound = function(self, sound)
-        self.SoundEntity:SetAmbientSound(nil, nil)
-        return true
-    end,
 }
 
 -- AIR UNITS
