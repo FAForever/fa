@@ -10,7 +10,10 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
 local VectorCached = Vector(0, 0, 0)
+
+-- upvalue for performance
 local MathSqrt = math.sqrt
+local IsEnemy = IsEnemy
 
 
 -- Default values for a shield specification table (to be passed to native code)
@@ -44,7 +47,7 @@ for k, bp in __blueprints do
     end
 end
 
--- cache categories computation for overspill calculations
+-- cache categories computations
 local CategoriesOverspill = (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK
 
 Shield = Class(moho.shield_methods, Entity) {
@@ -261,26 +264,6 @@ Shield = Class(moho.shield_methods, Entity) {
         amount = amount * (self.Owner:GetArmorMult(type))
         amount = amount * (1.0 - ArmyGetHandicap(self:GetArmy()))
         return math.min(self:GetHealth(), amount)
-    end,
-
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
-                return false
-            end
-        end
-        -- Check DNC list
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
     end,
 
     GetOverkill = function(self, instigator, amount, type)
@@ -552,13 +535,13 @@ Shield = Class(moho.shield_methods, Entity) {
         ChangeState(self, self.DeadState)
     end,
 
-    -- Return true to process this collision, false to ignore it.
+    --- Called when a shield collides with a projectile to check if the collision is valid
+    -- @param self The shield we're checking the collision for
+    -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-        if other.Army == -1 then
-            return false
-        end
 
-        if EntityCategoryContains(categories.SHIELDCOLLIDE, other) then
+        -- special logic when it is a projectile to simulate air crashes
+        if other.CrashingAirplaneShieldCollisionLogic then 
             if other.ShieldImpacted then
                 return false
             else
@@ -569,16 +552,27 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- Allow strategic nuke missile to penetrate shields
-        if EntityCategoryContains(categories.STRATEGIC, other) and
-            EntityCategoryContains(categories.MISSILE, other) then
-            return false
-        end
-
-        if other:GetBlueprint().Physics.CollideFriendlyShield then
+        -- special behavior for projectiles that always collide with 
+        -- shields, like the seraphim storm when the Ythotha dies
+        if other.CollideFriendlyShield then
             return true
         end
 
+        if      -- our projectiles do not collide with our shields
+                self.Army == other.Army
+                -- neutral projectiles do not collide with any shields
+            or  other.Army == -1 
+        then
+            return false
+        end
+
+        -- special behavior for projectiles that represent strategic missiles
+        local otherHashedCats = other.BlueprintCache.HashedCats
+        if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
+            return false
+        end
+
+        -- otherwise, only collide if we're hostile to the other army
         return IsEnemy(self.Army, other.Army)
     end,
 
@@ -832,6 +826,28 @@ Shield = Class(moho.shield_methods, Entity) {
             return false
         end,
     },
+
+    --- Deprecated functionality
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        local weaponBP = firingWeapon:GetBlueprint()
+        local collide = weaponBP.CollideFriendly
+        if collide == false then
+            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
+                return false
+            end
+        end
+        -- Check DNC list
+        if weaponBP.DoNotCollideList then
+            for _, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end,
 }
 
 --- A bubble shield attached to a single unit.
