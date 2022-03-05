@@ -1579,33 +1579,6 @@ Unit = Class(moho.unit_methods) {
         return true 
     end,
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        LOG("UnitOnCollisionCheckWeapon")
-        if self.DisallowCollisions then
-            return false
-        end
-
-        -- Skip friendly collisions
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if IsAlly(self.Army, firingWeapon.unit.Army) then
-                return false
-            end
-        end
-
-        -- Check for specific non-collisions
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
-
     ChooseAnimBlock = function(self, bp)
         local totWeight = 0
         for _, v in bp do
@@ -4551,6 +4524,35 @@ Unit = Class(moho.unit_methods) {
 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    --- Deprecated functionality
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        if self.DisallowCollisions then
+            return false
+        end
+
+        -- Skip friendly collisions
+        local weaponBP = firingWeapon:GetBlueprint()
+        local collide = weaponBP.CollideFriendly
+        if collide == false then
+            if IsAlly(self.Army, firingWeapon.unit.Army) then
+                return false
+            end
+        end
+
+        -- Check for specific non-collisions
+        if weaponBP.DoNotCollideList then
+            for _, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end,
+
 }
 
 -- upvalied math functions for performance

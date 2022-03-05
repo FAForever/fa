@@ -300,23 +300,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         return TerrainType.FXImpact[TargetType][ImpactEffectType] or {}
     end,
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
-            return false
-        end
-
-        -- If this unit category is on the weapon's do-not-collide list, skip!
-        local weaponBP = firingWeapon:GetBlueprint()
-        if weaponBP.DoNotCollideList then
-            for k, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-        return true
-    end,
-
     -- Create some cool explosions when we get destroyed
     OnImpact = function(self, targetType, targetEntity)
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
@@ -512,6 +495,26 @@ Projectile = Class(moho.projectile_methods, Entity) {
             end
         end
     end,
+
+    --- Deprecated functionality
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
+            return false
+        end
+
+        -- If this unit category is on the weapon's do-not-collide list, skip!
+        local weaponBP = firingWeapon:GetBlueprint()
+        if weaponBP.DoNotCollideList then
+            for k, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+        return true
+    end,
+
 }
 
 --- A dummy projectile that solely inherits what it needs. Useful for 

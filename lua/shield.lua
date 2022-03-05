@@ -828,7 +828,6 @@ Shield = Class(moho.shield_methods, Entity) {
     },
 
     --- Deprecated functionality
-    -- Various functionality of shields that is deprecated or appears to be deprecated
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local weaponBP = firingWeapon:GetBlueprint()
