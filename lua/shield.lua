@@ -169,10 +169,10 @@ Shield = Class(moho.shield_methods, Entity) {
                     -- check if it is a different unti and that it has an active shield with a radius
                     -- larger than 0, as engine defaults shield table to 0
                     if      shieldOther 
+                        and shieldOther.ShieldType ~= "Personal"
                         and shieldOther:IsUp()
                         and shieldOther.Size
                         and shieldOther.Size > 0 
-                        and shieldOther.ShieldType ~= "Personal"
                         and self.Owner.EntityId ~= other.EntityId 
                     then 
 
