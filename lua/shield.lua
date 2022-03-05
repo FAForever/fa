@@ -302,10 +302,10 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- damage correction for overspill
+        -- damage correction for overspill, only apply to bubble shields
 
         local instigatorId = (instigator and instigator.EntityId) or false
-        if instigatorId then 
+        if self.ShieldType == "Bubble" and instigatorId then 
 
             -- check if source has applied damage this tick
             if self.DamageReductionTick[instigatorId] == tick then 
