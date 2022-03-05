@@ -2,7 +2,7 @@
 -- File     :  /projectiles/ShieldCollider_script.lua
 -- Author(s):  Exotic_Retard, made for Equilibrium Balance Mod
 -- Summary  : Companion projectile enabling air units to hit shields
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright c 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
 
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
