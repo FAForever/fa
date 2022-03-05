@@ -539,7 +539,6 @@ Shield = Class(moho.shield_methods, Entity) {
     -- @param self The shield we're checking the collision for
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-
         -- special logic when it is a projectile to simulate air crashes
         if other.CrashingAirplaneShieldCollisionLogic then 
             if other.ShieldImpacted then
@@ -551,7 +550,6 @@ Shield = Class(moho.shield_methods, Entity) {
                 end
             end
         end
-
         -- special behavior for projectiles that always collide with 
         -- shields, like the seraphim storm when the Ythotha dies
         if other.CollideFriendlyShield then
