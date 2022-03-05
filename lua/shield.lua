@@ -139,12 +139,10 @@ Shield = Class(moho.shield_methods, Entity) {
             self.OverlappingShieldsTick = tick 
 
             local brain = self.Owner:GetAIBrain()
-            local position = self.Owner:GetPosition() -- why not self:GetPosition()?
-            -- debugCenter = position 
+            local position = self.Owner:GetPosition()
 
             -- diameter where other shields overlap with us or are contained by us
             local diameter = LargestShieldDiameter + self.Size
-            -- debugDiameter = diameter
 
             -- retrieve candidate units
             local units = brain:GetUnitsAroundPoint(CategoriesOverspill, position, 0.5 * diameter, 'Ally')
@@ -171,6 +169,7 @@ Shield = Class(moho.shield_methods, Entity) {
                     -- check if it is a different unti and that it has an active shield with a radius
                     -- larger than 0, as engine defaults shield table to 0
                     if      shieldOther 
+                        and shieldOther.ShieldType ~= "Personal"
                         and shieldOther:IsUp()
                         and shieldOther.Size
                         and shieldOther.Size > 0 
@@ -302,29 +301,32 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- damage correction for overspill
+        -- damage correction for overspill, do not apply to personal shields
 
-        local instigatorId = (instigator and instigator.EntityId) or false
-        if instigatorId then 
+        if self.ShieldType ~= "Personal" then
 
-            -- check if source has applied damage this tick
-            if self.DamageReductionTick[instigatorId] == tick then 
+            local instigatorId = (instigator and instigator.EntityId) or false
+            if instigatorId then 
 
-                -- if it did, reduce it from the damage that we're doing
-                amount = amount - self.DamageReduction[instigatorId]
+                -- check if source has applied damage this tick
+                if self.DamageReductionTick[instigatorId] == tick then 
 
-                -- if nothing is left, bail out
-                if amount < 0 then 
-                    return 
+                    -- if it did, reduce it from the damage that we're doing
+                    amount = amount - self.DamageReduction[instigatorId]
+
+                    -- if nothing is left, bail out
+                    if amount < 0 then 
+                        return 
+                    end
+
+                    -- further reduce future damage
+                    self.DamageReduction[instigatorId] = self.DamageReduction[instigatorId] + amount 
+
+                -- otherwise, inform us that we're applying damage this tick
+                else 
+                    self.DamageReduction[instigatorId] = amount 
+                    self.DamageReductionTick[instigatorId] = tick
                 end
-
-                -- further reduce future damage
-                self.DamageReduction[instigatorId] = self.DamageReduction[instigatorId] + amount 
-
-            -- otherwise, inform us that we're applying damage this tick
-            else 
-                self.DamageReduction[instigatorId] = amount 
-                self.DamageReductionTick[instigatorId] = tick
             end
         end
 
@@ -372,8 +374,10 @@ Shield = Class(moho.shield_methods, Entity) {
         -- overspill damage checks
 
         if 
-            -- personal shields do not have overspill damage
+            -- prevent recursively applying overspill
             doOverspill 
+            -- personal shields do not have overspill damage
+            and self.ShieldType ~= "Personal"
             -- we consider damage without an instigator irrelevant, typically force events
             and IsEntity(instigator) 
             -- we consider damage that is 1 or lower irrelevant, typically force events
