@@ -566,8 +566,6 @@ Shield = Class(moho.shield_methods, Entity) {
             return false
         end
 
-
-
         -- special behavior for projectiles that represent strategic missiles
         local otherHashedCats = other.BlueprintCache.HashedCats
         if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
