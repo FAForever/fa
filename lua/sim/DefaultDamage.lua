@@ -55,6 +55,7 @@ function AreaDoTThread (instigator, position, pulses, pulseTime, radius, damage,
     end
 end
 
+-- Deprecated functionality -- 
 
 -- SCALABLE RADIUS AREA DOT
 -- - Allows for a scalable damage radius that begins with DamageStartRadius and ends
