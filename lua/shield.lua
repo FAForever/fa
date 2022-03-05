@@ -286,8 +286,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
 
-        LOG(repr(debug.getinfo(2)))
-
         -- cache information used throughout the function
 
         local tick = GetGameTick()
