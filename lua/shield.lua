@@ -123,7 +123,66 @@ Shield = Class(moho.shield_methods, Entity) {
         self.DamageReduction = { }
         self.DamageReductionTick = { }
 
+        -- manage regeneration thread
+        self.RegenThreadSuspended = true
+        self.RegenThreadState = "On"
+        self.RegenThread = ForkThread(self.RegenThread, self)
+        self.Trash:Add(self.RegenThread)
+
         ChangeState(self, self.OnState)
+    end,
+
+    RegenThread = function(self)
+
+        -- localize for performance
+        local CoroutineYield = coroutine.yield
+        local SuspendCurrentThread = SuspendCurrentThread
+
+        while true do
+
+            -- gather some information
+            local fromSuspension = false
+            local tick = GetGameTick()
+            local health = self:GetHealth()
+
+            -- check if we need to suspend ourselves
+            if 
+                -- we're at zero health or lower
+                    health <= 0 
+                -- we're full health
+                or  health == self:GetMaxHealth() 
+                -- we're not up, suspend
+                or  not self:IsUp() 
+            then 
+                self.RegenThreadSuspended = true 
+                SuspendCurrentThread()
+                self.RegenThreadSuspended = false
+                fromSuspension = true 
+            end
+
+            -- if we didn't suspend then check regeneration conditions
+            if not fromSuspension then 
+
+                -- check if we're allowed to start regenerating again
+                if tick > self.RegenThreadStartTick then 
+
+                    -- adjust health, rate is in seconds 
+                    self:AdjustHealth(self.Owner, 0.1 * self.RegenRate)
+
+                    -- adjust shield bar
+                    self:UpdateShieldRatio(-1)
+
+                -- if not, yield for the difference in ticks
+                else 
+                    local diff = self.RegenThreadStartTick - tick 
+                    LOG("Pausing regen thread until for ticks: " .. diff)
+                    CoroutineYield(diff)
+                end
+            end
+
+            -- wait till next tick
+            CoroutineYield(1)
+        end
     end,
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
@@ -336,7 +395,7 @@ Shield = Class(moho.shield_methods, Entity) {
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             -- take some damage
-            self:AdjustHealth(instigator, -absorbed)
+            -- self:AdjustHealth(instigator, -absorbed)
 
             -- adjust shield bar
             self:UpdateShieldRatio(-1)
@@ -350,24 +409,15 @@ Shield = Class(moho.shield_methods, Entity) {
                 ForkThread(self.CreateImpactEffect, self, vector)
             end
 
-            -- stop us from regenerating, we took damage
-            if self.RegenThread then
-                KillThread(self.RegenThread)
-                self.RegenThread = nil
-            end
-
             -- if we have no health, collapse
             if self:GetHealth() <= 0 then
                 ChangeState(self, self.DamageRechargeState)
-
-            -- if we do have health, start the delay before we regenerate health
-            elseif self.OffHealth < 0 then
-                if self.RegenRate > 0 then
-                    self.RegenThread = ForkThread(self.RegenStartThread, self)
-                    self.Owner.Trash:Add(self.RegenThread)
+            -- otherwise, attempt to regenerate
+            else 
+                self.RegenThreadStartTick = tick + 10 * self.RegenStartTime
+                if self.RegenThreadSuspended then 
+                    ResumeThread(self.RegenThread)
                 end
-            else
-                self:UpdateShieldRatio(0)
             end
         end
 
@@ -401,26 +451,6 @@ Shield = Class(moho.shield_methods, Entity) {
                 )
             end
         end
-    end,
-
-    RegenStartThread = function(self)
-        --ActiveConsumption means shield is upgrading. Upgrade has highest priority than regen and engies always assist it first
-        --no need to launch validation thread in this case
-        if self.StaticShield and not self.AssistersThread and not self.Owner.ActiveConsumption then
-            self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
-            self.Owner.Trash:Add(self.AssistersThread)
-        end
-
-        WaitSeconds(self.RegenStartTime)
-        while self:GetHealth() < self:GetMaxHealth() do
-
-            self:AdjustHealth(self.Owner, self.RegenRate / 10)
-
-            self:UpdateShieldRatio(-1)
-
-            WaitTicks(1)
-        end
-        self.RegenThread = nil
     end,
 
     --Fix "free" shield regen. Assist efficiency never drops, no matter what mass income you have
@@ -650,6 +680,10 @@ Shield = Class(moho.shield_methods, Entity) {
 
     OnState = State {
         Main = function(self)
+
+            -- inform 
+            self.RegenThreadState = "On"
+
             if self.DamageRecharge then
                 self.Owner:SetMaintenanceConsumptionActive()
                 self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
@@ -672,10 +706,10 @@ Shield = Class(moho.shield_methods, Entity) {
                 self.OnStateCharging = nil
 
                 -- If the shield has less than full health, allow the shield to begin regening
-                if self:GetHealth() < self:GetMaxHealth() and self.RegenRate > 0 then
-                    self.RegenThread = ForkThread(self.RegenStartThread, self)
-                    self.Owner.Trash:Add(self.RegenThread)
-                end
+                -- if self:GetHealth() < self:GetMaxHealth() and self.RegenRate > 0 then
+                --     self.RegenThread = ForkThread(self.RegenStartThread, self)
+                --     self.Owner.Trash:Add(self.RegenThread)
+                -- end
             end
             self.Owner:OnShieldEnabled()
 
@@ -730,12 +764,6 @@ Shield = Class(moho.shield_methods, Entity) {
         Main = function(self)
             self.Owner:OnShieldDisabled()
             self.OnStateCharging = nil
-
-            -- No regen during off state
-            if self.RegenThread then
-                KillThread(self.RegenThread)
-                self.RegenThread = nil
-            end
 
             -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
             self.OffHealth = self:GetHealth()
