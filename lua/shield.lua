@@ -15,6 +15,7 @@ local VectorCached = Vector(0, 0, 0)
 local MathSqrt = math.sqrt
 local IsEnemy = IsEnemy
 
+local DeprecatedWarnings = { }
 
 -- Default values for a shield specification table (to be passed to native code)
 local DEFAULT_OPTIONS = {
@@ -63,45 +64,53 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     OnCreate = function(self, spec)
-        self.Trash = TrashBag()
+
+        -- cache information that is used frequently
+        self.Army = self:GetArmy()
+        self.EntityId = self:GetEntityId()
+
+        -- copy over information from specifiaction
+        self.Size = spec.Size 
         self.Owner = spec.Owner
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
+        self.SpillOverDmgMod = spec.ShieldSpillOverDamageMod or 0.15
+        self.ShieldRechargeTime = spec.ShieldRechargeTime or 5
+        self.ShieldEnergyDrainRechargeTime = spec.ShieldEnergyDrainRechargeTime
+        self.ShieldVerticalOffset = spec.ShieldVerticalOffset
+        self.RegenRate = spec.ShieldRegenRate
+        self.RegenStartTime = spec.ShieldRegenStartTime
+        self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
-        self.Army = self:GetArmy()
-        self.EntityId = self:GetEntityId()
-        self._IsUp = false
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
             self.ImpactEffects = {}
         end
 
-        self:SetSize(spec.Size)
+        -- set some internal state related to shields
+        self._IsUp = false
+        self.OffHealth = -1
+        self.ShieldType = 'Bubble'
+
+        -- set our health
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self, spec.ShieldMaxHealth)
-        self:SetType('Bubble')
-        self.SpillOverDmgMod = math.max(spec.ShieldSpillOverDamageMod or 0.15, 0)
 
-        -- Show our 'lifebar'
+        -- show our 'lifebar'
         self:UpdateShieldRatio(1.0)
 
-        self:SetRechargeTime(spec.ShieldRechargeTime or 5, spec.ShieldEnergyDrainRechargeTime or 5)
-        self:SetVerticalOffset(spec.ShieldVerticalOffset)
-
+        -- tell the engine when we should be visible
         self:SetVizToFocusPlayer('Always')
         self:SetVizToEnemies('Intel')
         self:SetVizToAllies('Always')
         self:SetVizToNeutrals('Intel')
 
+        -- attach us to the owner
         self:AttachBoneTo(-1, spec.Owner, -1)
 
         self:SetShieldRegenRate(spec.ShieldRegenRate)
         self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
-
-        self.OffHealth = -1
-
-        self.PassOverkillDamage = spec.PassOverkillDamage
 
         local ownerCategories = self.Owner:GetBlueprint().CategoriesHash
         if ownerCategories.STRUCTURE then
@@ -109,6 +118,9 @@ Shield = Class(moho.shield_methods, Entity) {
         elseif ownerCategories.COMMAND then
             self.CommandShield = true
         end
+
+        -- use trashbag of the unit that owns us
+        self.Trash = self.Owner.Trash
 
         -- manage impact entities
         self.LiveImpactEntities = 0
@@ -135,8 +147,13 @@ Shield = Class(moho.shield_methods, Entity) {
     RegenThread = function(self)
 
         -- localize for performance
+        local GetGameTick = GetGameTick
         local CoroutineYield = coroutine.yield
         local SuspendCurrentThread = SuspendCurrentThread
+
+        -- note to self: do **not** cache shield / unit related functions
+        -- into the local scope. E.g., something like `local GetHealth = self.GetHealth`,
+        -- this can break mods and / or map scripts
 
         while true do
 
@@ -145,13 +162,13 @@ Shield = Class(moho.shield_methods, Entity) {
             local tick = GetGameTick()
             local health = self:GetHealth()
 
-            -- check if we need to suspend ourselves
+            -- check if we need to suspend ourself
             if 
                 -- we're at zero health or lower
                     health <= 0 
                 -- we're full health
                 or  health == self:GetMaxHealth() 
-                -- we're not up, suspend
+                -- we're not enabled
                 or  not self:IsUp() 
             then 
                 self.RegenThreadSuspended = true 
@@ -174,9 +191,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
                 -- if not, yield for the difference in ticks
                 else 
-                    local diff = self.RegenThreadStartTick - tick 
-                    LOG("Pausing regen thread until for ticks: " .. diff)
-                    CoroutineYield(diff)
+                    CoroutineYield(self.RegenThreadStartTick - tick )
                 end
             end
 
@@ -271,44 +286,12 @@ Shield = Class(moho.shield_methods, Entity) {
         return self.OverlappingShields, self.OverlappingShieldsCount
     end,
 
-    SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
-        self.ShieldRechargeTime = rechargeTime
-        self.ShieldEnergyDrainRechargeTime = energyRechargeTime
-    end,
-
-    SetVerticalOffset = function(self, offset)
-        self.ShieldVerticalOffset = offset
-    end,
-
-    --- Property to set the diameter of the shield
-    -- @param self A shield
-    -- @param size The new diameter of the shield
-    SetSize = function(self, size)
-        self.Size = size
-    end,
-
-    SetShieldRegenRate = function(self, rate)
-        self.RegenRate = rate
-    end,
-
-    SetShieldRegenStartTime = function(self, time)
-        self.RegenStartTime = time
-    end,
-
-    SetType = function(self, type)
-        self.ShieldType = type
-    end,
-
     UpdateShieldRatio = function(self, value)
         if value >= 0 then
             self.Owner:SetShieldRatio(value)
         else
             self.Owner:SetShieldRatio(self:GetHealth() / self:GetMaxHealth())
         end
-    end,
-
-    GetCachePosition = function(self)
-        return self:GetPosition()
     end,
 
     -- Note, this is called by native code to calculate spillover damage. The
@@ -395,7 +378,7 @@ Shield = Class(moho.shield_methods, Entity) {
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             -- take some damage
-            -- self:AdjustHealth(instigator, -absorbed)
+            self:AdjustHealth(instigator, -absorbed)
 
             -- adjust shield bar
             self:UpdateShieldRatio(-1)
@@ -696,6 +679,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 self.Owner:SetMaintenanceConsumptionActive()
                 self.OnStateCharging = true
 
+                -- TODO: 
                 -- In this particular case (OnState + charging) shield can be assisted by engineers
                 -- It's unfixable without changing the state (and changing state causes even more issues)
                 -- so we have to launch assisters thread here too
@@ -707,6 +691,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
                 self.OnStateCharging = nil
             end
+
             self.Owner:OnShieldEnabled()
 
             -- We are no longer turned off
@@ -746,7 +731,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- Record the amount of health on the shield here so when the unit tries to turn its shield
             -- back on and off it has the amount of health from before.
-            --self.OffHealth = self:GetHealth()
+            self.OffHealth = self:GetHealth()
             ChangeState(self, self.EnergyDrainRechargeState)
         end,
 
@@ -876,6 +861,85 @@ Shield = Class(moho.shield_methods, Entity) {
 
         return true
     end,
+
+    GetCachePosition = function(self)
+
+        if not DeprecatedWarnings.GetCachePosition then 
+            DeprecatedWarnings.GetCachePosition = true 
+            WARN("GetCachePosition is deprecated: use shield:GetPosition() instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        return self:GetPosition()
+    end,
+
+    SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
+
+        if not DeprecatedWarnings.SetRechargeTime then 
+            DeprecatedWarnings.SetRechargeTime = true 
+            WARN("SetRechargeTime is deprecated: set the values shield.ShieldRechargeTime and shield.ShieldEnergyDrainRechargeTime instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.ShieldRechargeTime = rechargeTime
+        self.ShieldEnergyDrainRechargeTime = energyRechargeTime
+    end,
+
+    SetVerticalOffset = function(self, offset)
+
+        if not DeprecatedWarnings.SetVerticalOffset then 
+            DeprecatedWarnings.SetVerticalOffset = true 
+            WARN("SetVerticalOffset is deprecated: set the value shield.ShieldVerticalOffset instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.ShieldVerticalOffset = offset
+    end,
+
+    SetSize = function(self, size)
+
+        if not DeprecatedWarnings.SetSize then 
+            DeprecatedWarnings.SetSize = true 
+            WARN("SetSize is deprecated: set the value shield.Size instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.Size = size
+    end,
+
+    SetShieldRegenRate = function(self, rate)
+
+        if not DeprecatedWarnings.SetShieldRegenRate then 
+            DeprecatedWarnings.SetShieldRegenRate = true 
+            WARN("SetShieldRegenRate is deprecated: set the value shield.RegenRate instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.RegenRate = rate
+    end,
+
+    SetShieldRegenStartTime = function(self, time)
+
+        if not DeprecatedWarnings.SetShieldRegenStartTime then 
+            DeprecatedWarnings.SetShieldRegenStartTime = true 
+            WARN("SetShieldRegenStartTime is deprecated: set the value shield.RegenStartTime instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.RegenStartTime = time
+    end,
+
+    SetType = function(self, type)
+
+        if not DeprecatedWarnings.SetShieldRegenStartTime then 
+            DeprecatedWarnings.SetShieldRegenStartTime = true 
+            WARN("SetShieldRegenStartTime is deprecated: set the value shield.ShieldType instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.ShieldType = type
+    end,
+
 }
 
 --- A bubble shield attached to a single unit.
