@@ -718,7 +718,7 @@ UnitBlueprint {
             DamageFriendly = true,
             DamageRadius = 6,
             DamageType = 'DeathExplosion',
-            DisplayName = 'Collossus Death',
+            DisplayName = 'Ythotha Death',
             DummyWeapon = true,
             Label = 'CollossusDeath',
             WeaponCategory = 'Death',
