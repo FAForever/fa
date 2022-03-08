@@ -4,6 +4,7 @@
 -- Summary  :  Default definitions of units
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+local Entity = import('/lua/sim/Entity.lua').Entity
 local Unit = import('/lua/sim/Unit.lua').Unit
 local explosion = import('defaultexplosions.lua')
 local EffectUtil = import('EffectUtilities.lua')
@@ -1667,6 +1668,16 @@ SubUnit = Class(MobileUnit) {
     -- DESTRUCTION PARAMS
     ShowUnitDestructionDebris = false,
     DeathThreadDestructionWaitTime = 0,
+
+    OnCreate = function(self, spec)
+        MobileUnit.OnCreate(self, spec)
+
+        -- submarines do not make a sound by default, we want them to make sound so we use an entity as source instead
+        self.SoundEntity = Entity()
+        self.Trash:Add(self.SoundEntity)
+        Warp(self.SoundEntity, self:GetPosition())
+        self.SoundEntity:AttachTo(self,-1)
+    end,
 }
 
 -- AIR UNITS

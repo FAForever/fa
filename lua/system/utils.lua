@@ -540,6 +540,20 @@ function table.unique(t)
     return unique
 end
 
+-- Lua 5.0 implementation of the Lua 5.1 function string.match
+-- Returns a regex match
+-- optional param init defines where to start searching. Can be negative to search from the end.
+rawset(string, 'match', function(input, exp, init)
+    local match
+    string.gsub(input:sub(init or 1), exp, function(...) match = arg end, 1)
+    if match then
+        return unpack(match)
+    end
+end)
+
+-- gfind was renamed to gmatch in Lua 5.1. added gmatch for additional compatibility
+rawset(string, 'gmatch', string.gfind)
+
 --- Returns items as a single string, separated by the delimiter
 function StringJoin(items, delimiter)
     local str = "";

@@ -64,6 +64,8 @@ LobbyOptions = false
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
 
+GameHasAIs = false
+
 function KillWaitingDialog()
     if waitingDialog then
         waitingDialog:Destroy()
@@ -142,6 +144,10 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
+    -- override some UI globals
+    import("/lua/ui/override/ArmiesTable.lua").Setup()
+    import("/lua/ui/override/SessionClients.lua").Setup()
 
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then
@@ -502,6 +508,17 @@ function DeselectSelens(selection)
     return otherUnits, true
 end
 
+--- A cache used with ObserveSelection to prevent continious table allocations
+local cachedSelection = {
+    oldSelection = { },
+    newSelection = { },
+    added = { },
+    removed = { },
+}
+
+--- Observable to allow mods to do something with a new selection
+ObserveSelection = import("/lua/shared/observable.lua").Create()
+
 -- This function is called whenever the set of currently selected units changes
 -- See /lua/unit.lua for more information on the lua unit object
 -- @param oldSelection: What the selection was before
@@ -518,6 +535,13 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import('/lua/ui/game/selection.lua').IsHidden() then
         return
     end
+
+    -- populate observable and send out a notification
+    cachedSelection.oldSelection = oldSelection
+    cachedSelection.newSelection = newSelection
+    cachedSelection.added = added
+    cachedSelection.removed = removed
+    ObserveSelection:Set(cachedSelection)
 
     if not hotkeyLabelsOnSelectionChanged then
         hotkeyLabelsOnSelectionChanged = import('/lua/keymap/hotkeylabels.lua').onSelectionChanged

@@ -169,6 +169,7 @@ UnitBlueprint {
     },
     CollisionOffsetZ = 0.2,
     Defense = {
+        SkipDynamicThreatCalculations = true,
         AirThreatLevel = 0,
         ArmorType = 'Commander',
         EconomyThreatLevel = 5,
@@ -1246,6 +1247,7 @@ UnitBlueprint {
             RackFireTogether = false,
             RackRecoilDistance = 0,
             RackReloadTimeout = 10,
+            EnabledByEnhancement = "Missile",
             RackSalvoChargeTime = 0,
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,

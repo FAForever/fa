@@ -181,6 +181,9 @@ function CreateMinimap(parent)
     controls.displayGroup.ClientGroup:DisableHitTest()
     controls.miniMap:EnableHitTest()
     CommonLogic()
+    if Prefs.GetFromCurrentProfile('disableMinimapMesh') ~= false then
+        ConExecute("cam_DefaultMiniLOD 0")
+    end
 end
 
 function ToggleMinimap()

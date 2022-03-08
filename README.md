@@ -1,186 +1,63 @@
-FAF LUA Code
-------------
-master|develop
- ------------ | -------------
-[![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=master)](https://travis-ci.org/FAForever/fa) | [![Build Status](https://travis-ci.org/FAForever/fa.svg?branch=develop)](https://travis-ci.org/FAForever/fa)
 
-Current patch is: 3730
+FAF Gametype | FAF Develop game type | FAF Beta balance gametype
+ ------------ | ------------- | -----------
+[![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffaf)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafdevelop)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafbeta)](https://github.com/FAForever/fa/actions/workflows/build.yaml)
 
-Changelog can be found [here](changelog.md).
+Read this in other languages: [English](README.md), [Russian](README-russian.md)
 
+About Forged Alliance Forever
+-----------------------------
+
+![Impression of the game](/images/impression-a.jpg)
+
+Forged Alliance Forever is a community-driven [project](https://github.com/FAForever) designed to facilitate online play for Supreme Commander: Forged Alliance. We are a thriving community with a self-made [client](https://github.com/FAForever/downlords-faf-client), [backend](https://github.com/FAForever/server) and [website](https://github.com/FAForever/website). We have an extensive library of community made maps, mods and co-op scenarios. We introduced a rating system based on [TrueSkill](https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/) to provide a competitive environment with automated matchmaking. To see all that we have added it is best to experience it yourself by playing the game through the client.
+
+You can download the client on our [website](https://faforever.com/). In order to play you will need to sync your account with Steam to prove you own a copy of [Supreme Commander: Forged Aliance](https://store.steampowered.com/app/9420/Supreme_Commander_Forged_Alliance/). You can get in touch with the community through the [forums](https://forum.faforever.com/) and the official [Discord server](https://discord.gg/mXahVSKGVb). The developers chat can be found on [Zulip](https://zulip.com/) - you can ask for access from the admin of this repository. The project is kept alive by donations to our [Patreon](https://www.patreon.com/faf).
+
+About this repository
+---------------------
+
+This repository contains the changes to the Lua side of the game, such as balance changes, performance improvements, and additional features. The repository mimics the organization of the base game. A quick reference guide:
+
+Folder          | Description
+--------------- | -----------
+`effects`       | Blueprints, textures and meshes of effects and HLSL shaders that are used to render the game
+`engine*`       | Engine documentation: all objects and their functions are documented
+`env`           | Props, decals, splats, stratum layer and environmental effects
+`etc*`          | Legacy - a rudimentary implementation of versioning control 
+`loc`           | Localization files for the game, see the translation guidelines
+`lua`           | Lua files that control all the behavior outside of the physics simulation
+`meshes`        | Meshes that do not belong to props, units or projectiles. E.g. the world border
+`projectiles`   | Blueprint files, textures and meshes of projectiles
+`props`         | Blueprint files, textures and meshes of props
+`schook`        | Legacy - the **s**upreme **c**ommander **hook** folder that was used due to licensing issues
+`testmaps*`     | Test maps. E.g. the benchmark map shipped with the game
+`tests*`        | Unit tests that run on engine-oblivion functions. E.g. Testing string operations
+`textures`      | Textures used by the engine (as fallback) and UI
+`units`         | Blueprint files, textures and meshes of units
+
+Files that are unchanged are retrieved from the base game. Folders with an asterisk (*) are not shipped to the user with the client. See the installation instructions in the contribution section for more information.
+
+Repositories that are directly related to the game:
+ - A [Lua profiler](https://github.com/FAForever/FAFProfiler)
+ - A [Lua benchmark tool](https://gitlab.com/supreme-commander-forged-alliance/other/profiler)
+ - The [executable patcher](https://github.com/FAForever/FA_Patcher)
+ - The [executable patches](https://github.com/FAForever/FA-Binary-Patches)
+ - A [debugger](https://github.com/FAForever/FADeepProbe) to help with exceptions 
+
+Changelog
+---------
+
+Here is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
 
 Contributing
 ------------
 
-See guidelines for contributing [here](CONTRIBUTING.md).
+There are instructions [in English](setup/setup-english.md) and [in Russian](setup/setup-russian.md) to help you set up a development environment. It is important that you discuss your contributions beforehand. You can do this by making a comment on an existing issue or, if it doesn't exist yet, by opening a new issue. Not all pull requests are merged by default. It is important that the changes align with the vision of the project. 
 
-See git branch model for the repository and how it relates to FAF client game modes [here](branchmodel.png).
-
-Exe patcher are [here](https://github.com/FAForever/FA_Patcher)
-
-Exe patches are [here](https://github.com/FAForever/FA-Binary-Patches)
-
-FAF profiler [here](https://github.com/FAForever/FAFProfiler)
-
-Lua benchmarks [here](https://gitlab.com/supreme-commander-forged-alliance/other/profiler)
-
-Replaces Bugsplat [here](https://github.com/FAForever/FADeepProbe)
-
-Running the game with your changes
-----------------------------------
-
-The easiest way to running the game with your changes is to create a DevData directory nested in FAForever and put all the modified files there.
-
-When FA starts without any command line arguments, it looks for a file called `SupComDataPath.lua`.
-
-This file is a normal lua-file, that is allowed to use FA's IO operations to load directories and compressed directories (zip files) into the virtual file system.
-
-The normal file looks like this:
-
-    mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-    mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
-    mount_dir(InitFileDir .. '\\..\\gamedata\\*.scd', '/')
-    mount_dir(InitFileDir .. '\\..', '/')
-
-Where `mount_contents` is a helper function defined also in that file.
-
-This loads all maps and mods in your `~\Documents\My Games\...` folder, followed by the core game files that are located in compressed `.scd` files.
-
-What's important to note about the load order is that if two directories contain the same file, the *first loaded* takes precedence. There are ways to get around this using hooks, that I'll explain in the end.
-
-FAF extends the loading mechanism of FA, by using different initialization files: One for each featured mod.
-
-`init_faf.lua` contains a whitelist of files that it allows to be loaded, this whitelist is implemented using the function `mount_dir_with_whitelist`, which is just like the helper function from the normal FA init file, except for the whitelist which only allows the given named files to be loaded.
-
-The actual loading in `init_faf.lua` is done here:
-
-    -- these are the classic supcom directories. They don't work with accents or other foreign characters in usernames
-    mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-    mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
-    -- these are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the upper ones.
-    mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-    mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
-    mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nxt', '/')
-    mount_dir_with_whitelist(InitFileDir .. '\\..\\gamedata\\', '*.nx2', '/')
-    -- these are using the newly generated path from the dofile() statement at the beginning of this script
-    mount_dir_with_whitelist(fa_path .. '\\gamedata\\', '*.scd', '/')
-    mount_dir(fa_path, '/')[/code]
-
-After adding all maps and mods to the search path, all `.nxt` compressed directories are loaded (as filtered by the whitelist). This currently includes: murderparty, labwars, advanced strategic icons and texturepack. They are loaded in alphabetical order.
-
-Followed by `.nxt` files, `.nx2` files are loaded. These comprise compressed directories for each subdirectory of the FA virtual file system: effects, env, loc, lua, modules, schook, projectiles, units, textures and meshes.
-
-After all FAF-files have been loaded, the init file loads the base-game .scd files. Since these are loaded _last_, files that are in the FAF-directories take precedence and _shadow_ the base game files.
-
-Hooking
--------
-
-Hooking with the FA virtual file system simply means `concatenating files`.
-
-Given the following directories and load-order:
-
-*cool_mod* directory containing:
-- `/hook/lua/file.lua`
-
-*FAF.scd* containing:
-- `/lua/file.lua`
-- `/schook/lua/file.lua`
-
-*FA.scd* containing:
-- `/lua/file.lua`
-
-What ends up in the actual filesystem used by FA is:
-
-`/lua/file.lua` = `FAF.scd/lua/file.lua` + `cool_mod/hook/lua/file.lua` + `FAF.scd/schook/lua/file.lua`
-
-Where "`fileA` + `fileB`" means that `fileB` has been appended to `fileA`.
-
-The directory that is used for hooks can be configured in the init.lua file, and it customizable for each mod in the `mod_info.lua` file.
-
-Setting up a development init file
-----------------------------------
+In general, before contributing, please read the [contribution guidelines](CONTRIBUTING.md) and the [translation guidelines](loc/guidelines.md)
 
 
-[ForgedAlliance.exe takes several useful command-line arguments](http://supcom.wikia.com/wiki/Command_line_switches), and it's even possible to make your own.
-
-We can use a custom init file to ease the development process. The following file init file can be used:
-
-    dev_path = 'C:\\Workspace\\forged-alliance-forever-lua'
-    -- this imports a path file that is written by Forged Alliance Forever right before it starts the game.
-    dofile(InitFileDir .. '\\..\\fa_path.lua')
-    path = {}
-    local function mount_dir(dir, mountpoint)
-        table.insert(path, { dir = dir, mountpoint = mountpoint } )
-    end
-    local function mount_contents(dir, mountpoint)
-        LOG('checking ' .. dir)
-        for _,entry in io.dir(dir .. '\\*') do
-            if entry != '.' and entry != '..' then
-                local mp = string.lower(entry)
-                mp = string.gsub(mp, '[.]scd$', '')
-                mp = string.gsub(mp, '[.]zip$', '')
-                mount_dir(dir .. '\\' .. entry, mountpoint .. '/' .. mp)
-            end
-        end
-    end
-    -- these are the classic supcom directories. They don't work with accents or other foreign characters in usernames
-    mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-    mount_contents(SHGetFolderPath('PERSONAL') .. 'My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
-    -- these are the local FAF directories. The My Games ones are only there for people with usernames that don't work in the upper ones.
-    mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\mods', '/mods')
-    mount_contents(InitFileDir .. '\\..\\user\\My Games\\Gas Powered Games\\Supreme Commander Forged Alliance\\maps', '/maps')
-    mount_dir(dev_path, '/')
-    -- these are using the newly generated path from the dofile() statement at the beginning of this script
-    mount_dir(fa_path .. '\\gamedata\\*.scd', '/')
-    mount_dir(fa_path, '/')
-    hook = {
-        '/schook'
-    }
-    protocols = {
-        'http',
-        'https',
-        'mailto',
-        'ventrilo',
-        'teamspeak',
-        'daap',
-        'im',
-    }
-
-At the very top there is the line: `dev_path`, which should be set to wherever you have cloned this repository.
 
 
-Starting Forged Alliance from the command line with the following arguments:
 
-`ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog /nobugreport`
-
-Will put it into a mode where it will look for updates to files that it has loaded. So when you modify a unit file or a blueprint, the game will reload the file and put it into the active session.
-
-This way, you don't need to restart the game every time you make a change, you simply need to make a new unit of the type, spawn a new projectile or do whatever it is you're doing.
-
-It's not perfect; some changes will require a full game restart, and certain changes can cause crashes. But it's a lot better than reloading the game for every change, every time.
-
-To start several processes of the game you need to add a line
-
-`debug = { enable_debug_facilities = true }`
-
-to `%userprofile%\AppData\Local\Gas Powered Games\Supreme Commander Forged Alliance\Game.prefs`
-
-Translation guidelines
-----------------------------------
-
-
-The translation of both the game and the faf patch should be written in the way that they follow those guidelines. 
-This goes for both future and past work on the SCFA translation and for all languages.
-
-1) *Compliance with the game's UI*
-- Text should never overflow from anywhere
-- As much as possible, try to keep a few pixels of margin between the text and its parent element boundaries
-- Use obvious abbreviations if a shorter translation is impossible, but the abbreviation should be made in a way that it is clear and obvious. Keywords from the game should never be abbreviated.
-
-2) *Gender-neutral writing*
-- The translation should never adopt gendered formulations when addressing the player directly, and should respect gender-neutral writing everywhere possible
-- Median point and/or parentheses, or gendering a word twice, should be avoided to the maximum.
-
-3) *Consistency of keywords*
-- Game specific keywords, like unit names and building names, should always be translated in the same manner consistently across the whole game.
-- If a new keyword appears, that is not translated elsewhere, it should be translated in a consistent manner regarding the other translated keywords.

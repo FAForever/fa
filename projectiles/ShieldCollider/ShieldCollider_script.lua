@@ -2,15 +2,18 @@
 -- File     :  /projectiles/ShieldCollider_script.lua
 -- Author(s):  Exotic_Retard, made for Equilibrium Balance Mod
 -- Summary  : Companion projectile enabling air units to hit shields
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright c 2005 Gas Powered Games, Inc.  All rights reserved.
 --------------------------------------------------------------------
 
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local Projectile = import('/lua/sim/projectile.lua').Projectile
+local VectorCached = Vector(0, 0, 0)
 
 ShieldCollider = Class(Projectile) {
     OnCreate = function(self)
         Projectile.OnCreate(self)
+
+        self.CrashingAirplaneShieldCollisionLogic = true 
 
         self:SetVizToFocusPlayer('Never') -- Set to 'Always' to see a nice box
         self:SetVizToAllies('Never')
@@ -69,7 +72,11 @@ ShieldCollider = Class(Projectile) {
 
                     -- Find the vector to the impact location, used for the impact ripple FX
                     local wx, wy, wz = unpack(VDiff(targetEntity:GetPosition(), self:GetPosition())) -- Vector from mid of shield to impact point
-                    local shieldImpactVector = {x = wx, y = wy, z = wz}
+
+                    local shieldImpactVector = VectorCached
+                    VectorCached[1] = wx 
+                    VectorCached[2] = wy 
+                    VectorCached[3] = wz 
 
                     local exclusions = categories.EXPERIMENTAL + categories.TRANSPORTATION - categories.uea0203
                     if not EntityCategoryContains(exclusions, self.Plane) then -- Exclude experimentals and transports from momentum system, but not damage
@@ -104,7 +111,7 @@ ShieldCollider = Class(Projectile) {
 
                     -- Damage the shield
                     local finalDamage = math.min(shieldDamageLimit, damage)
-                    targetEntity:ApplyDamage(self.Plane, finalDamage, shieldImpactVector or {x = 0, y = 0, z = 0}, deathWep.DamageType, false)
+                    targetEntity:ApplyDamage(self.Plane, finalDamage, shieldImpactVector, deathWep.DamageType, false)
 
                     -- Play an impact effect, but only if not bouncing. Also stop Exps, because it just looks very silly.
                     if not self.Plane.Detector and not EntityCategoryContains(categories.EXPERIMENTAL, self.Plane) then
