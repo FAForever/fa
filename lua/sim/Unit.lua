@@ -2002,17 +2002,6 @@ Unit = Class(moho.unit_methods) {
         ChangeState(self, self.DeadState)
     end,
 
-    HideLandBones = function(self)
-        -- Hide the bones for buildings built on land
-        if self.LandBuiltHiddenBones and self.Layer == 'Land' then
-            for _, v in self.LandBuiltHiddenBones do
-                if self:IsValidBone(v) then
-                    self:HideBone(v, true)
-                end
-            end
-        end
-    end,
-
     -- Generic function for showing a table of bones
     -- Table = List of bones
     -- Childrend = True/False to show child bones

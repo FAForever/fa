@@ -53,10 +53,21 @@ StructureUnit = Class(Unit) {
 
     OnCreate = function(self)
         Unit.OnCreate(self)
+        self:HideLandBones()
         self.WeaponMod = {}
         self.FxBlinkingLightsBag = {}
         if self.Layer == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
             self:FlattenSkirt()
+        end
+    end,
+
+    HideLandBones = function(self)
+        if self.LandBuiltHiddenBones and self.Layer == 'Land' then
+            for _, v in self.LandBuiltHiddenBones do
+                if self:IsValidBone(v) then
+                    self:HideBone(v, true)
+                end
+            end
         end
     end,
 
