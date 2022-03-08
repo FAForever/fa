@@ -304,20 +304,6 @@ options = {
                     },
                 },
             },
-            {
-                title = "<LOC no_singleplayer_netlag_title>Remove command delay when playing alone",
-                key = 'no_singleplayer_netlag',
-                type = 'toggle',
-                default = 'yes',
-                set = function(key,value,startup)
-                end,
-                custom = {
-                    states = {
-                        {text = "<LOC _On>", key = 'yes' },
-                        {text = "<LOC _Off>", key = 'no' },
-                    },
-                },
-            },
         },
     },
     ui = {
