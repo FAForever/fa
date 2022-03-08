@@ -28,7 +28,6 @@ local Factions = import('/lua/factions.lua').GetFactions(true)
 
 local DeprecatedWarnings = { }
 
-
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
@@ -346,7 +345,6 @@ Unit = Class(moho.unit_methods) {
         self.Dead = false
 
         self:InitBuffFields()
-        self:OnCreated()
 
         -- Ensure transport slots are available
         self.attachmentBone = nil
@@ -4324,7 +4322,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnCreated = function(self) end,
     -- Buff Fields
     InitBuffFields = function(self)
         -- Creates all buff fields
