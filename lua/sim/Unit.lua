@@ -4386,6 +4386,14 @@ Unit = Class(moho.unit_methods) {
     --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StopRocking = function(self)
+
+        if not DeprecatedWarnings.StopRocking then 
+            DeprecatedWarnings.StopRocking = true 
+            WARN("StopRocking is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
         if self.StartRockThread then
             -- clear it so that GC can take it
             KillThread(self.StartRockThread)
@@ -4400,6 +4408,14 @@ Unit = Class(moho.unit_methods) {
 
     --- Rocking thread to move a unit when it is on the water.
     RockingThread = function(self, speed)
+
+        if not DeprecatedWarnings.RockingThread then 
+            DeprecatedWarnings.RockingThread = true 
+            WARN("RockingThread is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
         -- default value
         speed = speed or 1.5
 
