@@ -602,17 +602,6 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     ---- MISC EVENTS
     -------------------------------------------------------------------------------------------
-    OnSpecialAction = function(self, location)
-    end,
-
-    OnProductionActive = function(self)
-    end,
-
-    OnActive = function(self)
-    end,
-
-    OnInactive = function(self)
-    end,
 
     OnStartCapture = function(self, target)
         self:DoUnitCallbacks('OnStartCapture', target)
@@ -2217,7 +2206,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Turn off land bones if this unit has them.
-        self:HideLandBones()
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         -- Create any idle effects on unit
@@ -4427,6 +4415,23 @@ Unit = Class(moho.unit_methods) {
     end,
 
     -- Functions that allow for specific callbacks
+
+    OnSpecialAction = function(self, location)
+        LOG("OnActive")
+        LOG(repr(location))
+    end,
+
+    OnProductionActive = function(self)
+        LOG("OnActive")
+    end,
+
+    OnActive = function(self)
+        LOG("OnActive")
+    end,
+
+    OnInactive = function(self)
+        LOG("OnInactive")
+    end,
 
     -- shield related callbacks
     OnShieldEnabled = function(self) end,
