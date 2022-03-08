@@ -361,12 +361,6 @@ Unit = Class(moho.unit_methods) {
         self.Repairers = {}
     end,
 
-    OnGotTarget = function(self, Weapon)
-    end,
-
-    OnLostTarget = function(self, Weapon)
-    end,
-
     -------------------------------------------------------------------------------------------
     ---- MISC FUNCTIONS
     -------------------------------------------------------------------------------------------
@@ -4439,158 +4433,39 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    -------------------------------------------------------------------------------------------
-    ---- DEPRECATED FUNCTIONS
-    -------------------------------------------------------------------------------------------
-    
-    ---- MISC FUNCTIONS
+    -- Functions that allow for specific callbacks
 
-    -- Deprecation / refactored warning for mods.
-    updateBuildRestrictions = function(self)
-        if not DeprecatedWarnings.updateBuildRestrictions then 
-            WARN("updateBuildRestrictions is refactored since PR #3319. Call UpdateBuildRestrictions instead.")
-            DeprecatedWarnings.updateBuildRestrictions = true 
-        end
-
-        -- call the old function
-        self.UpdateBuildRestrictions(self)
-    end,
-
-    -- Deprecation warning for mods.
-    FindHQType = function(aiBrain, category)
-        if not DeprecatedWarnings.FindHQType then 
-            WARN("FindHQType is deprecated since PR #3319.")
-            DeprecatedWarnings.FindHQType = true 
-        end
-    end,
-
-    SetDead = function(self)
-        if not DeprecatedWarnings.SetDead then 
-            DeprecatedWarnings.SetDead = true 
-            WARN("SetDead is deprecated: use unit.Dead = true instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        self.Dead = true
-    end,
-
-    IsDead = function(self)
-        if not DeprecatedWarnings.IsDead then 
-            DeprecatedWarnings.IsDead = true 
-            WARN("IsDead is deprecated: use unit.Dead instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        return self.Dead
-    end,
-
-    GetCachePosition = function(self)
-        if not DeprecatedWarnings.GetCachePosition then 
-            DeprecatedWarnings.GetCachePosition = true 
-            WARN("GetCachePosition is deprecated: use unit:GetPosition() instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        return self:GetPosition()
-    end,
-    
-    GetFootPrintSize = function(self)
-        if not DeprecatedWarnings.GetFootPrintSize then 
-            DeprecatedWarnings.GetFootPrintSize = true 
-            WARN("GetFootPrintSize is deprecated: use unit.FootPrintSize instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        return self.FootPrintSize
-    end,
-    
-    -- Returns collision box size
-    GetUnitSizes = function(self)
-        if not DeprecatedWarnings.GetUnitSizes then 
-            DeprecatedWarnings.GetUnitSizes = true 
-            WARN("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
-    end,
-
-    --- DAMAGE
-
-    SetCanTakeDamage = function(self, val)
-        if not DeprecatedWarnings.SetCanTakeDamage then 
-            DeprecatedWarnings.SetCanTakeDamage = true 
-            WARN("SetCanTakeDamage is deprecated: use unit.CanTakeDamage = val instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        self.CanTakeDamage = val
-    end,
-
-    CheckCanTakeDamage = function(self)
-        if not DeprecatedWarnings.CheckCanTakeDamage then 
-            DeprecatedWarnings.CheckCanTakeDamage = true 
-            WARN("CheckCanTakeDamage is deprecated: use unit.CanTakeDamage instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        return self.CanTakeDamage
-    end,
-
-    CheckCanBeKilled = function(self, other)
-        if not DeprecatedWarnings.CheckCanBeKilled then 
-            DeprecatedWarnings.CheckCanBeKilled = true 
-            WARN("CheckCanBeKilled is deprecated: use unit.CanBeKilled instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        return self.CanBeKilled
-    end,
-    
-    -- Argument val is true or false. False = cannot be killed
-    SetCanBeKilled = function(self, val)
-        if not DeprecatedWarnings.SetCanBeKilled then 
-            DeprecatedWarnings.SetCanBeKilled = true 
-            WARN("SetCanBeKilled is deprecated: use unit.CanBeKilled = val instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-        end
-        self.CanBeKilled = val
-    end,
-
-    --- OTHER
-
-    GetUnitBeingBuilt = function(self)
-        if not GetUnitBeingBuiltWarning then
-            WARN("Deprecated function GetUnitBeingBuilt called at")
-            WARN(debug.traceback())
-            WARN("Further warnings of this will be suppressed")
-            GetUnitBeingBuiltWarning = true
-        end
-
-        return self.UnitBeingBuilt
-    end,
-
+    -- shield related callbacks
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    -- weapon related callbacks
+    OnGotTarget = function(self, Weapon) end,
+    OnLostTarget = function(self, Weapon) end,
 
     --- Deprecated functionality
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        if self.DisallowCollisions then
-            return false
-        end
 
-        -- Skip friendly collisions
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if IsAlly(self.Army, firingWeapon.unit.Army) then
-                return false
-            end
-        end
-
-        -- Check for specific non-collisions
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
+        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
+            DeprecatedWarnings.OnCollisionCheckWeapon = true 
+            WARN("OnCollisionCheckWeapon is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
 
         return true
+    end,
+
+    GetUnitBeingBuilt = function(self)
+        if not DeprecatedWarnings.GetUnitBeingBuilt then 
+            DeprecatedWarnings.GetUnitBeingBuilt = true 
+            WARN("CreateCybranBuildBeams is deprecated: use unit.UnitBeingBuilt instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
+        return self.UnitBeingBuilt
     end,
 
 }
