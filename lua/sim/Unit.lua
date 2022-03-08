@@ -840,11 +840,6 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     -- ECONOMY
     -------------------------------------------------------------------------------------------
-    OnConsumptionActive = function(self)
-    end,
-
-    OnConsumptionInActive = function(self)
-    end,
 
     -- We are splitting Consumption into two catagories:
     -- Maintenance -- for units that are usually "on": radar, mass extractors, etc.
@@ -4410,8 +4405,15 @@ Unit = Class(moho.unit_methods) {
 
     -- Various callback-like functions
 
+    -- Called when the C function unit.SetConsumptionActive is called
+    OnConsumptionActive = function(self) end,
+    OnConsumptionInActive = function(self) end,
+
     -- Called when the C function unit.SetProductionActive is called
     OnProductionActive = function(self) end,
+    OnProductionInActive = function(self) 
+        LOG(debug.traceback())
+    end,
 
     -- shield related callbacks
     OnShieldEnabled = function(self) end,
