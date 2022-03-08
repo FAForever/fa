@@ -35,16 +35,12 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 -- cached categories for performance
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
--- upvalues for performance
-local IsAlly = IsAlly
-
--- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
-
 -- Deprecated function warning flags
 local GetUnitBeingBuiltWarning = false
 
 -- upvalue for performance
 local rawget = rawget 
+local IsAlly = IsAlly
 
 SyncMeta = {
     __index = function(t, key)
