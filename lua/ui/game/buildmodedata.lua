@@ -228,7 +228,8 @@ local UEFT1Air = {
 }
 
 local UEFT2Air = {
-    ['F'] = 'dea0202',
+    ['J'] = 'dea0202',
+    ['F'] = 'xel0209',
     ['E'] = 'uel0208',
     ['P'] = 'uea0204',
     ['G'] = 'uea0203',
@@ -254,6 +255,7 @@ local UEFT1Sea = {
 local UEFT2Sea = {
     ['V'] = 'xes0205',
     ['E'] = 'uel0208',
+    ['F'] = 'xel0209',
     ['O'] = 'xes0102',
     ['C'] = 'ues0202',
     ['D'] = 'ues0201',
