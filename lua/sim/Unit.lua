@@ -43,6 +43,9 @@ local IsAlly = IsAlly
 -- Deprecated function warning flags
 local GetUnitBeingBuiltWarning = false
 
+-- upvalue for performance
+local rawget = rawget 
+
 SyncMeta = {
     __index = function(t, key)
         local id = rawget(t, 'id')
