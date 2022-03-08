@@ -3898,9 +3898,6 @@ Unit = Class(moho.unit_methods) {
 
     WorkingState = State {
         Main = function(self)
-            while self.WorkProgress < 1 and not self.Dead do
-                WaitSeconds(0.1)
-            end
         end,
 
         OnWorkEnd = function(self, work)
