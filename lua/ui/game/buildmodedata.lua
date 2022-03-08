@@ -82,6 +82,7 @@ local AeonT3Land = {
     ['E'] = 'ual0309',
     ['O'] = 'ual0303',
     ['R'] = 'ual0304',
+	['N'] = 'dalk003',
 }
 
 local AeonT1Air = {
@@ -215,6 +216,7 @@ local UEFT3Land = {
     ['E'] = 'uel0309',
     ['O'] = 'uel0303',
     ['R'] = 'uel0304',
+    ['N'] = 'delk002',
 }
 
 local UEFT1Air = {
@@ -226,7 +228,8 @@ local UEFT1Air = {
 }
 
 local UEFT2Air = {
-    ['F'] = 'dea0202',
+    ['J'] = 'dea0202',
+    ['F'] = 'xel0209',
     ['E'] = 'uel0208',
     ['P'] = 'uea0204',
     ['G'] = 'uea0203',
@@ -252,6 +255,7 @@ local UEFT1Sea = {
 local UEFT2Sea = {
     ['V'] = 'xes0205',
     ['E'] = 'uel0208',
+    ['F'] = 'xel0209',
     ['O'] = 'xes0102',
     ['C'] = 'ues0202',
     ['D'] = 'ues0201',
@@ -346,6 +350,7 @@ local CybranT3Land = {
     ['E'] = 'url0309',
     ['O'] = 'url0303',
     ['R'] = 'url0304',
+	['N'] = 'drlk001',
 }
 
 local CybranT1Air = {
@@ -400,6 +405,7 @@ local CybranCrabBot = {
     ['A'] = 'xrl0003',
     ['N'] = 'xrl0004',
     ['R'] = 'xrl0005',
+    ['N'] = 'drlk001',
 }
 
 local SeraphimT1Eng = {
@@ -480,6 +486,7 @@ local SeraphimT3Land = {
     ['R'] = 'xsl0304',
     ['S'] = 'xsl0305',
     ['V'] = 'xsl0307',
+	['N'] = 'dslk004',
 }
 
 local SeraphimT1Air = {
@@ -624,6 +631,24 @@ buildModeKeys = {
         [2] = AeonT2Sea,
         ['U'] = 'uab0303',
     },
+    -- T2 Land Factory
+    ['zab9501'] = {
+        [1] = AeonT1Land,
+        [2] = AeonT2Land,
+        ['U'] = 'zab9601',
+    },
+    -- T2 Air Factory
+    ['zab9502'] = {
+        [1] = AeonT1Air,
+        [2] = AeonT2Air,
+        ['U'] = 'zab9602',
+    },
+    -- T2 Naval Factory
+    ['zab9503'] = {
+        [1] = AeonT1Sea,
+        [2] = AeonT2Sea,
+        ['U'] = 'zab9603',
+    },
     -- T3 Land Factory
     ['uab0301'] = {
         [1] = AeonT1Land,
@@ -638,6 +663,24 @@ buildModeKeys = {
     },
     -- T3 Naval Factory
     ['uab0303'] = {
+        [1] = AeonT1Sea,
+        [2] = AeonT2Sea,
+        [3] = AeonT3Sea,
+    },
+    -- T3 Land Factory
+    ['zab9601'] = {
+        [1] = AeonT1Land,
+        [2] = AeonT2Land,
+        [3] = AeonT3Land,
+    },
+    -- T3 Air Factory
+    ['zab9602'] = {
+        [1] = AeonT1Air,
+        [2] = AeonT2Air,
+        [3] = AeonT3Air,
+    },
+    -- T3 Naval Factory
+    ['zab9603'] = {
         [1] = AeonT1Sea,
         [2] = AeonT2Sea,
         [3] = AeonT3Sea,
@@ -759,6 +802,11 @@ buildModeKeys = {
         [1] = UEFT1Eng,
         [2] = UEFT2Eng,
     },
+    -- T2 field engineer
+    ['xel0209'] = {
+        [1] = UEFT1Eng,
+        [2] = UEFT2Eng,
+    },
     -- T3 engineer
     ['uel0309'] = {
         [1] = UEFT1Eng,
@@ -799,6 +847,24 @@ buildModeKeys = {
         [2] = UEFT2Sea,
         ['U'] = 'ueb0303',
     },
+    -- T2 Land Factory
+    ['zeb9501'] = {
+        [1] = UEFT1Land,
+        [2] = UEFT2Land,
+        ['U'] = 'zeb9601',
+    },
+    -- T2 Air Factory
+    ['zeb9502'] = {
+        [1] = UEFT1Air,
+        [2] = UEFT2Air,
+        ['U'] = 'zeb9602',
+    },
+    -- T2 Naval Factory
+    ['zeb9503'] = {
+        [1] = UEFT1Sea,
+        [2] = UEFT2Sea,
+        ['U'] = 'zeb9603',
+    },
     -- T3 Land Factory
     ['ueb0301'] = {
         [1] = UEFT1Land,
@@ -813,6 +879,24 @@ buildModeKeys = {
     },
     -- T3 Naval Factory
     ['ueb0303'] = {
+        [1] = UEFT1Sea,
+        [2] = UEFT2Sea,
+        [3] = UEFT3Sea,
+    },
+    -- T3 Land Factory
+    ['zeb9601'] = {
+        [1] = UEFT1Land,
+        [2] = UEFT2Land,
+        [3] = UEFT3Land,
+    },
+    -- T3 Air Factory
+    ['zeb9602'] = {
+        [1] = UEFT1Air,
+        [2] = UEFT2Air,
+        [3] = UEFT3Air,
+    },
+    -- T3 Naval Factory
+    ['zeb9603'] = {
         [1] = UEFT1Sea,
         [2] = UEFT2Sea,
         [3] = UEFT3Sea,
@@ -977,6 +1061,24 @@ buildModeKeys = {
         [2] = CybranT2Sea,
         ['U'] = 'urb0303',
     },
+	    -- T2 Land Factory
+    ['zrb9501'] = {
+        [1] = CybranT1Land,
+        [2] = CybranT2Land,
+        ['U'] = 'zrb9601',
+    },
+    -- T2 Air Factory
+    ['zrb9502'] = {
+        [1] = CybranT1Air,
+        [2] = CybranT2Air,
+        ['U'] = 'zrb9602',
+    },
+    -- T2 Naval Factory
+    ['zrb9503'] = {
+        [1] = CybranT1Sea,
+        [2] = CybranT2Sea,
+        ['U'] = 'zrb9603',
+    },
     -- T3 Land Factory
     ['urb0301'] = {
         [1] = CybranT1Land,
@@ -991,6 +1093,24 @@ buildModeKeys = {
     },
     -- T3 Naval Factory
     ['urb0303'] = {
+        [1] = CybranT1Sea,
+        [2] = CybranT2Sea,
+        [3] = CybranT3Sea,
+    },
+    -- T3 Land Factory
+    ['zrb9601'] = {
+        [1] = CybranT1Land,
+        [2] = CybranT2Land,
+        [3] = CybranT3Land,
+    },
+    -- T3 Air Factory
+    ['zrb9602'] = {
+        [1] = CybranT1Air,
+        [2] = CybranT2Air,
+        [3] = CybranT3Air,
+    },
+    -- T3 Naval Factory
+    ['zrb9603'] = {
         [1] = CybranT1Sea,
         [2] = CybranT2Sea,
         [3] = CybranT3Sea,
@@ -1039,7 +1159,7 @@ buildModeKeys = {
     ['urb4206'] = {
         ['U'] = 'urb4207',
     },
-    -- T3 Air Factory
+    -- Aircraft Carrier
     ['urs0303'] = {
         [1] = CybranT1Air,
         [2] = CybranT2Air,
@@ -1157,6 +1277,24 @@ buildModeKeys = {
         [2] = SeraphimT2Sea,
         ['U'] = 'xsb0303',
     },
+    -- T2 Land Factory
+    ['zsb9501'] = {
+        [1] = SeraphimT1Land,
+        [2] = SeraphimT2Land,
+        ['U'] = 'zsb9601',
+    },
+    -- T2 Air Factory
+    ['zsb9502'] = {
+        [1] = SeraphimT1Air,
+        [2] = SeraphimT2Air,
+        ['U'] = 'zsb9602',
+    },
+    -- T2 Naval Factory
+    ['zsb9503'] = {
+        [1] = SeraphimT1Sea,
+        [2] = SeraphimT2Sea,
+        ['U'] = 'zsb9603',
+    },
     -- T3 Land Factory
     ['xsb0301'] = {
         [1] = SeraphimT1Land,
@@ -1171,6 +1309,24 @@ buildModeKeys = {
     },
     -- T3 Naval Factory
     ['xsb0303'] = {
+        [1] = SeraphimT1Sea,
+        [2] = SeraphimT2Sea,
+        [3] = SeraphimT3Sea,
+    },
+    -- T3 Land Factory
+    ['zsb9601'] = {
+        [1] = SeraphimT1Land,
+        [2] = SeraphimT2Land,
+        [3] = SeraphimT3Land,
+    },
+    -- T3 Air Factory
+    ['zsb9602'] = {
+        [1] = SeraphimT1Air,
+        [2] = SeraphimT2Air,
+        [3] = SeraphimT3Air,
+    },
+    -- T3 Naval Factory
+    ['zsb9603'] = {
         [1] = SeraphimT1Sea,
         [2] = SeraphimT2Sea,
         [3] = SeraphimT3Sea,
@@ -1219,7 +1375,7 @@ buildModeKeys = {
     ['xsb4206'] = {
         ['U'] = 'xsb4207',
     },
-    -- T3 Air Factory
+    -- Aircraft Carrier
     ['xss0303'] = {
         [1] = SeraphimT1Air,
         [2] = SeraphimT2Air,
