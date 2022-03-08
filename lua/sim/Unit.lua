@@ -209,12 +209,6 @@ Unit = Class(moho.unit_methods) {
         -- cache commonly used values from the engine
         -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
 
-        -- Turn off land bones if this unit has them.
-        self:HideLandBones()
-
-
-        local bp = self:GetBlueprint()
-
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
         self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
@@ -4414,24 +4408,10 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    -- Functions that allow for specific callbacks
+    -- Various callback-like functions
 
-    OnSpecialAction = function(self, location)
-        LOG("OnActive")
-        LOG(repr(location))
-    end,
-
-    OnProductionActive = function(self)
-        LOG("OnActive")
-    end,
-
-    OnActive = function(self)
-        LOG("OnActive")
-    end,
-
-    OnInactive = function(self)
-        LOG("OnInactive")
-    end,
+    -- Called when the C function unit.SetProductionActive is called
+    OnProductionActive = function(self) end,
 
     -- shield related callbacks
     OnShieldEnabled = function(self) end,
@@ -4440,6 +4420,11 @@ Unit = Class(moho.unit_methods) {
     -- weapon related callbacks
     OnGotTarget = function(self, Weapon) end,
     OnLostTarget = function(self, Weapon) end,
+
+    -- Unknown when these are called
+    OnActive = function(self) end,
+    OnInActive = function(self) end,
+    OnSpecialAction = function(self, location) end,
 
     --- Deprecated functionality
 

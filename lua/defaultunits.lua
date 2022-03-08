@@ -165,6 +165,9 @@ StructureUnit = Class(Unit) {
             self:CreateTarmac(true, true, true, false, false)
         end
         self:PlayActiveAnimation()
+
+        -- remove land bones if the structure has them
+        self:HideLandBones()
     end,
 
     OnFailedToBeBuilt = function(self)

@@ -51,6 +51,7 @@ UEB1102 = Class(TEnergyCreationUnit) {
         end,
 
         OnInActive = function(self)
+            LOG("OnInActive")
             ChangeState(self, self.InActiveState)
         end,
     },
@@ -67,6 +68,7 @@ UEB1102 = Class(TEnergyCreationUnit) {
         end,
 
         OnActive = function(self)
+            LOG("OnActive")
             ChangeState(self, self.ActiveState)
         end,
     },
