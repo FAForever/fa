@@ -976,14 +976,6 @@ Unit = Class(moho.unit_methods) {
             mass_rate = mass / time
         end
 
-        -- only run this part if we actually have AIs in the game, they are the ones that use
-        -- this functionality apparently. A consequence of this is that engineers start assisting
-        -- slower if they are chain-assisting each other. However, in practice it is a lot cheaper
-        -- on the performance of the game. Best to just assist what you want it to assist directly.
-        -- if GameHasAIs then 
-        --     self:UpdateAssistersConsumption()
-        -- end
-
         local myBlueprint = self:GetBlueprint()
         if self.MaintenanceConsumption then
             local mai_energy = (self.EnergyMaintenanceConsumptionOverride or myBlueprint.Economy.MaintenanceConsumptionPerSecondEnergy)  or 0
