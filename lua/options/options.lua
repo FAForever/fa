@@ -303,7 +303,7 @@ options = {
                         {text = "<LOC _MaxTech>", key = 'maxTech'},
                     },
                 },
-            }
+            },
         },
     },
     ui = {
