@@ -68,7 +68,7 @@ local function CalculatedDPS(weapon)
     elseif weapon.BeamLifetime and weapon.BeamLifetime > 0 then
         -- Uncontinuous beam. Interval from start to next start.
         DamageInterval = DamageInterval + weapon.BeamLifetime
-        -- Damage is calculated as a single glob
+        -- Damage is calculated as a single glob, beam weapons are typically underappreciated
         Damage = Damage * (weapon.BeamLifetime / (0.1 + (weapon.BeamCollisionDelay or 0)))
     end
 
@@ -77,7 +77,7 @@ end
 
 
 function SetUnitThreatValues(unitBPs)
-    
+
     -- localize for performance
     local TableFind = TableFind
     local TableGetn = TableGetn
@@ -106,6 +106,11 @@ function SetUnitThreatValues(unitBPs)
             continue 
         end
 
+        -- not all units need dynamic threat calculations, such as the commanders
+        if bp.Defense.SkipDynamicThreatCalculations then 
+            continue 
+        end
+
         --  default to 0
         cache.AirThreatLevel = 0
         cache.EconomyThreatLevel = 0
@@ -120,6 +125,7 @@ function SetUnitThreatValues(unitBPs)
         if bp.Defense.MaxHealth then
             cache.HealthThreat = bp.Defense.MaxHealth * 0.01
         end
+
         if bp.Defense.Shield then
             local shield = bp.Defense.Shield                                               -- ShieldProjectionRadius entirely only for the Pillar of Prominence
             local shieldarea = (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * (shield.ShieldProjectionRadius or shield.ShieldSize or 0) * math.pi
@@ -136,11 +142,13 @@ function SetUnitThreatValues(unitBPs)
             -- Mass prod + 5% of health
             cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondMass * 10 + (cache.HealthThreat + cache.PersonalShieldThreat) * 5
         end
+
         if bp.Economy.ProductionPerSecondEnergy then
             -- Energy prod + 1% of health
             cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.ProductionPerSecondEnergy * 0.1 + cache.HealthThreat + cache.PersonalShieldThreat
         end
-        -- 0 off the personal health values if we alreaady used them
+
+        -- remove health and shield because they're used
         if bp.Economy.ProductionPerSecondMass or bp.Economy.ProductionPerSecondEnergy then
             cache.HealthThreat = 0
             cache.PersonalShieldThreat = 0
@@ -166,7 +174,8 @@ function SetUnitThreatValues(unitBPs)
         if bp.Economy.StorageEnergy then
             cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Economy.StorageEnergy * 0.001 + cache.HealthThreat + cache.PersonalShieldThreat
         end
-        -- 0 off the personal health values if we alreaady used them
+
+        -- remove health and shield because they're used
         if bp.Economy.StorageMass or bp.Economy.StorageEnergy then
             cache.HealthThreat = 0
             cache.PersonalShieldThreat = 0
@@ -186,47 +195,58 @@ function SetUnitThreatValues(unitBPs)
         if bp.Weapon then
             for i, weapon in bp.Weapon do
 
-                -- skip disabled weapons by default
+                -- skip weapons part of an enhancement
                 if weapon.EnabledByEnhancement then 
                     continue 
                 end
 
+                -- dps of weapon
+                local dps = CalculatedDPS(weapon)
+
+                -- multipliers to scale damage a bit
+                local econMult = 1
+                local surfaceMult = 0.1
+
+                -- determines if we apply dps to economic or anti surface threat
+                local blockedByArtilleryShield = weapon.ArtilleryShieldBlocks  
+
+                -- Anti air
                 if weapon.RangeCategory == 'UWRC_AntiAir' or weapon.TargetRestrictOnlyAllow == 'AIR' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Air') then
-                    cache.AirThreatLevel = cache.AirThreatLevel + CalculatedDPS(weapon) / 10
+                    cache.AirThreatLevel = cache.AirThreatLevel + dps / 10
+
+                -- Anti submarine
                 elseif weapon.RangeCategory == 'UWRC_AntiNavy' or StringFind(weapon.WeaponCategory or 'nope', 'Anti Navy') then
                     if StringFind(weapon.WeaponCategory or 'nope', 'Bomb') or StringFind(weapon.Label or 'nope', 'Bomb') or weapon.NeedToComputeBombDrop or bp.Air.Winged then
                         cache.SubThreatLevel = cache.SubThreatLevel + CalculatedDamage(weapon) / 100
                     else
-                        cache.SubThreatLevel = cache.SubThreatLevel + CalculatedDPS(weapon) / 10
+                        cache.SubThreatLevel = cache.SubThreatLevel + dps / 10
                     end
+
+                -- Direct fire or artillery
                 elseif weapon.RangeCategory == 'UWRC_DirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Direct Fire')
                 or weapon.RangeCategory == 'UWRC_IndirectFire' or StringFind(weapon.WeaponCategory or 'nope', 'Artillery') then
-                    -- Range cutoff for artillery being considered eco and surface threat is 100
-                    local wepDPS = CalculatedDPS(weapon)
-                    local rangeCutoff = 50
-                    local econMult = 1
-                    local surfaceMult = 0.1
-                    if weapon.MinRadius and weapon.MinRadius >= rangeCutoff then
-                        cache.EconomyThreatLevel = cache.EconomyThreatLevel + wepDPS * econMult
-                    elseif weapon.MaxRadius and weapon.MaxRadius <= rangeCutoff then
-                        cache.SurfaceThreatLevel = cache.SurfaceThreatLevel + wepDPS * surfaceMult
-                    else
-                        local distr = (rangeCutoff - (weapon.MinRadius or 0)) / (weapon.MaxRadius - (weapon.MinRadius or 0))
-                        cache.EconomyThreatLevel = cache.EconomyThreatLevel + wepDPS * (1 - distr) * econMult
-                        cache.SurfaceThreatLevel = cache.SurfaceThreatLevel + wepDPS * distr * surfaceMult
+                    if blockedByArtilleryShield then 
+                        cache.EconomyThreatLevel = cache.EconomyThreatLevel + dps * econMult
+                    else 
+                        cache.SurfaceThreatLevel = cache.SurfaceThreatLevel + dps * surfaceMult
                     end
+
+                -- Bombers
                 elseif StringFind(weapon.WeaponCategory or 'nope', 'Bomb') or StringFind(weapon.Label or 'nope', 'Bomb') or weapon.NeedToComputeBombDrop then
                     cache.SurfaceThreatLevel = cache.SurfaceThreatLevel + CalculatedDamage(weapon) / 100
+
+                -- Death weapon
                 elseif StringFind(weapon.WeaponCategory or 'nope', 'Death') then
-                    cache.EconomyThreatLevel = MathFloor(cache.EconomyThreatLevel + CalculatedDPS(weapon) / 200)
+                    cache.EconomyThreatLevel = MathFloor(cache.EconomyThreatLevel + dps / 200)
+
+                -- Unknown weapon threat (mods)
                 else
-                    cache.UnknownWeaponThreat = cache.UnknownWeaponThreat + CalculatedDPS(weapon)
+                    cache.UnknownWeaponThreat = cache.UnknownWeaponThreat + dps
                     if ReportIssues then 
                         LOG(" * WARNING: Unknown weapon type on: " .. id .. " with the weapon label: " .. (weapon.Label or "nil") )
                     end
                     bp.Warnings = (bp.Warnings or 0) + 1
                 end
-                -- LOG(id .. " - " .. LOC(bp.General.UnitName or bp.Description) .. ' --  ' .. (weapon.DisplayName or '<Unnamed weapon>') .. ' ' .. weapon.RangeCategory .. " DPS: " .. CalculatedDPS(weapon))
             end
         end
 

@@ -169,6 +169,7 @@ UnitBlueprint {
     },
     CollisionOffsetZ = 0.2,
     Defense = {
+        SkipDynamicThreatCalculations = true,
         AirThreatLevel = 0,
         ArmorType = 'Commander',
         EconomyThreatLevel = 5,
