@@ -1971,15 +1971,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --- Called under mysterous circumstances, previously held logic for nonexistent sound effects.
-    OnDamageBy = function(self, index) end,
-
-    --- Called when a nuke is armed, played a nonexistent sound effect
-    OnNukeArmed = function(self) end,
-
-    OnNukeLaunched = function(self)
-    end,
-
     --- STRATEGIC LAUNCH DETECTED
     NukeCreatedAtUnit = function(self)
         if self:GetNukeSiloAmmoCount() <= 0 then
@@ -4210,85 +4201,6 @@ Unit = Class(moho.unit_methods) {
         EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
     end,
 
-    ------------------------------------------------------------------------------------------
-    -- ROCKING
-    -------------------------------------------------------------------------------------------
-    -- Causes units to rock from side to side on water
-
-    --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
-    -- in practice, nor by this repository or by any of the commonly played mod packs.
-    StartRocking = function(self)
-        local bp = self:GetBlueprint().Display
-        local speed = bp.MaxRockSpeed
-        if (not self.RockManip) and (not self.Dead) and speed and speed > 0 then 
-
-            -- clear it so that GC can take it, if it exists
-            if self.StopRockThread then 
-                KillThread(self.StopRockThread)
-                self.StopRockThread = nil 
-            end
-
-            self.StartRockThread = self:ForkThread(self.RockingThread, speed)
-        end
-    end,
-
-    --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
-    -- in practice, nor by this repository or by any of the commonly played mod packs.
-    StopRocking = function(self)
-        if self.StartRockThread then
-            -- clear it so that GC can take it
-            KillThread(self.StartRockThread)
-            self.StartRockThread = nil
-
-            local bp = self:GetBlueprint().Display
-            local speed = bp.MaxRockSpeed
-
-            self.StopRockThread = self:ForkThread(self.EndRockingThread, speed)
-        end
-    end,
-
-    --- Rocking thread to move a unit when it is on the water.
-    RockingThread = function(self, speed)
-        -- default value
-        speed = speed or 1.5
-
-        self.RockManip = CreateRotator(self, 0, 'z', nil, 0, speed * 0.2, speed * 0.6)
-        self.Trash:Add(self.RockManip)
-        self.RockManip:SetPrecedence(0)
-
-        while true do
-            WaitFor(self.RockManip)
-
-            if self.Dead then break end -- Abort if the unit died
-
-            self.RockManip:SetTargetSpeed(-speed) 
-            WaitFor(self.RockManip)
-
-            if self.Dead then break end -- Abort if the unit died
-
-            self.RockManip:SetTargetSpeed(speed)
-        end
-    end,
-
-    --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
-    -- warping to the original position.
-    EndRockingThread = function(self, speed)
-        if self.RockManip then
-
-            -- default value
-            speed = speed or 1.5
-
-            self.RockManip:SetGoal(0)
-            self.RockManip:SetSpeed(speed / 4)
-            WaitFor(self.RockManip)
-
-            if self.RockManip then
-                self.RockManip:Destroy()
-                self.RockManip = nil
-            end
-        end
-    end,
-
     -- Buff Fields
     InitBuffFields = function(self)
         -- Creates all buff fields
@@ -4401,22 +4313,25 @@ Unit = Class(moho.unit_methods) {
 
     -- Called when the C function unit.SetProductionActive is called
     OnProductionActive = function(self) end,
-    OnProductionInActive = function(self) 
-        LOG(debug.traceback())
-    end,
+    OnProductionInActive = function(self) end,
 
-    -- shield related callbacks
+    -- Called by the shield class 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
 
-    -- weapon related callbacks
+    -- Called by the weapon class, these are expensive!
     OnGotTarget = function(self, Weapon) end,
     OnLostTarget = function(self, Weapon) end,
+
+    --- called when the unit
+    OnNukeArmed = function(self) end,
+    OnNukeLaunched = function(self) end,
 
     -- Unknown when these are called
     OnActive = function(self) end,
     OnInActive = function(self) end,
     OnSpecialAction = function(self, location) end,
+    OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality
 
@@ -4441,6 +4356,88 @@ Unit = Class(moho.unit_methods) {
         end
 
         return self.UnitBeingBuilt
+    end,
+
+    --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
+    StartRocking = function(self)
+
+        if not DeprecatedWarnings.StartRocking then 
+            DeprecatedWarnings.StartRocking = true 
+            WARN("StartRocking is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
+        local bp = self:GetBlueprint().Display
+        local speed = bp.MaxRockSpeed
+        if (not self.RockManip) and (not self.Dead) and speed and speed > 0 then 
+
+            -- clear it so that GC can take it, if it exists
+            if self.StopRockThread then 
+                KillThread(self.StopRockThread)
+                self.StopRockThread = nil 
+            end
+
+            self.StartRockThread = self:ForkThread(self.RockingThread, speed)
+        end
+    end,
+
+    --- Stops the unit to rock from side to side. Useful when the unit is on water. Is not used
+    -- in practice, nor by this repository or by any of the commonly played mod packs.
+    StopRocking = function(self)
+        if self.StartRockThread then
+            -- clear it so that GC can take it
+            KillThread(self.StartRockThread)
+            self.StartRockThread = nil
+
+            local bp = self:GetBlueprint().Display
+            local speed = bp.MaxRockSpeed
+
+            self.StopRockThread = self:ForkThread(self.EndRockingThread, speed)
+        end
+    end,
+
+    --- Rocking thread to move a unit when it is on the water.
+    RockingThread = function(self, speed)
+        -- default value
+        speed = speed or 1.5
+
+        self.RockManip = CreateRotator(self, 0, 'z', nil, 0, speed * 0.2, speed * 0.6)
+        self.Trash:Add(self.RockManip)
+        self.RockManip:SetPrecedence(0)
+
+        while true do
+            WaitFor(self.RockManip)
+
+            if self.Dead then break end -- Abort if the unit died
+
+            self.RockManip:SetTargetSpeed(-speed) 
+            WaitFor(self.RockManip)
+
+            if self.Dead then break end -- Abort if the unit died
+
+            self.RockManip:SetTargetSpeed(speed)
+        end
+    end,
+
+    --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
+    -- warping to the original position.
+    EndRockingThread = function(self, speed)
+        if self.RockManip then
+
+            -- default value
+            speed = speed or 1.5
+
+            self.RockManip:SetGoal(0)
+            self.RockManip:SetSpeed(speed / 4)
+            WaitFor(self.RockManip)
+
+            if self.RockManip then
+                self.RockManip:Destroy()
+                self.RockManip = nil
+            end
+        end
     end,
 
 }
