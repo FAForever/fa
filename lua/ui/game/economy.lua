@@ -32,6 +32,17 @@ States = {
     massViewState = Prefs.GetFromCurrentProfile("massRateView") or 1,
 }
 
+-- Keep track of the economy of the past 20 ticks
+
+-- {
+--   income={ ENERGY=2, MASS=0.10000000149012 },
+--   lastUseActual={ ENERGY=0, MASS=0 },
+--   lastUseRequested={ ENERGY=0, MASS=0 },
+--   maxStorage={ ENERGY=4000, MASS=650 },
+--   reclaimed={ ENERGY=0, MASS=0 },
+--   stored={ ENERGY=4000, MASS=650 }
+-- }
+
 function Contract()
     UIState = false
 end
@@ -371,9 +382,11 @@ function ConfigureBeatFunction()
         -- tick (captured into the returned closure).
         local lastReclaimTotal = 0
         local lastReclaimRate = 0
+        local test = false 
 
         -- Finally, glue all the bits together into a a resource-update function.
         return function()
+
             local econData = GetEconomyTotals()
             local simFrequency = GetSimTicksPerSecond()
 
@@ -413,6 +426,7 @@ function ConfigureBeatFunction()
 
             -- Should always be positive integer
             local incomeSec = math.max(0, incomeVal * simFrequency)
+
             local generatedIncome = incomeSec - lastReclaimRate
 
             -- How much are we wanting to drain?
@@ -429,8 +443,6 @@ function ConfigureBeatFunction()
             incomeTxt:SetText(string.format("+%d", fmtnum(generatedIncome)))
             expenseTxt:SetText(string.format("-%d", fmtnum(expense)))
 
-
-
             -- Store this tick's reclaimRate for next tick
             lastReclaimRate = reclaimRate
 
@@ -439,6 +451,7 @@ function ConfigureBeatFunction()
 
             -- incomeSec and expense are already limit-checked and integers
             local rateVal = incomeSec - expense
+            local etaVal = generatedIncome - expense
 
             -- Calculate resource usage efficiency for % display mode
             local effVal
@@ -476,6 +489,7 @@ function ConfigureBeatFunction()
             end
 
             local rateColor = getRateColour(rateVal, storedVal, maxStorageVal)
+            local etaColor = getRateColour(etaVal, storedVal, maxStorageVal)
             rateTxt:SetColor(rateColor)
 
             if not UIState then
@@ -488,8 +502,8 @@ function ConfigureBeatFunction()
             local str = "~"
 
             -- decreasing storage storage
-            if rateVal < 0 then  
-                local time = math.abs(storedVal / rateVal)
+            if etaVal < 0 then  
+                local time = math.abs(storedVal / etaVal)
                 local seconds = math.floor(time)
                 local minutes = math.floor(seconds / 60)
                 seconds = (seconds - (minutes * 60))
@@ -501,8 +515,8 @@ function ConfigureBeatFunction()
             end
 
             -- increasing storage
-            if rateVal > 0 then  
-                local time = math.abs((maxStorageVal - storedVal) / rateVal)
+            if etaVal > 0 then  
+                local time = math.abs((maxStorageVal - storedVal) / etaVal)
                 local seconds = math.floor(time)
                 local minutes = math.floor(seconds / 60)
                 seconds = seconds - (minutes * 60)
@@ -515,8 +529,13 @@ function ConfigureBeatFunction()
 
             -- set the text and color
             etaValueTxt:SetText(str)
-            etaValueTxt:SetColor(rateColor)
-            etaTxt:SetColor(rateColor)
+            etaValueTxt:SetColor(etaColor)
+            if etaVal > 0 then 
+                etaTxt:SetText("Full in")
+            else
+                etaTxt:SetText("Depleted in")
+            end 
+            etaTxt:SetColor(etaColor)
 
             ShowUIWarnings(effVal, storedVal, maxStorageVal)
         end
