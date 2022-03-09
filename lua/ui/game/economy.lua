@@ -533,7 +533,7 @@ function ConfigureBeatFunction()
             if etaVal > 0 then 
                 etaTxt:SetText("Full in")
             else
-                etaTxt:SetText("Depleted in")
+                etaTxt:SetText("Empty in")
             end 
             etaTxt:SetColor(etaColor)
 
