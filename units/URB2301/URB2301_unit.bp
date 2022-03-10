@@ -196,7 +196,7 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 2,
+            FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 50,
             MuzzleSalvoDelay = 0,
