@@ -110,7 +110,7 @@ function RemoteViewing(SuperClass)
             -- visible entity already off
             if self.RemoteViewingData.DisableCounter > 1 then return end
             -- disable vis entity and monitor resources
-            if not self:IsDead() and self.RemoteViewingData.Satellite then
+            if not self.Dead and self.RemoteViewingData.Satellite then
                 self.RemoteViewingData.Satellite:DisableIntel('Omni')
                 self.RemoteViewingData.Satellite:DisableIntel('Radar')
                 self.RemoteViewingData.Satellite:DisableIntel('Vision')
