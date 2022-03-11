@@ -73,7 +73,7 @@ UAL0401 = Class(AWalkingLandUnit) {
                 end
             end
 
-            WaitSeconds(1.0)
+            WaitSeconds(0.2)
         end
     end,
 
