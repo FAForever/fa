@@ -4429,6 +4429,14 @@ Unit = Class(moho.unit_methods) {
     --- Stopping of the rocking thread, allowing it to gracefully end instead of suddenly
     -- warping to the original position.
     EndRockingThread = function(self, speed)
+
+        if not DeprecatedWarnings.EndRockingThread then 
+            DeprecatedWarnings.EndRockingThread = true 
+            WARN("EndRockingThread is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
         if self.RockManip then
 
             -- default value
@@ -4447,7 +4455,9 @@ Unit = Class(moho.unit_methods) {
 
     updateBuildRestrictions = function(self)
         if not DeprecatedWarnings.updateBuildRestrictions then 
-            WARN("updateBuildRestrictions is refactored since PR #3319. Call UpdateBuildRestrictions instead.")
+            WARN("updateBuildRestrictions is deprecated. Call UpdateBuildRestrictions instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
             DeprecatedWarnings.updateBuildRestrictions = true 
         end
 
@@ -4457,8 +4467,10 @@ Unit = Class(moho.unit_methods) {
 
     FindHQType = function(aiBrain, category)
         if not DeprecatedWarnings.FindHQType then 
-            WARN("FindHQType is deprecated since PR #3319.")
             DeprecatedWarnings.FindHQType = true 
+            WARN("FindHQType is deprecated since PR #3319.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
     end,
 
@@ -4467,6 +4479,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.SetDead = true 
             WARN("SetDead is deprecated: use unit.Dead = true instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         self.Dead = true
     end,
@@ -4476,6 +4489,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.IsDead = true 
             WARN("IsDead is deprecated: use unit.Dead instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         return self.Dead
     end,
@@ -4485,6 +4499,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.GetCachePosition = true 
             WARN("GetCachePosition is deprecated: use unit:GetPosition() instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         return self:GetPosition()
     end,
@@ -4494,6 +4509,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.GetFootPrintSize = true 
             WARN("GetFootPrintSize is deprecated: use unit.FootPrintSize instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         return self.FootPrintSize
     end,
@@ -4503,6 +4519,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.GetUnitSizes = true 
             WARN("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
     end,
@@ -4512,6 +4529,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.SetCanTakeDamage = true 
             WARN("SetCanTakeDamage is deprecated: use unit.CanTakeDamage = val instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         self.CanTakeDamage = val
     end,
@@ -4521,6 +4539,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.CheckCanTakeDamage = true 
             WARN("CheckCanTakeDamage is deprecated: use unit.CanTakeDamage instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         return self.CanTakeDamage
     end,
@@ -4530,6 +4549,7 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.CheckCanBeKilled = true 
             WARN("CheckCanBeKilled is deprecated: use unit.CanBeKilled instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         return self.CanBeKilled
     end,
@@ -4539,15 +4559,16 @@ Unit = Class(moho.unit_methods) {
             DeprecatedWarnings.SetCanBeKilled = true 
             WARN("SetCanBeKilled is deprecated: use unit.CanBeKilled = val instead.")
             WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
         end
         self.CanBeKilled = val
     end,
 
     GetUnitBeingBuilt = function(self)
         if not GetUnitBeingBuiltWarning then
-            WARN("Deprecated function GetUnitBeingBuilt called at")
-            WARN(debug.traceback())
-            WARN("Further warnings of this will be suppressed")
+            WARN("GetUnitBeingBuilt is deprecated: use unit.UnitBeingBuilt instead.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
             GetUnitBeingBuiltWarning = true
         end
 
