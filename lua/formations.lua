@@ -835,8 +835,6 @@ function GuardFormation(formationUnits)
         end
 
         local fs = u.FootPrintSize
-        LOG(fs)
-        LOG(u.UnitId)
         footprintCounts[fs] = (footprintCounts[fs] or 0) + 1
     end
 
