@@ -4577,9 +4577,6 @@ DummyUnit = Class(moho.unit_methods) {
 
     BlueprintCache = false,
 
-    -- the only things we need
-    __init = function(self) end,
-    __post_init = function(self) end,
     OnCreate = function(self) 
 
         local bp = self:GetBlueprint()
@@ -4601,7 +4598,6 @@ DummyUnit = Class(moho.unit_methods) {
 
         self.Footprint = bp.Footprint
         self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
-        LOG("self.FootPrintSize: " .. repr(self.FootPrintSize))
 
         -- basic check if this insignificant unit is truely insignificant
         if not EntityCategoryContains(CategoriesDummyUnit, self) then 
