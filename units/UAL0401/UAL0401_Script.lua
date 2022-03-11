@@ -14,12 +14,68 @@ local explosion = import('/lua/defaultexplosions.lua')
 
 local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
 
+-- upvalue for performance
+local MathSqrt = math.sqrt
+local MathCos = math.cos 
+local MathSin = math.sin 
+
+
+-- store for performance
+local ZeroDegrees = Vector(0, 0, 1)
+local SignCheck = Vector(1, 0, 0)
+
 UAL0401 = Class(AWalkingLandUnit) {
     Weapons = {
         EyeWeapon = Class(ADFPhasonLaser) {},
         RightArmTractor = Class(ADFTractorClaw) {},
         LeftArmTractor = Class(ADFTractorClaw) {},
     },
+
+    OnCreate = function (self, spec)
+        AWalkingLandUnit.OnCreate(self, spec)
+
+        self:ForkThread(self.AdjustWeaponsThread)
+    end,
+
+
+    AdjustWeaponsThread = function(self)
+
+        while not self.Dead do 
+
+            -- only perform this logic if the unit is complete
+            if self:GetFractionComplete() > 0.99 then 
+
+                -- compute the direction of the heading
+                local sx, sy, sz = self:GetPositionXYZ()
+                local heading = self:GetHeading()
+                local hx, hz = MathSin(heading), MathCos(heading)
+
+                for k = 1, self.WeaponCount do 
+
+                    -- retrieve weapon and its target
+                    local weapon = self:GetWeapon(k)
+                    local target = weapon:GetCurrentTarget()
+
+                    if target then 
+
+                        -- compute direction and normalize
+                        local tx, ty, tz = target:GetPositionXYZ()
+                        local dx, dz = tx - sx, tz - sz
+                        local invLength = 1.0 / MathSqrt(dx * dx + dz * dz)
+                        dx, dz = invLength * dx, invLength * dz
+
+                        -- compute dot product between weapon target and our heading, if it is lower than 0 it means the target is behind us
+                        local dot = dx * hx + dz * hz
+                        if dot < 0 then 
+                            weapon:ResetTarget()
+                        end
+                    end
+                end
+            end
+
+            WaitSeconds(1.0)
+        end
+    end,
 
     StartBeingBuiltEffects = function(self, builder, layer)
         AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
