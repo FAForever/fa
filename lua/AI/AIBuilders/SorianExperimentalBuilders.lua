@@ -51,7 +51,7 @@ function T4LandAttackCondition(aiBrain, locationType, targetNumber)
     local radius = engineerManager.Radius
 
     --local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND * categories.EXPERIMENTAL, position, radius * 2.5)
-    local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND * categories.EXPERIMENTAL)
+    local surThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.LAND * categories.EXPERIMENTAL)
     if surThreat >= targetNumber * .6 then
         return true
     --elseif UC.UnitCapCheckGreater(aiBrain, .99) then
@@ -82,7 +82,7 @@ function T4AirAttackCondition(aiBrain, locationType, targetNumber)
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager.Radius
 
-    local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR * categories.EXPERIMENTAL, position, radius * 2.5)
+    local surThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.AIR * categories.EXPERIMENTAL, position, radius * 2.5)
     if surThreat > targetNumber * .6 then
         return true
     --elseif UC.UnitCapCheckGreater(aiBrain, .99) then
@@ -449,7 +449,7 @@ BuilderGroup {
         BuilderConditions = {
             #{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
             #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
-            { T4LandAttackCondition, { 'LocationType', 250 } },
+            { T4LandAttackCondition, { 'LocationType', 350 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderData = {
@@ -632,7 +632,7 @@ BuilderGroup {
         BuilderConditions = {
             #{ SIBC, 'HaveLessThanUnitsWithCategory', { 3, 'EXPERIMENTAL MOBILE LAND, EXPERIMENTAL MOBILE AIR'}},
             #{ UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 1, 'FACTORY TECH1, FACTORY TECH2' } },
-            { T4AirAttackCondition, { 'LocationType', 250 } },
+            { T4AirAttackCondition, { 'LocationType', 350 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderData = {

@@ -307,7 +307,7 @@ BuilderGroup {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, categories.TECH1 * categories.LAND * categories.MOBILE * categories.DIRECTFIRE * categories.BOT - categories.SCOUT - categories.ENGINEER - categories.EXPERIMENTAL} },
         },
         BuilderData = {
-            ThreatSupport = 75,
+            ThreatSupport = 60,
             PrioritizedCategories = {
                 'ENERGYPRODUCTION DRAGBUILD',
                 'HYDROCARBON',

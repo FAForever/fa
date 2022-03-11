@@ -32,9 +32,11 @@ local DeprecatedWarnings = { }
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
--- Localised category operations for performance
+-- cached categories for performance
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
+-- upvalues for performance
+local IsAlly = IsAlly
 
 -- Localised global functions for speed. ~10% for single references, ~30% for double (eg table.insert)
 
@@ -68,7 +70,33 @@ SyncMeta = {
     end,
 }
 
+local function PopulateBlueprintCache(projectile, blueprint)
+
+    -- populate the cache
+    local cache = { }
+    cache.Blueprint = blueprint 
+
+    cache.Cats = blueprint.Categories
+    cache.CatsCount = table.getn(blueprint.Categories)
+    cache.HashedCats = table.hash(blueprint.Categories)
+
+    cache.DoNotCollideCats = blueprint.DoNotCollideList or false
+    cache.DoNotCollideCatsCount = table.getn(blueprint.DoNotCollideList or { })
+    cache.HashedDoNotCollideCats = table.hash(blueprint.DoNotCollideList)
+
+    cache.Audio = blueprint.Audio
+  
+    -- store the result
+    local meta = getmetatable(projectile)
+    meta.BlueprintCache = cache
+
+    SPEW("Populated blueprint cache for unit: " .. tostring(blueprint.BlueprintId))
+end
+
 Unit = Class(moho.unit_methods) {
+
+    BlueprintCache = false,
+
     Weapons = {},
 
     FxScale = 1,
@@ -163,6 +191,22 @@ Unit = Class(moho.unit_methods) {
 
     OnCreate = function(self)
         Entity.OnCreate(self)   
+
+        local bp = self:GetBlueprint()
+
+        -- populate blueprint cache if we haven't done that yet
+        if not self.BlueprintCache then 
+            PopulateBlueprintCache(self, bp)
+        end
+
+        -- copy reference from meta table to inner table
+        self.BlueprintCache = self.BlueprintCache
+
+        -- copy frequently used values from cache to reduce table look ups
+        self.Audio = self.BlueprintCache.Audio
+
+        -- the entity that produces sound, by default ourself
+        self.SoundEntity = self
 
         -- cache commonly used values from the engine
         -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
@@ -1463,62 +1507,36 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Called when a unit collides with a projectile to check if the collision is valid
+    -- @param self The unit we're checking the collision for
+    -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other, firingWeapon)
+
+        -- bail out immediately
         if self.DisallowCollisions then
             return false
         end
 
-        if EntityCategoryContains(categories.PROJECTILE, other) then
-            if IsAlly(self.Army, other:GetArmy()) then
-                return other.CollideFriendly
+        -- if we're allied, check if we allow allied collisions
+        if self.Army == other.Army or IsAlly(self.Army, other.Army) then
+            return other.CollideFriendly
+        end
+
+        -- check for exclusions from projectile perspective
+        for k = 1, other.BlueprintCache.DoNotCollideCatsCount do 
+            if self.BlueprintCache.CategoriesHash[other.BlueprintCache.DoNotCollideCats[k]] then 
+                return false 
             end
         end
 
-        -- Check for specific non-collisions
-        local bp = other:GetBlueprint()
-        if bp.DoNotCollideList then
-            for _, v in pairs(bp.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
+        -- check for exclusions from unit perspective
+        for k = 1, self.BlueprintCache.DoNotCollideCatsCount do 
+            if other.BlueprintCache.CategoriesHash[self.BlueprintCache.DoNotCollideCats[k]] then 
+                return false 
             end
         end
 
-        bp = self:GetBlueprint()
-        if bp.DoNotCollideList then
-            for _, v in pairs(bp.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), other) then
-                    return false
-                end
-            end
-        end
-        return true
-    end,
-
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        if self.DisallowCollisions then
-            return false
-        end
-
-        -- Skip friendly collisions
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if IsAlly(self.Army, firingWeapon.unit.Army) then
-                return false
-            end
-        end
-
-        -- Check for specific non-collisions
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
+        return true 
     end,
 
     ChooseAnimBlock = function(self, bp)
@@ -3725,62 +3743,41 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    GetSoundEntity = function(self, type)
-        -- these may not be initialised yet
-        self.Sounds = self.Sounds or { }
-        self.SoundEntities = self.SoundEntities or { }
+    -------------------------------------------------------------------------------------------
+    -- Sound
+    -------------------------------------------------------------------------------------------
 
-        local entity = self.Sounds[type]
-        if not self.Sounds[type] then
-            if self.SoundEntities[1] then
-                entity = table.remove(self.SoundEntities, 1)
-            else
-                entity = Entity()
-                Warp(entity, self:GetPosition())
-                entity:AttachTo(self, -1)
-                self.Trash:Add(entity)
-            end
-            self.Sounds[type] = entity
-        end
-
-        return self.Sounds[type]
-    end,
-
+    --- Plays a sound using the unit as a source. Returns true if successful, false otherwise
+    -- @param self A unit
+    -- @param sound A string identifier that represents the sound to be played.
     PlayUnitSound = function(self, sound)
         local audio = self.Audio[sound]
         if not audio then 
-            return 
+            return false
         end
 
-        self:GetSoundEntity('UnitSound'):PlaySound(audio)
-
+        self.SoundEntity:PlaySound(audio)
         return true
     end,
 
+    --- Plays an ambient sound using the unit as a source. Returns true if successful, false otherwise
+    -- @param self A unit
+    -- @param sound A string identifier that represents the ambient sound to be played.
     PlayUnitAmbientSound = function(self, sound)
         local audio = self.Audio[sound]
         if not audio then 
-            return 
+            return false
         end
 
-        self:GetSoundEntity('Ambient' .. sound):SetAmbientSound(audio, nil)
+        self.SoundEntity:SetAmbientSound(audio, nil)
+        return true 
     end,
 
-    StopUnitAmbientSound = function(self, sound)
-        -- these may not be initialised yet
-        self.Sounds = self.Sounds or { }
-        self.SoundEntities = self.SoundEntities or { }
-
-        if not self.Audio[sound] then return end
-
-        local type = 'Ambient' .. sound
-        local entity = self:GetSoundEntity(type)
-        if entity and not entity:BeenDestroyed() then
-            self.Sounds[type] = nil
-            entity:SetAmbientSound(nil, nil)
-            self.SoundEntities = self.SoundEntities
-            table.insert(self.SoundEntities, entity)
-        end
+    --- Stops playing the ambient sound that is currently being played.
+    -- @param self A unit
+    StopUnitAmbientSound = function(self)
+        self.SoundEntity:SetAmbientSound(nil, nil)
+        return true
     end,
 
     -------------------------------------------------------------------------------------------
@@ -4578,6 +4575,35 @@ Unit = Class(moho.unit_methods) {
 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    --- Deprecated functionality
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        if self.DisallowCollisions then
+            return false
+        end
+
+        -- Skip friendly collisions
+        local weaponBP = firingWeapon:GetBlueprint()
+        local collide = weaponBP.CollideFriendly
+        if collide == false then
+            if IsAlly(self.Army, firingWeapon.unit.Army) then
+                return false
+            end
+        end
+
+        -- Check for specific non-collisions
+        if weaponBP.DoNotCollideList then
+            for _, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end,
+
 }
 
 -- upvalued math functions for performance
@@ -4603,13 +4629,23 @@ DummyUnit = Class(moho.unit_methods) {
     __post_init = function(self) end,
     OnCreate = function(self) 
 
+        local bp = self:GetBlueprint()
+
+        -- populate blueprint cache if we haven't done that yet
+        if not self.BlueprintCache then 
+            PopulateBlueprintCache(self, bp)
+        end
+
+        -- copy reference from meta table to inner table
+        self.BlueprintCache = self.BlueprintCache
+
         -- values that are expected on all units
         self.EntityId = EntityGetEntityId(self)
         self.UnitId = UnitGetUnitId(self)
         self.Army = EntityGetArmy(self)
         self.Layer = UnitGetCurrentLayer(self)
-        self.Blueprint = EntityGetBlueprint(self)
-        self.Footprint = self.Blueprint.Footprint
+        self.Blueprint = bp
+        self.Footprint = bp.Footprint
         self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
 
         -- basic check if this insignificant unit is truely insignificant

@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: functions that make it simpler to set up control layouts.
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 --* Percentage versus offset
@@ -483,4 +483,8 @@ end
 
 function ScaleNumber(number)
     return math.floor(number * pixelScaleFactor)
+end
+
+function InvScaleNumber(number)
+    return math.floor(number * (1 / pixelScaleFactor))
 end

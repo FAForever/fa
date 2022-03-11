@@ -148,6 +148,7 @@ UnitBlueprint {
         'SNIPEMODE',
     },
     Defense = {
+        SkipDynamicThreatCalculations = true,
         AirThreatLevel = 0,
         ArmorType = 'Commander',
         EconomyThreatLevel = 5,

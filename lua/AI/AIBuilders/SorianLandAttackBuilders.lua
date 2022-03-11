@@ -45,8 +45,8 @@ function LandAttackCondition(aiBrain, locationType, targetNumber)
     local radius = engineerManager.Radius
 
     --local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
-    local surThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER)
-    local airThreat = 0 #pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
+    local surThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER)
+    local airThreat = 0 #pool:GetPlatoonThreat('Air', categories.MOBILE * categories.LAND - categories.EXPERIMENTAL - categories.SCOUT - categories.ENGINEER, position, radius)
     local adjustForTime = 1 + (math.floor(GetGameTimeSeconds()/60) * .01)
     --LOG("*AI DEBUG: Pool Threat: "..surThreat.." adjustment: "..adjustForTime.." Enemy Threat: "..targetNumber)
     if (surThreat + airThreat) >= targetNumber and targetNumber > 0 then
@@ -244,7 +244,7 @@ BuilderGroup {
         PlatoonAddBehaviors = { 'AirLandToggleSorian' },
         Priority = 900,
         BuilderConditions = {
-            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH1 } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH2, FACTORY TECH3' }},
@@ -513,7 +513,7 @@ BuilderGroup {
         Priority = 900,
         BuilderConditions = {
             #{ TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
-            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH3' }},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH2 } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
@@ -584,7 +584,7 @@ BuilderGroup {
             { SBC, 'NoRushTimeCheck', { 600 }},
             { UCBC, 'HaveUnitRatio', { 0.15, categories.LAND * categories.ANTIAIR * categories.MOBILE, '<=', categories.LAND * categories.DIRECTFIRE * categories.MOBILE}},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
-            #{ TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            #{ TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
         },
         BuilderType = 'Land',
     },
@@ -655,7 +655,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH3 } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, 'LAND ANTIAIR MOBILE' } },
-            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'AntiAir', 'Air' } },
+            { TBC, 'HaveLessThreatThanNearby', { 'LocationType', 'Air', 'Air' } },
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.65, 1.05 }},
             { SBC, 'NoRushTimeCheck', { 600 }},
         },
@@ -838,7 +838,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 10 } },
+            { LandAttackCondition, { 'LocationType', 20 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
@@ -864,7 +864,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, categories.MOBILE * categories.LAND * categories.TECH2 - categories.ENGINEER} },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND * categories.TECH3 - categories.ENGINEER} },
-            { LandAttackCondition, { 'LocationType', 50 } },
+            { LandAttackCondition, { 'LocationType', 70 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
@@ -890,7 +890,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, categories.MOBILE * categories.LAND * categories.TECH3 - categories.ENGINEER} },
-            { LandAttackCondition, { 'LocationType', 150 } },
+            { LandAttackCondition, { 'LocationType', 230 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
@@ -911,7 +911,7 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
                 { SBC, 'LessThanGameTime', { 600 } },
-                { LandAttackCondition, { 'LocationType', 10 } },
+                { LandAttackCondition, { 'LocationType', 20 } },
                 { SBC, 'NoRushTimeCheck', { 0 }},
                 { SBC, 'MapGreaterThan', { 500, 500 }},
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
@@ -924,8 +924,8 @@ BuilderGroup {
             MoveNext = 'Threat',
             ThreatType = 'Economy', 		    # Type of threat to use for gauging attacks
             FindHighestThreat = false, 		# Don't find high threat targets
-            MaxThreatThreshold = 2900, 		# If threat is higher than this, do not attack
-            MinThreatThreshold = 1000, 		# If threat is lower than this, do not attack
+            MaxThreatThreshold = 140, 		# If threat is higher than this, do not attack
+            MinThreatThreshold = 50, 		# If threat is lower than this, do not attack
             AvoidBases = true,
             AvoidBasesRadius = 75,
             UseFormation = 'AttackFormation',
@@ -946,7 +946,7 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
                 { SBC, 'GreaterThanGameTime', { 600 } },
-                { LandAttackCondition, { 'LocationType', 50 } },
+                { LandAttackCondition, { 'LocationType', 70 } },
                 { SBC, 'NoRushTimeCheck', { 0 }},
                 { SBC, 'MapGreaterThan', { 500, 500 }},
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
@@ -960,7 +960,7 @@ BuilderGroup {
             ThreatType = 'Economy', 		    # Type of threat to use for gauging attacks
             FindHighestThreat = false, 		# Don't find high threat targets
             MaxThreatThreshold = 9999999, 	# If threat is higher than this, do not attack
-            MinThreatThreshold = 1000, 		# If threat is lower than this, do not attack
+            MinThreatThreshold = 50, 		# If threat is lower than this, do not attack
             AvoidBases = true,
             AvoidBasesRadius = 75,
             UseFormation = 'AttackFormation',
@@ -1047,7 +1047,7 @@ BuilderGroup {
         BuilderConditions = {
                 #{ UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 350, -1000, 0, 2, 'StructuresNotMex' } },
                 { SBC, 'GreaterThanGameTime', { 720 } },
-                { LandAttackCondition, { 'LocationType', 50 } },
+                { LandAttackCondition, { 'LocationType', 70 } },
                 { SBC, 'MapLessThan', { 1000, 1000 }},
                 { SBC, 'NoRushTimeCheck', { 0 }},
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
@@ -1108,11 +1108,11 @@ BuilderGroup {
         PlatoonAddBehaviors = { 'AirLandToggleSorian' },
         Priority = 1400,
         BuilderConditions = {
-            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, 'AntiSurface', 'AntiSurface', 1}},
+            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, 'AntiSurface', 'Surface', 1}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, 'FACTORY TECH2 LAND, FACTORY TECH3 LAND' }},
             { SBC, 'GreaterThanGameTime', { 720 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
-            { LandAttackCondition, { 'LocationType', 50 } },
+            { LandAttackCondition, { 'LocationType', 70 } },
         },
         BuilderData = {
             ThreatSupport = 75,
@@ -1152,11 +1152,11 @@ BuilderGroup {
         PlatoonAddBehaviors = { 'AirLandToggleSorian' },
         Priority = 1400,
         BuilderConditions = {
-            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, 'AntiSurface', 'AntiSurface', 1}},
+            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, 'AntiSurface', 'Surface', 1}},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH2 LAND, FACTORY TECH3 LAND' }},
             { SBC, 'GreaterThanGameTime', { 720 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
-            { LandAttackCondition, { 'LocationType', 10 } },
+            { LandAttackCondition, { 'LocationType', 20 } },
         },
         BuilderData = {
             ThreatSupport = 75,
@@ -1276,7 +1276,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 10 } },
+            { LandAttackCondition, { 'LocationType', 15 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },
@@ -1304,7 +1304,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 - categories.TECH2 } },
             { SBC, 'MapLessThan', { 1000, 1000 }},
-            { LandAttackCondition, { 'LocationType', 50 } },
+            { LandAttackCondition, { 'LocationType', 70 } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
     },

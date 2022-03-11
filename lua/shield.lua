@@ -6,9 +6,15 @@
 ------------------------------------------------------------------
 
 local Entity = import('/lua/sim/Entity.lua').Entity
-local Overspill = import('/lua/overspill.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
+
+local VectorCached = Vector(0, 0, 0)
+
+-- upvalue for performance
+local MathSqrt = math.sqrt
+local IsEnemy = IsEnemy
+
 
 -- Default values for a shield specification table (to be passed to native code)
 local DEFAULT_OPTIONS = {
@@ -25,6 +31,24 @@ local DEFAULT_OPTIONS = {
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
 }
+
+-- scan blueprints for the largest shield radius
+LargestShieldDiameter = 0
+for k, bp in __blueprints do 
+    -- check for blueprints that have a shield and a shield size set
+    if bp.Defense and bp.Defense.Shield and bp.Defense.Shield.ShieldSize then 
+        -- skip Aeon palace and UEF shield boat as they skew the results
+        if not (bp.BlueprintId == "xac2101" or bp.BlueprintId == "xes0205") then 
+            local size = bp.Defense.Shield.ShieldSize
+            if size > LargestShieldDiameter then 
+                LargestShieldDiameter = size
+            end
+        end
+    end
+end
+
+-- cache categories computations
+local CategoriesOverspill = (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK
 
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
@@ -86,7 +110,106 @@ Shield = Class(moho.shield_methods, Entity) {
             self.CommandShield = true
         end
 
+        -- manage impact entities
+        self.LiveImpactEntities = 0
+        self.ImpactEntitySpecs = { Owner = self.Owner }
+
+        -- manage overlapping shields
+        self.OverlappingShields = { }
+        self.OverlappingShieldsCount = 0
+        self.OverlappingShieldsTick = -1
+
+        -- manage overspill 
+        self.DamageReduction = { }
+        self.DamageReductionTick = { }
+
         ChangeState(self, self.OnState)
+    end,
+
+    --- Retrieves allied shields that overlap with this shield, caches the results per tick
+    -- @param self A shield that we're computing the overlapping shields for
+    -- @param tick Optional parameter, represents the game tick. Used to determine if we need to refresh the cash
+    GetOverlappingShields = function(self, tick)
+
+        -- allow the game tick to be send to us, saves cycles
+        tick = tick or GetGameTick()
+
+        -- see if we need to re-compute the overlapping shields as the information we're requesting is of a different tick
+        if tick ~= self.OverlappingShieldsTick then 
+            self.OverlappingShieldsTick = tick 
+
+            local brain = self.Owner:GetAIBrain()
+            local position = self.Owner:GetPosition()
+
+            -- diameter where other shields overlap with us or are contained by us
+            local diameter = LargestShieldDiameter + self.Size
+
+            -- retrieve candidate units
+            local units = brain:GetUnitsAroundPoint(CategoriesOverspill, position, 0.5 * diameter, 'Ally')
+
+            if units then 
+
+                -- allocate locals once
+                local shieldOther
+                local radiusOther
+                local distanceToOverlap
+                local osx, osy, osz
+                local d, dx, dy, dz 
+                
+                -- compute our information only once
+                local psx, psy, psz = self:GetPositionXYZ()
+                local radius = 0.5 * self.Size
+
+                local head = 1 
+                for k, other in units do 
+
+                    -- store reference to reduce table lookups
+                    shieldOther = other.MyShield
+
+                    -- check if it is a different unti and that it has an active shield with a radius
+                    -- larger than 0, as engine defaults shield table to 0
+                    if      shieldOther 
+                        and shieldOther.ShieldType ~= "Personal"
+                        and shieldOther:IsUp()
+                        and shieldOther.Size
+                        and shieldOther.Size > 0 
+                        and self.Owner.EntityId ~= other.EntityId 
+                    then 
+
+                        -- compute radius of shield
+                        radiusOther = 0.5 * shieldOther.Size
+
+                        -- compute total distance to overlap and square it to prevent a square root
+                        distanceToOverlap = radius + radiusOther 
+                        distanceToOverlap = distanceToOverlap * distanceToOverlap
+
+                        -- retrieve position of other shield
+                        osx, osy, osz = shieldOther:GetPositionXYZ()
+
+                        -- compute vector from self to other
+                        dx = osx - psx 
+                        dy = osy - psy 
+                        dz = osz - psz
+
+                        -- compute squared distance and check it
+                        d = dx * dx + dy * dy + dz * dz
+                        if d < distanceToOverlap then 
+                            self.OverlappingShields[head] = shieldOther 
+                            head = head + 1
+                        end
+                    end
+                end
+
+                -- keep track of the number of adjacent shields
+                self.OverlappingShieldsCount = head - 1
+            else 
+                -- no units found
+                self.OverlappingShieldsCount = 0
+            end
+        end
+
+        -- return the shields in question
+        return self.OverlappingShields, self.OverlappingShieldsCount
     end,
 
     SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
@@ -98,6 +221,9 @@ Shield = Class(moho.shield_methods, Entity) {
         self.ShieldVerticalOffset = offset
     end,
 
+    --- Property to set the diameter of the shield
+    -- @param self A shield
+    -- @param size The new diameter of the shield
     SetSize = function(self, size)
         self.Size = size
     end,
@@ -139,26 +265,6 @@ Shield = Class(moho.shield_methods, Entity) {
         return math.min(self:GetHealth(), amount)
     end,
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
-                return false
-            end
-        end
-        -- Check DNC list
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
-
     GetOverkill = function(self, instigator, amount, type)
         -- Like armor damage, first multiply by armor reduction, then apply handicap
         -- See SimDamage.cpp (DealDamage function) for how this should work
@@ -178,10 +284,14 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
-        -- check for UnitId, so we only check the ACU Overcharge damage and not shield overspill damage
-        -- when UnitId is false and EntityId is true, then we got overspill from a shield that was impacted
-        -- by the splat damage of an ACU overcharge weapon.
-        if dmgType == 'Overcharge' and instigator.UnitId then
+
+        -- cache information used throughout the function
+
+        local tick = GetGameTick()
+
+        -- damage correction for overcharge
+        
+        if dmgType == 'Overcharge' and dmgType ~= "ShieldSpill" then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
                 amount = wep:GetBlueprint().Overcharge.structureDamage * 2
@@ -190,18 +300,67 @@ Shield = Class(moho.shield_methods, Entity) {
                 amount = wep:GetBlueprint().Overcharge.commandDamage
             end
         end
+
+        -- damage correction for overspill, do not apply to personal shields
+
+        if self.ShieldType ~= "Personal" then
+
+            local instigatorId = (instigator and instigator.EntityId) or false
+            if instigatorId then 
+
+                -- check if source has applied damage this tick
+                if self.DamageReductionTick[instigatorId] == tick then 
+
+                    -- if it did, reduce it from the damage that we're doing
+                    amount = amount - self.DamageReduction[instigatorId]
+
+                    -- if nothing is left, bail out
+                    if amount < 0 then 
+                        return 
+                    end
+
+                    -- further reduce future damage
+                    self.DamageReduction[instigatorId] = self.DamageReduction[instigatorId] + amount 
+
+                -- otherwise, inform us that we're applying damage this tick
+                else 
+                    self.DamageReduction[instigatorId] = amount 
+                    self.DamageReductionTick[instigatorId] = tick
+                end
+            end
+        end
+
+        -- do damage logic for shield
+
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
+            -- take some damage
             self:AdjustHealth(instigator, -absorbed)
+
+            -- adjust shield bar
             self:UpdateShieldRatio(-1)
-            ForkThread(self.CreateImpactEffect, self, vector)
+
+            -- check to spawn impact effect
+            local r = Random(1, self.Size)
+            if  dmgType ~= "ShieldSpill"
+                and not (       self.LiveImpactEntities > 10
+                            and (r >= 0.2 * self.Size and r < self.LiveImpactEntities))
+            then 
+                ForkThread(self.CreateImpactEffect, self, vector)
+            end
+
+            -- stop us from regenerating, we took damage
             if self.RegenThread then
                 KillThread(self.RegenThread)
                 self.RegenThread = nil
             end
+
+            -- if we have no health, collapse
             if self:GetHealth() <= 0 then
                 ChangeState(self, self.DamageRechargeState)
+
+            -- if we do have health, start the delay before we regenerate health
             elseif self.OffHealth < 0 then
                 if self.RegenRate > 0 then
                     self.RegenThread = ForkThread(self.RegenStartThread, self)
@@ -212,11 +371,35 @@ Shield = Class(moho.shield_methods, Entity) {
             end
         end
 
-        -- Only do overspill on events where we have an instigator.
-        -- "Force" damage events from stratbombs are one example
-        -- where we don't.
-        if doOverspill and IsEntity(instigator) then
-            Overspill.DoOverspill(self, instigator, amount, dmgType, self.SpillOverDmgMod)
+        -- overspill damage checks
+
+        if 
+            -- prevent recursively applying overspill
+            doOverspill 
+            -- personal shields do not have overspill damage
+            and self.ShieldType ~= "Personal"
+            -- we consider damage without an instigator irrelevant, typically force events
+            and IsEntity(instigator) 
+            -- we consider damage that is 1 or lower irrelevant, typically force events
+            and amount > 1 
+            -- do not recursively apply overspill damage
+            and dmgType ~= "ShieldSpill"
+        then 
+            local spillAmount = self.SpillOverDmgMod * amount
+
+            -- retrieve shields that overlap with us
+            local others, count = self:GetOverlappingShields(tick)
+
+            -- apply overspill damage to neighbour shields
+            for k = 1, count do 
+                others[k]:ApplyDamage(
+                    instigator,         -- instigator
+                    spillAmount,        -- amount
+                    nil,                -- vector
+                    "ShieldSpill",      -- type
+                    false               -- do overspill
+                )
+            end
         end
     end,
 
@@ -301,23 +484,49 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     CreateImpactEffect = function(self, vector)
-        if not self or self.Owner.Dead then return end
-        local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactMesh = Entity {Owner = self.Owner}
-        Warp(ImpactMesh, self:GetPosition())
 
+        -- keep track of this entity
+        self.LiveImpactEntities = self.LiveImpactEntities + 1
+
+        -- cache values
+        local effect
+        local army = self.Army
+        local vc = VectorCached
+
+        -- compute distance to offset effect
+        local x = vector[1]
+        local y = vector[2]
+        local z = vector[3]
+        local d = MathSqrt(x * x + y * y + z * z)
+
+        -- allocate an entity
+        local entity = Entity( self.ImpactEntitySpecs )
+        Warp(entity, self:GetPosition())
+
+        -- set the impact mesh and scale it accordingly
         if self.ImpactMeshBp ~= '' then
-            ImpactMesh:SetMesh(self.ImpactMeshBp)
-            ImpactMesh:SetDrawScale(self.Size)
-            ImpactMesh:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
+            entity:SetMesh(self.ImpactMeshBp)
+            entity:SetDrawScale(self.Size)
+
+            vc[1] = -x
+            vc[2] = -y 
+            vc[3] = -z 
+            entity:SetOrientation(OrientFromDir(vc), true)
         end
 
+        -- spawn additional effects
         for _, v in self.ImpactEffects do
-            CreateEmitterAtBone(ImpactMesh, -1, self.Army, v):OffsetEmitter(0, 0, OffsetLength)
+            effect = CreateEmitterAtBone(entity, -1, army, v)
+            effect:OffsetEmitter(0, 0, d)
         end
 
-        WaitSeconds(5)
-        ImpactMesh:Destroy()
+        -- hold up a bit
+        WaitSeconds(2)
+
+        -- take out the entity again
+        entity:Destroy()
+        
+        self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
     OnDestroy = function(self)
@@ -330,13 +539,12 @@ Shield = Class(moho.shield_methods, Entity) {
         ChangeState(self, self.DeadState)
     end,
 
-    -- Return true to process this collision, false to ignore it.
+    --- Called when a shield collides with a projectile to check if the collision is valid
+    -- @param self The shield we're checking the collision for
+    -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-        if other.Army == -1 then
-            return false
-        end
-
-        if EntityCategoryContains(categories.SHIELDCOLLIDE, other) then
+        -- special logic when it is a projectile to simulate air crashes
+        if other.CrashingAirplaneShieldCollisionLogic then 
             if other.ShieldImpacted then
                 return false
             else
@@ -346,17 +554,27 @@ Shield = Class(moho.shield_methods, Entity) {
                 end
             end
         end
-
-        -- Allow strategic nuke missile to penetrate shields
-        if EntityCategoryContains(categories.STRATEGIC, other) and
-            EntityCategoryContains(categories.MISSILE, other) then
-            return false
-        end
-
-        if other:GetBlueprint().Physics.CollideFriendlyShield then
+        -- special behavior for projectiles that always collide with 
+        -- shields, like the seraphim storm when the Ythotha dies
+        if other.CollideFriendlyShield then
             return true
         end
 
+        if      -- our projectiles do not collide with our shields
+                self.Army == other.Army
+                -- neutral projectiles do not collide with any shields
+            or  other.Army == -1 
+        then
+            return false
+        end
+
+        -- special behavior for projectiles that represent strategic missiles
+        local otherHashedCats = other.BlueprintCache.HashedCats
+        if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
+            return false
+        end
+
+        -- otherwise, only collide if we're hostile to the other army
         return IsEnemy(self.Army, other.Army)
     end,
 
@@ -610,6 +828,28 @@ Shield = Class(moho.shield_methods, Entity) {
             return false
         end,
     },
+
+    --- Deprecated functionality
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        local weaponBP = firingWeapon:GetBlueprint()
+        local collide = weaponBP.CollideFriendly
+        if collide == false then
+            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
+                return false
+            end
+        end
+        -- Check DNC list
+        if weaponBP.DoNotCollideList then
+            for _, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end,
 }
 
 --- A bubble shield attached to a single unit.
@@ -792,6 +1032,10 @@ PersonalShield = Class(Shield){
 
         self.PassOverkillDamage = spec.PassOverkillDamage
 
+        -- manage impact entities
+        self.LiveImpactEntities = 0
+        self.ImpactEntitySpecs = { Owner = self.Owner }
+
         ChangeState(self, self.OnState)
     end,
 
@@ -809,6 +1053,9 @@ PersonalShield = Class(Shield){
     end,
 
     CreateImpactEffect = function(self, vector)
+
+        self.LiveImpactEntities = self.LiveImpactEntities + 1
+
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactEnt = Entity {Owner = self.Owner}
 
@@ -821,6 +1068,7 @@ PersonalShield = Class(Shield){
         WaitSeconds(1)
 
         ImpactEnt:Destroy()
+        self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
     CreateShieldMesh = function(self)
@@ -930,12 +1178,18 @@ CzarShield = Class(PersonalShield) {
 
         self.PassOverkillDamage = spec.PassOverkillDamage
 
+        -- manage impact entities
+        self.LiveImpactEntities = 0
+        self.ImpactEntitySpecs = { Owner = self.Owner }
+
         ChangeState(self, self.OnState)
     end,
 
 
     CreateImpactEffect = function(self, vector)
-        if not self or self.Owner.Dead then return end
+
+        self.LiveImpactEntities = self.LiveImpactEntities + 1
+
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
         local ImpactMesh = Entity {Owner = self.Owner}
@@ -971,6 +1225,7 @@ CzarShield = Class(PersonalShield) {
 
         WaitSeconds(5)
         ImpactMesh:Destroy()
+        self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
     CreateShieldMesh = function(self)
