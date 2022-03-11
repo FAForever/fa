@@ -358,7 +358,6 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:StopRocking()
             local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
@@ -1488,13 +1487,6 @@ SonarUnit = Class(StructureUnit) {
 
 -- SEA FACTORY UNITS
 SeaFactoryUnit = Class(FactoryUnit) {
-    -- Disable the default rocking behavior
-    StartRocking = function(self)
-    end,
-
-    StopRocking = function(self)
-    end,
-
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()

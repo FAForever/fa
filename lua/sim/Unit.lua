@@ -4305,7 +4305,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    -- Various callback-like functions
+    --- Various callback-like functions
 
     -- Called when the C function unit.SetConsumptionActive is called
     OnConsumptionActive = function(self) end,
@@ -4574,6 +4574,9 @@ local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
 DummyUnit = Class(moho.unit_methods) {
+
+    BlueprintCache = false,
+
     -- the only things we need
     __init = function(self) end,
     __post_init = function(self) end,
@@ -4595,8 +4598,10 @@ DummyUnit = Class(moho.unit_methods) {
         self.Army = EntityGetArmy(self)
         self.Layer = UnitGetCurrentLayer(self)
         self.Blueprint = bp
+
         self.Footprint = bp.Footprint
         self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
+        LOG("self.FootPrintSize: " .. repr(self.FootPrintSize))
 
         -- basic check if this insignificant unit is truely insignificant
         if not EntityCategoryContains(CategoriesDummyUnit, self) then 

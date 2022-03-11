@@ -272,13 +272,10 @@ CBuildBotUnit = Class(DummyUnit) {
 
     -- only initialise what we need
     OnCreate = function(self)
-        -- prevent drone from consuming anything and remove collision shape
+        DummyUnit.OnCreate(self)
+        
+        -- prevent drone from consuming anything
         UnitSetConsumptionActive(self, false)
-
-        -- store the army in case AOE damage tries to hit the drone
-        self.Footprint = self:GetBlueprint().Footprint
-        self.Army = self:GetArmy()
-        self.UnitId = self:GetUnitId()
     end,
 
     -- short-cut when being destroyed
