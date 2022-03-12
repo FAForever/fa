@@ -679,7 +679,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnStopBeingBuilt")
+                end, "OnStopBeingBuilt"
+            )
 
             -- is called when:
             --  - unit is killed
@@ -696,7 +697,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnKilled")
+                end, "OnKilled"
+            )
 
             -- is called when:
             --  - unit is given (used for the old army)
@@ -714,7 +716,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnGiven")
+                end, "OnGiven"
+            )
 
             -- is called when:
             --  - unit is reclaimed
@@ -731,7 +734,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnReclaimed")
+                end, "OnReclaimed"
+            )
         end
 
         -- Save build effect bones for faster access when creating build effects
