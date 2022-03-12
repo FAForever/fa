@@ -70,7 +70,6 @@ local function TransferUnitsOwnershipDelayedWeapons (weapon)
 
     -- enable the weapon again
     weapon:SetEnabled(true)
-    LOG("Enabled: " .. bp.Label)
 end
 
 function TransferUnitsOwnership(units, ToArmyIndex, captured)
