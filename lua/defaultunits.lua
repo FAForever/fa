@@ -15,8 +15,6 @@ local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
-local teleportTime = {}
-
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
@@ -2451,7 +2449,6 @@ CommandUnit = Class(WalkingLandUnit) {
         Warp(self, location, orientation)
         self:PlayTeleportInEffects()
         self:CleanupRemainingTeleportChargeEffects()
-        teleportTime[self.EntityId] = GetGameTick()
 
         WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
 
