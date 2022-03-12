@@ -947,7 +947,6 @@ FactoryUnit = Class(StructureUnit) {
 
     IdleState = State {
         Main = function(self)
-            self:ChangeBlinkingLights('Green')
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
             self:DestroyBuildRotator()
