@@ -17,6 +17,8 @@ local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 local teleportTime = {}
 
+local DeprecatedWarnings = { }
+
 local CreateScaledBoom = function(unit, overkill, bone)
     explosion.CreateDefaultHitExplosionAtBone(
         unit,
@@ -608,6 +610,46 @@ StructureUnit = Class(Unit) {
         end
         Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
+
+
+    -- Deprecated functionality
+
+    ChangeBlinkingLights = function(self)
+        if not DeprecatedWarnings.ChangeBlinkingLights then 
+            DeprecatedWarnings.ChangeBlinkingLights = true 
+            WARN("ChangeBlinkingLights is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
+
+    CreateBlinkingLights = function(self)
+        if not DeprecatedWarnings.CreateBlinkingLights then 
+            DeprecatedWarnings.CreateBlinkingLights = true 
+            WARN("CreateBlinkingLights is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
+
+    OnMassStorageStateChange = function(self, state)
+        if not DeprecatedWarnings.OnMassStorageStateChange then 
+            DeprecatedWarnings.OnMassStorageStateChange = true 
+            WARN("OnMassStorageStateChange is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
+
+    OnEnergyStorageStateChange = function(self, state)
+        if not DeprecatedWarnings.OnEnergyStorageStateChange then 
+            DeprecatedWarnings.OnEnergyStorageStateChange = true 
+            WARN("OnEnergyStorageStateChange is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
+
 }
 
 -- FACTORY UNITS
