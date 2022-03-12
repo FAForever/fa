@@ -28,13 +28,6 @@ end
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
--- MISC UNITS
-DummyUnit = Class(Unit) {
-    OnStopBeingBuilt = function(self, builder, layer)
-        self:Destroy()
-    end,
-}
-
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
 local StructureUnitRotateTowardsEnemiesArtillery = categories.ARTILLERY * (categories.TECH2 + categories.TECH3 + categories.EXPERIMENTAL)
