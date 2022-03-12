@@ -17,14 +17,6 @@ local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
 local teleportTime = {}
 
-local CreateScaledBoom = function(unit, overkill, bone)
-    explosion.CreateDefaultHitExplosionAtBone(
-        unit,
-        bone or 0,
-        explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
-)
-end
-
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
 
