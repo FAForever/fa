@@ -53,10 +53,21 @@ StructureUnit = Class(Unit) {
 
     OnCreate = function(self)
         Unit.OnCreate(self)
+        self:HideLandBones()
         self.WeaponMod = {}
         self.FxBlinkingLightsBag = {}
         if self.Layer == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
             self:FlattenSkirt()
+        end
+    end,
+
+    HideLandBones = function(self)
+        if self.LandBuiltHiddenBones and self.Layer == 'Land' then
+            for _, v in self.LandBuiltHiddenBones do
+                if self:IsValidBone(v) then
+                    self:HideBone(v, true)
+                end
+            end
         end
     end,
 
@@ -154,6 +165,9 @@ StructureUnit = Class(Unit) {
             self:CreateTarmac(true, true, true, false, false)
         end
         self:PlayActiveAnimation()
+
+        -- remove land bones if the structure has them
+        self:HideLandBones()
     end,
 
     OnFailedToBeBuilt = function(self)
@@ -344,7 +358,6 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:StopRocking()
             local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
@@ -625,8 +638,13 @@ FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
 
-        -- keeps track of what HQs are available
-        if EntityCategoryContains(categories.RESEARCH, self) then
+        -- if we're a support factory, make sure our build restrictions are correct
+        if self.Cache.HashedCats["SUPPORTFACTORY"] then 
+            self:UpdateBuildRestrictions()
+        end
+        
+        -- if we're an HQ, enable all the additional logic
+        if self.Cache.HashedCats["RESEARCH"] then
 
             -- is called when:
             -- - structure is being upgraded
@@ -661,7 +679,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnStopBeingBuilt")
+                end, "OnStopBeingBuilt"
+            )
 
             -- is called when:
             --  - unit is killed
@@ -678,7 +697,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnKilled")
+                end, "OnKilled"
+            )
 
             -- is called when:
             --  - unit is given (used for the old army)
@@ -696,7 +716,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnGiven")
+                end, "OnGiven"
+            )
 
             -- is called when:
             --  - unit is reclaimed
@@ -713,7 +734,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnReclaimed")
+                end, "OnReclaimed"
+            )
         end
 
         -- Save build effect bones for faster access when creating build effects
@@ -1474,13 +1496,6 @@ SonarUnit = Class(StructureUnit) {
 
 -- SEA FACTORY UNITS
 SeaFactoryUnit = Class(FactoryUnit) {
-    -- Disable the default rocking behavior
-    StartRocking = function(self)
-    end,
-
-    StopRocking = function(self)
-    end,
-
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()

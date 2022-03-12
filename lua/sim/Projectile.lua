@@ -28,7 +28,7 @@ local function PopulateBlueprintCache(entity, blueprint)
 
     -- store the result
     local meta = getmetatable(entity)
-    meta.BlueprintCache = cache
+    meta.Cache = cache
 
     SPEW("Populated blueprint cache for projectile: " .. tostring(blueprint.BlueprintId))
 end
@@ -38,7 +38,7 @@ local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categor
 
 Projectile = Class(moho.projectile_methods, Entity) {
 
-    BlueprintCache = false,
+    Cache = false,
 
     PassDamageData = function(self, DamageData)
         self.DamageData.DamageRadius = DamageData.DamageRadius
@@ -149,15 +149,15 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
     OnCreate = function(self, inWater)
 
-        local bp = self:GetBlueprint()
-
         -- populate blueprint cache if we haven't done that yet
-        if not self.BlueprintCache then 
+        if not self.Cache then 
+            local bp = self:GetBlueprint()
             PopulateBlueprintCache(self, bp)
         end
 
         -- copy reference from meta table to inner table
-        self.BlueprintCache = self.BlueprintCache
+        self.Cache = self.Cache
+        self.Blueprint = self.Cache.Blueprint 
 
         self.DamageData = {
             DamageRadius = nil,
@@ -168,14 +168,14 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         self.Army = self:GetArmy()
         self.Trash = TrashBag()
-        self:SetMaxHealth(bp.Defense.MaxHealth or 1)
+        self:SetMaxHealth(self.Blueprint.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
-        local snd = bp.Audio.ExistLoop
+        local snd = self.Blueprint.Audio.ExistLoop
         if snd then
             self:SetAmbientSound(snd, nil)
         end
 
-        if bp.Physics.TrackTargetGround and bp.Physics.TrackTargetGround == true then
+        if self.Blueprint.Physics.TrackTargetGround and self.Blueprint.Physics.TrackTargetGround == true then
             local pos = self:GetCurrentTargetPosition()
             pos[2] = GetSurfaceHeight(pos[1], pos[3])
             self:SetNewTargetGround(pos)
@@ -522,7 +522,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 -- effects that require projectiles without additional overhead.
 DummyProjectile = Class(moho.projectile_methods, Entity) {
 
-    BlueprintCache = false,
+    Cache = false,
 
     __init = function(self, spec) end,
     __post_init = function(self, spec) end,
@@ -531,12 +531,12 @@ DummyProjectile = Class(moho.projectile_methods, Entity) {
         local bp = self:GetBlueprint()
 
         -- populate blueprint cache if we haven't done that yet
-        if not self.BlueprintCache then 
+        if not self.Cache then 
             PopulateBlueprintCache(self, bp)
         end
 
         -- copy reference from meta table to inner table
-        self.BlueprintCache = self.BlueprintCache
+        self.Cache = self.Cache
 
         -- expected to be cached by all projectiles
         self.Army = self:GetArmy()
