@@ -638,8 +638,13 @@ FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
 
-        -- keeps track of what HQs are available
-        if EntityCategoryContains(categories.RESEARCH, self) then
+        -- if we're a support factory, make sure our build restrictions are correct
+        if self.Cache.HashedCats["SUPPORTFACTORY"] then 
+            self:UpdateBuildRestrictions()
+        end
+        
+        -- if we're an HQ, enable all the additional logic
+        if self.Cache.HashedCats["RESEARCH"] then
 
             -- is called when:
             -- - structure is being upgraded

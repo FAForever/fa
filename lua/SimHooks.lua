@@ -1,10 +1,12 @@
 
--- upvalue for performance
-local EntityCategoryFilterDown = EntityCategoryFilterDown
-local CategoriesNoDummyUnits = categories.ALLUNITS - categories.DUMMYUNIT
+
 
 do
-    local oldGetUnitsInRect = GetUnitsInRect
+    local oldGetUnitsInRect = _G.GetUnitsInRect
+
+    -- upvalue for performance
+    local EntityCategoryFilterDown = EntityCategoryFilterDown
+    local CategoriesNoDummyUnits = categories.ALLUNITS - categories.DUMMYUNIT
 
     --- Retrieves all units in a rectangle, Excludes dummy units, such as the Cybran Build Drone, by default.
     -- @param rectangle The rectangle to look for units in {x0, z0, x1, z1}.
