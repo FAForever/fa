@@ -649,7 +649,6 @@ StructureUnit = Class(Unit) {
             WARN("Stacktrace:" .. repr(debug.traceback()))
         end
     end,
-
 }
 
 -- FACTORY UNITS
