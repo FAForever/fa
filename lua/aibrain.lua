@@ -211,7 +211,7 @@ AIBrain = Class(moho.aibrain_methods) {
         -- make sure the army stats exist
         self:SetArmyStat('Economy_Ratio_Mass', 1.0)
         self:SetArmyStat('Economy_Ratio_Energy', 1.0)
-
+    
         -- add initial trigger and assume we're not depleted
         self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
         self.EnergyDepleted = false 
