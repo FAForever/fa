@@ -9,11 +9,12 @@
 --  - _IsUp: determines whether the shield is up
 
 -- Current hield state:
---  - Enabled: indicates the shield is enabled or not (via the toggle of the user)
---  - Recharged : determines whether the shield is recharged
---  - DepletedByEnergy: indicates the shield is drained of energy and needs to recharge
---  - DepletedByDamage: indicates the shield sustained too much damage and needs to recharge
---  - NoEnergyToSustain: indicates the shield does not have sufficient energy to recharge
+--  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
+--  - Recharged : flag that indicates whether the shield is recharged
+--  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
+--  - DepletedByDamage: flag that indicates the shield sustained too much damage and needs to recharge
+--  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
+--  - RolledFromFactory: flag that allows us to skip the first attachment check
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -176,7 +177,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
         -- then check if we can actually turn it on
         if not self.Brain.EnergyDepleted then 
-            LOG("Viable!")
             self:OnEnergyViable()
         else 
             self:OnEnergyDepleted()
@@ -822,7 +822,7 @@ Shield = Class(moho.shield_methods, Entity) {
     DeadState = State {
         Main = function(self) 
         end,
-        
+
         IsOn = function(self)
             return false
         end,
@@ -941,9 +941,9 @@ Shield = Class(moho.shield_methods, Entity) {
 
     SetType = function(self, type)
 
-        if not DeprecatedWarnings.SetShieldRegenStartTime then 
-            DeprecatedWarnings.SetShieldRegenStartTime = true 
-            WARN("SetShieldRegenStartTime is deprecated: set the value shield.ShieldType instead.")
+        if not DeprecatedWarnings.ShieldType then 
+            DeprecatedWarnings.ShieldType = true 
+            WARN("ShieldType is deprecated: set the value shield.ShieldType instead.")
             WARN("Source: " .. repr(debug.traceback()))
         end
 

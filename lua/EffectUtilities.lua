@@ -121,7 +121,6 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
     end
 
     unitBeingBuilt:ShowBone(0, true)
-    unitBeingBuilt:HideLandBones()
     unitBeingBuilt.BeingBuiltShowBoneTriggered = true
 
     local lComplete = unitBeingBuilt:GetFractionComplete()
