@@ -740,6 +740,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.DepletedByDamage = false
             self.DepletedByEnergy = false 
             self.Recharged = true 
+            self.RegenThreadStartTick = GetGameTick() + 10 * self.RegenStartTime
 
             -- back to the regular onstate
             ChangeState(self, self.OnState)
@@ -960,7 +961,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
         self.ShieldType = type
     end,
-
 }
 
 --- A bubble shield attached to a single unit.
@@ -1024,53 +1024,47 @@ PersonalBubble = Class(Shield) {
         end
     },
 
-    DamageRechargeState = State(Shield.DamageRechargeState) {
+    RechargeState = State(Shield.RechargeState) {
         Main = function(self)
             self.Owner:RevertCollisionShape()
-            Shield.DamageRechargeState.Main(self)
+            Shield.RechargeState.Main(self)
          end
     },
-
-    EnergyDrainRechargeState = State(Shield.EnergyDrainRechargeState) {
-        Main = function(self)
-            self.Owner:RevertCollisionShape()
-            Shield.EnergyDrainRechargeState.Main(self)
-        end
-    }
 }
 
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
 TransportShield = Class(Shield) {
-    -- Yes it says contents, but this includes the generating transport too
+
+    -- toggle vulnerability of the transport and its content
     SetContentsVulnerable = function(self, canTakeDamage)
         for k, v in self.protectedUnits do
             k.CanTakeDamage = canTakeDamage
         end
     end,
 
+    -- we try and forget this unit
     RemoveProtectedUnit = function(self, unit)
         self.protectedUnits[unit] = nil
         unit.CanTakeDamage = true
     end,
 
+    -- we try and protect this unit
     AddProtectedUnit = function(self, unit)
         self.protectedUnits[unit] = true
     end,
 
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
-
         self.protectedUnits = {}
     end,
 
-    -- Protect the contents while the shield is up.
     OnState = State(Shield.OnState) {
         Main = function(self)
-            -- We want to protect ourself too!
-            self:AddProtectedUnit(self.Owner)
-
+            -- prevent ourself and our content from taking damage
             self:SetContentsVulnerable(false)
+            self.Owner.CanTakeDamage = false 
+
             Shield.OnState.Main(self)
         end,
 
@@ -1080,37 +1074,33 @@ TransportShield = Class(Shield) {
         end
     },
 
-    -- Set the contents vulnerable in the various shield-down states.
     OffState = State(Shield.OffState) {
         Main = function(self)
+            -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
+            self.Owner.CanTakeDamage = true 
+
             Shield.OffState.Main(self)
         end,
     },
 
-    DamageRechargeState = State(Shield.DamageRechargeState) {
+    RechargeState = State(Shield.RechargeState) {
         Main = function(self)
+            -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
-            Shield.DamageRechargeState.Main(self)
+            self.Owner.CanTakeDamage = true 
+            Shield.RechargeState.Main(self)
         end
     },
-
-    EnergyDrainRechargeState = State(Shield.EnergyDrainRechargeState) {
-        Main = function(self)
-            self:SetContentsVulnerable(true)
-            Shield.EnergyDrainRechargeState.Main(self)
-        end
-    }
 }
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
 PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
-        self.Trash = TrashBag()
-        self.Owner = spec.Owner
+        Shield.OnCreate(self, spec)
 
-        self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
+        -- store information from sepc
         self.CollisionSizeX = spec.CollisionSizeX or 1
         self.CollisionSizeY = spec.CollisionSizeY or 1
         self.CollisionSizeZ = spec.CollisionSizeZ or 1
@@ -1119,35 +1109,7 @@ PersonalShield = Class(Shield){
         self.CollisionCenterZ = spec.CollisionCenterZ or 0
         self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
 
-        self:SetSize(spec.Size)
-        self:SetType('Personal')
-
-        self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self, spec.ShieldMaxHealth)
-
-        -- Show our 'lifebar'
-        self:UpdateShieldRatio(1.0)
-
-        self:SetRechargeTime(spec.ShieldRechargeTime or 5, spec.ShieldEnergyDrainRechargeTime or 5)
-        self:SetVerticalOffset(spec.ShieldVerticalOffset)
-
-        self:SetVizToFocusPlayer('Always')
-        self:SetVizToEnemies('Intel')
-        self:SetVizToAllies('Always')
-        self:SetVizToNeutrals('Always')
-
-        self:AttachBoneTo(-1, spec.Owner, -1)
-
-        self:SetShieldRegenRate(spec.ShieldRegenRate)
-        self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
-
-        self.PassOverkillDamage = spec.PassOverkillDamage
-
-        -- manage impact entities
-        self.LiveImpactEntities = 0
-        self.ImpactEntitySpecs = { Owner = self.Owner }
-
-        ChangeState(self, self.OnState)
+        self.ShieldType = 'Personal'
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
@@ -1168,17 +1130,17 @@ PersonalShield = Class(Shield){
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
         local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactEnt = Entity {Owner = self.Owner}
+        local entity = Entity( self.ImpactEntitySpecs )
 
-        Warp(ImpactEnt, self:GetPosition())
-        ImpactEnt:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
+        Warp(entity, self:GetPosition())
+        entity:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
 
         for k, v in self.ImpactEffects do
-            CreateEmitterAtBone(ImpactEnt, -1, self.Army, v):OffsetEmitter(0, 0, OffsetLength)
+            CreateEmitterAtBone(entity, -1, self.Army, v):OffsetEmitter(0, 0, OffsetLength)
         end
         WaitSeconds(1)
 
-        ImpactEnt:Destroy()
+        entity:Destroy()
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
