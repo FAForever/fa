@@ -170,11 +170,13 @@ Shield = Class(moho.shield_methods, Entity) {
         -- by default, turn on maintenance and the toggle for the owner
         self.Enabled = true
         self.Recharged = true 
+        self.RolledFromFactory = false 
         self.Owner:SetMaintenanceConsumptionActive()
         self.Owner:SetScriptBit('RULEUTC_ShieldToggle', true)
 
         -- then check if we can actually turn it on
         if not self.Brain.EnergyDepleted then 
+            LOG("Viable!")
             self:OnEnergyViable()
         else 
             self:OnEnergyDepleted()
@@ -669,7 +671,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
-            if self.Owner:IsUnitState('Attached') then
+            if self.Owner:IsUnitState('Attached') and self.RolledFromFactory then
                 ChangeState(self, self.OffState)
 
             -- if we're still out of energy, go wait for that to fix itself
@@ -687,6 +689,10 @@ Shield = Class(moho.shield_methods, Entity) {
                 if self.RegenThreadSuspended then 
                     ResumeThread(self.RegenThread)
                 end
+
+                -- mobile shields are 'attached' to the factory when they are build, this allows
+                -- us to skip the first check of whether we're attached
+                self.RolledFromFactory = true 
 
                 -- introduce the shield bar
                 self:UpdateShieldRatio(-1)
@@ -814,7 +820,9 @@ Shield = Class(moho.shield_methods, Entity) {
     },
 
     DeadState = State {
-        Main = function(self) end,
+        Main = function(self) 
+        end,
+        
         IsOn = function(self)
             return false
         end,
