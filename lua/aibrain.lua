@@ -212,6 +212,13 @@ AIBrain = Class(moho.aibrain_methods) {
         self:SetArmyStat('Economy_Ratio_Mass', 1.0)
         self:SetArmyStat('Economy_Ratio_Energy', 1.0)
 
+        -- add initial trigger and assume we're not depleted
+        self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
+        self.EnergyDepleted = false 
+        self.EnergyDependingUnits = { }
+        self.EnergyDependingUnits.__mode = 'v'
+        self.EnergyDependingUnitsHead = 1
+
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
@@ -305,9 +312,59 @@ AIBrain = Class(moho.aibrain_methods) {
         self.PreBuilt = true
     end,
 
+    -- Energy storage callbacks
+
+    --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
+    -- @param self Brain that keeps track of the entity
+    -- @param entity Entity to be updated according to the 
+    AddEnergyDependingEntity = function(self, entity)
+        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
+        self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
+    end,
+
+    OnEnergyTrigger = function(self, triggerName)
+        if triggerName == "EnergyDepleted" then 
+            -- add trigger when we can recover units
+            self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
+            self.EnergyDepleted = true 
+
+            -- recurse over the list of units and do callbacks accordingly
+            local index = 1 
+            for k = 1, self.EnergyDependingUnitsHead - 1 do 
+                local entity = self.EnergyDependingUnits[k]
+
+                if not entity:BeenDestroyed() then 
+                    self.EnergyDependingUnits[index] = entity 
+                    index = index + 1
+                    entity:OnEnergyDepleted()
+                end
+            end
+        else 
+            -- add trigger when we're depleted
+            self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
+            self.EnergyDepleted = false 
+
+            -- recurse over the list of units and do callbacks accordingly
+            local index = 1 
+            for k = 1, self.EnergyDependingUnitsHead - 1 do 
+                local entity = self.EnergyDependingUnits[k]
+
+                if entity and not entity:BeenDestroyed() then 
+                    self.EnergyDependingUnits[index] = entity 
+                    index = index + 1
+                    entity:OnEnergyViable()
+                end
+            end
+        end
+    end,
+
+
     -- TRIGGERS BASED ON AN AI BRAIN
     OnStatsTrigger = function(self, triggerName)
-        LOG(triggerName)
+
+        if triggerName == "EnergyDepleted" or triggerName == "EnergyViable" then 
+            self:OnEnergyTrigger(triggerName)
+        end
 
         for k, v in self.TriggerList do
             if v.Name == triggerName then

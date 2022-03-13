@@ -5,11 +5,25 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
+-- Legacy shield state:
+--  - _IsUp: determines whether the shield wants to be up 
+
+-- New shield state:
+--  - Enabled: indicates the shield is enabled or not (via the toggle of the user)
+--  - Recharged : determines whether the shield wants to be up
+--  - DepletedByEnergy: indicates the shield is drained of energy and needs to recharge
+--  - DepletedByDamage: indicates the shield sustained too much damage and needs to recharge
+--  - NoEnergyToSustain: indicates the shield has sufficient energy to recharge at all
+
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
 local VectorCached = Vector(0, 0, 0)
+
+local DeprecatedWarnings = { }
+
+
 
 -- upvalue for performance
 local MathSqrt = math.sqrt
@@ -63,52 +77,60 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     OnCreate = function(self, spec)
-        self.Trash = TrashBag()
+        -- cache information that is used frequently
+        self.Army = self:GetArmy()
+        self.EntityId = self:GetEntityId()
+        self.Brain = spec.Owner:GetAIBrain()
+
+        -- copy over information from specifiaction
+        self.Size = spec.Size 
         self.Owner = spec.Owner
         self.MeshBp = spec.Mesh
         self.MeshZBp = spec.MeshZ
+        self.SpillOverDmgMod = spec.ShieldSpillOverDamageMod or 0.15
+        self.ShieldRechargeTime = spec.ShieldRechargeTime or 5
+        self.ShieldEnergyDrainRechargeTime = spec.ShieldEnergyDrainRechargeTime
+        self.ShieldVerticalOffset = spec.ShieldVerticalOffset
+        self.RegenRate = spec.ShieldRegenRate
+        self.RegenStartTime = spec.ShieldRegenStartTime
+        self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
-        self.Army = self:GetArmy()
-        self.EntityId = self:GetEntityId()
-        self._IsUp = false
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
             self.ImpactEffects = {}
         end
 
-        self:SetSize(spec.Size)
+        -- set some internal state related to shields
+        self._IsUp = false
+        self.ShieldType = 'Bubble'
+
+        -- set our health
         self:SetMaxHealth(spec.ShieldMaxHealth)
         self:SetHealth(self, spec.ShieldMaxHealth)
-        self:SetType('Bubble')
-        self.SpillOverDmgMod = math.max(spec.ShieldSpillOverDamageMod or 0.15, 0)
 
-        -- Show our 'lifebar'
+        -- show our 'lifebar'
         self:UpdateShieldRatio(1.0)
 
-        self:SetRechargeTime(spec.ShieldRechargeTime or 5, spec.ShieldEnergyDrainRechargeTime or 5)
-        self:SetVerticalOffset(spec.ShieldVerticalOffset)
-
+        -- tell the engine when we should be visible
         self:SetVizToFocusPlayer('Always')
         self:SetVizToEnemies('Intel')
         self:SetVizToAllies('Always')
         self:SetVizToNeutrals('Intel')
 
+        -- attach us to the owner
         self:AttachBoneTo(-1, spec.Owner, -1)
 
-        self:SetShieldRegenRate(spec.ShieldRegenRate)
-        self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
-
-        self.OffHealth = -1
-
-        self.PassOverkillDamage = spec.PassOverkillDamage
-
-        local ownerCategories = self.Owner:GetBlueprint().CategoriesHash
+        -- lookup as to whether we're static or a commander shield
+        local ownerCategories = (self.Owner.Blueprint or self.Owner:GetBlueprint()).CategoriesHash
         if ownerCategories.STRUCTURE then
             self.StaticShield = true
         elseif ownerCategories.COMMAND then
             self.CommandShield = true
         end
+
+        -- use trashbag of the unit that owns us
+        self.Trash = self.Owner.Trash
 
         -- manage impact entities
         self.LiveImpactEntities = 0
@@ -123,7 +145,103 @@ Shield = Class(moho.shield_methods, Entity) {
         self.DamageReduction = { }
         self.DamageReductionTick = { }
 
-        ChangeState(self, self.OnState)
+        -- manage regeneration thread
+        self.RegenThreadSuspended = true
+        self.RegenThreadState = "On"
+        self.RegenThread = ForkThread(self.RegenThread, self)
+        self.Trash:Add(self.RegenThread)
+
+        -- manage the loss of shield when energy is depleted
+        self.Brain:AddEnergyDependingEntity(self)
+
+        -- by default, turn on maintenance and the toggle for the owner
+        self.Enabled = true
+        self.Recharged = true 
+        self.Owner:SetMaintenanceConsumptionActive()
+        self.Owner:SetScriptBit('RULEUTC_ShieldToggle', true)
+
+        -- then check if we can actually turn it on
+        if not self.Brain.EnergyDepleted then 
+            self:OnEnergyViable()
+        else 
+            self:OnEnergyDepleted()
+        end
+    end,
+
+    RegenThread = function(self)
+
+        -- localize for performance
+        local GetGameTick = GetGameTick
+        local CoroutineYield = coroutine.yield
+        local SuspendCurrentThread = SuspendCurrentThread
+
+        -- note to self: do **not** cache shield / unit related functions
+        -- into the local scope. E.g., something like `local GetHealth = self.GetHealth`,
+        -- this can break mods and / or map scripts
+
+        while true do
+
+            -- gather some information
+            local fromSuspension = false
+            local tick = GetGameTick()
+            local health = self:GetHealth()
+
+            -- check if we need to suspend ourself
+            if 
+                -- we're at zero health or lower
+                    health <= 0 
+                -- we're full health
+                or  health == self:GetMaxHealth() 
+                -- we're not enabled
+                or  not self.Enabled 
+                -- we're not recharged
+                or  not self.Recharged
+            then 
+                self.RegenThreadSuspended = true 
+                SuspendCurrentThread()
+                self.RegenThreadSuspended = false
+                fromSuspension = true 
+            end
+
+            -- if we didn't suspend then check regeneration conditions
+            if not fromSuspension then 
+
+                -- check if we're allowed to start regenerating again
+                if tick > self.RegenThreadStartTick then 
+
+                    -- adjust health, rate is in seconds 
+                    self:AdjustHealth(self.Owner, 0.1 * self.RegenRate)
+
+                    -- adjust shield bar
+                    self:UpdateShieldRatio(-1)
+
+                -- if not, yield for the difference in ticks
+                else 
+                    CoroutineYield(self.RegenThreadStartTick - tick )
+                end
+            end
+
+            -- wait till next tick
+            CoroutineYield(1)
+        end
+    end,
+
+    OnEnergyDepleted = function(self)
+        self.NoEnergyToSustain = true 
+
+        -- change state if we're enabled
+        if self.Enabled then 
+            ChangeState(self, self.EnergyDrainedState)
+        end
+    end,
+
+    OnEnergyViable = function(self)
+        self.NoEnergyToSustain = false 
+
+        -- change state if we're enabled
+        if self.Enabled then 
+            ChangeState(self, self.OnState)
+        end
     end,
 
     --- Retrieves allied shields that overlap with this shield, caches the results per tick
@@ -212,44 +330,12 @@ Shield = Class(moho.shield_methods, Entity) {
         return self.OverlappingShields, self.OverlappingShieldsCount
     end,
 
-    SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
-        self.ShieldRechargeTime = rechargeTime
-        self.ShieldEnergyDrainRechargeTime = energyRechargeTime
-    end,
-
-    SetVerticalOffset = function(self, offset)
-        self.ShieldVerticalOffset = offset
-    end,
-
-    --- Property to set the diameter of the shield
-    -- @param self A shield
-    -- @param size The new diameter of the shield
-    SetSize = function(self, size)
-        self.Size = size
-    end,
-
-    SetShieldRegenRate = function(self, rate)
-        self.RegenRate = rate
-    end,
-
-    SetShieldRegenStartTime = function(self, time)
-        self.RegenStartTime = time
-    end,
-
-    SetType = function(self, type)
-        self.ShieldType = type
-    end,
-
     UpdateShieldRatio = function(self, value)
         if value >= 0 then
             self.Owner:SetShieldRatio(value)
         else
             self.Owner:SetShieldRatio(self:GetHealth() / self:GetMaxHealth())
         end
-    end,
-
-    GetCachePosition = function(self)
-        return self:GetPosition()
     end,
 
     -- Note, this is called by native code to calculate spillover damage. The
@@ -350,24 +436,15 @@ Shield = Class(moho.shield_methods, Entity) {
                 ForkThread(self.CreateImpactEffect, self, vector)
             end
 
-            -- stop us from regenerating, we took damage
-            if self.RegenThread then
-                KillThread(self.RegenThread)
-                self.RegenThread = nil
-            end
-
             -- if we have no health, collapse
             if self:GetHealth() <= 0 then
-                ChangeState(self, self.DamageRechargeState)
-
-            -- if we do have health, start the delay before we regenerate health
-            elseif self.OffHealth < 0 then
-                if self.RegenRate > 0 then
-                    self.RegenThread = ForkThread(self.RegenStartThread, self)
-                    self.Owner.Trash:Add(self.RegenThread)
+                ChangeState(self, self.DamageDrainedState)
+            -- otherwise, attempt to regenerate
+            else 
+                self.RegenThreadStartTick = tick + 10 * self.RegenStartTime
+                if self.RegenThreadSuspended then 
+                    ResumeThread(self.RegenThread)
                 end
-            else
-                self:UpdateShieldRatio(0)
             end
         end
 
@@ -401,86 +478,6 @@ Shield = Class(moho.shield_methods, Entity) {
                 )
             end
         end
-    end,
-
-    RegenStartThread = function(self)
-        --ActiveConsumption means shield is upgrading. Upgrade has highest priority than regen and engies always assist it first
-        --no need to launch validation thread in this case
-        if self.StaticShield and not self.AssistersThread and not self.Owner.ActiveConsumption then
-            self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
-            self.Owner.Trash:Add(self.AssistersThread)
-        end
-
-        WaitSeconds(self.RegenStartTime)
-        while self:GetHealth() < self:GetMaxHealth() do
-
-            self:AdjustHealth(self.Owner, self.RegenRate / 10)
-
-            self:UpdateShieldRatio(-1)
-
-            WaitTicks(1)
-        end
-        self.RegenThread = nil
-    end,
-
-    --Fix "free" shield regen. Assist efficiency never drops, no matter what mass income you have
-    --We have to compensate it in this thread.
-    ValidateAssistersThread = function(self)
-        local shieldBP = self.Owner:GetBlueprint().Defense.Shield
-        local RegenPerBR = shieldBP.ShieldRegenRate / shieldBP.RegenAssistMult / 10 --amount of hp per 1 buildrate (for 1 tick). Weird formula
-
-        local previousTickTotalBR
-        local previousTickAssisters
-
-        while self.RegenThread and not self.Owner.ActiveConsumption or self.OnStateCharging and self:GetHealth() ~= shieldBP.ShieldMaxHealth do
-            if previousTickAssisters then
-                local realBuildRate = 0
-
-                for key, unit in previousTickAssisters do
-                    -- ActiveConsumption means unit is not on pause. Without this, rapid pausing/unpausing engies causes hp drops
-                    if not unit.Dead and unit.ActiveConsumption then
-                        realBuildRate = realBuildRate + (unit:GetResourceConsumed() * unit.AssistBuildRate)
-                    else
-                        realBuildRate = realBuildRate + unit.AssistBuildRate
-                    end
-                end
-
-                if realBuildRate ~= previousTickTotalBR then
-                    local health = (previousTickTotalBR - realBuildRate) * RegenPerBR --calculate "free" hp that should be subtracted
-
-                    self:AdjustHealth(self.Owner, -health)
-                end
-
-                previousTickAssisters = nil
-                previousTickTotalBR = nil
-            end
-
-            local assisters = self.Owner:GetGuards()
-
-            if assisters[1] then
-                local engineers = {}
-                local totalBR = 0
-
-                for key, unit in assisters do
-                    --only engies can have shield as FocusUnit, also checking for pause
-                    if unit:GetFocusUnit() == self.Owner and unit.ActiveConsumption then
-                        unit.AssistBuildRate = unit:GetBuildRate()
-                        totalBR = totalBR + unit.AssistBuildRate
-
-                        table.insert(engineers, unit)
-                    end
-                end
-
-                if engineers[1] then
-                    previousTickAssisters = engineers
-                    previousTickTotalBR = totalBR
-                end
-            end
-
-            WaitTicks(1)
-        end
-
-        self.AssistersThread = nil
     end,
 
     CreateImpactEffect = function(self, vector)
@@ -543,6 +540,7 @@ Shield = Class(moho.shield_methods, Entity) {
     -- @param self The shield we're checking the collision for
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
+
         -- special logic when it is a projectile to simulate air crashes
         if other.CrashingAirplaneShieldCollisionLogic then 
             if other.ShieldImpacted then
@@ -554,6 +552,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 end
             end
         end
+
         -- special behavior for projectiles that always collide with 
         -- shields, like the seraphim storm when the Ythotha dies
         if other.CollideFriendlyShield then
@@ -591,11 +590,11 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     IsUp = function(self)
-        return (self:IsOn() and self._IsUp)
+        return (self:IsOn() and self.Enabled)
     end,
 
     RemoveShield = function(self)
-        self._IsUp = false
+        self._IsUp = false 
 
         self:SetCollisionShape('None')
 
@@ -634,8 +633,7 @@ Shield = Class(moho.shield_methods, Entity) {
     ChargingUp = function(self, curProgress, time)
         self.Charging = true
         while curProgress < time do
-            local fraction = self.Owner:GetResourceConsumed()
-            curProgress = curProgress + (fraction / 10)
+            curProgress = curProgress + 0.1
             curProgress = math.min(curProgress, time)
 
             local workProgress = curProgress / time
@@ -643,79 +641,45 @@ Shield = Class(moho.shield_methods, Entity) {
             self:UpdateShieldRatio(workProgress)
             WaitTicks(1)
         end
-        self.Charging = nil
+        self.Charging = false
     end,
 
     OnState = State {
         Main = function(self)
-            if self.DamageRecharge then
-                self.Owner:SetMaintenanceConsumptionActive()
-                self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
-                ChangeState(self, self.DamageRechargeState)
 
-            -- If the shield was turned off; use the recharge time before turning back on
-            elseif self.OffHealth >= 0 then
-                self.Owner:SetMaintenanceConsumptionActive()
-                self.OnStateCharging = true
-
-                -- In this particular case (OnState + charging) shield can be assisted by engineers
-                -- It's unfixable without changing the state (and changing state causes even more issues)
-                -- so we have to launch assisters thread here too
-                if self.StaticShield and not self.AssistersThread and not self.Owner.ActiveConsumption then
-                    self.AssistersThread = ForkThread(self.ValidateAssistersThread, self)
-                    self.Owner.Trash:Add(self.AssistersThread)
-                end
-
-                self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
-                self.OnStateCharging = nil
-
-                -- If the shield has less than full health, allow the shield to begin regening
-                if self:GetHealth() < self:GetMaxHealth() and self.RegenRate > 0 then
-                    self.RegenThread = ForkThread(self.RegenStartThread, self)
-                    self.Owner.Trash:Add(self.RegenThread)
-                end
-            end
-            self.Owner:OnShieldEnabled()
-
-            -- We are no longer turned off
-            self.OffHealth = -1
-
-            self:UpdateShieldRatio(-1)
-            self:CreateShieldMesh()
-
-            self.Owner:PlayUnitSound('ShieldOn')
+            -- always start consuming energy at this point
+            self.Enabled = true 
             self.Owner:SetMaintenanceConsumptionActive()
 
-            local aiBrain = self.Owner:GetAIBrain()
+            -- if we're attached to a transport then our shield should be off
+            if self.Owner:IsUnitState('Attached') then
+                ChangeState(self, self.OffState)
 
-            WaitSeconds(1.0)
-            local fraction = self.Owner:GetResourceConsumed()
-            local on = true
-            local test = false
+            -- if we're still out of energy, go wait for that to fix itself
+            elseif self.NoEnergyToSustain then 
+                ChangeState(self, self.EnergyDrainedState)
 
-            -- Test in here if we have run out of power; if the fraction is ever not 1 we don't have full power
-            while on do
-                WaitTicks(1)
+            -- if we are depleted for some reason, go fix that first
+            elseif self.DepletedByEnergy or self.DepletedByDamage or not self.Recharged then 
+                ChangeState(self, self.RechargeState)
 
-                self:UpdateShieldRatio(-1)
+            -- we're all good, go shield things
+            else 
 
-                fraction = self.Owner:GetResourceConsumed()
-                if fraction ~= 1 and aiBrain:GetEconomyStored('ENERGY') <= 1 then
-                    if test then
-                        on = false
-                    else
-                        test = true
-                    end
-                else
-                    on = true
-                    test = false
+                -- unsuspend the regeneration thread
+                if self.RegenThreadSuspended then 
+                    ResumeThread(self.RegenThread)
                 end
-            end
 
-            -- Record the amount of health on the shield here so when the unit tries to turn its shield
-            -- back on and off it has the amount of health from before.
-            --self.OffHealth = self:GetHealth()
-            ChangeState(self, self.EnergyDrainRechargeState)
+                -- introduce the shield bar
+                self:UpdateShieldRatio(-1)
+                self:CreateShieldMesh()
+
+                -- inform owner that the shield is enabled
+                self.Owner:OnShieldEnabled()
+                self.Owner:PlayUnitSound('ShieldOn')
+
+            end
         end,
 
         IsOn = function(self)
@@ -725,94 +689,113 @@ Shield = Class(moho.shield_methods, Entity) {
 
     -- When manually turned off
     OffState = State {
+
         Main = function(self)
-            self.Owner:OnShieldDisabled()
-            self.OnStateCharging = nil
 
-            -- No regen during off state
-            if self.RegenThread then
-                KillThread(self.RegenThread)
-                self.RegenThread = nil
-            end
+            LOG("OffState")
 
-            -- Set the offhealth - this is used basically to let the unit know the unit was manually turned off
-            self.OffHealth = self:GetHealth()
-
-            if self.DamageRecharge then
-                self.DamageRecharge = self.Owner:GetShieldRatio(self.Owner)
-            end
-
-            -- Get rid of the shield bar
-            self:UpdateShieldRatio(0)
-            self:RemoveShield()
-
-            self.Owner:PlayUnitSound('ShieldOff')
+            -- update internal state
+            self.Enabled = false 
+            self.Recharged = false 
             self.Owner:SetMaintenanceConsumptionInactive()
 
-            WaitSeconds(1)
-        end,
-
-        IsOn = function(self)
-            return false
-        end,
-    },
-
-    -- This state happens when the shield has been depleted due to damage
-    DamageRechargeState = State {
-        Main = function(self)
-            if not self.DamageRecharge then
-                self.DamageRecharge = true
-
-                self:RemoveShield()
-
-                self.Owner:OnShieldDisabled()
-                self.Owner:PlayUnitSound('ShieldOff')
-
-                -- We must make the unit charge up before getting its shield back
-                self:ChargingUp(0, self.ShieldRechargeTime)
-
-                -- Fully charged, get full health
-                self:SetHealth(self, self:GetMaxHealth())
-
-                self.DamageRecharge = nil
-                ChangeState(self, self.OnState)
-            else
-                self:RemoveShield()
-
-                self.Owner:OnShieldDisabled()
-                self.Owner:PlayUnitSound('ShieldOff')
-
-                self:ChargingUp(self.ShieldRechargeTime * self.DamageRecharge, self.ShieldRechargeTime)
-
-                self:SetHealth(self, self:GetMaxHealth())
-
-                self.DamageRecharge = nil
-                ChangeState(self, self.OnState)
-            end
-        end,
-
-        IsOn = function(self)
-            return false
-        end,
-    },
-
-    -- This state happens only when the army has run out of power
-    EnergyDrainRechargeState = State {
-        Main = function(self)
+            -- remove the shield and the shield bar
             self:RemoveShield()
+            self:UpdateShieldRatio(-1)
 
+            -- inform the owner that the shield is disabled
+            self.Owner:OnShieldDisabled()
+            self.Owner:PlayUnitSound('ShieldOff')
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
+    },
+
+    RechargeState = State {
+        Main = function(self)
+
+            LOG("RechargeState")
+
+            -- determine recharge time
+            local rechargeTime = self.ShieldEnergyDrainRechargeTime           
+            if self.DepletedByDamage then 
+                rechargeTime = math.max(rechargeTime, self.ShieldRechargeTime)
+            end
+
+            -- wait until we're done charging up
+            self:ChargingUp(0, rechargeTime)
+
+            -- determine health 
+            local health = self:GetHealth()
+            if self.DepletedByDamage then 
+                health = self:GetMaxHealth()
+            end
+
+            -- fully charged, reset our helpt
+            self:SetHealth(self, health)
+
+            -- update internal state
+            self.DepletedByDamage = false
+            self.DepletedByEnergy = false 
+            self.Recharged = true 
+
+            -- back to the regular onstate
+            ChangeState(self, self.OnState)
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
+    },
+
+    DamageDrainedState = State {
+        Main = function(self)
+
+            LOG("DamageDrainedState")
+
+            -- update internal state
+            self.DepletedByDamage = true 
+            self.Recharged = false 
+
+            -- remove the shield
+            self:RemoveShield()
+            self:UpdateShieldRatio(0)
+
+            -- interact with the owner
             self.Owner:OnShieldDisabled()
             self.Owner:PlayUnitSound('ShieldOff')
 
-            self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
+            -- start recharging right away
+            ChangeState(self, self.RechargeState)
+        end,
 
-            -- If the unit is attached to a transport, make sure the shield goes to the off state
-            -- so the shield isn't turned on while on a transport
-            if not self.Owner:IsUnitState('Attached') then
-                ChangeState(self, self.OnState)
-            else
-                ChangeState(self, self.OffState)
-            end
+        IsOn = function(self)
+            return false
+        end,
+    },
+
+    EnergyDrainedState = State {
+        Main = function(self)
+
+            LOG("EnergyDrainedState")
+
+            -- update internal state
+            self.DepletedByEnergy = true 
+            self.Recharged = false 
+
+            -- remove the shield
+            self:RemoveShield()
+            self:UpdateShieldRatio(0)
+
+            -- interact with the owner
+            self.Owner:OnShieldDisabled()
+            self.Owner:PlayUnitSound('ShieldOff')
+
+            -- do not start recharging, wait until we have some power in storage. We're
+            -- informed through the OnEnergyViable callback
+            -- ChangeState(self, self.RechargeState)
         end,
 
         IsOn = function(self)
@@ -822,6 +805,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
     DeadState = State {
         Main = function(self)
+            LOG("DeadState")
         end,
 
         IsOn = function(self)
@@ -830,6 +814,53 @@ Shield = Class(moho.shield_methods, Entity) {
     },
 
     --- Deprecated functionality
+
+    DamageRechargeState = State {
+
+        Main = function(self)
+
+            -- remove the shield, but not the bar as we use that to indicate when the shield is done recharging
+            self:RemoveShield()
+
+            -- inform the owner the shield is disabled
+            self.Owner:OnShieldDisabled()
+            self.Owner:PlayUnitSound('ShieldOff')
+
+            -- wait until we're done charging up
+            self:ChargingUp(0, self.ShieldRechargeTime)
+
+            -- fully charged, so reset our health
+            self:SetHealth(self, self:GetMaxHealth())
+
+            -- update internal state
+            self.DepletedByDamage = true
+            self.DepletedByEnergy = false 
+
+            -- back to the regular onstate
+            ChangeState(self, self.OnState)
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
+    },
+
+    EnergyDrainRechargeState = State {
+        Main = function(self)
+
+            -- do something that resembles the old logic
+            self:ChargingUp(0, self.ShieldEnergyDrainRechargeTime)
+
+            self.DepletedByEnergy = false 
+
+            -- and we're done, turn us back on
+            ChangeState(self, self.OnState)
+        end,
+
+        IsOn = function(self)
+            return false
+        end,
+    },
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
         local weaponBP = firingWeapon:GetBlueprint()
@@ -850,6 +881,86 @@ Shield = Class(moho.shield_methods, Entity) {
 
         return true
     end,
+
+
+    GetCachePosition = function(self)
+
+        if not DeprecatedWarnings.GetCachePosition then 
+            DeprecatedWarnings.GetCachePosition = true 
+            WARN("GetCachePosition is deprecated: use shield:GetPosition() instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        return self:GetPosition()
+    end,
+
+    SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
+
+        if not DeprecatedWarnings.SetRechargeTime then 
+            DeprecatedWarnings.SetRechargeTime = true 
+            WARN("SetRechargeTime is deprecated: set the values shield.ShieldRechargeTime and shield.ShieldEnergyDrainRechargeTime instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.ShieldRechargeTime = rechargeTime
+        self.ShieldEnergyDrainRechargeTime = energyRechargeTime
+    end,
+
+    SetVerticalOffset = function(self, offset)
+
+        if not DeprecatedWarnings.SetVerticalOffset then 
+            DeprecatedWarnings.SetVerticalOffset = true 
+            WARN("SetVerticalOffset is deprecated: set the value shield.ShieldVerticalOffset instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.ShieldVerticalOffset = offset
+    end,
+
+    SetSize = function(self, size)
+
+        if not DeprecatedWarnings.SetSize then 
+            DeprecatedWarnings.SetSize = true 
+            WARN("SetSize is deprecated: set the value shield.Size instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.Size = size
+    end,
+
+    SetShieldRegenRate = function(self, rate)
+
+        if not DeprecatedWarnings.SetShieldRegenRate then 
+            DeprecatedWarnings.SetShieldRegenRate = true 
+            WARN("SetShieldRegenRate is deprecated: set the value shield.RegenRate instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.RegenRate = rate
+    end,
+
+    SetShieldRegenStartTime = function(self, time)
+
+        if not DeprecatedWarnings.SetShieldRegenStartTime then 
+            DeprecatedWarnings.SetShieldRegenStartTime = true 
+            WARN("SetShieldRegenStartTime is deprecated: set the value shield.RegenStartTime instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.RegenStartTime = time
+    end,
+
+    SetType = function(self, type)
+
+        if not DeprecatedWarnings.SetShieldRegenStartTime then 
+            DeprecatedWarnings.SetShieldRegenStartTime = true 
+            WARN("SetShieldRegenStartTime is deprecated: set the value shield.ShieldType instead.")
+            WARN("Source: " .. repr(debug.traceback()))
+        end
+
+        self.ShieldType = type
+    end,
+
 }
 
 --- A bubble shield attached to a single unit.
