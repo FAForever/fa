@@ -1101,7 +1101,7 @@ PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
 
-        -- store information from sepc
+        -- store information from spec
         self.CollisionSizeX = spec.CollisionSizeX or 1
         self.CollisionSizeY = spec.CollisionSizeY or 1
         self.CollisionSizeZ = spec.CollisionSizeZ or 1
@@ -1110,7 +1110,10 @@ PersonalShield = Class(Shield){
         self.CollisionCenterZ = spec.CollisionCenterZ or 0
         self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
 
+        -- set our shield type
         self.ShieldType = 'Personal'
+
+        -- cache our shield effect entity
         self.ShieldEffectEntity = Entity( self.ImpactEntitySpecs )
     end,
 
@@ -1234,50 +1237,10 @@ AntiArtilleryShield = Class(Shield) {
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
 CzarShield = Class(PersonalShield) {
     OnCreate = function(self, spec)
-        self.Trash = TrashBag()
-        self.Owner = spec.Owner
-        self.MeshBp = spec.Mesh
+        PersonalShield.OnCreate(self, spec)
+
         self.ImpactMeshBp = spec.ImpactMesh
         self.ImpactMeshBigBp = spec.ImpactMeshBig
-
-        self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
-        self.CollisionSizeX = spec.CollisionSizeX or 1
-        self.CollisionSizeY = spec.CollisionSizeY or 1
-        self.CollisionSizeZ = spec.CollisionSizeZ or 1
-        self.CollisionCenterX = spec.CollisionCenterX or 0
-        self.CollisionCenterY = spec.CollisionCenterY or 0
-        self.CollisionCenterZ = spec.CollisionCenterZ or 0
-        self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
-
-        self:SetSize(spec.Size)
-        self:SetType('Personal')
-
-        self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self, spec.ShieldMaxHealth)
-
-        -- Show our 'lifebar'
-        self:UpdateShieldRatio(1.0)
-
-        self:SetRechargeTime(spec.ShieldRechargeTime or 5, spec.ShieldEnergyDrainRechargeTime or 5)
-        self:SetVerticalOffset(spec.ShieldVerticalOffset)
-
-        self:SetVizToFocusPlayer('Always')
-        self:SetVizToEnemies('Intel')
-        self:SetVizToAllies('Always')
-        self:SetVizToNeutrals('Always')
-
-        self:AttachBoneTo(-1, spec.Owner, -1)
-
-        self:SetShieldRegenRate(spec.ShieldRegenRate)
-        self:SetShieldRegenStartTime(spec.ShieldRegenStartTime)
-
-        self.PassOverkillDamage = spec.PassOverkillDamage
-
-        -- manage impact entities
-        self.LiveImpactEntities = 0
-        self.ImpactEntitySpecs = { Owner = self.Owner }
-
-        ChangeState(self, self.OnState)
     end,
 
 
@@ -1287,7 +1250,7 @@ CzarShield = Class(PersonalShield) {
 
         local army = self:GetArmy()
         local OffsetLength = Util.GetVectorLength(vector)
-        local ImpactMesh = Entity {Owner = self.Owner}
+        local ImpactMesh = Entity ( self.ImpactEntitySpecs )
         local pos = self:GetPosition()
 
         -- Shield has non-standard form (ellipsoid) and no collision, so we need some magic to make impacts look good
