@@ -1036,6 +1036,12 @@ PersonalBubble = Class(Shield) {
 -- Useful for shielded transports (to work around the area-damage bug).
 TransportShield = Class(Shield) {
 
+
+    OnCreate = function(self, spec)
+        Shield.OnCreate(self, spec)
+        self.protectedUnits = {}
+    end,
+
     -- toggle vulnerability of the transport and its content
     SetContentsVulnerable = function(self, canTakeDamage)
         for k, v in self.protectedUnits do
@@ -1052,11 +1058,6 @@ TransportShield = Class(Shield) {
     -- we try and protect this unit
     AddProtectedUnit = function(self, unit)
         self.protectedUnits[unit] = true
-    end,
-
-    OnCreate = function(self, spec)
-        Shield.OnCreate(self, spec)
-        self.protectedUnits = {}
     end,
 
     OnState = State(Shield.OnState) {
@@ -1110,6 +1111,7 @@ PersonalShield = Class(Shield){
         self.OwnerShieldMesh = spec.OwnerShieldMesh or ''
 
         self.ShieldType = 'Personal'
+        self.ShieldEffectEntity = Entity( self.ImpactEntitySpecs )
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
@@ -1127,20 +1129,40 @@ PersonalShield = Class(Shield){
 
     CreateImpactEffect = function(self, vector)
 
+        -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
-        local OffsetLength = Util.GetVectorLength(vector)
-        local entity = Entity( self.ImpactEntitySpecs )
+        -- cache values
+        local effect
+        local army = self.Army
+        local vc = VectorCached
 
-        Warp(entity, self:GetPosition())
-        entity:SetOrientation(OrientFromDir(Vector(-vector.x, -vector.y, -vector.z)), true)
+        -- compute length of vector that points at the point of impact
+        local x = vector[1]
+        local y = vector[2]
+        local z = vector[3]
+        local d = MathSqrt(x * x + y * y + z * z)
 
+        -- re-use previous entity as we have no mesh
+        local entity = self.ShieldEffectEntity
+
+        -- warp the entity
+        vc[1], vc[2], vc[3] = self:GetPositionXYZ()
+        Warp(entity, vc)
+        
+        -- orientate it to orientate the effect
+        vc[1], vc[2], vc[3] = -x, -y, -z
+        entity:SetOrientation(OrientFromDir(vc), true)
+
+        -- create the effect
         for k, v in self.ImpactEffects do
-            CreateEmitterAtBone(entity, -1, self.Army, v):OffsetEmitter(0, 0, OffsetLength)
+            effect = CreateEmitterAtBone(entity, -1, army, v)
+            effect:OffsetEmitter(0, 0, d)
         end
-        WaitSeconds(1)
 
-        entity:Destroy()
+        -- hold a bit to lower the number of allowed effects
+        WaitSeconds(2)
+
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
