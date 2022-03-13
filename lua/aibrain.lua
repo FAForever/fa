@@ -358,7 +358,6 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-
     -- TRIGGERS BASED ON AN AI BRAIN
     OnStatsTrigger = function(self, triggerName)
 

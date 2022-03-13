@@ -644,12 +644,18 @@ Shield = Class(moho.shield_methods, Entity) {
 
     -- Basically run a timer, but with visual bar movement
     ChargingUp = function(self, curProgress, time)
+
+        local max = 1
+        if not self.DepletedByDamage then 
+            max = self:GetHealth() / self:GetMaxHealth()
+        end
+
         while curProgress < time do
             WaitTicks(1)
 
             curProgress = curProgress + 0.1
             local workProgress = curProgress / time
-            self:UpdateShieldRatio(workProgress)
+            self:UpdateShieldRatio(workProgress * max)
         end
 
         self:UpdateShieldRatio(1)
