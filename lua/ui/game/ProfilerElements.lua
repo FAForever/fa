@@ -13,10 +13,11 @@ local Edit = import('/lua/maui/edit.lua').Edit
 function CreateDefaultElement(parent, alignment)
     local group = Group(parent)
     group.Left:Set(parent.Left)
+    group.is_group = true
     group.Right:Set(parent.Right)
     group.Top:Set(alignment.Bottom)
     LayoutHelpers.AtBottomIn(group, alignment, -16)
-
+    local highlightColor = 'ffffff00'
     local function MakeText(parent, text)
         return UIUtil.CreateText(parent, text, 14, UIUtil.bodyFont, false)
     end
@@ -40,7 +41,23 @@ function CreateDefaultElement(parent, alignment)
     group.growth = MakeText(group, "growth")
     LayoutHelpers.FromLeftIn(group.growth, group, 0.9)
     LayoutHelpers.AtTopIn(group.growth, group)
-
+    group.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            self:ApplyFunction(function(control)
+                if not control.is_group then
+                    control:SetColor(highlightColor)
+                end
+            end)
+            return true
+        elseif event.Type == 'MouseExit' then
+            self:ApplyFunction(function(control)
+                if not control.is_group then
+                    control:SetColor(UIUtil.fontColor)
+                end
+            end)
+            return true
+        end
+    end
     return group
 end
 
@@ -91,7 +108,9 @@ end
 
 function DepopulateDefaultElement(element)
     element:ApplyFunction(function(control)
-        control:SetText("")
+        if not control.is_group then
+            control:SetText("")
+        end
     end)
 end
 
