@@ -207,24 +207,3 @@ function CreateUEFBuildSliceBeams(
         yield(6)
     end
 end
-
-    -- -- Determine the the 2 closest edges of the build cube and use those for the location of our laser
-    -- local VectorExtentsList = { Vector(x + ox, y + oy, z + oz), Vector(x + ox, y + oy, z - oz), Vector(x - ox, y + oy, z + oz), Vector(x - ox, y + oy, z - oz) }
-    -- local endVec1 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-
-    -- for k, v in VectorExtentsList do
-    --     if v == endVec1 then
-    --         table.remove(VectorExtentsList, k)
-    --     end
-    -- end
-
-    -- local endVec2 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-
-LOG("CreateUEFBuildSliceBeams")
-LOG(repr(debug.listcode(CreateUEFBuildSliceBeams)))
-
--- LOG("GetClosestVector")
--- LOG(repr(debug.listcode(util.GetClosestVector)))
-
--- LOG("WaitSeconds")
--- LOG(repr(debug.listcode(WaitSeconds)))
