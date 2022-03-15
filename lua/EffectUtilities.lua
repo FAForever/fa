@@ -159,75 +159,6 @@ function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, BuildEffectsBag
     BuildEffectsBag:Add(CreateAttachedEmitter(builder, buildAttachBone, builder.Army, '/effects/emitters/uef_mobile_unit_build_01_emit.bp'))
 end
 
-function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
-    local buildbp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)
-
-    -- Create a projectile for the end of build effect and warp it to the unit
-    local BeamEndEntity = unitBeingBuilt:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
-    BuildEffectsBag:Add(BeamEndEntity)
-
-    -- Create build beams
-    if BuildEffectBones ~= nil then
-        local beamEffect = nil
-        for i, BuildBone in BuildEffectBones do
-            BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, BeamBuildEmtBp))
-            BuildEffectsBag:Add(CreateAttachedEmitter(builder, BuildBone, builder.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-        end
-    end
-
-    -- Determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
-    local mul = 1.15
-    local ox = buildbp.Physics.MeshExtentsX or (buildbp.Footprint.SizeX * mul)
-    local oz = buildbp.Physics.MeshExtentsZ or (buildbp.Footprint.SizeZ * mul)
-    local oy = (buildbp.Physics.MeshExtentsY or (0.5 + (ox + oz) * 0.1))
-
-    ox = ox * 0.5
-    oz = oz * 0.5
-
-    -- Determine the the 2 closest edges of the build cube and use those for the location of our laser
-    local VectorExtentsList = { Vector(x + ox, y + oy, z + oz), Vector(x + ox, y + oy, z - oz), Vector(x - ox, y + oy, z + oz), Vector(x - ox, y + oy, z - oz) }
-    local endVec1 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-
-    for k, v in VectorExtentsList do
-        if v == endVec1 then
-            table.remove(VectorExtentsList, k)
-        end
-    end
-
-    local endVec2 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-    local cx1, cy1, cz1 = unpack(endVec1)
-    local cx2, cy2, cz2 = unpack(endVec2)
-
-    -- Determine a the velocity of our projectile, used for the scaning effect
-    local velX = 2 * (endVec2.x - endVec1.x)
-    local velY = 2 * (endVec2.y - endVec1.y)
-    local velZ = 2 * (endVec2.z - endVec1.z)
-
-    if unitBeingBuilt:GetFractionComplete() == 0 then
-        Warp(BeamEndEntity, Vector((cx1 + cx2) * 0.5, ((cy1 + cy2) * 0.5) - oy, (cz1 + cz2) * 0.5))
-        WaitSeconds(0.7)
-    end
-
-    local flipDirection = true
-
-    -- Warp our projectile back to the initial corner and lower based on build completeness
-    while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
-        if flipDirection then
-            Warp(BeamEndEntity, Vector(cx1, (cy1 - (oy * unitBeingBuilt:GetFractionComplete())), cz1))
-            BeamEndEntity:SetVelocity(velX, velY, velZ)
-            flipDirection = false
-        else
-            Warp(BeamEndEntity, Vector(cx2, (cy2 - (oy * unitBeingBuilt:GetFractionComplete())), cz2))
-            BeamEndEntity:SetVelocity(-velX, -velY, -velZ)
-            flipDirection = true
-        end
-        WaitSeconds(0.5)
-    end
-end
-
 function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
     local buildbp = unitBeingBuilt:GetBlueprint()
@@ -1616,3 +1547,5 @@ PlayReclaimEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEffect
 PlayReclaimEndEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEndEffects
 
 CreateDefaultBuildBeams = import("/lua/EffectUtilitiesUEF.lua").CreateDefaultBuildBeams
+
+CreateUEFBuildSliceBeams = import("/lua/EffectUtilitiesUEF.lua").CreateUEFBuildSliceBeams
