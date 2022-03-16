@@ -1,5 +1,3 @@
-
-
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -12,10 +10,18 @@ local Edit = import('/lua/maui/edit.lua').Edit
 
 function CreateDefaultElement(parent, alignment)
     local group = Group(parent)
-    group.Left:Set(function() return parent.Left() end)
-    group.Right:Set(function() return parent.Right() end)
-    group.Top:Set(function() return alignment.Bottom() end)
-    group.Bottom:Set(function() return alignment.Bottom() + LayoutHelpers.ScaleNumber(16) end)
+    group.Left:Set(function()
+        return parent.Left()
+    end)
+    group.Right:Set(function()
+        return parent.Right()
+    end)
+    group.Top:Set(function()
+        return alignment.Bottom()
+    end)
+    group.Bottom:Set(function()
+        return alignment.Bottom() + LayoutHelpers.ScaleNumber(16)
+    end)
 
     group.name = UIUtil.CreateText(group, "function", 14, UIUtil.bodyFont, false)
     LayoutHelpers.AtLeftIn(group.name, group, 10)
@@ -40,6 +46,49 @@ function CreateDefaultElement(parent, alignment)
     return group
 end
 
+function CreateTitle(parent, alignment)
+    local group = Group(parent)
+    group.Left:Set(function()
+        return parent.Left()
+    end)
+    group.Right:Set(function()
+        return parent.Right()
+    end)
+    group.Top:Set(function()
+        return alignment.Top()
+    end)
+    LayoutHelpers.SetHeight(group, 20)
+
+    local font = UIUtil.titleFont
+    local color = 'ffF1F382'
+    group.name = UIUtil.CreateText(group, "function", 16, font, false)
+    group.name:SetColor(color)
+    LayoutHelpers.AtLeftIn(group.name, group, 10)
+    LayoutHelpers.AtTopIn(group.name, group, 0.0)
+
+    group.source = UIUtil.CreateText(group, "source", 16, font, false)
+    group.source:SetColor(color)
+    LayoutHelpers.FromLeftIn(group.source, group, 0.45)
+    LayoutHelpers.AtTopIn(group.source, group, 0.0)
+
+    group.scope = UIUtil.CreateText(group, "scope", 16, font, false)
+    group.scope:SetColor(color)
+    LayoutHelpers.FromLeftIn(group.scope, group, 0.60)
+    LayoutHelpers.AtTopIn(group.scope, group, 0.0)
+
+    group.value = UIUtil.CreateText(group, "value", 16, font, false)
+    group.value:SetColor(color)
+    LayoutHelpers.FromLeftIn(group.value, group, 0.75)
+    LayoutHelpers.AtTopIn(group.value, group, 0.0)
+
+    group.growth = UIUtil.CreateText(group, "growth", 16, font, false)
+    group.growth:SetColor(color)
+    LayoutHelpers.FromLeftIn(group.growth, group, 0.9)
+    LayoutHelpers.AtTopIn(group.growth, group, 0.0)
+
+    return group
+end
+
 function PopulateDefaultElement(element, entry)
     element.name:SetText(entry.name)
     element.source:SetText(entry.source)
@@ -58,48 +107,57 @@ end
 
 function CreateScrollableContent(area, create, populate, empty)
 
-    local elements = { }
+    local elements = {}
 
     -- compute size of an element
+    local title = CreateTitle(area, area)
     local dummy = create(area, area)
     local width = dummy.Width()
     local height = dummy.Height()
-    local n = math.floor(area.Height() / height)
+    dummy:Destroy()
+    local n = math.floor((area.Height() - title.Height()) / height)
 
     -- make list of elements
-    local previous = Group(area)
-    previous.Left:Set(function() return area.Left() end)
-    previous.Right:Set(function() return area.Right() end)
-    previous.Top:Set(function() return area.Top() end)
-    previous.Bottom:Set(function() return area.Top() end)
 
-    for k = 1, n do 
+    local previous = title
+    -- previous.Left:Set(area.Left)
+    -- previous.Right:Set(function()
+    --     return area.Right()
+    -- end)
+    -- previous.Top:Set(function()
+    --     return area.Top()
+    -- end)
+    -- previous.Bottom:Set(function()
+    --     return area.Top()
+    -- end)
+
+    for k = 1, n do
         elements[k] = create(area, previous)
         previous = elements[k]
     end
 
-    UIUtil.CreateLobbyVertScrollbar(
-        area,   -- calls functions on this
-        0,      -- offset right
-        0,      -- offset bottom
-        0       -- offset top
+    UIUtil.CreateLobbyVertScrollbar(area, -- calls functions on this
+    0, -- offset right
+    0, -- offset bottom
+    0 -- offset top
     )
 
     -- populate it a bit
     area.UIElements = elements
-    area.NumberOfUIElements = n 
-    area.Elements = { }
+    area.NumberOfUIElements = n
+    area.Elements = {}
     area.NumberOfElements = 0
     area.First = 0
 
-    area.ProvideElements = function (self, elements, count)
+    area.ProvideElements = function(self, elements, count)
         self.Elements = elements
         self.NumberOfElements = count
     end
 
     -- rangeMin, rangeMax, visibleMin, visibleMax
     area.GetScrollValues = function(self, axis)
-        return 0, self.NumberOfElements, self.First, math.min(self.First + self.NumberOfUIElements, self.NumberOfElements)
+        return 0, self.NumberOfElements, self.First,
+            math.min(self.First + self.NumberOfUIElements, self.NumberOfElements)
     end
 
     -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
@@ -117,10 +175,12 @@ function CreateScrollableContent(area, create, populate, empty)
 
         -- compute where we end up
         local size = self.NumberOfElements
-        first = math.max(math.min(size - self.NumberOfUIElements , math.floor(top)), 0) 
+        first = math.max(math.min(size - self.NumberOfUIElements, math.floor(top)), 0)
 
         -- check if it is different
-        if first == self.First then return end
+        if first == self.First then
+            return
+        end
 
         -- if so, store it and compute what is visible
         self.First = first
@@ -132,15 +192,21 @@ function CreateScrollableContent(area, create, populate, empty)
         return true
     end
 
-
     area.CalcVisible = function(self)
-        for k = 1, self.NumberOfUIElements do 
-            local index = k + self.First 
-            if index <= self.NumberOfElements then 
+        for k = 1, self.NumberOfUIElements do
+            local index = k + self.First
+            if index <= self.NumberOfElements then
                 populate(self.UIElements[k], self.Elements[index])
-            else 
+            else
                 empty(self.UIElements[k])
             end
         end
     end
 end
+
+ScrollArea = Class(Group) {
+    __init = function(self, parent)
+        Group.__init(self, parent)
+
+    end
+}
