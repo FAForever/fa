@@ -3408,7 +3408,7 @@ function CreateUI(maxPlayers)
         GUI.optimalteamsbutton:Disable()
     else
         GUI.optimalteamsbutton.OnClick = function()
-            OptimalTeams.f_fairestTeam()
+            OptimalTeams.f_fairestTeam(GetPlayerCount())
         end
     end
     
