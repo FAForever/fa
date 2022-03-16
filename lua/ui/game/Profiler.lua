@@ -3,7 +3,6 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Window = import('/lua/maui/window.lua')
 local GameMain = import('/lua/ui/game/gamemain.lua')
 local Text = import('/lua/maui/text.lua').Text
 local Edit = import('/lua/maui/edit.lua').Edit
@@ -390,7 +389,7 @@ function CreateWindow()
     SPEW("Created profiler window")
 
     -- create the window
-    State.GUI = Window.CreateDefaultWindow(
+    State.GUI = UIUtil.CreateWindowStd(
         GetFrame(0), 
         "Profiler", 
         false, 

@@ -26,6 +26,7 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
+local Window = import('/lua/maui/window.lua')
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -1125,4 +1126,58 @@ function SetTextBoxText(textBox, text)
     for i, line in wrapped do
         textBox:AddItem(line)
     end
+end
+
+local windowTextures = {
+    tl = UIFile('/game/mini-map-brd/mini-map_brd_ul.dds'),
+    tr = UIFile('/game/mini-map-brd/mini-map_brd_ur.dds'),
+    tm = UIFile('/game/mini-map-brd/mini-map_brd_horz_um.dds'),
+    ml = UIFile('/game/mini-map-brd/mini-map_brd_vert_l.dds'),
+    m =  UIFile('/game/mini-map-brd/mini-map_brd_m.dds'),
+    mr = UIFile('/game/mini-map-brd/mini-map_brd_vert_r.dds'),
+    bl = UIFile('/game/mini-map-brd/mini-map_brd_ll.dds'),
+    bm = UIFile('/game/mini-map-brd/mini-map_brd_lm.dds'),
+    br = UIFile('/game/mini-map-brd/mini-map_brd_lr.dds'),
+    borderColor = 'ff415055',
+}
+
+--- Constructs a default window.
+-- @param parent Parent of the window, defaults to GetFrame(0)
+-- @param title Title of the window
+-- @param icon Path to the icon to use for the window, defaults to false (in other words: no icon) 
+-- @param pin Toggle for the pin button, override window.OnPinCheck(self, checked) to set the behavior
+-- @param config Toggle for configuration button, override window.OnConfigClick(self) to set the behavior
+-- @Param lockSize Toggle to allow the user to adjust the size of the window.
+-- @param lockPosition Toggle to allow the user to adjust the position of the window.
+-- @param preferenceID Identifier used in the preference file to remember where this window was located last
+-- @param defaultLeft The default left boundary of the window, defaults to 10
+-- @param defaultTop The default top boundary of the window, defaults to 300
+-- @param defaultBottom The default bottom boundary of the window, defaults to 600
+-- @param defaultRight The default right boundary of the window, defaults to 210
+function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
+
+    -- allow for optionals
+    parent = parent or GetFrame(0)
+
+    defaultLeft = defaultLeft or 10
+    defaultTop = defaultTop or 300
+    defaultBottom = defaultBottom or 600
+    defaultRight = defaultRight or 210
+
+    -- setup data
+    local defaults = { Left = defaultLeft, Top = defaultTop, Bottom = defaultBottom, Right = defaultRight }
+
+    -- create and return window
+    return Window(
+        parent,          -- parent
+        title,           -- title
+        icon,            -- icon
+        pin,             -- pin
+        config,          -- config
+        lockSize,        -- lockSize
+        lockPosition,    -- lockPosition
+        preferenceID,    -- prefID
+        defaults,        -- default position
+        windowTextures   -- textureTable
+    )
 end
