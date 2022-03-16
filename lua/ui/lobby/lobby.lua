@@ -142,10 +142,6 @@ CurrentConnection = {} -- by Name
 ConnectionEstablished = {} -- by Name
 ConnectedWithProxy = {} -- by UID
 
--- The set of available colours for each slot. Each index in this table contains the set of colour
--- values that may appear in its combobox. Keys in the sub-tables are indexes into allColours,
--- values are the colour values.
-availableColours = {}
 
 allAvailableFactionsList = {}
 
@@ -526,6 +522,7 @@ local function DoSlotBehavior(slot, key, name)
         else
             HostUtils.RemoveAI(slot)
         end
+        Check_Availaible_Color()
     else
         -- We're adding an AI of some sort.
         if lobbyComm:IsHost() then
@@ -2128,7 +2125,7 @@ local function UpdateGame()
             -- contains information that is available during blueprint loading
             local preGameData = {}
 
-            -- MAP ASSETS LOADING -- 
+            -- MAP ASSETS LOADING --
 
             -- store the (selected) map directory so that we can load individual blueprints from it
             preGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
@@ -2143,13 +2140,13 @@ local function UpdateGame()
             local selectedMods = Mods.GetSelectedMods()
 
             -- loop over selected mods identifiers
-            for uid, _ in selectedMods do 
+            for uid, _ in selectedMods do
 
                 -- get the mod, determine path to icon configuration file
                 local mod = allMods[uid]
 
                 -- check for mod integrity
-                if not (mod.name and mod.author) then 
+                if not (mod.name and mod.author) then
                     WARN("Unable to load icons from mod '" .. uid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
                 end
 
@@ -2157,7 +2154,7 @@ local function UpdateGame()
                 local iconConfigurationPath = mod.location .. "/mod_icons.lua"
 
                 -- see if it exists
-                if DiskGetFileInfo(iconConfigurationPath) then 
+                if DiskGetFileInfo(iconConfigurationPath) then
 
                     -- see if we can import it
                     local ok, msg = pcall(
@@ -2175,16 +2172,16 @@ local function UpdateGame()
                     )
 
                     -- if it passes this basic check, then continue
-                    if ok then 
+                    if ok then
                         local info = { }
-                        info.Name = mod.name 
-                        info.Author = mod.author 
+                        info.Name = mod.name
+                        info.Author = mod.author
                         info.Location = mod.location
                         info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
                         info.UID = uid
                         table.insert(iconReplacements, info)
                     -- tell us (and then spam the author, not the dev) if it failed
-                    else 
+                    else
                         WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
                         WARN(msg)
                     end
@@ -2195,18 +2192,18 @@ local function UpdateGame()
 
             -- try and set the preferences - it may crash when running multiple instances on a single machine that all try and start at the same time.
             local ok, msg = pcall(
-                function() 
+                function()
                     -- store in preferences so that we can retrieve it during blueprint loading
                     SetPreference('PreGameData', preGameData)
-                end 
+                end
             )
 
-            if not ok then 
+            if not ok then
                 WARN("Unable to update preferences. Are you running multiple instances on the same machine?" )
                 WARN(msg)
             end
 
-            -- PREFETCHING -- 
+            -- PREFETCHING --
 
             -- we can't prefetch in combination with PreGameData as the prefs file
             -- is not updated accordingly, as a result when it is retrieved in
@@ -3022,12 +3019,14 @@ function CreateUI(maxPlayers)
           else
             AssignAutoTeams()
           end
+          Check_Availaible_Color()
         end
         GUI.AIClearButton.OnClick = function()
           for i = 1, table.getn(ChangedSlots) do
             HostUtils.RemoveAI(ChangedSlots[i])
           end
           ChangedSlots = {}
+          Check_Availaible_Color()
         end
         GUI.TeamCountSelector.OnClick = function(Self, Index, Text)
           local OccupiedSlots = 0
@@ -3440,7 +3439,7 @@ function CreateUI(maxPlayers)
                 Tooltip.AddControlTooltip(line.bg2, data.valueTooltip)
             end
 
-            if data.manualTooltipTitle then 
+            if data.manualTooltipTitle then
                 Tooltip.AddControlTooltipManual(line.bg, data.manualTooltipTitle, data.manualTooltipDescription )
                 Tooltip.AddControlTooltipManual(line.bg2, data.manualTooltipTitle, data.manualTooltipDescription )
             end
@@ -3934,13 +3933,13 @@ function RefreshOptionDisplayData(scenarioInfo)
 
     local description = "No mods enabled."
 
-    if modNum + modNumUI > 0 then 
+    if modNum + modNumUI > 0 then
         description = ""
 
         local descriptionSimMods = { "", }
-        if modNum > 0 then 
+        if modNum > 0 then
             table.insert(descriptionSimMods, LOC("<LOC enabled_sim_mods>The host enabled the following sim mods:"))
-            for k, mod in Mods.GetGameMods() do 
+            for k, mod in Mods.GetGameMods() do
                 table.insert(descriptionSimMods, "\r\n - " .. tostring(mod.name))
             end
 
@@ -3948,9 +3947,9 @@ function RefreshOptionDisplayData(scenarioInfo)
         end
 
         local descriptionUIMods = { "", }
-        if modNumUI > 0 then 
+        if modNumUI > 0 then
             table.insert(descriptionUIMods, LOC("<LOC enabled_ui_mods>You have enabled the following UI mods:"))
-            for k, mod in Mods.GetUiMods() do 
+            for k, mod in Mods.GetUiMods() do
                 table.insert(descriptionUIMods, "\r\n - " .. tostring(mod.name))
             end
         end
@@ -3958,14 +3957,14 @@ function RefreshOptionDisplayData(scenarioInfo)
         descriptionSimMods = tostring(table.concat(descriptionSimMods))
         descriptionUIMods = tostring(table.concat(descriptionUIMods))
 
-        if modNum > 0 and modNumUI > 0 then 
+        if modNum > 0 and modNumUI > 0 then
             description = tostring(table.concat({descriptionSimMods, "\r\n", descriptionUIMods}))
-        else 
-            if modNum > 0 then 
+        else
+            if modNum > 0 then
                 description = descriptionSimMods
-            end 
+            end
 
-            if modNumUI > 0 then 
+            if modNumUI > 0 then
                 description = descriptionUIMods
             end
         end
@@ -3976,7 +3975,7 @@ function RefreshOptionDisplayData(scenarioInfo)
             text = modStr,
             value = LOC('<LOC lobby_0003>Check Mod Manager'),
             mod = true,
-            
+
             manualTooltipTitle = 'Enabled mods',
             manualTooltipDescription = description
         }
@@ -5603,7 +5602,7 @@ function ShowTitleDialog()
             -- remove new lines from the text
             text = text:gsub("\r", "")
             text = text:gsub("\n", "")
-            
+
             SetGameOption("Title", text, true)
             SetGameTitleText(text)
         end, gameInfo.GameOptions.Title
@@ -6265,32 +6264,43 @@ function indexOf(table, needle)
 end
 
 -- Update the combobox for the given slot so it correctly shows the set of available colours.
--- causes availableColours[slot] to be repopulated.
+-- causes a new availableColours to be populated for each occupied slot
+-- if a slot is specified, that slot's displayed color will be made consistent with its coded color
 function Check_Availaible_Color(slot)
-    availableColours[slot] = {}
-
-    -- For each possible colour, scan the slots to try and find it and, if unsuccessful, add it to
-    -- the available colour set.
-    local allColours = gameColors.PlayerColors
-    for k, v in allColours do
-        local found = false
-        for ii = 1, LobbyComm.maxPlayerSlots do
-            -- Skip this slot and empty slots.
-            if slot ~= ii and gameInfo.PlayerOptions[ii] then
-                if gameInfo.PlayerOptions[ii].PlayerColor == k then
-                    found = true
-                    break
-                end
-            end
-        end
-
-        if not found then
-            availableColours[slot][k] = allColours[k]
+    -- generate a table of used colors
+    local UsedColours = {}
+    for i = 1, LobbyComm.maxPlayerSlots do
+        -- Skips empty slots.
+        if gameInfo.PlayerOptions[i] then
+            table.insert(UsedColours, gameInfo.PlayerOptions[i].PlayerColor)
         end
     end
-    --
-    GUI.slots[slot].color:ChangeBitmapArray(availableColours[slot], true)
-    GUI.slots[slot].color:SetItem(gameInfo.PlayerOptions[slot].PlayerColor)
+
+    -- generate a table of unused colors
+    local unusedColours = {}
+    for i, color in gameColors.PlayerColors do
+        if not table.find(UsedColours, i) then
+            unusedColours[i] = color
+        end
+    end
+
+    for i = 1, LobbyComm.maxPlayerSlots do
+        -- Skips empty slots.
+        if gameInfo.PlayerOptions[i] then
+            local availableColours = {}
+            -- deepcopy the unused colors because using them by reference causes problems with the displayed color list/ChangeBitmapArray
+            for c, color in unusedColours do
+                availableColours[c] = color
+            end
+            availableColours[ gameInfo.PlayerOptions[i].PlayerColor] = gameColors.PlayerColors[gameInfo.PlayerOptions[i].PlayerColor]
+            GUI.slots[i].color:ChangeBitmapArray(availableColours, true)
+        end
+    end
+
+    -- if a slot was entered, set the displayed color for that slot to the coded color for that slot
+    if slot then
+        GUI.slots[slot].color:SetItem(gameInfo.PlayerOptions[slot].PlayerColor)
+    end
 end
 
 function CheckModCompatability()
