@@ -26,7 +26,7 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
-local Window = import('/lua/maui/window.lua')
+
 
 --* Handy global variables to assist skinning
 buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
@@ -1128,6 +1128,7 @@ function SetTextBoxText(textBox, text)
     end
 end
 
+local Window = import('/lua/maui/window.lua').Window
 local windowTextures = {
     tl = UIFile('/game/mini-map-brd/mini-map_brd_ul.dds'),
     tr = UIFile('/game/mini-map-brd/mini-map_brd_ur.dds'),
