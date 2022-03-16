@@ -28,31 +28,31 @@ local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialo
 local skins = import('/lua/skins/skins.lua').skins
 
 --* Handy global variables to assist skinning
-buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
-factionFont = import('/lua/lazyvar.lua').Create()      -- default font used for dialog button faces
-dialogButtonFont = import('/lua/lazyvar.lua').Create()      -- default font used for dialog button faces
-bodyFont = import('/lua/lazyvar.lua').Create()              -- font used for all other text
-fixedFont = import('/lua/lazyvar.lua').Create()             -- font used for fixed width characters
-titleFont = import('/lua/lazyvar.lua').Create()             -- font used for titles and labels
-fontColor = import('/lua/lazyvar.lua').Create()             -- common font color
-fontOverColor = import('/lua/lazyvar.lua').Create()             -- common font color
-fontDownColor = import('/lua/lazyvar.lua').Create()             -- common font color
-tooltipTitleColor = import('/lua/lazyvar.lua').Create()             -- common font color
-tooltipBorderColor = import('/lua/lazyvar.lua').Create()             -- common font color
-bodyColor = import('/lua/lazyvar.lua').Create()             -- common color for dialog body text
-dialogCaptionColor = import('/lua/lazyvar.lua').Create()    -- common color for dialog titles
-dialogColumnColor = import('/lua/lazyvar.lua').Create()     -- common color for column headers in a dialog
-dialogButtonColor = import('/lua/lazyvar.lua').Create()     -- common color for buttons in a dialog
-highlightColor = import('/lua/lazyvar.lua').Create()        -- text highlight color
-disabledColor = import('/lua/lazyvar.lua').Create()         -- text disabled color
-panelColor = import('/lua/lazyvar.lua').Create()            -- default color when drawing a panel
-transparentPanelColor = import('/lua/lazyvar.lua').Create() -- default color when drawing a transparent panel
-consoleBGColor = import('/lua/lazyvar.lua').Create()        -- console background color
-consoleFGColor = import('/lua/lazyvar.lua').Create()        -- console foreground color (text)
-consoleTextBGColor = import('/lua/lazyvar.lua').Create()    -- console text background color
-menuFontSize = import('/lua/lazyvar.lua').Create()          -- font size used on main in game escape menu
-factionTextColor = import('/lua/lazyvar.lua').Create()      -- faction color for text foreground
-factionBackColor = import('/lua/lazyvar.lua').Create()      -- faction color for text background
+buttonFont = LazyVar.Create()            -- default font used for button faces
+factionFont = LazyVar.Create()      -- default font used for dialog button faces
+dialogButtonFont = LazyVar.Create()      -- default font used for dialog button faces
+bodyFont = LazyVar.Create()              -- font used for all other text
+fixedFont = LazyVar.Create()             -- font used for fixed width characters
+titleFont = LazyVar.Create()             -- font used for titles and labels
+fontColor = LazyVar.Create()             -- common font color
+fontOverColor = LazyVar.Create()             -- common font color
+fontDownColor = LazyVar.Create()             -- common font color
+tooltipTitleColor = LazyVar.Create()             -- common font color
+tooltipBorderColor = LazyVar.Create()             -- common font color
+bodyColor = LazyVar.Create()             -- common color for dialog body text
+dialogCaptionColor = LazyVar.Create()    -- common color for dialog titles
+dialogColumnColor = LazyVar.Create()     -- common color for column headers in a dialog
+dialogButtonColor = LazyVar.Create()     -- common color for buttons in a dialog
+highlightColor = LazyVar.Create()        -- text highlight color
+disabledColor = LazyVar.Create()         -- text disabled color
+panelColor = LazyVar.Create()            -- default color when drawing a panel
+transparentPanelColor = LazyVar.Create() -- default color when drawing a transparent panel
+consoleBGColor = LazyVar.Create()        -- console background color
+consoleFGColor = LazyVar.Create()        -- console foreground color (text)
+consoleTextBGColor = LazyVar.Create()    -- console text background color
+menuFontSize = LazyVar.Create()          -- font size used on main in game escape menu
+factionTextColor = LazyVar.Create()      -- faction color for text foreground
+factionBackColor = LazyVar.Create()      -- faction color for text background
 
 -- table of layouts supported by this skin, not a lazy var as we don't need updates
 layouts = nil
@@ -60,7 +60,7 @@ layouts = nil
 --* other handy variables!
 consoleDepth = false  -- in order to get the console to always be on top, assign this number and never go over
 
-networkBool = import('/lua/lazyvar.lua').Create()    -- boolean whether the game is local or networked
+networkBool = LazyVar.Create()    -- boolean whether the game is local or networked
 
 -- Default scenario for skirmishes / MP Lobby
 defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'
@@ -89,7 +89,7 @@ VK_UP = 38
 VK_DOWN = 40
 VK_PAUSE = 310
 
-local currentSkin = import('/lua/lazyvar.lua').Create()
+local currentSkin = LazyVar.Create()
 
 currentLayout = false
 changeLayoutFunction = false    -- set this function to get called with the new layout name when layout changes
