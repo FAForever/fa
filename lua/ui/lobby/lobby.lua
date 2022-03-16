@@ -53,6 +53,11 @@ local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
 
+
+-- Default color order used for lobbies/TMM if not otherwise specified
+-- Desired default order of the colors in the color tables in GameColors.lua for TMM/etc
+local ColorOrder = {1, 10, 21, 7, 23, 15, 3, 9, 5, 8, 19, 16, 22, 12, 17, 13}
+
 function GetAITypes()
     AIKeys = {}
     AIStrings = {}
@@ -450,6 +455,7 @@ function GetLocalPlayerData()
 end
 
 function GetAIPlayerData(name, AIPersonality)
+    local AIColor = GetAvailableColor()
     return PlayerData(
         {
             OwnerID = hostID,
@@ -457,6 +463,8 @@ function GetAIPlayerData(name, AIPersonality)
             Ready = true,
             Human = false,
             AIPersonality = AIPersonality,
+            PlayerColor = AIColor,
+            ArmyColor = AIColor,
         }
 )
 end
@@ -1111,10 +1119,16 @@ function ClearSlotInfo(slotIndex)
     RefreshMapPositionForAllControls(slotIndex)
 end
 
-function IsColorFree(colorIndex)
+function IsColorFree(colorIndex, playerName)
     for id, player in gameInfo.PlayerOptions:pairs() do
         if player.PlayerColor == colorIndex then
-            return false
+            if playerName then
+                if player.PlayerName != playerName then
+                    return false
+                end
+            else
+                return false
+            end
         end
     end
 
@@ -2426,9 +2440,9 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
 end
 
 function GetAvailableColor()
-    for colorIndex, colorVal in gameColors.PlayerColors do
-        if IsColorFree(colorIndex) then
-            return colorIndex
+    for i = 1, 16 do
+        if IsColorFree(ColorOrder[i]) then
+            return ColorOrder[i]
         end
     end
 end
@@ -6684,7 +6698,7 @@ function InitHostUtils()
             refreshObserverList()
         end,
 
-        --- Attempt to add a player to a slot. If no is available, add them as an observer.
+        --- Attempt to add a player to a slot. If none are available, add them as an observer.
         --
         -- @param senderID The peer ID of the player we're adding.
         -- @param slot The slot to insert the player to. A value of less than 1 indicates "any slot"
@@ -6711,7 +6725,7 @@ function InitHostUtils()
             end
 
             -- if a color is requested, attempt to use that color if available, otherwise, assign first available
-            if not IsColorFree(playerData.PlayerColor) then
+            if not IsColorFree(playerData.PlayerColor, playerData.PlayerName) then
                 SetPlayerColor(playerData, GetAvailableColor())
             end
 
