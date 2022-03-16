@@ -690,10 +690,6 @@ Shield = Class(moho.shield_methods, Entity) {
                     ResumeThread(self.RegenThread)
                 end
 
-                -- mobile shields are 'attached' to the factory when they are build, this allows
-                -- us to skip the first check of whether we're attached
-                self.RolledFromFactory = true 
-
                 -- introduce the shield bar
                 self:UpdateShieldRatio(-1)
                 self:CreateShieldMesh()
@@ -703,6 +699,10 @@ Shield = Class(moho.shield_methods, Entity) {
                 self.Owner:PlayUnitSound('ShieldOn')
 
             end
+
+            -- mobile shields are 'attached' to the factory when they are build, this allows
+            -- us to skip the first check of whether we're attached to a transport
+            self.RolledFromFactory = true 
         end,
 
         IsOn = function(self)
