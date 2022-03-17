@@ -1,11 +1,10 @@
---*****************************************************************************
---* File: lua/modules/ui/uimain.lua
---* Author: Chris Blackwell
---* Summary: The entry point for UI scripting
---*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
---*****************************************************************************
-
+-- *****************************************************************************
+-- * File: lua/modules/ui/uimain.lua
+-- * Author: Chris Blackwell
+-- * Summary: The entry point for UI scripting
+-- *
+-- * Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- *****************************************************************************
 local UIUtil = import('uiutil.lua')
 local UIFile = UIUtil.UIFile
 local Prefs = import('/lua/user/prefs.lua')
@@ -16,22 +15,24 @@ local CampaignManager = import('/lua/ui/campaign/campaignmanager.lua')
 local console = false
 local alreadySetup = false
 
---* Initialize the UI states, this is always called on startup
+-- * Initialize the UI states, this is always called on startup
 function SetupUI()
 
     -- SetCursor needs to happen anytime this function is called because we
     -- could be switching lua states.
     local c = UIUtil.CreateCursor()
-    SetCursor( c )
+    SetCursor(c)
 
     -- the rest of this function only needs to run once to set up the globals, so 
     -- don't do it again if not needed
-    if alreadySetup then return end
+    if alreadySetup then
+        return
+    end
     alreadySetup = true
 
     UIUtil.currentLayout = Prefs.GetFromCurrentProfile('layout') or 'bottom'
     local skin = Prefs.GetFromCurrentProfile('skin')
-    UIUtil.SetCurrentSkin(skin or 'uef')    -- default skin to start
+    UIUtil.SetCurrentSkin(skin or 'uef') -- default skin to start
 
     UIUtil.consoleDepth = 5000000 -- no UI element should depth higher than this!
 end
@@ -45,13 +46,13 @@ end
 
 function StartFrontEndUI()
     console = false
-    
+
     -- make sure cheat keys are disabled if needed
     if not DebugFacilitiesEnabled() then
         local keyMap = import('/lua/keymap/defaultKeyMap.lua')
-        IN_RemoveKeyMapTable(keyMap.debugKeyMap)                
-    end    
-    
+        IN_RemoveKeyMapTable(keyMap.debugKeyMap)
+    end
+
     -- if there is an auto continue state, then launch op immediately
     if GetFrontEndData('NextOpBriefing') then
         CampaignManager.LaunchBriefing(GetFrontEndData('NextOpBriefing'))
@@ -63,8 +64,7 @@ function StartFrontEndUI()
     end
 end
 
-
---Used by command line to host a game
+-- Used by command line to host a game
 function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTraversalProvider)
     LOG("Command line hostlobby")
     local lobby = import('/lua/ui/lobby/lobby.lua')
@@ -72,7 +72,7 @@ function StartHostLobbyUI(protocol, port, playerName, gameName, mapName, natTrav
     lobby.HostGame(gameName, mapName, false)
 end
 
---Used by command line to join a game
+-- Used by command line to join a game
 function StartJoinLobbyUI(protocol, address, playerName, natTraversalProvider)
     local lobby = import('/lua/ui/lobby/lobby.lua')
     local port = 0
@@ -100,8 +100,8 @@ function ToggleConsole()
     end
 end
 
---* The following scripts are alternate entry points to the UI from the engine
---* Typically these are dialog popup type calls
+-- * The following scripts are alternate entry points to the UI from the engine
+-- * Typically these are dialog popup type calls
 
 -- context sensitive exit dialog
 function ShowEscapeDialog(yesNoOnly)
@@ -117,7 +117,7 @@ end
 
 -- called by the engine when escape is pressed but there's no specific handler for it
 function EscapeHandler()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog ~= true) then
         if escapeHandler then
             escapeHandler()
         else
@@ -130,7 +130,7 @@ end
 local prevDisconnectModule
 function UpdateDisconnectDialog()
     local module = import('/lua/ui/dialogs/disconnect.lua')
-    if prevDisconnectModule and prevDisconnectModule != module then
+    if prevDisconnectModule and prevDisconnectModule ~= module then
         pcall(prevDisconnectModule.DestroyDialog)
     end
     prevDisconnectModule = module
@@ -154,8 +154,8 @@ function NoteGameOver()
         GetCursor():Show()
     end
     if SessionIsReplay() then
-        --local scoreDlg = import('/lua/ui/dialogs/score.lua').dialog
-        --import('/lua/ui/game/gameresult.lua').OnReplayEnd()
+        -- local scoreDlg = import('/lua/ui/dialogs/score.lua').dialog
+        -- import('/lua/ui/game/gameresult.lua').OnReplayEnd()
         import('/lua/ui/game/score.lua').ArmyAnnounce(1, '<LOC _Replay_over>Replay over.')
     else
         import('/lua/ui/game/score.lua').ArmyAnnounce(1, '<LOC _Game_over>Game over.')
@@ -196,13 +196,12 @@ function ShowDesyncDialog(beatNumber, strings)
     import('/lua/ui/dialogs/desync.lua').UpdateDialog(beatNumber, strings)
 end
 
---* The following functions are invoked by the engine to show some text at a certain location
---TODO keep a table of cursor texts to have multiple available?
+-- * The following functions are invoked by the engine to show some text at a certain location
+-- TODO keep a table of cursor texts to have multiple available?
 local cursorText = false
 
 function StartCursorText(x, y, text, color, time, flash)
-    if cursorText and cursorText._inTimer then return end -- if cursor text has a time, don't stomp it
-    if cursorText then cursorText:Destroy() end
+    if not StopCursorText() then return end
     cursorText = Text(GetFrame(0))
     cursorText:SetText(LOC(text))
     cursorText:SetColor(color)
@@ -210,52 +209,49 @@ function StartCursorText(x, y, text, color, time, flash)
     cursorText:SetDropShadow(true)
     cursorText.Left:Set(x + 16)
     cursorText.Top:Set(y)
-
+    cursorText._flashTime = 0
+    cursorText._time = 0
     cursorText:SetNeedsFrameUpdate(true)
 
     cursorText.OnFrame = function(self, elapsedTime)
         if flash then
-            if not cursorText._flashTime then
-                cursorText._flashTime = 0
-            else
-                cursorText._flashTime = cursorText._flashTime + elapsedTime
-            end
-            if cursorText._flashTime > 0.25 then -- 1/4 second flashes
-                cursorText:SetHidden(not cursorText:IsHidden())
-                cursorText._flashTime = 0
+            self._flashTime = self._flashTime + elapsedTime
+            if self._flashTime > 0.25 then -- 1/4 second flashes
+                self:SetHidden(not self:IsHidden())
+                self._flashTime = 0
             end
         end
-
-        if not cursorText._time then
-            cursorText._time = 0
-        else
-            cursorText._time = cursorText._time + elapsedTime
-        end
+        self._time = self._time + elapsedTime
         if time > 0 then
-            cursorText._inTimer = true
-            if time < (cursorText._time) then
-                cursorText:Destroy()
-                cursorText = nil
+            self._inTimer = true
+            if time < (self._time) then
+                self:Destroy()
             end
         end
     end
 end
 
 function StopCursorText()
-    if cursorText and cursorText._inTimer then return end -- if cursor text has a time, don't stomp it
-    if cursorText then cursorText:Destroy() end
+    if cursorText and not IsDestroyed(cursorText) then
+        if cursorText._inTimer then -- if cursor text has a time, don't stomp it
+            return false
+        else
+            cursorText:Destroy()
+        end
+    end
+    return true
 end
 
 function IncreaseGameSpeed()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog ~= true) then
         ConExecute('WLD_IncreaseSimRate')
-    end    
+    end
 end
 
 function DecreaseGameSpeed()
-    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog != true) then
+    if not WorldIsLoading() and (import('/lua/ui/game/gamemain.lua').supressExitDialog ~= true) then
         ConExecute('WLD_DecreaseSimRate')
-    end    
+    end
 end
 
 function OnApplicationResize(head, width, height)
