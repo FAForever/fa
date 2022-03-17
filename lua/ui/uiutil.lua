@@ -907,10 +907,7 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
     if numButtons > 1 then
         -- A button to either size...
-        dialog._button1.Left:Set(function()
-            return dialog.Left() + (((dialog.Width() / 2) - dialog._button1.Width()) / 2) - 44
-        end)
-
+        LayoutHelpers.AtHorizontalCenterIn(dialog._button1, dialog, -44)
         -- Handle stupid weird GPG convention...
         local rightButton
         if numButtons == 3 then
@@ -980,15 +977,16 @@ function CreateWorldCover(parent, colorOverride)
         local index = i
         if GetFrame(index) == parent:GetRootFrame() then
             worldCovers[index] = Bitmap(parent)
-            worldCovers[index].ID = index
-            worldCovers[index].OnDestroy = function(self)
+            local worldCover = worldCovers[index]
+            worldCover.ID = index
+            worldCover.OnDestroy = function(self)
                 for h, x in worldCovers do
                     if x and h ~= self.ID then
                         x:Destroy()
                     end
                 end
             end
-            worldCovers[index].OnHide = function(self, hidden)
+            worldCover.OnHide = function(self, hidden)
                 for h, x in worldCovers do
                     if x and h ~= self.ID then
                         x:SetHidden(hidden)
@@ -998,12 +996,13 @@ function CreateWorldCover(parent, colorOverride)
         else
             worldCovers[index] = Bitmap(GetFrame(index))
         end
-        worldCovers[index]:SetSolidColor(colorOverride or 'ff000000')
-        LayoutHelpers.FillParent(worldCovers[index], GetFrame(index))
-        worldCovers[index].Depth:Set(function() return parent.Depth() - 2 end)
-        worldCovers[index]:SetAlpha(0)
-        worldCovers[index]:SetNeedsFrameUpdate(true)
-        worldCovers[index].OnFrame = function(self, delta)
+        local worldCover = worldCovers[index]
+        worldCover:SetSolidColor(colorOverride or 'ff000000')
+        LayoutHelpers.FillParent(worldCover, GetFrame(index))
+        LayoutHelpers.DepthUnderParent(worldCover, parent ,2)
+        worldCover:SetAlpha(0)
+        worldCover:SetNeedsFrameUpdate(true)
+        worldCover.OnFrame = function(self, delta)
             local targetAlpha = self:GetAlpha() + (delta * 1.5)
             if targetAlpha < .8 then
                 self:SetAlpha(targetAlpha)
@@ -1046,10 +1045,10 @@ function CreateDialogBrackets(parent, leftOffset, topOffset, rightOffset, bottom
     ret.bottomleftglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-ll_bmp.dds'))
     ret.bottomrightglow = Bitmap(ret, UIFile(texturePath .. '/bracket-glow-lr_bmp.dds'))
 
-    ret.topleftglow.Depth:Set(function() return ret.topleft.Depth() - 1 end)
-    ret.toprightglow.Depth:Set(function() return ret.topright.Depth() - 1 end)
-    ret.bottomleftglow.Depth:Set(function() return ret.bottomleft.Depth() - 1 end)
-    ret.bottomrightglow.Depth:Set(function() return ret.bottomright.Depth() - 1 end)
+    LayoutHelpers.DepthUnderParent(ret.topleftglow, ret.topleft)
+    LayoutHelpers.DepthUnderParent(ret.toprightglow, ret.topright)
+    LayoutHelpers.DepthUnderParent(ret.bottomleftglow, ret.bottomleft)
+    LayoutHelpers.DepthUnderParent(ret.bottomrightglow, ret.bottomright)
 
     LayoutHelpers.AtCenterIn(ret.topleftglow, ret.topleft)
     LayoutHelpers.AtCenterIn(ret.toprightglow, ret.topright)
