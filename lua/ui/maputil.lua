@@ -57,11 +57,7 @@ end
 
 -- given a scenario, determines if it can be played in skirmish mode
 function IsScenarioPlayable(scenario)
-    if not scenario.Configurations.standard.teams[1].armies then
-        return false
-    end
-
-    return true
+    return not not scenario.Configurations.standard.teams[1].armies
 end
 
 -- EnumerateScenarios returns an array of scenario names
