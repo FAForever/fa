@@ -58,23 +58,21 @@ local function EditMessage(parent, data, line)
     helpText:SetText(clarityTable[data.source])
     helpText:SetCenteredHorizontally(true)
 
-    messageEntry = Bitmap(dialogContent)
+    local messageEntry = Bitmap(dialogContent)
     messageEntry:SetSolidColor('FF282828')
-    messageEntry.Left:Set(function() return dialogContent.Left() + 15 end)
-    messageEntry.Right:Set(function() return dialogContent.Right() - 15 end)
-    messageEntry.Top:Set(function() return helpText.Bottom() + 15 end)
-    messageEntry.Bottom:Set(function() return okButton.Top() - 15 end)
-    messageEntry.Width:Set(function() return messageEntry.Right() - messageEntry.Left() end)
-    messageEntry.Height:Set(function() return messageEntry.Bottom() - messageEntry.Top() end)
-
+    LayoutHelpers.FillParentFixedBorder(messageEntry, dialogContent, 15)
+    LayoutHelpers.AnchorToBottom(messageEntry, helpText, 15)
+    LayoutHelpers.AnchorToTop(messageEntry, okButton, 15)
+    LayoutHelpers.ResetWidth(messageEntry)
+    LayoutHelpers.ResetHeight(messageEntry)
     messageEntry.text = Edit(messageEntry)
     messageEntry.text:SetForegroundColor('FFF1ECEC')
     messageEntry.text:SetBackgroundColor('04E1B44A')
     messageEntry.text:SetHighlightForegroundColor(UIUtil.highlightColor)
     messageEntry.text:SetHighlightBackgroundColor("880085EF")
-    messageEntry.text.Height:Set(function() return messageEntry.Bottom() - messageEntry.Top() - 10 end)
-    messageEntry.text.Left:Set(function() return messageEntry.Left() + 5 end)
-    messageEntry.text.Right:Set(function() return messageEntry.Right() end)
+    messageEntry.text.Height:Set(function() return messageEntry.Height() - 10 end)
+    LayoutHelpers.AtLeftIn(messageEntry.text, messageEntry, 5)
+    LayoutHelpers.AtRightIn(messageEntry.text, messageEntry)
     LayoutHelpers.AtVerticalCenterIn(messageEntry.text, messageEntry)
     messageEntry.text:AcquireFocus()
     messageEntry.text:SetText(data.text or 'Insert Message Here')
@@ -92,13 +90,9 @@ local function EditMessage(parent, data, line)
         messagePopup:Close()
     end
 
-    messageEntry.text.OnEnterPressed = function(self, text)
-        ClosePopup()
-    end
-
-    okButton.OnClick = function(self, modifiers)
-        ClosePopup()
-    end
+    messageEntry.text.OnEnterPressed = ClosePopup
+    okButton.OnClick = ClosePopup
+    
 
     messagePopup.OnClose = function(self)
         dialogContent:AbandonKeyboardFocus()
@@ -137,11 +131,7 @@ local function ToggleLines(category)
     for index, line in lineGroupTable do
         if line.type == 'entry' then
             if line.category == category then
-                if line.collapsed then
-                    line.collapsed = false
-                else
-                    line.collapsed = true
-                end
+                line.collapsed = not line.collapsed
             end
             if not line.collapsed then
                 table.insert(linesVisible, index)
@@ -150,13 +140,7 @@ local function ToggleLines(category)
             table.insert(linesVisible, index) -- Always have non-entry lines visible
         end
     end
-
-    if LineGroups[category].collapsed then
-        LineGroups[category].collapsed = false
-    else
-        LineGroups[category].collapsed = true
-    end
-
+    LineGroups[category].collapsed = not LineGroups[category].collapsed
     mainContainer:CalcVisible()
 end
 
@@ -171,16 +155,15 @@ local function SelectLine(dataIndex)
 end
 
 function CreateToggle(parent, bgColor, txtColor, bgSize, txtSize, txt)
-    if not bgSize then bgSize = 20 end
-    if not bgColor then bgColor = 'FF343232' end
-    if not txtColor then txtColor = UIUtil.categoryTextColor end
-    if not txtSize then txtSize = 18 end
-    if not txt then txt = '?' end
+    bgSize = bgSize or 20
+    bgColor = bgColor or 'FF343232'
+    txtColor = txtColor or UIUtil.categoryTextColor
+    txtSize = txtSize or 18
+    txt = txt or '?'
 
     local button = Bitmap(parent)
     button:SetSolidColor(bgColor)
-    button.Height:Set(bgSize)
-    button.Width:Set(bgSize + 4)
+    LayoutHelpers.SetDimensions(button, bgSize + 4, bgSize)
     button.txt = UIUtil.CreateText(button, txt, txtSize)
     button.txt:SetColor(txtColor)
     button.txt:SetFont(UIUtil.bodyFont, txtSize)
@@ -196,13 +179,13 @@ function CreateToggle(parent, bgColor, txtColor, bgSize, txtSize, txt)
 
     button.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            button:SetAlpha(1.0)
-            button.txt:SetAlpha(1.0)
+            self:SetAlpha(1.0)
+            self.txt:SetAlpha(1.0)
         elseif event.Type == 'MouseExit' then
-            button:SetAlpha(0.8)
-            button.txt:SetAlpha(0.8)
+            self:SetAlpha(0.8)
+            self.txt:SetAlpha(0.8)
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-            return button:OnMouseClick()
+            return self:OnMouseClick()
         end
 
         return false
@@ -232,7 +215,7 @@ function CreateLine()
     line.message:SetAlpha(0.9)
 
     line.Height:Set(function() return line.description.Height() + 4 end)
-    line.Width:Set(function() return line.Right() - line.Left() end)
+    LayoutHelpers.ResetWidth(line)
 
     LayoutHelpers.AtLeftIn(line.message, line, keyBindingWidth)
     LayoutHelpers.AtVerticalCenterIn(line.message, line)
@@ -241,14 +224,14 @@ function CreateLine()
 
     line.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            line:SetAlpha(0.9)
-            line.description:SetAlpha(1.0)
-            line.message:SetAlpha(1.0)
+            self:SetAlpha(0.9)
+            self.description:SetAlpha(1.0)
+            self.message:SetAlpha(1.0)
             PlaySound(Sound({Cue = "UI_Menu_Rollover_Sml", Bank = "Interface"}))
         elseif event.Type == 'MouseExit' then
-            line:SetAlpha(1.0)
-            line.description:SetAlpha(0.9)
-            line.message:SetAlpha(0.9)
+            self:SetAlpha(1.0)
+            self.description:SetAlpha(0.9)
+            self.message:SetAlpha(0.9)
         elseif self.data.type == 'entry' then
             if event.Type == 'ButtonPress' then
                 SelectLine(self.data.index)
@@ -335,8 +318,8 @@ function CreateLine()
 
     -- This is where data is assigned to a line from the lineGroupTable by lineID
     line.Update = function(self, data, lineID)
-        line:SetSolidColor(GetLineColor(lineID, data))
-        line.data = table.copy(data)
+        self:SetSolidColor(GetLineColor(lineID, data))
+        self.data = table.copy(data)
 
         if data.type == 'header' then
             if LineGroups[self.data.category].collapsed then
@@ -344,29 +327,29 @@ function CreateLine()
             else
                self.toggle.txt:SetText('-')
             end
-            line.toggle:Show()
-            line.newMessageButton:Hide()
-            line.removeMessageButton:Hide()
-            line.message:SetText(data.text)
-            line.message:SetFont(UIUtil.titleFont, 16)
-            line.message:SetColor(UIUtil.factionTextColor)
-            line.description:SetText('')
+            self.toggle:Show()
+            self.newMessageButton:Hide()
+            self.removeMessageButton:Hide()
+            self.message:SetText(data.text)
+            self.message:SetFont(UIUtil.titleFont, 16)
+            self.message:SetColor(UIUtil.factionTextColor)
+            self.description:SetText('')
         elseif data.type == 'spacer' then
-            line.toggle:Hide()
-            line.newMessageButton:Hide()
-            line.removeMessageButton:Hide()
-            line.description:SetText('')
-            line.message:SetText('')
+            self.toggle:Hide()
+            self.newMessageButton:Hide()
+            self.removeMessageButton:Hide()
+            self.description:SetText('')
+            self.message:SetText('')
         elseif data.type == 'entry' then
-            line.toggle:Hide()
-            line.description:SetText(clarityTable[data.source])
-            line.description:SetColor('ffffffff')
-            line.description:SetFont('Arial', 16)
-            line.message:SetText(data.text)
-            line.message:SetFont('Arial', 16)
-            line.message:SetColor(UIUtil.fontColor)
-            line.removeMessageButton:Show()
-            line.newMessageButton:Show()
+            self.toggle:Hide()
+            self.description:SetText(clarityTable[data.source])
+            self.description:SetColor('ffffffff')
+            self.description:SetFont('Arial', 16)
+            self.message:SetText(data.text)
+            self.message:SetFont('Arial', 16)
+            self.message:SetColor(UIUtil.fontColor)
+            self.removeMessageButton:Show()
+            self.newMessageButton:Show()
         end
     end
     return line
@@ -499,9 +482,7 @@ function CreateUI()
     LayoutHelpers.AtBottomIn(okButton, dialogContent, 10)
     LayoutHelpers.AtRightIn(okButton, dialogContent, 10)
     Tooltip.AddControlTooltip(okButton, {text = '<LOC _Close>Close', body = '<LOC notify_0001>Closes this dialog and confirms assignments of messages'})
-    okButton.OnClick = function(self, modifiers)
-        CloseUI()
-    end
+    okButton.OnClick = CloseUI
 
     -- Button to reset everything
     local defaultButton = UIUtil.CreateButtonWithDropshadow(dialogContent, "/BUTTON/medium/", "<LOC notify_0008>Default Preset")
@@ -793,11 +774,12 @@ function FormatData()
     for category, data in messageTable do
         if factions[category] or category == 'experimentals' or category == 'tech' or category == 'other' then
             if not LineGroups[category] then
-                LineGroups[category] = {}
-                LineGroups[category].sources = {}
-                LineGroups[category].name = category
-                LineGroups[category].order = categories[category]
-                LineGroups[category].text = category
+                LineGroups[category] = {
+                    sources = {},
+                    name = category,
+                    order = categories[category],
+                    text = category,
+                }
             end
 
             LineGroups[category].collapsed = linesCollapsed
