@@ -907,7 +907,9 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
 
     if numButtons > 1 then
         -- A button to either size...
-        LayoutHelpers.AtHorizontalCenterIn(dialog._button1, dialog, -44)
+        dialog._button1.Left:Set(function()
+            return dialog.Left() + (((dialog.Width() / 2) - dialog._button1.Width()) / 2) - 44
+        end)
         -- Handle stupid weird GPG convention...
         local rightButton
         if numButtons == 3 then
