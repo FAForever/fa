@@ -20,29 +20,66 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local Util = import('utilities.lua')
 
-local VectorCached = Vector(0, 0, 0)
-
 local DeprecatedWarnings = { }
 
--- upvalue for performance
+local VectorCached = Vector(0, 0, 0)
+
+-- cache math and table functions
 local MathSqrt = math.sqrt
 local MathMin = math.min 
 
 local TableAssimilate = table.assimilate
 
+-- cache globals
+local Warp = Warp
+local IsEntity = IsEntity
+local IsUnit = IsUnit
+local IsEnemy = IsEnemy
+local Random = Random
 local GetGameTick = GetGameTick
 local SuspendCurrentThread = SuspendCurrentThread
 local ForkThread = ForkThread
 local ResumeThread = ResumeThread
 local ChangeState = ChangeState
 local ArmyGetHandicap = ArmyGetHandicap
-local WaitTicks = coroutine.yield 
-
+local CoroutineYield = coroutine.yield 
 local CreateEmitterAtBone = CreateEmitterAtBone
+local _c_CreateShield = _c_CreateShield
 
-local Warp = Warp
-local IsUnit = IsUnit
-local IsEnemy = IsEnemy
+-- cache cfunctions
+local EntityGetHealth = _G.moho.entity_methods.GetHealth
+local EntityGetMaxHealth = _G.moho.entity_methods.GetMaxHealth
+local EntitySetHealth = _G.moho.entity_methods.SetHealth 
+local EntitySetMaxHealth = _G.moho.entity_methods.SetMaxHealth 
+local EntityAdjustHealth = _G.moho.entity_methods.AdjustHealth
+local EntityGetArmy = _G.moho.entity_methods.GetArmy 
+local EntityGetEntityId = _G.moho.entity_methods.GetEntityId
+local EntitySetVizToFocusPlayer = _G.moho.entity_methods.SetVizToFocusPlayer
+local EntitySetVizToEnemies = _G.moho.entity_methods.SetVizToEnemies
+local EntitySetVizToAllies = _G.moho.entity_methods.SetVizToAllies
+local EntitySetVizToNeutrals = _G.moho.entity_methods.SetVizToNeutrals
+local EntityAttachBoneTo = _G.moho.entity_methods.AttachBoneTo
+local EntityGetPosition = _G.moho.entity_methods.GetPosition 
+local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ 
+local EntitySetMesh = _G.moho.entity_methods.SetMesh
+local EntitySetDrawScale = _G.moho.entity_methods.SetDrawScale
+local EntitySetOrientation = _G.moho.entity_methods.SetOrientation
+local EntityDestroy = _G.moho.entity_methods.Destroy
+local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
+local EntitySetCollisionShape = _G.moho.entity_methods.SetCollisionShape
+
+local EntitySetParentOffset = _G.moho.entity_methods.SetParentOffset
+
+local UnitSetScriptBit = _G.moho.unit_methods.SetScriptBit
+local UnitIsUnitState = _G.moho.unit_methods.IsUnitState
+local UnitRevertCollisionShape = _G.moho.unit_methods.RevertCollisionShape
+
+local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter 
+
+-- cache trashbag functions 
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
 
 -- cache categories computations
 local CategoriesOverspill = (categories.SHIELD * categories.DEFENSE) + categories.BUBBLESHIELDSPILLOVERCHECK
@@ -92,8 +129,8 @@ Shield = Class(moho.shield_methods, Entity) {
 
     OnCreate = function(self, spec)
         -- cache information that is used frequently
-        self.Army = self:GetArmy()
-        self.EntityId = self:GetEntityId()
+        self.Army = EntityGetArmy(self)
+        self.EntityId = EntityGetEntityId(self)
         self.Brain = spec.Owner:GetAIBrain()
 
         -- copy over information from specifiaction
@@ -120,23 +157,23 @@ Shield = Class(moho.shield_methods, Entity) {
         self.ShieldType = 'Bubble'
 
         -- set our health
-        self:SetMaxHealth(spec.ShieldMaxHealth)
-        self:SetHealth(self, spec.ShieldMaxHealth)
+        EntitySetMaxHealth(self, spec.ShieldMaxHealth)
+        EntitySetHealth(self, self, spec.ShieldMaxHealth)
 
         -- show our 'lifebar'
         self:UpdateShieldRatio(1.0)
 
         -- tell the engine when we should be visible
-        self:SetVizToFocusPlayer('Always')
-        self:SetVizToEnemies('Intel')
-        self:SetVizToAllies('Always')
-        self:SetVizToNeutrals('Intel')
+        EntitySetVizToFocusPlayer(self, 'Always')
+        EntitySetVizToEnemies(self, 'Intel')
+        EntitySetVizToAllies(self, 'Always')
+        EntitySetVizToNeutrals(self, 'Intel')
 
         -- attach us to the owner
-        self:AttachBoneTo(-1, spec.Owner, -1)
+        EntityAttachBoneTo(self, -1, spec.Owner, -1)
 
         -- lookup as to whether we're static or a commander shield
-        local ownerCategories = (self.Owner.Blueprint or self.Owner:GetBlueprint()).CategoriesHash
+        local ownerCategories = self.Owner.Blueprint.CategoriesHash
         if ownerCategories.STRUCTURE then
             self.StaticShield = true
         elseif ownerCategories.COMMAND then
@@ -163,7 +200,7 @@ Shield = Class(moho.shield_methods, Entity) {
         self.RegenThreadSuspended = true
         self.RegenThreadState = "On"
         self.RegenThread = ForkThread(self.RegenThread, self)
-        self.Trash:Add(self.RegenThread)
+        TrashAdd(self.Trash, self.RegenThread)
 
         -- manage the loss of shield when energy is depleted
         self.Brain:AddEnergyDependingEntity(self)
@@ -173,7 +210,7 @@ Shield = Class(moho.shield_methods, Entity) {
         self.Recharged = true 
         self.RolledFromFactory = false 
         self.Owner:SetMaintenanceConsumptionActive()
-        self.Owner:SetScriptBit('RULEUTC_ShieldToggle', true)
+        UnitSetScriptBit(self.Owner, 'RULEUTC_ShieldToggle', true)
 
         -- then check if we can actually turn it on
         if not self.Brain.EnergyDepleted then 
@@ -185,28 +222,29 @@ Shield = Class(moho.shield_methods, Entity) {
 
     RegenThread = function(self)
 
-        -- localize for performance
+        -- cache globals 
         local GetGameTick = GetGameTick
-        local CoroutineYield = coroutine.yield
+        local CoroutineYield = CoroutineYield
         local SuspendCurrentThread = SuspendCurrentThread
 
-        -- note to self: do **not** cache shield / unit related functions
-        -- into the local scope. E.g., something like `local GetHealth = self.GetHealth`,
-        -- this can break mods and / or map scripts
+        -- cache cfunctions
+        local EntityGetHealth = EntityGetHealth
+        local EntityGetMaxHealth = EntityGetMaxHealth
+        local EntityAdjustHealth = EntityAdjustHealth
 
         while true do
 
             -- gather some information
             local fromSuspension = false
             local tick = GetGameTick()
-            local health = self:GetHealth()
+            local health = EntityGetHealth(self)
 
             -- check if we need to suspend ourself
             if 
                 -- we're at zero health or lower
                     health <= 0 
                 -- we're full health
-                or  health == self:GetMaxHealth() 
+                or  health == EntityGetMaxHealth(self) 
                 -- we're not enabled
                 or  not self.Enabled 
                 -- we're not recharged
@@ -225,7 +263,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 if tick > self.RegenThreadStartTick then 
 
                     -- adjust health, rate is in seconds 
-                    self:AdjustHealth(self.Owner, 0.1 * self.RegenRate)
+                    EntityAdjustHealth(self, self.Owner, 0.1 * self.RegenRate)
 
                     -- adjust shield bar
                     self:UpdateShieldRatio(-1)
@@ -272,7 +310,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.OverlappingShieldsTick = tick 
 
             local brain = self.Brain
-            local position = self.Owner:GetPosition()
+            local position = EntityGetPosition(self.Owner)
 
             -- diameter where other shields overlap with us or are contained by us
             local diameter = LargestShieldDiameter + self.Size
@@ -290,7 +328,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 local d, dx, dy, dz 
                 
                 -- compute our information only once
-                local psx, psy, psz = self:GetPositionXYZ()
+                local psx, psy, psz = EntityGetPositionXYZ(self)
                 local radius = 0.5 * self.Size
 
                 local head = 1 
@@ -317,7 +355,7 @@ Shield = Class(moho.shield_methods, Entity) {
                         distanceToOverlap = distanceToOverlap * distanceToOverlap
 
                         -- retrieve position of other shield
-                        osx, osy, osz = shieldOther:GetPositionXYZ()
+                        osx, osy, osz = EntityGetPositionXYZ(shieldOther)
 
                         -- compute vector from self to other
                         dx = osx - psx 
@@ -349,7 +387,7 @@ Shield = Class(moho.shield_methods, Entity) {
         if value >= 0 then
             self.Owner:SetShieldRatio(value)
         else
-            self.Owner:SetShieldRatio(self:GetHealth() / self:GetMaxHealth())
+            self.Owner:SetShieldRatio(EntityGetHealth(self) / EntityGetMaxHealth(self))
         end
     end,
 
@@ -363,7 +401,13 @@ Shield = Class(moho.shield_methods, Entity) {
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
         amount = amount * (1.0 - ArmyGetHandicap(self.Army))
-        return MathMin(self:GetHealth(), amount)
+
+        local health = EntityGetHealth(self)
+        if health < amount then 
+            return health 
+        else 
+            return amount 
+        end
     end,
 
     GetOverkill = function(self, instigator, amount, type)
@@ -371,7 +415,7 @@ Shield = Class(moho.shield_methods, Entity) {
         -- See SimDamage.cpp (DealDamage function) for how this should work
         amount = amount * (self.Owner:GetArmorMult(type))
         amount = amount * (1.0 - ArmyGetHandicap(self.Army))
-        local finalVal =  amount - self:GetHealth()
+        local finalVal =  amount - EntityGetHealth(self)
         if finalVal < 0 then
             finalVal = 0
         end
@@ -437,7 +481,7 @@ Shield = Class(moho.shield_methods, Entity) {
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
 
             -- take some damage
-            self:AdjustHealth(instigator, -absorbed)
+            EntityAdjustHealth(self, instigator, -absorbed)
 
             -- adjust shield bar
             self:UpdateShieldRatio(-1)
@@ -452,7 +496,7 @@ Shield = Class(moho.shield_methods, Entity) {
             end
 
             -- if we have no health, collapse
-            if self:GetHealth() <= 0 then
+            if EntityGetHealth(self) <= 0 then
                 ChangeState(self, self.DamageDrainedState)
             -- otherwise, attempt to regenerate
             else 
@@ -513,38 +557,38 @@ Shield = Class(moho.shield_methods, Entity) {
 
         -- allocate an entity
         local entity = Entity( self.ImpactEntitySpecs )
-        Warp(entity, self:GetPosition())
+
+        vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
+        Warp(entity, vc)
 
         -- set the impact mesh and scale it accordingly
         if self.ImpactMeshBp ~= '' then
-            entity:SetMesh(self.ImpactMeshBp)
-            entity:SetDrawScale(self.Size)
+            EntitySetMesh(entity, self.ImpactMeshBp)
+            EntitySetDrawScale(entity, self.Size)
 
-            vc[1] = -x
-            vc[2] = -y 
-            vc[3] = -z 
-            entity:SetOrientation(OrientFromDir(vc), true)
+            vc[1], vc[2], vc[3] = -x, -y, -z
+            EntitySetOrientation(entity, OrientFromDir(vc), true)
         end
 
         -- spawn additional effects
         for _, v in self.ImpactEffects do
             effect = CreateEmitterAtBone(entity, -1, army, v)
-            effect:OffsetEmitter(0, 0, d)
+            IEffectOffsetEmitter(effect, 0, 0, d)
         end
 
         -- hold up a bit
-        WaitTicks(20)
+        CoroutineYield(20)
 
         -- take out the entity again
-        entity:Destroy()
+        EntityDestroy(entity)
         
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
 
     OnDestroy = function(self)
-        self:SetMesh('')
+        EntitySetMesh(self, '')
         if self.MeshZ ~= nil then
-            self.MeshZ:Destroy()
+            EntityDestroy(self.MeshZ)
             self.MeshZ = nil
         end
         self:UpdateShieldRatio(0)
@@ -561,7 +605,7 @@ Shield = Class(moho.shield_methods, Entity) {
             if other.ShieldImpacted then
                 return false
             else
-                if other and not other:BeenDestroyed() then
+                if other and not EntityBeenDestroyed(other) then
                     other:OnImpact('Shield', self)
                     return false
                 end
@@ -611,34 +655,40 @@ Shield = Class(moho.shield_methods, Entity) {
     RemoveShield = function(self)
         self._IsUp = false 
 
-        self:SetCollisionShape('None')
+        EntitySetCollisionShape(self, 'None')
 
-        self:SetMesh('')
+        EntitySetMesh(self, '')
         if self.MeshZ ~= nil then
-            self.MeshZ:Destroy()
+            EntityDestroy(self.MeshZ)
             self.MeshZ = nil
         end
     end,
 
     CreateShieldMesh = function(self)
-        self:SetCollisionShape('Sphere', 0, 0, 0, self.Size / 2)
+        EntitySetCollisionShape(self, 'Sphere', 0, 0, 0, self.Size / 2)
 
-        self:SetMesh(self.MeshBp)
-        self:SetParentOffset(Vector(0, self.ShieldVerticalOffset, 0))
-        self:SetDrawScale(self.Size)
+        EntitySetMesh(self, self.MeshBp)
+        EntitySetParentOffset(self, Vector(0, self.ShieldVerticalOffset, 0))
+        EntitySetDrawScale(self, self.Size)
 
         if self.MeshZ == nil then
-            self.MeshZ = Entity {Owner = self.Owner}
-            self.MeshZ:SetMesh(self.MeshZBp)
-            Warp(self.MeshZ, self.Owner:GetPosition())
-            self.MeshZ:SetDrawScale(self.Size)
-            self.MeshZ:AttachBoneTo(-1, self.Owner, -1)
-            self.MeshZ:SetParentOffset(Vector(0, self.ShieldVerticalOffset, 0))
+            local vc = VectorCached 
 
-            self.MeshZ:SetVizToFocusPlayer('Always')
-            self.MeshZ:SetVizToEnemies('Intel')
-            self.MeshZ:SetVizToAllies('Always')
-            self.MeshZ:SetVizToNeutrals('Intel')
+            self.MeshZ = Entity (self.ImpactEntitySpecs)
+            EntitySetMesh(self.MeshZ, self.MeshZBp)
+            EntitySetDrawScale(self.MeshZ, self.Size)
+
+            vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self.Owner)
+            Warp(self.MeshZ, vc)
+            EntityAttachBoneTo(self.MeshZ, -1, self.Owner, -1)
+
+            vc[1], vc[2], vc[3] = 0, self.ShieldVerticalOffset, 0
+            EntitySetParentOffset(self.MeshZ, vc)
+
+            EntitySetVizToFocusPlayer(self.MeshZ, 'Always')
+            EntitySetVizToEnemies(self.MeshZ, 'Intel')
+            EntitySetVizToAllies(self.MeshZ, 'Always')
+            EntitySetVizToNeutrals(self.MeshZ, 'Intel')
         end
 
         self._IsUp = true
@@ -649,11 +699,11 @@ Shield = Class(moho.shield_methods, Entity) {
 
         local max = 1
         if not self.DepletedByDamage then 
-            max = self:GetHealth() / self:GetMaxHealth()
+            max = EntityGetHealth(self) / EntityGetMaxHealth(self)
         end
 
         while curProgress < time do
-            WaitTicks(1)
+            CoroutineYield(1)
 
             curProgress = curProgress + 0.1
             local workProgress = curProgress / time
@@ -671,7 +721,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
-            if self.Owner:IsUnitState('Attached') and self.RolledFromFactory then
+            if UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory then
                 ChangeState(self, self.OffState)
 
             -- if we're still out of energy, go wait for that to fix itself
@@ -697,7 +747,6 @@ Shield = Class(moho.shield_methods, Entity) {
                 -- inform owner that the shield is enabled
                 self.Owner:OnShieldEnabled()
                 self.Owner:PlayUnitSound('ShieldOn')
-
             end
 
             -- mobile shields are 'attached' to the factory when they are build, this allows
@@ -739,21 +788,21 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- determine recharge time
             local rechargeTime = self.ShieldEnergyDrainRechargeTime           
-            if self.DepletedByDamage then 
-                rechargeTime = math.max(rechargeTime, self.ShieldRechargeTime)
+            if self.DepletedByDamage and self.ShieldRechargeTime > rechargeTime then 
+                rechargeTime = self.ShieldRechargeTime
             end
 
             -- wait until we're done charging up
             self:ChargingUp(0, rechargeTime)
 
             -- determine health 
-            local health = self:GetHealth()
+            local health = EntityGetHealth(self)
             if self.DepletedByDamage then 
-                health = self:GetMaxHealth()
+                health = EntityGetMaxHealth(self)
             end
 
             -- fully charged, reset our helpt
-            self:SetHealth(self, health)
+            EntitySetHealth(self, self, health)
 
             -- update internal state
             self.DepletedByDamage = false
@@ -965,9 +1014,10 @@ PersonalBubble = Class(Shield) {
 
         self.ShieldSize = spec.ShieldSize
 
+        self.ShieldType = 'Personal'
+
         -- Manually disable the bubble shield's collision sphere after its creation so it acts like the new personal shields
-        self:SetCollisionShape('None')
-        self:SetType('Personal')
+        EntitySetCollisionShape(self, 'None')
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
@@ -985,12 +1035,12 @@ PersonalBubble = Class(Shield) {
 
     CreateShieldMesh = function(self)
         Shield.CreateShieldMesh(self)
-        self:SetCollisionShape('None')
+        EntitySetCollisionShape(self, 'None')
     end,
 
     RemoveShield = function(self)
         Shield.RemoveShield(self)
-        self:SetCollisionShape('None')
+        EntitySetCollisionShape(self, 'None')
     end,
 
     OnState = State(Shield.OnState) {
@@ -998,7 +1048,7 @@ PersonalBubble = Class(Shield) {
             -- Set the collision profile of the unit to match the apparent shield sphere.
             -- Since the collision handler in Unit deals with personal shields, the damage will be
             -- passed to the shield.
-            self.Owner:SetCollisionShape('Sphere', 0, self.SizeY * 0.5, 0, self.ShieldSize * 0.5)
+            EntitySetCollisionShape(self.Owner, 'Sphere', 0, self.SizeY * 0.5, 0, self.ShieldSize * 0.5)
             Shield.OnState.Main(self)
         end
     },
@@ -1007,14 +1057,14 @@ PersonalBubble = Class(Shield) {
         Main = function(self)
             -- When the shield is down for some reason, reset the unit's collision profile so it can
             -- again be hit.
-            self.Owner:RevertCollisionShape()
+            UnitRevertCollisionShape(self.Owner)
             Shield.OffState.Main(self)
         end
     },
 
     RechargeState = State(Shield.RechargeState) {
         Main = function(self)
-            self.Owner:RevertCollisionShape()
+            UnitRevertCollisionShape(self.Owner)
             Shield.RechargeState.Main(self)
          end
     },
@@ -1141,21 +1191,21 @@ PersonalShield = Class(Shield){
         local entity = self.ShieldEffectEntity
 
         -- warp the entity
-        vc[1], vc[2], vc[3] = self:GetPositionXYZ()
+        vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
         Warp(entity, vc)
         
         -- orientate it to orientate the effect
         vc[1], vc[2], vc[3] = -x, -y, -z
-        entity:SetOrientation(OrientFromDir(vc), true)
+        EntitySetOrientation(entity, OrientFromDir(vc), true)
 
         -- create the effect
         for k, v in self.ImpactEffects do
             effect = CreateEmitterAtBone(entity, -1, army, v)
-            effect:OffsetEmitter(0, 0, d)
+            IEffectOffsetEmitter(effect, 0, 0, d)
         end
 
         -- hold a bit to lower the number of allowed effects
-        WaitTicks(20)
+        CoroutineYield(20)
 
         self.LiveImpactEntities = self.LiveImpactEntities - 1
     end,
@@ -1163,18 +1213,18 @@ PersonalShield = Class(Shield){
     CreateShieldMesh = function(self)
         -- Personal shields (unit shields) don't handle collisions anymore.
         -- This is done in the Unit's OnDamage function instead.
-        self:SetCollisionShape('None')
-        self.Owner:SetMesh(self.OwnerShieldMesh, true)
+        EntitySetCollisionShape(self, 'None')
+        EntitySetMesh(self.Owner, self.OwnerShieldMesh, true)
     end,
 
     RemoveShield = function(self)
-        self:SetCollisionShape('None')
-        self.Owner:SetMesh(self.Owner:GetBlueprint().Display.MeshBlueprint, true)
+        EntitySetCollisionShape(self, 'None')
+        EntitySetMesh(self.Owner, self.Owner.Blueprint.Display.MeshBlueprint, true)
     end,
 
     OnDestroy = function(self)
         if not self.Owner.MyShield or self.Owner.MyShield.EntityId == self.EntityId then
-            self.Owner:SetMesh((self.Owner.Blueprint or self.Owner:GetBlueprint()).Display.MeshBlueprint, true)
+            EntitySetMesh(self.Owner, self.Owner.Blueprint.Display.MeshBlueprint, true)
         end
         self:UpdateShieldRatio(0)
         ChangeState(self, self.DeadState)
@@ -1184,7 +1234,7 @@ PersonalShield = Class(Shield){
 AntiArtilleryShield = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
-        self:SetType('AntiArtillery')
+        self.ShieldType = 'AntiArtillery'
     end,
 
     OnCollisionCheckWeapon = function(self, firingWeapon)
