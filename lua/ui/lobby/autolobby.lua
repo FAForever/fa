@@ -19,6 +19,7 @@ local MenuCommon = import('/lua/ui/menus/menucommon.lua')
 local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local gameColors = import('/lua/gameColors.lua').GameColors
 local utils = import('/lua/system/utils.lua')
+local lobby = import('/lua/ui/lobby/lobby.lua')
 
 
 
@@ -141,7 +142,7 @@ local function HostAddPlayer(senderId, playerInfo)
 
     playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
     -- TODO: Should colors be based on teams?
-    playerInfo.PlayerColor = slot
+    playerInfo.PlayerColor = lobby.ColorOrder[slot]
 
     gameInfo.PlayerOptions[slot] = playerInfo
 end
