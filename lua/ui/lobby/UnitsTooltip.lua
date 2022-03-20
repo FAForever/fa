@@ -73,7 +73,7 @@ function Create(parent, bp)
 
     if bp.Description then
         title = ' ' .. bp.Tech .. ' ' .. LOCF(bp.Description)
-    elseif bp.Name  then
+    elseif bp.Name then
         title = ' ' .. LOCF(bp.Name)
     end
     if bp.General.UnitName and not bp.CategoriesHash['SUBCOMMANDER'] then
@@ -82,7 +82,7 @@ function Create(parent, bp)
 
     tooltipUI = Bitmap(parent)
     tooltipUI:SetSolidColor(UIUtil.tooltipBorderColor)
-    tooltipUI.Depth:Set(function() return parent.Depth() + 10000 end)
+    LayoutHelpers.DepthOverParent(tooltipUI, parent, 10000)
     LayoutHelpers.SetDimensions(tooltipUI, tooltipWidth, tooltipHeight)
 
     tooltipUI.title = UIUtil.CreateText(tooltipUI, title, fontTextSize, UIUtil.bodyFont)
@@ -90,11 +90,11 @@ function Create(parent, bp)
 
     tooltipUI.titleBg = Bitmap(tooltipUI)
     tooltipUI.titleBg:SetSolidColor(UIUtil.tooltipTitleColor)
-    tooltipUI.titleBg.Depth:Set(function() return tooltipUI.title.Depth() - 1 end)
+    LayoutHelpers.DepthUnderParent(tooltipUI.titleBg, tooltipUI)
     tooltipUI.titleBg.Top:Set(tooltipUI.title.Top)
     LayoutHelpers.AtBottomIn(tooltipUI.titleBg, tooltipUI.title, -2)
 
-    tooltipUI.titleBg.Left:Set(function() return tooltipUI.title.Left() end)
+    tooltipUI.titleBg.Left:Set(tooltipUI.title.Left)
     LayoutHelpers.AnchorToLeft(tooltipUI.titleBg, tooltipUI.title, - tooltipWidth + 4)
 
     local titleHeight = math.max(tooltipUI.title.Height(), 1) + 4
@@ -129,7 +129,7 @@ function Create(parent, bp)
     tooltipUI.Categories:SetFont(fontTextName, fontTextSize-1)
     tooltipUI.Categories:SetColors('FFFC9038', '00000000', UIUtil.fontColor, '00000000') --#FFFC9038
     local wrapped = Text.WrapText(value, LayoutHelpers.ScaleNumber(tooltipWidth-10), function(value) return tooltipUI.Categories:GetStringAdvance(value) end)
-    wrappedHeight = (table.getsize(wrapped) or 1) * tooltipHeight
+    local wrappedHeight = (table.getsize(wrapped) or 1) * tooltipHeight
     tooltipUI.Categories.Height:Set(wrappedHeight)
     LayoutHelpers.AtLeftTopIn(tooltipUI.Categories, tooltipUI, left, top)
 
@@ -162,19 +162,19 @@ function Create(parent, bp)
         top  = top + 12
     end
 
-    perMassLabel = UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)
+    local perMassLabel = UIUtil.CreateText(tooltipUI, 'PER MASS ', fontTextSize-2, fontTextName)
     perMassLabel:SetColor(colorText)
     LayoutHelpers.AtRightTopIn(perMassLabel, tooltipUI, column5-iconSize-5, top)
 
-    defenseLabel = UIUtil.CreateText(tooltipUI, 'DEFENSE ', fontTextSize-2, fontTextName)
+    local defenseLabel = UIUtil.CreateText(tooltipUI, 'DEFENSE ', fontTextSize-2, fontTextName)
     defenseLabel:SetColor(colorText)
     LayoutHelpers.AtRightTopIn(defenseLabel, tooltipUI, column4-iconSize-5, top)
 
-    prodLabel = UIUtil.CreateText(tooltipUI, 'PRODUCTION ', fontTextSize-2, fontTextName)
+    local prodLabel = UIUtil.CreateText(tooltipUI, 'PRODUCTION ', fontTextSize-2, fontTextName)
     prodLabel:SetColor(colorText)
     LayoutHelpers.AtRightTopIn(prodLabel, tooltipUI, column3-iconSize-5, top)
 
-    costLabel = UIUtil.CreateText(tooltipUI, 'BUILD COST ', fontTextSize-2, fontTextName)
+    local costLabel = UIUtil.CreateText(tooltipUI, 'BUILD COST ', fontTextSize-2, fontTextName)
     costLabel:SetColor(colorText)
     LayoutHelpers.AtRightTopIn(costLabel, tooltipUI, column2-iconSize-5, top)
 
@@ -182,22 +182,22 @@ function Create(parent, bp)
 
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 
-    healthValue = init(bp.NewHealth or bp.Defense.Health)
-    healthString = StringComma(math.floor(healthValue)) .. ' '
-    HealthText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
+    local healthValue = init(bp.NewHealth or bp.Defense.Health)
+    local healthString = StringComma(math.floor(healthValue)) .. ' '
+    local HealthText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
     HealthText:SetColor(colorDefense) --#FF0BACF7
     LayoutHelpers.AtRightTopIn(HealthText, tooltipUI, column4, top)
-    HealthIcon = Bitmap(tooltipUI)
+    local HealthIcon = Bitmap(tooltipUI)
     HealthIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds')
     LayoutHelpers.SetDimensions(HealthIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(HealthIcon, tooltipUI, tooltipWidth-column4, top+2)
 
     healthValue = (healthValue / eco.BuildCostMass)
     healthString = string.format("%0.2f ",healthValue)
-    HealthPerMassText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
+    local HealthPerMassText = UIUtil.CreateText(tooltipUI, healthString, fontValueSize, fontValueName)
     HealthPerMassText:SetColor(colorDefense) --#FF0BACF7
     LayoutHelpers.AtRightTopIn(HealthPerMassText, tooltipUI, column5, top)
-    HealthPerMassIcon = Bitmap(tooltipUI)
+    local HealthPerMassIcon = Bitmap(tooltipUI)
     HealthPerMassIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-health.dds')
     LayoutHelpers.SetDimensions(HealthPerMassIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(HealthPerMassIcon, tooltipUI, tooltipWidth-column5, top+2)
@@ -205,41 +205,41 @@ function Create(parent, bp)
     value = eco.YieldMass
     value = value > 0 and '+' .. value or value
     value = StringComma(value) .. ' '
-    MassProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    local MassProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
     MassProdText:SetColor(colorMass)  -- #FF2DEC28
     LayoutHelpers.AtRightTopIn(MassProdText, tooltipUI, column3, top)
-    MassProdIcon = Bitmap(tooltipUI)
+    local MassProdIcon = Bitmap(tooltipUI)
     MassProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
     LayoutHelpers.SetDimensions(MassProdIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(MassProdIcon, tooltipUI, tooltipWidth-column3, top+2)
 
     value = StringComma(eco.BuildCostMass) .. ' '
-    MassCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    local MassCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
     MassCostText:SetColor(colorMass) -- #FF2DEC28
     LayoutHelpers.AtRightTopIn(MassCostText, tooltipUI, column2, top)
-    MassCostIcon = Bitmap(tooltipUI)
+    local MassCostIcon = Bitmap(tooltipUI)
     MassCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/mass.dds')
     LayoutHelpers.SetDimensions(MassCostIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(MassCostIcon, tooltipUI, tooltipWidth-column2, top+2)
 
     top  = top + MassCostText.Height() + 2
 
-    shieldValue = init(bp.ShieldMaxHealth or bp.Defense.Shield.ShieldMaxHealth)
-    shieldString = StringComma(math.floor(shieldValue)) .. ' '
-    ShieldText = UIUtil.CreateText(tooltipUI, shieldString, fontValueSize, fontValueName)
+    local shieldValue = init(bp.ShieldMaxHealth or bp.Defense.Shield.ShieldMaxHealth)
+    local shieldString = StringComma(math.floor(shieldValue)) .. ' '
+    local ShieldText = UIUtil.CreateText(tooltipUI, shieldString, fontValueSize, fontValueName)
     ShieldText:SetColor(colorDefense) --#FF0BACF7
     LayoutHelpers.AtRightTopIn(ShieldText, tooltipUI, column4, top)
-    ShieldIcon = Bitmap(tooltipUI)
+    local ShieldIcon = Bitmap(tooltipUI)
     ShieldIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds')
     LayoutHelpers.SetDimensions(ShieldIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(ShieldIcon, tooltipUI, tooltipWidth-column4, top+2)
 
     shieldValue = (shieldValue / eco.BuildCostMass)
     shieldString = string.format("%0.2f",shieldValue) .. ' '
-    ShieldPerMassText = UIUtil.CreateText(tooltipUI, shieldString, fontValueSize, fontValueName)
+    local ShieldPerMassText = UIUtil.CreateText(tooltipUI, shieldString, fontValueSize, fontValueName)
     ShieldPerMassText:SetColor(colorDefense) --#FF0BACF7
     LayoutHelpers.AtRightTopIn(ShieldPerMassText, tooltipUI, column5, top)
-    ShieldPerMassIcon = Bitmap(tooltipUI)
+    local ShieldPerMassIcon = Bitmap(tooltipUI)
     ShieldPerMassIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/defense-shields.dds')
     LayoutHelpers.SetDimensions(ShieldPerMassIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(ShieldPerMassIcon, tooltipUI, tooltipWidth-column5, top+2)
@@ -247,19 +247,19 @@ function Create(parent, bp)
     value = eco.YieldEnergy
     value = value > 0 and '+' .. value or value
     value = StringComma(value) .. ' '
-    EnergyProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    local EnergyProdText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
     EnergyProdText:SetColor(colorEnergy) --#FFF7B00B
     LayoutHelpers.AtRightTopIn(EnergyProdText, tooltipUI, column3, top)
-    EnergyProdIcon = Bitmap(tooltipUI)
+    local EnergyProdIcon = Bitmap(tooltipUI)
     EnergyProdIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/energy.dds')
     LayoutHelpers.SetDimensions(EnergyProdIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(EnergyProdIcon, tooltipUI, tooltipWidth-column3, top+2)
 
     value = StringComma(math.ceil(eco.BuildCostEnergy)) .. ' '
-    EnergyCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    local EnergyCostText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
     EnergyCostText:SetColor(colorEnergy) --#FFF7B00B
     LayoutHelpers.AtRightTopIn(EnergyCostText, tooltipUI, column2, top)
-    EnergyCostIcon = Bitmap(tooltipUI)
+    local EnergyCostIcon = Bitmap(tooltipUI)
     EnergyCostIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/energy.dds')
     LayoutHelpers.SetDimensions(EnergyCostIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(EnergyCostIcon, tooltipUI, tooltipWidth-column2, top+2)
@@ -267,19 +267,19 @@ function Create(parent, bp)
     top = top + EnergyCostText.Height() + 2
 
     value = stringTime(math.floor(eco.BuildTime)) .. ' '
-    BuildTimeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    local BuildTimeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
     BuildTimeText:SetColor(colorBuild) --#FFD9D9D9
     LayoutHelpers.AtRightTopIn(BuildTimeText, tooltipUI, column2, top)
-    BuildTimeIcon = Bitmap(tooltipUI)
+    local BuildTimeIcon = Bitmap(tooltipUI)
     BuildTimeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/build-time.dds')
     LayoutHelpers.SetDimensions(BuildTimeIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(BuildTimeIcon, tooltipUI, tooltipWidth-column2, top+2)
 
     value = StringComma(eco.BuildRate).. ' '
-    BuildRateText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+    local BuildRateText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
     BuildRateText:SetColor(colorBuild) --#FFD9D9D9
     LayoutHelpers.AtRightTopIn(BuildRateText, tooltipUI, column3, top)
-    BuildRateIcon = Bitmap(tooltipUI)
+    local BuildRateIcon = Bitmap(tooltipUI)
     BuildRateIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/build-rate.dds')
     LayoutHelpers.SetDimensions(BuildRateIcon, iconSize, iconSize)
     LayoutHelpers.AtLeftTopIn(BuildRateIcon, tooltipUI, tooltipWidth-column3, top+2)
@@ -289,43 +289,43 @@ function Create(parent, bp)
     local weapons = UnitsAnalyzer.GetWeaponsStats(bp)
     for i, weapon in weapons or {} do
         top  = top + 1
-        weaponText = UIUtil.CreateText(tooltipUI, weapon.Info, fontTextSize-1, fontTextName)
+        local weaponText = UIUtil.CreateText(tooltipUI, weapon.Info, fontTextSize-1, fontTextName)
         weaponText:SetColor('FFE1DFDF') --#FFE1DFDF
         LayoutHelpers.AtLeftTopIn(weaponText, tooltipUI, left, top)
         top  = top + weaponText.Height()  + 1
 
         value = StringComma(weapon.Range) .. ' ' --RANGE
-        rangeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local rangeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         rangeText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(rangeText, tooltipUI, column4, top)
-        rangeIcon = Bitmap(tooltipUI)
+        local rangeIcon = Bitmap(tooltipUI)
         rangeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds')
         LayoutHelpers.SetDimensions(rangeIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(rangeIcon, tooltipUI, tooltipWidth-column4, top+1)
 
         value = string.format("%0.2f",weapon.DPM) .. ' '
-        dpmText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local dpmText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         dpmText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(dpmText, tooltipUI, column5, top)
-        dpmIcon = Bitmap(tooltipUI)
+        local dpmIcon = Bitmap(tooltipUI)
         dpmIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds')
         LayoutHelpers.SetDimensions(dpmIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(dpmIcon, tooltipUI, tooltipWidth-column5, top+1)
 
         value = StringComma(weapon.DPS) .. ' '
-        dpsText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local dpsText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         dpsText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(dpsText, tooltipUI, column3, top)
-        dpsIcon = Bitmap(tooltipUI)
+        local dpsIcon = Bitmap(tooltipUI)
         dpsIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds')
         LayoutHelpers.SetDimensions(dpsIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(dpsIcon, tooltipUI, tooltipWidth-column3, top+1)
 
         value = StringComma(weapon.Damage) .. ' '
-        dmgText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local dmgText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         dmgText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(dmgText, tooltipUI, column2, top)
-        dmgIcon = Bitmap(tooltipUI)
+        local dmgIcon = Bitmap(tooltipUI)
         dmgIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage.dds')
         LayoutHelpers.SetDimensions(dmgIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(dmgIcon, tooltipUI, tooltipWidth-column2, top+1)
@@ -337,43 +337,43 @@ function Create(parent, bp)
     if total.Count > 1 then
         top  = top + 10
 
-        weaponText = UIUtil.CreateText(tooltipUI, total.Info, fontTextSize, fontTextName)
+        local weaponText = UIUtil.CreateText(tooltipUI, total.Info, fontTextSize, fontTextName)
         weaponText:SetColor('FFE1DFDF') --#FFE1DFDF
         LayoutHelpers.AtLeftTopIn(weaponText, tooltipUI, left, top)
         top  = top + weaponText.Height() + 1
 
         value = StringComma(total.Range) .. ' ' --RANGE
-        rangeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local rangeText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         rangeText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(rangeText, tooltipUI, column4, top)
-        rangeIcon = Bitmap(tooltipUI)
+        local rangeIcon = Bitmap(tooltipUI)
         rangeIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-range.dds')
         LayoutHelpers.SetDimensions(rangeIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(rangeIcon, tooltipUI, tooltipWidth-column4, top+1)
 
         value = string.format("%0.2f",total.DPM) .. ' '
-        dpmText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local dpmText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         dpmText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(dpmText, tooltipUI, column5, top)
-        dpmIcon = Bitmap(tooltipUI)
+        local dpmIcon = Bitmap(tooltipUI)
         dpmIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-mass.dds')
         LayoutHelpers.SetDimensions(dpmIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(dpmIcon, tooltipUI, tooltipWidth-column5, top+1)
 
         value = StringComma(total.DPS) .. ' '
-        dpsText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local dpsText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         dpsText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(dpsText, tooltipUI, column3, top)
-        dpsIcon = Bitmap(tooltipUI)
+        local dpsIcon = Bitmap(tooltipUI)
         dpsIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage-per-second.dds')
         LayoutHelpers.SetDimensions(dpsIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(dpsIcon, tooltipUI, tooltipWidth-column3, top+1)
 
         value = StringComma(total.Damage) .. ' '
-        dmgText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
+        local dmgText = UIUtil.CreateText(tooltipUI, value, fontValueSize, fontValueName)
         dmgText:SetColor('FFF70B0B') --#FFF70B0B
         LayoutHelpers.AtRightTopIn(dmgText, tooltipUI, column2, top)
-        dmgIcon = Bitmap(tooltipUI)
+        local dmgIcon = Bitmap(tooltipUI)
         dmgIcon:SetTexture('/textures/ui/common/game/unit-build-over-panel/damage.dds')
         LayoutHelpers.SetDimensions(dmgIcon, iconSize, iconSize)
         LayoutHelpers.AtLeftTopIn(dmgIcon, tooltipUI, tooltipWidth-column2, top+1)
@@ -384,13 +384,13 @@ function Create(parent, bp)
     if bp.Mod then
         top  = top + 10
         value = 'MOD: ' .. bp.Mod.name
-        mod = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
+        local mod = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
         mod:SetColor(colorMod) --#FFC905DC
         LayoutHelpers.AtLeftTopIn(mod, tooltipUI, left, top)
         top  = top + mod.Height()
         if debugging and bp.Source then
             value = '' .. bp.Source
-            source = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
+            local source = UIUtil.CreateText(tooltipUI, value, fontTextSize, fontTextName)
             source:SetColor(colorMod) --#FFC905DC
             LayoutHelpers.AtLeftTopIn(source, tooltipUI, left, top)
             top  = top + source.Height()
@@ -411,13 +411,13 @@ function Create(parent, bp)
 
     local frame = GetFrame(0)
     if parent.Top() - tooltipUI.Height() < 0 then
-        tooltipUI.Top:Set(function() return parent.Bottom() end)
+        tooltipUI.Top:Set(parent.Bottom)
     else
         tooltipUI.Bottom:Set(parent.Top)
     end
 
     if parent.Left() - tooltipUI.Width() < 0 then
-        tooltipUI.Left:Set(function() return parent.Right() end)
+        tooltipUI.Left:Set(parent.Right)
     else
         tooltipUI.Right:Set(parent.Left)
     end
