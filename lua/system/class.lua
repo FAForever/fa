@@ -205,10 +205,14 @@ local function ComputeHierarchyChain(a, cache)
     local stackHead = 2 
 
     while stackHead > 1 do 
+        -- retrieve an element from the stack
         stackHead = stackHead - 1
         local elem = stack[stackHead]
+
+        -- add it to the hierarchy chain lookup table
         cache[elem] = true 
 
+        -- extend the stack until we're at a base instance
         local overrides = Hierarchy[elem]
         if overrides then 
             for k = 1, overrides.h - 1 do 
@@ -300,7 +304,7 @@ function ConstructClass(bases, specs)
                     elseif seen[l] == element then
                         -- do nothing 
 
-                    -- we've got two elements with the same key but different values, but our specs has a function to merge them: we're good
+                    -- we've got two elements with the same key but different values, but our specs has a function to define the behavior: we're good
                     elseif specs[l] then
                         -- do nothing
 
