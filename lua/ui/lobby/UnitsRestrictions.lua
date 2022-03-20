@@ -329,13 +329,14 @@ local function CreatePreset(key, tooltip, name, icon)
     elseif not Expressions[key] and not Enhancements[key] then
         WARN('UnitsRestrictions detected undefined restriction with "' ..key.. '" key')
     else
-        local preset = {}
-        preset.key = key
-        preset.name = name
-        preset.Icon = icon
-        preset.tooltip = tooltip
-        preset.categories = Expressions[key]
-        preset.enhancements = Enhancements[key]
+        local preset = {
+            key = key,
+            name = name,
+            Icon = icon,
+            tooltip = tooltip,
+            categories = Expressions[key],
+            enhancements = Enhancements[key]
+        }
         -- add new preset
         presetsRestrictions[key] = preset
     end
@@ -350,9 +351,10 @@ local function CreatePresetGroup(presetsKeys, key, tooltip, name, icon)
     -- check if a preset already exists
     local preset = presetsRestrictions[key]
     if not preset then
-        preset = {}
-        preset.categories = nil
-        preset.enhancements = nil
+        preset = {
+            categories = false,
+            enhancements = false
+        }
         presetMerging = true -- perform restrictions merge on a new preset
     end
     preset.key = key
