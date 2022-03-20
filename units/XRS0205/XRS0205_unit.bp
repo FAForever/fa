@@ -53,7 +53,7 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYSONAR',
     },
-    CollisionOffsetY = -0.15,
+    -- CollisionOffsetY = -0.15,
     CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
