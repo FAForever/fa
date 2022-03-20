@@ -46,11 +46,11 @@ Tooltips = {
         description = "<LOC tooltipui0300>Units will not engage enemies",
         keyID = "mode",
     },
-    mode_aggressive = {
-        title = "<LOC tooltipui0301>Ground Fire",
-        description = "<LOC tooltipui0302>Units will attack targeted positions rather attack-move",
-        keyID = "mode",
-    },
+    -- mode_aggressive = {
+    --     title = "<LOC tooltipui0301>Ground Fire",
+    --     description = "<LOC tooltipui0302>Units will attack targeted positions rather attack-move",
+    --     keyID = "mode",
+    -- },
     mode_return_fire = {
         title = "<LOC tooltipui0303>Return Fire",
         description = "<LOC tooltipui0304>Units will move and engage normally",
@@ -1336,18 +1336,18 @@ Tooltips = {
         title = "<LOC tooltipui0219>Score",
         description = "<LOC tooltipui0220>Sort by Overall Performance",
     },
-    PostScore_kills = {
-        title = "<LOC tooltipui0221>Kills",
-        description = "<LOC tooltipui0222>Sort by Units Destroyed",
-    },
-    PostScore_built = {
-        title = "<LOC tooltipui0223>Built",
-        description = "<LOC tooltipui0224>Sort by Structures Built",
-    },
-    PostScore_lost = {
-        title = "<LOC tooltipui0225>Losses",
-        description = "<LOC tooltipui0226>Sort by Units Lost",
-    },
+    -- PostScore_kills = {
+    --     title = "<LOC tooltipui0221>Kills",
+    --     description = "<LOC tooltipui0222>Sort by Units Destroyed",
+    -- },
+    -- PostScore_built = {
+    --     title = "<LOC tooltipui0223>Built",
+    --     description = "<LOC tooltipui0224>Sort by Structures Built",
+    -- },
+    -- PostScore_lost = {
+    --     title = "<LOC tooltipui0225>Losses",
+    --     description = "<LOC tooltipui0226>Sort by Units Lost",
+    -- },
     PostScore_cdr = {
         title = "<LOC tooltipui0231>Command Units",
         description = "<LOC tooltipui0232>Sort by Command Units",
@@ -2031,10 +2031,10 @@ Tooltips = {
     -- **********************
     -- ** Misc
     -- **********************
-    minimap_reset = {
-        title = "<LOC tooltipui0625>Reset Minimap",
-        description = "<LOC tooltipui0626>Sets the minimap to its default position and size",
-    },
+    -- minimap_reset = {
+    --     title = "<LOC tooltipui0625>Reset Minimap",
+    --     description = "<LOC tooltipui0626>Sets the minimap to its default position and size",
+    -- },
     no_rush_clock = {
         title = "<LOC tooltipui0627>No Rush Clock",
         description = "<LOC tooltipui0628>Displays time remaining in the no rush clock",

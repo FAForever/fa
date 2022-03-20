@@ -403,7 +403,7 @@ local CybranT3Sea = {
 local CybranCrabBot = {
     ['E'] = 'xrl0002',
     ['A'] = 'xrl0003',
-    ['N'] = 'xrl0004',
+    -- ['N'] = 'xrl0004',
     ['R'] = 'xrl0005',
     ['N'] = 'drlk001',
 }
