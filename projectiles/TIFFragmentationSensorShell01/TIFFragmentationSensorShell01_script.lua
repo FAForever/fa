@@ -6,8 +6,6 @@ local TArtilleryProjectile = import('/lua/terranprojectiles.lua').TArtilleryProj
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
-local once = true 
-
 TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
                
     OnImpact = function(self, TargetType, TargetEntity) 
