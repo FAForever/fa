@@ -19,8 +19,6 @@
 
 -- END COPY HERE --
 
-LOG("TRash!")
-
 TrashBag = Class {
 
     -- Tell the garbage collector that we're a weak table for our values. If an element is ready to be collected
