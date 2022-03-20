@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Mobile Light Artillery Script
 --#**
---#**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TIFHighBallisticMortarWeapon = import('/lua/terranweapons.lua').TIFHighBallisticMortarWeapon
