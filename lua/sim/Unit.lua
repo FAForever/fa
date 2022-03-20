@@ -187,6 +187,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCreate = function(self)
+
         Entity.OnCreate(self)   
 
         -- populate blueprint cache if we haven't done that yet
@@ -199,7 +200,7 @@ Unit = Class(moho.unit_methods) {
 
         -- cache often accessed values into inner table
         self.UnitId = self:GetUnitId()
-        self.Brain = self:GetAIBrain()
+        -- self.Brain = self:GetAIBrain()
         self.Blueprint = self.Cache.Blueprint
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
         self.Audio = self.Cache.Audio
@@ -4639,4 +4640,3 @@ DummyUnit = Class(moho.unit_methods) {
     CheckAssistFocus = function(self) end,
     UpdateAssistersConsumption = function (self) end,
 }
-

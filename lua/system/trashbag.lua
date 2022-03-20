@@ -19,6 +19,8 @@
 
 -- END COPY HERE --
 
+LOG("TRash!")
+
 TrashBag = Class {
 
     -- Tell the garbage collector that we're a weak table for our values. If an element is ready to be collected
@@ -73,4 +75,5 @@ TrashBag = Class {
         -- allow us to be re-used, useful for effects
         self.Next = 1
     end
+    
 }

@@ -19,6 +19,7 @@ Prop = Class(moho.prop_methods, Entity) {
     end,
 
     OnCreate = function(self)
+
         self.EventCallbacks = {
             OnKilled = {},
             OnReclaimed = {},

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Terran-specific weapon definitions
 --**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
@@ -120,7 +120,7 @@ TAAFlakArtilleryCannon = Class(DefaultProjectileWeapon) {
             Type = 'Normal',
             DamageFriendly = blueprint.DamageFriendly,
         }
-
+        
         if proj and not proj:BeenDestroyed() then
             proj:PassDamageData(damageTable)
             proj:PassData(data)

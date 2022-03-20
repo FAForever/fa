@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Mobile Light Artillery Script
 --#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TIFHighBallisticMortarWeapon = import('/lua/terranweapons.lua').TIFHighBallisticMortarWeapon
@@ -21,6 +21,7 @@ UEL0103 = Class(TLandUnit) {
                     Lifetime = bp.CameraLifetime or 5,
                     Army = self.unit.Army,
                 }
+
                 if proj and not proj:BeenDestroyed() then
                     proj:PassData(data)
                 end
