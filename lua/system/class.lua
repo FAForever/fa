@@ -40,6 +40,16 @@
 -- is a deep copy of the class. And each class that inherits from it needs the same deep copy
 -- of the inheriting class, accordingly. 
 
+local debug = false 
+
+
+-- upvalue for performance
+local next = next 
+local unpack = unpack
+local getmetatable = getmetatable
+local setmetatable = setmetatable
+local ForkThread = ForkThread
+
 local Exclusions = { 
     __index = true,
     n = true,
@@ -64,13 +74,7 @@ end
 -- Procedure
 -- 
 
-local debug = false 
 
--- upvalue for performance
-local unpack = unpack
-local getmetatable = getmetatable
-local setmetatable = setmetatable
-local ForkThread = ForkThread
 
 --- Determines whether we have a simple class: one that has no base classes
 local emptyMetaTable = getmetatable { }
@@ -83,6 +87,7 @@ local StateMetatable = { }
 StateMetatable.__index = StateMetatable  
 
 function State(...)
+
     -- State ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then 
         -- LOG("Created a simple state!")
@@ -120,7 +125,7 @@ function Class(...)
 
     -- Class ({ field=value, field=value, ... })
     if IsSimpleClass(arg) then 
-        -- LOG("Creating a simple class")\
+        -- LOG("Creating a simple class")
         local class = ConstructClass(nil, Deepcopy (arg[1]) )
 
         -- set the meta table and return it
@@ -258,8 +263,8 @@ function ConstructClass(bases, specs)
                     -- we're trying to override something here
                     if base[ks] then 
 
+                        -- keep track of the names and give them some unique identifier
                         if debug then 
-                            -- keep track of the names and give them some unique identifier
                             HierarchyDebugLookupCount[ks] = HierarchyDebugLookupCount[ks] or 0
                             HierarchyDebugLookupCount[ks] = HierarchyDebugLookupCount[ks] + 1
                             HierarchyDebugLookup[s] = { func = ks, identity = HierarchyDebugLookupCount[ks] }  
@@ -278,9 +283,8 @@ function ConstructClass(bases, specs)
         end
 
         -- check for collisions 
-        for k , base in bases do 
+        for k, base in bases do 
             for l, element in base do 
-
                 -- todo, refine this a bit
                 if not exclusions[l] then 
                     -- first time we've seen this key, keep track of it
@@ -308,7 +312,6 @@ function ConstructClass(bases, specs)
 
                         -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambigious!
                         else    
-
                             error("Class initialisation: field '" .. tostring(l).. "' is ambigious between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
                             LOG(repr(debug.traceback()))
                         end
@@ -323,7 +326,7 @@ function ConstructClass(bases, specs)
         end
 
         -- populate class 
-        for k , base in bases do 
+        for k, base in bases do 
             for l, element in base do 
                 if not class[l] then 
                     class[l] = element 
