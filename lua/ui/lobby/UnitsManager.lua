@@ -24,19 +24,20 @@ local blueprints = { All = {}, Original = {}, Modified = {}, Skipped = {} }
 local factions = {}
 
 -- Stores info about preset restrictions
-local presets = {}
-presets.PerRow   = 35 -- Determines number of presets' icons per row
-presets.Data     = UnitsRestrictions.GetPresetsData()
-presets.Order    = UnitsRestrictions.GetPresetsOrder()
+local presets = {
+    PerRow   = 35, -- Determines number of presets' icons per row
+    Data     = UnitsRestrictions.GetPresetsData(),
+    Order    = UnitsRestrictions.GetPresetsOrder()
+}
 
 -- Stores all UI elements of the UnitsManager
 local GUI = {
-    bg = nil,
-    popup = nil,
-    title = nil,
-    stats = nil,
-    unitsGrid = nil,
-    presetsGrid = nil,
+    bg = false,
+    popup = false,
+    title = false,
+    stats = false,
+    unitsGrid = false,
+    presetsGrid = false,
     -- stores references to checkboxes for quick toggling of Presets and Units
     checkboxes = { Units = {}, Presets = {} }
 }
@@ -218,12 +219,13 @@ function CreateDialog(parent, initial, OnOk, OnCancel, isHost)
 
     presets.Selected = {}
     GUI.checkboxes = { Units = {}, Presets = {} }
-    restrictions = {}
-    restrictions.Editable = isHost -- Editable only if hosting
-    restrictions.Custom = {}
-    restrictions.Presets = {}
-    restrictions.Stats = {}
-    restrictions.Initial = initial
+    restrictions = {
+        Editable = isHost, -- Editable only if hosting
+        Custom = {},
+        Presets = {},
+        Stats = {},
+        Initial = initial
+    }
 
     -- Scaling dialog size based on window size
     dialogWidth = GetFrame(0).Width() - LayoutHelpers.ScaleNumber(40)
@@ -466,7 +468,7 @@ function CreateControls(OnOk, OnCancel, isHost)
 
     GUI.cancelBtn.OnClick = doCancel
 
-    GUI.okBtn.OnClick = function()
+    GUI.okBtn.OnClick = function(self)
         local newRestrictions = {}
         -- Read current restrictions and pass them to game options
         for key, isChecked in presets.Selected do
@@ -484,19 +486,19 @@ function CreateControls(OnOk, OnCancel, isHost)
         CloseDialog()
     end
 
-    GUI.resetBtn.OnClick = function()
+    GUI.resetBtn.OnClick = function(self)
         TogglePresetCheckboxes(false)
         ToggleUnitCheckboxes(false)
         UpdateRestrictionsStats()
     end
 
-    GUI.controls = {}
-    table.insert(GUI.controls, GUI.title)
-    table.insert(GUI.controls, GUI.stats)
-    table.insert(GUI.controls, GUI.cancelBtn)
-    table.insert(GUI.controls, GUI.okBtn)
-    table.insert(GUI.controls, GUI.resetBtn)
-
+    GUI.controls = {
+        GUI.title,
+        GUI.stats,
+        GUI.cancelBtn,
+        GUI.okBtn,
+        GUI.resetBtn,
+    }
 end
 
 -- Closes dialog and cleans up its UI elements
@@ -506,22 +508,11 @@ function CloseDialog()
     import('/lua/ui/lobby/UnitsAnalyzer.lua').StopBlueprints()
 
     for id, control in GUI.controls or {} do
-        if control then
+        if not IsDestroyed(control) then
            control:Destroy()
         end
     end
     GUI.controls = nil
-
-    for _, checkbox in GUI.checkboxes.Units or {} do
-        if checkbox then
-           checkbox = nil
-        end
-    end
-    for _, checkbox in GUI.checkboxes.Presets or {} do
-        if checkbox then
-           checkbox = nil
-        end
-    end
     GUI.checkboxes = { Units = {}, Presets = {} }
 
     if GUI.popup then
@@ -553,11 +544,12 @@ function UpdateRestrictionsUI()
 end
 
 function UpdateRestrictionsStats()
-    restrictions.Stats = {}
-    restrictions.Stats.Total = 0
-    restrictions.Stats.Custom = 0
-    restrictions.Stats.Presets = 0
-    restrictions.Stats.Units = 0
+    restrictions.Stats = {
+        Total = 0,
+        Custom = 0,
+        Presets = 0,
+        Units = 0
+    }
 
     for key, isRestricted in restrictions.Custom do
         if isRestricted then
@@ -739,13 +731,7 @@ function CreateUnitIcon(parent, bp, faction)
                     restrictions.Presets[ID] = false
                 end
             end
-
-            if restrictions.Custom[self.bp.ID] then
-                restrictions.Custom[self.bp.ID] = false
-            else
-                restrictions.Custom[self.bp.ID] = true
-            end
-
+            restrictions.Custom[self.bp.ID] = not restrictions.Custom[self.bp.ID]
             -- Update checkboxes with the same blueprint IDs, e.g. Teleporter
             if GUI.checkboxes.Units[self.bp.ID] then
                 for _, chkbox in GUI.checkboxes.Units[self.bp.ID] do
@@ -832,12 +818,7 @@ function CreatePresetIcon(parent, presetName)
             hover:SetSolidColor(colors.HoverExit)
         elseif event.Type == 'ButtonPress' then
             if not restrictions.Editable then return true end
-
-            if presets.Selected[self.presetName] then
-               presets.Selected[self.presetName] = false
-            else
-               presets.Selected[self.presetName] = true
-            end
+            presets.Selected[self.presetName] = not presets.Selected[self.presetName]
             GUI.checkboxes.Presets[self.presetName]:HandleEvent(event)
             ProcessRestrictions()
 
@@ -863,7 +844,7 @@ function TogglePresetCheckboxes(isChecked)
 end
 
 function ToggleUnitCheckboxes(isChecked)
-      for ID, _ in restrictions.Custom do
+    for ID, _ in restrictions.Custom do
         restrictions.Custom[ID] = isChecked
     end
 
@@ -917,9 +898,7 @@ function ProcessRestrictions()
         local unit = blueprints.All[bpID]
         local isRestricted = false
 
-        if UnitsAnalyzer.Contains(unit, expressions) then
-            isRestricted = true
-        elseif enhancements[bpID] then
+        if UnitsAnalyzer.Contains(unit, expressions) or enhancements[bpID] then
             isRestricted = true
         end
 
@@ -929,20 +908,14 @@ function ProcessRestrictions()
                     restrictions.Custom[bpID] = false
                     restrictions.Presets[bpID] = true
                     checkbox:SetCheck(true)
+                elseif restrictions.Presets[bpID] then
+                    restrictions.Custom[bpID] = false
+                    checkbox:SetCheck(false)
                 else
-                    if restrictions.Presets[bpID] then
-                        restrictions.Custom[bpID] = false
-                        checkbox:SetCheck(false)
-                    else
-                        checkbox:SetCheck(true)
-                    end
+                    checkbox:SetCheck(true)
                 end
             else
-                if isRestricted then
-                    checkbox:SetCheck(true)
-                else
-                    checkbox:SetCheck(false)
-                end
+                checkbox:SetCheck(isRestricted)
             end
         end
         restrictions.Presets[bpID] = isRestricted
@@ -1092,9 +1065,7 @@ function CompareUnitsOrder(a, b, sortCategories, sortReversed)
 end
 
 function SortUnits(unitsByID, sortCategories, sortReversed)
-    if not sortCategories then
-       sortCategories = sortBy.TECH
-    end
+    sortCategories = sortCategories or sortBy.TECH
 
     if table.empty(unitsByID) then
         return unitsByID
