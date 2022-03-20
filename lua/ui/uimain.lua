@@ -232,7 +232,7 @@ function StartCursorText(x, y, text, color, time, flash)
 end
 
 function StopCursorText()
-    if cursorText and not IsDestroyed(cursorText) then
+    if not IsDestroyed(cursorText) then
         if cursorText._inTimer then -- if cursor text has a time, don't stomp it
             return false
         else
