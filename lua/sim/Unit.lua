@@ -3958,7 +3958,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         self:SetFocusEntity(self.MyShield)
-        self:EnableShield()
         self.Trash:Add(self.MyShield)
     end,
 
