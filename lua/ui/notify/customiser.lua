@@ -17,6 +17,7 @@ local defaultMessageTable = defaultMessages.defaultMessages
 local clarityTable = defaultMessages.clarityTable
 local Prefs = import('/lua/user/prefs.lua')
 local factions = import('/lua/factions.lua').FactionIndexMap
+local UTF =  import('/lua/UTF.lua')
 local newMessageTable = {}
 local lineGroupTable = {}
 local LineGroups = {}
@@ -32,6 +33,13 @@ local linesCollapsed = true
 function init(isReplay, parent)
     Notify.init(isReplay, parent)
     NotifyOverlay.init()
+end
+
+local NotifyMessages = 'Notify_Messages_ESC'
+
+function SavePrefs(messageTable)
+    messageTable = messageTable or newMessageTable
+    Prefs.SetToCurrentProfile(NotifyMessages, UTF.EscapeTable(messageTable))
 end
 
 local function EditMessage(parent, data, line)
@@ -283,7 +291,7 @@ function CreateLine()
 
         newMessageTable[category][source] = defaultMessageTable[category][source]
         self.message:SetText(newMessageTable[category][source])
-        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
+        SavePrefs()
     end
 
     -- The dropdown button
@@ -374,12 +382,12 @@ end
 
 function ImportMessages()
     local messageTable
-    local prefsMessages = Prefs.GetFromCurrentProfile('Notify_Messages')
+    local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile(NotifyMessages))
     if prefsMessages and not table.empty(prefsMessages) then
         messageTable = prefsMessages
     else
         messageTable = defaultMessageTable
-        Prefs.SetToCurrentProfile('Notify_Messages', messageTable)
+        SavePrefs(messageTable)
     end
 
     return messageTable
@@ -387,7 +395,7 @@ end
 
 function ResetMessages()
     newMessageTable = defaultMessageTable
-    Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
+    SavePrefs()
     lineGroupTable = FormatData()
     mainContainer:CalcVisible()
 end
@@ -485,7 +493,7 @@ function CreateUI()
 
     -- Activate the function to have this take effect on closing
     popup.OnClosed = function(self)
-        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
+        SavePrefs()
         populateMessages()
     end
 

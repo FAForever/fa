@@ -8,6 +8,7 @@ local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
 local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
 local toggleOverlay = NotifyOverlay.toggleOverlay
 local factions = import('/lua/factions.lua').FactionIndexMap
+local UTF =  import('/lua/UTF.lua')
 
 local categoriesDisabled = {}
 local messages = {}
@@ -144,12 +145,12 @@ function processIncomingMessage(sender, msg)
 end
 
 function populateMessages()
-    local prefsMessages = Prefs.GetFromCurrentProfile('Notify_Messages')
+    local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile('Notify_Messages_ESC'))
     if prefsMessages then
         messages = prefsMessages
     else
         messages = defaultMessages
-        Prefs.SetToCurrentProfile('Notify_Messages', messages)
+        Prefs.SetToCurrentProfile('Notify_Messages_ESC',UTF.EscapeTable(messages))
     end
 end
 

@@ -118,3 +118,33 @@ function UnescapeString(str)
     end
     return result
 end
+
+function UnescapeTable(t)
+    if not t then
+        return
+    end
+    t = table.deepcopy(t)
+    for k, v in t do
+        if type(v) == 'string' then
+            t[k] = UnescapeString(v)
+        elseif type(v) == 'table' then
+            t[k] = UnescapeTable(v)
+        end
+    end
+    return t
+end
+
+function EscapeTable(t)
+    if not t then
+        return
+    end
+    t = table.deepcopy(t)
+    for k, v in t do
+        if type(v) == 'string' then
+            t[k] = EscapeString(v)
+        elseif type(v) == 'table' then
+            t[k] = EscapeTable(v)
+        end
+    end
+    return t
+end
