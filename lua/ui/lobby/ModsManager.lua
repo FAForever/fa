@@ -171,7 +171,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     LayoutHelpers.AnchorToBottom(scrollGroup, subtitle, 10)
     LayoutHelpers.AnchorToTop(scrollGroup, SaveButton, 70)
     scrollGroup.Width:Set(function() return dialogContent.Width() - 20 end)
-    scrollGroup.Height:Set(function() return scrollGroup.Bottom() - scrollGroup.Top() end)
+    LayoutHelpers.ResetHeight(scrollGroup)
 
     modsPerPage = math.floor((scrollGroup.Height() - 10) / LayoutHelpers.ScaleNumber(modInfoHeight))
 
@@ -238,7 +238,7 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
         return mods.activated
     end
-    UIUtil.MakeInputModal(dialogContent, function() SaveButton.OnClick(SaveButton) end, function() SaveButton.OnClick(SaveButton) end)
+    UIUtil.MakeInputModal(dialogContent, function() SaveButton:OnClick() end, function() SaveButton:OnClick() end)
 
     RefreshModsList()
 
@@ -541,13 +541,8 @@ function RefreshModsList()
                         mod.sort = 'X'
                         mod.type = 'NO_DEPENDENCY'
                         mods.missingDependencies[uid] = mod
-
                     end
-
-                    if not modBackwardDependencyMap[k] then
-                        modBackwardDependencyMap[k] = {}
-                    end
-
+                    modBackwardDependencyMap[k] = modBackwardDependencyMap[k] or {}
                     modBackwardDependencyMap[k][uid] = true
                 end
             end
