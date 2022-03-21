@@ -84,8 +84,7 @@ local function PopulateBlueprintCache(entity)
     cache.Audio = blueprint.Audio
   
     -- store the result
-    local meta = getmetatable(entity)
-    meta.Cache = cache
+    entity.Cache = cache 
 
     SPEW("Populated blueprint cache for unit: " .. tostring(blueprint.BlueprintId))
 end

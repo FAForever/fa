@@ -27,8 +27,7 @@ local function PopulateBlueprintCache(entity, blueprint)
     cache.CollideFriendlyShield = blueprint.Physics.CollideFriendlyShield
 
     -- store the result
-    local meta = getmetatable(entity)
-    meta.Cache = cache
+    entity.Cache = cache 
 
     SPEW("Populated blueprint cache for projectile: " .. tostring(blueprint.BlueprintId))
 end

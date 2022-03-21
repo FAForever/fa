@@ -208,8 +208,19 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Played when a muzzle is fired. Mostly used for muzzle flashes
     PlayFxMuzzleSequence = function(self, muzzle)
-        for k, v in self.FxMuzzleFlash do
-            CreateAttachedEmitter(self.unit, muzzle, self.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
+
+        local ok, msg = pcall (
+            function()
+                for k, v in self.FxMuzzleFlash do
+                    CreateAttachedEmitter(self.unit, muzzle, self.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
+                end
+            end
+        )
+
+        if not ok then 
+            WARN(msg)
+            LOG(self.Blueprint.BlueprintId)
+            LOG(self.unit.Blueprint.BlueprintId)
         end
     end,
 

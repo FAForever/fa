@@ -80,6 +80,9 @@ local getmetatable = getmetatable
 local setmetatable = setmetatable
 local ForkThread = ForkThread
 
+local TableEmpty = table.empty 
+local TableGetn = table.getn 
+
 local Exclusions = { 
     __index = true,
     n = true,
@@ -252,6 +255,7 @@ local function CheckHierarchy(a, b)
     return false
 end
 
+local count = 0
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file.
 local Seen = { }
 function ConstructClass(bases, specs)
@@ -264,6 +268,31 @@ function ConstructClass(bases, specs)
     local class = specs
 
     if bases then 
+
+        -- special case: we have only one base and an empty specification: just return the base. There are a lot of empty classes
+        -- being created, an example is: 
+
+        -- UEL0001 = Class(ACUUnit) {
+        --     Weapons = {
+        --         DeathWeapon = Class(DeathNukeWeapon) {},
+        --         RightZephyr = Class(TDFZephyrCannonWeapon) {},
+        --         OverCharge = Class(TDFOverchargeWeapon) {},
+        --         AutoOverCharge = Class(TDFOverchargeWeapon) {},
+        --         TacMissile = Class(TIFCruiseMissileLauncher) {},
+        --         TacNukeMissile = Class(TIFCruiseMissileLauncher) {},
+        --     },
+        --     (...)
+        -- }
+
+        -- there is no need to allocate a unique table for all those sub classes that have no specifications!
+        if TableEmpty(specs) and TableGetn(bases) == 1 then
+            count = count + 1 
+            LOG("Shortcut: " .. tostring(count))
+            return bases[1]
+        end
+
+        -- regular case: we have a specification or multiple bases: work to do!
+
         -- keep track of hierarchy chains
         for ks, s in specs do 
             local t = type(s)
