@@ -9,23 +9,39 @@ local Warp = Warp
 local Random = Random
 local VectorCached = Vector(0, 0, 0)
 
-local yield = coroutine.yield
+local CoroutineYield = coroutine.yield
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateEmitterOnEntity = CreateEmitterOnEntity
+local CreateAttachedEmitter = CreateAttachedEmitter
 
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+
+local EntityCreateProjectile = _G.moho.entity_methods.CreateProjectile
+local UnitGetPositionXYZ = _G.moho.unit_methods.GetPositionXYZ
+local UnitGetFractionComplete = _G.moho.unit_methods.GetFractionComplete
+local ProjectileSetVelocity = _G.moho.projectile_methods.SetVelocity
+
+--- Creates the default build beams that, among others, UEF engineers use to build non-UEF units
+-- @param builder The builder
+-- @param unitBeingBuilt The unit being build
+-- @param buildEffectBones The effect bones of the builder
+-- @param buildeffectsBag The effects bag of the builder
 function CreateDefaultBuildBeams(
-    builder, unitBeingBuilt,    -- units
-    BuildEffectBones,           -- table of bone names
-    BuildEffectsBag             -- trashbag
+    builder,            -- Unit that is building
+    unitBeingBuilt,     -- Unit being built
+    buildEffectBones,   -- Table of bones
+    buildEffectsBag     -- Trashbag
 )
 
     local vc = VectorCached
-    local ox, oy, oz = unitBeingBuilt:GetPositionXYZ()
+    local ox, oy, oz = UnitGetPositionXYZ(unitBeingBuilt)
 
     -- allocation of entity
     local BeamEndEntity = Entity()
-    BuildEffectsBag:Add(BeamEndEntity)
+    TrashAdd(buildEffectsBag, BeamEndEntity)
 
     vc[1] = ox 
     vc[2] = oy 
@@ -33,20 +49,21 @@ function CreateDefaultBuildBeams(
     Warp(BeamEndEntity, vc)
 
     -- Create build beams
-    if BuildEffectBones ~= nil then
+    if buildEffectBones ~= nil then
         local beamEffect = nil
-        for i, BuildBone in BuildEffectBones do
+        for i, BuildBone in buildEffectBones do
             local beamEffect = AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, '/effects/emitters/build_beam_01_emit.bp')
-            BuildEffectsBag:Add(beamEffect)
+            TrashAdd(buildEffectsBag, beamEffect)
         end
     end
 
     CreateEmitterOnEntity(BeamEndEntity, builder.Army, '/effects/emitters/sparks_08_emit.bp')
 
-    -- cache orientation
+    local Warp = Warp 
+    local CoroutineYield = CoroutineYield
 
     local waitTime = Random(3, 15)
-    while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
+    while not (builder.Dead or unitBeingBuilt.Dead) do
         local x, y, z = builder.GetRandomOffset(unitBeingBuilt, 1)
 
         -- use orientation
@@ -56,27 +73,20 @@ function CreateDefaultBuildBeams(
         vc[3] = oz + z 
 
         Warp(BeamEndEntity, vc)
-        yield(waitTime)
+        CoroutineYield(waitTime)
     end
 end
 
--- Upvalued for performance (function-scope benchmark)
-local TrashBag = TrashBag
-local TrashAdd = TrashBag.Add
-local TrashDestroy = TrashBag.Destroy
-
-local CreateAttachedEmitter = CreateAttachedEmitter
-
-local EntityCreateProjectile = _G.moho.entity_methods.CreateProjectile
-local UnitGetPositionXYZ = _G.moho.unit_methods.GetPositionXYZ
-local UnitGetFractionComplete = _G.moho.unit_methods.GetFractionComplete
-local ProjectileSetVelocity = _G.moho.projectile_methods.SetVelocity
-
+--- Creates the slice beams that UEF engineers use to build UEF units 
+-- @param builder The builder
+-- @param unitBeingBuilt The unit being build
+-- @param buildEffectBones The effect bones of the builder
+-- @param buildeffectsBag The effects bag of the builder
 function CreateUEFBuildSliceBeams(
     builder,            -- Unit that is building
     unitBeingBuilt,     -- Unit being built
-    BuildEffectBones,   -- Table of bones
-    BuildEffectsBag     -- Trashbag
+    buildEffectBones,   -- Table of bones
+    buildEffectsBag     -- Trashbag
 )
 
     local vc = VectorCached
@@ -88,13 +98,13 @@ function CreateUEFBuildSliceBeams(
     -- Create a projectile for the end of build effect and warp it to the unit
     local BeamEndEntity = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
     
-    TrashAdd(BuildEffectsBag, BeamEndEntity)
+    TrashAdd(buildEffectsBag, BeamEndEntity)
 
     -- Create build beams
-    if BuildEffectBones ~= nil then
-        for i, BuildBone in BuildEffectBones do
-            TrashAdd(BuildEffectsBag, AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, '/effects/emitters/build_beam_01_emit.bp'))
-            TrashAdd(BuildEffectsBag, CreateAttachedEmitter(builder, BuildBone, builder.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
+    if buildEffectBones ~= nil then
+        for i, BuildBone in buildEffectBones do
+            TrashAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, '/effects/emitters/build_beam_01_emit.bp'))
+            TrashAdd(buildEffectsBag, CreateAttachedEmitter(builder, BuildBone, builder.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
         end
     end
 
@@ -178,7 +188,7 @@ function CreateUEFBuildSliceBeams(
         vc[2] = fy - oy
         vc[3] = (fz1 + fz2) * 0.5
         Warp(BeamEndEntity, vc)
-        yield(8)
+        CoroutineYield(8)
     end
 
     -- store as locals for performance
@@ -204,6 +214,6 @@ function CreateUEFBuildSliceBeams(
             ProjectileSetVelocity(BeamEndEntity, -velX, 0, -velZ)
             flipDirection = true
         end
-        yield(6)
+        CoroutineYield(6)
     end
 end
