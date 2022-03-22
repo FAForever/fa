@@ -576,16 +576,29 @@ AIBrain = Class(moho.aibrain_methods) {
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and not table.empty(units) then
                             TransferUnitsOwnership(units, brain.index)
+                            if brain:GetArmyIndex() == GetFocusArmy() then 
+                                PrintText(self.Nickname .. '\'s units have been transferred to you', 30, 'ffffffff', 12, 'center')
+                            end
                             WaitSeconds(1)
                         end
                     end
                 end
             end
 
-            -- Sort the destiniation armies by score
+            -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
             local function TransferUnitsToHighestBrain(brains)
                 if not table.empty(brains) then
-                    table.sort(brains, function(a, b) return a.score > b.score end)
+                    local ratings = ScenarioInfo.Options.Ratings
+                    for i, brain in brains do 
+                        if ratings[brain.Nickname] then
+                            brain.rating = ratings[brain.Nickname]
+                        else 
+                            -- if there is no rating, create a fake negative rating based on score
+                            brain.rating = - (1 / brain.score)
+                        end
+                    end
+                    -- sort brains by rating
+                    table.sort(brains, function(a, b) return a.rating > b.rating end)
                     TransferUnitsToBrain(brains)
                 end
             end
