@@ -56,7 +56,7 @@ local AITooltips = {}
 
 -- Default color order used for lobbies/TMM if not otherwise specified
 -- Desired default order of the colors in the color tables in GameColors.lua for TMM/etc
-local ColorOrder = {1, 10, 21, 7, 23, 15, 3, 9, 5, 8, 19, 16, 22, 12, 17, 13}
+local ColorOrder = {2, 12, 1, 9, 6, 13, 25, 17, 23, 11, 3, 16, 24, 18, 19, 14}
 
 function GetAITypes()
     AIKeys = {}
