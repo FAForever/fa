@@ -15,7 +15,7 @@ GameColors = {
         "ff8e7cc3",      -- light purple
         "ff9161ff",      -- purple
         "FF5F01A7",      -- dark purple
-        "ff920092",      -- dark rich purple
+        "ff920092",      -- rich purple
         "ff901427",      -- dark red
         "ffff88ff",      -- pink
         "ffff32ff",      -- new fuschia
@@ -43,7 +43,7 @@ GameColors = {
         "ff8e7cc3",      -- light purple
         "ff9161ff",      -- purple
         "FF5F01A7",      -- dark purple
-        "ff920092",      -- dark rich purple
+        "ff920092",      -- rich purple
         "ff901427",      -- dark red
         "ffff88ff",      -- pink
         "ffff32ff",      -- new fuschia

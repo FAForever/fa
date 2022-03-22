@@ -2440,11 +2440,12 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
 end
 
 function GetAvailableColor()
-    for i = 1, 16 do
+    for i = 1, LobbyComm.maxPlayerSlots do
         if IsColorFree(ColorOrder[i]) then
             return ColorOrder[i]
         end
     end
+    LOG('Error: No available color found in ColorOrder.')
 end
 
 --- This function is retarded.
