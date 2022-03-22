@@ -4202,7 +4202,7 @@ function AddChatText(text, playerID, scrollToBottom)
     local textColor = "AAAAAA"
     local nameFont = "Arial Gras"
     for id, player in gameInfo.PlayerOptions:pairs() do
-        if player.OwnerID == playerID then
+        if player.OwnerID == playerID and player.Human then
             textColor = nil
             nameColor = gameColors.PlayerColors[player.PlayerColor]
             if not chatPlayerColor then
