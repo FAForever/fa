@@ -275,8 +275,12 @@ DamageStructureFireSmoke01 = table.concatenate(DamageStructureSmoke01, DamageStr
 -- ---------------------------------------------------------------
 -- Ambient effects
 -- ---------------------------------------------------------------
-TreeBurning01 = table.concatenate(DamageFire01 ,{EmtBpPath .. 'forest_fire_smoke_01_emit.bp'})
 
+TreeBurning01 = {
+    EmtBpPath .. 'forest_fire_01.bp',
+    EmtBpPath .. 'forest_distortion_01.bp',
+    EmtBpPath .. 'forest_smoke_01.bp',
+}
 
 -- ---------------------------------------------------------------
 -- Shield Impact effects
