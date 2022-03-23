@@ -57,7 +57,7 @@ keyActions = {
         category = 'ui', order = 4,},
     ['toggle_disconnect_screen'] = {action = 'UI_Lua import("/lua/ui/game/connectivity.lua").CreateUI()',
         category = 'ui', order = 21,},
-    ['toggle_markers_screen'] = {action = 'UI_Lua import("/lua/ui/game/MapUtilities.lua").OpenWindow()',
+    ['toggle_map_utilities_window'] = {action = 'UI_Lua import("/lua/ui/game/MapUtilities.lua").OpenWindow()',
         category = 'debug', order = 21,},
     ['toggle_reclaim_labels'] = {action = 'UI_Lua import("/lua/ui/game/reclaim.lua").ToggleReclaim()',
         category = 'ui'},
