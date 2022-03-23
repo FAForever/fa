@@ -597,12 +597,11 @@ local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 
 -- direct access for performance
-local DefaultWreckageEffectsLrg01 = EffectTemplate.DefaultWreckageEffectsLrg01
-local DefaultWreckageEffectsLrg01Count = EffectTemplate.DefaultWreckageEffectsLrg01Count
+local DefaultWreckageEffects = EffectTemplate.DefaultWreckageEffectsLrg01
+local DefaultWreckageEffectsCount = EffectTemplate.DefaultWreckageEffectsLrg01Count
 
 -- remove all wreckage effects, but keep for compatibility
 function CreateWreckageEffects(unit, prop)
-
 
     -- determine number of effects
     local blueprint = unit.Blueprint or EntityGetBlueprint(unit)
@@ -614,12 +613,10 @@ function CreateWreckageEffects(unit, prop)
 
     -- determine number of effects
     local bones = unit:GetBoneCount()
-    local size = MathFloor(0.166 * (blueprint.SizeX + blueprint.SizeY + blueprint.SizeZ)) + 1
+    local size = MathFloor(0.2 * (blueprint.SizeX + blueprint.SizeY + blueprint.SizeZ)) + 1
     if size > bones - 1 then 
         size = bones - 1
     end
-
-    LOG(size)
 
     -- localize for performance
     local Random = Random 
@@ -627,9 +624,12 @@ function CreateWreckageEffects(unit, prop)
 
     -- spawn the effects
     for k = 1, size do 
+        -- create an emitter at a bone
         bone = Random(1, bones - 1) - 1
-        effect = Random(1, DefaultWreckageEffectsLrg01Count)
-        emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffectsLrg01[effect])
+        effect = Random(1, DefaultWreckageEffectsCount)
+        emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffects[effect])
+
+        -- make it follow the wind
         r1 = Random()
         IEffectScaleEmitter(emitter, 0.5 + 0.75 * r1)
         IEffectSetEmitterParam(emitter, 'LIFETIME', 40 + 75 * r1)
