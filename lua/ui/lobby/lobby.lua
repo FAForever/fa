@@ -54,9 +54,7 @@ local AIStrings = {}
 local AITooltips = {}
 
 
--- Default color order used for lobbies/TMM if not otherwise specified
--- Desired default order of the colors in the color tables in GameColors.lua for TMM/etc
-local ColorOrder = {2, 12, 1, 9, 6, 13, 25, 17, 23, 11, 3, 16, 24, 18, 19, 14}
+
 
 function GetAITypes()
     AIKeys = {}
@@ -86,6 +84,7 @@ local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
+
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 -- Add lobby options from AI mods
@@ -2441,11 +2440,11 @@ end
 
 function GetAvailableColor()
     for i = 1, LobbyComm.maxPlayerSlots do
-        if IsColorFree(ColorOrder[i]) then
-            return ColorOrder[i]
+        if IsColorFree(gameColors.DefaultColorOrder[i]) then
+            return gameColors.DefaultColorOrder[i]
         end
     end
-    LOG('Error: No available color found in ColorOrder.')
+    WARN('Error: No available colors found.')
 end
 
 --- This function is retarded.

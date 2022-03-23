@@ -4,7 +4,12 @@
 -- probably change the ColorOrder table in lobby.lua accordingly.
 
 GameColors = {
+
     CivilianArmyColor = "BurlyWood",
+
+    -- Default color order used for lobbies/TMM if not otherwise specified. Tightly coupled 
+    -- with the ArmyColors and the PlayerColors tables.
+    DefaultColorOrder = {2, 12, 1, 9, 6, 13, 25, 17, 23, 11, 3, 16, 24, 18, 19, 14},
 
     -- Faction colours
     ArmyColors = {
