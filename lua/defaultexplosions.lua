@@ -588,9 +588,57 @@ end
 -- WRECKAGE EFFECTS --
 ----------------------
 
+local MathFloor = math.floor
+
+-- upvalue for performance
+local IEffectSetEmitterParam = _G.moho.IEffect.SetEmitterParam
+local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
+local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
+local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
+
+-- direct access for performance
+local DefaultWreckageEffectsLrg01 = EffectTemplate.DefaultWreckageEffectsLrg01
+local DefaultWreckageEffectsLrg01Count = EffectTemplate.DefaultWreckageEffectsLrg01Count
+
 -- remove all wreckage effects, but keep for compatibility
 function CreateWreckageEffects(unit, prop)
-    return
+
+
+    -- determine number of effects
+    local blueprint = unit.Blueprint or EntityGetBlueprint(unit)
+
+    -- we can't make an animation for these based on bones: they spawn at the unanimated locations
+    if blueprint.Display.AnimationDeath then 
+        return 
+    end
+
+    -- determine number of effects
+    local bones = unit:GetBoneCount()
+    local size = MathFloor(0.166 * (blueprint.SizeX + blueprint.SizeY + blueprint.SizeZ)) + 1
+    if size > bones - 1 then 
+        size = bones - 1
+    end
+
+    LOG(size)
+
+    -- localize for performance
+    local Random = Random 
+    local bone, effect, emitter, r1
+
+    -- spawn the effects
+    for k = 1, size do 
+        bone = Random(1, bones - 1) - 1
+        effect = Random(1, DefaultWreckageEffectsLrg01Count)
+        emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffectsLrg01[effect])
+        r1 = Random()
+        IEffectScaleEmitter(emitter, 0.5 + 0.75 * r1)
+        IEffectSetEmitterParam(emitter, 'LIFETIME', 40 + 75 * r1)
+        IEffectSetEmitterCurveParam(emitter, "XDIR_CURVE", 0.008 + 0.03 * r1, 0.01)
+        IEffectSetEmitterCurveParam(emitter, "YDIR_CURVE", 0.008 + 0.02 * Random(), 0.01)
+        IEffectSetEmitterCurveParam(emitter, "ZDIR_CURVE", 0.008 + 0.03 * r1, 0.01)
+
+        prop.Trash:Add(emitter)
+    end
 end
 
 --------------------------------
