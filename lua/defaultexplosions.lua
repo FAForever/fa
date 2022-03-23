@@ -588,28 +588,9 @@ end
 -- WRECKAGE EFFECTS --
 ----------------------
 
-function CreateWreckageEffects(obj, prop)
-    if IsUnit(obj) then
-        local scale = GetAverageBoundingXYZRadius(obj)
-        local emitters = {}
-        local layer = obj.Layer
-
-        if scale < 0.5 then -- SMALL UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsSml01, 1)
-        elseif scale > 1.5 then -- LARGE UNITS
-            local x,y,z = GetUnitSizes(obj)
-            emitters = CreateEffectsWithRandomOffset(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsLrg01, x, 0, z)
-        else -- MEDIUM UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsMed01, 2)
-        end
-
-        -- Give the emitters created some random lifetimes
-        ScaleEmittersParam(emitters, 'LIFETIME', 100, 1000)
-
-        for k, v in emitters do
-            v:ScaleEmitter(GetRandomFloat(0.25, 1))
-        end
-    end
+-- remove all wreckage effects, but keep for compatibility
+function CreateWreckageEffects(unit, prop)
+    return
 end
 
 --------------------------------

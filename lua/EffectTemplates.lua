@@ -84,9 +84,15 @@ SmokePlumeMedDensitySml03 = { EmtBpPath .. 'destruction_explosion_smoke_11_emit.
 -- ---------------------------------------------------------------
 -- Wreckage Smoke Effects
 -- ---------------------------------------------------------------
+
 DefaultWreckageEffectsSml01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsSml01Count = table.getn(DefaultWreckageEffectsSml01)
+
 DefaultWreckageEffectsMed01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsMed01Count = table.getn(DefaultWreckageEffectsMed01)
+
 DefaultWreckageEffectsLrg01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsLrg01Count = table.getn(DefaultWreckageEffectsLrg01)
 
 
 -- ---------------------------------------------------------------
