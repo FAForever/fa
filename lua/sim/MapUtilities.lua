@@ -9,9 +9,11 @@ function MapResourceCheck()
 
     -- perform UI checks on sim to prevent cheating
     local count = 0
+    local playerIndex = 1
     for k, brain in ArmyBrains do 
-        if brain.brainType == "Human" then 
+        if brain.BrainType == "Human" then 
             count = count + 1
+            playerIndex = k
         end
     end
 
@@ -31,10 +33,19 @@ function MapResourceCheck()
 
     MapResourceCheckApplied = true 
 
+    -- inform us why it worked
+    if onePlayer then 
+        SPEW("Map resource check can be toggled: there is only one player")
+    end
+
+    if cheatsEnabled then 
+        SPEW("Map resource check can be toggled: cheats are enabled")
+    end
+
     -- get an arbitrary brain
-    local brain = ArmyBrains[1]
+    local brain = ArmyBrains[playerIndex]
     local army = brain:GetArmyIndex()
-    SetIgnoreArmyUnitCap(army, true )
+    SetIgnoreArmyUnitCap(army, true)
 
     -- get markers
     local mass = MarkerUtilities.GetMarkersByType("Mass")
@@ -122,7 +133,7 @@ function iMapToggleRendering()
     -- perform UI checks on sim to prevent cheating
     local count = 0
     for k, brain in ArmyBrains do 
-        if brain.brainType == "Human" then 
+        if brain.BrainType == "Human" then 
             count = count + 1
         end
     end

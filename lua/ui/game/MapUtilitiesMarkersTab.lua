@@ -9,7 +9,7 @@ local EnabledMarkerTypes = {
     Resources = { },
     Pathing = { },
     AI = { },
-},
+}
 
 --- Populate marker types
 EnabledMarkerTypes.Resources["Mass"] = false
