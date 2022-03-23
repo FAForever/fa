@@ -60,7 +60,7 @@ function OpenWindow()
         SPEW("Created map utilities window")
 
         -- create the window
-        State.GUI = Window.CreateDefaultWindow(
+        State.GUI = UIUtil.CreateWindowStd(
             GetFrame(0), 
             "Map utilities", 
             false, 
