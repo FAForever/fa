@@ -137,7 +137,7 @@ end
 function PauseUnitDeath(unit)
     if unit and not unit.Dead then
         unit.OnKilled = OverrideKilled
-        unit:SetCanBeKilled(false)
+        unit.CanBeKilled = false
         unit.DoTakeDamage = OverrideDoDamage
     end
 end
@@ -169,7 +169,7 @@ function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio
     while PauseUnitDeathActive do
         WaitSeconds(1)
     end
-    self:SetCanBeKilled(true)
+    self.CanBeKilled = true
     self:Kill(instigator, damageType, excessDamageRatio)
 end
 
@@ -935,7 +935,7 @@ end
 function FakeTeleportUnit(unit, killUnit)
     IssueStop({unit})
     IssueClearCommands({unit})
-    unit:SetCanBeKilled(false)
+    unit.CanBeKilled = false
 
     unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
     unit:PlayUnitSound('GateCharge')
@@ -1649,14 +1649,14 @@ function EndOperationSafety(units)
             end
         end
         for subk, subv in v:GetListOfUnits(categories.COMMAND, false) do
-            subv:SetCanTakeDamage(false)
-            subv:SetCanBeKilled(false)
+            subv.CanTakeDamage = false
+            subv.CanBeKilled = false
         end
         if units and not table.empty(units) then
             for subk, subv in units do
                 if not subv.Dead then
-                    subv:SetCanTakeDamage(false)
-                    subv:SetCanBeKilled(false)
+                    subv.CanTakeDamage = false
+                    subv.CanBeKilled = false
                 end
             end
         end
@@ -1942,11 +1942,11 @@ function FlagUnkillableSelect(armyNumber, units)
             if not v.CanTakeDamage then
                 v.UndamagableFlagSet = true
             end
-            if not v:CheckCanBeKilled() then
+            if not v.CanBeKilled then
                 v.UnKillableFlagSet = true
             end
-            v:SetCanTakeDamage(false)
-            v:SetCanBeKilled(false)
+            v.CanTakeDamage = false
+            v.CanBeKilled = false
         end
     end
 end
@@ -1957,20 +1957,20 @@ function FlagUnkillable(armyNumber, exceptions)
         if not v.CanTakeDamage then
             v.UndamagableFlagSet = true
         end
-        if not v:CheckCanBeKilled() then
+        if not v.CanBeKilled then
             v.UnKillableFlagSet = true
         end
-        v:SetCanTakeDamage(false)
-        v:SetCanBeKilled(false)
+        v.CanTakeDamage = false
+        v.CanBeKilled = false
     end
     if exceptions then
         for _, v in exceptions do
             -- Only process units that weren't already set
             if not v.UnKillableFlagSet then
-                v:SetCanBeKilled(true)
+                v.CanBeKilled = true
             end
             if not v.UndamagableFlagSet then
-                v:SetCanTakeDamage(true)
+                v.CanTakeDamage = true
             end
         end
     end
@@ -1981,10 +1981,10 @@ function UnflagUnkillable(armyNumber)
     for _, v in units do
         -- Only revert units that weren't already set
         if not v.UnKillableFlagSet then
-            v:SetCanBeKilled(true)
+            v.CanBeKilled = true
         end
         if not v.UndamagableFlagSet then
-            v:SetCanTakeDamage(true)
+            v.CanTakeDamage = true
         end
         v.KilledFlagSet = nil
         v.DamageFlagSet = nil

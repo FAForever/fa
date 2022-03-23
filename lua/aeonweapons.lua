@@ -65,7 +65,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
 
         -- Create vacuum suck up from ground effects on the unit targetted.
         for _, v in EffectTemplate.ACollossusTractorBeamVacuum01 do
-            CreateEmitterAtEntity(target, target.Army, v):ScaleEmitter(0.25 * target:GetFootPrintSize()/0.5)
+            CreateEmitterAtEntity(target, target.Army, v):ScaleEmitter(0.125 * target.FootPrintSize)
         end
 
         DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)

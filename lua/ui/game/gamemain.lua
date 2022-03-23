@@ -64,6 +64,8 @@ LobbyOptions = false
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
 
+GameHasAIs = false
+
 function KillWaitingDialog()
     if waitingDialog then
         waitingDialog:Destroy()
@@ -262,10 +264,12 @@ function CreateUI(isReplay)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
     else
+        -- check if we should reduce network delay / lag
         local clients = GetSessionClients()
         if table.getsize(clients) <= 1 then
-            -- No need for unnecessary lag when playing alone
-            ConExecute('net_lag 0')
+            if not HasCommandLineArg("/RunWithTheWind") then 
+                ConExecute('net_lag 0')
+            end
         end
     end
 

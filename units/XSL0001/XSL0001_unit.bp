@@ -169,6 +169,7 @@ UnitBlueprint {
     },
     CollisionOffsetZ = 0.2,
     Defense = {
+        SkipDynamicThreatCalculations = true,
         AirThreatLevel = 0,
         ArmorType = 'Commander',
         EconomyThreatLevel = 5,
@@ -337,8 +338,8 @@ UnitBlueprint {
         NeedToFaceTargetToBuild = false,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
-        StorageEnergy = 4000,
-        StorageMass = 650,
+        StorageEnergy = 3900,
+        StorageMass = 550,
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,

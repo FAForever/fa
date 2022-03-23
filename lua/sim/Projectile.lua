@@ -10,7 +10,36 @@ local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
+local function PopulateBlueprintCache(entity, blueprint)
+
+    -- populate the cache
+    local cache = { }
+    cache.Blueprint = blueprint 
+
+    cache.Cats = blueprint.Categories or { }
+    cache.CatsCount = table.getn(cache.Cats)
+    cache.HashedCats = table.hash(cache.Cats)
+
+    cache.DoNotCollideCats = blueprint.DoNotCollideList or { }
+    cache.DoNotCollideCatsCount = table.getn(cache.DoNotCollideCats)
+    cache.HashedDoNotCollideCats = table.hash(cache.DoNotCollideCats)
+
+    cache.CollideFriendlyShield = blueprint.Physics.CollideFriendlyShield
+
+    -- store the result
+    local meta = getmetatable(entity)
+    meta.Cache = cache
+
+    SPEW("Populated blueprint cache for projectile: " .. tostring(blueprint.BlueprintId))
+end
+
+-- cache categories computations
+local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
+
 Projectile = Class(moho.projectile_methods, Entity) {
+
+    Cache = false,
+
     PassDamageData = function(self, DamageData)
         self.DamageData.DamageRadius = DamageData.DamageRadius
         self.DamageData.DamageAmount = DamageData.DamageAmount
@@ -19,8 +48,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.DamageData.CollideFriendly = DamageData.CollideFriendly
         self.DamageData.DoTTime = DamageData.DoTTime
         self.DamageData.DoTPulses = DamageData.DoTPulses
-        self.DamageData.MetaImpactAmount = DamageData.MetaImpactAmount
-        self.DamageData.MetaImpactRadius = DamageData.MetaImpactRadius
         self.DamageData.Buffs = DamageData.Buffs
         self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
         self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
@@ -121,38 +148,51 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnCreate = function(self, inWater)
+
+        -- populate blueprint cache if we haven't done that yet
+        if not self.Cache then 
+            local bp = self:GetBlueprint()
+            PopulateBlueprintCache(self, bp)
+        end
+
+        -- copy reference from meta table to inner table
+        self.Cache = self.Cache
+        self.Blueprint = self.Cache.Blueprint 
+
         self.DamageData = {
             DamageRadius = nil,
             DamageAmount = nil,
             DamageType = nil,
-            DamageFriendly = nil,
-            MetaImpactAmount = nil,
-            MetaImpactRadius = nil,
+            DamageFriendly = nil
         }
+
         self.Army = self:GetArmy()
         self.Trash = TrashBag()
-        local bp = self:GetBlueprint()
-        self:SetMaxHealth(bp.Defense.MaxHealth or 1)
+        self:SetMaxHealth(self.Blueprint.Defense.MaxHealth or 1)
         self:SetHealth(self, self:GetMaxHealth())
-        local snd = bp.Audio.ExistLoop
+        local snd = self.Blueprint.Audio.ExistLoop
         if snd then
             self:SetAmbientSound(snd, nil)
         end
 
-        if bp.Physics.TrackTargetGround and bp.Physics.TrackTargetGround == true then
+        if self.Blueprint.Physics.TrackTargetGround and self.Blueprint.Physics.TrackTargetGround == true then
             local pos = self:GetCurrentTargetPosition()
             pos[2] = GetSurfaceHeight(pos[1], pos[3])
             self:SetNewTargetGround(pos)
         end
     end,
 
+    --- Called when a projectile collides with another projectile to check if the collision is valid. An example is a tactical missile defense
+    -- @param self The projectile we're checking the collision for
+    -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
-        -- If we return false the thing hitting us has no idea that it came into contact with us.
-        -- By default, anything hitting us should know about it so we return true.
-        if self.Army == other.Army then return false end
 
-        local dnc_cats = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
-        if EntityCategoryContains(dnc_cats, self) and EntityCategoryContains(dnc_cats, other) then
+        -- bail out immediately
+        if self.Army == other.Army then 
+            return false 
+        end
+
+        if EntityCategoryContains(CategoriesDoNotCollide, self) and EntityCategoryContains(CategoriesDoNotCollide, other) then
             return false
         end
 
@@ -220,14 +260,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self:Destroy()
     end,
 
-    DoMetaImpact = function(self, damageData)
-        if damageData.MetaImpactRadius and damageData.MetaImpactAmount then
-            local pos = self:GetPosition()
-            pos[2] = GetSurfaceHeight(pos[1], pos[3])
-            MetaImpact(self, pos, damageData.MetaImpactRadius, damageData.MetaImpactAmount)
-        end
-    end,
-
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -269,23 +301,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         return TerrainType.FXImpact[TargetType][ImpactEffectType] or {}
     end,
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
-            return false
-        end
-
-        -- If this unit category is on the weapon's do-not-collide list, skip!
-        local weaponBP = firingWeapon:GetBlueprint()
-        if weaponBP.DoNotCollideList then
-            for k, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-        return true
-    end,
-
     -- Create some cool explosions when we get destroyed
     OnImpact = function(self, targetType, targetEntity)
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
@@ -298,9 +313,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         -- Do Damage
         self:DoDamage(instigator, damageData, targetEntity)
-
-        -- Meta-Impact
-        self:DoMetaImpact(damageData)
 
         -- Buffs (Stun, etc)
         self:DoUnitImpactBuffs(targetEntity)
@@ -484,13 +496,49 @@ Projectile = Class(moho.projectile_methods, Entity) {
             end
         end
     end,
+
+    --- Deprecated functionality
+
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
+            return false
+        end
+
+        -- If this unit category is on the weapon's do-not-collide list, skip!
+        local weaponBP = firingWeapon:GetBlueprint()
+        if weaponBP.DoNotCollideList then
+            for k, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+        return true
+    end,
+
 }
 
 --- A dummy projectile that solely inherits what it needs. Useful for 
 -- effects that require projectiles without additional overhead.
 DummyProjectile = Class(moho.projectile_methods, Entity) {
-    -- the only things we need
+
+    Cache = false,
+
     __init = function(self, spec) end,
     __post_init = function(self, spec) end,
-    OnCreate = function(self, inWater) end,
+    OnCreate = function(self, inWater) 
+
+        local bp = self:GetBlueprint()
+
+        -- populate blueprint cache if we haven't done that yet
+        if not self.Cache then 
+            PopulateBlueprintCache(self, bp)
+        end
+
+        -- copy reference from meta table to inner table
+        self.Cache = self.Cache
+
+        -- expected to be cached by all projectiles
+        self.Army = self:GetArmy()
+    end,
 }

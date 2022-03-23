@@ -1666,7 +1666,7 @@ Platoon = Class(moho.platoon_methods) {
             for k,v in ents do
                 if not IsProp(v) or eng.BadReclaimables[v] then continue end
                 if not needEnergy or v.MaxEnergyReclaim then
-                    local rpos = v:GetCachePosition()
+                    local rpos = v:GetPosition()
                     table.insert(reclaim, {entity=v, pos=rpos, distance=VDist2(pos[1], pos[3], rpos[1], rpos[3])})
                 end
             end

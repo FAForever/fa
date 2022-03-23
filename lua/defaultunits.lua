@@ -4,6 +4,7 @@
 -- Summary  :  Default definitions of units
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+local Entity = import('/lua/sim/Entity.lua').Entity
 local Unit = import('/lua/sim/Unit.lua').Unit
 local explosion = import('defaultexplosions.lua')
 local EffectUtil = import('EffectUtilities.lua')
@@ -14,25 +15,8 @@ local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
-local teleportTime = {}
-
-local CreateScaledBoom = function(unit, overkill, bone)
-    explosion.CreateDefaultHitExplosionAtBone(
-        unit,
-        bone or 0,
-        explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
-)
-end
-
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
-
--- MISC UNITS
-DummyUnit = Class(Unit) {
-    OnStopBeingBuilt = function(self, builder, layer)
-        self:Destroy()
-    end,
-}
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
@@ -52,10 +36,21 @@ StructureUnit = Class(Unit) {
 
     OnCreate = function(self)
         Unit.OnCreate(self)
+        self:HideLandBones()
         self.WeaponMod = {}
         self.FxBlinkingLightsBag = {}
         if self.Layer == 'Land' and self:GetBlueprint().Physics.FlattenSkirt then
             self:FlattenSkirt()
+        end
+    end,
+
+    HideLandBones = function(self)
+        if self.LandBuiltHiddenBones and self.Layer == 'Land' then
+            for _, v in self.LandBuiltHiddenBones do
+                if self:IsValidBone(v) then
+                    self:HideBone(v, true)
+                end
+            end
         end
     end,
 
@@ -153,6 +148,9 @@ StructureUnit = Class(Unit) {
             self:CreateTarmac(true, true, true, false, false)
         end
         self:PlayActiveAnimation()
+
+        -- remove land bones if the structure has them
+        self:HideLandBones()
     end,
 
     OnFailedToBeBuilt = function(self)
@@ -161,7 +159,7 @@ StructureUnit = Class(Unit) {
     end,
 
     FlattenSkirt = function(self)
-        local x, y, z = unpack(self:GetCachePosition())
+        local x, y, z = self:GetPositionXYZ()
         local x0, z0, x1, z1 = self:GetSkirtRect()
         x0, z0, x1, z1 = math.floor(x0), math.floor(z0), math.ceil(x1), math.ceil(z1)
         FlattenMapRect(x0, z0, x1 - x0, z1 - z0, y)
@@ -266,29 +264,6 @@ StructureUnit = Class(Unit) {
         return not table.empty(self.TarmacBag.Decals)
     end,
 
-    OnMassStorageStateChange = function(self, state)
-    end,
-
-    OnEnergyStorageStateChange = function(self, state)
-    end,
-
-    CreateBlinkingLights = function(self, color)
-        self:DestroyBlinkingLights()
-        local bp = self:GetBlueprint()
-        if bp.Display.BlinkingLights then
-            local fxbp = bp.Display.BlinkingLightsFx[color]
-            for _, v in bp.Display.BlinkingLights do
-                if type(v) == 'table' then
-                    local fx = CreateAttachedEmitter(self, v.BLBone, self.Army, fxbp)
-                    fx:OffsetEmitter(v.BLOffsetX or 0, v.BLOffsetY or 0, v.BLOffsetZ or 0)
-                    fx:ScaleEmitter(v.BLScale or 1)
-                    table.insert(self.FxBlinkingLightsBag, fx)
-                    self.Trash:Add(fx)
-                end
-            end
-        end
-    end,
-
     DestroyBlinkingLights = function(self)
         for _, v in self.FxBlinkingLightsBag do
             v:Destroy()
@@ -343,7 +318,6 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:StopRocking()
             local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
@@ -617,6 +591,45 @@ StructureUnit = Class(Unit) {
         end
         Unit.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
+
+
+    -- Deprecated functionality
+
+    ChangeBlinkingLights = function(self)
+        if not DeprecatedWarnings.ChangeBlinkingLights then 
+            DeprecatedWarnings.ChangeBlinkingLights = true 
+            WARN("ChangeBlinkingLights is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
+
+    CreateBlinkingLights = function(self)
+        if not DeprecatedWarnings.CreateBlinkingLights then 
+            DeprecatedWarnings.CreateBlinkingLights = true 
+            WARN("CreateBlinkingLights is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
+
+    OnMassStorageStateChange = function(self, state)
+        if not DeprecatedWarnings.OnMassStorageStateChange then 
+            DeprecatedWarnings.OnMassStorageStateChange = true 
+            WARN("OnMassStorageStateChange is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
+
+    OnEnergyStorageStateChange = function(self, state)
+        if not DeprecatedWarnings.OnEnergyStorageStateChange then 
+            DeprecatedWarnings.OnEnergyStorageStateChange = true 
+            WARN("OnEnergyStorageStateChange is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+    end,
 }
 
 -- FACTORY UNITS
@@ -624,8 +637,13 @@ FactoryUnit = Class(StructureUnit) {
     OnCreate = function(self)
         StructureUnit.OnCreate(self)
 
-        -- keeps track of what HQs are available
-        if EntityCategoryContains(categories.RESEARCH, self) then
+        -- if we're a support factory, make sure our build restrictions are correct
+        if self.Cache.HashedCats["SUPPORTFACTORY"] then 
+            self:UpdateBuildRestrictions()
+        end
+        
+        -- if we're an HQ, enable all the additional logic
+        if self.Cache.HashedCats["RESEARCH"] then
 
             -- is called when:
             -- - structure is being upgraded
@@ -660,7 +678,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnStopBeingBuilt")
+                end, "OnStopBeingBuilt"
+            )
 
             -- is called when:
             --  - unit is killed
@@ -677,7 +696,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnKilled")
+                end, "OnKilled"
+            )
 
             -- is called when:
             --  - unit is given (used for the old army)
@@ -695,7 +715,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnGiven")
+                end, "OnGiven"
+            )
 
             -- is called when:
             --  - unit is reclaimed
@@ -712,7 +733,8 @@ FactoryUnit = Class(StructureUnit) {
                     for id, unit in affected do
                         unit:UpdateBuildRestrictions()
                     end
-                end, "OnReclaimed")
+                end, "OnReclaimed"
+            )
         end
 
         -- Save build effect bones for faster access when creating build effects
@@ -755,72 +777,7 @@ FactoryUnit = Class(StructureUnit) {
         end
     end,
 
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-
-        local aiBrain = GetArmyBrain(self.Army)
-        aiBrain:ESRegisterUnitMassStorage(self)
-        aiBrain:ESRegisterUnitEnergyStorage(self)
-        local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
-        local curMass = aiBrain:GetEconomyStoredRatio('MASS')
-        if curEnergy > 0.11 and curMass > 0.11 then
-            self:CreateBlinkingLights('Green')
-            self.BlinkingLightsState = 'Green'
-        else
-            self:CreateBlinkingLights('Red')
-            self.BlinkingLightsState = 'Red'
-        end
-    end,
-
-    ChangeBlinkingLights = function(self, state)
-        local bls = self.BlinkingLightsState
-        if state == 'Yellow' then
-            if bls == 'Green' then
-                self:CreateBlinkingLights('Yellow')
-                self.BlinkingLightsState = state
-            end
-        elseif state == 'Green' then
-            if bls == 'Yellow' then
-                self:CreateBlinkingLights('Green')
-                self.BlinkingLightsState = state
-            elseif bls == 'Red' then
-                local aiBrain = GetArmyBrain(self.Army)
-                local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
-                local curMass = aiBrain:GetEconomyStoredRatio('MASS')
-                if curEnergy > 0.11 and curMass > 0.11 then
-                    if self:GetNumBuildOrders(categories.ALLUNITS) == 0 then
-                        self:CreateBlinkingLights('Green')
-                        self.BlinkingLightsState = state
-                    else
-                        self:CreateBlinkingLights('Yellow')
-                        self.BlinkingLightsState = 'Yellow'
-                    end
-                end
-            end
-        elseif state == 'Red' then
-            self:CreateBlinkingLights('Red')
-            self.BlinkingLightsState = state
-        end
-    end,
-
-    OnMassStorageStateChange = function(self, newState)
-        if newState == 'EconLowMassStore' then
-            self:ChangeBlinkingLights('Red')
-        else
-            self:ChangeBlinkingLights('Green')
-        end
-    end,
-
-    OnEnergyStorageStateChange = function(self, newState)
-        if newState == 'EconLowEnergyStore' then
-            self:ChangeBlinkingLights('Red')
-        else
-            self:ChangeBlinkingLights('Green')
-        end
-    end,
-
     OnStartBuild = function(self, unitBeingBuilt, order)
-        self:ChangeBlinkingLights('Yellow')
         StructureUnit.OnStartBuild(self, unitBeingBuilt, order)
         self.BuildingUnit = true
         if order ~= 'Upgrade' then
@@ -1012,7 +969,6 @@ FactoryUnit = Class(StructureUnit) {
 
     IdleState = State {
         Main = function(self)
-            self:ChangeBlinkingLights('Green')
             self:SetBusy(false)
             self:SetBlockCommandQueue(false)
             self:DestroyBuildRotator()
@@ -1060,43 +1016,16 @@ ConcreteStructureUnit = Class(StructureUnit) {
 }
 
 -- ENERGY CREATION UNITS
-EnergyCreationUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-}
+EnergyCreationUnit = Class(StructureUnit) { }
 
 -- ENERGY STORAGE UNITS
-EnergyStorageUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self.Army)
-        aiBrain:ESRegisterUnitEnergyStorage(self)
-        local curEnergy = aiBrain:GetEconomyStoredRatio('ENERGY')
-        if curEnergy > 0.11 then
-            self:CreateBlinkingLights('Yellow')
-        else
-            self:CreateBlinkingLights('Red')
-        end
-    end,
-
-    OnEnergyStorageStateChange = function(self, newState)
-        if newState == 'EconLowEnergyStore' then
-            self:CreateBlinkingLights('Red')
-        elseif newState == 'EconMidEnergyStore' then
-            self:CreateBlinkingLights('Yellow')
-        elseif newState == 'EconFullEnergyStore' then
-            self:CreateBlinkingLights('Green')
-        end
-    end,
-}
+EnergyStorageUnit = Class(StructureUnit) { }
 
 -- LAND FACTORY UNITS
 LandFactoryUnit = Class(FactoryUnit) {}
 
 -- MASS COLLECTION UNITS
 MassCollectionUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
     OnConsumptionActive = function(self)
         StructureUnit.OnConsumptionActive(self)
@@ -1316,28 +1245,6 @@ MassFabricationUnit = Class(StructureUnit) {
 -- MASS STORAGE UNITS
 MassStorageUnit = Class(StructureUnit) {
     LandBuiltHiddenBones = {'Floatation'},
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        local aiBrain = GetArmyBrain(self.Army)
-        aiBrain:ESRegisterUnitMassStorage(self)
-        local curMass = aiBrain:GetEconomyStoredRatio('MASS')
-        if curMass > 0.11 then
-            self:CreateBlinkingLights('Yellow')
-        else
-            self:CreateBlinkingLights('Red')
-        end
-    end,
-
-    OnMassStorageStateChange = function(self, newState)
-        if newState == 'EconLowMassStore' then
-            self:CreateBlinkingLights('Red')
-        elseif newState == 'EconMidMassStore' then
-            self:CreateBlinkingLights('Yellow')
-        elseif newState == 'EconFullMassStore' then
-            self:CreateBlinkingLights('Green')
-        end
-    end,
 }
 
 -- RADAR UNITS
@@ -1352,14 +1259,10 @@ RadarUnit = Class(StructureUnit) {
     OnIntelDisabled = function(self)
         StructureUnit.OnIntelDisabled(self)
         self:DestroyIdleEffects()
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Red')
     end,
 
     OnIntelEnabled = function(self)
         StructureUnit.OnIntelEnabled(self)
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Green')
         self:CreateIdleEffects()
     end,
 }
@@ -1457,29 +1360,10 @@ SonarUnit = Class(StructureUnit) {
             self.TimedSonarEffectsThread:Destroy()
         end
     end,
-
-    OnIntelDisabled = function(self)
-        StructureUnit.OnIntelDisabled(self)
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Red')
-    end,
-
-    OnIntelEnabled = function(self)
-        StructureUnit.OnIntelEnabled(self)
-        self:DestroyBlinkingLights()
-        self:CreateBlinkingLights('Green')
-    end,
 }
 
 -- SEA FACTORY UNITS
 SeaFactoryUnit = Class(FactoryUnit) {
-    -- Disable the default rocking behavior
-    StartRocking = function(self)
-    end,
-
-    StopRocking = function(self)
-    end,
-
     DestroyUnitBeingBuilt = function(self)
         if self.UnitBeingBuilt and not self.UnitBeingBuilt.Dead and self.UnitBeingBuilt:GetFractionComplete() < 1 then
             self.UnitBeingBuilt:Destroy()
@@ -1667,6 +1551,16 @@ SubUnit = Class(MobileUnit) {
     -- DESTRUCTION PARAMS
     ShowUnitDestructionDebris = false,
     DeathThreadDestructionWaitTime = 0,
+
+    OnCreate = function(self, spec)
+        MobileUnit.OnCreate(self, spec)
+
+        -- submarines do not make a sound by default, we want them to make sound so we use an entity as source instead
+        self.SoundEntity = Entity()
+        self.Trash:Add(self.SoundEntity)
+        Warp(self.SoundEntity, self:GetPosition())
+        self.SoundEntity:AttachTo(self,-1)
+    end,
 }
 
 -- AIR UNITS
@@ -1797,10 +1691,11 @@ AirUnit = Class(MobileUnit) {
 
     CreateUnitAirDestructionEffects = function(self, scale)
         local scale = explosion.GetAverageBoundingXZRadius(self)
+        local size = self.Size
         explosion.CreateDefaultHitExplosion(self, scale)
 
         if self.ShowUnitDestructionDebris then
-            explosion.CreateDebrisProjectiles(self, scale, {self:GetUnitSizes()})
+            explosion.CreateDebrisProjectiles(self, scale, {size.SizeX, size.SizeY, size.SizeZ})
         end
     end,
 
@@ -2439,7 +2334,6 @@ CommandUnit = Class(WalkingLandUnit) {
         Warp(self, location, orientation)
         self:PlayTeleportInEffects()
         self:CleanupRemainingTeleportChargeEffects()
-        teleportTime[self.EntityId] = GetGameTick()
 
         WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
 

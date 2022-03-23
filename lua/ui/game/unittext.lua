@@ -2,7 +2,7 @@
 #* File: lua/ui/game/unittext.lua
 #* Summary: Floating text above a unit
 #*
-#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+#* Copyright Â© 2008 Gas Powered Games, Inc.  All rights reserved.
 #*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')

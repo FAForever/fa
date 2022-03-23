@@ -691,8 +691,10 @@ TNapalmHvyCarpetBombProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactUnit = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
     FxImpactProp = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
     FxImpactLand = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
-    FxImpactWater = EffectTemplate.TNapalmHvyCarpetBombHitWater01,
+    FxImpactWater = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
+    FxImpactShield = EffectTemplate.TNapalmHvyCarpetBombHitLand01,
     FxImpactUnderWater = {},
+    
     PolyTrail = '/effects/emitters/default_polytrail_01_emit.bp',
 }
 

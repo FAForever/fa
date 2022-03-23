@@ -195,9 +195,9 @@ end
 --- Opens up the window
 function OpenWindow()
 
-    -- prevent it from opening when cheats are enabled
-    if not sessionInfo.Options.CheatsEnabled then 
-        WARN("Unable to open AI utilities window: cheats are disabled")
+    -- prevent it from opening when there are no AIs or no cheats
+    if not (GameMain.GameHasAIs or sessionInfo.Options.CheatsEnabled) then 
+        WARN("Unable to open AI utilities window: no AIs and / or cheats are disabled")
         return 
     end
 
