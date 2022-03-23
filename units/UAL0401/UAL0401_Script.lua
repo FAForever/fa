@@ -101,9 +101,10 @@ UAL0401 = Class(AWalkingLandUnit) {
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
+        local size = self.Size
         self:PlayUnitSound('Destroyed')
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
         WaitSeconds(2)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Right_Leg_B02', 1.0)
         WaitSeconds(0.1)

@@ -1338,7 +1338,7 @@ function GetTransports(platoon, units)
     local location = platoon:GetPlatoonPosition()
     if not location then
         -- We can assume we have at least one unit here
-        location = units[1]:GetCachePosition()
+        location = units[1]:GetPosition()
     end
 
     if not location then

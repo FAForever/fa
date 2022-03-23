@@ -55,9 +55,6 @@ function ToggleProfiler(army, forceEnable)
         SPEW("Profiler can be toggled: session is a replay")
     end
 
-    -- make sure there is a concensus on whether the profiler can be toggled by a player, if not: the game desyncs
-    Random()
-
     -- Inform us in case of abuse
     SPEW("Profiler has been toggled on by army: " .. tostring(army))
 
