@@ -25,6 +25,7 @@ function ToggleProfiler(army, forceEnable)
     -- basic checks for toggling the profiler
     local gameHasAIs = ScenarioInfo.GameHasAIs
     local cheatsEnabled = CheatsEnabled()
+    local isReplay = SessionIsReplay()
 
     -- exception to allow toggling the profiler
     local gameHasJip = false 
@@ -33,7 +34,7 @@ function ToggleProfiler(army, forceEnable)
     end 
 
     -- return if conditions are not met
-    if not (gameHasAIs or cheatsEnabled or gameHasJip) then 
+    if not (gameHasAIs or cheatsEnabled or gameHasJip or isReplay) then 
         return
     end
 
@@ -48,6 +49,10 @@ function ToggleProfiler(army, forceEnable)
 
     if gameHasJip then 
         SPEW("Profiler can be toggled: a game developer is in the game")
+    end
+
+    if isReplay then 
+        SPEW("Profiler can be toggled: session is a replay")
     end
 
     -- Inform us in case of abuse
