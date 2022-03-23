@@ -1,8 +1,5 @@
--- Default color order for TMM/etc is set in conjunction with these tables,
--- and is specified in the local ColorOrder in lobby.lua.  So, if you change
--- the colors/order in the ArnyColors and or PlayerColors tables, you should
--- probably change the ColorOrder table in lobby.lua accordingly.
-
+--- Determines the available colors for players and the default color order for 
+-- matchmaking. See autolobby.lua and lobby.lua for more information.
 GameColors = {
 
     CivilianArmyColor = "BurlyWood",
