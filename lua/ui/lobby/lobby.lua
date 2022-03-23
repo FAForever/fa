@@ -53,6 +53,9 @@ local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
 
+
+
+
 function GetAITypes()
     AIKeys = {}
     AIStrings = {}
@@ -81,6 +84,7 @@ local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
+
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 -- Add lobby options from AI mods
@@ -450,6 +454,7 @@ function GetLocalPlayerData()
 end
 
 function GetAIPlayerData(name, AIPersonality)
+    local AIColor = GetAvailableColor()
     return PlayerData(
         {
             OwnerID = hostID,
@@ -457,6 +462,8 @@ function GetAIPlayerData(name, AIPersonality)
             Ready = true,
             Human = false,
             AIPersonality = AIPersonality,
+            PlayerColor = AIColor,
+            ArmyColor = AIColor,
         }
 )
 end
@@ -1111,10 +1118,16 @@ function ClearSlotInfo(slotIndex)
     RefreshMapPositionForAllControls(slotIndex)
 end
 
-function IsColorFree(colorIndex)
+function IsColorFree(colorIndex, playerName)
     for id, player in gameInfo.PlayerOptions:pairs() do
         if player.PlayerColor == colorIndex then
-            return false
+            if playerName then
+                if player.PlayerName != playerName then
+                    return false
+                end
+            else
+                return false
+            end
         end
     end
 
@@ -2426,11 +2439,12 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
 end
 
 function GetAvailableColor()
-    for colorIndex, colorVal in gameColors.PlayerColors do
-        if IsColorFree(colorIndex) then
-            return colorIndex
+    for i = 1, LobbyComm.maxPlayerSlots do
+        if IsColorFree(gameColors.DefaultColorOrder[i]) then
+            return gameColors.DefaultColorOrder[i]
         end
     end
+    WARN('Error: No available colors found.')
 end
 
 --- This function is retarded.
@@ -4187,7 +4201,7 @@ function AddChatText(text, playerID, scrollToBottom)
     local textColor = "AAAAAA"
     local nameFont = "Arial Gras"
     for id, player in gameInfo.PlayerOptions:pairs() do
-        if player.OwnerID == playerID then
+        if player.OwnerID == playerID and player.Human then
             textColor = nil
             nameColor = gameColors.PlayerColors[player.PlayerColor]
             if not chatPlayerColor then
@@ -6684,7 +6698,7 @@ function InitHostUtils()
             refreshObserverList()
         end,
 
-        --- Attempt to add a player to a slot. If no is available, add them as an observer.
+        --- Attempt to add a player to a slot. If none are available, add them as an observer.
         --
         -- @param senderID The peer ID of the player we're adding.
         -- @param slot The slot to insert the player to. A value of less than 1 indicates "any slot"
@@ -6711,7 +6725,7 @@ function InitHostUtils()
             end
 
             -- if a color is requested, attempt to use that color if available, otherwise, assign first available
-            if not IsColorFree(playerData.PlayerColor) then
+            if not IsColorFree(playerData.PlayerColor, playerData.PlayerName) then
                 SetPlayerColor(playerData, GetAvailableColor())
             end
 
