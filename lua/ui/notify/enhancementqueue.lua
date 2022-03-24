@@ -12,10 +12,7 @@ function enqueueEnhancement(units, enhancement)
     if enhancements[enhancement] then
         for _, unit in units do
             local id = unit:GetEntityId()
-            if not enhancementQueue[id] then
-                enhancementQueue[id] = {}
-            end
-
+            enhancementQueue[id] = enhancementQueue[id] or {}
             table.insert(enhancementQueue[id], enhancements[enhancement])
         end
         import('/lua/ui/game/construction.lua').updateCommandQueue()
