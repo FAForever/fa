@@ -119,31 +119,35 @@ function UnescapeString(str)
     return result
 end
 
-function UnescapeTable(t)
+function UnescapeTable(t, doNotCopy)
     if not t then
         return
     end
-    t = table.deepcopy(t)
+    if not doNotCopy then
+        t = table.deepcopy(t)
+    end
     for k, v in t do
         if type(v) == 'string' then
             t[k] = UnescapeString(v)
         elseif type(v) == 'table' then
-            t[k] = UnescapeTable(v)
+            t[k] = UnescapeTable(v, true)
         end
     end
     return t
 end
 
-function EscapeTable(t)
+function EscapeTable(t, doNotCopy)
     if not t then
         return
     end
-    t = table.deepcopy(t)
+    if not doNotCopy then
+        t = table.deepcopy(t)
+    end
     for k, v in t do
         if type(v) == 'string' then
             t[k] = EscapeString(v)
         elseif type(v) == 'table' then
-            t[k] = EscapeTable(v)
+            t[k] = EscapeTable(v, true)
         end
     end
     return t
