@@ -53,98 +53,12 @@ function CreateUI()
 
     -- this should be shown if there are no profiles
     if not GetPreference("profile.current") then
-        profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(function()
-            CreateUI()
-        end)
+        profileDlg = import('/lua/ui/dialogs/profile.lua').CreateDialog(CreateUI)
         return
     end
 
-    -- to disable any button on the menu, just comment/delete the "action" key/value pair or set to nil
-    local menuExtras = {
-        title = '<LOC tooltipui0355>Extras',
-        {
-            name = '<LOC OPTIONS_0073>Credits',
-            tooltip = 'options_credits',
-            action = function() ButtonCredits() end,
-        },
-        {
-            name = '<LOC OPTIONS_0086>EULA',
-            tooltip = 'options_eula',
-            action = function() ButtonEULA() end,
-            color = menuFontColorAlt,
-        },
-        {
-            name = '<LOC _Back>',
-            action = function() ButtonBack() end,
-            color = menuFontColorAlt,
-        },
-        {
-            name = '',
-            color = menuFontColorAlt,
-        },
-        {
-            name = '',
-            color = menuFontColorAlt,
-        },
-        {
-            name = '',
-            color = menuFontColorAlt,
-        },
-        {
-            name = '',
-            color = menuFontColorAlt,
-        },
-        {
-            name = '',
-            color = menuFontColorAlt,
-        },
-    }
-    local menuTop = {
-        title = '<LOC main_menu_0000>Forged Alliance',
-        {
-            name = '<LOC _Campaign>',
-            tooltip = 'mainmenu_campaign',
-            action = function() ButtonCampaign() end,
-        },
-        {
-            name = '<LOC _Skirmish>',
-            tooltip = 'mainmenu_skirmish',
-            action = function() ButtonSkirmish() end,
-        },
-        {
-            name = '<LOC main_menu_0001>Multiplayer LAN',
-            tooltip = 'mainmenu_mp',
-            action = function() ButtonLAN() end,
-        },
-        {
-            name = '<LOC _Replay>',
-            tooltip = 'mainmenu_replay',
-            action = function() ButtonReplay() end,
-            color = menuFontColorAlt,
-        },
-        {
-            name = '<LOC _Mod_Manager>',
-            tooltip = 'mainmenu_mod',
-            action = function() ButtonMod() end,
-            color = menuFontColorAlt,
-        },
-        {
-            name = '<LOC tooltipui0355>Extras',
-            tooltip = 'mainmenu_extras',
-            action = function() ButtonExtras() end,
-        },
-        {
-            name = '<LOC _Options>',
-            tooltip = 'mainmenu_options',
-            action = function() ButtonOptions() end,
-            color = menuFontColorAlt,
-        },
-        {
-            name = '<LOC _Exit>',
-            tooltip = 'mainmenu_exit',
-            action = function() ButtonExit() end,
-        }
-    }
+    local menuTop 
+    local menuExtras
 
     -- BACKGROUND
     local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Main Menu ScreenGroup")
@@ -174,7 +88,7 @@ function CreateUI()
     local topBorder = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-console-top_bmp.dds'))
     LayoutHelpers.AtHorizontalCenterIn(topBorder, border)
     LayoutHelpers.AtTopIn(topBorder, border)
-    topBorder.Depth:Set(function() return logo.Depth() - 1 end)
+    LayoutHelpers.DepthUnderParent(topBorder, logo)
 
     local botBorderLeft = Bitmap(logo, UIUtil.UIFile('/scx_menu/main-menu/border-bot-left.dds'))
     LayoutHelpers.AtLeftIn(botBorderLeft, border)
@@ -199,8 +113,9 @@ function CreateUI()
     -- legal text
     local legalText = UIUtil.CreateText(botBorderLeft, LOC(import('/lua/ui/help/eula.lua').LEGAL_TEXT), 9, UIUtil.bodyFont)
     legalText:SetColor('ffa5a5a5')
-    legalText.Depth:Set(function() return botBorderLeft.Depth() - 1 end)
-    scrollingBG.Depth:Set(function() return legalText.Depth() - 1 end)
+    LayoutHelpers.DepthUnderParent(legalText, botBorderLeft)
+    LayoutHelpers.DepthUnderParent(scrollingBG, legalText)
+
     LayoutHelpers.AtBottomIn(legalText, border, 3)
     legalText.Left:Set(botBorderRight.Right)
     legalText:SetDropShadow(true)
@@ -277,12 +192,13 @@ function CreateUI()
     menuBracketMiddle.Top:Set(function() return topBorder.Bottom() - menuBracketLeft.Height() end)
     LayoutHelpers.AtHorizontalCenterIn(menuBracketMiddle, border)
 
-    menuBracketMiddle.Depth:Set(function() return topBorder.Depth() - 1 end)
-    menuBracketBar.Depth:Set(function() return menuBracketMiddle.Depth() - 3 end)
-    menuBracketLeft.Depth:Set(function() return topBorder.Depth() - 1 end)
-    menuBracketRight.Depth:Set(function() return topBorder.Depth() - 1 end)
-    menuBracketLeftGlow.Depth:Set(function() return menuBracketLeft.Depth() - 2 end)
-    menuBracketRightGlow.Depth:Set(function() return menuBracketRight.Depth() - 2 end)
+    
+    LayoutHelpers.DepthUnderParent(menuBracketMiddle, topBorder)
+    LayoutHelpers.DepthUnderParent(menuBracketBar, menuBracketMiddle, 3)
+    LayoutHelpers.DepthUnderParent(menuBracketLeft, topBorder)
+    LayoutHelpers.DepthUnderParent(menuBracketRight, topBorder)
+    LayoutHelpers.DepthUnderParent(menuBracketLeftGlow, menuBracketLeft, 2)
+    LayoutHelpers.DepthUnderParent(menuBracketRightGlow, menuBracketRight, 2)
 
     menuBracketMiddle.Animate = function(control, animIn, callback)
         control:SetNeedsFrameUpdate(true)
@@ -734,7 +650,7 @@ function CreateUI()
     end
 
     function SetEscapeHandle(action)
-        import('/lua/ui/uimain.lua').SetEscapeHandler(function() action() end)
+        import('/lua/ui/uimain.lua').SetEscapeHandler(action)
     end
 
     function MenuHide(callback)
@@ -758,7 +674,7 @@ function CreateUI()
         EffectHelpers.FadeOut(darker, 1, .4, 0)
         if Prefs.GetOption("mainmenu_bgmovie") and not backMovie then
             backMovie = CreateBackMovie(parent)
-            darker.Depth:Set(function() return backMovie.Depth() + 10 end)
+            LayoutHelpers.DepthOverParent(darker, backMovie, 10)
         elseif Prefs.GetOption("mainmenu_bgmovie") == false and backMovie then
             backMovie:Destroy()
             backMovie = false
@@ -873,7 +789,7 @@ function CreateUI()
 
     function ButtonCredits()
         parent:Destroy()
-        import('/lua/ui/menus/credits.lua').CreateDialog(function() import('/lua/ui/menus/main.lua').CreateUI() end)
+        import('/lua/ui/menus/credits.lua').CreateDialog(import('/lua/ui/menus/main.lua').CreateUI)
     end
 
     function ButtonEULA()
@@ -892,22 +808,105 @@ function CreateUI()
     local exitDlg = nil
 
     function ButtonExit()
-
-        if not exitDlg then
-            exitDlg = UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
-                        "<LOC _Yes>", function()
-                            StopMusic()
-                            parent:Destroy()
-                            ExitApplication()
-                            end,
-                        "<LOC _No>", function() exitDlg = nil end,
-                        nil, nil,
-                        true,  {worldCover = true, enterButton = 1, escapeButton = 2})
-        end
+        exitDlg = exitDlg or UIUtil.QuickDialog(GetFrame(0), "<LOC EXITDLG_0003>Are you sure you'd like to exit?",
+                    "<LOC _Yes>", function()
+                        StopMusic()
+                        parent:Destroy()
+                        ExitApplication()
+                        end,
+                    "<LOC _No>", function() exitDlg = nil end,
+                    nil, nil,
+                    true,  {worldCover = true, enterButton = 1, escapeButton = 2})
     end
 
-    -- START
-
+   
+    -- to disable any button on the menu, just comment/delete the "action" key/value pair or set to nil
+    menuExtras = {
+        title = '<LOC tooltipui0355>Extras',
+        {
+            name = '<LOC OPTIONS_0073>Credits',
+            tooltip = 'options_credits',
+            action = ButtonCredits,
+        },
+        {
+            name = '<LOC OPTIONS_0086>EULA',
+            tooltip = 'options_eula',
+            action = ButtonEULA,
+            color = menuFontColorAlt,
+        },
+        {
+            name = '<LOC _Back>',
+            action = ButtonBack,
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
+        {
+            name = '',
+            color = menuFontColorAlt,
+        },
+    }
+    menuTop = {
+        title = '<LOC main_menu_0000>Forged Alliance',
+        {
+            name = '<LOC _Campaign>',
+            tooltip = 'mainmenu_campaign',
+            action = ButtonCampaign,
+        },
+        {
+            name = '<LOC _Skirmish>',
+            tooltip = 'mainmenu_skirmish',
+            action = ButtonSkirmish,
+        },
+        {
+            name = '<LOC main_menu_0001>Multiplayer LAN',
+            tooltip = 'mainmenu_mp',
+            action = ButtonLAN,
+        },
+        {
+            name = '<LOC _Replay>',
+            tooltip = 'mainmenu_replay',
+            action = ButtonReplay,
+            color = menuFontColorAlt,
+        },
+        {
+            name = '<LOC _Mod_Manager>',
+            tooltip = 'mainmenu_mod',
+            action = ButtonMod,
+            color = menuFontColorAlt,
+        },
+        {
+            name = '<LOC tooltipui0355>Extras',
+            tooltip = 'mainmenu_extras',
+            action = ButtonExtras,
+        },
+        {
+            name = '<LOC _Options>',
+            tooltip = 'mainmenu_options',
+            action = ButtonOptions,
+            color = menuFontColorAlt,
+        },
+        {
+            name = '<LOC _Exit>',
+            tooltip = 'mainmenu_exit',
+            action = ButtonExit,
+        }
+    }
+     -- START
     MenuBuild('home', true)
 
     FlushEvents()
