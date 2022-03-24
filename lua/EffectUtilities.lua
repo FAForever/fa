@@ -1642,3 +1642,8 @@ PlayReclaimEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEffect
 -- @param reclaimer Unit that is reclaiming
 -- @param reclaimed Unit that is reclaimed (and no longer exists after this effect)
 PlayReclaimEndEffects = import("/lua/EffectUtilitiesGeneric.lua").PlayReclaimEndEffects
+
+--- Played when reclaiming has been completed.
+-- @param reclaimer Unit that is reclaiming
+-- @param reclaimed Unit that is reclaimed (and no longer exists after this effect)
+ApplyWindDirection = import("/lua/EffectUtilitiesGeneric.lua").ApplyWindDirection
