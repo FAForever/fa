@@ -979,16 +979,16 @@ function CreateWorldCover(parent, colorOverride)
         local index = i
         if GetFrame(index) == parent:GetRootFrame() then
             worldCovers[index] = Bitmap(parent)
-            local worldCover = worldCovers[index]
-            worldCover.ID = index
-            worldCover.OnDestroy = function(self)
+            local frameCover = worldCovers[index]
+            frameCover.ID = index
+            frameCover.OnDestroy = function(self)
                 for h, x in worldCovers do
                     if x and h ~= self.ID then
                         x:Destroy()
                     end
                 end
             end
-            worldCover.OnHide = function(self, hidden)
+            frameCover.OnHide = function(self, hidden)
                 for h, x in worldCovers do
                     if x and h ~= self.ID then
                         x:SetHidden(hidden)
@@ -998,13 +998,13 @@ function CreateWorldCover(parent, colorOverride)
         else
             worldCovers[index] = Bitmap(GetFrame(index))
         end
-        local worldCover = worldCovers[index]
-        worldCover:SetSolidColor(colorOverride or 'ff000000')
-        LayoutHelpers.FillParent(worldCover, GetFrame(index))
-        LayoutHelpers.DepthUnderParent(worldCover, parent ,2)
-        worldCover:SetAlpha(0)
-        worldCover:SetNeedsFrameUpdate(true)
-        worldCover.OnFrame = function(self, delta)
+        local frameCover = worldCovers[index]
+        frameCover:SetSolidColor(colorOverride or 'ff000000')
+        LayoutHelpers.FillParent(frameCover, GetFrame(index))
+        LayoutHelpers.DepthUnderParent(frameCover, parent ,2)
+        frameCover:SetAlpha(0)
+        frameCover:SetNeedsFrameUpdate(true)
+        frameCover.OnFrame = function(self, delta)
             local targetAlpha = self:GetAlpha() + (delta * 1.5)
             if targetAlpha < .8 then
                 self:SetAlpha(targetAlpha)
