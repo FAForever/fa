@@ -78,7 +78,6 @@ local next = next
 local unpack = unpack
 local getmetatable = getmetatable
 local setmetatable = setmetatable
-local ForkThread = ForkThread
 
 local TableEmpty = table.empty 
 local TableGetn = table.getn 
@@ -227,7 +226,9 @@ local function ComputeHierarchyChain(a, cache)
 
     if debug then 
         LOG("Chain for: " .. tostring(a) .. " (" .. tostring(HierarchyDebugLookup[a].func)  .. ", id = " .. tostring(HierarchyDebugLookup[a].identity) .. ")")
-        LOG(repr(ca))
+        for k, v in cache do 
+            LOG(tostring(k) .. ": " .. tostring(v))
+        end
     end
 end
 
