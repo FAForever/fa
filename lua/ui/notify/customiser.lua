@@ -30,10 +30,10 @@ local linesVisible = {}
 local linesCollapsed = true
 
 local NotifyMessages = 'Notify_Messages_ESC'
+-- proxy for notify messages
 local notifyOptions = LazyVar.Create()
 
 function InitMessages()
-    local messageTable
     local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile(NotifyMessages))
     if prefsMessages and not table.empty(prefsMessages) then
         notifyOptions:Set(prefsMessages)
@@ -784,14 +784,11 @@ end
 -- Format the upgrades and messages into groups and lines
 function FormatData()
     local lineData = {}
-    local messageTable = notifyOptions()
-   
-
     -- Reset the lines because messages might have been changed
     for category, group in LineGroups do
         group.sources = {}
     end
-
+    
     local categories = {
         aeon = 1,
         uef = 2,
@@ -802,7 +799,8 @@ function FormatData()
         tech = 7,
         other = 8,
     }
-
+    
+    local messageTable = notifyOptions()
     -- Group upgrades and messages according to their category
     for category, data in messageTable do
         if factions[category] or category == 'experimentals' or category == 'tech' or category == 'other' then
