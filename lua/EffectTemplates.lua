@@ -4549,5 +4549,64 @@ CSGTestSpinner3 = {
     EmtBpPath .. '_test_gatecloud_07_emit.bp',
 }
 
+-- SACU effects
 
+SCUEdge = {
+    EmtBpPath .. 'Aeon_GlowingShockwaveEdgeThin.bp',
+    EmtBpPath .. 'Aeon_SCU_Smoke_Ring.bp',
+}
+
+SCUEdgeC = {
+    EmtBpPath .. 'Cybran_SCU_Smoke_Ring.bp',
+}
+
+SIFSerSCUHit01 = {
+    EmtBpPath .. 'seraphim_SerSCU_hit_03_emit.bp',			-- long glow
+    EmtBpPath .. 'seraphim_SerSCU_hit_07_emit.bp',			-- outer ring sucking in, ground oriented
+    EmtBpPath .. 'seraphim_SerSCU_hit_08_emit.bp',			-- fast flash
+    EmtBpPath .. 'seraphim_SerSCU_concussion_04_emit.bp',		-- ring slow
+}
+
+SIFSerSCUHit02 = {
+    EmtBpPath .. 'seraphim_SerSCU_hit_01_emit.bp',		-- ring alpha oriented
+    EmtBpPath .. 'seraphim_SerSCU_hit_02_emit.bp',		-- ring add oriented
+    EmtBpPath .. 'seraphim_SerSCU_hit_03_emit.bp',		-- long glow oriented
+    EmtBpPath .. 'seraphim_SerSCU_hit_04_emit.bp',		-- blue plasma lines add
+    EmtBpPath .. 'seraphim_SerSCU_hit_05_emit.bp',		-- ring add upwards
+    EmtBpPath .. 'seraphim_SerSCU_hit_06_emit.bp',		-- ring, darkening lines inward
+}
+
+SIFSerSCUDetonate01 = {
+    EmtBpPath .. 'seraphim_SerSCU_explode_01_emit.bp',		-- glow in air
+    EmtBpPath .. 'seraphim_SerSCU_concussion_01_emit.bp',		-- ring
+    EmtBpPath .. 'seraphim_SerSCU_concussion_02_emit.bp',		-- outward lines, faint add
+    EmtBpPath .. 'seraphim_SerSCU_concussion_03_emit.bp',		-- ring slow
+    EmtBpPath .. 'seraphim_SerSCU_explode_02_emit.bp',		-- faint plasma downward
+    EmtBpPath .. 'seraphim_SerSCU_explode_03_emit.bp',		-- vertical plasma, ser7 
+	EmtBpPath .. 'seraphim_SerSCU_explode_04_emit.bp',		-- ring outward add oriented 
+	EmtBpPath .. 'seraphim_SerSCU_explode_05_emit.bp',		-- glow on ground, oriented
+    EmtBpPath .. 'seraphim_SerSCU_explode_06_emit.bp',		-- fast flash in air
+    EmtBpPath .. 'seraphim_SerSCU_explode_07_emit.bp',		-- long glow in air, oriented
+    EmtBpPath .. 'seraphim_SerSCU_explode_08_emit.bp',		-- center plasma, ser7    
+}
+
+SIFSerSCUPlumeFxTrails01 = {
+    EmtBpPath .. 'seraphim_SerSCU_plume_fxtrails_01_emit.bp',	-- bright center
+    EmtBpPath .. 'seraphim_SerSCU_plume_fxtrails_02_emit.bp',	-- faint plasma trails
+}
+
+SIFSerSCUPlumeFxTrails02 = {
+    EmtBpPath .. 'seraphim_SerSCU_plume_fxtrails_03_emit.bp',	-- oriented glows
+    EmtBpPath .. 'seraphim_SerSCU_plume_fxtrails_04_emit.bp',	-- plasma
+}
+
+SIFSerSCUPlumeFxTrails03 = {
+    EmtBpPath .. 'seraphim_SerSCU_plume_fxtrails_05_emit.bp',	-- upwards nuke cloud   
+    EmtBpPath .. 'seraphim_SerSCU_plume_fxtrails_06_emit.bp',	-- upwards nuke cloud highlights 
+}
+
+SIFSerSCUHitRingProjectileFxTrails01 = {
+    EmtBpPath .. 'seraphim_SerSCU_hitring_fxtrails_01_emit.bp',   
+    EmtBpPath .. 'seraphim_SerSCU_hitring_fxtrails_02_emit.bp',
+}
 
