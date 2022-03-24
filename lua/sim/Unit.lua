@@ -3114,12 +3114,14 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
+
         if self.Dead then
             return
         end
+
         local layer = self.Layer
 
-        if old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed')) then
+        if old == 'Stopped' then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StartMove' .. layer) then
                 self:PlayUnitSound('StartMove')
@@ -3128,38 +3130,26 @@ Unit = Class(moho.unit_methods) {
             -- Initiate the unit's ambient movement sound
             -- Note that there is not currently an 'Air' version, and that
             -- AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
-            if not (
-                ((layer == 'Water' or layer == 'Seabed') and self:PlayUnitAmbientSound('AmbientMoveWater')) or
-                (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) or
-                (layer == 'Land' and self:PlayUnitAmbientSound('AmbientMoveLand'))
-                )
-            then
+
+            if not (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) then
                 self:PlayUnitAmbientSound('AmbientMove')
             end
-
         end
 
-        if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
+        if new == 'Stopped' then
             -- Try the specialised sound, fall back to the general one.
             if not self:PlayUnitSound('StopMove' .. layer) then
                 self:PlayUnitSound('StopMove')
             end
-        end
 
-        if new == 'Stopped' or new == 'Stopping' then
-            -- Stop ambient sounds
             self:StopUnitAmbientSound('AmbientMove')
-            self:StopUnitAmbientSound('AmbientMoveWater')
             self:StopUnitAmbientSound('AmbientMoveSub')
-            self:StopUnitAmbientSound('AmbientMoveLand')
+
+            self:DoOnHorizontalStartMoveCallbacks()
         end
 
         if self.MovementEffectsExist then
             self:UpdateMovementEffectsOnMotionEventChange(new, old)
-        end
-
-        if old == 'Stopped' then
-            self:DoOnHorizontalStartMoveCallbacks()
         end
 
         -- update weapon capabilities

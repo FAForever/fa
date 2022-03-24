@@ -38,6 +38,7 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
 local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
+local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 
 local EffectUtil = import('EffectUtilities.lua')
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
@@ -212,7 +213,7 @@ TMassStorageUnit = Class(MassStorageUnit) {}
 --------------------------------------------------------------
 --  MOBILE FACTORY UNIT
 --------------------------------------------------------------
-TMobileFactoryUnit = Class(LandUnit) {
+TMobileFactoryUnit = Class(AmphibiousLandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then

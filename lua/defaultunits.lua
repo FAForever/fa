@@ -2082,7 +2082,26 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 }
 
 -- HOVERING LAND UNITS
-HoverLandUnit = Class(MobileUnit) {}
+HoverLandUnit = Class(MobileUnit) {
+    OnMotionHorzEventChange = function(self, new, old)
+        MobileUnit.OnMotionHorzEventChange(self, new, old)
+
+        LOG("I am a HoverLand unit")
+
+        if old == 'Stopped' then 
+            if self.Layer == 'Water' then 
+                self:PlayUnitAmbientSound('AmbientMoveWater')
+            elseif self.Layer == 'Land' or self.Layer == 'Seabed' then
+                self:PlayUnitAmbientSound('AmbientMoveLand')
+            end
+        end
+
+        if new == 'Stopped' then
+            self:StopUnitAmbientSound('AmbientMoveWater')
+            self:StopUnitAmbientSound('AmbientMoveLand')
+        end
+    end,
+}
 
 SlowHoverLandUnit = Class(HoverLandUnit) {
     OnLayerChange = function(self, new, old)
@@ -2104,7 +2123,24 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
-AmphibiousLandUnit = Class(MobileUnit) {}
+AmphibiousLandUnit = Class(MobileUnit) {
+    OnMotionHorzEventChange = function(self, new, old)
+        MobileUnit.OnMotionHorzEventChange(self, new, old)
+
+        if old == 'Stopped' then 
+            if self.Layer == 'Water' then 
+                self:PlayUnitAmbientSound('AmbientMoveWater')
+            elseif self.Layer == 'Land' or self.Layer == 'Seabed' then
+                self:PlayUnitAmbientSound('AmbientMoveLand')
+            end
+        end
+
+        if new == 'Stopped' then
+            self:StopUnitAmbientSound('AmbientMoveWater')
+            self:StopUnitAmbientSound('AmbientMoveLand')
+        end
+    end,
+}
 
 SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
     OnLayerChange = function(self, new, old)
