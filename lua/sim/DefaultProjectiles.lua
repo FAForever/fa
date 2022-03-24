@@ -21,6 +21,10 @@ NullShell = Class(Projectile) {}
 -----------------------------------------------------------------
 -- PROJECTILE WITH ATTACHED EFFECT EMITTERS
 -----------------------------------------------------------------
+
+-- upvalue for performance
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+
 EmitterProjectile = Class(Projectile) {
     FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
@@ -193,6 +197,12 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
     end,
 }
 
+-- upvalue for performance
+local TableGetn = table.getn
+local MathFloor = math.floor 
+local Random = Random
+local CreateTrail = CreateTrail
+
 MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
@@ -203,12 +213,12 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
         if self.PolyTrails then
-            local NumPolyTrails = table.getn(self.PolyTrails)
+            local NumPolyTrails = TableGetn(self.PolyTrails)
 
             if self.RandomPolyTrails ~= 0 then
                 local index = nil
                 for i = 1, self.RandomPolyTrails do
-                    index = math.floor(Random(1, NumPolyTrails))
+                    index = MathFloor(Random(1, NumPolyTrails))
                     CreateTrail(self, -1, self.Army, self.PolyTrails[index]):OffsetEmitter(0, 0, self.PolyTrailOffset[index])
                 end
             else

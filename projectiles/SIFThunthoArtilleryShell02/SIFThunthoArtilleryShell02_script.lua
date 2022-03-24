@@ -6,30 +6,57 @@
 --  Summary  :  Thuntho Artillery Shell Projectile script
 --              Seraphim T1 Artillery : XSL0103
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
+
+local VectorCached = Vector(0, 0, 0)
+
+local Random = Random 
+local CreateDecal = CreateDecal
+local CreateTrail = CreateTrail
+
+local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
+
 local SThunthoArtilleryShell2 = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell2
+local ProjectileOnCreate = import('/lua/sim/Projectile.lua').Projectile.OnCreate
 
 SIFThunthoArtilleryShell02 = Class(SThunthoArtilleryShell2) {
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius-1, radius-1, 100, 10, army)
+
+    OnCreate = function(self, spec)
+        ProjectileOnCreate(self, spec)
+
+        -- create an actual trail
+        for i in self.PolyTrails do
+            CreateTrail(self, -1, self.Army, self.PolyTrails[i])
         end
-        
+    end,
+
+    OnImpact = function(self, targetType, targetEntity)
         SThunthoArtilleryShell2.OnImpact(self, targetType, targetEntity)
+
+        -- cache the position
+        local vc = VectorCached
+        vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
+
+        -- knock over some trees
+        local radius = self.DamageData.DamageRadius
+        DamageArea( self, vc, radius, 1, 'KnockTree', false )
+        
+        -- create a decal if we hit terrain
+        if targetType == "Terrain" then            
+            CreateDecal(
+                vc,                             -- position
+                6.28 * Random(),                -- orientation
+                'crater_radial01_albedo',       -- regular texture
+                '',                             -- special texture
+                'Albedo',                       -- type
+                radius-1,                       -- radius
+                radius-1,                       -- ??
+                100,                            -- LOD
+                10,                             -- duration
+                self.Army                       -- army 
+            )
+        end
     end,
 }
 TypeClass = SIFThunthoArtilleryShell02

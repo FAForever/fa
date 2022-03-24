@@ -84,11 +84,10 @@ Tree = Class(Prop) {
             local canBurn = (not self.Burning) and (not self.NoBurn)
 
             if type == 'Disintegrate' or type == "Reclaimed" then 
-                LOG("Desintegrated!")
                 -- we just got obliterated
                 EntityDestroy(self)
 
-            elseif type == 'Force' then
+            elseif type == 'Force' or type == "KnockTree" then
                 if canFall then 
                     -- change internal state
                     self.NoBurn = true

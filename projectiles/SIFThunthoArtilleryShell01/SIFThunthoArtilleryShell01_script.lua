@@ -1,64 +1,91 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_script.lua
-#**  Author(s):  Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Thuntho Artillery Shell Projectile script, XSL0103
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SIFThunthoArtilleryShell01/SIFThunthoArtilleryShell01_script.lua
+--**  Author(s):  Gordon Duclos, Aaron Lundquist
+--**
+--**  Summary  :  Thuntho Artillery Shell Projectile script, XSL0103
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-local EffectTemplate = import('/lua/EffectTemplates.lua')
 local SThunthoArtilleryShell = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+local SThunderStormCannonProjectileSplitFx = import('/lua/EffectTemplates.lua').SThunderStormCannonProjectileSplitFx 
+
+-- upvalue for performance
+local CreateTrail = CreateTrail
+local CreateEmitterAtEntity = CreateEmitterAtEntity
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+
+local Random = Random
+
+local MathSin = math.sin 
+local MathCos = math.cos
+
+local EntityDestroy = _G.moho.entity_methods.Destroy
+
+local ProjectileCreateChildProjectile = _G.moho.projectile_methods.CreateChildProjectile
+local ProjectileSetVelocity = _G.moho.projectile_methods.SetVelocity
+local ProjectileGetVelocity = _G.moho.projectile_methods.GetVelocity
+
+local ProjectileOnCreate = import('/lua/sim/Projectile.lua').Projectile.OnCreate
 
 SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
                
-    OnImpact = function(self, TargetType, TargetEntity) 
-        
-        local FxFragEffect = EffectTemplate.SThunderStormCannonProjectileSplitFx 
-        local bp = self:GetBlueprint().Physics
-              
-        ### Split effects
-        for k, v in FxFragEffect do
-            CreateEmitterAtEntity( self, self:GetArmy(), v )
+    OnCreate = function(self, spec)
+        ProjectileOnCreate(self, spec)
+
+        -- create the fx for trails
+        for i in self.FxTrails do
+            CreateEmitterOnEntity(self, self.Army, self.FxTrails[i])
         end
-        
-        local vx, vy, vz = self:GetVelocity()
-        local velocity = 18
+
+        -- create an actual trail
+        for i in self.PolyTrails do
+            CreateTrail(self, -1, self.Army, self.PolyTrails[i])
+        end
+    end,
+
+    OnImpact = function(self, TargetType, TargetEntity) 
     
-		# One initial projectile following same directional path as the original
-        #self:CreateChildProjectile(bp.FragmentId):SetVelocity(vx, vy, vz):SetVelocity(velocity):PassDamageData(self.DamageData)
-   		
-		# Create several other projectiles in a dispersal pattern
+        local Random = Random
+
+        -- the split fx
+        CreateEmitterAtEntity( self, self.Army, SThunderStormCannonProjectileSplitFx[1])
+
+        -- Create several other projectiles in a dispersal pattern
+        local bp = self.Blueprint.Physics
         local numProjectiles = bp.Fragments
         
-        local angle = (2 * math.pi) / numProjectiles
-        local angleInitial = RandomFloat( 0, angle )
+        -- Randomization of the spread
+        -- 1 / 2 * pi = 0.159235669
+        local angle = 0.159235669 * numProjectiles
+        local angleInitial = angle * Random()
+        local angleVariation = angle * 0.8   
         
-        # Randomization of the spread
-        local angleVariation = angle * 0.8 # Adjusts angle variance spread
-        local spreadMul = 0.15 # Adjusts the width of the dispersal        
-        
-        --vy= -0.8
-        
+        -- retrieve the current velocity
+        local vx, vy, vz = ProjectileGetVelocity(self)
         local xVec = 0
         local yVec = vy
         local zVec = 0
-     
-
-        # Launch projectiles at semi-random angles away from split location
+    
+        -- Launch projectiles at semi-random angles away from split location
         for i = 0, numProjectiles - 1 do
-            xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
-            zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul 
-            local proj = self:CreateChildProjectile(bp.FragmentId)
-            proj:SetVelocity(xVec,yVec,zVec)
-            proj:SetVelocity(velocity)
-            proj:PassDamageData(self.DamageData)                        
+
+            -- compute a random offset of the velocity for this fragment
+            local a = angleInitial + (i*angle)
+            xVec = vx + (MathSin(a + 2 * angleVariation * Random() - angleVariation)) * 0.15
+            zVec = vz + (MathCos(a + 2 * angleVariation * Random() - angleVariation)) * 0.15 
+
+            -- create the projectile and set the velocity direction and then the velocity magnitude
+            local proj = ProjectileCreateChildProjectile(self, bp.FragmentId)
+            ProjectileSetVelocity(proj, xVec,yVec,zVec)
+            ProjectileSetVelocity(proj, 18)
+
+            -- just copy the damage data
+            proj.DamageData = self.DamageData                        
         end
         
-        self:Destroy()
+        EntityDestroy(self)
     end
 }
 
