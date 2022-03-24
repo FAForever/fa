@@ -104,6 +104,10 @@ end
 --- @param str string
 --- @return string
 function UnescapeString(str)
+    -- local function unicode_to_sym(unicode)
+    --     local unilen = string.len(unicode)
+    --     return UTF(STR_xtoi(string.sub(unicode, 3, unilen)))
+    -- end
     local function unicode_to_sym(unicode)
         local bytes = {}
         local unilen = string.len(unicode)
@@ -119,6 +123,11 @@ function UnescapeString(str)
     return result
 end
 
+
+--- unescapes given table : goes through all fields and if value is string -- unescapes it
+---@param t table @given table
+---@param doNotCopy boolean @determines whether given table is deepcopied or not
+---@return table  @unescaped table
 function UnescapeTable(t, doNotCopy)
     if not t then
         return
@@ -136,6 +145,10 @@ function UnescapeTable(t, doNotCopy)
     return t
 end
 
+--- escapes given table : goes through all fields and if value is string -- escapes it
+---@param t table @given table
+---@param doNotCopy boolean @determines whether given table is deepcopied or not
+---@return table  @escaped table
 function EscapeTable(t, doNotCopy)
     if not t then
         return
