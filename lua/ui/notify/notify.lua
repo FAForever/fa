@@ -6,6 +6,7 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua').defaultMessages
 local AddChatCommand = import('/lua/ui/notify/commands.lua').AddChatCommand
 local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
+
 local toggleOverlay = NotifyOverlay.toggleOverlay
 local factions = import('/lua/factions.lua').FactionIndexMap
 local UTF =  import('/lua/UTF.lua')
@@ -145,13 +146,8 @@ function processIncomingMessage(sender, msg)
 end
 
 function populateMessages()
-    local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile('Notify_Messages_ESC'))
-    if prefsMessages then
-        messages = prefsMessages
-    else
-        messages = defaultMessages
-        Prefs.SetToCurrentProfile('Notify_Messages_ESC',UTF.EscapeTable(messages))
-    end
+    -- use lazyvar instead
+    messages = import('/lua/ui/notify/customiser.lua').ImportMessages()
 end
 
 -- This function is used to toggle ALL ASPECTS of notify functionality, and is saved
