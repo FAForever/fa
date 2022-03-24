@@ -453,8 +453,20 @@ function GetLocalPlayerData()
 )
 end
 
-function GetAIPlayerData(name, AIPersonality)
-    local AIColor = GetAvailableColor()
+function GetAIPlayerData(name, AIPersonality, slot)
+   local AIColor
+   -- gets the color of the player/AI occupying the slot directly prior if available
+    for i = 1, LobbyComm.maxPlayerSlots do
+        if gameInfo.PlayerOptions[i].StartSpot == slot then
+            if IsColorFree(gameInfo.PlayerOptions[i].PlayerColor, slot) then
+                AIColor =  gameInfo.PlayerOptions[i].PlayerColor
+            end
+            break
+        end
+    end
+    if not AIColor then
+        AIColor = GetAvailableColor()
+    end
     return PlayerData(
         {
             OwnerID = hostID,
@@ -1118,11 +1130,11 @@ function ClearSlotInfo(slotIndex)
     RefreshMapPositionForAllControls(slotIndex)
 end
 
-function IsColorFree(colorIndex, playerName)
+function IsColorFree(colorIndex, currentSlotNumber)
     for id, player in gameInfo.PlayerOptions:pairs() do
         if player.PlayerColor == colorIndex then
-            if playerName then
-                if player.PlayerName != playerName then
+            if currentSlotNumber then
+                if player.StartSpot != currentSlotNumber then
                     return false
                 end
             else
@@ -6306,7 +6318,9 @@ function Check_Availaible_Color(slot)
             for c, color in unusedColours do
                 availableColours[c] = color
             end
+            -- add this slot's color to its availableColours (you get a nil lazyvar error if it's not included)
             availableColours[ gameInfo.PlayerOptions[i].PlayerColor] = gameColors.PlayerColors[gameInfo.PlayerOptions[i].PlayerColor]
+            -- set the list of available colors for this slot
             GUI.slots[i].color:ChangeBitmapArray(availableColours, true)
         end
     end
@@ -6725,7 +6739,7 @@ function InitHostUtils()
             end
 
             -- if a color is requested, attempt to use that color if available, otherwise, assign first available
-            if not IsColorFree(playerData.PlayerColor, playerData.PlayerName) then
+            if not IsColorFree(playerData.PlayerColor, slot) then
                 SetPlayerColor(playerData, GetAvailableColor())
             end
 
@@ -6751,7 +6765,7 @@ function InitHostUtils()
         -- @param slot (optional) The slot into which to put this AI. Defaults to the first empty
         --                        slot from the top of the list.
         AddAI = function(name, personality, slot)
-            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality))
+            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality, slot))
         end,
 
         PlayerMissingMapAlert = function(id)
