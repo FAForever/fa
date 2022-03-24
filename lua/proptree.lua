@@ -8,6 +8,7 @@
 --****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
 local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01
+local ApplyWindDirection = import('/lua/EffectUtilities.lua').ApplyWindDirection
 local CreateScorchMarkSplat = import('/lua/defaultexplosions.lua').CreateScorchMarkSplat
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
@@ -82,7 +83,12 @@ Tree = Class(Prop) {
             local canFall = not self.Fallen 
             local canBurn = (not self.Burning) and (not self.NoBurn)
 
-            if type == 'Force' then
+            if type == 'Disintegrate' or type == "Reclaimed" then 
+                LOG("Desintegrated!")
+                -- we just got obliterated
+                EntityDestroy(self)
+
+            elseif type == 'Force' then
                 if canFall then 
                     -- change internal state
                     self.NoBurn = true
@@ -99,19 +105,12 @@ Tree = Class(Prop) {
                     self.Burn(self)
                 end
 
-            elseif type == 'Disintegrate' then
-                -- we just got obliterated
-                EntityDestroy(self)
-
             elseif type == 'Fire' and canBurn then 
 
                 -- fire type damage, slightly higher odds to catch fire
                 if Random(1, 35) <= 2 then
                     self.Burn(self)
                 end
-            elseif type == "Reclaimed" then 
-                -- oh noes!
-                EntityDestroy(self)
             end
             
             if (type ~= 'Force') and (type ~= 'Fire') and canBurn and canFall then 
@@ -187,10 +186,7 @@ Tree = Class(Prop) {
         end
 
         -- add randomness to direction of smoke
-        local r = Random()
-        EffectSetEmitterCurveParam(effects[3], "XDIR_CURVE", 0.005 + 0.02 * r, 0.01)
-        EffectSetEmitterCurveParam(effects[3], "YDIR_CURVE", 0.005 + 0.01 * Random(), 0.01)
-        EffectSetEmitterCurveParam(effects[3], "ZDIR_CURVE", 0.005 + 0.02 * r, 0.01)
+        ApplyWindDirection(effects[3], 1.0)
 
         -- light splash
         effect = CreateLightParticleIntel( self, -1, -1, 1.5, 10, 'glow_03', 'ramp_flare_02' )
@@ -237,6 +233,7 @@ Tree = Class(Prop) {
         -- add smoke effect removed when the tree is destroyed
         effect = CreateEmitterAtEntity(self, -1, FireEffects[3] )
         EffectScaleEmitter(effect, 2 + Random())
+        ApplyWindDirection(effect, 0.75)
         TrashAdd(trash, effect)
 
         -- fall down in a random direction if we didn't before

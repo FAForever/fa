@@ -81,7 +81,6 @@ Wreckage = Class(Prop) {
     -- this means we have to calculate the health from the reclaim values, instead of going the
     -- other way.
     Clone = function(self)
-        LOG("Clone happened!")
         local clone = CreateWreckage(
             __blueprints[self.AssociatedBP], 
             self.CachePosition, 

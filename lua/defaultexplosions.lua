@@ -18,6 +18,7 @@ local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
 local EfctUtil = import('EffectUtilities.lua')
+local ApplyWindDirection = EfctUtil.ApplyWindDirection
 local CreateEffects = EfctUtil.CreateEffects
 local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
 local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
@@ -629,13 +630,13 @@ function CreateWreckageEffects(unit, prop)
         effect = Random(1, DefaultWreckageEffectsCount)
         emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffects[effect])
 
-        -- make it follow the wind
+        -- larger smoke tends to live longer
         r1 = Random()
         IEffectScaleEmitter(emitter, 0.5 + 0.75 * r1)
         IEffectSetEmitterParam(emitter, 'LIFETIME', 40 + 75 * r1)
-        IEffectSetEmitterCurveParam(emitter, "XDIR_CURVE", 0.008 + 0.03 * r1, 0.01)
-        IEffectSetEmitterCurveParam(emitter, "YDIR_CURVE", 0.008 + 0.02 * Random(), 0.01)
-        IEffectSetEmitterCurveParam(emitter, "ZDIR_CURVE", 0.008 + 0.03 * r1, 0.01)
+
+        -- apply wind direction
+        ApplyWindDirection(emitter, 1.0)
 
         prop.Trash:Add(emitter)
     end
