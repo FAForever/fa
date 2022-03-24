@@ -17,7 +17,8 @@ local defaultMessageTable = defaultMessages.defaultMessages
 local clarityTable = defaultMessages.clarityTable
 local Prefs = import('/lua/user/prefs.lua')
 local factions = import('/lua/factions.lua').FactionIndexMap
-local UTF =  import('/lua/UTF.lua')
+local UTF = import('/lua/UTF.lua')
+
 local newMessageTable = {}
 local lineGroupTable = {}
 local LineGroups = {}
