@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Front end display of the EULA
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -33,7 +33,7 @@ function CreateEULA(inParent, callback)
         end
     end
 
-    UIUtil.MakeInputModal(parent, function() exitButton.OnClick(exitButton) end, function() exitButton.OnClick(exitButton) end)
+    UIUtil.MakeInputModal(parent, function() exitButton:OnClick() end, function() exitButton:OnClick() end)
 
     local title = UIUtil.CreateText(bg, "<LOC EULA_TITLE>End User License Agreement", 20)
     LayoutHelpers.AtHorizontalCenterIn(title, bg)
