@@ -46,8 +46,6 @@ SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
     end,
 
     OnImpact = function(self, TargetType, TargetEntity) 
-        LOG("OnImpact!")
-        local Random = Random
 
         -- the split fx
         CreateEmitterAtEntity( self, self.Army, SThunderStormCannonProjectileSplitFx[1])
