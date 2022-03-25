@@ -1031,16 +1031,20 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if damageType ~= "KnockTree" then 
-            if self.CanTakeDamage then
-                self:DoOnDamagedCallbacks(instigator)
 
-                -- Pass damage to an active personal shield, as personal shields no longer have collisions
-                if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
-                    self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
-                else
-                    self:DoTakeDamage(instigator, amount, vector, damageType)
-                end
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
+        if self.CanTakeDamage then
+            self:DoOnDamagedCallbacks(instigator)
+
+            -- Pass damage to an active personal shield, as personal shields no longer have collisions
+            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
+                self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
+            else
+                self:DoTakeDamage(instigator, amount, vector, damageType)
             end
         end
     end,

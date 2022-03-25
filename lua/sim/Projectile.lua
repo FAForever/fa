@@ -10,6 +10,32 @@ local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
+-- series of accepted scorch marks that we use for projectiles
+local ScorchSplatTextures = {
+    'scorch_001_albedo',
+    'scorch_002_albedo',
+    'scorch_003_albedo',
+    'scorch_004_albedo',
+    'scorch_005_albedo',
+    'scorch_006_albedo',
+    'scorch_007_albedo',
+    'scorch_008_albedo',
+    'scorch_009_albedo',
+    'scorch_010_albedo',
+}
+
+-- various information surrounding the scorch marks
+local ScorchSplatTexturesCount = table.getn(ScorchSplatTextures)
+local ScorchSplatTexturesLookup = { }
+local ScorchSplatTexturesLookupCount = 100
+local ScorchSplatTexturesLookupIndex = 1
+for k = 1, ScorchSplatTexturesLookupCount do 
+    ScorchSplatTexturesLookup[k] = Random(1, ScorchSplatTexturesCount)
+end
+
+local ScorchPreviousX = 0
+local ScorchPreviousZ = 0
+
 local VectorCached = Vector(0, 0, 0)
 
 -- upvalue for performance
@@ -236,6 +262,12 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
         local bp = self:GetBlueprint().Defense.MaxHealth
         if bp then
             self:DoTakeDamage(instigator, amount, vector, damageType)
@@ -337,9 +369,84 @@ Projectile = Class(moho.projectile_methods, Entity) {
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
         local damageData = self.DamageData
 
-        -- Do Damage
-
+        -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
+
+        -- do splat logic and knock over trees
+        local radius = damageData.DamageRadius
+        if radius > 0 then 
+
+            -- knock over trees
+            DamageArea( 
+                self,               -- instigator
+                vc,                 -- position
+                0.75 * radius,      -- radius
+                1,                  -- damage amount
+                'TreeForce',        -- damage type
+                false               -- damage friendly flag
+            )
+
+            -- try and spawn in a splat
+            if 
+                -- if we flat out hit the terrain
+                targetType == "Terrain" or 
+
+                -- if we hit a unit that is on land
+                (targetEntity and targetEntity.Layer == "Land") 
+            then 
+
+                -- see if we should spawn the splat
+                local rng = Random()
+                local dx = ScorchPreviousX - vc[1]
+                local dz = ScorchPreviousZ - vc[3]
+                local dsqrt = dx * dx + dz * dz 
+                if 
+                    -- always a 10% chance to spawn a splat
+                    rng < 0.1 or 
+                    
+                    -- spawn splat if we're sufficient spaced from the previous splat we made
+                    dsqrt > 0.5 * radius 
+                then 
+
+                    -- keep track of where the last splat was created
+                    ScorchPreviousX = vc[1]
+                    ScorchPreviousZ = vc[3]
+
+                    -- choose a splat to spawn
+                    local splat = ScorchSplatTextures[ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex]]
+                    ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
+                    if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then 
+                        ScorchSplatTexturesLookupIndex = 1 
+                    end
+
+                    -- less damage means less size, needs at least 100 damage for full size
+                    local damageMultiplier = (0.01 * damageData.DamageAmount)
+                    if damageMultiplier > 1 then 
+                        damageMultiplier = 1
+                    end
+
+                    local altRadius = damageMultiplier * radius  
+
+                    -- radius, lod and lifetime share the same rng adjustment
+                    local rngRadius = altRadius * Random()
+
+                    CreateSplat(
+
+                        -- position, orientation and the splat
+                        vc,                                 -- position
+                        6.28 * Random(),                    -- heading
+                        splat,                              -- splat
+
+                        -- scale the splat, lod and duration randomly
+                        0.75 * altRadius + 0.2 * rngRadius, -- size x
+                        0.75 * altRadius + 0.2 * rngRadius, -- size z
+                        50 * altRadius + 50 * rngRadius,   -- lod
+                        25 * altRadius + 25 * rngRadius,     -- duration
+                        self.Army                           -- owner of splat
+                    )
+                end
+            end
+        end
 
         -- Buffs (Stun, etc)
         self:DoUnitImpactBuffs(targetEntity)

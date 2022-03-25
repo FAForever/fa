@@ -218,6 +218,11 @@ Prop = Class(moho.prop_methods, Entity) {
     -- @param damageType The type of damage ('Normal', 'Fire', ...)
     OnDamage = function(self, instigator, amount, direction, damageType)
 
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
         -- if we're immune then we're good
         if not self.CanTakeDamage then 
             return 
