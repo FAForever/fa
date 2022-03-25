@@ -18,6 +18,7 @@ end
 
 ---
 --  Projectile:CreateChildProjectile(blueprint)
+-- Internally calls import to find the projectile
 function Projectile:CreateChildProjectile(blueprint)
 end
 

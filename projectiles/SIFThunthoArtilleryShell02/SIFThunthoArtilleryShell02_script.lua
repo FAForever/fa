@@ -12,6 +12,7 @@
 local VectorCached = Vector(0, 0, 0)
 
 local Random = Random 
+local DamageArea = DamageArea
 local CreateDecal = CreateDecal
 local CreateTrail = CreateTrail
 

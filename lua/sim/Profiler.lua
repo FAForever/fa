@@ -19,6 +19,8 @@ local thread = false
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
 
+local lastImport = ""
+
 --- Toggles the profiler on / off
 function ToggleProfiler(army, forceEnable)
 
@@ -101,6 +103,14 @@ function ToggleProfiler(army, forceEnable)
                 -- prevent an empty scope
                 if scope == "" then 
                     scope = "other"
+                end
+
+                if name == "import" then 
+                    local trace = repr(debug.traceback())
+                    if lastImport ~= trace then 
+                        lastImport = trace 
+                        LOG(trace)
+                    end
                 end
 
                 -- keep track 

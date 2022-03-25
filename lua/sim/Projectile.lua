@@ -13,6 +13,7 @@ local Flare = import('/lua/defaultantiprojectile.lua').Flare
 local VectorCached = Vector(0, 0, 0)
 
 -- upvalue for performance
+local EntityGetBlueprint = _G.moho.entity_methods.GetBlueprint
 local EntityGetArmy = _G.moho.entity_methods.GetArmy
 local EntitySetMaxHealth = _G.moho.entity_methods.SetMaxHealth
 local EntitySetHealth = _G.moho.entity_methods.SetHealth
@@ -172,7 +173,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         -- populate blueprint cache if we haven't done that yet
         if not self.Cache then 
-            local bp = self:GetBlueprint()
+            local bp = EntityGetBlueprint(self)
             PopulateBlueprintCache(self, bp)
         end
 
@@ -562,17 +563,16 @@ DummyProjectile = Class(moho.projectile_methods, Entity) {
     __init = false,
     __post_init = false,
 
-    OnCreate = function(self, inWater) 
-
-        local bp = self:GetBlueprint()
+    OnCreate = function(self, inWater)
 
         -- populate blueprint cache if we haven't done that yet
         if not self.Cache then 
-            PopulateBlueprintCache(self, bp)
+            PopulateBlueprintCache(self, EntityGetBlueprint(self))
         end
 
         -- copy reference from meta table to inner table
         self.Cache = self.Cache
+        self.Blueprint = self.Cache.Blueprint
 
         -- expected to be cached by all projectiles
         self.Army = self:GetArmy()
