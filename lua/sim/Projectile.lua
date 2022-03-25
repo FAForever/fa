@@ -10,6 +10,40 @@ local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
+-- scorch mark interaction
+local ScorchSplatTextures = {
+    'scorch_001_albedo',
+    'scorch_002_albedo',
+    'scorch_003_albedo',
+    'scorch_004_albedo',
+    'scorch_005_albedo',
+    'scorch_006_albedo',
+    'scorch_007_albedo',
+    'scorch_008_albedo',
+    'scorch_009_albedo',
+    'scorch_010_albedo',
+}
+
+-- various information surrounding the scorch marks that allows us to quickly access scorch marks
+-- and prevents scorch marks at the same location
+local ScorchSplatTexturesCount = table.getn(ScorchSplatTextures)
+local ScorchSplatTexturesLookup = { }
+local ScorchSplatTexturesLookupCount = 100
+local ScorchSplatTexturesLookupIndex = 1
+for k = 1, ScorchSplatTexturesLookupCount do 
+    ScorchSplatTexturesLookup[k] = Random(1, ScorchSplatTexturesCount)
+end
+
+-- terrain interaction 
+local GetTerrainType = GetTerrainType
+local DefaultTerrainType = GetTerrainType(-1, -1)
+local TerrainEffectsPreviousX = 0
+local TerrainEffectsPreviousZ = 0
+
+-- keep track of the previous impact location to cull effects
+local OnImpactPreviousX = 0
+local OnImpactPreviousZ = 0
+
 local VectorCached = Vector(0, 0, 0)
 
 -- upvalue for performance
@@ -29,8 +63,10 @@ local TableEmpty = table.empty
 local EntityCategoryContains = EntityCategoryContains
 local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
-local GetTerrainType = GetTerrainType
-local DefaultTerrainType = GetTerrainType(-1, -1)
+local CreateSplat = CreateSplat
+local DamageArea = DamageArea
+local Random = Random
+
 
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
@@ -236,6 +272,12 @@ Projectile = Class(moho.projectile_methods, Entity) {
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
         local bp = self:GetBlueprint().Defense.MaxHealth
         if bp then
             self:DoTakeDamage(instigator, amount, vector, damageType)
@@ -336,10 +378,86 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
         local damageData = self.DamageData
+        local radius = damageData.DamageRadius or 0
+        local bp = self.Blueprint 
 
-        -- Do Damage
-
+        -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
+
+        -- compute whether we should spawn additional effects for this 
+        -- projectile, there's always a 10% chance or if we're far away from 
+        -- the previous impact
+        local dx = OnImpactPreviousX - vc[1]
+        local dz = OnImpactPreviousZ - vc[3]
+        local dsqrt = dx * dx + dz * dz
+        local doEffects = Random() < 0.1 or dsqrt > radius
+        
+        -- update last position of known effects
+        if doEffects then 
+            OnImpactPreviousX = vc[1]
+            OnImpactPreviousZ = vc[3]
+        end
+
+        -- do splat logic and knock over trees
+        if doEffects and radius > 0 then 
+
+            -- knock over trees
+            DamageArea( 
+                self,               -- instigator
+                vc,                 -- position
+                0.75 * radius,      -- radius
+                1,                  -- damage amount
+                'TreeForce',        -- damage type
+                false               -- damage friendly flag
+            )
+
+            -- try and spawn in a splat
+            if 
+                -- if we flat out hit the terrain
+                targetType == "Terrain" or 
+
+                -- if we hit a unit that is on land
+                (targetEntity and targetEntity.Layer == "Land") 
+            then 
+                -- choose a splat to spawn
+                local splat = bp.Display.ScorchSplat
+                if not splat then 
+                    splat = ScorchSplatTextures[ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex]]
+                    ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
+                    if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then 
+                        ScorchSplatTexturesLookupIndex = 1 
+                    end
+                end
+
+                -- choose our radius to use
+                local altRadius = bp.Display.ScorchSplatSize
+                if not altRadius then 
+                    local damageMultiplier = (0.01 * damageData.DamageAmount)
+                    if damageMultiplier > 1 then 
+                        damageMultiplier = 1
+                    end
+                    altRadius = damageMultiplier * radius
+                end
+
+                -- radius, lod and lifetime share the same rng adjustment
+                local rngRadius = altRadius * Random()
+
+                CreateSplat(
+
+                    -- position, orientation and the splat
+                    vc,                                     -- position
+                    6.28 * Random(),                        -- heading
+                    splat,                                  -- splat
+
+                    -- scale the splat, lod and duration randomly
+                    0.75 * altRadius + 0.2 * rngRadius,     -- size x
+                    0.75 * altRadius + 0.2 * rngRadius,     -- size z
+                    10 + 30 * altRadius + 30 * rngRadius,   -- lod
+                    8 + 8 * altRadius + 8 * rngRadius,      -- duration
+                    self.Army                               -- owner of splat
+                )
+            end
+        end
 
         -- Buffs (Stun, etc)
         self:DoUnitImpactBuffs(targetEntity)
@@ -358,7 +476,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         --  'ProjectileUnderWater
         local ImpactEffects = false
         local ImpactEffectScale = 1
-        local bp = self.Blueprint 
         local bpAud = bp.Audio
 
         -- Sounds for all other impacts, ie: Impact<TargetTypeName>
@@ -408,16 +525,19 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
         ImpactEffects = ImpactEffects or { }
 
-        -- impact effects
+        -- impact effects, always make these
         self:CreateImpactEffects(self.Army, ImpactEffects, ImpactEffectScale)
 
-        -- terrain effects
-        local TerrainEffects = self:GetTerrainEffects(targetType, bp.Display.ImpactEffects.Type, vc)
-        if TerrainEffects then 
-            self:CreateTerrainEffects(self.Army, TerrainEffects, bp.Display.ImpactEffects.Scale or 1)
+        -- terrain effects, only make these when they're relatively unique
+        if doEffects then   
+            -- do the terrain effects
+            local TerrainEffects = self:GetTerrainEffects(targetType, bp.Display.ImpactEffects.Type, vc)
+            if TerrainEffects then 
+                self:CreateTerrainEffects(self.Army, TerrainEffects, bp.Display.ImpactEffects.Scale or 1)
+            end
         end
 
-        -- some time out value
+        -- in case we die slightly later
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
             self:ForkThread(self.ImpactTimeoutThread, timeout)
