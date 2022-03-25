@@ -379,6 +379,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
         local damageData = self.DamageData
         local radius = damageData.DamageRadius or 0
+        local bp = self.Blueprint 
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
@@ -419,19 +420,25 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 (targetEntity and targetEntity.Layer == "Land") 
             then 
                 -- choose a splat to spawn
-                local splat = ScorchSplatTextures[ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex]]
-                ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
-                if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then 
-                    ScorchSplatTexturesLookupIndex = 1 
+                local splat = bp.Display.ScorchSplat
+                
+                if not splat then 
+                    splat = ScorchSplatTextures[ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex]]
+                    ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
+                    if ScorchSplatTexturesLookupIndex > ScorchSplatTexturesLookupCount then 
+                        ScorchSplatTexturesLookupIndex = 1 
+                    end
                 end
 
-                -- less damage means less size, needs at least 100 damage for full size
-                local damageMultiplier = (0.01 * damageData.DamageAmount)
-                if damageMultiplier > 1 then 
-                    damageMultiplier = 1
+                -- choose our radius to use
+                local altRadius = bp.Display.ScorchSplatSize
+                if not altRadius then 
+                    local damageMultiplier = (0.01 * damageData.DamageAmount)
+                    if damageMultiplier > 1 then 
+                        damageMultiplier = 1
+                    end
+                    altRadius = damageMultiplier * radius
                 end
-
-                local altRadius = damageMultiplier * radius  
 
                 -- radius, lod and lifetime share the same rng adjustment
                 local rngRadius = altRadius * Random()
@@ -470,7 +477,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
         --  'ProjectileUnderWater
         local ImpactEffects = false
         local ImpactEffectScale = 1
-        local bp = self.Blueprint 
         local bpAud = bp.Audio
 
         -- Sounds for all other impacts, ie: Impact<TargetTypeName>
