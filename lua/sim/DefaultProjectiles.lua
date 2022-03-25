@@ -242,12 +242,13 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
         if self.PolyTrails then
             local effect
+            local army = self.Army 
             if self.RandomPolyTrails ~= 0 then
                 local index
                 local NumPolyTrails = TableGetn(self.PolyTrails)
                 for i = 1, self.RandomPolyTrails do
                     index = Random(1, NumPolyTrails)
-                    effect = CreateTrail(self, -1, self.Army, self.PolyTrails[index])
+                    effect = CreateTrail(self, -1, army, self.PolyTrails[index])
 
                     -- only do these engine calls when they matter
                     if self.PolyTrailOffset[index] ~= 0 then 
@@ -256,7 +257,7 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
                 end
             else
                 for i = 1, NumPolyTrails do
-                    effect = CreateTrail(self, -1, self.Army, self.PolyTrails[i])
+                    effect = CreateTrail(self, -1, army, self.PolyTrails[i])
 
                     -- only do these engine calls when they matter
                     if self.PolyTrailOffset[i] ~= 0 then 
@@ -324,7 +325,7 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
         Projectile.OnCreate(self, inWater)
 
         if inWater then
-            
+
             local effect 
             local army = self.Army 
 
