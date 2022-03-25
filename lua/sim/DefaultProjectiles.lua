@@ -4,6 +4,7 @@
 -- Summary  : Script for default projectiles
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
+
 local Projectile = import('/lua/sim/Projectile.lua').Projectile
 local DummyProjectile = import('/lua/sim/Projectile.lua').DummyProjectile
 local UnitsInSphere = import('/lua/utilities.lua').GetTrueEnemyUnitsInSphere
@@ -243,9 +244,10 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
         if self.PolyTrails then
             local effect
             local army = self.Army 
+            local NumPolyTrails = TableGetn(self.PolyTrails)
+
             if self.RandomPolyTrails ~= 0 then
                 local index
-                local NumPolyTrails = TableGetn(self.PolyTrails)
                 for i = 1, self.RandomPolyTrails do
                     index = Random(1, NumPolyTrails)
                     effect = CreateTrail(self, -1, army, self.PolyTrails[index])
