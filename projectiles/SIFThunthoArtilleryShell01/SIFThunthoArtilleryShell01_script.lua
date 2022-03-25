@@ -27,23 +27,7 @@ local ProjectileCreateChildProjectile = _G.moho.projectile_methods.CreateChildPr
 local ProjectileSetVelocity = _G.moho.projectile_methods.SetVelocity
 local ProjectileGetVelocity = _G.moho.projectile_methods.GetVelocity
 
-local ProjectileOnCreate = import('/lua/sim/Projectile.lua').Projectile.OnCreate
-
 SIFThunthoArtilleryShell01 = Class(SThunthoArtilleryShell) {
-               
-    OnCreate = function(self, spec)
-        ProjectileOnCreate(self, spec)
-
-        -- create the fx for trails
-        for i in self.FxTrails do
-            CreateEmitterOnEntity(self, self.Army, self.FxTrails[i])
-        end
-
-        -- create an actual trail
-        for i in self.PolyTrails do
-            CreateTrail(self, -1, self.Army, self.PolyTrails[i])
-        end
-    end,
 
     OnImpact = function(self, TargetType, TargetEntity) 
 

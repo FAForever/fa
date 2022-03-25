@@ -19,18 +19,8 @@ local CreateTrail = CreateTrail
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 
 local SThunthoArtilleryShell2 = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell2
-local ProjectileOnCreate = import('/lua/sim/Projectile.lua').Projectile.OnCreate
 
 SIFThunthoArtilleryShell02 = Class(SThunthoArtilleryShell2) {
-
-    OnCreate = function(self, spec)
-        ProjectileOnCreate(self, spec)
-
-        -- create an actual trail
-        for i in self.PolyTrails do
-            CreateTrail(self, -1, self.Army, self.PolyTrails[i])
-        end
-    end,
 
     OnImpact = function(self, targetType, targetEntity)
         SThunthoArtilleryShell2.OnImpact(self, targetType, targetEntity)
