@@ -421,7 +421,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
             then 
                 -- choose a splat to spawn
                 local splat = bp.Display.ScorchSplat
-                
                 if not splat then 
                     splat = ScorchSplatTextures[ScorchSplatTexturesLookup[ScorchSplatTexturesLookupIndex]]
                     ScorchSplatTexturesLookupIndex = ScorchSplatTexturesLookupIndex + 1
