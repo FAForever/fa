@@ -40,7 +40,7 @@ local DefaultTerrainType = GetTerrainType(-1, -1)
 local TerrainEffectsPreviousX = 0
 local TerrainEffectsPreviousZ = 0
 
---
+-- keep track of the previous impact location to cull effects
 local OnImpactPreviousX = 0
 local OnImpactPreviousZ = 0
 
