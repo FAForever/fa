@@ -1,0 +1,162 @@
+EmitterBlueprint {
+	BlueprintId = 'destruction_explosion_fire_plume_04',
+	Lifetime = 40.00,
+	Repeattime = 40.00,
+	TextureFramecount = 1.00,
+	Blendmode = 1.00,
+	LocalVelocity = false,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = -1.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = false,
+	ParticleResistance = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 5.00,
+	LowFidelity = true,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = [[/textures/particles/fire_multiply_01.dds]],
+	RampTexture = [[/textures/particles/ramp_white_premod_02.dds]],
+	XDirectionCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=0.000,z=0.020 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=18.470,y=0.000,z=0.020 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=19.736,y=0.000,z=0.020 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=19.420,y=0.500,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.000,y=40.000,z=20.000 },
+			{ x=40.000,y=23.578,z=8.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.000,y=0.120,z=0.100 },
+			{ x=40.000,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.000,y=0.000,z=0.150 },
+			{ x=39.800,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.000,y=-0.240,z=0.500 },
+			{ x=39.800,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.200,y=0.000,z=0.500 },
+			{ x=40.000,y=0.000,z=0.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.106,y=1.000,z=0.300 },
+			{ x=40.000,y=0.030,z=0.030 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.000,y=0.800,z=0.250 },
+			{ x=39.800,y=0.060,z=0.030 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.264,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=20.000,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=8.400,y=0.500,z=0.000 },
+		},
+	},
+}
+

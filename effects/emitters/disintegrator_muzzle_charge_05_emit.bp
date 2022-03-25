@@ -1,0 +1,146 @@
+EmitterBlueprint {
+	BlueprintId = 'disintegrator_muzzle_charge_05',
+	Lifetime = 8.00,
+	Repeattime = 8.00,
+	TextureFramecount = 1.00,
+	Blendmode = 4.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = -1.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	Texture = [[/textures/particles/geyser_01.dds]],
+	RampTexture = [[/textures/particles/ramp_sonic_pulse_01.dds]],
+	XDirectionCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.016,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.043,y=6.759,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.021,y=1.347,z=1.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.043,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=0.080,y=0.170,z=0.000 },
+			{ x=7.952,y=0.170,z=0.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.339,y=0.000,z=0.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=3.979,y=0.254,z=0.300 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 8.00,
+		Keys = {
+			{ x=4.000,y=0.000,z=0.000 },
+		},
+	},
+}
+
