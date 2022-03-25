@@ -452,8 +452,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
                     -- scale the splat, lod and duration randomly
                     0.75 * altRadius + 0.2 * rngRadius,     -- size x
                     0.75 * altRadius + 0.2 * rngRadius,     -- size z
-                    20 + 40 * altRadius + 40 * rngRadius,   -- lod
-                    20 + 10 * altRadius + 10 * rngRadius,   -- duration
+                    10 + 30 * altRadius + 30 * rngRadius,   -- lod
+                    8 + 8 * altRadius + 8 * rngRadius,      -- duration
                     self.Army                               -- owner of splat
                 )
             end
