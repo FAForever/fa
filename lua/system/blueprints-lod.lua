@@ -56,7 +56,14 @@ end
 --- Calculates the LODs of a single emitter
 -- @param emitter Emitter to compute the LODs for
 local function CalculateLODOfEmitter(emitter)
-    if emitter.LODCutoff == -1 then 
+    if 
+        -- if the LOD is set to infinity
+        emitter.LODCutoff == -1 and 
+
+        -- and this is not an emitter from a mod
+        not string.find(emitter.BlueprintId, "mods") 
+    then 
+        -- then we can safely set it to 160
         emitter.LODCutoff = 160
     end
 end
