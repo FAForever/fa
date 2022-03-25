@@ -13,6 +13,20 @@ local OCProjectiles = {}
 -- shared between sim and ui
 local OverchargeShared = import('/lua/shared/overcharge.lua')
 
+-- upvalue globals for performance
+local Random = Random
+local CreateTrail = CreateTrail
+local CreateEmitterOnEntity = CreateEmitterOnEntity
+local CreateBeamEmitterOnEntity = CreateBeamEmitterOnEntity
+
+local TableGetn = table.getn
+
+local MathFloor = math.floor 
+
+-- upvalue moho functions for performance
+local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
+local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
+
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
@@ -22,9 +36,6 @@ NullShell = Class(Projectile) {}
 -- PROJECTILE WITH ATTACHED EFFECT EMITTERS
 -----------------------------------------------------------------
 
--- upvalue for performance
-local CreateEmitterOnEntity = CreateEmitterOnEntity
-
 EmitterProjectile = Class(Projectile) {
     FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
@@ -32,8 +43,19 @@ EmitterProjectile = Class(Projectile) {
 
     OnCreate = function(self)
         Projectile.OnCreate(self)
+
+        local effect
         for i in self.FxTrails do
-            CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
+            effect = CreateEmitterOnEntity(self, self.Army, self.FxTrails[i])
+            
+            -- only do these engine calls when they matter
+            if self.FxTrailScale ~= 1 then 
+                IEffectScaleEmitter(effect, self.FxTrailScale)
+            end
+            
+            if self.FxTrailOffset ~= 1 then 
+                IEffectOffsetEmitter(effect, 0, 0, self.FxTrailOffset)
+            end
         end
     end,
 }
@@ -48,6 +70,7 @@ SingleBeamProjectile = Class(EmitterProjectile) {
 
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
+
         if self.BeamName then
             CreateBeamEmitterOnEntity(self, -1, self.Army, self.BeamName)
         end
@@ -61,6 +84,7 @@ MultiBeamProjectile = Class(EmitterProjectile) {
 
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
+
         local beam = nil
         for k, v in self.Beams do
             CreateBeamEmitterOnEntity(self, -1, self.Army, v)
@@ -191,17 +215,20 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
 
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
+
         if self.PolyTrail ~= '' then
-            CreateTrail(self, -1, self.Army, self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
+            local effect = CreateTrail(self, -1, self.Army, self.PolyTrail)
+            
+            -- only do these engine calls when they matter
+            if self.PolyTrailOffset ~= 0 then 
+                IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset)
+            end
         end
     end,
 }
 
 -- upvalue for performance
-local TableGetn = table.getn
-local MathFloor = math.floor 
-local Random = Random
-local CreateTrail = CreateTrail
+
 
 MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
@@ -212,18 +239,29 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
     OnCreate = function(self)
         EmitterProjectile.OnCreate(self)
-        if self.PolyTrails then
-            local NumPolyTrails = TableGetn(self.PolyTrails)
 
+        if self.PolyTrails then
+            local effect
             if self.RandomPolyTrails ~= 0 then
-                local index = nil
+                local index
+                local NumPolyTrails = TableGetn(self.PolyTrails)
                 for i = 1, self.RandomPolyTrails do
-                    index = MathFloor(Random(1, NumPolyTrails))
-                    CreateTrail(self, -1, self.Army, self.PolyTrails[index]):OffsetEmitter(0, 0, self.PolyTrailOffset[index])
+                    index = Random(1, NumPolyTrails)
+                    effect = CreateTrail(self, -1, self.Army, self.PolyTrails[index])
+
+                    -- only do these engine calls when they matter
+                    if self.PolyTrailOffset[index] ~= 0 then 
+                        IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset[index])
+                    end
                 end
             else
                 for i = 1, NumPolyTrails do
-                    CreateTrail(self, -1, self.Army, self.PolyTrails[i]):OffsetEmitter(0, 0, self.PolyTrailOffset[i])
+                    effect = CreateTrail(self, -1, self.Army, self.PolyTrails[i])
+
+                    -- only do these engine calls when they matter
+                    if self.PolyTrailOffset[i] ~= 0 then 
+                        IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset[i])
+                    end
                 end
             end
         end
@@ -244,6 +282,7 @@ SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
 
     OnCreate = function(self)
         SinglePolyTrailProjectile.OnCreate(self)
+
         if self.BeamName ~= '' then
             CreateBeamEmitterOnEntity(self, -1, self.Army, self.BeamName)
         end
@@ -261,6 +300,7 @@ MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
 
     OnCreate = function(self)
         MultiPolyTrailProjectile.OnCreate(self)
+
         local beam = nil
         for k, v in self.Beams do
             CreateBeamEmitterOnEntity(self, -1, self.Army, v)
@@ -282,23 +322,61 @@ OnWaterEntryEmitterProjectile = Class(Projectile) {
 
     OnCreate = function(self, inWater)
         Projectile.OnCreate(self, inWater)
+
         if inWater then
+            
+            local effect 
+            local army = self.Army 
+
             for i in self.FxTrails do
-                CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
+                effect = CreateEmitterOnEntity(self, army, self.FxTrails[i])
+            
+                -- only do these engine calls when they matter
+                if self.FxTrailScale ~= 1 then 
+                    IEffectScaleEmitter(effect, self.FxTrailScale)
+                end
+                
+                if self.FxTrailOffset ~= 1 then 
+                    IEffectOffsetEmitter(effect, 0, 0, self.FxTrailOffset)
+                end
             end
+
             if self.PolyTrail ~= '' then
-                CreateTrail(self, -1, self.Army, self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
+                effect = CreateTrail(self, -1, army, self.PolyTrail)
+            
+                -- only do these engine calls when they matter
+                if self.PolyTrailOffset ~= 0 then 
+                    IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset)
+                end
             end
         end
     end,
 
     EnterWaterThread = function(self)
         WaitTicks(self.TrailDelay)
+
+        local effect 
+        local army = self.Army 
+
         for i in self.FxTrails do
-            CreateEmitterOnEntity(self, self.Army, self.FxTrails[i]):ScaleEmitter(self.FxTrailScale):OffsetEmitter(0, 0, self.FxTrailOffset)
+            effect = CreateEmitterOnEntity(self, army, self.FxTrails[i])
+        
+            -- only do these engine calls when they matter
+            if self.FxTrailScale ~= 1 then 
+                IEffectScaleEmitter(effect, self.FxTrailScale)
+            end
+            
+            if self.FxTrailOffset ~= 1 then 
+                IEffectOffsetEmitter(effect, 0, 0, self.FxTrailOffset)
+            end
         end
         if self.PolyTrail ~= '' then
-            CreateTrail(self, -1, self.Army, self.PolyTrail):OffsetEmitter(0, 0, self.PolyTrailOffset)
+            local effect = CreateTrail(self, -1, army, self.PolyTrail)
+            
+            -- only do these engine calls when they matter
+            if self.PolyTrailOffset ~= 0 then 
+                IEffectOffsetEmitter(effect, 0, 0, self.PolyTrailOffset)
+            end
         end
     end,
 
@@ -397,6 +475,7 @@ BaseGenericDebris = Class(DummyProjectile){
 -----------------------------------------------------------
 -- PROJECTILE THAT ADJUSTS DAMAGE AND ENERGY COST ON IMPACT
 -----------------------------------------------------------
+
 OverchargeProjectile = Class() {
     OnImpact = function(self, targetType, targetEntity)
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData
