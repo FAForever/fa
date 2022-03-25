@@ -378,13 +378,6 @@ CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
     FxUnitHitScale = 2.5,
     FxWaterHitScale = 2.5,
     FxOnKilledScale = 2.5,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-
-        -- add additional tree fire
-        DamageRing( self, pos, radius, 5/4 * radius, 1, 'TreeFire', FriendlyFire )
-    end,
 }
 
 --------------------------------------------------------------------------
