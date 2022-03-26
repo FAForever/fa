@@ -324,7 +324,7 @@ function ConstructClass(bases, specs)
                 -- todo, refine this a bit
                 if not exclusions[l] then 
                     -- first time we've seen this key, keep track of it
-                    if not seen[l] then 
+                    if seen[l] == nil then 
                         seen[l] = element 
 
                     -- we've seen this key before and it has the same matching element: we're good
@@ -358,7 +358,7 @@ function ConstructClass(bases, specs)
 
         -- clean up seen
         for k, element in seen do 
-            seen[k] = false 
+            seen[k] = nil 
         end
 
         -- populate class 
