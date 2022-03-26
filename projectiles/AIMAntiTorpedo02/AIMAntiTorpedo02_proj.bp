@@ -1,0 +1,41 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'ANTITORPEDO',
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/torpedo_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.1,
+    },
+    General = {
+        Category = 'Defense',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = false,
+        InitialSpeed = 120,
+        Lifetime = 0.5,
+        MaxSpeed = 30,
+        StayUnderwater = true,
+        TrackTarget = true,
+        TurnRate = 360,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}
