@@ -278,8 +278,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Store build information for performance
         self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
-        self.BuildExtentsY = bp.Physics.MeshExtentsY or bp.Footprint.SizeY
         self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
+        self.BuildExtentsY = bp.Physics.MeshExtentsY or math.max(self.BuildExtentsX, self.BuildExtentsZ)
         self.Elevation = bp.Physics.Elevation
         self.MeshBlueprint = bp.Display.MeshBlueprint
         self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
