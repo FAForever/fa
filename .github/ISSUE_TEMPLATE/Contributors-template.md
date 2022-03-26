@@ -1,6 +1,6 @@
 ---
-name: Bug report
-about: Create a report to describe a bug
+name: Contributors template
+about: Template for an extensive description of the issue to solve.
 title: ''
 labels: 'status: novel issue'
 assignees: ''
