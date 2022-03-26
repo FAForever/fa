@@ -16,7 +16,7 @@ local WeakKeyMeta = { __mode = 'k' }
 ExtendedErrorMessages = false
 
 function LazyVarMetaTable:__call()
-    if not self[1] then
+    if self.compute then
         if self.busy then
             error("circular dependency in lazy evaluation for variable " .. (self.trace or ''), 2)
         end
@@ -45,7 +45,7 @@ function LazyVarMetaTable:__call()
 end
 
 function LazyVarMetaTable:SetDirty(onDirtyList)
-    if self[1] then
+    if self[1]~=nil then
         if self.OnDirty then
             table.insert(onDirtyList, self)
         end
@@ -107,7 +107,11 @@ end
 function Create(initial)
     result = {&1&4}
     setmetatable(result, LazyVarMetaTable)
-    result[1] = initial or 0
+    if initial == nil then 
+        result[1] = 0
+    else
+        result[1] = initial
+    end
     result.used_by = {}
     setmetatable(result.used_by, WeakKeyMeta)
     result.uses = {}
