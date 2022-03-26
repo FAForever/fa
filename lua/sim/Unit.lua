@@ -376,9 +376,11 @@ Unit = Class(moho.unit_methods) {
         local size = self.Size
         local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
         local heading = self:GetHeading()
+
         sx = sx * scalar
         sy = sy * scalar
         sz = sz * scalar
+
         local rx = Random() * sx - (sx * 0.5)
         local y  = Random() * sy + (self.CollisionOffsetY or 0)
         local rz = Random() * sz - (sz * 0.5)
@@ -387,7 +389,7 @@ Unit = Class(moho.unit_methods) {
         local sinh = math.sin(heading)
 
         local x = cosh * rx - sinh * rz
-        local z = sinh * rx - cosh * rz
+        local z = sinh * rx + cosh * rz
 
         return x, y, z
     end,

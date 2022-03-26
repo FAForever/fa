@@ -1,9 +1,3 @@
-#
-# script for projectile BoneAttached
-#
-local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 
-UEFBuildEffect03 = Class(NullShell) {}
-
+UEFBuildEffect03 = Class(import('/lua/sim/projectile.lua').DummyProjectile) { }
 TypeClass = UEFBuildEffect03
-
