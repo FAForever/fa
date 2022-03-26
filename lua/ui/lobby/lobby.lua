@@ -2119,12 +2119,15 @@ local function refreshObserverList()
         end
     end
 
-    local numTeams = table.getn(teamRatings)
+    local numTeams = 0
+    for i, team in teamRatings do
+        numTeams = numTeams + 1
+    end
 
     -- if there are 2 or fewer teams, list them before observers
     if numTeams <= 2 then
         for i, rating in teamRatings do
-            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. rating[1] - rating[2] * 3 .. '      (' .. rating[1] .. ' +/- ' .. rating[2] * 3 .. ')')
+            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
         end
     end
 
@@ -2161,7 +2164,7 @@ local function refreshObserverList()
     -- if there are more than 2 teams, list them after observers
     if numTeams > 2 then
         for i, rating in teamRatings do
-            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. rating[1] - rating[2] * 3 .. '      (' .. rating[1] .. ' +/- ' .. rating[2] * 3 .. ')')
+           GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
         end
     end
 end
@@ -4439,6 +4442,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                     end
                 end
             end
+            refreshObserverList()
         end
 
         if lobbyComm:IsHost() then
@@ -5258,6 +5262,7 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
     local options = {}
     options[key] = val
     SetPlayerOptions(slot, options, ignoreRefresh)
+    refreshObserverList()
 end
 
 function SetGameOptions(options, ignoreRefresh)
@@ -6589,13 +6594,13 @@ function InitHostUtils()
                 SendSystemMessage("lobui_0227", incomingPlayer.PlayerName)
             end
 
-            refreshObserverList()
             SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
 
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[toPlayerSlot])
+            refreshObserverList()
         end,
 
         RemoveAI = function(slot)
@@ -6612,6 +6617,7 @@ function InitHostUtils()
                     Slot = slot,
                 }
             )
+            refreshObserverList()
         end,
 
         --- Returns false if there's an obvious reason why a slot movement between the two given
@@ -6676,6 +6682,7 @@ function InitHostUtils()
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
+            refreshObserverList()
         end,
 
         --- Swap the players in the two given slots.
@@ -6700,6 +6707,7 @@ function InitHostUtils()
             -- If we're moving onto a blank, take the easy way out.
             if not player2 then
                 HostUtils.MovePlayerToEmptySlot(slot1, slot2)
+                refreshObserverList()
                 return
             end
 
@@ -6722,6 +6730,7 @@ function InitHostUtils()
 
             -- %s has switched with %s
             SendSystemMessage("lobui_0417", player1.PlayerName, player2.PlayerName)
+            refreshObserverList()
         end,
 
         --- Add an observer
