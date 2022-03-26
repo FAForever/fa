@@ -357,7 +357,7 @@ UnitBlueprint {
             RateOfFire = 10,
             SlavedToBody = true,
             SlavedToBodyArcRange = 65,
-            TargetCheckInterval = 0.3,
+            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -434,7 +434,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.15,
-            TargetCheckInterval = 2,
+            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -524,7 +524,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.15,
-            TargetCheckInterval = 2,
+            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',

@@ -300,7 +300,7 @@ function ConstructClass(bases, specs)
             if t == "function" or t == "cfunction" then 
                 for kb, base in bases do 
                     -- we're trying to override something here
-                    if base[ks] then 
+                    if base[ks] ~= nil then 
 
                         -- keep track of the names and give them some unique identifier
                         if debug then 
@@ -335,7 +335,7 @@ function ConstructClass(bases, specs)
                         -- do nothing 
 
                     -- we've got two elements with the same key but different values, but our specs has a function to define the behavior: we're good
-                    elseif specs[l] then
+                    elseif specs[l] ~= nil then
                         -- do nothing
 
                     -- we've got two elements with the same key but different values, check if they're not secretly a state with matching identifiers
@@ -367,7 +367,7 @@ function ConstructClass(bases, specs)
         -- populate class 
         for k, base in bases do 
             for l, element in base do 
-                if not class[l] then 
+                if class[l] == nil then 
                     class[l] = element 
                 end
             end

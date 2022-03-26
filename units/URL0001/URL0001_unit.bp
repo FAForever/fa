@@ -323,7 +323,7 @@ UnitBlueprint {
         NaturalProducer = true,
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
-        StorageEnergy = 4000,
+        StorageEnergy = 3900,
         StorageMass = 650,
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,

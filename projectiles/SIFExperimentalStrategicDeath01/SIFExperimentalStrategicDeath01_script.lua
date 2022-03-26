@@ -33,8 +33,8 @@ SIFExperimentalStrategicDeath01 = Class(NullShell) {
         local orientation = RandomFloat(0,2*math.pi)
         local pos = self:GetPosition()
         
-        DamageArea(self, pos, 25, 1, 'Force', true)
-        DamageArea(self, pos, 25, 1, 'Force', true)
+        DamageArea(self, pos, 25, 1, 'TreeForce', true)
+        DamageArea(self, pos, 25, 1, 'TreeForce', true)
         
         CreateDecal(pos, orientation, 'Scorch_012_albedo', '', 'Albedo', 70, 70, 800, 0, army)
         CreateDecal(pos, orientation, 'Crater01_normals', '', 'Normals', 70, 70, 800, 0, army)

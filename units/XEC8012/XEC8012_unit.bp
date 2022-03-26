@@ -106,10 +106,6 @@ UnitBlueprint {
         VisionRadius = 0,
         WaterVisionRadius = 0,
     },
-    Intel = {
-        VisionRadius = 0,
-        WaterVisionRadius = 0,
-    },
     Interface = {
         HelpText = '<LOC xec8012_help>UEF Wall Segment',
     },

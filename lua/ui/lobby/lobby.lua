@@ -53,6 +53,9 @@ local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
 
+
+
+
 function GetAITypes()
     AIKeys = {}
     AIStrings = {}
@@ -81,6 +84,7 @@ local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
+
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 -- Add lobby options from AI mods
@@ -449,7 +453,20 @@ function GetLocalPlayerData()
 )
 end
 
-function GetAIPlayerData(name, AIPersonality)
+function GetAIPlayerData(name, AIPersonality, slot)
+   local AIColor
+   -- gets the color of the player/AI occupying the slot directly prior if available
+    for i = 1, LobbyComm.maxPlayerSlots do
+        if gameInfo.PlayerOptions[i].StartSpot == slot then
+            if IsColorFree(gameInfo.PlayerOptions[i].PlayerColor, slot) then
+                AIColor =  gameInfo.PlayerOptions[i].PlayerColor
+            end
+            break
+        end
+    end
+    if not AIColor then
+        AIColor = GetAvailableColor()
+    end
     return PlayerData(
         {
             OwnerID = hostID,
@@ -457,6 +474,8 @@ function GetAIPlayerData(name, AIPersonality)
             Ready = true,
             Human = false,
             AIPersonality = AIPersonality,
+            PlayerColor = AIColor,
+            ArmyColor = AIColor,
         }
 )
 end
@@ -1111,10 +1130,16 @@ function ClearSlotInfo(slotIndex)
     RefreshMapPositionForAllControls(slotIndex)
 end
 
-function IsColorFree(colorIndex)
+function IsColorFree(colorIndex, currentSlotNumber)
     for id, player in gameInfo.PlayerOptions:pairs() do
         if player.PlayerColor == colorIndex then
-            return false
+            if currentSlotNumber then
+                if player.StartSpot != currentSlotNumber then
+                    return false
+                end
+            else
+                return false
+            end
         end
     end
 
@@ -2074,6 +2099,38 @@ end
 local function refreshObserverList()
     GUI.observerList:DeleteAllItems()
 
+    -- create the table that will hold the data for displaying team rating information
+    local teamRatings = {}
+
+    -- cycle through each player
+    for i, player in gameInfo.PlayerOptions:pairs() do
+
+        -- get the team number (which is 1 higher on the backend)
+        local team = player.Team - 1
+        -- add the player's rating information if the player is on a team
+        if team > 0 then
+            -- make sure the team is included in the teamRatings table
+            if teamRatings[team] == nil  then
+                -- initialize the team's rating in this table as having 0 mean and 0 deviation, respectively
+                teamRatings[team] = {0, 0}
+            end
+            -- add the player's rating information (mean and deviation) to the its team's totals
+            teamRatings[team] = {teamRatings[team][1] + player.MEAN, teamRatings[team][2] + player.DEV}
+        end
+    end
+
+    local numTeams = 0
+    for i, team in teamRatings do
+        numTeams = numTeams + 1
+    end
+
+    -- if there are 2 or fewer teams, list them before observers
+    if numTeams <= 2 then
+        for i, rating in teamRatings do
+            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
+        end
+    end
+
     for slot, observer in gameInfo.Observers:pairs() do
         observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
 
@@ -2102,6 +2159,13 @@ local function refreshObserverList()
         observer_label = observer_label .. ")"
 
         GUI.observerList:AddItem(observer_label)
+    end
+
+    -- if there are more than 2 teams, list them after observers
+    if numTeams > 2 then
+        for i, rating in teamRatings do
+           GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
+        end
     end
 end
 
@@ -2426,11 +2490,12 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
 end
 
 function GetAvailableColor()
-    for colorIndex, colorVal in gameColors.PlayerColors do
-        if IsColorFree(colorIndex) then
-            return colorIndex
+    for i = 1, LobbyComm.maxPlayerSlots do
+        if IsColorFree(gameColors.DefaultColorOrder[i]) then
+            return gameColors.DefaultColorOrder[i]
         end
     end
+    WARN('Error: No available colors found.')
 end
 
 --- This function is retarded.
@@ -4187,7 +4252,7 @@ function AddChatText(text, playerID, scrollToBottom)
     local textColor = "AAAAAA"
     local nameFont = "Arial Gras"
     for id, player in gameInfo.PlayerOptions:pairs() do
-        if player.OwnerID == playerID then
+        if player.OwnerID == playerID and player.Human then
             textColor = nil
             nameColor = gameColors.PlayerColors[player.PlayerColor]
             if not chatPlayerColor then
@@ -4377,6 +4442,7 @@ function ConfigureMapListeners(mapCtrl, scenario)
                     end
                 end
             end
+            refreshObserverList()
         end
 
         if lobbyComm:IsHost() then
@@ -5196,6 +5262,7 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
     local options = {}
     options[key] = val
     SetPlayerOptions(slot, options, ignoreRefresh)
+    refreshObserverList()
 end
 
 function SetGameOptions(options, ignoreRefresh)
@@ -6292,7 +6359,9 @@ function Check_Availaible_Color(slot)
             for c, color in unusedColours do
                 availableColours[c] = color
             end
+            -- add this slot's color to its availableColours (you get a nil lazyvar error if it's not included)
             availableColours[ gameInfo.PlayerOptions[i].PlayerColor] = gameColors.PlayerColors[gameInfo.PlayerOptions[i].PlayerColor]
+            -- set the list of available colors for this slot
             GUI.slots[i].color:ChangeBitmapArray(availableColours, true)
         end
     end
@@ -6525,13 +6594,13 @@ function InitHostUtils()
                 SendSystemMessage("lobui_0227", incomingPlayer.PlayerName)
             end
 
-            refreshObserverList()
             SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
 
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[toPlayerSlot])
+            refreshObserverList()
         end,
 
         RemoveAI = function(slot)
@@ -6548,6 +6617,7 @@ function InitHostUtils()
                     Slot = slot,
                 }
             )
+            refreshObserverList()
         end,
 
         --- Returns false if there's an obvious reason why a slot movement between the two given
@@ -6612,6 +6682,7 @@ function InitHostUtils()
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
+            refreshObserverList()
         end,
 
         --- Swap the players in the two given slots.
@@ -6636,6 +6707,7 @@ function InitHostUtils()
             -- If we're moving onto a blank, take the easy way out.
             if not player2 then
                 HostUtils.MovePlayerToEmptySlot(slot1, slot2)
+                refreshObserverList()
                 return
             end
 
@@ -6658,6 +6730,7 @@ function InitHostUtils()
 
             -- %s has switched with %s
             SendSystemMessage("lobui_0417", player1.PlayerName, player2.PlayerName)
+            refreshObserverList()
         end,
 
         --- Add an observer
@@ -6684,7 +6757,7 @@ function InitHostUtils()
             refreshObserverList()
         end,
 
-        --- Attempt to add a player to a slot. If no is available, add them as an observer.
+        --- Attempt to add a player to a slot. If none are available, add them as an observer.
         --
         -- @param senderID The peer ID of the player we're adding.
         -- @param slot The slot to insert the player to. A value of less than 1 indicates "any slot"
@@ -6711,7 +6784,7 @@ function InitHostUtils()
             end
 
             -- if a color is requested, attempt to use that color if available, otherwise, assign first available
-            if not IsColorFree(playerData.PlayerColor) then
+            if not IsColorFree(playerData.PlayerColor, slot) then
                 SetPlayerColor(playerData, GetAvailableColor())
             end
 
@@ -6728,6 +6801,7 @@ function InitHostUtils()
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
             PossiblyAnnounceGameFull()
+            refreshObserverList()
         end,
 
         --- Add an AI to the game in the given slot.
@@ -6737,7 +6811,7 @@ function InitHostUtils()
         -- @param slot (optional) The slot into which to put this AI. Defaults to the first empty
         --                        slot from the top of the list.
         AddAI = function(name, personality, slot)
-            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality))
+            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality, slot))
         end,
 
         PlayerMissingMapAlert = function(id)

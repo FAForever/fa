@@ -18,6 +18,7 @@ local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
 local EfctUtil = import('EffectUtilities.lua')
+local ApplyWindDirection = EfctUtil.ApplyWindDirection
 local CreateEffects = EfctUtil.CreateEffects
 local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
 local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
@@ -588,27 +589,56 @@ end
 -- WRECKAGE EFFECTS --
 ----------------------
 
-function CreateWreckageEffects(obj, prop)
-    if IsUnit(obj) then
-        local scale = GetAverageBoundingXYZRadius(obj)
-        local emitters = {}
-        local layer = obj.Layer
+local MathFloor = math.floor
 
-        if scale < 0.5 then -- SMALL UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsSml01, 1)
-        elseif scale > 1.5 then -- LARGE UNITS
-            local x,y,z = GetUnitSizes(obj)
-            emitters = CreateEffectsWithRandomOffset(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsLrg01, x, 0, z)
-        else -- MEDIUM UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsMed01, 2)
-        end
+-- upvalue for performance
+local IEffectSetEmitterParam = _G.moho.IEffect.SetEmitterParam
+local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
+local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
+local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 
-        -- Give the emitters created some random lifetimes
-        ScaleEmittersParam(emitters, 'LIFETIME', 100, 1000)
+-- direct access for performance
+local DefaultWreckageEffects = EffectTemplate.DefaultWreckageEffectsLrg01
+local DefaultWreckageEffectsCount = EffectTemplate.DefaultWreckageEffectsLrg01Count
 
-        for k, v in emitters do
-            v:ScaleEmitter(GetRandomFloat(0.25, 1))
-        end
+-- remove all wreckage effects, but keep for compatibility
+function CreateWreckageEffects(unit, prop)
+
+    -- determine number of effects
+    local blueprint = unit.Blueprint or EntityGetBlueprint(unit)
+
+    -- we can't make an animation for these based on bones: they spawn at the unanimated locations
+    if blueprint.Display.AnimationDeath then 
+        return 
+    end
+
+    -- determine number of effects
+    local bones = unit:GetBoneCount()
+    local size = MathFloor(0.2 * (blueprint.SizeX + blueprint.SizeY + blueprint.SizeZ)) + 1
+    if size > bones - 1 then 
+        size = bones - 1
+    end
+
+    -- localize for performance
+    local Random = Random 
+    local bone, effect, emitter, r1
+
+    -- spawn the effects
+    for k = 1, size do 
+        -- create an emitter at a bone
+        bone = Random(1, bones - 1) - 1
+        effect = Random(1, DefaultWreckageEffectsCount)
+        emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffects[effect])
+
+        -- larger smoke tends to live longer
+        r1 = Random()
+        IEffectScaleEmitter(emitter, 0.5 + 0.75 * r1)
+        IEffectSetEmitterParam(emitter, 'LIFETIME', 40 + 75 * r1)
+
+        -- apply wind direction
+        ApplyWindDirection(emitter, 1.0)
+
+        prop.Trash:Add(emitter)
     end
 end
 

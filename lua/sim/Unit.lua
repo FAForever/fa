@@ -277,8 +277,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Store build information for performance
         self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
-        self.BuildExtentsY = bp.Physics.MeshExtentsY or bp.Footprint.SizeY
         self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
+        self.BuildExtentsY = bp.Physics.MeshExtentsY or math.max(self.BuildExtentsX, self.BuildExtentsZ)
         self.Elevation = bp.Physics.Elevation
         self.MeshBlueprint = bp.Display.MeshBlueprint
         self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
@@ -375,14 +375,20 @@ Unit = Class(moho.unit_methods) {
         local size = self.Size
         local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
         local heading = self:GetHeading()
+
         sx = sx * scalar
         sy = sy * scalar
         sz = sz * scalar
+
         local rx = Random() * sx - (sx * 0.5)
         local y  = Random() * sy + (self.CollisionOffsetY or 0)
         local rz = Random() * sz - (sz * 0.5)
-        local x = math.cos(heading) * rx - math.sin(heading) * rz
-        local z = math.sin(heading) * rx - math.cos(heading) * rz
+
+        local cosh = math.cos(heading)
+        local sinh = math.sin(heading)
+
+        local x = cosh * rx - sinh * rz
+        local z = sinh * rx + cosh * rz
 
         return x, y, z
     end,
@@ -1030,6 +1036,12 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 
@@ -3957,7 +3969,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         self:SetFocusEntity(self.MyShield)
-        self:EnableShield()
         self.Trash:Add(self.MyShield)
     end,
 
@@ -4498,6 +4509,7 @@ Unit = Class(moho.unit_methods) {
             WARN("Source: " .. repr(debug.getinfo(2)))
             WARN("Stacktrace:" .. repr(debug.traceback()))
         end
+
         return self.Dead
     end,
 

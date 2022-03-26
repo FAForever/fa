@@ -5,10 +5,14 @@ local ReclaimBeams = import('/lua/EffectTemplates.lua').ReclaimBeams
 local ReclaimObjectEnd = import('/lua/EffectTemplates.lua').ReclaimObjectEnd
 
 -- upvalue for performance
+local Random = Random 
+
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local CreateLightParticleIntel = CreateLightParticleIntel
+
+local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 
 --- Played when reclaiming starts.
 -- @param reclaimer Unit that is reclaiming
@@ -48,4 +52,13 @@ function PlayReclaimEndEffects(reclaimer, reclaimed)
 
     -- create light effect
     CreateLightParticleIntel(reclaimed, -1, army, 4, 6, 'glow_02', 'ramp_flare_02')
+end
+
+--- Applies the wind direction to an emitter.
+-- @param emitter Emitter to apply the wind direction to
+function ApplyWindDirection(emitter, factor)
+    local r = Random()
+    IEffectSetEmitterCurveParam(emitter, "XDIR_CURVE", factor * 0.01, factor * (0.01 + 0.01 * r))
+    IEffectSetEmitterCurveParam(emitter, "YDIR_CURVE", factor * 0.0025, factor * (0.005 + 0.01 * Random()))
+    IEffectSetEmitterCurveParam(emitter, "ZDIR_CURVE", factor * 0.01, factor * (0.01 + 0.01 * r))
 end
