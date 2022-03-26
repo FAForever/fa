@@ -2099,6 +2099,35 @@ end
 local function refreshObserverList()
     GUI.observerList:DeleteAllItems()
 
+    -- create the table that will hold the data for displaying team rating information
+    local teamRatings = {}
+
+    -- cycle through each player
+    for i, player in gameInfo.PlayerOptions:pairs() do
+
+        -- get the team number (which is 1 higher on the backend)
+        local team = player.Team - 1
+        -- add the player's rating information if the player is on a team
+        if team > 0 then
+            -- make sure the team is included in the teamRatings table
+            if teamRatings[team] == nil  then
+                -- initialize the team's rating in this table as having 0 mean and 0 deviation, respectively
+                teamRatings[team] = {0, 0}
+            end
+            -- add the player's rating information (mean and deviation) to the its team's totals
+            teamRatings[team] = {teamRatings[team][1] + player.MEAN, teamRatings[team][2] + player.DEV}
+        end
+    end
+
+    local numTeams = table.getn(teamRatings)
+
+    -- if there are 2 or fewer teams, list them before observers
+    if numTeams <= 2 then
+        for i, rating in teamRatings do
+            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. rating[1] - rating[2] * 3 .. '      (' .. rating[1] .. ' +/- ' .. rating[2] * 3 .. ')')
+        end
+    end
+
     for slot, observer in gameInfo.Observers:pairs() do
         observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
 
@@ -2127,6 +2156,13 @@ local function refreshObserverList()
         observer_label = observer_label .. ")"
 
         GUI.observerList:AddItem(observer_label)
+    end
+
+    -- if there are more than 2 teams, list them after observers
+    if numTeams > 2 then
+        for i, rating in teamRatings do
+            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. rating[1] - rating[2] * 3 .. '      (' .. rating[1] .. ' +/- ' .. rating[2] * 3 .. ')')
+        end
     end
 end
 
@@ -6756,6 +6792,7 @@ function InitHostUtils()
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
             PossiblyAnnounceGameFull()
+            refreshObserverList()
         end,
 
         --- Add an AI to the game in the given slot.
