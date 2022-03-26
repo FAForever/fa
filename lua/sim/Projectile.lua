@@ -697,4 +697,8 @@ DummyProjectile = Class(moho.projectile_methods, Entity) {
         -- expected to be cached by all projectiles
         self.Army = self:GetArmy()
     end,
+
+    OnImpact = function(self, targetType, targetEntity)
+        self:Destroy()
+    end,
 }
