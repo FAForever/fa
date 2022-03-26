@@ -73,4 +73,5 @@ TrashBag = Class {
         -- allow us to be re-used, useful for effects
         self.Next = 1
     end
+    
 }

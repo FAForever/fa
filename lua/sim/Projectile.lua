@@ -70,6 +70,7 @@ local Random = Random
 
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
+local SharedTypeCache = { }
 
 local function PopulateBlueprintCache(entity, blueprint)
 
@@ -88,10 +89,7 @@ local function PopulateBlueprintCache(entity, blueprint)
     cache.CollideFriendlyShield = blueprint.Physics.CollideFriendlyShield
 
     -- store the result
-    local meta = getmetatable(entity)
-    meta.Cache = cache
-
-    SPEW("Populated blueprint cache for projectile: " .. tostring(blueprint.BlueprintId))
+    SharedTypeCache[blueprint.BlueprintId] = cache
 end
 
 -- cache categories computations
@@ -207,15 +205,16 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
     OnCreate = function(self, inWater)
 
+        local blueprint = EntityGetBlueprint(self)
+
         -- populate blueprint cache if we haven't done that yet
-        if not self.Cache then 
-            local bp = EntityGetBlueprint(self)
-            PopulateBlueprintCache(self, bp)
+        if not SharedTypeCache[blueprint.BlueprintId] then 
+            PopulateBlueprintCache(self, blueprint)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = self.Cache
-        self.Blueprint = self.Cache.Blueprint 
+        self.Cache = SharedTypeCache[blueprint.BlueprintId]
+        self.Blueprint = blueprint 
         self.Army = EntityGetArmy(self)
         self.Trash = TrashBag()
 
@@ -685,14 +684,16 @@ DummyProjectile = Class(moho.projectile_methods, Entity) {
 
     OnCreate = function(self, inWater)
 
+        local blueprint = EntityGetBlueprint(self)
+
         -- populate blueprint cache if we haven't done that yet
-        if not self.Cache then 
-            PopulateBlueprintCache(self, EntityGetBlueprint(self))
+        if not SharedTypeCache[blueprint.BlueprintId] then 
+            PopulateBlueprintCache(self, blueprint)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = self.Cache
-        self.Blueprint = self.Cache.Blueprint
+        self.Cache = SharedTypeCache[blueprint.BlueprintId]
+        self.Blueprint = blueprint 
 
         -- expected to be cached by all projectiles
         self.Army = self:GetArmy()

@@ -33,7 +33,7 @@ local UnitMethods = moho.unit_methods
 local UnitGetBuildRate = UnitMethods.GetBuildRate
 
 -- upvalue trashbag functions for performance
-local TrashBag = TrashBag
+-- local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
 

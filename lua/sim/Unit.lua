@@ -65,9 +65,8 @@ SyncMeta = {
     end,
 }
 
-local function PopulateBlueprintCache(entity)
-
-    local blueprint = entity:GetBlueprint()
+local SharedTypeCache = { }
+local function PopulateBlueprintCache(entity, blueprint)
 
     -- populate the cache
     local cache = { }
@@ -84,10 +83,7 @@ local function PopulateBlueprintCache(entity)
     cache.Audio = blueprint.Audio
   
     -- store the result
-    local meta = getmetatable(entity)
-    meta.Cache = cache
-
-    SPEW("Populated blueprint cache for unit: " .. tostring(blueprint.BlueprintId))
+    SharedTypeCache[blueprint.BlueprintId] = cache 
 end
 
 Unit = Class(moho.unit_methods) {
@@ -189,18 +185,20 @@ Unit = Class(moho.unit_methods) {
     OnCreate = function(self)
         Entity.OnCreate(self)   
 
+        local blueprint = self:GetBlueprint()
+
         -- populate blueprint cache if we haven't done that yet
-        if not self.Cache then 
-            PopulateBlueprintCache(self)
+        if not SharedTypeCache[blueprint.BlueprintId] then 
+            PopulateBlueprintCache(self, blueprint)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = self.Cache
+        self.Cache = SharedTypeCache[blueprint.BlueprintId]
 
         -- cache often accessed values into inner table
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
-        self.Blueprint = self.Cache.Blueprint
+        self.Blueprint = blueprint
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
         self.Audio = self.Cache.Audio
 
@@ -4620,13 +4618,15 @@ DummyUnit = Class(moho.unit_methods) {
 
     OnCreate = function(self) 
 
+        local blueprint = self:GetBlueprint()
+        
         -- populate blueprint cache if we haven't done that yet
-        if not self.Cache then 
-            PopulateBlueprintCache(self)
+        if not SharedTypeCache[blueprint.BlueprintId] then 
+            PopulateBlueprintCache(self, blueprint)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = self.Cache
+        self.Cache = SharedTypeCache[blueprint.BlueprintId]
 
         -- cache unique values into inner table
         self.EntityId = EntityGetEntityId(self)
@@ -4635,7 +4635,7 @@ DummyUnit = Class(moho.unit_methods) {
 
         -- cache often accessed values into inner table
         self.UnitId = UnitGetUnitId(self)
-        self.Blueprint = self.Cache.Blueprint
+        self.Blueprint = blueprint
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
 
         -- basic check if this insignificant unit is truely insignificant
@@ -4651,4 +4651,3 @@ DummyUnit = Class(moho.unit_methods) {
     CheckAssistFocus = function(self) end,
     UpdateAssistersConsumption = function (self) end,
 }
-

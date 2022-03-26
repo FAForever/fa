@@ -35,3 +35,4 @@ fi
 
 pushd tests && lua test_utils.lua && popd
 pushd tests && lua test_stringmatch.lua && popd
+pushd tests && lua test_class.lua && popd

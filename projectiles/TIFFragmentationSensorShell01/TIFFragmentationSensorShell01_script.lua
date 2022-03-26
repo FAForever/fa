@@ -9,7 +9,7 @@ local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
                
     OnImpact = function(self, TargetType, TargetEntity) 
-        
+
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag 
         local bp = self:GetBlueprint().Physics
               
@@ -48,6 +48,7 @@ TIFFragmentationSensorShell01 = Class(TArtilleryProjectile) {
             proj:PassDamageData(self.DamageData)                        
         end
         local pos = self:GetPosition()
+
         local spec = {
             X = pos[1],
             Z = pos[3],
