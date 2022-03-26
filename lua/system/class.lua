@@ -257,6 +257,7 @@ local function CheckHierarchy(a, b)
 end
 
 local count = 0
+
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file.
 local Seen = { }
 function ConstructClass(bases, specs)
