@@ -1,6 +1,6 @@
-#
-# Cybran laser 'bolt'
-#
+--
+-- Cybran laser 'bolt'
+--
 local CLaserLaserProjectile = import('/lua/cybranprojectiles.lua').CLaserLaserProjectile
 CDFLaserLight01 = Class(CLaserLaserProjectile) {}
 

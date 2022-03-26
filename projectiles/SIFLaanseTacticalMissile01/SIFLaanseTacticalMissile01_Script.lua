@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_script.lua
-#**  Author(s):  Gordon Duclos, Aaron Lundquist
-#**
-#**  Summary  :  Laanse Tactical Missile Projectile script, XSL0111
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SIFLaanseTacticalMissile01/SIFLaanseTacticalMissile01_script.lua
+--**  Author(s):  Gordon Duclos, Aaron Lundquist
+--**
+--**  Summary  :  Laanse Tactical Missile Projectile script, XSL0111
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SLaanseTacticalMissile = import('/lua/seraphimprojectiles.lua').SLaanseTacticalMissile
 
@@ -38,7 +38,7 @@ SIFLaanseTacticalMissile01 = Class(SLaanseTacticalMissile) {
         	self.Distance = self:GetDistanceToTarget()
         end
         if dist > 50 then        
-            #Freeze the turn rate as to prevent steep angles at long distance targets
+            --Freeze the turn rate as to prevent steep angles at long distance targets
             WaitSeconds(2)
             self:SetTurnRate(10)
         elseif dist > 30 and dist <= 50 then

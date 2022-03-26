@@ -1,6 +1,6 @@
-#
-# Cybran Anti Air Projectile
-#
+--
+-- Cybran Anti Air Projectile
+--
 
 CAANanoDartProjectile = import('/lua/cybranprojectiles.lua').CAANanoDartProjectile03
 

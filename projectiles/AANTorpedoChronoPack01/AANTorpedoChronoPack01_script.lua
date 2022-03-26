@@ -1,7 +1,7 @@
-#
-# Aeon Chrono Torpedo Pack
-# This will split up into 4 Chrono Torpedoes after it gets close to an enemy
-#
+--
+-- Aeon Chrono Torpedo Pack
+-- This will split up into 4 Chrono Torpedoes after it gets close to an enemy
+--
 local ATorpedoShipProjectile = import('/lua/aeonprojectiles.lua').ATorpedoShipProjectile
 
 AANTorpedoChronoPack01 = Class(ATorpedoShipProjectile) {
@@ -12,24 +12,24 @@ AANTorpedoChronoPack01 = Class(ATorpedoShipProjectile) {
     DistanceBeforeSplitRatio = 0.35,
     VelocityOnEnterWater = 3,
 
-    #FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-    #                '/effects/emitters/water_splash_plume_01_emit.bp',},
+    --FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+    --                '/effects/emitters/water_splash_plume_01_emit.bp',},
 
-    #OnEnterWater = function(self)
-    #    ATorpedoShipProjectile.OnEnterWater(self)
-    #    local army = self:GetArmy()
-    #
-    #    for k, v in self.FxEnterWater do #splash
-    #        CreateEmitterAtEntity(self,army,v)
-    #    end
-    #
-    #    self:StayUnderwater(true)
-    #    self:SetTurnRate(60)
-    #    self:SetMaxSpeed(self.VelocityOnEnterWater)
-    #    self:SetVelocity(self.VelocityOnEnterWater)
-    #
-    #    #self:ForkThread(self.SplitUpThread)
-    #end,
+    --OnEnterWater = function(self)
+    --    ATorpedoShipProjectile.OnEnterWater(self)
+    --    local army = self:GetArmy()
+    --
+    --    for k, v in self.FxEnterWater do --splash
+    --        CreateEmitterAtEntity(self,army,v)
+    --    end
+    --
+    --    self:StayUnderwater(true)
+    --    self:SetTurnRate(60)
+    --    self:SetMaxSpeed(self.VelocityOnEnterWater)
+    --    self:SetVelocity(self.VelocityOnEnterWater)
+    --
+    --    --self:ForkThread(self.SplitUpThread)
+    --end,
 
     SplitUpThread = function(self)
         local TrackingTarget = self:GetTrackingTarget()

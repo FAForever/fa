@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/AIFQuanticCluster02/AIFQuanticCluster02_script.lua
-#**  Author(s):  Drew Staltman, Gordon Duclos
-#**
-#**  Summary  :  Quantic Cluster Projectile script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/AIFQuanticCluster02/AIFQuanticCluster02_script.lua
+--**  Author(s):  Drew Staltman, Gordon Duclos
+--**
+--**  Summary  :  Quantic Cluster Projectile script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
@@ -18,7 +18,7 @@ AIFQuanticCluster02 = Class(import('/lua/aeonprojectiles.lua').AQuantumCluster) 
         local FxFragEffect = EffectTemplate.TFragmentationSensorShellFrag
         local ChildProjectileBP = '/projectiles/AIFQuanticCluster03/AIFQuanticCluster03_proj.bp'
 
-        # Split effects
+        -- Split effects
         for k, v in FxFragEffect do
             CreateEmitterAtEntity( self, self:GetArmy(), v )
         end
@@ -26,23 +26,23 @@ AIFQuanticCluster02 = Class(import('/lua/aeonprojectiles.lua').AQuantumCluster) 
         local vx, vy, vz = self:GetVelocity()
         local velocity = 6
 
-		# One initial projectile following same directional path as the original
+		-- One initial projectile following same directional path as the original
         self:CreateChildProjectile(ChildProjectileBP):SetVelocity(vx, vy, vz):SetVelocity(velocity):PassDamageData(self.DamageData)
 
-		# Create several other projectiles in a dispersal pattern
+		-- Create several other projectiles in a dispersal pattern
         local numProjectiles = 3
         local angle = (2*math.pi) / numProjectiles
         local angleInitial = RandomFloat( 0, angle )
 
-        # Randomization of the spread
-        local angleVariation = angle * 0.35 # Adjusts angle variance spread
-        local spreadMul = 5 # Adjusts the width of the dispersal
+        -- Randomization of the spread
+        local angleVariation = angle * 0.35 -- Adjusts angle variance spread
+        local spreadMul = 5 -- Adjusts the width of the dispersal
 
         local xVec = 0
         local yVec = vy
         local zVec = 0
 
-        # Launch projectiles at semi-random angles away from split location
+        -- Launch projectiles at semi-random angles away from split location
         for i = 0, (numProjectiles -1) do
             xVec = vx + (math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
             zVec = vz + (math.cos(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))) * spreadMul
