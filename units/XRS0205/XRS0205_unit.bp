@@ -53,8 +53,6 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYSONAR',
     },
-    -- CollisionOffsetY = -0.15,
-    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -221,6 +219,7 @@ UnitBlueprint {
     SizeY = 1.5,
     SizeZ = 3.6,
     CollisionOffsetY = -0.4,
+    CollisionOffsetZ = 0.1,
     StrategicIconName = 'icon_ship2_counterintel',
     StrategicIconSortPriority = 165,
     Weapon = {

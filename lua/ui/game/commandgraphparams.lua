@@ -45,7 +45,6 @@ CommandGraphParams = {
     },
     UNITCOMMAND_Retaliate = {inherit_from = 'UNITCOMMAND_Attack'},
     UNITCOMMAND_FormAttack = {inherit_from = 'UNITCOMMAND_Attack'},
-    -- UNITCOMMAND_OverCharge = {inherit_from = 'UNITCOMMAND_Attack'},
     UNITCOMMAND_Tactical = {inherit_from = 'UNITCOMMAND_Attack'},
     UNITCOMMAND_Script = {inherit_from = 'UNITCOMMAND_Attack'},
     UNITCOMMAND_AggressiveMove = {
@@ -186,7 +185,6 @@ CommandGraphParams = {
     UNITCOMMAND_Stop = {inherit_from = 'default'},
     UNITCOMMAND_Land = {inherit_from = 'default'},
     UNITCOMMAND_Upgrade = {inherit_from = 'default'},
-    -- UNITCOMMAND_Script = {inherit_from = 'default'},
     UNITCOMMAND_AssistCommander = {inherit_from = 'default'},
     UNITCOMMAND_KillSelf = {inherit_from = 'default'},
     UNITCOMMAND_DestroySelf = {inherit_from = 'default'},
