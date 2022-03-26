@@ -1037,6 +1037,12 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 
@@ -3964,7 +3970,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         self:SetFocusEntity(self.MyShield)
-        self:EnableShield()
         self.Trash:Add(self.MyShield)
     end,
 

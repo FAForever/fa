@@ -15,27 +15,8 @@ local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
-local teleportTime = {}
-
-local DeprecatedWarnings = { }
-
-local CreateScaledBoom = function(unit, overkill, bone)
-    explosion.CreateDefaultHitExplosionAtBone(
-        unit,
-        bone or 0,
-        explosion.CreateUnitExplosionEntity(unit, overkill).Spec.BoundingXZRadius
-)
-end
-
 -- allows us to skip ai-specific functionality
 local GameHasAIs = ScenarioInfo.GameHasAIs
-
--- MISC UNITS
-DummyUnit = Class(Unit) {
-    OnStopBeingBuilt = function(self, builder, layer)
-        self:Destroy()
-    end,
-}
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
@@ -2350,7 +2331,6 @@ CommandUnit = Class(WalkingLandUnit) {
         Warp(self, location, orientation)
         self:PlayTeleportInEffects()
         self:CleanupRemainingTeleportChargeEffects()
-        teleportTime[self.EntityId] = GetGameTick()
 
         WaitSeconds(0.1) -- Perform cooldown Teleportation FX here
 

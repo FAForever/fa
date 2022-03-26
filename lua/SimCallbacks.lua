@@ -675,3 +675,19 @@ do
         end
     end
 end
+
+Callbacks.MapResoureCheck = function(data)
+    import("/lua/sim/MapUtilities.lua").MapResourceCheck()
+end
+
+Callbacks.iMapSwitchPerspective = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapSwitchPerspective(data.Army)
+end
+
+Callbacks.iMapToggleRendering = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapToggleRendering()
+end
+
+Callbacks.iMapToggleThreat = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapToggleThreat(data.Identifier)
+end

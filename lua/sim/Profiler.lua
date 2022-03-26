@@ -19,12 +19,15 @@ local thread = false
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
 
+local traces = { }
+
 --- Toggles the profiler on / off
 function ToggleProfiler(army, forceEnable)
 
     -- basic checks for toggling the profiler
     local gameHasAIs = ScenarioInfo.GameHasAIs
     local cheatsEnabled = CheatsEnabled()
+    local isReplay = SessionIsReplay()
 
     -- exception to allow toggling the profiler
     local gameHasJip = false 
@@ -33,7 +36,7 @@ function ToggleProfiler(army, forceEnable)
     end 
 
     -- return if conditions are not met
-    if not (gameHasAIs or cheatsEnabled or gameHasJip) then 
+    if not (gameHasAIs or cheatsEnabled or gameHasJip or isReplay) then 
         return
     end
 
@@ -50,8 +53,9 @@ function ToggleProfiler(army, forceEnable)
         SPEW("Profiler can be toggled: a game developer is in the game")
     end
 
-    -- make sure there is a concensus on whether the profiler can be toggled by a player, if not: the game desyncs
-    Random()
+    if isReplay then 
+        SPEW("Profiler can be toggled: session is a replay")
+    end
 
     -- Inform us in case of abuse
     SPEW("Profiler has been toggled on by army: " .. tostring(army))
@@ -99,6 +103,16 @@ function ToggleProfiler(army, forceEnable)
                 -- prevent an empty scope
                 if scope == "" then 
                     scope = "other"
+                end
+
+                if name == "lambda" then 
+                    local trace = repr(debug.traceback())
+                    if not traces[trace] or traces[trace] == 500 then
+                        traces[trace] = traces[trace] or 0  
+                        LOG(tostring(traces[trace]) .. ": " .. trace)
+                    end
+                    
+                    traces[trace] = traces[trace] + 1
                 end
 
                 -- keep track 
