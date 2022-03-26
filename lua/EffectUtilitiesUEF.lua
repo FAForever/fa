@@ -247,6 +247,10 @@ function CreateUEFBuildSliceBeams(
     end
 end
 
+--- Creates the build cube used by UEF structures
+-- @param builder The builder
+-- @param unitBeingBuilt The unit being build
+-- @param onBeingBuiltEffectsBag The Effects bag of the unit being built
 function CreateBuildCubeThread(
     unitBeingBuilt, 
     builder, 

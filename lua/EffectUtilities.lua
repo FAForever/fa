@@ -1407,8 +1407,22 @@ CreateDefaultBuildBeams = import("/lua/EffectUtilitiesUEF.lua").CreateDefaultBui
 -- @param buildeffectsBag The effects bag of the builder
 CreateUEFBuildSliceBeams = import("/lua/EffectUtilitiesUEF.lua").CreateUEFBuildSliceBeams
 
+--- Creates the UEF unit being built effects
+-- @param builder The builder
+-- @param unitBeingBuilt The unit being build
+-- @param buildeffectsBag The effects bag of the unit being built
 CreateUEFUnitBeingBuiltEffects = import("/lua/EffectUtilitiesUEF.lua").CreateUEFUnitBeingBuiltEffects
 
+--- Creates the commander-like slice beams where two beams originate from the build effect bones instead of one. 
+-- This function is not optimized.
+-- @param builder a (S)ACU
+-- @param unitBeingBuilt The unit being build
+-- @param buildEffectBones The effect bones of the builder
+-- @param buildeffectsBag The effects bag of the builder
 CreateUEFCommanderBuildSliceBeams = import("/lua/EffectUtilitiesUEF.lua").CreateUEFCommanderBuildSliceBeams
 
+--- Creates the build cube used by UEF structures
+-- @param builder The builder
+-- @param unitBeingBuilt The unit being build
+-- @param onBeingBuiltEffectsBag The Effects bag of the unit being built
 CreateBuildCubeThread = import("/lua/EffectUtilitiesUEF.lua").CreateBuildCubeThread
