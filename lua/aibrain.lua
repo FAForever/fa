@@ -209,7 +209,6 @@ AIBrain = Class(moho.aibrain_methods) {
     CreateBrainShared = function(self, planName)
 
         -- make sure there is always some storage
-        self:GiveStorage('Mass', 100)
         self:GiveStorage('Energy', 100)
 
         -- make sure the army stats exist

@@ -324,7 +324,7 @@ UnitBlueprint {
         ProductionPerSecondEnergy = 20,
         ProductionPerSecondMass = 1,
         StorageEnergy = 3900,
-        StorageMass = 550,
+        StorageMass = 650,
         TeleportEnergyMod = 0.03,
         TeleportMassMod = 0,
         TeleportTimeMod = 0.0001,
