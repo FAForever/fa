@@ -298,6 +298,18 @@ Prop = Class(moho.prop_methods, Entity) {
     -- @param sizez The length of the box.
     -- @param radius The radius of the sphere.
     SetPropCollision = function(self, shape, centerx, centery, centerz, sizex, sizey, sizez, radius)
+
+        -- only store this for wreckages, it is used to restore the collision box when armies are shared 
+        -- upon death, see '/lua/simutils.lua' and then the function TransferUnfinishedUnitsAfterDeath.
+        self.CollisionRadius = radius
+        self.CollisionSizeX = sizex
+        self.CollisionSizeY = sizey
+        self.CollisionSizeZ = sizez
+        self.CollisionCenterX = centerx
+        self.CollisionCenterY = centery
+        self.CollisionCenterZ = centerz
+        self.CollisionShape = shape
+
         if radius and shape == 'Sphere' then
             EntitySetCollisionShape(self, shape, centerx, centery, centerz, radius)
         else
