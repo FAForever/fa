@@ -2014,10 +2014,6 @@ Tooltips = {
     -- **********************
     -- ** Misc
     -- **********************
-    -- minimap_reset = {
-    --     title = "<LOC tooltipui0625>Reset Minimap",
-    --     description = "<LOC tooltipui0626>Sets the minimap to its default position and size",
-    -- },
     no_rush_clock = {
         title = "<LOC tooltipui0627>No Rush Clock",
         description = "<LOC tooltipui0628>Displays time remaining in the no rush clock",
