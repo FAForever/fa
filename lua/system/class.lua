@@ -256,8 +256,6 @@ local function CheckHierarchy(a, b)
     return false
 end
 
-local count = 0
-
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file.
 local Seen = { }
 function ConstructClass(bases, specs)
@@ -288,8 +286,6 @@ function ConstructClass(bases, specs)
 
         -- there is no need to allocate a unique table for all those sub classes that have no specifications!
         if TableEmpty(specs) and TableGetn(bases) == 1 then
-            count = count + 1 
-            LOG("Shortcut: " .. tostring(count))
             return bases[1]
         end
 

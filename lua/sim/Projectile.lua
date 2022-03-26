@@ -90,8 +90,6 @@ local function PopulateBlueprintCache(entity, blueprint)
 
     -- store the result
     SharedTypeCache[blueprint.BlueprintId] = cache
-
-    SPEW("Populated blueprint cache for projectile: " .. tostring(blueprint.BlueprintId))
 end
 
 -- cache categories computations
