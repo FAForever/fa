@@ -1,9 +1,8 @@
-
 -- imports for functionality
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 -- globals as upvalues for performance
-local WaitTicks = coroutine.yield
+local CoroutineYield = coroutine.yield
 
 local EntityCategoryContains = EntityCategoryContains
 local CreateSlider = CreateSlider
@@ -15,6 +14,7 @@ local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetGoal = moho.SlideManipulator.SetGoal 
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
+local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
 
 -- upvalue math functions for performance
 local MathMax = math.max
@@ -131,7 +131,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         completed = UnitGetFractionComplete(unitBeingBuilt)
         SliderSetGoal(slider, 0, (1 - completed) * sy + offset, 0)
         SliderSetSpeed(slider, completed * completed * completed)
-        WaitTicks(2)
+        CoroutineYield(2)
     end
 
     -- # Nillify temporary tables
@@ -152,6 +152,9 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     local effect = false
     local army = builder.Army
 
+    -- optimize local access
+    local EmitterScaleEmitter = EmitterScaleEmitter
+
     -- # Create generic effects
 
     local effect = false
@@ -162,7 +165,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
 
     for _, vEffect in BuildEffectsEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
-        effect:ScaleEmitter(scaleFactor)
+        EmitterScaleEmitter(effect,scaleFactor)
 
         TrashBagAdd(effectsBag, effect)
         emitters[emittersHead] = effect
@@ -171,7 +174,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
 
     for _, vEffect in BuildEffectBaseEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
-        effect:ScaleEmitter(scaleFactor)
+        EmitterScaleEmitter(effect,scaleFactor)
 
         TrashBagAdd(effectsBag, effect)
         emitters[emittersHead] = effect
@@ -180,17 +183,21 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
 
     -- # Scale effects until the unit is finished
 
+    -- localize for optimal access
+    local UnitGetFractionComplete = UnitGetFractionComplete
+    local EmitterScaleEmitter = EmitterScaleEmitter
+
     -- only naval factories are not square, use the Z axis to get largest axis
     local unitScaleMetric = unitBeingBuilt.BuildExtentsZ * 0.75
     local complete = UnitGetFractionComplete(unitBeingBuilt)
     while not unitBeingBuilt.Dead and complete < 1.0 do
 
         for k = 1, emittersHead - 1 do
-            emitters[k]:ScaleEmitter(scaleFactor + (unitScaleMetric * complete))
+            EmitterScaleEmitter(emitters[k],scaleFactor + (unitScaleMetric * complete))
         end
 
         complete = UnitGetFractionComplete(unitBeingBuilt)
-        WaitTicks(4)
+        CoroutineYield(4)
     end
 
     -- # Poof - we're finished and clean up
@@ -198,6 +205,9 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     CreateLightParticleIntel(unitBeingBuilt, -1, army, unitScaleMetric * 3.5, 8, 'glow_02', 'ramp_blue_22')
 
 end
+
+LOG("CreateSeraphimBuildThread")
+LOG(repr(debug.listcode(CreateSeraphimBuildThread)))
 
 --- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
