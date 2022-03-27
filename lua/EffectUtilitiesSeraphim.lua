@@ -150,15 +150,12 @@ end
 function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFactor)
 
     -- # initialize various info used throughout the function
-
-    local effect = false
     local army = builder.Army
 
     -- optimize local access
     local EmitterScaleEmitter = EmitterScaleEmitter
 
     -- # Create generic effects
-
     local effect = false
 
     -- matches with number of effects being made, pre-allocates the table
