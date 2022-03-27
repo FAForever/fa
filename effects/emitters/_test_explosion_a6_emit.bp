@@ -1,4 +1,4 @@
--- not used 
+-- not used by faf
 EmitterBlueprint {
 	BlueprintId = '_test_explosion_a6',
 	Lifetime = -1.00,
@@ -11,8 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 1.00,
-	EmitIfVisible = true,
+	LODCutoff = 300 = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
 	SnapToWaterline = false,

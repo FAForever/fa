@@ -1,4 +1,4 @@
--- not used 
+-- not used by faf
 EmitterBlueprint {
 	BlueprintId = '_test_explosion_b1_flash',
 	Lifetime = -20.00,
@@ -11,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = 1.00,
+	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,

@@ -1,4 +1,5 @@
-EmitterBlueprint {
+--	used by ual0304
+	EmitterBlueprint {
 	BlueprintId = 'aeon_heavy_artillery_trail_02',
 	Lifetime = -1.00,
 	Repeattime = 50.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 500.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
