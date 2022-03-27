@@ -10,14 +10,14 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local MultiLineText = import('/lua/maui/multilinetext.lua').MultiLineText
 
 local Notify = import('/lua/ui/notify/notify.lua')
-local populateMessages = Notify.populateMessages
 local defaultMessages = import('/lua/ui/notify/defaultmessages.lua')
 local NotifyOverlay = import('/lua/ui/notify/notifyoverlay.lua')
 local defaultMessageTable = defaultMessages.defaultMessages
 local clarityTable = defaultMessages.clarityTable
 local Prefs = import('/lua/user/prefs.lua')
 local factions = import('/lua/factions.lua').FactionIndexMap
-local newMessageTable = {}
+local UTF = import('/lua/UTF.lua')
+local LazyVar = import('/lua/lazyvar.lua')
 local lineGroupTable = {}
 local LineGroups = {}
 
@@ -29,9 +29,36 @@ local messageLines = {}
 local linesVisible = {}
 local linesCollapsed = true
 
+local NotifyMessages = 'Notify_Messages_ESC'
+-- proxy for notify messages
+local notifyOptions = LazyVar.Create()
+
+function InitMessages()
+    local prefsMessages = UTF.UnescapeTable(Prefs.GetFromCurrentProfile(NotifyMessages))
+    if prefsMessages and not table.empty(prefsMessages) then
+        notifyOptions:Set(prefsMessages)
+    else
+        notifyOptions:Set(defaultMessages)
+    end
+end
+
 function init(isReplay, parent)
-    Notify.init(isReplay, parent)
+    notifyOptions.OnDirty = function(self)
+        Prefs.SetToCurrentProfile(NotifyMessages, UTF.EscapeTable(self()))
+    end
+    InitMessages()
+    Notify.init(isReplay, parent, notifyOptions)
     NotifyOverlay.init()
+end
+
+
+
+function SavePrefs(messageTable)
+    if messageTable then 
+        notifyOptions:Set(messageTable)
+    else 
+        notifyOptions:OnDirty()
+    end
 end
 
 local function EditMessage(parent, data, line)
@@ -88,7 +115,7 @@ local function EditMessage(parent, data, line)
         end
         data.text = newmsg
         line.message:SetText(newmsg)
-        newMessageTable[data.category][data.source] = newmsg
+        notifyOptions()[data.category][data.source] = newmsg
         messagePopup:Close()
     end
 
@@ -281,9 +308,9 @@ function CreateLine()
         local category = self.data.category
         local source = self.data.source
 
-        newMessageTable[category][source] = defaultMessageTable[category][source]
-        self.message:SetText(newMessageTable[category][source])
-        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
+        notifyOptions()[category][source] = defaultMessageTable[category][source]
+        self.message:SetText(notifyOptions()[category][source])
+        SavePrefs()
     end
 
     -- The dropdown button
@@ -372,22 +399,10 @@ function CreateLine()
     return line
 end
 
-function ImportMessages()
-    local messageTable
-    local prefsMessages = Prefs.GetFromCurrentProfile('Notify_Messages')
-    if prefsMessages and not table.empty(prefsMessages) then
-        messageTable = prefsMessages
-    else
-        messageTable = defaultMessageTable
-        Prefs.SetToCurrentProfile('Notify_Messages', messageTable)
-    end
 
-    return messageTable
-end
 
 function ResetMessages()
-    newMessageTable = defaultMessageTable
-    Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
+    notifyOptions:Set(defaultMessageTable)
     lineGroupTable = FormatData()
     mainContainer:CalcVisible()
 end
@@ -485,8 +500,7 @@ function CreateUI()
 
     -- Activate the function to have this take effect on closing
     popup.OnClosed = function(self)
-        Prefs.SetToCurrentProfile('Notify_Messages', newMessageTable)
-        populateMessages()
+        SavePrefs()
     end
 
     local title = UIUtil.CreateText(dialogContent, "<LOC notify_0000>Notify Management", 22)
@@ -770,14 +784,11 @@ end
 -- Format the upgrades and messages into groups and lines
 function FormatData()
     local lineData = {}
-    local messageTable = ImportMessages()
-    newMessageTable = messageTable
-
     -- Reset the lines because messages might have been changed
     for category, group in LineGroups do
         group.sources = {}
     end
-
+    
     local categories = {
         aeon = 1,
         uef = 2,
@@ -788,7 +799,8 @@ function FormatData()
         tech = 7,
         other = 8,
     }
-
+    
+    local messageTable = notifyOptions()
     -- Group upgrades and messages according to their category
     for category, data in messageTable do
         if factions[category] or category == 'experimentals' or category == 'tech' or category == 'other' then
