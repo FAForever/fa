@@ -11,6 +11,7 @@ PreviousSync = {}
 -- the Sync.UnitData table into this table each sync (if there's new data)
 UnitData = {}
 
+local UIUtil = import('/lua/ui/uiutil.lua')
 local reclaim = import('/lua/ui/game/reclaim.lua')
 local UpdateReclaim = reclaim.UpdateReclaim
 local sendEnhancementMessage = import('/lua/ui/notify/notify.lua').sendEnhancementMessage
@@ -18,6 +19,19 @@ local SetPlayableArea = reclaim.SetPlayableArea
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
+
+    if Sync.ArmyTransfer then 
+        local army = GetFocusArmy()
+        for k, transfer in Sync.ArmyTransfer do 
+            local other = GetArmiesTable().armiesTable[transfer.from].nickname 
+            if transfer.to == army then 
+                local primary = "Fullshare"
+                local secondary = LOCF('<LOC fullshare_announcement>%s\'s units have been transferred to you', other)
+                local control = nil
+                UIUtil.CreateAnnouncementStd(primary, secondary, control)
+            end
+        end
+    end
 
     if Sync.ProfilerData then 
         import("/lua/ui/game/Profiler.lua").ReceiveData(Sync.ProfilerData)
