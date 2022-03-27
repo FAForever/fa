@@ -306,7 +306,11 @@ function CreateBuildCubeThread(
 
     -- update internal state
     UnitShowBone(unitBeingBuilt, 0, true)
-    unitBeingBuilt:HideLandBones() -- we can't upvalue this, it is a Lua function
+    if unitBeingBuilt.HideLandBones then 
+        -- non-structure units that use this setup do not have the land bones function
+        -- we can't upvalue this, it is a Lua function
+        unitBeingBuilt:HideLandBones() 
+    end
     unitBeingBuilt.BeingBuiltShowBoneTriggered = true
 
     local lComplete = UnitGetFractionComplete(unitBeingBuilt)
