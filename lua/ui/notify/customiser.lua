@@ -38,7 +38,7 @@ function InitMessages()
     if prefsMessages and not table.empty(prefsMessages) then
         notifyOptions:Set(prefsMessages)
     else
-        notifyOptions:Set(defaultMessages)
+        notifyOptions:Set(defaultMessageTable)
     end
 end
 
