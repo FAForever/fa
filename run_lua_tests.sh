@@ -20,8 +20,12 @@ check_file() {
 # Some files have spaces in their name so we use this syntax to make sure the
 # output from `find` is split by line.
 while read file; do
-  check_file "$file"
-  (( files_checked++ ))
+
+  # file contains table pre-allocation synax ( {&1&4} ) that is not supported at the moment
+  if [ "$file" != "./lua/lazyvar.lua" ]; then 
+    check_file "$file"
+    (( files_checked++ ))
+  fi
 done < <(find . -type d \( -path ./testmaps -o -path ./engine \) -prune -false -o -name '*.lua' -o -name '*.bp')
 
 echo "Checked $files_checked files"
