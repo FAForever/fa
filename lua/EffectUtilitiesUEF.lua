@@ -516,14 +516,14 @@ function CreateUEFCommanderBuildSliceBeams(
             Warp(beamEndBuilder, vc)
             ProjectileSetVelocity(beamEndBuilder, velX, 0, velZ)
             vc[1] = fx2
-            vc[2] = (fy - (oy * UnitGetFractionComplete(unitBeingBuilt)))
+            vc[2] = (fy - (oy * fraction))
             vc[3] = fz2
             Warp(beamEndBuilder2, vc)
             ProjectileSetVelocity(beamEndBuilder2, -velX, 0, -velZ)
             flipDirection = false
         else
             vc[1] = fx2
-            vc[2] = (fy - (oy * UnitGetFractionComplete(unitBeingBuilt)))
+            vc[2] = (fy - (oy * fraction))
             vc[3] = fz2
             Warp(beamEndBuilder, vc)
             ProjectileSetVelocity(beamEndBuilder, -velX, 0, -velZ)
