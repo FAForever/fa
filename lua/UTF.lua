@@ -10,6 +10,7 @@ local STR_Utf8SubString = STR_Utf8SubString
 local TableInsert = table.insert
 local StringSub = string.sub
 local StringByte = string.byte
+local StringGFind = string.gfind
 
 function UTF(unicode)
     if unicode <= 0x7F then
@@ -126,7 +127,7 @@ function UnescapeString(str)
         return StringChar(unpack(bytes))
     end
     local result = ''
-    for s in string.gfind(str, "\\u%x+") do
+    for s in StringGFind(str, "\\u%x+") do
         result = result .. unicode_to_sym(s)
     end
     return result
