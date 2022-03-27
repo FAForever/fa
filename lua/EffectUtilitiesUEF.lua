@@ -502,6 +502,12 @@ function CreateUEFCommanderBuildSliceBeams(
         CoroutineYield(BuildCubeDelay)
     end
 
+    -- localize for optimal access
+    local Warp = Warp
+    local CoroutineYield = CoroutineYield
+    local ProjectileSetVelocity = ProjectileSetVelocity
+    local UnitGetFractionComplete = UnitGetFractionComplete
+
     -- Warp our projectile back to the initial corner and lower based on build completeness
     -- CrossWire cheat, but its fair game
     local flipDirection = true
