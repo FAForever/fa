@@ -1,16 +1,21 @@
-local StringChar = string.char
+
+-- upvalue for performance
 local MathMod = math.mod
 local MathFloor = math.floor
-local StringLen = string.len
-local TableDeepcopy = table.deepcopy
+
 local unpack = unpack
 local STR_xtoi = STR_xtoi
 local STR_itox = STR_itox
 local STR_Utf8SubString = STR_Utf8SubString
+
 local TableInsert = table.insert
+local TableDeepcopy = table.deepcopy
+
 local StringSub = string.sub
 local StringByte = string.byte
 local StringGFind = string.gfind
+local StringLen = string.len
+local StringChar = string.char
 
 function UTF(unicode)
     if unicode <= 0x7F then
