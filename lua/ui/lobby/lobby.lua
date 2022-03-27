@@ -47,7 +47,6 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
-local UTF =  import('/lua/UTF.lua')
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
@@ -236,7 +235,7 @@ local GUI = false
 local localPlayerID = false
 local gameInfo = false
 local pmDialog = false
-local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")
+local lastKickMessage = Prefs.GetFromCurrentProfile('lastKickMessage') or ""
 
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
 local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
@@ -534,7 +533,7 @@ local function DoSlotBehavior(slot, key, name)
                 lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
 
                 -- Save message for next time
-                Prefs.SetToCurrentProfile('lastKickMessage', UTF.EscapeString(str))
+                Prefs.SetToCurrentProfile('lastKickMessage', str)
                 lastKickMessage = str
             end
 
