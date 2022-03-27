@@ -12,7 +12,7 @@ local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
 
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
-local SliderSetGoal = moho.SlideManipulator.SetGoal 
+local SliderSetGoal = moho.SlideManipulator.SetGoal
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
 local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
 
@@ -47,8 +47,8 @@ local CategoriesHover = categories.HOVER
 function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, effectBones, effectsBag)
 
     -- do not create beams if things turn out to be destroyed
-    if builder.Dead or unitBeingBuilt.Dead then 
-        return 
+    if builder.Dead or unitBeingBuilt.Dead then
+        return
     end
 
     local army = builder.Army
@@ -76,7 +76,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     -- do not apply offsets for subs and air units
     local offset = 0
-    if EntityCategoryContains(CategoriesHover, unitBeingBuilt) then 
+    if EntityCategoryContains(CategoriesHover, unitBeingBuilt) then
         offset = unitBeingBuilt.Elevation or 0
     end
 
@@ -95,7 +95,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
     local slider = unitBeingBuilt.ConstructionSlider
     local initialised = unitBeingBuilt.ConstructionInitialised
 
-    if not initialised then 
+    if not initialised then
 
         unitBeingBuilt.ConstructionInitialised = true
 
@@ -104,7 +104,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         local unitBeingBuiltTrash = unitBeingBuilt.Trash
         local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
-        for k, bp in BuildEffectsEmitters do 
+        for k, bp in BuildEffectsEmitters do
             effect = CreateAttachedEmitter(unitBeingBuilt, -1, army, bp)
             TrashBagAdd(unitBeingBuiltTrash, effect)
             TrashBagAdd(unitOnStopBeingBuiltTrash, effect)
