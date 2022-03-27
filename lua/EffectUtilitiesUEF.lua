@@ -383,7 +383,7 @@ function CreateUEFCommanderBuildSliceBeams(
     local cx, cy, cz = EntityGetPositionXYZ(unitBeingBuilt)
     cy = cy + (buildbp.Physics.MeshExtentsOffsetY or 0)
 
-    -- Create a projectile for the end of build effect and warp it to the unit
+    -- Create a projectiles for the end of build effect and warp it to the unit
     local beamEndBuilder = builder.UEFBuildProjectile 
     if not beamEndBuilder then 
         beamEndBuilder = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
@@ -391,6 +391,7 @@ function CreateUEFCommanderBuildSliceBeams(
         TrashAdd(builder.Trash, beamEndBuilder)
     end
 
+    -- second beam for the commander
     local beamEndBuilder2 = builder.UEFBuildProjectile2
     if not beamEndBuilder2 then 
         beamEndBuilder2 = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
@@ -398,7 +399,7 @@ function CreateUEFCommanderBuildSliceBeams(
         TrashAdd(builder.Trash, beamEndBuilder2)
     end
 
-    -- reset the state of the projectile
+    -- reset the state of the projectiles
     ProjectileSetVelocity(beamEndBuilder, 0)
     ProjectileSetVelocity(beamEndBuilder2, 0)
     TrashAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
@@ -406,7 +407,7 @@ function CreateUEFCommanderBuildSliceBeams(
     TrashAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder2, army, '/effects/emitters/build_terran_glow_01_emit.bp'))
     TrashAdd(buildEffectsBag, CreateEmitterOnEntity(beamEndBuilder2, army, '/effects/emitters/build_sparks_blue_01_emit.bp'))
 
-    -- add the build beam between the build bones and the projectile
+    -- add the build beams between the build bones and the projectiles
     if buildEffectBones ~= nil then
         for i, BuildBone in buildEffectBones do
             TrashAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, BuildBone, beamEndBuilder, -1, army, '/effects/emitters/build_beam_01_emit.bp'))
