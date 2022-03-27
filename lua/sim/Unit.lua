@@ -250,11 +250,11 @@ Unit = Class(moho.unit_methods) {
         }
 
         -- Set up effect emitter bags
-        self.MovementEffectsBag = {}
-        self.IdleEffectsBag = {}
-        self.TopSpeedEffectsBag = {}
-        self.BeamExhaustEffectsBag = {}
-        self.TransportBeamEffectsBag = {}
+        self.MovementEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
+        self.TransportBeamEffectsBag = TrashBag()
         self.BuildEffectsBag = TrashBag()
         self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
@@ -1909,21 +1909,12 @@ Unit = Class(moho.unit_methods) {
                 v:Destroy()
             end
         end
-        for _, v in self.IdleEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TopSpeedEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.BeamExhaustEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.MovementEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TransportBeamEffectsBag or {} do
-            v:Destroy()
-        end
+
+        self.MovementEffectsBag:Destroy()
+        self.IdleEffectsBag:Destroy()
+        self.TopSpeedEffectsBag:Destroy()
+        self.BeamExhaustEffectsBag:Destroy()
+        self.TransportBeamEffectsBag:Destroy()
 
         -- destroy remaining trash of weapon
         for k = 1, self.WeaponCount do 
@@ -2197,7 +2188,7 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         -- Create any idle effects on unit
-        if table.empty(self.IdleEffectsBag) then
+        if self.IdleEffectsBag:Empty() then
             self:CreateIdleEffects()
         end
 
@@ -3406,7 +3397,7 @@ Unit = Class(moho.unit_methods) {
                             emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                         end
                         if EffectBag then
-                            table.insert(EffectBag, emit)
+                            EffectsBag:Add(emit)
                         end
                     end
                 end
@@ -3470,7 +3461,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     DestroyMovementEffects = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'MovementEffectsBag')
+        -- Destroy the stored movement effects
+        self.MovementEffectsBag:Destroy()
 
         -- Clean up any camera shake going on.
         local bpTable = self.Blueprint.Display.MovementEffects
@@ -3498,11 +3490,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     DestroyTopSpeedEffects = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'TopSpeedEffectsBag')
+        self.TopSpeedEffectsBag:Destroy()
     end,
 
     DestroyIdleEffects = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'IdleEffectsBag')
+        self.IdleEffectsBag:Destroy()
     end,
 
     UpdateBeamExhaust = function(self, motionState)
@@ -3516,7 +3508,7 @@ Unit = Class(moho.unit_methods) {
             if self.BeamExhaustCruise  then
                 self:DestroyBeamExhaust()
             end
-            if self.BeamExhaustIdle and table.empty(self.BeamExhaustEffectsBag) and beamExhaust.Idle ~= false then
+            if self.BeamExhaustIdle and self.BeamExhaustEffectsBag:Empty() and beamExhaust.Idle ~= false then
                 self:CreateBeamExhaust(beamExhaust, self.BeamExhaustIdle)
             end
         elseif motionState == 'Cruise' then
@@ -3540,12 +3532,12 @@ Unit = Class(moho.unit_methods) {
             return false
         end
         for kb, vb in effectBones do
-            table.insert(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, self.Army, beamBP))
+            self.BeamExhaustEffectsBag:Add(CreateBeamEmitterOnEntity(self, vb, self.Army, beamBP))
         end
     end,
 
     DestroyBeamExhaust = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'BeamExhaustEffectsBag')
+        self.BeamExhaustEffectsBag:Destroy()
     end,
 
     CreateContrails = function(self, tableData)
@@ -3557,7 +3549,7 @@ Unit = Class(moho.unit_methods) {
         local ZOffset = tableData.ZOffset or 0.0
         for ke, ve in self.ContrailEffects do
             for kb, vb in effectBones do
-                table.insert(self.TopSpeedEffectsBag, CreateTrail(self, vb, self.Army, ve):SetEmitterParam('POSITION_Z', ZOffset))
+                self.TopSpeedEffectsBag:Add(CreateTrail(self, vb, self.Army, ve):SetEmitterParam('POSITION_Z', ZOffset))
             end
         end
     end,
@@ -4031,18 +4023,17 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
-        table.insert(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
+        self.TransportBeamEffectsBag:Add(AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
+        self.TransportBeamEffectsBag:Add(AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
+        self.TransportBeamEffectsBag:Add(CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
+
         self:TransportAnimation()
     end,
 
     OnStopTransportBeamUp = function(self)
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
-        for k, v in self.TransportBeamEffectsBag do
-            v:Destroy()
-        end
+        self.TransportBeamEffectsBag:Destroy()
 
         -- Reset weapons to ensure torso centres and unit survives drop
         for i = 1, self.WeaponCount do

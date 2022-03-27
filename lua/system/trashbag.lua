@@ -72,6 +72,10 @@ TrashBag = Class {
 
         -- allow us to be re-used, useful for effects
         self.Next = 1
-    end
+    end,
     
+    -- Check if the trashbag is empty. True if empty, false otherwise
+    Empty = function(self)
+        return self.Next == 1
+    end
 }
