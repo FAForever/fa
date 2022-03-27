@@ -16,6 +16,7 @@
 -- local TrashBag = TrashBag
 -- local TrashAdd = TrashBag.Add
 -- local TrashDestroy = TrashBag.Destroy
+-- local TrashEmpty = TrashBag.Empty
 
 -- END COPY HERE --
 
