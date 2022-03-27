@@ -572,13 +572,14 @@ AIBrain = Class(moho.aibrain_methods) {
                         TransferUnfinishedUnitsAfterDeath(units, indexes)
                     end
 
+                    Sync.ArmyTransfer = { }
+
                     for k, brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and not table.empty(units) then
                             TransferUnitsOwnership(units, brain.index)
-                            if brain:GetArmyIndex() == GetFocusArmy() then 
-                                PrintText(self.Nickname .. '\'s units have been transferred to you', 30, 'ffffffff', 12, 'center')
-                            end
+
+                            table.insert(Sync.ArmyTransfer, { from = selfIndex, to = brain.index, reason = "fullshare" })
                             WaitSeconds(1)
                         end
                     end

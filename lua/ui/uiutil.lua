@@ -1182,3 +1182,23 @@ function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPositio
         windowTextures   -- textureTable
     )
 end
+
+function CreateAnnouncementStd(primary, secondary, control)
+
+    -- make it originate from the top
+    if not control then 
+        local frame = GetFrame(0)
+        control = Group(frame)
+        control.Left = function() return frame.Left() + 0.49 * frame.Right() end 
+        control.Right = function() return frame.Left() + 0.51 * frame.Right() end 
+        control.Top = frame.Top 
+        control.Bottom = frame.Top 
+    end
+
+    -- create the announcement accordingly
+    import('/lua/ui/game/announcement.lua').CreateAnnouncement(
+        primary,
+        control,
+        secondary 
+    )
+end
