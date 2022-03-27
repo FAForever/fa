@@ -125,12 +125,14 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         WaitFor(slider)
     end
 
+    -- localize for optimal access
+    local UnitGetFractionComplete = UnitGetFractionComplete
+    local completed = UnitGetFractionComplete(unitBeingBuilt)
     -- # Gradually move the unit to the plateau
-
-    while not unitBeingBuilt.Dead do
-        completed = UnitGetFractionComplete(unitBeingBuilt)
+    while not unitBeingBuilt.Dead and completed < 1.0 do
         SliderSetGoal(slider, 0, (1 - completed) * sy + offset, 0)
         SliderSetSpeed(slider, completed * completed * completed)
+        completed = UnitGetFractionComplete(unitBeingBuilt)
         CoroutineYield(2)
     end
 
@@ -205,9 +207,6 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     CreateLightParticleIntel(unitBeingBuilt, -1, army, unitScaleMetric * 3.5, 8, 'glow_02', 'ramp_blue_22')
 
 end
-
-LOG("CreateSeraphimBuildThread")
-LOG(repr(debug.listcode(CreateSeraphimBuildThread)))
 
 --- Creates the seraphim build cube effect.
 -- @param unitBeingBuilt the unit that is being built by the factory.
