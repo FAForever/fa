@@ -26,7 +26,7 @@ function OnSync()
             local other = GetArmiesTable().armiesTable[transfer.from].nickname 
             if transfer.to == army then 
                 local primary = "Fullshare"
-                local secondary = tostring(other) .. LOCF('<LOC fullshare_announcement>\'s units have been transferred to you')
+                local secondary = LOCF('<LOC fullshare_announcement>%s\'s units have been transferred to you', other)
                 local control = nil
                 UIUtil.CreateAnnouncementStd(primary, secondary, control)
             end
