@@ -208,8 +208,6 @@ function CreateUEFBuildSliceBeams(
     local velX = 2 * (fx2 - fx1)
     local velZ = 2 * (fz2 - fz1)
 
-
-
     -- store as locals for performance
     local UnitGetFractionComplete = UnitGetFractionComplete
     local ProjectileSetVelocity = ProjectileSetVelocity
@@ -258,7 +256,6 @@ function CreateBuildCubeThread(
     builder, 
     onBeingBuiltEffectsBag
 )
-
     -- used to differentiate between using a 
     -- slice beam and a default build beam
     unitBeingBuilt.BuildingCube = true
@@ -335,7 +332,6 @@ function CreateBuildCubeThread(
                 0, 
                 nil, nil, nil
             )
-
 
             TrashAdd(onBeingBuiltEffectsBag, proj)
 
