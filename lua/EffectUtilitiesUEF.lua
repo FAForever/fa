@@ -208,6 +208,13 @@ function CreateUEFBuildSliceBeams(
     local velX = 2 * (fx2 - fx1)
     local velZ = 2 * (fz2 - fz1)
 
+
+
+    -- store as locals for performance
+    local UnitGetFractionComplete = UnitGetFractionComplete
+    local ProjectileSetVelocity = ProjectileSetVelocity
+    local Warp = Warp
+
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
     if fraction == 0 then
         vc[1] = (fx1 + fx2) * 0.5
@@ -216,11 +223,6 @@ function CreateUEFBuildSliceBeams(
         Warp(beamEndBuilder, vc)
         CoroutineYield(BuildCubeDelay)
     end
-
-    -- store as locals for performance
-    local UnitGetFractionComplete = UnitGetFractionComplete
-    local ProjectileSetVelocity = ProjectileSetVelocity
-    local Warp = Warp
 
     -- Warp our projectile back to the initial corner and lower based on build completeness
     local flipDirection = true
@@ -237,7 +239,7 @@ function CreateUEFBuildSliceBeams(
             flipDirection = false
         else
             vc[1] = fx2
-            vc[2] = (fy - (oy * UnitGetFractionComplete(unitBeingBuilt)))
+            vc[2] = (fy - (oy * fraction))
             vc[3] = fz2
             Warp(beamEndBuilder, vc)
             ProjectileSetVelocity(beamEndBuilder, -velX, 0, -velZ)
