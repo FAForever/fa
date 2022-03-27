@@ -366,7 +366,6 @@ function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, buildEffectsBag
 end
 
 --- Creates the commander-like slice beams where two beams originate from the build effect bones instead of one. 
--- This function is not optimized.
 -- @param builder a (S)ACU
 -- @param unitBeingBuilt The unit being build
 -- @param buildEffectBones The effect bones of the builder
@@ -377,6 +376,7 @@ function CreateUEFCommanderBuildSliceBeams(
     buildEffectBones,   -- Table of bones
     buildEffectsBag     -- Trashbag
 ) 
+
     local vc = VectorCached
     local army = builder.Army
     local buildbp = unitBeingBuilt.Blueprint
