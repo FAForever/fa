@@ -861,9 +861,9 @@ end
 local function refreshObserverList()
     GUI.observerList:DeleteAllItems()
 
-     -- create the table that will hold the data for displaying team rating information
-     local teamRatings = {}
-     local numTeams = 0
+    -- create the table that will hold the data for displaying team rating information
+    local teamRatings = {}
+    local numTeams = 0
     -- calculate/display team ratings if spawns are fixed
     if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
 
