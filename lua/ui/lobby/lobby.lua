@@ -861,12 +861,11 @@ end
 local function refreshObserverList()
     GUI.observerList:DeleteAllItems()
 
-    local numTeams = 0
+     -- create the table that will hold the data for displaying team rating information
+     local teamRatings = {}
+     local numTeams = 0
     -- calculate/display team ratings if spawns are fixed
     if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
-
-         -- create the table that will hold the data for displaying team rating information
-        local teamRatings = {}
 
         -- cycle through each player
         for i, player in gameInfo.PlayerOptions:pairs() do
@@ -893,6 +892,9 @@ local function refreshObserverList()
         if numTeams <= 2 then
             for i, rating in teamRatings do
                 GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
+            end
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem('')
             end
         end
     end
@@ -929,6 +931,9 @@ local function refreshObserverList()
 
     -- if there are more than 2 teams (and slots are fixed), list them after observers
     if numTeams > 2 then
+        if not lobbyComm:IsHost() then
+            GUI.observerList:AddItem('')
+        end
         for i, rating in teamRatings do
            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
         end
