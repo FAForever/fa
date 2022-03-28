@@ -146,6 +146,7 @@ ChatArea = Class(Group){
                 self:AppendText(wrapLines[i], messageStyle, true)
             end
         end
+        self:ShowLines(self.Parent.top, self.Parent.bottom)
     end,
 
     --- appends text field to existing line or on a new line
@@ -286,7 +287,7 @@ ChatArea = Class(Group){
     --- gets the width of text field that would displayed the string passed as argument
     AdvanceFunction = function(self, str, strStyle)
         -- Creates a dummy text to measure width
-        dummy = Text.Text(self.Parent)
+        local dummy = Text.Text(self.Parent)
         dummy:Hide()
         dummy:SetFont(strStyle.fontFamily, strStyle.fontSize)
         dummy:SetText(str)
