@@ -646,12 +646,13 @@ function GetWeaponsStats(bp)
 end
 
 function GetWeaponsTotal(weapons)
-    local total = {}
-    total.Range = 100000
-    total.Count = 0
-    total.Damage = 0
-    total.DPM = 0
-    total.DPS = 0
+    local total = {
+        Range = 100000,
+        Count = 0,
+        Damage = 0,
+        DPM = 0,
+        DPS = 0
+    }
 
     for i, weapon in weapons or {} do
         -- Including only important weapons
@@ -787,25 +788,29 @@ end
 
 -- Checks if a unit contains specified ID
 function ContainsID(unit, value)
-    if not unit then return false end
-    if not unit.ID then return false end
-    if not value then return false end
-    return string.upper(value) == string.upper(unit.ID)
+    if unit and unit.ID and value then
+        return string.upper(value) == string.upper(unit.ID)
+    else
+        return false
+    end
 end
 
 --- Checks if a unit contains specified faction
 function ContainsFaction(unit, value)
-    if not unit then return false end
-    if not value then return false end
-    return string.upper(value) == unit.Faction
+    if unit and value then
+        return string.upper(value) == unit.Faction
+    else
+        return false
+    end
 end
 
 --- Checks if a unit contains specified categories
 function ContainsCategory(unit, value)
-    if not value then return false end
-    if not unit then return false end
-    if not unit.CategoriesHash then return false end
-    return unit.CategoriesHash[value]
+    if value and unit and unit.CategoriesHash then
+        return unit.CategoriesHash[value]
+    else
+        return false
+    end
 end
 
 --- Checks if a unit contains categories in specified expression

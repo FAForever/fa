@@ -99,7 +99,7 @@ function  Matrix:getDeterminant()
 
     if self.rowCount == 2 then
         local a = self.matrix[1][1]
-        local  b = self.matrix[1][2]
+        local b = self.matrix[1][2]
         local c = self.matrix[2][1]
         local d = self.matrix[2][2]
         return a*d - b*c
@@ -118,7 +118,7 @@ end
 
 function Rating.create(mean, deviation)
     local rtg = {}
-    setmetatable(rtg,Rating)
+    setmetatable(rtg, Rating)
     rtg.mean = mean
     rtg.deviation = deviation
     return rtg
@@ -135,7 +135,7 @@ end
 
 function Player.create(name, rating)
     local play = {}
-    setmetatable(play,Player)
+    setmetatable(play, Player)
     play.name = name
     play.rating = rating
     return play
@@ -152,7 +152,7 @@ end
 --- Create an empty Teams object
 function Teams.create()
     local tm = {}
-    setmetatable(tm,Teams)
+    setmetatable(tm, Teams)
     -- Maps team numbers to lists of Players.
     tm.teams = {}
     return tm
@@ -200,7 +200,7 @@ local function Vector(vectorValues)
 end
 
 local function fromColumnValues(rows, columns, columnValues)
-    local result =  Matrix.create(rows,columns)
+    local result = Matrix.create(rows,columns)
     for currentColumn=1,columns do
         local currentColumnData = columnValues[currentColumn]
         for currentRow=1,rows do

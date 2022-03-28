@@ -59,9 +59,8 @@ local function init(value)
 end
 
 function Destroy()
-    if tooltipUI then
+    if not IsDestroyed(tooltipUI) then
        tooltipUI:Destroy()
-       tooltipUI = false
     end
 end
 -- creates custom tooltip with detailed information about game units or modded units
@@ -178,7 +177,7 @@ function Create(parent, bp)
     costLabel:SetColor(colorText)
     LayoutHelpers.AtRightTopIn(costLabel, tooltipUI, column2-iconSize-5, top)
 
-    top  = top + costLabel.Height()  + 1
+    top = top + costLabel.Height()  + 1
 
     local eco = UnitsAnalyzer.GetEconomyStats(bp)
 

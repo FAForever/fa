@@ -74,11 +74,12 @@ function Create()
                     self.tasks[key].progress = self.tasks[key].update / self.tasks[key].goal
                end
             else -- create a new task
-                self.tasks[key] = {}
-                self.tasks[key].name = taskName
-                self.tasks[key].goal = taskGoal
-                self.tasks[key].update = 0
-                self.tasks[key].progress = 0
+                self.tasks[key] = {
+                    name = taskName,
+                    goal = taskGoal,
+                    update = 0,
+                    progress = 0
+                }
             end
 
             self.currentTask = self.tasks[key]
