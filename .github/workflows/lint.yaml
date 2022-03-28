@@ -11,6 +11,6 @@ jobs:
         with:
           repository: 'deploy/fafdevelop'
       - name: wow-lint
-        uses: davidcraig/action-wow-lint@1.0.1
+        uses: davidcraig/action-wow-lint@1.0.0
         with:
             path-to-files: 'lua'
