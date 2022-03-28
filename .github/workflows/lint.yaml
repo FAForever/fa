@@ -11,6 +11,6 @@ jobs:
         with:
           repository: 'ps-wow/action-test-repo'
       - name: wow-lint
-        uses: deploy/fafdevelop
+        uses: 'deploy/fafdevelop'
         with:
             path-to-files: 'lua'
