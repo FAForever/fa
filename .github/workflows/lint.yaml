@@ -1,0 +1,16 @@
+name: Lint
+on: [push]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          repository: 'deploy/fafdevelop'
+      - name: wow-lint
+        uses: davidcraig/action-wow-lint@1.0.1
+        with:
+            path-to-files: 'lua'
