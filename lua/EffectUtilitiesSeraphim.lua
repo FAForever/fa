@@ -15,9 +15,11 @@ local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetGoal = moho.SlideManipulator.SetGoal
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
 local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
+local EmitterSetEmitterParam = moho.IEffect.SetEmitterParam
 
 -- upvalue math functions for performance
 local MathMax = math.max
+local TableGetn = table.getn 
 
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
@@ -36,8 +38,6 @@ local BuildEffectsEmitters = {
     '/effects/emitters/seraphim_being_built_ambient_04_emit.bp',
     '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
 }
-
-local CategoriesHover = categories.HOVER
 
 --- Creates the seraphim factory building beam effects.
 -- @param builder The factory that is building the unit.
@@ -76,7 +76,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     -- do not apply offsets for subs and air units
     local offset = 0
-    if EntityCategoryContains(CategoriesHover, unitBeingBuilt) then
+    if unitBeingBuilt.Cache.HashedCats["HOVER"] then
         offset = unitBeingBuilt.Elevation or 0
     end
 
@@ -162,9 +162,15 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     local emitters = { false, false, false, false, false }
     local emittersHead = 1
 
+    -- determine a sane LOD cutoff for the size of the unit
+    local lods = unitBeingBuilt.Blueprint.Display.Mesh.LODs
+    local count = TableGetn(lods)
+    local LODCutoff = 0.9 * lods[count].LODCutoff or (90 * MathMax(unitBeingBuilt.BuildExtentsX, unitBeingBuilt.BuildExtentsZ))
+
     for _, vEffect in BuildEffectsEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
         EmitterScaleEmitter(effect,scaleFactor)
+        EmitterSetEmitterParam(effect, "LODCUTOFF", LODCutoff)
 
         TrashBagAdd(effectsBag, effect)
         emitters[emittersHead] = effect
@@ -174,6 +180,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     for _, vEffect in BuildEffectBaseEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
         EmitterScaleEmitter(effect,scaleFactor)
+        EmitterSetEmitterParam(effect, "LODCUTOFF", LODCutoff)
 
         TrashBagAdd(effectsBag, effect)
         emitters[emittersHead] = effect
