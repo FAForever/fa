@@ -76,7 +76,7 @@ XSL0401 = Class(SWalkingLandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         SWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
-        self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
+        self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2)
     end,
 
     DeathThread = function(self, overkillRatio , instigator)

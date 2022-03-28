@@ -2,7 +2,7 @@
 -- File     :  /cdimage/units/XSB2401/XSB2401_script.lua
 -- Author(s):  John Comes, David Tomandl, Matt Vainio
 -- Summary  :  Seraphim Tactical Missile Launcher Script
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
@@ -25,6 +25,12 @@ XSB2401 = Class(SStructureUnit) {
         },
         DeathWeapon = Class(DeathNukeWeapon) {},
     },
+
+    StartBeingBuiltEffects = function(self, builder, layer)
+        -- triggers the effect twice, one is larger than the other
+        SStructureUnit.StartBeingBuiltEffects(self, builder, layer)
+        self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2)
+    end,
 
     OnStopBeingBuilt = function(self, builder, layer)
         SStructureUnit.OnStopBeingBuilt(self, builder, layer)

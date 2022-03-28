@@ -149,6 +149,8 @@ end
 -- @param scaleFactor A scale factor for the effects.
 function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFactor)
 
+    LOG(scaleFactor)
+
     -- # initialize various info used throughout the function
     local army = builder.Army
 
@@ -200,7 +202,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     while not unitBeingBuilt.Dead and complete < 1.0 do
 
         for k = 1, emittersHead - 1 do
-            EmitterScaleEmitter(emitters[k],scaleFactor + (unitScaleMetric * complete))
+            EmitterScaleEmitter(emitters[k], 1 + scaleFactor * (unitScaleMetric * complete))
         end
 
         complete = UnitGetFractionComplete(unitBeingBuilt)
@@ -225,6 +227,7 @@ end
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
-function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, effectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, 1.5)
+function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, effectsBag, scale)
+    scale = scale or 1
+    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scale)
 end
