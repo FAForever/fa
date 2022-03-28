@@ -184,7 +184,6 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
 
     -- localize for optimal access
     local UnitGetFractionComplete = UnitGetFractionComplete
-    local EmitterScaleEmitter = EmitterScaleEmitter
 
     -- only naval factories are not square, use the Z axis to get largest axis
     local unitScaleMetric = unitBeingBuilt.BuildExtentsZ * 0.75
