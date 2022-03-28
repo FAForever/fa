@@ -37,9 +37,15 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 -- upvalue for performance
 local rawget = rawget 
 local IsAlly = IsAlly
+
+local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
 local TrashEmpty = TrashBag.Empty
+
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
+
 
 SyncMeta = {
     __index = function(t, key)
