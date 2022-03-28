@@ -1376,9 +1376,7 @@ local function AssignRandomStartSpots()
     end
 
     function teamsAddSpot(teams, team, spot)
-        if not teams[team] then
-            teams[team] = {}
-        end
+        teams[team] = teams[team] or {}
         table.insert(teams[team], spot)
     end
 

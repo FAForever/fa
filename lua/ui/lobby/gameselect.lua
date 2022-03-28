@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Game selection UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -29,9 +29,11 @@ local editInFocus = nil
 
 local MapUtil = import('/lua/ui/maputil.lua')
 local scenarios = MapUtil.EnumerateSkirmishScenarios()
-local gameOptions = {}
-gameOptions[1] = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
-gameOptions[2] = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+local gameOptions = {
+    import('/lua/ui/lobby/lobbyOptions.lua').teamOptions,
+    import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+}
+
 
 local tabData = {
     {
@@ -122,11 +124,7 @@ local tabData = {
 }
 
 local function IsNameOK(name)
-    if name == nil then
-        return false
-    end
-
-    if name == "" then
+    if name == nil or name == "" then
         return false
     end
 
@@ -207,7 +205,7 @@ function CreateUI(over, exitBehavior)
         Button.HandleEvent(self, event)
     end
 
-    gameList = Group(panel)
+    local gameList = Group(panel)
     LayoutHelpers.AtLeftTopIn(gameList, panel, 30, 152)
     gameList.Width:Set(panel.Width() - LayoutHelpers.ScaleNumber(90))
     LayoutHelpers.SetHeight(gameList, 432)
@@ -387,22 +385,22 @@ function CreateUI(over, exitBehavior)
 
     for index, tabinfo in tabData do
         local i = index
-        gameList._tabs[index] = CreateTab(tabinfo)
-        gameList._tabs[index].tabinfo = tabinfo
+        local tab = CreateTab(tabinfo)
+        tab.tabinfo = tabinfo
         if index == 1 then
-            LayoutHelpers.AtLeftTopIn(gameList._tabs[i], panel, 200, 125)
+            LayoutHelpers.AtLeftTopIn(tab, panel, 200, 125)
         else
-            LayoutHelpers.RightOf(gameList._tabs[i], gameList._tabs[i-1], 18)
+            LayoutHelpers.RightOf(tab, gameList._tabs[i-1], 18)
         end
-        gameList._tabs[index].Uncheck = function(control)
+        tab.Uncheck = function(control)
             control._checked = false
             control:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_m.dds'))
             control.lcap:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_l.dds'))
             control.rcap:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_r.dds'))
             control.arrow:Hide()
         end
-        gameList._tabs[index]._sortKey = tabinfo.sortby
-        gameList._tabs[index].OnClick = function(control, event)
+        tab._sortKey = tabinfo.sortby
+        tab.OnClick = function(control, event)
             control.arrow:Show()
             if control._checked then
                 gameList._sortby.ascending = not gameList._sortby.ascending
@@ -421,7 +419,7 @@ function CreateUI(over, exitBehavior)
             gameList._sortby.field = control._sortKey
             formatData()
         end
-        gameList._tabs[index].HandleEvent = function(control, event)
+        tab.HandleEvent = function(control, event)
             if event.Type == 'MouseEnter' then
                 control:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort_btn_over_m.dds'))
                 control.lcap:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort_btn_over_l.dds'))
@@ -440,9 +438,10 @@ function CreateUI(over, exitBehavior)
                 control:OnClick()
             end
         end
+        gameList._tabs[index] = tab
     end
 
-    gameListObjects = {}
+    local gameListObjects = {}
 
     function CreateRollover(parent)
         local bg = Bitmap(parent, UIUtil.UIFile('/scx_menu/gameselect/map-panel_bmp.dds'))
@@ -516,31 +515,31 @@ function CreateUI(over, exitBehavior)
         end
     end
     gameListObjects = {}
-    local function CreateElement(index)
-        gameListObjects[index] = Group(gameList)
-        gameListObjects[index].Depth:Set(function() return gameList.Depth() + 10 end)
+    local function CreateElement()
+        local group = Group(gameList)
+        group.Depth:Set(function() return gameList.Depth() + 10 end)
 
-        gameListObjects[index].bg = Bitmap(gameListObjects[index], UIUtil.UIFile('/scx_menu/gameselect/slot_bmp.dds'))
-        LayoutHelpers.AtLeftTopIn(gameListObjects[index].bg, gameListObjects[index], 235)
-        gameListObjects[index].bg.Depth:Set(gameListObjects[index].Depth)
+        group.bg = Bitmap(group, UIUtil.UIFile('/scx_menu/gameselect/slot_bmp.dds'))
+        LayoutHelpers.AtLeftTopIn(group.bg, group, 235)
+        group.bg.Depth:Set(group.Depth)
 
-        gameListObjects[index].mapbg = Bitmap(gameListObjects[index], UIUtil.UIFile('/scx_menu/gameselect/map-slot_bmp.dds'))
-        LayoutHelpers.AtLeftTopIn(gameListObjects[index].mapbg, gameListObjects[index], 163)
-        gameListObjects[index].mapbg.Depth:Set(gameListObjects[index].Depth)
+        group.mapbg = Bitmap(group, UIUtil.UIFile('/scx_menu/gameselect/map-slot_bmp.dds'))
+        LayoutHelpers.AtLeftTopIn(group.mapbg, group, 163)
+        group.mapbg.Depth:Set(group.Depth)
 
-        gameListObjects[index].Width:Set(gameList.Width)
-        gameListObjects[index].Height:Set(gameListObjects[index].bg.Height)
+        group.Width:Set(gameList.Width)
+        group.Height:Set(group.bg.Height)
 
-        gameListObjects[index].joinBtn = Button(gameListObjects[index],
+        group.joinBtn = Button(group,
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_dis.dds'))
-        gameListObjects[index].joinBtn.label = UIUtil.CreateText(gameListObjects[index].joinBtn, LOC("<LOC _Join>"), 14, UIUtil.bodyFont)
-        LayoutHelpers.AtCenterIn(gameListObjects[index].joinBtn.label, gameListObjects[index].joinBtn)
-        gameListObjects[index].joinBtn.label:DisableHitTest()
-        LayoutHelpers.AtLeftTopIn(gameListObjects[index].joinBtn, gameListObjects[index], -5, -5)
-        gameListObjects[index].joinBtn.OnClick = function(self, modifiers)
+        group.joinBtn.label = UIUtil.CreateText(group.joinBtn, LOC("<LOC _Join>"), 14, UIUtil.bodyFont)
+        LayoutHelpers.AtCenterIn(group.joinBtn.label, group.joinBtn)
+        group.joinBtn.label:DisableHitTest()
+        LayoutHelpers.AtLeftTopIn(group.joinBtn, group, -5, -5)
+        group.joinBtn.OnClick = function(self, modifiers)
     	    if errorDialog then errorDialog:Destroy() end
             local name = nameEdit:GetText()
             if not IsNameOK(name) then
@@ -559,16 +558,16 @@ function CreateUI(over, exitBehavior)
             lobby.JoinGame(hostInfo.Address, false)
         end
 
-        gameListObjects[index].obsBtn = Button(gameListObjects[index],
+        group.obsBtn = Button(group,
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_dis.dds'))
-        gameListObjects[index].obsBtn.label = UIUtil.CreateText(gameListObjects[index].obsBtn, LOC("<LOC _Observe>"), 14, UIUtil.bodyFont)
-        LayoutHelpers.AtCenterIn(gameListObjects[index].obsBtn.label, gameListObjects[index].obsBtn)
-        gameListObjects[index].obsBtn.label:DisableHitTest()
-        LayoutHelpers.Below(gameListObjects[index].obsBtn, gameListObjects[index].joinBtn, -15)
-        gameListObjects[index].obsBtn.OnClick = function(self, modifiers)
+        group.obsBtn.label = UIUtil.CreateText(group.obsBtn, LOC("<LOC _Observe>"), 14, UIUtil.bodyFont)
+        LayoutHelpers.AtCenterIn(group.obsBtn.label, group.obsBtn)
+        group.obsBtn.label:DisableHitTest()
+        LayoutHelpers.Below(group.obsBtn, group.joinBtn, -15)
+        group.obsBtn.OnClick = function(self, modifiers)
     	    if errorDialog then errorDialog:Destroy() end
             local name = nameEdit:GetText()
             if not IsNameOK(name) then
@@ -586,65 +585,66 @@ function CreateUI(over, exitBehavior)
             lobby.JoinGame(hostInfo.Address, true)
         end
 
-        gameListObjects[index].preview = MapPreview(gameListObjects[index])
-        LayoutHelpers.SetDimensions(gameListObjects[index].preview, 58, 58)
-        LayoutHelpers.AtHorizontalCenterIn(gameListObjects[index].preview, gameList._tabs[1])
-        LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].preview, gameListObjects[index])
-        gameListObjects[index].preview:DisableHitTest()
+        group.preview = MapPreview(group)
+        LayoutHelpers.SetDimensions(group.preview, 58, 58)
+        LayoutHelpers.AtHorizontalCenterIn(group.preview, gameList._tabs[1])
+        LayoutHelpers.AtVerticalCenterIn(group.preview, group)
+        group.preview:DisableHitTest()
 
-        gameListObjects[index].mapglow = Bitmap(gameListObjects[index].preview, UIUtil.UIFile('/scx_menu/gameselect/map-panel-glow_bmp.dds'))
+        group.mapglow = Bitmap(group.preview, UIUtil.UIFile('/scx_menu/gameselect/map-panel-glow_bmp.dds'))
 
-        LayoutHelpers.FillParentFixedBorder(gameListObjects[index].mapglow, gameListObjects[index].preview, -3)
-        gameListObjects[index].mapglow:DisableHitTest()
+        LayoutHelpers.FillParentFixedBorder(group.mapglow, group.preview, -3)
+        group.mapglow:DisableHitTest()
 
-        gameListObjects[index].nopreview = UIUtil.CreateText(gameListObjects[index], '?', 60, UIUtil.bodyFont)
-        LayoutHelpers.AtCenterIn(gameListObjects[index].nopreview, gameListObjects[index].preview)
-        gameListObjects[index].nopreview:DisableHitTest()
+        group.nopreview = UIUtil.CreateText(group, '?', 60, UIUtil.bodyFont)
+        LayoutHelpers.AtCenterIn(group.nopreview, group.preview)
+        group.nopreview:DisableHitTest()
 
-        gameListObjects[index].name1 = UIUtil.CreateText(gameListObjects[index], '', 16)
-        LayoutHelpers.AtLeftIn(gameListObjects[index].name1, gameList._tabs[2])
-        LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].name1, gameListObjects[index])
-        gameListObjects[index].name1:DisableHitTest()
+        group.name1 = UIUtil.CreateText(group, '', 16)
+        LayoutHelpers.AtLeftIn(group.name1, gameList._tabs[2])
+        LayoutHelpers.AtVerticalCenterIn(group.name1, group)
+        group.name1:DisableHitTest()
 
-        gameListObjects[index].name2 = UIUtil.CreateText(gameListObjects[index], '', 16)
-        LayoutHelpers.Below(gameListObjects[index].name2, gameListObjects[index].name1)
-        LayoutHelpers.AtLeftIn(gameListObjects[index].name2, gameList._tabs[2])
-        gameListObjects[index].name2:DisableHitTest()
+        group.name2 = UIUtil.CreateText(group, '', 16)
+        LayoutHelpers.Below(group.name2, group.name1)
+        LayoutHelpers.AtLeftIn(group.name2, gameList._tabs[2])
+        group.name2:DisableHitTest()
 
-        gameListObjects[index].players = UIUtil.CreateText(gameListObjects[index], '', 16)
-        LayoutHelpers.AtHorizontalCenterIn(gameListObjects[index].players, gameList._tabs[3])
-        LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].players, gameListObjects[index])
-        gameListObjects[index].players:DisableHitTest()
+        group.players = UIUtil.CreateText(group, '', 16)
+        LayoutHelpers.AtHorizontalCenterIn(group.players, gameList._tabs[3])
+        LayoutHelpers.AtVerticalCenterIn(group.players, group)
+        group.players:DisableHitTest()
 
-        gameListObjects[index].custom = UIUtil.CreateText(gameListObjects[index], 'custom', 16)
-        LayoutHelpers.AtLeftIn(gameListObjects[index].custom, gameList._tabs[4])
-        LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].custom, gameListObjects[index])
-        gameListObjects[index].custom:DisableHitTest()
+        group.custom = UIUtil.CreateText(group, 'custom', 16)
+        LayoutHelpers.AtLeftIn(group.custom, gameList._tabs[4])
+        LayoutHelpers.AtVerticalCenterIn(group.custom, group)
+        group.custom:DisableHitTest()
 
-        gameListObjects[index].roGroup = Group(gameListObjects[index])
-        LayoutHelpers.FillParent(gameListObjects[index].roGroup, gameListObjects[index].mapbg)
-        gameListObjects[index].roGroup.HandleEvent = function(self, event)
+        group.roGroup = Group(group)
+        LayoutHelpers.FillParent(group.roGroup, group.mapbg)
+        group.roGroup.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
-                if not gameListObjects[index].rollover then
-                    gameListObjects[index].rollover = CreateRollover(gameListObjects[index])
+                if not group.rollover then
+                    group.rollover = CreateRollover(group)
                 end
             elseif event.Type == 'MouseExit' then
-                if gameListObjects[index].rollover then
-                    gameListObjects[index].rollover:Destroy()
-                    gameListObjects[index].rollover = false
+                if group.rollover then
+                    group.rollover:Destroy()
+                    group.rollover = false
                 end
             end
         end
+        return group
     end
 
     local formattedData = {}
 
-    CreateElement(1)
+    gameListObjects[1] = CreateElement()
     LayoutHelpers.AtLeftTopIn(gameListObjects[1], gameList, 0, 10)
 
     local index = 2
     while gameListObjects[table.getsize(gameListObjects)].Bottom() + gameListObjects[1].Height() < gameList.Bottom() do
-        CreateElement(index)
+        gameListObjects[index] = CreateElement()
         LayoutHelpers.Below(gameListObjects[index], gameListObjects[index-1], 5)
         index = index + 1
     end
@@ -852,7 +852,7 @@ function CreateUI(over, exitBehavior)
     end
 
     discovery.GameFound = function(self,index,gameConfig)
-        for i, v in games do
+        for i, v in games do--doesnt do anything
             if v.Address == gameConfig.Address and v.Hostname == gameConfig.Hostname then
                 v = nil
             end
