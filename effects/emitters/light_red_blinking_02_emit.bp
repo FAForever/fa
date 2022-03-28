@@ -1,4 +1,4 @@
-light_red_blinking_01
+-- not used by faf
 EmitterBlueprint {
 	BlueprintId = 'light_red_blinking_02',
 	Lifetime = -1.00,

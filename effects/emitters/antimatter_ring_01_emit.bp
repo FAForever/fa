@@ -1,4 +1,4 @@
-used by ueb2302
+-- used by ueb2302
 EmitterBlueprint {
 	BlueprintId = 'antimatter_ring_01',
 	Lifetime = 2.00,
