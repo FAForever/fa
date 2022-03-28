@@ -888,8 +888,11 @@ local function refreshObserverList()
             numTeams = numTeams + 1
         end
 
-        -- if there are 2 or fewer teams, list them before observers
-        if numTeams <= 2 then
+        -- if there are 1 or 2 teams, list them before observers
+        if numTeams == 1 or numTeams == 2 then
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem('                               Team Ratings')
+            end
             for i, rating in teamRatings do
                 GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
             end
@@ -899,7 +902,18 @@ local function refreshObserverList()
         end
     end
 
+
+    local observers = false
+
     for slot, observer in gameInfo.Observers:pairs() do
+
+        if not observers then
+           observers = true 
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem('                                  Observers')
+            end
+        end
+
         observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
 
         -- Create a label for this observer of the form:
@@ -933,6 +947,7 @@ local function refreshObserverList()
     if numTeams > 2 then
         if not lobbyComm:IsHost() then
             GUI.observerList:AddItem('')
+            GUI.observerList:AddItem('                               Team Ratings')
         end
         for i, rating in teamRatings do
            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
