@@ -947,7 +947,7 @@ local function refreshObserverList()
     if numTeams > 2 then
         if not lobbyComm:IsHost() then
             GUI.observerList:AddItem('')
-            GUI.observerList:AddItem('                               Team Ratings')
+            GUI.observerList:AddItem('Team Ratings:')
         end
         for i, rating in teamRatings do
            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
