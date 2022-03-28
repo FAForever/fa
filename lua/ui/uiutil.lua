@@ -201,10 +201,7 @@ function GetLayoutFilename(key)
 end
 
 function UpdateWorldBorderState(skin, isOn)
-    if skin == nil then
-        skin = currentSkin()
-    end
-
+    skin = skin or currentSkin()
     if SessionIsActive() then
         if isOn == nil then
             isOn = Prefs.GetOption('world_border')
@@ -934,15 +931,15 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
             if modalInfo.enterButton then
                 if modalInfo.enterButton == 1 then
                     if dialog._button1 then
-                        dialog._button1.OnClick(dialog._button1)
+                        dialog._button1:OnClick()
                     end
                 elseif modalInfo.enterButton == 2 then
                     if dialog._button2 then
-                        dialog._button2.OnClick(dialog._button2)
+                        dialog._button2:OnClick()
                     end
                 elseif modalInfo.enterButton == 3 then
                     if dialog._button3 then
-                        dialog._button3.OnClick(dialog._button3)
+                        dialog._button3:OnClick()
                     end
                 end
             end
@@ -952,15 +949,15 @@ function QuickDialog(parent, dialogText, button1Text, button1Callback, button2Te
             if modalInfo.escapeButton then
                 if modalInfo.escapeButton == 1 then
                     if dialog._button1 then
-                        dialog._button1.OnClick(dialog._button1)
+                        dialog._button1:OnClick()
                     end
                 elseif modalInfo.escapeButton == 2 then
                     if dialog._button2 then
-                        dialog._button2.OnClick(dialog._button2)
+                        dialog._button2:OnClick()
                     end
                 elseif modalInfo.escapeButton == 3 then
                     if dialog._button3 then
-                        dialog._button3.OnClick(dialog._button3)
+                        dialog._button3:OnClick()
                     end
                 end
             end
