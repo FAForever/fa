@@ -149,8 +149,6 @@ end
 -- @param scaleFactor A scale factor for the effects.
 function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFactor)
 
-    LOG(scaleFactor)
-
     -- # initialize various info used throughout the function
     local army = builder.Army
 
