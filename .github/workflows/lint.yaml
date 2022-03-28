@@ -9,8 +9,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
         with:
-          repository: 'deploy/fafdevelop'
+          repository: 'ps-wow/action-test-repo'
       - name: wow-lint
-        uses: davidcraig/action-wow-lint@1.0.0
+        uses: deploy/fafdevelop
         with:
             path-to-files: 'lua'
