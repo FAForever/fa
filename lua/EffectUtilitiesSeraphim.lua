@@ -154,6 +154,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
 
     -- optimize local access
     local EmitterScaleEmitter = EmitterScaleEmitter
+    local UnitGetFractionComplete = UnitGetFractionComplete
 
     -- # Create generic effects
     local effect = false
@@ -190,9 +191,6 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     end
 
     -- # Scale effects until the unit is finished
-
-    -- localize for optimal access
-    local UnitGetFractionComplete = UnitGetFractionComplete
 
     -- only naval factories are not square, use the Z axis to get largest axis
     local unitScaleMetric = unitBeingBuilt.BuildExtentsZ * 0.75
