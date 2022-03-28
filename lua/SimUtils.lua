@@ -567,7 +567,7 @@ function GiveUnitsToPlayer(data, units)
                 units = EntityCategoryFilterDown(categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER, units)
                 local unitsAfter = table.getsize(units)
 
-                if table.getsize(units) ~= unitsBefore then
+                if unitsAfter ~= unitsBefore then
                     -- Maybe spawn an UI dialog instead?
                     print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
                 end
