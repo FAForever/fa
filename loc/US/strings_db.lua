@@ -7668,6 +7668,10 @@ lobui_0783="Teams will be optimally balanced, mirrored start locations"
 
 lobui_0790="Manual Unit Sharing"
 lobui_0791="Are players allowed to manually give units?"
+lobui_0792="Manual unit sharing are allowed"
+lobui_0793="Yes except builders"
+lobui_0794="No manual sharing of builder/factory"
+lobui_0795="No manual sharing of units"
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."

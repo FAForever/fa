@@ -473,17 +473,17 @@ globalOpts = {
         values = {
             {
                 text = "<LOC _Yes>Yes",
-                help = "Manual unit sharing are allowed",
+                help = "<LOC lobui_0792>Manual unit sharing are allowed",
                 key = 'all',
             },
             {
-                text = "Yes except builders",
-                help = "No manual sharing of builder/factory",
+                text = "<LOC lobui_0793>Yes except builders",
+                help = "<LOC lobui_0794>No manual sharing of builder/factory",
                 key = 'no_builders',
             },
             {
                 text = "<LOC _No>No",
-                help = "No manual sharing of units ",
+                help = "<LOC lobui_0795>No manual sharing of units",
                 key = 'none',
             },
         },
