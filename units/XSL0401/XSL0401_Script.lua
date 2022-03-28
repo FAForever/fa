@@ -75,6 +75,7 @@ XSL0401 = Class(SWalkingLandUnit) {
     },
 
     StartBeingBuiltEffects = function(self, builder, layer)
+        -- triggers the effect twice, one is larger than the other
         SWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
         self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2)
     end,

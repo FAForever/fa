@@ -5,7 +5,7 @@
 #**
 #**  Summary  :  Seraphim Experimental Strategic Bomber Script
 #**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+#**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
@@ -49,7 +49,7 @@ XSA0402 = Class(SAirUnit) {
     
     StartBeingBuiltEffects = function(self, builder, layer)
 		SAirUnit.StartBeingBuiltEffects(self, builder, layer)
-		self:ForkThread( EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag )
+		self:ForkThread( EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 0.5 )
     end,    
 }
 TypeClass = XSA0402
