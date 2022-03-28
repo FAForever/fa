@@ -330,6 +330,34 @@ AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
     end,
 }
 
+AANDepthChargeBombWeapon02 = Class(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp', },
+
+    CreateProjectileForWeapon = function(self, bone)
+        local proj = self:CreateProjectile(bone)
+        local damageTable = self:GetDamageTable()
+        local blueprint = self:GetBlueprint()
+        local data = {
+            Army = self.unit.Army,
+            Instigator = self.unit,
+            StartRadius = blueprint.DOTStartRadius,
+            EndRadius = blueprint.DOTEndRadius,
+            DOTtype = blueprint.DOTtype,
+            Damage = blueprint.DoTDamage,
+            Duration = blueprint.DoTDuration,
+            Frequency = blueprint.DoTFrequency,
+            Type = 'Normal',
+        }
+
+        if proj and not proj:BeenDestroyed() then
+            proj:PassDamageData(damageTable)
+            proj:PassData(data)
+        end
+
+        return proj
+    end,
+}
+
 AANTorpedoCluster = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/aeon_torpedocluster_flash_01_emit.bp', },
 

@@ -1,3 +1,4 @@
+-- used by xab2307
 EmitterBlueprint {
     BlueprintId = 'aeon_quanticcluster_fxtrail_01',
     Lifetime = -1.00,
@@ -10,10 +11,10 @@ EmitterBlueprint {
     AlignRotation = false,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = -1.00,
+    LODCutoff = 1000.00,
     EmitIfVisible = true,
-    CatchupEmit = false,
-    CreateIfVisible = false,
+    CatchupEmit = true,
+    CreateIfVisible = true,
     SnapToWaterline = false,
     OnlyEmitOnWater = false,
     ParticleResistance = false,

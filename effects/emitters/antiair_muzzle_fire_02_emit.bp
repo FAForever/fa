@@ -1,3 +1,4 @@
+-- used by uaa0304, uaa0310, ura0304, dea0202, uea0304,
 EmitterBlueprint {
 	BlueprintId = 'antiair_muzzle_fire_02',
 	Lifetime = 1.00,
@@ -10,9 +11,9 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = true,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 200.00,
 	EmitIfVisible = true,
-	CatchupEmit = true,
+	CatchupEmit = false,
 	CreateIfVisible = false,
 	SnapToWaterline = true,
 	InterpolateEmission = true,

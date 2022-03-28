@@ -1,3 +1,4 @@
+-- used by xab2307
 EmitterBlueprint {
 	BlueprintId = 'aeon_quanticcluster_hit_07',
 	Lifetime = 3.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 500.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
