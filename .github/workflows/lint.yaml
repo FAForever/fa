@@ -9,8 +9,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
         with:
-          repository: 'FAForever/fa'
+          repository: 'ps-wow/action-test-repo'
       - name: wow-lint
-        uses: davidcraig/action-wow-lint@1.0.1
+        uses: davidcraig/action-wow-lint@1.0.0
         with:
-            path-to-files: 'lua'
+            path-to-files: 'src/test.lua'
