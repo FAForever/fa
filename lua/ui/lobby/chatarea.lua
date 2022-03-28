@@ -4,8 +4,24 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
+local defaultStyle = {
+    -- storing style values in a flat table for easy access
+    fontColor = 'FFFFFFFF', -- #FFFFFFFF
+    fontFamily = UIUtil.bodyFont,
+    fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14,
+
+    shadow = false,
+    lineSpacing = 1, -- don't use higher values because chat looks strange with small fonts
+    padding = {
+        left = 0,
+        top = 3,
+        right = 3,
+        bottom = 3
+    }
+}
+
 --- Represents a control that keep tracks and displays chat messages and their author's names
-ChatArea = Class(Group){
+ChatArea = Class(Group) {
 
     __init = function(self, parent, width, height)
         Group.__init(self, parent)
@@ -19,7 +35,7 @@ ChatArea = Class(Group){
         -- ChatLines = {
         --   { TextFields = { { text = "Mike" }, { text = "Hi Dave, How are you?" } } },
         --   { TextFields = { { text = "Dave" }, { text = "I'm fine, how are you" } } }
-        --}
+        -- }
 
         -- this table stores all messages added to the ChatArea and the ReflowLines() will use this table
         -- to re-create and layout ChatLines if size of the ChatArea is changed or if fontSize is changed in lobby
@@ -28,12 +44,12 @@ ChatArea = Class(Group){
         -- ChatHistory = {
         --   { authorName = "Mike", messageText = "Hi Dave, How are you?" },
         --   { authorName = "Dave", messageText = "I'm fine, how are you?" },
-        --}
+        -- }
 
         -- specifies whether or not to save new messages in chat history
         self.ChatHistoryActive = true
 
-        self.Style = self:GetDefaultStyle()
+        self.Style = defaultStyle
         self.Parent = parent
 
         -- iInitial width and height are necessary to dodge partial-initialization/re-flow weirdness.
@@ -53,19 +69,6 @@ ChatArea = Class(Group){
         LayoutHelpers.AtLeftTopIn(self, parent, 0, 0)
     end,
 
-    GetDefaultStyle = function(self)
-        return {
-            -- storing style values in a flat table for easy access
-            fontColor = 'FFFFFFFF', --#FFFFFFFF
-            fontFamily = UIUtil.bodyFont,
-            fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14,
-
-            shadow = false,
-            lineSpacing = 1, -- don't use higher values because chat looks strange with small fonts
-            padding = { left = 0, top = 3, right = 3, bottom = 3 },
-        }
-    end,
-
     --- posts a new chat message and its author name using optional styling tables
     PostMessage = function(self, messageText, authorName, messageStyle, authorStyle)
 
@@ -73,29 +76,24 @@ ChatArea = Class(Group){
         -- The author style must be _roughly_ the same in font size and weight than the text style.
         -- Too different values might break the text wrapping, because the Text.Wrap method doesn't take style as a parameter.
 
-        local defaultStyle = self:GetDefaultStyle()
         -- ensure we have a style for the message text
         if messageStyle == nil then
-           messageStyle = self:GetDefaultStyle()
+            messageStyle = defaultStyle
         else
             -- ensure message style has all required values otherwise use values of default style
-            for k,v in pairs(defaultStyle) do
-                if messageStyle[k] == nil then
-                   messageStyle[k] = defaultStyle[k]
-                end
+            for k, v in pairs(defaultStyle) do
+                messageStyle[k] = messageStyle[k] or defaultStyle[k]
             end
         end
 
         -- ensure we have a style for the author name
         if authorStyle == nil then
-            authorStyle = self:GetDefaultStyle()
+            authorStyle = defaultStyle
             authorStyle.fontFamily = "Arial Gras"
         else
             -- ensure author style has all required values otherwise use values of default style
-            for k,v in pairs(defaultStyle) do
-                if authorStyle[k] == nil then
-                   authorStyle[k] = defaultStyle[k]
-                end
+            for k, v in pairs(defaultStyle) do
+                authorStyle[k] = authorStyle[k] or defaultStyle[k]
             end
         end
         -- avoid waste horizontal space
@@ -106,33 +104,31 @@ ChatArea = Class(Group){
 
         -- keep track of chat history by storing messages and their authors
         if self.ChatHistoryActive then
-            local entry = {}
-            entry.authorName = authorName
-            entry.authorStyle = authorStyle
-            entry.messageText = messageText
-            entry.messageStyle = messageStyle
+            local entry = {
+                authorName = authorName,
+                authorStyle = authorStyle,
+                messageText = messageText,
+                messageStyle = messageStyle
+            }
             table.insert(self.ChatHistory, entry)
         end
 
         -- If no author provided, we're simply going to skip it. Else we're going to style it
         if authorName == nil then
-           authorName = ''
+            authorName = ''
         else
-            authorName = '['..authorName..'] '
+            authorName = '[' .. authorName .. '] '
         end
-        if messageText == nil then
-           messageText = ''
-        end
+        messageText = messageText or ''
 
-        local chatText = authorName..messageText
+        local chatText = authorName .. messageText
         -- This custom advance function will take care of font size and other style parameters
         local customAdvanceFunction = function(chatText)
             return self.AdvanceFunction(self, chatText, messageStyle)
         end
 
         -- wrap message text and its author into multiple lines based on control's width
-        local wrapLines = Text.WrapText(chatText,
-            self.Width() - self.Style.padding.left - self.Style.padding.right,
+        local wrapLines = Text.WrapText(chatText, self.Width() - self.Style.padding.left - self.Style.padding.right,
             customAdvanceFunction)
 
         -- group wrapped text in to lines and text fields
@@ -146,6 +142,7 @@ ChatArea = Class(Group){
                 self:AppendText(wrapLines[i], messageStyle, true)
             end
         end
+        self:ShowLines(self.Parent.top, self.Parent.bottom)
     end,
 
     --- appends text field to existing line or on a new line
@@ -155,7 +152,7 @@ ChatArea = Class(Group){
         if useNewLine or table.empty(self.ChatLines) then
             line = self:CreateLine(style.fontSize + self.Style.lineSpacing)
         else
-            line = self.lastLine  -- getting the last/current line
+            line = self.lastLine -- getting the last/current line
         end
 
         local textField = UIUtil.CreateText(line, str, style.fontSize, style.fontFamily)
@@ -182,18 +179,18 @@ ChatArea = Class(Group){
         line.Height:Set(lineHeight)
         line.Width:Set(self.Width)
         line:DisableHitTest()
-        line.index = table.getsize(self.ChatLines)+ 1
+        line.index = table.getsize(self.ChatLines) + 1
         -- creating a table that will store all text fields that belong to this line
         line.TextFields = {}
 
         -- layout the new line based on its index
         if line.index == 1 then
-           LayoutHelpers.AtLeftTopIn(line, self, 0, self.Style.padding.top)
+            LayoutHelpers.AtLeftTopIn(line, self, 0, self.Style.padding.top)
         else
-           -- putting the line below previous line
-           line.previous = self.ChatLines[line.index - 1]
-           line.Left:Set(function() return self.Left() end)
-           LayoutHelpers.Below(line, line.previous)
+            -- putting the line below previous line
+            line.previous = self.ChatLines[line.index - 1]
+            line.Left:Set(self.Left)
+            LayoutHelpers.Below(line, line.previous)
         end
         -- store the new line so we can destroy all lines later
         table.insert(self.ChatLines, line)
@@ -214,7 +211,9 @@ ChatArea = Class(Group){
                 local i = visibleIndex
                 local c = line
                 -- calculate top position of a line based on its visible index
-                line.Top:Set(function() return self.Top() + ((i - topIndex) * (c.Height() + 2)) end)
+                line.Top:Set(function()
+                    return self.Top() + ((i - topIndex) * (c.Height() + 2))
+                end)
             end
             visibleIndex = visibleIndex + 1
         end
@@ -228,14 +227,11 @@ ChatArea = Class(Group){
 
     --- clears existing chat lines by destroying and dereferencing its UI elements
     ClearLines = function(self)
-       -- LOG('chatArea ClearLines')
+        -- LOG('chatArea ClearLines')
         for l, line in self.ChatLines or {} do
-            for t, textField in line.TextFields or {} do
-                textField:OnDestroy()
-                textField = nil
-            end
-            line:Destroy()
-            line = nil
+            line:ApplyFunction(function(control)
+                control:Destroy()
+            end)
         end
         self.ChatLines = {}
         self.lastLine = nil
@@ -248,8 +244,7 @@ ChatArea = Class(Group){
         -- temporary deactivate Chat history while re-creating chat lines
         self.ChatHistoryActive = false
         for _, chat in self.ChatHistory or {} do
-            self:PostMessage(chat.messageText, chat.authorName,
-                               chat.messageStyle, chat.authorStyle)
+            self:PostMessage(chat.messageText, chat.authorName, chat.messageStyle, chat.authorStyle)
         end
         self.ChatHistoryActive = true
     end,
@@ -261,9 +256,8 @@ ChatArea = Class(Group){
         local hasFontFamily = type(fontFamily) == 'string'
         local hasFontSize = type(fontSize) == 'number'
 
-        if self.fontSize == fontSize and
-           self.fontFamily == fontFamily then
-           return -- skip if the font did not changed
+        if self.fontSize == fontSize and self.fontFamily == fontFamily then
+            return -- skip if the font did not changed
         else
             self.fontSize = fontSize
             self.fontFamily = fontFamily
@@ -286,7 +280,7 @@ ChatArea = Class(Group){
     --- gets the width of text field that would displayed the string passed as argument
     AdvanceFunction = function(self, str, strStyle)
         -- Creates a dummy text to measure width
-        dummy = Text.Text(self.Parent)
+        local dummy = Text.Text(self.Parent)
         dummy:Hide()
         dummy:SetFont(strStyle.fontFamily, strStyle.fontSize)
         dummy:SetText(str)
@@ -301,5 +295,5 @@ ChatArea = Class(Group){
         self.ChatLines = nil
         self.ChatHistory = nil
         Group.OnDestroy(self)
-    end,
+    end
 }
