@@ -563,7 +563,14 @@ function GiveUnitsToPlayer(data, units)
         local owner = units[1].Army
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
             if manualShare == 'no_builders' then
+                local unitsBefore = table.getsize(units)
                 units = EntityCategoryFilterDown(categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER, units)
+                local unitsAfter = table.getsize(units)
+
+                if table.getsize(units) ~= unitsBefore then
+                    -- Maybe spawn an UI dialog instead?
+                    print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
+                end
             end
             
             TransferUnitsOwnership(units, data.To)
