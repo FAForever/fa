@@ -891,7 +891,7 @@ local function refreshObserverList()
         -- if there are 1 or 2 teams, list them before observers
         if numTeams == 1 or numTeams == 2 then
             if not lobbyComm:IsHost() then
-                GUI.observerList:AddItem('Team Ratings')
+                GUI.observerList:AddItem('Team Ratings:')
             end
             for i, rating in teamRatings do
                 GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
@@ -910,7 +910,7 @@ local function refreshObserverList()
         if not observers then
            observers = true 
             if not lobbyComm:IsHost() then
-                GUI.observerList:AddItem('Observers')
+                GUI.observerList:AddItem('Observers:')
             end
         end
 
