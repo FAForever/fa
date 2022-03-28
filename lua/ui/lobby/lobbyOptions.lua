@@ -478,7 +478,7 @@ globalOpts = {
             },
             {
                 text = "<LOC lobui_0793>Yes except builders",
-                help = "<LOC lobui_0794>No manual sharing of builder/factory",
+                help = "<LOC lobui_0794>No manual sharing of engineers/factories",
                 key = 'no_builders',
             },
             {
