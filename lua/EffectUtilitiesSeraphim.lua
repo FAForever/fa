@@ -167,6 +167,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     local count = TableGetn(lods)
     local LODCutoff = 0.9 * lods[count].LODCutoff or (90 * MathMax(unitBeingBuilt.BuildExtentsX, unitBeingBuilt.BuildExtentsZ))
 
+    -- smaller inner, dark-purple effect
     for _, vEffect in BuildEffectsEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
         EmitterScaleEmitter(effect,scaleFactor)
@@ -177,6 +178,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
         emittersHead = emittersHead + 1
     end
 
+    -- large outer radius effect
     for _, vEffect in BuildEffectBaseEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
         EmitterScaleEmitter(effect,scaleFactor)
