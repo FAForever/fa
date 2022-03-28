@@ -26,8 +26,6 @@
 
 local TableGetn = table.getn 
 
-local CleanUpThreshold = 11
-
 TrashBag = Class {
 
     -- Tell the garbage collector that we're a weak table for our values. If an element is ready to be collected
