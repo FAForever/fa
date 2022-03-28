@@ -116,7 +116,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unit
                     progress = 0 
                 end
 
-                scale = 1 - progress * progress
+                local scale = 1 - progress * progress
                 ProjectileSetScale(pool, sx * scale, 1.5 * sy * scale, sz * scale)
             end
 
@@ -359,7 +359,7 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
     -- # Apply build effects
 
     for k, v in ColossusEffectBones do 
-        effect = CreateEmitterAtBone(unitBeingBuilt, k, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        local effect = CreateEmitterAtBone(unitBeingBuilt, k, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
         EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 1)
         EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 1)
         EmitterScaleEmitter(effect, 1.0)
@@ -389,7 +389,7 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
                     progress = 0 
                 end
     
-                scale = 1 - progress * progress
+                local scale = 1 - progress * progress
 
                 -- progress pool
                 for k, pool in pools do 
@@ -441,7 +441,6 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local orientation = EntityGetOrientation(unitBeingBuilt)
 
     local sx = 0.6 * unitBeingBuilt.BuildExtentsX
     local sz = 0.6 * unitBeingBuilt.BuildExtentsZ
@@ -464,9 +463,8 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
 
     -- # Create additional sparkles
 
-    frac = false
     for k = 1, 10 do 
-        frac = k / 10.0
+        local frac = k / 10.0
         effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
         EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
         EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
@@ -511,7 +509,6 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local orientation = EntityGetOrientation(unitBeingBuilt)
 
     local sx = 0.55 * unitBeingBuilt.BuildExtentsX
     local sz = 0.55 * unitBeingBuilt.BuildExtentsZ
@@ -534,9 +531,8 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
 
     -- # Create additional sparkles
 
-    frac = false
     for k = 1, 10 do 
-        frac = k / 10.0
+        local frac = k / 10.0
         effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
         EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
         EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
@@ -577,7 +573,7 @@ local function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, sx, sy, sz
     -- # Add various effects over time
 
     local k = 0.1
-    local cFraction, progress = false, false
+    local cFraction = false
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
     while fraction < 1 do
 
@@ -585,7 +581,7 @@ local function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, sx, sy, sz
         cFraction = UnitGetFractionComplete(unitBeingBuilt)
         if cFraction > fraction then 
             if k < cFraction then 
-                frac = (1.1 - k) / 1
+                local frac = (1.1 - k) / 1
                 effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
                 EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 0.5 * frac * sx)
                 EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 0.5 * frac * sz)
@@ -617,7 +613,6 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local orientation = EntityGetOrientation(unitBeingBuilt)
 
     local sx = 1 * unitBeingBuilt.BuildExtentsX
     local sz = 1 * unitBeingBuilt.BuildExtentsZ
