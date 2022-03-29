@@ -24,6 +24,11 @@ local ProjectileSetScale = moho.projectile_methods.SetScale
 
 local EmitterSetEmitterCurveParam = moho.IEffect.SetEmitterCurveParam
 local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
+local EmitterSetEmitterParam = moho.IEffect.SetEmitterParam
+
+-- upvalue math functions for performance
+local MathMax = math.max
+local TableGetn = table.getn 
 
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetGoal = moho.SlideManipulator.SetGoal 
@@ -160,7 +165,6 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     local sz = unitBeingBuilt.BuildExtentsZ
     local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
 
-    -- # Create pool of mercury
 
     local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
     TrashBagAdd(unitBeingBuiltTrash, pool)
@@ -335,7 +339,7 @@ end
 -- @param unitBeingBuilt The Colossus that is being built.
 -- @param animator The animator that is applied.
 -- @param puddleBones The set of bones to use for puddles.
-local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator, puddleBones)
+local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator, puddleBones, scaleFactor)
 
     WaitTicks(2)
 
@@ -349,6 +353,11 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag 
 
+    -- determine a sane LOD cutoff for the size of the unit
+    local lods = unitBeingBuilt.Blueprint.Display.Mesh.LODs
+    local count = TableGetn(lods) --should be always 2, why bother to look up unless we have a local function module
+    local LODCutoff = 0.9 * lods[count].LODCutoff or (90 * MathMax(unitBeingBuilt.BuildExtentsX, unitBeingBuilt.BuildExtentsZ))
+    
     -- # Create pools of mercury
 
     local pools = { false, false }
@@ -356,26 +365,46 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
         pools[k] = CreateColossusPool(unitBeingBuilt, v, sx, sy, sz)
     end
 
-    -- # Apply build effects
 
+     -- matches with number of effects being made, pre-allocates the table
+     local emitters = { false, false, false, false, false }
+     local emittersHead = 1
+
+    -- # Apply build effects
+    
     for k, v in ColossusEffectBones do 
         local effect = CreateEmitterAtBone(unitBeingBuilt, k, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
         EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 1)
         EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 1)
-        EmitterScaleEmitter(effect, 1.0)
-        
+        EmitterScaleEmitter(effect, scaleFactor)
+        EmitterSetEmitterParam(effect, "LODCUTOFF", LODCutoff)
+
         TrashBagAdd(onDeathTrash, effect)
         TrashBagAdd(onFinishedTrash, effect)
+
+        emitters[emittersHead] = effect
+        emittersHead = emittersHead + 1
     end   
 
     -- # Apply a manual animation
 
     local cFraction, progress = false, false
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
+    local unitScaleMetric = unitBeingBuilt.BuildExtentsZ * 0.75
     while fraction < 1 do
 
         -- only update when we make progress
         cFraction = UnitGetFractionComplete(unitBeingBuilt)
+
+        --sparkle up the build
+        --we could reverse it and reverse sparkle with the completness
+        --so have more sparks coming in the initial phase of the build and slow down the emits
+        --based on progress
+        --or just based on the build power going into the model since we have the thread count
+        for k = 1, emittersHead - 1 do
+            EmitterScaleEmitter(emitters[k], 1 + scaleFactor * (unitScaleMetric * cFraction))
+        end
+
         if cFraction > fraction then 
 
             -- store updated value
@@ -408,7 +437,7 @@ end
 
 --- Creates the Aeon Tempest build effects, including particles and an animation.
 -- @param unitBeingBuilt The Colossus that is being built.
-function CreateAeonColossusBuildingEffects(unitBeingBuilt)
+function CreateAeonColossusBuildingEffects(unitBeingBuilt, poolscaler)
 
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
@@ -425,7 +454,7 @@ function CreateAeonColossusBuildingEffects(unitBeingBuilt)
     animator:SetRate(0)
     animator:SetAnimationFraction(0)    
 
-    local thread = ForkThread(CreateAeonColossusBuildingEffectsThread, unitBeingBuilt, animator, ColossusPuddleBones[index])
+    local thread = ForkThread(CreateAeonColossusBuildingEffectsThread, unitBeingBuilt, animator, ColossusPuddleBones[index], poolscaler) --read from BP later
     TrashBagAdd(onDeathTrash, thread)
     TrashBagAdd(onFinishedTrash, thread)
 

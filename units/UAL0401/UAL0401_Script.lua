@@ -9,10 +9,9 @@ local AWalkingLandUnit = import('/lua/aeonunits.lua').AWalkingLandUnit
 local WeaponsFile = import ('/lua/aeonweapons.lua')
 local ADFPhasonLaser = WeaponsFile.ADFPhasonLaser
 local ADFTractorClaw = WeaponsFile.ADFTractorClaw
-local utilities = import('/lua/utilities.lua')
 local explosion = import('/lua/defaultexplosions.lua')
 
-local CreateAeonColossusBuildingEffects = import("/lua/effectutilities.lua").CreateAeonColossusBuildingEffects
+local CreateAeonColossusBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonColossusBuildingEffects
 
 -- upvalue for performance
 local MathSqrt = math.sqrt
@@ -79,7 +78,7 @@ UAL0401 = Class(AWalkingLandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         AWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
-        CreateAeonColossusBuildingEffects(self)
+        CreateAeonColossusBuildingEffects(self, 1.0)
     end,
 
     OnKilled = function(self, instigator, type, overkillRatio)
