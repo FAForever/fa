@@ -3287,11 +3287,11 @@ function CreateUI(maxPlayers)
 
     -- this function get index of 1st line on the last scroll page (when scroll all the way down)
     GUI.chatPanel.GetScrollLastPage = function(self)
-        return table.getn(GUI.chatDisplay.ChatHistory) - self.linesPerScrollPage
+        return table.getn(GUI.chatDisplay.ChatLines) - self.linesPerScrollPage
     end
     -- this function gets scrolling max range and current range
     GUI.chatPanel.GetScrollValues = function(self, axis)
-        local max = table.getsize(GUI.chatDisplay.ChatHistory)
+        local max = table.getsize(GUI.chatDisplay.ChatLines)
         local bottom = math.min(self.top + self.linesPerScrollPage, max)
         return 1, max, self.top, bottom
     end

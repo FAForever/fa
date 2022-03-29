@@ -24,11 +24,13 @@ ChatArea = Class(Group) {
 
     __init = function(self, parent, width, height)
         Group.__init(self, parent)
-        self.ChatHistory = {} 
+        self.ChatHistory = {}
+        self.ChatLines = {}
+        self.ChatHistoryActive = true
+
         self.Parent = parent
         self.Style = defaultStyle
 
-     
         self.Width:Set(width)
         self.Height:Set(height)
 
@@ -52,6 +54,15 @@ ChatArea = Class(Group) {
         authorStyle.padding.left = 0
         authorStyle.padding.right = 0
 
+        if self.ChatHistoryActive then
+            local entry = {
+                authorName = authorName,
+                authorStyle = authorStyle,
+                messageText = messageText,
+                messageStyle = messageStyle
+            }
+            table.insert(self.ChatHistory, entry)
+        end
         if authorName == nil then
             authorName = ''
         else
@@ -70,7 +81,7 @@ ChatArea = Class(Group) {
         for i = 1, table.getn(wrapLines) do
             if (i == 1 and string.len(authorName) > 0) then
                 local strText = string.sub(wrapLines[i], string.len(authorName))
-                table.insert(self.ChatHistory, {
+                table.insert(self.ChatLines, {
                     author = {
                         text = authorName,
                         style = authorStyle
@@ -82,7 +93,7 @@ ChatArea = Class(Group) {
                 })
 
             else
-                table.insert(self.ChatHistory, {
+                table.insert(self.ChatLines, {
                     message = {
                         text = wrapLines[i],
                         style = messageStyle
@@ -90,7 +101,9 @@ ChatArea = Class(Group) {
                 })
             end
         end
-        self:ShowLines(self.Parent.top, self.Parent.bottom)
+        if self.ChatHistoryActive then
+            self:ShowLines(self.Parent.top, self.Parent.bottom)
+        end
     end,
 
     CreateLines = function(self)
@@ -101,7 +114,7 @@ ChatArea = Class(Group) {
         linesGroup.Lines[index] = self:CreateLine(linesGroup)
         local previous = linesGroup.Lines[index]
         LayoutHelpers.AtLeftTopIn(previous, linesGroup, 2)
-        while previous.Bottom() < linesGroup.Bottom() do
+        while previous.Bottom() + previous.Height()  < linesGroup.Bottom() do
             index = index + 1
             linesGroup.Lines[index] = self:CreateLine(linesGroup)
             LayoutHelpers.Below(linesGroup.Lines[index], previous)
@@ -142,14 +155,17 @@ ChatArea = Class(Group) {
         if IsDestroyed(self.linesGroup) then
             self:CreateLines()
         end
-        bottomIndex = bottomIndex or table.getn(self.ChatHistory)
+        bottomIndex = bottomIndex or table.getn(self.ChatLines)
         local visibleIndex = 1
         for id = topIndex, bottomIndex do
-            local entry = self.ChatHistory[id]
-            if entry then
-                self.linesGroup.Lines[visibleIndex]:Render(entry.message, entry.author)
-            else
-                self.linesGroup.Lines[visibleIndex]:Render()
+            local entry = self.ChatLines[id]
+            local line = self.linesGroup.Lines[visibleIndex]
+            if line then
+                if entry then
+                    line:Render(entry.message, entry.author)
+                else
+                    line:Render()
+                end
             end
             visibleIndex = visibleIndex + 1
         end
@@ -158,9 +174,11 @@ ChatArea = Class(Group) {
     ClearHistory = function(self)
         self:ClearLines()
         self.ChatHistory = {}
+
     end,
 
     ClearLines = function(self)
+        self.ChatLines = {}
         if not IsDestroyed(self.linesGroup) then
             self.linesGroup:ApplyFunction(function(control)
                 control:Destroy()
@@ -172,6 +190,12 @@ ChatArea = Class(Group) {
     ReflowLines = function(self)
         self:ClearLines()
         self:CreateLines()
+        self.ChatHistoryActive = false
+        for _, message in self.ChatHistory do
+            self:PostMessage(message.messageText, message.authorName, message.messageStyle, message.authorStyle)
+        end
+        self.ChatHistoryActive = true
+        self:ShowLines(self.Parent.top, self.Parent.bottom)
     end,
 
     --- sets font family and/or font size in all chat messages
