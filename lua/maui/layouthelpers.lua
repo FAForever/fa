@@ -135,10 +135,10 @@ end
 
 --* these functions will stretch the control to fill the parent and provide an optional border
 function FillParent(control, parent)
-    control.Top:Set(function() return parent.Top() end)
-    control.Left:Set(function() return parent.Left() end)
-    control.Bottom:Set(function() return parent.Bottom() end)
-    control.Right:Set(function() return parent.Right() end)
+    control.Top:Set(parent.Top)
+    control.Left:Set(parent.Left)
+    control.Bottom:Set(parent.Bottom)
+    control.Right:Set(parent.Right)
 end
 
 function FillParentRelativeBorder(control, parent, percent)
@@ -214,14 +214,14 @@ end
 function LeftOf(control, parent, offset)
     offset = offset or 0
     control.Right:Set(function() return math.floor(parent.Left() - (offset * pixelScaleFactor)) end)
-    control.Top:Set(function() return parent.Top() end)
+    control.Top:Set(parent.Top)
 end
 
 --* lock left top of control to right top of parent
 function RightOf(control, parent, offset)
     offset = offset or 0
     control.Left:Set(function() return math.floor(parent.Right() + (offset * pixelScaleFactor)) end)
-    control.Top:Set(function() return parent.Top() end)
+    control.Top:Set(parent.Top)
 end
 
 --* lock right top of control to left of parent, cenetered vertically to the parent
@@ -241,14 +241,14 @@ end
 --* lock bottom left of control to top left of parent
 function Above(control, parent, offset)
     offset = offset or 0
-    control.Left:Set(function() return parent.Left() end)
+    control.Left:Set(parent.Left)
     control.Bottom:Set(function() return parent.Top() - (offset * pixelScaleFactor) end)
 end
 
 --* lock top left of control to bottom left of parent
 function Below(control, parent, offset)
     offset = offset or 0
-    control.Left:Set(function() return parent.Left() end)
+    control.Left:Set(parent.Left)
     control.Top:Set(function() return math.floor(parent.Bottom() + (offset * pixelScaleFactor)) end)
 end
 
@@ -436,32 +436,19 @@ end
 
 --* set the dimensions
 function SetDimensions(control, width, height)
-    if width then
-        control.Width:Set(function()
-            return math.floor(width * pixelScaleFactor)
-        end)
-    end
-
-    if height then
-        control.Height:Set(function()
-            return math.floor(height * pixelScaleFactor)
-        end)
-    end
+    SetWidth(control, width)
+    SetHeight(control, height)
 end
 
 function SetWidth(control, width)
     if width then
-        control.Width:Set(function()
-            return math.floor(width * pixelScaleFactor)
-        end)
+        control.Width:Set(math.floor(width * pixelScaleFactor))
     end
 end
 
 function SetHeight(control, height)
     if height then
-        control.Height:Set(function()
-            return math.floor(height * pixelScaleFactor)
-        end)
+        control.Height:Set(math.floor(height * pixelScaleFactor))
     end
 end
 
