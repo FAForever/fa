@@ -157,8 +157,8 @@ ChatArea = Class(Group) {
             end
         end
         line.author.HandleEvent = function(control, event)
-            if event.Type == 'ButtonPress' and line.author.name then
-                self.Parent.edit:SetText('/w '.. line.author.name..' ')
+            if event.Type == 'ButtonPress' and control.name then
+                self.Parent.edit:SetText('/w '.. control.name..' ')
             end
         end
         line.author:EnableHitTest()
