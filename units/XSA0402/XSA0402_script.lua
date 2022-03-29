@@ -12,7 +12,7 @@ local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeapon
 local SB0OhwalliExperimentalStrategicBombWeapon = SeraphimWeapons.SB0OhwalliExperimentalStrategicBombWeapon
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
 local explosion = import('/lua/defaultexplosions.lua')
 
 XSA0402 = Class(SAirUnit) {
@@ -49,7 +49,7 @@ XSA0402 = Class(SAirUnit) {
     
     StartBeingBuiltEffects = function(self, builder, layer)
 		SAirUnit.StartBeingBuiltEffects(self, builder, layer)
-		self:ForkThread( EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 0.5 )
+		self:ForkThread( CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 0.5 )
     end,    
 }
 TypeClass = XSA0402
