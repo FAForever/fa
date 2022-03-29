@@ -3957,6 +3957,7 @@ function setupChatEdit(chatPanel)
             end
         end
     end
+    chatPanel.edit = GUI.chatEdit
 end
 
 function RefreshOptionDisplayData(scenarioInfo)

@@ -65,9 +65,11 @@ ChatArea = Class(Group) {
             }
             table.insert(self.ChatHistory, entry)
         end
+        local name = authorName
         if authorName == nil then
             authorName = ''
         else
+
             authorName = '[' .. authorName .. '] '
         end
         messageText = messageText or ''
@@ -86,7 +88,8 @@ ChatArea = Class(Group) {
                 table.insert(self.ChatLines, {
                     author = {
                         text = authorName,
-                        style = authorStyle
+                        style = authorStyle,
+                        name = name
                     },
                     message = {
                         text = strText,
@@ -132,15 +135,18 @@ ChatArea = Class(Group) {
         line:DisableHitTest()
 
         line.author = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.author.fontFamily())
+        
         LayoutHelpers.AtLeftTopIn(line.author, line)
         line.message = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.message.fontFamily())
         LayoutHelpers.RightOf(line.message, line.author)
 
         line.Render = function(control, message, author)
             if author then
+                control.author.name = author.name
                 control.author:SetText(author.text)
                 control.author:SetColor(author.style.fontColor)
             else
+                control.author.name = nil
                 control.author:SetText('')
             end
             if message then
@@ -150,6 +156,12 @@ ChatArea = Class(Group) {
                 control.message:SetText('')
             end
         end
+        line.author.HandleEvent = function(control, event)
+            if event.Type == 'ButtonPress' and line.author.name then
+                self.Parent.edit:SetText('/w '.. line.author.name..' ')
+            end
+        end
+        line.author:EnableHitTest()
         return line
     end,
 
