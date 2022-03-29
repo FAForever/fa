@@ -858,6 +858,108 @@ function GetPlayerDisplayName(playerInfo)
     end
 end
 
+-- Refresh (with a sledgehammer) all the items in the observer list.
+local function refreshObserverList()
+    GUI.observerList:DeleteAllItems()
+
+    -- create the table that will hold the data for displaying team rating information
+    local teamRatings = {}
+    local numTeams = 0
+    -- calculate/display team ratings if spawns are fixed
+    if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+
+        -- cycle through each player
+        for i, player in gameInfo.PlayerOptions:pairs() do
+            
+            -- get the team number (which is 1 higher on the backend)
+            local team = player.Team - 1
+            -- add the player's rating information if the player is on a team
+            if team > 0 then
+                -- make sure the team is included in the teamRatings table
+                if teamRatings[team] == nil  then
+                    -- initialize the team's rating in this table as having 0 mean and 0 deviation, respectively
+                    teamRatings[team] = {0, 0}
+                end
+                -- add the player's rating information (mean and deviation) to the its team's totals
+                teamRatings[team] = {teamRatings[team][1] + player.MEAN, teamRatings[team][2] + player.DEV}
+            end
+        end
+
+        for i, team in teamRatings do
+            numTeams = numTeams + 1
+        end
+
+        -- if there are 1 or 2 teams, list them before observers
+        if numTeams == 1 or numTeams == 2 then
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
+            end
+            for i, rating in teamRatings do
+                GUI.observerList:AddItem(
+                    LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+                )
+            end
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem('')
+            end
+        end
+    end
+
+
+    local observers = false
+
+    for slot, observer in gameInfo.Observers:pairs() do
+
+        if not observers then
+           observers = true 
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem(LOC('<LOC lobui_0275>Observers')..':')
+            end
+        end
+
+        observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
+
+        -- Create a label for this observer of the form:
+        -- PlayerName (R:xxx, P:xxx, C:xxx)
+        -- Such conciseness is necessary as the field in the UI is rather narrow...
+        local observer_label = observer.PlayerName .. " (R:" .. observer.PL
+
+        -- Add the ping only if this entry refers to a different client.
+        if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
+            local peer = lobbyComm:GetPeer(observer.OwnerID)
+
+            local ping = 0
+            if peer.ping ~= nil then
+                ping = math.floor(peer.ping)
+            end
+
+            observer_label = observer_label .. ", P:" .. ping
+        end
+
+        -- Add the CPU score if one is available.
+        local score_CPU = CPU_Benchmarks[observer.PlayerName]
+        if score_CPU then
+            observer_label = observer_label .. ", C:" .. score_CPU
+        end
+        observer_label = observer_label .. ")"
+
+        GUI.observerList:AddItem(observer_label)
+    end
+
+    -- if there are more than 2 teams (and slots are fixed), list them after observers
+    if numTeams > 2 then
+        if not lobbyComm:IsHost() then
+            GUI.observerList:AddItem('')
+            GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
+        end
+        for i, rating in teamRatings do
+            GUI.observerList:AddItem(
+                LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+            )
+        end
+    end
+end
+
 local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
 
 -- update the data in a player slot
@@ -1072,6 +1174,7 @@ function SetSlotInfo(slotNum, playerInfo)
     if isHost then
         HostUtils.RefreshButtonEnabledness()
     end
+    refreshObserverList()
 end
 
 function ClearSlotInfo(slotIndex)
@@ -1129,6 +1232,7 @@ function ClearSlotInfo(slotIndex)
     UpdateSlotBackground(slotIndex)
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotIndex)
+    refreshObserverList()
 end
 
 function IsColorFree(colorIndex, currentSlotNumber)
@@ -2096,80 +2200,6 @@ local function AlertHostMapMissing()
     end
 end
 
--- Refresh (with a sledgehammer) all the items in the observer list.
-local function refreshObserverList()
-    GUI.observerList:DeleteAllItems()
-
-    -- create the table that will hold the data for displaying team rating information
-    local teamRatings = {}
-
-    -- cycle through each player
-    for i, player in gameInfo.PlayerOptions:pairs() do
-
-        -- get the team number (which is 1 higher on the backend)
-        local team = player.Team - 1
-        -- add the player's rating information if the player is on a team
-        if team > 0 then
-            -- make sure the team is included in the teamRatings table
-            if teamRatings[team] == nil  then
-                -- initialize the team's rating in this table as having 0 mean and 0 deviation, respectively
-                teamRatings[team] = {0, 0}
-            end
-            -- add the player's rating information (mean and deviation) to the its team's totals
-            teamRatings[team] = {teamRatings[team][1] + player.MEAN, teamRatings[team][2] + player.DEV}
-        end
-    end
-
-    local numTeams = 0
-    for i, team in teamRatings do
-        numTeams = numTeams + 1
-    end
-
-    -- if there are 2 or fewer teams, list them before observers
-    if numTeams <= 2 then
-        for i, rating in teamRatings do
-            GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
-        end
-    end
-
-    for slot, observer in gameInfo.Observers:pairs() do
-        observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
-
-        -- Create a label for this observer of the form:
-        -- PlayerName (R:xxx, P:xxx, C:xxx)
-        -- Such conciseness is necessary as the field in the UI is rather narrow...
-        local observer_label = observer.PlayerName .. " (R:" .. observer.PL
-
-        -- Add the ping only if this entry refers to a different client.
-        if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
-            local peer = lobbyComm:GetPeer(observer.OwnerID)
-
-            local ping = 0
-            if peer.ping ~= nil then
-                ping = math.floor(peer.ping)
-            end
-
-            observer_label = observer_label .. ", P:" .. ping
-        end
-
-        -- Add the CPU score if one is available.
-        local score_CPU = CPU_Benchmarks[observer.PlayerName]
-        if score_CPU then
-            observer_label = observer_label .. ", C:" .. score_CPU
-        end
-        observer_label = observer_label .. ")"
-
-        GUI.observerList:AddItem(observer_label)
-    end
-
-    -- if there are more than 2 teams, list them after observers
-    if numTeams > 2 then
-        for i, rating in teamRatings do
-           GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
-        end
-    end
-end
-
 local function UpdateGame()
     -- This allows us to assume the existence of UI elements throughout.
     if not GUI.uiCreated then
@@ -2333,8 +2363,6 @@ local function UpdateGame()
             end
         end
     end
-
-    refreshObserverList()
 
     if isHost then
         HostUtils.RefreshButtonEnabledness()
@@ -4443,7 +4471,6 @@ function ConfigureMapListeners(mapCtrl, scenario)
                     end
                 end
             end
-            refreshObserverList()
         end
 
         if lobbyComm:IsHost() then
@@ -4828,7 +4855,6 @@ local MessageHandlers = {
         Handle = function(data)
             gameInfo.Observers[data.OldSlot] = nil
             gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-            refreshObserverList()
             SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
         end
@@ -4840,7 +4866,6 @@ local MessageHandlers = {
             gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
             gameInfo.PlayerOptions[data.OldSlot] = nil
             ClearSlotInfo(data.OldSlot)
-            refreshObserverList()
             UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
         end
     },
@@ -6518,7 +6543,6 @@ function InitHostUtils()
             end
 
             ClearSlotInfo(playerSlot)
-            refreshObserverList()
 
             -- TODO: can probably avoid transmitting the options map here. The slot number should be enough.
             lobbyComm:BroadcastData(
@@ -6601,7 +6625,6 @@ function InitHostUtils()
             AssignAutoTeams()
 
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[toPlayerSlot])
-            refreshObserverList()
         end,
 
         RemoveAI = function(slot)
@@ -6618,7 +6641,6 @@ function InitHostUtils()
                     Slot = slot,
                 }
             )
-            refreshObserverList()
         end,
 
         --- Returns false if there's an obvious reason why a slot movement between the two given
@@ -6683,7 +6705,6 @@ function InitHostUtils()
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
-            refreshObserverList()
         end,
 
         --- Swap the players in the two given slots.
@@ -6708,7 +6729,6 @@ function InitHostUtils()
             -- If we're moving onto a blank, take the easy way out.
             if not player2 then
                 HostUtils.MovePlayerToEmptySlot(slot1, slot2)
-                refreshObserverList()
                 return
             end
 
@@ -6731,7 +6751,6 @@ function InitHostUtils()
 
             -- %s has switched with %s
             SendSystemMessage("lobui_0417", player1.PlayerName, player2.PlayerName)
-            refreshObserverList()
         end,
 
         --- Add an observer
@@ -6802,7 +6821,6 @@ function InitHostUtils()
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
             AssignAutoTeams()
             PossiblyAnnounceGameFull()
-            refreshObserverList()
         end,
 
         --- Add an AI to the game in the given slot.
