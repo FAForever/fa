@@ -172,7 +172,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     for _, vEffect in BuildEffectsEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
         EmitterScaleEmitter(effect,scaleFactor)
-        EmitterSetEmitterParam(effect, "LODCUTOFF", LODCutoff)
+        EmitterSetEmitterParam(effect, "LODCUTOFF", lods[1].LODCutoff)
 
         TrashBagAdd(effectsBag, effect)
         emitters[emittersHead] = effect
