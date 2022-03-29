@@ -374,6 +374,8 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
     
     for k, v in ColossusEffectBones do 
         local effect = CreateEmitterAtBone(unitBeingBuilt, k, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+
+        --alternative have with increased build power expand the sparkle width and tie to scaler
         EmitterSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 1)
         EmitterSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 1)
         EmitterScaleEmitter(effect, scaleFactor)
