@@ -7,7 +7,7 @@
 
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit
 local SIFExperimentalStrategicMissile = import('/lua/seraphimweapons.lua').SIFExperimentalStrategicMissile
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local DeathNukeWeapon = import('/lua/sim/defaultweapons.lua').DeathNukeWeapon
 
@@ -29,7 +29,7 @@ XSB2401 = Class(SStructureUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         -- triggers the effect twice, one is larger than the other
         SStructureUnit.StartBeingBuiltEffects(self, builder, layer)
-        self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2)
+        self:ForkThread( CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2 )
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
