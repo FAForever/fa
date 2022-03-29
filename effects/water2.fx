@@ -220,8 +220,8 @@ LOWFIDELITY_VERTEX LowFidelityVS(float4 position : POSITION,float2 texcoord0 : T
 float4 LowFidelityPS0( LOWFIDELITY_VERTEX vertex) : COLOR
 {
     float4 water = tex2D(UtilitySamplerC,vertex.texcoord0);
-    float  alpha = clamp(water.g,0,0.3);
-    return float4(waterColorLowFi,alpha);
+    float  alpha = clamp(water.g,0.1,1.0);
+    return float4(0.1, 0.5, 2.0, alpha);
 }
 
 float4 LowFidelityPS1( LOWFIDELITY_VERTEX vertex) : COLOR
