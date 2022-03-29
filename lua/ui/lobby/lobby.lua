@@ -891,10 +891,12 @@ local function refreshObserverList()
         -- if there are 1 or 2 teams, list them before observers
         if numTeams == 1 or numTeams == 2 then
             if not lobbyComm:IsHost() then
-                GUI.observerList:AddItem('Team Ratings:')
+                GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
             end
             for i, rating in teamRatings do
-                GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
+                GUI.observerList:AddItem(
+                    LOCF('<LOC lobui_0703>Team %d (%d+/-%d)', math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+                )
             end
             if not lobbyComm:IsHost() then
                 GUI.observerList:AddItem('')
@@ -910,7 +912,7 @@ local function refreshObserverList()
         if not observers then
            observers = true 
             if not lobbyComm:IsHost() then
-                GUI.observerList:AddItem('Observers:')
+                GUI.observerList:AddItem(LOC('<LOC lobui_0275>Observers')..':')
             end
         end
 
@@ -947,10 +949,12 @@ local function refreshObserverList()
     if numTeams > 2 then
         if not lobbyComm:IsHost() then
             GUI.observerList:AddItem('')
-            GUI.observerList:AddItem('Team Ratings:')
+            GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
         end
         for i, rating in teamRatings do
-           GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
+            GUI.observerList:AddItem(
+                LOCF('<LOC lobui_0703>Team %d (%d+/-%d)', math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+            )
         end
     end
 end

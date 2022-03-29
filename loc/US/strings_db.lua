@@ -4673,6 +4673,8 @@ lobui_0398="An arbitrary option has been selected for now: check the game option
 lobui_0399="The selected map does not exist."
 lobui_0700=" kicked because he does not have this mod: "
 lobui_0701="The last player is kicked because he does not have this mod: "
+lobui_0702="Team Ratings:"
+lobui_0703="Team %d (%d+/-%d)"
 
 --Lobby options panel
 lobui_0400="Stretch Background"
