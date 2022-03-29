@@ -23,6 +23,7 @@ local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
 local EntityCreateProjectile = _G.moho.entity_methods.CreateProjectile
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 local EntitySetScale = _G.moho.entity_methods.SetScale 
+local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
 
 local UnitGetFractionComplete = _G.moho.unit_methods.GetFractionComplete
 local UnitShowBone = _G.moho.unit_methods.ShowBone 
@@ -83,7 +84,7 @@ function CreateDefaultBuildBeams(
 
     local waitTime = Random(8, 15)
     local waitTimeInv =  10 * 1 / waitTime
-    while not (builder.Dead or unitBeingBuilt.Dead) do
+    while not (EntityBeenDestroyed(builder) or EntityBeenDestroyed(unitBeingBuilt)) do
         local x, y, z = builder.GetRandomOffset(unitBeingBuilt, 1)
         local px, py, pz = EntityGetPositionXYZ(beamEndBuilder)
         local dx, dy, dz = waitTimeInv * ((ox + x) - px), waitTimeInv * ((oy + y) - py), waitTimeInv * ((oz + z) - pz)
@@ -224,7 +225,7 @@ function CreateUEFBuildSliceBeams(
 
     -- Warp our projectile back to the initial corner and lower based on build completeness
     local flipDirection = true
-    while not (builder.Dead or unitBeingBuilt.Dead) do
+    while not (EntityBeenDestroyed(builder) or EntityBeenDestroyed(unitBeingBuilt)) do
 
         fraction = UnitGetFractionComplete(unitBeingBuilt)
 
@@ -323,7 +324,7 @@ function CreateBuildCubeThread(
     -- Create glow slice cuts and resize base cube
     local slice = nil
     local cComplete = UnitGetFractionComplete(unitBeingBuilt)
-    while not unitBeingBuilt.Dead and cComplete < 1.0 do
+    while not EntityBeenDestroyed(unitBeingBuilt) and cComplete < 1.0 do
 
         if lComplete < cComplete and not EntityBeenDestroyed(BuildBaseEffect) then
 
@@ -348,7 +349,7 @@ function CreateBuildCubeThread(
         CoroutineYield(BuildCubeSlicePeriod)
 
         -- always check if we're still there after waiting
-        if not unitBeingBuilt.Dead then 
+        if not EntityBeenDestroyed(unitBeingBuilt) then 
             lComplete = cComplete
             cComplete = UnitGetFractionComplete(unitBeingBuilt)
         end
