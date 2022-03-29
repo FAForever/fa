@@ -185,10 +185,10 @@ end
 --* note that the offset version is more useful than hard coding the location
 --* as it will take advantage of the pixel scale factor
 function PercentIn(control, parent, left, top, right, bottom)
-    leftOffset = left or 0.00
-    topOffset = top or 0.00
-    rightOffset = right or 0.00
-    bottomOffset = bottom or 0.00
+    left = left or 0.00
+    top = top or 0.00
+    right = right or 0.00
+    bottom = bottom or 0.00
 
     control.Left:Set(function() return math.floor(parent.Left() + (left * parent.Width())) end)
     control.Top:Set(function() return math.floor(parent.Top() + (top * parent.Height())) end)
@@ -197,10 +197,10 @@ function PercentIn(control, parent, left, top, right, bottom)
 end
 
 function OffsetIn(control, parent, left, top, right, bottom)
-    leftOffset = left or 0
-    topOffset = top or 0
-    rightOffset = right or 0
-    bottomOffset = bottom or 0
+    left = left or 0
+    top = top or 0
+    right = right or 0
+    bottom = bottom or 0
 
     control.Left:Set(function() return math.floor(parent.Left() + (left * pixelScaleFactor)) end)
     control.Top:Set(function() return math.floor(parent.Top() + (top * pixelScaleFactor)) end)
