@@ -6,10 +6,15 @@ local Prefs = import('/lua/user/prefs.lua')
 local LazyVar = import('/lua/lazyvar.lua')
 
 local defaultStyle = {
-    fontColor = LazyVar.Create('FFFFFFFF'), -- #FFFFFFFF
-    fontFamily = LazyVar.Create(UIUtil.bodyFont),
+    message = {
+        fontColor = LazyVar.Create('FFFFFFFF'),
+        fontFamily = LazyVar.Create(UIUtil.bodyFont),
+    },
+    author = {
+        fontColor = LazyVar.Create('FFFFFFFF'),
+        fontFamily = LazyVar.Create("Arial Gras"),
+    },
     fontSize = LazyVar.Create(tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14),
-
     shadow = false,
     lineSpacing = 1,
     padding = {
@@ -48,11 +53,8 @@ ChatArea = Class(Group) {
 
     PostMessage = function(self, messageText, authorName, messageStyle, authorStyle)
 
-        messageStyle = table.merged(defaultStyle, messageStyle or {})
-        authorStyle = table.merged(defaultStyle, authorStyle or {})
-
-        authorStyle.padding.left = 0
-        authorStyle.padding.right = 0
+        messageStyle = table.merged(defaultStyle.message, messageStyle or {})
+        authorStyle = table.merged(defaultStyle.author, authorStyle or {})
 
         if self.ChatHistoryActive then
             local entry = {
@@ -113,7 +115,7 @@ ChatArea = Class(Group) {
         local index = 1
         linesGroup.Lines[index] = self:CreateLine(linesGroup)
         local previous = linesGroup.Lines[index]
-        LayoutHelpers.AtLeftTopIn(previous, linesGroup, 2)
+        LayoutHelpers.AtLeftTopIn(previous, linesGroup, self.Style.padding.left)
         while previous.Bottom() + previous.Height()  < linesGroup.Bottom() do
             index = index + 1
             linesGroup.Lines[index] = self:CreateLine(linesGroup)
@@ -129,9 +131,9 @@ ChatArea = Class(Group) {
         line.Width:Set(parent.Width)
         line:DisableHitTest()
 
-        line.author = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.fontFamily())
-        LayoutHelpers.AtLeftTopIn(line.author, line, 2)
-        line.message = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.fontFamily())
+        line.author = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.author.fontFamily())
+        LayoutHelpers.AtLeftTopIn(line.author, line)
+        line.message = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.message.fontFamily())
         LayoutHelpers.RightOf(line.message, line.author)
 
         line.Render = function(control, message, author)
@@ -206,7 +208,7 @@ ChatArea = Class(Group) {
         local hasFontSize = type(fontSize) == 'number'
 
         if hasFontFamily then
-            self.Style.fontFamily:Set(fontFamily)
+            self.Style.message.fontFamily:Set(fontFamily)
         end
         if hasFontSize then
             self.Style.fontSize:Set(fontSize)
@@ -217,7 +219,7 @@ ChatArea = Class(Group) {
     AdvanceFunction = function(self, str, strStyle)
         local dummy = Text.Text(self.Parent)
         dummy:Hide()
-        dummy:SetFont(strStyle.fontFamily(), strStyle.fontSize())
+        dummy:SetFont(strStyle.fontFamily(), self.Style.fontSize())
         dummy:SetText(str)
         local width = dummy:Width()
         dummy:Destroy()
