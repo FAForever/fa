@@ -1,3 +1,4 @@
+-- used by ueb 2302, ueb2303, ueb2401, uel0304
 EmitterBlueprint {
 	BlueprintId = 'cannon_artillery_muzzle_flash_01',
 	Lifetime = 24.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = true,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 100.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
