@@ -895,7 +895,7 @@ local function refreshObserverList()
             end
             for i, rating in teamRatings do
                 GUI.observerList:AddItem(
-                    LOCF('<LOC lobui_0703>Team %d (%d+/-%d)', math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+                    LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
                 )
             end
             if not lobbyComm:IsHost() then
@@ -953,7 +953,7 @@ local function refreshObserverList()
         end
         for i, rating in teamRatings do
             GUI.observerList:AddItem(
-                LOCF('<LOC lobui_0703>Team %d (%d+/-%d)', math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+                LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
             )
         end
     end
