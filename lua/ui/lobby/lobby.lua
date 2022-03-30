@@ -47,6 +47,7 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
+local UTF =  import('/lua/UTF.lua')
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
@@ -235,7 +236,7 @@ local GUI = false
 local localPlayerID = false
 local gameInfo = false
 local pmDialog = false
-local lastKickMessage = Prefs.GetFromCurrentProfile('lastKickMessage') or ""
+local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")
 
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
 local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
@@ -533,7 +534,7 @@ local function DoSlotBehavior(slot, key, name)
                 lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
 
                 -- Save message for next time
-                Prefs.SetToCurrentProfile('lastKickMessage', str)
+                Prefs.SetToCurrentProfile('lastKickMessage', UTF.EscapeString(str))
                 lastKickMessage = str
             end
 
@@ -869,7 +870,7 @@ local function refreshObserverList()
 
         -- cycle through each player
         for i, player in gameInfo.PlayerOptions:pairs() do
-            
+
             -- get the team number (which is 1 higher on the backend)
             local team = player.Team - 1
             -- add the player's rating information if the player is on a team
@@ -891,10 +892,12 @@ local function refreshObserverList()
         -- if there are 1 or 2 teams, list them before observers
         if numTeams == 1 or numTeams == 2 then
             if not lobbyComm:IsHost() then
-                GUI.observerList:AddItem('                               Team Ratings')
+                GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
             end
             for i, rating in teamRatings do
-                GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
+                GUI.observerList:AddItem(
+                    LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+                )
             end
             if not lobbyComm:IsHost() then
                 GUI.observerList:AddItem('')
@@ -908,9 +911,9 @@ local function refreshObserverList()
     for slot, observer in gameInfo.Observers:pairs() do
 
         if not observers then
-           observers = true 
+           observers = true
             if not lobbyComm:IsHost() then
-                GUI.observerList:AddItem('                                  Observers')
+                GUI.observerList:AddItem(LOC('<LOC lobui_0275>Observers')..':')
             end
         end
 
@@ -947,10 +950,12 @@ local function refreshObserverList()
     if numTeams > 2 then
         if not lobbyComm:IsHost() then
             GUI.observerList:AddItem('')
-            GUI.observerList:AddItem('                               Team Ratings')
+            GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
         end
         for i, rating in teamRatings do
-           GUI.observerList:AddItem('Team ' .. i .. ':   ' .. math.round(rating[1] - rating[2] * 3) .. '      (' .. math.round(rating[1]) .. ' +/- ' .. math.round(rating[2] * 3) .. ')')
+            GUI.observerList:AddItem(
+                LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+            )
         end
     end
 end
@@ -3821,21 +3826,21 @@ function CreateUI(maxPlayers)
     if not isHost then
         GUI.PenguinAutoBalance:Hide()
     else
-        -- What this does: it balances all occupied slots into two teams with equal numbers of 
-        -- players.  If half of the occupied slots are set to team 1 and half to team 2, then 
-        -- it balances the players while keeping the team-slot matches.  If the teams are not 
-        -- set that way, they are changed automatically to be alternating team 1 and team 2. 
-        -- If there are an odd number of occupied slots, the last one is set to team - (no team) 
+        -- What this does: it balances all occupied slots into two teams with equal numbers of
+        -- players.  If half of the occupied slots are set to team 1 and half to team 2, then
+        -- it balances the players while keeping the team-slot matches.  If the teams are not
+        -- set that way, they are changed automatically to be alternating team 1 and team 2.
+        -- If there are an odd number of occupied slots, the last one is set to team - (no team)
         -- and the others are balanced without it.
 
-        -- How this balances: this function checks every possible balance combination for making 
-        -- the two teams (while keeping their player counts equal to half the number of occupied 
-        -- slots, rounded down, and not using the last player if there is an odd number of players). 
-        -- To do this, the function sums up all the relevant players' ratings 
-        -- (keeping mean and deviation separate), and then divides by two.  That yields the goal  
-        -- value for each team.  Any deviation from that is calculated to be the team's imbalance 
+        -- How this balances: this function checks every possible balance combination for making
+        -- the two teams (while keeping their player counts equal to half the number of occupied
+        -- slots, rounded down, and not using the last player if there is an odd number of players).
+        -- To do this, the function sums up all the relevant players' ratings
+        -- (keeping mean and deviation separate), and then divides by two.  That yields the goal
+        -- value for each team.  Any deviation from that is calculated to be the team's imbalance
         -- value.  Then, the various team combinations are tested, and the one with the lowest
-        -- imbalance value is used.  
+        -- imbalance value is used.
 
 
         -- Automatically balance an even number of non-observer players into 2 teams in the lobby
@@ -3843,7 +3848,7 @@ function CreateUI(maxPlayers)
 
             -- a table of the target mean, target deviation, and the lowest logged imbalance value
             local goalValue = {0, 0, 99999}
-            
+
             local playerCount = 0
             local lastSlot = {0, 0}
             local playerRatings = {}
@@ -3904,7 +3909,7 @@ function CreateUI(maxPlayers)
                     numPlayersTeam2 = numPlayersTeam2 + 1
                 end
             end
-            
+
 
             -- the number of players per team
             local teamSize = playerCount / 2
@@ -3930,7 +3935,7 @@ function CreateUI(maxPlayers)
                     end
                 end
             end
-            
+
 
 
             -- a table of team1's mean, deviation, and imbalance value
@@ -3969,7 +3974,7 @@ function CreateUI(maxPlayers)
             -- test the balance of different combinations of teams, covering balance possibility
             -- intended for use with 2 teams of even player counts
             -- combinations are iterated starting with the lowest-numbered players on team1 first,
-            -- and progressively iterating the highest-numbered player on team1 to each higher-numbered 
+            -- and progressively iterating the highest-numbered player on team1 to each higher-numbered
             -- possible player, and then repeating the process with the next highest-numbered player
             -- increasing by 1... this process continues until every possible balacnce combination
             -- of 2 equally sized teams of even player counts has been covered

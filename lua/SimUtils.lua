@@ -63,13 +63,15 @@ local function TransferUnitsOwnershipComparator (a, b)
 end
 
 local function TransferUnitsOwnershipDelayedWeapons (weapon)
-    -- compute delay
-    local bp = weapon:GetBlueprint()
-    local delay = 1 / bp.RateOfFire
-    WaitSeconds(delay)
+    if not weapon:BeenDestroyed() then 
+        -- compute delay
+        local bp = weapon:GetBlueprint()
+        local delay = 1 / bp.RateOfFire
+        WaitSeconds(delay)
 
-    -- enable the weapon again
-    weapon:SetEnabled(true)
+        -- enable the weapon again
+        weapon:SetEnabled(true)
+    end
 end
 
 function TransferUnitsOwnership(units, ToArmyIndex, captured)
