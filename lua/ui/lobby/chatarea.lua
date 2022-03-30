@@ -122,7 +122,7 @@ ChatArea = Class(Group) {
         while previous.Bottom() + previous.Height()  < linesGroup.Bottom() do
             index = index + 1
             linesGroup.Lines[index] = self:CreateLine(linesGroup)
-            LayoutHelpers.Below(linesGroup.Lines[index], previous)
+            LayoutHelpers.Below(linesGroup.Lines[index], previous, 2)
             previous = linesGroup.Lines[index]
         end
         self.linesGroup = linesGroup
