@@ -3833,14 +3833,15 @@ function CreateUI(maxPlayers)
         -- If there are an odd number of occupied slots, the last one is set to team - (no team)
         -- and the others are balanced without it.
 
-        -- How this balances: this function checks every possible balance combination for making
+        -- How it balances: this function checks every possible balance combination for making 
         -- the two teams (while keeping their player counts equal to half the number of occupied
         -- slots, rounded down, and not using the last player if there is an odd number of players).
-        -- To do this, the function sums up all the relevant players' ratings
-        -- (keeping mean and deviation separate), and then divides by two.  That yields the goal
-        -- value for each team.  Any deviation from that is calculated to be the team's imbalance
-        -- value.  Then, the various team combinations are tested, and the one with the lowest
-        -- imbalance value is used.
+        -- To do this, the function sums up all the relevant players' ratings (keeping mean and
+        -- deviation separate - it balances teams to have similar total ratings, and also similar
+        -- total uncertainties (grayness)), and then divides by two. That yields the goal values
+        -- for each team. Any deviation from those values is calculated to help determine a team's
+        -- imbalance value. Then, the various team combinations are tested, and the one with the
+        -- lowest imbalance value is used.
 
 
         -- Automatically balance an even number of non-observer players into 2 teams in the lobby
