@@ -3831,8 +3831,8 @@ function CreateUI(maxPlayers)
         -- How this balances: this function checks every possible balance combination for making 
         -- the two teams (while keeping their player counts equal to half the number of occupied 
         -- slots, rounded down, and not using the last player if there is an odd number of players). 
-        -- To do this, the function sums up all the relevant players' rating, and sums them up  
-        -- (keeping mean and deviation separate, and then divides by two.  That yields the goal  
+        -- To do this, the function sums up all the relevant players' ratings 
+        -- (keeping mean and deviation separate), and then divides by two.  That yields the goal  
         -- value for each team.  Any deviation from that is calculated to be the team's imbalance 
         -- value.  Then, the various team combinations are tested, and the one with the lowest
         -- imbalance value is used.  
