@@ -1,4 +1,4 @@
-used by urb2302
+-- used by urb2302
 EmitterBlueprint {
 	BlueprintId = 'cybran_lra_vent_effect_01',
 	Lifetime = 55.00,
