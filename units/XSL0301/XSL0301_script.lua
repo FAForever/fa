@@ -43,7 +43,7 @@ XSL0301 = Class(CommandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         CommandUnit.StartBeingBuiltEffects(self, builder, layer)
-        self:ForkThread( EffectUtil.CreateSeraphimBuildThread, builder, self.OnBeingBuiltEffectsBag, 1 )
+        self:ForkThread( EffectUtil.CreateSeraphimBuildThread, builder, self.OnBeingBuiltEffectsBag, 2 )
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
