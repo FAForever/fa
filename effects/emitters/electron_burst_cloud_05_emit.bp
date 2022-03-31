@@ -1,3 +1,4 @@
+-- not used by faf
 EmitterBlueprint {
 	BlueprintId = 'electron_burst_cloud_05',
 	Lifetime = 45.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 100.00,
+	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
