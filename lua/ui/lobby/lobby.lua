@@ -3316,12 +3316,12 @@ function CreateUI(maxPlayers)
 
     -- this function get index of 1st line on the last scroll page (when scroll all the way down)
     GUI.chatPanel.GetScrollLastPage = function(self)
-        return table.getsize(GUI.chatDisplay.ChatLines) - self.linesPerScrollPage
+        return table.getn(GUI.chatDisplay.ChatLines) - self.linesPerScrollPage
     end
     -- this function gets scrolling max range and current range
     GUI.chatPanel.GetScrollValues = function(self, axis)
         local max = table.getsize(GUI.chatDisplay.ChatLines)
-        local bottom = math.min(self.top + self.linesPerScrollPage - 1, max)
+        local bottom = math.min(self.top + self.linesPerScrollPage, max)
         return 1, max, self.top, bottom
     end
     -- this function controls how many lines to scroll when clicking on up/down arrows of the scrollbar
@@ -3337,7 +3337,7 @@ function CreateUI(maxPlayers)
         top = math.floor(top)
         if top == self.top then return end
         local delta = self:GetScrollLastPage()
-        self.top = math.max( math.min(delta + 1, top), 1)
+        self.top = math.max( math.min(delta, top), 1)
         self.bottom = self.top + self.linesPerScrollPage
         GUI.chatDisplay:ShowLines(self.top, self.bottom)
         if self.top >= delta + 1 then
@@ -3986,6 +3986,7 @@ function setupChatEdit(chatPanel)
             end
         end
     end
+    chatPanel.edit = GUI.chatEdit
 end
 
 function RefreshOptionDisplayData(scenarioInfo)
