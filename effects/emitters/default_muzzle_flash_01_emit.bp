@@ -1,3 +1,24 @@
+-- AANChronoTorpedoWeapon 
+-- uab2109 uab2205 uas0201 uas0203 uas0401 xas0204 
+
+-- CANNaniteTorpedoWeapon
+-- urb2109 urb2205 urs0201 urs0203 urs0302 xrl0305 xrl0403 xrs0204
+
+-- CAABurstCloudFlakArtilleryWeapon
+-- urb2204 url0205 xrl0403
+
+-- CDFLaserPulseLightWeapon
+-- url0106
+
+-- CDFOverchargeWeapon
+-- url0001
+
+-- TANTorpedoLandWeapon
+-- ueb2109
+
+-- TANTorpedoAngler
+-- uea0204 uea0302 ueb2205 uel0401 ues0201 ues0203 ues0305 ues0401 xes0102 xes0307
+
 EmitterBlueprint {
 	BlueprintId = 'default_muzzle_flash_01',
 	Lifetime = 1.00,
@@ -10,7 +31,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = true,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 150.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,

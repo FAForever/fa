@@ -1,3 +1,4 @@
+-- used by url0402 xrl0403 --death effect--
 EmitterBlueprint {
 	BlueprintId = 'destruction_explosion_fire_plume_02',
 	Lifetime = 20.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = -1.00, -- experimental death weapon always visable
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
