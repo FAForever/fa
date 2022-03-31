@@ -1,3 +1,4 @@
+-- used by xrb2308, xrb2309 --death effect
 EmitterBlueprint {
 	BlueprintId = 'flash_03',
 	Lifetime = 0.10,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = -1.00,
+	LODCutoff = 200.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
