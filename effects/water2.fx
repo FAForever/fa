@@ -495,6 +495,63 @@ float4 HighFidelityPS( VS_OUTPUT inV,
 #endif    
 }
 
+float4 MediumFidelityPS0( LOWFIDELITY_VERTEX vertex) : COLOR
+{
+    float4 water = tex2D(UtilitySamplerC,vertex.texcoord0);
+    float  alpha = clamp(water.g, 0, 0.3);
+    return float4(waterColorLowFi, alpha);
+}
+
+float4 MediumFidelityPS1( LOWFIDELITY_VERTEX vertex) : COLOR
+{
+    float4 water = tex2D(UtilitySamplerC,vertex.texcoord0);
+	float  alpha = clamp(water.g,0,0.2);
+	
+    float w0 = tex2D(NormalSampler0,vertex.normal0).a;
+    float w1 = tex2D(NormalSampler1,vertex.normal1).a;
+    float w2 = tex2D(NormalSampler2,vertex.normal2).a;
+    float w3 = tex2D(NormalSampler3,vertex.normal3).a;
+    
+    float waveCrest = saturate(( w0 + w1 + w2 + w3 ) - waveCrestThreshold);
+    return float4(waveCrestColor, waveCrest);
+}
+
+technique Water_MedFidelity
+<
+    string abstractTechnique = "TWater";
+    int fidelity = FIDELITY_MEDIUM;
+>
+{
+    pass P0
+    {
+		AlphaBlendEnable = true;
+		ColorWriteEnable = 0x07;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+        
+		ZEnable = true;
+		ZFunc = lessequal;
+		ZWriteEnable = false;
+        
+		VertexShader = compile vs_1_1 LowFidelityVS();
+		PixelShader = compile ps_2_0 MediumFidelityPS0();
+    }
+    pass P1
+    {
+		AlphaBlendEnable = true;
+		ColorWriteEnable = 0x07;
+		SrcBlend = SrcAlpha;
+		DestBlend = InvSrcAlpha;
+        
+		ZEnable = true;
+		ZFunc = lessequal;
+		ZWriteEnable = false;
+        
+		VertexShader = compile vs_1_1 LowFidelityVS();
+		PixelShader = compile ps_2_0 MediumFidelityPS1();
+    }
+}
+
 technique Water_HighFidelity
 <
     string abstractTechnique = "TWater";
