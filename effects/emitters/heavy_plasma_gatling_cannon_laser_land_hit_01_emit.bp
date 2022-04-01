@@ -1,3 +1,4 @@
+-- not used by faf
 EmitterBlueprint {
 	BlueprintId = 'heavy_plasma_gatling_cannon_laser_land_hit_01',
 	Lifetime = 1.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
