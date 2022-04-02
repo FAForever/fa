@@ -258,6 +258,14 @@ ADFCannonOblivionWeapon02 = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = EffectTemplate.AOblivionCannonChargeMuzzleFlash02,
 }
 
+ADFCannonOblivionWeapon03 = Class(DefaultProjectileWeapon) {
+    FxChargeMuzzleFlash = {
+        '/effects/emitters/oblivion_cannon_flash_04_emit.bp',
+        '/effects/emitters/oblivion_cannon_flash_05_emit.bp',
+        '/effects/emitters/oblivion_cannon_flash_06_emit.bp',
+    },
+}
+
 AIFMortarWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
 }
