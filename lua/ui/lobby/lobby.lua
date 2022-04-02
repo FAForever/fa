@@ -3337,7 +3337,7 @@ function CreateUI(maxPlayers)
         top = math.floor(top)
         if top == self.top then return end
         local delta = self:GetScrollLastPage()
-        self.top = math.max( math.min(delta, top), 1)
+        self.top = math.max(math.min(delta + 1, top), 1)
         self.bottom = self.top + self.linesPerScrollPage
         GUI.chatDisplay:ShowLines(self.top, self.bottom)
         if self.top >= delta + 1 then
