@@ -1,3 +1,6 @@
+-- used by 	TDFPlasmaCannonWeapon, del0204, delk002,
+--			TDFHeavyPlasmaCannonWeapon, uea0305, uel0301, xea0306, xeb2306  
+--			TIFFragLauncherWeapon, del0204, 
 EmitterBlueprint {
 	BlueprintId = 'plasma_cannon_muzzle_flash_02',
 	Lifetime = 1.00,
@@ -10,7 +13,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = true,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 100.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
