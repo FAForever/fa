@@ -45,8 +45,6 @@ ConnectionStatus = Class(Group) {
         LayoutHelpers.LeftOf(self.ConnectionsCheckbox, self.ConnectionsText)
         LayoutHelpers.AtVerticalCenterIn(self.ConnectionsCheckbox, self.ConnectionsText)
 
-        -- 
-
         LOG("__init ran!")
     end,
 
