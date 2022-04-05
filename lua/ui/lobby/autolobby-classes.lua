@@ -25,7 +25,7 @@ ConnectionStatus = Class(Group) {
         self.HeaderText = UIUtil.CreateText(
             self, 
             "Connection status", 
-            16 * LayoutHelpers.GetPixelScaleFactor(), 
+            16, 
             UIUtil.bodyFont
         )
         LayoutHelpers.AtLeftIn(self.HeaderText, self, 4)
@@ -35,7 +35,7 @@ ConnectionStatus = Class(Group) {
         self.ConnectionsText = UIUtil.CreateText(
             self, 
             "X / Y are connected", 
-            16 * LayoutHelpers.GetPixelScaleFactor(), 
+            16, 
             UIUtil.bodyFont
         )
         LayoutHelpers.Below(self.ConnectionsText, self.HeaderText, 20)
