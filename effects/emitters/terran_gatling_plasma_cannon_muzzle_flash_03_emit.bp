@@ -1,3 +1,4 @@
+-- used by del0204 and delk002
 EmitterBlueprint {
 	BlueprintId = 'terran_gatling_plasma_cannon_muzzle_flash_03',
 	Lifetime = 1.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 150, -- match other emitters of same effect
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
