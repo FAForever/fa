@@ -1,3 +1,4 @@
+-- used by SDFSinnutheWeaponChargeMuzzleFlash, which is used by xsl0401
 EmitterBlueprint {
 	BlueprintId = 'seraphim_sinnuthe_muzzle_charge_01',
 	Lifetime = 25.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,

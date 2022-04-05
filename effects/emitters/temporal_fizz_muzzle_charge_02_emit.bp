@@ -1,16 +1,17 @@
+-- used by uab2204, ual0205
 EmitterBlueprint {
 	BlueprintId = 'temporal_fizz_muzzle_charge_02',
-	Lifetime = 4.00,
+	Lifetime = 1.00,
 	Repeattime = 4.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
-	LocalVelocity = true,
+	LocalVelocity = false,
 	LocalAcceleration = false,
 	Gravity = false,
-	AlignRotation = false,
-	AlignToBone = false,
+	AlignRotation = true,
+	AlignToBone = true,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 150.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
@@ -36,7 +37,7 @@ EmitterBlueprint {
 	ZDirectionCurve = {
 		XRange = 8.00,
 		Keys = {
-			{ x=4.000,y=0.280,z=0.050 },
+			{ x=4.000,y=0.140,z=0.050 },
 		},
 	},
 	EmitRateCurve = {
@@ -46,15 +47,15 @@ EmitterBlueprint {
 		},
 	},
 	LifetimeCurve = {
-		XRange = 8.00,
+		XRange = 1.00,
 		Keys = {
 			{ x=4.063,y=1.200,z=0.000 },
 		},
 	},
 	VelocityCurve = {
-		XRange = 8.00,
+		XRange = 1.00,
 		Keys = {
-			{ x=4.000,y=0.500,z=0.000 },
+			{ x=1.000,y=0.500,z=0.000 },
 		},
 	},
 	XAccelCurve = {
