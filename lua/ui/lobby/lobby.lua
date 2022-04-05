@@ -870,7 +870,7 @@ local function refreshObserverList()
 
         -- cycle through each player
         for i, player in gameInfo.PlayerOptions:pairs() do
-            
+
             -- get the team number (which is 1 higher on the backend)
             local team = player.Team - 1
             -- add the player's rating information if the player is on a team
@@ -911,7 +911,7 @@ local function refreshObserverList()
     for slot, observer in gameInfo.Observers:pairs() do
 
         if not observers then
-           observers = true 
+           observers = true
             if not lobbyComm:IsHost() then
                 GUI.observerList:AddItem(LOC('<LOC lobui_0275>Observers')..':')
             end
@@ -3749,7 +3749,7 @@ function CreateUI(maxPlayers)
 
     -- CLOSE/OPEN EMPTY SLOTS BUTTON --
     GUI.closeEmptySlots = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/closeslots/')
-    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, 0, 47)
+    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -39, 47)
     Tooltip.AddButtonTooltip(GUI.closeEmptySlots, 'lob_close_empty_slots')
     if not isHost then
         GUI.closeEmptySlots:Hide()
@@ -3817,6 +3817,281 @@ function CreateUI(maxPlayers)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), body=LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
     GUI.rerunBenchmark.OnClick = function(self, modifiers)
         ForkThread(function() UpdateBenchmark(true) end)
+    end
+
+    -- Autobalance Button --
+    GUI.PenguinAutoBalance = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autobalance/')
+    LayoutHelpers.RightOf(GUI.PenguinAutoBalance, GUI.becomeObserver, 59)
+    Tooltip.AddButtonTooltip(GUI.PenguinAutoBalance, {text=LOC("<LOC lobui_0444>Autobalance"), body=LOC("<LOC lobui_0445>Automatically balance players into 2 equally sized teams")})
+    if not isHost then
+        GUI.PenguinAutoBalance:Hide()
+    else
+        -- What this does: it balances all occupied slots into two teams with equal numbers of
+        -- players.  If half of the occupied slots are set to team 1 and half to team 2, then
+        -- it balances the players while keeping the team-slot matches.  If the teams are not
+        -- set that way, they are changed automatically to be alternating team 1 and team 2.
+        -- If there are an odd number of occupied slots, the last one is set to team - (no team)
+        -- and the others are balanced without it.
+
+        -- How it balances: this function checks every possible balance combination for making 
+        -- the two teams (while keeping their player counts equal to half the number of occupied
+        -- slots, rounded down, and not using the last player if there is an odd number of players).
+        -- To do this, the function sums up all the relevant players' ratings (keeping mean and
+        -- deviation separate - it balances teams to have similar total ratings, and also similar
+        -- total uncertainties (grayness)), and then divides by two. That yields the goal values
+        -- for each team. Any deviation from those values is calculated to help determine a team's
+        -- imbalance value. Then, the various team combinations are tested, and the one with the
+        -- lowest imbalance value is used.
+
+
+        -- Automatically balance an even number of non-observer players into 2 teams in the lobby
+        GUI.PenguinAutoBalance.OnClick = function()
+
+            -- a table of the target mean, target deviation, and the lowest logged imbalance value
+            local goalValue = {0, 0, 99999}
+
+            local playerCount = 0
+            local lastSlot = {0, 0}
+            local playerRatings = {}
+            -- get rating data for each player
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                playerRatings[i] = {player.MEAN, player.DEV, player.StartSpot, player.Team - 1}
+                playerCount = playerCount + 1
+                if player.StartSpot > lastSlot[1] then
+                    lastSlot = {player.StartSpot, i}
+                end
+                goalValue[1] = goalValue[1] + player.MEAN
+                goalValue[2] = goalValue[2] + player.DEV
+            end
+
+            -- if there is only one player, there is no need to balance
+            if playerCount == 1 then
+                return
+            end
+
+            -- if there is an odd number of players, remove the last one from the balancing
+            if math.mod(playerCount, 2) == 1 then
+                goalValue[1] = goalValue[1] - playerRatings[lastSlot[2]][1]
+                goalValue[2] = goalValue[2] - playerRatings[lastSlot[2]][2]
+                playerRatings[lastSlot[2]] = nil
+                playerCount = playerCount - 1
+                -- set the player to not be on a team
+                for i, player in gameInfo.PlayerOptions:pairs() do
+                    if player.StartSpot == lastSlot[1] then
+                        -- set AutoTeams to none (so, this function can set an individual player's team)
+                        gameInfo.GameOptions.AutoTeams = 'none'
+                        player.Team = 1 -- no team
+                        break
+                    end
+                end
+            end
+
+            -- the goal value is all of the remaining players' ratings divided by 2
+            goalValue[1] = goalValue[1] / 2
+            goalValue[2] = goalValue[2] / 2
+
+            local sortedPlayerRatings = {}
+            local sortedSlotTeams = {}
+            local numPlayersTeam1 = 0
+            local numPlayersTeam2 = 0
+            for i, player in playerRatings do
+                local orderNum = 1
+                for i2, player2 in playerRatings do
+                    if player[1] < player2[1] or (player[1] == player2[1] and i > i2) then
+                        orderNum = orderNum + 1
+                    end
+                end
+                -- these are sorted in parallel
+                sortedPlayerRatings[orderNum] = {player[1], player[2]}
+                sortedSlotTeams[orderNum] = {player[3], player[4]}
+                if player[4] == 1 then
+                    numPlayersTeam1 = numPlayersTeam1 + 1
+                elseif player[4] == 2 then
+                    numPlayersTeam2 = numPlayersTeam2 + 1
+                end
+            end
+
+
+            -- the number of players per team
+            local teamSize = playerCount / 2
+            -- if the teams were not set properly, set them properly
+            if numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize then
+                -- set AutoTeams to none (so, they can be set by slot by this function)
+                gameInfo.GameOptions.AutoTeams = 'none'
+                local counter = 0
+                for i, player in gameInfo.PlayerOptions:pairs() do
+                    for i2, slotTeam in sortedSlotTeams do
+                        if player.StartSpot == slotTeam[1] then
+                            counter = counter + 1
+                            -- set the player's team
+                            if math.mod(counter, 2) == 1  then
+                                player.Team = 2 -- team 1
+                                slotTeam[2] = 1
+                            else
+                                player.Team = 3 -- team 2
+                                slotTeam[2] = 2
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+
+
+
+            -- a table of team1's mean, deviation, and imbalance value
+            local teamValue
+            -- a table of team members
+            local team1 = {}
+            -- a table of the most balanced team
+            local bestTeam = {}
+            local choosableCount = playerCount - teamSize
+
+            -- the number of iterations is the number of team combinations to check, which is
+            -- exactly half of the number of possible teams, which covers every possibility,
+            -- since the remaining half are just the opposite of what was already checked,
+            -- which means they have the exact same balance
+            -- ie: Player A + Player B vs Player C + Player D == Player C + Player D vs Player A + Player B
+            -- this works because of the order in which the combinations are tested
+            local numIterations
+            if teamSize == 2 then
+                numIterations = 3
+            elseif teamSize == 3 then
+                numIterations = 10
+            elseif teamSize == 4 then
+                numIterations = 35
+            elseif teamSize == 5 then
+                numIterations = 126
+            elseif teamSize == 6 then
+                numIterations = 462
+            elseif teamSize == 7 then
+                numIterations = 1716
+            else
+                numIterations = 6435
+            end
+
+            local currentIteration = 0
+
+            -- test the balance of different combinations of teams, covering balance possibility
+            -- intended for use with 2 teams of even player counts
+            -- combinations are iterated starting with the lowest-numbered players on team1 first,
+            -- and progressively iterating the highest-numbered player on team1 to each higher-numbered
+            -- possible player, and then repeating the process with the next highest-numbered player
+            -- increasing by 1... this process continues until every possible balacnce combination
+            -- of 2 equally sized teams of even player counts has been covered
+            local function testCombinations(team1MemberNumber, firstPlayerToCheck)
+                -- check if this player is the last player on the team
+                local lastPlayer
+                if team1MemberNumber < teamSize then
+                    lastPlayer = false
+                else
+                    lastPlayer = true
+                end
+                -- iterate through the possible players for this team1MemberNumber
+                for i = firstPlayerToCheck, choosableCount + team1MemberNumber do
+                    -- when the number of iterations is reached, every possible balance of even player count
+                    --  of the 2 equally sized teams has been checked, and the function ends
+                    if currentIteration >= numIterations then
+                        return
+                    end
+                    team1[team1MemberNumber] = i
+                    if lastPlayer then
+                        -- test this combination of team members
+                        teamValue = {0, 0, 0}
+                        -- add each team member's base rating and devation to the team's values
+                        for i, player in team1 do
+                            teamValue[1] = teamValue[1] + sortedPlayerRatings[player][1]
+                            teamValue[2] = teamValue[2] + sortedPlayerRatings[player][2]
+                        end
+                        -- calculate the team's imbalance value
+                        teamValue[3] = math.abs(teamValue[2] - goalValue[2]) * 1.2 + math.abs(teamValue[1] - goalValue[1])
+                        -- check if the team's imbalance value is lower than the lowest logged imbalance value
+                        if teamValue[3] < goalValue[3] then
+                            -- if it is lower, then this is the best balance so far, and it is logged over the previous best balance
+                            goalValue[3] = teamValue[3]
+                            -- deepcopy the team's player numbers
+                            for i, player in team1 do
+                                bestTeam[i] = player
+                            end
+                        end
+                        currentIteration = currentIteration + 1
+                    else
+                        -- test a subset of combinations
+                        testCombinations(team1MemberNumber + 1, i + 1)
+                    end
+                end
+            end
+
+            testCombinations(1, 1)
+
+            -- make the sorted list of used slots for each team
+            local sortedTeam1Slots = {}
+            local sortedTeam2Slots = {}
+            for i, slotTeam in sortedSlotTeams do
+                local team1OrderNum = 0
+                local team2OrderNum = 0
+                for i2, slotTeam2 in sortedSlotTeams do
+                    if slotTeam[1] > slotTeam2[1] or (slotTeam[1] == slotTeam2[1] and i >= i2) then
+                        if slotTeam2[2] == 1 then
+                            team1OrderNum = team1OrderNum + 1
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                        end
+                    end
+                end
+                -- add the slot to its team's table
+                if slotTeam[2] == 1 then
+                    sortedTeam1Slots[team1OrderNum] = slotTeam[1]
+                else
+                    sortedTeam2Slots[team2OrderNum] = slotTeam[1]
+                end
+            end
+
+            -- specify the players on team 2 (aka, the ones not on team 1)
+            local bestTeam2 = {}
+            for i = 1, playerCount do
+                if not table.find(bestTeam, i) then
+                    table.insert(bestTeam2, i)
+                end
+            end
+
+            -- move players on team1 to the intended slots
+            local team1OrderNum = 0
+            local slotA
+            local slotB
+            for i, player in bestTeam do
+                team1OrderNum = team1OrderNum + 1
+                slotA = sortedSlotTeams[player][1]
+                slotB = sortedTeam1Slots[team1OrderNum]
+                HostUtils.SwapPlayers(slotA, slotB)
+                -- keep track of the slot changes in sortedSlotTeams
+                for i, slotTeam in sortedSlotTeams do
+                    if slotTeam[1] == slotB then
+                        slotTeam[1] = slotA
+                        break
+                    end
+                end
+                sortedSlotTeams[player][1] = slotB
+            end
+
+            -- move players on team2 to the intended slots
+            local team2OrderNum = 0
+            for i, player in bestTeam2 do
+                team2OrderNum = team2OrderNum + 1
+                slotA = sortedSlotTeams[player][1]
+                slotB = sortedTeam2Slots[team2OrderNum]
+                HostUtils.SwapPlayers(slotA, slotB)
+                -- keep track of the slot changes in sortedSlotTeams
+                for i, slotTeam in sortedSlotTeams do
+                    if slotTeam[1] == slotB then
+                        slotTeam[1] = slotA
+                        break
+                    end
+                end
+                sortedSlotTeams[player][1] = slotB
+            end
+            UpdateGame()
+        end
     end
 
     -- Observer List
@@ -5607,7 +5882,7 @@ function StressCPU(waitTime)
 
         -- lobbyComm is destroyed when the lobby is exited. If the user left the lobby, we no longer
         -- want to run the benchmark (it just introduces lag as the user is trying to do something
-        -- else.
+        -- else).
         if not lobbyComm then
             return
         end
@@ -6914,6 +7189,17 @@ function InitHostUtils()
 
             -- Launch button enabled if everyone is ready.
             UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or hostObserves or not playerNotReady)
+
+            -- Disable the AutoBalance button if any players are on a tean greater than 2 or buttonState is false
+            local noOtherTeams = true
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                -- Team numbers are 1 higher on the backend
+                if player.Team > 3 then
+                    noOtherTeams = false
+                    break
+                end
+            end
+            UIUtil.setEnabled(GUI.PenguinAutoBalance, noOtherTeams and buttonState)
         end,
 
         -- Update our local gameInfo.GameMods from selected map name and selected mods, then
