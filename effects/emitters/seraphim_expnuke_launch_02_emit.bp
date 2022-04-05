@@ -1,4 +1,4 @@
---used by SIFExperimentalStrategicMissile01, xsb2401EmitterBlueprint {
+--used by SIFExperimentalStrategicMissile01, xsb2401EmitterBlueprint
 	BlueprintId = 'seraphim_expnuke_launch_02',
 	Lifetime = 20.00,
 	Repeattime = 20.00,
