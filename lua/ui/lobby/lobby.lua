@@ -542,7 +542,6 @@ local function DoSlotBehavior(slot, key, name)
         else
             HostUtils.RemoveAI(slot)
         end
-        Check_Availaible_Color()
     else
         -- We're adding an AI of some sort.
         if lobbyComm:IsHost() then
@@ -1232,6 +1231,7 @@ function ClearSlotInfo(slotIndex)
     UpdateSlotBackground(slotIndex)
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotIndex)
+    Check_Availaible_Color()
     refreshObserverList()
 end
 
@@ -3113,14 +3113,12 @@ function CreateUI(maxPlayers)
           else
             AssignAutoTeams()
           end
-          Check_Availaible_Color()
         end
         GUI.AIClearButton.OnClick = function()
           for i = 1, table.getn(ChangedSlots) do
             HostUtils.RemoveAI(ChangedSlots[i])
           end
           ChangedSlots = {}
-          Check_Availaible_Color()
         end
         GUI.TeamCountSelector.OnClick = function(Self, Index, Text)
           local OccupiedSlots = 0
