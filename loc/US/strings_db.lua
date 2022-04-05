@@ -4676,6 +4676,9 @@ lobui_0701="The last player is kicked because he does not have this mod: "
 lobui_0702="Team Ratings:"
 lobui_0703="Team %d: %d (%d+/-%d)"
 
+AutoLobbyHeaderText="Connection status"
+AutoLobbyConnectionsText="%s / %s are connected"
+
 --Lobby options panel
 lobui_0400="Stretch Background"
 lobui_0401="Stretch background to fill screen."
