@@ -3864,8 +3864,8 @@ function CreateUI(maxPlayers)
                 goalValue[2] = goalValue[2] + player.DEV
             end
 
-            -- if there is only one player, there is no need to balance
-            if playerCount == 1 then
+            -- if there are fewer than 2 players, there is no need to balance
+            if playerCount < 2 then
                 return
             end
 
@@ -3894,10 +3894,16 @@ function CreateUI(maxPlayers)
             local sortedSlotTeams = {}
             local numPlayersTeam1 = 0
             local numPlayersTeam2 = 0
+            local sortingValue1
+            local sortingValue2
+            -- sort the players in a weighted cross between displayed and base rating
+            -- the order goes from greatest to lowest result of: mean - (deviation * 2.2)
             for i, player in playerRatings do
                 local orderNum = 1
+                sortingValue1 = player[1] - (player[2] * 2.2)
                 for i2, player2 in playerRatings do
-                    if player[1] < player2[1] or (player[1] == player2[1] and i > i2) then
+                    sortingValue2 = player2[1] - (player2[2] * 2.2)
+                    if sortingValue1 < sortingValue2 or (sortingValue1 == sortingValue2 and i > i2) then
                         orderNum = orderNum + 1
                     end
                 end
