@@ -52,9 +52,9 @@ EmitterBlueprint {
 		},
 	},
 	VelocityCurve = {
-		XRange = 40.00,
+		XRange = 5.00,
 		Keys = {
-			{ x=5.00,y=1.00,z=0.00 },
+			{ x=1.00,y=0.50,z=0.00 },
 		},
 	},
 	XAccelCurve = {

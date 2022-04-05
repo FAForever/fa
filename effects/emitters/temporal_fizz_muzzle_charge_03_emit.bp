@@ -41,7 +41,7 @@ EmitterBlueprint {
 		},
 	},
 	EmitRateCurve = {
-		XRange = 8.00,
+		XRange = 1.00,
 		Keys = {
 			{ x=3.768,y=10,z=0.000 },
 		},
@@ -53,9 +53,9 @@ EmitterBlueprint {
 		},
 	},
 	VelocityCurve = {
-		XRange = 8.00,
+		XRange = 1.00,
 		Keys = {
-			{ x=4.000,y=0.500,z=0.000 },
+			{ x=4.000,y=0.250,z=0.000 },
 		},
 	},
 	XAccelCurve = {
