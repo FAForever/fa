@@ -1,3 +1,4 @@
+-- used by SIFInainoStrategicMissile, xsb2305
 EmitterBlueprint {
 	BlueprintId = 'seraphim_inaino_explode_03',
 	Lifetime = 25.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 500.00,
+	LODCutoff = -1.00, -- nuke
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
