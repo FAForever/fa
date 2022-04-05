@@ -16,7 +16,7 @@ local WeakKeyMeta = { __mode = 'k' }
 ExtendedErrorMessages = false
 
 function LazyVarMetaTable:__call()
-    if self.compute then
+    if self[1]==nil then
         if self.busy then
             error("circular dependency in lazy evaluation for variable " .. (self.trace or ''), 2)
         end
