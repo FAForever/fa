@@ -7188,6 +7188,17 @@ function InitHostUtils()
 
             -- Launch button enabled if everyone is ready.
             UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or hostObserves or not playerNotReady)
+
+            -- Disable the AutoBalance button if any players are on a tean greater than 2 or buttonState is false
+            local noOtherTeams = true
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                -- Team numbers are 1 higher on the backend
+                if player.Team > 3 then
+                    noOtherTeams = false
+                    break
+                end
+            end
+            UIUtil.setEnabled(GUI.PenguinAutoBalance, noOtherTeams and buttonState)
         end,
 
         -- Update our local gameInfo.GameMods from selected map name and selected mods, then
