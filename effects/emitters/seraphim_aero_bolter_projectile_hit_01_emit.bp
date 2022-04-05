@@ -1,3 +1,5 @@
+-- used by 	SDFAireauBolterWeapon, xsl0303
+--			SDFAireauBolterWeapon02, xsl0202
 EmitterBlueprint {
 	BlueprintId = 'seraphim_aero_bolter_projectile_hit_01',
 	Lifetime = 1.00,
@@ -10,7 +12,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = -1.00,
+	LODCutoff = 100.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
