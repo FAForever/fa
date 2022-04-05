@@ -160,6 +160,10 @@ function OpenWindow()
         for k = 1, 8 do 
             status:AddConnectedPlayer()
             WaitSeconds(1.0)
+            status:RemoveConnectedPlayer()
+            WaitSeconds(1.0)
+            status:AddConnectedPlayer()
+            WaitSeconds(1.0)
         end
     end)
 
