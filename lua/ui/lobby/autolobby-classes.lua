@@ -45,11 +45,14 @@ ConnectionStatus = Class(Group) {
             16, 
             UIUtil.bodyFont
         )
-        LayoutHelpers.Below(self.ConnectionsText, self.HeaderText, 20)
+        LayoutHelpers.CenteredBelow(self.ConnectionsText, self.HeaderText, 20)
         self.ConnectionsCheckbox = UIUtil.CreateCheckboxStd(self, '/dialogs/check-box_btn/radio')
         -- self.ConnectionsCheckbox:Disable()
         LayoutHelpers.LeftOf(self.ConnectionsCheckbox, self.ConnectionsText)
         LayoutHelpers.AtVerticalCenterIn(self.ConnectionsCheckbox, self.ConnectionsText)
+
+        -- hide for now
+        self.ConnectionsCheckbox:Hide()
 
         -- initial view update
         self:UpdateView()
