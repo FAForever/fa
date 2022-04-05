@@ -1,3 +1,6 @@
+-- used by 	AIFMortar01, ual0103
+--			AIFSonanceShell01, ual0304 uab2302
+--			AIFBombQuark01, uaa0304
 EmitterBlueprint {
 	BlueprintId = 'quark_bomb_01',
 	Lifetime = -1.00,
@@ -10,7 +13,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 100.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
