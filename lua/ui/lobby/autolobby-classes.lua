@@ -12,7 +12,7 @@ ConnectionStatus = Class(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
 
-        LayoutHelpers.SetDimensions(self, 200, 200)
+        LayoutHelpers.SetDimensions(self, 200, 100)
 
         self.Background = Bitmap(self)
         self.Background:SetSolidColor("000000")
@@ -28,7 +28,7 @@ ConnectionStatus = Class(Group) {
             16, 
             UIUtil.bodyFont
         )
-        LayoutHelpers.AtLeftIn(self.HeaderText, self, 4)
+        LayoutHelpers.AtCenterIn(self.HeaderText, self, 0.18)
         LayoutHelpers.AtTopIn(self.HeaderText, self, 4)
 
         -- connection status to other players
@@ -39,13 +39,10 @@ ConnectionStatus = Class(Group) {
             UIUtil.bodyFont
         )
         LayoutHelpers.Below(self.ConnectionsText, self.HeaderText, 20)
-        LayoutHelpers.AtLeftIn(self.ConnectionsText, self, 24)
         self.ConnectionsCheckbox = UIUtil.CreateCheckboxStd(self, '/dialogs/check-box_btn/radio')
         -- self.ConnectionsCheckbox:Disable()
         LayoutHelpers.LeftOf(self.ConnectionsCheckbox, self.ConnectionsText)
         LayoutHelpers.AtVerticalCenterIn(self.ConnectionsCheckbox, self.ConnectionsText)
-
-        LOG("__init ran!")
     end,
 
     --- Updates the internal state and the text
@@ -57,6 +54,16 @@ ConnectionStatus = Class(Group) {
     --- Updates the internal state and the text
     SetPlayersConnectedCount = function(self, count)
         self.ConnectedPlayersCount = count 
+        self:UpdateView()
+    end,
+
+    AddConnectedPlayer = function(self)
+        self.ConnectedPlayersCount = self.ConnectedPlayersCount + 1 
+        self:UpdateView()
+    end,
+
+    RemoveConnectedPlayer = function(self)
+        self.ConnectedPlayersCount = self.ConnectedPlayersCount - 1  
         self:UpdateView()
     end,
 

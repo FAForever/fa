@@ -158,7 +158,7 @@ function OpenWindow()
 
     ForkThread(function()
         for k = 1, 8 do 
-            status:SetPlayersConnectedCount(k)
+            status:AddConnectedPlayer()
             WaitSeconds(1.0)
         end
     end)
