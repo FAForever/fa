@@ -3848,12 +3848,15 @@ function CreateUI(maxPlayers)
         GUI.PenguinAutoBalance.OnClick = function()
 
             -- set spawns to fixed
-            gameInfo.GameOptions.TeamSpawn = 'fixed'
-            -- tell everyone else to set spawns to fixed
-            lobbyComm:BroadcastData {
-                Type = 'GameOptions',
-                Options = {['TeamSpawn'] = 'fixed'}
-            }
+            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+                gameInfo.GameOptions.TeamSpawn = 'fixed'
+                -- tell everyone else to set spawns to fixed
+                lobbyComm:BroadcastData {
+                    Type = 'GameOptions',
+                    Options = {['TeamSpawn'] = 'fixed'}
+                }
+                AddChatText(LOC("<LOC lobui_0446>Enabled fixed spawn locations"))
+            end
 
             -- a table of the target mean, target deviation, and the lowest logged imbalance value
             local goalValue = {0, 0, 99999}
