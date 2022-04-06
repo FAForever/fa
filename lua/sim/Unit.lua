@@ -1525,6 +1525,24 @@ Unit = Class(moho.unit_methods) {
         return true 
     end,
 
+    --- Called when a unit collides with a collision beam to check if the collision is valid
+    -- @param self The unit we're checking the collision for
+    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+
+       -- bail out immediately
+        if self.DisallowCollisions then
+            return false
+        end
+
+        -- if we're allied, check if we allow allied collisions
+        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+            return firingWeapon.Blueprint.CollideFriendly
+        end
+
+        return true
+    end,
+
     ChooseAnimBlock = function(self, bp)
         local totWeight = 0
         for _, v in bp do
@@ -4351,18 +4369,6 @@ Unit = Class(moho.unit_methods) {
     OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality
-
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-
-        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
-            DeprecatedWarnings.OnCollisionCheckWeapon = true 
-            WARN("OnCollisionCheckWeapon is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
-
-        return true
-    end,
 
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
