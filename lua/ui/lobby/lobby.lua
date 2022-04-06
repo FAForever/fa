@@ -3847,7 +3847,7 @@ function CreateUI(maxPlayers)
         -- Automatically balance an even number of non-observer players into 2 teams in the lobby
         GUI.PenguinAutoBalance.OnClick = function()
 
-            -- set spawns to fixed
+            -- make sure spawns are set to fixed
             if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
                 gameInfo.GameOptions.TeamSpawn = 'fixed'
                 -- tell everyone else to set spawns to fixed
@@ -3862,14 +3862,14 @@ function CreateUI(maxPlayers)
             local goalValue = {0, 0, 99999}
 
             local playerCount = 0
-            local lastSlot = {0, 0}
+            local lastSlot = {0, 0, false}
             local playerRatings = {}
             -- get rating data for each player
             for i, player in gameInfo.PlayerOptions:pairs() do
                 playerRatings[i] = {player.MEAN, player.DEV, player.StartSpot, player.Team - 1}
                 playerCount = playerCount + 1
                 if player.StartSpot > lastSlot[1] then
-                    lastSlot = {player.StartSpot, i}
+                    lastSlot = {player.StartSpot, i, player.Human}
                 end
                 goalValue[1] = goalValue[1] + player.MEAN
                 goalValue[2] = goalValue[2] + player.DEV
@@ -3887,13 +3887,20 @@ function CreateUI(maxPlayers)
                 goalValue[2] = goalValue[2] - playerRatings[lastSlot[2]][2]
                 playerRatings[lastSlot[2]] = nil
                 playerCount = playerCount - 1
-                -- set the player to not be on a team
-                for i, player in gameInfo.PlayerOptions:pairs() do
-                    if player.StartSpot == lastSlot[1] then
-                        -- set AutoTeams to none (so, this function can set an individual player's team)
-                        gameInfo.GameOptions.AutoTeams = 'none'
-                        player.Team = 1 -- no team
-                        break
+                -- set the player to not be on a team if teams are manual
+                -- otherwise make the player an observer if human or remove it if AI
+                if gameInfo.GameOptions.AutoTeams == 'none' then
+                    for i, player in gameInfo.PlayerOptions:pairs() do
+                        if player.StartSpot == lastSlot[1] then
+                            player.Team = 1 -- no team
+                            break
+                        end
+                    end
+                else
+                    if lastSlot[3] then
+                        HostUtils.ConvertPlayerToObserver(lastSlot[1])
+                    else
+                        HostUtils.RemoveAI(lastSlot[1])
                     end
                 end
             end
@@ -3932,8 +3939,60 @@ function CreateUI(maxPlayers)
 
             -- the number of players per team
             local teamSize = playerCount / 2
+
+
+            -- make the sorted list of slots for each team
+            local sortedTeam1Slots = {}
+            local sortedTeam2Slots = {}
+            local team1OrderNum = 0
+            local team2OrderNum = 0
+
+            local manualTeams
+                
+            if gameInfo.GameOptions.AutoTeams == 'pvsi' then -- odd vs even
+                for i = 1, 16 do
+                    if not gameInfo.ClosedSlots[i] then
+                        if math.mod(i, 2) == 1  then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then -- top vs bottom
+                local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+                for i, startPosition in GUI.mapView.startPositions do
+                    if not gameInfo.ClosedSlots[i] then
+                        if startPosition.Top() < midLine then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            elseif gameInfo.GameOptions.AutoTeams == 'lvsr' then -- left vs right
+                local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+                for i, startPosition in GUI.mapView.startPositions do
+                    if not gameInfo.ClosedSlots[i] then
+                        if startPosition.Left() < midLine then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            else
+                manualTeams = true
+            end
+
             -- if the teams were not set properly, set them properly
-            if numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize then
+            if table.getn(sortedTeam1Slots) < teamSize or table.getn(sortedTeam2Slots) < teamSize or (manualTeams and (numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize)) then
                 -- set AutoTeams to none (so, they can be set by slot by this function)
                 gameInfo.GameOptions.AutoTeams = 'none'
                 local counter = 0
@@ -3949,8 +4008,40 @@ function CreateUI(maxPlayers)
                                 player.Team = 3 -- team 2
                                 slotTeam[2] = 2
                             end
+                            -- tell everyone else the team number for that slot
+                            lobbyComm:BroadcastData(
+                            {
+                                Type = 'PlayerOptions',
+                                Options = {['Team'] = slotTeam[2] + 1}, -- make team number 1 higher for the backend
+                                Slot = slotTeam[1],
+                            })
                             break
                         end
+                    end
+                end
+            end
+
+            -- if teams are set to manual, make the sorted list of slots for each team
+            if gameInfo.GameOptions.AutoTeams == 'none' then
+                sortedTeam1Slots = {}
+                sortedTeam2Slots = {}
+                for i, slotTeam in sortedSlotTeams do 
+                    team1OrderNum = 0
+                    team2OrderNum = 0
+                    for i2, slotTeam2 in sortedSlotTeams do
+                        if slotTeam[1] > slotTeam2[1] or (slotTeam[1] == slotTeam2[1] and i >= i2) then
+                            if slotTeam2[2] == 1 then
+                                team1OrderNum = team1OrderNum + 1
+                            else
+                                team2OrderNum = team2OrderNum + 1
+                            end
+                        end
+                    end
+                    -- add the slot to its team's table
+                    if slotTeam[2] == 1 then
+                        sortedTeam1Slots[team1OrderNum] = slotTeam[1]
+                    else
+                        sortedTeam2Slots[team2OrderNum] = slotTeam[1]
                     end
                 end
             end
@@ -4042,28 +4133,6 @@ function CreateUI(maxPlayers)
 
             testCombinations(1, 1)
 
-            -- make the sorted list of used slots for each team
-            local sortedTeam1Slots = {}
-            local sortedTeam2Slots = {}
-            for i, slotTeam in sortedSlotTeams do
-                local team1OrderNum = 0
-                local team2OrderNum = 0
-                for i2, slotTeam2 in sortedSlotTeams do
-                    if slotTeam[1] > slotTeam2[1] or (slotTeam[1] == slotTeam2[1] and i >= i2) then
-                        if slotTeam2[2] == 1 then
-                            team1OrderNum = team1OrderNum + 1
-                        else
-                            team2OrderNum = team2OrderNum + 1
-                        end
-                    end
-                end
-                -- add the slot to its team's table
-                if slotTeam[2] == 1 then
-                    sortedTeam1Slots[team1OrderNum] = slotTeam[1]
-                else
-                    sortedTeam2Slots[team2OrderNum] = slotTeam[1]
-                end
-            end
 
             -- specify the players on team 2 (aka, the ones not on team 1)
             local bestTeam2 = {}
