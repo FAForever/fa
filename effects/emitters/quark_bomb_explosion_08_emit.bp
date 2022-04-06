@@ -1,3 +1,4 @@
+-- used by uab2302
 EmitterBlueprint {
 	BlueprintId = 'quark_bomb_explosion_08',
 	Lifetime = 2.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 100.00,
+	LODCutoff = 1000.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
