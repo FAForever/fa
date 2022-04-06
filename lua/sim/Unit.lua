@@ -1525,15 +1525,12 @@ Unit = Class(moho.unit_methods) {
         return true 
     end,
 
+    --- Called when a unit collides with a collision beam to check if the collision is valid
+    -- @param self The unit we're checking the collision for
+    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
-        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
-            DeprecatedWarnings.OnCollisionCheckWeapon = true 
-            WARN("OnCollisionCheckWeapon is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
-
+       -- bail out immediately
         if self.DisallowCollisions then
             return false
         end
@@ -1541,15 +1538,6 @@ Unit = Class(moho.unit_methods) {
         -- if we're allied, check if we allow allied collisions
         if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
             return firingWeapon.Blueprint.CollideFriendly
-        end
-
-        -- bail out immediately
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
         end
 
         return true
