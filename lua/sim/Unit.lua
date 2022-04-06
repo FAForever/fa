@@ -1525,6 +1525,36 @@ Unit = Class(moho.unit_methods) {
         return true 
     end,
 
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+
+        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
+            DeprecatedWarnings.OnCollisionCheckWeapon = true 
+            WARN("OnCollisionCheckWeapon is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
+        if self.DisallowCollisions then
+            return false
+        end
+
+        -- if we're allied, check if we allow allied collisions
+        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+            return firingWeapon.Blueprint.CollideFriendly
+        end
+
+        -- bail out immediately
+        if weaponBP.DoNotCollideList then
+            for _, v in pairs(weaponBP.DoNotCollideList) do
+                if EntityCategoryContains(ParseEntityCategory(v), self) then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end,
+
     ChooseAnimBlock = function(self, bp)
         local totWeight = 0
         for _, v in bp do
@@ -4351,18 +4381,6 @@ Unit = Class(moho.unit_methods) {
     OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality
-
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-
-        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
-            DeprecatedWarnings.OnCollisionCheckWeapon = true 
-            WARN("OnCollisionCheckWeapon is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
-
-        return true
-    end,
 
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
