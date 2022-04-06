@@ -33,10 +33,10 @@ ConnectionStatus = Class(Group) {
             self, 
             "", 
             16, 
-            UIUtil.bodyFont
+            UIUtil.titleFont
         )
         LayoutHelpers.AtCenterIn(self.HeaderText, self, 0.18)
-        LayoutHelpers.AtTopIn(self.HeaderText, self, 4)
+        LayoutHelpers.AtTopIn(self.HeaderText, self, 6)
 
         -- connection status to other players
         self.ConnectionsText = UIUtil.CreateText(
