@@ -91,7 +91,7 @@ ShieldCollider = Class(Projectile) {
                         self.Plane.Detector:EnableTerrainCheck(true)
                         self.Plane.Detector:Enable()
 
-                        -- If you try to deattach the plane, it has retarded game code that makes it continue falling in its original direction
+                        -- If you try to deattach the plane, it has derpy game code that makes it continue falling in its original direction
                         self:ShieldBounce(targetEntity, shieldImpactVector) -- Calculate the appropriate change of velocity
                     end
 

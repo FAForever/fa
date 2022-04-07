@@ -424,7 +424,7 @@ end
 
 --- Get the value of the LastFaction, sanitised in case it's an unsafe value.
 --
--- This means when some retarded mod (*cough*Nomads*cough*) writes a large number to LastFaction, we
+-- This means when some potentially problematic mod (*cough*Nomads*cough*) writes a large number to LastFaction, we
 -- don't catch fire.
 function GetSanitisedLastFaction()
     local lastFaction = Prefs.GetFromCurrentProfile('LastFaction') or 1
@@ -1179,7 +1179,7 @@ function SetSlotInfo(slotNum, playerInfo)
     if gameInfo.GameOptions['TeamSpawn'] != 'fixed' then
         playerInfo.Party = 1
     end
-    
+
     slot.party:Show()
     slot.party:SetItem(playerInfo.Party)
 
@@ -2565,7 +2565,7 @@ function GetAvailableColor()
     WARN('Error: No available colors found.')
 end
 
---- This function is retarded.
+--- This function is undesirable.
 -- Unfortunately, we're stuck with it.
 -- The game requires both ArmyColor and PlayerColor be set. We don't want to have to write two fields
 -- all the time, and the magic that makes PlayerData work precludes adding member functions to it.
@@ -5319,7 +5319,7 @@ local MessageHandlers = {
             -- Evil hack to correct the skin for randomfaction players before launch.
             for index, player in info.PlayerOptions do
                 -- Set the skin to the faction you'll be playing as, whatever that may be. (prevents
-                -- random-faction people from ending up with something retarded)
+                -- random-faction people from ending up with something problematic)
                 if player.OwnerID == localPlayerID then
                     UIUtil.SetCurrentSkin(FACTION_NAMES[player.Faction])
                 end
@@ -6537,7 +6537,7 @@ function ShowPresetDialog()
         DeleteButton:Enable()
     end
 
-    -- Because GPG's event model is painfully retarded..
+    -- Because GPG's event model is painfully problematic..
     PresetList.OnKeySelect = onListItemChanged
     PresetList.OnClick = function(self, row, event)
         self:SetSelection(row)
