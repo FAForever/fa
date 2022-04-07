@@ -1,3 +1,4 @@
+-- used by uea0304
 EmitterBlueprint {
 	BlueprintId = 'terran_bomber_bomb_explosion_04',
 	Lifetime = 1.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 100.00,
+	LODCutoff = 350.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,

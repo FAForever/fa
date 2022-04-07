@@ -1,3 +1,4 @@
+-- used by DestructionDust01, which is used by url0402
 EmitterBlueprint {
 	BlueprintId = 'terran_bomber_dust_blanket_01',
 	Lifetime = 60.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1000.00,
+	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,

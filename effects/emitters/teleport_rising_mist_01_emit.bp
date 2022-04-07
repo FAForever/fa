@@ -1,3 +1,4 @@
+-- used by UnitTeleport01, which is used to teleport units
 EmitterBlueprint {
 	BlueprintId = 'teleport_rising_mist_01',
 	Lifetime = -20.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 100.00,
+	LODCutoff = 750.00, -- used as a visual cue for the teleportation, hence it is quite high
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
