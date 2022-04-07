@@ -1,3 +1,4 @@
+-- used by SIFInainoStrategicMissile, xsb2305
 EmitterBlueprint {
 	BlueprintId = 'seraphim_inaino_prelaunch_02',
 	Lifetime = 65.00,

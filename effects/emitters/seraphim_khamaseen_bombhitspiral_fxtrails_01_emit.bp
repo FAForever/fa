@@ -1,3 +1,4 @@
+-- used by SBOZhanaseeBomb01, xsa0304
 EmitterBlueprint {
 	BlueprintId = 'seraphim_khamaseen_bombhitspiral_fxtrails_01',
 	Lifetime = 15.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = -1.00,
+	LODCutoff = 350.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
