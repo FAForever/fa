@@ -441,7 +441,7 @@ function JoinGame(address, asObserver, playerName, uid)
     SetGameOptionsFromCommandLine()
 
     -- update the connection status GUI
-    connectionStatusGUI:SetTotalPlayersCount(requiredPlayers or 1)
+    connectionStatusGUI:SetTotalPlayersCount(requiredPlayers)
 
     lobbyComm:JoinGame(address, playerName, uid)
 end
