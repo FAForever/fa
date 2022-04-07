@@ -3992,7 +3992,7 @@ function CreateUI(maxPlayers)
             end
 
             -- if the teams were not set properly, set them properly
-            if table.getn(sortedTeam1Slots) < teamSize or table.getn(sortedTeam2Slots) < teamSize or (manualTeams and (numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize)) then
+            if (not manualTeams and (table.getn(sortedTeam1Slots) < teamSize or table.getn(sortedTeam2Slots) < teamSize)) or (manualTeams and (numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize)) then
                 -- set AutoTeams to none (so, they can be set by slot by this function)
                 gameInfo.GameOptions.AutoTeams = 'none'
                 local counter = 0
