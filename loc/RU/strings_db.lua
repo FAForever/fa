@@ -5328,7 +5328,7 @@ lobui_0702="Рейтинги команд:"
 lobui_0703="Команда %d: %d (%d+/-%d)"
 
 AutoLobbyHeaderText="Состояние соединения"
-AutoLobbyConnectionsText="%s из %s подключено"
+AutoLobbyConnectionsTextPlural="%s из %s подключено"
 
 --Lobby options panel
 lobui_0400="Растянуть фон"

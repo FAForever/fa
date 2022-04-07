@@ -4677,7 +4677,8 @@ lobui_0702="Team Ratings:"
 lobui_0703="Team %d: %d (%d+/-%d)"
 
 AutoLobbyHeaderText="Connection status"
-AutoLobbyConnectionsText="%s / %s are connected"
+AutoLobbyConnectionsTextSingular="%s / %s is connected"
+AutoLobbyConnectionsTextPlural="%s / %s are connected"
 
 --Lobby options panel
 lobui_0400="Stretch Background"

@@ -71,7 +71,11 @@ ConnectionStatus = Class(Group) {
         local headerText = LOC('<LOC AutoLobbyHeaderText>Connection status')
         self.HeaderText:SetText(headerText)
 
-        local connectionsText = LOCF('<LOC AutoLobbyConnectionsText>%s / %s are connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
+        local connectionsText = LOCF('<LOC AutoLobbyConnectionsTextPlural>%s / %s are connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
+        if ConnectedPlayersCount == 1 then 
+            local connectionsText = LOCF('<LOC AutoLobbyConnectionsTextSingular>%s / %s is connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
+        end
+
         self.ConnectionsText:SetText(connectionsText)
         self.ConnectionsCheckbox:SetCheck(self.ConnectedPlayersCount == self.TotalPlayersCount)
     end,
