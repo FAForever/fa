@@ -1038,6 +1038,35 @@ function SetSlotInfo(slotNum, playerInfo)
         hostKey = 'client'
     end
 
+    --- Returns true if the party selector for this slot should be enabled.
+    local function partySelectionEnabled(ready, locallyOwned, isHost)
+        -- If slot are set to fixed, no selector for you.
+        -- This could be changed if party support is added for opti/etc
+        if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+            return false
+        end
+
+        if isHost and not playerInfo.Human then
+            return true
+        end
+
+        -- You can control your own one when you're not ready.
+        if locallyOwned then
+            return not ready
+        end
+
+        if isHost then
+            -- The host can control the team of others, provided he's not ready himself.
+            local slot = FindSlotForID(localPlayerID)
+            local is_ready = slot and gameInfo.PlayerOptions[slot].Ready -- could be observer
+
+            return not is_ready
+        end
+    end
+
+    -- Determine party selection enabledness
+    UIUtil.setEnabled(slot.party, partySelectionEnabled(playerInfo.Ready, isLocallyOwned, isHost))
+
     -- These states are used to select the appropriate strings with GetSlotMenuTables.
     local slotState
     if not playerInfo.Human then
@@ -1144,6 +1173,15 @@ function SetSlotInfo(slotNum, playerInfo)
     if isHost then
         HostUtils.SendPlayerSettingsToServer(slotNum)
     end
+
+    -- change party number to 1 (no party) if spawns are not set to fixed
+    -- if opti/etc is changed to support party functionality, this can be removed
+    if gameInfo.GameOptions['TeamSpawn'] != 'fixed' then
+        playerInfo.Party = 1
+    end
+    
+    slot.party:Show()
+    slot.party:SetItem(playerInfo.Party)
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
     slot.ready:SetCheck(playerInfo.Ready, true)
@@ -2578,6 +2616,7 @@ end
 
 function EnableSlot(slot)
     GUI.slots[slot].team:Enable()
+    GUI.slots[slot].party:Enable()
     GUI.slots[slot].color:Enable()
     GUI.slots[slot].faction:Enable()
     GUI.slots[slot].ready:Enable()
@@ -2585,6 +2624,7 @@ end
 
 function DisableSlot(slot, exceptReady)
     GUI.slots[slot].team:Disable()
+    GUI.slots[slot].party:Disable()
     GUI.slots[slot].color:Disable()
     GUI.slots[slot].faction:Disable()
     if not exceptReady then
@@ -2603,8 +2643,8 @@ function CreateSlotsUI(makeLabel)
     local ColumnLayout = import('/lua/ui/controls/columnlayout.lua').ColumnLayout
 
     -- The dimensions of the columns used for slot UI controls.
-    local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 395, 465, 535, 605, 677, 749}
-    local COLUMN_WIDTHS = {20, 20, 45, 45, 257, 59, 59, 59, 62, 62, 51}
+    local COLUMN_POSITIONS = {1, 21, 47, 91, 133, 395, 465, 527, 589, 657, 703, 749}
+    local COLUMN_WIDTHS = {20, 20, 45, 45, 257, 59, 52, 52, 52, 42, 42, 51}
 
     local labelGroup = ColumnLayout(GUI.playerPanel, COLUMN_POSITIONS, COLUMN_WIDTHS)
 
@@ -2635,6 +2675,8 @@ function CreateSlotsUI(makeLabel)
 
     local teamLabel = makeLabel(LOC("<LOC lobui_0216>Team"), 14)
     labelGroup:AddChild(teamLabel)
+
+    labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0449>Party"), 14))
 
     labelGroup:AddChild(makeLabel(LOC("<LOC lobui_0450>CPU"), 14))
 
@@ -2828,12 +2870,24 @@ function CreateSlotsUI(makeLabel)
         Tooltip.AddControlTooltip(teamSelector, 'lob_team')
         teamSelector.OnEvent = defaultHandler
 
+        -- Party
+        local partySelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        newSlot.party = partySelector
+        newSlot:AddChild(partySelector)
+        LayoutHelpers.SetWidth(partySelector, COLUMN_WIDTHS[9])
+        partySelector.OnClick = function(self, index)
+            Tooltip.DestroyMouseoverDisplay()
+            SetPlayerOption(curRow, 'Party', index)
+        end
+        Tooltip.AddControlTooltip(partySelector, 'lob_party')
+        partySelector.OnEvent = defaultHandler
+
         -- CPU
         local barMax = 450
         local barMin = 0
         local CPUGroup = Group(newSlot)
         newSlot.CPUGroup = CPUGroup
-        LayoutHelpers.SetWidth(CPUGroup, COLUMN_WIDTHS[9])
+        LayoutHelpers.SetWidth(CPUGroup, COLUMN_WIDTHS[10])
         CPUGroup.Height:Set(newSlot.Height)
         newSlot:AddChild(CPUGroup)
         local CPUSpeedBar = StatusBar(CPUGroup, barMin, barMax, false, false,
@@ -2853,7 +2907,7 @@ function CreateSlotsUI(makeLabel)
         barMin = 0
         local pingGroup = Group(newSlot)
         newSlot.pingGroup = pingGroup
-        LayoutHelpers.SetWidth(pingGroup, COLUMN_WIDTHS[10])
+        LayoutHelpers.SetWidth(pingGroup, COLUMN_WIDTHS[11])
         pingGroup.Height:Set(newSlot.Height)
         newSlot:AddChild(pingGroup)
         local pingStatus = StatusBar(pingGroup, barMin, barMax, false, false,
@@ -2888,6 +2942,7 @@ function CreateSlotsUI(makeLabel)
             factionSelector:Hide()
             colorSelector:Hide()
             teamSelector:Hide()
+            partySelector:Hide()
             CPUSpeedBar:Hide()
             pingStatus:Hide()
             readyBox:Hide()
@@ -3855,7 +3910,7 @@ function CreateUI(maxPlayers)
             local playerRatings = {}
             -- get rating data for each player
             for i, player in gameInfo.PlayerOptions:pairs() do
-                playerRatings[i] = {player.MEAN, player.DEV, player.StartSpot, player.Team - 1}
+                playerRatings[i] = {player.MEAN, player.DEV, player.StartSpot, player.Team - 1, player.Party}
                 playerCount = playerCount + 1
                 if player.StartSpot > lastSlot[1] then
                     lastSlot = {player.StartSpot, i}
@@ -3890,6 +3945,9 @@ function CreateUI(maxPlayers)
             goalValue[1] = goalValue[1] / 2
             goalValue[2] = goalValue[2] / 2
 
+            -- parties of players that should be teamed together
+            local parties = {}
+
             local sortedPlayerRatings = {}
             local sortedSlotTeams = {}
             local numPlayersTeam1 = 0
@@ -3914,6 +3972,24 @@ function CreateUI(maxPlayers)
                     numPlayersTeam1 = numPlayersTeam1 + 1
                 elseif player[4] == 2 then
                     numPlayersTeam2 = numPlayersTeam2 + 1
+                end
+
+                -- check if the player is in a party (1 == no party)
+                if player[5] > 1 then
+                    -- if this party has a table in parties, add the player's order num to the party's table
+                    -- otherwise, create the party's table with the player's order num in it
+                    if parties[player[5]] then
+                        table.insert(parties[player[5]], orderNum)
+                    else
+                        parties[player[5]] = {orderNum}
+                    end
+                end
+            end
+
+            -- if a party has less than 2 players in it, remove it from the table of parties used in this function
+            for i, party in parties do
+                if table.getn(party) < 2 then
+                    parties[i] = nil
                 end
             end
 
@@ -3977,6 +4053,8 @@ function CreateUI(maxPlayers)
             end
 
             local currentIteration = 0
+            local partiesTogether = true
+            local numTeamMembersInParty
 
             -- test the balance of different combinations of teams, covering balance possibility
             -- intended for use with 2 teams of even player counts
@@ -4002,22 +4080,42 @@ function CreateUI(maxPlayers)
                     end
                     team1[team1MemberNumber] = i
                     if lastPlayer then
-                        -- test this combination of team members
-                        teamValue = {0, 0, 0}
-                        -- add each team member's base rating and devation to the team's values
-                        for i, player in team1 do
-                            teamValue[1] = teamValue[1] + sortedPlayerRatings[player][1]
-                            teamValue[2] = teamValue[2] + sortedPlayerRatings[player][2]
+                        -- for each party with multiple members, check if all of its members are on the same team
+                        if parties then
+                            partiesTogether = true
+                            for i, party in parties do
+                                numTeamMembersInParty = 0
+                                for i, player in party do
+                                    if table.find(team1, player) then
+                                        numTeamMembersInParty = numTeamMembersInParty + 1
+                                    end
+                                end
+                                if not (numTeamMembersInParty == 0 or numTeamMembersInParty == table.getn(party)) then
+                                    partiesTogether = false
+                                    break
+                                end
+                            end
                         end
-                        -- calculate the team's imbalance value
-                        teamValue[3] = math.abs(teamValue[2] - goalValue[2]) * 1.2 + math.abs(teamValue[1] - goalValue[1])
-                        -- check if the team's imbalance value is lower than the lowest logged imbalance value
-                        if teamValue[3] < goalValue[3] then
-                            -- if it is lower, then this is the best balance so far, and it is logged over the previous best balance
-                            goalValue[3] = teamValue[3]
-                            -- deepcopy the team's player numbers
+
+                        -- skip this team combination if any members of a party are not on the same team as their partymates
+                        if partiesTogether then
+                            -- test this combination of team members
+                            teamValue = {0, 0, 0}
+                            -- add each team member's base rating and devation to the team's values
                             for i, player in team1 do
-                                bestTeam[i] = player
+                                teamValue[1] = teamValue[1] + sortedPlayerRatings[player][1]
+                                teamValue[2] = teamValue[2] + sortedPlayerRatings[player][2]
+                            end
+                            -- calculate the team's imbalance value
+                            teamValue[3] = math.abs(teamValue[2] - goalValue[2]) * 1.2 + math.abs(teamValue[1] - goalValue[1])
+                            -- check if the team's imbalance value is lower than the lowest logged imbalance value
+                            if teamValue[3] < goalValue[3] then
+                                -- if it is lower, then this is the best balance so far, and it is logged over the previous best balance
+                                goalValue[3] = teamValue[3]
+                                -- deepcopy the team's player numbers
+                                for i, player in team1 do
+                                    bestTeam[i] = player
+                                end
                             end
                         end
                         currentIteration = currentIteration + 1
@@ -4029,6 +4127,25 @@ function CreateUI(maxPlayers)
             end
 
             testCombinations(1, 1)
+
+            -- check if bestTeam's player count is wrong
+            if table.getn(bestTeam) != teamSize then
+
+                -- reset settings and try again without keeping parties together
+                parties = nil
+                currentIteration = 0
+                partiesTogether = true
+                testCombinations(1, 1)
+
+                -- check if bestTeam's player count is still wrong
+                if table.getn(bestTeam) != teamSize then
+                    AddChatText(LOC("<LOC lobui_0447>Could not autobalance teams properly"))
+                    WARN('Error: Could not autobalance teams properly')
+                    return
+                else
+                    AddChatText(LOC("<LOC lobui_0448>Could not autobalance parties properly, so autobalancing disregarded them"))
+                end
+            end
 
             -- make the sorted list of used slots for each team
             local sortedTeam1Slots = {}

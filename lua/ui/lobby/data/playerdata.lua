@@ -3,8 +3,8 @@ local WatchedValueTable = import('/lua/ui/lobby/data/watchedvalue/watchedvalueta
 -- The default values (and the only valid keyset) for a PlayerData object.
 local DEFAULT_MAPPING = {
     Team = 1,
+    Party = 1,
     -- Both PlayerColor and ArmyColor must be set for the game to start.
-    -- This is retarded.
     PlayerColor = 1,
     ArmyColor = 1,
     StartSpot = 1,

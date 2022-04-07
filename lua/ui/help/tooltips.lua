@@ -884,6 +884,10 @@ Tooltips = {
         title = "<LOC tooltipui0127>Team",
         description = "<LOC tooltipui0128>Players with the same Team will start off Allied with each other",
     },
+    lob_party = {
+        title = "<LOC tooltipui0698>Party",
+        description = "<LOC tooltipui0699>Players with the same Party will be autobalanced together",
+    },
     lob_curated_maps = {
         title = "<LOC tooltipui0712>Curated Maps",
         description = "<LOC tooltipui0713>Open a web page in your browser to view curated maps",
