@@ -574,9 +574,13 @@ AIBrain = Class(moho.aibrain_methods) {
                     for k, brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         if units and not table.empty(units) then
-                            TransferUnitsOwnership(units, brain.index)
+                            local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
 
-                            Sync.ArmyTransfer = { { from = selfIndex, to = brain.index, reason = "fullshare" } }
+                            -- only show message when we actually gift that player some units
+                            if givenUnitCount > 0 then 
+                                Sync.ArmyTransfer = { { from = selfIndex, to = brain.index, reason = "fullshare" } }
+                            end
+
                             WaitSeconds(1)
                         end
                     end
