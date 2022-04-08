@@ -7,7 +7,7 @@ TrailEmitterBlueprint {
     SortOrder = 0,
     BlendMode = 0.0,
     TextureRepeatRate = 1,
-    LODCutoff = -1,
+    LODCutoff = -1, -- t3 / t4 artillery
 	RepeatTexture = [[/textures/particles/railgun_trail_01.dds]],
 	RampTexture = [[/textures/particles/ramp_white_07.dds]],
 }
