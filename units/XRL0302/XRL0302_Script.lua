@@ -33,8 +33,8 @@ local DeathWeaponKamikaze = Class(Weapon) {
             
             local rotation = math.random(0, 6.28)
             
-            DamageArea( self.unit, position, 6, 1, 'Force', true )
-            DamageArea( self.unit, position, 6, 1, 'Force', true )
+            DamageArea( self.unit, position, 6, 1, 'TreeForce', true )
+            DamageArea( self.unit, position, 6, 1, 'TreeForce', true )
             
             CreateDecal( position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
         end

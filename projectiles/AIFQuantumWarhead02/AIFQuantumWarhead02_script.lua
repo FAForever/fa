@@ -45,6 +45,7 @@ AIFQuantumWarhead02 = Class(NullShell) {
         local emit, x, y, z = nil
         local DirectionMul = 0.02
         local OffsetMul = 4
+        local army = self.Army 
 
         for i = 0, (numFlares - 1) do
             x = math.sin(angleInitial + (i*angle) + RandomFloat(-angleVariation, angleVariation))

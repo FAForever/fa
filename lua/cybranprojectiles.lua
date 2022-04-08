@@ -68,28 +68,10 @@ CIFProtonBombProjectile = Class(NullShell) { -- T3 strategic bomber
     FxImpactLand = EffectTemplate.CProtonBombHit01,
 
     OnImpact = function(self, targetType, targetEntity)
-        local army = self.Army
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
         
-        CreateLightParticle(self, -1, army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
-        CreateLightParticle(self, -1, army, 8, 22, 'glow_03', 'ramp_antimatter_02')
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local rotation = RandomFloat(0.0,6.28)
-            
-            DamageRing(self, pos, 0.1, radius, 10, 'Fire', FriendlyFire, false)
-            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 10
-            
-            CreateDecal(pos, rotation, 'scorch_011_albedo', '', 'Albedo', 12, 12, 300, 200, army)
-        end
-
+        CreateLightParticle(self, -1, self.Army, 12, 28, 'glow_03', 'ramp_proton_flash_02')
+        CreateLightParticle(self, -1, self.Army, 8, 22, 'glow_03', 'ramp_antimatter_02')
+    
         local blanketSides = 12
         local blanketAngle = (2*math.pi) / blanketSides
         local blanketStrength = 1
@@ -123,26 +105,6 @@ CDFProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.CProtonCannonHit01,
     FxTrailOffset = 0,
     FxImpactUnderWater = {},
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 250, 50, army)
-        end
-        
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 ---- XRL0403 experimental crab heavy proton cannon
@@ -160,28 +122,7 @@ CDFHvyProtonCannonProjectile = Class(MultiPolyTrailProjectile) {
     FxImpactLand = EffectTemplate.CHvyProtonCannonHitLand,
     FxImpactUnderWater = EffectTemplate.CHvyProtonCannonHit01,
     FxImpactWater = EffectTemplate.CHvyProtonCannonHit01,
-    FxTrailOffset = 0,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+2, radius+2, 300, 70, army)
-        end
-        
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
-    
+    FxTrailOffset = 0,    
 }
 
 --------------------------------------------------------------------------
@@ -291,25 +232,11 @@ CArtilleryProtonProjectile = Class(SinglePolyTrailProjectile) {
     FxImpactUnderWater = {},
 
     OnImpact = function(self, targetType, targetEntity)
-        local army = self.Army
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        CreateLightParticle( self, -1, army, radius * 2, 12, 'glow_03', 'ramp_red_06' )
-        CreateLightParticle( self, -1, army, radius * 2, 22, 'glow_03', 'ramp_antimatter_02' )
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', FriendlyFire )
-            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 1
-        end
-
         EmitterProjectile.OnImpact(self, targetType, targetEntity)
+
+        -- pretty flash
+        CreateLightParticle( self, -1, self.Army, 7, 12, 'glow_03', 'ramp_red_06' )
+        CreateLightParticle( self, -1, self.Army, 7, 22, 'glow_03', 'ramp_antimatter_02' )
     end,
 }
 
@@ -391,26 +318,6 @@ CDisintegratorLaserProjectile = Class(MultiPolyTrailProjectile) { --loya & waile
     FxImpactProp = EffectTemplate.CDisintegratorHitUnit01,
     FxImpactLand = EffectTemplate.CDisintegratorHitLand01,
     FxImpactUnderWater = {},
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
-        end
-
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 -- adjusments for URA0104 to tone down effect
@@ -446,39 +353,6 @@ CElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- loya, wagner, m
     FxImpactUnit = EffectTemplate.CElectronBolterHitUnit01,
     FxImpactProp = EffectTemplate.CElectronBolterHitUnit01,
     FxImpactLand = EffectTemplate.CElectronBolterHitLand01,
-
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-
-        if radius > 0 then
-            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-            DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-            
-        else
-            DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
-            DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
-            
-        end
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            if radius > 0 then
-                
-                CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius, radius, 50, 15, army)
-            else
-                
-                CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', 1, 1, 50, 15, army)
-            end
-        end
-
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
@@ -504,29 +378,6 @@ CHeavyElectronBolterProjectile = Class(MultiPolyTrailProjectile) { -- SR
     FxUnitHitScale = 2.5,
     FxWaterHitScale = 2.5,
     FxOnKilledScale = 2.5,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            DamageRing( self, pos, radius, 5/4 * radius, 1, 'Fire', FriendlyFire )
-            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 1
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius+1, radius+1, 250, 50, army)
-        end
-        
-        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 --------------------------------------------------------------------------
@@ -614,29 +465,6 @@ CIridiumRocketProjectile = Class(SingleCompositeEmitterProjectile) { -- T2 gs & 
     FxImpactProp = EffectTemplate.CMissileHit02,
     FxImpactLand = EffectTemplate.CMissileHit02,
     FxImpactUnderWater = {},
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local radius = self.DamageData.DamageRadius
-        
-        if radius == 0 then
-            local pos = self:GetPosition()
-            local FriendlyFire = false
-            
-            DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
-            DamageArea(self, pos, 1, 1, 'Force', FriendlyFire)
-            
-            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-            
-            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-                local rotation = RandomFloat(0,2*math.pi)
-                local army = self.Army
-                
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 250, 50, army)
-            end
-        end
-        
-        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 --------------------------------------------------------------------------
@@ -650,26 +478,6 @@ CCorsairRocketProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactProp = EffectTemplate.CCorsairMissileHit01,
     FxImpactLand = EffectTemplate.CCorsairMissileLandHit01,
     FxImpactUnderWater = {},
-
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, radius, 1, 'Force', FriendlyFire )
-        
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', radius, radius, 150, 50, army)
-        end
-
-        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 --------------------------------------------------------------------------
@@ -731,29 +539,6 @@ CMolecularCannonProjectile = Class(SinglePolyTrailProjectile) { -- ACU
     FxImpactUnit = EffectTemplate.CMolecularRipperHit01,
     FxImpactProp = EffectTemplate.CMolecularRipperHit01,
     FxImpactLand = EffectTemplate.CMolecularRipperHit01,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local radius = self.DamageData.DamageRadius
-        
-        if radius == 0 then -- to prevent OC from doing that decal
-            local pos = self:GetPosition()
-            local FriendlyFire = false
-            
-            DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
-            DamageArea( self, pos, 0.5, 1, 'Force', FriendlyFire )
-            
-            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-            
-            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-                local rotation = RandomFloat(0,2*math.pi)
-                local army = self.Army
-                
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
-            end
-        end
-
-        SinglePolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 --------------------------------------------------------------------------
@@ -834,6 +619,7 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
     OnImpact = function(self, targetType, targetEntity)
         if self.Impacted == false and targetType ~= 'Air' then
             self.Impacted = true
+            local Random = Random 
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),Random(1.5,3))
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(Random(1,2),Random(1,3),Random(1,2))
             self:CreateChildProjectile(self.ChildProjectile):SetVelocity(0,Random(1,3),-Random(1.5,3))
@@ -892,29 +678,6 @@ CRocketProjectile = Class(SingleBeamProjectile) { -- wagner
     FxImpactProp = EffectTemplate.CMissileHit01,
     FxImpactLand = EffectTemplate.CMissileHit01,
     FxImpactUnderWater = {},
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local radius = self.DamageData.DamageRadius
-        
-        if radius == 0 then
-            local pos = self:GetPosition()
-            local FriendlyFire = false
-            
-            DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
-            DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
-            
-            self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-            
-            if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-                local rotation = RandomFloat(0,2*math.pi)
-                local army = self.Army
-                
-                CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1, 1, 70, 20, army)
-            end
-        end
-
-        SingleBeamProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 CLOATacticalMissileProjectile = Class(SingleBeamProjectile) {
@@ -1167,26 +930,6 @@ CHeavyDisintegratorPulseLaser = Class(MultiPolyTrailProjectile) { -- Brick
     FxImpactUnderWater = {},
     FxTrails = {},
     FxTrailOffset = 0,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        local pos = self:GetPosition()
-        local radius = self.DamageData.DamageRadius
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
-        DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
-        DamageArea( self, pos, 1, 1, 'Force', FriendlyFire )
-
-        self.DamageData.DamageAmount = self.DamageData.DamageAmount - 2
-        
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' and targetType ~= 'Unit' then
-            local rotation = RandomFloat(0,2*math.pi)
-            local army = self.Army
-            
-            CreateDecal(pos, rotation, 'scorch_001_albedo', '', 'Albedo', 1.5, 1.5, 70, 20, army)
-        end
-
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 

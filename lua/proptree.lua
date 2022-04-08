@@ -84,11 +84,10 @@ Tree = Class(Prop) {
             local canBurn = (not self.Burning) and (not self.NoBurn)
 
             if type == 'Disintegrate' or type == "Reclaimed" then 
-                LOG("Desintegrated!")
                 -- we just got obliterated
                 EntityDestroy(self)
 
-            elseif type == 'Force' then
+            elseif type == 'Force' or type == "TreeForce" then
                 if canFall then 
                     -- change internal state
                     self.NoBurn = true
@@ -105,7 +104,7 @@ Tree = Class(Prop) {
                     self.Burn(self)
                 end
 
-            elseif type == 'Fire' and canBurn then 
+            elseif (type == 'Fire' or type == 'TreeFire') and canBurn then 
 
                 -- fire type damage, slightly higher odds to catch fire
                 if Random(1, 35) <= 2 then
@@ -211,7 +210,7 @@ Tree = Class(Prop) {
 
             -- try and spread out the fire
             if i == 3 then
-                DamageArea(self, position, 1, 1, 'Fire', true)
+                DamageArea(self, position, 1, 1, 'TreeFire', true)
             end
         end
 
@@ -220,7 +219,7 @@ Tree = Class(Prop) {
         CreateScorchMarkSplat( self, 0.5, -1 )
 
         -- try and spread the fire
-        DamageArea(self, position, 1, 1, 'Fire', true)
+        DamageArea(self, position, 1, 1, 'TreeFire', true)
 
         -- stop all sound
         self.PlayPropAmbientSound(self, nil)

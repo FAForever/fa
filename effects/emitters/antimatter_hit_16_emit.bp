@@ -1,3 +1,4 @@
+-- used by ueb2302
 EmitterBlueprint {
     BlueprintId = 'antimatter_hit_16',
     Lifetime = 1.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = true,
-    LODCutoff = 200.00,
+    LODCutoff = 500.00,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,

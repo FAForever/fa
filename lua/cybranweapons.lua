@@ -280,7 +280,7 @@ CAAMissileNaniteWeapon = Class(DefaultProjectileWeapon) {
 }
 
 CIFGrenadeWeapon = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp',},
+    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp',},
 }
 
 CIFArtilleryWeapon = Class(DefaultProjectileWeapon) {

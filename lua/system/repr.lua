@@ -75,9 +75,9 @@ local function _repr(obj, indent, width, mindepth, objectstack)
     local keys = {}
     local r1
     if getmetatable(obj) == getmetatable {} then
-        r1 = { '{' }
+        r1 = { '{ ' .. tostring(obj) .. " " }
     else
-        r1 = { '{ <metatable=', tostring(getmetatable(obj)), '>'}
+        r1 = { '{ ' .. tostring(obj) .. ' <metatable=', tostring(getmetatable(obj)), '>'}
     end
     local r2 = { unpack(r1) }
 

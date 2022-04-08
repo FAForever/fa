@@ -4673,6 +4673,8 @@ lobui_0398="An arbitrary option has been selected for now: check the game option
 lobui_0399="The selected map does not exist."
 lobui_0700=" kicked because he does not have this mod: "
 lobui_0701="The last player is kicked because he does not have this mod: "
+lobui_0702="Team Ratings:"
+lobui_0703="Team %d: %d (%d+/-%d)"
 
 --Lobby options panel
 lobui_0400="Stretch Background"
@@ -7607,6 +7609,8 @@ lobui_0440="All"
 lobui_0441="Share unitcap with all players"
 lobui_0442="From %s"
 lobui_0443="To %s"
+lobui_0444 = "Autobalance"
+lobui_0445 = "Automatically balance players into 2 equally sized teams"
 
 lobui_0450="CPU"
 lobui_0451="Ping"

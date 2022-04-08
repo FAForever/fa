@@ -22,6 +22,7 @@ ProjectileBlueprint {
         'INDIRECTFIRE',
     },
     Display = {
+        ScorchSplatSize = 2,
         CameraFollowTimeout = 2,
         CameraFollowsProjectile = true,
         Mesh = {

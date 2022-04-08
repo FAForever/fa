@@ -160,7 +160,6 @@ defaultKeyMap = {
 debugKeyMap = {
     ['Ctrl-Alt-N']          = 'debug_nodamage',
     ['Alt-F2']              = 'debug_create_unit',
-    ['Ctrl-Alt-B']          = 'debug_blingbling',
     ['Alt-Delete']          = 'debug_destroy_units',
     ['Ctrl-F9']             = 'debug_toggle_log_window',
     ['Ctrl-Shift-C']        = 'debug_copy_units',

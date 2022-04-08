@@ -17,6 +17,9 @@ local VectorCache = Vector(0, 0, 0)
 local MathFloor = math.floor 
 local CoroutineYield = coroutine.yield 
 
+local EntityBeenDestroyed = _G.moho.entity_methods.BeenDestroyed
+local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
+
 --- Performs damage over time on a unit.
 function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, friendly)
 
@@ -29,8 +32,8 @@ function UnitDoTThread (instigator, unit, pulses, pulseTime, damage, damType, fr
     pulseTime = 10 * pulseTime + 1
 
     for i = 1, pulses do
-        if unit and not unit.Dead then
-            position[1], position[2], position[3] = unit:GetPositionXYZ()
+        if unit and not EntityBeenDestroyed(unit) then
+            position[1], position[2], position[3] = EntityGetPositionXYZ(unit)
             Damage(instigator, position, unit, damage, damType )
         else
             break
