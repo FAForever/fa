@@ -84,7 +84,7 @@ ChatArea = Class(Group) {
 
         for i = 1, table.getn(wrapLines) do
             if (i == 1 and string.len(authorName) > 0) then
-                local strText = string.sub(wrapLines[i], string.len(authorName))
+                local strText = string.sub(wrapLines[i], string.len(authorName) + 1)
                 table.insert(self.ChatLines, {
                     author = {
                         text = authorName,
