@@ -2079,7 +2079,7 @@ AircraftCarrier = Class(SeaUnit, BaseTransport) {
 }
 
 -- HOVERING LAND UNITS
-HoverLandUnit = Class(MobileUnit) {}
+HoverLandUnit = Class(MobileUnit) { }
 
 SlowHoverLandUnit = Class(HoverLandUnit) {
     OnLayerChange = function(self, new, old)
@@ -2101,7 +2101,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
 }
 
 -- AMPHIBIOUS LAND UNITS
-AmphibiousLandUnit = Class(MobileUnit) {}
+AmphibiousLandUnit = Class(MobileUnit) { }
 
 SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
     OnLayerChange = function(self, new, old)

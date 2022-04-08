@@ -189,7 +189,6 @@ Unit = Class(moho.unit_methods) {
             OnStartReclaim = {},
             OnStopReclaim = {},
             OnStopBeingBuilt = {},
-            OnHorizontalStartMove = {},
             OnCaptured = {},
             OnCapturedNewUnit = {},
             OnDamaged = {},
@@ -1808,9 +1807,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Stop any motion sounds we may have
-        self:StopUnitAmbientSound('AmbientMove')
-        self:StopUnitAmbientSound('AmbientMoveLand')
-        self:StopUnitAmbientSound('AmbientMoveWater')
+        self:StopUnitAmbientSound()
 
         -- BOOM!
         if self.PlayDestructionEffects then
@@ -3146,52 +3143,37 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
+
+        -- we can't do anything if we're dead
         if self.Dead then
             return
         end
+
         local layer = self.Layer
 
-        if old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed')) then
-            -- Try the specialised sound, fall back to the general one.
-            if not self:PlayUnitSound('StartMove' .. layer) then
+        -- play sounds / events when we start moving
+        if old == 'Stopped' then
+
+            if not self:PlayUnitSound('StartMove' .. layer) then 
                 self:PlayUnitSound('StartMove')
             end
 
-            -- Initiate the unit's ambient movement sound
-            -- Note that there is not currently an 'Air' version, and that
-            -- AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
-            if not (
-                ((layer == 'Water' or layer == 'Seabed') and self:PlayUnitAmbientSound('AmbientMoveWater')) or
-                (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) or
-                (layer == 'Land' and self:PlayUnitAmbientSound('AmbientMoveLand'))
-                )
-            then
+            if not self:PlayUnitAmbientSound('AmbientMove' .. layer) then 
                 self:PlayUnitAmbientSound('AmbientMove')
             end
-
         end
 
-        if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
-            -- Try the specialised sound, fall back to the general one.
-            if not self:PlayUnitSound('StopMove' .. layer) then
+        -- play sounds / events when we stop moving
+        if new == 'Stopping' then
+            if not self:PlayUnitSound('StopMove' .. layer) then 
                 self:PlayUnitSound('StopMove')
             end
+            self:StopUnitAmbientSound()
         end
 
-        if new == 'Stopped' or new == 'Stopping' then
-            -- Stop ambient sounds
-            self:StopUnitAmbientSound('AmbientMove')
-            self:StopUnitAmbientSound('AmbientMoveWater')
-            self:StopUnitAmbientSound('AmbientMoveSub')
-            self:StopUnitAmbientSound('AmbientMoveLand')
-        end
-
+        -- update movement effects
         if self.MovementEffectsExist then
             self:UpdateMovementEffectsOnMotionEventChange(new, old)
-        end
-
-        if old == 'Stopped' then
-            self:DoOnHorizontalStartMoveCallbacks()
         end
 
         -- update weapon capabilities
@@ -3821,14 +3803,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    AddOnHorizontalStartMoveCallback = function(self, fn)
-        self:AddUnitCallback(fn, "OnHorizontalStartMove")
-    end,
-
-    DoOnHorizontalStartMoveCallbacks = function(self)
-        self:DoUnitCallbacks("OnHorizontalStartMove")
-    end,
-
     RemoveCallback = function(self, fn)
         for k, v in self.EventCallbacks do
             if type(v) == "table" then
@@ -4373,6 +4347,17 @@ Unit = Class(moho.unit_methods) {
     OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality
+
+    AddOnHorizontalStartMoveCallback = function(self, fn)
+
+        if not DeprecatedWarnings.AddOnHorizontalStartMoveCallback then 
+            DeprecatedWarnings.AddOnHorizontalStartMoveCallback = true 
+            WARN("AddOnHorizontalStartMoveCallback is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
+    end,
 
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
