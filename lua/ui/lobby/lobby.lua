@@ -137,6 +137,8 @@ teamIcons = {
     '/lobby/team_icons/team_4_icon.dds',
     '/lobby/team_icons/team_5_icon.dds',
     '/lobby/team_icons/team_6_icon.dds',
+    '/lobby/team_icons/team_7_icon.dds',
+    '/lobby/team_icons/team_8_icon.dds',
 }
 
 DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
