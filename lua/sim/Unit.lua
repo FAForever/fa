@@ -38,6 +38,26 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 local rawget = rawget 
 local IsAlly = IsAlly
 
+-- Structures that are reused for performance reasons
+-- Maps unit.techCategory to a number so we can do math on it for naval units
+local veterancyTechLevels = {
+    TECH1 = 1,
+    TECH2 = 2,
+    TECH3 = 3,
+    COMMAND = 3,
+    SUBCOMMANDER = 4,
+    EXPERIMENTAL = 5,
+}
+
+-- Regen values by tech level and veterancy level
+local veterancyRegenBuffs = {
+    {1,  2,  3,  4,  5}, -- T1
+    {3,  6,  9,  12, 15}, -- T2
+    {6,  12, 18, 24, 30}, -- T3 / ACU
+    {9,  18, 27, 36, 45}, -- SACU
+    {25, 50, 75, 100,125}, -- Experimental
+}
+
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
@@ -45,7 +65,6 @@ local TrashEmpty = TrashBag.Empty
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateEmitterAtBone = CreateEmitterAtBone
-
 
 SyncMeta = {
     __index = function(t, key)
@@ -1379,11 +1398,14 @@ Unit = Class(moho.unit_methods) {
 
     -- Set the veteran level to the level specified
     SetVeteranLevel = function(self, level)
-        local buffs = self:CreateVeterancyBuffs(level)
-        if buffs then
-            for _, buffName in buffs do
-                Buff.ApplyBuff(self, buffName)
-            end
+        local regenBuff, hpBuff = self:CreateVeterancyBuffs(level)
+        
+        if regenBuff then
+            Buff.ApplyBuff(self, regenBuff)
+        end
+
+        if hpBuff then 
+            Buff.ApplyBuff(self, hpBuff)
         end
 
         self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
@@ -1406,31 +1428,13 @@ Unit = Class(moho.unit_methods) {
         local regenBuffName = self.UnitId .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
 
         if not Buffs[regenBuffName] then
-            -- Maps self.techCategory to a number so we can do math on it for naval units
-            local techLevels = {
-                TECH1 = 1,
-                TECH2 = 2,
-                TECH3 = 3,
-                COMMAND = 3,
-                SUBCOMMANDER = 4,
-                EXPERIMENTAL = 5,
-            }
-
-            local techLevel = techLevels[self.techCategory] or 1
+            -- Get techLevel as a number to do math on it
+            local techLevel = veterancyTechLevels[self.techCategory] or 1
 
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
                 techLevel = techLevel + 1
             end
-
-            -- Regen values by tech level and veterancy level
-            local regenBuffs = {
-                {1,  2,  3,  4,  5}, -- T1
-                {3,  6,  9,  12, 15}, -- T2
-                {6,  12, 18, 24, 30}, -- T3 / ACU
-                {9,  18, 27, 36, 45}, -- SACU
-                {25, 50, 75, 100,125}, -- Experimental
-            }
 
             BuffBlueprint {
                 Name = regenBuffName,
@@ -1440,13 +1444,13 @@ Unit = Class(moho.unit_methods) {
                 Duration = -1,
                 Affects = {
                     Regen = {
-                        Add = regenBuffs[techLevel][level],
+                        Add = veterancyRegenBuffs[techLevel][level],
                     },
                 },
             }
         end
 
-        return {regenBuffName, healthBuffName}
+        return regenBuffName, healthBuffName
     end,
 
     -- Returns true if a unit can gain veterancy (Has a weapon)
