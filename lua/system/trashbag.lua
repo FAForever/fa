@@ -16,8 +16,15 @@
 -- local TrashBag = TrashBag
 -- local TrashAdd = TrashBag.Add
 -- local TrashDestroy = TrashBag.Destroy
+-- local TrashEmpty = TrashBag.Empty
 
 -- END COPY HERE --
+
+-- This threshold is chosen to prevent the construction of effects to trigger the check, 
+-- looking over at /lua/EffectTemplate.lua there can be up to nine emitters (oblivion_cannon_hit_08_emit)
+-- for a given effect.
+
+local TableGetn = table.getn 
 
 TrashBag = Class {
 
@@ -27,8 +34,9 @@ TrashBag = Class {
     -- http://lua-users.org/wiki/WeakTablesTutorial
     __mode = 'v',
 
-    -- Keep track of the number of elements in the trash bag
-    Next = 1,
+    -- Signifies the largest index used by this trashbag,  
+    -- used during cleaning to ensure we destroy all values
+    LargestIndex = 0,
 
     --- Add an entity to the trash bag.
     Add = function(self, entity)
@@ -45,12 +53,12 @@ TrashBag = Class {
         --     return 
         -- end
 
-        -- Keeping track of separate counter for performance (table-loops benchmark). The 
-        -- counter is updated _after_ the table has been set, this is faster because the table
-        -- operation depends on the counter value and doesn't have to wait for it in this case.
+        local index = TableGetn(self) + 1
+        self[index] = entity
 
-        self[self.Next] = entity
-        self.Next = self.Next + 1
+        if index > self.LargestIndex then 
+            self.LargestIndex = index 
+        end
     end,
 
     --- Destroy all (remaining) entities in the trash bag.
@@ -62,15 +70,19 @@ TrashBag = Class {
         --     return 
         -- end
 
-        -- Check if values are still relevant
-        for k = 1, self.Next - 1 do 
+        -- Remove any value still in the trashbag
+        for k = 1, self.LargestIndex do 
             if self[k] then 
                 self[k]:Destroy()
                 self[k] = nil
             end
         end 
 
-        -- allow us to be re-used, useful for effects
-        self.Next = 1
+        self.LargestIndex = 0
+    end,
+    
+    -- Check if the trashbag is empty. True if empty, false otherwise
+    Empty = function(self)
+        return TableGetn(self) == 0
     end
 }

@@ -1439,10 +1439,7 @@ MobileUnit = Class(Unit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         Unit.StartBeingBuiltEffects(self, builder, layer)
-        local bp = self:GetBlueprint()
-        local FactionName = bp.General.FactionName
-
-        if FactionName == 'UEF' then
+        if self.factionCategory == 'UEF' then
             EffectUtil.CreateUEFUnitBeingBuiltEffects(self, builder, self.OnBeingBuiltEffectsBag)
         end
     end,

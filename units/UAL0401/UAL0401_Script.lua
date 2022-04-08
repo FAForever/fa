@@ -42,8 +42,8 @@ UAL0401 = Class(AWalkingLandUnit) {
 
         while not self.Dead do 
 
-            -- only perform this logic if the unit is complete
-            if self:GetFractionComplete() > 0.99 then 
+            -- only perform this logic if the unit is on the move
+            if self:IsUnitState("Moving") then 
 
                 -- compute the direction of the heading
                 local sx, sy, sz = self:GetPositionXYZ()

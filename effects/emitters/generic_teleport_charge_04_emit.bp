@@ -10,7 +10,7 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = 500.00,
+    LODCutoff = 800, -- teleport effect
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,

@@ -131,7 +131,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             local fxBeam
             local bp = self.FxBeam[Random(1, table.getn(self.FxBeam))]
             if self.TargetEntity then
-                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, 0, self.Army, bp)
+                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, -2, self.Army, bp)
             else
                 fxBeam = CreateBeamEmitter(bp, self.Army)
                 AttachBeamToEntity(fxBeam, self, 0, self.Army)

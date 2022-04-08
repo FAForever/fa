@@ -6,7 +6,7 @@ GameColors = {
 
     -- Default color order used for lobbies/TMM if not otherwise specified. Tightly coupled 
     -- with the ArmyColors and the PlayerColors tables.
-    DefaultColorOrder = {2, 12, 1, 9, 6, 13, 25, 17, 23, 11, 3, 16, 24, 18, 19, 14},
+    DefaultColorOrder = {2, 11, 1, 8, 5, 12, 22, 15, 20, 10, 3, 14, 21, 7, 16, 13},
 
     -- Faction colours
     ArmyColors = {
@@ -14,7 +14,6 @@ GameColors = {
         "ff436eee",      -- new blue1
         "ff1a9ba2",      -- dark cyan
         "ff6fa8dc",      -- sky blue
-        "ff8e7cc3",      -- light purple
         "ff9161ff",      -- purple
         "FF5F01A7",      -- dark purple
         "ff920092",      -- rich purple
@@ -25,12 +24,10 @@ GameColors = {
         "FFFF873E",      -- Nomads orange
         "ffb76518",      -- new brown
         "ffa79602",      -- Sera golden
-        "FFD8B038",      -- golden brown
         "fffafa00",      -- new yellow
         "ffffffff",      -- white
         "ff616d7e",      -- grey
         "FF2F4F4F",      -- olive (dark green)
-        "ff1c6404",      -- dark green
         "ff2e8b57",      -- new green
         "ff40bf40",      -- mid green
         "ff9fd802",      -- Order Green
@@ -42,7 +39,6 @@ GameColors = {
         "ff436eee",      -- new blue1
         "ff1a9ba2",      -- dark cyan
         "ff6fa8dc",      -- sky blue
-        "ff8e7cc3",      -- light purple
         "ff9161ff",      -- purple
         "FF5F01A7",      -- dark purple
         "ff920092",      -- rich purple
@@ -53,12 +49,10 @@ GameColors = {
         "FFFF873E",      -- Nomads orange
         "ffb76518",      -- new brown
         "ffa79602",      -- Sera golden
-        "FFD8B038",      -- golden brown
         "fffafa00",      -- new yellow
         "ffffffff",      -- white
         "ff616d7e",      -- grey
         "FF2F4F4F",      -- olive (dark green)
-        "ff1c6404",      -- dark green
         "ff2e8b57",      -- new green
         "ff40bf40",      -- mid green
         "ff9fd802",      -- Order Green

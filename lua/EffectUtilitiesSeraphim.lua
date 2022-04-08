@@ -1,9 +1,8 @@
-
 -- imports for functionality
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 -- globals as upvalues for performance
-local WaitTicks = coroutine.yield
+local CoroutineYield = coroutine.yield
 
 local EntityCategoryContains = EntityCategoryContains
 local CreateSlider = CreateSlider
@@ -13,11 +12,14 @@ local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
 
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
-local SliderSetGoal = moho.SlideManipulator.SetGoal 
+local SliderSetGoal = moho.SlideManipulator.SetGoal
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
+local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
+local EmitterSetEmitterParam = moho.IEffect.SetEmitterParam
 
 -- upvalue math functions for performance
 local MathMax = math.max
+local TableGetn = table.getn 
 
 -- upvalued trashbag functions for performance
 local TrashBag = _G.TrashBag
@@ -37,8 +39,6 @@ local BuildEffectsEmitters = {
     '/effects/emitters/seraphim_being_built_ambient_05_emit.bp',
 }
 
-local CategoriesHover = categories.HOVER
-
 --- Creates the seraphim factory building beam effects.
 -- @param builder The factory that is building the unit.
 -- @param unitBeingBuilt the unit that is being built by the factory.
@@ -47,8 +47,8 @@ local CategoriesHover = categories.HOVER
 function CreateSeraphimUnitEngineerBuildingEffects(builder, unitBeingBuilt, effectBones, effectsBag)
 
     -- do not create beams if things turn out to be destroyed
-    if builder.Dead or unitBeingBuilt.Dead then 
-        return 
+    if builder.Dead or unitBeingBuilt.Dead then
+        return
     end
 
     local army = builder.Army
@@ -76,7 +76,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     -- do not apply offsets for subs and air units
     local offset = 0
-    if EntityCategoryContains(CategoriesHover, unitBeingBuilt) then 
+    if unitBeingBuilt.Cache.HashedCats["HOVER"] then
         offset = unitBeingBuilt.Elevation or 0
     end
 
@@ -95,7 +95,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
     local slider = unitBeingBuilt.ConstructionSlider
     local initialised = unitBeingBuilt.ConstructionInitialised
 
-    if not initialised then 
+    if not initialised then
 
         unitBeingBuilt.ConstructionInitialised = true
 
@@ -104,7 +104,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         local unitBeingBuiltTrash = unitBeingBuilt.Trash
         local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
-        for k, bp in BuildEffectsEmitters do 
+        for k, bp in BuildEffectsEmitters do
             effect = CreateAttachedEmitter(unitBeingBuilt, -1, army, bp)
             TrashBagAdd(unitBeingBuiltTrash, effect)
             TrashBagAdd(unitOnStopBeingBuiltTrash, effect)
@@ -125,13 +125,15 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         WaitFor(slider)
     end
 
+    -- localize for optimal access
+    local UnitGetFractionComplete = UnitGetFractionComplete
+    local completed = UnitGetFractionComplete(unitBeingBuilt)
     -- # Gradually move the unit to the plateau
-
-    while not unitBeingBuilt.Dead do
-        completed = UnitGetFractionComplete(unitBeingBuilt)
+    while not unitBeingBuilt.Dead and completed < 1.0 do
         SliderSetGoal(slider, 0, (1 - completed) * sy + offset, 0)
         SliderSetSpeed(slider, completed * completed * completed)
-        WaitTicks(2)
+        completed = UnitGetFractionComplete(unitBeingBuilt)
+        CoroutineYield(2)
     end
 
     -- # Nillify temporary tables
@@ -148,30 +150,40 @@ end
 function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFactor)
 
     -- # initialize various info used throughout the function
-
-    local effect = false
     local army = builder.Army
 
-    -- # Create generic effects
+    -- optimize local access
+    local EmitterScaleEmitter = EmitterScaleEmitter
+    local UnitGetFractionComplete = UnitGetFractionComplete
 
+    -- # Create generic effects
     local effect = false
 
     -- matches with number of effects being made, pre-allocates the table
     local emitters = { false, false, false, false, false }
     local emittersHead = 1
 
+    -- determine a sane LOD cutoff for the size of the unit
+    local lods = unitBeingBuilt.Blueprint.Display.Mesh.LODs
+    local count = TableGetn(lods)
+    local LODCutoff = 0.9 * lods[count].LODCutoff or (90 * MathMax(unitBeingBuilt.BuildExtentsX, unitBeingBuilt.BuildExtentsZ))
+
+    -- smaller inner, dark-purple effect
     for _, vEffect in BuildEffectsEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
-        effect:ScaleEmitter(scaleFactor)
+        EmitterScaleEmitter(effect,scaleFactor)
+        EmitterSetEmitterParam(effect, "LODCUTOFF", lods[1].LODCutoff)
 
         TrashBagAdd(effectsBag, effect)
         emitters[emittersHead] = effect
         emittersHead = emittersHead + 1
     end
 
+    -- large outer radius effect
     for _, vEffect in BuildEffectBaseEmitters do
         effect = CreateAttachedEmitter(unitBeingBuilt, -1, builder.Army, vEffect)
-        effect:ScaleEmitter(scaleFactor)
+        EmitterScaleEmitter(effect,scaleFactor)
+        EmitterSetEmitterParam(effect, "LODCUTOFF", LODCutoff)
 
         TrashBagAdd(effectsBag, effect)
         emitters[emittersHead] = effect
@@ -186,11 +198,11 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     while not unitBeingBuilt.Dead and complete < 1.0 do
 
         for k = 1, emittersHead - 1 do
-            emitters[k]:ScaleEmitter(scaleFactor + (unitScaleMetric * complete))
+            EmitterScaleEmitter(emitters[k], 1 + scaleFactor * (unitScaleMetric * complete))
         end
 
         complete = UnitGetFractionComplete(unitBeingBuilt)
-        WaitTicks(4)
+        CoroutineYield(4)
     end
 
     -- # Poof - we're finished and clean up
@@ -211,6 +223,7 @@ end
 -- @param unitBeingBuilt the unit that is being built by the factory.
 -- @param builder The factory that is building the unit.
 -- @param effectsBag The trashbag for effects.
-function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, effectsBag)
-    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, 1.5)
+function CreateSeraphimExperimentalBuildBaseThread(unitBeingBuilt, builder, effectsBag, scale)
+    scale = scale or 1
+    CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scale)
 end
