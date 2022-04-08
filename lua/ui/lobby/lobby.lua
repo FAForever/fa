@@ -139,6 +139,18 @@ teamIcons = {
     '/lobby/team_icons/team_6_icon.dds',
 }
 
+partyIcons = {
+    '/lobby/party_icons/party_no_icon.dds',
+    '/lobby/party_icons/party_A_icon.dds',
+    '/lobby/party_icons/party_B_icon.dds',
+    '/lobby/party_icons/party_C_icon.dds',
+    '/lobby/party_icons/party_D_icon.dds',
+    '/lobby/party_icons/party_E_icon.dds',
+    '/lobby/party_icons/party_F_icon.dds',
+    '/lobby/party_icons/party_G_icon.dds',
+    '/lobby/party_icons/party_H_icon.dds',
+}
+
 DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
 local HideDefaultOptions = Prefs.GetFromCurrentProfile('LobbyHideDefaultOptions') == 'true'
 
@@ -2871,7 +2883,7 @@ function CreateSlotsUI(makeLabel)
         teamSelector.OnEvent = defaultHandler
 
         -- Party
-        local partySelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local partySelector = BitmapCombo(newSlot, partyIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.party = partySelector
         newSlot:AddChild(partySelector)
         LayoutHelpers.SetWidth(partySelector, COLUMN_WIDTHS[9])
