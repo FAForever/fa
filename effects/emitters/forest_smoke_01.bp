@@ -1,3 +1,4 @@
+-- used by trees
 EmitterBlueprint {
 	BlueprintId = 'forest_fire_smoke_01',
 	Lifetime = -1,
@@ -10,7 +11,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 340.00,
+	LODCutoff = 300.00,
 	EmitIfVisible = true,
 	CatchupEmit = false,
 	CreateIfVisible = false,

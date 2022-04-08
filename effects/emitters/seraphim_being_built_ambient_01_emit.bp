@@ -10,9 +10,9 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = true,
-	LODCutoff = 100.00,
+	LODCutoff = 100.00,  -- set by script to match unit size
 	EmitIfVisible = true,
-	CatchupEmit = false,
+	CatchupEmit = true,
 	CreateIfVisible = false,
 	SnapToWaterline = false,
 	OnlyEmitOnWater = false,
