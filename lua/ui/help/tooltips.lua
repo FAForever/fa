@@ -793,6 +793,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0184>Bloom Render",
         description = "<LOC OPTIONS_0185>Toggles a glow type effect that is used on many weapon effects and some UI elements (off = fastest)",
     },
+    options_experimental_graphics = {
+        title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
+        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'. \r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support. \r\n\r\nThis feature may be unstable - use at your own risk.",
+    },
     options_use_mydocuments = {
         title = "<LOC OPTIONS_0186>Save Games and Replays in My Documents",
         description = "<LOC OPTIONS_0187>When on, changes the location where save games and replays get stored (My Documents\\My Games\\Supreme Commander Forged Alliance\\). Note that you will only see save games and replays in the active directory. Also, files saved to the alternate location will not be removed when the game is uninstalled.",
