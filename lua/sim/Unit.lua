@@ -4316,6 +4316,17 @@ Unit = Class(moho.unit_methods) {
 
     --- Deprecated functionality
 
+    AddOnHorizontalStartMoveCallback = function(self, fn)
+
+        if not DeprecatedWarnings.AddOnHorizontalStartMoveCallback then 
+            DeprecatedWarnings.AddOnHorizontalStartMoveCallback = true 
+            WARN("AddOnHorizontalStartMoveCallback is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
+    end,
+
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
         if not DeprecatedWarnings.OnCollisionCheckWeapon then 
