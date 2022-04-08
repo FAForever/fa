@@ -80,6 +80,8 @@ end
 -- @param bps All available blueprints
 function CalculateLODs(bps)
     CalculateLODsOfProps(bps.Prop)
-    CalculateLODsOfEmitters(bps.Emitter)
-    CalculateLODsOfEmitters(bps.TrailEmitter)
+
+    -- no longer required as of #3720
+    -- CalculateLODsOfEmitters(bps.Emitter)
+    -- CalculateLODsOfEmitters(bps.TrailEmitter)
 end
