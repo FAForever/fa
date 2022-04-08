@@ -14,8 +14,8 @@ ADFReactonCannon01 = Class(AReactonCannonProjectile) {
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local launcher = self:GetLauncher()
         if launcher and launcher:HasEnhancement('StabilitySuppressant') then
-            CreateLightParticle(self, -1, army, 3.0, 6, 'ring_05', 'ramp_green_02')
-            CreateEmitterAtEntity(self,army,'/effects/emitters/oblivion_cannon_hit_11_emit.bp')
+            CreateLightParticle(self, -1, self.Army, 3.0, 6, 'ring_05', 'ramp_green_02')
+            CreateEmitterAtEntity(self, self.Army,'/effects/emitters/oblivion_cannon_hit_11_emit.bp')
         end
         AReactonCannonProjectile.CreateImpactEffects(self, army, EffectTable, EffectScale)
     end,

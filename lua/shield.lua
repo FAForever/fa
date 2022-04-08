@@ -422,10 +422,16 @@ Shield = Class(moho.shield_methods, Entity) {
         return finalVal
     end,
 
-    OnDamage = function(self, instigator, amount, vector, dmgType)
+    OnDamage = function(self, instigator, amount, vector, damageType)
+
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
         -- Only called when a shield is directly impacted, so not for Personal Shields
         -- This means personal shields never have ApplyDamage called with doOverspill as true
-        self:ApplyDamage(instigator, amount, vector, dmgType, true)
+        self:ApplyDamage(instigator, amount, vector, damageType, true)
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)

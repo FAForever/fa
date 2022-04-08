@@ -38,6 +38,15 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 local rawget = rawget 
 local IsAlly = IsAlly
 
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+local TrashEmpty = TrashBag.Empty
+
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
+
+
 SyncMeta = {
     __index = function(t, key)
         local id = rawget(t, 'id')
@@ -65,9 +74,8 @@ SyncMeta = {
     end,
 }
 
-local function PopulateBlueprintCache(entity)
-
-    local blueprint = entity:GetBlueprint()
+local SharedTypeCache = { }
+local function PopulateBlueprintCache(entity, blueprint)
 
     -- populate the cache
     local cache = { }
@@ -84,10 +92,7 @@ local function PopulateBlueprintCache(entity)
     cache.Audio = blueprint.Audio
   
     -- store the result
-    local meta = getmetatable(entity)
-    meta.Cache = cache
-
-    SPEW("Populated blueprint cache for unit: " .. tostring(blueprint.BlueprintId))
+    SharedTypeCache[blueprint.BlueprintId] = cache 
 end
 
 Unit = Class(moho.unit_methods) {
@@ -189,18 +194,20 @@ Unit = Class(moho.unit_methods) {
     OnCreate = function(self)
         Entity.OnCreate(self)   
 
+        local blueprint = self:GetBlueprint()
+
         -- populate blueprint cache if we haven't done that yet
-        if not self.Cache then 
-            PopulateBlueprintCache(self)
+        if not SharedTypeCache[blueprint.BlueprintId] then 
+            PopulateBlueprintCache(self, blueprint)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = self.Cache
+        self.Cache = SharedTypeCache[blueprint.BlueprintId]
 
         -- cache often accessed values into inner table
         self.UnitId = self:GetUnitId()
         self.Brain = self:GetAIBrain()
-        self.Blueprint = self.Cache.Blueprint
+        self.Blueprint = blueprint
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
         self.Audio = self.Cache.Audio
 
@@ -252,11 +259,11 @@ Unit = Class(moho.unit_methods) {
         }
 
         -- Set up effect emitter bags
-        self.MovementEffectsBag = {}
-        self.IdleEffectsBag = {}
-        self.TopSpeedEffectsBag = {}
-        self.BeamExhaustEffectsBag = {}
-        self.TransportBeamEffectsBag = {}
+        self.MovementEffectsBag = TrashBag()
+        self.IdleEffectsBag = TrashBag()
+        self.TopSpeedEffectsBag = TrashBag()
+        self.BeamExhaustEffectsBag = TrashBag()
+        self.TransportBeamEffectsBag = TrashBag()
         self.BuildEffectsBag = TrashBag()
         self.ReclaimEffectsBag = TrashBag()
         self.OnBeingBuiltEffectsBag = TrashBag()
@@ -278,8 +285,8 @@ Unit = Class(moho.unit_methods) {
 
         -- Store build information for performance
         self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
-        self.BuildExtentsY = bp.Physics.MeshExtentsY or bp.Footprint.SizeY
         self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
+        self.BuildExtentsY = bp.Physics.MeshExtentsY or math.max(self.BuildExtentsX, self.BuildExtentsZ)
         self.Elevation = bp.Physics.Elevation
         self.MeshBlueprint = bp.Display.MeshBlueprint
         self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
@@ -376,14 +383,20 @@ Unit = Class(moho.unit_methods) {
         local size = self.Size
         local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
         local heading = self:GetHeading()
+
         sx = sx * scalar
         sy = sy * scalar
         sz = sz * scalar
+
         local rx = Random() * sx - (sx * 0.5)
         local y  = Random() * sy + (self.CollisionOffsetY or 0)
         local rz = Random() * sz - (sz * 0.5)
-        local x = math.cos(heading) * rx - math.sin(heading) * rz
-        local z = math.sin(heading) * rx - math.cos(heading) * rz
+
+        local cosh = math.cos(heading)
+        local sinh = math.sin(heading)
+
+        local x = cosh * rx - sinh * rz
+        local z = sinh * rx + cosh * rz
 
         return x, y, z
     end,
@@ -1031,16 +1044,20 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if damageType ~= "KnockTree" then 
-            if self.CanTakeDamage then
-                self:DoOnDamagedCallbacks(instigator)
 
-                -- Pass damage to an active personal shield, as personal shields no longer have collisions
-                if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
-                    self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
-                else
-                    self:DoTakeDamage(instigator, amount, vector, damageType)
-                end
+        -- only applies to trees
+        if damageType == "TreeForce" or damageType == "TreeFire" then 
+            return 
+        end
+
+        if self.CanTakeDamage then
+            self:DoOnDamagedCallbacks(instigator)
+
+            -- Pass damage to an active personal shield, as personal shields no longer have collisions
+            if self:GetShieldType() == 'Personal' and self:ShieldIsOn() and not self.MyShield.Charging then
+                self.MyShield:ApplyDamage(instigator, amount, vector, damageType)
+            else
+                self:DoTakeDamage(instigator, amount, vector, damageType)
             end
         end
     end,
@@ -1508,6 +1525,24 @@ Unit = Class(moho.unit_methods) {
         return true 
     end,
 
+    --- Called when a unit collides with a collision beam to check if the collision is valid
+    -- @param self The unit we're checking the collision for
+    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+
+       -- bail out immediately
+        if self.DisallowCollisions then
+            return false
+        end
+
+        -- if we're allied, check if we allow allied collisions
+        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+            return firingWeapon.Blueprint.CollideFriendly
+        end
+
+        return true
+    end,
+
     ChooseAnimBlock = function(self, bp)
         local totWeight = 0
         for _, v in bp do
@@ -1901,21 +1936,12 @@ Unit = Class(moho.unit_methods) {
                 v:Destroy()
             end
         end
-        for _, v in self.IdleEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TopSpeedEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.BeamExhaustEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.MovementEffectsBag or {} do
-            v:Destroy()
-        end
-        for _, v in self.TransportBeamEffectsBag or {} do
-            v:Destroy()
-        end
+        
+        TrashDestroy(self.MovementEffectsBag)
+        TrashDestroy(self.IdleEffectsBag)
+        TrashDestroy(self.TopSpeedEffectsBag)
+        TrashDestroy(self.BeamExhaustEffectsBag)
+        TrashDestroy(self.TransportBeamEffectsBag)
 
         -- destroy remaining trash of weapon
         for k = 1, self.WeaponCount do 
@@ -2189,7 +2215,7 @@ Unit = Class(moho.unit_methods) {
         self:DoUnitCallbacks('OnStopBeingBuilt')
 
         -- Create any idle effects on unit
-        if table.empty(self.IdleEffectsBag) then
+        if TrashEmpty(self.IdleEffectsBag) then
             self:CreateIdleEffects()
         end
 
@@ -3376,7 +3402,7 @@ Unit = Class(moho.unit_methods) {
         return TerrainType[FxType][layer][type] or {}
     end,
 
-    CreateTerrainTypeEffects = function(self, effectTypeGroups, FxBlockType, FxBlockKey, TypeSuffix, EffectBag, TerrainType)
+    CreateTerrainTypeEffects = function(self, effectTypeGroups, FxBlockType, FxBlockKey, TypeSuffix, EffectsBag, TerrainType)
         local pos = self:GetPosition()
         local effects = {}
         local emit
@@ -3397,8 +3423,8 @@ Unit = Class(moho.unit_methods) {
                         if vTypeGroup.Offset then
                             emit:OffsetEmitter(vTypeGroup.Offset[1] or 0, vTypeGroup.Offset[2] or 0, vTypeGroup.Offset[3] or 0)
                         end
-                        if EffectBag then
-                            table.insert(EffectBag, emit)
+                        if EffectsBag then
+                            TrashAdd(EffectsBag, emit)
                         end
                     end
                 end
@@ -3462,7 +3488,8 @@ Unit = Class(moho.unit_methods) {
     end,
 
     DestroyMovementEffects = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'MovementEffectsBag')
+        -- Destroy the stored movement effects
+        TrashDestroy(self.MovementEffectsBag)
 
         -- Clean up any camera shake going on.
         local bpTable = self.Blueprint.Display.MovementEffects
@@ -3490,11 +3517,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     DestroyTopSpeedEffects = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'TopSpeedEffectsBag')
+        TrashDestroy(self.TopSpeedEffectsBag)
     end,
 
     DestroyIdleEffects = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'IdleEffectsBag')
+        TrashDestroy(self.IdleEffectsBag)
     end,
 
     UpdateBeamExhaust = function(self, motionState)
@@ -3508,7 +3535,7 @@ Unit = Class(moho.unit_methods) {
             if self.BeamExhaustCruise  then
                 self:DestroyBeamExhaust()
             end
-            if self.BeamExhaustIdle and table.empty(self.BeamExhaustEffectsBag) and beamExhaust.Idle ~= false then
+            if self.BeamExhaustIdle and TrashEmpty(self.BeamExhaustEffectsBag) and beamExhaust.Idle ~= false then
                 self:CreateBeamExhaust(beamExhaust, self.BeamExhaustIdle)
             end
         elseif motionState == 'Cruise' then
@@ -3532,12 +3559,12 @@ Unit = Class(moho.unit_methods) {
             return false
         end
         for kb, vb in effectBones do
-            table.insert(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, self.Army, beamBP))
+            TrashAdd(self.BeamExhaustEffectsBag, CreateBeamEmitterOnEntity(self, vb, self.Army, beamBP))
         end
     end,
 
     DestroyBeamExhaust = function(self)
-        EffectUtilities.CleanupEffectBag(self, 'BeamExhaustEffectsBag')
+        TrashDestroy(self.BeamExhaustEffectsBag)
     end,
 
     CreateContrails = function(self, tableData)
@@ -3549,7 +3576,7 @@ Unit = Class(moho.unit_methods) {
         local ZOffset = tableData.ZOffset or 0.0
         for ke, ve in self.ContrailEffects do
             for kb, vb in effectBones do
-                table.insert(self.TopSpeedEffectsBag, CreateTrail(self, vb, self.Army, ve):SetEmitterParam('POSITION_Z', ZOffset))
+                TrashAdd(self.TopSpeedEffectsBag, CreateTrail(self, vb, self.Army, ve):SetEmitterParam('POSITION_Z', ZOffset))
             end
         end
     end,
@@ -4023,18 +4050,17 @@ Unit = Class(moho.unit_methods) {
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
 
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
-        table.insert(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
-        table.insert(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
+        TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(self, -1, transport, bone, self.Army, EffectTemplate.TTransportBeam01))
+        TrashAdd(self.TransportBeamEffectsBag, AttachBeamEntityToEntity(transport, bone, self, -1, self.Army, EffectTemplate.TTransportBeam02))
+        TrashAdd(self.TransportBeamEffectsBag, CreateEmitterAtBone(transport, bone, self.Army, EffectTemplate.TTransportGlow01))
+
         self:TransportAnimation()
     end,
 
     OnStopTransportBeamUp = function(self)
         self:DestroyIdleEffects()
         self:DestroyMovementEffects()
-        for k, v in self.TransportBeamEffectsBag do
-            v:Destroy()
-        end
+        TrashDestroy(self.TransportBeamEffectsBag)
 
         -- Reset weapons to ensure torso centres and unit survives drop
         for i = 1, self.WeaponCount do
@@ -4344,18 +4370,6 @@ Unit = Class(moho.unit_methods) {
 
     --- Deprecated functionality
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-
-        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
-            DeprecatedWarnings.OnCollisionCheckWeapon = true 
-            WARN("OnCollisionCheckWeapon is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
-
-        return true
-    end,
-
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StartRocking = function(self)
@@ -4500,6 +4514,7 @@ Unit = Class(moho.unit_methods) {
             WARN("Source: " .. repr(debug.getinfo(2)))
             WARN("Stacktrace:" .. repr(debug.traceback()))
         end
+
         return self.Dead
     end,
 
@@ -4609,13 +4624,15 @@ DummyUnit = Class(moho.unit_methods) {
 
     OnCreate = function(self) 
 
+        local blueprint = self:GetBlueprint()
+        
         -- populate blueprint cache if we haven't done that yet
-        if not self.Cache then 
-            PopulateBlueprintCache(self)
+        if not SharedTypeCache[blueprint.BlueprintId] then 
+            PopulateBlueprintCache(self, blueprint)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = self.Cache
+        self.Cache = SharedTypeCache[blueprint.BlueprintId]
 
         -- cache unique values into inner table
         self.EntityId = EntityGetEntityId(self)
@@ -4624,7 +4641,7 @@ DummyUnit = Class(moho.unit_methods) {
 
         -- cache often accessed values into inner table
         self.UnitId = UnitGetUnitId(self)
-        self.Blueprint = self.Cache.Blueprint
+        self.Blueprint = blueprint
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
 
         -- basic check if this insignificant unit is truely insignificant
@@ -4640,4 +4657,3 @@ DummyUnit = Class(moho.unit_methods) {
     CheckAssistFocus = function(self) end,
     UpdateAssistersConsumption = function (self) end,
 }
-
