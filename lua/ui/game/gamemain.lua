@@ -170,10 +170,13 @@ function CreateUI(isReplay)
         LOG("Experimental graphics enabled, use at your own risk: ")
 
         if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
+            -- allow meshes and effects to be seen from further away
             ConExecute("cam_SetLOD WorldCamera 0.6")
         end
 
         if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+
+            -- improve shadow LOD and resolution
             ConExecute("ren_ShadowLOD 1024")
             ConExecute("ren_ShadowSize 2048")
         end
@@ -182,8 +185,6 @@ function CreateUI(isReplay)
     -- keep track of the original focus army
     import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
     OriginalFocusArmy = GetFocusArmy()
-
-
 
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
