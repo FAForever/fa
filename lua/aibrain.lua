@@ -576,11 +576,11 @@ AIBrain = Class(moho.aibrain_methods) {
                         if units and not table.empty(units) then
                             local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
 
-                            -- happens when we, for example, try and gift an unfinished storage
+                            -- only show message when we actually gift that player some units
                             if givenUnitCount > 0 then 
                                 Sync.ArmyTransfer = { { from = selfIndex, to = brain.index, reason = "fullshare" } }
                             end
-                            
+
                             WaitSeconds(1)
                         end
                     end
