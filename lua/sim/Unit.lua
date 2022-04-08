@@ -165,7 +165,6 @@ Unit = Class(moho.unit_methods) {
             OnStartReclaim = {},
             OnStopReclaim = {},
             OnStopBeingBuilt = {},
-            OnHorizontalStartMove = {},
             OnCaptured = {},
             OnCapturedNewUnit = {},
             OnDamaged = {},
@@ -3130,13 +3129,13 @@ Unit = Class(moho.unit_methods) {
             if not self:PlayUnitAmbientSound('AmbientMove' .. layer) then 
                 self:PlayUnitAmbientSound('AmbientMove')
             end
-
-            self:DoOnHorizontalStartMoveCallbacks()
         end
 
         -- play sounds / events when we stop moving
         if new == 'Stopping' then
-            self:PlayUnitSound('StopMove')
+            if not self:PlayUnitSound('StopMove' .. layer) then 
+                self:PlayUnitSound('StopMove')
+            end
             self:StopUnitAmbientSound()
         end
 
@@ -3769,14 +3768,6 @@ Unit = Class(moho.unit_methods) {
                 v.cb(self, unit)
             end
         end
-    end,
-
-    AddOnHorizontalStartMoveCallback = function(self, fn)
-        self:AddUnitCallback(fn, "OnHorizontalStartMove")
-    end,
-
-    DoOnHorizontalStartMoveCallbacks = function(self)
-        self:DoUnitCallbacks("OnHorizontalStartMove")
     end,
 
     RemoveCallback = function(self, fn)
