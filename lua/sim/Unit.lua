@@ -1766,9 +1766,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Stop any motion sounds we may have
-        self:StopUnitAmbientSound('AmbientMove')
-        self:StopUnitAmbientSound('AmbientMoveLand')
-        self:StopUnitAmbientSound('AmbientMoveWater')
+        self:StopUnitAmbientSound()
 
         -- BOOM!
         if self.PlayDestructionEffects then
@@ -3119,9 +3117,11 @@ Unit = Class(moho.unit_methods) {
             return
         end
 
+        local layer = self.Layer
+
         -- play sounds / events when we start moving
         if old == 'Stopped' then
-            local layer = self.Layer
+
             if not self:PlayUnitSound('StartMove' .. layer) then 
                 self:PlayUnitSound('StartMove')
             end
