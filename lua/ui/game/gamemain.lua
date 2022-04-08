@@ -163,6 +163,22 @@ function CreateUI(isReplay)
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')  
 
+    -- enable experimental graphics
+    if      Prefs.GetFromCurrentProfile('options.fidelity') == 2 
+        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
+
+        LOG("Experimental graphics enabled, use at your own risk: ")
+
+        if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
+            ConExecute("cam_SetLOD WorldCamera 0.6")
+        end
+
+        if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+            ConExecute("ren_ShadowLOD 1024")
+            ConExecute("ren_ShadowSize 2048")
+        end
+    end
+
     -- keep track of the original focus army
     import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
     OriginalFocusArmy = GetFocusArmy()
