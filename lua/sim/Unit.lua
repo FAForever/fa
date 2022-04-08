@@ -1398,11 +1398,14 @@ Unit = Class(moho.unit_methods) {
 
     -- Set the veteran level to the level specified
     SetVeteranLevel = function(self, level)
-        local buffs = self:CreateVeterancyBuffs(level)
-        if buffs then
-            for _, buffName in buffs do
-                Buff.ApplyBuff(self, buffName)
-            end
+        local regenBuff, hpBuff = self:CreateVeterancyBuffs(level)
+        
+        if regenBuff then
+            Buff.ApplyBuff(self, regenBuff)
+        end
+
+        if hpBuff then 
+            Buff.ApplyBuff(self, hpBuff)
         end
 
         self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
@@ -1447,7 +1450,7 @@ Unit = Class(moho.unit_methods) {
             }
         end
 
-        return {regenBuffName, healthBuffName}
+        return regenBuffName, healthBuffName
     end,
 
     -- Returns true if a unit can gain veterancy (Has a weapon)
