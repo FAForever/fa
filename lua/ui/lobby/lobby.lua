@@ -3827,11 +3827,15 @@ function CreateUI(maxPlayers)
         GUI.PenguinAutoBalance:Hide()
     else
         -- What this does: it balances all occupied slots into two teams with equal numbers of
-        -- players.  If half of the occupied slots are set to team 1 and half to team 2, then
-        -- it balances the players while keeping the team-slot matches.  If the teams are not
-        -- set that way, they are changed automatically to be alternating team 1 and team 2.
+        -- players.  If teams are set manually and half of the occupied slots are set to team 1
+        -- and half to team 2, then it balances the players while keeping the team-slot matches.
+        -- If the teams are set manually, but there is an uneven number of players on teams 1
+        -- and 2, then players' teams are changed automatically to be alternating team 1 and team 2.
         -- If there are an odd number of occupied slots, the last one is set to team - (no team)
-        -- and the others are balanced without it.
+        -- and the others are balanced without it.  Alternatively, if teams are not set manually,
+        -- players will be balanced into the slowest available slot numbers on their teams.
+        -- If there is an odd number of players in that case, the last player will be made an
+        -- observer if human or removed if AI.
 
         -- How it balances: this function checks every possible balance combination for making 
         -- the two teams (while keeping their player counts equal to half the number of occupied
@@ -3862,6 +3866,8 @@ function CreateUI(maxPlayers)
             local goalValue = {0, 0, 99999}
 
             local playerCount = 0
+            -- a table of the highest occupied slot's slot number, that slot's player's order number
+            -- in the playerRatings table, and a booleon of whether or not that player is human
             local lastSlot = {0, 0, false}
             local playerRatings = {}
             -- get rating data for each player
@@ -3991,8 +3997,13 @@ function CreateUI(maxPlayers)
                 manualTeams = true
             end
 
-            -- if the teams were not set properly, set them properly
-            if (not manualTeams and (table.getn(sortedTeam1Slots) < teamSize or table.getn(sortedTeam2Slots) < teamSize)) or (manualTeams and (numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize)) then
+            -- If the teams were not set properly, set them properly.
+            -- When teams are set manually, they are not set properly if the number of 
+            -- players on either team does not equal the team size.  
+            -- When teams are not set manually, they are not set properly if the number
+            -- of slots on either team is less than the team size.
+            if (manualTeams and (numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize))
+             or (not manualTeams and (table.getn(sortedTeam1Slots) < teamSize or table.getn(sortedTeam2Slots) < teamSize)) then
                 -- set AutoTeams to none (so, they can be set by slot by this function)
                 gameInfo.GameOptions.AutoTeams = 'none'
                 local counter = 0
