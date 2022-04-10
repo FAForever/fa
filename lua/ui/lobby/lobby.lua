@@ -1040,9 +1040,9 @@ function SetSlotInfo(slotNum, playerInfo)
 
     --- Returns true if the party selector for this slot should be enabled.
     local function partySelectionEnabled(ready, locallyOwned, isHost)
-        -- If slot are set to fixed, no selector for you.
-        -- This could be changed if party support is added for opti/etc
-        if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+        -- If slot are set to fixed or parties are locked, no selector for you.
+        -- The fixed part could be changed if party support is added for opti/etc
+        if gameInfo.GameOptions.TeamSpawn ~= 'fixed' or gameInfo.GameOptions.PartiesLocked then
             return false
         end
 
@@ -1180,7 +1180,11 @@ function SetSlotInfo(slotNum, playerInfo)
         playerInfo.Party = 1
     end
 
-    slot.party:Show()
+    if not (gameInfo.GameOptions.PartiesLocked and playerInfo.Party == 1) then
+        slot.party:Show()
+    else
+        slot.party:Hide()
+    end
     slot.party:SetItem(playerInfo.Party)
 
     UIUtil.setVisible(slot.ready, playerInfo.Human and not singlePlayer)
@@ -4217,6 +4221,24 @@ function CreateUI(maxPlayers)
                 sortedSlotTeams[player][1] = slotB
             end
             UpdateGame()
+        end
+    end
+
+    -- Toggle Party Lock Button --
+    GUI.TogglePartyLock = UIUtil.CreateButtonStd(GUI.labelGroup, '/BUTTON/medium/', LOC('<LOC lobui_0449>Party'), 12)
+    LayoutHelpers.SetWidth(GUI.TogglePartyLock, 72)
+    LayoutHelpers.SetHeight(GUI.TogglePartyLock, 21)
+    LayoutHelpers.AtLeftTopIn(GUI.TogglePartyLock, GUI.labelGroup, 579, 1)
+    Tooltip.AddButtonTooltip(GUI.TogglePartyLock, {text=LOC("<LOC lobui_0620>Toggle Party Lock"), body=LOC("<LOC lobui_0621>Toggle whether or not parties are locked.")})
+    if not isHost then
+        GUI.TogglePartyLock:Hide()
+    else
+        GUI.TogglePartyLock.OnClick = function()
+            if gameInfo.GameOptions.PartiesLocked == true then
+                SetGameOption("PartiesLocked", false)
+            else
+                SetGameOption("PartiesLocked", true)
+            end
         end
     end
 
