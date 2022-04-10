@@ -7611,6 +7611,7 @@ lobui_0442="From %s"
 lobui_0443="To %s"
 lobui_0444 = "Autobalance"
 lobui_0445 = "Automatically balance players into 2 equally sized teams"
+lobui_0446 = "Enabled fixed spawn locations"
 
 lobui_0450="CPU"
 lobui_0451="Ping"
