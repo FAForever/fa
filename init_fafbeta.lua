@@ -326,13 +326,13 @@ local function MountModContent(dir)
 
         -- do not load integrated mods
         if integratedMods[mod] then 
-            LOG("Blocked mod that is integrated: " .. mod )
+            LOG("Prevented loading a mod that is integrated: " .. mod )
             continue 
         end 
 
         -- do not load deprecated mods
         if deprecatedMods[mod] then 
-            LOG("Blocked mod that is deprecated: " .. mod )
+            LOG("Prevented loading a mod that is deprecated: " .. mod )
             continue 
         end 
 
