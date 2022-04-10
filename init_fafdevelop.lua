@@ -62,6 +62,11 @@ local integratedMods = { }
 integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
+-- mods that are deprecated, based on folder name
+local deprecatedMods = { }
+deprecatedMods["simspeed++"] = true
+deprecatedMods = LowerHashTable(deprecatedMods)
+
 -- typical FA packages
 local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
@@ -93,7 +98,6 @@ allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 -- typical backwards compatible packages
 local allowedAssetsNxt = { }
 allowedAssetsNxt["kyros.nxt"] = true
-allowedAssetsNxt["texturepack.nxt"] = true
 allowedAssetsNxt["advanced strategic icons.nxt"] = true
 allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
 allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
@@ -322,7 +326,13 @@ local function MountModContent(dir)
 
         -- do not load integrated mods
         if integratedMods[mod] then 
-            LOG("Blocked mod that is integrated: " .. mod )
+            LOG("Prevented loading a mod that is integrated: " .. mod )
+            continue 
+        end 
+
+        -- do not load deprecated mods
+        if deprecatedMods[mod] then 
+            LOG("Prevented loading a mod that is deprecated: " .. mod )
             continue 
         end 
 

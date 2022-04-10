@@ -542,7 +542,6 @@ local function DoSlotBehavior(slot, key, name)
         else
             HostUtils.RemoveAI(slot)
         end
-        Check_Availaible_Color()
     else
         -- We're adding an AI of some sort.
         if lobbyComm:IsHost() then
@@ -1274,6 +1273,7 @@ function ClearSlotInfo(slotIndex)
     UpdateSlotBackground(slotIndex)
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotIndex)
+    Check_Availaible_Color()
     refreshObserverList()
 end
 
@@ -3175,14 +3175,12 @@ function CreateUI(maxPlayers)
           else
             AssignAutoTeams()
           end
-          Check_Availaible_Color()
         end
         GUI.AIClearButton.OnClick = function()
           for i = 1, table.getn(ChangedSlots) do
             HostUtils.RemoveAI(ChangedSlots[i])
           end
           ChangedSlots = {}
-          Check_Availaible_Color()
         end
         GUI.TeamCountSelector.OnClick = function(Self, Index, Text)
           local OccupiedSlots = 0
@@ -3889,11 +3887,15 @@ function CreateUI(maxPlayers)
         GUI.PenguinAutoBalance:Hide()
     else
         -- What this does: it balances all occupied slots into two teams with equal numbers of
-        -- players.  If half of the occupied slots are set to team 1 and half to team 2, then
-        -- it balances the players while keeping the team-slot matches.  If the teams are not
-        -- set that way, they are changed automatically to be alternating team 1 and team 2.
+        -- players.  If teams are set manually and half of the occupied slots are set to team 1
+        -- and half to team 2, then it balances the players while keeping the team-slot matches.
+        -- If the teams are set manually, but there is an uneven number of players on teams 1
+        -- and 2, then players' teams are changed automatically to be alternating team 1 and team 2.
         -- If there are an odd number of occupied slots, the last one is set to team - (no team)
-        -- and the others are balanced without it.
+        -- and the others are balanced without it.  Alternatively, if teams are not set manually,
+        -- players will be balanced into the slowest available slot numbers on their teams.
+        -- If there is an odd number of players in that case, the last player will be made an
+        -- observer if human or removed if AI.
 
         -- How it balances: this function checks every possible balance combination for making 
         -- the two teams (while keeping their player counts equal to half the number of occupied
@@ -3909,18 +3911,31 @@ function CreateUI(maxPlayers)
         -- Automatically balance an even number of non-observer players into 2 teams in the lobby
         GUI.PenguinAutoBalance.OnClick = function()
 
+            -- make sure spawns are set to fixed
+            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+                gameInfo.GameOptions.TeamSpawn = 'fixed'
+                -- tell everyone else to set spawns to fixed
+                lobbyComm:BroadcastData {
+                    Type = 'GameOptions',
+                    Options = {['TeamSpawn'] = 'fixed'}
+                }
+                AddChatText(LOC("<LOC lobui_0446>Enabled fixed spawn locations"))
+            end
+
             -- a table of the target mean, target deviation, and the lowest logged imbalance value
             local goalValue = {0, 0, 99999}
 
             local playerCount = 0
-            local lastSlot = {0, 0}
+            -- a table of the highest occupied slot's slot number, that slot's player's order number
+            -- in the playerRatings table, and a booleon of whether or not that player is human
+            local lastSlot = {0, 0, false}
             local playerRatings = {}
             -- get rating data for each player
             for i, player in gameInfo.PlayerOptions:pairs() do
                 playerRatings[i] = {player.MEAN, player.DEV, player.StartSpot, player.Team - 1, player.Party}
                 playerCount = playerCount + 1
                 if player.StartSpot > lastSlot[1] then
-                    lastSlot = {player.StartSpot, i}
+                    lastSlot = {player.StartSpot, i, player.Human}
                 end
                 goalValue[1] = goalValue[1] + player.MEAN
                 goalValue[2] = goalValue[2] + player.DEV
@@ -3928,6 +3943,7 @@ function CreateUI(maxPlayers)
 
             -- if there are fewer than 2 players, there is no need to balance
             if playerCount < 2 then
+                UpdateGame()
                 return
             end
 
@@ -3937,13 +3953,20 @@ function CreateUI(maxPlayers)
                 goalValue[2] = goalValue[2] - playerRatings[lastSlot[2]][2]
                 playerRatings[lastSlot[2]] = nil
                 playerCount = playerCount - 1
-                -- set the player to not be on a team
-                for i, player in gameInfo.PlayerOptions:pairs() do
-                    if player.StartSpot == lastSlot[1] then
-                        -- set AutoTeams to none (so, this function can set an individual player's team)
-                        gameInfo.GameOptions.AutoTeams = 'none'
-                        player.Team = 1 -- no team
-                        break
+                -- set the player to not be on a team if teams are manual
+                -- otherwise make the player an observer if human or remove it if AI
+                if gameInfo.GameOptions.AutoTeams == 'none' then
+                    for i, player in gameInfo.PlayerOptions:pairs() do
+                        if player.StartSpot == lastSlot[1] then
+                            player.Team = 1 -- no team
+                            break
+                        end
+                    end
+                else
+                    if lastSlot[3] then
+                        HostUtils.ConvertPlayerToObserver(lastSlot[1])
+                    else
+                        HostUtils.RemoveAI(lastSlot[1])
                     end
                 end
             end
@@ -4003,8 +4026,65 @@ function CreateUI(maxPlayers)
 
             -- the number of players per team
             local teamSize = playerCount / 2
-            -- if the teams were not set properly, set them properly
-            if numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize then
+
+
+            -- make the sorted list of slots for each team
+            local sortedTeam1Slots = {}
+            local sortedTeam2Slots = {}
+            local team1OrderNum = 0
+            local team2OrderNum = 0
+
+            local manualTeams
+                
+            if gameInfo.GameOptions.AutoTeams == 'pvsi' then -- odd vs even
+                for i = 1, 16 do
+                    if not gameInfo.ClosedSlots[i] then
+                        if math.mod(i, 2) == 1  then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then -- top vs bottom
+                local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+                for i, startPosition in GUI.mapView.startPositions do
+                    if not gameInfo.ClosedSlots[i] then
+                        if startPosition.Top() < midLine then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            elseif gameInfo.GameOptions.AutoTeams == 'lvsr' then -- left vs right
+                local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+                for i, startPosition in GUI.mapView.startPositions do
+                    if not gameInfo.ClosedSlots[i] then
+                        if startPosition.Left() < midLine then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            else
+                manualTeams = true
+            end
+
+            -- If the teams were not set properly, set them properly.
+            -- When teams are set manually, they are not set properly if the number of 
+            -- players on either team does not equal the team size.  
+            -- When teams are not set manually, they are not set properly if the number
+            -- of slots on either team is less than the team size.
+            if (manualTeams and (numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize))
+             or (not manualTeams and (table.getn(sortedTeam1Slots) < teamSize or table.getn(sortedTeam2Slots) < teamSize)) then
                 -- set AutoTeams to none (so, they can be set by slot by this function)
                 gameInfo.GameOptions.AutoTeams = 'none'
                 local counter = 0
@@ -4020,8 +4100,40 @@ function CreateUI(maxPlayers)
                                 player.Team = 3 -- team 2
                                 slotTeam[2] = 2
                             end
+                            -- tell everyone else the team number for that slot
+                            lobbyComm:BroadcastData(
+                            {
+                                Type = 'PlayerOptions',
+                                Options = {['Team'] = slotTeam[2] + 1}, -- make team number 1 higher for the backend
+                                Slot = slotTeam[1],
+                            })
                             break
                         end
+                    end
+                end
+            end
+
+            -- if teams are set to manual, make the sorted list of slots for each team
+            if gameInfo.GameOptions.AutoTeams == 'none' then
+                sortedTeam1Slots = {}
+                sortedTeam2Slots = {}
+                for i, slotTeam in sortedSlotTeams do 
+                    team1OrderNum = 0
+                    team2OrderNum = 0
+                    for i2, slotTeam2 in sortedSlotTeams do
+                        if slotTeam[1] > slotTeam2[1] or (slotTeam[1] == slotTeam2[1] and i >= i2) then
+                            if slotTeam2[2] == 1 then
+                                team1OrderNum = team1OrderNum + 1
+                            else
+                                team2OrderNum = team2OrderNum + 1
+                            end
+                        end
+                    end
+                    -- add the slot to its team's table
+                    if slotTeam[2] == 1 then
+                        sortedTeam1Slots[team1OrderNum] = slotTeam[1]
+                    else
+                        sortedTeam2Slots[team2OrderNum] = slotTeam[1]
                     end
                 end
             end

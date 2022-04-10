@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = false,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 100.00,
+	LODCutoff = 100.00, -- set by script to match unit size
 	EmitIfVisible = true,
 	CatchupEmit = false,
 	CreateIfVisible = false,

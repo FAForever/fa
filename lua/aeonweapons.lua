@@ -258,6 +258,14 @@ ADFCannonOblivionWeapon02 = Class(DefaultProjectileWeapon) {
     FxChargeMuzzleFlash = EffectTemplate.AOblivionCannonChargeMuzzleFlash02,
 }
 
+ADFCannonOblivionWeapon03 = Class(DefaultProjectileWeapon) {
+    FxChargeMuzzleFlash = {
+        '/effects/emitters/oblivion_cannon_flash_04_emit.bp',
+        '/effects/emitters/oblivion_cannon_flash_05_emit.bp',
+        '/effects/emitters/oblivion_cannon_flash_06_emit.bp',
+    },
+}
+
 AIFMortarWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {},
 }
@@ -304,6 +312,34 @@ AIFBombQuarkWeapon = Class(DefaultProjectileWeapon) {
 
 AANDepthChargeBombWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_02_emit.bp', },
+
+    CreateProjectileForWeapon = function(self, bone)
+        local proj = self:CreateProjectile(bone)
+        local damageTable = self:GetDamageTable()
+        local blueprint = self:GetBlueprint()
+        local data = {
+            Army = self.unit.Army,
+            Instigator = self.unit,
+            StartRadius = blueprint.DOTStartRadius,
+            EndRadius = blueprint.DOTEndRadius,
+            DOTtype = blueprint.DOTtype,
+            Damage = blueprint.DoTDamage,
+            Duration = blueprint.DoTDuration,
+            Frequency = blueprint.DoTFrequency,
+            Type = 'Normal',
+        }
+
+        if proj and not proj:BeenDestroyed() then
+            proj:PassDamageData(damageTable)
+            proj:PassData(data)
+        end
+
+        return proj
+    end,
+}
+
+AANDepthChargeBombWeapon02 = Class(DefaultProjectileWeapon) {
+    FxMuzzleFlash = {'/effects/emitters/antiair_muzzle_fire_01_emit.bp', },
 
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)

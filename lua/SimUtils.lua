@@ -558,9 +558,23 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
 end
 
 function GiveUnitsToPlayer(data, units)
+    local manualShare = ScenarioInfo.Options.ManualUnitShare
+    if manualShare == 'none' then return end
+
     if units then
         local owner = units[1].Army
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
+            if manualShare == 'no_builders' then
+                local unitsBefore = table.getsize(units)
+                units = EntityCategoryFilterDown(categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER, units)
+                local unitsAfter = table.getsize(units)
+
+                if unitsAfter ~= unitsBefore then
+                    -- Maybe spawn an UI dialog instead?
+                    print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
+                end
+            end
+            
             TransferUnitsOwnership(units, data.To)
         end
     end

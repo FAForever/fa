@@ -53,33 +53,8 @@ local function CalculateLODsOfProps(props)
     end
 end
 
---- Calculates the LODs of a single emitter
--- @param emitter Emitter to compute the LODs for
-local function CalculateLODOfEmitter(emitter)
-    if 
-        -- if the LOD is set to infinity
-        emitter.LODCutoff == -1 and 
-
-        -- and this is not an emitter from a mod
-        not string.find(emitter.BlueprintId, "mods") 
-    then 
-        -- then we can safely set it to 160
-        emitter.LODCutoff = 160
-    end
-end
-
---- Defaults the LOD of emitters if it is not set
--- @param emitters List of emitters to tweak the LODs for
-local function CalculateLODsOfEmitters(emitters)
-    for k, emitter in emitters do 
-        CalculateLODOfEmitter(emitter)
-    end
-end
-
 --- Calculates the LODs of all entities
 -- @param bps All available blueprints
 function CalculateLODs(bps)
     CalculateLODsOfProps(bps.Prop)
-    CalculateLODsOfEmitters(bps.Emitter)
-    CalculateLODsOfEmitters(bps.TrailEmitter)
 end

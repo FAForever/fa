@@ -1161,7 +1161,24 @@ options = {
                         {text = "<LOC _On>", key = 1 },
                     },
                 },
-            }
+            },
+
+            {
+                title = "Experimental graphics",
+                key = 'experimental_graphics',
+                type = 'toggle',
+                default = 0,
+                update = function(control,value)
+                end,
+                set = function(key,value,startup)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0},
+                        {text = "<LOC _On>", key = 1},
+                    },
+                },
+            },
         },
     },
     sound = {

@@ -38,6 +38,26 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 local rawget = rawget 
 local IsAlly = IsAlly
 
+-- Structures that are reused for performance reasons
+-- Maps unit.techCategory to a number so we can do math on it for naval units
+local veterancyTechLevels = {
+    TECH1 = 1,
+    TECH2 = 2,
+    TECH3 = 3,
+    COMMAND = 3,
+    SUBCOMMANDER = 4,
+    EXPERIMENTAL = 5,
+}
+
+-- Regen values by tech level and veterancy level
+local veterancyRegenBuffs = {
+    {1,  2,  3,  4,  5}, -- T1
+    {3,  6,  9,  12, 15}, -- T2
+    {6,  12, 18, 24, 30}, -- T3 / ACU
+    {9,  18, 27, 36, 45}, -- SACU
+    {25, 50, 75, 100,125}, -- Experimental
+}
+
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
@@ -45,7 +65,6 @@ local TrashEmpty = TrashBag.Empty
 
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateEmitterAtBone = CreateEmitterAtBone
-
 
 SyncMeta = {
     __index = function(t, key)
@@ -170,7 +189,6 @@ Unit = Class(moho.unit_methods) {
             OnStartReclaim = {},
             OnStopReclaim = {},
             OnStopBeingBuilt = {},
-            OnHorizontalStartMove = {},
             OnCaptured = {},
             OnCapturedNewUnit = {},
             OnDamaged = {},
@@ -1379,11 +1397,14 @@ Unit = Class(moho.unit_methods) {
 
     -- Set the veteran level to the level specified
     SetVeteranLevel = function(self, level)
-        local buffs = self:CreateVeterancyBuffs(level)
-        if buffs then
-            for _, buffName in buffs do
-                Buff.ApplyBuff(self, buffName)
-            end
+        local regenBuff, hpBuff = self:CreateVeterancyBuffs(level)
+        
+        if regenBuff then
+            Buff.ApplyBuff(self, regenBuff)
+        end
+
+        if hpBuff then 
+            Buff.ApplyBuff(self, hpBuff)
         end
 
         self:GetAIBrain():OnBrainUnitVeterancyLevel(self, level)
@@ -1406,31 +1427,13 @@ Unit = Class(moho.unit_methods) {
         local regenBuffName = self.UnitId .. 'VeterancyRegen' .. level -- Generate a buff based on the unitId - eg. uel0001VeterancyRegen3
 
         if not Buffs[regenBuffName] then
-            -- Maps self.techCategory to a number so we can do math on it for naval units
-            local techLevels = {
-                TECH1 = 1,
-                TECH2 = 2,
-                TECH3 = 3,
-                COMMAND = 3,
-                SUBCOMMANDER = 4,
-                EXPERIMENTAL = 5,
-            }
-
-            local techLevel = techLevels[self.techCategory] or 1
+            -- Get techLevel as a number to do math on it
+            local techLevel = veterancyTechLevels[self.techCategory] or 1
 
             -- Treat naval units as one level higher
             if techLevel < 4 and EntityCategoryContains(categories.NAVAL, self) then
                 techLevel = techLevel + 1
             end
-
-            -- Regen values by tech level and veterancy level
-            local regenBuffs = {
-                {1,  2,  3,  4,  5}, -- T1
-                {3,  6,  9,  12, 15}, -- T2
-                {6,  12, 18, 24, 30}, -- T3 / ACU
-                {9,  18, 27, 36, 45}, -- SACU
-                {25, 50, 75, 100,125}, -- Experimental
-            }
 
             BuffBlueprint {
                 Name = regenBuffName,
@@ -1440,13 +1443,13 @@ Unit = Class(moho.unit_methods) {
                 Duration = -1,
                 Affects = {
                     Regen = {
-                        Add = regenBuffs[techLevel][level],
+                        Add = veterancyRegenBuffs[techLevel][level],
                     },
                 },
             }
         end
 
-        return {regenBuffName, healthBuffName}
+        return regenBuffName, healthBuffName
     end,
 
     -- Returns true if a unit can gain veterancy (Has a weapon)
@@ -1804,9 +1807,7 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- Stop any motion sounds we may have
-        self:StopUnitAmbientSound('AmbientMove')
-        self:StopUnitAmbientSound('AmbientMoveLand')
-        self:StopUnitAmbientSound('AmbientMoveWater')
+        self:StopUnitAmbientSound()
 
         -- BOOM!
         if self.PlayDestructionEffects then
@@ -3142,52 +3143,37 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMotionHorzEventChange = function(self, new, old)
+
+        -- we can't do anything if we're dead
         if self.Dead then
             return
         end
+
         local layer = self.Layer
 
-        if old == 'Stopped' or (old == 'Stopping' and (new == 'Cruise' or new == 'TopSpeed')) then
-            -- Try the specialised sound, fall back to the general one.
-            if not self:PlayUnitSound('StartMove' .. layer) then
+        -- play sounds / events when we start moving
+        if old == 'Stopped' then
+
+            if not self:PlayUnitSound('StartMove' .. layer) then 
                 self:PlayUnitSound('StartMove')
             end
 
-            -- Initiate the unit's ambient movement sound
-            -- Note that there is not currently an 'Air' version, and that
-            -- AmbientMoveWater plays if the unit is in either the Water or Seabed layer.
-            if not (
-                ((layer == 'Water' or layer == 'Seabed') and self:PlayUnitAmbientSound('AmbientMoveWater')) or
-                (layer == 'Sub' and self:PlayUnitAmbientSound('AmbientMoveSub')) or
-                (layer == 'Land' and self:PlayUnitAmbientSound('AmbientMoveLand'))
-                )
-            then
+            if not self:PlayUnitAmbientSound('AmbientMove' .. layer) then 
                 self:PlayUnitAmbientSound('AmbientMove')
             end
-
         end
 
-        if (new == 'Stopped' or new == 'Stopping') and (old == 'Cruise' or old == 'TopSpeed') then
-            -- Try the specialised sound, fall back to the general one.
-            if not self:PlayUnitSound('StopMove' .. layer) then
+        -- play sounds / events when we stop moving
+        if new == 'Stopping' then
+            if not self:PlayUnitSound('StopMove' .. layer) then 
                 self:PlayUnitSound('StopMove')
             end
+            self:StopUnitAmbientSound()
         end
 
-        if new == 'Stopped' or new == 'Stopping' then
-            -- Stop ambient sounds
-            self:StopUnitAmbientSound('AmbientMove')
-            self:StopUnitAmbientSound('AmbientMoveWater')
-            self:StopUnitAmbientSound('AmbientMoveSub')
-            self:StopUnitAmbientSound('AmbientMoveLand')
-        end
-
+        -- update movement effects
         if self.MovementEffectsExist then
             self:UpdateMovementEffectsOnMotionEventChange(new, old)
-        end
-
-        if old == 'Stopped' then
-            self:DoOnHorizontalStartMoveCallbacks()
         end
 
         -- update weapon capabilities
@@ -3817,14 +3803,6 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    AddOnHorizontalStartMoveCallback = function(self, fn)
-        self:AddUnitCallback(fn, "OnHorizontalStartMove")
-    end,
-
-    DoOnHorizontalStartMoveCallbacks = function(self)
-        self:DoUnitCallbacks("OnHorizontalStartMove")
-    end,
-
     RemoveCallback = function(self, fn)
         for k, v in self.EventCallbacks do
             if type(v) == "table" then
@@ -4369,6 +4347,17 @@ Unit = Class(moho.unit_methods) {
     OnDamageBy = function(self, index) end,
 
     --- Deprecated functionality
+
+    AddOnHorizontalStartMoveCallback = function(self, fn)
+
+        if not DeprecatedWarnings.AddOnHorizontalStartMoveCallback then 
+            DeprecatedWarnings.AddOnHorizontalStartMoveCallback = true 
+            WARN("AddOnHorizontalStartMoveCallback is deprecated.")
+            WARN("Source: " .. repr(debug.getinfo(2)))
+            WARN("Stacktrace:" .. repr(debug.traceback()))
+        end
+
+    end,
 
     --- Allows the unit to rock from side to side. Useful when the unit is on water. Is not used
     -- in practice, nor by this repository or by any of the commonly played mod packs.
