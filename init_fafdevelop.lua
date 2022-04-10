@@ -62,6 +62,11 @@ local integratedMods = { }
 integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
+-- mods that are deprecated, based on folder name
+local deprecatedMods = { }
+deprecatedMods["simspeed++"] = true
+deprecatedMods = LowerHashTable(deprecatedMods)
+
 -- typical FA packages
 local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
@@ -322,6 +327,12 @@ local function MountModContent(dir)
         -- do not load integrated mods
         if integratedMods[mod] then 
             LOG("Blocked mod that is integrated: " .. mod )
+            continue 
+        end 
+
+        -- do not load deprecated mods
+        if deprecatedMods[mod] then 
+            LOG("Blocked mod that is deprecated: " .. mod )
             continue 
         end 
 
