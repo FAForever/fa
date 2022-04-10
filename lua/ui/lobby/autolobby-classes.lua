@@ -62,7 +62,9 @@ ConnectionStatus = Class(Group) {
 
     -- these start at 1 as we're always connected to ourself
     TotalPlayersCount = 1,
+    IsTotalPlayersCountSet = false,
     ConnectedPlayersCount = 1,
+
 
     -- View elements
 
@@ -71,9 +73,20 @@ ConnectionStatus = Class(Group) {
         local headerText = LOC('<LOC AutoLobbyHeaderText>Connection status')
         self.HeaderText:SetText(headerText)
 
-        local connectionsText = LOCF('<LOC AutoLobbyConnectionsTextPlural>%s / %s are connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
-        if ConnectedPlayersCount == 1 then 
-            local connectionsText = LOCF('<LOC AutoLobbyConnectionsTextSingular>%s / %s is connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
+        local connectionsText
+        if not self.IsTotalPlayersCountSet then 
+            
+            if self.ConnectedPlayersCount == 1 then 
+                connectionsText = LOCF('<LOC AutoLobbyConnectionsTextSingularNoTotal>%s player is connected', tostring(self.ConnectedPlayersCount))
+            else 
+                connectionsText = LOCF('<LOC AutoLobbyConnectionsTextPluralNoTotal>%s players are connected', tostring(self.ConnectedPlayersCount))
+            end
+        else 
+            if self.ConnectedPlayersCount == 1 then 
+                connectionsText = LOCF('<LOC AutoLobbyConnectionsTextSingular>%s / %s is connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
+            else 
+                connectionsText = LOCF('<LOC AutoLobbyConnectionsTextPlural>%s / %s are connected', tostring(self.ConnectedPlayersCount))
+            end
         end
 
         self.ConnectionsText:SetText(connectionsText)
@@ -84,7 +97,8 @@ ConnectionStatus = Class(Group) {
 
     --- Updates the internal state and the text
     SetTotalPlayersCount = function(self, count)
-        self.TotalPlayersCount = count 
+        self.TotalPlayersCount = count
+        self.IsTotalPlayersCountSet = true 
         self:UpdateView()
     end,
 
@@ -95,7 +109,11 @@ ConnectionStatus = Class(Group) {
     end,
 
     AddConnectedPlayer = function(self)
-        self.ConnectedPlayersCount = MathMin(self.ConnectedPlayersCount + 1 , self.TotalPlayersCount)
+        self.ConnectedPlayersCount = self.ConnectedPlayersCount + 1
+        if self.IsTotalPlayersCountSet then 
+            self.ConnectedPlayersCount = MathMin(self.ConnectedPlayersCount, self.TotalPlayersCount)
+        end
+
         self:UpdateView()
     end,
 

@@ -154,7 +154,7 @@ function OpenWindow()
     local status = import("/lua/ui/lobby/autolobby-classes.lua").ConnectionStatus(GetFrame(0))
     LayoutHelpers.AtCenterIn(status, GetFrame(0))
 
-    status:SetTotalPlayersCount(8)
+    -- status:SetTotalPlayersCount(8)
 
     ForkThread(function()
         for k = 1, 8 do 

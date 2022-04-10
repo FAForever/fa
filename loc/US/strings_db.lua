@@ -4677,9 +4677,10 @@ lobui_0702="Team Ratings:"
 lobui_0703="Team %d: %d (%d+/-%d)"
 
 AutoLobbyHeaderText="Connection status"
-AutoLobbyConnectionsTextSingular="%s / %s is connected"
-AutoLobbyConnectionsTextPlural="%s / %s are connected"
-
+AutoLobbyConnectionsTextSingular="%s / %s players are connected"
+AutoLobbyConnectionsTextPlural="%s / %s players are connected"
+AutoLobbyConnectionsTextSingularNoTotal="%s player is connected"
+AutoLobbyConnectionsTextPluralNoTotal="%s players are connected"
 --Lobby options panel
 lobui_0400="Stretch Background"
 lobui_0401="Stretch background to fill screen."
