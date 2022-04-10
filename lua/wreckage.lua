@@ -157,17 +157,18 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     sy = sy * 0.5
     sz = sz * 0.5
 
-    -- create the collision box
-    prop.SetPropCollision(prop, 'Box', cx, cy, cz, sx, sy, sz)
-    prop.SetMaxReclaimValues(prop, time, mass, energy)
+    -- set health
     EntitySetMaxHealth(prop, bp.Defense.Health)
     EntitySetHealth(prop, nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
 
+    -- set collision box and reclaim values, the latter depends on the health of the wreck
+    prop.SetPropCollision(prop, 'Box', cx, cy, cz, sx, sy, sz)
+    prop.SetMaxReclaimValues(prop, time, mass, energy)
 
     --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
     -- under the fog. However the engine has a bug with prop intel that makes the wreckage
     -- never appear at all, even when you drive up to it, so this is disabled for now.
-    -- tested 2022-03-23: this work :)), but clashes with the reclaim labels that expects wrecks to be always visible
+    -- tested 2022-03-23: this works :)), but clashes with the reclaim labels that expects wrecks to be always visible
     -- prop:SetVizToNeutrals('Intel')
 
     if not bp.Wreckage.UseCustomMesh then
