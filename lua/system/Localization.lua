@@ -11,7 +11,7 @@ LocGlobals = {
 }
 
 -- upvalue access for performance
-local UpLocGlobals = LocaGlobals
+local UpLocGlobals = LocGlobals
 
 -- upvalue globals for performance
 local type = type
