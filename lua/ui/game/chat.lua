@@ -609,16 +609,20 @@ end
 function GetNickname(str)
     local id = MatchPlayersNicknames(str)
     if id == -1 then
-        return 'all' ,-1
-    else 
-        return GetArmiesTable().armiesTable[id].nickname,id
+        if ChatTo() == 'all' then
+            return 'allies', 'allies'
+        else
+            return 'all', 'all'
+        end
+    else
+        return GetArmiesTable().armiesTable[id].nickname, id
     end
 end
  
 function CreateNicknameMatcher(str)
     local id
     local nickname
-    nickname,id = GetNickname(str)
+    nickname, id = GetNickname(str)
     if GUI.matcher then
         GUI.matcher.id = id
         GUI.matcher.text:SetText(nickname)
@@ -629,10 +633,13 @@ function CreateNicknameMatcher(str)
     LayoutHelpers.Above(matcher, GUI.chatEdit.edit, 2)
     LayoutHelpers.AtLeftIn(matcher, GUI.chatContainer)
     LayoutHelpers.AtRightIn(matcher, GUI.chatContainer)
-    LayoutHelpers.DepthOverParent(matcher, GUI.chatContainer,100)
+    LayoutHelpers.DepthOverParent(matcher, GUI.chatContainer, 100)
     LayoutHelpers.SetHeight(matcher,20)
-    matcher.text = UIUtil.CreateText(matcher, nickname, 16, "Arial",true)
+    matcher.text = UIUtil.CreateText(matcher, nickname, 16, "Arial", true)
+    matcher.hint = UIUtil.CreateText(matcher, "press tab to proceed", 16, "Arial", true)
+    matcher.hint:SetColor(UIUtil.disabledColor)
     LayoutHelpers.AtLeftTopIn(matcher.text, matcher,2,2)
+    LayoutHelpers.AtRightTopIn(matcher.hint, matcher,2,2)
     matcher.nickname = nickname
     matcher.id = id
     GUI.matcher = matcher
@@ -810,12 +817,8 @@ function CreateChatEdit()
         end
         local charLim = self:GetMaxChars()
         if charcode == UIUtil.VK_TAB then
-            if GUI.matcher then 
-                if GUI.matcher.id ~= -1 then
-                    ChatTo:Set(GUI.matcher.id)
-                else
-                    ChatTo:Set("all")
-                end
+            if GUI.matcher then
+                ChatTo:Set(GUI.matcher.id)
                 local text = self:GetText()
                 local caretPos = self:GetCaretPosition()
                 local beginPos = GUI.matcher.BeginPos
