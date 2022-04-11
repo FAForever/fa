@@ -2819,9 +2819,9 @@ function CreateSlotsUI(makeLabel)
         factionSelector.OnEvent = defaultHandler
 
         -- Team
-        local teamSelector = Combo(newSlot, 17, 9, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local teamSelector = Combo(newSlot, 14, 9, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         teamSelector:AddItems({' - ', ' 1', ' 2', ' 3', ' 4', ' 5', ' 6', ' 7', ' 8'})
-        teamSelector._text:SetFont('Arial Bold', 17)
+        teamSelector._text:SetFont('Arial Bold', 14)
         teamSelector._titleColor = 'White'
         newSlot.team = teamSelector
         newSlot:AddChild(teamSelector)
