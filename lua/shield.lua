@@ -192,10 +192,6 @@ Shield = Class(moho.shield_methods, Entity) {
         self.OverlappingShieldsCount = 0
         self.OverlappingShieldsTick = -1
 
-        -- manage overspill 
-        self.DamageReduction = { }
-        self.DamageReductionTick = { }
-
         -- manage overspill
         self.DamagedTick = { }
         self.DamagedRegular = { }
@@ -493,8 +489,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
         if self.Owner ~= instigator then
             local absorbed = self:OnGetDamageAbsorption(instigator, amount, dmgType)
-
-            
 
             -- take some damage
             EntityAdjustHealth(self, instigator, -absorbed)
