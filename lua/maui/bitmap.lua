@@ -71,10 +71,6 @@ Bitmap = Class(moho.bitmap_methods, Control) {
         self.Height:SetFunction(function() return ScaleNumber(self.BitmapHeight()) end)
     end,
 
-    OnInit = function(self)
-        Control.OnInit(self)
-    end,
-
     OnDestroy = function(self)
         if self._filename and self._filename._texture then
             self._filename._texture:Destroy()
