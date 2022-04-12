@@ -3304,10 +3304,10 @@ function CreateUI(maxPlayers)
     GUI.chatDisplay = import('/lua/ui/lobby/chatarea.lua').ChatArea(
         GUI.chatPanel,
         function() return GUI.chatPanel.Width() - 20 end,
-        function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
+        function() return GUI.chatPanel.Height() - GUI.chatBG.Height() end
     )
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 2, 5)
-    LayoutHelpers.DepthOverParent(GUI.chatDisplay, GUI.chatPanel, -1)
+    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 2)
+    LayoutHelpers.DepthUnderParent(GUI.chatDisplay, GUI.chatPanel)
 
     ---------------------------------------------------------------------------
     -- set up all .*Scroll* functions for the chat panel
