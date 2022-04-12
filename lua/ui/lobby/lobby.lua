@@ -137,6 +137,8 @@ teamIcons = {
     '/lobby/team_icons/team_4_icon.dds',
     '/lobby/team_icons/team_5_icon.dds',
     '/lobby/team_icons/team_6_icon.dds',
+    '/lobby/team_icons/team_7_icon.dds',
+    '/lobby/team_icons/team_8_icon.dds',
 }
 
 DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
@@ -2817,7 +2819,10 @@ function CreateSlotsUI(makeLabel)
         factionSelector.OnEvent = defaultHandler
 
         -- Team
-        local teamSelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local teamSelector = Combo(newSlot, 17, 9, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        teamSelector:AddItems({' - ', ' 1', ' 2', ' 3', ' 4', ' 5', ' 6', ' 7', ' 8'})
+        teamSelector._text:SetFont('Arial', 14)
+        teamSelector._titleColor = 'White'
         newSlot.team = teamSelector
         newSlot:AddChild(teamSelector)
         LayoutHelpers.SetWidth(teamSelector, COLUMN_WIDTHS[8])

@@ -192,9 +192,10 @@ Shield = Class(moho.shield_methods, Entity) {
         self.OverlappingShieldsCount = 0
         self.OverlappingShieldsTick = -1
 
-        -- manage overspill 
-        self.DamageReduction = { }
-        self.DamageReductionTick = { }
+        -- manage overspill
+        self.DamagedTick = { }
+        self.DamagedRegular = { }
+        self.DamagedOverspill = { }
 
         -- manage regeneration thread
         self.RegenThreadSuspended = true
@@ -442,7 +443,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
         -- damage correction for overcharge
         
-        if dmgType == 'Overcharge' and dmgType ~= "ShieldSpill" then
+        if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
                 amount = wep:GetBlueprint().Overcharge.structureDamage * 2
@@ -459,24 +460,26 @@ Shield = Class(moho.shield_methods, Entity) {
             local instigatorId = (instigator and instigator.EntityId) or false
             if instigatorId then 
 
-                -- check if source has applied damage this tick
-                if self.DamageReductionTick[instigatorId] == tick then 
+                -- reset our status quo for this instigator
+                if self.DamagedTick[instigatorId] ~= tick then 
+                    self.DamagedTick[instigatorId] = tick 
+                    self.DamagedRegular[instigatorId] = false 
+                    self.DamagedOverspill[instigatorId] = 0 
+                end
 
-                    -- if it did, reduce it from the damage that we're doing
-                    amount = amount - self.DamageReduction[instigatorId]
-
-                    -- if nothing is left, bail out
-                    if amount < 0 then 
+                -- anything but shield spill damage is regular damage, remove any previous overspill damage from the same instigator during the same tick
+                if dmgType ~= "ShieldSpill" then 
+                    self.DamagedRegular[instigatorId] = tick 
+                    amount = amount - self.DamagedOverspill[instigatorId]
+                    self.DamagedOverspill[instigatorId] = 0 
+                else 
+                    -- if we have already received regular damage from this instigator at this tick, skip the overspill damage
+                    if self.DamagedRegular[instigatorId] == tick then 
                         return 
                     end
 
-                    -- further reduce future damage
-                    self.DamageReduction[instigatorId] = self.DamageReduction[instigatorId] + amount 
-
-                -- otherwise, inform us that we're applying damage this tick
-                else 
-                    self.DamageReduction[instigatorId] = amount 
-                    self.DamageReductionTick[instigatorId] = tick
+                    -- keep track of overspill damage if we have not received any actual damage yet
+                    self.DamagedOverspill[instigatorId] = self.DamagedOverspill[instigatorId] + amount 
                 end
             end
         end
