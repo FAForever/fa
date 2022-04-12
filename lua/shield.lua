@@ -461,14 +461,13 @@ Shield = Class(moho.shield_methods, Entity) {
             if instigatorId then 
 
                 -- reset our status quo for this instigator
-                local tick = GetGameTick()
                 if self.DamagedTick[instigatorId] ~= tick then 
                     self.DamagedTick[instigatorId] = tick 
                     self.DamagedRegular[instigatorId] = false 
                     self.DamagedOverspill[instigatorId] = 0 
                 end
 
-                -- anything but shield spill damage is regular damage, remove any overspill damage from the same instigator
+                -- anything but shield spill damage is regular damage, remove any previous overspill damage from the same instigator during the same tick
                 if dmgType ~= "ShieldSpill" then 
                     self.DamagedRegular[instigatorId] = tick 
                     amount = amount - self.DamagedOverspill[instigatorId]
@@ -479,7 +478,7 @@ Shield = Class(moho.shield_methods, Entity) {
                         return 
                     end
 
-                    -- keep track of overspill damage
+                    -- keep track of overspill damage if we have not received any actual damage yet
                     self.DamagedOverspill[instigatorId] = self.DamagedOverspill[instigatorId] + amount 
                 end
             end
