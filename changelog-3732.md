@@ -154,6 +154,8 @@ Game version 3732 (22nd of April, 2022)
 
  - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
 
+ - Fix some styling issues with the lobby (#3777)
+
 ### Performance
  - Fix LODs of effects (#3720) 
 
@@ -289,7 +291,8 @@ Game version 3732 (22nd of April, 2022)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
  - 4z0t (#3651, #3647, #3704, #3703, #3709,
-         #3725, #3737, #3747, #3766, #3767)
+         #3725, #3737, #3747, #3766, #3767,
+         #3777)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
