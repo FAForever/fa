@@ -3,7 +3,7 @@ Game version 3732 (22nd of April, 2022)
 ===================================
 
 ### Features
- - In-lobby auto balancing (#3750, #3764) 
+ - In-lobby auto balancing (#3750, #3764, #3768) 
     Introduction of in-lobby balancing for the typical two-team setup. Similar results
     to optimal balance but allows the host to manually tweak the starting positions
     and take into account parties before launching the game.
@@ -14,6 +14,11 @@ Game version 3732 (22nd of April, 2022)
     applied after restarting the game.
 
     Please read the tooltip carefully.
+
+ - Introduction of lobby option to determine sharing behavior of units (#3741)
+    Allows the host to enable the sharing of all units, only allow the sharing of
+    non-construction units or disable the sharing of units all together. By default
+    sharing of all units is enabled.
 
  - Dynamic AI threat calculations (#3660) 
     The AI threat values have not been updated over the years - they are now 
@@ -96,7 +101,7 @@ Game version 3732 (22nd of April, 2022)
  - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765)
 
  - Fix various issues that people found while playing on FAF Develop 
- - (#3729, #3731, #3732, #3748, #3771, #3774)
+ - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782) 
 
     With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
     people that hosted games on FAF Develop and / or reported issues to the game team.
@@ -222,7 +227,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Removal of the blinking lights (#3698)
 
- - Improve performance of UI related classes (#3704, #3703, #3709, #3725, #3766, #3767)
+ - Improve performance of UI related classes (#3704, #3703, #3709, #3725, #3766, #3767, #3521, #3781)
 
  - Improve performance of all props, including wrecks (#3714)
     Significantly reduces the number of tables allocated per prop. Simplifies some 
@@ -278,7 +283,7 @@ Game version 3732 (22nd of April, 2022)
  - BlackYps (#3647, #3642)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
                      #3728, #3712, #3742, #3751,
-                     #3764, #3750)
+                     #3764, #3750, #3768) 
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
@@ -291,7 +296,7 @@ Game version 3732 (22nd of April, 2022)
         #3693, #3691, #3696, #3698, #3718,
         #3714, #3719, #3702, #3729, #3710,
         #3712, #3736, #3740, #3753, #3720,
-        #3774, #3775)
+        #3774, #3775, #3780, #3521, #3781)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
@@ -302,3 +307,4 @@ Game version 3732 (22nd of April, 2022)
  - SkepticSpecter (#3743)
  - Madmax (#3720)
  - Healther (#3722, #3717)
+ - Crotalus (#3741)
