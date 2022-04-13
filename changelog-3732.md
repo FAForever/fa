@@ -16,7 +16,7 @@ Game version 3732 (22nd of April, 2022)
  - Allow Hives to start upgrading immediately (#3675)
     Part of the Small Suggestions topic on the forum - suggested by Tagada.
 
- - Introduction of the (performance) profiler (#3674)
+ - Introduction of the (performance) profiler (#3674, #3700)
     Allows us to diagnose where the performance is being used during a game. Revolutionary 
     in terms of our capabilities of understanding where all those cycles are going.
 
@@ -167,7 +167,8 @@ Game version 3732 (22nd of April, 2022)
     Reduction of table allocations and engine calls.
 
  - Removal of the blinking lights (#3698)
-    Completely removes the blinking lights. They took a lot of bookkeeping while being barely visible.
+
+ - Improve performance of UI related classes (#3704, #3703)
 
 ### Contributors
 
@@ -178,7 +179,7 @@ Game version 3732 (22nd of April, 2022)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
- - 4z0t (#3651, #3647)
+ - 4z0t (#3651, #3647, #3704))
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
