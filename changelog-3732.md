@@ -29,6 +29,10 @@ Game version 3732 (22nd of April, 2022)
     There was a bug introduced last patch that causes weapons to reset
     their orientation right before the unit was destroyed. 
 
+ - Fix trampling damage (#3669)
+    There was a bug introduced last patch that reduced all trampling
+    damage to zero. Surprising how little people reported about it :) .
+
 ### Other
  - Improve readme of repository (#3647, #3663)
     Introduces a modern readme and accurate installation instructions of the 
@@ -111,4 +115,4 @@ Game version 3732 (22nd of April, 2022)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
-        #3668)
+        #3668, #3669)
