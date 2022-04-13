@@ -66,6 +66,8 @@ Game version 3732 (22nd of April, 2022)
  - Display team ratings in the observer window of the lobby (#3721, #3728, #3742)
 
  - Introduction of an announcement when you receive units due to full share (#3712) 
+
+ - Introduction of click-on-name-to-whisper feature while in the lobby (#3747)
     
 ### Bug fixes
 
@@ -151,8 +153,6 @@ Game version 3732 (22nd of April, 2022)
     Useful when you have Ai vs Ai games
 
  - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
-
- - Improve stability of lobby (#3747)
 
 ### Performance
  - Fix LODs of effects (#3720) 
@@ -283,7 +283,8 @@ Game version 3732 (22nd of April, 2022)
  - BlackYps (#3647, #3642)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
                      #3728, #3712, #3742, #3751,
-                     #3764, #3750, #3768) 
+                     #3764, #3750, #3768, #3765,
+                     #3782) 
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
