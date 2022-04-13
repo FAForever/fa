@@ -146,7 +146,7 @@ Game version 3732 (22nd of April, 2022)
     Reduces the amount of garbage generated when an engineer is reclaiming a prop, such
     as a tree or a wreck.
 
- - Improve performance of shield interactions (#3681)
+ - Improve performance of shield interactions (#3681, #3699)
     Significantly improves the performance when a lot of shield interactions are happening
     simultaniously. This is the case when shields get tickled to death, such as by a Mantis
     or by a bomber. 
