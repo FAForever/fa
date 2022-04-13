@@ -8,6 +8,13 @@ Game version 3732 (22nd of April, 2022)
     to optimal balance but allows the host to manually tweak the starting positions
     and take into account parties before launching the game.
 
+ - Introduction of experimental graphics (#3775)
+    Allows you to increase the LOD of entities and the LOD and resolution of 
+    shadows. This can be enabled separetely in the graphics options of the game. Is
+    applied after restarting the game.
+
+    Please read the tooltip carefully.
+
  - Dynamic AI threat calculations (#3660) 
     The AI threat values have not been updated over the years - they are now 
     computed based on unit statistics during the blueprint loading phase. 
@@ -89,7 +96,7 @@ Game version 3732 (22nd of April, 2022)
  - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765)
 
  - Fix various issues that people found while playing on FAF Develop 
- - (#3729, #3731, #3732, #3748, #3771)
+ - (#3729, #3731, #3732, #3748, #3771, #3774)
 
     With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
     people that hosted games on FAF Develop and / or reported issues to the game team.
@@ -257,6 +264,10 @@ Game version 3732 (22nd of April, 2022)
     
     This was a well-described starters issue - you can find more of these issues on the repository.
 
+ - Improve performance of veterancy buff creation (#3720)
+    Reduction of table allocations.
+
+    This was a well-described starters issue - you can find more of these issues on the repository.
 ### Contributors
 
  - Sheikah (#3647)
@@ -276,7 +287,8 @@ Game version 3732 (22nd of April, 2022)
         #3681, #3683, #3685, #3673, #3653,
         #3693, #3691, #3696, #3698, #3718,
         #3714, #3719, #3702, #3729, #3710,
-        #3712, #3736, #3740, #3753, #3720)
+        #3712, #3736, #3740, #3753, #3720,
+        #3774, #3775)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
@@ -286,3 +298,4 @@ Game version 3732 (22nd of April, 2022)
  - Brokerjoe (#3738, #3740)
  - SkepticSpecter (#3743)
  - Madmax (#3720)
+ - Healther (#3722)
