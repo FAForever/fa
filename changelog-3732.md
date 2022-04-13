@@ -165,6 +165,9 @@ Game version 3732 (22nd of April, 2022)
  - Improve performance of utility functions of the Unit class (#3678, #3691)
     Reduction of table allocations and engine calls.
 
+ - Removal of the blinking lights (#3698)
+    Completely removes the blinking lights. They took a lot of bookkeeping while being barely visible.
+
 ### Contributors
 
  - Sheikah (#3647)
@@ -179,7 +182,7 @@ Game version 3732 (22nd of April, 2022)
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653
-        #3693, #3691, #3696)
+        #3693, #3691, #3696, #3698)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
