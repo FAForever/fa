@@ -268,6 +268,9 @@ Game version 3732 (22nd of April, 2022)
     Reduction of table allocations.
 
     This was a well-described starters issue - you can find more of these issues on the repository.
+
+ - Improve performance of OnMotionHorzEventChange (#3717) 
+    Reduction of function calls and removes the 'OnMotionHorzStart' callback.
 ### Contributors
 
  - Sheikah (#3647)
@@ -298,4 +301,4 @@ Game version 3732 (22nd of April, 2022)
  - Brokerjoe (#3738, #3740)
  - SkepticSpecter (#3743)
  - Madmax (#3720)
- - Healther (#3722)
+ - Healther (#3722, #3717)
