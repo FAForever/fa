@@ -126,6 +126,13 @@ Game version 3732 (22nd of April, 2022)
     One particular use case that is significantly faster is when you have fire at Janus fly over
     30 mobile shields. This took about 60% of the total budget per tick, but now only takes 10%.
 
+ - Improve performance of damage over time (DOT) (#3683)
+
+ - Improve performance of projectile collisions (#3685) 
+    
+ - Improve performance of unit sound interactions (#3686) 
+    According to commit dfb363d the sound of submarine units do not work. The solution introduced is applied to all units and allocates a handful of entities per unit. These allocations are expensive! By default, units try to play the sound themselves. For submarine units we introduce one entity that plays all the sounds of the submarine. 
+
 ### Contributors
 
  - Sheikah (#3647)
@@ -139,6 +146,6 @@ Game version 3732 (22nd of April, 2022)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
-        #3681)
+        #3681, #3683, #3685)
  - Tagada (#3675)
  - Strogo (#3667)
