@@ -13,11 +13,9 @@ Game version 3732 (22nd of April, 2022)
     in the hotkeys dialogue (F1) by searching for 'information'. Cheats need to 
     be enabled in order for the window to show.
 
- - Fix inconsistencies with cheat menu (#3656)
-    The mouse click is now always registered. Prevents selected units from 
-    interfering with the cheat progress by deselecting them while spawning 
-    units and reselecting them when you are finished. Fixes veterancy issues: 
-    both for the spawn menu and all campaign missions.
+ - Allow Hives to start upgrading immediately (#3675)
+    Part of the Small Suggestions topic on the forum - suggested by Tagada.
+
 
 ### Bug fixes
 
@@ -31,7 +29,13 @@ Game version 3732 (22nd of April, 2022)
 
  - Fix trampling damage (#3669)
     There was a bug introduced last patch that reduced all trampling
-    damage to zero. Surprising how little people reported about it :) .
+    damage to zero. Surprising how little people reported about it :)
+ 
+ - Fix inconsistencies with cheat menu (#3656)
+    The mouse click is now always registered. Prevents selected units from 
+    interfering with the cheat progress by deselecting them while spawning 
+    units and reselecting them when you are finished. Fixes veterancy issues: 
+    both for the spawn menu and all campaign missions.
 
 ### Other
  - Improve readme of repository (#3647, #3663, #3670)
@@ -91,7 +95,7 @@ Game version 3732 (22nd of April, 2022)
     Technical detail: this has no impact on regular games, only on games with AI once they've
     implemented these new routines.
 
- - Improve various UI-related functions (#3659) 
+ - Improve performance of various UI-related functions (#3659) 
     Replaces the global function to use a cached result. A call to `GetSessionClients` or 
     `GetArmiesTable` created a unique table that the garbage collector can pick up two 
     lines later. These functions are called each frame or each tick. With this caching 
@@ -115,4 +119,5 @@ Game version 3732 (22nd of April, 2022)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
-        #3668, #3669, #3670)
+        #3668, #3669, #3670, #3675)
+ - Tagada (#3675)
