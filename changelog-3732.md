@@ -1,6 +1,8 @@
 
-Game version 3731 (30th of December, 2021)
+Game version 3732 (22nd of April, 2022)
 ===================================
+
+
 
 ### Features
  - Dynamic AI threat calculations (#3660) 
@@ -17,14 +19,13 @@ Game version 3731 (30th of December, 2021)
     units and reselecting them when you are finished. Fixes veterancy issues: 
     both for the spawn menu and all campaign missions.
 
-
-
 ### Bug fixes
 
  - Remove new lines when you set a lobby title (#3644) 
     Prevents having lobbies in the client that occupy multiple lines, 
     allowing them to overlap with other lobbies.
 
+ - 
 
 ### Other
  - Improve readme of repository (#3647, #3663)
@@ -70,7 +71,7 @@ Game version 3731 (30th of December, 2021)
     
     Technical detail: The LOD values of props in the blueprint are now ignored.
 
- - Optimize marker usage (#3387) 
+ - Improve performance of markers (#3387) 
     Allows AI developers / map scripters to work with markers without having to worry 
     about underlying performance issues. As an example, retrieving the mass markers
     on a map is a common operation for AIs. If done through the base game code it would 
@@ -84,12 +85,18 @@ Game version 3731 (30th of December, 2021)
     Technical detail: this has no impact on regular games, only on games with AI once they've
     implemented these new routines.
 
- - Optimize session armies and clients (#3659) 
+ - Improve various UI-related functions (#3659) 
     Replaces the global function to use a cached result. A call to `GetSessionClients` or 
     `GetArmiesTable` created a unique table that the garbage collector can pick up two 
     lines later. These functions are called each frame or each tick. With this caching 
     behavior they get replenished every two seconds, or every 0.025 seconds if a fast
     interval is set.
+
+ - Improve performance of reclaim effects (#3672)
+    Reduces the amount of garbage generated when an engineer is reclaiming a prop, such
+    as a tree or a wreck.
+
+
 
 
 ### Contributors
@@ -103,4 +110,4 @@ Game version 3731 (30th of December, 2021)
  - Balthazar (#3660, #3647)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
-        #3659, #3648, #3646, #3649)
+        #3659, #3648, #3646, #3649, #3672)
