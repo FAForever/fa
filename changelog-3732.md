@@ -47,6 +47,8 @@ Game version 3732 (22nd of April, 2022)
     Requires you to set a hotkey to enable it. 
 
  - Display team ratings in the observer window of the lobby (#3721, #3728)
+
+ - Introduction of an announcement when you receive units due to full share (#3712) 
     
 ### Bug fixes
 
@@ -76,6 +78,8 @@ Game version 3732 (22nd of April, 2022)
  - Add missing build mode entries (#3690)
 
  - Fix Cerberus turrets over extending their range (#3693)
+
+ - Fix encoding issues with unicode characters in the preference file (#3711, #3737) 
 
 ### Other
  - Improve readme of repository (#3647, #3663, #3670)
@@ -188,7 +192,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Removal of the blinking lights (#3698)
 
- - Improve performance of UI related classes (#3704, #3703, #3709)
+ - Improve performance of UI related classes (#3704, #3703, #3709, #3725) 
 
  - Improve performance of all props, including wrecks (#3714)
     Significantly reduces the number of tables allocated per prop. Simplifies some 
@@ -207,7 +211,7 @@ Game version 3732 (22nd of April, 2022)
     Introduces a generic approach that is highly optimized. Supports units from
     mod packs accordingly.
  
- - Improve performance of the UEF build effects (#3702)
+ - Improve performance of the UEF build effects (#3702, #3736)
     Significant reduction of table allocations, engine calls and a significant reduction in
     the amount of Lua instructions related to these functions.
 
@@ -222,25 +226,25 @@ Game version 3732 (22nd of April, 2022)
     automated class culling and adjust the implementation of states to reduce the memory footprint 
     of the game. 
 
-
-
 ### Contributors
 
  - Sheikah (#3647)
  - FtxCommando (#3647)
  - BlackYps (#3647, #3642)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
-                     #3728)
+                     #3728, #3712)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
- - 4z0t (#3651, #3647, #3704, #3703, #3709)
+ - 4z0t (#3651, #3647, #3704, #3703, #3709,
+         #3725, #3737)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653,
         #3693, #3691, #3696, #3698, #3718,
-        #3714, #3719, #3702, #3729, #3710)
+        #3714, #3719, #3702, #3729, #3710,
+        #3712, #3736)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
