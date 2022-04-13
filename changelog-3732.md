@@ -20,6 +20,8 @@ Game version 3732 (22nd of April, 2022)
     Allows us to diagnose where the performance is being used during a game. Revolutionary 
     in terms of our capabilities of understanding where all those cycles are going.
 
+    Requires you to set a hotkey to enable it. Abuse is bannable.
+
  - Introduce toggle for mesh rendering on the minimap (#3667)
     All meshes would be culled (or rendered) accordingly on the minimap even though
     they are, typically, never visible. Introduces a toggle to disable mesh rendering
@@ -38,6 +40,13 @@ Game version 3732 (22nd of April, 2022)
  - Temporarily disables weapons of a unit upon gifting (#3696)
     Prevents the cheat where gifted units can immediately fire again. This was particularly
     relevant to bombers.
+
+ - Map utilities window (#3677, #3713) 
+    Introduces a window to help analyse a map. Can be used to visualize the threat values of an AI, 
+    check the buildability of extractors, along with ringed storages and fabricators. Can visualize
+    all markers on a map.
+
+    Requires you to set a hotkey to enable it. 
 
 ### Bug fixes
 
@@ -111,6 +120,8 @@ Game version 3732 (22nd of April, 2022)
     Useful when you have Ai vs Ai games
 
  - Fix issues with the color picker of the lobby (#3705)
+
+ - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
 
 ### Performance
  - Dynamic LOD settings (#3662) 
