@@ -73,20 +73,27 @@ UnitTeleportEffect01 = Class(NullShell) {
         DamageRing(self, pos, .1, 11, 100, 'Disintegrate', false, false)
         WaitSeconds(0.2)
         
+        -- light some trees on fire
+        DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
+        DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
+
 		-- knockdown trees
         for k = 1, 2 do 
-            DamageRing(self, pos, 11, 11 + k, 1, 'Force', false, false)
+            DamageRing(self, pos, 11, 11 + k, 1, 'TreeForce', false, false)
             WaitSeconds(0.1)
         end
+
+        -- light some trees on fire
+        DamageRing(self, pos, 13, 21, 1, 'TreeFire', false, false)
 
 		-- knockdown trees
         for k = 1, 4 do 
-            DamageRing(self, pos, 11, 13 + k * 2, 1, 'Force', false, false)
+            DamageRing(self, pos, 11, 13 + k * 2, 1, 'TreeForce', false, false)
             WaitSeconds(0.1)
         end
 
-        -- Scorch decal and light some trees on fire
-        DamageRing(self, pos, 20, 27, 1, 'Fire', false, false)
+        -- light some trees on fire
+        DamageRing(self, pos, 12, 22, 1, 'TreeFire', false, false)
     end,
 
 	CreateEnergySpinner = function(self)
