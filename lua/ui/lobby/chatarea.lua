@@ -18,10 +18,10 @@ local defaultStyle = {
     shadow = false,
     lineSpacing = 1,
     padding = {
-        left = 0,
-        top = 3,
+        left = 3,
+        top = 2,
         right = 3,
-        bottom = 3
+        bottom = 2
     }
 }
 
@@ -48,7 +48,7 @@ ChatArea = Class(Group) {
             self:ReflowLines()
         end
 
-        LayoutHelpers.AtLeftTopIn(self, parent, 0, 0)
+        LayoutHelpers.AtLeftTopIn(self, parent)
     end,
 
     PostMessage = function(self, messageText, authorName, messageStyle, authorStyle)
@@ -84,7 +84,7 @@ ChatArea = Class(Group) {
 
         for i = 1, table.getn(wrapLines) do
             if (i == 1 and string.len(authorName) > 0) then
-                local strText = string.sub(wrapLines[i], string.len(authorName))
+                local strText = string.sub(wrapLines[i], string.len(authorName) + 1)
                 table.insert(self.ChatLines, {
                     author = {
                         text = authorName,
@@ -118,8 +118,8 @@ ChatArea = Class(Group) {
         local index = 1
         linesGroup.Lines[index] = self:CreateLine(linesGroup)
         local previous = linesGroup.Lines[index]
-        LayoutHelpers.AtLeftTopIn(previous, linesGroup, self.Style.padding.left)
-        while previous.Bottom() + previous.Height()  < linesGroup.Bottom() do
+        LayoutHelpers.AtLeftTopIn(previous, linesGroup, self.Style.padding.left, self.Style.padding.top)
+        while previous.Bottom() + previous.Height() + self.Style.padding.bottom < linesGroup.Bottom() do
             index = index + 1
             linesGroup.Lines[index] = self:CreateLine(linesGroup)
             LayoutHelpers.Below(linesGroup.Lines[index], previous, 2)
@@ -135,7 +135,6 @@ ChatArea = Class(Group) {
         line:DisableHitTest()
 
         line.author = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.author.fontFamily())
-        
         LayoutHelpers.AtLeftTopIn(line.author, line)
         line.message = UIUtil.CreateText(line, '', self.Style.fontSize(), self.Style.message.fontFamily())
         LayoutHelpers.RightOf(line.message, line.author)
@@ -188,15 +187,12 @@ ChatArea = Class(Group) {
     ClearHistory = function(self)
         self:ClearLines()
         self.ChatHistory = {}
-
     end,
 
     ClearLines = function(self)
         self.ChatLines = {}
         if not IsDestroyed(self.linesGroup) then
-            self.linesGroup:ApplyFunction(function(control)
-                control:Destroy()
-            end)
+            self.linesGroup:Destroy()
             self.linesGroup = nil
         end
     end,
