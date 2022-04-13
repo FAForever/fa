@@ -48,6 +48,8 @@ Game version 3732 (22nd of April, 2022)
 
     Requires you to set a hotkey to enable it. 
 
+ - Display team ratings in the observer window of the lobby (#3721)
+    
 ### Bug fixes
 
  - Remove new lines when you set a lobby title (#3644) 
@@ -214,7 +216,7 @@ Game version 3732 (22nd of April, 2022)
  - Sheikah (#3647)
  - FtxCommando (#3647)
  - BlackYps (#3647, #3642)
- - Emperor_Penguin (#3647, #3705, #3715)
+ - Emperor_Penguin (#3647, #3705, #3715, #3721)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
@@ -222,8 +224,8 @@ Game version 3732 (22nd of April, 2022)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
-        #3681, #3683, #3685, #3673, #3653
-        #3693, #3691, #3696, #3698, #3718
+        #3681, #3683, #3685, #3673, #3653,
+        #3693, #3691, #3696, #3698, #3718,
         #3714, #3719, #3702)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
