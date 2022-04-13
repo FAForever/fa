@@ -125,7 +125,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
 
- - Fix various issues that people found while playing on FAF Develop (#3728)
+ - Fix various issues that people found while playing on FAF Develop (#3729)
 
 ### Performance
  - Dynamic LOD settings (#3662) 
@@ -229,7 +229,7 @@ Game version 3732 (22nd of April, 2022)
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653,
         #3693, #3691, #3696, #3698, #3718,
-        #3714, #3719, #3702, #3728)
+        #3714, #3719, #3702, #3729)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
