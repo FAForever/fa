@@ -49,6 +49,11 @@ Game version 3732 (22nd of April, 2022)
 
  - Proper UI scaling of Window class (#3679) 
 
+ - Fix display name of Ythotha death weapon (#3689)
+    The yearly contribution of Rowey - can't wait what next year will bring us!
+
+ - Add missing build mode entries (#3690)
+
 ### Other
  - Improve readme of repository (#3647, #3663, #3670)
     Introduces a modern readme and accurate installation instructions of the 
@@ -83,6 +88,8 @@ Game version 3732 (22nd of April, 2022)
  - Change default army color order of lobby (#3642)
     Changes the default army colors to be more intuitive, as an example: when the game is 
     2 vs 2 then it is two shades of red versus two shades of blue.
+
+ - Improve compatibility with Lua 5.1 (#3676) 
 
 ### Performance
  - Dynamic LOD settings (#3662) 
@@ -127,9 +134,11 @@ Game version 3732 (22nd of April, 2022)
     30 mobile shields. This took about 60% of the total budget per tick, but now only takes 10%.
 
  - Improve performance of damage over time (DOT) (#3683)
+    Reduction of table allocations. 
 
  - Improve performance of projectile collisions (#3685) 
-    
+    Reduction of table allocations and engine calls.
+
  - Improve performance of unit sound interactions (#3686) 
     According to commit dfb363d the sound of submarine units do not work. The solution introduced is applied to all units and allocates a handful of entities per unit. These allocations are expensive! By default, units try to play the sound themselves. For submarine units we introduce one entity that plays all the sounds of the submarine. 
 
@@ -141,7 +150,7 @@ Game version 3732 (22nd of April, 2022)
  - Emperor_Penguin (#3647)
  - Askaholic (#3647)
  - Sheeo (#3647)
- - Balthazar (#3660, #3647)
+ - Balthazar (#3660, #3647, #3676)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
@@ -149,3 +158,6 @@ Game version 3732 (22nd of April, 2022)
         #3681, #3683, #3685)
  - Tagada (#3675)
  - Strogo (#3667)
+ - Rowey (#3689)
+ - Unbring (#3690)
+
