@@ -26,6 +26,7 @@ Game version 3732 (22nd of April, 2022)
     in the minimap.
 
     This is not functional until the next release of the executable.
+
 ### Bug fixes
 
  - Remove new lines when you set a lobby title (#3644) 
@@ -117,6 +118,13 @@ Game version 3732 (22nd of April, 2022)
     Reduces the amount of garbage generated when an engineer is reclaiming a prop, such
     as a tree or a wreck.
 
+ - Improve performance of shield interactions (#3681)
+    Significantly improves the performance when a lot of shield interactions are happening
+    simultaniously. This is the case when shields get tickled to death, such as by a Mantis
+    or by a bomber. 
+
+    One particular use case that is significantly faster is when you have fire at Janus fly over
+    30 mobile shields. This took about 60% of the total budget per tick, but now only takes 10%.
 
 ### Contributors
 
@@ -130,6 +138,7 @@ Game version 3732 (22nd of April, 2022)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
-        #3668, #3669, #3670, #3675, #3679)
+        #3668, #3669, #3670, #3675, #3679,
+        #3681)
  - Tagada (#3675)
  - Strogo (#3667)
