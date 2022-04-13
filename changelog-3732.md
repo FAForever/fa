@@ -25,7 +25,9 @@ Game version 3732 (22nd of April, 2022)
     Prevents having lobbies in the client that occupy multiple lines, 
     allowing them to overlap with other lobbies.
 
- - 
+ - Preserve weapon bone orientation upon destruction (#3668)
+    There was a bug introduced last patch that causes weapons to reset
+    their orientation right before the unit was destroyed. 
 
 ### Other
  - Improve readme of repository (#3647, #3663)
@@ -97,8 +99,6 @@ Game version 3732 (22nd of April, 2022)
     as a tree or a wreck.
 
 
-
-
 ### Contributors
 
  - Sheikah (#3647)
@@ -110,4 +110,5 @@ Game version 3732 (22nd of April, 2022)
  - Balthazar (#3660, #3647)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
-        #3659, #3648, #3646, #3649, #3672)
+        #3659, #3648, #3646, #3649, #3672,
+        #3668)
