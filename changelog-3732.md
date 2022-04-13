@@ -143,6 +143,20 @@ Game version 3732 (22nd of April, 2022)
  - Improve stability of lobby (#3747)
 
 ### Performance
+ - Fix LODs of effects (#3720) 
+
+    Fixes inconsistent Level of Detail (LOD) cutoffs for effects. The cutoff is used to 
+    prevent the creation and rendering of particles when they barely contribute to the final 
+    image. A lot of effects had an infinite cutoff. These particles were always created and 
+    rendered. The creation of particles has a significant impact on the sim, the rendering 
+    has an impact on your fps. We introduce a sane LOD cutoff value with which we improve 
+    the performance of the sim and your fps at the same time.
+
+    With thanks to Madmax (creator of various maps and mods) for all his effort to
+    look at more than individual 300 effect files.
+
+    This was a well-described starters issue - you can find more of these issues on the repository.
+
  - Dynamic LOD settings (#3662) 
     Computes the LOD cut off values of props based on its blueprint properties. A 
     prop that occupies less screen space will have a lower cut off value - allowing 
@@ -241,7 +255,7 @@ Game version 3732 (22nd of April, 2022)
  - Improve performance of exhaus effects (#3743)
     Significant reduction of table allocations.
     
-    This was a well-described starters issue - you can find more of these issue on the repository.
+    This was a well-described starters issue - you can find more of these issues on the repository.
 
 ### Contributors
 
@@ -262,7 +276,7 @@ Game version 3732 (22nd of April, 2022)
         #3681, #3683, #3685, #3673, #3653,
         #3693, #3691, #3696, #3698, #3718,
         #3714, #3719, #3702, #3729, #3710,
-        #3712, #3736, #3740, #3753) 
+        #3712, #3736, #3740, #3753, #3720)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
@@ -271,3 +285,4 @@ Game version 3732 (22nd of April, 2022)
  - Relent0r (#3673)
  - Brokerjoe (#3738, #3740)
  - SkepticSpecter (#3743)
+ - Madmax (#3720)
