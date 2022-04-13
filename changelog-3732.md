@@ -46,7 +46,7 @@ Game version 3732 (22nd of April, 2022)
 
     Requires you to set a hotkey to enable it. 
 
- - Display team ratings in the observer window of the lobby (#3721, #3728)
+ - Display team ratings in the observer window of the lobby (#3721, #3728, #3742)
 
  - Introduction of an announcement when you receive units due to full share (#3712) 
     
@@ -129,9 +129,9 @@ Game version 3732 (22nd of April, 2022)
 
  - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
 
- - Fix various issues that people found while playing on FAF Develop (#3729, #3731, #3732)
-    With thanks to: Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
-    people that reported issues to the game team.
+ - Fix various issues that people found while playing on FAF Develop (#3729, #3731, #3732, #3748)
+    With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
+    people that hosted games on FAF Develop and / or reported issues to the game team.
 
 ### Performance
  - Dynamic LOD settings (#3662) 
@@ -211,7 +211,7 @@ Game version 3732 (22nd of April, 2022)
     Introduces a generic approach that is highly optimized. Supports units from
     mod packs accordingly.
  
- - Improve performance of the UEF build effects (#3702, #3736)
+ - Improve performance of the UEF build effects (#3702, #3736, #3738)
     Significant reduction of table allocations, engine calls and a significant reduction in
     the amount of Lua instructions related to these functions.
 
@@ -226,13 +226,18 @@ Game version 3732 (22nd of April, 2022)
     automated class culling and adjust the implementation of states to reduce the memory footprint 
     of the game. 
 
+ - Improve performance of exhaus effects (#3743)
+    Significant reduction of table allocations.
+    
+    This was a well-described starters issue - you can find more of these issue on the repository.
+
 ### Contributors
 
  - Sheikah (#3647)
  - FtxCommando (#3647)
  - BlackYps (#3647, #3642)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
-                     #3728, #3712)
+                     #3728, #3712, #3742)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
@@ -251,4 +256,5 @@ Game version 3732 (22nd of April, 2022)
  - Unbring (#3690)
  - KionX (#3682)
  - Relent0r (#3673)
- - Brokerjoe (#)
+ - Brokerjoe (#3738) 
+ - SkepticSpecter (#3743)
