@@ -35,6 +35,9 @@ Game version 3732 (22nd of April, 2022)
 
     This only impacts AI-related games. With thanks to Relent0r (creator of RNGAI) for his time.
 
+ - Temporarily disables weapons of a unit upon gifting (#3696)
+    Prevents the cheat where gifted units can immediately fire again. This was particularly
+    relevant to bombers.
 ### Bug fixes
 
  - Remove new lines when you set a lobby title (#3644) 
@@ -159,7 +162,7 @@ Game version 3732 (22nd of April, 2022)
  - Improve performance of unit sound interactions (#3686) 
     According to commit dfb363d the sound of submarine units do not work. The solution introduced is applied to all units and allocates a handful of entities per unit. These allocations are expensive! By default, units try to play the sound themselves. For submarine units we introduce one entity that plays all the sounds of the submarine. 
 
- - Refactor utility functions of the Unit class (#3678) 
+ - Improve performance of utility functions of the Unit class (#3678, #3691)
     Reduction of table allocations and engine calls.
 
 ### Contributors
@@ -176,7 +179,7 @@ Game version 3732 (22nd of April, 2022)
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653
-        #3693)
+        #3693, #3691, #3696)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
