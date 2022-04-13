@@ -119,7 +119,7 @@ Game version 3732 (22nd of April, 2022)
  - Enable `wld_RunWithTheWind` from the command line (#3653)
     Useful when you have Ai vs Ai games
 
- - Fix issues with the color picker of the lobby (#3705)
+ - Fix issues with the color picker of the lobby (#3705, #3715)
 
  - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
 
