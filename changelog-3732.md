@@ -219,6 +219,9 @@ Game version 3732 (22nd of April, 2022)
     performance of UEF build effects in the playlist Game Development on the FAForever  
     Youtube channel.
 
+ - Improve performance of the Seraphim build effects (#3740, #3753)
+    Corrects the scope of some values and improves the consistency of the Seraphim build effect.
+
  - Improve performance of the Lua class hierarchy (#3710) 
     Re-implements the class hierarchy used on the Lua side of the game from scratch. It simplifies
     the implementation to improve the performance while retaining the same functionality. Reduces
@@ -249,12 +252,12 @@ Game version 3732 (22nd of April, 2022)
         #3681, #3683, #3685, #3673, #3653,
         #3693, #3691, #3696, #3698, #3718,
         #3714, #3719, #3702, #3729, #3710,
-        #3712, #3736)
+        #3712, #3736, #3740, #3753) 
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
  - Unbring (#3690)
  - KionX (#3682)
  - Relent0r (#3673)
- - Brokerjoe (#3738) 
+ - Brokerjoe (#3738, #3740)
  - SkepticSpecter (#3743)
