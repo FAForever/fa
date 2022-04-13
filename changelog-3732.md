@@ -37,6 +37,8 @@ Game version 3732 (22nd of April, 2022)
     units and reselecting them when you are finished. Fixes veterancy issues: 
     both for the spawn menu and all campaign missions.
 
+ - Proper UI scaling of Window class (#3679) 
+
 ### Other
  - Improve readme of repository (#3647, #3663, #3670)
     Introduces a modern readme and accurate installation instructions of the 
@@ -119,5 +121,5 @@ Game version 3732 (22nd of April, 2022)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
-        #3668, #3669, #3670, #3675)
+        #3668, #3669, #3670, #3675, #3679)
  - Tagada (#3675)
