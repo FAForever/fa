@@ -38,6 +38,7 @@ Game version 3732 (22nd of April, 2022)
  - Temporarily disables weapons of a unit upon gifting (#3696)
     Prevents the cheat where gifted units can immediately fire again. This was particularly
     relevant to bombers.
+
 ### Bug fixes
 
  - Remove new lines when you set a lobby title (#3644) 
@@ -109,7 +110,7 @@ Game version 3732 (22nd of April, 2022)
  - Enable `wld_RunWithTheWind` from the command line (#3653)
     Useful when you have Ai vs Ai games
 
-   
+ - Fix issues with the color picker of the lobby (#3705)
 
 ### Performance
  - Dynamic LOD settings (#3662) 
@@ -173,7 +174,7 @@ Game version 3732 (22nd of April, 2022)
  - Sheikah (#3647)
  - FtxCommando (#3647)
  - BlackYps (#3647, #3642)
- - Emperor_Penguin (#3647)
+ - Emperor_Penguin (#3647, #3705)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
