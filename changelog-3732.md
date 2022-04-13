@@ -2,8 +2,6 @@
 Game version 3732 (22nd of April, 2022)
 ===================================
 
-
-
 ### Features
  - Dynamic AI threat calculations (#3660) 
     The AI threat values have not been updated over the years - they are now 
@@ -116,7 +114,9 @@ Game version 3732 (22nd of April, 2022)
 
  - Improve compatibility with Lua 5.1 (#3676) 
 
- - Compatibility for LuaJIT (#3682) 
+ - Improve compatibility for LuaJIT (#3682) 
+    Sadly - LuaJit itself has been cancelled due to the insignificant improvements to the simulation
+    in comparison to the amount of work.
 
  - Enable `wld_RunWithTheWind` from the command line (#3653)
     Useful when you have Ai vs Ai games
@@ -125,7 +125,9 @@ Game version 3732 (22nd of April, 2022)
 
  - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
 
- - Fix various issues that people found while playing on FAF Develop (#3729)
+ - Fix various issues that people found while playing on FAF Develop (#3729, #3731, #3732)
+    With thanks to: Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
+    people that reported issues to the game team.
 
 ### Performance
  - Dynamic LOD settings (#3662) 
@@ -213,6 +215,15 @@ Game version 3732 (22nd of April, 2022)
     performance of UEF build effects in the playlist Game Development on the FAForever  
     Youtube channel.
 
+ - Improve performance of the Lua class hierarchy (#3710) 
+    Re-implements the class hierarchy used on the Lua side of the game from scratch. It simplifies
+    the implementation to improve the performance while retaining the same functionality. Reduces
+    the amount of tables allocated and the amount of table-related Lua instructions. Supports  
+    automated class culling and adjust the implementation of states to reduce the memory footprint 
+    of the game. 
+
+
+
 ### Contributors
 
  - Sheikah (#3647)
@@ -229,7 +240,7 @@ Game version 3732 (22nd of April, 2022)
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653,
         #3693, #3691, #3696, #3698, #3718,
-        #3714, #3719, #3702, #3729)
+        #3714, #3719, #3702, #3729, #3710)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
