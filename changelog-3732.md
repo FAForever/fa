@@ -184,26 +184,35 @@ Game version 3732 (22nd of April, 2022)
 
  - Improve performance of UI related classes (#3704, #3703)
 
- - Improve the performance of all props, including wrecks (#3714)
+ - Improve performance of all props, including wrecks (#3714)
     Significantly reduces the number of tables allocated per prop. Simplifies some 
     of the logic in favor of performance. Completely removes the state machine. Improves
     the visual fidelity of forest fires.
+
+ - Improve performance of all projectiles (#3718)
+    Reduction of table allocations, engine calls and various logic across the projectile
+    class hierarchy.
+
+    Part of a session available on Youtube. See the videos about improving the 
+    performance of projectiles in the playlist Game Development on the FAForever Youtube 
+    channel.
 
 ### Contributors
 
  - Sheikah (#3647)
  - FtxCommando (#3647)
  - BlackYps (#3647, #3642)
- - Emperor_Penguin (#3647, #3705)
+ - Emperor_Penguin (#3647, #3705, #3715)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
- - 4z0t (#3651, #3647, #3704))
+ - 4z0t (#3651, #3647, #3704, #3703)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653
-        #3693, #3691, #3696, #3698)
+        #3693, #3691, #3696, #3698, #3718
+        #3714, )
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
