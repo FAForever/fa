@@ -34,7 +34,7 @@ Game version 3732 (22nd of April, 2022)
     damage to zero. Surprising how little people reported about it :) .
 
 ### Other
- - Improve readme of repository (#3647, #3663)
+ - Improve readme of repository (#3647, #3663, #3670)
     Introduces a modern readme and accurate installation instructions of the 
     development environment. With thanks to everyone involved, including but not 
     limited to BlackYps, Sheikah, Balthazar, Emperor, Ftx. And thanks to 4z0t there is 
@@ -115,4 +115,4 @@ Game version 3732 (22nd of April, 2022)
  - 4z0t (#3651, #3647)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
-        #3668, #3669)
+        #3668, #3669, #3670)
