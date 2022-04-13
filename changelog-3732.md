@@ -103,7 +103,7 @@ Game version 3732 (22nd of April, 2022)
  - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765)
 
  - Fix various issues that people found while playing on FAF Develop 
- - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782) 
+ - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784) 
 
     With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
     people that hosted games on FAF Develop and / or reported issues to the game team.
