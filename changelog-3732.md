@@ -16,7 +16,16 @@ Game version 3732 (22nd of April, 2022)
  - Allow Hives to start upgrading immediately (#3675)
     Part of the Small Suggestions topic on the forum - suggested by Tagada.
 
+ - Introduction of the (performance) profiler (#3674)
+    Allows us to diagnose where the performance is being used during a game. Revolutionary 
+    in terms of our capabilities of understanding where all those cycles are going.
 
+ - Introduce toggle for mesh rendering on the minimap (#3667)
+    All meshes would be culled (or rendered) accordingly on the minimap even though
+    they are, typically, never visible. Introduces a toggle to disable mesh rendering
+    in the minimap.
+
+    This is not functional until the next release of the executable.
 ### Bug fixes
 
  - Remove new lines when you set a lobby title (#3644) 
@@ -123,3 +132,4 @@ Game version 3732 (22nd of April, 2022)
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679)
  - Tagada (#3675)
+ - Strogo (#3667)
