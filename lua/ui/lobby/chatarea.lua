@@ -126,6 +126,7 @@ ChatArea = Class(Group) {
             previous = linesGroup.Lines[index]
         end
         self.linesGroup = linesGroup
+        self.Parent.LinesOnPage:Set(index)
     end,
 
     CreateLine = function(self, parent)
