@@ -27,6 +27,14 @@ Game version 3732 (22nd of April, 2022)
 
     This is not functional until the next release of the executable.
 
+ - Adjust dynamic threat computations (#3680, #3673)
+    Armored command units no longer have inflated threat values. Introduces a flag to skip 
+    the dynamic threat computation all together, defaulting back to what was set in the 
+    blueprint. Weapons by default produce direct fire threat, unless they are flagged to be 
+    blockable by an anti-artillery shield. In that case they only produce economic threat.
+
+    This only impacts AI-related games. With thanks to Relent0r (creator of RNGAI) for his time.
+
 ### Bug fixes
 
  - Remove new lines when you set a lobby title (#3644) 
@@ -159,9 +167,10 @@ Game version 3732 (22nd of April, 2022)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
-        #3681, #3683, #3685)
+        #3681, #3683, #3685, #3673))
  - Tagada (#3675)
  - Strogo (#3667)
  - Rowey (#3689)
  - Unbring (#3690)
  - KionX (#3682)
+ - Relent0r (#3673)
