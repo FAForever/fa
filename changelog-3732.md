@@ -91,6 +91,10 @@ Game version 3732 (22nd of April, 2022)
 
  - Improve compatibility with Lua 5.1 (#3676) 
 
+ - Compatibility for LuaJIT (#3682) 
+
+
+
 ### Performance
  - Dynamic LOD settings (#3662) 
     Computes the LOD cut off values of props based on its blueprint properties. A 
@@ -160,4 +164,4 @@ Game version 3732 (22nd of April, 2022)
  - Strogo (#3667)
  - Rowey (#3689)
  - Unbring (#3690)
-
+ - KionX (#3682)
