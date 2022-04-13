@@ -48,7 +48,7 @@ Game version 3732 (22nd of April, 2022)
 
     Requires you to set a hotkey to enable it. 
 
- - Display team ratings in the observer window of the lobby (#3721)
+ - Display team ratings in the observer window of the lobby (#3721, #3728)
     
 ### Bug fixes
 
@@ -124,6 +124,8 @@ Game version 3732 (22nd of April, 2022)
  - Fix issues with the color picker of the lobby (#3705, #3715)
 
  - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
+
+ - Fix various issues that people found while playing on FAF Develop (#3728)
 
 ### Performance
  - Dynamic LOD settings (#3662) 
@@ -216,7 +218,8 @@ Game version 3732 (22nd of April, 2022)
  - Sheikah (#3647)
  - FtxCommando (#3647)
  - BlackYps (#3647, #3642)
- - Emperor_Penguin (#3647, #3705, #3715, #3721)
+ - Emperor_Penguin  (#3647, #3705, #3715, #3721,
+                     #3728)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
@@ -226,7 +229,7 @@ Game version 3732 (22nd of April, 2022)
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653,
         #3693, #3691, #3696, #3698, #3718,
-        #3714, #3719, #3702)
+        #3714, #3719, #3702, #3728)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
