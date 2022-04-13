@@ -86,7 +86,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Fix encoding issues with unicode characters in the preference file (#3711, #3737) 
 
- - Fix issues with the color picker of the lobby (#3705, #3715, #3751)
+ - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765)
 
  - Fix various issues that people found while playing on FAF Develop 
  - (#3729, #3731, #3732, #3748, #3771)
