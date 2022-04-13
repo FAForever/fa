@@ -3,6 +3,11 @@ Game version 3732 (22nd of April, 2022)
 ===================================
 
 ### Features
+ - In-lobby auto balancing (#3750, #3764) 
+    Introduction of in-lobby balancing for the typical two-team setup. Similar results
+    to optimal balance but allows the host to manually tweak the starting positions
+    and take into account parties before launching the game.
+
  - Dynamic AI threat calculations (#3660) 
     The AI threat values have not been updated over the years - they are now 
     computed based on unit statistics during the blueprint loading phase. 
@@ -242,7 +247,8 @@ Game version 3732 (22nd of April, 2022)
  - FtxCommando (#3647)
  - BlackYps (#3647, #3642)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
-                     #3728, #3712, #3742, #3751)
+                     #3728, #3712, #3742, #3751,
+                     #3764, #3750)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
