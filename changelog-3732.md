@@ -182,7 +182,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Removal of the blinking lights (#3698)
 
- - Improve performance of UI related classes (#3704, #3703)
+ - Improve performance of UI related classes (#3704, #3703, #3709)
 
  - Improve performance of all props, including wrecks (#3714)
     Significantly reduces the number of tables allocated per prop. Simplifies some 
@@ -197,6 +197,10 @@ Game version 3732 (22nd of April, 2022)
     performance of projectiles in the playlist Game Development on the FAForever Youtube 
     channel.
 
+ - Improve performance of tree-knocking and decal creation of projectiles (#3719)
+    Introduces a generic approach that is highly optimized. Supports units from
+    mod packs accordingly.
+
 ### Contributors
 
  - Sheikah (#3647)
@@ -206,13 +210,13 @@ Game version 3732 (22nd of April, 2022)
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
- - 4z0t (#3651, #3647, #3704, #3703)
+ - 4z0t (#3651, #3647, #3704, #3703, #3709)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653
         #3693, #3691, #3696, #3698, #3718
-        #3714, )
+        #3714, #3719)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
