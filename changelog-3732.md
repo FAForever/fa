@@ -62,6 +62,8 @@ Game version 3732 (22nd of April, 2022)
 
  - Add missing build mode entries (#3690)
 
+ - Fix Cerberus turrets over extending their range (#3693)
+
 ### Other
  - Improve readme of repository (#3647, #3663, #3670)
     Introduces a modern readme and accurate installation instructions of the 
@@ -101,7 +103,10 @@ Game version 3732 (22nd of April, 2022)
 
  - Compatibility for LuaJIT (#3682) 
 
+ - Enable `wld_RunWithTheWind` from the command line (#3653)
+    Useful when you have Ai vs Ai games
 
+   
 
 ### Performance
  - Dynamic LOD settings (#3662) 
@@ -154,6 +159,9 @@ Game version 3732 (22nd of April, 2022)
  - Improve performance of unit sound interactions (#3686) 
     According to commit dfb363d the sound of submarine units do not work. The solution introduced is applied to all units and allocates a handful of entities per unit. These allocations are expensive! By default, units try to play the sound themselves. For submarine units we introduce one entity that plays all the sounds of the submarine. 
 
+ - Refactor utility functions of the Unit class (#3678) 
+    Reduction of table allocations and engine calls.
+
 ### Contributors
 
  - Sheikah (#3647)
@@ -167,8 +175,9 @@ Game version 3732 (22nd of April, 2022)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
-        #3681, #3683, #3685, #3673)
- - Tagada (#3675)
+        #3681, #3683, #3685, #3673, #3653
+        #3693)
+ - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
  - Unbring (#3690)
