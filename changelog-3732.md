@@ -200,6 +200,14 @@ Game version 3732 (22nd of April, 2022)
  - Improve performance of tree-knocking and decal creation of projectiles (#3719)
     Introduces a generic approach that is highly optimized. Supports units from
     mod packs accordingly.
+ 
+ - Improve performance of the UEF build effects (#3702)
+    Significant reduction of table allocations, engine calls and a significant reduction in
+    the amount of Lua instructions related to these functions.
+
+    Part of a session available on Youtube. See the videos about improving the 
+    performance of UEF build effects in the playlist Game Development on the FAForever  
+    Youtube channel.
 
 ### Contributors
 
@@ -216,10 +224,11 @@ Game version 3732 (22nd of April, 2022)
         #3668, #3669, #3670, #3675, #3679,
         #3681, #3683, #3685, #3673, #3653
         #3693, #3691, #3696, #3698, #3718
-        #3714, #3719)
+        #3714, #3719, #3702)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
  - Unbring (#3690)
  - KionX (#3682)
  - Relent0r (#3673)
+ - Brokerjoe (#)
