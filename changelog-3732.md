@@ -172,7 +172,10 @@ Game version 3732 (22nd of April, 2022)
     Reduction of table allocations and engine calls.
 
  - Improve performance of unit sound interactions (#3686) 
-    According to commit dfb363d the sound of submarine units do not work. The solution introduced is applied to all units and allocates a handful of entities per unit. These allocations are expensive! By default, units try to play the sound themselves. For submarine units we introduce one entity that plays all the sounds of the submarine. 
+    According to commit dfb363d the sound of submarine units do not work. The solution introduced 
+    is applied to all units and allocates a handful of entities per unit. These allocations are 
+    expensive! By default, units try to play the sound themselves. For submarine units we 
+    introduce one entity that plays all the sounds of the submarine. 
 
  - Improve performance of utility functions of the Unit class (#3678, #3691)
     Reduction of table allocations and engine calls.
@@ -180,6 +183,11 @@ Game version 3732 (22nd of April, 2022)
  - Removal of the blinking lights (#3698)
 
  - Improve performance of UI related classes (#3704, #3703)
+
+ - Improve the performance of all props, including wrecks (#3714)
+    Significantly reduces the number of tables allocated per prop. Simplifies some 
+    of the logic in favor of performance. Completely removes the state machine. Improves
+    the visual fidelity of forest fires.
 
 ### Contributors
 
