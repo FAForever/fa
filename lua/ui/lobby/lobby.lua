@@ -3366,8 +3366,9 @@ function CreateUI(maxPlayers)
         return self.top >= self:GetScrollLastPage()
     end
     -- this function set how many chat lines can fit per scroll page (chatPanel)
-    GUI.chatPanel.SetLinesPerScrollPage = function(self, fontSize)
-        self.linesPerScrollPage = math.floor((self.Height() - 10) / (fontSize + 4))
+    GUI.chatPanel.LinesOnPage = import('/lua/lazyvar.lua').Create()
+    GUI.chatPanel.LinesOnPage.OnDirty = function(var)
+        GUI.chatPanel.linesPerScrollPage = var()
     end
     -- --------- Chat Scrolling Functions -----------------------
 
@@ -3378,7 +3379,6 @@ function CreateUI(maxPlayers)
     end
     -- set initial scrolling based on chat font size
     local fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
-    GUI.chatPanel:SetLinesPerScrollPage(fontSize)
 
     local newMessageArrow = Button(GUI.chatPanel, '/textures/ui/common/lobby/chat_arrow/arrow_up.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds','/textures/ui/common/lobby/chat_arrow/arrow_dis.dds', "UI_Arrow_Click")
     GUI.newMessageArrow = newMessageArrow
@@ -3401,10 +3401,11 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -5)
     chatBG.Width:Set(GUI.chatPanel.Width() - LayoutHelpers.ScaleNumber(16))
     LayoutHelpers.SetHeight(chatBG, 24)
-
+    
     -- Set up the chat edit buttons and functions
     setupChatEdit(GUI.chatPanel)
-
+    -- finally create chat lines
+    GUI.chatDisplay:CreateLines()
     ---------------------------------------------------------------------------
     -- Option display
     ---------------------------------------------------------------------------
@@ -6307,7 +6308,6 @@ function ShowLobbyOptionsDialog()
 
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
         -- updating chat panel with new font size
-        GUI.chatPanel:SetLinesPerScrollPage(sliderValue)
         GUI.chatPanel:SetFont(nil, sliderValue)
 
         if isScrolledDown then
