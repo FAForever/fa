@@ -12,7 +12,19 @@ local TableInsert = table.insert
 -- prevent magic numbers
 local countdownDuration = 5
 
-function ToggleSelfDestruct(data)
+--- Destroys the given unit after a set duration
+local function SelfDestructThread(unit)
+    WaitSeconds(countdownDuration)
+    if unit:BeenDestroyed() then 
+        return 
+    end
+
+    unit:Kill()
+end
+
+--- Toggles the destruction of the units
+function ToggleSelfDestruct(data, units)
+
     -- suppress self destruct in tutorial missions as they screw up the mission end
     if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
         return
@@ -23,9 +35,8 @@ function ToggleSelfDestruct(data)
 
         -- just take them all out
         if data.noDelay then 
-            for _, unitId in data.units do
-                local unit = GetEntityById(unitId)
-                if OkayToMessWithArmy(unit.Army) then
+            for _, unit in units do
+                if OkayToMessWithArmy(unit.Army) then 
                     if not (unit.Dead or unit:BeenDestroyed()) then 
                         unit:Kill()
                     end
@@ -35,48 +46,33 @@ function ToggleSelfDestruct(data)
         -- wait a few seconds, then destroy
         else 
 
-            -- gather units
-            local unitEntities = { }
-            for _, unitId in data.units do
-                local unit = GetEntityById(unitId)
-                if OkayToMessWithArmy(unit.Army) then
-                    TableInsert(unitEntities, unit)
-                end
-            end
-
             -- if one is in the process of being destroyed, remove all destruction threads
             local togglingOff = false
-            for _, unit in unitEntities do
-                if unit.SelfDestructThread then
-                    togglingOff = true
-                    KillThread(unit.SelfDestructThread)
-                    unit.SelfDestructThread = false
-                    CancelCountdown(unit.EntityId)                          -- as defined in SymSync.lua
+            for _, unit in units do
+                if OkayToMessWithArmy(unit.Army) then 
+                    if unit.SelfDestructThread then
+                        togglingOff = true
+                        KillThread(unit.SelfDestructThread)
+                        unit.SelfDestructThread = false
+                        CancelCountdown(unit.EntityId)                          -- as defined in SymSync.lua
+                    end
                 end
             end
 
             -- if none are in the process of being destroyed, destroy them after a delay
             if not togglingOff then
-                for _, unit in unitEntities do
+                for _, unit in units do
+                    if OkayToMessWithArmy(unit.Army) then 
+                        
+                        -- allows fire beetle to be destroyed immediately
+                        if unit.Blueprint.General.InstantDeathOnSelfDestruct then 
+                            unit:Kill()
 
-                    -- allows fire beetle to be destroyed immediately
-                    if unit.Blueprint.General.InstantDeathOnSelfDestruct then 
-                        unit:Kill()
-
-                    -- destroy everything else after five seconds
-                    else 
-                        StartCountdown(unit.EntityId, countdownDuration)    -- as defined in SymSync.lua
-                        unit.SelfDestructThread = ForkThread(
-                            function(unit)
-                                WaitSeconds(countdownDuration)
-                                if unit:BeenDestroyed() then 
-                                    return 
-                                end
-
-                                unit:Kill()
-                            end,
-                            unit 
-                        )
+                        -- destroy everything else after five seconds
+                        else 
+                            StartCountdown(unit.EntityId, countdownDuration)    -- as defined in SymSync.lua
+                            unit.SelfDestructThread = ForkThread(SelfDestructThread, unit)
+                        end
                     end
                 end
             end

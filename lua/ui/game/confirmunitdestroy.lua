@@ -21,7 +21,7 @@ function ConfirmUnitDestruction(instant)
             for _, unit in units do
                 table.insert(unitIds, unit:GetEntityId())
             end
-            SimCallback({Func = 'ToggleSelfDestruct', Args = {units = unitIds, owner = GetFocusArmy(), noDelay = instant}})
+            SimCallback({Func = 'ToggleSelfDestruct', Args = {units = unitIds, owner = GetFocusArmy(), noDelay = instant}}, true)
         end
     end
 end
