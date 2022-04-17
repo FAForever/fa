@@ -141,7 +141,7 @@ local function HostAddPlayer(senderId, playerInfo)
 
     playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
     -- TODO: Should colors be based on teams?
-    playerInfo.PlayerColor = gameColors.DefaultColorOrder[slot]
+    playerInfo.PlayerColor = gameColors.TMMColorOrder[slot]
 
     gameInfo.PlayerOptions[slot] = playerInfo
 end
