@@ -1180,7 +1180,25 @@ function SetSlotInfo(slotNum, playerInfo)
     end
 
     if not (gameInfo.GameOptions.PartiesLocked and playerInfo.Party == 1) then
-        slot.party:Show()
+        -- determine the local party
+        local localParty
+        for i = 1, 16 do
+            if IsLocallyOwned(i) and gameInfo.PlayerOptions[i].Human then
+                localParty = gameInfo.PlayerOptions[i].Party
+                break
+            end
+        end
+
+        -- if this player is requesting to join the local player's party, show
+        -- this slot's add to party button to the local player and locally
+        -- hide the party selector for this slot
+        if playerInfo.Party > 9 and playerInfo.Party == localParty + 8 then
+            slot.party:Hide()
+            GUI.AddToParty[playerInfo.StartSpot]:Show()
+        else
+            GUI.AddToParty[playerInfo.StartSpot]:Hide()
+            slot.party:Show()
+        end
     else
         slot.party:Hide()
     end
@@ -2876,7 +2894,7 @@ function CreateSlotsUI(makeLabel)
 
         -- Party
         local partySelector = Combo(newSlot, 14, 9, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-        partySelector:AddItems({'  ', ' A', ' B', ' C', ' D', ' E', ' F', ' G', ' H'})
+        partySelector:AddItems({'  ', ' A', ' B', ' C', ' D', ' E', ' F', ' G', ' H', ' A?', ' B?', ' C?', ' D?', ' E?', ' F?', ' G?', ' H?'})
         partySelector._text:SetFont('Arial Bold', 14)
         partySelector._titleColor = 'White'
         newSlot.party = partySelector
@@ -2884,6 +2902,55 @@ function CreateSlotsUI(makeLabel)
         LayoutHelpers.SetWidth(partySelector, COLUMN_WIDTHS[9])
         partySelector.OnClick = function(self, index)
             Tooltip.DestroyMouseoverDisplay()
+            local currentParty = gameInfo.PlayerOptions[curRow].Party
+            -- check if the player is trying to join a different party than the player's current party
+            if index != currentParty then
+                -- check if the player is trying to join a party 
+                if index > 1 then
+                    -- check if anyone is already in this party
+                    for i, player in gameInfo.PlayerOptions:pairs() do
+                        if player.Party == index and player.Human then
+                            -- if anyone is already in this party, set this
+                            -- player as a [letter]? party member (indicating
+                            -- desire to be in the party)
+                            index = index + 8
+                            break
+                        end
+                    end
+                end
+                -- if the player was in an actual party
+                if currentParty > 1 and currentParty < 10 then
+                    -- check if anyone else is still in the player's old party
+                    local anyoneElseInParty = false
+                    for i, player in gameInfo.PlayerOptions:pairs() do
+                        if player.Party == currentParty and player.Human and not IsLocallyOwned(i) then
+                            anyoneElseInParty = true
+                            break
+                        end
+                    end
+                    -- if no one will be left in the party and anyone is requesting it,
+                    -- add one requesting player to it
+                    if not anyoneElseInParty then
+                        for i, player in gameInfo.PlayerOptions:pairs() do
+                            if player.Party == currentParty + 8 then
+                                if lobbyComm:IsHost() then
+                                    SetPlayerOption(player.StartSpot, 'Party', currentParty)
+                                else
+                                    lobbyComm:SendData(
+                                        hostID,
+                                        {
+                                            Type = 'ApproveAddToParty',
+                                            PlayerSlot = player.StartSpot,
+                                            Party = currentParty
+                                        }
+                                    )
+                                end
+                                break
+                            end
+                        end
+                    end
+                end
+            end
             SetPlayerOption(curRow, 'Party', index)
         end
         Tooltip.AddControlTooltip(partySelector, 'lob_party')
@@ -3933,6 +4000,11 @@ function CreateUI(maxPlayers)
             -- get rating data for each player
             for i, player in gameInfo.PlayerOptions:pairs() do
                 playerRatings[i] = {player.MEAN, player.DEV, player.StartSpot, player.Team - 1, player.Party}
+                -- if the player's party is >9, then the player requested to join a party,
+                -- but did not actually join one - count this as no party
+                if playerRatings[i][5] > 9 then
+                    playerRatings[i][5] = 1
+                end
                 playerCount = playerCount + 1
                 if player.StartSpot > lastSlot[1] then
                     lastSlot = {player.StartSpot, i, player.Human}
@@ -4353,6 +4425,83 @@ function CreateUI(maxPlayers)
             end
         end
     end
+
+    -- 16 Add To Party Buttons --
+    GUI.AddToParty = {}
+    function CreateAddToPartyButton(slotNum)
+        -- Add To Party Button --
+        GUI.AddToParty[slotNum] = UIUtil.CreateButtonStd(GUI.labelGroup, '/BUTTON/medium/', LOC('<LOC lobui_0622>Add'), 10)
+        LayoutHelpers.SetWidth(GUI.AddToParty[slotNum], 72)
+        LayoutHelpers.SetHeight(GUI.AddToParty[slotNum], 20)
+        LayoutHelpers.AtLeftTopIn(GUI.AddToParty[slotNum], GUI.labelGroup, 579, (slotNum * 22) - 1)
+        Tooltip.AddButtonTooltip(GUI.AddToParty[slotNum], {text=LOC("<LOC lobui_0623>Add to party"), body=LOC("<LOC lobui_0624>Add this player to your party.")})
+
+        GUI.AddToParty[slotNum].OnClick = function()
+
+            -- determine the local party
+            local localParty
+            for i = 1, 16 do
+                if IsLocallyOwned(i) and gameInfo.PlayerOptions[i].Human then
+                    localParty = gameInfo.PlayerOptions[i].Party
+                    break
+                end
+            end
+
+            if lobbyComm:IsHost() then
+                -- add the player to the requested party
+                for i, player in gameInfo.PlayerOptions:pairs() do
+                    if i == slotNum then
+                        SetPlayerOption(i, 'Party', localParty)
+                        break
+                    end
+                end
+            else
+                -- tell the host that the player is approved to be added
+                -- to the requested party
+                for i, player in gameInfo.PlayerOptions:pairs() do
+                    if i == slotNum then
+                        lobbyComm:SendData(
+                            hostID,
+                            {
+                                Type = 'ApproveAddToParty',
+                                PlayerSlot = slotNum,
+                                Party = localParty
+                            }
+                        )
+                        break
+                    end
+                end
+            end
+        end
+
+        -- hide the add to party button by default
+        GUI.AddToParty[slotNum]:Hide()
+    end
+
+    -- create the add to party buttons
+    for i = 1, 16 do
+        CreateAddToPartyButton(i)
+    end
+
+    if not gameInfo.GameOptions.PartiesLocked then
+        -- determine the local party
+        local localParty
+        for i = 1, 16 do
+            if IsLocallyOwned(i) and gameInfo.PlayerOptions[i].Human then
+                localParty = gameInfo.PlayerOptions[i].Party
+                break
+            end
+        end
+
+        -- if a player is requesting to join the local player's party, show
+        -- that slot's add to party button to the local player
+        for i, player in gameInfo.PlayerOptions:pairs() do
+            if player.Party > 9 and player.Party == localParty + 8 then
+                GUI.AddToParty[i]:Show()
+            end
+        end
+    end
+    
 
     -- Observer List
     GUI.observerList = ItemList(GUI.observerPanel)
@@ -5268,6 +5417,15 @@ local MessageHandlers = {
                     Type = 'SetColor',
                     Color = gameInfo.PlayerOptions[TargetSlot].PlayerColor, Slot = TargetSlot
                 })
+            end
+        end
+    },
+
+    ApproveAddToParty = {
+        Accept = AmHost,
+        Handle = function(data)
+            if gameInfo.PlayerOptions[data.PlayerSlot].Party == data.Party + 8 then
+                SetPlayerOption(data.PlayerSlot, 'Party', data.Party)
             end
         end
     },
