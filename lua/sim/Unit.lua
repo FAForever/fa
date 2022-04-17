@@ -1491,7 +1491,6 @@ Unit = Class(moho.unit_methods) {
                 else
                     self:ForkThread(self.DeathWeaponDamageThread, v.DamageRadius, v.Damage, v.DamageType, v.DamageFriendly)
                 end
-                break
             end
         end
     end,

@@ -25,6 +25,7 @@
 -- for a given effect.
 
 local TableGetn = table.getn 
+local TableEmpty = table.empty
 
 TrashBag = Class {
 
@@ -33,10 +34,6 @@ TrashBag = Class {
     -- http://lua-users.org/wiki/GarbageCollectionTutorial
     -- http://lua-users.org/wiki/WeakTablesTutorial
     __mode = 'v',
-
-    -- Signifies the largest index used by this trashbag,  
-    -- used during cleaning to ensure we destroy all values
-    LargestIndex = 0,
 
     --- Add an entity to the trash bag.
     Add = function(self, entity)
@@ -53,12 +50,7 @@ TrashBag = Class {
         --     return 
         -- end
 
-        local index = TableGetn(self) + 1
-        self[index] = entity
-
-        if index > self.LargestIndex then 
-            self.LargestIndex = index 
-        end
+        self[TableGetn(self) + 1] = entity
     end,
 
     --- Destroy all (remaining) entities in the trash bag.
@@ -71,18 +63,16 @@ TrashBag = Class {
         -- end
 
         -- Remove any value still in the trashbag
-        for k = 1, self.LargestIndex do 
+        for k, v in self do
             if self[k] then 
                 self[k]:Destroy()
                 self[k] = nil
             end
         end 
-
-        self.LargestIndex = 0
     end,
     
     -- Check if the trashbag is empty. True if empty, false otherwise
     Empty = function(self)
-        return TableGetn(self) == 0
+        return TableEmpty(self)
     end
 }
