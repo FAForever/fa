@@ -96,8 +96,8 @@ XRL0302 = Class(CWalkingLandUnit) {
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
 
-        self.EffectsBag = {}
-        self.AmbientExhaustEffectsBag = {}
+        self.EffectsBagXRL = TrashBag()
+        self.AmbientExhaustEffectsBagXRL = TrashBag()
         self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
@@ -157,13 +157,11 @@ XRL0302 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.DoDeathWeapon(self)
 
         -- clean up some effects
-        if self.EffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'EffectsBag')
-            self.EffectsBag = nil
+        if self.EffectsBagXRL then
+            self.EffectsBagXRL:Destroy()
         end
-        if self.AmbientExhaustEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
-            self.AmbientExhaustEffectsBag = nil
+        if self.AmbientExhaustEffectsBagXRL then
+            self.AmbientExhaustEffectsBagXRL:Destroy()
         end
 
         -- stop the periodice effects
