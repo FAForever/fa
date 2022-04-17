@@ -1293,6 +1293,11 @@ function ClearSlotInfo(slotIndex)
     RefreshMapPositionForAllControls(slotIndex)
     Check_Availaible_Color()
     refreshObserverList()
+    -- Check for each real party because ClearSlotInfo often doesn't
+    -- get the relevent data to only check for the relevant party
+    for i = 2, 9 do
+        MaybeAddRequesterToParty(i)
+    end
     RefreshAddToPartyButtons()
 end
 
@@ -2659,6 +2664,9 @@ end
 local playersToSwap = false
 
 function MaybeAddRequesterToParty(Party, SlotOfNewlyExPartyMember)
+    if not SlotOfNewlyExPartyMember then
+        SlotOfNewlyExPartyMember = 0
+    end
     -- if the player was in an actual party
     if Party > 1 and Party < 10 then
         -- check if anyone else is still in the player's old party
