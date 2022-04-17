@@ -217,7 +217,7 @@ UnitBlueprint {
         {            
             AboveWaterTargetsOnly = true,
             CollideFriendly = false,
-            Damage = 1100,
+            Damage = 1,
             DamageFriendly = false,
             DamageRadius = 6.5,
             DamageType = 'FireBeetleExplosion',
