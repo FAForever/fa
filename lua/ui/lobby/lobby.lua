@@ -2522,8 +2522,8 @@ end
 
 function GetAvailableColor()
     for i = 1, LobbyComm.maxPlayerSlots do
-        if IsColorFree(gameColors.DefaultColorOrder[i]) then
-            return gameColors.DefaultColorOrder[i]
+        if IsColorFree(gameColors.LobbyColorOrder[i]) then
+            return gameColors.LobbyColorOrder[i]
         end
     end
     WARN('Error: No available colors found.')

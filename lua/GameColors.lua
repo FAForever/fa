@@ -6,57 +6,52 @@ GameColors = {
 
     -- Default color order used for lobbies/TMM if not otherwise specified. Tightly coupled 
     -- with the ArmyColors and the PlayerColors tables.
-    DefaultColorOrder = {2, 11, 1, 8, 5, 12, 22, 15, 20, 10, 3, 14, 21, 7, 16, 13},
+    LobbyColorOrder = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
+    TMMColorOrder = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 },
 
     -- Faction colours
     ArmyColors = {
-        "FF2929e1",      -- UEF blue
-        "ff436eee",      -- new blue1
-        "ff1a9ba2",      -- dark cyan
-        "ff6fa8dc",      -- sky blue
-        "ff9161ff",      -- purple
-        "FF5F01A7",      -- dark purple
-        "ff920092",      -- rich purple
-        "ff901427",      -- dark red
-        "ffff88ff",      -- pink
-        "ffff32ff",      -- new fuschia
-        "FFe80a0a",      -- Cybran red
-        "FFFF873E",      -- Nomads orange
-        "ffb76518",      -- new brown
-        "ffa79602",      -- Sera golden
-        "fffafa00",      -- new yellow
-        "ffffffff",      -- white
-        "ff616d7e",      -- grey
-        "FF2F4F4F",      -- olive (dark green)
-        "ff2e8b57",      -- new green
-        "ff40bf40",      -- mid green
-        "ff9fd802",      -- Order Green
-        "ff66ffcc",      -- aqua
+        "ff436eee",      -- new blue1               -- 1
+        "FFe80a0a",      -- Cybran red              -- 2 
+        "FF2929e1",      -- UEF blue                -- 3
+        "ff901427",      -- dark red                -- 4
+        "ff9161ff",      -- purple                  -- 5
+        "FFFF873E",      -- Nomads orange           -- 6
+        "ff66ffcc",      -- aqua                    -- 7
+        "fffafa00",      -- new yellow              -- 8
+        "ffff88ff",      -- pink                    -- 9
+        "ffff32ff",      -- new fuschia             -- 10
+        "FF5F01A7",      -- dark purple             -- 11
+        "ffa79602",      -- Sera golden             -- 12
+        "ffb76518",      -- new brown               -- 13
+        "FF2F4F4F",      -- olive (dark green)      -- 14
+        "ff2e8b57",      -- new green               -- 15
+        "ff40bf40",      -- mid green               -- 16
+        "ff9fd802",      -- Order Green             -- 17
+        "ff616d7e",      -- grey                    -- 18
+        "ffffffff",      -- white                   -- 19
     },
 
     PlayerColors = {
-        "FF2929e1",      -- UEF blue
-        "ff436eee",      -- new blue1
-        "ff1a9ba2",      -- dark cyan
-        "ff6fa8dc",      -- sky blue
-        "ff9161ff",      -- purple
-        "FF5F01A7",      -- dark purple
-        "ff920092",      -- rich purple
-        "ff901427",      -- dark red
-        "ffff88ff",      -- pink
-        "ffff32ff",      -- new fuschia
-        "FFe80a0a",      -- Cybran red
-        "FFFF873E",      -- Nomads orange
-        "ffb76518",      -- new brown
-        "ffa79602",      -- Sera golden
-        "fffafa00",      -- new yellow
-        "ffffffff",      -- white
-        "ff616d7e",      -- grey
-        "FF2F4F4F",      -- olive (dark green)
-        "ff2e8b57",      -- new green
-        "ff40bf40",      -- mid green
-        "ff9fd802",      -- Order Green
-        "ff66ffcc",      -- aqua
+        "ff436eee",      -- new blue1               -- 1
+        "FFe80a0a",      -- Cybran red              -- 2 
+        "FF2929e1",      -- UEF blue                -- 3
+        "ff901427",      -- dark red                -- 4
+        "ff9161ff",      -- purple                  -- 5
+        "FFFF873E",      -- Nomads orange           -- 6
+        "ff66ffcc",      -- aqua                    -- 7
+        "fffafa00",      -- new yellow              -- 8
+        "ffff88ff",      -- pink                    -- 9
+        "ffff32ff",      -- new fuschia             -- 10
+        "FF5F01A7",      -- dark purple             -- 11
+        "ffa79602",      -- Sera golden             -- 12
+        "ffb76518",      -- new brown               -- 13
+        "FF2F4F4F",      -- olive (dark green)      -- 14
+        "ff2e8b57",      -- new green               -- 15
+        "ff40bf40",      -- mid green               -- 16
+        "ff9fd802",      -- Order Green             -- 17
+        "ff616d7e",      -- grey                    -- 18
+        "ffffffff",      -- white                   -- 19
     },
 
     TeamColorMode = {
