@@ -731,11 +731,26 @@ function CreateEnhancementUnitAmbient(unit, bone, TrashBag)
     end
 end
 
-function CleanupEffectBag(self, EffectBag)
-    for _, v in self[EffectBag] do
-        v:Destroy()
+local TableEmpty = table.empty 
+
+function CleanupEffectBag(self, identifier)
+
+    local bag = self[identifier]
+
+    -- old 'bag' where it is just a table
+    if TableEmpty(getmetatable(bag)) then 
+        for k, v in bag do 
+            if v.Destroy then 
+                v:Destroy()
+            end
+            
+            bag[k] = nil 
+        end
+
+    -- new 'bag' that is a trashbag
+    else 
+        bag:Destroy()
     end
-    self[EffectBag] = {}
 end
 
 function SeraphimRiftIn(unit)

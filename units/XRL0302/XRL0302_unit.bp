@@ -245,7 +245,7 @@ UnitBlueprint {
             Accurate = true,
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
-            Damage = 1,
+            Damage = 1100,
             DamageFriendly = false,
             DamageRadius = 6.5,
             DamageType = 'EMP',
