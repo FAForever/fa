@@ -6,8 +6,8 @@ GameColors = {
 
     -- Default color order used for lobbies/TMM if not otherwise specified. Tightly coupled 
     -- with the ArmyColors and the PlayerColors tables.
-    LobbyColorOrder = { 12, 1, 13, 2, 16, 3, 11, 6, 14, 15, 17, 5, 4, 10, 9, 8, 7, 18, 19 }, -- warm vs blue 
-    TMMColorOrder = { 12, 1, 13, 2, 16, 3, 11, 6, 14, 15, 17, 5, 4, 10, 9, 8, 7, 18, 19 }, -- warm vs blue 
+    LobbyColorOrder = { 12, 1, 13, 2, 16, 3, 11, 6, 14, 15, 17, 5, 4, 10, 9, 8, 7, 18, 19 }, -- warm vs cold 
+    TMMColorOrder = { 12, 1, 13, 2, 16, 3, 11, 6, 14, 15, 17, 5, 4, 10, 9, 8, 7, 18, 19 }, -- warm vs cold 
 
     -- If you end up working with this file, suggestion to install the Color Highlight extension:
     -- - https://marketplace.visualstudio.com/items?itemName=naumovs.color-highlight
