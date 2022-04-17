@@ -156,12 +156,8 @@ XRL0302 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.DoDeathWeapon(self)
 
         -- clean up some effects
-        if self.EffectsBagXRL then
-            self.EffectsBagXRL:Destroy()
-        end
-        if self.AmbientExhaustEffectsBagXRL then
-            self.AmbientExhaustEffectsBagXRL:Destroy()
-        end
+        self.EffectsBagXRL:Destroy()
+        self.AmbientExhaustEffectsBagXRL:Destroy()
 
         -- stop the periodice effects
         self.PeriodicFXThread:Destroy()
