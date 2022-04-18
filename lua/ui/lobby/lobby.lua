@@ -5283,7 +5283,6 @@ local MessageHandlers = {
     SwapPlayers = {
         Accept = IsFromHost,
         Handle = function(data)
-            LOG("Message handler: Swap players " .. repr(data))
             DoSlotSwap(data.Slot1, data.Slot2)
         end
     },
@@ -5401,8 +5400,6 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.DataReceived = function(self, data)
-
-        LOG("Received data: " .. repr(data))
 
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
@@ -6806,8 +6803,7 @@ end
 
 function DoSlotSwap(slot1, slot2)
 
-    LOG(string.format("Do slot swap: Swap players %i <-> %i", slot1, slot2))
-
+    -- retrieve player info
     local player1 = gameInfo.PlayerOptions[slot1]
     local player2 = gameInfo.PlayerOptions[slot2]
 
@@ -6819,6 +6815,7 @@ function DoSlotSwap(slot1, slot2)
     GUI.slots[slot1].ready:SetCheck(false)
     GUI.slots[slot2].ready:SetCheck(false)
 
+    -- swap teams
     local team_bucket = player1.Team
     player1.Team = player2.Team
     player2.Team = team_bucket
@@ -6827,12 +6824,15 @@ function DoSlotSwap(slot1, slot2)
     KeepSameFactionOrRandom(slot1, slot2, player1)
     KeepSameFactionOrRandom(slot2, slot1, player2)
 
+    -- swap the slots
     gameInfo.PlayerOptions[slot2] = player1
     gameInfo.PlayerOptions[slot1] = player2
 
+    -- update slot info
     SetSlotInfo(slot2, player1)
     SetSlotInfo(slot1, player2)
 
+    -- update faction selector
     UpdateFactionSelectorForPlayer(player1)
     UpdateFactionSelectorForPlayer(player2)
 end
@@ -7113,8 +7113,6 @@ function InitHostUtils()
         -- If the target slot is closed, this is a no-op.
         -- If a player or ai occupies both slots, they are swapped.
         SwapPlayers = function(slot1, slot2)
-
-            LOG(string.format("Host utils: Swap players %i <-> %i", slot1, slot2))
 
             -- Bail out early for the stupid cases.
             if not HostUtils.SanityCheckSlotMovement(slot1, slot2) then
