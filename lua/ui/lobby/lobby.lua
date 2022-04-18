@@ -5401,6 +5401,8 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
 
     lobbyComm.DataReceived = function(self, data)
 
+        SPEW("Received data: " .. repr(data))
+
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
@@ -7122,20 +7124,10 @@ function InitHostUtils()
             local player1 = gameInfo.PlayerOptions[slot1]
             local player2 = gameInfo.PlayerOptions[slot2]
 
-            -- Unready the move-ee
-            if player1.Human then
-                HostUtils.SetPlayerNotReady(slot1)
-            end
-
             -- If we're moving onto a blank, take the easy way out.
             if not player2 then
                 HostUtils.MovePlayerToEmptySlot(slot1, slot2)
                 return
-            end
-
-            -- If we're switching with a human, we need to clear their ready state for the move
-            if player2.Human then
-                HostUtils.SetPlayerNotReady(slot2)
             end
 
             -- Do the swap on our end
