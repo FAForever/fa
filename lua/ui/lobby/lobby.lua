@@ -5014,10 +5014,18 @@ local MessageHandlers = {
     SetPlayerNotReady = {
         Accept = FromSubjectOrHost,
         Handle = function(data)
-            EnableSlot(data.Slot)
-            GUI.becomeObserver:Enable()
 
+            -- allow the user to make changes
+            EnableSlot(data.Slot)
+
+            -- allow the user to become an observer again
+            GUI.becomeObserver:Enable()
+                
+            -- update player options
             SetPlayerOption(data.Slot, 'Ready', false)
+
+            -- update GUI
+            GUI.slots[data.Slot].ready:SetCheck(false)
         end
     },
 
@@ -5275,6 +5283,7 @@ local MessageHandlers = {
     SwapPlayers = {
         Accept = IsFromHost,
         Handle = function(data)
+            LOG("Message handler: Swap players " .. repr(data))
             DoSlotSwap(data.Slot1, data.Slot2)
         end
     },
@@ -5392,6 +5401,9 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.DataReceived = function(self, data)
+
+        LOG("Received data: " .. repr(data))
+
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
@@ -6793,8 +6805,19 @@ function WarnIncompatibleMods()
 end
 
 function DoSlotSwap(slot1, slot2)
+
+    LOG(string.format("Do slot swap: Swap players %i <-> %i", slot1, slot2))
+
     local player1 = gameInfo.PlayerOptions[slot1]
     local player2 = gameInfo.PlayerOptions[slot2]
+
+    -- unready players in the player options
+    player1.Ready = false 
+    player2.Ready = false
+
+    -- unready players in GUI
+    GUI.slots[slot1].ready:SetCheck(false)
+    GUI.slots[slot2].ready:SetCheck(false)
 
     local team_bucket = player1.Team
     player1.Team = player2.Team
@@ -7090,6 +7113,9 @@ function InitHostUtils()
         -- If the target slot is closed, this is a no-op.
         -- If a player or ai occupies both slots, they are swapped.
         SwapPlayers = function(slot1, slot2)
+
+            LOG(string.format("Host utils: Swap players %i <-> %i", slot1, slot2))
+
             -- Bail out early for the stupid cases.
             if not HostUtils.SanityCheckSlotMovement(slot1, slot2) then
                 return
