@@ -5014,10 +5014,18 @@ local MessageHandlers = {
     SetPlayerNotReady = {
         Accept = FromSubjectOrHost,
         Handle = function(data)
-            EnableSlot(data.Slot)
-            GUI.becomeObserver:Enable()
 
+            -- allow the user to make changes
+            EnableSlot(data.Slot)
+
+            -- allow the user to become an observer again
+            GUI.becomeObserver:Enable()
+                
+            -- update player options
             SetPlayerOption(data.Slot, 'Ready', false)
+
+            -- update GUI
+            GUI.slots[data.Slot].ready:SetCheck(false)
         end
     },
 
@@ -5392,6 +5400,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.DataReceived = function(self, data)
+
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
@@ -6793,9 +6802,20 @@ function WarnIncompatibleMods()
 end
 
 function DoSlotSwap(slot1, slot2)
+
+    -- retrieve player info
     local player1 = gameInfo.PlayerOptions[slot1]
     local player2 = gameInfo.PlayerOptions[slot2]
 
+    -- unready players in the player options
+    player1.Ready = false 
+    player2.Ready = false
+
+    -- unready players in GUI
+    GUI.slots[slot1].ready:SetCheck(false)
+    GUI.slots[slot2].ready:SetCheck(false)
+
+    -- swap teams
     local team_bucket = player1.Team
     player1.Team = player2.Team
     player2.Team = team_bucket
@@ -6804,12 +6824,15 @@ function DoSlotSwap(slot1, slot2)
     KeepSameFactionOrRandom(slot1, slot2, player1)
     KeepSameFactionOrRandom(slot2, slot1, player2)
 
+    -- swap the slots
     gameInfo.PlayerOptions[slot2] = player1
     gameInfo.PlayerOptions[slot1] = player2
 
+    -- update slot info
     SetSlotInfo(slot2, player1)
     SetSlotInfo(slot1, player2)
 
+    -- update faction selector
     UpdateFactionSelectorForPlayer(player1)
     UpdateFactionSelectorForPlayer(player2)
 end
@@ -7090,6 +7113,7 @@ function InitHostUtils()
         -- If the target slot is closed, this is a no-op.
         -- If a player or ai occupies both slots, they are swapped.
         SwapPlayers = function(slot1, slot2)
+
             -- Bail out early for the stupid cases.
             if not HostUtils.SanityCheckSlotMovement(slot1, slot2) then
                 return
@@ -7098,20 +7122,10 @@ function InitHostUtils()
             local player1 = gameInfo.PlayerOptions[slot1]
             local player2 = gameInfo.PlayerOptions[slot2]
 
-            -- Unready the move-ee
-            if player1.Human then
-                HostUtils.SetPlayerNotReady(slot1)
-            end
-
             -- If we're moving onto a blank, take the easy way out.
             if not player2 then
                 HostUtils.MovePlayerToEmptySlot(slot1, slot2)
                 return
-            end
-
-            -- If we're switching with a human, we need to clear their ready state for the move
-            if player2.Human then
-                HostUtils.SetPlayerNotReady(slot2)
             end
 
             -- Do the swap on our end
