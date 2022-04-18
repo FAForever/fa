@@ -5266,6 +5266,7 @@ local MessageHandlers = {
         Handle = function(data)
             gameInfo.PlayerOptions[data.OldSlot] = nil
             gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+            gameInfo.PlayerOptions[data.NewSlot].Ready = false
             ClearSlotInfo(data.OldSlot)
             SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
@@ -6812,6 +6813,7 @@ function DoSlotSwap(slot1, slot2)
 
     UpdateFactionSelectorForPlayer(player1)
     UpdateFactionSelectorForPlayer(player2)
+    UpdateGame()
 end
 
 function KeepSameFactionOrRandom(slotFrom, slotTo, player)
@@ -6848,12 +6850,8 @@ function InitHostUtils()
         --
         -- @param slot The slot number of the target player.
         SetPlayerNotReady = function(slot)
-            local slotOptions = gameInfo.PlayerOptions[slot]
-            if slotOptions.Ready then
-                if not IsLocallyOwned(slot) then
-                    lobbyComm:SendData(slotOptions.OwnerID, {Type = 'SetPlayerNotReady', Slot = slot})
-                end
-                slotOptions.Ready = false
+            if gameInfo.PlayerOptions[slot].Ready then
+                SetPlayerOption(slot, 'Ready', false)
             end
         end,
 
@@ -7066,6 +7064,7 @@ function InitHostUtils()
 
             KeepSameFactionOrRandom(currentSlot, requestedSlot, player)
 
+            gameInfo.PlayerOptions[currentSlot].Ready = false
             gameInfo.PlayerOptions[requestedSlot] = gameInfo.PlayerOptions[currentSlot]
             gameInfo.PlayerOptions[currentSlot] = nil
             ClearSlotInfo(currentSlot)
