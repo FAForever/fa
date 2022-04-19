@@ -297,7 +297,7 @@ function CreateBuildCubeThread(
     CoroutineYield(BuildCubeDelay)
 
     -- always check if we're still there after waiting
-    if unitBeingBuilt.Dead then
+    if EntityBeenDestroyed(unitBeingBuilt) then
         return
     end
 
