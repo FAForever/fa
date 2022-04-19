@@ -473,8 +473,6 @@ Window = Class(Group) {
                 if self.Right() - self.Left() ~= oldWidth then
                     self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
                 end
-                LayoutHelpers.ResetHeight(self)
-                LayoutHelpers.ResetWidth(self)
             -- new version in preference file that does support UI scaling
             else 
                 local top = location.top 
@@ -502,8 +500,6 @@ Window = Class(Group) {
                 self.Bottom:Set(defaultPosition.Bottom)
                 self.Right:Set(defaultPosition.Right)
             end
-            LayoutHelpers.ResetHeight(self)
-            LayoutHelpers.ResetWidth(self)
         end
     end,
 
