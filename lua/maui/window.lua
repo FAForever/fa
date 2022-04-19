@@ -473,7 +473,8 @@ Window = Class(Group) {
                 if self.Right() - self.Left() ~= oldWidth then
                     self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
                 end
-
+                LayoutHelpers.ResetHeight(self)
+                LayoutHelpers.ResetWidth(self)
             -- new version in preference file that does support UI scaling
             else 
                 local top = location.top 
@@ -485,8 +486,8 @@ Window = Class(Group) {
                 self.Top:Set(top)
 
                 -- we can scale these accordingly as we applied the inverse on saving
-                self.Width:Set(LayoutHelpers.ScaleNumber(width))
-                self.Height:Set(LayoutHelpers.ScaleNumber(height))
+                self.Right:Set(LayoutHelpers.ScaleNumber(width) + left)
+                self.Bottom:Set(LayoutHelpers.ScaleNumber(height) + top)
             end
         elseif defaultPosition then
             -- Scale only if it's a number, else it's already scaled lazyvar
@@ -501,6 +502,8 @@ Window = Class(Group) {
                 self.Bottom:Set(defaultPosition.Bottom)
                 self.Right:Set(defaultPosition.Right)
             end
+            LayoutHelpers.ResetHeight(self)
+            LayoutHelpers.ResetWidth(self)
         end
     end,
 
