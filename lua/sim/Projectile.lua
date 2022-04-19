@@ -114,9 +114,9 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.CollideFriendly = self.DamageData.CollideFriendly
     end,
 
-    DoDamage = function(self, instigator, DamageData, targetEntity, position)
+    DoDamage = function(self, instigator, DamageData, targetEntity)
 
-        position = position or self:GetPosition()
+        local position = self:GetPosition()
 
         local damage = DamageData.DamageAmount
         if damage and damage > 0 then
@@ -381,7 +381,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local bp = self.Blueprint 
 
         -- do the projectile damage
-        self:DoDamage(instigator, damageData, targetEntity, vc)
+        self:DoDamage(instigator, damageData, targetEntity)
 
         -- compute whether we should spawn additional effects for this 
         -- projectile, there's always a 10% chance or if we're far away from 
