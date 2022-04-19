@@ -36,29 +36,6 @@ local function ParsePriorities()
     return finalPriorities
 end
 
---- A collection of functions that are most often called. Is not in any specific order.
--- These functions should be cached during OnCreate to improve the access pattern. See also
--- the benchmark about metatables.
--- local FunctionsToCache = { 
---     "GetDamageTable"
-
---   , "OnStartTracking"
---   , "OnStopTracking"
---   , "OnGotTarget"
---   , "OnLostTarget"
-
---   , "PlayWeaponSound"
---   , "PlayWeaponAmbientSound"
---   , "StopWeaponAmbientSound"
-
---   , "ForkThread"
-
---   , "OnMotionHorzEventChange"
-
---   , "DoOnFireBuffs"
---   , "CreateProjectileForWeapon"
--- }
-
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit
