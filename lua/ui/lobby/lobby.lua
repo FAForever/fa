@@ -5274,6 +5274,7 @@ local MessageHandlers = {
         Handle = function(data)
             gameInfo.PlayerOptions[data.OldSlot] = nil
             gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+            gameInfo.PlayerOptions[data.NewSlot].Ready = false
             ClearSlotInfo(data.OldSlot)
             SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
@@ -6811,10 +6812,6 @@ function DoSlotSwap(slot1, slot2)
     player1.Ready = false 
     player2.Ready = false
 
-    -- unready players in GUI
-    GUI.slots[slot1].ready:SetCheck(false)
-    GUI.slots[slot2].ready:SetCheck(false)
-
     -- swap teams
     local team_bucket = player1.Team
     player1.Team = player2.Team
@@ -6835,6 +6832,8 @@ function DoSlotSwap(slot1, slot2)
     -- update faction selector
     UpdateFactionSelectorForPlayer(player1)
     UpdateFactionSelectorForPlayer(player2)
+
+    UpdateGame()
 end
 
 function KeepSameFactionOrRandom(slotFrom, slotTo, player)
