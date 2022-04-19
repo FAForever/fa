@@ -34,6 +34,7 @@ local TableAssimilate = table.assimilate
 local Warp = Warp
 local IsEntity = IsEntity
 local IsUnit = IsUnit
+local IsAlly = IsAlly
 local IsEnemy = IsEnemy
 local Random = Random
 local GetGameTick = GetGameTick
@@ -645,6 +646,19 @@ Shield = Class(moho.shield_methods, Entity) {
         return IsEnemy(self.Army, other.Army)
     end,
 
+    --- Called when a unit collides with a collision beam to check if the collision is valid
+    -- @param self The unit we're checking the collision for
+    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+
+        -- if we're allied, check if we allow that type of collision
+        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+            return firingWeapon.Blueprint.CollideFriendly
+        end
+
+        return true
+    end,
+
     TurnOn = function(self)
         ChangeState(self, self.OnState)
     end,
@@ -903,32 +917,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end,
     },
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
 
-        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
-            DeprecatedWarnings.OnCollisionCheckWeapon = true 
-            WARN("OnCollisionCheckWeapon is deprecated.")
-            WARN(debug.tracestack())
-        end
-
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
-                return false
-            end
-        end
-        -- Check DNC list
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
 
     GetCachePosition = function(self)
 
