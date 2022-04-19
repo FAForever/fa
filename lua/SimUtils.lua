@@ -69,8 +69,10 @@ local function TransferUnitsOwnershipDelayedWeapons (weapon)
         local delay = 1 / bp.RateOfFire
         WaitSeconds(delay)
 
-        -- enable the weapon again
-        weapon:SetEnabled(true)
+        -- enable the weapon again if it still exists
+        if not weapon:BeenDestroyed() then 
+            weapon:SetEnabled(true)
+        end
     end
 end
 
