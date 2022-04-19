@@ -13,9 +13,6 @@ local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
 --- A unique death weapon for the Fire Beetle
 local DeathWeaponKamikaze = Class(Weapon) {
-
-
-
     OnFire = function(self)
         -- do regular death weapon of unit if we didn't already
         if not self.unit.Dead then 
@@ -136,14 +133,6 @@ XRL0302 = Class(CWalkingLandUnit) {
             end
 
             WaitSeconds(3)
-        end
-    end,
-
-    --- Called when the unit dies - if it dies to some instigator then the suicide weapon is activated.
-    OnKilled = function(self, instigator, type, overkillRatio)
-        CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
-        if instigator then
-            self:GetWeaponByLabel('Suicide'):FireWeapon()
         end
     end,
     
