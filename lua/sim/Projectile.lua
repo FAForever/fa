@@ -204,17 +204,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
                     -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
-                        if radius > 0 then      -- isn't this always false at this point?
-                            DamageArea(
-                                instigator, 
-                                cachedPosition, 
-                                radius, 
-                                initialDmg, 
-                                DamageData.DamageType, 
-                                DamageData.DamageFriendly, 
-                                DamageData.DamageSelf or false
-                            )
-                        elseif targetEntity then
+                        if targetEntity then
                             Damage(
                                 instigator, 
                                 cachedPosition, 
