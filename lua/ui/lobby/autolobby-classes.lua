@@ -17,7 +17,7 @@ ConnectionStatus = Class(Group) {
         Group.__init(self, parent)
 
         -- set our dimensions
-        LayoutHelpers.SetDimensions(self, 200, 100)
+        LayoutHelpers.SetDimensions(self, 200, 110)
 
         -- put a border around ourselves
         UIUtil.SurroundWithBorder(self, '/scx_menu/lan-game-lobby/frame/')

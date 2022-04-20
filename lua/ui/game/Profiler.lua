@@ -149,30 +149,6 @@ list = false
 --- Opens up the window
 function OpenWindow()
 
-    -- Test code for branch improve-matchmaking-communication --
-
-    local status = import("/lua/ui/lobby/autolobby-classes.lua").ConnectionStatus(GetFrame(0))
-    LayoutHelpers.AtCenterIn(status, GetFrame(0))
-
-    -- status:SetTotalPlayersCount(8)
-
-    ForkThread(function()
-        for k = 1, 8 do 
-            status:AddConnectedPlayer()
-            WaitSeconds(1.0)
-            status:RemoveConnectedPlayer()
-            WaitSeconds(1.0)
-            status:AddConnectedPlayer()
-            WaitSeconds(1.0)
-        end
-    end)
-
-    if true then 
-        return 
-    end
-
-    -- End of test code for branch improve-matchmaking-communication --
-
     local gameHasAIs = GameMain.GameHasAIs
     local cheatsOn = sessionInfo.Options.CheatsEnabled
     local isThisJip = "jip" == GetArmiesTable()[GameMain.OriginalFocusArmy].nickname
