@@ -65,7 +65,10 @@ local CreateEmitterAtBone = CreateEmitterAtBone
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local CreateSplat = CreateSplat
 local DamageArea = DamageArea
+local Damage = Damage
 local Random = Random
+local IsAlly = IsAlly
+local ForkThread = ForkThread
 
 
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
@@ -114,51 +117,136 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.CollideFriendly = self.DamageData.CollideFriendly
     end,
 
-    DoDamage = function(self, instigator, DamageData, targetEntity)
+    --- Contains the damage logic of projectiles 
+    -- @param self The projectile itself
+    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
+    -- @param DamageData The damage data passed by the weapon
+    -- @param targetEntity The entity we hit, is nil if we hit terrain
+    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
+    DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
 
-        local position = self:GetPosition()
+        -- this may be a cached vector, we can not send this to threads or use after waiting statements!
+        cachedPosition = cachedPosition or self:GetPosition()
 
         local damage = DamageData.DamageAmount
         if damage and damage > 0 then
+
+            -- check for radius
             local radius = DamageData.DamageRadius
             if radius and radius > 0 then
+
+                -- check for damage-over-time
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    DamageArea(instigator, position, radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                    -- no damage over time, do radius-based damage
+                    DamageArea(
+                        instigator, 
+                        cachedPosition, 
+                        radius, 
+                        damage, 
+                        DamageData.DamageType, 
+                        DamageData.DamageFriendly, 
+                        DamageData.DamageSelf or false
+                    )
                 else
-                    -- DoT damage - check for initial damage
+                    -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
                         if radius > 0 then
-                            DamageArea(instigator, position, radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                            DamageArea(
+                                instigator, 
+                                cachedPosition, 
+                                radius, 
+                                initialDmg, 
+                                DamageData.DamageType, 
+                                DamageData.DamageFriendly, 
+                                DamageData.DamageSelf or false
+                            )
                         elseif targetEntity then
-                            Damage(instigator, position, targetEntity, initialDmg, DamageData.DamageType)
+                            Damage(
+                                instigator, 
+                                cachedPosition, 
+                                targetEntity, 
+                                initialDmg, 
+                                DamageData.DamageType
+                            )
                         end
                     end
 
-                    ForkThread(DefaultDamage.AreaDoTThread, instigator, position, DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), radius, damage, DamageData.DamageType, DamageData.DamageFriendly)
+                    -- apply damage over time
+                    ForkThread(
+                        DefaultDamage.AreaDoTThread, 
+                        instigator, 
+                        self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                        DamageData.DoTPulses or 1, 
+                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)), 
+                        radius, 
+                        damage, 
+                        DamageData.DamageType, 
+                        DamageData.DamageFriendly
+                    )
                 end
-            -- ONLY DO DAMAGE IF THERE IS DAMAGE DATA.  SOME PROJECTILE DO NOT DO DAMAGE WHEN THEY IMPACT.
+
+            -- check for entity-specific damage
             elseif DamageData.DamageAmount and targetEntity then
+
+                -- check for damage-over-time
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    Damage(instigator, position, targetEntity, DamageData.DamageAmount, DamageData.DamageType)
+
+                    -- no damage over time, do single target damage
+                    Damage(
+                        instigator, 
+                        cachedPosition, 
+                        targetEntity, 
+                        DamageData.DamageAmount, 
+                        DamageData.DamageType
+                    )
                 else
-                    -- DoT damage - check for initial damage
+                    -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
-                        if radius > 0 then
-                            DamageArea(instigator, position, radius, initialDmg, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
-                        elseif targetEntity then
-                            Damage(instigator, position, targetEntity, initialDmg, DamageData.DamageType)
+                        if targetEntity then
+                            Damage(
+                                instigator, 
+                                cachedPosition, 
+                                targetEntity, 
+                                initialDmg, 
+                                DamageData.DamageType
+                            )
                         end
                     end
 
-                    ForkThread(DefaultDamage.UnitDoTThread, instigator, targetEntity, DamageData.DoTPulses or 1, (DamageData.DoTTime / (DamageData.DoTPulses or 1)), damage, DamageData.DamageType, DamageData.DamageFriendly)
+                    -- apply damage over time
+                    ForkThread(
+                        DefaultDamage.UnitDoTThread, 
+                        instigator, 
+                        targetEntity, 
+                        DamageData.DoTPulses or 1, 
+                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)), 
+                        damage, 
+                        DamageData.DamageType, 
+                        DamageData.DamageFriendly
+                    )
                 end
             end
         end
+
+        -- related to strategic missiles
         if self.InnerRing and self.OuterRing then
-            self.InnerRing:DoNukeDamage(self.Launcher, position, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
-            self.OuterRing:DoNukeDamage(self.Launcher, position, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
+            self.InnerRing:DoNukeDamage(
+                self.Launcher, 
+                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                self.Brain, 
+                self.Army, 
+                DamageData.DamageType or 'Nuke'
+            )
+
+            self.OuterRing:DoNukeDamage(
+                self.Launcher, 
+                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                self.Brain, 
+                self.Army, 
+                DamageData.DamageType or 'Nuke'
+            )
         end
     end,
 
@@ -242,29 +330,38 @@ Projectile = Class(moho.projectile_methods, Entity) {
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
-        -- bail out immediately
-        if self.Army == other.Army then 
+        -- only anti missiles can take things down 
+        if not other.Cache.HashedCats["ANTIMISSILE"] then 
             return false 
         end
 
-        if EntityCategoryContains(CategoriesDoNotCollide, self) and EntityCategoryContains(CategoriesDoNotCollide, other) then
-            return false
+        -- only tactical or strategical projectiles can be taken down 
+        if not (self.Cache.HashedCats["TACTICAL"] or self.Cache.HashedCats["STRATEGIC"]) then 
+            return false 
         end
 
-        if other:GetBlueprint().Physics.HitAssignedTarget and other:GetTrackingTarget() ~= self then
-            return false
+        -- check if we can hit ourself or hit allies
+        if self.Army == other.Army or IsAlly(self.Army, other.Army) then 
+            return self.CollideFriendly 
         end
 
-        local dnc
-        for _, p in {{self, other}, {other, self}} do
-            dnc = p[1]:GetBlueprint().DoNotCollideList
-            if dnc then
-                for _, v in dnc do
-                    if EntityCategoryContains(ParseEntityCategory(v), p[2]) then
-                        return false
-                    end
-                end
-            end
+        -- enemies always hit
+        return true
+    end,
+
+    --- Called when a projectile collides with a collision beam to check if the collision is valid
+    -- @param self The projectile we're checking the collision for
+    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+
+        -- only tactical or strategical projectiles can be taken down 
+        if not (self.Cache.HashedCats["TACTICAL"] or self.Cache.HashedCats["STRATEGIC"]) then 
+            return false 
+        end
+
+        -- if we're allied, check if we allow that type of collision
+        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+            return firingWeapon.Blueprint.CollideFriendly
         end
 
         return true
@@ -381,7 +478,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local bp = self.Blueprint 
 
         -- do the projectile damage
-        self:DoDamage(instigator, damageData, targetEntity)
+        self:DoDamage(instigator, damageData, targetEntity, vc)
 
         -- compute whether we should spawn additional effects for this 
         -- projectile, there's always a 10% chance or if we're far away from 
@@ -651,25 +748,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 self:SetLifetime(0.5)
             end
         end
-    end,
-
-    --- Deprecated functionality
-
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
-            return false
-        end
-
-        -- If this unit category is on the weapon's do-not-collide list, skip!
-        local weaponBP = firingWeapon:GetBlueprint()
-        if weaponBP.DoNotCollideList then
-            for k, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-        return true
     end,
 
 }
