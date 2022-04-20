@@ -68,6 +68,7 @@ local DamageArea = DamageArea
 local Damage = Damage
 local Random = Random
 local IsAlly = IsAlly
+local ForkThread = ForkThread
 
 
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
@@ -130,19 +131,30 @@ Projectile = Class(moho.projectile_methods, Entity) {
         local damage = DamageData.DamageAmount
         if damage and damage > 0 then
 
-            -- check radius-based weapons
+            -- check for radius
             local radius = DamageData.DamageRadius
             if radius and radius > 0 then
+
+                -- check for damage-over-time
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    DamageArea(instigator, position, radius, damage, DamageData.DamageType, DamageData.DamageFriendly, DamageData.DamageSelf or false)
+                    -- no damage over time, do radius-based damage
+                    DamageArea(
+                        instigator, 
+                        cachedPosition, 
+                        radius, 
+                        damage, 
+                        DamageData.DamageType, 
+                        DamageData.DamageFriendly, 
+                        DamageData.DamageSelf or false
+                    )
                 else
-                    -- DoT damage - check for initial damage
+                    -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
                         if radius > 0 then
                             DamageArea(
                                 instigator, 
-                                position, 
+                                cachedPosition, 
                                 radius, 
                                 initialDmg, 
                                 DamageData.DamageType, 
@@ -152,7 +164,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
                         elseif targetEntity then
                             Damage(
                                 instigator, 
-                                position, 
+                                cachedPosition, 
                                 targetEntity, 
                                 initialDmg, 
                                 DamageData.DamageType
@@ -160,11 +172,11 @@ Projectile = Class(moho.projectile_methods, Entity) {
                         end
                     end
 
-                    -- we can't send the cached vector as it doesn't remain the same over time
+                    -- apply damage over time
                     ForkThread(
                         DefaultDamage.AreaDoTThread, 
                         instigator, 
-                        self:GetPosition(),                                     -- can't use cachedPosition here: breaks invariant
+                        self:GetPosition(), -- can't use cachedPosition here: breaks invariant
                         DamageData.DoTPulses or 1, 
                         (DamageData.DoTTime / (DamageData.DoTPulses or 1)), 
                         radius, 
@@ -174,24 +186,28 @@ Projectile = Class(moho.projectile_methods, Entity) {
                     )
                 end
 
-            -- check non-radius based weapons
+            -- check for entity-specific damage
             elseif DamageData.DamageAmount and targetEntity then
+
+                -- check for damage-over-time
                 if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+
+                    -- no damage over time, do single target damage
                     Damage(
                         instigator, 
-                        position, 
+                        cachedPosition, 
                         targetEntity, 
                         DamageData.DamageAmount, 
                         DamageData.DamageType
                     )
                 else
-                    -- DoT damage - check for initial damage
+                    -- check for initial damage
                     local initialDmg = DamageData.InitialDamageAmount or 0
                     if initialDmg > 0 then
                         if radius > 0 then      -- isn't this always false at this point?
                             DamageArea(
                                 instigator, 
-                                position, 
+                                cachedPosition, 
                                 radius, 
                                 initialDmg, 
                                 DamageData.DamageType, 
@@ -201,7 +217,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
                         elseif targetEntity then
                             Damage(
                                 instigator, 
-                                position, 
+                                cachedPosition, 
                                 targetEntity, 
                                 initialDmg, 
                                 DamageData.DamageType
@@ -209,6 +225,7 @@ Projectile = Class(moho.projectile_methods, Entity) {
                         end
                     end
 
+                    -- apply damage over time
                     ForkThread(
                         DefaultDamage.UnitDoTThread, 
                         instigator, 
@@ -222,9 +239,24 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 end
             end
         end
+
+        -- related to strategic missiles
         if self.InnerRing and self.OuterRing then
-            self.InnerRing:DoNukeDamage(self.Launcher, position, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
-            self.OuterRing:DoNukeDamage(self.Launcher, position, self.Brain, self.Army, DamageData.DamageType or 'Nuke')
+            self.InnerRing:DoNukeDamage(
+                self.Launcher, 
+                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                self.Brain, 
+                self.Army, 
+                DamageData.DamageType or 'Nuke'
+            )
+
+            self.OuterRing:DoNukeDamage(
+                self.Launcher, 
+                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                self.Brain, 
+                self.Army, 
+                DamageData.DamageType or 'Nuke'
+            )
         end
     end,
 
