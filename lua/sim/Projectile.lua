@@ -66,6 +66,7 @@ local CreateEmitterAtEntity = CreateEmitterAtEntity
 local CreateSplat = CreateSplat
 local DamageArea = DamageArea
 local Random = Random
+local IsAlly = IsAlly
 
 
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
@@ -242,29 +243,38 @@ Projectile = Class(moho.projectile_methods, Entity) {
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
-        -- bail out immediately
-        if self.Army == other.Army then 
+        -- only anti missiles can take things down 
+        if not other.Cache.HashedCats["ANTIMISSILE"] then 
             return false 
         end
 
-        if EntityCategoryContains(CategoriesDoNotCollide, self) and EntityCategoryContains(CategoriesDoNotCollide, other) then
-            return false
+        -- only tactical or strategical projectiles can be taken down 
+        if not (self.Cache.HashedCats["TACTICAL"] or self.Cache.HashedCats["STRATEGIC"]) then 
+            return false 
         end
 
-        if other:GetBlueprint().Physics.HitAssignedTarget and other:GetTrackingTarget() ~= self then
-            return false
+        -- check if we can hit ourself or hit allies
+        if self.Army == other.Army or IsAlly(self.Army, other.Army) then 
+            return self.CollideFriendly 
         end
 
-        local dnc
-        for _, p in {{self, other}, {other, self}} do
-            dnc = p[1]:GetBlueprint().DoNotCollideList
-            if dnc then
-                for _, v in dnc do
-                    if EntityCategoryContains(ParseEntityCategory(v), p[2]) then
-                        return false
-                    end
-                end
-            end
+        -- enemies always hit
+        return true
+    end,
+
+    --- Called when a unit collides with a collision beam to check if the collision is valid
+    -- @param self The unit we're checking the collision for
+    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+
+        -- only tactical or strategical projectiles can be taken down 
+        if not (self.Cache.HashedCats["TACTICAL"] or self.Cache.HashedCats["STRATEGIC"]) then 
+            return false 
+        end
+
+        -- if we're allied, check if we allow that type of collision
+        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+            return firingWeapon.Blueprint.CollideFriendly
         end
 
         return true
@@ -651,25 +661,6 @@ Projectile = Class(moho.projectile_methods, Entity) {
                 self:SetLifetime(0.5)
             end
         end
-    end,
-
-    --- Deprecated functionality
-
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-        if not firingWeapon.CollideFriendly and self.Army == firingWeapon.unit.Army then
-            return false
-        end
-
-        -- If this unit category is on the weapon's do-not-collide list, skip!
-        local weaponBP = firingWeapon:GetBlueprint()
-        if weaponBP.DoNotCollideList then
-            for k, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-        return true
     end,
 
 }

@@ -1498,6 +1498,7 @@ Unit = Class(moho.unit_methods) {
     --- Called when a unit collides with a projectile to check if the collision is valid
     -- @param self The unit we're checking the collision for
     -- @param other The projectile we're checking the collision with
+    -- @param firingWeapon The weapon that the projectile originates from
     OnCollisionCheck = function(self, other, firingWeapon)
 
         -- bail out immediately
