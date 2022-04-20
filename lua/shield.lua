@@ -646,8 +646,8 @@ Shield = Class(moho.shield_methods, Entity) {
         return IsEnemy(self.Army, other.Army)
     end,
 
-    --- Called when a unit collides with a collision beam to check if the collision is valid
-    -- @param self The unit we're checking the collision for
+    --- Called when a shield collides with a collision beam to check if the collision is valid
+    -- @param self The shield we're checking the collision for
     -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
