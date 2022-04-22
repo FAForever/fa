@@ -104,7 +104,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Fix various issues that people found while playing on FAF Develop 
    - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784,
-      #3788, #3794, #3793) 
+      #3788, #3794, #3793, #3796) 
 
     With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
     people that hosted games on FAF Develop and / or reported issues to the game team.
@@ -307,7 +307,7 @@ Game version 3732 (22nd of April, 2022)
         #3714, #3719, #3702, #3729, #3710,
         #3712, #3736, #3740, #3753, #3720,
         #3774, #3775, #3780, #3521, #3781,
-        #3788, #3791)
+        #3788, #3791, #3793, #3794, #3796)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
