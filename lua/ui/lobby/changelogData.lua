@@ -6,6 +6,7 @@ gamePatches = {
         description = {
             "",
             "### Features",
+            "",
             " - In-lobby auto balancing (#3750, #3764, #3768) ",
             "    Introduction of in-lobby balancing for the typical two-team setup. Similar results",
             "    to optimal balance but allows the host to manually tweak the starting positions",
