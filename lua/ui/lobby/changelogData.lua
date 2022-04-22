@@ -7,7 +7,7 @@ gamePatches = {
             "",
             "### Bug fixes",
             "",
-            " - Fix missing parameter in matchmaking (#3801) ",
+            " - Fix (another) missing parameter in matchmaking (#3801) ",
             "",
             "### Contributors",
             "",

@@ -3,7 +3,7 @@ Game version 3734 (22nd of April, 2022)
 
 ### Bug fixes
 
- - Fix missing parameter in matchmaking (#3801) 
+ - Fix (another) missing parameter in matchmaking (#3801) 
 
 ### Contributors
 
