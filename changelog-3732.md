@@ -100,10 +100,10 @@ Game version 3732 (22nd of April, 2022)
 
  - Fix encoding issues with unicode characters in the preference file (#3711, #3737) 
 
- - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765)
+ - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765, #3706)
 
  - Fix various issues that people found while playing on FAF Develop 
- - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784) 
+   - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784) 
 
     With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
     people that hosted games on FAF Develop and / or reported issues to the game team.
@@ -229,7 +229,8 @@ Game version 3732 (22nd of April, 2022)
 
  - Removal of the blinking lights (#3698)
 
- - Improve performance of UI related classes (#3704, #3703, #3709, #3725, #3766, #3767, #3521, #3781)
+ - Improve performance of UI related classes 
+   - (#3704, #3703, #3709, #3725, #3766, #3767, #3521, #3781, #3785)
 
  - Improve performance of all props, including wrecks (#3714)
     Significantly reduces the number of tables allocated per prop. Simplifies some 
@@ -286,13 +287,13 @@ Game version 3732 (22nd of April, 2022)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
                      #3728, #3712, #3742, #3751,
                      #3764, #3750, #3768, #3765,
-                     #3782) 
+                     #3782, #3706) 
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
  - 4z0t (#3651, #3647, #3704, #3703, #3709,
          #3725, #3737, #3747, #3766, #3767,
-         #3777)
+         #3777, #3787, #3785)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
