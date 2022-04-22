@@ -104,7 +104,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Fix various issues that people found while playing on FAF Develop 
    - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784,
-      #3788) 
+      #3788, #3794, #3793) 
 
     With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
     people that hosted games on FAF Develop and / or reported issues to the game team.
@@ -160,6 +160,7 @@ Game version 3732 (22nd of April, 2022)
  - Attempts to fix the self-awareness of the ready button in the lobby (#3791, #3792)
     Reduces the occurences of the ready button not being in sync with the
     host and other users in the lobby.
+
 ### Performance
  - Fix LODs of effects (#3720) 
 
