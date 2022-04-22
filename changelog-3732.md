@@ -157,6 +157,9 @@ Game version 3732 (22nd of April, 2022)
 
  - Fix some styling issues with the lobby (#3777)
 
+ - Attempts to fix the self-awareness of the ready button in the lobby (#3791, #3792)
+    Reduces the occurences of the ready button not being in sync with the
+    host and other users in the lobby.
 ### Performance
  - Fix LODs of effects (#3720) 
 
@@ -288,7 +291,7 @@ Game version 3732 (22nd of April, 2022)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
                      #3728, #3712, #3742, #3751,
                      #3764, #3750, #3768, #3765,
-                     #3782, #3706) 
+                     #3782, #3706, #3792) 
  - Askaholic (#3647)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
@@ -303,7 +306,7 @@ Game version 3732 (22nd of April, 2022)
         #3714, #3719, #3702, #3729, #3710,
         #3712, #3736, #3740, #3753, #3720,
         #3774, #3775, #3780, #3521, #3781,
-        #3788)
+        #3788, #3791)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
