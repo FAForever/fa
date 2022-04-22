@@ -85,7 +85,7 @@ ConnectionStatus = Class(Group) {
             if self.ConnectedPlayersCount == 1 then 
                 connectionsText = LOCF('<LOC AutoLobbyConnectionsTextSingular>%s / %s is connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
             else 
-                connectionsText = LOCF('<LOC AutoLobbyConnectionsTextPlural>%s / %s are connected', tostring(self.ConnectedPlayersCount))
+                connectionsText = LOCF('<LOC AutoLobbyConnectionsTextPlural>%s / %s are connected', tostring(self.ConnectedPlayersCount), tostring(self.TotalPlayersCount))
             end
         end
 
