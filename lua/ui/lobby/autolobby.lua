@@ -253,6 +253,7 @@ local function CreateUI()
     -- construct the connection status GUI and position it right below the dialog
     connectionStatusGUI = ConnectionStatus(GetFrame(0))
     LayoutHelpers.CenteredBelow(connectionStatusGUI, currentDialog, 20)
+    LayoutHelpers.DepthOverParent(connectionStatusGUI, background, 1)
 end
 
 
