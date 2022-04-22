@@ -104,7 +104,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Fix encoding issues with unicode characters in the preference file (#3711, #3737) 
 
- - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765, #3706)
+ - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765, #3706, #3799)
 
  - Fix various issues that people found while playing on FAF Develop 
    - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784,
@@ -297,7 +297,7 @@ Game version 3732 (22nd of April, 2022)
  - Penguin  (#3647, #3705, #3715, #3721,
              #3728, #3712, #3742, #3751,
              #3764, #3750, #3768, #3765,
-             #3782, #3706, #3792) 
+             #3782, #3706, #3792, #3799) 
  - Askaholic (#3647, #3759)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
