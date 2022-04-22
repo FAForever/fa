@@ -31,6 +31,10 @@ Game version 3732 (22nd of April, 2022)
  - Allow Hives to start upgrading immediately (#3675)
     Part of the Small Suggestions topic on the forum - suggested by Tagada.
 
+ - Introduce connection status during matchmaking
+    Adds a UI component that informs you how many players are connected while waiting for
+    the people to connect for ladder / matchmaking.
+
  - Introduction of the (performance) profiler (#3674, #3700)
     Allows us to diagnose where the performance is being used during a game. Revolutionary 
     in terms of our capabilities of understanding where all those cycles are going.
@@ -89,7 +93,7 @@ Game version 3732 (22nd of April, 2022)
     units and reselecting them when you are finished. Fixes veterancy issues: 
     both for the spawn menu and all campaign missions.
 
- - Proper UI scaling of Window class (#3679) 
+ - Proper UI scaling of Window class (#3679, #3795)
 
  - Fix display name of Ythotha death weapon (#3689)
     The yearly contribution of Rowey - can't wait what next year will bring us!
@@ -288,17 +292,17 @@ Game version 3732 (22nd of April, 2022)
 
  - Sheikah (#3647)
  - FtxCommando (#3647)
- - BlackYps (#3647, #3642)
+ - BlackYps (#3647, #3642, #3759)
  - Emperor_Penguin  (#3647, #3705, #3715, #3721,
                      #3728, #3712, #3742, #3751,
                      #3764, #3750, #3768, #3765,
                      #3782, #3706, #3792) 
- - Askaholic (#3647)
+ - Askaholic (#3647, #3759)
  - Sheeo (#3647)
  - Balthazar (#3660, #3647, #3676)
  - 4z0t (#3651, #3647, #3704, #3703, #3709,
          #3725, #3737, #3747, #3766, #3767,
-         #3777, #3787, #3785)
+         #3777, #3787, #3785, #3795)
  - Jip (#3660, #3647, #3663, #3656, #3387, 
         #3659, #3648, #3646, #3649, #3672,
         #3668, #3669, #3670, #3675, #3679,
@@ -307,7 +311,8 @@ Game version 3732 (22nd of April, 2022)
         #3714, #3719, #3702, #3729, #3710,
         #3712, #3736, #3740, #3753, #3720,
         #3774, #3775, #3780, #3521, #3781,
-        #3788, #3791, #3793, #3794, #3796)
+        #3788, #3791, #3793, #3794, #3796,
+        #3759)
  - Tagada (#3675, #3678)
  - Strogo (#3667)
  - Rowey (#3689)
@@ -319,3 +324,4 @@ Game version 3732 (22nd of April, 2022)
  - Madmax (#3720)
  - Healther (#3722, #3717)
  - Crotalus (#3741)
+ - speed2 (#3759)
