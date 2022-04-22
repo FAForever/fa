@@ -1,6 +1,20 @@
 last_version = 3732
 gamePatches = {
     {
+        version = 3732, -- purposefully set to 3732, so that it shows on top of game version 3732. Should be fixed in next release
+        name = "Game version 3733",
+        description = {
+            "",
+            "### Bug fixes",
+            "",
+            " - Fix missing parameter in matchmaking (#3800) ",
+            "",
+            "### Contributors",
+            "",
+            " - Jip (#3800)",
+        },
+    },
+    {
         version = 3732,
         name = "Game version 3732",
         description = {

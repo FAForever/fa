@@ -251,7 +251,7 @@ local function CreateUI()
     SetDialog(parent, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
 
     -- construct the connection status GUI and position it right below the dialog
-    connectionStatusGUI = ConnectionStatus()
+    connectionStatusGUI = ConnectionStatus(GetFrame(0))
     LayoutHelpers.CenteredBelow(connectionStatusGUI, currentDialog, 20)
 end
 
