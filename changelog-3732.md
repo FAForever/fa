@@ -166,7 +166,7 @@ Game version 3732 (22nd of April, 2022)
     host and other users in the lobby.
 
 ### Performance
- - Fix LODs of effects (#3720) 
+ - Fix LODs of effects (#3720, #3798)
 
     Fixes inconsistent Level of Detail (LOD) cutoffs for effects. The cutoff is used to 
     prevent the creation and rendering of particles when they barely contribute to the final 
@@ -288,6 +288,7 @@ Game version 3732 (22nd of April, 2022)
 
  - Improve performance of OnMotionHorzEventChange (#3717) 
     Reduction of function calls and removes the 'OnMotionHorzStart' callback.
+
 ### Contributors
 
  - Sheikah (#3647)
@@ -321,7 +322,7 @@ Game version 3732 (22nd of April, 2022)
  - Relent0r (#3673)
  - Brokerjoe (#3738, #3740)
  - SkepticSpecter (#3743)
- - Madmax (#3720)
+ - Madmax (#3720, #3798)
  - Healther (#3722, #3717)
  - Crotalus (#3741)
  - speed2 (#3759)
