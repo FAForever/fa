@@ -32,6 +32,7 @@ gamePatches = {
             "    be enabled in order for the window to show.",
             "",
             " - Allow Hives to start upgrading immediately (#3675)",
+            "", 
             "    Part of the Small Suggestions topic on the forum - suggested by Tagada.",
             "",
             " - Introduce connection status during matchmaking",
