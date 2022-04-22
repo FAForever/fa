@@ -4,7 +4,6 @@ gamePatches = {
         version = 3732,
         name = "Game version 3732",
         description = {
-            {
                 "",
                 "### Features",
                 " - In-lobby auto balancing (#3750, #3764, #3768) ",
@@ -330,9 +329,8 @@ gamePatches = {
                 " - Healther (#3722, #3717)",
                 " - Crotalus (#3741)",
                 " - speed2 (#3759)",
-             }
+            },
         },
-    },
 
         version = 3731,
         name = "Game version 3731",
