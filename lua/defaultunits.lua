@@ -1064,24 +1064,6 @@ MassCollectionUnit = Class(StructureUnit) {
         adjacentUnit:RequestRefreshUI()
     end,
 
-    OnCreate = function(self)
-        StructureUnit.OnCreate(self)
-        local markers = ScenarioUtils.GetMarkers()
-        local unitPosition = self:GetPosition()
-
-        for _, v in pairs(markers) do
-            if v.type == 'MASS' then
-                local massPosition = v.position
-                if (massPosition[1] < unitPosition[1] + 1) and (massPosition[1] > unitPosition[1] - 1) and
-                    (massPosition[2] < unitPosition[2] + 1) and (massPosition[2] > unitPosition[2] - 1) and
-                    (massPosition[3] < unitPosition[3] + 1) and (massPosition[3] > unitPosition[3] - 1) then
-                    self:SetProductionPerSecondMass(self:GetProductionPerSecondMass() * (v.amount / 100))
-                    break
-                end
-            end
-        end
-    end,
-
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
