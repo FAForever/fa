@@ -237,28 +237,20 @@ local function CheckHierarchy(a, b)
 
     local c = ChainCache
 
-    -- cfunctions, functions and regular tables
-    if not a.__State then 
+    -- populate the hierarchy chains
+    ComputeHierarchyChain(a, c)
 
-        -- populate the hierarchy chains
-        ComputeHierarchyChain(a, c)
-
-        -- if the head of chain b is part of ca, then ca is longer
-        if c[b] then 
-            return a
-        end
-
-        ComputeHierarchyChain(b, c)
-
-        -- if the head of chain a is part of cb, then cb is longer
-        if c[a] then 
-            return b
-        end 
-
-    -- states that do something different
-    else 
-
+    -- if the head of chain b is part of ca, then ca is longer
+    if c[b] then 
+        return a
     end
+
+    ComputeHierarchyChain(b, c)
+
+    -- if the head of chain a is part of cb, then cb is longer
+    if c[a] then 
+        return b
+    end 
 
     -- not part of a hierarchy
     return false
