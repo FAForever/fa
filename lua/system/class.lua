@@ -366,14 +366,14 @@ function ConstructClass(bases, specs)
 
                         -- we've got two elements with the same key but different values that are states - oh no!
                         elseif t == "table" and element.__State and (element.__StateIdentifier < seen[l].__StateIdentifier) then 
-                            WARN("Ambigious state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")
+                            WARN("ambiguous state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")
                             WARN(debug.traceback())
 
                             -- do nothing
                         
                         -- we've got two elements with the same key but different values that are states - oh no!
                         elseif t == "table" and element.__State and (element.__StateIdentifier > seen[l].__StateIdentifier) then 
-                            WARN("Ambigious state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")                           
+                            WARN("ambiguous state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")                           
                             WARN(debug.traceback())
 
                             -- switch them up, use the state made last
