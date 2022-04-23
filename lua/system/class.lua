@@ -140,7 +140,6 @@ function State(...)
         local state = ConstructClass(nil, arg[1] )
         state.__State = true 
         state.__StateIdentifier = StateIdentifier
-        state.__StateInheritance = { }
         StateIdentifier = StateIdentifier + 1
         return state 
 
@@ -151,13 +150,6 @@ function State(...)
             local state = ConstructClass(bases, specs)
             state.__State = true 
             state.__StateIdentifier = StateIdentifier
-            state.__StateInheritance = { }
-            for k , v in bases do 
-                TableInsert(state.__StateInheritance, v.__StateIdentifier) 
-                for k, other in v.__StateInheritance do 
-                    TableInsert(state.__StateInheritance, other) 
-                end
-            end
             StateIdentifier = StateIdentifier + 1
             return state 
         end
