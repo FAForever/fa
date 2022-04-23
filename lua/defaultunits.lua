@@ -1004,14 +1004,7 @@ FactoryUnit = Class(StructureUnit) {
 AirFactoryUnit = Class(FactoryUnit) {}
 
 -- AIR STAGING PLATFORMS UNITS
-AirStagingPlatformUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-
-    OnStopBeingBuilt = function(self, builder, layer)
-        StructureUnit.OnStopBeingBuilt(self, builder, layer)
-        self:SetMaintenanceConsumptionActive()
-    end,
-}
+AirStagingPlatformUnit = Class(StructureUnit) { }
 
 -- ENERGY CREATION UNITS
 ConcreteStructureUnit = Class(StructureUnit) {
@@ -1068,25 +1061,6 @@ MassCollectionUnit = Class(StructureUnit) {
 
         self:RequestRefreshUI()
         adjacentUnit:RequestRefreshUI()
-    end,
-
-    OnCreate = function(self)
-        StructureUnit.OnCreate(self)
-        LOG("OnCreate")
-        local markers = ScenarioUtils.GetMarkers()
-        local unitPosition = self:GetPosition()
-
-        for _, v in pairs(markers) do
-            if v.type == 'MASS' then
-                local massPosition = v.position
-                if (massPosition[1] < unitPosition[1] + 1) and (massPosition[1] > unitPosition[1] - 1) and
-                    (massPosition[2] < unitPosition[2] + 1) and (massPosition[2] > unitPosition[2] - 1) and
-                    (massPosition[3] < unitPosition[3] + 1) and (massPosition[3] > unitPosition[3] - 1) then
-                    self:SetProductionPerSecondMass(self:GetProductionPerSecondMass() * 10)
-                    break
-                end
-            end
-        end
     end,
 
     OnStopBeingBuilt = function(self, builder, layer)
@@ -1181,7 +1155,6 @@ MassCollectionUnit = Class(StructureUnit) {
 
 -- MASS FABRICATION UNITS
 MassFabricationUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
@@ -1250,13 +1223,10 @@ MassFabricationUnit = Class(StructureUnit) {
 }
 
 -- MASS STORAGE UNITS
-MassStorageUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-}
+MassStorageUnit = Class(StructureUnit) { }
 
 -- RADAR UNITS
 RadarUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
@@ -1276,7 +1246,6 @@ RadarUnit = Class(StructureUnit) {
 
 -- RADAR JAMMER UNITS
 RadarJammerUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
     -- Shut down intel while upgrading
     OnStartBuild = function(self, unitbuilding, order)
@@ -1325,7 +1294,6 @@ RadarJammerUnit = Class(StructureUnit) {
 
 -- SONAR UNITS
 SonarUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
 
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
@@ -1393,7 +1361,7 @@ ShieldStructureUnit = Class(StructureUnit) {
 
 -- TRANSPORT BEACON UNITS
 TransportBeaconUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
+
     FxTransportBeacon = {'/effects/emitters/red_beacon_light_01_emit.bp'},
     FxTransportBeaconScale = 0.5,
 
@@ -1410,17 +1378,10 @@ TransportBeaconUnit = Class(StructureUnit) {
 }
 
 -- WALL STRCUTURE UNITS
-WallStructureUnit = Class(StructureUnit) {
-    LandBuiltHiddenBones = {'Floatation'},
-}
+WallStructureUnit = Class(StructureUnit) { }
 
 -- QUANTUM GATE UNITS
-QuantumGateUnit = Class(FactoryUnit) {
-    OnKilled = function(self, instigator, type, overkillRatio)
-        self:StopUnitAmbientSound('ActiveLoop')
-        FactoryUnit.OnKilled(self, instigator, type, overkillRatio)
-    end,
-}
+QuantumGateUnit = Class(FactoryUnit) { }
 
 -- MOBILE UNITS
 MobileUnit = Class(Unit) {
@@ -1449,18 +1410,6 @@ MobileUnit = Class(Unit) {
         if self.factionCategory == 'UEF' then
             EffectUtil.CreateUEFUnitBeingBuiltEffects(self, builder, self.OnBeingBuiltEffectsBag)
         end
-    end,
-
-    StopBeingBuiltEffects = function(self, builder, layer)
-        Unit.StopBeingBuiltEffects(self, builder, layer)
-    end,
-
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        Unit.StartBuildingEffects(self, unitBeingBuilt, order)
-    end,
-
-    StopBuildingEffects = function(self, unitBeingBuilt)
-        Unit.StopBuildingEffects(self, unitBeingBuilt)
     end,
 
     CreateReclaimEffects = function(self, target)
