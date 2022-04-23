@@ -28,8 +28,6 @@ CIFMissileTactical02 = Class(CLOATacticalMissileProjectile) {
     end,    
     
     OnImpact = function(self, targetType, targetEntity)
-        local FriendlyFire = self.DamageData.DamageFriendly and radius ~=0
-        
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
         
         -- if I collide with terrain dont split
