@@ -1,5 +1,41 @@
 last_version = 3732
 gamePatches = {
+
+    {
+        version = 3732, -- purposefully set to 3732, so that it shows on top of game version 3732. Should be fixed in next release
+        name = "Game version 3735",
+        description = {
+            "",
+            "### Bug fixes",
+            "",
+            " - Remove remainder of old decal / tree knocking code (#3803)",
+            "    Fixes issues with the missiles of the Cybran 'Plan B' submarine",
+            "",
+            " - Fix consumption issue with extractors when pausing (#3804)",
+            "    Extractors no longer produce mass for free when paused :)",
+            "",
+            " - Allow for ambiguous states in classes (#3805)",
+            "    This fixes an issue with the mod RKs explosions that immediately ",
+            "    broke the simulation upon launch",
+            "",
+            " - Fix wreckage not taking damage (#3807)",
+            "",
+            " - Fix inconsistent lods (#3808)",
+            "    This was particularly noticeable between trees and tree groups.",
+            "",
+            " - Fix Aeon structures shader after construction (#3809)",
+            "",
+            "### Performance",
+            "",
+            " - Prevent extractors from looking through all markers upon creation (#3804)",
+            "### Contributors",
+            "",
+            " - Jip (#3803, #3804, #3805, #3807",
+            "        #3808, #3809)",
+            "",
+        },
+    },
+
     {
         version = 3732, -- purposefully set to 3732, so that it shows on top of game version 3732. Should be fixed in next release
         name = "Game version 3734",
