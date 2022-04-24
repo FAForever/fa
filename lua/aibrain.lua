@@ -42,6 +42,8 @@ local Points = {
     victory = 10
 }
 
+local CoroutineYield = coroutine.yield
+
 AIBrain = Class(moho.aibrain_methods) {
 
     -- for the engi mod
@@ -222,6 +224,14 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyDependingUnits.__mode = 'v'
         self.EnergyDependingUnitsHead = 1
 
+        --- Units that we toggle on / off depending on whether we have excess energy
+        self.EnergyExcessUnitsEnabled = { }
+        setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'k' })
+        self.EnergyExcessUnitsDisabled = { }
+        setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'k' })
+
+        ForkThread(self.ToggleEnergyExcessUnitsThread, self)
+
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
@@ -316,6 +326,75 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     -- Energy storage callbacks
+
+    AddEnabledEnergyExcessEntity = function (self, entity)
+        self.EnergyExcessUnitsEnabled[entity] = true
+        self.EnergyExcessUnitsDisabled[entity] = nil 
+    end,
+
+    AddDisabledEnergyExcessEntity = function (self, entity)
+        self.EnergyExcessUnitsEnabled[entity] = nil
+        self.EnergyExcessUnitsDisabled[entity] = true 
+    end,
+
+    RemoveEnergyExcessEntity = function (self, entity)
+        self.EnergyExcessUnitsEnabled[entity] = nil 
+        self.EnergyExcessUnitsDisabled[entity] = nil 
+    end,
+
+    ToggleEnergyExcessUnitsThread = function (self)
+        if not (self:GetArmyIndex() == 1) then 
+            return 
+        end
+
+        while true do 
+
+            local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
+            local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
+
+            -- low on storage and insufficient energy income, disable fabricators
+            if energyStoredRatio < 0.4 and energyTrend < 0 then 
+
+                -- while we have fabricators to disable
+                for fabricator, _ in self.EnergyExcessUnitsEnabled do 
+                    if fabricator and not fabricator:BeenDestroyed() then 
+
+                        -- disable fabricator
+                        fabricator:OnProductionPaused()
+
+                        -- keep track of it
+                        self.EnergyExcessUnitsDisabled[fabricator] = true
+                        self.EnergyExcessUnitsEnabled[fabricator] = nil
+
+                        break
+                    end
+                end
+            end
+
+            -- high on storage and sufficient energy income, enable fabricators
+            if energyStoredRatio > 0.6 and energyTrend > 100 then 
+
+                -- while we have fabricators to retrieve
+                for fabricator, _ in self.EnergyExcessUnitsDisabled do
+                    if fabricator and not fabricator:BeenDestroyed() then 
+                        if fabricator.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
+
+                            -- enable fabricator
+                            fabricator:OnProductionUnpaused()
+
+                            -- keep track of it
+                            self.EnergyExcessUnitsDisabled[fabricator] = nil
+                            self.EnergyExcessUnitsEnabled[fabricator] = true
+
+                            break
+                        end
+                    end
+                end
+            end
+
+            CoroutineYield(1)
+        end
+    end,
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     -- @param self Brain that keeps track of the entity
