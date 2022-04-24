@@ -49,9 +49,16 @@ Wreckage = Class(Prop) {
         -- # Set state
 
         self.IsWreckage = true
+        self.CanTakeDamage = true 
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
+        if self.CanTakeDamage then 
+            self.DoTakeDamage(self, instigator, amount, vector, damageType)
+        end
+    end,
+
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
         EntityAdjustHealth(self, instigator, -amount)
         local health = EntityGetHealth(self)
 
