@@ -23,6 +23,7 @@ Game version 3735 (24th of April, 2022)
 ### Performance
 
  - Prevent extractors from looking through all markers upon creation (#3804)
+ 
 ### Contributors
 
  - Jip (#3803, #3804, #3805, #3807

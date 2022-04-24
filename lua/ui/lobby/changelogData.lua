@@ -28,6 +28,7 @@ gamePatches = {
             "### Performance",
             "",
             " - Prevent extractors from looking through all markers upon creation (#3804)",
+            "",
             "### Contributors",
             "",
             " - Jip (#3803, #3804, #3805, #3807",
