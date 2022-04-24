@@ -6,8 +6,8 @@ Game version 3735 (24th of April, 2022)
  - Remove remainder of old decal / tree knocking code (#3803)
     Fixes issues with the missiles of the Cybran 'Plan B' submarine
 
- - Fix consumption issue with extractors when pausing (#3804)
-    Extractors no longer produce mass for free when paused :)
+ - Fix consumption issue with extractors when production is paused (#3804)
+    Extractors no longer produce mass for free when their production is paused :)
 
  - Allow for ambiguous states in classes (#3805)
     This fixes an issue with the mod RKs explosions that immediately 
@@ -23,7 +23,7 @@ Game version 3735 (24th of April, 2022)
 ### Performance
 
  - Prevent extractors from looking through all markers upon creation (#3804)
- 
+
 ### Contributors
 
  - Jip (#3803, #3804, #3805, #3807
