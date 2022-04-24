@@ -49,14 +49,13 @@ Wreckage = Class(Prop) {
         -- # Set state
 
         self.IsWreckage = true
+        self.CanTakeDamage = true 
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.CanTakeDamage then 
-            return 
+        if self.CanTakeDamage then 
+            self.DoTakeDamage(self, instigator, amount, vector, damageType)
         end
-
-        self.DoTakeDamage(self, instigator, amount, vector, damageType)
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
