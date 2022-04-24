@@ -83,7 +83,7 @@ UAB1104 = Class(AMassFabricationUnit) {
                 self.AmbientEffects = nil
             end
 
-            if self.Open then
+            if self.Open and self.Rotator then
                 if self.Clockwise == true then
                     self.Rotator:SetSpinDown(true)
                     self.Rotator:SetTargetSpeed(self.Goal)
