@@ -392,13 +392,12 @@ StructureUnit = Class(Unit) {
     end,
 
     StopBeingBuiltEffects = function(self, builder, layer)
-        local FactionName = self:GetBlueprint().General.FactionName
-        if FactionName == 'Aeon' then
-            WaitSeconds(2.0)
-        elseif FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
+        local FactionName = self.Blueprint.General.FactionName
+        if FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
             self:ShowBone(0, true)
             self:HideLandBones()
         end
+
         Unit.StopBeingBuiltEffects(self, builder, layer)
     end,
 
