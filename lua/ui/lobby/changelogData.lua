@@ -1,8 +1,8 @@
-last_version = 3732
+last_version = 3735
 gamePatches = {
 
     {
-        version = 3732, -- purposefully set to 3732, so that it shows on top of game version 3732. Should be fixed in next release
+        version = 3735,
         name = "Game version 3735",
         description = {
             "",
@@ -31,14 +31,15 @@ gamePatches = {
             "",
             "### Contributors",
             "",
-            " - Jip (#3803, #3804, #3805, #3807",
-            "        #3808, #3809)",
+            " - Jip (#3803, #3804, #3805, #3807, #3808, #3809)",
+            "",
+            "With thanks to Archsimkat, AlfaViTe and Cyrris for taking the time to report various issues.",
             "",
         },
     },
 
     {
-        version = 3732, -- purposefully set to 3732, so that it shows on top of game version 3732. Should be fixed in next release
+        version = 3734,
         name = "Game version 3734",
         description = {
             "",
@@ -53,7 +54,7 @@ gamePatches = {
     },
 
     {
-        version = 3732, -- purposefully set to 3732, so that it shows on top of game version 3732. Should be fixed in next release
+        version = 3733,
         name = "Game version 3733",
         description = {
             "",

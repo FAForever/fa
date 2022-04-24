@@ -26,8 +26,9 @@ Game version 3735 (24th of April, 2022)
 
 ### Contributors
 
- - Jip (#3803, #3804, #3805, #3807
-        #3808, #3809)
+ - Jip (#3803, #3804, #3805, #3807, #3808, #3809)
+
+With thanks to Archsimkat, AlfaViTe and Cyrris for taking the time to report various issues.
 
 Game version 3734 (22nd of April, 2022)
 ===================================
