@@ -164,22 +164,29 @@ function CreateUI(isReplay)
     ConExecute('d3d_WindowsCursor on')  
 
     -- enable experimental graphics
-    if      Prefs.GetFromCurrentProfile('options.fidelity') == 2 
+    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2 
         and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
 
-        LOG("Experimental graphics enabled, use at your own risk: ")
+        ForkThread(
+            function() 
 
-        if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
-            -- allow meshes and effects to be seen from further away
-            ConExecute("cam_SetLOD WorldCamera 0.6")
-        end
+                WaitSeconds(1.0)
 
-        if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+                LOG("Experimental graphics enabled, use at your own risk: ")
 
-            -- improve shadow LOD and resolution
-            ConExecute("ren_ShadowLOD 1024")
-            ConExecute("ren_ShadowSize 2048")
-        end
+                if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
+                    -- allow meshes and effects to be seen from further away
+                    ConExecute("cam_SetLOD WorldCamera 0.7")
+                end
+
+                if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+
+                    -- improve shadow LOD and resolution
+                    ConExecute("ren_ShadowLOD 1024")
+                    ConExecute("ren_ShadowSize 2048")
+                end
+            end
+        )
     end
 
     -- keep track of the original focus army
