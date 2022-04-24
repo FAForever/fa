@@ -52,7 +52,6 @@ end
 -- @param props List of props to tweak the LODs for
 local function CalculateLODsOfProps(props)
     for k, prop in props do 
-        LOG(k)
         CalculateLODOfProp(prop)
     end
 end
