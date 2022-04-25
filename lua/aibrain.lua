@@ -53,6 +53,9 @@ AIBrain = Class(moho.aibrain_methods) {
     OnCreateHuman = function(self, planName)
         self:CreateBrainShared(planName)
         self.BrainType = 'Human'
+
+        -- human-only behavior
+        self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
     end,
 
     AddUnitStat = function(self, unitId, statName, value)
@@ -230,8 +233,6 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyExcessUnitsDisabled = { }
         setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'k' })
 
-        ForkThread(self.ToggleEnergyExcessUnitsThread, self)
-
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
@@ -343,12 +344,6 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ToggleEnergyExcessUnitsThread = function (self)
-
-        -- only humans need this - ai can do their own logic.
-        if self.BrainType ~= "Human" then 
-            return 
-        end
-
         while true do 
 
             local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
@@ -3492,6 +3487,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
                     -- Reassign all Army attributes to better suit the AI.
                     self.BrainType = 'AI'
+
+                    if self.EnergyExcessThread then 
+                        KillThread(self.EnergyExcessThread)
+                    end
+
                     self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
                     self.NumBases = 0 -- AddBuilderManagers will increase the number
                     self.BuilderManagers = {}
