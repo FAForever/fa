@@ -343,7 +343,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ToggleEnergyExcessUnitsThread = function (self)
-        if not (self:GetArmyIndex() == 1) then 
+
+        -- only humans need this - ai can do their own logic.
+        if self.BrainType ~= "Human" then 
             return 
         end
 
