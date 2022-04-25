@@ -244,7 +244,7 @@ end
 function sendEnhancementMessage(messageTable)
     local source = messageTable.source
     local category = messageTable.category
-    if messages and not messages()[category][source] then return end
+    if not messages or not messages()[category][source] then return end
 
     local id = messageTable.id
     local army = messageTable.army
