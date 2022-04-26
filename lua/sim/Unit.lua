@@ -1220,7 +1220,9 @@ Unit = Class(moho.unit_methods) {
             -- Handle ships that can walk on land
             self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
         else
-            self:PlayUnitSound('Killed')
+            if not self:PlayUnitSound('Killed') then 
+                self:PlayUnitSound('Destroyed')
+            end
         end
 
         -- apply death animation on half built units (do not apply for ML and mega)
