@@ -8094,4 +8094,4 @@ lobui_0806="Yes"
 lobui_0807="This game will not be rated."
 
 replay_id="Replay id"
-
+map_version="Map version"
