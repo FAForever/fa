@@ -1774,7 +1774,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SeabedWatcher = function(self)
-        LOG("SeabedWatcher")
         local pos = self:GetPosition()
         local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         local watchBone = self.Blueprint.WatchBone or 0
