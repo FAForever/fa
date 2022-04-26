@@ -1202,8 +1202,6 @@ Unit = Class(moho.unit_methods) {
         local layer = self.Layer
         self.Dead = true
 
-        self:PlayUnitSound('Destroyed')
-
         -- Clear out any remaining projectiles
         for k = 1, self.WeaponCount do 
             self.WeaponInstances[k]:ClearProjectileTrash();
