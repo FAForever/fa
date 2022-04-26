@@ -66,6 +66,8 @@ BuffField = Class(Entity) {
     end,
 
     OnCreate = function(self)
+        self.Army = self:GetArmy()
+        
         local Owner = self:GetOwner()
         local bp = self:GetBlueprint()
 
