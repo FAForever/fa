@@ -210,8 +210,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCreate = function(self)
-        Entity.OnCreate(self)   
-
         local blueprint = self:GetBlueprint()
 
         -- populate blueprint cache if we haven't done that yet

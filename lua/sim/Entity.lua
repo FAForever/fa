@@ -5,7 +5,9 @@
 --**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
--- we can't scope this as an upvalue because this file is touched upon by UI code.
+-- From a performance perspective any changes to this file is strictly forbidden.
+
+-- We can't scope this as an upvalue because this file is touched upon by UI code.
 -- - unitview.lua -> import of game.lua (ui file)
 -- - game.lua -> import of BuffField.lua (sim file)
 -- - BuffField.lua -> import of Entity (sim file)
