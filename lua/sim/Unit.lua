@@ -1202,6 +1202,8 @@ Unit = Class(moho.unit_methods) {
         local layer = self.Layer
         self.Dead = true
 
+        self:PlayUnitSound('Destroyed')
+
         -- Clear out any remaining projectiles
         for k = 1, self.WeaponCount do 
             self.WeaponInstances[k]:ClearProjectileTrash();
@@ -1774,6 +1776,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SeabedWatcher = function(self)
+        LOG("SeabedWatcher")
         local pos = self:GetPosition()
         local seafloor = GetTerrainHeight(pos[1], pos[3]) + GetTerrainTypeOffset(pos[1], pos[3])
         local watchBone = self.Blueprint.WatchBone or 0
@@ -1864,7 +1867,6 @@ Unit = Class(moho.unit_methods) {
         -- wait at least 1 tick before destroying unit
         WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
 
-        self:PlayUnitSound('Destroyed')
         self:Destroy()
     end,
 
