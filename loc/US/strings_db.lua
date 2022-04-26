@@ -1540,7 +1540,7 @@ Unit_Description_0094="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0095="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0096="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0097="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0098="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0098="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 
 -- UEF -- Engineers
 Unit_Description_0076="Tech 1 amphibious construction, repair, capture and reclamation unit."
@@ -1703,7 +1703,7 @@ Unit_Description_0211="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0212="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0213="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0214="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0215="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0215="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 
 -- CYBRAN -- Engineers
 Unit_Description_0193="Tech 1 amphibious construction, repair, capture and reclamation unit."
@@ -1860,7 +1860,7 @@ Unit_Description_0291="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0292="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0293="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0294="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0295="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0295="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 Unit_Description_0336="Generates an adaptive economy of up to 10000 mass per second and 1000000 energy per second. When killed the reactor core destabilizes in a fully-fledged nuclear explosion."
 
 -- AEON -- Engineers
@@ -2004,7 +2004,7 @@ Unit_Description_0406="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0407="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0408="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0409="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0410="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0410="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 
 -- SERAPHIM -- Engineers
 Unit_Description_0387="Tech 1 amphibious construction, Repair, Capture and Reclamation unit."
@@ -8094,5 +8094,4 @@ lobui_0806="Yes"
 lobui_0807="This game will not be rated."
 
 replay_id="Replay id"
-map_version="Map version"
 
