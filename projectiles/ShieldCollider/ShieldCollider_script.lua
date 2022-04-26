@@ -66,9 +66,6 @@ ShieldCollider = Class(Projectile) {
                     self.Plane:OnImpact(targetType)
                 end
 
-                -- make crash sound
-                self.Plane:PlayUnitSound('Destroyed')
-
                 self:Destroy()
             elseif targetType == 'Shield' and targetEntity and not targetEntity:BeenDestroyed() and targetEntity.ShieldType == 'Bubble' then
                 if not self.ShieldImpacted and not self.Plane.GroundImpacted then
