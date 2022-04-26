@@ -1864,6 +1864,11 @@ Unit = Class(moho.unit_methods) {
         -- wait at least 1 tick before destroying unit
         WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
 
+        -- do not play sound after sinking
+        if not self.Sinking then 
+            self:PlayUnitSound('Destroyed')
+        end
+
         self:Destroy()
     end,
 
