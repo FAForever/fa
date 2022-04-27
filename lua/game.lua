@@ -5,6 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- This file is used by both sim and UI code. It should therefore at
+-- no moment use logic that is not available in both. Any pull request that 
+-- introduces logic that is not functional in both the ui and the sim will 
+-- be rejected.
+
 FireState = {
     RETURN_FIRE = 0,
     HOLD_FIRE = 1,
