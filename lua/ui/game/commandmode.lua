@@ -113,8 +113,25 @@ function EndCommandMode(isCancel)
     end
 
     -- regain selection if we were cheating in units
-    if modeData.cheat and modeData.selection then 
-        SelectUnits(modeData.selection)
+    if modeData.cheat then 
+        if modeData.ids and modeData.index <= table.getn(modeData.ids) then 
+            local modeData = table.deepcopy(modeData)
+            ForkThread(
+                function()
+                    WaitSeconds(0.0001)
+
+                    modeData.name = modeData.ids[modeData.index]
+                    modeData.bpId = modeData.ids[modeData.index]
+                    modeData.index = modeData.index + 1
+        
+                    StartCommandMode("build", modeData)
+                end
+            )
+        else 
+            if modeData.selection then
+                SelectUnits(modeData.selection)
+            end
+        end
     end
 
     -- add information to modeData for end behavior
