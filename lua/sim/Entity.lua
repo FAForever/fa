@@ -7,7 +7,8 @@
 
 -- From a performance perspective any changes to this file is strictly 
 -- forbidden - if you do intend to make changes please contact the 
--- administrator of the repository to discuss your changes.
+-- administrator of the repository to discuss your changes before assuming
+-- that your changes will get merged in.
 
 local _c_CreateEntity = _c_CreateEntity 
 
