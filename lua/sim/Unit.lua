@@ -4354,9 +4354,8 @@ Unit = Class(moho.unit_methods) {
 
         if not DeprecatedWarnings.AddOnHorizontalStartMoveCallback then 
             DeprecatedWarnings.AddOnHorizontalStartMoveCallback = true 
-            WARN("AddOnHorizontalStartMoveCallback is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
+            WARN("AddOnHorizontalStartMoveCallback is deprecated and no longer functional. There is no alternative.")
+            WARN("Stacktrace: " .. repr(debug.traceback()))
         end
 
     end,
@@ -4365,12 +4364,11 @@ Unit = Class(moho.unit_methods) {
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StartRocking = function(self)
 
-        if not DeprecatedWarnings.StartRocking then 
-            DeprecatedWarnings.StartRocking = true 
-            WARN("StartRocking is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.StartRocking then 
+        --     DeprecatedWarnings.StartRocking = true 
+        --     SPEW("StartRocking is deprecated.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         local bp = self.Blueprint.Display
         local speed = bp.MaxRockSpeed
@@ -4390,12 +4388,11 @@ Unit = Class(moho.unit_methods) {
     -- in practice, nor by this repository or by any of the commonly played mod packs.
     StopRocking = function(self)
 
-        if not DeprecatedWarnings.StopRocking then 
-            DeprecatedWarnings.StopRocking = true 
-            WARN("StopRocking is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.StopRocking then 
+        --     DeprecatedWarnings.StopRocking = true 
+        --     SPEW("StopRocking is deprecated.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         if self.StartRockThread then
             -- clear it so that GC can take it
@@ -4412,12 +4409,11 @@ Unit = Class(moho.unit_methods) {
     --- Rocking thread to move a unit when it is on the water.
     RockingThread = function(self, speed)
 
-        if not DeprecatedWarnings.RockingThread then 
-            DeprecatedWarnings.RockingThread = true 
-            WARN("RockingThread is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.RockingThread then 
+        --     DeprecatedWarnings.RockingThread = true 
+        --     SPEW("RockingThread is deprecated.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         -- default value
         speed = speed or 1.5
@@ -4444,12 +4440,11 @@ Unit = Class(moho.unit_methods) {
     -- warping to the original position.
     EndRockingThread = function(self, speed)
 
-        if not DeprecatedWarnings.EndRockingThread then 
-            DeprecatedWarnings.EndRockingThread = true 
-            WARN("EndRockingThread is deprecated.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.EndRockingThread then 
+        --     DeprecatedWarnings.EndRockingThread = true 
+        --     SPEW("EndRockingThread is deprecated.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         if self.RockManip then
 
@@ -4468,12 +4463,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     updateBuildRestrictions = function(self)
-        if not DeprecatedWarnings.updateBuildRestrictions then 
-            WARN("updateBuildRestrictions is deprecated. Call unit.UpdateBuildRestrictions instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-            DeprecatedWarnings.updateBuildRestrictions = true 
-        end
+        -- if not DeprecatedWarnings.updateBuildRestrictions then 
+        --     SPEW("updateBuildRestrictions is deprecated. Call unit.UpdateBuildRestrictions instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        --     DeprecatedWarnings.updateBuildRestrictions = true 
+        -- end
 
         -- call the old function
         self.UpdateBuildRestrictions(self)
@@ -4482,110 +4476,99 @@ Unit = Class(moho.unit_methods) {
     FindHQType = function(aiBrain, category)
         if not DeprecatedWarnings.FindHQType then 
             DeprecatedWarnings.FindHQType = true 
-            WARN("FindHQType is deprecated since PR #3319.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
+            WARN("FindHQType is deprecated and is no longer functional. There is no alternative.")
+            WARN("Stacktrace: " .. repr(debug.traceback()))
         end
     end,
 
     SetDead = function(self)
-        if not DeprecatedWarnings.SetDead then 
-            DeprecatedWarnings.SetDead = true 
-            WARN("SetDead is deprecated: use unit.Dead = true instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetDead then 
+        --     DeprecatedWarnings.SetDead = true 
+        --     SPEW("SetDead is deprecated: use unit.Dead = true instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         self.Dead = true
     end,
 
     IsDead = function(self)
-        if not DeprecatedWarnings.IsDead then 
-            DeprecatedWarnings.IsDead = true 
-            WARN("IsDead is deprecated: use unit.Dead instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.IsDead then 
+        --     DeprecatedWarnings.IsDead = true 
+        --     SPEW("IsDead is deprecated: use unit.Dead instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         return self.Dead
     end,
 
     GetCachePosition = function(self)
-        if not DeprecatedWarnings.GetCachePosition then 
-            DeprecatedWarnings.GetCachePosition = true 
-            WARN("GetCachePosition is deprecated: use unit:GetPosition() instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.GetCachePosition then 
+        --     DeprecatedWarnings.GetCachePosition = true 
+        --     SPEW("GetCachePosition is deprecated: use unit:GetPosition() instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         return self:GetPosition()
     end,
     
     GetFootPrintSize = function(self)
-        if not DeprecatedWarnings.GetFootPrintSize then 
-            DeprecatedWarnings.GetFootPrintSize = true 
-            WARN("GetFootPrintSize is deprecated: use unit.FootPrintSize instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.GetFootPrintSize then 
+        --     DeprecatedWarnings.GetFootPrintSize = true 
+        --     SPEW("GetFootPrintSize is deprecated: use unit.FootPrintSize instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         return self.FootPrintSize
     end,
     
     GetUnitSizes = function(self)
-        if not DeprecatedWarnings.GetUnitSizes then 
-            DeprecatedWarnings.GetUnitSizes = true 
-            WARN("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.GetUnitSizes then 
+        --     DeprecatedWarnings.GetUnitSizes = true 
+        --     SPEW("GetUnitSizes is deprecated: use unit.Size.SizeX, unit.Size.SizeY, unit.Size.SizeZ instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         return self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
     end,
 
     SetCanTakeDamage = function(self, val)
-        if not DeprecatedWarnings.SetCanTakeDamage then 
-            DeprecatedWarnings.SetCanTakeDamage = true 
-            WARN("SetCanTakeDamage is deprecated: use unit.CanTakeDamage = val instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetCanTakeDamage then 
+        --     DeprecatedWarnings.SetCanTakeDamage = true 
+        --     SPEW("SetCanTakeDamage is deprecated: use unit.CanTakeDamage = val instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         self.CanTakeDamage = val
     end,
 
     CheckCanTakeDamage = function(self)
-        if not DeprecatedWarnings.CheckCanTakeDamage then 
-            DeprecatedWarnings.CheckCanTakeDamage = true 
-            WARN("CheckCanTakeDamage is deprecated: use unit.CanTakeDamage instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.CheckCanTakeDamage then 
+        --     DeprecatedWarnings.CheckCanTakeDamage = true 
+        --     SPEW("CheckCanTakeDamage is deprecated: use unit.CanTakeDamage instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         return self.CanTakeDamage
     end,
 
     CheckCanBeKilled = function(self, other)
-        if not DeprecatedWarnings.CheckCanBeKilled then 
-            DeprecatedWarnings.CheckCanBeKilled = true 
-            WARN("CheckCanBeKilled is deprecated: use unit.CanBeKilled instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.CheckCanBeKilled then 
+        --     DeprecatedWarnings.CheckCanBeKilled = true 
+        --     SPEW("CheckCanBeKilled is deprecated: use unit.CanBeKilled instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         return self.CanBeKilled
     end,
     
     SetCanBeKilled = function(self, val)
-        if not DeprecatedWarnings.SetCanBeKilled then 
-            DeprecatedWarnings.SetCanBeKilled = true 
-            WARN("SetCanBeKilled is deprecated: use unit.CanBeKilled = val instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetCanBeKilled then 
+        --     DeprecatedWarnings.SetCanBeKilled = true 
+        --     SPEW("SetCanBeKilled is deprecated: use unit.CanBeKilled = val instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
         self.CanBeKilled = val
     end,
 
     GetUnitBeingBuilt = function(self)
-        if not DeprecatedWarnings.GetUnitBeingBuilt then
-            DeprecatedWarnings.GetUnitBeingBuilt = true
-            WARN("GetUnitBeingBuilt is deprecated: use unit.UnitBeingBuilt instead.")
-            WARN("Source: " .. repr(debug.getinfo(2)))
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.GetUnitBeingBuilt then
+        --     DeprecatedWarnings.GetUnitBeingBuilt = true
+        --     SPEW("GetUnitBeingBuilt is deprecated: use unit.UnitBeingBuilt instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         return self.UnitBeingBuilt
     end,
