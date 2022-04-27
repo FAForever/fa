@@ -21,7 +21,6 @@ local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
 
 local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local BuffFieldBlueprints = import('/lua/sim/BuffField.lua').BuffFieldBlueprints
 local Wreckage = import('/lua/wreckage.lua')
 local Set = import('/lua/system/setutils.lua')
 local Factions = import('/lua/factions.lua').GetFactions(true)
@@ -210,8 +209,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnCreate = function(self)
-        Entity.OnCreate(self)   
-
         local blueprint = self:GetBlueprint()
 
         -- populate blueprint cache if we haven't done that yet
@@ -370,8 +367,6 @@ Unit = Class(moho.unit_methods) {
         end
 
         self.Dead = false
-
-        self:InitBuffFields()
 
         -- Ensure transport slots are available
         self.attachmentBone = nil
@@ -4214,47 +4209,6 @@ Unit = Class(moho.unit_methods) {
 
     PlayTeleportInEffects = function(self)
         EffectUtilities.PlayTeleportInEffects(self, self.TeleportFxBag)
-    end,
-
-    -- Buff Fields
-    InitBuffFields = function(self)
-        -- Creates all buff fields
-        local bp = self.Blueprint
-        if self.BuffFields and bp.BuffFields then
-            for scriptName, field in self.BuffFields do
-                -- Getting buff field blueprint
-
-                local BuffFieldBp = BuffFieldBlueprints[bp.BuffFields[scriptName]]
-                if not BuffFieldBp or type(BuffFieldBp) ~= 'table' then
-                    WARN('BuffField: no blueprint data for buff field '..repr(scriptName))
-                else
-                    -- We need a different buff field instance for each unit. This takes care of that.
-                    if not self.MyBuffFields then
-                        self.MyBuffFields = {}
-                    end
-                    self.MyBuffFields[scriptName] = self:CreateBuffField(scriptName, BuffFieldBp)
-                end
-            end
-        end
-    end,
-
-    CreateBuffField = function(self, name, buffFieldBP) -- Buff field stuff
-        local spec = {
-            Name = buffFieldBP.Name,
-            Owner = self,
-        }
-        return (self.BuffFields[name](spec))
-    end,
-
-    GetBuffFieldByName = function(self, name)
-        if self.BuffFields and self.MyBuffFields then
-            for k, field in self.MyBuffFields do
-                local fieldBP = field:GetBlueprint()
-                if fieldBP.Name == name then
-                    return field
-                end
-            end
-        end
     end,
 
     OnAttachedToTransport = function(self, transport, bone)
