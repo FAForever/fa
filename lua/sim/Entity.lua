@@ -5,13 +5,11 @@
 --**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
--- From a performance perspective any changes to this file is strictly forbidden.
+-- From a performance perspective any changes to this file is strictly 
+-- forbidden - if you do intend to make changes please contact the 
+-- administrator of the repository to discuss your changes.
 
--- We can't scope this as an upvalue because this file is touched upon by UI code.
--- - unitview.lua -> import of game.lua (ui file)
--- - game.lua -> import of BuffField.lua (sim file)
--- - BuffField.lua -> import of Entity (sim file)
--- local _c_CreateEntity = _c_CreateEntity 
+local _c_CreateEntity = _c_CreateEntity 
 
 Entity = Class(moho.entity_methods) {
 

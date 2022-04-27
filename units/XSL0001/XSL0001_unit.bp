@@ -134,10 +134,6 @@ UnitBlueprint {
             Level5 = 15,
         },
     },
-    BuffFields = {
-        RegenField = 'SeraphimACURegenBuffField',
-        AdvancedRegenField = 'SeraphimAdvancedACURegenBuffField',
-    },
     Categories = {
         'PRODUCTFA',
         'SELECTABLE',
