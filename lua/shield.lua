@@ -8,7 +8,7 @@
 -- Legacy shield state:
 --  - _IsUp: determines whether the shield is up
 
--- Current hield state:
+-- Current shield state:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
