@@ -5,16 +5,24 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
--- Legacy shield state:
+-- Legacy shield flags:
 --  - _IsUp: determines whether the shield is up
 
--- Current hield state:
+-- Current shield flags:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
 --  - DepletedByDamage: flag that indicates the shield sustained too much damage and needs to recharge
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
+
+-- Current shield states:
+-- - OnState
+-- - OffState
+-- - RechargeState
+-- - DamageDrainedState
+-- - EnergyDrainedState
+-- - DeadState
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -1096,11 +1104,11 @@ TransportShield = Class(Shield) {
 
     OnState = State(Shield.OnState) {
         Main = function(self)
+            Shield.OnState.Main(self)
+
             -- prevent ourself and our content from taking damage
             self:SetContentsVulnerable(false)
             self.Owner.CanTakeDamage = false 
-
-            Shield.OnState.Main(self)
         end,
 
         AddProtectedUnit = function(self, unit)
@@ -1111,24 +1119,31 @@ TransportShield = Class(Shield) {
 
     OffState = State(Shield.OffState) {
         Main = function(self)
+            Shield.OffState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-
-            Shield.OffState.Main(self)
         end,
+    },
 
-        AddProtectedUnit = function(self, unit)
-            self.protectedUnits[unit] = true
+    DamageDrainedState = State(Shield.DamageDrainedState) {
+        Main = function(self)
+            Shield.DamageDrainedState.Main(self)
+
+            -- allow ourself and our content to take damage
+            self:SetContentsVulnerable(true)
+            self.Owner.CanTakeDamage = true 
         end
     },
 
-    RechargeState = State(Shield.RechargeState) {
+    EnergyDrainedState = State(Shield.EnergyDrainedState) {
         Main = function(self)
+            Shield.EnergyDrainedState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-            Shield.RechargeState.Main(self)
         end
     },
 }
