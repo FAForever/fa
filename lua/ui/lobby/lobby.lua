@@ -4063,8 +4063,14 @@ function CreateUI(maxPlayers)
 
 
 
+            -- DetermineTeams(true, true) can be called for testing balancing with generated test data
+            -- Results of that testing should be in the log if DetermineTeams is called with logResult set to true
             local function DetermineTeams(generateTestData, logResult, sortedPlayerRatings, teamSize, playerCount, goalValue)
 
+                local sortedPlayerRatings = sortedPlayerRatings or {}
+                local teamSize = teamSize or 0
+                local playerCount = playerCount or 0
+                local goalValue = goalValue or {0, 0}
                 if generateTestData then
                     -- create some example test data
                     teamSize = Random(2, 8)
@@ -4081,7 +4087,7 @@ function CreateUI(maxPlayers)
                         end
                         if mean < dev * 3 then
                             -- floor this test data at -300 displayed rating
-                            dev = math.min((mean / 3) + 100, dev)
+                            dev = math.round(math.min((mean / 3) + 100, dev))
                         end
                         sortedPlayerRatings[i] = {mean, dev}
                         goalValue = {goalValue[1] + sortedPlayerRatings[i][1], goalValue[2] + sortedPlayerRatings[i][2]}
