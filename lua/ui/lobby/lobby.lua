@@ -4063,99 +4063,157 @@ function CreateUI(maxPlayers)
 
 
 
-            -- a table of team1's mean, deviation, and imbalance value
-            local teamValue
-            -- a table of team members
-            local team1 = {}
-            -- a table of the most balanced team
-            local bestTeam = {}
-            local choosableCount = playerCount - teamSize
+            local function DetermineTeams(generateTestData, logResult, sortedPlayerRatings, teamSize, playerCount, goalValue)
 
-            -- the number of iterations is the number of team combinations to check, which is
-            -- exactly half of the number of possible teams, which covers every possibility,
-            -- since the remaining half are just the opposite of what was already checked,
-            -- which means they have the exact same balance
-            -- ie: Player A + Player B vs Player C + Player D == Player C + Player D vs Player A + Player B
-            -- this works because of the order in which the combinations are tested
-            local numIterations
-            if teamSize == 2 then
-                numIterations = 3
-            elseif teamSize == 3 then
-                numIterations = 10
-            elseif teamSize == 4 then
-                numIterations = 35
-            elseif teamSize == 5 then
-                numIterations = 126
-            elseif teamSize == 6 then
-                numIterations = 462
-            elseif teamSize == 7 then
-                numIterations = 1716
-            else
-                numIterations = 6435
-            end
+                if generateTestData then
+                    -- create some example test data
+                    teamSize = Random(2, 8)
+                    playerCount = teamSize * 2
+                    sortedPlayerRatings = {}
+                    goalValue = {0, 0}
+                    local mean, dev
+                    for i = 1, playerCount do
+                        mean = Random(0, 2500)
+                        if Random(1, 3) == 1 then
+                            dev = Random(50, 500)
+                        else
+                            dev = Random(50, 130)
+                        end
+                        if mean < dev * 3 then
+                            -- floor this test data at -300 displayed rating
+                            dev = math.min((mean / 3) + 100, dev)
+                        end
+                        sortedPlayerRatings[i] = {mean, dev}
+                        goalValue = {goalValue[1] + sortedPlayerRatings[i][1], goalValue[2] + sortedPlayerRatings[i][2]}
+                    end
+                    goalValue = {goalValue[1] / 2, goalValue[2] / 2, 99999}
+                end
 
-            local currentIteration = 0
 
-            -- test the balance of different combinations of teams, covering balance possibility
-            -- intended for use with 2 teams of even player counts
-            -- combinations are iterated starting with the lowest-numbered players on team1 first,
-            -- and progressively iterating the highest-numbered player on team1 to each higher-numbered
-            -- possible player, and then repeating the process with the next highest-numbered player
-            -- increasing by 1... this process continues until every possible balacnce combination
-            -- of 2 equally sized teams of even player counts has been covered
-            local function testCombinations(team1MemberNumber, firstPlayerToCheck)
-                -- check if this player is the last player on the team
-                local lastPlayer
-                if team1MemberNumber < teamSize then
-                    lastPlayer = false
+                -- a table of team1's mean, deviation, and imbalance value
+                local teamValue
+                -- a table of team members
+                local team1 = {}
+                -- a table of the most balanced team
+                local bestTeam = {}
+                -- a table of the best team 2 that goes with the above best team 1
+                local bestTeam2 = {}
+                local choosableCount = playerCount - teamSize
+
+                -- the number of iterations is the number of team combinations to check, which is
+                -- exactly half of the number of possible teams, which covers every possibility,
+                -- since the remaining half are just the opposite of what was already checked,
+                -- which means they have the exact same balance
+                -- ie: Player A + Player B vs Player C + Player D == Player C + Player D vs Player A + Player B
+                -- this works because of the order in which the combinations are tested
+                local numIterations
+                if teamSize == 2 then
+                    numIterations = 3
+                elseif teamSize == 3 then
+                    numIterations = 10
+                elseif teamSize == 4 then
+                    numIterations = 35
+                elseif teamSize == 5 then
+                    numIterations = 126
+                elseif teamSize == 6 then
+                    numIterations = 462
+                elseif teamSize == 7 then
+                    numIterations = 1716
                 else
-                    lastPlayer = true
+                    numIterations = 6435
                 end
-                -- iterate through the possible players for this team1MemberNumber
-                for i = firstPlayerToCheck, choosableCount + team1MemberNumber do
-                    -- when the number of iterations is reached, every possible balance of even player count
-                    --  of the 2 equally sized teams has been checked, and the function ends
-                    if currentIteration >= numIterations then
-                        return
-                    end
-                    team1[team1MemberNumber] = i
-                    if lastPlayer then
-                        -- test this combination of team members
-                        teamValue = {0, 0, 0}
-                        -- add each team member's base rating and devation to the team's values
-                        for i, player in team1 do
-                            teamValue[1] = teamValue[1] + sortedPlayerRatings[player][1]
-                            teamValue[2] = teamValue[2] + sortedPlayerRatings[player][2]
-                        end
-                        -- calculate the team's imbalance value
-                        teamValue[3] = math.abs(teamValue[2] - goalValue[2]) * 1.2 + math.abs(teamValue[1] - goalValue[1])
-                        -- check if the team's imbalance value is lower than the lowest logged imbalance value
-                        if teamValue[3] < goalValue[3] then
-                            -- if it is lower, then this is the best balance so far, and it is logged over the previous best balance
-                            goalValue[3] = teamValue[3]
-                            -- deepcopy the team's player numbers
-                            for i, player in team1 do
-                                bestTeam[i] = player
-                            end
-                        end
-                        currentIteration = currentIteration + 1
+
+                local currentIteration = 0
+
+                -- test the balance of different combinations of teams, covering balance possibility
+                -- intended for use with 2 teams of even player counts
+                -- combinations are iterated starting with the lowest-numbered players on team1 first,
+                -- and progressively iterating the highest-numbered player on team1 to each higher-numbered
+                -- possible player, and then repeating the process with the next highest-numbered player
+                -- increasing by 1... this process continues until every possible balacnce combination
+                -- of 2 equally sized teams of even player counts has been covered
+                local function testCombinations(team1MemberNumber, firstPlayerToCheck)
+                    -- check if this player is the last player on the team
+                    local lastPlayer
+                    if team1MemberNumber < teamSize then
+                        lastPlayer = false
                     else
-                        -- test a subset of combinations
-                        testCombinations(team1MemberNumber + 1, i + 1)
+                        lastPlayer = true
+                    end
+                    -- iterate through the possible players for this team1MemberNumber
+                    for i = firstPlayerToCheck, choosableCount + team1MemberNumber do
+                        -- when the number of iterations is reached, every possible balance of even player count
+                        --  of the 2 equally sized teams has been checked, and the function ends
+                        if currentIteration >= numIterations then
+                            return
+                        end
+                        team1[team1MemberNumber] = i
+                        if lastPlayer then
+                            -- test this combination of team members
+                            teamValue = {0, 0, 0}
+                            -- add each team member's base rating and devation to the team's values
+                            for i, player in team1 do
+                                teamValue[1] = teamValue[1] + sortedPlayerRatings[player][1]
+                                teamValue[2] = teamValue[2] + sortedPlayerRatings[player][2]
+                            end
+                            -- calculate the team's imbalance value
+                            teamValue[3] = math.abs(teamValue[2] - goalValue[2]) * 1.2 + math.abs(teamValue[1] - goalValue[1])
+                            -- check if the team's imbalance value is lower than the lowest logged imbalance value
+                            if teamValue[3] < goalValue[3] then
+                                -- if it is lower, then this is the best balance so far, and it is logged over the previous best balance
+                                goalValue[3] = teamValue[3]
+                                -- deepcopy the team's player numbers
+                                for i, player in team1 do
+                                    bestTeam[i] = player
+                                end
+                            end
+                            currentIteration = currentIteration + 1
+                        else
+                            -- test a subset of combinations
+                            testCombinations(team1MemberNumber + 1, i + 1)
+                        end
                     end
                 end
-            end
 
-            testCombinations(1, 1)
+                testCombinations(1, 1)
 
 
-            -- specify the players on team 2 (aka, the ones not on team 1)
-            local bestTeam2 = {}
-            for i = 1, playerCount do
-                if not table.find(bestTeam, i) then
-                    table.insert(bestTeam2, i)
+                -- specify the players on team 2 (aka, the ones not on team 1)
+                for i = 1, playerCount do
+                    if not table.find(bestTeam, i) then
+                        table.insert(bestTeam2, i)
+                    end
                 end
+
+                if logResult then
+                    local totals = {0, 0, 0}
+                    local displayedRating, baseRating, uncertainty
+                    LOG('Team 1')
+                    for i, player in bestTeam do
+                        baseRating = sortedPlayerRatings[player][1]
+                        uncertainty = sortedPlayerRatings[player][2] * 3
+                        displayedRating = baseRating - uncertainty
+                        totals = {totals[1] + displayedRating, totals[2] + baseRating, totals[3] + uncertainty}
+                        LOG('Player ' .. i .. ': ' .. displayedRating .. ' = ' .. baseRating .. ' - ' ..  uncertainty)
+                    end
+                    LOG('Total: ' .. totals[1] .. ' = ' .. totals[2] .. ' - ' .. totals[3])
+                    
+                    totals = {0, 0, 0}
+                    LOG('Team 2')
+                    for i, player in bestTeam2 do
+                        baseRating = sortedPlayerRatings[player][1]
+                        uncertainty = sortedPlayerRatings[player][2] * 3
+                        displayedRating = baseRating - uncertainty
+                        totals = {totals[1] + displayedRating, totals[2] + baseRating, totals[3] + uncertainty}
+                        LOG('Player ' .. i + teamSize .. ': ' .. displayedRating .. ' = ' .. baseRating .. ' - ' ..  uncertainty)
+                    end
+                    LOG('Total: ' .. totals[1] .. ' = ' .. totals[2] .. ' - ' .. totals[3])
+                end
+
+                return bestTeam, bestTeam2
             end
+
+            local bestTeam, bestTeam2 = DetermineTeams(false, false, sortedPlayerRatings, teamSize, playerCount, goalValue)
 
             -- move players on team1 to the intended slots
             local team1OrderNum = 0
