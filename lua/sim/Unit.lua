@@ -1215,7 +1215,9 @@ Unit = Class(moho.unit_methods) {
             -- Handle ships that can walk on land
             self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
         else
-            self:PlayUnitSound('Killed')
+            if not self:PlayUnitSound('Killed') then 
+                self:PlayUnitSound('Destroyed')
+            end
         end
 
         -- apply death animation on half built units (do not apply for ML and mega)
@@ -1859,7 +1861,11 @@ Unit = Class(moho.unit_methods) {
         -- wait at least 1 tick before destroying unit
         WaitSeconds(math.max(0.1, self.DeathThreadDestructionWaitTime))
 
-        self:PlayUnitSound('Destroyed')
+        -- do not play sound after sinking
+        if not self.Sinking then 
+            self:PlayUnitSound('Destroyed')
+        end
+
         self:Destroy()
     end,
 

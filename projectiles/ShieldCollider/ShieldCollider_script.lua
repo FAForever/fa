@@ -65,6 +65,7 @@ ShieldCollider = Class(Projectile) {
                 if not self.Plane.GroundImpacted then
                     self.Plane:OnImpact(targetType)
                 end
+
                 self:Destroy()
             elseif targetType == 'Shield' and targetEntity and not targetEntity:BeenDestroyed() and targetEntity.ShieldType == 'Bubble' then
                 if not self.ShieldImpacted and not self.Plane.GroundImpacted then
