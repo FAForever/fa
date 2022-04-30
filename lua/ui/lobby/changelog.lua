@@ -20,6 +20,9 @@ end
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
 local debugInterface = false 
 
+--- A bit of a hack, but allows us to keep track of whether the changelog is open or not. The lobby
+-- is (almost aggressively) trying to keep control of the keyboard on the chat box to prevent hotkeys
+-- from working :sad:
 isOpen = false 
 
 Changelog = Class(Group) {
