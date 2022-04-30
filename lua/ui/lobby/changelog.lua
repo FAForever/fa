@@ -97,7 +97,7 @@ Changelog = Class(Group) {
         self.HeaderSubtitle.Right:Set(function() return self.HeaderEscapeButton.Left() - LayoutHelpers.ScaleNumber(20) end)
 
         self.HeaderDivider = Bitmap(self.CommonUI)
-        self.HeaderDivider:SetSolidColor("ffffffff")
+        self.HeaderDivider:SetSolidColor("99ffffff")
         self.HeaderDivider.Left:Set(function() return self.Header.Left() + LayoutHelpers.ScaleNumber(10) end)
         self.HeaderDivider.Top:Set(function() return self.Header.Bottom() - 1 end)
         self.HeaderDivider.Right:Set(function() return self.Header.Right() - LayoutHelpers.ScaleNumber(10) end)
@@ -141,7 +141,7 @@ Changelog = Class(Group) {
         end
 
         self.FooterDivider = Bitmap(self.CommonUI)
-        self.FooterDivider:SetSolidColor("ffffffff")
+        self.FooterDivider:SetSolidColor("99ffffff")
         self.FooterDivider.Left:Set(function() return self.Footer.Left() + LayoutHelpers.ScaleNumber(10) end)
         self.FooterDivider.Top:Set(function() return self.Footer.Top() - 1 end)
         self.FooterDivider.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(10) end)
@@ -176,7 +176,7 @@ Changelog = Class(Group) {
         LayoutHelpers.FillParent(self.ContentPatchesDebug, self.ContentPatches)
 
         self.ContentDivider = Bitmap(self.CommonUI)
-        self.ContentDivider:SetSolidColor("ffffffff")
+        self.ContentDivider:SetSolidColor("99ffffff")
         self.ContentDivider.Left:Set(function() return self.ContentNotes.Right() + 1 end)
         self.ContentDivider.Top:Set(function() return self.Content.Top() + LayoutHelpers.ScaleNumber(10) end)
         self.ContentDivider.Right:Set(self.ContentNotes.Right)
