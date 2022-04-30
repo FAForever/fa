@@ -149,6 +149,17 @@ list = false
 --- Opens up the window
 function OpenWindow()
 
+    -- start of test code
+
+    local changelog = import("/lua/ui/lobby/changelog.lua").Changelog(GetFrame(0))
+
+    if true then 
+        return 
+
+    end
+
+    -- End of test code 
+
     local gameHasAIs = GameMain.GameHasAIs
     local cheatsOn = sessionInfo.Options.CheatsEnabled
     local isThisJip = "jip" == GetArmiesTable()[GameMain.OriginalFocusArmy].nickname

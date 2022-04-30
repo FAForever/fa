@@ -29,5 +29,7 @@ doscript '/lua/system/collapse.lua'
 -- real classes.
 --
 for name,cclass in moho do
+    LOG(name)
+    LOG(repr(cclass))
     ConvertCClassToLuaSimplifiedClass(cclass)
 end

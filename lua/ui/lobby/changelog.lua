@@ -1,118 +1,239 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Combo = import('/lua/ui/controls/combo.lua').Combo
-local Group = import('/lua/maui/group.lua').Group
-local ItemList = import('/lua/maui/itemlist.lua').ItemList
+
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local Prefs = import('/lua/user/prefs.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = import('/lua/maui/group.lua').Group
+local ItemList = import('/lua/maui/itemlist.lua').ItemList
+
 local data = import('/lua/ui/lobby/changelogData.lua')
-
---- Creates the popup window with the game patch changelog.
-function CreateUI(parent, showPatch)
-    local dialogContent = Group(parent)
-    LayoutHelpers.SetDimensions(dialogContent, 1000, 700)
-
-    local changelogPopup = Popup(parent, dialogContent)
-    changelogPopup.OnClosed = function()
-        Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
-    end
-
-    local TextBG = Bitmap(dialogContent)
-    TextBG:SetSolidColor('ff000000')
-    TextBG.Left:Set(function() return dialogContent.Left() + 10 end)
-    TextBG.Right:Set(function() return dialogContent.Right() - 10 end)
-    LayoutHelpers.SetHeight(TextBG, 24)
-    LayoutHelpers.AtTopIn(TextBG, dialogContent, 7)
-
-    -- Title
-    local Title = UIUtil.CreateText(TextBG, LOC("<LOC lobui_0412>What's new to FAF?"), 17, 'Arial Gras', true)
-    LayoutHelpers.AtHorizontalCenterIn(Title, dialogContent, 0)
-    LayoutHelpers.AtTopIn(Title, dialogContent, 10)
-
-    -- Dropdown menu to select a patch
-    local VersionSelection = Combo(TextBG, 12, 20, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
-    VersionSelection._text:SetFont('Arial Gras', 15)
-    LayoutHelpers.SetWidth(VersionSelection, 70)
-    -- Fill it with all patch numbers
-    local items = {}
-    for _, patch in data.gamePatches do
-        table.insert(items, patch.version)
-    end
-    VersionSelection:AddItems(items, 1)
-    VersionSelection.OnClick = function(self, index, text)
-        dialogContent.InfoList:DeleteAllItems()
-        dialogContent.InfoList:AddItem(data.gamePatches[index].name)
-        for _, v in data.gamePatches[index].description do
-            dialogContent.InfoList:AddItem(v)
-        end
-        dialogContent.InfoList:AddItem('')
-    end
-    LayoutHelpers.AtTopIn(VersionSelection, dialogContent, 10)
-    LayoutHelpers.AtRightIn(VersionSelection, dialogContent, 55)
-
-    local VersionText = UIUtil.CreateText(TextBG, "Select a patch: ", 15, UIUtil.bodyFont)
-    VersionText:SetDropShadow(true)
-    LayoutHelpers.CenteredLeftOf(VersionText, VersionSelection)
-
-    -- Info List
-    local InfoList = ItemList(dialogContent)
-    dialogContent.InfoList = InfoList
-    InfoList:SetFont(UIUtil.bodyFont, Prefs.GetFromCurrentProfile('LobbyChatFontSize') or 12)
-    InfoList:SetColors(nil, "00000000")
-    LayoutHelpers.SetDimensions(InfoList, 972, 610)
-    LayoutHelpers.AtLeftIn(InfoList, dialogContent, 10)
-    LayoutHelpers.AtRightIn(InfoList, dialogContent, 26)
-    LayoutHelpers.AtTopIn(InfoList, dialogContent, 38)
-    UIUtil.CreateLobbyVertScrollbar(InfoList)
-    InfoList.OnClick = function(self)
-    end
-
-    -- See only new Changelog by version
-    local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-    if showPatch == true then
-        LastChangelogVersion = LastChangelogVersion -1
-    end
-    for _, patch in data.gamePatches do
-        if LastChangelogVersion < patch.version then
-            InfoList:AddItem(patch.name)
-            for _, v in patch.description do
-                InfoList:AddItem(v)
-            end
-            InfoList:AddItem('')
-        end
-    end
-
-    -- Close button
-    local CloseButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', '<LOC _Close>Close')
-    LayoutHelpers.AtRightIn(CloseButton, dialogContent)
-    LayoutHelpers.AtBottomIn(CloseButton, dialogContent, 10)
-    CloseButton.OnClick = function()
-        changelogPopup:Close()
-    end
-
-    -- Link to the changelog on github
-    local GithubButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Github")
-    LayoutHelpers.AtLeftIn(GithubButton, dialogContent)
-    LayoutHelpers.AtBottomIn(GithubButton, dialogContent, 10)
-    GithubButton.OnClick = function()
-        OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
-    end
-
-    -- Link to the patch notes
-    local PatchnotesButton = UIUtil.CreateButtonWithDropshadow(dialogContent, '/BUTTON/medium/', "Patchnotes")
-    LayoutHelpers.AtHorizontalCenterIn(PatchnotesButton, dialogContent)
-    LayoutHelpers.AtBottomIn(PatchnotesButton, dialogContent, 10)
-    PatchnotesButton.OnClick = function()
-        OpenURL('http://patchnotes.faforever.com/')
-    end
-end
 
 --- Test if we should display the changelog of the new game version.
 -- @return true/false
-function NeedChangelog()
+function OpenChangelog()
     local LastChangelogVersion = Prefs.GetFromCurrentProfile('LobbyChangelog') or 0
-
     return LastChangelogVersion < data.last_version
 end
+
+--- Toggles the debug interface that shows the various groups that are used
+-- to divide the dialog
+local debugInterface = false 
+
+Changelog = Class(Group) {
+
+    __init = function(self, parent)
+        Group.__init(self, parent)
+
+        LayoutHelpers.SetDimensions(self, 1000, 700)
+        LayoutHelpers.AtCenterIn(self, GetFrame(0))
+        self.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
+
+        -- Debugging
+
+        self.Debug = Group(self)
+        LayoutHelpers.FillParent(self.Debug, self)
+
+        -- Setup
+
+        self.CommonUI = Group(self)
+        LayoutHelpers.FillParent(self.CommonUI, self)
+
+        self.Border = UIUtil.SurroundWithBorder(self.CommonUI, '/scx_menu/lan-game-lobby/frame/')
+
+        self.Background = Bitmap(self.CommonUI)
+        self.Background:SetSolidColor("99111111")
+        LayoutHelpers.FillParent(self.Background, GetFrame(0))
+
+        self.DialogBackground = Bitmap(self.CommonUI)
+        self.DialogBackground:SetSolidColor("ff111111")
+        LayoutHelpers.FillParent(self.DialogBackground, self.CommonUI)
+
+        -- Header
+
+        self.Header = Group(self.CommonUI)
+        self.Header.Left:Set(function() return self.CommonUI.Left() end)
+        self.Header.Top:Set(function() return self.CommonUI.Top() end)
+        self.Header.Right:Set(function() return self.CommonUI.Right() end)
+        self.Header.Bottom:Set(function() return self.CommonUI.Top() + LayoutHelpers.ScaleNumber(50) end)
+
+        self.HeaderDebug = Bitmap(self.Debug)
+        self.HeaderDebug:SetSolidColor("ffff0000")
+        LayoutHelpers.FillParent(self.HeaderDebug, self.Header)
+
+        self.HeaderTitle = UIUtil.CreateText(self.CommonUI, LOC("Changelog of Supreme Commander: Forged Alliance Forever"), 17, 'Arial Gras', true)
+        LayoutHelpers.AtVerticalCenterIn(self.HeaderTitle, self.Header)
+        self.HeaderTitle.Left:Set(function() return self.Header.Left() + LayoutHelpers.ScaleNumber(10) end)
+
+        self.HeaderEscapeButton = UIUtil.CreateButtonStd(self.CommonUI, '/game/menu-btns/close', "", 12)
+        LayoutHelpers.AtVerticalCenterIn(self.HeaderEscapeButton, self.Header)
+        LayoutHelpers.DepthOverParent(self.HeaderEscapeButton, self.CommonUI, 5)
+        self.HeaderEscapeButton.Right:Set(function() return self.Header.Right() - LayoutHelpers.ScaleNumber(10) end)
+        self.HeaderEscapeButton.OnClick = function()
+            self:Close()
+        end
+
+        self.HeaderSubtitle = UIUtil.CreateText(self.CommonUI, LOC("Game version 3700"), 17, 'Arial Gras', true)
+        LayoutHelpers.AtVerticalCenterIn(self.HeaderSubtitle, self.Header)
+        self.HeaderSubtitle.Right:Set(function() return self.HeaderEscapeButton.Left() - LayoutHelpers.ScaleNumber(20) end)
+
+        self.HeaderDivider = Bitmap(self.CommonUI)
+        self.HeaderDivider:SetSolidColor("ffffffff")
+        self.HeaderDivider.Left:Set(function() return self.Header.Left() + LayoutHelpers.ScaleNumber(10) end)
+        self.HeaderDivider.Top:Set(function() return self.Header.Bottom() - 1 end)
+        self.HeaderDivider.Right:Set(function() return self.Header.Right() - LayoutHelpers.ScaleNumber(10) end)
+        self.HeaderDivider.Bottom:Set(function() return self.Header.Bottom() end)
+
+        -- Footer
+
+        self.Footer = Group(self.CommonUI)
+        self.Footer.Left:Set(function() return self.CommonUI.Left() end)
+        self.Footer.Top:Set(function() return self.CommonUI.Bottom() - LayoutHelpers.ScaleNumber(50) end)
+        self.Footer.Right:Set(function() return self.CommonUI.Right() end)
+        self.Footer.Bottom:Set(function() return self.CommonUI.Bottom() end)
+
+        self.FooterDebug = Bitmap(self.Debug)
+        self.FooterDebug:SetSolidColor("ff00ff00")
+        LayoutHelpers.FillParent(self.FooterDebug, self.Footer)
+
+        self.FooterGithubButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Github")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterGithubButton, self.Footer, 2)
+        LayoutHelpers.DepthOverParent(self.FooterGithubButton, self.Footer, 5)
+        self.FooterGithubButton.Left:Set(function() return self.Footer.Left() - LayoutHelpers.ScaleNumber(10) end)
+        self.FooterGithubButton.OnClick = function()
+            OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
+        end
+
+        self.FooterDiscordButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Report bug")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterDiscordButton, self.Footer, 2)
+        LayoutHelpers.DepthOverParent(self.FooterDiscordButton, self.Footer, 5)
+        self.FooterDiscordButton.Left:Set(function() return self.FooterGithubButton.Right() - LayoutHelpers.ScaleNumber(20) end)
+        self.FooterDiscordButton.OnClick = function()
+            OpenURL('http://github.com/FAForever/fa/wiki/report-a-bug')
+        end
+
+        self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Balance notes")
+        LayoutHelpers.AtVerticalCenterIn(self.FooterPatchNotesButton, self.Footer, 2)
+        LayoutHelpers.DepthOverParent(self.FooterPatchNotesButton, self.Footer, 5)
+        self.FooterPatchNotesButton.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(220) end)
+        self.FooterPatchNotesButton:Disable()
+        self.FooterPatchNotesButton.OnClick = function()
+            OpenURL('http://github.com/FAForever/fa/blob/develop/changelog.md')
+        end
+
+        self.FooterDivider = Bitmap(self.CommonUI)
+        self.FooterDivider:SetSolidColor("ffffffff")
+        self.FooterDivider.Left:Set(function() return self.Footer.Left() + LayoutHelpers.ScaleNumber(10) end)
+        self.FooterDivider.Top:Set(function() return self.Footer.Top() - 1 end)
+        self.FooterDivider.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(10) end)
+        self.FooterDivider.Bottom:Set(function() return self.Footer.Top() end)
+
+        -- Content
+
+        self.Content = Group(self)
+        self.Content.Left:Set(function() return self.CommonUI.Left() end)
+        self.Content.Right:Set(function() return self.CommonUI.Right() end)
+        self.Content.Top:Set(function() return self.Header.Bottom() end)
+        self.Content.Bottom:Set(function() return self.Footer.Top() end)
+
+        self.ContentDebug = Bitmap(self.Debug)
+        self.ContentDebug:SetSolidColor("ff0000ff")
+        LayoutHelpers.FillParent(self.ContentDebug, self.Content)
+
+        self.ContentNotes = Group(self.Content)
+        LayoutHelpers.FillParent(self.ContentNotes, self.Content)
+        self.ContentNotes.Right:Set(function() return self.Content.Right() - LayoutHelpers.ScaleNumber(200) end)
+
+        self.ContentNotesDebug = Bitmap(self.Debug)
+        self.ContentNotesDebug:SetSolidColor("9900ff00")
+        LayoutHelpers.FillParent(self.ContentNotesDebug, self.ContentNotes)
+
+        self.ContentPatches = Group(self.Content)
+        LayoutHelpers.FillParent(self.ContentPatches, self.Content)
+        self.ContentPatches.Left:Set(function() return self.ContentNotes.Right() end)
+
+        self.ContentPatchesDebug = Bitmap(self.Debug)
+        self.ContentPatchesDebug:SetSolidColor("99ff0000")
+        LayoutHelpers.FillParent(self.ContentPatchesDebug, self.ContentPatches)
+
+        self.ContentDivider = Bitmap(self.CommonUI)
+        self.ContentDivider:SetSolidColor("ffffffff")
+        self.ContentDivider.Left:Set(function() return self.ContentNotes.Right() + 1 end)
+        self.ContentDivider.Top:Set(function() return self.Content.Top() + LayoutHelpers.ScaleNumber(10) end)
+        self.ContentDivider.Right:Set(function() return self.ContentNotes.Right() end)
+        self.ContentDivider.Bottom:Set(function() return self.Content.Bottom() - LayoutHelpers.ScaleNumber(10) end)
+
+        -- Patches 
+
+        self.ContentPatchesList = ItemList(self.ContentPatches)
+        LayoutHelpers.FillParentFixedBorder(self.ContentPatchesList, self.ContentPatches, 12)
+        self.ContentPatchesList.Right:Set(function() return self.ContentPatches.Right() - LayoutHelpers.ScaleNumber(24) end)
+
+        self.ContentPatchesList:SetFont(UIUtil.bodyFont, 12)
+        self.ContentPatchesList:SetColors(nil, "00000000")
+        self.ContentPatchesList:ShowMouseoverItem(true)
+
+        UIUtil.CreateLobbyVertScrollbar(self.ContentPatchesList)
+        self.ContentPatchesList.OnClick = function(element, row, event)
+            self:PopulateWithPatch(row)
+        end
+
+        -- Content
+
+        self.ContentNotesList = ItemList(self.ContentNotes)
+        LayoutHelpers.FillParentFixedBorder(self.ContentNotesList, self.ContentNotes, 12)
+        self.ContentNotesList.Right:Set(function() return self.ContentNotes.Right() - LayoutHelpers.ScaleNumber(24) end)
+
+        self.ContentNotesList:SetFont(UIUtil.bodyFont, 12)
+        self.ContentNotesList:SetColors("ffffffff", "00000000")
+        self.ContentNotesList:ShowMouseoverItem(true)
+
+        UIUtil.CreateLobbyVertScrollbar(self.ContentNotesList)
+        self.ContentNotesList.OnClick = function(element, row, event) end
+
+        -- Populate
+
+        self:PopulatePatchList()
+
+        if not debugInterface then 
+            self.Debug:Hide()
+        end
+
+    end,
+
+    --- Populates the dialog with the given patch
+    PopulateWithPatch = function(self, index)
+        local patch = data.gamePatches[index + 1]
+        if patch then 
+            if patch.hasPrettyPatchnotes then 
+                self.FooterPatchNotesButton:Enable()
+                self.FooterPatchNotesButton.OnClick = function()
+                    OpenURL(string.format('http://patchnotes.faforever.com/%s.html', patch.version))
+                end
+            else 
+                self.FooterPatchNotesButton:Disable()
+            end
+
+            self.ContentPatchesList:SetSelection(index)
+            self.HeaderSubtitle:SetText(patch.name)
+            self.ContentNotesList:DeleteAllItems()
+            for k, line in patch.description do 
+                self.ContentNotesList:AddItem(line)
+            end
+        end
+    end,
+
+    --- Populates the list of patches
+    PopulatePatchList = function(self)
+        self.ContentPatchesList:DeleteAllItems()
+        for k, patch in data.gamePatches do 
+            self.ContentPatchesList:AddItem(patch.version .. " - " .. patch.name)
+        end
+    end,
+
+    --- Destroys the dialog
+    Close = function(self)
+        Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
+        self:Destroy()
+    end,
+}

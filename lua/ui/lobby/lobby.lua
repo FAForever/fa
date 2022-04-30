@@ -973,8 +973,8 @@ function SetSlotInfo(slotNum, playerInfo)
         GUI.connectdialog = nil
 
         -- Changelog, if necessary.
-        if Changelog.NeedChangelog() then
-            Changelog.CreateUI(GUI)
+        if Changelog.OpenChangelog() then
+            Changelog.Changelog(GUI)
         end
     end
 
@@ -3036,7 +3036,7 @@ function CreateUI(maxPlayers)
         elseif event.Type == 'MouseExit' then
             self:SetColor('677983')
         elseif event.Type == 'ButtonPress' then
-            Changelog.CreateUI(GUI, true)
+            Changelog.Changelog(GUI)
         end
     end
 
