@@ -16,8 +16,7 @@ function OpenChangelog()
     return LastChangelogVersion < data.last_version
 end
 
---- Toggles the debug interface that shows the various groups that are used
--- to divide the dialog
+--- Toggles the debug interface that shows the various groups that are used to divide the dialog
 local debugInterface = false 
 
 Changelog = Class(Group) {
@@ -25,16 +24,21 @@ Changelog = Class(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
 
+        -- occupy center of screen
+
         LayoutHelpers.SetDimensions(self, 1000, 700)
         LayoutHelpers.AtCenterIn(self, GetFrame(0))
+
+        -- make sure we're on top of everything else 
+
         self.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
 
-        -- Debugging
+        -- debugging
 
         self.Debug = Group(self)
         LayoutHelpers.FillParent(self.Debug, self)
 
-        -- Setup
+        -- setup
 
         self.CommonUI = Group(self)
         LayoutHelpers.FillParent(self.CommonUI, self)
@@ -49,7 +53,7 @@ Changelog = Class(Group) {
         self.DialogBackground:SetSolidColor("ff111111")
         LayoutHelpers.FillParent(self.DialogBackground, self.CommonUI)
 
-        -- Header
+        -- header
 
         self.Header = Group(self.CommonUI)
         self.Header.Left:Set(function() return self.CommonUI.Left() end)
@@ -84,7 +88,7 @@ Changelog = Class(Group) {
         self.HeaderDivider.Right:Set(function() return self.Header.Right() - LayoutHelpers.ScaleNumber(10) end)
         self.HeaderDivider.Bottom:Set(function() return self.Header.Bottom() end)
 
-        -- Footer
+        -- footer
 
         self.Footer = Group(self.CommonUI)
         self.Footer.Left:Set(function() return self.CommonUI.Left() end)
@@ -128,7 +132,7 @@ Changelog = Class(Group) {
         self.FooterDivider.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(10) end)
         self.FooterDivider.Bottom:Set(function() return self.Footer.Top() end)
 
-        -- Content
+        -- content
 
         self.Content = Group(self)
         self.Content.Left:Set(function() return self.CommonUI.Left() end)
@@ -163,14 +167,14 @@ Changelog = Class(Group) {
         self.ContentDivider.Right:Set(function() return self.ContentNotes.Right() end)
         self.ContentDivider.Bottom:Set(function() return self.Content.Bottom() - LayoutHelpers.ScaleNumber(10) end)
 
-        -- Patches 
+        -- patches 
 
         self.ContentPatchesList = ItemList(self.ContentPatches)
         LayoutHelpers.FillParentFixedBorder(self.ContentPatchesList, self.ContentPatches, 12)
         self.ContentPatchesList.Right:Set(function() return self.ContentPatches.Right() - LayoutHelpers.ScaleNumber(24) end)
 
         self.ContentPatchesList:SetFont(UIUtil.bodyFont, 12)
-        self.ContentPatchesList:SetColors(nil, "00000000")
+        self.ContentPatchesList:SetColors("ffffffff", "00000000")
         self.ContentPatchesList:ShowMouseoverItem(true)
 
         UIUtil.CreateLobbyVertScrollbar(self.ContentPatchesList)
@@ -178,7 +182,7 @@ Changelog = Class(Group) {
             self:PopulateWithPatch(row)
         end
 
-        -- Content
+        -- patchnotes
 
         self.ContentNotesList = ItemList(self.ContentNotes)
         LayoutHelpers.FillParentFixedBorder(self.ContentNotesList, self.ContentNotes, 12)
@@ -194,6 +198,7 @@ Changelog = Class(Group) {
         -- Populate
 
         self:PopulatePatchList()
+        self:PopulateWithPatch(0)
 
         if not debugInterface then 
             self.Debug:Hide()
@@ -233,7 +238,11 @@ Changelog = Class(Group) {
 
     --- Destroys the dialog
     Close = function(self)
+
+        -- prevent the dialog from popping up again
         Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
+
+        -- go into oblivion
         self:Destroy()
     end,
 }

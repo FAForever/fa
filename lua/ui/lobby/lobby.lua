@@ -4324,6 +4324,7 @@ function setupChatEdit(chatPanel)
     end
 
     GUI.chatEdit.OnEscPressed = function(self, text)
+
         -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
         -- the escape handling mechanism.
         if HasCommandLineArg("/gpgnet") then
