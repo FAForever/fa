@@ -1,4 +1,5 @@
 
+local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -19,6 +20,8 @@ end
 --- Toggles the debug interface that shows the various groups that are used to divide the dialog
 local debugInterface = false 
 
+isOpen = false 
+
 Changelog = Class(Group) {
 
     __init = function(self, parent)
@@ -28,6 +31,15 @@ Changelog = Class(Group) {
 
         LayoutHelpers.SetDimensions(self, 1000, 700)
         LayoutHelpers.AtCenterIn(self, GetFrame(0))
+
+        -- allow us to use escape to quickly get out
+
+        isOpen = true 
+        EscapeHandler.PushEscapeHandler(
+            function()
+                self:Close()
+            end
+        )
 
         -- make sure we're on top of everything else 
 
@@ -241,6 +253,9 @@ Changelog = Class(Group) {
 
         -- prevent the dialog from popping up again
         Prefs.SetToCurrentProfile('LobbyChangelog', data.last_version)
+
+        isOpen = false
+        EscapeHandler.PopEscapeHandler()
 
         -- go into oblivion
         self:Destroy()

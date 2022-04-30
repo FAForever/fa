@@ -4324,15 +4324,18 @@ function setupChatEdit(chatPanel)
     end
 
     GUI.chatEdit.OnEscPressed = function(self, text)
-
-        -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
-        -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") then
-            -- Quit to desktop
-            EscapeHandler.HandleEsc(true)
-        else
-            -- Back to main menu
-            GUI.exitButton.OnClick()
+        if Changelog.isOpen then 
+            EscapeHandler.HandleEsc()
+        else 
+            -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
+            -- the escape handling mechanism.
+            if HasCommandLineArg("/gpgnet") then
+                -- Quit to desktop
+                EscapeHandler.HandleEsc()
+            else
+                -- Back to main menu
+                GUI.exitButton.OnClick()
+            end
         end
 
         -- Don't clear the textbox, either.
