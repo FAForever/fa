@@ -974,7 +974,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
         -- Changelog, if necessary.
         if Changelog.OpenChangelog() then
-            Changelog.Changelog(GUI)
+            Changelog.Changelog(GetFrame(0))
         end
     end
 

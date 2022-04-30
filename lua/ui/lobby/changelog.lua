@@ -30,7 +30,7 @@ Changelog = Class(Group) {
         -- occupy center of screen
 
         LayoutHelpers.SetDimensions(self, 1000, 700)
-        LayoutHelpers.AtCenterIn(self, GetFrame(0))
+        LayoutHelpers.AtCenterIn(self, parent)
 
         -- allow us to use escape to quickly get out
 
@@ -68,9 +68,9 @@ Changelog = Class(Group) {
         -- header
 
         self.Header = Group(self.CommonUI)
-        self.Header.Left:Set(function() return self.CommonUI.Left() end)
-        self.Header.Top:Set(function() return self.CommonUI.Top() end)
-        self.Header.Right:Set(function() return self.CommonUI.Right() end)
+        self.Header.Left:Set(self.CommonUI.Left())
+        self.Header.Top:Set(self.CommonUI.Top())
+        self.Header.Right:Set(self.CommonUI.Right())
         self.Header.Bottom:Set(function() return self.CommonUI.Top() + LayoutHelpers.ScaleNumber(50) end)
 
         self.HeaderDebug = Bitmap(self.Debug)
@@ -98,15 +98,15 @@ Changelog = Class(Group) {
         self.HeaderDivider.Left:Set(function() return self.Header.Left() + LayoutHelpers.ScaleNumber(10) end)
         self.HeaderDivider.Top:Set(function() return self.Header.Bottom() - 1 end)
         self.HeaderDivider.Right:Set(function() return self.Header.Right() - LayoutHelpers.ScaleNumber(10) end)
-        self.HeaderDivider.Bottom:Set(function() return self.Header.Bottom() end)
+        self.HeaderDivider.Bottom:Set( self.Header.Bottom())
 
         -- footer
 
         self.Footer = Group(self.CommonUI)
-        self.Footer.Left:Set(function() return self.CommonUI.Left() end)
+        self.Footer.Left:Set(self.CommonUI.Left())
         self.Footer.Top:Set(function() return self.CommonUI.Bottom() - LayoutHelpers.ScaleNumber(50) end)
-        self.Footer.Right:Set(function() return self.CommonUI.Right() end)
-        self.Footer.Bottom:Set(function() return self.CommonUI.Bottom() end)
+        self.Footer.Right:Set(self.CommonUI.Right())
+        self.Footer.Bottom:Set(self.CommonUI.Bottom())
 
         self.FooterDebug = Bitmap(self.Debug)
         self.FooterDebug:SetSolidColor("ff00ff00")
@@ -142,15 +142,15 @@ Changelog = Class(Group) {
         self.FooterDivider.Left:Set(function() return self.Footer.Left() + LayoutHelpers.ScaleNumber(10) end)
         self.FooterDivider.Top:Set(function() return self.Footer.Top() - 1 end)
         self.FooterDivider.Right:Set(function() return self.Footer.Right() - LayoutHelpers.ScaleNumber(10) end)
-        self.FooterDivider.Bottom:Set(function() return self.Footer.Top() end)
+        self.FooterDivider.Bottom:Set(self.Footer.Top())
 
         -- content
 
         self.Content = Group(self)
-        self.Content.Left:Set(function() return self.CommonUI.Left() end)
-        self.Content.Right:Set(function() return self.CommonUI.Right() end)
-        self.Content.Top:Set(function() return self.Header.Bottom() end)
-        self.Content.Bottom:Set(function() return self.Footer.Top() end)
+        self.Content.Left:Set(self.CommonUI.Left())
+        self.Content.Right:Set(self.CommonUI.Right())
+        self.Content.Top:Set(self.Header.Bottom())
+        self.Content.Bottom:Set(self.Footer.Top())
 
         self.ContentDebug = Bitmap(self.Debug)
         self.ContentDebug:SetSolidColor("ff0000ff")
@@ -176,7 +176,7 @@ Changelog = Class(Group) {
         self.ContentDivider:SetSolidColor("ffffffff")
         self.ContentDivider.Left:Set(function() return self.ContentNotes.Right() + 1 end)
         self.ContentDivider.Top:Set(function() return self.Content.Top() + LayoutHelpers.ScaleNumber(10) end)
-        self.ContentDivider.Right:Set(function() return self.ContentNotes.Right() end)
+        self.ContentDivider.Right:Set(self.ContentNotes.Right())
         self.ContentDivider.Bottom:Set(function() return self.Content.Bottom() - LayoutHelpers.ScaleNumber(10) end)
 
         -- patches 
