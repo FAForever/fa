@@ -3,9 +3,8 @@ gamePatches = {
 
     {
         version = 3735,
-        name = "Game version 3735",
+        name = "Hotfix",
         description = {
-            "",
             "### Bug fixes",
             "",
             " - Remove remainder of old decal / tree knocking code (#3803)",
@@ -40,9 +39,8 @@ gamePatches = {
 
     {
         version = 3734,
-        name = "Game version 3734",
+        name = "Hotfix",
         description = {
-            "",
             "### Bug fixes",
             "",
             " - Fix (another) missing parameter in matchmaking (#3801) ",
@@ -55,9 +53,8 @@ gamePatches = {
 
     {
         version = 3733,
-        name = "Game version 3733",
+        name = "Hotfix",
         description = {
-            "",
             "### Bug fixes",
             "",
             " - Fix missing parameter in matchmaking (#3800) ",
@@ -69,9 +66,8 @@ gamePatches = {
     },
     {
         version = 3732,
-        name = "Game version 3732",
+        name = "Developers patch",
         description = {
-            "",
             "### Features",
             "",
             " - In-lobby auto balancing (#3750, #3764, #3768) ",
@@ -403,9 +399,8 @@ gamePatches = {
 
     {
         version = 3731,
-        name = "Game version 3731",
+        name = "Hotfix",
         description = {
-            "",
             "### Features",
             "- Improve scoreboard (#3633)",
                 "Adds the share conditions to the scoreboard. Adds tooltip for ",
@@ -454,7 +449,7 @@ gamePatches = {
 
     {
         version = 3730,
-        name = "Game version 3730",
+        name = "Hotfix",
         description = {
             "",
             "Games using the featured mod Nomads will break when playing the Aeon ",
@@ -481,9 +476,8 @@ gamePatches = {
 
     {
         version = 3729,
-        name = "Game version 3729",
+        name = "Developers patch",
         description = {
-            "",
             "### Features",
             " - (#3615) Happy Christmas (in advance) ^_^",
             "",
@@ -500,9 +494,8 @@ gamePatches = {
     },
     {
         version = 3729,
-        name = "Game version 3728",
+        name = "Developers patch",
         description = {
-"",
             "A quick FAQ:",
             "- I lost all my mods, where did they go?",
             "Due to the init file changes the mods are _only_ loaded from one location to prevent collisions between the same mod in different locations. Your mods are either in: ",
@@ -736,7 +729,7 @@ gamePatches = {
     },
     {
         version = 3727,
-        name = "Hotfix 3727",
+        name = "Hotfix",
         description = {
            '  **Bugs** ',
            '  - (#3571) Fix tree groups when they split',
@@ -753,7 +746,7 @@ gamePatches = {
     },
     {
         version = 3726,
-        name = "Hotfix 3726",
+        name = "Hotfix",
         description = {
             '**Bugs** ',
             '- (#3565) Reverts changes to the buff mechanic',
@@ -768,7 +761,8 @@ gamePatches = {
     },
     {
         version = 3725,
-        name = "Game version 3725",
+        name = "Balance patch",
+        hasPrettyPatchnotes = true,
         description = {
             '**Land**',
             '- Zthuee',
@@ -891,7 +885,7 @@ gamePatches = {
     },
     {
         version = 3724,
-        name = "Game version 3724",
+        name = "Developers patch",
         description = {
             '**Gameplay**',
             ' - (#3450) An alternative approach to loading in custom strategic icons',
@@ -929,7 +923,7 @@ gamePatches = {
     },
     {
         version = 3723,
-        name = 'Hotfix 3723',
+        name = 'Hotfix',
         description = {
             'Fixed a bug preventing from spawning the wreck of some experimentals',
             '',
@@ -939,7 +933,7 @@ gamePatches = {
     },
     {
         version = 3722,
-        name = 'Hotfix 3722',
+        name = 'Hotfix',
         description = {
             '**Lobby**',
             'Updated balance patchnotes link',
@@ -961,7 +955,7 @@ gamePatches = {
     },
     {
         version = 3721,
-        name = 'Game Version 3721',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '- Improved visibility of balance patchnotes',
@@ -1064,7 +1058,8 @@ gamePatches = {
     },
     {
         version = 3720,
-        name = 'Game Version 3720',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Land**',
             '    - Tech 1 Land',
@@ -1115,14 +1110,15 @@ gamePatches = {
     },
     {
         version = 3719,
-        name = 'Hotfix 3719',
+        name = 'Hotfix',
         description = {
             '- Reverted previous change breaking Sorian AI',
         },
     },
     {
         version = 3718,
-        name = 'Game Version 3718',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '- Land',
             '   - Tech 1 Land',
@@ -1241,7 +1237,7 @@ gamePatches = {
     },
     {
         version = 3717,
-        name = 'Hotfix 3717',
+        name = 'Hotfix',
         description = {
             '- Fixed coop not working',
             '- Fixed all games being unrated',
@@ -1253,7 +1249,7 @@ gamePatches = {
     },
     {
         version = 3716,
-        name = 'Hotfix 3716',
+        name = 'Hotfix',
         description = {
             '- Fixed cybran arty explosion when hitting shields',
             '',
@@ -1263,7 +1259,7 @@ gamePatches = {
     },
     {
         version = 3715,
-        name = 'Game Version 3715',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '- Allowed single player lobby to get the features from the multiplayer lobby',
@@ -1321,7 +1317,8 @@ gamePatches = {
     },
     {
         version = 3714,
-        name = 'Game Version 3714',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Land**',
             '- Tech 1 Land',
@@ -1581,7 +1578,7 @@ gamePatches = {
     },
     {
         version = 3713,
-        name = 'Game Version 3713',
+        name = 'Hotfix',
         description = {
             '- Fixed a bug leading to black screen for some players',
             '',
@@ -1591,7 +1588,7 @@ gamePatches = {
     },
     {
         version = 3712,
-        name = 'Game Version 3712',
+        name = 'Developers patch',
         description = {
             '- Fixed wrong rating reward when someone quit the game before it ended',
             '- Fixed the black plane bug for maps',
@@ -1637,7 +1634,7 @@ gamePatches = {
     },
     {
         version = 3711,
-        name = 'Game Version 3711',
+        name = 'Hotfix',
         description = {
             '- Fix a bug allowing to generate resources for free',
             '',
@@ -1647,7 +1644,7 @@ gamePatches = {
     },
     {
         version = 3710,
-        name = 'Game Version 3710',
+        name = 'Developers patch',
         description = {
             '- Reworked the score board to request/send resources/unit to allies and view allie\'s resources income, storage and drain',
             '- Removed vet bar for unvettable units',
@@ -1681,7 +1678,8 @@ gamePatches = {
     },
     {
         version = 3709,
-        name = 'Game Version 3709',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Land**',
             '- Mongoose',
@@ -1755,7 +1753,7 @@ gamePatches = {
     },
     {
         version = 3708,
-        name = 'Game Version 3708',
+        name = 'Developers patch',
         description = {
             '- Added new icons for E storages',
             '- Added missing categories for SACUs',
@@ -1802,14 +1800,14 @@ gamePatches = {
     },
     {
         version = 3707,
-        name = 'Game Version 3707',
+        name = 'Hotfix',
         description = {
             '- Revert exe change to stable 3704 exe',
         },
     },
     {
         version = 3706,
-        name = 'Game Version 3706',
+        name = 'Developers patch',
         description = {
             '- Improved the team kill detection',
             '- Increased the team kill report wait time',
@@ -1828,7 +1826,7 @@ gamePatches = {
     },
     {
         version = 3705,
-        name = 'Game Version 3705',
+        name = 'Developers patch',
         description = {
             '- Fixed various desync Issues for replays',
             '- Improved In Game Cheat Menu [ALT]+[F2] to support 16 players',
@@ -1864,7 +1862,8 @@ gamePatches = {
     },
     {
         version = 3704,
-        name = 'Game Version 3704',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Land**',
             '- Mongoose',
@@ -2111,7 +2110,7 @@ gamePatches = {
     },
     {
         version = 3703,
-        name = 'Game Version 3703',
+        name = 'Hotfix',
         description = {
             '- Fixed a bug in lobby related to obsolete maps',
             '- Switched the position of the github and close button on the changelog screen',
@@ -2129,7 +2128,7 @@ gamePatches = {
     },
     {
         version = 3702,
-        name = 'Game Version 3702',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '- Added a feedback button for the ladder map pool in the score screen',
@@ -2167,7 +2166,7 @@ gamePatches = {
     },
     {
         version = 3701,
-        name = 'Game Version 3701',
+        name = 'Developers patch',
         description = {
             '- Fixed bug that caused the Kennel structure to stay after being upgraded which resulted into having two buildings stacked upon each other',
             '- Changed Novax Sat fix in order to not potentially break mods',
@@ -2186,7 +2185,7 @@ gamePatches = {
     },
     {
         version = 3700,
-        name = 'Game Version 3700',
+        name = 'Hotfix',
         description = {
             '- Fixed bug that caused users to get stuck when trying to host/join a game',
             '',
@@ -2196,7 +2195,7 @@ gamePatches = {
     },
     {
         version = 3699,
-        name = 'Game Version 3699',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '- Added an option for coloured name in the chat',
@@ -2238,7 +2237,7 @@ gamePatches = {
     },
     {
         version = 3698,
-        name = 'Game Version 3698',
+        name = 'Hotfix',
         description = {
             '- Remove AI Takeover from ladder as it is intended to be an option for custom games',
             '',
@@ -2248,7 +2247,7 @@ gamePatches = {
     },
     {
         version = 3697,
-        name = 'Game Version 3697',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '- Introduced ability to have mods that affect AI options',
@@ -2318,7 +2317,8 @@ gamePatches = {
     },
     {
         version = 3696,
-        name = 'Game Version 3696',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
 
             '**ACU**',
@@ -2633,7 +2633,7 @@ gamePatches = {
     },
     {
         version = 3693,
-        name = 'Game Version 3693',
+        name = 'Hotfix',
         description = {
             '**Lobby**',
             '- Fixed the lobby changelog appearing every time',
@@ -2644,7 +2644,7 @@ gamePatches = {
     },
     {
         version = 3692,
-        name = 'Game Version 3692',
+        name = 'Developers patch',
         description = {
             '** Shared Armies **',
             '- This patch ships with a new, modified exe file that enables the Shared Armies alpha mod. The mod can be found on the vault.',
@@ -2718,7 +2718,7 @@ gamePatches = {
     },
     {
         version = 3690,
-        name = 'Game Version 3690',
+        name = 'Hotfix',
         description = {
             '**Bugs**',
             '- Fixed a word wrap bug that caused missing characters in tooltips and chat, and allowed certain chat messages to crash the game.',
@@ -2729,7 +2729,7 @@ gamePatches = {
     },
     {
         version = 3689,
-        name = 'Game Version 3689',
+        name = 'Hotfix',
         description = {
             '**Bugs**',
             '- Fixed a bug that caused units to give 100% veterancy points instead of a fraction depending on their remaining HP on death when getting destroyed by self destruction.',
@@ -2744,7 +2744,8 @@ gamePatches = {
     },
     {
         version = 3688,
-        name = 'Game Version 3688',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Balance**',
             '- Veterancy',
@@ -2813,7 +2814,7 @@ gamePatches = {
     },
     {
         version = 3686,
-        name = 'Game Version 3686',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '- Changed "Hide Obsolete" filter in map selection to be enabled by default',
@@ -2936,7 +2937,8 @@ gamePatches = {
     },
     {
         version = 3684,
-        name = 'Game Version 3684',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Other**',
             '- Fixed a bug where split trees from groups were worth less than they should have been',
@@ -3053,7 +3055,7 @@ gamePatches = {
     },
     {
         version = 3682,
-        name = 'Game Version 3682',
+        name = 'Developers patch',
         description = {
             '**Bugs**',
             '- Fixed a typo that is probably responsible for the rare sim freeze bug that has been happening since 3680',
@@ -3085,7 +3087,7 @@ gamePatches = {
     },
     {
         version = 3681,
-        name = 'Game Version 3681',
+        name = 'Hotfix',
         description = {
             '**Bugs**',
             '- Fixed always loading the default or last map, which broke COOP',
@@ -3101,7 +3103,7 @@ gamePatches = {
     },
     {
         version = 3680,
-        name = 'Game Version 3680',
+        name = 'Developers patch',
         description = {
             '**Gameplay**',
             '- New feature: Dead air unit wrecks now bounce off shields. The amount of bounce depends on the unit momentum and angle of approach. Some of the crash damage is transferred to the shield.',
@@ -3213,7 +3215,7 @@ gamePatches = {
     },
     {
         version = 3677,
-        name = 'Game Version 3677',
+        name = 'Hotfix',
         description = {
             '- Added code to log and potentially fix an issue with army index assignment which may be causing rating irregularities',
             '',
@@ -3223,7 +3225,8 @@ gamePatches = {
     },
     {
         version = 3676,
-        name = 'Game Version 3676',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Other**',
             '- Fixed wall segements giving full veterancy points. They give 0.1 per segment now to prevent abuse',
@@ -3303,14 +3306,15 @@ gamePatches = {
     },
     {
         version = 3675,
-        name = 'Game Version 3675',
+        name = 'Hotfix',
         description = {
             '- Fixed a small bug that led to the game not ending properly when a player died with Share Unit Cap turned on',
         }
     },
     {
         version = 3674,
-        name = 'Game Version 3674',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Lobby**',
             '- Use default map from file. This allows coop, tutorials, and other mods to have an easier time',
@@ -3584,63 +3588,63 @@ gamePatches = {
     },
     {
         version = 3672,
-        name = 'Game Version 3672',
+        name = 'Hotfix',
         description = {
             '- Fixed non-default team balance option breaking the anti-rating-bug code',
         }
     },
     {
         version = 3671,
-        name = 'Game Version 3671',
+        name = 'Hotfix',
         description = {
             '- Fixed an unintentional bug with hosting games with an AI introduced with the rating bug fixes below',
         }
     },
     {
         version = 3670,
-        name = 'Game Version 3670',
+        name = 'Hotfix',
         description = {
             '- Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end',
         }
     },
     {
         version = 3669,
-        name = 'Game Version 3669',
+        name = 'Hotfix',
         description = {
             '- Reverted that last one for a bit to fix an idiot bug',
         }
     },
     {
         version = 3668,
-        name = 'Game Version 3668',
+        name = 'Hotfix',
         description = {
             '- Fixed the game reporting incorrect army indexes to the server on game start, leading to incorrect rating calculations on game end',
         }
     },
     {
         version = 3667,
-        name = 'Game Version 3667',
+        name = 'Hotfix',
         description = {
             '- Fixed a typo which was setting the default labels to show onscreen to 10 rather than 1000',
         }
     },
     {
         version = 3666,
-        name = 'Game Version 3666',
+        name = 'Hotfix',
         description = {
             '- The negative reaction of the community to the new Hotbuild bindings as defaults was severely underestimated. Attempting to reverse the change.',
         }
     },
     {
         version = 3665,
-        name = 'Game Version 3665',
+        name = 'Hotfix',
         description = {
             '- Fixed a small error that cause the Unit Manager to hard crash',
         }
     },
     {
         version = 3664,
-        name = 'Game Version 3664',
+        name = 'Developers patch',
         description = {
             '**Bugs**',
             '- Removed deploy ability tooltip from Aeon T3 Mobile Artillery',
@@ -3711,7 +3715,7 @@ gamePatches = {
     },
     {
         version = 3663,
-        name = 'Game Version 3663',
+        name = 'Hotfix',
         description = {
             '- Fixed a small oversight which led to non-cloaked units getting the cloak FX in a power stall',
             '- Added cloak FX support for cloak fields (Mods only, FAF itself has no unit with this ability)',
@@ -3719,7 +3723,8 @@ gamePatches = {
     },
     {
         version = 3662,
-        name = 'Game Version 3662',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Bugs**',
             '- Fixed units dropping from a transport from teleporting closer to a pre-assigned target',
@@ -3833,7 +3838,7 @@ gamePatches = {
     },
     {
         version = 3661,
-        name = 'Game Version 3661',
+        name = 'Hotfix',
         description = {
             '- Reverted ping-related changes which caused desyncs. We will approach this again in future, but it will require some changes to a certain popular mod as well. Stay tuned.',
             '- Reverted "Fixed upgraded structures not being targetable via radar blip". This is the second time this code approach has ended up being reverted. It appears to interact with the engine in an',
@@ -3842,7 +3847,7 @@ gamePatches = {
     },
     {
         version = 3660,
-        name = 'Game Version 3660',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '',
@@ -3933,14 +3938,14 @@ gamePatches = {
     },
     {
         version = 3659,
-        name = 'Hotfix Patch 3659',
+        name = 'Hotfix',
         description = {
             '- Fixed UEF T2 Naval Support Factory HP typo 900 → 9000',
         }
     },
     {
         version = 3658,
-        name = 'Game Version 3658',
+        name = 'Developers patch',
         description = {
             '**Exploits**',
             '- Fixed an exploit where Factories and QGates could be made to build units at half-price',
@@ -4190,7 +4195,7 @@ gamePatches = {
     },
     {
         version = 3656,
-        name = 'Hotfix Patch 3656',
+        name = 'Hotfix',
         description = {
             '**Server Compatibility**',
             '- Made teamkill reporting work alongside the server update V0.3',
@@ -4203,7 +4208,7 @@ gamePatches = {
     },
     {
         version = 3654,
-        name = 'Game Version 3654',
+        name = 'Developers patch',
         description = {
             '**Reverted**',
             '- The change in 3652 which refreshed intel for a blip on upgrade had unintentional free intel side effects we have been unable to solve.',
@@ -4242,7 +4247,7 @@ gamePatches = {
     },
     {
         version = 3652,
-        name = 'Game Version 3652',
+        name = 'Developers patch',
         description = {
             '**Lobby**',
             '- Name filter when selecting map',
@@ -4384,7 +4389,8 @@ gamePatches = {
     },
     {
         version = 3650,
-        name = 'Game Version 3650',
+        name = 'Balance patch',
+        hasPrettyPatchnotes = true,
         description = {
             '**Seraphim and UEF ACU TML**',
             '    - Missile hitpoints: 3 hp → 2 hp',
@@ -4534,7 +4540,7 @@ gamePatches = {
     },
     {
         version = 3648,
-        name = 'Game Version 3648',
+        name = 'Hotfix',
         description = {
             '**Bugs**',
             '- ASF no longer have issues gaining targets when just given move orders',
@@ -4546,7 +4552,7 @@ gamePatches = {
     },
     {
         version = 3646,
-        name = 'Game Version 3646',
+        name = 'Hotfix',
         description = {
             '**Bugs**',
             '- UEF buildbots no longer explode after being built with no-air restriction enabled',
@@ -4562,8 +4568,8 @@ gamePatches = {
         }
     },
     {
-        version = 3644.1,
-        name = 'Game Version 3644.1',
+        version = 3645,
+        name = 'Hotfix',
         description = {
             '**Enhancements**',
             '- "More unit info" mod integrated and improved',
@@ -4572,7 +4578,7 @@ gamePatches = {
     },
     {
         version = 3644,
-        name = 'Game Version 3644',
+        name = 'Developers patch',
         description = {
             '**Bugs**',
             '- AI now works again',
@@ -4587,7 +4593,7 @@ gamePatches = {
     },
     {
         version = 3643,
-        name = 'Game Version 3643',
+        name = 'Developers patch',
         description = {
             '**Bugs**',
             '- Fixed issue with half built units from naval factories',
@@ -4616,7 +4622,7 @@ gamePatches = {
     },
     {
         version = 3642,
-        name = 'Game Version 3642',
+        name = 'Hotfix',
         description = {
             '**Bugs**',
             '- Obsidians and titans die to overcharge again',
@@ -4624,7 +4630,7 @@ gamePatches = {
     },
     {
         version = 3641,
-        name = 'Game Version 3641',
+        name = 'Developers patch',
         description = {
             '**Exploits**',
             '- Instant crash exploit partially fixed',
@@ -4752,14 +4758,14 @@ gamePatches = {
     },
     {
         version = 3640,
-        name = 'Game Version 3640',
+        name = 'Hotfix',
         description = {
             '- Addressed an issue that causes the game to crash with core dumps in long games',
         }
     },
     {
         version = 3639,
-        name = 'Game Version 3639',
+        name = 'Developers patch',
         description = {
             '**General changes**',
             '- Christmas presents for reclaim have been removed',
@@ -4825,7 +4831,7 @@ gamePatches = {
     },
     {
         version = 3638,
-        name = 'Game Version 3638',
+        name = 'Hotfix',
         description = {
             '- Added christmas presents for reclaim',
             '- Big thanks to ozonex for this contribution!',
@@ -4833,7 +4839,7 @@ gamePatches = {
     },
     {
         version = 3637,
-        name = 'Game Version 3637',
+        name = 'Hotfix',
         description = {
             '**Bugs**',
             '- Selection Range Overlay works for multiple units again',
@@ -4849,7 +4855,7 @@ gamePatches = {
     },
     {
         version = 3636,
-        name = 'Game Version 3636',
+        name = 'Developers patch',
         description = {
             '**Exploit Fixes**',
             '- Fixed infinite economy exploit',

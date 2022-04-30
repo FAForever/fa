@@ -973,8 +973,8 @@ function SetSlotInfo(slotNum, playerInfo)
         GUI.connectdialog = nil
 
         -- Changelog, if necessary.
-        if Changelog.NeedChangelog() then
-            Changelog.CreateUI(GUI)
+        if Changelog.OpenChangelog() then
+            Changelog.Changelog(GetFrame(0))
         end
     end
 
@@ -3036,7 +3036,7 @@ function CreateUI(maxPlayers)
         elseif event.Type == 'MouseExit' then
             self:SetColor('677983')
         elseif event.Type == 'ButtonPress' then
-            Changelog.CreateUI(GUI, true)
+            Changelog.Changelog(GUI)
         end
     end
 
@@ -4326,9 +4326,9 @@ function setupChatEdit(chatPanel)
     GUI.chatEdit.OnEscPressed = function(self, text)
         -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
         -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") then
+        if HasCommandLineArg("/gpgnet") or Changelog.isOpen then
             -- Quit to desktop
-            EscapeHandler.HandleEsc(true)
+            EscapeHandler.HandleEsc(not Changelog.isOpen)
         else
             -- Back to main menu
             GUI.exitButton.OnClick()
