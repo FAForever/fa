@@ -4328,7 +4328,7 @@ function setupChatEdit(chatPanel)
         -- the escape handling mechanism.
         if HasCommandLineArg("/gpgnet") or Changelog.isOpen then
             -- Quit to desktop
-            EscapeHandler.HandleEsc()
+            EscapeHandler.HandleEsc(not Changelog.isOpen)
         else
             -- Back to main menu
             GUI.exitButton.OnClick()
