@@ -476,6 +476,10 @@ function InvScaleNumber(number)
     return math.floor(number * (1 / pixelScaleFactor))
 end
 
+--**********************************
+--*********  Layouter  *************
+--**********************************
+
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
