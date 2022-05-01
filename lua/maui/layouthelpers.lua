@@ -1,5 +1,5 @@
 --*****************************************************************************
---* File: lua/modules/maui/lua
+--* File: lua/modules/maui/layouthelpers.lua
 --* Author: Chris Blackwell
 --* Summary: functions that make it simpler to set up control layouts.
 --*
