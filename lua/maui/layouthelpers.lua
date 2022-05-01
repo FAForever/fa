@@ -1,5 +1,5 @@
 --*****************************************************************************
---* File: lua/modules/maui/layouthelpers.lua
+--* File: lua/modules/maui/lua
 --* Author: Chris Blackwell
 --* Summary: functions that make it simpler to set up control layouts.
 --*
@@ -474,4 +474,332 @@ end
 
 function InvScaleNumber(number)
     return math.floor(number * (1 / pixelScaleFactor))
+end
+
+local LayouterMetaTable = {}
+LayouterMetaTable.__index = LayouterMetaTable
+
+function LayouterMetaTable:Disable()
+    self.c:Disable()
+    return self
+end
+
+function LayouterMetaTable:Hide()
+    self.c:Hide()
+    return self
+end
+
+function LayouterMetaTable:TextColor(color)
+    self.c:SetColor(color)
+    return self
+end
+
+function LayouterMetaTable:DropShadow(state)
+    self.c:SetDropShadow(state)
+    return self
+end
+
+function LayouterMetaTable:BitmapColor(color)
+    self.c:SetSolidColor(color)
+    return self
+end
+
+function LayouterMetaTable:Texture(texture)
+    self.c:SetTexture(texture)
+    return self
+end
+
+function LayouterMetaTable:HitTest(state)
+    if state == nil then
+        error(":HitTest requires 1 positional argument \"state\"")
+    end
+    if state then
+        self.c:EnableHitTest()
+    else
+        self.c:DisableHitTest()
+    end
+    return self
+end
+
+function LayouterMetaTable:NeedsFrameUpdate(state)
+    self.c:SetNeedsFrameUpdate(state)
+    return self
+end
+
+function LayouterMetaTable:Alpha(alpha)
+    self.c:SetAlpha(alpha)
+    return self
+end
+
+-- raw setting
+
+function LayouterMetaTable:Left(left)
+    self.c.Left:Set(left)
+    return self
+end
+
+function LayouterMetaTable:Right(right)
+    self.c.Right:Set(right)
+    return self
+end
+
+function LayouterMetaTable:Top(top)
+    self.c.Top:Set(top)
+    return self
+end
+
+function LayouterMetaTable:Bottom(bottom)
+    self.c.Bottom:Set(bottom)
+    return self
+end
+
+function LayouterMetaTable:Width(width)
+    if iscallable(width) then
+        self.c.Width:SetFunction(width)
+    else
+        self.c.Width:SetValue(ScaleNumber(width))
+    end
+    return self
+end
+
+function LayouterMetaTable:Height(height)
+    if iscallable(height) then
+        self.c.Height:SetFunction(height)
+    else
+        self.c.Height:SetValue(ScaleNumber(height))
+    end
+    return self
+end
+
+function LayouterMetaTable:Fill(parent)
+    FillParent(self.c, parent)
+    return self
+end
+
+function LayouterMetaTable:FillFixedBorder(parent, offset)
+    FillParentFixedBorder(self.c, parent, offset)
+    return self
+end
+
+-- double-based positioning
+
+function LayouterMetaTable:AtLeftTopIn(parent, leftOffset, topOffset)
+    AtLeftTopIn(self.c, parent, leftOffset, topOffset)
+    return self
+end
+
+function LayouterMetaTable:AtRightBottomIn(parent, rightOffset, bottomOffset)
+    AtRightBottomIn(self.c, parent, rightOffset, bottomOffset)
+    return self
+end
+
+function LayouterMetaTable:AtLeftBottomIn(parent, leftOffset, bottomOffset)
+    AtLeftBottomIn(self.c, parent, leftOffset, bottomOffset)
+    return self
+end
+
+function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
+    AtRightTopIn(self.c, parent, rightOffset, topOffset)
+    return self
+end
+
+-- centered--
+
+function LayouterMetaTable:CenteredLeftOf(parent, offset)
+    CenteredLeftOf(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:CenteredRightOf(parent, offset)
+    CenteredRightOf(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:CenteredAbove(parent, offset)
+    CenteredAbove(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:CenteredBelow(parent, offset)
+    CenteredBelow(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtHorizontalCenterIn(parent, offset)
+    AtHorizontalCenterIn(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtVerticalCenterIn(parent, offset)
+    AtVerticalCenterIn(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtCenterIn(parent, vertOffset, horzOffset)
+    AtCenterIn(self.c, parent, vertOffset, horzOffset)
+    return self
+end
+
+-- single-in positioning
+
+function LayouterMetaTable:AtLeftIn(parent, offset)
+    AtLeftIn(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtRightIn(parent, offset)
+    AtRightIn(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtTopIn(parent, offset)
+    AtTopIn(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtBottomIn(parent, offset)
+    AtBottomIn(self.c, parent, offset)
+    return self
+end
+
+-- center-in positioning
+
+function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
+    AtLeftIn(self.c, parent, offset)
+    AtVerticalCenterIn(self.c, parent, verticalOffset)
+    return self
+end
+
+function LayouterMetaTable:AtRightCenterIn(parent, offset, verticalOffset)
+    AtRightIn(self.c, parent, offset)
+    AtVerticalCenterIn(self.c, parent, verticalOffset)
+    return self
+end
+
+function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
+    AtTopIn(self.c, parent, offset)
+    AtHorizontalCenterIn(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
+    AtBottomIn(self.c, parent, offset)
+    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
+    return self
+end
+
+-- out-of positioning
+
+function LayouterMetaTable:Below(parent, offset)
+    Below(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:Above(parent, offset)
+    Above(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:RightOf(parent, offset)
+    RightOf(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:LeftOf(parent, offset)
+    LeftOf(self.c, parent, offset)
+    return self
+end
+
+-- depth--
+
+function LayouterMetaTable:Over(parent, depth)
+    DepthOverParent(self.c, parent, depth)
+    return self
+end
+
+function LayouterMetaTable:Under(parent, depth)
+    DepthUnderParent(self.c, parent, depth)
+    return self
+end
+
+-- anchor--
+
+function LayouterMetaTable:AnchorToTop(parent, offset)
+    AnchorToTop(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AnchorToLeft(parent, offset)
+    AnchorToLeft(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AnchorToRight(parent, offset)
+    AnchorToRight(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AnchorToBottom(parent, offset)
+    AnchorToBottom(self.c, parent, offset)
+    return self
+end
+
+-- reset--
+
+function LayouterMetaTable:ResetLeft()
+    ResetLeft(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetRight()
+    ResetRight(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetBottom()
+    ResetBottom(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetHeight()
+    ResetHeight(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetTop()
+    ResetTop(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetWidth()
+    ResetWidth(self.c)
+    return self
+end
+
+-- get control --
+
+function LayouterMetaTable:Get()
+    return self.c
+end
+
+function LayouterMetaTable:__newindex(key, value)
+    error("attempt to set new index for a Layouter object")
+end
+
+function LayoutFor(control)
+    local result = {
+        c = control
+    }
+    setmetatable(result, LayouterMetaTable)
+    return result
+end
+
+local layouter = {
+    c = false
+}
+setmetatable(layouter, LayouterMetaTable)
+
+function ReusedLayoutFor(control)
+    layouter.c = control
+    return layouter
 end
