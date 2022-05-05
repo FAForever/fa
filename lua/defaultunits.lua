@@ -1161,13 +1161,13 @@ MassFabricationUnit = Class(StructureUnit) {
         StructureUnit.OnCreate(self, spec)
 
         -- make brain track us to enable / disable accordingly
-        self.Brain:AddEnabledEnergyExcessEntity(self)
+        self.Brain:AddEnabledEnergyExcessUnit(self)
     end,
 
     OnScriptBitSet = function(self, bit)
         if bit == 4 then 
             -- no longer track us, we want to be disabled
-            self.Brain:RemoveEnergyExcessEntity(self)
+            self.Brain:RemoveEnergyExcessUnit(self)
 
             -- immediately disable production
             self:OnProductionPaused()
@@ -1179,7 +1179,7 @@ MassFabricationUnit = Class(StructureUnit) {
     OnScriptBitClear = function (self, bit)
         if bit == 4 then 
             -- make brain track us to enable / disable accordingly
-            self.Brain:AddDisabledEnergyExcessEntity(self)
+            self.Brain:AddDisabledEnergyExcessUnit(self)
         else 
             StructureUnit.OnScriptBitClear(self, bit)
         end

@@ -328,60 +328,65 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Energy storage callbacks
 
-    AddEnabledEnergyExcessEntity = function (self, entity)
-        self.EnergyExcessUnitsEnabled[entity] = true
-        self.EnergyExcessUnitsDisabled[entity] = nil 
+    AddEnabledEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
     end,
 
-    AddDisabledEnergyExcessEntity = function (self, entity)
-        self.EnergyExcessUnitsEnabled[entity] = nil
-        self.EnergyExcessUnitsDisabled[entity] = true 
+    AddDisabledEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit 
     end,
 
-    RemoveEnergyExcessEntity = function (self, entity)
-        self.EnergyExcessUnitsEnabled[entity] = nil 
-        self.EnergyExcessUnitsDisabled[entity] = nil 
+    RemoveEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil 
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
     end,
 
     ToggleEnergyExcessUnitsThread = function (self)
+
+        -- localize scope for better performance
+        local CoroutineYield = CoroutineYield
+        local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
+        local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
+
         while true do 
 
             local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
             local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
 
-            -- low on storage and insufficient energy income, disable fabricators
-            if energyStoredRatio < 0.4 and energyTrend < 0 then 
+            -- low on storage, start disabling them to fill our storages asap
+            if energyStoredRatio < 0.9 then 
 
-                -- while we have fabricators to disable
-                for fabricator, _ in self.EnergyExcessUnitsEnabled do 
-                    if fabricator and not fabricator:BeenDestroyed() then 
+                -- while we have units to disable
+                for id, unit in EnergyExcessUnitsEnabled do 
+                    if unit and not unit:BeenDestroyed() then 
 
-                        -- disable fabricator
-                        fabricator:OnProductionPaused()
+                        -- disable unit
+                        unit:OnProductionPaused()
 
                         -- keep track of it
-                        self.EnergyExcessUnitsDisabled[fabricator] = true
-                        self.EnergyExcessUnitsEnabled[fabricator] = nil
+                        EnergyExcessUnitsDisabled[unit.EntityId] = unit
+                        EnergyExcessUnitsEnabled[unit.EntityId] = nil
 
                         break
                     end
                 end
-            end
+            
+            -- high on storage and sufficient energy income, enable units
+            elseif energyStoredRatio >= 1.0 and energyTrend > 100 then 
 
-            -- high on storage and sufficient energy income, enable fabricators
-            if energyStoredRatio > 0.6 and energyTrend > 100 then 
+                -- while we have units to retrieve
+                for id, unit in EnergyExcessUnitsDisabled do
+                    if unit and not unit:BeenDestroyed() then 
+                        if unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
 
-                -- while we have fabricators to retrieve
-                for fabricator, _ in self.EnergyExcessUnitsDisabled do
-                    if fabricator and not fabricator:BeenDestroyed() then 
-                        if fabricator.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
-
-                            -- enable fabricator
-                            fabricator:OnProductionUnpaused()
+                            -- enable unit
+                            unit:OnProductionUnpaused()
 
                             -- keep track of it
-                            self.EnergyExcessUnitsDisabled[fabricator] = nil
-                            self.EnergyExcessUnitsEnabled[fabricator] = true
+                            EnergyExcessUnitsDisabled[unit.EntityId] = nil
+                            EnergyExcessUnitsEnabled[unit.EntityId] = unit
 
                             break
                         end
