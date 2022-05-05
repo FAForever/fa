@@ -375,7 +375,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             -- high on storage and sufficient energy income, enable fabricators
-            if energyStoredRatio >= 1.0 and energyTrend > 1 then 
+            if energyStoredRatio >= 1.0 and energyTrend > 100 then 
 
                 -- while we have fabricators to retrieve
                 for id, fabricator in EnergyExcessUnitsDisabled do
