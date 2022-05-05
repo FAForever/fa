@@ -356,7 +356,21 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param self The brain itself
     ToggleEnergyExcessUnitsThread = function (self)
 
+        -- allow for protected calls without closures
+
+        local unitToProcess
+        function ProtectedOnExcessEnergy()
+            unitToProcess:OnProductionUnpaused()
+        end
+
+        function ProtectedOnNoExcessEnergy()
+            unitToProcess:OnProductionPaused()
+        end
+
         -- localize scope for better performance
+        
+        local pcall = pcall
+        local ok, msg
         local CoroutineYield = CoroutineYield
         local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
         local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
@@ -373,12 +387,18 @@ AIBrain = Class(moho.aibrain_methods) {
                 for id, unit in EnergyExcessUnitsEnabled do 
                     if unit and not unit:BeenDestroyed() then 
 
-                        -- disable unit
-                        unit:OnProductionPaused()
+                        -- update internal state
+                        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
+                        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+                        
+                        -- try to disable unit
+                        unitToProcess = unit 
+                        ok, msg = pcall(ProtectedOnNoExcessEnergy)
 
-                        -- keep track of it
-                        EnergyExcessUnitsDisabled[unit.EntityId] = unit
-                        EnergyExcessUnitsEnabled[unit.EntityId] = nil
+                        -- allow for debugging
+                        if not ok then 
+                            WARN(msg)
+                        end
 
                         break
                     end
@@ -392,12 +412,18 @@ AIBrain = Class(moho.aibrain_methods) {
                     if unit and not unit:BeenDestroyed() then 
                         if unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
 
-                            -- enable unit
-                            unit:OnProductionUnpaused()
+                            -- update internal state
+                            self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
+                            self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
 
-                            -- keep track of it
-                            EnergyExcessUnitsDisabled[unit.EntityId] = nil
-                            EnergyExcessUnitsEnabled[unit.EntityId] = unit
+                            -- try to enable unit
+                            unitToProcess = unit 
+                            ok, msg = pcall(ProtectedOnExcessEnergy)
+
+                            -- allow for debugging
+                            if not ok then 
+                                WARN(msg)
+                            end
 
                             break
                         end
