@@ -525,8 +525,8 @@ function LayouterMetaTable:HitTest(bool)
     return self
 end
 
-function LayouterMetaTable:NeedsFrameUpdate(state)
-    self.c:SetNeedsFrameUpdate(state)
+function LayouterMetaTable:NeedsFrameUpdate(bool)
+    self.c:SetNeedsFrameUpdate(bool)
     return self
 end
 
