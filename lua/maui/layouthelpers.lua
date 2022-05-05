@@ -493,7 +493,7 @@ function LayouterMetaTable:Hide()
     return self
 end
 
-function LayouterMetaTable:TextColor(color)
+function LayouterMetaTable:Color(color)
     self.c:SetColor(color)
     return self
 end
@@ -503,7 +503,7 @@ function LayouterMetaTable:DropShadow(state)
     return self
 end
 
-function LayouterMetaTable:BitmapColor(color)
+function LayouterMetaTable:SolidColor(color)
     self.c:SetSolidColor(color)
     return self
 end
@@ -513,11 +513,11 @@ function LayouterMetaTable:Texture(texture)
     return self
 end
 
-function LayouterMetaTable:HitTest(state)
-    if state == nil then
-        error(":HitTest requires 1 positional argument \"state\"")
+function LayouterMetaTable:HitTest(bool)
+    if bool == nil then
+        WARN(":HitTest requires 1 positional argument \"bool\"")
     end
-    if state then
+    if bool then
         self.c:EnableHitTest()
     else
         self.c:DisableHitTest()
