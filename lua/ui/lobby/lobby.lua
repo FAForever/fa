@@ -4204,16 +4204,38 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightBottomIn(GUI.observerList, GUI.observerPanel, 15)
     GUI.observerList.OnClick = function(self, row, event)
         if isHost and event.Modifiers.Right then
-            UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-                                    "<LOC lobui_0167>Kick Player", function()
-                                        SendSystemMessage("lobui_0756", gameInfo.Observers[row+1].PlayerName)
-                                        lobbyComm:EjectPeer(gameInfo.Observers[row+1].OwnerID, "KickedByHost")
-                                    end,
-                                    "<LOC _Cancel>", nil,
-                                    nil, nil,
-                                    true,
-                                    {worldCover = false, enterButton = 1, escapeButton = 2}
-            )
+            -- determine the number of teams (excluding the no team (-) option that equals 1 on the backend)
+            local teams = {}
+            local numTeams = 0
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                if not teams[player.Team] and player.Team != 1 then
+                    teams[player.Team] = 1
+                    numTeams = numTeams + 1
+                end
+            end
+            -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
+            local indexAdjustment
+            if numTeams < 3 then
+                indexAdjustment = 1 - numTeams
+            else
+                -- if there's more than 2 teams, the team rating rows are listed after observers instead of before
+                indexAdjustment = 1
+            end
+            
+            -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
+            -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
+            if row + indexAdjustment > 0 and gameInfo.Observers[row + indexAdjustment].OwnerID != localPlayerID then
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
+                                        "<LOC lobui_0167>Kick Player", function()
+                                            SendSystemMessage("lobui_0756", gameInfo.Observers[row + indexAdjustment].PlayerName)
+                                            lobbyComm:EjectPeer(gameInfo.Observers[row + indexAdjustment].OwnerID, "KickedByHost")
+                                        end,
+                                        "<LOC _Cancel>", nil,
+                                        nil, nil,
+                                        true,
+                                        {worldCover = false, enterButton = 1, escapeButton = 2}
+                )
+            end
         end
     end
     UIUtil.CreateLobbyVertScrollbar(GUI.observerList, 0, 0, -1)
