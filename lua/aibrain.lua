@@ -328,21 +328,32 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Energy storage callbacks
 
+    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts enabled
+    -- @param self The brain itself
+    -- @param unit The unit to keep track of
     AddEnabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
         self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
     end,
 
+    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
+    -- @param self The brain itself
+    -- @param unit The unit to keep track of
     AddDisabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
         self.EnergyExcessUnitsDisabled[unit.EntityId] = unit 
     end,
 
+    --- Removes a unit that is enabled / disabled depending on how much energy storage we have
+    -- @param self The brain itself
+    -- @param unit The unit to forget about
     RemoveEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = nil 
         self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
     end,
 
+    --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
+    -- @param self The brain itself
     ToggleEnergyExcessUnitsThread = function (self)
 
         -- localize scope for better performance
