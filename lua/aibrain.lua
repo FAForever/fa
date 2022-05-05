@@ -358,36 +358,35 @@ AIBrain = Class(moho.aibrain_methods) {
             -- low on storage, start disabling them to fill our storages asap
             if energyStoredRatio < 0.9 then 
 
-                -- while we have fabricators to disable
-                for id, fabricator in EnergyExcessUnitsEnabled do 
-                    if fabricator and not fabricator:BeenDestroyed() then 
+                -- while we have units to disable
+                for id, unit in EnergyExcessUnitsEnabled do 
+                    if unit and not unit:BeenDestroyed() then 
 
-                        -- disable fabricator
-                        fabricator:OnProductionPaused()
+                        -- disable unit
+                        unit:OnProductionPaused()
 
                         -- keep track of it
-                        EnergyExcessUnitsDisabled[fabricator.EntityId] = fabricator
-                        EnergyExcessUnitsEnabled[fabricator.EntityId] = nil
+                        EnergyExcessUnitsDisabled[unit.EntityId] = unit
+                        EnergyExcessUnitsEnabled[unit.EntityId] = nil
 
                         break
                     end
                 end
-            end
+            
+            -- high on storage and sufficient energy income, enable units
+            elseif energyStoredRatio >= 1.0 and energyTrend > 100 then 
 
-            -- high on storage and sufficient energy income, enable fabricators
-            if energyStoredRatio >= 1.0 and energyTrend > 100 then 
+                -- while we have units to retrieve
+                for id, unit in EnergyExcessUnitsDisabled do
+                    if unit and not unit:BeenDestroyed() then 
+                        if unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
 
-                -- while we have fabricators to retrieve
-                for id, fabricator in EnergyExcessUnitsDisabled do
-                    if fabricator and not fabricator:BeenDestroyed() then 
-                        if fabricator.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
-
-                            -- enable fabricator
-                            fabricator:OnProductionUnpaused()
+                            -- enable unit
+                            unit:OnProductionUnpaused()
 
                             -- keep track of it
-                            EnergyExcessUnitsDisabled[fabricator.EntityId] = nil
-                            EnergyExcessUnitsEnabled[fabricator.EntityId] = fabricator
+                            EnergyExcessUnitsDisabled[unit.EntityId] = nil
+                            EnergyExcessUnitsEnabled[unit.EntityId] = unit
 
                             break
                         end
