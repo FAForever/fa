@@ -3030,15 +3030,15 @@ function CreateUI(maxPlayers)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
-    GUI.gameVersionText.HandleEvent = function (self, event)
-        if event.Type == 'MouseEnter' then
-            self:SetColor('ffffff')
-        elseif event.Type == 'MouseExit' then
-            self:SetColor('677983')
-        elseif event.Type == 'ButtonPress' then
-            Changelog.Changelog(GUI)
-        end
-    end
+    --GUI.gameVersionText.HandleEvent = function (self, event)
+    --    if event.Type == 'MouseEnter' then
+    --        self:SetColor('ffffff')
+    --    elseif event.Type == 'MouseExit' then
+    --        self:SetColor('677983')
+    --    elseif event.Type == 'ButtonPress' then
+    --        Changelog.Changelog(GUI)
+    --    end
+    --end
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -3209,6 +3209,16 @@ function CreateUI(maxPlayers)
         GUI.OptionContainer.ScrollSetTop(GUI.OptionContainer, 'Vert', 0)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
+
+    -- Patchnotes Button
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_1000>Patchnotes")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'lob_patchnotes')
+    LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
+    GUI.patchnotesButton.OnClick = function(self, event)
+        Changelog.Changelog(GUI)
+    end
+
 
     -- curated Maps
     -- GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
