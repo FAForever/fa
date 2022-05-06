@@ -24,13 +24,6 @@ local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-local Game = import('/lua/game.lua')   ----added for CBFP
-local DefaultBuffField = import('/lua/DefaultBuffField.lua').DefaultBuffField     ----added for CBFP
-
-SeraphimBuffField = Class(DefaultBuffField) {     ----added for CBFP
-    FieldVisualEmitter = '/effects/emitters/seraphim_regenerative_aura_01_emit.bp',     ----added for CBFP
-}
-
 SANAnaitTorpedo = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SAnaitTorpedoMuzzleFlash,
 }

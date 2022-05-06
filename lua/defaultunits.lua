@@ -398,9 +398,7 @@ StructureUnit = Class(Unit) {
 
     StopBeingBuiltEffects = function(self, builder, layer)
         local FactionName = self.Blueprint.General.FactionName
-        if FactionName == 'Aeon' then
-            WaitSeconds(2.0)
-        elseif FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
+        if FactionName == 'UEF' and not self.BeingBuiltShowBoneTriggered then
             self:ShowBone(0, true)
             self:HideLandBones()
         end
@@ -1156,10 +1154,34 @@ MassCollectionUnit = Class(StructureUnit) {
 -- MASS FABRICATION UNITS
 MassFabricationUnit = Class(StructureUnit) {
 
+    OnScriptBitSet = function(self, bit)
+        if bit == 4 then 
+            -- no longer track us, we want to be disabled
+            self.Brain:RemoveEnergyExcessUnit(self)
+
+            -- immediately disable production
+            self:OnProductionPaused()
+        else 
+            StructureUnit.OnScriptBitSet(self, bit)
+        end
+    end,
+
+    OnScriptBitClear = function (self, bit)
+        if bit == 4 then 
+            -- make brain track us to enable / disable accordingly
+            self.Brain:AddDisabledEnergyExcessUnit(self)
+        else 
+            StructureUnit.OnScriptBitClear(self, bit)
+        end
+    end,
+
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
+
+        -- make brain track us to enable / disable accordingly
+        self.Brain:AddEnabledEnergyExcessUnit(self)
     end,
 
     OnConsumptionActive = function(self)
@@ -1203,14 +1225,6 @@ MassFabricationUnit = Class(StructureUnit) {
         adjacentUnit:RequestRefreshUI()
     end,
 
-    OnPaused = function(self)
-        StructureUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        StructureUnit.OnUnpaused(self)
-    end,
-
     OnProductionPaused = function(self)
         StructureUnit.OnProductionPaused(self)
         self:StopUnitAmbientSound('ActiveLoop')
@@ -1220,6 +1234,15 @@ MassFabricationUnit = Class(StructureUnit) {
         StructureUnit.OnProductionUnpaused(self)
         self:PlayUnitAmbientSound('ActiveLoop')
     end,
+
+    OnExcessEnergy = function(self)
+        self:OnProductionUnpaused()
+    end,
+
+    OnNoExcessEnergy = function(self)
+        self:OnProductionPaused()
+    end,
+
 }
 
 -- MASS STORAGE UNITS

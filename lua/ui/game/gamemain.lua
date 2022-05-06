@@ -164,22 +164,29 @@ function CreateUI(isReplay)
     ConExecute('d3d_WindowsCursor on')  
 
     -- enable experimental graphics
-    if      Prefs.GetFromCurrentProfile('options.fidelity') == 2 
+    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2 
         and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
 
-        LOG("Experimental graphics enabled, use at your own risk: ")
+        ForkThread(
+            function() 
 
-        if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
-            -- allow meshes and effects to be seen from further away
-            ConExecute("cam_SetLOD WorldCamera 0.6")
-        end
+                WaitSeconds(1.0)
 
-        if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+                LOG("Experimental graphics enabled, use at your own risk: ")
 
-            -- improve shadow LOD and resolution
-            ConExecute("ren_ShadowLOD 1024")
-            ConExecute("ren_ShadowSize 2048")
-        end
+                if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
+                    -- allow meshes and effects to be seen from further away
+                    ConExecute("cam_SetLOD WorldCamera 0.7")
+                end
+
+                if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+
+                    -- improve shadow LOD and resolution
+                    ConExecute("ren_ShadowLOD 1024")
+                    ConExecute("ren_ShadowSize 2048")
+                end
+            end
+        )
     end
 
     -- keep track of the original focus army
@@ -280,14 +287,6 @@ function CreateUI(isReplay)
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
-    else
-        -- check if we should reduce network delay / lag
-        local clients = GetSessionClients()
-        if table.getsize(clients) <= 1 then
-            if not HasCommandLineArg("/RunWithTheWind") then 
-                ConExecute('net_lag 0')
-            end
-        end
     end
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then

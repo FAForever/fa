@@ -217,7 +217,7 @@ function OpenWindow()
         SPEW("Created AI utilities window")
 
         -- create the window
-        State.GUI = Window.CreateDefaultWindow(
+        State.GUI = UIUtil.CreateWindowStd(
             GetFrame(0), 
             "AI blueprint information", 
             false, 

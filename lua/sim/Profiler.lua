@@ -19,8 +19,6 @@ local thread = false
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
 
-local traces = { }
-
 --- Toggles the profiler on / off
 function ToggleProfiler(army, forceEnable)
 
@@ -105,15 +103,15 @@ function ToggleProfiler(army, forceEnable)
                     scope = "other"
                 end
 
-                if name == "lambda" then 
-                    local trace = repr(debug.traceback())
-                    if not traces[trace] or traces[trace] == 500 then
-                        traces[trace] = traces[trace] or 0  
-                        LOG(tostring(traces[trace]) .. ": " .. trace)
-                    end
+                -- if name == "lambda" then 
+                --     local trace = repr(debug.traceback())
+                --     if not traces[trace] or traces[trace] == 500 then
+                --         traces[trace] = traces[trace] or 0  
+                --         LOG(tostring(traces[trace]) .. ": " .. trace)
+                --     end
                     
-                    traces[trace] = traces[trace] + 1
-                end
+                --     traces[trace] = traces[trace] + 1
+                -- end
 
                 -- keep track 
                 local count = data[source][scope][name]

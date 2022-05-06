@@ -5,16 +5,24 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
--- Legacy shield state:
+-- Legacy shield flags:
 --  - _IsUp: determines whether the shield is up
 
--- Current hield state:
+-- Current shield flags:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
 --  - DepletedByDamage: flag that indicates the shield sustained too much damage and needs to recharge
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
+
+-- Current shield states:
+-- - OnState
+-- - OffState
+-- - RechargeState
+-- - DamageDrainedState
+-- - EnergyDrainedState
+-- - DeadState
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -906,37 +914,36 @@ Shield = Class(moho.shield_methods, Entity) {
 
         Main = function(self)
 
-            if not DeprecatedWarnings.DamageRechargeState then 
-                DeprecatedWarnings.DamageRechargeState = true 
-                WARN("DamageRechargeState is deprecated: use shield.RechargeState instead.")
-                WARN("Unit type of owner: " .. self.Owner.UnitId)
-            end
+            -- if not DeprecatedWarnings.DamageRechargeState then 
+            --     DeprecatedWarnings.DamageRechargeState = true 
+            --     SPEW("DamageRechargeState is deprecated: use shield.RechargeState instead.")
+            --     SPEW("Unit type of owner: " .. self.Owner.UnitId)
+            --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+            -- end
 
             -- back to the regular onstate
             ChangeState(self, self.RechargeState)
         end,
     },
 
-
-
     GetCachePosition = function(self)
 
-        if not DeprecatedWarnings.GetCachePosition then 
-            DeprecatedWarnings.GetCachePosition = true 
-            WARN("GetCachePosition is deprecated: use shield:GetPosition() or shield:GetPositionXYZ() instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.GetCachePosition then 
+        --     DeprecatedWarnings.GetCachePosition = true 
+        --     SPEW("GetCachePosition is deprecated: use shield:GetPosition() or shield:GetPositionXYZ() instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         return self:GetPosition()
     end,
 
     SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
 
-        if not DeprecatedWarnings.SetRechargeTime then 
-            DeprecatedWarnings.SetRechargeTime = true 
-            WARN("SetRechargeTime is deprecated: set the values shield.ShieldRechargeTime and shield.ShieldEnergyDrainRechargeTime instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetRechargeTime then 
+        --     DeprecatedWarnings.SetRechargeTime = true 
+        --     SPEW("SetRechargeTime is deprecated: set the values shield.ShieldRechargeTime and shield.ShieldEnergyDrainRechargeTime instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.ShieldRechargeTime = rechargeTime
         self.ShieldEnergyDrainRechargeTime = energyRechargeTime
@@ -944,55 +951,55 @@ Shield = Class(moho.shield_methods, Entity) {
 
     SetVerticalOffset = function(self, offset)
 
-        if not DeprecatedWarnings.SetVerticalOffset then 
-            DeprecatedWarnings.SetVerticalOffset = true 
-            WARN("SetVerticalOffset is deprecated: set the value shield.ShieldVerticalOffset instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetVerticalOffset then 
+        --     DeprecatedWarnings.SetVerticalOffset = true 
+        --     SPEW("SetVerticalOffset is deprecated: set the value shield.ShieldVerticalOffset instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.ShieldVerticalOffset = offset
     end,
 
     SetSize = function(self, size)
 
-        if not DeprecatedWarnings.SetSize then 
-            DeprecatedWarnings.SetSize = true 
-            WARN("SetSize is deprecated: set the value shield.Size instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetSize then 
+        --     DeprecatedWarnings.SetSize = true 
+        --     SPEW("SetSize is deprecated: set the value shield.Size instead.")
+        --     SPEW("Source: " .. repr(debug.traceback()))
+        -- end
 
         self.Size = size
     end,
 
     SetShieldRegenRate = function(self, rate)
 
-        if not DeprecatedWarnings.SetShieldRegenRate then 
-            DeprecatedWarnings.SetShieldRegenRate = true 
-            WARN("SetShieldRegenRate is deprecated: set the value shield.RegenRate instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetShieldRegenRate then 
+        --     DeprecatedWarnings.SetShieldRegenRate = true 
+        --     SPEW("SetShieldRegenRate is deprecated: set the value shield.RegenRate instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.RegenRate = rate
     end,
 
     SetShieldRegenStartTime = function(self, time)
 
-        if not DeprecatedWarnings.SetShieldRegenStartTime then 
-            DeprecatedWarnings.SetShieldRegenStartTime = true 
-            WARN("SetShieldRegenStartTime is deprecated: set the value shield.RegenStartTime instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetShieldRegenStartTime then 
+        --     DeprecatedWarnings.SetShieldRegenStartTime = true 
+        --     SPEW("SetShieldRegenStartTime is deprecated: set the value shield.RegenStartTime instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.RegenStartTime = time
     end,
 
     SetType = function(self, type)
 
-        if not DeprecatedWarnings.ShieldType then 
-            DeprecatedWarnings.ShieldType = true 
-            WARN("ShieldType is deprecated: set the value shield.ShieldType instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.ShieldType then 
+        --     DeprecatedWarnings.ShieldType = true 
+        --     SPEW("ShieldType is deprecated: set the value shield.ShieldType instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.ShieldType = type
     end,
@@ -1097,11 +1104,11 @@ TransportShield = Class(Shield) {
 
     OnState = State(Shield.OnState) {
         Main = function(self)
+            Shield.OnState.Main(self)
+
             -- prevent ourself and our content from taking damage
             self:SetContentsVulnerable(false)
             self.Owner.CanTakeDamage = false 
-
-            Shield.OnState.Main(self)
         end,
 
         AddProtectedUnit = function(self, unit)
@@ -1112,24 +1119,31 @@ TransportShield = Class(Shield) {
 
     OffState = State(Shield.OffState) {
         Main = function(self)
+            Shield.OffState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-
-            Shield.OffState.Main(self)
         end,
+    },
 
-        AddProtectedUnit = function(self, unit)
-            self.protectedUnits[unit] = true
+    DamageDrainedState = State(Shield.DamageDrainedState) {
+        Main = function(self)
+            Shield.DamageDrainedState.Main(self)
+
+            -- allow ourself and our content to take damage
+            self:SetContentsVulnerable(true)
+            self.Owner.CanTakeDamage = true 
         end
     },
 
-    RechargeState = State(Shield.RechargeState) {
+    EnergyDrainedState = State(Shield.EnergyDrainedState) {
         Main = function(self)
+            Shield.EnergyDrainedState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-            Shield.RechargeState.Main(self)
         end
     },
 }

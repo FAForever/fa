@@ -42,6 +42,8 @@ local Points = {
     victory = 10
 }
 
+local CoroutineYield = coroutine.yield
+
 AIBrain = Class(moho.aibrain_methods) {
 
     -- for the engi mod
@@ -51,6 +53,9 @@ AIBrain = Class(moho.aibrain_methods) {
     OnCreateHuman = function(self, planName)
         self:CreateBrainShared(planName)
         self.BrainType = 'Human'
+
+        -- human-only behavior
+        self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
     end,
 
     AddUnitStat = function(self, unitId, statName, value)
@@ -222,6 +227,12 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyDependingUnits.__mode = 'v'
         self.EnergyDependingUnitsHead = 1
 
+        --- Units that we toggle on / off depending on whether we have excess energy
+        self.EnergyExcessUnitsEnabled = { }
+        setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'v' })
+        self.EnergyExcessUnitsDisabled = { }
+        setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'v' })
+
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
@@ -316,6 +327,113 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     -- Energy storage callbacks
+
+    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts enabled
+    -- @param self The brain itself
+    -- @param unit The unit to keep track of
+    AddEnabledEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
+    end,
+
+    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
+    -- @param self The brain itself
+    -- @param unit The unit to keep track of
+    AddDisabledEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit 
+    end,
+
+    --- Removes a unit that is enabled / disabled depending on how much energy storage we have
+    -- @param self The brain itself
+    -- @param unit The unit to forget about
+    RemoveEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil 
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
+    end,
+
+    --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
+    -- @param self The brain itself
+    ToggleEnergyExcessUnitsThread = function (self)
+
+        -- allow for protected calls without closures
+
+        local unitToProcess
+        function ProtectedOnExcessEnergy()
+            unitToProcess:OnExcessEnergy()
+        end
+
+        function ProtectedOnNoExcessEnergy()
+            unitToProcess:OnNoExcessEnergy()
+        end
+
+        -- localize scope for better performance
+        
+        local pcall = pcall
+        local ok, msg
+        local CoroutineYield = CoroutineYield
+        local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
+        local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
+
+        while true do 
+
+            local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
+            local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
+
+            -- low on storage, start disabling them to fill our storages asap
+            if energyStoredRatio < 0.9 then 
+
+                -- while we have units to disable
+                for id, unit in EnergyExcessUnitsEnabled do 
+                    if not unit:BeenDestroyed() then 
+
+                        -- update internal state
+                        EnergyExcessUnitsDisabled[unit.EntityId] = unit
+                        EnergyExcessUnitsEnabled[unit.EntityId] = nil
+                        
+                        -- try to disable unit
+                        unitToProcess = unit 
+                        ok, msg = pcall(ProtectedOnNoExcessEnergy)
+
+                        -- allow for debugging
+                        if not ok then 
+                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                        end
+
+                        break
+                    end
+                end
+            
+            -- high on storage and sufficient energy income, enable units
+            elseif energyStoredRatio >= 1.0 and energyTrend > 100 then 
+
+                -- while we have units to retrieve
+                for id, unit in EnergyExcessUnitsDisabled do
+                    if not unit:BeenDestroyed() then 
+                        if unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
+
+                            -- update internal state
+                            EnergyExcessUnitsDisabled[unit.EntityId] = nil
+                            EnergyExcessUnitsEnabled[unit.EntityId] = unit
+
+                            -- try to enable unit
+                            unitToProcess = unit 
+                            ok, msg = pcall(ProtectedOnExcessEnergy)
+
+                            -- allow for debugging
+                            if not ok then 
+                                WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            end
+
+                            break
+                        end
+                    end
+                end
+            end
+
+            CoroutineYield(1)
+        end
+    end,
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     -- @param self Brain that keeps track of the entity
@@ -3411,6 +3529,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
                     -- Reassign all Army attributes to better suit the AI.
                     self.BrainType = 'AI'
+
+                    if self.EnergyExcessThread then 
+                        KillThread(self.EnergyExcessThread)
+                    end
+
                     self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
                     self.NumBases = 0 -- AddBuilderManagers will increase the number
                     self.BuilderManagers = {}
