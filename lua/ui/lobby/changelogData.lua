@@ -73,6 +73,8 @@ gamePatches = {
             " - Jip  (#3813, #3814, #3822, #3838, #3840,",
             "        (#3825, #3827, #3824, #3826, #3822,",
             "         #3833, #3830)",
+            "",
+            "With thanks to speed2 for reporting some of the issues through Github.",
         }
     },
 
