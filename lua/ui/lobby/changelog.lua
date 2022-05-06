@@ -128,7 +128,7 @@ Changelog = Class(Group) {
         LayoutHelpers.DepthOverParent(self.FooterDiscordButton, self.Footer, 5)
         self.FooterDiscordButton.Left:Set(function() return self.FooterGithubButton.Right() - LayoutHelpers.ScaleNumber(20) end)
         self.FooterDiscordButton.OnClick = function()
-            OpenURL('http://github.com/FAForever/fa/wiki/report-a-bug')
+            OpenURL('http://github.com/FAForever/fa/wiki/how-to:-report-a-bug')
         end
 
         self.FooterPatchNotesButton = UIUtil.CreateButtonWithDropshadow(self.Footer, '/BUTTON/medium/', "Balance notes")
