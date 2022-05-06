@@ -1132,14 +1132,6 @@ MassCollectionUnit = Class(StructureUnit) {
         end
     end,
 
-    OnPaused = function(self)
-        StructureUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        StructureUnit.OnUnpaused(self)
-    end,
-
     OnProductionPaused = function(self)
         StructureUnit.OnProductionPaused(self)
         self:StopUnitAmbientSound('ActiveLoop')
