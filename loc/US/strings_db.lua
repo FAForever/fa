@@ -7566,6 +7566,7 @@ lobui_0430="Country not found. Please contact the development team on the forums
 lobui_0431="Close - spawn mex"
 lobui_0432="Closed - spawn mex"
 lobui_0433="Curated Maps"
+lobui_1000="Patchnotes"
 tooltipui0360 = "Set how quickly the Game runs"
 
 sorian_0001="AI: Sorian"
