@@ -122,7 +122,7 @@ function ToggleProfiler(army, forceEnable)
                 end
 
             end
-            -- only track on function calls and only every 100th call
+            -- only track on function calls
             , "c")
 
     else 
