@@ -1184,7 +1184,6 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetProductionActive(true)
 
         -- make brain track us to enable / disable accordingly
-        LOG("HEY!")
         self.Brain:AddEnabledEnergyExcessUnit(self)
     end,
 
@@ -1229,14 +1228,6 @@ MassFabricationUnit = Class(StructureUnit) {
         adjacentUnit:RequestRefreshUI()
     end,
 
-    OnPaused = function(self)
-        StructureUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        StructureUnit.OnUnpaused(self)
-    end,
-
     OnProductionPaused = function(self)
         StructureUnit.OnProductionPaused(self)
         self:StopUnitAmbientSound('ActiveLoop')
@@ -1246,6 +1237,15 @@ MassFabricationUnit = Class(StructureUnit) {
         StructureUnit.OnProductionUnpaused(self)
         self:PlayUnitAmbientSound('ActiveLoop')
     end,
+
+    OnExcessEnergy = function(self)
+        self:OnProductionUnpaused()
+    end,
+
+    OnNoExcessEnergy = function(self)
+        self:OnProductionPaused()
+    end,
+
 }
 
 -- MASS STORAGE UNITS

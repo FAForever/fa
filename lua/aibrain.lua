@@ -360,11 +360,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
         local unitToProcess
         function ProtectedOnExcessEnergy()
-            unitToProcess:OnProductionUnpaused()
+            unitToProcess:OnExcessEnergy()
         end
 
         function ProtectedOnNoExcessEnergy()
-            unitToProcess:OnProductionPaused()
+            unitToProcess:OnNoExcessEnergy()
         end
 
         -- localize scope for better performance
@@ -397,7 +397,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                         -- allow for debugging
                         if not ok then 
-                            WARN(msg)
+                            WARN("ToggleEnergyExcessUnitsThread: " .. msg)
                         end
 
                         break
@@ -422,7 +422,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                             -- allow for debugging
                             if not ok then 
-                                WARN(msg)
+                                WARN("ToggleEnergyExcessUnitsThread: " .. msg)
                             end
 
                             break
