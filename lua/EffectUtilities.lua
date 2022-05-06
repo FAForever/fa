@@ -10,7 +10,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
-local DeprecatedWarnings = { }
+-- local DeprecatedWarnings = { }
 
 function CreateEffects(obj, army, EffectTable)
     local emitters = {}
@@ -85,12 +85,12 @@ end
 
 function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
 
-    -- deprecation warning for more effcient alternative
-    if not DeprecatedWarnings.CreateCybranBuildBeams then 
-        DeprecatedWarnings.CreateCybranBuildBeams = true 
-        WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-    end
+    -- -- deprecation warning for more effcient alternative
+    -- if not DeprecatedWarnings.CreateCybranBuildBeams then 
+    --     DeprecatedWarnings.CreateCybranBuildBeams = true 
+    --     WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
+    --     WARN("Source: " .. repr(debug.getinfo(2)))
+    -- end
 
     WaitSeconds(0.2)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
@@ -123,12 +123,12 @@ end
 
 function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
 
-    -- deprecation warning for more effcient alternative
-    if not DeprecatedWarnings.SpawnBuildBots then 
-        DeprecatedWarnings.SpawnBuildBots = true 
-        WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-    end
+    -- -- deprecation warning for more effcient alternative
+    -- if not DeprecatedWarnings.SpawnBuildBots then 
+    --     DeprecatedWarnings.SpawnBuildBots = true 
+    --     WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
+    --     WARN("Source: " .. repr(debug.getinfo(2)))
+    -- end
 
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
     -- clamped to a max of 10 to avoid insane FPS drop
@@ -188,12 +188,12 @@ end
 
 function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildEffectsBag)
 
-    -- deprecation warning for more effcient alternative
-    if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
-        DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
-        WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-    end
+    -- -- deprecation warning for more effcient alternative
+    -- if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
+    --     DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
+    --     WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
+    --     WARN("Source: " .. repr(debug.getinfo(2)))
+    -- end
 
     -- Create build constant build effect for each build effect bone defined
     if BuildBones and BuildBots then
