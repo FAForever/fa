@@ -385,11 +385,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
                 -- while we have units to disable
                 for id, unit in EnergyExcessUnitsEnabled do 
-                    if unit and not unit:BeenDestroyed() then 
+                    if not unit:BeenDestroyed() then 
 
                         -- update internal state
-                        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
-                        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+                        EnergyExcessUnitsDisabled[unit.EntityId] = unit
+                        EnergyExcessUnitsEnabled[unit.EntityId] = nil
                         
                         -- try to disable unit
                         unitToProcess = unit 
@@ -409,12 +409,12 @@ AIBrain = Class(moho.aibrain_methods) {
 
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
-                    if unit and not unit:BeenDestroyed() then 
+                    if not unit:BeenDestroyed() then 
                         if unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
 
                             -- update internal state
-                            self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
-                            self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
+                            EnergyExcessUnitsDisabled[unit.EntityId] = nil
+                            EnergyExcessUnitsEnabled[unit.EntityId] = unit
 
                             -- try to enable unit
                             unitToProcess = unit 
