@@ -397,7 +397,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                         -- allow for debugging
                         if not ok then 
-                            WARN("ToggleEnergyExcessUnitsThread: " .. msg)
+                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
                         end
 
                         break
@@ -422,7 +422,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
                             -- allow for debugging
                             if not ok then 
-                                WARN("ToggleEnergyExcessUnitsThread: " .. msg)
+                                WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
                             end
 
                             break
