@@ -6,6 +6,8 @@ Game version 3737 (6th of May, 2022)
 
  - (Engine patch) Introduction of alternative profiling function for better accuracy (ff630c8)
 
+ - (Engine patch) Maximum game speed is set to +50 (adc06ef5)
+
 ### Bug fixes
 
  - (Engine patch) Disable mesh rendering for minimap (#7)
@@ -25,7 +27,7 @@ Game version 3737 (6th of May, 2022)
 ### Contributors
 
  - Strogo (#7, #6)
- - KionX (1b17fe7, ff630c8, 3bf0ba5, 564ff89)
+ - KionX (1b17fe7, ff630c8, 3bf0ba5, 564ff89, adc06ef5)
 
 Game version 3736 (6th of May, 2022)
 ===================================
