@@ -71,6 +71,8 @@ Game version 3736 (6th of May, 2022)
         (#3825, #3827, #3824, #3826, #3822,
          #3833, #3830)
 
+With thanks to speed2 for reporting some of the issues through Github.
+
 ### Bug fixes
 
  - Remove remainder of old decal / tree knocking code (#3803)
