@@ -483,6 +483,8 @@ end
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
+-- controls' mostly used methods
+
 function LayouterMetaTable:Disable()
     self.c:Disable()
     return self
@@ -498,8 +500,8 @@ function LayouterMetaTable:Color(color)
     return self
 end
 
-function LayouterMetaTable:DropShadow(state)
-    self.c:SetDropShadow(state)
+function LayouterMetaTable:DropShadow(bool)
+    self.c:SetDropShadow(bool)
     return self
 end
 
@@ -575,6 +577,8 @@ function LayouterMetaTable:Height(height)
     return self
 end
 
+-- Fill parent
+
 function LayouterMetaTable:Fill(parent)
     FillParent(self.c, parent)
     return self
@@ -607,7 +611,7 @@ function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
     return self
 end
 
--- centered--
+-- centered out of parent
 
 function LayouterMetaTable:CenteredLeftOf(parent, offset)
     CenteredLeftOf(self.c, parent, offset)
@@ -628,6 +632,8 @@ function LayouterMetaTable:CenteredBelow(parent, offset)
     CenteredBelow(self.c, parent, offset)
     return self
 end
+
+-- centered--
 
 function LayouterMetaTable:AtHorizontalCenterIn(parent, offset)
     AtHorizontalCenterIn(self.c, parent, offset)
@@ -748,7 +754,8 @@ function LayouterMetaTable:AnchorToBottom(parent, offset)
     return self
 end
 
--- reset--
+
+-- resets control's properties to default
 
 function LayouterMetaTable:ResetLeft()
     ResetLeft(self.c)
@@ -786,6 +793,24 @@ function LayouterMetaTable:Get()
     return self.c
 end
 
+-- calculates control's Properties to determine its layout completion
+-- and returns it
+-- remember, if parent has incomplete layout it will warn you anyway
+
+function LayouterMetaTable:End()
+    if not pcall(self.c.Top) or not pcall(self.c.Bottom) or not pcall(self.c.Height) then
+        WARN("Incorrect layout for Top-Height-Bottom:")
+        WARN(debug.traceback())
+    end
+    
+    if not pcall(self.c.Left) or not pcall(self.c.Right) or not pcall(self.c.Width)  then
+        WARN("Incorrect layout for Left-Width-Right:")
+        WARN(debug.traceback())
+    end
+    
+    return self.c
+end
+
 function LayouterMetaTable:__newindex(key, value)
     error("attempt to set new index for a Layouter object")
 end
@@ -802,6 +827,8 @@ local layouter = {
     c = false
 }
 setmetatable(layouter, LayouterMetaTable)
+
+-- use if you don't cache layouter object
 
 function ReusedLayoutFor(control)
     layouter.c = control or false
