@@ -1157,13 +1157,6 @@ MassCollectionUnit = Class(StructureUnit) {
 MassFabricationUnit = Class(StructureUnit) {
     LandBuiltHiddenBones = {'Floatation'},
 
-    OnCreate = function(self, spec)
-        StructureUnit.OnCreate(self, spec)
-
-        -- make brain track us to enable / disable accordingly
-        self.Brain:AddEnabledEnergyExcessUnit(self)
-    end,
-
     OnScriptBitSet = function(self, bit)
         if bit == 4 then 
             -- no longer track us, we want to be disabled
@@ -1189,6 +1182,9 @@ MassFabricationUnit = Class(StructureUnit) {
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()
         self:SetProductionActive(true)
+
+        -- make brain track us to enable / disable accordingly
+        self.Brain:AddEnabledEnergyExcessUnit(self)
     end,
 
     OnConsumptionActive = function(self)
