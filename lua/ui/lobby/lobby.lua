@@ -3030,15 +3030,6 @@ function CreateUI(maxPlayers)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
-    --GUI.gameVersionText.HandleEvent = function (self, event)
-    --    if event.Type == 'MouseEnter' then
-    --        self:SetColor('ffffff')
-    --    elseif event.Type == 'MouseExit' then
-    --        self:SetColor('677983')
-    --    elseif event.Type == 'ButtonPress' then
-    --        Changelog.Changelog(GUI)
-    --    end
-    --end
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -3218,18 +3209,6 @@ function CreateUI(maxPlayers)
     GUI.patchnotesButton.OnClick = function(self, event)
         Changelog.Changelog(GUI)
     end
-
-
-    -- curated Maps
-    -- GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-    -- Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-    -- LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
-    -- LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-    -- GUI.curatedmapsButton.OnClick = function()
-    --     OpenURL('http://forum.faforever.com/topic/347')
-    -- end
-
-    -- GUI.curatedmapsButton:Disable()
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
