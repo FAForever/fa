@@ -229,9 +229,9 @@ AIBrain = Class(moho.aibrain_methods) {
 
         --- Units that we toggle on / off depending on whether we have excess energy
         self.EnergyExcessUnitsEnabled = { }
-        setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'k' })
+        setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'v' })
         self.EnergyExcessUnitsDisabled = { }
-        setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'k' })
+        setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'v' })
 
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }

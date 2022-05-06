@@ -1184,6 +1184,7 @@ MassFabricationUnit = Class(StructureUnit) {
         self:SetProductionActive(true)
 
         -- make brain track us to enable / disable accordingly
+        LOG("HEY!")
         self.Brain:AddEnabledEnergyExcessUnit(self)
     end,
 
