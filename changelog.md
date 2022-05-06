@@ -1,3 +1,32 @@
+
+Game version 3737 (6th of May, 2022)
+===================================
+
+### Features
+
+ - (Engine patch) Introduction of alternative profiling function for better accuracy (ff630c8)
+
+### Bug fixes
+
+ - (Engine patch) Disable mesh rendering for minimap (#7)
+
+ - (Engine patch) Fix a crash when restarting a map with a Salem wreck (#6)
+
+ - (Engine patch) Fix a crash when air units have a collision box of 'None' (1b17fe7)
+
+ - (Engine patch) Fix players being defeated out of the blue when their commanders are being healed (1b17fe7)
+
+ - (Engine patch) Fix a crash when the mouse is pointing towards the sky, away from the terrain (3bf0ba5)
+
+### Performance
+
+ - (Engine patch) Improve performance of common table operations (ff630c8, da692d3)
+    
+### Contributors
+
+ - Strogo (#7, #6)
+ - KionX (1b17fe7, ff630c8, 3bf0ba5, 564ff89)
+
 Game version 3736 (6th of May, 2022)
 ===================================
 
