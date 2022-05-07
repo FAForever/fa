@@ -603,16 +603,6 @@ CNeutronClusterBombProjectile = Class(SinglePolyTrailProjectile) {
     end,
 
     ---------------------------------------------------------------------------
-    -- Over-ride the way damage is dealt to allow custom damage to be dealt.
-    -- Spec 9/21/05 states that possible instakill functionality could be dealt
-    -- to unit, dependent on units current armor level.
-    -- Spec pending revision -- Update when finalized.
-    ---------------------------------------------------------------------------
-    DoDamage = function(self, instigator, damageData, targetEntity)
-        SinglePolyTrailProjectile.DoDamage(self, instigator, damageData, targetEntity)
-    end,
-
-    ---------------------------------------------------------------------------
     -- Note: Damage is done once in AOE by main projectile. Secondary projectiles
     -- are just visual.
     ---------------------------------------------------------------------------
@@ -693,23 +683,6 @@ CLOATacticalMissileProjectile = Class(SingleBeamProjectile) {
     FxImpactProp = EffectTemplate.CMissileLOAHit01,
     FxImpactNone = EffectTemplate.CMissileLOAHit01,
     FxImpactUnderWater = {},
-
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for k, v in EffectTable do
-            emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
-        end
-    end,
-
-    OnExitWater = function(self)
-        EmitterProjectile.OnExitWater(self)
-        for k, v in self.FxExitWaterEmitter do
-            CreateEmitterAtBone(self, -2, self.Army, v)
-        end
-    end,
 }
 
 CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
@@ -751,13 +724,6 @@ CLOATacticalChildMissileProjectile = Class(SingleBeamProjectile) {
             if emit and EffectScale ~= 1 then
                 emit:ScaleEmitter(EffectScale or 1)
             end
-        end
-    end,
-
-    OnExitWater = function(self)
-        EmitterProjectile.OnExitWater(self)
-        for k, v in self.FxExitWaterEmitter do
-            CreateEmitterAtBone(self, -2, self.Army, v)
         end
     end,
 }
@@ -885,10 +851,6 @@ CDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
 
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
-
-        for k, v in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self, self.Army, v)
-        end
 
         self:TrackTarget(false)
         self:StayUnderwater(true)
