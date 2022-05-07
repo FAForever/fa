@@ -423,6 +423,12 @@ Projectile = Class(moho.projectile_methods) {
 
     -- Lua functionality
 
+    --- Passes damage data as a meta table
+    PassMetaDamage = function(self, data)
+        self.DamageData = { }
+        setmetatable(self.DamageData, data)
+    end,
+
     --- All of the damage logic of a projectile
     -- @param self The projectile itself
     -- @param instigator The launcher, and if it doesn't exist, the projectile itself
@@ -724,8 +730,8 @@ Projectile = Class(moho.projectile_methods) {
         self.CollideFriendly = self.DamageData.CollideFriendly
     end,
 
+    -- root of all performance evil
     ForkThread = function(self, fn, ...)
-        LOG(repr(arg))
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
             self.Trash:Add(thread)
