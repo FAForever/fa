@@ -109,14 +109,15 @@ ACUButton = Class(Group) {
         textOverlay:SetFont(UIUtil.bodyFont, 20)
         LayoutHelpers.AtCenterIn(textOverlay, self)
         self.textOverlay = textOverlay
+    end,
 
-        self.OnHide = function(self, hidden)
-            self.markerOverlay:SetHidden(hidden)
-            self.marker:SetHidden(hidden)
-            self.teamIndicator:SetHidden(hidden)
-            self.textOverlay:SetHidden(hidden)
-            return true
-        end
+    OnHide = function(self, hidden)
+        self:ApplyFunction(function (control)
+            if control ~= self then
+                control:SetHidden(hidden)
+            end
+        end)
+        return true
     end,
 
     --- Returns true if the control is enabled.
