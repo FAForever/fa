@@ -5,7 +5,6 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
@@ -752,3 +751,8 @@ DummyProjectile = Class(moho.projectile_methods) {
         self:Destroy()
     end,
 }
+
+-- imports kept for backwards compatibility with mods
+
+local Explosion = import('/lua/defaultexplosions.lua')
+local Entity = import('/lua/sim/entity.lua').Entity
