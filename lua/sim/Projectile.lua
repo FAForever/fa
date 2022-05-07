@@ -381,27 +381,31 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile exits the water
     OnExitWater = function(self)
-        local bp = self.Blueprint.Audio['ExitWater']
-        if bp then
-            self:PlaySound(bp)
-        end
-
         -- try and do a splash
-        for k, v in self.FxExitWaterEmitter do
-            CreateEmitterAtBone(self, -2, self.Army, v)
+        if self.FxExitWaterEmitter then 
+            for k, v in self.FxExitWaterEmitter do
+                CreateEmitterAtEntity(self, self.Army, v)
+            end
+
+            local bp = self.Blueprint.Audio['ExitWater']
+            if bp then
+                self:PlaySound(bp)
+            end
         end
     end,
 
     --- Called by the engine when the projectile enters the water
     OnEnterWater = function(self)
-        local bp = self.Blueprint.Audio['EnterWater']
-        if bp then
-            self:PlaySound(bp)
-        end
-
         -- try and do a splash
-        for k, v in self.FxEnterWater do 
-            CreateEmitterAtEntity(self, self.Army, v)
+        if self.FxEnterWater then 
+            for k, v in self.FxEnterWater do 
+                CreateEmitterAtEntity(self, self.Army, v)
+            end
+
+            local bp = self.Blueprint.Audio['EnterWater']
+            if bp then
+                self:PlaySound(bp)
+            end
         end
     end,
 

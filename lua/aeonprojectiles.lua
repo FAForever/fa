@@ -399,6 +399,7 @@ AMissileSerpentineProjectile = Class(SingleCompositeEmitterProjectile) {
     FxImpactUnit = EffectTemplate.AMissileHit01,
     FxImpactProp = EffectTemplate.AMissileHit01,
     FxImpactLand = EffectTemplate.AMissileHit01,
+    FxExitWaterEmitter = EffectTemplate.TIFCruiseMissileLaunchExitWater,
     FxImpactUnderWater = {},
     
     OnCreate = function(self)
