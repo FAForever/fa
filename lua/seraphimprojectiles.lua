@@ -334,7 +334,7 @@ SThunthoArtilleryShell2 = Class(MultiPolyTrailProjectile) {
 --------------------------------------------------------------------------
 --  SERAPHIM SHLEO AA GATLING ROUND
 --------------------------------------------------------------------------
-SShleoAACannon = Class(EmitterProjectile) {
+SShleoAACannon = Class(MultiPolyTrailProjectile) {
     FxImpactAirUnit = EffectTemplate.SShleoCannonUnitHit,
     FxImpactLand = EffectTemplate.SShleoCannonLandHit,
     FxImpactWater = EffectTemplate.SShleoCannonLandHit,
@@ -344,16 +344,9 @@ SShleoAACannon = Class(EmitterProjectile) {
     FxImpactUnderWater = {},
     FxImpactUnit = EffectTemplate.SShleoCannonUnitHit,
     FxTrails = {},
+    
     PolyTrails = EffectTemplate.SShleoCannonProjectilePolyTrails,
-
-    OnCreate = function(self)
-        EmitterProjectile.OnCreate(self)
-        local PolytrailGroup = self.PolyTrails[RandomInt(1,table.getn(self.PolyTrails))]
-
-        for k, v in PolytrailGroup do
-            CreateTrail(self, -1, self.Army, v)
-        end
-    end,
+    RandomPolyTrails = 1,
 }
 
 --------------------------------------------------------------------------
