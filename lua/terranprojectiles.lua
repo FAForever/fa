@@ -250,10 +250,6 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) { -- SACU, titan,
     FxImpactUnit = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
     FxImpactProp = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
     FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 
@@ -372,16 +368,6 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
     FxImpactLand = EffectTemplate.TMissileHit01,
     FxImpactProp = EffectTemplate.TMissileHit01,
     FxImpactUnderWater = {},
-
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for k, v in EffectTable do
-            emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
-        end
-    end,
 }
 
 TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
@@ -395,16 +381,6 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
     FxImpactProp = EffectTemplate.TShipGaussCannonHit02,
     FxImpactLand = EffectTemplate.TShipGaussCannonHit02,
     FxImpactUnderWater = {},
-
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for k, v in EffectTable do
-            emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
-        end
-    end,
 }
 
 --------------------------------------------------------------------------
