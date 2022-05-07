@@ -63,6 +63,7 @@ DiskFindFiles = DiskFindFiles
 
 doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
+doscript("/lua/system/blueprints-projectiles.lua")
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
 local function LoadPreGameData()
@@ -870,13 +871,20 @@ function PostModBlueprints(all_bps)
     -- we do before releasing the blueprint values to the game as we want to catch all
     -- units, even those included by mods.
     FindCustomStrategicIcons(all_bps)
+    BlueprintLoaderUpdateProgress()
 
     -- dynamically compute the unit threat values that are used by the AI to make sense
     -- of a units capabilities.
     SetUnitThreatValues(all_bps.Unit)
+    BlueprintLoaderUpdateProgress()
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
     CalculateLODs(all_bps)
+    BlueprintLoaderUpdateProgress()
+
+    -- post process projectiles for easier access to information
+    PostProcessProjectiles(all_bps.Projectile)
+
 end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
