@@ -45,7 +45,7 @@ ACUButton = Class(Group) {
         local buttonImage = UIUtil.UIFile('/dialogs/mapselect02/commander_alpha.dds')
         local markerOverlay = Button(colourBmp, buttonImage, buttonImage, buttonImage, buttonImage)
         LayoutHelpers.AtCenterIn(markerOverlay, colourBmp)
-        markerOverlay.OnClick = function(this, modifiers)
+        markerOverlay.OnClick = function(control, modifiers)
             if not self:IsEnabled() then
                 return
             end
@@ -57,7 +57,7 @@ ACUButton = Class(Group) {
             end
         end
 
-        markerOverlay.OnRolloverEvent = function(this, state)
+        markerOverlay.OnRolloverEvent = function(control, state)
         -- Don't respond to events if the control is disabled.
             if not self:IsEnabled() then
                 return
@@ -81,26 +81,26 @@ ACUButton = Class(Group) {
         indicator.Depth:Set(function() return colourBmp.Depth() - 1 end)
         indicator:Hide()
         indicator:DisableHitTest()
-        indicator.Play = function(this)
+        indicator.Play = function(control)
             if not self:IsEnabled() then
                 return
             end
-            this:SetAlpha(1)
-            this:Show()
-            this:SetNeedsFrameUpdate(true)
-            this.time = 0
-            this.OnFrame = function(control, time)
+            control:SetAlpha(1)
+            control:Show()
+            control:SetNeedsFrameUpdate(true)
+            control.time = 0
+            control.OnFrame = function(control, time)
                 control.time = control.time + (time*4)
                 control:SetAlpha(MATH_Lerp(math.sin(control.time), -.5, .5, 0.3, 0.5))
             end
         end
-        indicator.Stop = function(this)
+        indicator.Stop = function(control)
             if not self:IsEnabled() then
                 return
             end
-            this:SetAlpha(0)
-            this:Hide()
-            this:SetNeedsFrameUpdate(false)
+            control:SetAlpha(0)
+            control:Hide()
+            control:SetNeedsFrameUpdate(false)
         end
 
         self.indicator = indicator

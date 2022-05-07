@@ -38,20 +38,18 @@ Popup = Class(Group) {
         -- Plant the dialog in the middle of the screen.
         LayoutHelpers.AtCenterIn(self, GUI)
 
-        -- Closure copy.
-        local this = self
-
+        
         -- Dismiss dialog when shadow is clicked.
         shadow.HandleEvent = function(shadow, event)
             if event.Type == 'ButtonPress' then
-                this:OnShadowClicked()
+                self:OnShadowClicked()
             end
         end
 
         ---- Close when the escape key is pressed.
         EscapeHandler.PushEscapeHandler(function()
             EscapeHandler.PopEscapeHandler()
-            this:OnEscapePressed()
+            self:OnEscapePressed()
         end)
     end,
 
