@@ -163,6 +163,7 @@ Expressions = {
     RAS          = "(SUBCOMMANDER * ResourceAllocation)",   -- RAS SCU PRESETS (url0301_ras + uel0301_ras + ual0301_ras)"
     TMLPACK      = "(SUBCOMMANDER * (Missile + RightRocket + LeftRocket))", -- TML SCU PRESET xsl0301_missile
     TELE         = "(SUBCOMMANDER * Teleporter)",           -- TML SCU PRESET with teleporter
+    CLOAK        = "(SUBCOMMANDER * CloakingGenerator) + url0301_Cloak",
 
     INTEL_OPTICS = "(STRUCTURE * OPTICS)", -- "xab3301 + xrb3301",
     INTEL_SONAR  = "(STRUCTURE * SONAR) + MOBILESONAR",
@@ -172,7 +173,7 @@ Expressions = {
 
     STEALTH_BASE = "(STEALTHFIELD * STRUCTURE)",
     STEALTH_AIR  = "(STEALTH * AIR)",
-    STEALTH_LAND = "((STEALTH * LAND) + (STEALTHFIELD * LAND) + url0301_Stealth + url0301_Cloak)",
+    STEALTH_LAND = "((STEALTH * LAND) + (STEALTHFIELD * LAND) + url0301_Stealth)",
     STEALTH_NAVY = "(STEALTHFIELD * NAVAL)",
 }
 --- note that enhancements are defined in tables and not in strings like category expressions are.
@@ -204,6 +205,8 @@ Enhancements = {
                      "StealthGeneratorRemove",
                      "CloakingGenerator",
                      "CloakingGeneratorRemove"},
+    CLOAK =     { "CloakingGenerator",
+                    "CloakingGeneratorRemove"},
     SHIELD_LAND = { "ShieldGeneratorField",
                     "ShieldGeneratorField" },
     ANTIAIR_LAND = { "NaniteMissileSystem",
@@ -316,6 +319,7 @@ local presetsOrder = {
     "RAS",
     "TMLPACK",
     "BILLY",
+    "CLOAK",
     "", -- preset separator
     "SERAPHIM",
     "UEF",
@@ -637,6 +641,10 @@ local function CreatePresets()
         "<LOC restricted_units_info_TMLPACK>Prevents commander upgrades that enable tactical missile launchers (TML)",
         "<LOC restricted_units_data_TMLPACK>No Tactical Missile Pack",
         "/textures/ui/common/icons/presets/enh-tml-icon.dds")
+        CreatePreset("CLOAK",
+        "<LOC restricted_units_info_CLOAK>Prevents commander upgrades that enable Personal Cloak",
+        "<LOC restricted_units_data_CLOAK>No Cloak",
+        "/textures/ui/common/icons/presets/enh-cloak-icon.dds")
     -- INTEL restrictions
     CreatePreset("INTEL_BASE",
         "<LOC restricted_units_info_INTELBASIC>Prevents structures that provide basic intelligence such as radar, sonar, and omni",
