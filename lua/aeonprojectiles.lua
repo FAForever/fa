@@ -154,26 +154,6 @@ ADepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     FxImpactUnderWater = EffectTemplate.ADepthChargeHitUnderWaterUnit01,
     FxImpactNone = {},
 
-    OnCreate = function(self, inWater)
-        OnWaterEntryEmitterProjectile.OnCreate(self)
-        --self:TrackTarget(true)
-    end,
-
-    OnEnterWater = function(self)
-        OnWaterEntryEmitterProjectile.OnEnterWater(self)
-
-        for k, v in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self, self.Army ,v)
-        end
-
-        -- self:TrackTarget(false)
-        -- self:StayUnderwater(true)
-        -- self:SetTurnRate(0)
-        -- self:SetMaxSpeed(1)
-        -- self:SetVelocity(0, -0.25, 0)
-        -- self:SetVelocity(0.25)
-    end,
-
     AddDepthCharge = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -239,16 +219,6 @@ AIMFlareProjectile = Class(EmitterProjectile) {
     FxImpactLand = {},
     FxImpactUnderWater = {},
     DestroyOnImpact = false,
-
-    OnImpact = function(self, TargetType, targetEntity)
-        EmitterProjectile.OnImpact(self, TargetType, targetEntity)
-        if TargetType == 'Terrain' or TargetType == 'Water' or TargetType == 'Prop' then
-            if self.Trash then
-                self.Trash:Destroy()
-            end
-            self:Destroy()
-        end
-    end,
 }
 
 --------------------------------------------------------------------------
