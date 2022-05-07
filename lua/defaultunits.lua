@@ -95,7 +95,7 @@ StructureUnit = Class(Unit) {
                     -- if this is more of a threat than what we have, compute distance
                     if threat >= target.threat then
                         local epos = u:GetPosition()
-                        local distance = pos[1] * epos[1] + pos[1] * pos[3]
+                        local distance = VDist2Sq(pos[1], pos[3], epos[1], epos[3])
 
                         -- if threat is bigger, then we don't need to compare distance
                         if threat > target.threat then 
@@ -1362,17 +1362,7 @@ SeaFactoryUnit = Class(FactoryUnit) {
 }
 
 -- SHIELD STRCUTURE UNITS
-ShieldStructureUnit = Class(StructureUnit) {
-    UpgradingState = State(StructureUnit.UpgradingState) {
-        Main = function(self)
-            StructureUnit.UpgradingState.Main(self)
-        end,
-
-        OnFailedToBuild = function(self)
-            StructureUnit.UpgradingState.OnFailedToBuild(self)
-        end,
-    }
-}
+ShieldStructureUnit = Class(StructureUnit) { }
 
 -- TRANSPORT BEACON UNITS
 TransportBeaconUnit = Class(StructureUnit) {
@@ -1400,10 +1390,6 @@ QuantumGateUnit = Class(FactoryUnit) { }
 
 -- MOBILE UNITS
 MobileUnit = Class(Unit) {
-    -- Added for engymod. After creating an enhancement, units must re-check their build restrictions
-    CreateEnhancement = function(self, enh)
-        Unit.CreateEnhancement(self, enh)
-    end,
 
     -- Added for engymod. When created, units must re-check their build restrictions
     OnCreate = function(self)
@@ -1512,9 +1498,9 @@ WalkingLandUnit = Class(MobileUnit) {
 -- These units typically float under the water and have wake when they move
 SubUnit = Class(MobileUnit) {
     -- Use default spark effect until underwater damaged states are made
-    FxDamage1 = {EffectTemplate.DamageSparks01},
-    FxDamage2 = {EffectTemplate.DamageSparks01},
-    FxDamage3 = {EffectTemplate.DamageSparks01},
+    FxDamage1 = { EffectTemplate.DamageSparks01 },
+    FxDamage2 = { EffectTemplate.DamageSparks01 },
+    FxDamage3 = { EffectTemplate.DamageSparks01 },
 
     -- DESTRUCTION PARAMS
     ShowUnitDestructionDebris = false,
@@ -1715,42 +1701,23 @@ AirUnit = Class(MobileUnit) {
     end,
 
 
-    -- It's a modified copy of unit.OnCollisionCheck, this way we can get rid of unnecessary calls and double checks
-    -- the only difference is the `elseif other.Nuke...` condition
-    -- this can't be done in projectile.OnCollisionCheck because it's called after unit.OnCollisionCheck and then it's too late
+    --- Called when a unit collides with a projectile to check if the collision is valid, allows
+    -- ASF to be destroyed when they impact with strategic missiles
+    -- @param self The unit we're checking the collision for
+    -- @param other The projectile we're checking the collision with
+    -- @param firingWeapon The weapon that the projectile originates from
     OnCollisionCheck = function(self, other, firingWeapon)
         if self.DisallowCollisions then
             return false
         end
 
-        if EntityCategoryContains(categories.PROJECTILE, other) then
-            if IsAlly(self:GetArmy(), other:GetArmy()) then
-                return other.CollideFriendly
-            elseif other.Nuke and not self.Blueprint.CategoriesHash.EXPERIMENTAL then
-                self:Kill()
-                return false
-            end
+        -- allow regular air units to be destroyed by strategic missiles
+        if other.Nuke and not self.Blueprint.CategoriesHash.EXPERIMENTAL then 
+            self:Kill()
+            return false 
         end
 
-        -- Check for specific non-collisions
-        local bp = other.Blueprint
-        if bp.DoNotCollideList then
-            for _, v in pairs(bp.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        bp = self.Blueprint
-        if bp.DoNotCollideList then
-            for _, v in pairs(bp.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), other) then
-                    return false
-                end
-            end
-        end
-        return true
+        return MobileUnit.OnCollisionCheck(self, other, firingWeapon)
     end,
 }
 
