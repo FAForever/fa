@@ -485,6 +485,11 @@ LayouterMetaTable.__index = LayouterMetaTable
 
 -- controls' mostly used methods
 
+function LayouterMetaTable:Name(debugName)
+    self.c:SetName(debugName)
+    return self
+end
+
 function LayouterMetaTable:Disable()
     self.c:Disable()
     return self
