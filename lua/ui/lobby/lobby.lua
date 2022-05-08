@@ -4182,6 +4182,7 @@ function CreateUI(maxPlayers)
                 sortedSlotTeams[player][1] = slotB
             end
             UpdateGame()
+            AddChatText(LOC("<LOC lobui_0626>Finished autobalancing"))
         end
     end
 
@@ -7059,6 +7060,11 @@ function InitHostUtils()
         -- @param moveFrom Slot number to move from
         -- @param moveTo Slot number to move to.
         SanityCheckSlotMovement = function(moveFrom, moveTo)
+            if moveTo == moveFrom then
+                -- no need to move a slot to its current location
+                return false
+            end
+
             if gameInfo.ClosedSlots[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
                 return false
