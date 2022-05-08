@@ -804,12 +804,12 @@ end
 
 function LayouterMetaTable:End()
     if not pcall(self.c.Top) or not pcall(self.c.Bottom) or not pcall(self.c.Height) then
-        WARN("Incorrect layout for Top-Height-Bottom:")
+        WARN(string.format("Incorrect layout for \"%s\" Top-Height-Bottom", self.c:GetName()))
         WARN(debug.traceback())
     end
     
     if not pcall(self.c.Left) or not pcall(self.c.Right) or not pcall(self.c.Width)  then
-        WARN("Incorrect layout for Left-Width-Right:")
+        WARN(string.format("Incorrect layout for \"%s\" Left-Width-Right", self.c:GetName()))
         WARN(debug.traceback())
     end
     
