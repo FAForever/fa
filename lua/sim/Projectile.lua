@@ -423,13 +423,13 @@ Projectile = Class(moho.projectile_methods) {
 
     -- Lua functionality
 
-    --- Passes damage data as a meta table
+    --- Called by Lua to pass the damage data as a metatable
     PassMetaDamage = function(self, data)
         self.DamageData = { }
         setmetatable(self.DamageData, data)
     end,
 
-    --- All of the damage logic of a projectile
+    --- Called by Lua to process the damage logic of a projectile
     -- @param self The projectile itself
     -- @param instigator The launcher, and if it doesn't exist, the projectile itself
     -- @param DamageData The damage data passed by the weapon
@@ -562,7 +562,7 @@ Projectile = Class(moho.projectile_methods) {
         end
     end,
 
-    -- When this projectile impacts with the target, do any buffs that have been passed to it.
+    --- Called by Lua to process buffs on impact
     DoUnitImpactBuffs = function(self, target)
         local data = self.DamageData
 
@@ -591,6 +591,7 @@ Projectile = Class(moho.projectile_methods) {
         end
     end,
 
+    --- Called by Lua to determine whether the projectile should be destroyed
     OnImpactDestroy = function(self, targetType, targetEntity)
         if  self.DestroyOnImpact or 
             (not targetEntity) or
@@ -600,11 +601,13 @@ Projectile = Class(moho.projectile_methods) {
         end
     end,
 
+    --- Called by Lua for a delayed destruction
     ImpactTimeoutThread = function(self, seconds)
         WaitSeconds(seconds)
         self:Destroy()
     end,
 
+    --- Called by Lua to add a flare
     AddFlare = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -633,6 +636,7 @@ Projectile = Class(moho.projectile_methods) {
         self.Trash:Add(self.MyFlare)
     end,
 
+    --- Called by Lua to create the impact effects
     CreateImpactEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -648,6 +652,7 @@ Projectile = Class(moho.projectile_methods) {
         end
     end,
 
+    --- Called by Lua to create the terrain effects
     CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
         local emit = nil
         for _, v in EffectTable do
@@ -658,6 +663,7 @@ Projectile = Class(moho.projectile_methods) {
         end
     end,
 
+    --- Called by Lua to retrieve the terrain effects
     GetTerrainEffects = function(self, TargetType, ImpactEffectType, position)
 
         local position = position or self:GetPosition()
@@ -676,6 +682,7 @@ Projectile = Class(moho.projectile_methods) {
         return TerrainType.FXImpact[TargetType][ImpactEffectType] or false
     end,
 
+    --- Called by Lua to process taking damage
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
         -- Check for valid projectile
         if not self or self:BeenDestroyed() then
