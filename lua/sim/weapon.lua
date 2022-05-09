@@ -470,7 +470,7 @@ Weapon = Class(moho.weapon_methods) {
                     count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
-                for i = 1, table.getn(priorityTable) do
+                for i = 1, count - 1 do
                     priorityTable[i] = nil
                 end
             end
@@ -483,7 +483,7 @@ Weapon = Class(moho.weapon_methods) {
                     count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
-                for i = 1, table.getn(priorityTable) do
+                for i = 1, count - 1 do
                     priorityTable[i] = nil
                 end
             else
