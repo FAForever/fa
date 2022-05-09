@@ -37,13 +37,6 @@ local function ParsePriorities()
     return finalPriorities
 end
 
-local function ClearRecycledPriTable()
-    local UnclearedRecycledPriTable = RecycledPriTable
-    for i = 1, table.getn(RecycledPriTable) do
-        UnclearedRecycledPriTable[i] = nil
-    end
-end
-
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit
@@ -452,6 +445,7 @@ Weapon = Class(moho.weapon_methods) {
     end,
 
     SetWeaponPriorities = function(self, priTable)
+
         if not cachedPriorities then
             cachedPriorities = ParsePriorities()
         end
@@ -476,6 +470,9 @@ Weapon = Class(moho.weapon_methods) {
                     count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
+                for i = 1, table.getn(priorityTable) do
+                    priorityTable[i] = nil
+                end
             end
         else
             if type(priTable[1]) == 'string' then
@@ -486,11 +483,13 @@ Weapon = Class(moho.weapon_methods) {
                     count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
+                for i = 1, table.getn(priorityTable) do
+                    priorityTable[i] = nil
+                end
             else
                 self:SetTargetingPriorities(priTable)
             end
         end
-        ClearRecycledPriTable()
     end,
 
     WeaponUsesEnergy = function(self)
