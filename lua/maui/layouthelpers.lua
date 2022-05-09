@@ -192,8 +192,8 @@ function PercentIn(control, parent, left, top, right, bottom)
 
     control.Left:Set(function() return math.floor(parent.Left() + (left * parent.Width())) end)
     control.Top:Set(function() return math.floor(parent.Top() + (top * parent.Height())) end)
-    control.Right:Set(function() return math.floor(parent.Left() + (right * parent.Width())) end)
-    control.Bottom:Set(function() return math.floor(parent.Top() + (bottom * parent.Height())) end)
+    control.Right:Set(function() return math.floor(parent.Right() - (right * parent.Width())) end)
+    control.Bottom:Set(function() return math.floor(parent.Bottom() - (bottom * parent.Height())) end)
 end
 
 function OffsetIn(control, parent, left, top, right, bottom)
@@ -204,8 +204,8 @@ function OffsetIn(control, parent, left, top, right, bottom)
 
     control.Left:Set(function() return math.floor(parent.Left() + (left * pixelScaleFactor)) end)
     control.Top:Set(function() return math.floor(parent.Top() + (top * pixelScaleFactor)) end)
-    control.Right:Set(function() return math.floor(parent.Left() + (right * pixelScaleFactor)) end)
-    control.Bottom:Set(function() return math.floor(parent.Top() + (bottom * pixelScaleFactor)) end)
+    control.Right:Set(function() return math.floor(parent.Right() - (right * pixelScaleFactor)) end)
+    control.Bottom:Set(function() return math.floor(parent.Bottom() - (bottom * pixelScaleFactor)) end)
 end
 
 --* these functions will set the controls position relative to a sibling
