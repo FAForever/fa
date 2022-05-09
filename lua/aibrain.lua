@@ -358,12 +358,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- allow for protected calls without closures
 
-        local unitToProcess
-        function ProtectedOnExcessEnergy()
+        local function ProtectedOnExcessEnergy(unitToProcess)
             unitToProcess:OnExcessEnergy()
         end
 
-        function ProtectedOnNoExcessEnergy()
+        local function ProtectedOnNoExcessEnergy(unitToProcess)
             unitToProcess:OnNoExcessEnergy()
         end
 
@@ -392,8 +391,7 @@ AIBrain = Class(moho.aibrain_methods) {
                         EnergyExcessUnitsEnabled[unit.EntityId] = nil
                         
                         -- try to disable unit
-                        unitToProcess = unit 
-                        ok, msg = pcall(ProtectedOnNoExcessEnergy)
+                        ok, msg = pcall(ProtectedOnNoExcessEnergy, unit)
 
                         -- allow for debugging
                         if not ok then 
@@ -417,8 +415,7 @@ AIBrain = Class(moho.aibrain_methods) {
                             EnergyExcessUnitsEnabled[unit.EntityId] = unit
 
                             -- try to enable unit
-                            unitToProcess = unit 
-                            ok, msg = pcall(ProtectedOnExcessEnergy)
+                            ok, msg = pcall(ProtectedOnExcessEnergy, unit)
 
                             -- allow for debugging
                             if not ok then 
