@@ -4204,21 +4204,19 @@ function CreateUI(maxPlayers)
                 end
             end
             -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
-            local indexAdjustment
+            -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
+            local obsIndex = row + 1
             if numTeams < 3 then
-                indexAdjustment = 1 - numTeams
-            else
-                -- if there's more than 2 teams, the team rating rows are listed after observers instead of before
-                indexAdjustment = 1
+                obsIndex = obsIndex - numTeams
             end
             
             -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
             -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
-            if row + indexAdjustment > 0 and gameInfo.Observers[row + indexAdjustment].OwnerID != localPlayerID then
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                         "<LOC lobui_0167>Kick Player", function()
-                                            SendSystemMessage("lobui_0756", gameInfo.Observers[row + indexAdjustment].PlayerName)
-                                            lobbyComm:EjectPeer(gameInfo.Observers[row + indexAdjustment].OwnerID, "KickedByHost")
+                                            SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
+                                            lobbyComm:EjectPeer(gameInfo.Observers[obsIndex].OwnerID, "KickedByHost")
                                         end,
                                         "<LOC _Cancel>", nil,
                                         nil, nil,
