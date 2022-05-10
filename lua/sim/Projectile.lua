@@ -138,7 +138,7 @@ Projectile = Class(moho.projectile_methods) {
     OnCollisionCheck = function(self, other)
 
         -- only anti missiles can take things down 
-        if not other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
+        if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
 
             -- only tactical or strategical projectiles can be taken down 
             if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
