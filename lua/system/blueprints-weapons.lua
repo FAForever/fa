@@ -40,7 +40,7 @@ local function ProcessWeapon(unit, weapon)
     -- - process target check interval
 
     -- default formula for target check interval
-    weapon.TargetCheckInterval = (weapon.MaxRadius or 20) / 20
+    weapon.TargetCheckInterval = (weapon.MaxRadius or 20) / 30
     weapon.TargetCheckInterval = weapon.TargetCheckInterval * (weaponTargetCheckMultiplier[weapon.RangeCategory] or 1.2)
 
     if isStructure then 
@@ -48,8 +48,8 @@ local function ProcessWeapon(unit, weapon)
     end
 
     -- clamp value
-    if weapon.TargetCheckInterval < 1.0 then 
-        weapon.TargetCheckInterval = 1.0 
+    if weapon.TargetCheckInterval < 0.70 then 
+        weapon.TargetCheckInterval = 0.70 
     end
 
     if weapon.TargetCheckInterval > 10 then 
