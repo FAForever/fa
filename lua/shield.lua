@@ -260,6 +260,10 @@ Shield = Class(moho.shield_methods, Entity) {
                 -- we're not recharged
                 or  not self.Recharged
             then 
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(-1)
+
+                -- suspend ourselves and wait
                 self.RegenThreadSuspended = true 
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
@@ -275,13 +279,11 @@ Shield = Class(moho.shield_methods, Entity) {
                     -- adjust health, rate is in seconds 
                     EntityAdjustHealth(self, self.Owner, 0.1 * self.RegenRate)
 
-                    -- adjust shield bar
-                    self:UpdateShieldRatio(-1)
-
                 -- if not, yield for the difference in ticks
-                else 
-                    CoroutineYield(self.RegenThreadStartTick - tick )
                 end
+
+                -- adjust shield bar
+                self:UpdateShieldRatio(-1)
             end
 
             -- wait till next tick
