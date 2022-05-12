@@ -279,12 +279,13 @@ Shield = Class(moho.shield_methods, Entity) {
 
                     -- adjust health, rate is in seconds 
                     EntityAdjustHealth(self, self.Owner, 0.1 * self.RegenRate)
+                    health = health + 0.1 * self.RegenRate
 
                 -- if not, yield for the difference in ticks
                 end
 
                 -- adjust shield bar as we may be assisted
-                self:UpdateShieldRatio((health + 0.1 * self.RegenRate) / maxHealth)
+                self:UpdateShieldRatio(health / maxHealth)
             end
 
             -- wait till next tick
