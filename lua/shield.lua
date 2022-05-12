@@ -503,9 +503,6 @@ Shield = Class(moho.shield_methods, Entity) {
             -- take some damage
             EntityAdjustHealth(self, instigator, -absorbed)
 
-            -- adjust shield bar
-            self:UpdateShieldRatio(-1)
-
             -- check to spawn impact effect
             local r = Random(1, self.Size)
             if  dmgType ~= "ShieldSpill"
