@@ -81,7 +81,6 @@ MissileRedirect = Class(Entity) {
         -- Return true to process this collision, false to ignore it.
         WaitingState = State {
             OnCollisionCheck = function(self, other)
-                LOG("OnCollisionCheck")
                 if EntityCategoryContains(categories.MISSILE, other) and not EntityCategoryContains(categories.STRATEGIC, other) and
                    other ~= self.EnemyProj and IsEnemy(self.Army, other.Army) then
                     self.Enemy = other:GetLauncher()
