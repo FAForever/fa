@@ -282,7 +282,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 -- if not, yield for the difference in ticks
                 end
 
-                -- adjust shield bar
+                -- adjust shield bar as we may be assisted
                 self:UpdateShieldRatio(-1)
             end
 
