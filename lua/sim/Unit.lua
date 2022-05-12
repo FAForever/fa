@@ -375,6 +375,8 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
 
         self.Repairers = {}
+
+        LOG(self:ToString(true))
     end,
 
     -------------------------------------------------------------------------------------------
@@ -4531,6 +4533,78 @@ Unit = Class(moho.unit_methods) {
         -- end
 
         return self.UnitBeingBuilt
+    end,
+    
+    --- Debug functionality
+
+    ToString = function(self, printMetatable)
+
+        -- to local scope for performance
+        local TableInsert = table.insert
+
+        local simplify = {
+            Brain = true,
+            Blueprint = true,
+            Buffs = true
+        }
+
+        local units = { 
+            AdjacentUnits = true,
+            Repairers = true
+        }
+
+        local refSelf = { }
+        for k, v in self do 
+            local sk = tostring(k)
+            if simplify[k] then 
+                TableInsert(refSelf, " - " .. sk .. ": -\n")
+            elseif units[k] then
+                TableInsert(refSelf, " - " .. sk .. " (unit table): \n")
+                for k, unit in v do 
+                    TableInsert(refSelf, " - | " .. sk .. ": " .. tostring(unit.Blueprint.BlueprintId) .. "\n")
+                end
+            else
+                TableInsert(refSelf, " - " .. sk .. ": " .. tostring(v) .. "\n")
+            end
+        end
+
+        local refMeta = { }
+        if printMetatable then 
+            for k, v in getmetatable(self) do 
+
+                local sk = tostring(k)
+                if simplify[k] then 
+                    TableInsert(refMeta, " - " .. sk .. ": -\n")
+                elseif units[k] then
+                    TableInsert(refMeta, " - " .. sk .. " (unit table): \n")
+                    for k, unit in v do 
+                        TableInsert(refMeta, " - | " .. sk .. ": " .. tostring(unit.Blueprint.BlueprintId) .. "\n")
+                    end
+                else
+                    TableInsert(refMeta, " - " .. sk .. ": " .. tostring(v) .. "\n")
+                end
+            end
+        else 
+            TableInsert(refMeta, " - (no metatable printed)\n")
+        end
+
+        table.sort(refSelf)
+        table.sort(refMeta)
+
+        return table.concat(
+            { 
+                " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n",
+                "Printing information for: " .. self.Blueprint.BlueprintId .. ", with entity id: " .. self.EntityId .. "\n",
+                "Table information: \n",
+                table.concat(refSelf), 
+
+                " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n",
+                "Metatable information: \n",
+                table.concat(refMeta),
+
+                " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n",
+                "The table information is unique to each unit. The metatable information is shared across all units of the same type.\n" 
+            })
     end,
 
 }
