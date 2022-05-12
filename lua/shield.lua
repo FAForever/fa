@@ -248,20 +248,21 @@ Shield = Class(moho.shield_methods, Entity) {
             local fromSuspension = false
             local tick = GetGameTick()
             local health = EntityGetHealth(self)
+            local maxHealth = EntityGetMaxHealth(self)
 
             -- check if we need to suspend ourself
             if 
                 -- we're at zero health or lower
                     health <= 0 
                 -- we're full health
-                or  health == EntityGetMaxHealth(self) 
+                or  health == maxHealth
                 -- we're not enabled
                 or  not self.Enabled 
                 -- we're not recharged
                 or  not self.Recharged
             then 
                 -- adjust shield bar one last time
-                self:UpdateShieldRatio(-1)
+                self:UpdateShieldRatio(health / maxHealth)
 
                 -- suspend ourselves and wait
                 self.RegenThreadSuspended = true 
@@ -283,7 +284,7 @@ Shield = Class(moho.shield_methods, Entity) {
                 end
 
                 -- adjust shield bar as we may be assisted
-                self:UpdateShieldRatio(-1)
+                self:UpdateShieldRatio((health + 0.1 * self.RegenRate) / maxHealth)
             end
 
             -- wait till next tick
