@@ -248,18 +248,23 @@ Shield = Class(moho.shield_methods, Entity) {
             local fromSuspension = false
             local tick = GetGameTick()
             local health = EntityGetHealth(self)
+            local maxHealth = EntityGetMaxHealth(self)
 
             -- check if we need to suspend ourself
             if 
                 -- we're at zero health or lower
                     health <= 0 
                 -- we're full health
-                or  health == EntityGetMaxHealth(self) 
+                or  health == maxHealth
                 -- we're not enabled
                 or  not self.Enabled 
                 -- we're not recharged
                 or  not self.Recharged
             then 
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(health / maxHealth)
+
+                -- suspend ourselves and wait
                 self.RegenThreadSuspended = true 
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
@@ -275,13 +280,11 @@ Shield = Class(moho.shield_methods, Entity) {
                     -- adjust health, rate is in seconds 
                     EntityAdjustHealth(self, self.Owner, 0.1 * self.RegenRate)
 
-                    -- adjust shield bar
-                    self:UpdateShieldRatio(-1)
-
                 -- if not, yield for the difference in ticks
-                else 
-                    CoroutineYield(self.RegenThreadStartTick - tick )
                 end
+
+                -- adjust shield bar as we may be assisted
+                self:UpdateShieldRatio(health / maxHealth)
             end
 
             -- wait till next tick
@@ -500,9 +503,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- take some damage
             EntityAdjustHealth(self, instigator, -absorbed)
-
-            -- adjust shield bar
-            self:UpdateShieldRatio(-1)
 
             -- check to spawn impact effect
             local r = Random(1, self.Size)
