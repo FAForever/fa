@@ -36,7 +36,7 @@ local function ProcessWeapon(unit, weapon)
 
     -- - process weapon
 
-    -- these should never do a target check, and always be a manual fire solution
+    -- Death weapons of any kind
     if weapon.DamageType == "DeathExplosion" or weapon.Label == "DeathWeapon" or weapon.Label == "DeathImpact" then 
         weapon.TargetCheckInterval = weaponTargetCheckUpperLimit
         weapon.AlwaysRecheckTarget = false 
@@ -46,30 +46,45 @@ local function ProcessWeapon(unit, weapon)
         return 
     end
 
+    -- Tactical, strategical missile defenses and torpedo defenses
+    if weapon.RangeCategory == "UWRC_Countermeasure" then 
+        weapon.TargetCheckInterval = 0.25
+        weapon.AlwaysRecheckTarget = false 
+        weapon.TrackingRadius = 1.15
+        weapon.DummyWeapon = false 
+        weapon.ManualFire = false
+        return 
+    end
+
     -- - process target check interval
 
-    -- default formula for target check interval
-    weapon.TargetCheckInterval = (weapon.MaxRadius or 20) / 40
-    weapon.TargetCheckInterval = weapon.TargetCheckInterval * (weaponTargetCheckMultiplier[weapon.RangeCategory] or 1.2)
+    weapon.TargetCheckInterval = math.min(
+            0.5 * (1 / (weapon.RateOfFire or 1))    -- based on attack rate
+        ,   (weapon.MaxRadius or 10) / 40           -- based on attack range
+    )   
 
-    -- lower check interval for structures and experimentals and non-air tech 3 units
-    if isStructure or isExperimental or (isTech3 and not isAir) then 
-        weapon.TargetCheckInterval = 0.50 * weapon.TargetCheckInterval
-    end
-
-    -- lower check interval for non-air tech 2 units
-    if isTech2 and not isAir then 
-        weapon.TargetCheckInterval = 0.75 * weapon.TargetCheckInterval
-    end
-
-    -- clamp value
-    if weapon.TargetCheckInterval < 0.5 then 
+    -- except for counter measure weaponry
+    if weapon.RangeCategory == "UWRC_Countermeasure" then 
         weapon.TargetCheckInterval = 0.5 
     end
 
+    -- clamp value to something sane
+    if weapon.TargetCheckInterval < 0.5 and (not isExperimental) then 
+        weapon.TargetCheckInterval = 0.5 
+    end
+
+    -- clamp value to something sane
+    if weapon.TargetCheckInterval < 0.1 then 
+        weapon.TargetCheckInterval = 0.1 
+    end
+
+    -- clamp value to something sane
     if weapon.TargetCheckInterval > 10 then 
         weapon.TargetCheckInterval = 10 
     end
+
+    -- sanitize it
+    weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
 
     -- - process target tracking radius 
 
@@ -80,10 +95,15 @@ local function ProcessWeapon(unit, weapon)
     if isStructure and (weapon.RangeCategory ~= "UWRC_AntiAir") then 
         weapon.TrackingRadius = 1.0
     end
+
+    -- give anti air a larger track radius
+    if weapon.RangeCategory == "UWRC_AntiAir" then 
+        weapon.TrackingRadius = 1.3 
+    end
     
     -- add significant target checking radius for bombers
     if isBomber then 
-        weapon.TrackingRadius = 2.0
+        weapon.TrackingRadius = 1.5
     end
 
     -- - process target rechecking
@@ -124,14 +144,18 @@ function ProcessWeapons(units)
 
         if not skip then 
             if unit.Weapon then 
-                -- LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
+                LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
                 for k, weapon in unit.Weapon do 
-                    -- LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
-                    -- LOG(" - - WeaponCheckinterval (prev): " .. tostring(weapon.TargetCheckInterval or 3.0))
+                    local TargetCheckInterval = weapon.TargetCheckInterval
+                    local AlwaysRecheckTarget = weapon.AlwaysRecheckTarget 
+                    local TrackingRadius = weapon.TrackingRadius
+
                     ProcessWeapon(unit, weapon)
-                    -- LOG(" - - WeaponCheckinterval (post): " .. tostring(weapon.TargetCheckInterval))
-                    -- LOG(" - - AlwaysRecheckTarget (post): " .. tostring(weapon.AlwaysRecheckTarget))
-                    -- LOG(" - - TrackingRadius (post): " .. tostring(weapon.TrackingRadius))
+
+                    LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
+                    LOG(" - - WeaponCheckinterval: " .. tostring(TargetCheckInterval) .. " -> " .. tostring(weapon.TargetCheckInterval))
+                    LOG(" - - AlwaysRecheckTarget: " .. tostring(AlwaysRecheckTarget) .. " -> " .. tostring(weapon.AlwaysRecheckTarget))
+                    LOG(" - - TrackingRadius: " .. tostring(TrackingRadius) .. " -> " .. tostring(weapon.TrackingRadius))
                 end
             end
         end
