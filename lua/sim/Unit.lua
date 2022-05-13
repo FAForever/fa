@@ -4532,7 +4532,6 @@ Unit = Class(moho.unit_methods) {
 
         return self.UnitBeingBuilt
     end,
-
 }
 
 -- upvalued math functions for performance
