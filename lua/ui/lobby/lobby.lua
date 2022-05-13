@@ -5218,6 +5218,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.Closed
             gameInfo.SpawnMex[data.Slot] = false
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     SlotClosedSpawnMex = {
@@ -6906,6 +6907,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = closed
             gameInfo.SpawnMex[slot] = false
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         SetSlotClosedSpawnMex = function(slot)
