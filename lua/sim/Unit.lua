@@ -375,8 +375,6 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
 
         self.Repairers = {}
-
-        reprol(self)
     end,
 
     -------------------------------------------------------------------------------------------
