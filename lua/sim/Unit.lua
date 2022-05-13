@@ -375,9 +375,6 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
 
         self.Repairers = {}
-
-        local props = GetReclaimablesInRect(0, 0, 50, 50)
-        reprol(self)
     end,
 
     -------------------------------------------------------------------------------------------
