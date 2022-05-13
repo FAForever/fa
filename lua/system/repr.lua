@@ -1,10 +1,18 @@
+
+-- scope as upvalue for performance
 local sort = table.sort
 local insert = table.insert
 local concat = table.concat
 local getn = table.getn
 local len = string.len
 local getmetatable = getmetatable 
+local format = string.format
+local type = type
 
+-- easy lookup for a divider
+local divider = "--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n"
+
+-- keys that we always skip by definition
 local skip = {
     Blueprint = true , Cache = true, __index = true
 }
@@ -52,21 +60,21 @@ local function _FormatHeader(t)
     end
 
     if IsState(t) then 
-        return "Printing information of state with identifier: " .. tostring(t.__StateIdentifier) .. "\n"
+        return format("Printing information of state with identifier: %s\n", tostring(t.__StateIdentifier))
     elseif IsUnit(t) then 
-        return "Printing information of unit of type: " .. tostring(t.Blueprint.BlueprintId) .. ", and with entity id: " .. tostring(t.EntityId) .. "\n"
+        return format("Printing information of unit of type: %s, and with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
     elseif IsProp(t) then 
-        return "Printing information of prop of type: " .. tostring(t.Blueprint.BlueprintId) .. ", and with entity id: " .. tostring(t.EntityId) .. "\n"
+        return format("Printing information of prop of type: %s, and with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
     elseif IsProjectile(t) then 
-        return "Printing information of projectile of type: " .. tostring(t.Blueprint.BlueprintId) .. ", and with entity id: " .. tostring(t.EntityId) .. "\n"
+        return format("Printing information of projectile of type: %s, and with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
     elseif IsBrain(t) then 
-        return "Printing information of brain of army: " .. tostring(t:GetArmyIndex()) .. "\n"
+        return format("Printing information of brain of army: %s\n", tostring(t:GetArmyIndex()))
     elseif IsWeapon(t) then 
-        return "Printing information of weapon of type: " .. tostring(t.Blueprint.BlueprintId) .. " and with label: " .. tostring(t.Blueprint.Label) .. ", of owner with entity id: " .. tostring(t.unit.EntityId) .. "\n"
+        return format("Printing information of weapon of type: %s and with label: %s, of owner with entity id: %s\n", tostring(t.Blueprint.BlueprintId), tostring(t.Blueprint.Label), tostring(t.unit.EntityId))
     elseif IsTrashbag(t) then 
-        return "Printing information of a Trashbag \n"
+        return format("Printing information of a Trashbag \n")
     elseif IsLazyVar(t) then 
-        return "Printing information of a Lazyvar \n"
+        return format("Printing information of a Lazyvar \n")
     end
 
     return false
@@ -80,21 +88,21 @@ local function _FormatTable(t)
     end
 
     if IsState(t) then 
-        return "(State)"
+        return format("(State)")
     elseif IsUnit(t) then 
-        return "(Unit of type: " .. tostring(t.Blueprint.BlueprintId) .. ", with entity id: " .. tostring(t.EntityId) .. ")"
+        return format("(Unit of type: %s, with entity id: %s)",  tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
     elseif IsProp(t) then 
-        return "(Prop of type: " .. tostring(t.Blueprint.BlueprintId) .. ", with entity id: " .. tostring(t.EntityId) .. ")"
+        return format("(Prop of type: %s, with entity id: %s)", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
     elseif IsProjectile(t) then 
-        return "(Projectile of type: " .. tostring(t.Blueprint.BlueprintId) .. ", with entity id: " .. tostring(t.EntityId) .. ")"
+        return format("(Projectile of type: %s, with entity id: %s)", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
     elseif IsBrain(t) then 
-        return "(Brain of army: " .. tostring(t:GetArmyIndex()) .. ")"
+        return format("(Brain of army: %s)", tostring(t:GetArmyIndex()))
     elseif IsWeapon(t) then 
-        return "(Weapon)"
+        return format("(Weapon)")
     elseif IsTrashbag(t) then 
-        return "(Trashbag)"
+        return format("(Trashbag)")
     elseif IsLazyVar(t) then 
-        return "(Lazyvar)"
+        return format("(Lazyvar)")
     end
 
     return "(skipped)"
@@ -114,7 +122,7 @@ local function __repro(t, offset, seen)
     for k, v in t do 
 
         -- basic definition of key / value
-        local s = offset .. tostring(k) .. ": " .. tostring(v)
+        local s = format("%s%s: %s", offset, tostring(k), tostring(v))
         
         local tv = type(v)
         if tv == "table" then 
@@ -126,18 +134,18 @@ local function __repro(t, offset, seen)
                 -- simple table
                 if getmetatable(v) == getmetatable({ }) and not skip[k] then 
                     s = s .. "\n"
-                    table.insert(ref, s)
+                    insert(ref, s)
                     local other = __repro(v, offset, seen)
                     otherRefs[s] = other
                 -- complicated table
                 else 
-                    table.insert(ref, s)
-                    otherRefs[s] = { " " .. _FormatTable (v) .. " \n" }
+                    insert(ref, s)
+                    otherRefs[s] = { format( " %s \n", _FormatTable (v)) }
                 end
             end
         else 
             s = s .. "\n"
-            table.insert(ref, s)
+            insert(ref, s)
         end
     end
 
@@ -149,10 +157,10 @@ local function __repro(t, offset, seen)
 
     local final = { }
     for k, v in ref do 
-        table.insert(final, v)
+        insert(final, v)
         if otherRefs[v] then 
             for l, vo in otherRefs[v] do 
-                table.insert(final, vo)
+                insert(final, vo)
             end
         end
     end
@@ -170,24 +178,24 @@ local function _repro(t, offset)
     -- add some additional headers
 
     local final = { }
-    table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
+    insert(final, divider)
     
     if header then 
-        table.insert(final, header)
-        table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
+        insert(final, header)
+        insert(final, divider)
     end
 
-    table.insert(final, "Table information: \n")
+    insert(final, "Table information: \n")
 
     for k, v in content do 
-        table.insert(final, v)
+        insert(final, v)
     end
 
-    table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
+    insert(final, divider)
 
     -- concat into one large string
 
-    return table.concat(final)
+    return concat(final)
 end
 
 local function _reproExt(t, offset)
@@ -199,46 +207,55 @@ local function _reproExt(t, offset)
     -- add some additional headers
 
     local final = { }
-    table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
+    insert(final, divider)
     
     if header then 
-        table.insert(final, header)
-        table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
+        insert(final, header)
+        insert(final, divider)
     end
     
-    table.insert(final, "Table information: \n")
+    insert(final, "Table information: \n")
 
     for k, v in tableContent do 
-        table.insert(final, v)
+        insert(final, v)
     end
 
-    table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
-    table.insert(final, "Metatable information: \n")
+    insert(final, divider)
+    insert(final, "Metatable information: \n")
 
-    if table.getsize(metaContent) > 0 then
+    if getn(metaContent) > 0 then
         for k, v in metaContent do 
-            table.insert(final, v)
+            insert(final, v)
         end
     else 
-        table.insert(final, "   (empty meta table) \n")
+        insert(final, "   (empty meta table) \n")
     end
 
-    table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
-    table.insert(final, " The metatable is shared across all units with the same type. You can inspect the blueprint of a unit by selecting it and using \n")
-    table.insert(final, " shift + f6 to open the entity window. Requires cheats to be enabled. You can find your own hotkey by searching for 'entity' \n")
-    table.insert(final, " in the hotkeys menu. \n")
-    table.insert(final, " --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- \n")
+    insert(final, divider)
+    insert(final, " The metatable is shared across all units with the same type. You can inspect the blueprint of a unit by selecting it and using \n")
+    insert(final, " shift + f6 to open the entity window. Requires cheats to be enabled. You can find your own hotkey by searching for 'entity' \n")
+    insert(final, " in the hotkeys menu. \n")
+    insert(final, divider)
 
     -- concat into one large string
 
-    return table.concat(final)
+    return concat(final)
+end
+
+function repr(t)
+    return "\n" .. repro(t)
 end
 
 function repro(t, extensive)
-    if extensive then 
-        return _reproExt(t, "")
-    else
-        return _repro(t, "")
+
+    if type(t) == 'table' then 
+        if extensive then 
+            return _reproExt(t, "")
+        else
+            return _repro(t, "")
+        end
+    else 
+        return tostring(t)
     end
 end
 
