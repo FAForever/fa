@@ -183,71 +183,69 @@ Unit = Class(moho.unit_methods) {
         }
 
         self.EventCallbacks = {
-            OnKilled = {},
-            OnUnitBuilt = {},
-            OnStartBuild = {},
-            OnReclaimed = {},
-            OnStartReclaim = {},
-            OnStopReclaim = {},
-            OnStopBeingBuilt = {},
-            OnCaptured = {},
-            OnCapturedNewUnit = {},
-            OnDamaged = {},
-            OnStartCapture = {},
-            OnStopCapture = {},
-            OnFailedCapture = {},
-            OnStartBeingCaptured = {},
-            OnStopBeingCaptured = {},
-            OnFailedBeingCaptured = {},
-            OnFailedToBuild = {},
-            OnVeteran = {},
-            OnGiven = {},
-            ProjectileDamaged = {},
-            SpecialToggleEnableFunction = false,
-            SpecialToggleDisableFunction = false,
-            OnAttachedToTransport = {}, -- Returns self, transport, bone
-            OnDetachedFromTransport = {}, -- Returns self, transport, bone
+            -- OnKilled = {},
+            -- OnUnitBuilt = {},
+            -- OnStartBuild = {},
+            -- OnReclaimed = {},
+            -- OnStartReclaim = {},
+            -- OnStopReclaim = {},
+            -- OnStopBeingBuilt = {},
+            -- OnCaptured = {},
+            -- OnCapturedNewUnit = {},
+            -- OnDamaged = {},
+            -- OnStartCapture = {},
+            -- OnStopCapture = {},
+            -- OnFailedCapture = {},
+            -- OnStartBeingCaptured = {},
+            -- OnStopBeingCaptured = {},
+            -- OnFailedBeingCaptured = {},
+            -- OnFailedToBuild = {},
+            -- OnVeteran = {},
+            -- OnGiven = {},
+            -- ProjectileDamaged = {},
+            -- SpecialToggleEnableFunction = false,
+            -- SpecialToggleDisableFunction = false,
+            -- OnAttachedToTransport = {}, -- Returns self, transport, bone
+            -- OnDetachedFromTransport = {}, -- Returns self, transport, bone
         }
     end,
 
     OnCreate = function(self)
-        local blueprint = self:GetBlueprint()
+        local bp = self:GetBlueprint()
 
         -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[blueprint.BlueprintId] then 
-            PopulateBlueprintCache(self, blueprint)
+        if not SharedTypeCache[bp.BlueprintId] then 
+            PopulateBlueprintCache(self, bp)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[blueprint.BlueprintId]
+        self.Cache = SharedTypeCache[bp.BlueprintId]
 
         -- cache often accessed values into inner table
-        self.UnitId = self:GetUnitId()
-        self.Brain = self:GetAIBrain()
-        self.Blueprint = blueprint
+        self.Blueprint = bp
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-        self.Audio = self.Cache.Audio
+        self.techCategory = bp.TechCategory
+        self.layerCategory = bp.LayerCategory
+        self.factionCategory = bp.FactionCategory
+        self.MovementEffects = bp.Display.MovementEffects
+        self.Audio = bp.Audio
 
-        -- cache unique values into inner table
+        -- cache engine calls
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
-        self.Layer = self:GetCurrentLayer()
+        self.UnitId = self:GetUnitId()
+        self.Brain = self:GetAIBrain()
 
         -- the entity that produces sound, by default ourself
         self.SoundEntity = self
 
-        local bp = self.Blueprint
 
-        -- cache commonly used values from the engine
-        -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
 
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
-        self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
         self.SkirtOffset = { OffsetX = bp.Physics.SkirtOffsetX, OffsetZ = bp.Physics.SkirtOffsetZ }
         self.SkirtSize = { SizeX = bp.Physics.SkirtSizeX, SizeZ = bp.Physics.SkirtSizeZ }
         self.Size = { SizeX = bp.SizeX, SizeY = bp.SizeY, SizeZ = bp.SizeZ }
-        self.CollisionOffsetY = bp.CollisionOffsetY
 
         -- Set number of effects per damage depending on its volume
         local x, y, z = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
@@ -288,25 +286,10 @@ Unit = Class(moho.unit_methods) {
         self.UpgradeEffectsBag = TrashBag()
         self.TeleportFxBag = TrashBag()
 
-        -- Store targets and attackers for proper Stealth management
-        self.Targets = {}
-        self.WeaponTargets = {}
-        self.WeaponAttackers = {}
-
         -- Set up veterancy
         self.xp = 0
         self.Instigators = {}
         self.totalDamageTaken = 0
-
-        self.debris_Vector = Vector(0, 0, 0)
-
-        -- Store build information for performance
-        self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
-        self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
-        self.BuildExtentsY = bp.Physics.MeshExtentsY or math.max(self.BuildExtentsX, self.BuildExtentsZ)
-        self.Elevation = bp.Physics.Elevation
-        self.MeshBlueprint = bp.Display.MeshBlueprint
-        self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
 
         -- Store weapon information for performance
         self.WeaponCount = self:GetWeaponCount() or 0
@@ -316,18 +299,6 @@ Unit = Class(moho.unit_methods) {
             self.WeaponInstances[weapon.Label] = weapon
             self.WeaponInstances[k] = weapon
         end
-
-        -- Store animations for performance
-        self.AnimationWater = bp.Display.AnimationWater
-
-        -- Store common accessed information for performance
-        self.Audio = bp.Audio
-        self.Brain = self:GetAIBrain()
-        self.UnitId = self:GetUnitId()
-        self.techCategory = bp.TechCategory
-        self.layerCategory = bp.LayerCategory
-        self.factionCategory = bp.FactionCategory
-        self.MovementEffects = bp.Display.MovementEffects
 
         -- Define Economic modifications
         local bpEcon = bp.Economy
@@ -345,8 +316,7 @@ Unit = Class(moho.unit_methods) {
             Affects = {},
         }
 
-        local bpVision = bp.Intel.VisionRadius
-        self:SetIntelRadius('Vision', bpVision or 0)
+        self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
 
         self.CanTakeDamage = true
         self.CanBeKilled = true
@@ -360,24 +330,13 @@ Unit = Class(moho.unit_methods) {
         self.MaintenanceConsumption = false
         self.ActiveConsumption = false
         self.ProductionEnabled = true
-        self.EnergyModifier = 0
-        self.MassModifier = 0
-
-        -- Cheating
-        if self:GetAIBrain().CheatEnabled then
-            AIUtils.ApplyCheatBuffs(self)
-        end
-
-        self.Dead = false
-
-        -- Ensure transport slots are available
-        self.attachmentBone = nil
-
-        -- Set up Adjacency container
-        self.AdjacentUnits = {}
 
         self.Repairers = {}
 
+        -- Cheating
+        if self.Brain.CheatEnabled then
+            AIUtils.ApplyCheatBuffs(self)
+        end
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
     end,
@@ -398,6 +357,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetRandomOffset = function(self, scalar)
+        local bp = self.blueprint
         local size = self.Size
         local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
         local heading = self:GetHeading()
@@ -407,7 +367,7 @@ Unit = Class(moho.unit_methods) {
         sz = sz * scalar
 
         local rx = Random() * sx - (sx * 0.5)
-        local y  = Random() * sy + (self.CollisionOffsetY or 0)
+        local y  = Random() * sy + (bp.CollisionOffsetY or 0)
         local rz = Random() * sz - (sz * 0.5)
 
         local cosh = math.cos(heading)
@@ -1023,8 +983,8 @@ Unit = Class(moho.unit_methods) {
             local mai_mass = myBlueprint.Economy.MaintenanceConsumptionPerSecondMass or 0
 
             -- Apply economic bonuses
-            mai_energy = mai_energy * (100 + self.EnergyModifier) * (self.EnergyMaintAdjMod or 1) * 0.01
-            mai_mass = mai_mass * (100 + self.MassModifier) * (self.MassMaintAdjMod or 1) * 0.01
+            mai_energy = mai_energy * (100 + (self.EnergyModifier or 0)) * (self.EnergyMaintAdjMod or 1) * 0.01
+            mai_mass = mai_mass * (100 + (self.MassModifier or 0)) * (self.MassMaintAdjMod or 1) * 0.01
 
             energy_rate = energy_rate + mai_energy
             mass_rate = mass_rate + mai_mass
@@ -3751,10 +3711,7 @@ Unit = Class(moho.unit_methods) {
     -- UNIT CALLBACKS
     -------------------------------------------------------------------------------------------
     AddUnitCallback = function(self, fn, type)
-        if not fn then
-            error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
-            return
-        end
+        self.EventCallbacks[type] = self.EventCallbacks[type] or { }
         table.insert(self.EventCallbacks[type], fn)
     end,
 
@@ -3771,10 +3728,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnCapturedCallback = function(self, cbOldUnit, cbNewUnit)
-        if not cbOldUnit and not cbNewUnit then
-            error('*ERROR: Tried to add an OnCaptured callback without any functions', 2)
-            return
-        end
         if cbOldUnit then
             self:AddUnitCallback(cbOldUnit, 'OnCaptured')
         end
@@ -3798,13 +3751,16 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnUnitBuiltCallback = function(self, fn, category)
+        self.EventCallbacks.OnUnitBuilt = self.EventCallbacks.OnUnitBuilt or { }
         table.insert(self.EventCallbacks['OnUnitBuilt'], {category=category, cb=fn})
     end,
 
     DoOnUnitBuiltCallbacks = function(self, unit)
-        for _, v in self.EventCallbacks['OnUnitBuilt'] or {} do
-            if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
-                v.cb(self, unit)
+        if self.EventCallbacks.OnUnitBuilt then 
+            for _, v in self.EventCallbacks.OnUnitBuilt do
+                if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
+                    v.cb(self, unit)
+                end
             end
         end
     end,
@@ -3822,12 +3778,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnDamagedCallback = function(self, fn, amount, repeatNum)
-        if not fn then
-            error('*ERROR: Tried to add an OnDamaged callback with a nil function')
-            return
-        end
         local num = amount or -1
         repeatNum = repeatNum or 1
+        self.EventCallbacks.OnDamaged = self.EventCallbacks.OnDamaged or { }
         table.insert(self.EventCallbacks.OnDamaged, {Func = fn, Amount=num, Called=0, Repeat = repeatNum})
     end,
 

@@ -72,12 +72,15 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
     local effect = false
     local army = builder.Army
-    local sy = unitBeingBuilt.BuildExtentsY or (unitBeingBuilt.BuildExtentsX + unitBeingBuilt.BuildExtentsZ) or 1
+    local bp = unitBeingBuilt.Blueprint
+    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
+    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
+    local sy = bp.Physics.MeshExtentsY or bp.Footprint.SizeYX or (sx + sz)
 
     -- do not apply offsets for subs and air units
     local offset = 0
     if unitBeingBuilt.Cache.HashedCats["HOVER"] then
-        offset = unitBeingBuilt.Elevation or 0
+        offset = bp.Elevation or 0
     end
 
     -- # Create effects for each build bone
@@ -166,7 +169,10 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     -- determine a sane LOD cutoff for the size of the unit
     local lods = unitBeingBuilt.Blueprint.Display.Mesh.LODs
     local count = TableGetn(lods)
-    local LODCutoff = 0.9 * lods[count].LODCutoff or (90 * MathMax(unitBeingBuilt.BuildExtentsX, unitBeingBuilt.BuildExtentsZ))
+
+    local sx = unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
+    local sz = unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
+    local LODCutoff = 0.9 * lods[count].LODCutoff or (90 * MathMax(sx, sz))
 
     -- smaller inner, dark-purple effect
     for _, vEffect in BuildEffectsEmitters do
@@ -193,7 +199,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     -- # Scale effects until the unit is finished
 
     -- only naval factories are not square, use the Z axis to get largest axis
-    local unitScaleMetric = unitBeingBuilt.BuildExtentsZ * 0.75
+    local unitScaleMetric = 0.75 * sz
     local complete = UnitGetFractionComplete(unitBeingBuilt)
     while not unitBeingBuilt.Dead and complete < 1.0 do
 
