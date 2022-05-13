@@ -5227,6 +5227,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
             gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     GameInfo = {
@@ -6927,6 +6928,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = true
             gameInfo.SpawnMex[slot] = true
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
