@@ -111,10 +111,6 @@ end
 
 local function __repro(t, offset, seen)
 
-    -- allows us to support indenting
-
-    offset = offset .. "   "
-
     -- find all interesting keys
 
     local otherRefs = { }
@@ -135,7 +131,7 @@ local function __repro(t, offset, seen)
                 if getmetatable(v) == getmetatable({ }) and not skip[k] then 
                     s = s .. "\n"
                     insert(ref, s)
-                    local other = __repro(v, offset, seen)
+                    local other = __repro(v, offset .. "   ", seen)
                     otherRefs[s] = other
                 -- complicated table
                 else 
@@ -177,12 +173,10 @@ local function _repro(t, offset)
 
     -- add some additional headers
 
-    local final = { }
-    insert(final, divider)
+    local final = { "\n" }
     
     if header then 
         insert(final, header)
-        insert(final, divider)
     end
 
     insert(final, "Table information: \n")
@@ -190,8 +184,6 @@ local function _repro(t, offset)
     for k, v in content do 
         insert(final, v)
     end
-
-    insert(final, divider)
 
     -- concat into one large string
 
@@ -206,7 +198,7 @@ local function _reproExt(t, offset)
     
     -- add some additional headers
 
-    local final = { }
+    local final = { "\n" }
     insert(final, divider)
     
     if header then 
@@ -242,27 +234,31 @@ local function _reproExt(t, offset)
     return concat(final)
 end
 
+--- Recursively stringifies a value, kept for backwards compatibility
+-- @param t value to print
 function repr(t)
-    return "\n" .. repro(t)
+    return repro(t)
 end
 
+--- Recursively stringifies a value
+-- @param t value to print
+-- @param extensive include printer of metatable, if applicable
 function repro(t, extensive)
 
     if type(t) == 'table' then 
         if extensive then 
-            return _reproExt(t, "")
+            return _reproExt(t, " - ")
         else
-            return _repro(t, "")
+            return _repro(t, " - ")
         end
     else 
         return tostring(t)
     end
 end
 
+--- Recursively stringifies and logs a value
+-- @param t value to print
+-- @param extensive include printer of metatable, if applicable
 function reprol(t, extensive)
-    if extensive then 
-        LOG(_reproExt(t, ""))
-    else
-        LOG(_repro(t, ""))
-    end
+    LOG(repro(t, extensive))
 end
