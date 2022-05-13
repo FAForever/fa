@@ -479,7 +479,7 @@ Weapon = Class(moho.weapon_methods) {
                 local count = 1
                 local priorityTable = RecycledPriTable
                 for k, v in priTable do
-                    priorityTable[count] = ParseEntityCategory[v]
+                    priorityTable[count] = ParseEntityCategory(v)
                     count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
