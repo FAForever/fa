@@ -5218,6 +5218,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.Closed
             gameInfo.SpawnMex[data.Slot] = false
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     SlotClosedSpawnMex = {
@@ -5226,6 +5227,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
             gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     GameInfo = {
@@ -6906,6 +6908,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = closed
             gameInfo.SpawnMex[slot] = false
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         SetSlotClosedSpawnMex = function(slot)
@@ -6925,6 +6928,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = true
             gameInfo.SpawnMex[slot] = true
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
