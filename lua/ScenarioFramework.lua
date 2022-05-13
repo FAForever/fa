@@ -2027,7 +2027,6 @@ function GenerateOffMapAreas()
     else
         playablearea = {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
     end
-    LOG('playable area coordinates are ' .. repr(playablearea))
 
     local x0 = playablearea[1]
     local y0 = playablearea[2]
@@ -2066,8 +2065,6 @@ function GenerateOffMapAreas()
 
     ScenarioInfo.OffMapAreas = OffMapAreas
     ScenarioInfo.PlayableArea = playablearea
-
-    LOG('Offmapareas are ' .. repr(OffMapAreas))
 end
 
 function AntiOffMapMainThread()
