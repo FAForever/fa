@@ -1215,9 +1215,7 @@ Unit = Class(moho.unit_methods) {
             -- Handle ships that can walk on land
             self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
         else
-            if not self:PlayUnitSound('Killed') then 
-                self:PlayUnitSound('Destroyed')
-            end
+            self:PlayUnitSound('Killed')
         end
 
         -- apply death animation on half built units (do not apply for ML and mega)
@@ -1511,15 +1509,15 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- check for exclusions from projectile perspective
-        for k = 1, other.Cache.DoNotCollideCatsCount do 
-            if self.Cache.CategoriesHash[other.Cache.DoNotCollideCats[k]] then 
+        for k = 1, other.Blueprint.DoNotCollideListCount do 
+            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then 
                 return false 
             end
         end
 
         -- check for exclusions from unit perspective
         for k = 1, self.Cache.DoNotCollideCatsCount do 
-            if other.Cache.CategoriesHash[self.Cache.DoNotCollideCats[k]] then 
+            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then 
                 return false 
             end
         end
@@ -4532,7 +4530,6 @@ Unit = Class(moho.unit_methods) {
 
         return self.UnitBeingBuilt
     end,
-
 }
 
 -- upvalued math functions for performance

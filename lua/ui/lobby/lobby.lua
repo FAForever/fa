@@ -3030,15 +3030,6 @@ function CreateUI(maxPlayers)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
-    GUI.gameVersionText.HandleEvent = function (self, event)
-        if event.Type == 'MouseEnter' then
-            self:SetColor('ffffff')
-        elseif event.Type == 'MouseExit' then
-            self:SetColor('677983')
-        elseif event.Type == 'ButtonPress' then
-            Changelog.Changelog(GUI)
-        end
-    end
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -3210,16 +3201,14 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-    -- curated Maps
-    -- GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-    -- Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-    -- LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
-    -- LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-    -- GUI.curatedmapsButton.OnClick = function()
-    --     OpenURL('http://forum.faforever.com/topic/347')
-    -- end
-
-    -- GUI.curatedmapsButton:Disable()
+    -- Patchnotes Button
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_1000>Patchnotes")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'lob_patchnotes')
+    LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
+    GUI.patchnotesButton.OnClick = function(self, event)
+        Changelog.Changelog(GUI)
+    end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -4193,6 +4182,7 @@ function CreateUI(maxPlayers)
                 sortedSlotTeams[player][1] = slotB
             end
             UpdateGame()
+            AddChatText(LOC("<LOC lobui_0626>Finished autobalancing"))
         end
     end
 
@@ -4214,21 +4204,19 @@ function CreateUI(maxPlayers)
                 end
             end
             -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
-            local indexAdjustment
+            -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
+            local obsIndex = row + 1
             if numTeams < 3 then
-                indexAdjustment = 1 - numTeams
-            else
-                -- if there's more than 2 teams, the team rating rows are listed after observers instead of before
-                indexAdjustment = 1
+                obsIndex = obsIndex - numTeams
             end
             
             -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
             -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
-            if row + indexAdjustment > 0 and gameInfo.Observers[row + indexAdjustment].OwnerID != localPlayerID then
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
                 UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
                                         "<LOC lobui_0167>Kick Player", function()
-                                            SendSystemMessage("lobui_0756", gameInfo.Observers[row + indexAdjustment].PlayerName)
-                                            lobbyComm:EjectPeer(gameInfo.Observers[row + indexAdjustment].OwnerID, "KickedByHost")
+                                            SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
+                                            lobbyComm:EjectPeer(gameInfo.Observers[obsIndex].OwnerID, "KickedByHost")
                                         end,
                                         "<LOC _Cancel>", nil,
                                         nil, nil,
@@ -5230,6 +5218,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.Closed
             gameInfo.SpawnMex[data.Slot] = false
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     SlotClosedSpawnMex = {
@@ -5238,6 +5227,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
             gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     GameInfo = {
@@ -6918,6 +6908,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = closed
             gameInfo.SpawnMex[slot] = false
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         SetSlotClosedSpawnMex = function(slot)
@@ -6937,6 +6928,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = true
             gameInfo.SpawnMex[slot] = true
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
@@ -7070,6 +7062,11 @@ function InitHostUtils()
         -- @param moveFrom Slot number to move from
         -- @param moveTo Slot number to move to.
         SanityCheckSlotMovement = function(moveFrom, moveTo)
+            if moveTo == moveFrom then
+                -- no need to move a slot to its current location
+                return false
+            end
+
             if gameInfo.ClosedSlots[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
                 return false

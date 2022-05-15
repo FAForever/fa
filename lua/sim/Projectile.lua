@@ -5,8 +5,6 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
-local Entity = import('/lua/sim/Entity.lua').Entity
-local Explosion = import('/lua/defaultexplosions.lua')
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local Flare = import('/lua/defaultantiprojectile.lua').Flare
 
@@ -70,192 +68,16 @@ local Random = Random
 local IsAlly = IsAlly
 local ForkThread = ForkThread
 
-
-local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
-
-local SharedTypeCache = { }
-
-local function PopulateBlueprintCache(entity, blueprint)
-
-    -- populate the cache
-    local cache = { }
-    cache.Blueprint = blueprint 
-
-    cache.Cats = blueprint.Categories or { }
-    cache.CatsCount = table.getn(cache.Cats)
-    cache.HashedCats = table.hash(cache.Cats)
-
-    cache.DoNotCollideCats = blueprint.DoNotCollideList or { }
-    cache.DoNotCollideCatsCount = table.getn(cache.DoNotCollideCats)
-    cache.HashedDoNotCollideCats = table.hash(cache.DoNotCollideCats)
-
-    cache.CollideFriendlyShield = blueprint.Physics.CollideFriendlyShield
-
-    -- store the result
-    SharedTypeCache[blueprint.BlueprintId] = cache
-end
-
 -- cache categories computations
 local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
+local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
-Projectile = Class(moho.projectile_methods, Entity) {
-
-    Cache = false,
-
-    PassDamageData = function(self, DamageData)
-        self.DamageData = { }
-        self.DamageData.DamageRadius = DamageData.DamageRadius
-        self.DamageData.DamageAmount = DamageData.DamageAmount
-        self.DamageData.DamageType = DamageData.DamageType
-        self.DamageData.DamageFriendly = DamageData.DamageFriendly
-        self.DamageData.CollideFriendly = DamageData.CollideFriendly
-        self.DamageData.DoTTime = DamageData.DoTTime
-        self.DamageData.DoTPulses = DamageData.DoTPulses
-        self.DamageData.Buffs = DamageData.Buffs
-        self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
-        self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
-        self.CollideFriendly = self.DamageData.CollideFriendly
-    end,
-
-    --- Contains the damage logic of projectiles 
-    -- @param self The projectile itself
-    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
-    -- @param DamageData The damage data passed by the weapon
-    -- @param targetEntity The entity we hit, is nil if we hit terrain
-    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
-    DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
-
-        -- this may be a cached vector, we can not send this to threads or use after waiting statements!
-        cachedPosition = cachedPosition or self:GetPosition()
-
-        local damage = DamageData.DamageAmount
-        if damage and damage > 0 then
-
-            -- check for radius
-            local radius = DamageData.DamageRadius
-            if radius and radius > 0 then
-
-                -- check for damage-over-time
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-                    -- no damage over time, do radius-based damage
-                    DamageArea(
-                        instigator, 
-                        cachedPosition, 
-                        radius, 
-                        damage, 
-                        DamageData.DamageType, 
-                        DamageData.DamageFriendly, 
-                        DamageData.DamageSelf or false
-                    )
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
-                    if initialDmg > 0 then
-                        if radius > 0 then
-                            DamageArea(
-                                instigator, 
-                                cachedPosition, 
-                                radius, 
-                                initialDmg, 
-                                DamageData.DamageType, 
-                                DamageData.DamageFriendly, 
-                                DamageData.DamageSelf or false
-                            )
-                        elseif targetEntity then
-                            Damage(
-                                instigator, 
-                                cachedPosition, 
-                                targetEntity, 
-                                initialDmg, 
-                                DamageData.DamageType
-                            )
-                        end
-                    end
-
-                    -- apply damage over time
-                    ForkThread(
-                        DefaultDamage.AreaDoTThread, 
-                        instigator, 
-                        self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                        DamageData.DoTPulses or 1, 
-                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)), 
-                        radius, 
-                        damage, 
-                        DamageData.DamageType, 
-                        DamageData.DamageFriendly
-                    )
-                end
-
-            -- check for entity-specific damage
-            elseif DamageData.DamageAmount and targetEntity then
-
-                -- check for damage-over-time
-                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
-
-                    -- no damage over time, do single target damage
-                    Damage(
-                        instigator, 
-                        cachedPosition, 
-                        targetEntity, 
-                        DamageData.DamageAmount, 
-                        DamageData.DamageType
-                    )
-                else
-                    -- check for initial damage
-                    local initialDmg = DamageData.InitialDamageAmount or 0
-                    if initialDmg > 0 then
-                        if targetEntity then
-                            Damage(
-                                instigator, 
-                                cachedPosition, 
-                                targetEntity, 
-                                initialDmg, 
-                                DamageData.DamageType
-                            )
-                        end
-                    end
-
-                    -- apply damage over time
-                    ForkThread(
-                        DefaultDamage.UnitDoTThread, 
-                        instigator, 
-                        targetEntity, 
-                        DamageData.DoTPulses or 1, 
-                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)), 
-                        damage, 
-                        DamageData.DamageType, 
-                        DamageData.DamageFriendly
-                    )
-                end
-            end
-        end
-
-        -- related to strategic missiles
-        if self.InnerRing and self.OuterRing then
-            self.InnerRing:DoNukeDamage(
-                self.Launcher, 
-                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                self.Brain, 
-                self.Army, 
-                DamageData.DamageType or 'Nuke'
-            )
-
-            self.OuterRing:DoNukeDamage(
-                self.Launcher, 
-                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
-                self.Brain, 
-                self.Army, 
-                DamageData.DamageType or 'Nuke'
-            )
-        end
-    end,
-
-    -- Do not call the base class __init and __post_init, we already have a c++ object
-    __init = false,
-    __post_init = false,
+Projectile = Class(moho.projectile_methods) {
 
     DestroyOnImpact = true,
     FxImpactTrajectoryAligned = true,
+
+    -- tables used for effects
 
     FxImpactAirUnit = {},
     FxImpactLand = {},
@@ -269,6 +91,8 @@ Projectile = Class(moho.projectile_methods, Entity) {
     FxImpactProjectileUnderWater = {},
     FxOnKilled = {},
 
+    -- scale values used for effects
+
     FxAirUnitHitScale = 1,
     FxLandHitScale = 1,
     FxNoneHitScale = 1,
@@ -281,40 +105,24 @@ Projectile = Class(moho.projectile_methods, Entity) {
     FxWaterHitScale = 1,
     FxOnKilledScale = 1,
 
-    ForkThread = function(self, fn, ...)
-        if fn then
-            local thread = ForkThread(fn, self, unpack(arg))
-            self.Trash:Add(thread)
-            return thread
-        else
-            return nil
-        end
-    end,
+    -- Engine functionality
 
+    --- Called by the engine when the projectile is created
+    -- @param self The projectile that we're creating
+    -- @param other Flag to indicate the projectile is in water or not
     OnCreate = function(self, inWater)
 
-        local blueprint = EntityGetBlueprint(self)
-
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[blueprint.BlueprintId] then 
-            PopulateBlueprintCache(self, blueprint)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[blueprint.BlueprintId]
-        self.Blueprint = blueprint 
+        -- store information 
+        self.Blueprint = EntityGetBlueprint(self) 
         self.Army = EntityGetArmy(self)
+        self.Launcher = ProjectileGetLauncher(self)
         self.Trash = TrashBag()
 
-        -- set some health
-        local health = self.Blueprint.Defense.MaxHealth or 1
-        EntitySetMaxHealth(self, health)
-        EntitySetHealth(self, self, health)
-
-        -- only used by strategic missiles
-        local snd = self.Blueprint.Audio.ExistLoop
-        if snd then
-            self:SetAmbientSound(snd, nil)
+        -- set some health, if we have some
+        if self.Blueprint.Defense and self.Blueprint.Defense.MaxHealth then 
+            local health = self.Blueprint.Defense.MaxHealth or 1
+            EntitySetMaxHealth(self, health)
+            EntitySetHealth(self, self, health)
         end
 
         -- only used by tactical missiles
@@ -325,150 +133,97 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
     end,
 
-    --- Called when a projectile collides with another projectile to check if the collision is valid. An example is a tactical missile defense
-    -- @param self The projectile we're checking the collision for
+    --- Called by the engine when a projectile collides with another projectile to check if the collision is valid. An example is a tactical missile defense
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
-        -- only anti missiles can take things down 
-        if not other.Cache.HashedCats["ANTIMISSILE"] then 
+        -- we can't hit our own
+        if self.Army == other.Army then 
             return false 
         end
 
-        -- only tactical or strategical projectiles can be taken down 
-        if not (self.Cache.HashedCats["TACTICAL"] or self.Cache.HashedCats["STRATEGIC"]) then 
-            return false 
+        -- flag if we can hit allied projectiles
+        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
+
+        -- torpedoes can only be taken down by anti torpedo
+        if self.Blueprint.CategoriesHash['TORPEDO'] then 
+            if other.Blueprint.CategoriesHash["ANTITORPEDO"] then 
+                return alliedCheck 
+            else 
+                return false 
+            end
         end
 
-        -- check if we can hit ourself or hit allies
-        if self.Army == other.Army or IsAlly(self.Army, other.Army) then 
-            return self.CollideFriendly 
+        -- missiles can only be taken down by anti missiles
+        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
+            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
+                return alliedCheck 
+            else 
+                return false 
+            end
         end
 
         -- enemies always hit
-        return true
+        return alliedCheck
     end,
 
-    --- Called when a projectile collides with a collision beam to check if the collision is valid
+    --- Called by the engine when a projectile collides with a collision beam to check if the collision is valid
     -- @param self The projectile we're checking the collision for
     -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
 
-        -- only tactical or strategical projectiles can be taken down 
-        if not (self.Cache.HashedCats["TACTICAL"] or self.Cache.HashedCats["STRATEGIC"]) then 
+        -- we can't hit our own
+        if self.Army == firingWeapon.Army then 
             return false 
         end
 
-        -- if we're allied, check if we allow that type of collision
-        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
-            return firingWeapon.Blueprint.CollideFriendly
+        -- flag that indicates whether we should impact allied projectiles
+        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
+
+        -- specific check if we have a weapon that is defensive
+        if firingWeapon.Blueprint.WeaponCategory == 'Defense' then 
+            if self.Blueprint.CategoriesHash['TACTICAL'] or self.Blueprint.CategoriesHash['STRATEGIC'] then 
+                return alliedCheck
+            else 
+                return false 
+            end
         end
 
-        return true
+        -- depend on allied flag whether we hit or not
+        return alliedCheck
     end,
 
+    --- Called by the engine when the projectile receives damage
     OnDamage = function(self, instigator, amount, vector, damageType)
-
-        -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" then 
-            return 
-        end
-
-        local bp = self:GetBlueprint().Defense.MaxHealth
-        if bp then
+        if self.Blueprint.Defense.MaxHealth then
+            -- we have some health, try and survive
             self:DoTakeDamage(instigator, amount, vector, damageType)
         else
+            -- we have no health, just perish
             self:OnKilled(instigator, damageType)
         end
     end,
 
+    --- Called by the engine when the projectile is destroyed
     OnDestroy = function(self)
         if self.Trash then
             self.Trash:Destroy()
         end
     end,
 
-    DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        -- Check for valid projectile
-        if not self or self:BeenDestroyed() then
-            return
-        end
-
-        self:AdjustHealth(instigator, -amount)
-        local health = self:GetHealth()
-        if health <= 0 then
-            if damageType == 'Reclaimed' then
-                self:Destroy()
-            else
-                local excessDamageRatio = 0.0
-
-                -- Calculate the excess damage amount
-                local excess = health - amount
-                local maxHealth = self:GetBlueprint().Defense.MaxHealth or 10
-                if excess < 0 and maxHealth > 0 then
-                    excessDamageRatio = -excess / maxHealth
-                end
-                self:OnKilled(instigator, damageType, excessDamageRatio)
-            end
-        end
-    end,
-
+    --- Called by the engine when the projectile is killed, in other words: intercepted
     OnKilled = function(self, instigator, type, overkillRatio)
         self:CreateImpactEffects(self.Army, self.FxOnKilled, self.FxOnKilledScale)
         self:Destroy()
     end,
 
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for _, v in EffectTable do
-            if self.FxImpactTrajectoryAligned then
-                emit = CreateEmitterAtBone(self, -2, army, v)
-            else
-                emit = CreateEmitterAtEntity(self, army, v)
-            end
-
-            if EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
-        end
-    end,
-
-    CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for _, v in EffectTable do
-            emit = CreateEmitterAtBone(self, -2, army, v)
-            if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
-        end
-    end,
-
-    GetTerrainEffects = function(self, TargetType, ImpactEffectType, position)
-
-        local position = position or self:GetPosition()
-
-        local TerrainType = nil
-        if ImpactEffectType then
-            TerrainType = GetTerrainType(position.x, position.z)
-            if TerrainType.FXImpact[TargetType][ImpactEffectType] == nil then
-                TerrainType = DefaultTerrainType
-            end
-        else
-            TerrainType = DefaultTerrainType
-            ImpactEffectType = 'Default'
-        end
-
-        return TerrainType.FXImpact[TargetType][ImpactEffectType] or false
-    end,
-
-    -- Create some cool explosions when we get destroyed
+    --- Called by the engine when the projectile impacts something 
+    -- @param targetType 
+    -- @param targetEntity 
     OnImpact = function(self, targetType, targetEntity)
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
-        local instigator = ProjectileGetLauncher(self)
-        if instigator == nil then
-            instigator = self
-        end
+        local instigator = self.Launcher or self 
 
         -- localize information for performance
         local vc = VectorCached 
@@ -636,27 +391,197 @@ Projectile = Class(moho.projectile_methods, Entity) {
         -- in case we die slightly later
         local timeout = bp.Physics.ImpactTimeout
         if timeout and targetType == 'Terrain' then
-            self:ForkThread(self.ImpactTimeoutThread, timeout)
+            self.Trash:Add(ForkThread(self.ImpactTimeoutThread, self, timeout))
         else
             self:OnImpactDestroy(targetType, targetEntity)
         end
     end,
 
-    OnImpactDestroy = function(self, targetType, targetEntity)
-        if  self.DestroyOnImpact or 
-            (not targetEntity) or
-            (not EntityCategoryContains(OnImpactDestroyCategories, targetEntity))
-        then
-            EntityDestroy(self)
+    --- Called by the engine when the projectile exits the water
+    OnExitWater = function(self)
+        -- try and do a splash
+        if self.FxExitWaterEmitter then 
+            for k, v in self.FxExitWaterEmitter do
+                CreateEmitterAtEntity(self, self.Army, v)
+            end
+
+            local bp = self.Blueprint.Audio['ExitWater']
+            if bp then
+                self:PlaySound(bp)
+            end
         end
     end,
 
-    ImpactTimeoutThread = function(self, seconds)
-        WaitSeconds(seconds)
-        self:Destroy()
+    --- Called by the engine when the projectile enters the water
+    OnEnterWater = function(self)
+        -- try and do a splash
+        if self.FxEnterWater then 
+            for k, v in self.FxEnterWater do 
+                CreateEmitterAtEntity(self, self.Army, v)
+            end
+
+            local bp = self.Blueprint.Audio['EnterWater']
+            if bp then
+                self:PlaySound(bp)
+            end
+        end
     end,
 
-    -- When this projectile impacts with the target, do any buffs that have been passed to it.
+    --- Called by the engine when the target of the projectile is lost, typically due to 
+    -- the target being destroyed before arrival.
+    OnLostTarget = function(self)
+        local bp = self.Blueprint.Physics
+        if bp.TrackTarget and bp.TrackTarget == true then
+            if bp.OnLostTargetLifetime then
+                self:SetLifetime(bp.OnLostTargetLifetime)
+            else
+                self:SetLifetime(0.5)
+            end
+        end
+    end,
+
+    -- Lua functionality
+
+    --- Called by Lua to pass the damage data as a metatable
+    PassMetaDamage = function(self, data)
+        self.DamageData = { }
+        setmetatable(self.DamageData, data)
+    end,
+
+    --- Called by Lua to process the damage logic of a projectile
+    -- @param self The projectile itself
+    -- @param instigator The launcher, and if it doesn't exist, the projectile itself
+    -- @param DamageData The damage data passed by the weapon
+    -- @param targetEntity The entity we hit, is nil if we hit terrain
+    -- @param cachedPosition A cached position that is passed to prevent table allocations, can not be used in fork threads and / or after a yield statement
+    DoDamage = function(self, instigator, DamageData, targetEntity, cachedPosition)
+
+        -- this may be a cached vector, we can not send this to threads or use after waiting statements!
+        cachedPosition = cachedPosition or self:GetPosition()
+
+        local damage = DamageData.DamageAmount
+        if damage and damage > 0 then
+
+            -- check for radius
+            local radius = DamageData.DamageRadius
+            if radius and radius > 0 then
+
+                -- check for damage-over-time
+                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+                    -- no damage over time, do radius-based damage
+                    DamageArea(
+                        instigator, 
+                        cachedPosition, 
+                        radius, 
+                        damage, 
+                        DamageData.DamageType, 
+                        DamageData.DamageFriendly, 
+                        DamageData.DamageSelf or false
+                    )
+                else
+                    -- check for initial damage
+                    local initialDmg = DamageData.InitialDamageAmount or 0
+                    if initialDmg > 0 then
+                        if radius > 0 then
+                            DamageArea(
+                                instigator, 
+                                cachedPosition, 
+                                radius, 
+                                initialDmg, 
+                                DamageData.DamageType, 
+                                DamageData.DamageFriendly, 
+                                DamageData.DamageSelf or false
+                            )
+                        elseif targetEntity then
+                            Damage(
+                                instigator, 
+                                cachedPosition, 
+                                targetEntity, 
+                                initialDmg, 
+                                DamageData.DamageType
+                            )
+                        end
+                    end
+
+                    -- apply damage over time
+                    ForkThread(
+                        DefaultDamage.AreaDoTThread, 
+                        instigator, 
+                        self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                        DamageData.DoTPulses or 1, 
+                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)), 
+                        radius, 
+                        damage, 
+                        DamageData.DamageType, 
+                        DamageData.DamageFriendly
+                    )
+                end
+
+            -- check for entity-specific damage
+            elseif DamageData.DamageAmount and targetEntity then
+
+                -- check for damage-over-time
+                if not DamageData.DoTTime or DamageData.DoTTime <= 0 then
+
+                    -- no damage over time, do single target damage
+                    Damage(
+                        instigator, 
+                        cachedPosition, 
+                        targetEntity, 
+                        DamageData.DamageAmount, 
+                        DamageData.DamageType
+                    )
+                else
+                    -- check for initial damage
+                    local initialDmg = DamageData.InitialDamageAmount or 0
+                    if initialDmg > 0 then
+                        if targetEntity then
+                            Damage(
+                                instigator, 
+                                cachedPosition, 
+                                targetEntity, 
+                                initialDmg, 
+                                DamageData.DamageType
+                            )
+                        end
+                    end
+
+                    -- apply damage over time
+                    ForkThread(
+                        DefaultDamage.UnitDoTThread, 
+                        instigator, 
+                        targetEntity, 
+                        DamageData.DoTPulses or 1, 
+                        (DamageData.DoTTime / (DamageData.DoTPulses or 1)), 
+                        damage, 
+                        DamageData.DamageType, 
+                        DamageData.DamageFriendly
+                    )
+                end
+            end
+        end
+
+        -- related to strategic missiles
+        if self.InnerRing and self.OuterRing then
+            self.InnerRing:DoNukeDamage(
+                self.Launcher, 
+                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                self.Brain, 
+                self.Army, 
+                DamageData.DamageType or 'Nuke'
+            )
+
+            self.OuterRing:DoNukeDamage(
+                self.Launcher, 
+                self:GetPosition(), -- can't use cachedPosition here: breaks invariant
+                self.Brain, 
+                self.Army, 
+                DamageData.DamageType or 'Nuke'
+            )
+        end
+    end,
+
+    --- Called by Lua to process buffs on impact
     DoUnitImpactBuffs = function(self, target)
         local data = self.DamageData
 
@@ -685,32 +610,23 @@ Projectile = Class(moho.projectile_methods, Entity) {
         end
     end,
 
-    GetCachePosition = function(self)
-        return self:GetPosition()
-    end,
-
-    GetCollideFriendly = function(self)
-        return self.CollideFriendly
-    end,
-
-    PassData = function(self, data)
-        self.Data = data
-    end,
-
-    OnExitWater = function(self)
-        local bp = self:GetBlueprint().Audio['ExitWater']
-        if bp then
-            self:PlaySound(bp)
+    --- Called by Lua to determine whether the projectile should be destroyed
+    OnImpactDestroy = function(self, targetType, targetEntity)
+        if  self.DestroyOnImpact or 
+            (not targetEntity) or
+            (not EntityCategoryContains(OnImpactDestroyCategories, targetEntity))
+        then
+            EntityDestroy(self)
         end
     end,
 
-    OnEnterWater = function(self)
-        local bp = self:GetBlueprint().Audio['EnterWater']
-        if bp then
-            self:PlaySound(bp)
-        end
+    --- Called by Lua for a delayed destruction
+    ImpactTimeoutThread = function(self, seconds)
+        WaitSeconds(seconds)
+        self:Destroy()
     end,
 
+    --- Called by Lua to add a flare
     AddFlare = function(self, tbl)
         if not tbl then return end
         if not tbl.Radius then return end
@@ -739,14 +655,115 @@ Projectile = Class(moho.projectile_methods, Entity) {
         self.Trash:Add(self.MyFlare)
     end,
 
-    OnLostTarget = function(self)
-        local bp = self:GetBlueprint().Physics
-        if bp.TrackTarget and bp.TrackTarget == true then
-            if bp.OnLostTargetLifetime then
-                self:SetLifetime(bp.OnLostTargetLifetime)
+    --- Called by Lua to create the impact effects
+    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
+        local emit = nil
+        for _, v in EffectTable do
+            if self.FxImpactTrajectoryAligned then
+                emit = CreateEmitterAtBone(self, -2, army, v)
             else
-                self:SetLifetime(0.5)
+                emit = CreateEmitterAtEntity(self, army, v)
             end
+
+            if EffectScale ~= 1 then
+                emit:ScaleEmitter(EffectScale or 1)
+            end
+        end
+    end,
+
+    --- Called by Lua to create the terrain effects
+    CreateTerrainEffects = function(self, army, EffectTable, EffectScale)
+        local emit = nil
+        for _, v in EffectTable do
+            emit = CreateEmitterAtBone(self, -2, army, v)
+            if emit and EffectScale ~= 1 then
+                emit:ScaleEmitter(EffectScale or 1)
+            end
+        end
+    end,
+
+    --- Called by Lua to retrieve the terrain effects
+    GetTerrainEffects = function(self, TargetType, ImpactEffectType, position)
+
+        local position = position or self:GetPosition()
+
+        local TerrainType = nil
+        if ImpactEffectType then
+            TerrainType = GetTerrainType(position.x, position.z)
+            if TerrainType.FXImpact[TargetType][ImpactEffectType] == nil then
+                TerrainType = DefaultTerrainType
+            end
+        else
+            TerrainType = DefaultTerrainType
+            ImpactEffectType = 'Default'
+        end
+
+        return TerrainType.FXImpact[TargetType][ImpactEffectType] or false
+    end,
+
+    --- Called by Lua to process taking damage
+    DoTakeDamage = function(self, instigator, amount, vector, damageType)
+        -- Check for valid projectile
+        if not self or self:BeenDestroyed() then
+            return
+        end
+
+        self:AdjustHealth(instigator, -amount)
+        local health = self:GetHealth()
+        if health <= 0 then
+            if damageType == 'Reclaimed' then
+                self:Destroy()
+            else
+                local excessDamageRatio = 0.0
+
+                -- Calculate the excess damage amount
+                local excess = health - amount
+                local maxHealth = self.Blueprint.Defense.MaxHealth or 10
+                if excess < 0 and maxHealth > 0 then
+                    excessDamageRatio = -excess / maxHealth
+                end
+                self:OnKilled(instigator, damageType, excessDamageRatio)
+            end
+        end
+    end,
+
+    -- Deprecated functionality
+
+    GetCachePosition = function(self)
+        return self:GetPosition()
+    end,
+
+    PassData = function(self, data)
+        self.Data = data
+    end,
+
+    GetCollideFriendly = function(self)
+        return self.CollideFriendly
+    end,
+
+    PassDamageData = function(self, DamageData)
+        self.DamageData = { }
+        self.DamageData.DamageRadius = DamageData.DamageRadius
+        self.DamageData.DamageAmount = DamageData.DamageAmount
+        self.DamageData.DamageType = DamageData.DamageType
+        self.DamageData.DamageFriendly = DamageData.DamageFriendly
+        self.DamageData.CollideFriendly = DamageData.CollideFriendly
+        self.DamageData.DoTTime = DamageData.DoTTime
+        self.DamageData.DoTPulses = DamageData.DoTPulses
+        self.DamageData.Buffs = DamageData.Buffs
+        self.DamageData.ArtilleryShieldBlocks = DamageData.ArtilleryShieldBlocks
+        self.DamageData.InitialDamageAmount = DamageData.InitialDamageAmount
+        self.CollideFriendly = self.DamageData.CollideFriendly
+    end,
+
+    -- root of all performance evil
+    ForkThread = function(self, fn, ...)
+        if fn then
+            local thread = ForkThread(fn, self, unpack(arg))
+            self.Trash:Add(thread)
+            return thread
+        else
+            return nil
         end
     end,
 
@@ -754,30 +771,20 @@ Projectile = Class(moho.projectile_methods, Entity) {
 
 --- A dummy projectile that solely inherits what it needs. Useful for 
 -- effects that require projectiles without additional overhead.
-DummyProjectile = Class(moho.projectile_methods, Entity) {
-
-    Cache = false,
-    __init = false,
-    __post_init = false,
+DummyProjectile = Class(moho.projectile_methods) {
 
     OnCreate = function(self, inWater)
-
-        local blueprint = EntityGetBlueprint(self)
-
-        -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[blueprint.BlueprintId] then 
-            PopulateBlueprintCache(self, blueprint)
-        end
-
-        -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[blueprint.BlueprintId]
-        self.Blueprint = blueprint 
-
         -- expected to be cached by all projectiles
-        self.Army = self:GetArmy()
+        self.Blueprint = EntityGetBlueprint(self) 
+        self.Army = EntityGetArmy(self)
     end,
 
     OnImpact = function(self, targetType, targetEntity)
         self:Destroy()
     end,
 }
+
+-- imports kept for backwards compatibility with mods
+
+local Explosion = import('/lua/defaultexplosions.lua')
+local Entity = import('/lua/sim/entity.lua').Entity

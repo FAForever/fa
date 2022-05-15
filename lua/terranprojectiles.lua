@@ -163,10 +163,6 @@ TDepthChargeProjectile = Class(OnWaterEntryEmitterProjectile) {
     OnEnterWater = function(self)
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
 
-        for k, v in self.FxEnterWater do --splash
-            CreateEmitterAtEntity(self, self.Army, v)
-        end
-
         self:TrackTarget(false)
         self:StayUnderwater(true)
         -- self:SetTurnRate(0)
@@ -250,10 +246,6 @@ THeavyPlasmaCannonProjectile = Class(MultiPolyTrailProjectile) { -- SACU, titan,
     FxImpactUnit = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
     FxImpactProp = EffectTemplate.TPlasmaCannonHeavyHitUnit01,
     FxImpactLand = EffectTemplate.TPlasmaCannonHeavyHit01,
-    
-    OnImpact = function(self, targetType, targetEntity)
-        MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
-    end,
 }
 
 
@@ -372,16 +364,6 @@ TMissileCruiseProjectile = Class(SingleBeamProjectile) {
     FxImpactLand = EffectTemplate.TMissileHit01,
     FxImpactProp = EffectTemplate.TMissileHit01,
     FxImpactUnderWater = {},
-
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for k, v in EffectTable do
-            emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
-        end
-    end,
 }
 
 TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
@@ -395,16 +377,6 @@ TMissileCruiseProjectile02 = Class(SingleBeamProjectile) {
     FxImpactProp = EffectTemplate.TShipGaussCannonHit02,
     FxImpactLand = EffectTemplate.TShipGaussCannonHit02,
     FxImpactUnderWater = {},
-
-    CreateImpactEffects = function(self, army, EffectTable, EffectScale)
-        local emit = nil
-        for k, v in EffectTable do
-            emit = CreateEmitterAtEntity(self,army,v)
-            if emit and EffectScale ~= 1 then
-                emit:ScaleEmitter(EffectScale or 1)
-            end
-        end
-    end,
 }
 
 --------------------------------------------------------------------------
@@ -423,14 +395,6 @@ TMissileCruiseSubProjectile = Class(SingleBeamProjectile) {
     FxImpactLand = EffectTemplate.TMissileHit01,
     FxImpactProp = EffectTemplate.TMissileHit01,
     FxImpactUnderWater = {},
-
-    OnExitWater = function(self)
-        EmitterProjectile.OnExitWater(self)
-        for k, v in self.FxExitWaterEmitter do
-            CreateEmitterAtBone(self, -2, self.Army, v)
-        end
-    end,
-
 }
 
 --------------------------------------------------------------------------
@@ -585,9 +549,6 @@ TTorpedoShipProjectile = Class(OnWaterEntryEmitterProjectile) {
         OnWaterEntryEmitterProjectile.OnEnterWater(self)
         self:SetCollisionShape('Sphere', 0, 0, 0, 1.0)
 
-        for k, v in self.FxEnterWater do -- splash
-            CreateEmitterAtEntity(self, self.Army, v)
-        end
         self:TrackTarget(true)
         self:StayUnderwater(true)
         self:SetTurnRate(120)

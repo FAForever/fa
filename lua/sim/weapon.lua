@@ -380,6 +380,8 @@ Weapon = Class(moho.weapon_methods) {
             end
         end
 
+        damageTable.__index = damageTable
+
         return damageTable
     end,
 
@@ -394,7 +396,7 @@ Weapon = Class(moho.weapon_methods) {
         local damageTable = self:GetDamageTable()
 
         if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
+            proj:PassMetaDamage(damageTable)
             local bp = self.Blueprint
 
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
