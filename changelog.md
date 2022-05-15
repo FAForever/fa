@@ -16,7 +16,11 @@ Game version 3737 (15th of May, 2022)
  - Add Cloak Enhancement restriction option (#3844)
     Allows the host to restrict the cloak enhancement of the Cybran ACU / SACU.
 
- - Add proper recursive logging (#3861) 
+ - Add proper recursive logging (#3861, #3869) 
+    Introduces the functions 'reprs' and 'reprsl'. They are abbreviations for 'Recursive printing safe' and
+    'Recursive printing safe to log'. It introduces an alternative to 'repr' which can get stuck in a recursive
+    loop when trying to stringify units, projectiles, weapons and / or props. The old repr functions is available
+    as 'repru', which is an abbreviation for 'Recursive printing unsafe'. The function 'repr' refers to 'reprs'.
 
 ### Bug fixes
 
