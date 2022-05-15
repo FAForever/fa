@@ -8,6 +8,14 @@ Game version 3737 (6th of May, 2022)
 
  - (Engine patch) Maximum game speed is set to +50 (adc06ef5)
 
+ - Add button to lobby to access patch notes (#3842)
+    Another contribution of Rowey: introduces a button in the lobby to access the patch notes.
+
+ - Add Cloak Enhancement restriction option (#3844)
+    Allows the host to restrict the cloak enhancement of the Cybran ACU.
+
+ - Add proper recursive logging (#3861) 
+
 ### Bug fixes
 
  - (Engine patch) Disable mesh rendering for minimap (#7)
@@ -20,14 +28,49 @@ Game version 3737 (6th of May, 2022)
 
  - (Engine patch) Fix a crash when the mouse is pointing towards the sky, away from the terrain (3bf0ba5)
 
+ - Fix mass fabricator behavior for multiplayer (#3852)
+    Fixes an issue where the new fabricators could seriously hamper the performance of the game
+
+ - Fix reclaim effects (#3865) 
+    Fixes an issue where the beam glitches out when reclaiming a unit
+
+ - Fix destruction sound being played twice (#3868)
+    Was especially noticeable on the Monkeylord
+
 ### Performance
 
  - (Engine patch) Improve performance of common table operations (ff630c8, da692d3)
-    
+
+ - Optimize abstract projectile classes (#3847, #3855, #3866, #3867)
+    Further reduces the load on the CPU when projectiles are taking part in the simulation
+
+ - Clean up defaultunits.lua (#3806) 
+    Improves documentation, removes engine calls, empty functions and duplicated code
+
+### Other 
+
+ - Fix coloring of lobby buttons (#3846) 
+    Rowey has keen eyes - fixes a few textures having the wrong colors when in the lobby when
+    you select the UEF faction
+
+ - Minor autobalance-related improvements (#3849)
+    Prevents a no-op swap where a player is switched with him / herself
+
+ - Fix two UI layout functions (#3848)
+    Fixes the UI functions 'OffsetIn' and 'PercentIn' of LayoutHelpers.lua
+
+ - Announce game full on slot closure (#3862)
+    Enables the game full announcement to happen when you close slots
+
 ### Contributors
 
  - Strogo (#7, #6)
  - KionX (1b17fe7, ff630c8, 3bf0ba5, 564ff89, adc06ef5)
+ - Rowey (#3842, #3846, #3844)
+ - Jip (#3847, #3855, #3866, #3867, #3865,
+       (#3868, #3861, #3869)
+ - 4z0t (#3852, #3848)
+ - Penguin (#3849)
 
 Game version 3736 (6th of May, 2022)
 ===================================
