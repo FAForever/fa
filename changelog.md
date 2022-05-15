@@ -7,6 +7,8 @@ Game version 3737 (15th of May, 2022)
  - (Engine patch) Introduction of alternative profiling function for better accuracy (ff630c8)
 
  - (Engine patch) Maximum game speed is set to +50 (adc06ef5)
+    Note that the interface (for replays, for example) has not been adjusted yet. Usually anything
+    above +10 is only applicable in the first few minutes of the game.
 
  - Add button to lobby to access patch notes (#3842)
     Another contribution of Rowey: introduces a button in the lobby to access the patch notes.
