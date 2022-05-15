@@ -66,3 +66,8 @@ local oldEntityCategoryFilterOut = EntityCategoryFilterOut
 function EntityCategoryFilterOut(categories, units)
     return oldEntityCategoryFilterOut(categories, units or {})
 end
+
+LOG("User init: check if they are the same")
+LOG(__blueprints[__blueprints[1].BlueprintId])
+LOG(__blueprints[1])
+LOG(table.getsize(__blueprints))

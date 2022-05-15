@@ -218,6 +218,61 @@ Unit = Class(moho.unit_methods) {
             PopulateBlueprintCache(self, bp)
         end
 
+
+
+local ok, msg = pcall(
+    function()
+
+        if true then 
+            return 
+        end
+
+        local lookUp = { }
+
+        -- keep the duplicate values in a table that has a weak reference to the value, e.g. if this
+        -- is the only reference then they can get dropped.
+        local duplicates = { }
+        setmetatable(duplicates, { __mode = "v" })
+
+        -- construct a lookup table, keep track of the duplicates
+        for k, other in __blueprints do 
+            if type(k) == 'string' then 
+                table.insert(duplicates, other)
+            else
+                lookUp[other.BlueprintId] = k
+            end
+        end
+
+        -- do a shallow copy from the one used by entity:GetBlueprint() to the more user friendly version
+        for hash, id in lookUp do 
+            if __blueprints[hash].BlueprintId == __blueprints[id].BlueprintId then 
+                __blueprints[hash] = __blueprints[id]
+            else 
+                LOG(string.format("Error: %s doesn't match %i", hash, id))
+            end
+        end
+
+        -- sanity check
+        LOG(table.getn(duplicates))         -- one less because blueprints start at [0]
+        LOG(table.getsize(__blueprints))
+        LOG(table.getsize(lookUp))
+
+        -- check if they get dropped, this should happen in a second or two. But they never do :sad:
+        self.Trash:Add(ForkThread(
+            function()
+                while true do 
+                    WaitSeconds(1.0)
+                    LOG(table.getn(duplicates))
+                end
+            end
+        ))
+    end
+)
+
+reprol(msg)
+
+
+
         -- copy reference from meta table to inner table
         self.Cache = SharedTypeCache[bp.BlueprintId]
 
