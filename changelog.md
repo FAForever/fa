@@ -1,5 +1,5 @@
 
-Game version 3737 (6th of May, 2022)
+Game version 3737 (15th of May, 2022)
 ===================================
 
 ### Features
@@ -45,7 +45,7 @@ Game version 3737 (6th of May, 2022)
     Further reduces the load on the CPU when projectiles are taking part in the simulation
 
  - Clean up defaultunits.lua (#3806) 
-    Improves documentation, removes engine calls, empty functions and duplicated code
+    Improves documentation, while removing engine calls, empty functions and duplicated code
 
 ### Other 
 
