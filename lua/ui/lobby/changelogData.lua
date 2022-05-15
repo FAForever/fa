@@ -14,7 +14,7 @@ gamePatches = {
            "    Another contribution of Rowey: introduces a button in the lobby to access the patch notes.",
            "",
            " - Add Cloak Enhancement restriction option (#3844)",
-           "    Allows the host to restrict the cloak enhancement of the Cybran ACU / SACU.",
+           "    Allows the host to restrict the cloak enhancement of the Cybran ACU.",
            "",
            " - Add proper recursive logging (#3861) ",
            "",
