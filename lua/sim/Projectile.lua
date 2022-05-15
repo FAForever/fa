@@ -137,41 +137,50 @@ Projectile = Class(moho.projectile_methods) {
     -- @param other The projectile we're checking the collision with
     OnCollisionCheck = function(self, other)
 
-        -- only anti missiles can take things down 
-        if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
+        -- we can't hit our own
+        if self.Army == other.Army then 
+            return false 
+        end
 
-            -- only tactical or strategical projectiles can be taken down 
-            if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
+        -- flag if we can hit allied projectiles
+        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
 
-            -- if we're allied, check if we allow friendly fire
-                if self.Army == other.Army or IsAlly(self.Army, other.Army) then 
-                    return self.CollideFriendly 
-                end
-
-                return true
+        -- specific check for tactical / strategic missiles
+        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
+            -- these can only be taken down by anti missile projectiles
+            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
+                return alliedCheck 
             end
         end
 
         -- enemies always hit
-        return false
+        return alliedCheck
     end,
 
     --- Called by the engine when a projectile collides with a collision beam to check if the collision is valid
     -- @param self The projectile we're checking the collision for
     -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
     OnCollisionCheckWeapon = function(self, firingWeapon)
-        -- only tactical or strategical projectiles can be taken down 
-        if self.Blueprint.Blueprint["TACTICAL"] or self.Blueprint.Blueprint["STRATEGIC"] then 
 
-            -- if we're allied, check if we allow friendly fire
-            if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
-                return firingWeapon.Blueprint.CollideFriendly
-            end
-
-            return true
+        -- we can't hit our own
+        if self.Army == firingWeapon.Army then 
+            return false 
         end
 
-        return false 
+        -- flag that indicates whether we should impact allied projectiles
+        local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, firingWeapon.Army))
+
+        -- specific check if we have a weapon that is defensive
+        if firingWeapon.Blueprint.WeaponCategory == 'Defense' then 
+            if self.Blueprint.CategoriesHash['TACTICAL'] or self.Blueprint.CategoriesHash['STRATEGIC'] then 
+                return alliedCheck
+            else 
+                return false 
+            end
+        end
+
+        -- depend on allied flag whether we hit or not
+        return alliedCheck
     end,
 
     --- Called by the engine when the projectile receives damage
