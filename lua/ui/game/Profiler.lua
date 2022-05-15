@@ -172,8 +172,6 @@ function OpenWindow()
     if not State.GUI then
         State.GUI = ProfilerWindow(GetFrame(0))
 
-        reprol(State.GUI)
-
         -- retrieve benchmarks
         SimCallback({
             Func = "FindBenchmarks",
