@@ -30,9 +30,10 @@ Game version 3737 (15th of May, 2022)
 
  - (Engine patch) Fix a crash when air units have a collision of 'None' (1b17fe7)
 
- - (Engine patch) Fix players being defeated out of the blue when their commanders is being repaired (1b17fe7)
-    The problem in question is more complicated and happens in every game, but it noticeable when it
-    happens to a commander. 
+ - (Engine patch) Excludes negative income and problems from this (1b17fe7)
+    The problem in question is complicated and happens in every game, but it noticeable when it
+    happens to a commander. The negative income causes the commander to not be 'fully built', and that causes
+    a player to lose the game. This could happen when the commander was being repaired.
 
  - (Engine patch) Fix a crash when the mouse is pointing towards the sky, away from the terrain (3bf0ba5)
 
