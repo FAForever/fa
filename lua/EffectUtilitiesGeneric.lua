@@ -7,6 +7,10 @@ local ReclaimObjectEnd = import('/lua/EffectTemplates.lua').ReclaimObjectEnd
 -- upvalue for performance
 local Random = Random 
 
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateEmitterAtEntity = CreateEmitterAtEntity
@@ -24,17 +28,39 @@ function PlayReclaimEffects(reclaimer, reclaimed, buildEffectBones, effectsBag)
     -- cache army
     local army = reclaimer.Army
 
+    -- projectile to introduce a small animation
+    local reclaimEndpoint = reclaimer.ReclaimEndpoint 
+    if not reclaimEndpoint then 
+        reclaimEndpoint = EntityCreateProjectile(reclaimer, '/effects/entities/ReclaimEndpoint/ReclaimEndpoint_proj.bp', 0, 0, 0)
+        reclaimer.ReclaimEndpoint = reclaimEndpoint
+        TrashAdd(reclaimer.Trash, reclaimEndpoint)
+    end
+
+    -- reset the state of the projectile
+    ProjectileSetVelocity(beamEndBuilder, 0)
+
+    -- move projectile to the reclaimed
+    vc[1] = ox 
+    vc[2] = oy 
+    vc[3] = oz
+    Warp(reclaimed, vc)
+
     -- create beams
     for _, bone in buildEffectBones do
         for _, emitter in ReclaimBeams do
-            effectsBag:Add(AttachBeamEntityToEntity(reclaimer, bone, reclaimed, -1, army, emitter))
+            TrashAdd(effectsBag, AttachBeamEntityToEntity(reclaimer, bone, reclaimEndpoint, -1, army, emitter))
         end
     end
 
     -- create particle effects
     for _, v in ReclaimObjectAOE do
-        effectsBag:Add(CreateEmitterOnEntity(reclaimed, army, v))
+        TrashAdd(effectsBag, CreateEmitterOnEntity(reclaimEndpoint, army, v))
     end
+
+    -- create movement animation
+    WaitSeconds(1.0)
+    LOG("Heh!")
+
 end
 
 --- Played when reclaiming has been completed.
