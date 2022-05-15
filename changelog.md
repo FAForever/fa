@@ -36,8 +36,8 @@ Game version 3737 (15th of May, 2022)
  - Fix reclaim effects (#3865) 
     Fixes an issue where the beam glitches out when reclaiming a unit
 
- - Fix destruction sound being played twice (#3868)
-    Was especially noticeable on the Monkeylord
+ - Fix destruction sound of units being played twice (#3868)
+    Was especially noticeable on the Spiderbot
 
 ### Performance
 
