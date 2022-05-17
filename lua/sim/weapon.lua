@@ -13,6 +13,7 @@ local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
 local Set = import('/lua/system/setutils.lua')
 local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
 local cachedPriorities = false
+local RecycledPriTable = {}
 
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
@@ -452,29 +453,39 @@ Weapon = Class(moho.weapon_methods) {
         if not priTable then
             local bp = self.Blueprint.TargetPriorities
             if bp then
-                local priorityTable = {}
+                local count = 1
+                local priorityTable = RecycledPriTable
                 for k, v in bp do
                     if cachedPriorities[v] then
-                        table.insert(priorityTable, cachedPriorities[v])
+                        priorityTable[count] = cachedPriorities[v]
                     else
                         if string.find(v, '%(') then
                             cachedPriorities[v] = ParseEntityCategoryProperly(v)
-                            table.insert(priorityTable, cachedPriorities[v])
+                            priorityTable[count] = cachedPriorities[v]
                         else
                             cachedPriorities[v] = ParseEntityCategory(v)
-                            table.insert(priorityTable, cachedPriorities[v])
+                            priorityTable[count] = cachedPriorities[v]
                         end
                     end
+                    count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
+                for i = 1, count - 1 do
+                    priorityTable[i] = nil
+                end
             end
         else
             if type(priTable[1]) == 'string' then
-                local priorityTable = {}
+                local count = 1
+                local priorityTable = RecycledPriTable
                 for k, v in priTable do
-                    table.insert(priorityTable, ParseEntityCategory(v))
+                    priorityTable[count] = ParseEntityCategory(v)
+                    count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
+                for i = 1, count - 1 do
+                    priorityTable[i] = nil
+                end
             else
                 self:SetTargetingPriorities(priTable)
             end
