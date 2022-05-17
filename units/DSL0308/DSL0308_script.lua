@@ -27,16 +27,16 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_04_emit.bp',
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_05_emit.bp',
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_06_emit.bp',
-        '/units/DSLK004/effects/seraphim_electricity_emit.bp'
+        '/Effects/Emitters/seraphim_electricity_emit.bp'
     },
     FxBeam = {
-        '/units/DSLK004/effects/seraphim_lightning_beam_01_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_beam_01_emit.bp',
     },
     FxBeamEndPoint = {
-        '/units/DSLK004/effects/seraphim_lightning_hit_01_emit.bp',
-        '/units/DSLK004/effects/seraphim_lightning_hit_02_emit.bp',
-        '/units/DSLK004/effects/seraphim_lightning_hit_03_emit.bp',
-        '/units/DSLK004/effects/seraphim_lightning_hit_04_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_01_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_02_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_03_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_04_emit.bp',
     },
 
 
@@ -232,8 +232,8 @@ DSLK004 = Class(SLandUnit) {
         SLandUnit.OnStopBeingBuilt(self,builder,layer)
 
         local EfctTempl = {
-            '/units/DSLK004/effects/orbeffect_01.bp',
-            '/units/DSLK004/effects/orbeffect_02.bp',
+            '/Effects/Emitters/orbeffect_01.bp',
+            '/Effects/Emitters/orbeffect_02.bp',
         }
         for k, v in EfctTempl do
             CreateAttachedEmitter(self, 'Orb', self.Army, v)

@@ -2,7 +2,7 @@ UnitBlueprint {
     AI = {
         TargetBones = {
             'Turret01',
-            'DRLK001',
+            'drl0307',
         },
     },
     Audio = {
@@ -78,20 +78,20 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC DRLK001_desc>Mobile Missile Anti-Air',
+    Description = '<LOC drl0307_desc>Mobile Missile Anti-Air',
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
         },
         AnimationDeath = {
             {
-                Animation = '/units/DRLK001/DRLK001_death01.sca',
+                Animation = '/units/drl0307/drl0307_death01.sca',
                 AnimationRateMax = 4,
                 AnimationRateMin = 2.5,
                 Weight = 100,
             },
         },
-        AnimationWalk = '/units/DRLK001/DRLK001_walk.sca',
+        AnimationWalk = '/units/drl0307/drl0307_walk.sca',
         AnimationWalkRate = 7,
         AttackReticuleSize = 3,
         Mesh = {
@@ -121,13 +121,13 @@ UnitBlueprint {
         SpawnRandomRotation = true,
         TransportAnimation = {
             {
-                Animation = '/units/DRLK001/DRLK001_fold.sca',
+                Animation = '/units/drl0307/drl0307_fold.sca',
                 Weight = 100,
             },
         },
         TransportDropAnimation = {
             {
-                Animation = '/units/DRLK001/DRLK001_unfold.sca',
+                Animation = '/units/drl0307/drl0307_unfold.sca',
                 Weight = 100,
             },
         },
@@ -165,14 +165,14 @@ UnitBlueprint {
         FactionName = 'Cybran',
         Icon = 'land',
         TechLevel = 'RULEUTL_Secret',
-        UnitName = '<LOC DRLK001_name>Bouncer',
+        UnitName = '<LOC drl0307_name>Bouncer',
         UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 26,
     },
     Interface = {
-        HelpText = '<LOC DRLK001_help>Mobile Missile Anti-Air',
+        HelpText = '<LOC drl0307_help>Mobile Missile Anti-Air',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.55,

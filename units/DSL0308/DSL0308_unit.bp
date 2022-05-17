@@ -62,14 +62,14 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 5,
     },
-    Description = '<LOC dslk004_desc>Lightning Tank',
+    Description = '<LOC dsl0308_desc>Lightning Tank',
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
         },
         AnimationDeath = {
             {
-                Animation = '/units/DSLK004/DSLK004_death.sca',
+                Animation = '/units/dsl0308/dsl0308_death.sca',
                 AnimationRateMax = 8,
                 AnimationRateMin = 8,
                 Weight = 1,
@@ -173,14 +173,14 @@ UnitBlueprint {
         FactionName = 'Seraphim',
         Icon = 'land',
         TechLevel = 'RULEUTL_Secret',
-        UnitName = '<LOC dslk004_name>Uyanah',
+        UnitName = '<LOC dsl0308_name>Uyanah',
         UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 26,
     },
     Interface = {
-        HelpText = '<LOC dslk004_help>Unstable Lightning Tank',
+        HelpText = '<LOC dsl0308_help>Unstable Lightning Tank',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.58,
@@ -305,7 +305,7 @@ UnitBlueprint {
             Turreted = true,
             WeaponCategory = 'Direct Fire',
             WeaponRepackTimeout = 4,
-            WeaponUnpackAnimation = '/units/DSLK004/DSLK004_unpack.sca',
+            WeaponUnpackAnimation = '/units/dsl0308/dsl0308_unpack.sca',
             WeaponUnpackAnimationRate = 3.8,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,
@@ -389,7 +389,7 @@ UnitBlueprint {
             Turreted = true,
             WeaponCategory = 'Anti Air',
             WeaponRepackTimeout = 4,
-            WeaponUnpackAnimation = '/units/DSLK004/DSLK004_updummy.sca',
+            WeaponUnpackAnimation = '/units/dsl0308/dsl0308_updummy.sca',
             WeaponUnpackAnimationRate = 3.8,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,

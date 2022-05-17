@@ -67,7 +67,7 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC delk002_desc>Mobile Rapid-fire AA Cannon',
+    Description = '<LOC del0307_desc>Mobile Rapid-fire AA Cannon',
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
@@ -97,7 +97,7 @@ UnitBlueprint {
                     ScrollTreads = true,
                     TreadMarks = {
                         {
-                            BoneName = 'DELK002',
+                            BoneName = 'del0307',
                             TreadMarks = 'tank_treads_albedo',
                             TreadMarksInterval = 0.5,
                             TreadMarksSizeX = 1,
@@ -116,13 +116,13 @@ UnitBlueprint {
         SpawnRandomRotation = false,
         TransportAnimation = {
             {
-                Animation = '/units/DELK002/DELK002_fold.sca',
+                Animation = '/units/del0307/del0307_fold.sca',
                 Weight = 100,
             },
         },
         TransportDropAnimation = {
             {
-                Animation = '/units/DELK002/DELK002_unfold.sca',
+                Animation = '/units/del0307/del0307_unfold.sca',
                 Weight = 100,
             },
         },
@@ -156,14 +156,14 @@ UnitBlueprint {
         FactionName = 'UEF',
         Icon = 'land',
         TechLevel = 'RULEUTL_Secret',
-        UnitName = '<LOC DELK002_name>Cougar',
+        UnitName = '<LOC del0307_name>Cougar',
         UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 26,
     },
     Interface = {
-        HelpText = '<LOC delk002_help>Mobile Rapid-fire AA Cannon',
+        HelpText = '<LOC del0307_help>Mobile Rapid-fire AA Cannon',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.35,

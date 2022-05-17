@@ -68,9 +68,9 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC drlk005_desc>Crab Egg (Bouncer)',
+    Description = '<LOC drl0308_desc>Crab Egg (Bouncer)',
     Display = {
-        AnimationOpen = '/units/drlk005/drlk005_aopen.sca',
+        AnimationOpen = '/units/drl0308/drl0308_aopen.sca',
         BuildAttachBone = 'AttachPoint',
         Mesh = {
             IconFadeInZoom = 130,
@@ -80,10 +80,10 @@ UnitBlueprint {
                     ShaderName = 'Insect',
                 },
                 {
-                    AlbedoName = 'drlk005_lod1_albedo.dds',
+                    AlbedoName = 'drl0308_lod1_albedo.dds',
                     LODCutoff = 500,
                     ShaderName = 'Insect',
-                    SpecularName = 'drlk005_lod1_specteam.dds',
+                    SpecularName = 'drl0308_lod1_specteam.dds',
                 },
             },
         },
@@ -128,7 +128,7 @@ UnitBlueprint {
         VisionRadius = 5,
     },
     Interface = {
-        HelpText = '<LOC drlk005_help>Crab Egg (Bouncer)',
+        HelpText = '<LOC drl0308_help>Crab Egg (Bouncer)',
     },
     LifeBarHeight = 0.075,
     LifeBarOffset = 0.5,

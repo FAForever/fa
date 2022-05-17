@@ -72,26 +72,26 @@ UnitBlueprint {
         SubThreatLevel = 0,
         SurfaceThreatLevel = 0,
     },
-    Description = '<LOC dalk003_desc>Mobile Missile Anti-Air',
+    Description = '<LOC dal0311_desc>Mobile Missile Anti-Air',
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
         },
         AnimationDeath = {
             {
-                Animation = '/units/DALK003/DALK003_death01.sca',
+                Animation = '/units/dal0311/dal0311_death01.sca',
                 AnimationRateMax = 6,
                 AnimationRateMin = 5,
                 Weight = 1,
             },
             {
-                Animation = '/units/DALK003/DALK003_death02.sca',
+                Animation = '/units/dal0311/dal0311_death02.sca',
                 AnimationRateMax = 2.5,
                 AnimationRateMin = 1.5,
                 Weight = 1,
             },
         },
-        AnimationWalk = '/units/DALK003/DALK003_walk.sca',
+        AnimationWalk = '/units/dal0311/dal0311_walk.sca',
         AnimationWalkRate = 6,
         Mesh = {
             IconFadeInZoom = 130,
@@ -108,7 +108,7 @@ UnitBlueprint {
                 Effects = {
                     {
                         Bones = {
-                            'DALK003',
+                            'dal0311',
                         },
                         Offset = {
                             0,
@@ -124,13 +124,13 @@ UnitBlueprint {
         SpawnRandomRotation = true,
         TransportAnimation = {
             {
-                Animation = '/units/DALK003/DALK003_fold.sca',
+                Animation = '/units/dal0311/dal0311_fold.sca',
                 Weight = 100,
             },
         },
         TransportDropAnimation = {
             {
-                Animation = '/units/DALK003/DALK003_unfold.sca',
+                Animation = '/units/dal0311/dal0311_unfold.sca',
                 Weight = 100,
             },
         },
@@ -164,7 +164,7 @@ UnitBlueprint {
         FactionName = 'Aeon',
         Icon = 'land',
         TechLevel = 'RULEUTL_Secret',
-        UnitName = '<LOC dalk003_name>Redeemer',
+        UnitName = '<LOC dal0311_name>Redeemer',
         UnitWeight = 1,
     },
     Intel = {
@@ -324,7 +324,7 @@ UnitBlueprint {
             Turreted = false,
             WeaponCategory = 'Anti Air',
             WeaponRepackTimeout = 5,
-            WeaponUnpackAnimation = '/units/DALK003/DALK003_unpack.sca',
+            WeaponUnpackAnimation = '/units/dal0311/dal0311_unpack.sca',
             WeaponUnpackAnimationRate = 4,
             WeaponUnpackLocksMotion = false,
             WeaponUnpacks = true,
