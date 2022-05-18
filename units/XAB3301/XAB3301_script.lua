@@ -38,19 +38,29 @@ XAB3301 = Class( AStructureUnit ) {
     CreateVisibleEntity = function(self)
         AStructureUnit.CreateVisibleEntity(self)
 
-        if self.RemoteViewingData.VisibleLocation and self.RemoteViewingData.DisableCounter == 0 and self.RemoteViewingData.IntelButton and not self.ScryEnabled then
-            self.ScryEnabled = true 
-            
-            LOG("CreateVisibleEntity")
-            
-            self.Animator:SetRate(1)
-            self.RotatorBot:SetTargetSpeed(12)
-            self.RotatorTop:SetTargetSpeed(-8)
+        if self.RemoteViewingData.VisibleLocation and self.RemoteViewingData.DisableCounter == 0 and self.RemoteViewingData.IntelButton then
 
-            for k, v in AQuantumGateAmbient do
-                self.TrashAmbientEffects:Add(CreateAttachedEmitter(self, 'spin02', self.Army, v):ScaleEmitter(0.6))
+            if self.ScryEnabled then 
+                CreateLightParticle(self, "spin02", self.Army, 1, 20, 'glow_02', 'ramp_blue_16')
+            else 
+                CreateLightParticle(self, "spin02", self.Army, 10, 20, 'glow_02', 'ramp_blue_22')
             end
 
+            
+
+            if not self.ScryEnabled then
+                self.ScryEnabled = true 
+                
+                LOG("CreateVisibleEntity")
+                
+                self.Animator:SetRate(1)
+                self.RotatorBot:SetTargetSpeed(12)
+                self.RotatorTop:SetTargetSpeed(-8)
+
+                for k, v in AQuantumGateAmbient do
+                    self.TrashAmbientEffects:Add(CreateAttachedEmitter(self, 'spin02', self.Army, v):ScaleEmitter(0.6))
+                end
+            end
         end
 
     end,
