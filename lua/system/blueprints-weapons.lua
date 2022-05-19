@@ -79,8 +79,8 @@ local function ProcessWeapon(unit, weapon)
     end
 
     -- clamp value to something sane
-    if weapon.TargetCheckInterval > 10 then 
-        weapon.TargetCheckInterval = 10 
+    if weapon.TargetCheckInterval > 3 then 
+        weapon.TargetCheckInterval = 3 
     end
 
     -- sanitize it
