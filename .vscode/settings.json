@@ -1,0 +1,31 @@
+{
+    "Lua.runtime.nonstandardSymbol": [
+        "continue",
+        "!="
+    ],
+    "Lua.completion.showWord": "Fallback",
+    "Lua.runtime.special": {
+        "import": "require",
+        "doscript": "require"
+    },
+    "Lua.runtime.version": "Lua 5.1",
+    "Lua.telemetry.enable": false,
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.runtime.path": [
+        "/?"
+    ],
+    "Lua.runtime.plugin": ".vscode/fa-plugin.lua",
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+        "loc",
+        "engine"
+    ],
+    "[lua]": {
+        "editor.wordBasedSuggestions": false,
+    },
+    "Lua.completion.requireSeparator": "/",
+    "Lua.diagnostics.enable": true,
+    "Lua.runtime.pathStrict": true,
+    "Lua.runtime.exportEnvDefault": true,
+    "Lua.completion.autoRequire": false,
+}
