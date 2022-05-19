@@ -48,20 +48,20 @@
 
 local IntelMap = {
 
-    Cloak = 'Cloak'
-    CloakField = 'CloakField'
-    CloakFieldRadius = 'CloakField'
-    JamRadius = 'Spoof'
+    Cloak = 'Cloak',
+    CloakField = 'CloakField',
+    CloakFieldRadius = 'CloakField',
+    JamRadius = 'Spoof',
 
-    RadarRadius = 'Radar'
-    RadarStealth = 'RadarStealth'
-    RadarStealthField = 'RadarStealthField'
-    RadarStealthFieldRadius = 'RadarStealthField'
+    RadarRadius = 'Radar',
+    RadarStealth = 'RadarStealth',
+    RadarStealthField = 'RadarStealthField',
+    RadarStealthFieldRadius = 'RadarStealthField',
 
-    Sonar = 'Sonar'
-    SonarRadius = 'Sonar'
-    SonarStealth = 'SonarStealth'
-    SonarStealthFieldRadius = 'SonarStealthField'
+    Sonar = 'Sonar',
+    SonarRadius = 'Sonar',
+    SonarStealth = 'SonarStealth',
+    SonarStealthFieldRadius = 'SonarStealthField',
 }
 
 UnitIntelBase = Class {
@@ -108,7 +108,6 @@ UnitIntelBase = Class {
                         end
 
                         self.Intel[intelType][cause] = true 
-                        
                     end
                 end
 
