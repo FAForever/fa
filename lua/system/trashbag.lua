@@ -1,4 +1,4 @@
-
+---@declare-global
 -- TrashBag is a class to help manage objects that need destruction. You add objects to it with Add().
 -- When TrashBag:Destroy() is called, it calls Destroy() in turn on all its contained objects.
 --

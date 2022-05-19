@@ -1,3 +1,4 @@
+---@declare-global
 -- ==========================================================================================
 -- * File       : lua/simInit.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR

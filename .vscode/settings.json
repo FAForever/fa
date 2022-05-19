@@ -3,7 +3,7 @@
         "continue",
         "!="
     ],
-    "Lua.completion.showWord": "Fallback",
+    "Lua.completion.showWord": "Disable",
     "Lua.runtime.special": {
         "import": "require",
         "doscript": "require"

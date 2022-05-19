@@ -1,4 +1,4 @@
-
+---@declare-global
 --- Class structure
 
 -- Simple class

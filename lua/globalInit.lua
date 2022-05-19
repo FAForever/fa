@@ -1,3 +1,4 @@
+---@declare-global
 -- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --
 -- This is the top-level lua initialization file. It is run at initialization time
