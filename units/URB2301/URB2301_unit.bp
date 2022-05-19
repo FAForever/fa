@@ -229,8 +229,8 @@ UnitBlueprint {
             TargetPriorities = {
                 'EXPERIMENTAL',
                 '(STRUCTURE * TECH2 * DEFENSE - ANTIMISSILE)',
-                'MOBILE TECH3',
                 'MOBILE TECH1 ARTILLERY',
+                'MOBILE TECH3',
                 'MOBILE TECH2',
                 'MOBILE TECH1',
                 'COMMAND',
