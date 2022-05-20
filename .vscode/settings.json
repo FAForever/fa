@@ -12,7 +12,8 @@
     "Lua.telemetry.enable": false,
     "Lua.workspace.checkThirdParty": false,
     "Lua.runtime.path": [
-        "/?"
+        "/?",
+        "?"
     ],
     "Lua.runtime.plugin": ".vscode/fa-plugin.lua",
     "Lua.workspace.ignoreDir": [
@@ -25,7 +26,7 @@
     },
     "Lua.completion.requireSeparator": "/",
     "Lua.diagnostics.enable": true,
-    "Lua.runtime.pathStrict": true,
+    "Lua.runtime.pathStrict": false,
     "Lua.runtime.exportEnvDefault": true,
     "Lua.completion.autoRequire": false,
 }
