@@ -4306,7 +4306,7 @@ function setupChatEdit(chatPanel)
     -- in-game keybindings in the lobby.
     -- That would be very bad. We should probably instead just not assign those keybindings yet...
     GUI.chatEdit.OnLoseKeyboardFocus = function(self)
-        GUI.chatEdit:AcquireFocus()
+        self:AcquireFocus()
     end
 
     local commandQueueIndex = 0
