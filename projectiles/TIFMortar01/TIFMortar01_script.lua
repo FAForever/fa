@@ -1,9 +1,4 @@
---
 -- Terran Mortar
---
-local TArtilleryProjectile = import('/lua/terranprojectiles.lua').TArtilleryProjectile
-TIFMortar01 = Class(TArtilleryProjectile) {
-}
 
+TIFMortar01 = Class(import('/lua/terranprojectiles.lua').TArtilleryProjectile) {}
 TypeClass = TIFMortar01
-

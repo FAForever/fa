@@ -1,9 +1,6 @@
---
 -- Terran Very Fast Anti-Missile Missile
---
-local TAntiNukeInterceptorProjectile = import('/lua/terranprojectiles.lua').TAntiNukeInterceptorProjectile
-TIMMissileIntercerptor01 = Class(TAntiNukeInterceptorProjectile) {
-}
 
+
+--UEB4302
+TIMMissileIntercerptor01 = Class(import('/lua/terranprojectiles.lua').TAntiNukeInterceptorProjectile) {}
 TypeClass = TIMMissileIntercerptor01
-

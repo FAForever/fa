@@ -1,9 +1,8 @@
---
 -- Aeon Ship-based torpedo
---
-local ATorpedoShipProjectile = import('/lua/aeonprojectiles.lua').ATorpedoShipProjectile
-TorpedoShipAeon01 = Class(ATorpedoShipProjectile) {
-}
+
+--unused???
+--[[
+TorpedoShipAeon01 = Class(import('/lua/aeonprojectiles.lua').ATorpedoShipProjectile) {}
 
 TypeClass = TorpedoShipAeon01
-
+]]

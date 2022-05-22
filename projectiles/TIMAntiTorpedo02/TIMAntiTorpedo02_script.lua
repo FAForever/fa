@@ -7,8 +7,9 @@
 --**
 --**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local TDepthChargeProjectile = import('/lua/terranprojectiles.lua').TDepthChargeProjectile
 
-TIMAntiTorpedo02 = Class(TDepthChargeProjectile) {}
+--unused???
+--[[
+TIMAntiTorpedo02 = Class(import('/lua/terranprojectiles.lua').TDepthChargeProjectile) {}
 TypeClass = TIMAntiTorpedo02
-
+]]

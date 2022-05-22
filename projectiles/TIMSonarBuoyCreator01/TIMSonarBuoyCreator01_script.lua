@@ -3,9 +3,10 @@
 --   This will create a temporary sonar buoy unit when it hits the water, nothing more.
 --   This projectile is not intended to do damage.
 --
-local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
 
-TIMSonarBuoyCreator01 = Class(TTorpedoShipProjectile) {
+-- unused???
+--[[
+TIMSonarBuoyCreator01 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipProjectile) {
     FxSplashScale = 0.2,
     FxTrailScale = 3,
     FxExitWaterEmitter = {
@@ -36,3 +37,4 @@ TIMSonarBuoyCreator01 = Class(TTorpedoShipProjectile) {
 }
 
 TypeClass = TIMSonarBuoyCreator01
+]]

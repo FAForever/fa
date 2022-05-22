@@ -1,9 +1,8 @@
---
 -- Terran Ship-based torpedo
---
-local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
-TorpedoShipTerran01 = Class(TTorpedoShipProjectile) {
-}
+
+--unused???
+--[[
+TorpedoShipTerran01 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipProjectile) {}
 
 TypeClass = TorpedoShipTerran01
-
+]]

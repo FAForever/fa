@@ -8,10 +8,6 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
-local TNapalmHvyCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-
-TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) { }
-
+-- DEA0202
+TIFNapalmCarpetBomb02 = Class(import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile) {}
 TypeClass = TIFNapalmCarpetBomb02

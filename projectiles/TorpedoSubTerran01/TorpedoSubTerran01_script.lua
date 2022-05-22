@@ -1,9 +1,8 @@
---
 -- Sub-Based Torpedo Script
---
-local TTorpedoSubProjectile = import('/lua/terranprojectiles.lua').TTorpedoSubProjectile
-TorpedoSubTerran01 = Class(TTorpedoSubProjectile) {
-}
+
+--unused???
+--[[
+TorpedoSubTerran01 = Class(import('/lua/terranprojectiles.lua').TTorpedoSubProjectile) {}
 
 TypeClass = TorpedoSubTerran01
-
+]]
