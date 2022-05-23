@@ -149,10 +149,16 @@ MassFabPanel = Class(Group) {
 
     Update = function(self, data)
         if data.on == 0 and data.off == 0 then
-            self:Hide()
+            if not self:IsHidden() then
+                self:Hide()
+                self._collapseArrow:Disable()
+            end
             return
         end
-        self:Show()
+        if self:IsHidden() then
+            self:Show()
+            self._collapseArrow:Enable()
+        end
         self._activeCountText:SetText(tostring(data.on))
         self._inactiveCountText:SetText(tostring(data.off))
         self._energyRequiredText:SetText(tostring(data.totalEnergyRequired))
