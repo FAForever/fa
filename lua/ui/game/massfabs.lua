@@ -3,6 +3,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 local Prefs = import("/lua/user/prefs.lua")
 
 local panel
@@ -23,6 +24,7 @@ MassFabPanel = Class(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
         self._parent = parent
+        self._collapseArrow = Checkbox(parent)
         self._panel = Bitmap(self)
         self._leftBrace = Bitmap(self)
         self._rightBrace = Bitmap(self)
@@ -32,6 +34,7 @@ MassFabPanel = Class(Group) {
         self._energyConsumedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont, true)
         self._massProducedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont, true)
         self:_Layout()
+        self:_Logic()
         local pos = self:_LoadPosition()
         LayoutHelpers.AtLeftTopIn(self, parent, pos.left, 4)
     end,
@@ -44,6 +47,18 @@ MassFabPanel = Class(Group) {
         self._panel:DisableHitTest()
         self._leftBrace:DisableHitTest()
         self._rightBrace:DisableHitTest()
+
+        self._collapseArrow:SetTexture(UIUtil.SkinnableFile("/game/tab-t-btn/tab-close_btn_up.dds"))
+        self._collapseArrow:SetNewTextures(UIUtil.SkinnableFile("/game/tab-t-btn/tab-close_btn_up.dds"),
+            UIUtil.SkinnableFile("/game/tab-t-btn/tab-open_btn_up.dds"),
+            UIUtil.SkinnableFile("/game/tab-t-btn/tab-close_btn_over.dds"),
+            UIUtil.SkinnableFile("/game/tab-t-btn/tab-open_btn_over.dds"),
+            UIUtil.SkinnableFile("/game/tab-t-btn/tab-close_btn_dis.dds"),
+            UIUtil.SkinnableFile("/game/tab-t-btn/tab-open_btn_dis.dds"))
+        LayoutHelpers.AtTopIn(self._collapseArrow, self._parent, -3)
+        LayoutHelpers.AtHorizontalCenterIn(self._collapseArrow, self)
+
+        LayoutHelpers.DepthOverParent(self._collapseArrow, self, 10)
 
         self.Height:Set(self._panel.Height)
         self.Width:Set(self._panel.Width)
@@ -77,6 +92,62 @@ MassFabPanel = Class(Group) {
 
         self._activeCountText:SetColor("ffffffff")
         self._inactiveCountText:SetColor("ffffffff")
+    end,
+
+    _Logic = function(self)
+        -- self._collapseArrow.OnHide = function(control, hidden)
+        --     if import('/lua/ui/game/gamemain.lua').gameUIHidden and not hidden then
+        --         control:Hide()
+        --         return
+        --     end
+        --     if control:IsHidden() then
+        --         control:Show()
+        --     end
+        -- end
+        self._collapseArrow.OnCheck = function(_, checked)
+            if UIUtil.GetAnimationPrefs() then
+                if checked or self:IsHidden() then
+                    PlaySound(Sound({
+                        Cue = "UI_Score_Window_Open",
+                        Bank = "Interface"
+                    }))
+                    self:Show()
+                    self:SetNeedsFrameUpdate(true)
+                    self.OnFrame = function(control, delta)
+                        local newTop = control.Top() + (500 * delta)
+                        if newTop > control._parent.Top() then
+                            newTop = control._parent.Top()
+                            control:SetNeedsFrameUpdate(false)
+                        end
+                        control.Top:Set(newTop + 4)
+                    end
+                else
+                    PlaySound(Sound({
+                        Cue = "UI_Score_Window_Close",
+                        Bank = "Interface"
+                    }))
+
+                    self:SetNeedsFrameUpdate(true)
+                    self.OnFrame = function(control, delta)
+                        local newTop = control.Top() - (500 * delta)
+                        if newTop < control._parent.Top() - control.Height() then
+                            newTop = control._parent.Top() - control.Height()
+                            control:Hide()
+                            control:SetNeedsFrameUpdate(false)
+                        end
+                        control.Top:Set(newTop)
+                    end
+                end
+            else
+                if checked or self:IsHidden() then
+                    self:Show()
+                    self._collapseArrow:SetCheck(false, true)
+                else
+                    self:Hide()
+                    self._collapseArrow:SetCheck(true, true)
+                end
+            end
+        end
     end,
 
     Update = function(self, data)
