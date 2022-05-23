@@ -5,6 +5,7 @@ local Group = import("/lua/maui/group.lua").Group
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 local Prefs = import("/lua/user/prefs.lua")
+local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 local panel
 
@@ -86,6 +87,13 @@ MassFabPanel = Class(Group) {
         LayoutHelpers.AnchorToBottom(self._massProducedText, self._energyConsumedText, -1)
         self._massProducedText.Right:Set(self._energyConsumedText.Right)
 
+
+        Tooltip.AddControlTooltip(self._energyRequiredText, "mf_energy_required")
+        Tooltip.AddControlTooltip(self._energyConsumedText, "mf_energy_expense_display")
+        Tooltip.AddControlTooltip(self._massProducedText, "mf_mass_income_display")
+        Tooltip.AddControlTooltip(self._activeCountText, "mf_active_amount")
+        Tooltip.AddControlTooltip(self._inactiveCountText, "mf_inactive_amount")
+    
         self._energyRequiredText:SetColor("fff8c000")
         self._energyConsumedText:SetColor("fff8c000")
         self._massProducedText:SetColor("ffb7e75f")
@@ -95,18 +103,9 @@ MassFabPanel = Class(Group) {
     end,
 
     _Logic = function(self)
-        -- self._collapseArrow.OnHide = function(control, hidden)
-        --     if import('/lua/ui/game/gamemain.lua').gameUIHidden and not hidden then
-        --         control:Hide()
-        --         return
-        --     end
-        --     if control:IsHidden() then
-        --         control:Show()
-        --     end
-        -- end
         self._collapseArrow.OnCheck = function(_, checked)
             if UIUtil.GetAnimationPrefs() then
-                if checked or self:IsHidden() then
+                if not checked or self:IsHidden() then
                     PlaySound(Sound({
                         Cue = "UI_Score_Window_Open",
                         Bank = "Interface"
@@ -139,7 +138,7 @@ MassFabPanel = Class(Group) {
                     end
                 end
             else
-                if checked or self:IsHidden() then
+                if not checked or self:IsHidden() then
                     self:Show()
                     self._collapseArrow:SetCheck(false, true)
                 else

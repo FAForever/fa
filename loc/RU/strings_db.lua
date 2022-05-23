@@ -8670,6 +8670,17 @@ tooltipui0704="Выберите название для новой конфиг�
 tooltipui0705="Настройки"
 tooltipui0706="Это окно позволяет Вам сохранить текущую конфигурацию игры и загрузить ее позже.\n\nЧтобы сохранить конфигурацию нажмите на кнопку \"Создать\" в этом окне. Вы можете загрузить сохранённую конфигурацию путём её выбора и нажимания \"Загрузить\".\n\nКнопка \"Сохранить\" перезапишет выбранную существующую конфигурацию на текущую."
 
+tooltipui1000="Mass Income"
+tooltipui1001="Mass being generated with mass fabricators per second"
+tooltipui1002="Energy Expense"
+tooltipui1003="Energy being spent per with mass fabricators second"
+tooltipui1004="Active mass fabricators"
+tooltipui1005="Amount of active mass fabricators"
+tooltipui1006="Inactive mass fabricators"
+tooltipui1007="Amount of inactive mass fabricators"
+tooltipui1008="Energy Required"
+tooltipui1009="Amount of required energy for mass fabricators to work"
+
 LOADING = "Загрузка..."
 sorian_0001="ИИ: Сориан"
 sorian_0002="Сбалансированный ИИ. Хорош для 20x20+ карт."
