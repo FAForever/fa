@@ -2,14 +2,14 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Prefs = import('/lua/user/prefs.lua')
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Prefs = import("/lua/user/prefs.lua")
 
 local panel
 
 function Create(parent)
     panel = MassFabPanel(parent)
-   
+
     return panel
 end
 
@@ -22,14 +22,15 @@ end
 MassFabPanel = Class(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)
+        self._parent = parent
         self._panel = Bitmap(self)
         self._leftBrace = Bitmap(self)
         self._rightBrace = Bitmap(self)
         self._activeCountText = UIUtil.CreateText(self, "0", 18, UIUtil.bodyFont)
         self._inactiveCountText = UIUtil.CreateText(self, "0", 18, UIUtil.bodyFont)
-        self._energyRequiredText = UIUtil.CreateText(self, "0", 12, UIUtil.bodyFont)
-        self._energyConsumedText = UIUtil.CreateText(self, "0", 12, UIUtil.bodyFont)
-        self._massProducedText = UIUtil.CreateText(self, "0", 12, UIUtil.bodyFont)
+        self._energyRequiredText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont)
+        self._energyConsumedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont)
+        self._massProducedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont)
         self:_Layout()
         local pos = self:_LoadPosition()
         LayoutHelpers.AtLeftTopIn(self, parent, pos.left, 3)
@@ -57,14 +58,18 @@ MassFabPanel = Class(Group) {
         LayoutHelpers.AnchorToRight(self._rightBrace, self, -12)
         LayoutHelpers.AtTopIn(self._rightBrace, self)
 
-        LayoutHelpers.AtLeftTopIn(self._activeCountText, self, 10, 5)
-        LayoutHelpers.AtLeftBottomIn(self._inactiveCountText, self, 10, 5)
+        LayoutHelpers.AtLeftTopIn(self._activeCountText, self, 10, 9)
+        LayoutHelpers.AtLeftBottomIn(self._inactiveCountText, self, 10, 9)
 
-        LayoutHelpers.AtRightTopIn(self._energyConsumedText, self, 10, 5)
-        LayoutHelpers.AtRightBottomIn(self._energyRequiredText, self, 10, 5)
+        LayoutHelpers.AtRightTopIn(self._energyConsumedText, self, 12, 9)
+        LayoutHelpers.AtRightBottomIn(self._energyRequiredText, self, 12, 9)
 
         LayoutHelpers.AnchorToBottom(self._massProducedText, self._energyConsumedText)
         self._massProducedText.Right:Set(self._energyConsumedText.Right)
+
+        self._energyRequiredText:SetColor("fff8c000")
+        self._energyConsumedText:SetColor("fff8c000")
+        self._massProducedText:SetColor("ffb7e75f")
 
     end,
 
@@ -77,17 +82,17 @@ MassFabPanel = Class(Group) {
         self._activeCountText:SetText(tostring(data.on))
         self._inactiveCountText:SetText(tostring(data.off))
         self._energyRequiredText:SetText(tostring(data.totalEnergyRequired))
-        self._energyConsumedText:SetText(tostring(data.totalEnergyConsumed))
-        self._massProducedText:SetText(tostring(data.totalMassProduced))
+        self._energyConsumedText:SetText(tostring(-data.totalEnergyConsumed))
+        self._massProducedText:SetText("+" .. tostring(data.totalMassProduced))
     end,
 
     HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' and event.Modifiers.Middle then
+        if event.Type == "ButtonPress" and event.Modifiers.Middle then
             local drag = Dragger()
             local offX = event.MouseX - self.Left()
             drag.OnMove = function(dragself, x, y)
-                self.Left:Set(x - offX)
-                GetCursor():SetTexture(UIUtil.GetCursor('W_E'))
+                self.Left:Set(math.min(math.max(x - offX, self._parent.Left()), self._parent.Right() - self.Width()))
+                GetCursor():SetTexture(UIUtil.GetCursor("W_E"))
             end
             drag.OnRelease = function(dragself)
                 self:_SavePosition()
@@ -101,14 +106,14 @@ MassFabPanel = Class(Group) {
     end,
 
     _LoadPosition = function(self)
-        return Prefs.GetFromCurrentProfile('MassFabsPanelPos') or {
-            left = 500,
+        return Prefs.GetFromCurrentProfile("MassFabsPanelPos") or {
+            left = 500
         }
     end,
 
     _SavePosition = function(self)
         Prefs.SetToCurrentProfile("MassFabsPanelPos", {
-            left = self.Left(),
+            left = self.Left()
         })
     end
 
