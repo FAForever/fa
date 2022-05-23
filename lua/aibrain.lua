@@ -353,19 +353,21 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
         local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
         self.totalEnergyRequired = self.totalEnergyRequired + energyRequired
-        self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
     end,
 
     --- Removes a unit that is enabled / disabled depending on how much energy storage we have
     -- @param self The brain itself
     -- @param unit The unit to forget about
     RemoveEnergyExcessUnit = function (self, unit)
-        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
-        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
         local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-        self.totalEnergyConsumed = self.totalEnergyConsumed - energyRequired
-        self.totalEnergyRequired = self.totalEnergyRequired - energyRequired
-        self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
+        if  self.EnergyExcessUnitsEnabled[unit.EntityId] then
+            self.totalEnergyConsumed = self.totalEnergyConsumed - energyRequired
+            self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
+            self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+        elseif self.EnergyExcessUnitsDisabled[unit.EntityId] then
+            self.totalEnergyRequired = self.totalEnergyRequired - energyRequired
+            self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
+        end
     end,
 
     --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
