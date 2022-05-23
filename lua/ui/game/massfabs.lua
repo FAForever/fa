@@ -63,8 +63,6 @@ MassFabPanel = Class(Group) {
 
         self.Height:Set(self._panel.Height)
         self.Width:Set(self._panel.Width)
-        -- self._leftBrace.Width:Set(self._leftBrace.Width() / 2.5)
-        -- self._rightBrace.Width:Set(self._rightBrace.Width() / 2.5)
 
         LayoutHelpers.FillParent(self._panel, self)
 
