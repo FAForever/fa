@@ -54,6 +54,12 @@ AIBrain = Class(moho.aibrain_methods) {
         self:CreateBrainShared(planName)
         self.BrainType = 'Human'
 
+        -- for mass fabs tracking
+        self.totalEnergyConsumed = 0
+        self.totalEnergyRequired = 0
+
+        self.totalMassProduced = 0
+
         -- human-only behavior
         self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
     end,
@@ -333,7 +339,10 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param unit The unit to keep track of
     AddEnabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
-        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
+        local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
+        self.totalEnergyConsumed = self.totalEnergyConsumed + energyRequired
+        self.totalMassProduced = self.totalMassProduced + unit.Blueprint.Economy.ProductionPerSecondMass
     end,
 
     --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
@@ -341,15 +350,22 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param unit The unit to keep track of
     AddDisabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
-        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit 
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
+        local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
+        self.totalEnergyRequired = self.totalEnergyRequired + energyRequired
+        self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
     end,
 
     --- Removes a unit that is enabled / disabled depending on how much energy storage we have
     -- @param self The brain itself
     -- @param unit The unit to forget about
     RemoveEnergyExcessUnit = function (self, unit)
-        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil 
-        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
+        local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
+        self.totalEnergyConsumed = self.totalEnergyConsumed - energyRequired
+        self.totalEnergyRequired = self.totalEnergyRequired - energyRequired
+        self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
     end,
 
     --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
@@ -369,7 +385,11 @@ AIBrain = Class(moho.aibrain_methods) {
         -- localize scope for better performance
         
         local pcall = pcall
+        local TableSize = table.getsize
         local ok, msg
+
+        local energyRequired
+
         local CoroutineYield = CoroutineYield
         local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
         local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
@@ -386,10 +406,16 @@ AIBrain = Class(moho.aibrain_methods) {
                 for id, unit in EnergyExcessUnitsEnabled do 
                     if not unit:BeenDestroyed() then 
 
-                        -- update internal state
-                        EnergyExcessUnitsDisabled[unit.EntityId] = unit
-                        EnergyExcessUnitsEnabled[unit.EntityId] = nil
                         
+                        energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
+                        self.totalEnergyConsumed = self.totalEnergyConsumed - energyRequired
+                        self.totalEnergyRequired = self.totalEnergyRequired + energyRequired
+                        self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
+                        
+                        -- update internal state
+                        EnergyExcessUnitsDisabled[id] = unit
+                        EnergyExcessUnitsEnabled[id] = nil
+
                         -- try to disable unit
                         ok, msg = pcall(ProtectedOnNoExcessEnergy, unit)
 
@@ -408,11 +434,17 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
                     if not unit:BeenDestroyed() then 
-                        if unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy < energyTrend then 
+                        energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
+                        if  energyRequired < energyTrend then 
 
+                            
+                            self.totalEnergyConsumed = self.totalEnergyConsumed + energyRequired
+                            self.totalEnergyRequired = self.totalEnergyRequired - energyRequired
+                            self.totalMassProduced = self.totalMassProduced + unit.Blueprint.Economy.ProductionPerSecondMass
+                            
                             -- update internal state
-                            EnergyExcessUnitsDisabled[unit.EntityId] = nil
-                            EnergyExcessUnitsEnabled[unit.EntityId] = unit
+                            EnergyExcessUnitsDisabled[id] = nil
+                            EnergyExcessUnitsEnabled[id] = unit
 
                             -- try to enable unit
                             ok, msg = pcall(ProtectedOnExcessEnergy, unit)
@@ -427,7 +459,15 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
             end
-
+            if self:GetArmyIndex() == GetFocusArmy() then
+                Sync.MassFabs = {
+                    on = TableSize(EnergyExcessUnitsEnabled),
+                    off = TableSize(EnergyExcessUnitsDisabled),
+                    totalEnergyConsumed = self.totalEnergyConsumed,
+                    totalEnergyRequired = self.totalEnergyRequired,
+                    totalMassProduced = self.totalMassProduced 
+                }
+            end
             CoroutineYield(1)
         end
     end,

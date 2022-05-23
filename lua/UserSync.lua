@@ -142,4 +142,8 @@ function OnSync()
     if Sync.LobbyOptions then 
         import('/lua/ui/game/gamemain.lua').LobbyOptions = table.deepcopy(Sync.LobbyOptions)
     end
+
+    if Sync.MassFabs then
+        import('/lua/ui/game/massfabs.lua').Update(table.deepcopy(Sync.MassFabs))
+    end
 end
