@@ -37,7 +37,7 @@ MassFabPanel = Class(Group) {
     end,
 
     _Layout = function(self)
-        self._panel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-mini-panel_bmp.dds"))
+        self._panel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_bmp.dds"))
         self._leftBrace:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/bracket-energy-l_bmp.dds"))
         self._rightBrace:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/bracket-energy-r_bmp.dds"))
 
