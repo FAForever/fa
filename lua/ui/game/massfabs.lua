@@ -26,19 +26,19 @@ MassFabPanel = Class(Group) {
         self._panel = Bitmap(self)
         self._leftBrace = Bitmap(self)
         self._rightBrace = Bitmap(self)
-        self._activeCountText = UIUtil.CreateText(self, "0", 18, UIUtil.bodyFont)
-        self._inactiveCountText = UIUtil.CreateText(self, "0", 18, UIUtil.bodyFont)
-        self._energyRequiredText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont)
-        self._energyConsumedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont)
-        self._massProducedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont)
+        self._activeCountText = UIUtil.CreateText(self, "0", 18, UIUtil.bodyFont, true)
+        self._inactiveCountText = UIUtil.CreateText(self, "0", 18, UIUtil.bodyFont, true)
+        self._energyRequiredText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont, true)
+        self._energyConsumedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont, true)
+        self._massProducedText = UIUtil.CreateText(self, "0", 10, UIUtil.bodyFont, true)
         self:_Layout()
         local pos = self:_LoadPosition()
-        LayoutHelpers.AtLeftTopIn(self, parent, pos.left, 3)
+        LayoutHelpers.AtLeftTopIn(self, parent, pos.left, 4)
     end,
 
     _Layout = function(self)
         self._panel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_bmp.dds"))
-        self._leftBrace:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/bracket-energy-l_bmp.dds"))
+        self._leftBrace:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/bracket-energy-r_bmp.dds"))
         self._rightBrace:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/bracket-energy-r_bmp.dds"))
 
         self._panel:DisableHitTest()
@@ -52,25 +52,31 @@ MassFabPanel = Class(Group) {
 
         LayoutHelpers.FillParent(self._panel, self)
 
-        LayoutHelpers.AnchorToLeft(self._leftBrace, self, -11)
+        LayoutHelpers.AtLeftIn(self._leftBrace, self, 11)
         LayoutHelpers.AtTopIn(self._leftBrace, self)
 
-        LayoutHelpers.AnchorToRight(self._rightBrace, self, -12)
+        self._leftBrace.Right:Set(function()
+            return self._leftBrace.Left() - self._leftBrace.Width()
+        end)
+
+        LayoutHelpers.AnchorToRight(self._rightBrace, self, -11)
         LayoutHelpers.AtTopIn(self._rightBrace, self)
 
-        LayoutHelpers.AtLeftTopIn(self._activeCountText, self, 10, 9)
-        LayoutHelpers.AtLeftBottomIn(self._inactiveCountText, self, 10, 9)
+        LayoutHelpers.AtLeftTopIn(self._activeCountText, self, 10, 10)
+        LayoutHelpers.AtLeftBottomIn(self._inactiveCountText, self, 10, 10)
 
-        LayoutHelpers.AtRightTopIn(self._energyConsumedText, self, 12, 9)
-        LayoutHelpers.AtRightBottomIn(self._energyRequiredText, self, 12, 9)
+        LayoutHelpers.AtRightTopIn(self._energyConsumedText, self, 12, 8)
+        LayoutHelpers.AtRightBottomIn(self._energyRequiredText, self, 12, 8)
 
-        LayoutHelpers.AnchorToBottom(self._massProducedText, self._energyConsumedText)
+        LayoutHelpers.AnchorToBottom(self._massProducedText, self._energyConsumedText, -1)
         self._massProducedText.Right:Set(self._energyConsumedText.Right)
 
         self._energyRequiredText:SetColor("fff8c000")
         self._energyConsumedText:SetColor("fff8c000")
         self._massProducedText:SetColor("ffb7e75f")
 
+        self._activeCountText:SetColor("ffffffff")
+        self._inactiveCountText:SetColor("ffffffff")
     end,
 
     Update = function(self, data)
