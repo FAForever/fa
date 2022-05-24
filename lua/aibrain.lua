@@ -55,10 +55,9 @@ AIBrain = Class(moho.aibrain_methods) {
         self.BrainType = 'Human'
 
         -- for mass fabs tracking
-        self.totalEnergyConsumed = 0
-        self.totalEnergyRequired = 0
-
-        self.totalMassProduced = 0
+        self.TotalEnergyConsumed = 0
+        self.TotalEnergyRequired = 0
+        self.TotalMassProduced = 0
 
         -- human-only behavior
         self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
@@ -261,6 +260,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
         -- end of engi mod
 
+        self.Army = self:GetArmyIndex()
         self.Result = nil -- No-op, just to be explicit it starts as nil
         self.StatsSent = false
         self.UnitStats = {}
@@ -340,9 +340,10 @@ AIBrain = Class(moho.aibrain_methods) {
     AddEnabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
         self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
-        local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-        self.totalEnergyConsumed = self.totalEnergyConsumed + energyRequired
-        self.totalMassProduced = self.totalMassProduced + unit.Blueprint.Economy.ProductionPerSecondMass
+
+        local ecobp = unit.Blueprint.Economy
+        self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
+        self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
     end,
 
     --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
@@ -351,21 +352,20 @@ AIBrain = Class(moho.aibrain_methods) {
     AddDisabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
         self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
-        local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-        self.totalEnergyRequired = self.totalEnergyRequired + energyRequired
+        self.TotalEnergyRequired = self.TotalEnergyRequired + unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
     end,
 
     --- Removes a unit that is enabled / disabled depending on how much energy storage we have
     -- @param self The brain itself
     -- @param unit The unit to forget about
     RemoveEnergyExcessUnit = function (self, unit)
-        local energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
+        local ecobp = unit.Blueprint.Economy
         if  self.EnergyExcessUnitsEnabled[unit.EntityId] then
-            self.totalEnergyConsumed = self.totalEnergyConsumed - energyRequired
-            self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
+            self.TotalEnergyConsumed = self.TotalEnergyConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
+            self.TotalMassProduced = self.TotalMassProduced - ecobp.ProductionPerSecondMass
             self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
         elseif self.EnergyExcessUnitsDisabled[unit.EntityId] then
-            self.totalEnergyRequired = self.totalEnergyRequired - energyRequired
+            self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
             self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
         end
     end,
@@ -415,11 +415,10 @@ AIBrain = Class(moho.aibrain_methods) {
                 for id, unit in EnergyExcessUnitsEnabled do 
                     if not unit:BeenDestroyed() then 
 
-                        
-                        energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-                        self.totalEnergyConsumed = self.totalEnergyConsumed - energyRequired
-                        self.totalEnergyRequired = self.totalEnergyRequired + energyRequired
-                        self.totalMassProduced = self.totalMassProduced - unit.Blueprint.Economy.ProductionPerSecondMass
+                        local ecobp = unit.Blueprint.Economy
+                        self.TotalEnergyConsumed = self.TotalEnergyConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.TotalEnergyRequired = self.TotalEnergyRequired + ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.TotalMassProduced = self.TotalMassProduced - ecobp.ProductionPerSecondMass
                         
                         -- update internal state
                         EnergyExcessUnitsDisabled[id] = unit
@@ -443,13 +442,12 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
                     if not unit:BeenDestroyed() then 
-                        energyRequired = unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-                        if  energyRequired < energyTrend then 
+                        if  energyTrend > 100 then 
 
-                            
-                            self.totalEnergyConsumed = self.totalEnergyConsumed + energyRequired
-                            self.totalEnergyRequired = self.totalEnergyRequired - energyRequired
-                            self.totalMassProduced = self.totalMassProduced + unit.Blueprint.Economy.ProductionPerSecondMass
+                            local ecobp = unit.Blueprint.Economy
+                            self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
+                            self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
+                            self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
                             
                             -- update internal state
                             EnergyExcessUnitsDisabled[id] = nil
@@ -468,12 +466,13 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                 end
             end
-            if self:GetArmyIndex() == GetFocusArmy() then
+
+            if self.Army == GetFocusArmy() then
                 syncTable.on = TableSize(EnergyExcessUnitsEnabled)
                 syncTable.off = TableSize(EnergyExcessUnitsDisabled)
-                syncTable.totalEnergyConsumed = self.totalEnergyConsumed
-                syncTable.totalEnergyRequired = self.totalEnergyRequired
-                syncTable.totalMassProduced = self.totalMassProduced
+                syncTable.totalEnergyConsumed = self.TotalEnergyConsumed
+                syncTable.totalEnergyRequired = self.TotalEnergyRequired
+                syncTable.totalMassProduced = self.TotalMassProduced
                 
                 Sync.MassFabs = syncTable
             end
