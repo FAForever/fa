@@ -385,14 +385,21 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         -- localize scope for better performance
-        
         local pcall = pcall
         local TableSize = table.getsize
+        local CoroutineYield = CoroutineYield
+        
         local ok, msg
 
         local energyRequired
+        local syncTable = {
+            on = 0,
+            off = 0,
+            totalEnergyConsumed = 0,
+            totalEnergyRequired = 0,
+            totalMassProduced = 0
+        }
 
-        local CoroutineYield = CoroutineYield
         local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
         local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
 
@@ -462,13 +469,13 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             end
             if self:GetArmyIndex() == GetFocusArmy() then
-                Sync.MassFabs = {
-                    on = TableSize(EnergyExcessUnitsEnabled),
-                    off = TableSize(EnergyExcessUnitsDisabled),
-                    totalEnergyConsumed = self.totalEnergyConsumed,
-                    totalEnergyRequired = self.totalEnergyRequired,
-                    totalMassProduced = self.totalMassProduced 
-                }
+                syncTable.on = TableSize(EnergyExcessUnitsEnabled)
+                syncTable.off = TableSize(EnergyExcessUnitsDisabled)
+                syncTable.totalEnergyConsumed = self.totalEnergyConsumed
+                syncTable.totalEnergyRequired = self.totalEnergyRequired
+                syncTable.totalMassProduced = self.totalMassProduced
+                
+                Sync.MassFabs = syncTable
             end
             CoroutineYield(1)
         end
