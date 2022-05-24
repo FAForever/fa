@@ -1258,10 +1258,10 @@ function CreateConfigWindow()
         br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
         borderColor = 'ff415055',
     }
-    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', nil, windowTextures)
+    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, false, 'chat_config', nil, windowTextures)
     GUI.config.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     Tooltip.AddButtonTooltip(GUI.config._closeBtn, 'chat_close')
-    LayoutHelpers.AnchorToBottom(GUI.config, GetFrame(0), -700)
+    LayoutHelpers.AnchorToTop(GUI.config, GetFrame(0), 0)
     LayoutHelpers.SetWidth(GUI.config, 300)
     LayoutHelpers.AtHorizontalCenterIn(GUI.config, GetFrame(0))
     LayoutHelpers.ResetRight(GUI.config)
@@ -1305,7 +1305,7 @@ function CreateConfigWindow()
                 {type = 'color', name = '<LOC _Links>', key = 'link_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC notify_0033>', key = 'notify_color', tooltip = 'chat_color'},
                 {type = 'splitter'},
-                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
+                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 1},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
                 {type = 'splitter'},
