@@ -1459,9 +1459,16 @@ function CreateConfigWindow()
         index = index + 1
     end
 
+    local okBtn -- for reuse okBtn's.Onclick and for keeping buttons in logical order in the code flow (Apply + Reset | Ok + Cancel)
+    local applyBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC OPTIONS_0139>', 16)
+    LayoutHelpers.Below(applyBtn, optionGroup.options[index-1], 4)
+    LayoutHelpers.AtLeftIn(applyBtn, optionGroup)
+    applyBtn.OnClick = function(self) okBtn.OnClick(self, true) end -- re-use okBtn's click, but set noCloseDlg param
+
     local resetBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC _Reset>', 16)
     LayoutHelpers.Below(resetBtn, optionGroup.options[index-1], 4)
-    LayoutHelpers.AtHorizontalCenterIn(resetBtn, optionGroup)
+    LayoutHelpers.AtRightIn(resetBtn, optionGroup)
+    LayoutHelpers.ResetLeft(resetBtn)
     resetBtn.OnClick = function(self)
         for option, value in defOptions do
             for i, control in optionGroup.options do
@@ -1483,15 +1490,17 @@ function CreateConfigWindow()
         end
     end
 
-    local okBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC _Ok>', 16)
+    okBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC _Ok>', 16)
     LayoutHelpers.Below(okBtn, resetBtn, 4)
     LayoutHelpers.AtLeftIn(okBtn, optionGroup)
-    okBtn.OnClick = function(self)
+    okBtn.OnClick = function(self, noCloseDlg)
         ChatOptions = table.merged(ChatOptions, tempOptions)
         Prefs.SetToCurrentProfile("chatoptions", ChatOptions)
         GUI.bg:OnOptionsSet()
-        GUI.config:Destroy()
-        GUI.config = false
+        if (noCloseDlg or true) ~= true then -- preserve normal ok's behavior
+            GUI.config:Destroy()
+            GUI.config = false
+        end
     end
 
     local cancelBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC _Cancel>', 16)
