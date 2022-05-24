@@ -248,7 +248,7 @@ function CreateChatLines()
             for i = curEntries + 1, neededEntries do
                 local index = i
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
                 GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
@@ -281,7 +281,7 @@ function CreateChatLines()
             index = index + 1
             if not GUI.chatLines[index] then
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
                 GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
