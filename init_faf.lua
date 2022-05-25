@@ -459,7 +459,7 @@ allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)
 
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
-	LOG('Loading custom vault path' .. custom_vault_path)
+	LOG('Loading custom vault path: ' .. custom_vault_path)
 	LoadVaultContent(custom_vault_path)
 else
     LOG("No custom vault path defined: loading from backup locations. You should update your client to 2021/10/+.")

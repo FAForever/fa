@@ -435,17 +435,6 @@ end
 
 -- typical FAF packages
 local allowedAssetsNxy = { }
-allowedAssetsNxy["effects.nx5"] = true
-allowedAssetsNxy["env.nx5"] = true
-allowedAssetsNxy["etc.nx5"] = true
-allowedAssetsNxy["loc.nx5"] = true
-allowedAssetsNxy["lua.nx5"] = true
-allowedAssetsNxy["meshes.nx5"] = true
-allowedAssetsNxy["mods.nx5"] = true
-allowedAssetsNxy["projectiles.nx5"] = true
-allowedAssetsNxy["schook.nx5"] = true
-allowedAssetsNxy["textures.nx5"] = true
-allowedAssetsNxy["units.nx5"] = true
 allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)
 
 -- load maps / mods from custom vault location, if set by client
