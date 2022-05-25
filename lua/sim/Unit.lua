@@ -2230,6 +2230,7 @@ Unit = Class(moho.unit_methods) {
         -- }
         -- ... Which we must carefully ignore.
         local bpShield = bp.Defense.Shield
+        bpShield.SkipAttachmentCheck = true 
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end

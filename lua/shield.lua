@@ -107,6 +107,7 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
+    SkipAttachmentCheck = false,
 }
 
 -- scan blueprints for the largest shield radius
@@ -155,6 +156,8 @@ Shield = Class(moho.shield_methods, Entity) {
         self.RegenStartTime = spec.ShieldRegenStartTime
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
+        self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+        
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
@@ -752,7 +755,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
-            if UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory then
+            if (not self.SkipAttachmentCheck) and (UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory) then
                 ChangeState(self, self.OffState)
 
             -- if we're still out of energy, go wait for that to fix itself
