@@ -113,6 +113,7 @@ local function PopulateBlueprintCache(entity, blueprint)
     SharedTypeCache[blueprint.BlueprintId] = cache 
 end
 
+local cUnit = moho.unit_methods
 Unit = Class(moho.unit_methods) {
 
     Cache = false,
@@ -4275,6 +4276,13 @@ Unit = Class(moho.unit_methods) {
                 local message = {source = source or unitType, trigger = trigger, category = category, id = id, army = self.Army}
                 table.insert(Sync.EnhanceMessage, message)
             end
+        end
+    end,
+
+    SetStunned = function(self, duration)
+        LOG(self.ImmuneToStun)
+        if not self.ImmuneToStun then 
+            cUnit.SetStunned(self, duration)
         end
     end,
 

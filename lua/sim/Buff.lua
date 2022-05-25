@@ -272,10 +272,12 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             unit:SetAccMult(val)
             unit:SetTurnMult(val)
         elseif atype == 'Stun' and not afterRemove then
-            unit:SetStunned(buffDef.Duration or 1, instigator)
-            if unit.Anims then
-                for k, manip in unit.Anims do
-                    manip:SetRate(0)
+            if unit.ImmuneToStun then 
+                unit:SetStunned(buffDef.Duration or 1, instigator)
+                if unit.Anims then
+                    for k, manip in unit.Anims do
+                        manip:SetRate(0)
+                    end
                 end
             end
         elseif atype == 'WeaponsEnable' then
