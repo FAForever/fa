@@ -107,7 +107,7 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
-    SkipAttachmentCheck = false,
+    -- SkipAttachmentCheck = false, -- defaults to nil, same as false
 }
 
 -- scan blueprints for the largest shield radius
@@ -157,7 +157,7 @@ Shield = Class(moho.shield_methods, Entity) {
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
         self.SkipAttachmentCheck = spec.SkipAttachmentCheck
-        
+
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
