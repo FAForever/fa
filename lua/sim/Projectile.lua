@@ -157,9 +157,7 @@ Projectile = Class(moho.projectile_methods) {
         -- missiles can only be taken down by anti missiles
         if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
             if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
-                return alliedCheck 
-            else 
-                return false 
+                return other.Target == self 
             end
         end
 

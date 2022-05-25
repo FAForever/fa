@@ -42,6 +42,13 @@ local function PostProcessProjectile(projectile)
             projectile.DoNotCollideListHash[category] = true 
         end
     end
+
+    if projectile.CategoriesHash['MISSILE'] then 
+        if not projectile.DesiredShooterCap then 
+            WARN(string.format("Shooter cap defaults health (%i) for projectile %s", projectile.Defense.Health or 1, projectile.BlueprintId))
+            projectile.DesiredShooterCap = projectile.Defense.Health or 1
+        end
+    end
 end
 
 --- Post-processes all the provided projectile blueprints

@@ -84,7 +84,7 @@ local function PostProcessUnit(unit)
 
                 -- any other unit should stay at roughly the other edge of their primary weapon
                 else 
-                    unit.AI.GuardScanRadius = 0.90 * maxRadius
+                    unit.AI.GuardScanRadius = 4 * maxRadius
                 end
 
             -- units with no weaponry, like some scouts or spy planes

@@ -394,7 +394,11 @@ Weapon = Class(moho.weapon_methods) {
 
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
+        proj.Target = self:GetCurrentTarget()
+        DrawLine(proj:GetPosition(), proj.Target:GetPosition(), 'ffffff')
+
         local damageTable = self:GetDamageTable()
+
 
         if proj and not proj:BeenDestroyed() then
             proj:PassMetaDamage(damageTable)
