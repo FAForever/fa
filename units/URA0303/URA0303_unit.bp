@@ -109,7 +109,7 @@ UnitBlueprint {
     CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'ASF', # Light
+        ArmorType = 'ASF',
         EconomyThreatLevel = 0,
         Health = 1725,
         MaxHealth = 1725,
@@ -190,8 +190,8 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
-        SizeZ = 1,
+        SizeX = 3,
+        SizeZ = 3,
     },
     General = {
         Category = 'Fighter',
@@ -285,7 +285,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200, # 100
+            Damage = 200,
             DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
@@ -296,12 +296,12 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Missiles1',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 2
+            MuzzleSalvoDelay = 0,
+            MuzzleSalvoSize = 1,
             MuzzleVelocity = 65,
             ProjectileId = '/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp',
             ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 1, # 2
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -321,15 +321,14 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
+            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
+            AlwaysRecheckTarget = false,
+            TargetRestrictDisallow = 'UNTARGETABLE,POD',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 0,
+            TrackingRadius = 1.0,
             TurretBoneMuzzle = 'Missile_L',
             TurretBonePitch = 'Missile_L',
             TurretBoneYaw = 'Missile_L',
@@ -356,7 +355,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 200, # 100
+            Damage = 200,
             DamageFriendly = false,
             DamageRadius = 0,
             DamageType = 'Normal',
@@ -368,13 +367,13 @@ UnitBlueprint {
             FiringTolerance = 2,
             Label = 'Missiles2',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 2
+            MuzzleSalvoDelay = 0,
+            MuzzleSalvoSize = 1,
             MuzzleVelocity = 65,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/CAAMissileNanite03/CAAMissileNanite03_proj.bp',
             ProjectileLifetime = 3,
-            ProjectilesPerOnFire = 1, #2
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -394,13 +393,13 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
+            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
+            AlwaysRecheckTarget = false,
+            TrackingRadius = 1.0,
+            TargetRestrictDisallow = 'UNTARGETABLE,POD',
             TargetRestrictOnlyAllow = 'AIR',
             TurretBoneMuzzle = 'Missile_R',
             TurretBonePitch = 'Missile_R',
