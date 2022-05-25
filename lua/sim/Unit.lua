@@ -4280,7 +4280,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetStunned = function(self, duration)
-        LOG(self.ImmuneToStun)
         if not self.ImmuneToStun then 
             cUnit.SetStunned(self, duration)
         end
