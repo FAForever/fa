@@ -272,7 +272,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             unit:SetAccMult(val)
             unit:SetTurnMult(val)
         elseif atype == 'Stun' and not afterRemove then
-            if unit.ImmuneToStun then 
+            if not unit.ImmuneToStun then 
                 unit:SetStunned(buffDef.Duration or 1, instigator)
                 if unit.Anims then
                     for k, manip in unit.Anims do
