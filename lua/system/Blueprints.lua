@@ -64,6 +64,7 @@ DiskFindFiles = DiskFindFiles
 doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
+doscript("/lua/system/blueprints-units.lua")
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
 local function LoadPreGameData()
@@ -882,9 +883,9 @@ function PostModBlueprints(all_bps)
     CalculateLODs(all_bps)
     BlueprintLoaderUpdateProgress()
 
-    -- post process projectiles for easier access to information
+    -- post process units and projectiles for easier access to information and sanitizing some fields
     PostProcessProjectiles(all_bps.Projectile)
-
+    PostProcessUnits(all_bps.Unit)
 end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
