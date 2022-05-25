@@ -45,7 +45,7 @@ local function PostProcessProjectile(projectile)
 
     if projectile.CategoriesHash['MISSILE'] then 
         if not projectile.DesiredShooterCap then 
-            WARN(string.format("Shooter cap defaults health (%i) for projectile %s", projectile.Defense.Health or 1, projectile.BlueprintId))
+            WARN(string.format("Shooter cap defaults to health value %i for projectile %s", projectile.Defense.Health or 1, projectile.BlueprintId))
             projectile.DesiredShooterCap = projectile.Defense.Health or 1
         end
     end
