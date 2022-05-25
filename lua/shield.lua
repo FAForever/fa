@@ -16,6 +16,9 @@
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
 
+-- Current shield flags for mods:
+--  - SkipAttachmentCheck: flag that allows us to skip all attachment checks 
+
 -- Current shield states:
 -- - OnState
 -- - OffState
@@ -107,6 +110,8 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
+
+    -- flags for mods
     -- SkipAttachmentCheck = false, -- defaults to nil, same as false
 }
 

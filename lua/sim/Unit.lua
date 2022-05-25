@@ -2230,7 +2230,6 @@ Unit = Class(moho.unit_methods) {
         -- }
         -- ... Which we must carefully ignore.
         local bpShield = bp.Defense.Shield
-        bpShield.SkipAttachmentCheck = true 
         if bpShield.ShieldSize ~= 0 then
             self:CreateShield(bpShield)
         end
@@ -4220,8 +4219,12 @@ Unit = Class(moho.unit_methods) {
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
         if self:ShieldIsOn() or self.MyShield.Charging then
-            self:DisableShield()
+            if not self.MyShield.SkipAttachmentCheck then 
+                self:DisableShield()
+            end
+
             self:DisableDefaultToggleCaps()
+
         end
         self:DoUnitCallbacks('OnAttachedToTransport', transport, bone)
     end,
