@@ -4307,7 +4307,6 @@ Unit = Class(moho.unit_methods) {
     OnDamageBy = function(self, index) end,
 
     OnMissileIntercepted = function(self, target, defense, position) 
-        LOG(repr(target))
         DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
         DrawCircle(defense:GetPosition(), 5, '00ff00')      -- green
         DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
@@ -4315,7 +4314,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMissileImpactShield = function(self, target, shield, position)
-        LOG(repr(target))
         DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
         DrawCircle(shield:GetPosition(), 5, '00ff00')       -- green
         DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
@@ -4323,7 +4321,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnMissileImpactTerrain = function(self, target, position)
-        LOG(repr(target))
         DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
         DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
         DrawCircle(position, 5, 'ff0000')                   -- red
