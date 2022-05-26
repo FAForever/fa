@@ -41,9 +41,11 @@ local function PostProcessUnit(unit)
     local isScout = unit.CategoriesHash['SCOUT']
     local isArtillery = unit.CategoriesHash['ARTILLERY']
     local isAir = unit.CategoriesHash['AIR']
+    local isCommand = unit.CategoriesHash['COMMAND']
+    local isBomber = unit.CategoriesHash['BOMBER']
 
     -- do not touch guard scan radius values of engineer-like units, as it is the reason we have
-    -- the factory-reclaim-bug that we're keen in keeping at this point
+    -- the factory-reclaim-bug that we're keen in keeping that at this point
     if not isEngineer then 
 
         -- guarantee that the table exists
@@ -53,7 +55,14 @@ local function PostProcessUnit(unit)
         if isStructure then 
             unit.AI.GuardScanRadius = 0
 
-        -- any other unit should use primary weapon
+        -- exceptions as these are tweaked by balance team
+        elseif isLand and isScout then 
+            -- do nothing
+        
+        -- exceptions as these are tweaked by balance team
+        elseif isCommand then 
+            -- do nothing 
+
         else 
             -- check if we have a primary weapon
             local primaryWeapon = unit.Weapon[1]
@@ -62,29 +71,16 @@ local function PostProcessUnit(unit)
                 local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
                 local maxRadius = primaryWeapon.MaxRadius
                 
-                -- scouts should try and stay at the edge to prevent dying
-                if isScout then 
-                    unit.AI.GuardScanRadius = maxRadius
+                -- allow them to engage on targets more easily when on patrol
+                elseif isAir and isBomber then 
+                    unit.AI.GuardScanRadius = 2 * maxRadius
 
-                -- surface to air units should move in close
-                elseif isLand and isAntiAir then 
-                    unit.AI.GuardScanRadius = 0.65 * maxRadius
+                -- land to air and air to air units shouldn't get triggered too fast
+                elseif (isLand or isAir) and isAntiAir then 
+                    unit.AI.GuardScanRadius = 0.80 * maxRadius
 
-                -- this value doesn't make sense when doing an aggressive move for air to air, we give it some sane value for when they patrol
-                elseif isAir and isAntiAir then 
-                    unit.AI.GuardScanRadius = 0.60 * maxRadius                    
-
-                -- artillery should try and stay at the outer edge
-                elseif isArtillery then 
-                    unit.AI.GuardScanRadius = 1.05 * maxRadius
-
-                -- shields should try to get near the front
-                elseif isShield then 
-                    unit.AI.GuardScanRadius = 0.85 * maxRadius
-
-                -- any other unit should stay at roughly the other edge of their primary weapon
-                else 
-                    unit.AI.GuardScanRadius = 0.90 * maxRadius
+                -- all other units have - roughly - the default value of 10% on top of their maximum radius
+                    unit.AI.GuardScanRadius = 1.10 * maxRadius
                 end
 
             -- units with no weaponry, like some scouts or spy planes
