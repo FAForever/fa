@@ -22,11 +22,17 @@ function Update(data)
 end
 
 MassFabPanel = Class(Group) {
+
+    DefaultHeight = 72,
+    DefaultWidth = 104,
+
     __init = function(self, parent)
         Group.__init(self, parent)
         self._parent = parent
         self._collapseArrow = Checkbox(parent)
-        self._panel = Bitmap(self)
+        self._leftPanel = Bitmap(self)
+        self._rightPanel = Bitmap(self)
+        self._centerPanel = Bitmap(self)
         self._leftBrace = Bitmap(self)
         self._rightBrace = Bitmap(self)
         self._activeCountText = UIUtil.CreateText(self, "0", 18, UIUtil.bodyFont, true)
@@ -41,11 +47,16 @@ MassFabPanel = Class(Group) {
     end,
 
     _Layout = function(self)
-        self._panel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_bmp.dds"))
+        self._leftPanel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_l_bmp.dds"))
+        self._rightPanel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_r_bmp.dds"))
+        self._centerPanel:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/filter-ping-panel01_c_bmp.dds"))
         self._leftBrace:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/bracket-energy-r_bmp.dds"))
         self._rightBrace:SetTexture(UIUtil.SkinnableFile("/game/filter-ping-panel/bracket-energy-r_bmp.dds"))
 
-        self._panel:DisableHitTest()
+        self._centerPanel:DisableHitTest()
+        self._leftPanel:DisableHitTest()
+        self._rightPanel:DisableHitTest()
+
         self._leftBrace:DisableHitTest()
         self._rightBrace:DisableHitTest()
 
@@ -61,10 +72,17 @@ MassFabPanel = Class(Group) {
 
         LayoutHelpers.DepthOverParent(self._collapseArrow, self, 10)
 
-        self.Height:Set(self._panel.Height)
-        self.Width:Set(self._panel.Width)
+        self.Height:Set(LayoutHelpers.ScaleNumber(self.DefaultHeight))
+        self.Width:Set(LayoutHelpers.ScaleNumber(self.DefaultWidth))
 
-        LayoutHelpers.FillParent(self._panel, self)
+        self._leftPanel.Top:Set(self.Top)
+        self._rightPanel.Top:Set(self.Top)
+        self._centerPanel.Top:Set(self.Top)
+
+        self._leftPanel.Left:Set(self.Left)
+        self._rightPanel.Right:Set(self.Right)
+        self._centerPanel.Left:Set(self._leftPanel.Right)
+        self._centerPanel.Right:Set(self._rightPanel.Left)
 
         LayoutHelpers.AtLeftIn(self._leftBrace, self, 11)
         LayoutHelpers.AtTopIn(self._leftBrace, self)
@@ -76,8 +94,8 @@ MassFabPanel = Class(Group) {
         LayoutHelpers.AnchorToRight(self._rightBrace, self, -11)
         LayoutHelpers.AtTopIn(self._rightBrace, self)
 
-        LayoutHelpers.AtLeftTopIn(self._activeCountText, self, 10, 10)
-        LayoutHelpers.AtLeftBottomIn(self._inactiveCountText, self, 10, 10)
+        LayoutHelpers.AtLeftTopIn(self._activeCountText, self, 12, 10)
+        LayoutHelpers.AtLeftBottomIn(self._inactiveCountText, self, 12, 10)
 
         LayoutHelpers.AtRightTopIn(self._energyConsumedText, self, 12, 8)
         LayoutHelpers.AtRightBottomIn(self._energyRequiredText, self, 12, 8)
