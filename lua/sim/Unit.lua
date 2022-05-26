@@ -231,7 +231,6 @@ Unit = Class(moho.unit_methods) {
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
         self.Layer = self:GetCurrentLayer()
-        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
         -- the entity that produces sound, by default ourself
         self.SoundEntity = self
@@ -377,6 +376,9 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
 
         self.Repairers = {}
+
+        -- Flags for scripts
+        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
     end,
 
     -------------------------------------------------------------------------------------------
