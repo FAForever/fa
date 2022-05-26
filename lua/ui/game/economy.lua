@@ -168,7 +168,6 @@ function CommonLogic()
             group.expense:SetHidden(hidden)
             group.reclaimDelta:SetHidden(hidden)
             group.reclaimTotal:SetHidden(hidden)
-            group.warningBG:SetHidden(hidden)
 
             return true
         end
