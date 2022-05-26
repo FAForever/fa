@@ -10,6 +10,7 @@ local Game = import('/lua/game.lua')
 local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleration.lua').CalculateBallisticAcceleration
 
 -- Most weapons derive from this class, including beam weapons later in this file
+---@class DefaultProjectileWeapon: Weapon
 DefaultProjectileWeapon = Class(Weapon) {
 
     FxRackChargeMuzzleFlash = {},

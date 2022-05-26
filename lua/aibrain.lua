@@ -44,13 +44,17 @@ local Points = {
 
 local CoroutineYield = coroutine.yield
 
+---@class AIBrain
 AIBrain = Class(moho.aibrain_methods) {
 
     -- for the engi mod
 
 
-   -- HUMAN BRAIN FUNCTIONS HANDLED HERE
+   --- HUMAN BRAIN FUNCTIONS HANDLED HERE
+   ---@param self AIBrain
+   ---@param planName string
     OnCreateHuman = function(self, planName)
+        self.
         self:CreateBrainShared(planName)
         self.BrainType = 'Human'
 

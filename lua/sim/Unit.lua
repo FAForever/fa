@@ -113,6 +113,7 @@ local function PopulateBlueprintCache(entity, blueprint)
     SharedTypeCache[blueprint.BlueprintId] = cache 
 end
 
+---@class Unit
 Unit = Class(moho.unit_methods) {
 
     Cache = false,
