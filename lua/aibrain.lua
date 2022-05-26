@@ -54,7 +54,6 @@ AIBrain = Class(moho.aibrain_methods) {
    ---@param self AIBrain
    ---@param planName string
     OnCreateHuman = function(self, planName)
-        self.
         self:CreateBrainShared(planName)
         self.BrainType = 'Human'
 

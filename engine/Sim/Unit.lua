@@ -1,4 +1,4 @@
----@class Unit
+---@class moho_unit_methods
 local Unit = {}
 -- @classmod Sim.Unit
 
