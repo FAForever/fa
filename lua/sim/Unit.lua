@@ -1084,10 +1084,6 @@ Unit = Class(moho.unit_methods) {
                 self:Kill(instigator, damageType, excessDamageRatio)
             end
         end
-
-        if health < 1 or self.Dead then
-            self.debris_Vector = vector or ''
-        end
     end,
 
     ManageDamageEffects = function(self, newHealth, oldHealth)
