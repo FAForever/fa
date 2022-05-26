@@ -8,7 +8,7 @@
 -- Legacy shield flags:
 --  - _IsUp: determines whether the shield is up
 
--- Current shield flags:
+-- Shield flags:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
@@ -16,10 +16,10 @@
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
 
--- Current shield flags for mods:
+-- Shield flags for mods:
 --  - SkipAttachmentCheck: flag that allows us to skip all attachment checks, as an example when the unit is attached to a transport
 
--- Current shield states:
+-- Shield states:
 -- - OnState
 -- - OffState
 -- - RechargeState
