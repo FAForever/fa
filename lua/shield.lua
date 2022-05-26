@@ -17,7 +17,7 @@
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
 
 -- Current shield flags for mods:
---  - SkipAttachmentCheck: flag that allows us to skip all attachment checks 
+--  - SkipAttachmentCheck: flag that allows us to skip all attachment checks, as an example when the unit is attached to a transport
 
 -- Current shield states:
 -- - OnState
