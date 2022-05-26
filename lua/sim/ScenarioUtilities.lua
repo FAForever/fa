@@ -351,13 +351,6 @@ function CreateInitialArmyGroup(strArmy, createCommander)
         end
     end
 
-    -- for all civilian units
-    if tblGroup and ScenarioInfo.ArmySetup[strArmy].Civilian then 
-        for k, unit in tblGroup do 
-            unit.IsCivilian = true
-        end
-    end
-
     return tblGroup, cdrUnit
 end
 
