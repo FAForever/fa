@@ -44,11 +44,7 @@ local StringGsub = string.gsub
 -- upvalue table functions for performance
 local TableInsert = table.insert
 
-Prop = Class(moho.prop_methods, Entity) {
-
-    -- override the functions provided in the Entity class: we don't need an additional c-object!
-    __init = false,
-    __post_init = false,
+Prop = Class(moho.prop_methods) {
 
     OnCreate = function(self)
 

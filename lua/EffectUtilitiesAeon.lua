@@ -82,7 +82,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unit
     if EntityCategoryContains(CategoriesHover, unitBeingBuilt) then 
 
         -- set elevation offset
-        offset = unitBeingBuilt.Elevation or 0
+        offset = unitBeingBuilt.Blueprint.Elevation or 0
 
         -- create a slider
         slider = CreateSlider(unitBeingBuilt, 0)
@@ -132,7 +132,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, unitBeingBuiltTrash, unit
     end
 
     -- set correct shader of unitBeingBuilt so that it happens instantly after finishing
-    unitBeingBuilt:SetMesh(unitBeingBuilt.MeshBlueprint, true)
+    unitBeingBuilt:SetMesh(unitBeingBuilt.Blueprint.Display.MeshBlueprint, true)
 end
 
 --- The build animation for Aeon buildings in general.
@@ -153,12 +153,12 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
 
     local effect = false
     local army = unitBeingBuilt.Army
-    local orientation = EntityGetOrientation(unitBeingBuilt)
     local unitBeingBuiltTrash = unitBeingBuilt.Trash
     local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local sx = unitBeingBuilt.BuildExtentsX
-    local sz = unitBeingBuilt.BuildExtentsZ
-    local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
+    local bp = unitBeingBuilt.Blueprint
+    local sx = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
+    local sz = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
+    local sy = bp.Physics.MeshExtentsY or bp.Footprint.SizeYX or (sx + sz)
 
     -- # Create pool of mercury
 
@@ -166,7 +166,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     TrashBagAdd(unitBeingBuiltTrash, pool)
     TrashBagAdd(unitOnStopBeingBuiltTrash, pool)
 
-    EntitySetOrientation(pool, orientation, true)
+    EntitySetOrientation(pool, EntityGetOrientation(unitBeingBuilt), true)
     ProjectileSetScale(pool, sx, sy * 1.5, sz)
 
     -- # Create effects
@@ -229,9 +229,9 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         local unitBeingBuiltTrash = unitBeingBuilt.Trash
         local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
-        local sx = unitBeingBuilt.BuildExtentsX
-        local sz = unitBeingBuilt.BuildExtentsZ
-        local sy = unitBeingBuilt.BuildExtentsY or (sx + sz)
+        local sx = unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
+        local sz = unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
+        local sy = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
 
         -- # Create pool of mercury
 
@@ -443,9 +443,9 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
     local orientation = EntityGetOrientation(unitBeingBuilt)
 
-    local sx = 0.6 * unitBeingBuilt.BuildExtentsX
-    local sz = 0.6 * unitBeingBuilt.BuildExtentsZ
-    local sy = 1.5 * (unitBeingBuilt.BuildExtentsY or (sx + sz))
+    local sx = 0.6 * unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
+    local sz = 0.6 * unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
+    local sy = 1.5 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
 
     -- # Create generic build effects
 
@@ -513,9 +513,9 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
     local orientation = EntityGetOrientation(unitBeingBuilt)
 
-    local sx = 0.55 * unitBeingBuilt.BuildExtentsX
-    local sz = 0.55 * unitBeingBuilt.BuildExtentsZ
-    local sy = 3 * unitBeingBuilt.BuildExtentsY or (sx + sz)
+    local sx = 0.55 * unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
+    local sz = 0.55 * unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
+    local sy = 3 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
 
     -- # Create effects of build animation
 
@@ -619,9 +619,9 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
     local orientation = EntityGetOrientation(unitBeingBuilt)
 
-    local sx = 1 * unitBeingBuilt.BuildExtentsX
-    local sz = 1 * unitBeingBuilt.BuildExtentsZ
-    local sy = 2 * unitBeingBuilt.BuildExtentsY or (sx + sz)
+    local sx = 1 * unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
+    local sz = 1 * unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
+    local sy = 2 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
 
     -- # Create effects of build animation
 

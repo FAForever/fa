@@ -37,7 +37,7 @@ StructureUnit = Class(Unit) {
     OnCreate = function(self)
         Unit.OnCreate(self)
         self:HideLandBones()
-        self.WeaponMod = {}
+        self.AdjacentUnits = {}
         self.FxBlinkingLightsBag = {}
         if self.Layer == 'Land' and self.Blueprint.Physics.FlattenSkirt then
             self:FlattenSkirt()
