@@ -8,7 +8,7 @@
 -- Legacy shield flags:
 --  - _IsUp: determines whether the shield is up
 
--- Current shield flags:
+-- Shield flags:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
@@ -16,7 +16,10 @@
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
 
--- Current shield states:
+-- Shield flags for mods:
+--  - SkipAttachmentCheck: flag that allows us to skip all attachment checks, as an example when the unit is attached to a transport
+
+-- Shield states:
 -- - OnState
 -- - OffState
 -- - RechargeState
@@ -107,6 +110,9 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
+
+    -- flags for mods
+    -- SkipAttachmentCheck = false, -- defaults to nil, same as false
 }
 
 -- scan blueprints for the largest shield radius
@@ -155,6 +161,8 @@ Shield = Class(moho.shield_methods, Entity) {
         self.RegenStartTime = spec.ShieldRegenStartTime
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
+        self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
@@ -752,7 +760,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
-            if UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory then
+            if (not self.SkipAttachmentCheck) and (UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory) then
                 ChangeState(self, self.OffState)
 
             -- if we're still out of energy, go wait for that to fix itself
