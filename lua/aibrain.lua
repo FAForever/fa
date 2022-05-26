@@ -406,10 +406,11 @@ AIBrain = Class(moho.aibrain_methods) {
         while true do 
 
             local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
+            local energyStored = self:GetEconomyStored('ENERGY')
             local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
 
             -- low on storage, start disabling them to fill our storages asap
-            if energyStoredRatio < 0.9 then 
+            if energyStoredRatio < 0.8 and energyStored < 39000 then 
 
                 -- while we have units to disable
                 for id, unit in EnergyExcessUnitsEnabled do 
@@ -437,7 +438,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             
             -- high on storage and sufficient energy income, enable units
-            elseif energyStoredRatio >= 1.0 and energyTrend > 100 then 
+            elseif energyStoredRatio >= 0.9 and energyTrend > 100 or energyStored > 41000 then 
 
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
