@@ -95,13 +95,13 @@ MassFabPanel = Class(Group) {
         LayoutHelpers.AtTopIn(self._rightBrace, self)
 
         LayoutHelpers.AtLeftTopIn(self._activeCountText, self, 12, 10)
-        LayoutHelpers.AtLeftBottomIn(self._inactiveCountText, self, 12, 10)
+        LayoutHelpers.AtLeftTopIn(self._inactiveCountText, self, 12, 39)
 
-        LayoutHelpers.AtRightTopIn(self._energyConsumedText, self, 12, 8)
-        LayoutHelpers.AtRightBottomIn(self._energyRequiredText, self, 12, 8)
+        LayoutHelpers.AtRightTopIn(self._massProducedText, self, 12, 8)
+        LayoutHelpers.AtRightTopIn(self._energyRequiredText, self, 12, 49)
 
-        LayoutHelpers.AnchorToBottom(self._massProducedText, self._energyConsumedText, -1)
-        self._massProducedText.Right:Set(self._energyConsumedText.Right)
+        LayoutHelpers.AnchorToBottom(self._energyConsumedText, self._massProducedText, -1)
+        self._energyConsumedText.Right:Set(self._massProducedText.Right)
 
 
         Tooltip.AddControlTooltip(self._energyRequiredText, "mf_energy_required")
