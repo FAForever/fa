@@ -4325,6 +4325,7 @@ Unit = Class(moho.unit_methods) {
     OnMissileImpactTerrain = function(self, target, position)
         LOG(repr(target))
         DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
+        DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
         DrawCircle(position, 5, 'ff0000')                   -- red
     end,
 
