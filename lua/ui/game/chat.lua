@@ -1258,10 +1258,12 @@ function CreateConfigWindow()
         br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
         borderColor = 'ff415055',
     }
-    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, false, 'chat_config', nil, windowTextures)
+
+    local defPosition = Prefs.GetFromCurrentProfile('chat_config') or nil
+    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', defPosition, windowTextures)
     GUI.config.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     Tooltip.AddButtonTooltip(GUI.config._closeBtn, 'chat_close')
-    LayoutHelpers.AnchorToTop(GUI.config, GetFrame(0), 0)
+    LayoutHelpers.AnchorToBottom(GUI.config, GetFrame(0), -700)
     LayoutHelpers.SetWidth(GUI.config, 300)
     LayoutHelpers.AtHorizontalCenterIn(GUI.config, GetFrame(0))
     LayoutHelpers.ResetRight(GUI.config)
@@ -1515,6 +1517,13 @@ function CreateConfigWindow()
 
 
     GUI.config.Bottom:Set(function() return okBtn.Bottom() + 5 end)
+    if defPosition ~= nil then
+        GUI.config.Top:Set(defPosition.top)
+        GUI.config.Left:Set(defPosition.left)
+    else
+        GUI.config.Top:Set(function() return 90 end)
+    end
+    GUI.config:SetPositionLock(false) -- allow window to be draggable, didn't worked in Window() call
 end
 
 function CloseChatConfig()
