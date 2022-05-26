@@ -36,6 +36,7 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 -- upvalue for performance
 local rawget = rawget 
 local IsAlly = IsAlly
+local armies = ListArmies()
 
 -- Structures that are reused for performance reasons
 -- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -375,6 +376,9 @@ Unit = Class(moho.unit_methods) {
         self.AdjacentUnits = {}
 
         self.Repairers = {}
+
+        -- Flags for scripts
+        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
     end,
 
     -------------------------------------------------------------------------------------------
