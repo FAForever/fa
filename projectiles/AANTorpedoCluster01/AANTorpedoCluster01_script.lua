@@ -7,9 +7,9 @@
 --**
 --**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
 local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 -- cache specification table 
 local CachedSpecifications = {
@@ -29,8 +29,10 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
     FxTrail = import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01,
 
-    FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-                    '/effects/emitters/water_splash_plume_01_emit.bp',},
+    FxEnterWater= { 
+        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+        '/effects/emitters/water_splash_plume_01_emit.bp',
+    },
 
     OnCreate = function(self)
         ATorpedoCluster.OnCreate(self)
@@ -56,14 +58,8 @@ AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
         self:Destroy()
     end,
-    
-    OnImpact = function(self, TargetType, TargetEntity)
-
-        -- is this possible?
-        if (TargetEntity == nil) and (TargetType == "Air") then
-            return
-        end
-        ATorpedoCluster.OnImpact(self, TargetType, TargetEntity)
-    end,
 }
 TypeClass = AANTorpedoCluster01
+
+-- kept for mod backwards compatibility
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat

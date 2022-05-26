@@ -2,5 +2,6 @@
 -- Aeon Chrono Torpedo Pack
 
 -- uab2205
-AANTorpedoChronoPack01 = Class(import('/lua/aeonprojectiles.lua').ATorpedoShipProjectile) { }
+local ATorpedoShipProjectile = import('/lua/aeonprojectiles.lua').ATorpedoShipProjectile
+AANTorpedoChronoPack01 = Class(ATorpedoShipProjectile) { }
 TypeClass = AANTorpedoChronoPack01
