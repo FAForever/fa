@@ -19,7 +19,6 @@
     "Lua.workspace.ignoreDir": [
         ".vscode",
         "loc",
-        "engine"
     ],
     "[lua]": {
         "editor.wordBasedSuggestions": false,
@@ -29,4 +28,7 @@
     "Lua.runtime.pathStrict": false,
     "Lua.runtime.exportEnvDefault": true,
     "Lua.completion.autoRequire": false,
+    "Lua.diagnostics.globals": [
+        "moho"
+    ],
 }
