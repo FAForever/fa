@@ -215,6 +215,7 @@ AIBrain = Class(moho.aibrain_methods) {
         return count
     end,
 
+    ---@param self AIBrain
     CreateBrainShared = function(self, planName)
 
         -- make sure there is always some storage
@@ -333,8 +334,8 @@ AIBrain = Class(moho.aibrain_methods) {
     -- Energy storage callbacks
 
     --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts enabled
-    -- @param self The brain itself
-    -- @param unit The unit to keep track of
+    ---@param self AIBrain The brain itself
+    ---@param unit MassFabricationUnit The unit to keep track of
     AddEnabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
         self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
@@ -357,15 +358,16 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
-    -- @param self The brain itself
+    ---@param self AIBrain The brain itself
     ToggleEnergyExcessUnitsThread = function (self)
 
         -- allow for protected calls without closures
-
+        ---@param unitToProcess MassFabricationUnit
         local function ProtectedOnExcessEnergy(unitToProcess)
             unitToProcess:OnExcessEnergy()
         end
 
+        ---@param unitToProcess MassFabricationUnit
         local function ProtectedOnNoExcessEnergy(unitToProcess)
             unitToProcess:OnNoExcessEnergy()
         end

@@ -23,7 +23,8 @@
 --                          AntiSub
 --                          Economy
 --                          Unknown
-
+---@class AIBrain
+local CAiBrain = {}
 function CAiBrain:AssignThreatAtPosition(position, threat, [decay], [threatType])
 end
 
@@ -229,8 +230,8 @@ function CAiBrain:GetEconomyStoredRatio(resource)
 end
 
 --- Returns the relative resource income. (production - usage)
--- @param resource 'ENERGY' or 'MASS'.
--- @return Number. (0.1 = 1)
+---@param resource 'ENERGY'|'MASS'.
+---@return number  (0.1 = 1)
 function CAiBrain:GetEconomyTrend(resource)
 end
 

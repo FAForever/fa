@@ -1,3 +1,4 @@
+---@declare-global
 ---Module: Sim
 -- @module Sim
 
@@ -365,6 +366,8 @@ function GenerateRandomOrientation()
 end
 
 --- Returns an army brain given the brain's name.
+---@param strArmy any
+---@return AIBrain
 function GetArmyBrain(strArmy)
 end
 

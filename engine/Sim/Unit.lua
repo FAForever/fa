@@ -1,4 +1,5 @@
---- Class Unit
+---@class Unit
+local Unit = {}
 -- @classmod Sim.Unit
 
 --- Add a command cap to a unit.
@@ -719,6 +720,6 @@ end
 
 ---
 --
-function Unit:moho.unit_methods()
-end
+moho.unit_methods = Unit
+
 

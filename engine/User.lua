@@ -1,3 +1,4 @@
+---@declare-global
 ---Module: User
 -- @module User
 

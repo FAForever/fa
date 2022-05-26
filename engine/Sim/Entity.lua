@@ -1,4 +1,4 @@
---- Class Entity
+---@class Entity
 -- @classmod Sim.Entity
 
 ---

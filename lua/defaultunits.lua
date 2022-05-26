@@ -1156,6 +1156,7 @@ MassCollectionUnit = Class(StructureUnit) {
 ---@class MassFabricationUnit : StructureUnit
 MassFabricationUnit = Class(StructureUnit) {
 
+    ---@param self MassFabricationUnit
     OnScriptBitSet = function(self, bit)
         if bit == 4 then 
             -- no longer track us, we want to be disabled
@@ -1168,6 +1169,7 @@ MassFabricationUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self MassFabricationUnit
     OnScriptBitClear = function (self, bit)
         if bit == 4 then 
             -- make brain track us to enable / disable accordingly

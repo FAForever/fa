@@ -114,6 +114,7 @@ local function PopulateBlueprintCache(entity, blueprint)
 end
 
 ---@class Unit
+---@field Brain AIBrain
 Unit = Class(moho.unit_methods) {
 
     Cache = false,
