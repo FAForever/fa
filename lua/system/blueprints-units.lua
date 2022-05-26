@@ -43,6 +43,14 @@ local function PostProcessUnit(unit)
     local isAir = unit.CategoriesHash['AIR']
     local isCommand = unit.CategoriesHash['COMMAND']
     local isBomber = unit.CategoriesHash['BOMBER']
+    local isAntiNavy = unit.CategoriesHash['ANTINAVY']
+
+    local isTech1 = unit.CategoriesHash['TECH1']
+    local isTech2 = unit.CategoriesHash['TECH2']
+    local isTech3 = unit.CategoriesHash['TECH3']
+    local isExperimental = unit.CategoriesHash['EXPERIMENTAL']
+
+    local isScathis = unit.BlueprintId == 'url0401'
 
     -- do not touch guard scan radius values of engineer-like units, as it is the reason we have
     -- the factory-reclaim-bug that we're keen in keeping that at this point
@@ -63,6 +71,9 @@ local function PostProcessUnit(unit)
         elseif isCommand then 
             -- do nothing 
 
+        elseif isScathis then 
+            -- do nothing
+
         else 
             -- check if we have a primary weapon
             local primaryWeapon = unit.Weapon[1]
@@ -78,7 +89,7 @@ local function PostProcessUnit(unit)
                 -- let bombers use their tracking radius, usually 1.25
                 elseif isAir and isBomber then 
                     unit.AI.GuardScanRadius = trackingRadius * maxRadius
-
+                
                 -- all other units have - roughly - the default value of 10% on top of their maximum radius
                 else
                     unit.AI.GuardScanRadius = 1.10 * maxRadius
@@ -89,6 +100,21 @@ local function PostProcessUnit(unit)
                 unit.AI.GuardScanRadius = 0
             end
         end
+
+        -- cap it, some units have extreme values for their tech level
+        if isTech1 and unit.AI.GuardScanRadius > 40 then 
+            unit.AI.GuardScanRadius = 40 
+        elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
+            unit.AI.GuardScanRadius = 80
+        elseif isTech3 and unit.AI.GuardScanRadius > 160 then 
+            unit.AI.GuardScanRadius = 160
+        elseif isExperimental and unit.AI.GuardScanRadius > 320 then 
+            unit.AI.GuardScanRadius = 320
+        end
+
+        -- sanitize it
+        unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius) + 1 -- +1 to indicate unit is capped
+
     end
 
     -- sanitize air staging radius
@@ -108,6 +134,21 @@ end
 --- Post-processes all units
 function PostProcessUnits(units)
     for k, unit in units do 
+
+        local oldGuardScanRadius = unit.AI.GuardScanRadius
+        if not oldGuardScanRadius then 
+            local primaryWeapon = unit.Weapon[1]
+            if primaryWeapon then 
+                local maxRadius = primaryWeapon.MaxRadius or 0
+                local trackingRadius = primaryWeapon.TrackingRadius or 1.0
+                oldGuardScanRadius = trackingRadius * maxRadius
+            else 
+                oldGuardScanRadius = 25 -- default value
+            end
+        end
+
         PostProcessUnit(unit)
+
+        LOG("Processing: " .. unit.BlueprintId .. " - GuardScanRadius: " .. tostring(oldGuardScanRadius) .. " -> " .. tostring(unit.AI.GuardScanRadius) .. " (" .. tostring(unit.General.UnitName) .. ")")
     end
 end
