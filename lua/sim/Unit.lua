@@ -4306,6 +4306,28 @@ Unit = Class(moho.unit_methods) {
     OnSpecialAction = function(self, location) end,
     OnDamageBy = function(self, index) end,
 
+    OnMissileIntercepted = function(self, target, defense, position) 
+        LOG(repr(target))
+        DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
+        DrawCircle(defense:GetPosition(), 5, '00ff00')      -- green
+        DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
+        DrawCircle(position, 5, 'ff0000')                   -- red
+    end,
+
+    OnMissileImpactShield = function(self, target, shield, position)
+        LOG(repr(target))
+        DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
+        DrawCircle(shield:GetPosition(), 5, '00ff00')       -- green
+        DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
+        DrawCircle(position, 5, 'ff0000')                   -- red
+    end,
+
+    OnMissileImpactTerrain = function(self, target, position)
+        LOG(repr(target))
+        DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
+        DrawCircle(position, 5, 'ff0000')                   -- red
+    end,
+
     --- Deprecated functionality
 
     AddOnHorizontalStartMoveCallback = function(self, fn)

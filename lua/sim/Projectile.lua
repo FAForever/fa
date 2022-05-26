@@ -211,6 +211,12 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile is killed, in other words: intercepted
     OnKilled = function(self, instigator, type, overkillRatio)
+
+        -- callbacks for launcher to have an idea what is going on for AIs
+        if not IsDestroyed(self.Launcher) then 
+            self.Launcher:OnMissileIntercepted(self.Target, instigator, self:GetPosition())
+        end
+
         self:CreateImpactEffects(self.Army, self.FxOnKilled, self.FxOnKilledScale)
         self:Destroy()
     end,
@@ -219,6 +225,38 @@ Projectile = Class(moho.projectile_methods) {
     -- @param targetType 
     -- @param targetEntity 
     OnImpact = function(self, targetType, targetEntity)
+
+        -- in case the OnImpact crashes it guarantees that it gets destroyed at some point, useful for mods 
+        self.Impacts = (self.Impacts or 0) + 1
+        if self.Impacts > 3 then 
+            WARN("Faulty destroyed manually: " .. tostring(self.Blueprint.BlueprintId))
+            self:Destroy()
+            return
+        end
+
+        -- localize information for performance
+        local position = self:GetPosition()
+        local damageData = self.DamageData
+        local radius = damageData.DamageRadius or 0
+        local bp = self.Blueprint 
+
+        -- callbacks for launcher to have an idea what is going on for AIs
+        local categoriesHash = self.Blueprint.CategoriesHash
+        if categoriesHash['TACTICAL'] or categoriesHash['STRATEGICAL'] then
+            -- we had a target, but got caught by terrain
+            if targetType == 'Terrain' and self.Target and not self.Target:BeenDestroyed() then 
+                if not IsDestroyed(self.Launcher) then 
+                    self.Launcher:OnMissileImpactTerrain(self.Target, position)
+                end
+
+            -- we have a target, but got caught by an (unexpected) shield
+            elseif targetType == 'Shield' and self.Target and self.Target ~= targetEntity.Owner then 
+                if not IsDestroyed(self.Launcher) then 
+                    self.Launcher:OnMissileImpactShield(self.Target, targetEntity.Owner, position)
+                end
+            end
+        end
+
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
         local instigator = self.Launcher or self 
@@ -226,9 +264,7 @@ Projectile = Class(moho.projectile_methods) {
         -- localize information for performance
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
-        local damageData = self.DamageData
-        local radius = damageData.DamageRadius or 0
-        local bp = self.Blueprint 
+
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
