@@ -400,8 +400,3 @@ function AIModTemplatesPreloader()
     end
 end
 
-LOG("Sim init: check if they are the same")
-LOG(__blueprints[__blueprints[1].BlueprintId])
-LOG(__blueprints[1])
-LOG(table.getsize(__blueprints))
-
