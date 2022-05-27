@@ -113,7 +113,7 @@ local function PostProcessUnit(unit)
         end
 
         -- sanitize it
-        unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius) + 1 -- +1 to indicate unit is capped
+        unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
 
     end
 
