@@ -1521,7 +1521,7 @@ function CreateConfigWindow()
         GUI.config.Top:Set(defPosition.top)
         GUI.config.Left:Set(defPosition.left)
     else
-        GUI.config.Top:Set(function() return 90 end)
+        GUI.config.Top:Set(function() return LayoutHelpers.ScaleNumber(90) end)
     end
     GUI.config:SetPositionLock(false) -- allow window to be draggable, didn't worked in Window() call
 end
