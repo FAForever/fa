@@ -3,10 +3,12 @@
 --   This will create a temporary sonar buoy unit when it hits the water, nothing more.
 --   This projectile is not intended to do damage.
 --
+-- unused ???
 
--- unused???
---[[
-TIMSonarBuoyCreator01 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipProjectile) {
+local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
+
+---@class TIMSonarBuoyCreator01 : TTorpedoShipProjectile
+TIMSonarBuoyCreator01 = Class(TTorpedoShipProjectile) {
     FxSplashScale = 0.2,
     FxTrailScale = 3,
     FxExitWaterEmitter = {
@@ -15,9 +17,9 @@ TIMSonarBuoyCreator01 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipP
         '/effects/emitters/destruction_water_splash_plume_01_emit.bp',
     },
 
-
+    ---@param self TIMSonarBuoyCreator01
 	OnCreate = function(self)
-		TTorpedoshipProjectile.OnCreate(self)
+		TTorpedoShipProjectile.OnCreate(self)
 		-- creates collision shape on creation since that's how it used to work
 		-- before collision shapes got moved to creation OnEnterWater for torpedos
 		-- to prevent them from being shot out of the sky
@@ -37,4 +39,3 @@ TIMSonarBuoyCreator01 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipP
 }
 
 TypeClass = TIMSonarBuoyCreator01
-]]

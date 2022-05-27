@@ -1,7 +1,10 @@
 -- Terran Napalm Carpet Bomb
 
---unused???
---[[
-TIFNapalmCarpetBomb01 = Class(import('/lua/terranprojectiles.lua').TNapalmCarpetBombProjectile) { }
+
+-- UEA0103
+local TNapalmCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmCarpetBombProjectile
+
+---@class TIFNapalmCarpetBomb01 : TNapalmCarpetBombProjectile
+TIFNapalmCarpetBomb01 = Class(TNapalmCarpetBombProjectile) { }
+
 TypeClass = TIFNapalmCarpetBomb01
---]]

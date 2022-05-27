@@ -9,5 +9,12 @@
 -------------------------------------------------------------------------------
 
 -- DEA0202
-TIFNapalmCarpetBomb02 = Class(import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile) {}
+local TNapalmHvyCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile
+
+---@class TIFNapalmCarpetBomb02 : TNapalmHvyCarpetBombProjectile
+TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) { }
+
 TypeClass = TIFNapalmCarpetBomb02
+
+local EffectTemplate = import('/lua/EffectTemplates.lua')
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat

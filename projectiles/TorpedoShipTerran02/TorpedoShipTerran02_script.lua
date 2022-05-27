@@ -1,8 +1,10 @@
 -- Terran Land-based torpedo
+-- unused ???
 
---unused???
---[[
-TorpedoShipTerran02 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipProjectile) {
+local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
+
+---@class TorpedoShipTerran02 : TTorpedoShipProjectile
+TorpedoShipTerran02 = Class(TTorpedoShipProjectile) {
     FxSplashScale = 1,
 
     -- copied from terran projectiles, TMissileCruiseSubProjectile
@@ -12,16 +14,16 @@ TorpedoShipTerran02 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipPro
         '/effects/emitters/destruction_water_splash_plume_01_emit.bp',
     },
 
-    --OnCreate = function(self)
-    --    TMissileCruiseSubProjectile.OnCreate(self)
-    --    self:SetScale(0.6)
-    --end
-
+    ---@param self TorpedoShipTerran02
     OnEnterWater = function(self)
         TTorpedoShipProjectile.OnEnterWater(self)
 
         for i in self.FxExitWaterEmitter do --splash
-            CreateEmitterAtEntity(self,self:GetArmy(),self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+            if self.FxSplashScale ~= 1 then
+                CreateEmitterAtEntity(self, self:GetArmy(), self.FxExitWaterEmitter[i])
+            else
+                CreateEmitterAtEntity(self, self:GetArmy(), self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
+            end
         end
 
         self:TrackTarget(true)
@@ -33,4 +35,3 @@ TorpedoShipTerran02 = Class(import('/lua/terranprojectiles.lua').TTorpedoShipPro
 }
 
 TypeClass = TorpedoShipTerran02
-]]
