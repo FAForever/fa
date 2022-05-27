@@ -74,8 +74,8 @@ function ToggleAvatars(checked)
     -- disable when in Screen Capture mode
     if GameMain.gameUIHidden then
        return
-    end	
-	
+    end
+
     if UIUtil.GetAnimationPrefs() then
         if controls.avatarGroup:IsHidden() then
             PlaySound(Sound({Cue = "UI_Score_Window_Open", Bank = "Interface"}))
@@ -141,14 +141,14 @@ function CreateAvatar(unit)
 
     bg.healthbar = StatusBar(bg, 0, 1, false, false,
         UIUtil.SkinnableFile('/game/avatar/health-bar-back_bmp.dds'),
-        UIUtil.SkinnableFile('/game/avatar/health-bar-green.dds'),		
+        UIUtil.SkinnableFile('/game/avatar/health-bar-green.dds'),
         true, "avatar RO Health Status Bar")
-		
+
     bg.shieldbar = StatusBar(bg, 0, 1, false, false,
         UIUtil.SkinnableFile('/game/avatar/health-bar-back_bmp.dds'),
         UIUtil.SkinnableFile('/game/avatar/shield-bar-blue.dds'),
         true, "avatar RO Shield Status Bar")
-	
+
 
     LayoutHelpers.AtLeftIn(bg.healthbar, bg, 8)
     LayoutHelpers.AtRightBottomIn(bg.healthbar, bg, 14, 5)
@@ -156,12 +156,12 @@ function CreateAvatar(unit)
     bg.healthbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
     bg.healthbar.Width:Set(function() return bg.healthbar.Right() - bg.healthbar.Left() end)
     bg.healthbar:DisableHitTest(true)
-	
+
     LayoutHelpers.CenteredBelow(bg.shieldbar, bg.healthbar, -5)
     bg.shieldbar.Height:Set(function() return bg.healthbar.Bottom() - bg.healthbar.Top() end)
     bg.shieldbar.Width:Set(function() return  bg.healthbar.Right() - bg.healthbar.Left() end)
     bg.shieldbar:DisableHitTest(true)
-	
+
     bg.curIndex = 1
     bg.HandleEvent = ClickFunc
     bg.idleAnnounced = true
@@ -206,15 +206,15 @@ function CreateAvatar(unit)
         bg.healthbar:SetRange(0, self.units[1]:GetMaxHealth())
         bg.healthbar:SetValue(tempHealth)
         bg.shieldbar:SetValue(shieldRatio)
-		
+
         if not GameMain.gameUIHidden then
-           if shieldRatio > 0 and self.units[1]:IsInCategory('COMMAND') then          
+           if shieldRatio > 0 and self.units[1]:IsInCategory('COMMAND') then
               bg.shieldbar:Show()
            else
               bg.shieldbar:Hide()
            end
         end
-		
+
         if tempPrevHealth ~= tempHealth then
             SetHealthbarColor(bg.healthbar, self.units[1]:GetHealth() / self.units[1]:GetMaxHealth())
         end
@@ -295,7 +295,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             local i = table.getn(sortedUnits)
             local needIcon = true
             while i > 0 do
-                if table.getn(sortedUnits[i]) > 0 then
+                if not table.empty(sortedUnits[i]) then
                     if needIcon then
                         -- Idle engineer icons
                         if Factions[currentFaction].IdleEngTextures[keyToIcon[i]] and UIUtil.UIFile(Factions[currentFaction].IdleEngTextures[keyToIcon[i]],true) then
@@ -325,7 +325,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             local needIcon = true
             while i > 0 do
                 for curCat = 1, 3 do
-                    if table.getn(sortedFactories[curCat][i]) > 0 then
+                    if not table.empty(sortedFactories[curCat][i]) then
                         if needIcon then
                             -- Idle factory icons
                             if UIUtil.UIFile(Factions[currentFaction].IdleFactoryTextures[categoryTable[curCat]][i],true) then
@@ -344,7 +344,7 @@ function CreateIdleTab(unitData, id, expandFunc)
             end
            if needIcon == true then
                local ExpFactories = EntityCategoryFilterDown(categories.EXPERIMENTAL, self.allunits)
-               if table.getn(ExpFactories) > 0 then
+               if not table.empty(ExpFactories) then
                    local FactoryUnitId = ExpFactories[1]:GetUnitId()
                    if UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true) then
                        self.icon:SetTexture(UIUtil.UIFile('/icons/units/' .. FactoryUnitId .. '_icon.dds', true))
@@ -599,7 +599,7 @@ function CreateIdleEngineerList(parent, units)
                 self.icons[i] = CreateUnitEntry(indexToIcon[i], units, Factions[currentFaction].IdleEngTextures[keyToIcon[index]])
                 self.icons[i].priority = i
             end
-            if table.getn(units) > 0 and not self.icons[i]:IsHidden() then
+            if not table.empty(units) and not self.icons[i]:IsHidden() then
                 self.icons[i].units = units
                 self.icons[i].count:SetText(table.getn(units))
                 self.icons[i].count:Show()
@@ -711,7 +711,7 @@ function CreateIdleFactoryList(parent, units)
         for type, icons in bg.icons do
             for index=1,3 do
                 local i = index
-                if table.getn(factories[type][i]) > 0 then
+                if not table.empty(factories[type][i]) then
                     bg.icons[type][i].units = factories[type][i]
                     bg.icons[type][i]:SetAlpha(1)
                     bg.icons[type][i].countBG:Show()
@@ -790,7 +790,7 @@ function AvatarUpdate()
         end
     end
 
-    if factories and table.getn(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) > 0 then
+    if factories and not table.empty(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE - categories.ORBITALSYSTEM, factories)) then
         if controls.idleFactories then
             controls.idleFactories:Update(EntityCategoryFilterDown(categories.ALLUNITS - categories.GATE, factories))
         else

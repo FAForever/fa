@@ -180,7 +180,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.4,
     SelectionThickness = 1,
     SizeX = 0.6,
-    SizeY = 0.5,
+    SizeY = 0.6,
     SizeZ = 0.6,
     StrategicIconName = 'icon_structure1_intel',
     StrategicIconSortPriority = 64,

@@ -265,12 +265,13 @@ UnitBlueprint {
             RateOfFire = 1.5,				#1.25
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'EXPERIMENTAL',
                 'AIR MOBILE HIGHPRIAIR',
-                'AIR MOBILE TECH3 BOMBER',
-                'AIR MOBILE BOMBER',
+                '(AIR * MOBILE * EXPERIMENTAL - BOMBER)',
                 'AIR MOBILE GROUNDATTACK',
+                'AIR MOBILE TECH2 BOMBER',
+                'AIR MOBILE TECH1 BOMBER',
                 'AIR MOBILE TRANSPORTATION',
+                'AIR MOBILE BOMBER',
                 'AIR MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },

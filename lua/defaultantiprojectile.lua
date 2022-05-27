@@ -12,6 +12,8 @@ local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 Flare = Class(Entity){
         OnCreate = function(self, spec)
+            self.Army = self:GetArmy()
+
             self.Owner = spec.Owner
             self.Radius = spec.Radius or 5
             self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
@@ -32,6 +34,8 @@ Flare = Class(Entity){
 
 DepthCharge = Class(Entity){
     OnCreate = function(self, spec)
+        self.Army = self:GetArmy()
+
         self.Owner = spec.Owner
         self.Radius = spec.Radius
         self:SetCollisionShape('Sphere', 0, 0, 0, self.Radius)
@@ -54,7 +58,7 @@ MissileRedirect = Class(Entity) {
         EndPointEffects = {'/effects/emitters/particle_cannon_end_01_emit.bp' },
 
         OnCreate = function(self, spec)
-            Entity.OnCreate(self, spec)
+            self.Army = self:GetArmy()
             self.Owner = spec.Owner
             self.Radius = spec.Radius
             self.RedirectRateOfFire = spec.RedirectRateOfFire or 1
@@ -66,7 +70,6 @@ MissileRedirect = Class(Entity) {
         end,
 
         OnDestroy = function(self)
-            Entity.OnDestroy(self)
             ChangeState(self, self.DeadState)
         end,
 
@@ -142,11 +145,11 @@ MissileRedirect = Class(Entity) {
                             WaitSeconds(2)
                             enemyPos = enemy:GetPosition()
                         end
-                                                
+
                         -- aim at right below surface if unit is submerged
                         enemyPos = enemyPos or projPos
                         local surfaceHeight = GetSurfaceHeight(enemyPos[1], enemyPos[3]) - 0.02
-                        enemyPos[2] = math.max(surfaceHeight, enemyPos[2]) 
+                        enemyPos[2] = math.max(surfaceHeight, enemyPos[2])
 
                         proj:SetNewTargetGround(enemyPos)
                     end)

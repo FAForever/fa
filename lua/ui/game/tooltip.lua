@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Tool Tips
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -20,23 +20,39 @@ local Keymapping = import('/lua/keymap/defaultKeyMap.lua').defaultKeyMap
 local mouseoverDisplay = false
 local createThread = false
 
-function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
+function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced)
+
+    -- # values used throughout the function
+
+    local totalTime = 0
+    local alpha = 0.0
+    local text = ""
+    local body = ""
+
+    -- # remove previous instance
+
     if mouseoverDisplay then
         mouseoverDisplay:Destroy()
         mouseoverDisplay = false
     end
 
-    if not Prefs.GetOption('tooltips') then return end
+    -- # determine if we want to show this tooltip (game options can prevent that)
+
+    if not forced and not Prefs.GetOption('tooltips') then return end
+
+    -- # determine delay
+
     local createDelay = 0
     if delay and Prefs.GetOption('tooltip_delay') then
         createDelay = math.max(delay, Prefs.GetOption('tooltip_delay'))
     else
         createDelay = Prefs.GetOption('tooltip_delay') or 0
     end
-    local totalTime = 0
-    local alpha = 0.0
-    local text = ""
-    local body = ""
+
+
+
+    -- # retrieve tooltip title / description
+
     if type(ID) == 'string' then
         if TooltipInfo['Tooltips'][ID] then
             text = TooltipInfo['Tooltips'][ID]['title']
@@ -63,11 +79,17 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
     else
         WARN('UNRECOGNIZED TOOLTIP ENTRY - Not a string or table! ', repr(ID))
     end
+
+    -- # create the tooltip
+
     if extendedBool then
         mouseoverDisplay = CreateExtendedToolTip(parent, text, body, width)
     else
         mouseoverDisplay = CreateToolTip(parent, text)
     end
+
+    -- # adjust the tooltip
+
     if extendedBool then
         local Frame = GetFrame(0)
         if parent.Top() - mouseoverDisplay.Height() < 0 then
@@ -93,6 +115,9 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
             LayoutHelpers.AtHorizontalCenterIn(mouseoverDisplay, parent)
         end
     end
+
+    -- # some hack
+
     if ID == "mfd_defense" then
         local size = table.getn(mouseoverDisplay.desc)
         mouseoverDisplay.desc[size]:SetColor('ffff0000')
@@ -100,6 +125,9 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width)
         mouseoverDisplay.desc[size-2]:SetColor('ff00ff00')
         mouseoverDisplay.desc[size-3]:SetColor('ff4f77f4')
     end
+
+    -- adjust the tooltip further
+
     mouseoverDisplay:SetAlpha(alpha, true)
     mouseoverDisplay:SetNeedsFrameUpdate(true)
     mouseoverDisplay.OnFrame = function(self, deltaTime)
@@ -304,6 +332,45 @@ function AddControlTooltip(control, tooltipID, delay, width)
     control.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
             CreateMouseoverDisplay(self, tooltipID, delay, true, width)
+        elseif event.Type == 'MouseExit' then
+            DestroyMouseoverDisplay()
+        end
+        return self.oldHandleEvent(self, event)
+    end
+end
+
+function AddControlTooltipManual(control, title, description, delay, width)
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            CreateMouseoverDisplay(self, 
+                {
+                    text = title,
+                    body = description
+                }, delay, true, width
+            )
+        elseif event.Type == 'MouseExit' then
+            DestroyMouseoverDisplay()
+        end
+        return self.oldHandleEvent(self, event)
+    end
+end
+
+function AddForcedControlTooltipManual(control, title, description, delay, width)
+    if not control.oldHandleEvent then
+        control.oldHandleEvent = control.HandleEvent
+    end
+    control.HandleEvent = function(self, event)
+        if event.Type == 'MouseEnter' then
+            local forced = true
+            CreateMouseoverDisplay(self, 
+                {
+                    text = title,
+                    body = description
+                }, delay, true, width, forced
+            )
         elseif event.Type == 'MouseExit' then
             DestroyMouseoverDisplay()
         end

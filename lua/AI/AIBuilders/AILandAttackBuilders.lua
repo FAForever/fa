@@ -32,7 +32,7 @@ function LandAttackCondition(aiBrain, locationType, targetNumber)
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager.Radius
 
-    local poolThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, position, radius)
+    local poolThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.LAND - categories.SCOUT - categories.ENGINEER, position, radius)
     if poolThreat > targetNumber then
         return true
     end
@@ -394,7 +394,7 @@ BuilderGroup {
         Priority = 600,
         BuilderConditions = {
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY LAND TECH3' }},
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 15, 'Air' } },
             { UCBC, 'HaveUnitRatio', { 0.2, categories.LAND * categories.ANTIAIR, '<=', categories.LAND * categories.DIRECTFIRE}},
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ANTIAIR * categories.LAND - categories.TECH1  } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.05 }},
@@ -407,7 +407,7 @@ BuilderGroup {
         Priority = 850, #DUNCAN - was 500
         BuilderConditions = {
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY LAND TECH3' }},
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'Air' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 15, 'Air' } },
             { UCBC, 'LocationFactoriesBuildingLess', { 'LocationType', 1, categories.ANTIAIR * categories.LAND - categories.TECH1 } },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.05 }},
         },
@@ -441,7 +441,7 @@ BuilderGroup {
         BuilderType = 'Land',
         BuilderConditions = {
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.LAND * categories.FACTORY * categories.TECH3 } },
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 5, 'AntiSurface' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'AntiSurface' } },
             { UCBC, 'HaveUnitRatio', { 0.2, categories.LAND * categories.INDIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE}},
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.6, 1.05 }},
@@ -494,7 +494,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { EBC, 'GreaterThanEconEfficiencyOverTime', { 0.8, 1.05 }}, #DUNCAN - was 0.6
             { UCBC, 'HaveUnitRatio', { 0.2, categories.LAND * categories.INDIRECTFIRE, '<=', categories.LAND * categories.DIRECTFIRE}},
-            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 5, 'AntiSurface' } },
+            { TBC, 'EnemyThreatGreaterThanValueAtBase', { 'LocationType', 10, 'AntiSurface' } },
         },
     },
     Builder {
@@ -613,7 +613,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 10 } },
+            { LandAttackCondition, { 'LocationType', 20 } },
         },
     },
     Builder {
@@ -649,7 +649,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { LandAttackCondition, { 'LocationType', 150 } },
+            { LandAttackCondition, { 'LocationType', 230 } },
         },
     },
 }
@@ -705,7 +705,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 10 } },
+            { LandAttackCondition, { 'LocationType', 20 } },
         },
     },
     Builder {
@@ -724,7 +724,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND * categories.TECH3 - categories.ENGINEER} },
-            { LandAttackCondition, { 'LocationType', 50 } },
+            { LandAttackCondition, { 'LocationType', 70 } },
         },
     },
     Builder {
@@ -742,7 +742,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { LandAttackCondition, { 'LocationType', 150 } },
+            { LandAttackCondition, { 'LocationType', 230 } },
         },
     },
 }
@@ -763,7 +763,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 20 } },
+            { LandAttackCondition, { 'LocationType', 30 } },
         },
     },
     Builder {
@@ -779,7 +779,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND * categories.TECH3 - categories.ENGINEER } },
-            { LandAttackCondition, { 'LocationType', 100 } },
+            { LandAttackCondition, { 'LocationType', 150 } },
         },
     },
     Builder {
@@ -794,7 +794,7 @@ BuilderGroup {
             UseFormation = 'AttackFormation',
         },
         BuilderConditions = {
-            { LandAttackCondition, { 'LocationType', 300 } },
+            { LandAttackCondition, { 'LocationType', 460 } },
         },
     },
 }
@@ -812,7 +812,7 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
-                { MIBC, 'LessThanGameTime', { 600 } },      
+                { MIBC, 'LessThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
@@ -821,8 +821,8 @@ BuilderGroup {
             MoveNext = 'Threat',
             ThreatType = 'Economy', 		    # Type of threat to use for gauging attacks
             FindHighestThreat = false, 		# Don't find high threat targets
-            MaxThreatThreshold = 2900, 		# If threat is higher than this, do not attack
-            MinThreatThreshold = 1000, 		# If threat is lower than this, do not attack
+            MaxThreatThreshold = 140, 		# If threat is higher than this, do not attack
+            MinThreatThreshold = 50, 		# If threat is lower than this, do not attack
             AvoidBases = true,
             AvoidBasesRadius = 75,
             #UseFormation = 'AttackFormation',
@@ -841,7 +841,7 @@ BuilderGroup {
         Priority = 950,
         BuilderConditions = {
                 { MIBC, 'MapCheck', { 'Seton\'s Clutch', false } },
-                { MIBC, 'GreaterThanGameTime', { 600 } },      
+                { MIBC, 'GreaterThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
@@ -851,7 +851,7 @@ BuilderGroup {
             ThreatType = 'Economy', 		    # Type of threat to use for gauging attacks
             FindHighestThreat = false, 		# Don't find high threat targets
             MaxThreatThreshold = 9999999, 	# If threat is higher than this, do not attack
-            MinThreatThreshold = 1000, 		# If threat is lower than this, do not attack
+            MinThreatThreshold = 50, 		# If threat is lower than this, do not attack
             AvoidBases = true,
             AvoidBasesRadius = 75,
             #UseFormation = 'AttackFormation',
@@ -918,7 +918,7 @@ BuilderGroup {
         Priority =  0, #DUNCAN - was 1000
         BuilderConditions = {
                 #{ UCBC, 'ExpansionAreaNeedsEngineer', { 'LocationType', 350, -1000, 0, 2, 'StructuresNotMex' } },
-                { MIBC, 'GreaterThanGameTime', { 720 } },  
+                { MIBC, 'GreaterThanGameTime', { 720 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
@@ -973,7 +973,7 @@ BuilderGroup {
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, #DUNCAN - added to stop units bunching on island maps
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 10 } },
+            { LandAttackCondition, { 'LocationType', 15 } },
         },
     },
 
@@ -995,7 +995,7 @@ BuilderGroup {
         BuilderConditions = {
             { MIBC, 'IsIsland', { false } }, #DUNCAN - added to stop units bunching on island maps
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, categories.MOBILE * categories.LAND - categories.ENGINEER - categories.TECH1 } },
-            { LandAttackCondition, { 'LocationType', 10 } },
+            { LandAttackCondition, { 'LocationType', 15 } },
         },
     },
 

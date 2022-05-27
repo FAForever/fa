@@ -197,14 +197,12 @@ UnitBlueprint {
             AboveWaterTargetsOnly = true,
             Audio = {
                 Fire = Sound {
-                    Bank = 'URLWeapon',
-                    Cue = 'URL0202_Cannon_Dbl',
-                    LodCutoff = 'Weapon_LodCutoff',
+                Bank = 'URLWeapon',
+                Cue = 'URL0202_Cannon_Dbl',
+                LodCutoff = 'Weapon_LodCutoff',
                 },
             },
-            BallisticArc = 'RULEUBA_None',
-            BeamCollisionDelay = 0.1,
-            BeamLifetime = 0.1,
+            BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
             Damage = 25,
             DamageType = 'Normal',
@@ -213,16 +211,18 @@ UnitBlueprint {
                 Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
-            FiringTolerance = 0,
+            FiringTolerance = 1,
             Label = 'MainGun',
-            LeadTarget = false,
+            LeadTarget = true,
             MaxRadius = 24,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
+            MuzzleVelocity = 100,
             ProjectilesPerOnFire = 1,
+            ProjectileId = '/projectiles/CDFLaserHeavy02/CDFLaserHeavy02_proj.bp',
             RackBones = {
-                {
-                    MuzzleBones = {
+            {
+                MuzzleBones = {
                         'Turret_Muzzle01',
                         'Turret_Muzzle02',
                     },
@@ -244,7 +244,7 @@ UnitBlueprint {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

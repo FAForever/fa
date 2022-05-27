@@ -47,12 +47,11 @@ UEL0301 = Class(CommandUnit) {
     end,
 
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
-        -- If we are assisting an upgrading unit, or repairing a unit, play separate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
-        else
+        -- Different effect if we have building cube
+        if unitBeingBuilt.BuildingCube then
             EffectUtil.CreateUEFCommanderBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        else
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
@@ -180,7 +179,7 @@ UEL0301 = Class(CommandUnit) {
         if self.RadarJammerEnh and self:IsIntelEnabled('Jammer') then
             if self.IntelEffects then
                 self.IntelEffectsBag = {}
-                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self:GetCurrentLayer(), nil, self.IntelEffectsBag)
+                self.CreateTerrainTypeEffects(self, self.IntelEffects, 'FXIdle',  self.Layer, nil, self.IntelEffectsBag)
             end
             self:SetEnergyMaintenanceConsumptionOverride(self:GetBlueprint().Enhancements['RadarJammer'].MaintenanceConsumptionPerSecondEnergy or 0)
             self:SetMaintenanceConsumptionActive()

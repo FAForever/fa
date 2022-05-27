@@ -96,6 +96,7 @@ keyDescriptions = {
     ['move'] = '<LOC key_desc_0065>Move',
     ['nuke'] = '<LOC key_desc_0063>Nuke',
     ['mode'] = '<LOC key_desc_0101>Cycle through all of the available fire states.',
+    ['dock'] = '<LOC key_desc_0405>Dock',
     ['shift_repair'] = '<LOC key_desc_0036>Repair',
     ['shift_reclaim'] = '<LOC key_desc_0037>Reclaim',
     ['shift_patrol'] = '<LOC key_desc_0043>Patrol',
@@ -110,6 +111,7 @@ keyDescriptions = {
     ['shift_overcharge'] = '<LOC key_desc_0055>Overcharge',
     ['shift_move'] = '<LOC key_desc_0065>Move',
     ['shift_nuke'] = '<LOC key_desc_0063>Nuke',
+    ['shift_dock'] = '<LOC key_desc_0405>Dock',
     ['rename'] = '<LOC key_desc_0064>Rename the selected unit',
     ['goto_engineer'] = '<LOC key_desc_0066>Go to the nearest idle Engineer',
     ['select_idle_engineer'] = '<LOC key_desc_0067>Select the nearest idle Engineer',
@@ -217,6 +219,11 @@ keyDescriptions = {
     ['spreadattack'] = '<LOC key_desc_0182>Spread attack',
     ['shift_spreadattack'] = '<LOC key_desc_0183>Spread attack',
     ['show_objective_screen'] = '<LOC key_desc_0184>Show Scenario Options/Objectives Window',
+    ['toggle_ai_screen'] = 'Toggle AI blueprint information window, requires cheats to be enabled',
+    ['toggle_markers_screen'] = 'Toggle marker information window, requires cheats to be enabled',
+    ['toggle_map_utilities_window'] = 'Toggle map utilities window, requires cheats to be enabled',
+    ['toggle_profiler'] = 'Toggles the profiler. This is a debug tool, abuse is bannable',
+    ['toggle_profiler_window'] = 'Toggles the profiler window. This is a debug tool, abuse is bannable',
 
     -- GAZUI
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
@@ -266,6 +273,7 @@ keyDescriptions = {
     ['select_bombers'] = '<LOC key_desc_0228>Select all Bombers',
     ['select_anti_air_fighters'] = '<LOC key_desc_0229>Select all Air Fighters',
     ['select_nearest_idle_airscout'] = '<LOC key_desc_0230>Select nearest idle Air Scout',
+    ['select_all_idle_airscouts'] = '<LOC key_desc_0230_all>Select all idle Air Scouts',
     ['select_all_tml'] = '<LOC key_desc_0231>Select all TML',
     ['select_all_stationdrones'] = '<LOC key_desc_0232>Select all Drones',
     ['select_all_t2_podstations'] = '<LOC key_desc_0233>Select all T2 Engineering Podstations',
@@ -316,21 +324,21 @@ keyDescriptions = {
     ['upgrades'] = '<LOC key_desc_0275>build Upgrades + T3 Mobile Anti Air + T3 Air Transport + T3 torpedo bomber',
 
     -- Alternative Hotbuild
-    ['alt_builders'] = '<LOC key_desc_0389>build factories & quantum gateway + engineers & SCUs', -- also T3 engie from Megalith 
+    ['alt_builders'] = '<LOC key_desc_0389>build factories & quantum gateway + engineers & SCUs', -- also T3 engie from Megalith
     ['alt_radars'] = '<LOC key_desc_0390>build radars (+ perimeter & eye of Rhianne) + land scouts + air scouts',
     ['alt_shields'] = '<LOC key_desc_0391>build shields + mobiles Shields & shield disruptors + shield boat',
     ['alt_tmd'] = '<LOC key_desc_0392>build tactical missiles defense & strategic missile defense',
     ['alt_xp'] = '<LOC key_desc_0393>build experimentals + mobile bomb + guided missile',
     ['alt_sonars'] = '<LOC key_desc_0394>build sonars + transports + amphibious / hover tanks',
-    ['alt_mass'] = '<LOC key_desc_0395>build mass extractors / fabricators + tanks + bombers + frigates / destroyers / battlecruisers / battleships', -- also Brick from Megalith 
+    ['alt_mass'] = '<LOC key_desc_0395>build mass extractors / fabricators + tanks + bombers + frigates / destroyers / battlecruisers / battleships', -- also Brick from Megalith
     ['alt_stealth'] = '<LOC key_desc_0396>build steath fields & cybran T3 sonar + mobile stealth fields + counter intelligence boat',
     ['alt_pgen'] = '<LOC key_desc_0397>build power generators / storage + snipers & Loyalist / titan & gattling / rocket bots & LABs + gunships',
     ['alt_templates'] = '<LOC key_desc_0398>build templates + factory templates',
     ['alt_engystation'] = '<LOC key_desc_0399>build engineers stations + field engineers',
     ['alt_defense'] = '<LOC key_desc_0400>build point defenses & walls + structure upgrades',
-    ['alt_aa'] = '<LOC key_desc_0401>build static AA + air staging + mobile AA & flaks + air fighters + aircrafts carriers / cruisers / attack boat', -- also flak & T3 mobile anti air from Megalith 
+    ['alt_aa'] = '<LOC key_desc_0401>build static AA + air staging + mobile AA & flaks + air fighters + aircrafts carriers / cruisers / attack boat', -- also flak & T3 mobile anti air from Megalith
     ['alt_torpedo'] = '<LOC key_desc_0402>build torpedo defenses + torpedo bombers + submarines & torpedo boat',
-    ['alt_arties'] = '<LOC key_desc_0403>build static artilleries + mobile artilleries', -- also T3 arty from Megalith 
+    ['alt_arties'] = '<LOC key_desc_0403>build static artilleries + mobile artilleries', -- also T3 arty from Megalith
     ['alt_tml'] = '<LOC key_desc_0404>build TML & SML + mobile missile launchers + nuke subs / battleship & missile ship & sera / uef cruisers',
 
     -- Extra

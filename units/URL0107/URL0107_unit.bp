@@ -140,9 +140,9 @@ UnitBlueprint {
     },
     Economy = {
         BuildCostEnergy = 273,
-        BuildCostMass = 52,
+        BuildCostMass = 56,
         BuildRate = 1,
-        BuildTime = 260,
+        BuildTime = 265,
         NeedToFaceTargetToBuild = true,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -217,7 +217,7 @@ UnitBlueprint {
     SizeX = 0.7,
     SizeY = 0.7, #from0.5
     SizeZ = 0.9,
-    StrategicIconName = 'icon_bot1_directfire',
+    StrategicIconName = 'icon_land1_directfire',
     StrategicIconSortPriority = 135,
     Transport = {
         CanFireFromTransport = false,
@@ -288,7 +288,7 @@ UnitBlueprint {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
                 'TECH3 MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

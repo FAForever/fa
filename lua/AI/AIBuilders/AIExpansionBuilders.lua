@@ -422,7 +422,7 @@ BuilderGroup {
         InstanceCount = 2,
         BuilderConditions = {
             { UCBC, 'UnitCapCheckLess', { .8 } },
-            { MIBC, 'LessThanGameTime', { 600 } }, 
+            { MIBC, 'LessThanGameTime', { 600 } },
         },
         BuilderType = 'Any',
         BuilderData = {
@@ -433,7 +433,7 @@ BuilderGroup {
                     'T1GroundDefense',
                     'T1GroundDefense',
                     'T1GroundDefense',
-                    'T1GroundDefense', 
+                    'T1GroundDefense',
                     'T1LandFactory',
                     'T1AADefense',
                     'T1AADefense',

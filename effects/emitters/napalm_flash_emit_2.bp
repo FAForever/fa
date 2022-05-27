@@ -1,3 +1,4 @@
+-- not used by faf
 EmitterBlueprint {
     BlueprintId = 'napalm_flash_2',
     Lifetime = 0.10,
@@ -10,7 +11,7 @@ EmitterBlueprint {
     AlignRotation = false,
     AlignToBone = false,
     Flat = true,
-    LODCutoff = -1.00,
+    LODCutoff = 300,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,

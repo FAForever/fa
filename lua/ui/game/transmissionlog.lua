@@ -35,7 +35,7 @@ function CreateTransmissionLog()
     controls.bg = Bitmap(GetFrame(0), UIUtil.UIFile('/dialogs/transmision-log/panel_bmp.dds'))
     controls.bg.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
     LayoutHelpers.AtCenterIn(controls.bg, GetFrame(0))
-    
+
     controls.closeBtn = UIUtil.CreateButtonStd(controls.bg, "/widgets02/small", "<LOC _Close>", 16)
     LayoutHelpers.AtRightBottomIn(controls.closeBtn, controls.bg, 70, 28)
     controls.closeBtn.OnClick = function(self, modifiers)
@@ -50,59 +50,59 @@ function CreateTransmissionLog()
             end
         end
     end
-    
+
     controls.logContainer = Group(controls.bg)
     LayoutHelpers.SetDimensions(controls.logContainer, 752, 330)
     controls.logContainer.top = 1
-    
+
     controls.title = UIUtil.CreateText(controls.bg, LOC('<LOC trans_log_0000>Transmission Log'), 20)
     LayoutHelpers.AtLeftTopIn(controls.title, controls.bg, 35, 30)
-    
+
     LayoutHelpers.AtLeftTopIn(controls.logContainer, controls.bg, 55, 100)
     UIUtil.CreateVertScrollbarFor(controls.logContainer)
-    
+
     controls.logEntries[1] = {}
     controls.logEntries[1].bg = Bitmap(controls.logContainer)
-    
+
     controls.logEntries[1].time = UIUtil.CreateText(controls.logEntries[1].bg, '', 14, "Arial")
     LayoutHelpers.AtLeftTopIn(controls.logEntries[1].time, controls.logContainer)
     LayoutHelpers.SetWidth(controls.logEntries[1].time, 60)
-    
+
     controls.logEntries[1].name = UIUtil.CreateText(controls.logEntries[1].bg, '', 14, "Arial")
-    
+
     controls.logEntries[1].text = UIUtil.CreateText(controls.logEntries[1].bg, '', 14, "Arial")
     LayoutHelpers.AtRightTopIn(controls.logEntries[1].text, controls.logContainer)
     controls.logEntries[1].text.Width:Set(function() return controls.logContainer.Width() - LayoutHelpers.ScaleNumber(170) end)
-    
+
     controls.logEntries[1].bg.Top:Set(controls.logEntries[1].time.Top)
     LayoutHelpers.AtLeftIn(controls.logEntries[1].bg, controls.logContainer, -10)
     controls.logEntries[1].bg.Right:Set(controls.logContainer.Right)
     controls.logEntries[1].bg.Bottom:Set(controls.logEntries[1].time.Bottom)
     controls.logEntries[1].bg:SetSolidColor('00000000')
-        
+
     LayoutHelpers.LeftOf(controls.logEntries[1].name, controls.logEntries[1].text, 15)
     controls.logEntries[1].name.Left:Set(controls.logEntries[1].time.Right)
     controls.logEntries[1].name:SetClipToWidth(true)
-    
+
     local index = 2
     while controls.logEntries[table.getsize(controls.logEntries)].time.Bottom() + controls.logEntries[1].time.Height() < controls.logContainer.Bottom() do
         controls.logEntries[index] = {}
         controls.logEntries[index].bg = Bitmap(controls.logContainer)
-        
+
         controls.logEntries[index].time = UIUtil.CreateText(controls.logEntries[index].bg, '', 14, "Arial")
         LayoutHelpers.Below(controls.logEntries[index].time, controls.logEntries[index-1].time)
         LayoutHelpers.SetWidth(controls.logEntries[index].time, 60)
-        
+
         controls.logEntries[index].name = UIUtil.CreateText(controls.logEntries[index].bg, '', 14, "Arial")
-        
+
         controls.logEntries[index].text = UIUtil.CreateText(controls.logEntries[index].bg, '', 14, "Arial")
         LayoutHelpers.Below(controls.logEntries[index].text, controls.logEntries[index-1].text)
-        
+
         LayoutHelpers.LeftOf(controls.logEntries[index].name, controls.logEntries[index].text, 15)
-        
+
         controls.logEntries[index].name.Left:Set(controls.logEntries[index].time.Right)
         controls.logEntries[index].name:SetClipToWidth(true)
-        
+
         controls.logEntries[index].bg.Top:Set(controls.logEntries[index].time.Top)
         LayoutHelpers.AtLeftIn(controls.logEntries[index].bg, controls.logContainer, -5)
         controls.logEntries[index].bg.Right:Set(controls.logContainer.Right)
@@ -110,12 +110,12 @@ function CreateTransmissionLog()
         controls.logEntries[index].bg:SetSolidColor('00000000')
         index = index + 1
     end
-    
+
     local numLines = table.getsize(controls.logEntries)
     local prevtabsize = 0
     local prevsize = 0
-    
-    
+
+
     local function DataSize()
         if prevtabsize ~= table.getn(LogData) then
             local size = 1
@@ -129,7 +129,7 @@ function CreateTransmissionLog()
             return prevsize
         end
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -163,7 +163,7 @@ function CreateTransmissionLog()
     controls.logContainer.IsScrollable = function(self, axis)
         return true
     end
-    
+
     -- determines what controls should be visible or not
     controls.logContainer.CalcVisible = function(self)
         local maxLines = table.getn(controls.logEntries)
@@ -211,7 +211,7 @@ function CreateTransmissionLog()
     end
 
     controls.bg:Hide()
-    if loadData then 
+    if loadData then
         FormatLoadData()
     end
     WinMgr.AddWindow({id = WIN_ID, closeFunc = ToggleTransmissionLog})

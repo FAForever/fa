@@ -10,6 +10,23 @@ LocGlobals = {
     GT=">"
 }
 
+-- upvalue access for performance
+local UpLocGlobals = LocGlobals
+
+-- upvalue globals for performance
+local type = type
+local unpack = unpack
+local exists = exists
+local doscript = doscript
+local DiskFindFiles = DiskFindFiles
+local AudioSetLanguage = AudioSetLanguage
+
+-- upvalue string operations for performance
+local StringGsub = string.gsub
+local StringFind = string.find
+local StringSub = string.sub
+local StringFormat = string.format
+
 local function dbFilename(la)
     return '/loc/' .. la .. '/strings_db.lua'
 end
@@ -26,7 +43,7 @@ local function okLanguage(la)
     end
 
     local dbfiles = DiskFindFiles('/loc', '*strings_db.lua')
-    la = string.gsub(dbfiles[1], ".*/(.*)/.*", "%1")
+    la = StringGsub(dbfiles[1], ".*/(.*)/.*", "%1")
     return la
 end
 
@@ -93,7 +110,7 @@ local function LocSubFn(op, ident)
             return "{unknown key: "..ident.."}"
         end
     elseif op=='g' then
-        local s = LocGlobals[ident]
+        local s = UpLocGlobals[ident]
         if iscallable(s) then
             s = s()
         end
@@ -112,7 +129,7 @@ end
 -- Given some text from the loc DB, recursively apply formatting directives
 function LocExpand(s)
     -- Look for braces {} in text
-    return (string.gsub(s, "{(%w+) ([^{}]*)}", LocSubFn))
+    return (StringGsub(s, "{(%w+) ([^{}]*)}", LocSubFn))
 end
 
 -- If s is a string with a localization tag, like "<LOC HW1234>Hello World",
@@ -125,23 +142,23 @@ function LOC(s)
         return s
     end
 
-    if string.sub(s,1,5) ~= [[<LOC ]] then
+    if StringSub(s,1,5) ~= [[<LOC ]] then
         -- This string doesn't have a <LOC key> tag
         return LocExpand(s)
     end
 
-    local i = string.find(s,">")
+    local i = StringFind(s,">")
     if not i then
         -- Missing the second half of <LOC> tag
         WARN(_TRACEBACK('String has malformed loc tag: ',s))
         return s
     end
 
-    local key = string.sub(s,6,i-1)
+    local key = StringSub(s,6,i-1)
 
     local r = loc_table[key]
     if not r then
-        r = string.sub(s,i+1)
+        r = StringSub(s,i+1)
         if r=="" then
             r = key
         end
@@ -157,7 +174,7 @@ function LOCF(...)
             arg[k] = LOC(v)
         end
     end
-    return string.format(unpack(arg))
+    return StringFormat(unpack(arg))
 end
 
 -- Call LOC() on all elements of a table

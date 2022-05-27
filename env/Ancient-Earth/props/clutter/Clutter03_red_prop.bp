@@ -1,0 +1,33 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+                    AlbedoName = 'Clutter03_red_albedo.dds',
+                    LODCutoff = 100,
+                    ShaderName = 'NormalMappedAlpha',
+					NormalsName = 'Clutter03_normalsTS.dds',
+                },
+            },
+        },
+        UniformScale = 0.25,
+    },
+    Economy = {
+        ReclaimEnergyMax = 0,
+        ReclaimMassMax = 0,
+        ReclaimTime = 5,
+    },
+    Interface = {
+        HelpText = 'Clutter',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 0.25,
+    SizeY = 0.25,
+    SizeZ = 0.25,
+}

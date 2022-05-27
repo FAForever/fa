@@ -545,4 +545,3 @@ aSpecificStratIcons = {
     ueb1104 = 'structure_massfab',
     ueb1303 = 'structure_massfab',
 }
- 

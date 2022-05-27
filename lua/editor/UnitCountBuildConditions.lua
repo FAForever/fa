@@ -835,7 +835,7 @@ function AdjacencyCheck(aiBrain, locationType, category, radius, testUnit)
     end
 
     local reference  = AIUtils.GetOwnUnitsAroundPoint(aiBrain, testCat, factoryManager:GetLocationCoords(), radius)
-    if not reference or table.getn(reference) == 0 then
+    if not reference or table.empty(reference) then
         return false
     end
 

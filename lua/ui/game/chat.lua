@@ -248,7 +248,7 @@ function CreateChatLines()
             for i = curEntries + 1, neededEntries do
                 local index = i
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
                 GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
@@ -281,7 +281,7 @@ function CreateChatLines()
             index = index + 1
             if not GUI.chatLines[index] then
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
                 GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
@@ -679,7 +679,7 @@ function CreateChatEdit()
             ChatPageUp(mod)
             return true
         elseif charcode == UIUtil.VK_UP then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.max(self.recallEntry-1, 1)
                 else
@@ -688,7 +688,7 @@ function CreateChatEdit()
                 RecallCommand(self.recallEntry)
             end
         elseif charcode == UIUtil.VK_DOWN then
-            if table.getsize(commandHistory) > 0 then
+            if not table.empty(commandHistory) then
                 if self.recallEntry then
                     self.recallEntry = math.min(self.recallEntry+1, table.getsize(commandHistory))
                     RecallCommand(self.recallEntry)
@@ -825,7 +825,7 @@ function ReceiveChatFromSim(sender, msg)
     if not msg.Chat then
         return
     end
-    
+
     if msg.to == 'notify' and not import('/lua/ui/notify/notify.lua').processIncomingMessage(sender, msg) then
         return
     end
@@ -865,7 +865,7 @@ function ReceiveChatFromSim(sender, msg)
     end
     local tempText = WrapText({text = msg.text, name = name})
     -- if text wrap produces no lines (ie text is all white space) then add a blank line
-    if table.getn(tempText) == 0 then
+    if table.empty(tempText) then
         tempText = {""}
     end
     local entry = {
@@ -926,7 +926,7 @@ end
 
 function ActivateChat(modifiers)
     if type(ChatTo()) ~= 'number' then
-        if modifiers.Shift then
+        if (not modifiers.Shift) == (ChatOptions['send_type'] or false) then
             ChatTo:Set('allies')
         else
             ChatTo:Set('all')
@@ -1005,7 +1005,7 @@ function CreateChatList(parent)
             LayoutHelpers.AtBottomIn(container.entries[i], container)
         end
     end
-    container.Width:Set(maxWidth)
+    container.Width:Set(maxWidth + 40)
     container.Height:Set(height)
 
     container.LTBG = Bitmap(container, UIUtil.UIFile('/game/chat_brd/drop-box_brd_ul.dds'))
@@ -1258,7 +1258,9 @@ function CreateConfigWindow()
         br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
         borderColor = 'ff415055',
     }
-    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', nil, windowTextures)
+
+    local defPosition = Prefs.GetFromCurrentProfile('chat_config') or nil
+    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', defPosition, windowTextures)
     GUI.config.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     Tooltip.AddButtonTooltip(GUI.config._closeBtn, 'chat_close')
     LayoutHelpers.AnchorToBottom(GUI.config, GetFrame(0), -700)
@@ -1305,10 +1307,11 @@ function CreateConfigWindow()
                 {type = 'color', name = '<LOC _Links>', key = 'link_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC notify_0033>', key = 'notify_color', tooltip = 'chat_color'},
                 {type = 'splitter'},
-                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
+                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 1},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
                 {type = 'splitter'},
+                {type = 'filter', name = '<LOC chat_send_type_title>Default recipient: allies', key = 'send_type', tooltip = 'chat_send_type'},
                 {type = 'filter', name = '<LOC chat_0014>Show Feed Background', key = 'feed_background', tooltip = 'chat_feed_background'},
                 {type = 'filter', name = '<LOC chat_0015>Persist Feed Timeout', key = 'feed_persist', tooltip = 'chat_feed_persist'},
         },
@@ -1458,9 +1461,19 @@ function CreateConfigWindow()
         index = index + 1
     end
 
+    local applyBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC OPTIONS_0139>', 16)
+    LayoutHelpers.Below(applyBtn, optionGroup.options[index-1], 4)
+    LayoutHelpers.AtLeftIn(applyBtn, optionGroup)
+    applyBtn.OnClick = function(self)
+        ChatOptions = table.merged(ChatOptions, tempOptions)
+        Prefs.SetToCurrentProfile("chatoptions", ChatOptions)
+        GUI.bg:OnOptionsSet()
+    end
+
     local resetBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC _Reset>', 16)
     LayoutHelpers.Below(resetBtn, optionGroup.options[index-1], 4)
-    LayoutHelpers.AtHorizontalCenterIn(resetBtn, optionGroup)
+    LayoutHelpers.AtRightIn(resetBtn, optionGroup)
+    LayoutHelpers.ResetLeft(resetBtn)
     resetBtn.OnClick = function(self)
         for option, value in defOptions do
             for i, control in optionGroup.options do
@@ -1504,6 +1517,13 @@ function CreateConfigWindow()
 
 
     GUI.config.Bottom:Set(function() return okBtn.Bottom() + 5 end)
+    if defPosition ~= nil then
+        GUI.config.Top:Set(defPosition.top)
+        GUI.config.Left:Set(defPosition.left)
+    else
+        GUI.config.Top:Set(function() return LayoutHelpers.ScaleNumber(90) end)
+    end
+    GUI.config:SetPositionLock(false) -- allow window to be draggable, didn't worked in Window() call
 end
 
 function CloseChatConfig()

@@ -43,6 +43,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'SORTDEFENSE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -229,8 +230,18 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.25,
             TargetPriorities = {
-                'MOBILE',
-                'STRUCTURE DEFENSE',
+                'EXPERIMENTAL',
+                'STRUCTURE SHIELD',
+                'TECH3 DEFENSE DIRECTFIRE',
+                'TECH2 ARTILLERY',
+                'ANTISHIELD',
+                'SNIPER',
+                'TECH3 MOBILE ARTILLERY',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'COMMAND',
+                'TECH3 MOBILE',
+                'TECH2 MOBILE',
+                'TECH1 MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

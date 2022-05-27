@@ -28,7 +28,7 @@ end
 
 function removeEnhancement(unit)
     local id = unit:GetEntityId()
-    if enhancementQueue[id] and table.getn(enhancementQueue[id]) > 0 then
+    if enhancementQueue[id] and not table.empty(enhancementQueue[id]) then
         table.remove(enhancementQueue[id], 1)
     end
 end

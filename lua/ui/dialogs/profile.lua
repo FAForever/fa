@@ -22,7 +22,7 @@ function CreateDialog(exitBehavior)
             UIUtil.ShowInfoDialog(parent, "<LOC PROFILE_0008>You must create at least one profile", "<LOC PROFILE_0009>OK")
             return false
         end
-        
+
         return true
     end
     local tempProfileCurrent = GetPreference("profile.current")
@@ -31,18 +31,18 @@ function CreateDialog(exitBehavior)
     local panel = Bitmap(GetFrame(0), UIUtil.UIFile('/scx_menu/profile/panel_bmp.dds'))
     LayoutHelpers.AtCenterIn(panel, GetFrame(0))
     panel.Depth:Set(100000)
-    
+
     panel.brackets = UIUtil.CreateDialogBrackets(panel, 43, 32, 43, 30)
-    
+
     --local worldCover = UIUtil.CreateWorldCover(panel)
 
     local titleText = UIUtil.CreateText(panel, "<LOC PROFILE_0001>Profile Manager", 24)
     LayoutHelpers.AtTopIn(titleText, panel, 21)
     LayoutHelpers.AtHorizontalCenterIn(titleText, panel)
-    
+
     local deleteButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0006>Delete", 16, 2)
     Tooltip.AddButtonTooltip(deleteButton, "Profile_delete")
-    
+
     local optionsButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0012>Options", 16, 2)
     Tooltip.AddButtonTooltip(optionsButton, "mainmenu_options")
     optionsButton.OnClick = function(self, modifiers)
@@ -50,20 +50,20 @@ function CreateDialog(exitBehavior)
         panel:Hide()
         import('/lua/ui/dialogs/options.lua').CreateDialog(GetFrame(0), function() panel:Show() end)
     end
-    
+
     local createButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0004>Create", 16, 2)
     Tooltip.AddButtonTooltip(createButton, "Profile_create")
-    
+
     LayoutHelpers.AtTopIn(optionsButton, panel, 305)
     LayoutHelpers.AtHorizontalCenterIn(optionsButton, panel)
     LayoutHelpers.LeftOf(deleteButton, optionsButton, -15)
     LayoutHelpers.RightOf(createButton, optionsButton, -15)
-        
+
     local cancelButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0005>Cancel", 16, 2)
     LayoutHelpers.AtTopIn(cancelButton, panel, 365)
     cancelButton.Left:Set(function() return ((panel.Width() / 2) + 10) + panel.Left() end)
     Tooltip.AddButtonTooltip(cancelButton, "Profile_cancel")
-        
+
     local okButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0007>OK", 16, 2)
     LayoutHelpers.AtTopIn(okButton, panel, 365)
     okButton.Right:Set(function() return ((panel.Width() / 2) - 10) + panel.Left() end)
@@ -84,7 +84,7 @@ function CreateDialog(exitBehavior)
     function UpdateProfileList()
         profileList:DeleteAllItems()
         local profiles = GetPreference("profile.profiles")
-        
+
         if Prefs.GetProfileCount() > 1 then
             deleteButton:Enable()
         else
@@ -130,7 +130,7 @@ function CreateDialog(exitBehavior)
 
     deleteButton.OnClick = function(self)
         if Prefs.GetProfileCount() > 1 then
-            UIUtil.QuickDialog(panel, "<LOC PROFILE_0000>Are you sure you want to delete this profile?", 
+            UIUtil.QuickDialog(panel, "<LOC PROFILE_0000>Are you sure you want to delete this profile?",
                 "<LOC _Yes>", function()
                     local current = GetPreference("profile.current")
                     if not current then return end
@@ -148,10 +148,10 @@ function CreateDialog(exitBehavior)
                         "<LOC _No>", nil,
                         nil, nil,
                         true, {worldCover = false, enterButton = 1, escapeButton = 2})
-                                            
-               end, 
-           "<LOC _No>", nil, 
-           nil, nil, 
+
+               end,
+           "<LOC _No>", nil,
+           nil, nil,
            true, {worldCover = false, enterButton = 1, escapeButton = 2})
         end
     end
@@ -175,8 +175,8 @@ function CreateDialog(exitBehavior)
 
         -- set up our new options, if any
         local newOptions = OptionsLogic.GetCurrent()
-        OptionsLogic.SetCurrent(newOptions, tempProfileTable[tempProfileCurrent].options)        
-        
+        OptionsLogic.SetCurrent(newOptions, tempProfileTable[tempProfileCurrent].options)
+
         panel:Destroy()
         if exitBehavior then
             exitBehavior()
@@ -210,27 +210,27 @@ function CreationDialog(parent, callback)
     local bg = Bitmap(parent, UIUtil.UIFile('/dialogs/dialog/panel_bmp.dds'))
     LayoutHelpers.AtCenterIn(bg, parent)
     bg.Depth:Set(function() return parent.Depth() + 10 end)
-    
+
     local title = UIUtil.CreateText(bg, LOC('<LOC profile_0000>Enter your Name'), 18)
     LayoutHelpers.AtTopIn(title, bg, 30)
     LayoutHelpers.AtHorizontalCenterIn(title, bg)
-    
+
     local okButton = UIUtil.CreateButtonStd(bg, '/scx_menu/small-btn/small', "<LOC PROFILE_0007>OK", 14, 2)
     LayoutHelpers.AtLeftTopIn(okButton, bg, 20, 90)
-    
+
     local cancelButton = UIUtil.CreateButtonStd(bg, '/scx_menu/small-btn/small', "<LOC PROFILE_0005>Cancel", 14, 2)
     LayoutHelpers.RightOf(cancelButton, okButton, -10)
-    
+
     bg.brackets = UIUtil.CreateDialogBrackets(bg, 30, 36, 32, 36, true)
-    
+
     local nameEdit = Edit(bg)
     LayoutHelpers.AtTopIn(nameEdit, bg, 50)
     LayoutHelpers.AtHorizontalCenterIn(nameEdit, bg)
     LayoutHelpers.SetWidth(nameEdit, 350)
     nameEdit.Height:Set(function() return nameEdit:GetFontHeight() end)
     UIUtil.SetupEditStd(nameEdit, UIUtil.fontColor, "00569FFF", UIUtil.highlightColor, "880085EF", UIUtil.bodyFont, 20, 20)
-    nameEdit:AcquireFocus()    
-    
+    nameEdit:AcquireFocus()
+
     local function DestroyMe()
         bg:Destroy()
         if callback then
@@ -249,13 +249,13 @@ function CreationDialog(parent, callback)
             -- since the profile name will make a directory for save games and replays, it needs to be validated
             local filepicker = import('/lua/ui/controls/filepicker.lua')
             local err = filepicker.IsFilenameInvalid(name)
-            
+
             if err == 'invalidchars' or err == 'invalidlast' or err == 'invalidname' then
                 nameEdit:AbandonFocus()
                 UIUtil.ShowInfoDialog(bg, "<LOC PROFILE_0017>Profile names can not begin or end with a space, be a reserved windows file name, or contain the characters \\ / : * ? < > | \" ' .", "<LOC PROFILE_0011>OK", function() nameEdit:AcquireFocus() end)
                 return
             end
-            
+
             if profiles then
                 for key, value in profiles do
                     if string.lower(value.Name) == string.lower(name) then
@@ -275,22 +275,22 @@ function CreationDialog(parent, callback)
 
         UpdateProfileList()
         DestroyMe()
-    end 
+    end
 
     cancelButton.OnClick = function(self)
         DestroyMe()
-    end 
-    
+    end
+
     nameEdit.OnEnterPressed = function(self, text)
         okButton:OnClick()
         return true
     end
-    
+
     nameEdit.OnEscPressed = function(self, text)
         cancelButton.OnClick(cancelButton)
         return false
     end
-    
+
     -- don't allow tabs, they screw up multiplayer
     nameEdit.OnCharPressed = function(self, charcode)
         if charcode == UIUtil.VK_TAB then
@@ -302,7 +302,7 @@ function CreationDialog(parent, callback)
             PlaySound(sound)
         end
     end
-    
+
     local function OnEnterFunc()
         okButton.OnClick(okButton)
     end

@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 50, --RadarRadius
+        GuardScanRadius = 33, -- Weapon range so that the scout doesn't suicide when attack moved into T1 tanks including Aurora
     },
     Audio = {
         AmbientMove = Sound {
@@ -154,9 +154,9 @@ UnitBlueprint {
         UniformScale = 0.08,
     },
     Economy = {
-        BuildCostEnergy = 40,
+        BuildCostEnergy = 60,
         BuildCostMass = 8,
-        BuildTime = 80,
+        BuildTime = 60,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
         TeleportTimeMod = 0.01,
@@ -208,7 +208,7 @@ UnitBlueprint {
         DragCoefficient = 0.2,
         Elevation = 0.25,
         MaxAcceleration = 5,
-        MaxBrake = 5,
+        MaxBrake = 10,
         MaxSpeed = 5,
         MaxSpeedReverse = 3,
         MaxSteerForce = 1000,
@@ -263,7 +263,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'LaserTurret',
-            MaxRadius = 30,
+            MaxRadius = 33,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
@@ -290,7 +290,7 @@ UnitBlueprint {
             TargetCheckInterval = 1,
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

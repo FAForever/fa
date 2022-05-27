@@ -135,7 +135,7 @@ CollisionBeam = Class(moho.CollisionBeamEntity) {
             table.insert(self.BeamEffectsBag, fx)
             self.Trash:Add(fx)
         end
-        if table.getn(self.FxBeam) ~= 0 then
+        if not table.empty(self.FxBeam) then
             local fxBeam = CreateBeamEmitter(self.FxBeam[Random(1, table.getn(self.FxBeam))], self.Army)
             AttachBeamToEntity(fxBeam, self, 0, self.Army)
 

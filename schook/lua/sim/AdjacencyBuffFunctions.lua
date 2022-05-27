@@ -1,6 +1,6 @@
 MassActiveBuffCheck = function(buff, unit)
     local bp = unit:GetBlueprint()
-    if bp.Economy.BuildableCategory and table.getn(bp.Economy.BuildableCategory) > 0 then
+    if bp.Economy.BuildableCategory and not table.empty(bp.Economy.BuildableCategory) then
         return true
     end
     if EntityCategoryContains(categories.SILO, unit) and EntityCategoryContains(categories.STRUCTURE, unit) then

@@ -38,6 +38,7 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
 local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
+local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 
 local EffectUtil = import('EffectUtilities.lua')
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
@@ -121,17 +122,16 @@ TConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 --------------------------------------------------------------
 TConstructionUnit = Class(ConstructionUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
-        local UpgradesFrom = unitBeingBuilt:GetBlueprint().General.UpgradesFrom
-        -- If we are assisting an upgrading unit, or repairing a unit, play seperate effects
-        if (order == 'Repair' and not unitBeingBuilt:IsBeingBuilt()) or (UpgradesFrom and UpgradesFrom  ~= 'none' and self:IsUnitState('Guarding'))then
-            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        -- Different effect if we have building cube
+        if unitBeingBuilt.BuildingCube then
+            EffectUtil.CreateUEFBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         else
-            CreateUEFBuildSliceBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+            EffectUtil.CreateDefaultBuildBeams(self, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
         end
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self:GetBlueprint().Display.AnimationWater then
+        if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -149,7 +149,7 @@ TConstructionUnit = Class(ConstructionUnit) {
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self:GetBlueprint().Display.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.Blueprint.Display.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else
@@ -213,7 +213,7 @@ TMassStorageUnit = Class(MassStorageUnit) {}
 --------------------------------------------------------------
 --  MOBILE FACTORY UNIT
 --------------------------------------------------------------
-TMobileFactoryUnit = Class(LandUnit) {
+TMobileFactoryUnit = Class(AmphibiousLandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
@@ -304,15 +304,7 @@ TShieldLandUnit = Class(ShieldLandUnit) {}
 --------------------------------------------------------------
 --  SHIELD STRUCTURES
 --------------------------------------------------------------
-TShieldStructureUnit = Class(ShieldStructureUnit) {
-    StartBeingBuiltEffects = function(self,builder,layer)
-        self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
-        if builder and EntityCategoryContains(categories.MOBILE, builder) then
-            self:HideBone(0, true)
-            self.OnBeingBuiltEffectsBag:Add(self:ForkThread(CreateBuildCubeThread, builder, self.OnBeingBuiltEffectsBag))
-        end
-    end,
-}
+TShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 --------------------------------------------------------------
 --  STRUCTURES
@@ -348,7 +340,7 @@ TTransportBeaconUnit = Class(TransportBeaconUnit) {}
 --------------------------------------------------------------
 --  WALKING LAND UNITS
 --------------------------------------------------------------
-TWalkingLandUnit = Class(WalkingLandUnit) {}
+TWalkingLandUnit = Class(WalkingLandUnit) { }
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
@@ -467,6 +459,7 @@ TPodTowerUnit = Class(TStructureUnit) {
         self.PodData[podName].PodHandle = CreateUnitHPR(self.PodData[podName].PodUnitID, self.Army, location[1], location[2], location[3], 0, 0, 0)
         self.PodData[podName].PodHandle:SetParent(self, podName)
         self.PodData[podName].Active = true
+        return self.PodData[podName].PodHandle
     end,
 
     OnTransportAttach = function(self, bone, attachee)
@@ -492,7 +485,6 @@ TPodTowerUnit = Class(TStructureUnit) {
     end,
 
     OnTransportDetach = function(self, bone, attachee)
-        attachee:SetDoNotTarget(false)
         self:PlayUnitSound('Open')
         self:RequestRefreshUI()
         if not self.OpeningAnimationStarted then
@@ -511,25 +503,31 @@ TPodTowerUnit = Class(TStructureUnit) {
         end
     end,
 
+    InitializeTower = function(self, forceAnimation)
+        -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
+        -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
+        -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
+        self.TowerCaptured = nil
+        local bp = self:GetBlueprint()
+        for _, v in bp.Economy.EngineeringPods do
+            if v.CreateWithUnit and not self.PodData[v.PodName].Active then
+                if not self.PodData then
+                    self.PodData = {}
+                end
+                self.PodData[v.PodName] = table.copy(v)
+                self:OnTransportDetach(false, self:CreatePod(v.PodName))
+            end
+        end
+
+        self.InitializedTower = true
+    end,
+
     FinishedBeingBuilt = State {
         Main = function(self)
             -- Wait one tick to make sure this wasn't captured and we don't create an extra pod
             coroutine.yield(1)
 
-            -- Create the pod for the kennel.  DO NOT ADD TO TRASH.
-            -- This pod may have to be passed to another unit after it upgrades.  We cannot let the trash clean it up
-            -- when this unit is destroyed at the tail end of the upgrade.  Make sure the unit dies properly elsewhere.
-            self.TowerCaptured = nil
-            local bp = self:GetBlueprint()
-            for _, v in bp.Economy.EngineeringPods do
-                if v.CreateWithUnit and not self.PodData[v.PodName].Active then
-                    if not self.PodData then
-                        self.PodData = {}
-                    end
-                    self.PodData[v.PodName] = table.copy(v)
-                    self:CreatePod(v.PodName)
-                end
-            end
+            self:InitializeTower()
 
             ChangeState(self, self.MaintainPodsState)
         end,
@@ -628,7 +626,12 @@ TPodTowerUnit = Class(TStructureUnit) {
 
     UpgradingState = State {
         Main = function(self)
-            self:StopRocking()
+
+            -- catch case when tower is immediately upgraded during build
+            if not self.InitializedTower then 
+                self:InitializeTower()
+            end
+
             local bp = self:GetBlueprint().Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
@@ -682,9 +685,6 @@ TPodTowerUnit = Class(TStructureUnit) {
             TStructureUnit.OnFailedToBuild(self)
             self:EnableDefaultToggleCaps()
             self.AnimatorUpgradeManip:Destroy()
-            if self:GetCurrentLayer() == 'Water' then
-                self:StartRocking()
-            end
             self:PlayUnitSound('UpgradeFailed')
             self:PlayActiveAnimation()
             self:CreateTarmac(true, true, true, self.TarmacBag.Orientation, self.TarmacBag.CurrentBP)

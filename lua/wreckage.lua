@@ -8,37 +8,70 @@
 --****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
 
+local CreateProp = CreateProp
+
+local EntityMethods = moho.entity_methods
+local EntityDestroy = EntityMethods.Destroy
+local EntitySetHealth = EntityMethods.SetHealth
+local EntitySetMaxHealth = EntityMethods.SetMaxHealth
+local EntityAdjustHealth = EntityMethods.AdjustHealth
+local EntityGetHealth = EntityMethods.GetHealth
+local EntityGetMaxHealth = EntityMethods.GetMaxHealth
+local EntityGetEntityId = EntityMethods.GetEntityId
+local EntityGetBlueprint = EntityMethods.GetBlueprint
+local EntityGetPosition = EntityMethods.GetPosition
+local EntitySetOrientation = EntityMethods.SetOrientation
+local EntityBeenDestroyed = EntityMethods.BeenDestroyed
+local EntityGetFractionComplete = EntityMethods.GetFractionComplete
+local EntitySetCollisionShape = EntityMethods.SetCollisionShape
+local EntityGetBoneCount = EntityMethods.GetBoneCount
+local EntityGetBoneName = EntityMethods.GetBoneName
+local EntitySetAmbientSound = EntityMethods.SetAmbientSound
+
+local EntityGetCollisionExtents = EntityMethods.GetCollisionExtents
+local EntityGetOrientation = EntityMethods.GetOrientation
+local EntitySetScale = EntityMethods.SetScale
+local EntitySetMesh = EntityMethods.SetMesh
+
+
 Wreckage = Class(Prop) {
 
     OnCreate = function(self)
-        Prop.OnCreate(self)
+
+        -- # Caching
+
+        self.Trash = TrashBag()
+        self.EntityId = EntityGetEntityId(self)
+        self.Blueprint = EntityGetBlueprint(self)
+        self.CachePosition = EntityGetPosition(self)
+        self.SyncData = { }
+
+        -- # Set state
+
         self.IsWreckage = true
-        self.OrientationCache = self:GetOrientation()
+        self.CanTakeDamage = true 
     end,
 
     OnDamage = function(self, instigator, amount, vector, damageType)
-        if not self.CanTakeDamage then return end
-        self:DoTakeDamage(instigator, amount, vector, damageType)
+        if self.CanTakeDamage then 
+            self.DoTakeDamage(self, instigator, amount, vector, damageType)
+        end
     end,
 
     DoTakeDamage = function(self, instigator, amount, vector, damageType)
-        self:AdjustHealth(instigator, -amount)
-        local health = self:GetHealth()
+        EntityAdjustHealth(self, instigator, -amount)
+        local health = EntityGetHealth(self)
 
         if health <= 0 then
-            self:DoPropCallbacks('OnKilled')
-            self:Destroy()
+            self.DoPropCallbacks(self, 'OnKilled')
+            EntityDestroy(self)
         else
-            self:UpdateReclaimLeft()
+            self.UpdateReclaimLeft(self)
         end
     end,
 
     OnCollisionCheck = function(self, other)
-        if IsUnit(other) then
-            return false
-        else
-            return true
-        end
+        return false
     end,
 
     --- Create and return an identical wreckage prop. Useful for replacing this one when something
@@ -47,12 +80,20 @@ Wreckage = Class(Prop) {
     -- this means we have to calculate the health from the reclaim values, instead of going the
     -- other way.
     Clone = function(self)
-        local clone = CreateWreckage(__blueprints[self.AssociatedBP], self.CachePosition, self.OrientationCache, self.MaxMassReclaim, self.MaxEnergyReclaim, self.TimeReclaim, self:GetCollisionExtents())
+        local clone = CreateWreckage(
+            __blueprints[self.AssociatedBP], 
+            self.CachePosition, 
+            EntityGetOrientation(self), 
+            self.MaxMassReclaim, 
+            self.MaxEnergyReclaim, 
+            self.TimeReclaim, 
+            EntityGetCollisionExtents(self)
+        )
 
         -- Figure out the health this wreck had before it was deleted. We can't use any native
         -- functions like GetHealth(), so we use the latest known value
 
-        clone:SetHealth(nil, clone:GetMaxHealth() * (self.ReclaimLeft or 1))
+        EntitySetHealth(clone, nil, clone:GetMaxHealth() * (self.ReclaimLeft or 1))
         clone:UpdateReclaimLeft()
 
         return clone
@@ -88,8 +129,8 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     local bpWreck = bp.Wreckage.Blueprint
 
     local prop = CreateProp(position, bpWreck)
-    prop:SetOrientation(orientation, true)
-    prop:SetScale(bp.Display.UniformScale)
+    EntitySetOrientation(prop, orientation, true)
+    EntitySetScale(prop, bp.Display.UniformScale)
 
     -- take the default center (cx, cy, cz) and size (sx, sy, sz)
     local cx, cy, cz, sx, sy, sz;
@@ -101,13 +142,13 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     sz = bp.SizeZ
 
     -- if a death animation is played the wreck hitbox may need some changes
-    if deathHitBox then 
-        cx = deathHitBox.CollisionOffsetX or cx 
-        cy = deathHitBox.CollisionOffsetY or cy 
-        cz = deathHitBox.CollisionOffsetZ or cz 
-        sx = deathHitBox.SizeX or sx 
-        sy = deathHitBox.SizeY or sy 
-        sz = deathHitBox.SizeZ or sz 
+    if deathHitBox then
+        cx = deathHitBox.CollisionOffsetX or cx
+        cy = deathHitBox.CollisionOffsetY or cy
+        cz = deathHitBox.CollisionOffsetZ or cz
+        sx = deathHitBox.SizeX or sx
+        sy = deathHitBox.SizeY or sy
+        sz = deathHitBox.SizeZ or sz
     end
 
     -- adjust the size, these dimensions are in both directions based on the center
@@ -115,19 +156,22 @@ function CreateWreckage(bp, position, orientation, mass, energy, time, deathHitB
     sy = sy * 0.5
     sz = sz * 0.5
 
-    -- create the collision box
-    prop:SetPropCollision('Box', cx, cy, cz, sx, sy, sz)
+    -- set health
+    EntitySetMaxHealth(prop, bp.Defense.Health)
+    EntitySetHealth(prop, nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
 
-    prop:SetMaxHealth(bp.Defense.Health)
-    prop:SetHealth(nil, bp.Defense.Health * (bp.Wreckage.HealthMult or 1))
-    prop:SetMaxReclaimValues(time, mass, energy)
+    -- set collision box and reclaim values, the latter depends on the health of the wreck
+    prop.SetPropCollision(prop, 'Box', cx, cy, cz, sx, sy, sz)
+    prop.SetMaxReclaimValues(prop, time, mass, energy)
 
     --FIXME: SetVizToNeurals('Intel') is correct here, so you can't see enemy wreckage appearing
     -- under the fog. However the engine has a bug with prop intel that makes the wreckage
     -- never appear at all, even when you drive up to it, so this is disabled for now.
-    --prop:SetVizToNeutrals('Intel')
+    -- tested 2022-03-23: this works :)), but clashes with the reclaim labels that expects wrecks to be always visible
+    -- prop:SetVizToNeutrals('Intel')
+
     if not bp.Wreckage.UseCustomMesh then
-        prop:SetMesh(bp.Display.MeshBlueprintWrecked)
+        EntitySetMesh(prop, bp.Display.MeshBlueprintWrecked)
     end
 
     -- This field cannot be renamed or the magical native code that detects rebuild bonuses breaks.

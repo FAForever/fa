@@ -16,7 +16,7 @@ function ToggleZoomPop()
       end
       local hpr = Vector(3.14159, (1 - 20 / 90) * 1.5708, 0) -- I don't know the actual formula for the camera orientation but this is close
       cam:SnapTo(GetMouseWorldPos(), hpr, zoom)
-      cam:RevertRotation() -- Revert to basic rotation scheme after popping in. Will move the camera uunless the camera tilt is already correct
+      cam:RevertRotation() -- Revert to basic rotation scheme after popping in. Will move the camera unless the camera tilt is already correct
    else
       cam:Reset()
    end

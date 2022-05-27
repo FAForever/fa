@@ -95,6 +95,7 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYDEFENSE',
         'OVERLAYANTINAVY',
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.29,
     Defense = {
@@ -433,7 +434,7 @@ UnitBlueprint {
             TurretPitchRange = 30,
             TurretPitchSpeed = 30,
             TurretYaw = 0,
-            TurretYawRange = 135,
+            TurretYawRange = 140,
             TurretYawSpeed = 90,
             Turreted = true,
             WeaponCategory = 'Direct Fire Naval',
@@ -563,7 +564,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

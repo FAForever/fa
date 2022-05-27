@@ -1,77 +1,80 @@
-function ToggleSelfDestruct(data)
-    -- Suppress self destruct in tutorial missions as they screw up the mission end
+
+local GetEntityById = GetEntityById
+local OkayToMessWithArmy = OkayToMessWithArmy
+local StartCountdown = StartCountdown
+local CancelCountdown = CancelCountdown
+local ForkThread = ForkThread
+local KillThread = KillThread
+
+local TableInsert = table.insert
+
+
+-- prevent magic numbers
+local countdownDuration = 5
+
+--- Destroys the given unit after a set duration
+local function SelfDestructThread(unit)
+    WaitSeconds(countdownDuration)
+    if unit:BeenDestroyed() then 
+        return 
+    end
+
+    unit:Kill()
+end
+
+--- Toggles the destruction of the units
+function ToggleSelfDestruct(data, units)
+
+    -- suppress self destruct in tutorial missions as they screw up the mission end
     if ScenarioInfo.tutorial and ScenarioInfo.tutorial == true then
         return
     end
 
+    -- do not allow observers to use this
     if data.owner ~= -1 then
-        local unitEntities = {}
-        for _, unitId in data.units do
-            local unit = GetEntityById(unitId)
-            if OkayToMessWithArmy(unit.Army) then
-                table.insert(unitEntities, unit)
-            end
-        end
-        if table.getsize(unitEntities) > 0 then
-            if data.noDelay then -- Kill these units instantly
-                for _, unit in unitEntities do
-                    if unit:BeenDestroyed() or unit.Dead then return end
 
-                    FireSelfdestructWeapons(unit)
-                    unit.SelfDestructed = true
-                    unit:Kill()
+        -- just take them all out
+        if data.noDelay then 
+            for _, unit in units do
+                if OkayToMessWithArmy(unit.Army) then 
+                    if not (unit.Dead or unit:BeenDestroyed()) then 
+                        unit:Kill()
+                    end
                 end
-            else
-                local togglingOff = false
-                for _, unit in unitEntities do -- Rescue anything in the process of dying, and skip the next bit
+            end
+
+        -- wait a few seconds, then destroy
+        else 
+
+            -- if one is in the process of being destroyed, remove all destruction threads
+            local togglingOff = false
+            for _, unit in units do
+                if OkayToMessWithArmy(unit.Army) then 
                     if unit.SelfDestructThread then
                         togglingOff = true
                         KillThread(unit.SelfDestructThread)
                         unit.SelfDestructThread = false
-                        CancelCountdown(unit.EntityId)
-                    end
-                end
-
-                if not togglingOff then
-                    for _, unitEnt in unitEntities do
-                        local unit = unitEnt
-
-                        -- Unit and weapon bp flags can be used to control behaviour on SelfDestruct
-                        -- Instant kill if InstantDeathOnSelfDestruct = true variable set in units general table
-                        -- Fires weapons with FireOnSelfDestruct = true in units weapon table
-                        local bp = unit:GetBlueprint()
-                        if bp.General.InstantDeathOnSelfDestruct then
-                            FireSelfdestructWeapons(unit)
-                            unit.SelfDestructed = true
-                            unit:Kill()
-                        else
-                            -- Regular self destruct cycle
-                            StartCountdown(unit.EntityId)
-                            unit.SelfDestructThread = ForkThread(function()
-                                WaitSeconds(5)
-                                if unit:BeenDestroyed() then return end
-                                FireSelfdestructWeapons(unit)
-                                unit.SelfDestructed = true
-                                unit:Kill()
-                            end)
-                        end
+                        CancelCountdown(unit.EntityId)                          -- as defined in SymSync.lua
                     end
                 end
             end
-        end
-    end
-end
 
-function FireSelfdestructWeapons(unit)
-    local wepCount = unit:GetWeaponCount()
-    for i = 1, wepCount do
-        local wep = unit:GetWeapon(i)
-        local wepBP = wep:GetBlueprint()
-        if wepBP.FireOnSelfDestruct then
-            if wep.Fire then
-                wep.Fire()
-            else
-                wep.OnFire(wep)
+            -- if none are in the process of being destroyed, destroy them after a delay
+            if not togglingOff then
+                for _, unit in units do
+                    if OkayToMessWithArmy(unit.Army) then 
+                        
+                        -- allows fire beetle to be destroyed immediately
+                        if unit.Blueprint.General.InstantDeathOnSelfDestruct then 
+                            unit:Kill()
+
+                        -- destroy everything else after five seconds
+                        else 
+                            StartCountdown(unit.EntityId, countdownDuration)    -- as defined in SymSync.lua
+                            unit.SelfDestructThread = ForkThread(SelfDestructThread, unit)
+                        end
+                    end
+                end
             end
         end
     end

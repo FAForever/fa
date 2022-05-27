@@ -11,17 +11,21 @@ local controls = {}
 local countdownThreads = {}
 
 function ConfirmUnitDestruction(instant)
-    if import('/lua/ui/campaign/campaignmanager.lua').campaignMode
-    and table.getn(EntityCategoryFilterDown(categories.COMMAND, GetSelectedUnits())) > 0 then
+
+    -- get selected units
+    local units = GetSelectedUnits()
+
+    if  
+        -- if we're in campaign mode
+        import('/lua/ui/campaign/campaignmanager.lua').campaignMode  
+
+        -- and we're trying to self destruct a command unit
+        and not table.empty(EntityCategoryFilterDown(categories.COMMAND, units)) 
+    then
+        -- don't allow that, as it would end the operation
         CreateAnnouncement('<LOC confirm_0001>You cannot self destruct during an operation!')
     else
-        local units = GetSelectedUnits()
-        if units then
-            local unitIds = {}
-            for _, unit in units do
-                table.insert(unitIds, unit:GetEntityId())
-            end
-            SimCallback({Func = 'ToggleSelfDestruct', Args = {units = unitIds, owner = GetFocusArmy(), noDelay = instant}})
-        end
+        -- do the callback accordingly
+        SimCallback({Func = 'ToggleSelfDestruct', Args = { owner = GetFocusArmy(), noDelay = instant }}, true)
     end
 end

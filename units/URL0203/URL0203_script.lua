@@ -23,13 +23,13 @@ URL0203 = Class(CLandUnit, SlowAmphibious) {
     OnStopBeingBuilt = function(self, builder, layer)
         CLandUnit.OnStopBeingBuilt(self,builder,layer)
         # If created with F2 on land, then play the transform anim.
-        if(self:GetCurrentLayer() == 'Land') then
+        if(self.Layer == 'Land') then
 			# Enable Land weapons
 	        self:SetWeaponEnabledByLabel('Rocket', true)
 	        self:SetWeaponEnabledByLabel('Bolter', true)
 			# Disable Torpedo
 	        self:SetWeaponEnabledByLabel('Torpedo', false)
-        elseif (self:GetCurrentLayer() == 'Seabed') then
+        elseif (self.Layer == 'Seabed') then
 			# Disable Land Weapons
 	        self:SetWeaponEnabledByLabel('Rocket', false)
 	        self:SetWeaponEnabledByLabel('Bolter', false)

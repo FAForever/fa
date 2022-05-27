@@ -392,30 +392,13 @@ end
 -- Gets a name and actual version for specified mod
 function GetModNameVersion(mod)
     local name = mod.name
+
     -- remove old mod version from mod name
-    name = name:gsub(" %[", " ")
-    name = name:gsub("%]", "")
-    name = name:gsub(" V", " ")
-    name = name:gsub(" v", " ")
-    name = name:gsub(" %(V", " ")
-    name = name:gsub(" %(v", " ")
-    name = name:gsub("%d%)", "")
-    name = name:gsub(" %d%_%d%_%d", "")
-    name = name:gsub(" %d%.%d%d%d", "")
-    name = name:gsub(" %d%.%d%d", "")
-    name = name:gsub(" %d%.%d", "")
-    name = name:gsub(" %d%.", "")
-    name = name:gsub(" %d", "")
-    -- cleanup name
-    name = name:gsub(" %(%)", "")
-    name = name:gsub("%)", "")
-    name = name:gsub(" %-", " ")
-    name = name:gsub("%- ", "")
-    name = name:gsub("%-", " ", 1)
-    name = name:gsub("%_", " ")
-    name = name:gsub(" %(", " - ")
+    name = string.gsub(name, '[%[%<%{%(%s]+[vV]+%s*%d+[%.%d]*[%]%>%}%)%s]*', '')
+
     name = StringCapitalize(name)
 
+    -- append new mod version to mod name
     if not mod.version then
         name = name .. ' ---- (v1.0)'
     elseif type(mod.version) == 'number' then
@@ -487,7 +470,7 @@ function UpdateMods(modsList)
                 mod.units[id] = bp
             end
         end
-        if table.getsize(mod.units) > 0 then
+        if not table.empty(mod.units) then
             mod.tags['UNITS'] = true
         end
     end
@@ -725,7 +708,7 @@ function ActivateMod(uid, isRecursing)
                 end
             end
             -- Prompt the user, and if they approve, turn off all conflicting mods.
-            if table.getn(activatedConflictingMods) > 0 then
+            if not table.empty(activatedConflictingMods) then
                 if isRecursing then
                     -- Just quietly get on and do it if it's a recursive call.
                     doEnable()
@@ -911,11 +894,11 @@ function CreateListElement(parent, mod, Pos)
 
     if mod.type == 'NO_DEPENDENCY' then
         local body = ''
-        if table.getsize(mod.requiresNames) > 0 then
+        if not table.empty(mod.requiresNames) then
             for k, v in mod.requiresNames do
                 body = v .. ',\n' .. body
             end
-        elseif table.getsize(mod.requires) > 0 then
+        elseif not table.empty(mod.requires) then
             for k, v in mod.requires do
                 body = v .. ',\n' .. body
             end

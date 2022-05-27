@@ -43,7 +43,7 @@ end
 
 --- Remove the current escape handler and restore the previous one pushed.
 function PopEscapeHandler()
-    if table.getn(escapeHandlers) < 1 then
+    if table.empty(escapeHandlers) then
         LOG("Error popping escape handler, stack is empty")
         LOG(repr(debug.traceback()))
         return

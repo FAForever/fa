@@ -278,13 +278,13 @@ function HighestFactoryLevel(aiBrain, level, baseName)
 
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3, bManager:GetPosition(), bManager.Radius)
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2, bManager:GetPosition(), bManager.Radius)
-    if t3FacList and table.getn(t3FacList) > 0 then
+    if t3FacList and not table.empty(t3FacList) then
         if level == 3 then
             return true
         else
             return false
         end
-    elseif t2FacList and table.getn(t2FacList) > 0 then
+    elseif t2FacList and not table.empty(t2FacList) then
         if level == 2 then
             return true
         else
@@ -336,7 +336,7 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
         return false
     end
     -- Return out if the list is empty or all buildings are finished
-    if table.getn(bManager.UnfinishedBuildings) == 0 then
+    if table.empty(bManager.UnfinishedBuildings) then
         return false
     else
         local allFinished = true
@@ -389,13 +389,13 @@ function HighestFactoryLevelType(aiBrain, level, baseName, type)
 
     local t3FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH3 * catCheck, bManager:GetPosition(), bManager.Radius)
     local t2FacList = AIUtils.GetOwnUnitsAroundPoint(aiBrain, categories.FACTORY * categories.TECH2 * catCheck, bManager:GetPosition(), bManager.Radius)
-    if t3FacList and table.getn(t3FacList) > 0 then
+    if t3FacList and not table.empty(t3FacList) then
         if level == 3 then
             return true
         else
             return false
         end
-    elseif t2FacList and table.getn(t2FacList) > 0 then
+    elseif t2FacList and not table.empty(t2FacList) then
         if level == 2 then
             return true
         else

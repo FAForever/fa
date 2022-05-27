@@ -100,7 +100,7 @@ function OnSelectionSetChanged(name, units, applied)
         bg.UpdateGroup = function(self)
             self.units = ValidateUnitsList(self.units)
 
-            if table.getsize(self.units) > 0 then
+            if not table.empty(self.units) then
                 local sortedUnits = {}
                 sortedUnits[1] = EntityCategoryFilterDown(categories.COMMAND, self.units)
                 sortedUnits[2] = EntityCategoryFilterDown(categories.EXPERIMENTAL, self.units)
@@ -111,7 +111,7 @@ function OnSelectionSetChanged(name, units, applied)
 
                 local iconID = ''
                 for _, unitTable in sortedUnits do
-                    if table.getn(unitTable) > 0 then
+                    if not table.empty(unitTable) then
                         iconID = unitTable[1]:GetBlueprint().BlueprintId
                         break
                     end
@@ -217,7 +217,7 @@ function Contract()
 end
 
 function Expand()
-    if table.getsize(controls.groups) > 0 then
+    if not table.empty(controls.groups) then
         controls.container:Show()
         controls.collapseArrow:Show()
     end

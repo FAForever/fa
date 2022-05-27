@@ -69,7 +69,7 @@ function OnFactionSelect(data)
     if ScenarioInfo.campaignInfo then
         ScenarioInfo.campaignInfo.campaignID = data.Faction
     end
-    if table.getn(factionCallbacks) > 0 then
+    if not table.empty(factionCallbacks) then
         for index, callbackFunc in factionCallbacks do
             if callbackFunc then callbackFunc(data) end
         end
@@ -137,7 +137,7 @@ end
 function PauseUnitDeath(unit)
     if unit and not unit.Dead then
         unit.OnKilled = OverrideKilled
-        unit:SetCanBeKilled(false)
+        unit.CanBeKilled = false
         unit.DoTakeDamage = OverrideDoDamage
     end
 end
@@ -169,7 +169,7 @@ function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio
     while PauseUnitDeathActive do
         WaitSeconds(1)
     end
-    self:SetCanBeKilled(true)
+    self.CanBeKilled = true
     self:Kill(instigator, damageType, excessDamageRatio)
 end
 
@@ -181,11 +181,11 @@ function OverrideKilled(self, instigator, type, overkillRatio)
     self.Dead = true
 
     local bp = self:GetBlueprint()
-    if self:GetCurrentLayer() == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
+    if self.Layer == 'Water' and bp.Physics.MotionType == 'RULEUMT_Hover' then
         self:PlayUnitSound('HoverKilledOnWater')
     end
 
-    if self:GetCurrentLayer() == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
+    if self.Layer == 'Land' and bp.Physics.MotionType == 'RULEUMT_AmphibiousFloating' then
         self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
     else
         self:PlayUnitSound('Killed')
@@ -224,6 +224,10 @@ function OverrideKilled(self, instigator, type, overkillRatio)
 end
 
 function GiveUnitToArmy(unit, newArmyIndex, triggerOnGiven)
+    -- Shared army mod will result in different players having the same army number.
+    if unit.Army == newArmyIndex then
+        return unit
+    end
     -- We need the brain to ignore army cap when transferring the unit
     -- do all necessary steps to set brain to ignore, then un-ignore if necessary the unit cap
     unit.IsBeingTransferred = true
@@ -711,7 +715,7 @@ end
 
 -- The actual thread used by Dialogue
 function PlayDialogue()
-    while table.getn(ScenarioInfo.DialogueQueue) > 0 do
+    while not table.empty(ScenarioInfo.DialogueQueue) do
         local dTable = table.remove(ScenarioInfo.DialogueQueue, 1)
         if not dTable then WARN('dTable is nil, ScenarioInfo.DialogueQueue len is '..repr(table.getn(ScenarioInfo.DialogueQueue))) end
         if not dTable.Flushed and (not ScenarioInfo.OpEnded or dTable.Critical) then
@@ -931,7 +935,7 @@ end
 function FakeTeleportUnit(unit, killUnit)
     IssueStop({unit})
     IssueClearCommands({unit})
-    unit:SetCanBeKilled(false)
+    unit.CanBeKilled = false
 
     unit:PlayTeleportChargeEffects(unit:GetPosition(), unit:GetOrientation())
     unit:PlayUnitSound('GateCharge')
@@ -1470,7 +1474,7 @@ function AttachUnitsToTransports(units, transports)
             local i = 1
             if bp.Transport.TransportClass == 3 then
                 while notInserted and i <= numTransports do
-                    if table.getn(transportBones[i].Lrg) > 0 then
+                    if not table.empty(transportBones[i].Lrg) then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Lrg, 1)
                         transports[i]:OnTransportAttach(bone, v)
@@ -1505,7 +1509,7 @@ function AttachUnitsToTransports(units, transports)
                 end
             elseif bp.Transport.TransportClass == 2 then
                 while notInserted and i <= numTransports do
-                    if table.getn(transportBones[i].Med) > 0 then
+                    if not table.empty(transportBones[i].Med) then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Med, 1)
                         transports[i]:OnTransportAttach(bone, v)
@@ -1528,7 +1532,7 @@ function AttachUnitsToTransports(units, transports)
                 end
             else
                 while notInserted and i <= numTransports do
-                    if table.getn(transportBones[i].Sml) > 0 then
+                    if not table.empty(transportBones[i].Sml) then
                         notInserted = false
                         local bone = table.remove(transportBones[i].Sml, 1)
                         transports[i]:OnTransportAttach(bone, v)
@@ -1645,14 +1649,14 @@ function EndOperationSafety(units)
             end
         end
         for subk, subv in v:GetListOfUnits(categories.COMMAND, false) do
-            subv:SetCanTakeDamage(false)
-            subv:SetCanBeKilled(false)
+            subv.CanTakeDamage = false
+            subv.CanBeKilled = false
         end
-        if units and table.getn(units) > 0 then
+        if units and not table.empty(units) then
             for subk, subv in units do
                 if not subv.Dead then
-                    subv:SetCanTakeDamage(false)
-                    subv:SetCanBeKilled(false)
+                    subv.CanTakeDamage = false
+                    subv.CanBeKilled = false
                 end
             end
         end
@@ -1938,11 +1942,11 @@ function FlagUnkillableSelect(armyNumber, units)
             if not v.CanTakeDamage then
                 v.UndamagableFlagSet = true
             end
-            if not v:CheckCanBeKilled() then
+            if not v.CanBeKilled then
                 v.UnKillableFlagSet = true
             end
-            v:SetCanTakeDamage(false)
-            v:SetCanBeKilled(false)
+            v.CanTakeDamage = false
+            v.CanBeKilled = false
         end
     end
 end
@@ -1953,20 +1957,20 @@ function FlagUnkillable(armyNumber, exceptions)
         if not v.CanTakeDamage then
             v.UndamagableFlagSet = true
         end
-        if not v:CheckCanBeKilled() then
+        if not v.CanBeKilled then
             v.UnKillableFlagSet = true
         end
-        v:SetCanTakeDamage(false)
-        v:SetCanBeKilled(false)
+        v.CanTakeDamage = false
+        v.CanBeKilled = false
     end
     if exceptions then
         for _, v in exceptions do
             -- Only process units that weren't already set
             if not v.UnKillableFlagSet then
-                v:SetCanBeKilled(true)
+                v.CanBeKilled = true
             end
             if not v.UndamagableFlagSet then
-                v:SetCanTakeDamage(true)
+                v.CanTakeDamage = true
             end
         end
     end
@@ -1977,10 +1981,10 @@ function UnflagUnkillable(armyNumber)
     for _, v in units do
         -- Only revert units that weren't already set
         if not v.UnKillableFlagSet then
-            v:SetCanBeKilled(true)
+            v.CanBeKilled = true
         end
         if not v.UndamagableFlagSet then
-            v:SetCanTakeDamage(true)
+            v.CanTakeDamage = true
         end
         v.KilledFlagSet = nil
         v.DamageFlagSet = nil
@@ -2023,7 +2027,6 @@ function GenerateOffMapAreas()
     else
         playablearea = {0, 0, ScenarioInfo.size[1], ScenarioInfo.size[2]}
     end
-    LOG('playable area coordinates are ' .. repr(playablearea))
 
     local x0 = playablearea[1]
     local y0 = playablearea[2]
@@ -2062,13 +2065,13 @@ function GenerateOffMapAreas()
 
     ScenarioInfo.OffMapAreas = OffMapAreas
     ScenarioInfo.PlayableArea = playablearea
-
-    LOG('Offmapareas are ' .. repr(OffMapAreas))
 end
 
 function AntiOffMapMainThread()
+
     WaitTicks(11)
     GenerateOffMapAreas()
+    local WaitTicks = coroutine.yield
     local OffMapAreas = {}
     local UnitsThatAreOffMap = {}
 
@@ -2086,7 +2089,10 @@ function AntiOffMapMainThread()
                     end
                 else
             end
+            WaitTicks(11)
         end
+
+        WaitTicks(11)
         local NumberOfUnitsOffMap = table.getn(NewUnitsThatAreOffMap)
         for index, NewUnitThatIsOffMap in NewUnitsThatAreOffMap do
             if not NewUnitThatIsOffMap.IAmOffMap then
@@ -2103,7 +2109,7 @@ function AntiOffMapMainThread()
                 end
             end
         end
-        WaitSeconds(1)
+
         NewUnitsThatAreOffMap = nil
     end
 end

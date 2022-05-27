@@ -926,9 +926,11 @@ end
 function SetVolume(category,  volume)
 end
 
----
---  SimCallback(callback[,bool]): Execute a lua function in sim
-function SimCallback(callback[, bool])
+--- SimCallback(identifier, bool) 
+-- Performs a callback with the given identifier from /lua/sim/simcallbacks.lua. Optionally appends the unit selection to the arguments
+-- @param callback Table of { Func :: String, Args :: Table } where Func represents the callback functions and Args additional data
+-- @param addUnitSelection Toggles appending the unit selection to the callback
+function SimCallback(identifier, addUnitSelection)
 end
 
 ---

@@ -1,0 +1,12 @@
+# https://docs.github.com/en/repositories/working-with-files/using-files/viewing-a-file#ignore-commits-in-the-blame-view
+
+# Changes all lines in lobby.lua
+b5ad96a044b34f12b1c95121c4b49297fc0d243d
+27d8e201037bbf0b78a631e3baa42ce22c007dd0
+
+# Changes all line endings to LF
+76f8ac36b322bae6c0145e9da7b56e3e5dabb1ca
+
+# white space cleanups
+16d5cfebac6ddd19a3a9496b810beb9a1a73d950
+ce65d77916260cb29d021a036d484e84bd38eabd

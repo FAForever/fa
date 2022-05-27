@@ -112,6 +112,7 @@ UnitBlueprint {
         },
     },
     BuildIconSortPriority = 10,
+    BuildBotTotal = 3,
     Categories = {
         'PRODUCTSC1',
         'SELECTABLE',
@@ -780,8 +781,11 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'MOBILE',
-                'STRUCTURE DEFENSE',
+                'MOBILE EXPERIMENTAL',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE TECH1',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

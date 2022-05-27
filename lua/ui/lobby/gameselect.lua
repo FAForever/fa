@@ -125,17 +125,17 @@ local function IsNameOK(name)
     if name == nil then
         return false
     end
-    
+
     if name == "" then
         return false
     end
-    
+
     -- test for name consisting only of whitespace
     local nBegin, nEnd = string.find(name, "%s+")
     if nBegin and (nBegin == 1 and nEnd == string.len(name)) then
         return false
     end
-    
+
     return true
 end
 
@@ -170,13 +170,13 @@ function CreateUI(over, exitBehavior)
     local title = UIUtil.CreateText(panel, "<LOC GAMESEL_0000>LAN/IP Connect", 24)
     LayoutHelpers.AtHorizontalCenterIn(title, panel)
     LayoutHelpers.AtTopIn(title, panel, 26)
-    
+
     local exitButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _Back>", 14, 0, 0, "UI_Back_MouseDown")
     LayoutHelpers.AtLeftTopIn(exitButton, panel, 15, 645)
-    
+
     local games = {}
 	local serverList = {}
-    
+
     exitButton.OnClick = function(self)
     	if exitBehavior then
         	exitBehavior()
@@ -195,7 +195,7 @@ function CreateUI(over, exitBehavior)
     end
 
     import('/lua/ui/uimain.lua').SetEscapeHandler(function() exitButton.OnClick() end)
-    
+
     local createButton = UIUtil.CreateButtonStd(panel, '/scx_menu/large-no-bracket-btn/large', "<LOC _Create>Create", 18, 2)
     LayoutHelpers.AtRightTopIn(createButton, panel, -17, 645)
     createButton.HandleEvent = function(self, event)
@@ -206,15 +206,16 @@ function CreateUI(over, exitBehavior)
         end
         Button.HandleEvent(self, event)
     end
-    
+
     gameList = Group(panel)
     LayoutHelpers.AtLeftTopIn(gameList, panel, 30, 152)
-    LayoutHelpers.SetDimensions(gameList, panel.Width() - 90, 432)
+    gameList.Width:Set(panel.Width() - LayoutHelpers.ScaleNumber(90))
+    LayoutHelpers.SetHeight(gameList, 432)
     gameList.top = 0
-    
+
     local gamesTitle = UIUtil.CreateText(panel, '<LOC GAMESEL_0002>Server List', 18, UIUtil.bodyFont)
     LayoutHelpers.Above(gamesTitle, gameList, 6)
-    
+
 	-- name edit field
     local nameEdit = CreateEditField(panel, 375, 20)
     LayoutHelpers.AtLeftIn(nameEdit, panel, 30)
@@ -245,7 +246,7 @@ function CreateUI(over, exitBehavior)
     end
     local nameLabel = UIUtil.CreateText(panel, "<LOC NICKNAME>Nickname", 18, UIUtil.bodyFont)
     LayoutHelpers.Above(nameLabel, nameEdit, 3)
-    
+
     createButton.OnClick = function(self)
         local name = nameEdit:GetText()
         if IsNameOK(name) then
@@ -259,7 +260,7 @@ function CreateUI(over, exitBehavior)
             errorDialog = UIUtil.ShowInfoDialog(parent, "<LOC GAMESEL_0003>Please fill in your nickname", "<LOC _OK>")
         end
     end
-    
+
 	-- ip address and port edit
 	local ipaddressEdit = CreateEditField(panel, 290)
     LayoutHelpers.AtLeftTopIn(ipaddressEdit, panel, 28, 615)
@@ -277,20 +278,20 @@ function CreateUI(over, exitBehavior)
         portEdit:AcquireFocus()
         return true
     end
-    
+
     portEdit.OnCharPressed = nameEdit.OnCharPressed
     portEdit.OnEnterPressed = function(self, text)
         portEdit:AbandonFocus()
         ipaddressEdit:AcquireFocus()
         return true
-    end    
-    
+    end
+
     local portLabel = UIUtil.CreateText(panel, "<LOC _Port>", 18, UIUtil.bodyFont)
     LayoutHelpers.Above(portLabel, portEdit, 2)
 
     local ipaddressLabel = UIUtil.CreateText(panel, "<LOC DIRCON_0001>IP Address/Hostname", 18, UIUtil.bodyFont)
     LayoutHelpers.Above(ipaddressLabel, ipaddressEdit, 2)
-    
+
     local ipconnectBtn = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _Connect>Connect", 14)
     Tooltip.AddButtonTooltip(ipconnectBtn, 'mainmenu_quickipconnect')
     LayoutHelpers.RightOf(ipconnectBtn, portEdit, 10)
@@ -299,7 +300,7 @@ function CreateUI(over, exitBehavior)
         local ipaddress = ipaddressEdit:GetText()
         local portstr = portEdit:GetText()
         local port = tonumber(portstr)
-    
+
         if not port or math.floor(port) ~= port or port < 1 or port > 65535 then
             UIUtil.ShowInfoDialog(parent,
                                   LOCF('<LOC DIRCON_0003>Invalid port number: %s.  Must be an integer between 1 and 65535', portstr),
@@ -316,7 +317,7 @@ function CreateUI(over, exitBehavior)
             if valid then
                 Prefs.SetToCurrentProfile('last_dc_ipaddress', ipaddress)
                 Prefs.SetToCurrentProfile('last_dc_port', tostring(port))
-    
+
                 lobby.CreateLobby("UDP", 0, name, nil, nil, over, function() CreateUI(over, exitBehavior) end)
                	panel:Destroy()
                	discovery:Destroy()
@@ -329,28 +330,28 @@ function CreateUI(over, exitBehavior)
             end
         end
     end
-    
+
     gameList._tabs = {}
     gameList._sortby = {field = 'wrappedName', ascending = true, isOption = false, customField = 'AllowObservers', customFieldIsOption = false}
-    
+
     local function CreateTab(data)
         local btn = Bitmap(panel, UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_m.dds'))
-        
+
         btn.lcap = Bitmap(btn, UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_l.dds'))
         btn.lcap.Depth:Set(btn.Depth)
         LayoutHelpers.LeftOf(btn.lcap, btn)
-        
+
         btn.rcap = Bitmap(btn, UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_r.dds'))
         btn.rcap.Depth:Set(btn.Depth)
         LayoutHelpers.RightOf(btn.rcap, btn)
-        
+
         if data.options then
             btn.combo = Combo(btn, 14, 20, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
             LayoutHelpers.SetWidth(btn.combo, 260)
             LayoutHelpers.AtLeftIn(btn.combo, btn, 38)
             LayoutHelpers.AtVerticalCenterIn(btn.combo, btn, -1)
             btn.combo.Depth:Set(function() return btn.Depth() + 20 end)
-            
+
             local itemArray = {}
             btn.combo.keyMap = {}
             for index, val in data.options do
@@ -358,7 +359,7 @@ function CreateUI(over, exitBehavior)
                 btn.combo.keyMap[index] = {field = val.sortby, isOption = val.isGameOption}
             end
             btn.combo:AddItems(itemArray, 1)
-            
+
             btn.combo.OnClick = function(self, index, text)
                 gameList._sortby.customField = self.keyMap[index].field
                 gameList._sortby.customFieldIsOption = self.keyMap[index].isOption
@@ -370,20 +371,20 @@ function CreateUI(over, exitBehavior)
             LayoutHelpers.AtLeftIn(btn.text, btn, 18)
             LayoutHelpers.AtVerticalCenterIn(btn.text, btn, -1)
         end
-        
+
         btn.arrow = Bitmap(btn, UIUtil.UIFile('/dialogs/sort_btn/sort-arrow-down_bmp.dds'))
         btn.arrow:DisableHitTest()
         LayoutHelpers.AtLeftIn(btn.arrow, btn.lcap, 4)
         LayoutHelpers.AtVerticalCenterIn(btn.arrow, btn.lcap)
         btn.arrow:Hide()
-        
+
         LayoutHelpers.SetWidth(btn, data.width)
-        
+
         btn._checked = false
-        
+
         return btn
     end
-    
+
     for index, tabinfo in tabData do
         local i = index
         gameList._tabs[index] = CreateTab(tabinfo)
@@ -404,7 +405,7 @@ function CreateUI(over, exitBehavior)
         gameList._tabs[index].OnClick = function(control, event)
             control.arrow:Show()
             if control._checked then
-                gameList._sortby.ascending = not gameList._sortby.ascending 
+                gameList._sortby.ascending = not gameList._sortby.ascending
             end
             for index, tab in gameList._tabs do
                 if index ~= i then
@@ -440,22 +441,22 @@ function CreateUI(over, exitBehavior)
             end
         end
     end
-    
+
     gameListObjects = {}
-    
+
     function CreateRollover(parent)
         local bg = Bitmap(parent, UIUtil.UIFile('/scx_menu/gameselect/map-panel_bmp.dds'))
         bg.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
         LayoutHelpers.RightOf(bg, parent.preview)
         LayoutHelpers.AtVerticalCenterIn(bg, parent.preview)
-        
+
         bg.preview = MapPreview(bg)
         LayoutHelpers.AtLeftTopIn(bg.preview, bg, 44, 26)
-        
+
         bg.mapglow = Bitmap(bg.preview, UIUtil.UIFile('/scx_menu/gameselect/map-panel-glow_bmp.dds'))
         LayoutHelpers.AtLeftTopIn(bg.mapglow, bg, 35, 17)
         bg.mapglow:DisableHitTest()
-        
+
         if parent.data.ScenarioMap then
             bg.preview:SetTextureFromMap(parent.data.ScenarioMap)
             LayoutHelpers.SetDimensions(bg.preview, 240, 240)
@@ -463,21 +464,21 @@ function CreateUI(over, exitBehavior)
             bg.preview.Width:Set(0)
             bg.preview.Height:Set(0)
         end
-        
+
         bg.textfields = {}
-        
+
         bg.textfields.gamename = UIUtil.CreateText(bg, parent.data.GameName, 18, UIUtil.bodyFont)
         LayoutHelpers.AtLeftTopIn(bg.textfields.gamename, bg, 300, 17)
-        
+
         bg.textfields.hostName = UIUtil.CreateText(bg, LOCF("<LOC gamesel_0000>Host: %s", parent.data.RolloverData.HostedBy), 14, UIUtil.bodyFont)
         LayoutHelpers.Below(bg.textfields.hostName, bg.textfields.gamename)
-        
+
         bg.textfields.players = UIUtil.CreateText(bg, LOCF("<LOC gamesel_0001>Players: %d / %d", parent.data.PlayerCount, parent.data.MaxPlayers), 14, UIUtil.bodyFont)
         LayoutHelpers.Below(bg.textfields.players, bg.textfields.hostName)
-        
+
         bg.textfields.mapname = UIUtil.CreateText(bg, LOCF("<LOC gamesel_0002>Map: %s", parent.data.RolloverData.scenario.name), 14, UIUtil.bodyFont)
         LayoutHelpers.Below(bg.textfields.mapname, bg.textfields.players)
-        
+
         local prevcontrol = bg.textfields.mapname
         for i, v in parent.data.RolloverData.FormattedOptions do
             local index = i
@@ -485,8 +486,8 @@ function CreateUI(over, exitBehavior)
             LayoutHelpers.Below(bg.textfields[index], prevcontrol)
             prevcontrol = bg.textfields[index]
         end
-        
-        bg.RefreshData = function(self, data) 
+
+        bg.RefreshData = function(self, data)
             if data.ScenarioMap then
                 self.preview:SetTextureFromMap(data.ScenarioMap)
                 LayoutHelpers.SetDimensions(self.preview, 240, 240)
@@ -504,12 +505,12 @@ function CreateUI(over, exitBehavior)
                 end
             end
         end
-        
+
         bg:DisableHitTest(true)
         return bg
     end
-    
-    if table.getn(gameListObjects) > 0 then
+
+    if not table.empty(gameListObjects) then
         for i, v in gameListObjects do
             v:Destroy()
         end
@@ -518,19 +519,19 @@ function CreateUI(over, exitBehavior)
     local function CreateElement(index)
         gameListObjects[index] = Group(gameList)
         gameListObjects[index].Depth:Set(function() return gameList.Depth() + 10 end)
-        
+
         gameListObjects[index].bg = Bitmap(gameListObjects[index], UIUtil.UIFile('/scx_menu/gameselect/slot_bmp.dds'))
         LayoutHelpers.AtLeftTopIn(gameListObjects[index].bg, gameListObjects[index], 235)
         gameListObjects[index].bg.Depth:Set(gameListObjects[index].Depth)
-        
+
         gameListObjects[index].mapbg = Bitmap(gameListObjects[index], UIUtil.UIFile('/scx_menu/gameselect/map-slot_bmp.dds'))
         LayoutHelpers.AtLeftTopIn(gameListObjects[index].mapbg, gameListObjects[index], 163)
         gameListObjects[index].mapbg.Depth:Set(gameListObjects[index].Depth)
-        
+
         gameListObjects[index].Width:Set(gameList.Width)
         gameListObjects[index].Height:Set(gameListObjects[index].bg.Height)
-        
-        gameListObjects[index].joinBtn = Button(gameListObjects[index], 
+
+        gameListObjects[index].joinBtn = Button(gameListObjects[index],
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
@@ -557,8 +558,8 @@ function CreateUI(over, exitBehavior)
             --LOG('Joining ', repr(hostInfo))
             lobby.JoinGame(hostInfo.Address, false)
         end
-        
-        gameListObjects[index].obsBtn = Button(gameListObjects[index], 
+
+        gameListObjects[index].obsBtn = Button(gameListObjects[index],
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_up.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_down.dds'),
             UIUtil.UIFile('/scx_menu/small-short-btn/small-btn_over.dds'),
@@ -584,42 +585,42 @@ function CreateUI(over, exitBehavior)
             --LOG('Joining ', repr(hostInfo))
             lobby.JoinGame(hostInfo.Address, true)
         end
-        
+
         gameListObjects[index].preview = MapPreview(gameListObjects[index])
         LayoutHelpers.SetDimensions(gameListObjects[index].preview, 58, 58)
         LayoutHelpers.AtHorizontalCenterIn(gameListObjects[index].preview, gameList._tabs[1])
         LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].preview, gameListObjects[index])
         gameListObjects[index].preview:DisableHitTest()
-        
+
         gameListObjects[index].mapglow = Bitmap(gameListObjects[index].preview, UIUtil.UIFile('/scx_menu/gameselect/map-panel-glow_bmp.dds'))
 
         LayoutHelpers.FillParentFixedBorder(gameListObjects[index].mapglow, gameListObjects[index].preview, -3)
         gameListObjects[index].mapglow:DisableHitTest()
-        
+
         gameListObjects[index].nopreview = UIUtil.CreateText(gameListObjects[index], '?', 60, UIUtil.bodyFont)
         LayoutHelpers.AtCenterIn(gameListObjects[index].nopreview, gameListObjects[index].preview)
         gameListObjects[index].nopreview:DisableHitTest()
-        
+
         gameListObjects[index].name1 = UIUtil.CreateText(gameListObjects[index], '', 16)
         LayoutHelpers.AtLeftIn(gameListObjects[index].name1, gameList._tabs[2])
         LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].name1, gameListObjects[index])
         gameListObjects[index].name1:DisableHitTest()
-        
+
         gameListObjects[index].name2 = UIUtil.CreateText(gameListObjects[index], '', 16)
         LayoutHelpers.Below(gameListObjects[index].name2, gameListObjects[index].name1)
         LayoutHelpers.AtLeftIn(gameListObjects[index].name2, gameList._tabs[2])
         gameListObjects[index].name2:DisableHitTest()
-        
+
         gameListObjects[index].players = UIUtil.CreateText(gameListObjects[index], '', 16)
         LayoutHelpers.AtHorizontalCenterIn(gameListObjects[index].players, gameList._tabs[3])
         LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].players, gameListObjects[index])
         gameListObjects[index].players:DisableHitTest()
-        
+
         gameListObjects[index].custom = UIUtil.CreateText(gameListObjects[index], 'custom', 16)
         LayoutHelpers.AtLeftIn(gameListObjects[index].custom, gameList._tabs[4])
         LayoutHelpers.AtVerticalCenterIn(gameListObjects[index].custom, gameListObjects[index])
         gameListObjects[index].custom:DisableHitTest()
-        
+
         gameListObjects[index].roGroup = Group(gameListObjects[index])
         LayoutHelpers.FillParent(gameListObjects[index].roGroup, gameListObjects[index].mapbg)
         gameListObjects[index].roGroup.HandleEvent = function(self, event)
@@ -635,25 +636,25 @@ function CreateUI(over, exitBehavior)
             end
         end
     end
-    
+
     local formattedData = {}
-    
+
     CreateElement(1)
     LayoutHelpers.AtLeftTopIn(gameListObjects[1], gameList, 0, 10)
-        
+
     local index = 2
     while gameListObjects[table.getsize(gameListObjects)].Bottom() + gameListObjects[1].Height() < gameList.Bottom() do
         CreateElement(index)
         LayoutHelpers.Below(gameListObjects[index], gameListObjects[index-1], 5)
         index = index + 1
     end
-            
+
     local numLines = function() return table.getsize(gameListObjects) end
-    
+
     local function DataSize()
         return table.getsize(formattedData)
     end
-    
+
     -- called when the scrollbar for the control requires data to size itself
     -- GetScrollValues must return 4 values in this order:
     -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -757,7 +758,7 @@ function CreateUI(over, exitBehavior)
         end
     end
     gameList:CalcVisible()
-    
+
     gameList.HandleEvent = function(control, event)
         if event.Type == 'WheelRotation' then
             local lines = 1
@@ -767,17 +768,17 @@ function CreateUI(over, exitBehavior)
             control:ScrollLines(nil, lines)
         end
     end
-    
+
     UIUtil.CreateVertScrollbarFor(gameList)
-    
+
     function formatData()
         formattedData = {}
         for i, gameData in games do
             if gameData.ProductCode == nil or gameData.ProductCode ~= import('/lua/productcode.lua').productCode then continue end
-            gameData.wrappedName = import('/lua/maui/text.lua').WrapText(gameData.GameName, 
-                gameList._tabs[2].Right() - gameList._tabs[2].Left(), 
+            gameData.wrappedName = import('/lua/maui/text.lua').WrapText(gameData.GameName,
+                gameList._tabs[2].Right() - gameList._tabs[2].Left(),
                 function(curText) return gameListObjects[1].name1:GetStringAdvance(curText) end)
-            
+
             for i, v in scenarios do
                 if v.file == string.lower(gameData.Options.ScenarioFile) then
                     gameData.scenario = v
@@ -785,15 +786,15 @@ function CreateUI(over, exitBehavior)
                     break
                 end
             end
-            
+
             if not gameData.scenario then
                 gameData.scenario = {name = 'Unknown Map'}
                 gameData.MaxPlayers = 0
             end
-            
+
             local custom = ''
             gameData.FormattedOptions = {}
-            
+
             for i, v in gameOptions do
                 for index, option in v do
                     for valIndex, value in option.values do
@@ -817,9 +818,9 @@ function CreateUI(over, exitBehavior)
                     end
                 end
             end
-            
+
             table.insert(formattedData, {
-                PlayerCount = gameData.PlayerCount, 
+                PlayerCount = gameData.PlayerCount,
                 GameName = gameData.GameName,
                 wrappedName = gameData.wrappedName,
                 MaxPlayers = gameData.MaxPlayers,
@@ -842,7 +843,7 @@ function CreateUI(over, exitBehavior)
         --LOG(repr(formattedData))
         gameList:CalcVisible()
     end
-    
+
 -- discovery behaviors
     discovery.RemoveGame = function(self,index)
         games[index+1] = nil
@@ -866,7 +867,7 @@ function CreateUI(over, exitBehavior)
         --LOG(repr(games))
         formatData()
     end
-    
+
     ForkThread(function()
         gameList._tabs[2]:OnClick()
     end)

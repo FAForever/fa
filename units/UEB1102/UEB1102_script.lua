@@ -5,7 +5,7 @@
 --
 --  Summary  :  UEF Hydrocarbon Power Plant Script
 --
---  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
@@ -35,10 +35,10 @@ UEB1102 = Class(TEnergyCreationUnit) {
             local effects = {}
             local bones = {}
             local scale = 1
-            if self:GetCurrentLayer() == 'Land' then
+            if self.Layer == 'Land' then
                 effects = self.AirEffects
                 bones = self.AirEffectsBones
-            elseif self:GetCurrentLayer() == 'Seabed' then
+            elseif self.Layer == 'Seabed' then
                 effects = self.WaterEffects
                 bones = self.WaterEffectsBones
                 scale = 3

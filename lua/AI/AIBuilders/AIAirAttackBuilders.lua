@@ -31,8 +31,8 @@ function AirAttackCondition(aiBrain, locationType, targetNumber)
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager.Radius
 
-    local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
-    local airThreat = pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    local surfaceThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    local airThreat = pool:GetPlatoonThreat('Air', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, position, radius)
     if (surfaceThreat + airThreat) > targetNumber then
         return true
     end
@@ -880,7 +880,7 @@ BuilderGroup {
         #PlatoonTemplate = 'EarlyGameMassHuntersCategory',
         Priority = 950,
         BuilderConditions = {
-                #{ MIBC, 'LessThanGameTime', { 600 } },      
+                #{ MIBC, 'LessThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
             },
         BuilderData = {
@@ -889,8 +889,8 @@ BuilderGroup {
             MoveNext = 'GunshipHuntAI', 	#DUNCAN - was guardbase
             ThreatType = 'Economy', 		    # Type of threat to use for gauging attacks
             FindHighestThreat = false, 		# Don't find high threat targets
-            MaxThreatThreshold = 2900, 		# If threat is higher than this, do not attack
-            MinThreatThreshold = 1000, 		# If threat is lower than this, do not attack
+            MaxThreatThreshold = 140, 		# If threat is higher than this, do not attack
+            MinThreatThreshold = 50, 		# If threat is lower than this, do not attack
             AvoidBases = true,
             AvoidBasesRadius = 75,
             AggressiveMove = true,
@@ -984,7 +984,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 4, categories.AIR * categories.MOBILE * (categories.TECH1 + categories.TECH2 + categories.TECH3) * categories.ANTIAIR } },
             { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.MOBILE * categories.AIR * categories.TECH3 * categories.BOMBER } },
-            { UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.AIR * categories.TECH3 * categories.BOMBER } }, 
+            { UCBC, 'UnitsNeedGuard', { categories.MOBILE * categories.AIR * categories.TECH3 * categories.BOMBER } },
         },
     },
 }

@@ -14,6 +14,10 @@ end
 
 local baseBeginSession = BeginSession
 function BeginSession()
+
+    -- make sure the hook happens before scripts start working
+    import ("/lua/sim/MarkerUtilities.lua")
+
     ScenarioUtils.CreateProps()
     ScenarioUtils.CreateResources()
 

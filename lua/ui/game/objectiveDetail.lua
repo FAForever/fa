@@ -551,7 +551,7 @@ function Refresh()
         local function SortFunc(t1, t2)
             return (t1.EndTime or t1.StartTime) > (t2.EndTime or t2.StartTime)
         end
-        if table.getn(sortedPrim) > 0 then
+        if not table.empty(sortedPrim) then
             ObjectiveLogData[index] = {type = 'title', title = primtitle, color = 'ffff0000'}
             index = index + 1
             table.sort(sortedPrim, SortFunc)
@@ -560,7 +560,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedSec) > 0 then
+        if not table.empty(sortedSec) then
             ObjectiveLogData[index] = {type = 'title', title = sectitle, color = 'fffff700'}
             index = index + 1
             table.sort(sortedSec, SortFunc)
@@ -569,7 +569,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedBon) > 0 then
+        if not table.empty(sortedBon) then
             ObjectiveLogData[index] = {type = 'title', title = bontitle, color = 'ffba00ff'}
             index = index + 1
             table.sort(sortedBon, SortFunc)
@@ -578,7 +578,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedCom) > 0 then
+        if not table.empty(sortedCom) then
             ObjectiveLogData[index] = {type = 'title', title = comtitle, color = 'ff5fbde9'}
             index = index + 1
             table.sort(sortedCom, SortFunc)
@@ -587,7 +587,7 @@ function Refresh()
                 index = index + 1
             end
         end
-        if table.getn(sortedFail) > 0 then
+        if not table.empty(sortedFail) then
             ObjectiveLogData[index] = {type = 'title', title = failtitle, color = 'ffe95f5f'}
             index = index + 1
             table.sort(sortedFail, SortFunc)

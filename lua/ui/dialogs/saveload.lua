@@ -37,13 +37,13 @@ local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
 
     local panel = Bitmap(parent, UIUtil.UIFile('/scx_menu/replay/panel_bmp.dds'))
     LayoutHelpers.AtCenterIn(panel, parent)
-    
+
     panel.brackets = UIUtil.CreateDialogBrackets(panel, 43, 25, 43, 25)
-    
+
     if over then
         panel.Depth:Set(GetFrame(over:GetRootFrame():GetTargetHead()):GetTopmostDepth() + 1)
     end
-    
+
     local worldCover = UIUtil.CreateWorldCover(panel)
 
     local dlgHead = UIUtil.CreateText(panel, "", 20, UIUtil.titleFont)
@@ -54,7 +54,7 @@ local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
     else
         dlgHead:SetText(LOC("<LOC uisaveload_0002>Save"))
     end
-    
+
     local dlgLabel = UIUtil.CreateText(panel, "<LOC uisaveload_0003>Enter or select filename", 16, UIUtil.titleFont)
     LayoutHelpers.AtLeftTopIn(dlgLabel, panel, 52, 83)
 
@@ -78,20 +78,20 @@ local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
     end
     local okButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC _Ok>", 14)
     local deleteButton = UIUtil.CreateButtonStd(panel, '/scx_menu/small-btn/small', "<LOC PROFILE_0006>Delete", 14)
-    
+
     LayoutHelpers.AtLeftTopIn(deleteButton, panel, 15, 505)
-    
+
     LayoutHelpers.AtRightTopIn(panel.cancelButton, panel, 15, 505)
     LayoutHelpers.LeftOf(okButton, panel.cancelButton, 0)
-    
+
     panel.HandleEvent = function(self, event)
         if event.Type == 'KeyDown' and event.KeyCode == 127 then
             deleteButton:OnClick()
         end
     end
-    
+
     UIUtil.MakeInputModal(panel, function() okButton.OnClick(okButton) end, function() panel.cancelButton.OnClick(panel.cancelButton) end)
-    
+
     if exitButton then
         exitButton.OnClick = function(self, modifiers)
             KillDialog(true)
@@ -105,26 +105,26 @@ local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
     end)
     LayoutHelpers.AtLeftTopIn(filePicker, panel, 43, 118)
     LayoutHelpers.SetDimensions(filePicker, 595, 362)
-    
+
     local lastStr = Prefs.GetFromCurrentProfile(fileType)
     if lastStr then
         filePicker:SetFilename(lastStr)
     end
-    
+
     okButton.OnClick = function(self, modifiers)
         filePicker:DoSelectBehavior()
     end
-    
+
     deleteButton.OnClick = function(self, modifiers)
         if filePicker:GetBaseName() == '' then
-            UIUtil.QuickDialog(panel, "<LOC file_0002>You must select a file to delete first.", 
+            UIUtil.QuickDialog(panel, "<LOC file_0002>You must select a file to delete first.",
                 "<LOC _Ok>", nil,
                 nil, nil,
                 nil, nil,
-                true, 
+                true,
                 {worldCover = false, enterButton = 1, escapeButton = 1})
         else
-            UIUtil.QuickDialog(panel, "<LOC file_0001>Are you sure you want to move this file to the recycle bin?", 
+            UIUtil.QuickDialog(panel, "<LOC file_0001>Are you sure you want to move this file to the recycle bin?",
                 "<LOC _Yes>", function()
                     if filePicker:GetBaseName() == Prefs.GetFromCurrentProfile(fileType) then
                         Prefs.SetToCurrentProfile(fileType, nil)
@@ -135,7 +135,7 @@ local function CreateDialog(over, isLoad, callback, exitBehavior, fileType)
                 end,
                 "<LOC _No>", nil,
                 nil, nil,
-                true, 
+                true,
                 {worldCover = false, enterButton = 1, escapeButton = 2})
         end
     end
@@ -174,10 +174,10 @@ function CreateSaveDialog(parent, exitBehavior, fileType)
         end
 
         if GetSpecialFileInfo(fileInfo.profile, fileInfo.fname, fileInfo.type) then
-            UIUtil.QuickDialog(parent, "<LOC filepicker_0004>A file already exists with that name. Are you sure you want to overwrite it?", 
-                "<LOC _Yes>", function() ExecuteSave() end, 
-                "<LOC _No>", nil, 
-                nil, nil, 
+            UIUtil.QuickDialog(parent, "<LOC filepicker_0004>A file already exists with that name. Are you sure you want to overwrite it?",
+                "<LOC _Yes>", function() ExecuteSave() end,
+                "<LOC _No>", nil,
+                nil, nil,
                 true, {worldCover = false, enterButton = 1, escapeButton = 2})
         else
             ExecuteSave()

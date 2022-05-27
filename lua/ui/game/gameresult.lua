@@ -64,6 +64,8 @@ function DoGameResult(armyIndex, result)
     local tabs = import('/lua/ui/game/tabs.lua')
     tabs.OnGameOver()
     tabs.TabAnnouncement('main', LOC(MyArmyResultStrings[result]))
+    --For disable ping buttons
+    import('/lua/ui/game/multifunction.lua').FocusArmyChanged()
 
     local score = import('/lua/ui/dialogs/score.lua')
     tabs.AddModeText("<LOC _Score>", function()

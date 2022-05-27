@@ -1,0 +1,118 @@
+UnitBlueprint {
+    Air = {
+        BankFactor = 0.1,
+        BankForward = false,
+        CanFly = true,
+        CirclingDirChangeFrequencySec = 2,
+        CirclingElevationChangeRatio = 0.5,
+        CirclingRadiusChangeMaxRatio = 2.1,
+        CirclingRadiusChangeMinRatio = 0.6,
+        CirclingRadiusVsAirMult = 0.99,
+        CirclingTurnMult = 3,
+        KLift = 3,
+        KLiftDamping = 2,
+        KMove = 4,
+        KMoveDamping = 1,
+        KTurn = 4,
+        KTurnDamping = 2,
+        LiftFactor = 7,
+        MaxAirspeed = 6,
+        MinAirspeed = 5,
+        StartTurnDistance = 5,
+        Winged = false,
+    },
+    Categories = {
+        -- to allow it to build / repair when assist
+        'CONSTRUCTION',
+        'ENGINEER',
+        'REPAIR',
+
+        -- for unit restrictions
+        'POD',
+
+        -- for UI
+        'NOFORMATION',
+
+        -- makes it a dummy-isch unit
+        'UNTARGETABLE',
+        'INVULNERABLE',
+        'UNSPAWNABLE',
+        'UNSELECTABLE',
+    },
+    Display = {
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/Units/URA0004/URA0004_Albedo.dds',
+                    LODCutoff = 200,
+                    MeshName = '/Units/URA0004/URA0004_LOD0.scm',
+                    NormalsName = '/UNITS/URA0004/URA0004_NormalsTS.dds',
+                    ShaderName = 'Insect',
+                    SpecularName = '/Units/URA0004/URA0004_SpecTeam.dds',
+                },
+            },
+        },
+        PlaceholderMeshName = 'URA0004',
+        SpawnRandomRotation = true,
+        UniformScale = 0.12,
+    },
+    Economy = {
+        BuildRate = 0.00001,
+        MaxBuildDistance = 100,
+    },
+
+    Intel = {
+        VisionRadius = 0,
+        WaterVisionRadius = 0,
+    },
+    General = {
+        CapCost = 0,
+        Category = 'Construction',
+        Classification = 'RULEUC_Engineer',
+        CommandCaps = {
+            RULEUCC_Attack = false,
+            RULEUCC_CallTransport = true,
+            RULEUCC_Capture = false,
+            RULEUCC_Guard = true,
+            RULEUCC_Move = true,
+            RULEUCC_Nuke = false,
+            RULEUCC_Patrol = false,
+            RULEUCC_Reclaim = true,
+            RULEUCC_Repair = true,
+            RULEUCC_RetaliateToggle = true,
+            RULEUCC_Stop = true,
+            RULEUCC_Transport = false,
+        },
+        FactionName = 'Cybran',
+        Icon = 'air',
+        SelectionPriority = 3,
+        TechLevel = 'RULEUTL_Basic',
+        UnitWeight = 1,
+    },
+    Physics = {
+        BankingSlope = 0.5,
+        BuildOnLayerCaps = {
+            LAYER_Air = true,
+            LAYER_Land = false,
+            LAYER_Orbit = false,
+            LAYER_Seabed = false,
+            LAYER_Sub = false,
+            LAYER_Water = false,
+        },
+        DragCoefficient = 0.2,
+        Elevation = 5,
+        MaxAcceleration = 10.5,
+        MaxSpeed = 20.5,
+        MaxSpeedReverse = 0,
+        MaxSteerForce = 0,
+        MinSpeedPercent = 0,
+        MotionType = 'RULEUMT_Air',
+        RotateBodyWhileMoving = true,
+        TurnFacingRate = 100,
+        TurnRadius = 360,
+        TurnRate = 180,
+    },
+    SizeX = 0.01,
+    SizeY = 0.01,
+    SizeZ = 0.01,
+}

@@ -113,13 +113,13 @@ function GetStartPositions(scenario)
                 break
             end
         end
-        if table.getsize(armyPositions) == 0 then
+        if table.empty(armyPositions) then
             WARN("Unable to find FFA configuration in " .. scenario.file)
         end
     end
 
     -- try old data if nothing added to army positions
-    if table.getsize(armyPositions) == 0 then
+    if table.empty(armyPositions) then
         -- figure out all the armies in this map
         -- make sure old data is there
         if scenario.Games then
@@ -132,7 +132,7 @@ function GetStartPositions(scenario)
     end
 
     -- if we found armies, then get the positions
-    if table.getsize(armyPositions) > 0 then
+    if not table.empty(armyPositions) then
         for army, position in armyPositions do
             if saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army] then
                 pos = saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers[army].position
@@ -166,7 +166,7 @@ function GetArmies(scenario)
         end
     end
 
-    if (retArmies == nil) or (table.getn(retArmies) == 0) then
+    if (retArmies == nil) or (table.empty(retArmies)) then
         WARN("No starting armies defined in " .. scenario.file)
     end
 
@@ -237,16 +237,16 @@ function CheckMapHasMarkers(scenario)
     doscript('/lua/dataInit.lua', saveData)
     doscript(scenario.save, saveData)
 
-    
-    local markers = saveData and 
-                    saveData.Scenario and 
+
+    local markers = saveData and
+                    saveData.Scenario and
                     saveData.Scenario.MasterChain and
                     saveData.Scenario.MasterChain['_MASTERCHAIN_'] and
                     saveData.Scenario.MasterChain['_MASTERCHAIN_'].Markers or false
- 
-    if not markers then 
-       WARN('Map '.. scenario.name..' has no markers') return false 
-    else 
+
+    if not markers then
+       WARN('Map '.. scenario.name..' has no markers') return false
+    else
        for marker, data in markers do
           if data.adjacentTo and string.find(data.adjacentTo, ' ') then
              return true

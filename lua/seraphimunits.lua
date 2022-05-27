@@ -34,35 +34,33 @@ local DefaultBeamWeapon = WeaponFile.DefaultBeamWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects
-local CreateSeraphimFactoryBuildingEffectsUnPause = EffectUtil.CreateSeraphimFactoryBuildingEffectsUnPause
 
 -- FACTORIES
 SFactoryUnit = Class(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local BuildBones = self.BuildEffectBones
         local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        self.BuildEffectsBag:Add(thread)
     end,
 
     StartBuildFxUnpause = function(self, unitBeingBuilt)
         local BuildBones = self.BuildEffectBones
-        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffectsUnPause, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
-        unitBeingBuilt.Trash:Add(thread)
+        local thread = self:ForkThread(CreateSeraphimFactoryBuildingEffects, unitBeingBuilt, BuildBones, 'Attachpoint', self.BuildEffectsBag)
+        self.BuildEffectsBag:Add(thread)
     end,
-    
+
     OnPaused = function(self)
         -- When factory is paused take some action
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
+        if self:IsUnitState('Building') and self.UnitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-            self:StartBuildFx(self:GetFocusUnit())
         end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
+        if self:IsUnitState('Building') and self.UnitBeingBuilt then
             self:StartBuildFxUnpause(self:GetFocusUnit())
         end
     end,
@@ -404,7 +402,7 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            end
         end,
     },
-    
+
     OnPaused = function(self)
         SFactoryUnit.OnPaused(self)
     end,
@@ -501,7 +499,7 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
            end
         end,
     },
-    
+
     OnPaused = function(self)
         SFactoryUnit.OnPaused(self)
     end,
@@ -574,8 +572,8 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     OnCreate = function(self)
         SHoverLandUnit.OnCreate(self)
-        self:SetCanTakeDamage(false)
-        self:SetCanBeKilled(false)
+        self.CanTakeDamage = false
+        self.CanBeKilled = false
         self:PlayUnitSound('Spawn')
         ChangeState(self, self.KillingState)
     end,
@@ -650,8 +648,8 @@ SEnergyBallUnit = Class(SHoverLandUnit) {
 
     DeathState = State {
         Main = function(self)
-            self:SetCanBeKilled(true)
-            if self:GetCurrentLayer() == 'Water' then
+            self.CanBeKilled = true
+            if self.Layer == 'Water' then
                 self:PlayUnitSound('HoverKilledOnWater')
             end
             self:PlayUnitSound('Destroyed')

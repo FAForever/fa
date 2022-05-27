@@ -4,19 +4,34 @@
 -- * Summary    : Contains global functions for working with tables and strings
 -- ==========================================================================================
 
+
+-- upvalue globals for performance
+local type = type 
+local pcall = pcall 
+local unpack = unpack 
+local next = next
+
+-- local Random = Random
+
+-- upvalue table operations for performance
+local TableInsert = table.insert 
+local TableGetn = table.getn 
+local TableRemove = table.remove 
+local TableSort = table.sort
+
 --- RandomIter(table) returns a function that when called, returns a pseudo-random element of the supplied table.
 --- Each element of the table will be returned once. This is essentially for "shuffling" sets.
 function RandomIter(someSet)
     local keyList = {}
     for key, val in someSet do
-        table.insert(keyList, key)
+        TableInsert(keyList, key)
     end
 
     return function()
-        local size = table.getn(keyList)
+        local size = TableGetn(keyList)
 
         if size > 0 then
-            local key = table.remove(keyList, Random(1, size))
+            local key = TableRemove(keyList, Random(1, size))
             return key, someSet[key]
         else
             return
@@ -47,7 +62,7 @@ function table.copy(t)
     return r
 end
 
---- table.contains(t,val) returns the key for val if it is in t table.
+--- table.find(t,val) returns the key for val if it is in t table.
 --- Otherwise, return nil
 function table.find(t,val)
     if not t then return end -- prevents looping over nil table
@@ -80,7 +95,7 @@ function table.removeByValue(t,val)
     if not t then return end -- prevent looping over nil table
     for k,v in t do
         if v == val then
-            table.remove(t,k)
+            TableRemove(t,k)
             return
         end
     end
@@ -170,11 +185,11 @@ function table.cat(t1, t2)
     if not t2 then return table.copy(t1) end
     local r = {}
     for i,v in t1 do
-        table.insert(r, v)
+        TableInsert(r, v)
     end
 
     for i,v in t2 do
-        table.insert(r, v)
+        TableInsert(r, v)
     end
 
     return r
@@ -185,10 +200,10 @@ end
 function table.concatenate(...)
     local ret = {}
 
-    for index = 1, table.getn(arg) do
+    for index = 1, TableGetn(arg) do
         if arg[index] then
             for k, v in arg[index] do
-                table.insert(ret, v)
+                TableInsert(ret, v)
             end
         end
     end
@@ -201,7 +216,7 @@ end
 --- but this avoids the need to copy the values in t1, saving some time.
 function table.destructiveCat(t1, t2)
     for k, v in t2 do
-        table.insert(t1, v)
+        TableInsert(t1, v)
     end
 end
 
@@ -210,7 +225,7 @@ end
 --- [comp] is an optional comparison function, defaulting to less-than.
 function table.sorted(t, comp)
     local r = table.copy(t)
-    table.sort(r, comp)
+    TableSort(r, comp)
     return r
 end
 
@@ -250,7 +265,7 @@ function table.keys(t, comp)
         r[n] = k -- faster than table.insert(r,k)
         n = n + 1
     end
-    if comp ~= false then table.sort(r, comp) end
+    if comp ~= false then TableSort(r, comp) end
     return r
 end
 
@@ -294,7 +309,7 @@ end
 function table.getsize(t)
     -- handling nil table like empty tables so that no need to check
     -- for nil table and then size of table:
-    -- if t and table.getsize(t) > 0 then
+    -- if t and not table.empty(t) then
     -- do some thing
     -- end
     if type(t) ~= 'table' then return 0 end
@@ -405,7 +420,8 @@ end
 
 --- table.empty(t) returns true iff t has no keys/values.
 function table.empty(t)
-    return table.getsize(t) == 0
+    if type(t) ~= 'table' then return true end
+    return next(t) == nil
 end
 
 --- table.shuffle(t) returns a shuffled table
@@ -413,7 +429,7 @@ function table.shuffle(t)
     local r = {}
     for key, val in RandomIter(t) do
         if type(key) == 'number' then
-            table.insert(r, val)
+            TableInsert(r, val)
         else
             r[key] = val
         end
@@ -434,7 +450,7 @@ function table.binsert(t, value, cmp)
          end
       end
 
-      table.insert(t, mid + state, value)
+      TableInsert(t, mid + state, value)
       return mid + state
    end
 
@@ -472,7 +488,7 @@ function table.print(tbl, tblPrefix, printer)
         printer(tblPrefix .." table is nil")
         return
     end
-    if table.getsize(tbl) == 0 then
+    if table.empty(tbl) then
         printer(tblPrefix .." { }")
         return
     end
@@ -524,6 +540,20 @@ function table.unique(t)
     return unique
 end
 
+-- Lua 5.0 implementation of the Lua 5.1 function string.match
+-- Returns a regex match
+-- optional param init defines where to start searching. Can be negative to search from the end.
+rawset(string, 'match', function(input, exp, init)
+    local match
+    string.gsub(input:sub(init or 1), exp, function(...) match = arg end, 1)
+    if match then
+        return unpack(match)
+    end
+end)
+
+-- gfind was renamed to gmatch in Lua 5.1. added gmatch for additional compatibility
+rawset(string, 'gmatch', string.gfind)
+
 --- Returns items as a single string, separated by the delimiter
 function StringJoin(items, delimiter)
     local str = "";
@@ -543,7 +573,7 @@ end
 
 --- Returns true if the string starts with the specified value
 function StringStartsWith(stringToMatch, valueToSeek)
-    return string.sub(stringToMatch, 1, valueToSeek:len()) == valueToSeek
+    return stringToMatch:sub(1, valueToSeek:len()) == valueToSeek
 end
 
 --- Extracts a string between two specified strings
@@ -551,7 +581,7 @@ end
 function StringExtract(str, str1, str2, fromEnd)
     local pattern = str1 .. '(.*)' .. str2
     if fromEnd then pattern = '.*' .. pattern end
-    local i, ii, m = string.find(str, pattern)
+    local _, _, m = str:find(pattern)
     return m
 end
 
@@ -573,44 +603,51 @@ function StringPrepend(str, symbol)
     if not symbol then symbol = ' ' end
     return symbol .. str
 end
---- Splits a string with camel cast to a string with separate words
+
+--- Splits a string with camel case to a string with separate words
 --- e.g. StringSplitCamel('SupportCommanderUnit') -> 'Support Commander Unit'
 function StringSplitCamel(str)
-   return (str:gsub("[A-Z]", StringPrepend):gsub("^.", string.upper))
+    local first = str:sub(1, 1)
+    local split = first .. str:sub(2):gsub("[A-Z]", StringPrepend)
+    return split:gsub("^.", string.upper)
 end
 
 --- Reverses order of letters for specified string
---- e.g. StringCapitalize('abc123') --> 321cba
+--- e.g. StringReverse('abc123') --> 321cba
 function StringReverse(str)
     local tbl =  {}
-    str:gsub(".",function(c) table.insert(tbl,c) end)
+    str:gsub(".", function(c) table.insert(tbl,c) end)
     tbl = table.reverse(tbl)
     return table.concat(tbl)
 end
+
 --- Capitalizes each word in specified string
 --- e.g. StringCapitalize('hello supreme commander') --> Hello Supreme Commander
 function StringCapitalize(str)
     return string.gsub(" "..str, "%W%l", string.upper):sub(2)
 end
+
 --- Check if a given string starts with specified string
 function StringStarts(str, startString)
-   return string.sub(str, 1, string.len(startString)) == startString
+   return StringStartsWith(str, startString)
 end
+
 --- Check if a given string ends with specified string
 function StringEnds(str, endString)
-   return endString == '' or string.sub(str, -string.len(endString)) == endString
+   return endString == '' or str:sub(-endString:len()) == endString
 end
+
 --- Sorts two variables based on their numeric value or alpha order (strings)
 function Sort(itemA, itemB)
     if not itemA or not itemB then return 0 end
 
     if type(itemA) == "string" or
        type(itemB) == "string" then
-        if string.lower(itemA) == string.lower(itemB) then
+        if itemA:lower() == itemB:lower() then
             return 0
         else
             -- sort string using alpha order
-            return string.lower(itemA) < string.lower(itemB)
+            return itemA:lower() < itemB:lower()
         end
     else
        if math.abs(itemA - itemB) < 0.0001 then
@@ -623,17 +660,44 @@ function Sort(itemA, itemB)
 end
 
 -- Rounds a number to specified double precision
-function math.round(num, idp)
+function math.round(num,idp)
     if not idp then
         return math.floor(num+.5)
-    else
-        return tonumber(string.format("%." .. (idp or 0) .. "f", num))
     end
+
+    idp = math.pow(10,idp)
+    return math.floor(num*idp+.5)/idp
 end
 
 --- Clamps numeric value to specified Min and Max range
 function math.clamp(v, min, max)
     return math.max(min, math.min(max, v))
+end
+
+-- Return a table parsed from key:value pairs passed on the command line
+-- Example:
+--  command line args: /arg key1:value1 key2:value2
+--  GetCommandLineArgTable("/arg") -> {key1="value1", key2="value2"}
+function GetCommandLineArgTable(option)
+    -- Find total number of args
+    local next = 1
+    local args, nextArgs = nil, nil
+    repeat
+        nextArgs, args = GetCommandLineArg(option, next), nextArgs
+        next = next + 1
+    until not nextArgs
+
+    -- Construct result table
+    local result = {}
+    if args then
+        for _, arg in args do
+            local pair = StringSplit(arg, ":")
+            local name, value = pair[1], pair[2]
+            result[name] = value
+        end
+    end
+
+    return result
 end
 
 --- Creates timer for profiling task(s) and calculating time delta between consecutive function calls, e.g.

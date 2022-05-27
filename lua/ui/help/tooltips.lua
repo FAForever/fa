@@ -46,11 +46,6 @@ Tooltips = {
         description = "<LOC tooltipui0300>Units will not engage enemies",
         keyID = "mode",
     },
-    mode_aggressive = {
-        title = "<LOC tooltipui0301>Ground Fire",
-        description = "<LOC tooltipui0302>Units will attack targeted positions rather attack-move",
-        keyID = "mode",
-    },
     mode_return_fire = {
         title = "<LOC tooltipui0303>Return Fire",
         description = "<LOC tooltipui0304>Units will move and engage normally",
@@ -398,11 +393,18 @@ Tooltips = {
         title = "Persist Chat Feed Timeout",
         description = "Allows chat to timeout normally in the chat feed after closing the chat window",
     },
+    chat_send_type = {
+        title = "<LOC chat_send_type_title>Default recipient: allies",
+        description = "<LOC chat_send_type_description>When enabled, enter sends messages to allies and holding shift + enter sends to all. When not enabled, the behavior is reversed.",
+    },
     minimap_reset = {
         title = "<LOC tooltipui0649>Reset Minimap Window",
         description = "<LOC tooltipui0650>Resets the position and layout of the minimap window",
     },
-
+    minimap_pin = {
+        title = "<LOC tooltipui0800>Pin Minimap Window",
+        description = "<LOC tooltipui0801>Locks the position and layout of the minimap window",
+    },
     toggle_cartographic = {
         title = "<LOC tooltipui0415>Cartographic Mode",
         description = "<LOC tooltipui0416>Display the terrain using a topographic visualization",
@@ -544,6 +546,31 @@ Tooltips = {
         title = "<LOC tooltipui0129>Build Efficiency",
         description = "<LOC tooltipui0130>Your overall Economic Efficiency",
     },
+    -- **********************
+    -- ** Mass Fabs panel Strings
+    -- **********************
+    mf_mass_income_display = {
+        title = "<LOC tooltipui1000>Mass Income",
+        description = "<LOC tooltipui1001>Mass being generated with mass fabricators per second",
+    },
+    mf_energy_expense_display = {
+        title = "<LOC tooltipui1002>Energy Expense",
+        description = "<LOC tooltipui1003>Energy being spent with mass fabricators per second",
+    },
+    mf_active_amount = {
+        title = "<LOC tooltipui1004>Active mass fabricators",
+        description = "<LOC tooltipui1005>Amount of active mass fabricators",
+    },
+    mf_inactive_amount = {
+        title = "<LOC tooltipui1006>Inactive mass fabricators",
+        description = "<LOC tooltipui1007>Amount of inactive mass fabricators",
+    },
+    mf_energy_required = {
+        title = "<LOC tooltipui1008>Energy Required",
+        description = "<LOC tooltipui1009>Amount of required energy for mass fabricators to work",
+    },
+
+
 
 
     -- **********************
@@ -791,6 +818,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0184>Bloom Render",
         description = "<LOC OPTIONS_0185>Toggles a glow type effect that is used on many weapon effects and some UI elements (off = fastest)",
     },
+    options_experimental_graphics = {
+        title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
+        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'. \r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support. \r\n\r\nThis feature may be unstable - use at your own risk.",
+    },
     options_use_mydocuments = {
         title = "<LOC OPTIONS_0186>Save Games and Replays in My Documents",
         description = "<LOC OPTIONS_0187>When on, changes the location where save games and replays get stored (My Documents\\My Games\\Supreme Commander Forged Alliance\\). Note that you will only see save games and replays in the active directory. Also, files saved to the alternate location will not be removed when the game is uninstalled.",
@@ -803,9 +834,13 @@ Tooltips = {
         title = "<LOC OPTIONS_0212>Accept Build Templates",
         description = "<LOC OPTIONS_0217>Allows other players to send you build templates over the network",
     },
-    options_assist_mex = {
-        title = "<LOC OPTIONS_0273>Assist Mex to Build Mass Storages",
-        description = "<LOC OPTIONS_0274>Assist a T2 or T3 massextractor with engineer(s) to build surrounding mass storages. If mex currently is upgrading, you need to shift-right click twice on the mex to build mass storages.",
+    options_structure_capping_feature_01 = {
+        title = "<LOC OPTIONS_0273>Automated Structure Ringing",
+        description = "<LOC OPTIONS_0274>Assist a structure to cap it with adjacency-friendly structures. As an example: storages surrounding a tech 2 or tech 3 mass extractor.",
+    },
+    options_automex = {
+        title = "<LOC OPTIONS_0285>Automatic Extractor Selection",
+        description = "<LOC OPTIONS_0286>After selecting an engineer, hover the mouse over a mass extractor spot to autopreselect a mass extractor for building",
     },
     options_show_attached_unit_lifebars = {
         title = "<LOC OPTIONS_0222>Show Lifebars of Attached Units",
@@ -1324,18 +1359,6 @@ Tooltips = {
     PostScore_score = {
         title = "<LOC tooltipui0219>Score",
         description = "<LOC tooltipui0220>Sort by Overall Performance",
-    },
-    PostScore_kills = {
-        title = "<LOC tooltipui0221>Kills",
-        description = "<LOC tooltipui0222>Sort by Units Destroyed",
-    },
-    PostScore_built = {
-        title = "<LOC tooltipui0223>Built",
-        description = "<LOC tooltipui0224>Sort by Structures Built",
-    },
-    PostScore_lost = {
-        title = "<LOC tooltipui0225>Losses",
-        description = "<LOC tooltipui0226>Sort by Units Lost",
     },
     PostScore_cdr = {
         title = "<LOC tooltipui0231>Command Units",
@@ -2020,10 +2043,6 @@ Tooltips = {
     -- **********************
     -- ** Misc
     -- **********************
-    minimap_reset = {
-        title = "<LOC tooltipui0625>Reset Minimap",
-        description = "<LOC tooltipui0626>Sets the minimap to its default position and size",
-    },
     no_rush_clock = {
         title = "<LOC tooltipui0627>No Rush Clock",
         description = "<LOC tooltipui0628>Displays time remaining in the no rush clock",
@@ -2031,6 +2050,9 @@ Tooltips = {
     save_template = {
         title = "<LOC tooltipui0629>Save Template",
         description = "<LOC tooltipui0630>Creates construction template by saving units/structures and their position",
+    },
+    minimap_mesh = {
+        description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
     },
 
     -- **********************
@@ -2048,6 +2070,10 @@ Tooltips = {
     options_gui_draggable_queue = {
         title = '<LOC OPTIONS_0231>Draggable Build Queue',
         description = '<LOC OPTIONS_0258>Allows factory build queues to be reordered with drag and drop.',
+    },
+    options_gui_queue_on_hover_02 = {
+        title = '<LOC OPTIONS_0246>Show Factory Queue on Hover',
+        description = '<LOC OPTIONS_0249>Shows Factory queue above unit description when hover over unit with mouse.',
     },
     options_gui_idle_engineer_avatars = {
         title = '<LOC OPTIONS_0232>Middle Click Avatars',

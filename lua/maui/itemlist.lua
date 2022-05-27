@@ -78,7 +78,7 @@ ItemList = Class(moho.item_list_methods, Control) {
             self:_internalSetFont()
         end
     end,
-    
+
     _internalSetFont = function(self)
         if not self._lockFontChanges then
             self:SetNewFont(self._font._family(), self._font._pointsize())
@@ -123,7 +123,7 @@ ItemList = Class(moho.item_list_methods, Control) {
     # The selection changed via keyboard (up,down,pageup,pagedown,home,end etc)
     OnKeySelect = function(self, row)
     end,
-    
+
     # updated when mouseover item changes, -1 when no mouseover
     OnMouseoverItem = function(self, row)
     end,

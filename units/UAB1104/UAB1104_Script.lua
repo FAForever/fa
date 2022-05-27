@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  :  Aeon Mass Fabricator
 --#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 local AMassFabricationUnit = import('/lua/aeonunits.lua').AMassFabricationUnit
 
@@ -83,7 +83,7 @@ UAB1104 = Class(AMassFabricationUnit) {
                 self.AmbientEffects = nil
             end
 
-            if self.Open then
+            if self.Open and self.Rotator then
                 if self.Clockwise == true then
                     self.Rotator:SetSpinDown(true)
                     self.Rotator:SetTargetSpeed(self.Goal)

@@ -656,8 +656,10 @@ BitmapCombo = Class(Group) {
         -- prev will be last control here
         self.ddm.Bottom:Set(prev.Bottom)
 
-        self._dropdown:Hide()
-        self._ddhidden = true
+        if self._dropdown:IsHidden() then
+            self._dropdown:Hide()
+            self._ddhidden = true
+        end
     end,
 
     SetBitmap = function(self, bmp, name)

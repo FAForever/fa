@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: functions that make it simpler to set up control layouts.
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 --* Percentage versus offset
@@ -135,10 +135,10 @@ end
 
 --* these functions will stretch the control to fill the parent and provide an optional border
 function FillParent(control, parent)
-    control.Top:Set(function() return parent.Top() end)
-    control.Left:Set(function() return parent.Left() end)
-    control.Bottom:Set(function() return parent.Bottom() end)
-    control.Right:Set(function() return parent.Right() end)
+    control.Top:Set(parent.Top)
+    control.Left:Set(parent.Left)
+    control.Bottom:Set(parent.Bottom)
+    control.Right:Set(parent.Right)
 end
 
 function FillParentRelativeBorder(control, parent, percent)
@@ -166,46 +166,46 @@ function FillParentPreserveAspectRatio(control, parent)
         end
         return ratio
     end
-    
-    control.Top:Set(function() return 
+
+    control.Top:Set(function() return
         math.floor(parent.Top() + ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
     control.Bottom:Set(function()
         return math.floor(parent.Bottom() - ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
     control.Left:Set(function()
         return math.floor(parent.Left() + ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
     control.Right:Set(function()
         return math.floor(parent.Right() - ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
-    end)     
+    end)
 end
 
 --* these functions will place the control and resize in a specified location within the parent
 --* note that the offset version is more useful than hard coding the location
 --* as it will take advantage of the pixel scale factor
 function PercentIn(control, parent, left, top, right, bottom)
-    leftOffset = left or 0.00
-    topOffset = top or 0.00
-    rightOffset = right or 0.00
-    bottomOffset = bottom or 0.00
+    left = left or 0.00
+    top = top or 0.00
+    right = right or 0.00
+    bottom = bottom or 0.00
 
     control.Left:Set(function() return math.floor(parent.Left() + (left * parent.Width())) end)
     control.Top:Set(function() return math.floor(parent.Top() + (top * parent.Height())) end)
-    control.Right:Set(function() return math.floor(parent.Left() + (right * parent.Width())) end)
-    control.Bottom:Set(function() return math.floor(parent.Top() + (bottom * parent.Height())) end)
+    control.Right:Set(function() return math.floor(parent.Right() - (right * parent.Width())) end)
+    control.Bottom:Set(function() return math.floor(parent.Bottom() - (bottom * parent.Height())) end)
 end
 
 function OffsetIn(control, parent, left, top, right, bottom)
-    leftOffset = left or 0
-    topOffset = top or 0
-    rightOffset = right or 0
-    bottomOffset = bottom or 0
+    left = left or 0
+    top = top or 0
+    right = right or 0
+    bottom = bottom or 0
 
     control.Left:Set(function() return math.floor(parent.Left() + (left * pixelScaleFactor)) end)
     control.Top:Set(function() return math.floor(parent.Top() + (top * pixelScaleFactor)) end)
-    control.Right:Set(function() return math.floor(parent.Left() + (right * pixelScaleFactor)) end)
-    control.Bottom:Set(function() return math.floor(parent.Top() + (bottom * pixelScaleFactor)) end)
+    control.Right:Set(function() return math.floor(parent.Right() - (right * pixelScaleFactor)) end)
+    control.Bottom:Set(function() return math.floor(parent.Bottom() - (bottom * pixelScaleFactor)) end)
 end
 
 --* these functions will set the controls position relative to a sibling
@@ -214,14 +214,14 @@ end
 function LeftOf(control, parent, offset)
     offset = offset or 0
     control.Right:Set(function() return math.floor(parent.Left() - (offset * pixelScaleFactor)) end)
-    control.Top:Set(function() return parent.Top() end)
+    control.Top:Set(parent.Top)
 end
 
 --* lock left top of control to right top of parent
 function RightOf(control, parent, offset)
     offset = offset or 0
     control.Left:Set(function() return math.floor(parent.Right() + (offset * pixelScaleFactor)) end)
-    control.Top:Set(function() return parent.Top() end)
+    control.Top:Set(parent.Top)
 end
 
 --* lock right top of control to left of parent, cenetered vertically to the parent
@@ -241,14 +241,14 @@ end
 --* lock bottom left of control to top left of parent
 function Above(control, parent, offset)
     offset = offset or 0
-    control.Left:Set(function() return parent.Left() end)
+    control.Left:Set(parent.Left)
     control.Bottom:Set(function() return parent.Top() - (offset * pixelScaleFactor) end)
 end
 
 --* lock top left of control to bottom left of parent
 function Below(control, parent, offset)
     offset = offset or 0
-    control.Left:Set(function() return parent.Left() end)
+    control.Left:Set(parent.Left)
     control.Top:Set(function() return math.floor(parent.Bottom() + (offset * pixelScaleFactor)) end)
 end
 
@@ -436,32 +436,19 @@ end
 
 --* set the dimensions
 function SetDimensions(control, width, height)
-    if width then
-        control.Width:Set(function()
-            return math.floor(width * pixelScaleFactor)
-        end)
-    end
-    
-    if height then
-        control.Height:Set(function()
-            return math.floor(height * pixelScaleFactor)
-        end)
-    end
+    SetWidth(control, width)
+    SetHeight(control, height)
 end
 
 function SetWidth(control, width)
     if width then
-        control.Width:Set(function()
-            return math.floor(width * pixelScaleFactor)
-        end)
+        control.Width:Set(math.floor(width * pixelScaleFactor))
     end
 end
 
 function SetHeight(control, height)
     if height then
-        control.Height:Set(function()
-            return math.floor(height * pixelScaleFactor)
-        end)
+        control.Height:Set(math.floor(height * pixelScaleFactor))
     end
 end
 
@@ -476,11 +463,15 @@ function DepthUnderParent(control, parent, depth)
     control.Depth:Set(function() return parent.Depth() - depth end)
 end
 
--- Scale according to the globally set ratio 
+-- Scale according to the globally set ratio
 function Scale(control)
     SetDimensions(control, control.Width(), control.Height())
 end
 
 function ScaleNumber(number)
     return math.floor(number * pixelScaleFactor)
+end
+
+function InvScaleNumber(number)
+    return math.floor(number * (1 / pixelScaleFactor))
 end

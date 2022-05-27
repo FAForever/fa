@@ -43,8 +43,8 @@ function AirAttackCondition(aiBrain, locationType, targetNumber)
     local radius = engineerManager.Radius
 
     --local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
-    local surfaceThreat = pool:GetPlatoonThreat('AntiSurface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE)
-    local airThreat = 0 #pool:GetPlatoonThreat('AntiAir', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
+    local surfaceThreat = pool:GetPlatoonThreat('Surface', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE)
+    local airThreat = 0 #pool:GetPlatoonThreat('Air', categories.MOBILE * categories.AIR - categories.EXPERIMENTAL - categories.SCOUT - categories.INTELLIGENCE, position, radius)
     if (surfaceThreat + airThreat) >= targetNumber then
         return true
     elseif UC.UnitCapCheckGreater(aiBrain, .95) then
@@ -1129,7 +1129,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 4 } },
+            { AirAttackCondition, { 'LocationType', 6 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, MOBILE AIR TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1162,7 +1162,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 4 } },
+            { AirAttackCondition, { 'LocationType', 6 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, MOBILE AIR TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1196,7 +1196,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 4, categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'Enemy'}},
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 4 } },
+            { AirAttackCondition, { 'LocationType', 6 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, MOBILE AIR TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1229,7 +1229,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 4 } },
+            { AirAttackCondition, { 'LocationType', 6 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, MOBILE AIR TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1244,7 +1244,7 @@ BuilderGroup {
         BuilderType = 'Any',
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE GROUNDATTACK' } },
-            { AirAttackCondition, { 'LocationType', 4 } },
+            { AirAttackCondition, { 'LocationType', 6 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, AIR MOBILE TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1292,7 +1292,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 12 } },
+            { AirAttackCondition, { 'LocationType', 20 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1325,7 +1325,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 12 } },
+            { AirAttackCondition, { 'LocationType', 20 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1360,7 +1360,7 @@ BuilderGroup {
         BuilderConditions = {
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { false, 4, categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'Enemy'}},
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 12 } },
+            { AirAttackCondition, { 'LocationType', 20 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1393,7 +1393,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 12 } },
+            { AirAttackCondition, { 'LocationType', 20 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
@@ -1661,7 +1661,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'AntiSurface', 1}},
+            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'Surface', 1}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, 'FACTORY TECH2 AIR, FACTORY TECH3 AIR' }},
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, 'AIR MOBILE BOMBER TECH2, AIR MOBILE BOMBER TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
@@ -1698,7 +1698,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'AntiSurface', 1}},
+            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'Surface', 1}},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH2 AIR, FACTORY TECH3 AIR' }},
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE BOMBER TECH1' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
@@ -1736,7 +1736,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'AntiSurface', 1}},
+            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'Surface', 1}},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, 'FACTORY TECH2 AIR, FACTORY TECH3 AIR' }},
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 5, 'AIR MOBILE GROUNDATTACK TECH2, AIR MOBILE GROUNDATTACK TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
@@ -1773,7 +1773,7 @@ BuilderGroup {
             },
         },
         BuilderConditions = {
-            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'AntiSurface', 1}},
+            { SBC, 'PoolThreatGreaterThanEnemyBase', {'LocationType', categories.MOBILE * categories.AIR - categories.SCOUT - categories.INTELLIGENCE, 'AntiAir', 'Surface', 1}},
             { UCBC, 'FactoryLessAtLocation', { 'LocationType', 1, 'FACTORY TECH2 AIR, FACTORY TECH3 AIR' }},
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE GROUNDATTACK TECH1' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
@@ -1792,7 +1792,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 4 } },
+            { AirAttackCondition, { 'LocationType', 6 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH2, MOBILE AIR TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
             { SIBC, 'AIThreatExists', { 100 } },
@@ -1811,7 +1811,7 @@ BuilderGroup {
         },
         BuilderConditions = {
             #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 2, 'AIR MOBILE BOMBER' } },
-            { AirAttackCondition, { 'LocationType', 12 } },
+            { AirAttackCondition, { 'LocationType', 20 } },
             { UCBC, 'PoolLessAtLocation', { 'LocationType', 1, 'AIR MOBILE TECH3' } },
             { SBC, 'NoRushTimeCheck', { 0 }},
             { SIBC, 'AIThreatExists', { 100 } },
@@ -1908,7 +1908,7 @@ BuilderGroup {
         #PlatoonTemplate = 'EarlyGameMassHuntersCategory',
         Priority = 950,
         BuilderConditions = {
-                #{ SBC, 'LessThanGameTime', { 600 } },      
+                #{ SBC, 'LessThanGameTime', { 600 } },
                 #{ UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.TECH2 * categories.MOBILE * categories.LAND - categories.ENGINEER } },
                 #{ UCBC, 'PoolGreaterAtLocation', { 'LocationType', 3, 'AIR MOBILE GROUNDATTACK' } },
                 { AirAttackCondition, { 'LocationType', 6 } },
@@ -1920,8 +1920,8 @@ BuilderGroup {
             MoveNext = 'Guard Base',
             ThreatType = 'Economy', 		    # Type of threat to use for gauging attacks
             FindHighestThreat = false, 		# Don't find high threat targets
-            MaxThreatThreshold = 2900, 		# If threat is higher than this, do not attack
-            MinThreatThreshold = 1000, 		# If threat is lower than this, do not attack
+            MaxThreatThreshold = 140, 		# If threat is higher than this, do not attack
+            MinThreatThreshold = 50, 		# If threat is lower than this, do not attack
             AvoidBases = true,
             AvoidBasesRadius = 75,
             AggressiveMove = true,

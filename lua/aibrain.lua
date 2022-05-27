@@ -28,6 +28,13 @@ local TransferUnitsOwnership = import('/lua/SimUtils.lua').TransferUnitsOwnershi
 local TransferUnfinishedUnitsAfterDeath = import('/lua/SimUtils.lua').TransferUnfinishedUnitsAfterDeath
 local CalculateBrainScore = import('/lua/sim/score.lua').CalculateBrainScore
 
+local Factions = import('/lua/factions.lua').GetFactions(true)
+
+-- upvalue for performance
+local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
+local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
+local CategoriesDummyUnit = categories.DUMMYUNIT
+
 local observer = false
 local Points = {
     defeat = -10,
@@ -35,12 +42,25 @@ local Points = {
     victory = 10
 }
 
+local CoroutineYield = coroutine.yield
+
 AIBrain = Class(moho.aibrain_methods) {
+
+    -- for the engi mod
+
+
    -- HUMAN BRAIN FUNCTIONS HANDLED HERE
     OnCreateHuman = function(self, planName)
         self:CreateBrainShared(planName)
-        self:InitializeEconomyState()
         self.BrainType = 'Human'
+
+        -- for mass fabs tracking
+        self.TotalEnergyConsumed = 0
+        self.TotalEnergyRequired = 0
+        self.TotalMassProduced = 0
+
+        -- human-only behavior
+        self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
     end,
 
     AddUnitStat = function(self, unitId, statName, value)
@@ -113,7 +133,6 @@ AIBrain = Class(moho.aibrain_methods) {
             self.PlatoonNameCounter['AttackForce'] = 0
             self.BaseTemplates = {}
             self.RepeatExecution = true
-            self:InitializeEconomyState()
             self.IntelData = {
                 ScoutCounter = 0,
             }
@@ -134,7 +153,114 @@ AIBrain = Class(moho.aibrain_methods) {
         self.BrainType = 'AI'
     end,
 
+    --- Adds a HQ so that the engi mod knows we have it
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
+    AddHQ = function (self, faction, layer, tech)
+        self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
+    end,
+
+    --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
+    RemoveHQ = function (self, faction, layer, tech)
+        self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
+    end,
+
+    --- Manages the support factory restrictions of the engi mod
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    SetHQSupportFactoryRestrictions = function (self, faction, layer)
+
+        -- localize for performance
+        local army = self:GetArmyIndex()
+
+        -- the pessimists we are, restrict everything!
+        AddBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
+        AddBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
+
+        -- lift t2 / t3 support factory restrictions
+        if self.HQs[faction][layer]["TECH3"] > 0 then 
+            RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
+            RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH3"] * categories.SUPPORTFACTORY)
+        end
+
+        -- lift t2 support factory restrictions
+        if self.HQs[faction][layer]["TECH2"] > 0 then 
+            RemoveBuildRestriction(army, categories[faction] * categories[layer] * categories["TECH2"] * categories.SUPPORTFACTORY)
+        end
+    end,
+
+    --- Counts all HQs of specific faction, layer and tech for the engi mod.
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param layer The layer (LAND / AIR / NAVY) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
+    CountHQs = function (self, faction, layer, tech)
+        return self.HQs[faction][layer][tech]
+    end,
+
+    --- Counts all HQs of faction and tech, regardless of layer
+    -- @param self The brain itself
+    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    -- @param tech The tech (TECH2 / TECH3) as a string
+    CountHQsAllLayers = function (self, faction, tech)
+        local count = self.HQs[faction]["LAND"][tech]
+        count = count + self.HQs[faction]["AIR"][tech]
+        count = count + self.HQs[faction]["NAVAL"][tech]
+        return count
+    end,
+
     CreateBrainShared = function(self, planName)
+
+        -- make sure there is always some storage
+        self:GiveStorage('Energy', 100)
+
+        -- make sure the army stats exist
+        self:SetArmyStat('Economy_Ratio_Mass', 1.0)
+        self:SetArmyStat('Economy_Ratio_Energy', 1.0)
+    
+        -- add initial trigger and assume we're not depleted
+        self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
+        self.EnergyDepleted = false 
+        self.EnergyDependingUnits = { }
+        self.EnergyDependingUnits.__mode = 'v'
+        self.EnergyDependingUnitsHead = 1
+
+        --- Units that we toggle on / off depending on whether we have excess energy
+        self.EnergyExcessUnitsEnabled = { }
+        setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'v' })
+        self.EnergyExcessUnitsDisabled = { }
+        setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'v' })
+
+        -- they are capitalized to match category names
+        local layers = { "LAND", "AIR", "NAVAL" }
+        local techs = { "TECH2", "TECH3" }
+
+        -- populate the possible HQs per faction, layer and tech
+        self.HQs = { }
+        for _, facData in Factions do 
+            local faction = facData.Category
+            self.HQs[faction] = { }
+            for _, layer in layers do 
+                self.HQs[faction][layer] = { }
+                for _, tech in techs do 
+                    self.HQs[faction][layer][tech] = 0
+                end 
+            end
+        end
+
+        -- restrict all support factories by default
+        AddBuildRestriction(self:GetArmyIndex(), (categories.TECH3 + categories.TECH2) * categories.SUPPORTFACTORY)
+
+        -- end of engi mod
+
+        self.Army = self:GetArmyIndex()
         self.Result = nil -- No-op, just to be explicit it starts as nil
         self.StatsSent = false
         self.UnitStats = {}
@@ -206,133 +332,205 @@ AIBrain = Class(moho.aibrain_methods) {
         self.PreBuilt = true
     end,
 
-    -- GLOBAL AI BRAIN ARMY FEATURES
-    InitializeEconomyState = function(self)
-        -- This is called very early, so ensure stats exist
-        self:SetArmyStat('Economy_Ratio_Mass', 0.0)
-        self:SetArmyStat('Economy_Ratio_Energy', 0.0)
+    -- Energy storage callbacks
 
-        if not self.EconStateUnits then
-            self.EconStateUnits = {
-                MassStorage = {},
-                EnergyStorage = {},
-            }
-        end
+    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts enabled
+    -- @param self The brain itself
+    -- @param unit The unit to keep track of
+    AddEnabledEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = unit
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
 
-        self.EconMassStorageState = nil
-        self.EconEnergyStorageState = nil
-        self.EconStorageTrigs = {}
-
-        self:SetArmyStatsTrigger('Economy_Ratio_Mass', 'EconLowMassStore', 'LessThan', 0.1)
-        self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EconLowEnergyStore', 'LessThan', 0.1)
+        local ecobp = unit.Blueprint.Economy
+        self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
+        self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
     end,
 
-    ESRegisterUnitMassStorage = function(self, unit)
-        if not self.EconStateUnits then
-            self.EconStateUnits = {
-                MassStorage = {},
-                EnergyStorage = {},
-            }
-        end
-        table.insert(self.EconStateUnits.MassStorage, unit)
+    --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
+    -- @param self The brain itself
+    -- @param unit The unit to keep track of
+    AddDisabledEnergyExcessUnit = function (self, unit)
+        self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+        self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
+        self.TotalEnergyRequired = self.TotalEnergyRequired + unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
     end,
 
-    ESRegisterUnitEnergyStorage = function(self, unit)
-        if not self.EconStateUnits then
-            self.EconStateUnits = {
-                MassStorage = {},
-                EnergyStorage = {},
-            }
-        end
-        table.insert(self.EconStateUnits.EnergyStorage, unit)
-    end,
-
-    ESUnregisterUnit = function(self, unit)
-        for k, v in self.EconStateUnits do
-            for i, j in v do
-                if j == unit then
-                    table.remove(self.EconStateUnits[k], i)
-                end
-            end
+    --- Removes a unit that is enabled / disabled depending on how much energy storage we have
+    -- @param self The brain itself
+    -- @param unit The unit to forget about
+    RemoveEnergyExcessUnit = function (self, unit)
+        local ecobp = unit.Blueprint.Economy
+        if  self.EnergyExcessUnitsEnabled[unit.EntityId] then
+            self.TotalEnergyConsumed = self.TotalEnergyConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
+            self.TotalMassProduced = self.TotalMassProduced - ecobp.ProductionPerSecondMass
+            self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
+        elseif self.EnergyExcessUnitsDisabled[unit.EntityId] then
+            self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
+            self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
         end
     end,
 
-    ESMassStorageUpdate = function(self, newState)
-        if self.EconMassStorageState ~= newState then
-            for k, v in self.EconStateUnits.MassStorage do
-                if not v.Dead then
-                    v:OnMassStorageStateChange(newState)
-                else
-                    table.remove(self.EconStateUnits.MassStorage, k)
-                end
-            end
+    --- A continious thread that across the life span of the brain. Is the heart and sole of the enabling and disabling of units that are designed to eliminate excess energy.
+    -- @param self The brain itself
+    ToggleEnergyExcessUnitsThread = function (self)
 
-            if newState == 'EconLowMassStore' then
-                if not self.EconStorageTrigs['EconMidMassStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Mass', 'EconMidMassStore', 'GreaterThanOrEqual', 0.11)
-                    self.EconStorageTrigs['EconMidMassStore'] = true
-                end
-            elseif newState == 'EconMidMassStore' then
-                if not self.EconStorageTrigs['EconLowMassStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Mass', 'EconLowMassStore', 'LessThan', 0.1)
-                    self.EconStorageTrigs['EconLowMassStore'] = true
-                end
-                if not self.EconStorageTrigs['EconFullMassStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Mass', 'EconFullMassStore', 'GreaterThanOrEqual', 0.9)
-                    self.EconStorageTrigs['EconFullMassStore'] = true
-                end
-            elseif newState == 'EconFullMassStore' then
-                if not self.EconStorageTrigs['EconMidMassStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Mass', 'EconMidMassStore', 'LessThan', 0.89)
-                    self.EconStorageTrigs['EconMidMassStore'] = true
-                end
-            end
-            self.EconMassStorageState = newState
+        -- allow for protected calls without closures
 
-            return true
+        local function ProtectedOnExcessEnergy(unitToProcess)
+            unitToProcess:OnExcessEnergy()
         end
-        return false
+
+        local function ProtectedOnNoExcessEnergy(unitToProcess)
+            unitToProcess:OnNoExcessEnergy()
+        end
+
+        -- localize scope for better performance
+        local pcall = pcall
+        local TableSize = table.getsize
+        local CoroutineYield = CoroutineYield
+        
+        local ok, msg
+
+        local energyRequired
+        local syncTable = {
+            on = 0,
+            off = 0,
+            totalEnergyConsumed = 0,
+            totalEnergyRequired = 0,
+            totalMassProduced = 0
+        }
+
+        local EnergyExcessUnitsDisabled = self.EnergyExcessUnitsDisabled
+        local EnergyExcessUnitsEnabled = self.EnergyExcessUnitsEnabled
+
+        while true do 
+
+            local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
+            local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
+
+            -- low on storage, start disabling them to fill our storages asap
+            if energyStoredRatio < 0.9 then 
+
+                -- while we have units to disable
+                for id, unit in EnergyExcessUnitsEnabled do 
+                    if not unit:BeenDestroyed() then 
+
+                        local ecobp = unit.Blueprint.Economy
+                        self.TotalEnergyConsumed = self.TotalEnergyConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.TotalEnergyRequired = self.TotalEnergyRequired + ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.TotalMassProduced = self.TotalMassProduced - ecobp.ProductionPerSecondMass
+                        
+                        -- update internal state
+                        EnergyExcessUnitsDisabled[id] = unit
+                        EnergyExcessUnitsEnabled[id] = nil
+
+                        -- try to disable unit
+                        ok, msg = pcall(ProtectedOnNoExcessEnergy, unit)
+
+                        -- allow for debugging
+                        if not ok then 
+                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                        end
+
+                        break
+                    end
+                end
+            
+            -- high on storage and sufficient energy income, enable units
+            elseif energyStoredRatio >= 1.0 and energyTrend > 100 then 
+
+                -- while we have units to retrieve
+                for id, unit in EnergyExcessUnitsDisabled do
+                    if not unit:BeenDestroyed() then 
+                        if  energyTrend > 100 then 
+
+                            local ecobp = unit.Blueprint.Economy
+                            self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
+                            self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
+                            self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
+                            
+                            -- update internal state
+                            EnergyExcessUnitsDisabled[id] = nil
+                            EnergyExcessUnitsEnabled[id] = unit
+
+                            -- try to enable unit
+                            ok, msg = pcall(ProtectedOnExcessEnergy, unit)
+
+                            -- allow for debugging
+                            if not ok then 
+                                WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
+                            end
+
+                            break
+                        end
+                    end
+                end
+            end
+
+            if self.Army == GetFocusArmy() then
+                syncTable.on = TableSize(EnergyExcessUnitsEnabled)
+                syncTable.off = TableSize(EnergyExcessUnitsDisabled)
+                syncTable.totalEnergyConsumed = self.TotalEnergyConsumed
+                syncTable.totalEnergyRequired = self.TotalEnergyRequired
+                syncTable.totalMassProduced = self.TotalMassProduced
+                
+                Sync.MassFabs = syncTable
+            end
+            CoroutineYield(1)
+        end
     end,
 
-    ESEnergyStorageUpdate = function(self, newState)
-        if self.EconEnergyStorageState ~= newState then
-            for k, v in self.EconStateUnits.EnergyStorage do
-                if not v.Dead then
-                    v:OnEnergyStorageStateChange(newState)
-                else
-                    table.remove(self.EconStateUnits.EnergyStorage, k)
+    --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
+    -- @param self Brain that keeps track of the entity
+    -- @param entity Entity to be updated according to the 
+    AddEnergyDependingEntity = function(self, entity)
+        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
+        self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
+    end,
+
+    OnEnergyTrigger = function(self, triggerName)
+        if triggerName == "EnergyDepleted" then 
+            -- add trigger when we can recover units
+            self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyViable', 'GreaterThanOrEqual', 0.1)
+            self.EnergyDepleted = true 
+
+            -- recurse over the list of units and do callbacks accordingly
+            local index = 1 
+            for k = 1, self.EnergyDependingUnitsHead - 1 do 
+                local entity = self.EnergyDependingUnits[k]
+
+                if not entity:BeenDestroyed() then 
+                    self.EnergyDependingUnits[index] = entity 
+                    index = index + 1
+                    entity:OnEnergyDepleted()
                 end
             end
+        else 
+            -- add trigger when we're depleted
+            self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EnergyDepleted', 'LessThanOrEqual', 0.0)
+            self.EnergyDepleted = false 
 
-            if newState == 'EconLowEnergyStore' then
-                if not self.EconStorageTrigs['EconMidEnergyStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EconMidEnergyStore', 'GreaterThanOrEqual', 0.11)
-                    self.EconStorageTrigs['EconMidEnergyStore'] = true
-                end
-            elseif newState == 'EconMidEnergyStore' then
-                if not self.EconStorageTrigs['EconLowEnergyStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EconLowEnergyStore', 'LessThan', 0.1)
-                    self.EconStorageTrigs['EconLowEnergyStore'] = true
-                end
-                if not self.EconStorageTrigs['EconFullEnergyStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EconFullEnergyStore', 'GreaterThanOrEqual', 0.9)
-                    self.EconStorageTrigs['EconFullEnergyStore'] = true
-                end
-            elseif newState == 'EconFullEnergyStore' then
-                if not self.EconStorageTrigs['EconMidEnergyStore'] then
-                    self:SetArmyStatsTrigger('Economy_Ratio_Energy', 'EconMidEnergyStore', 'LessThan', 0.89)
-                    self.EconStorageTrigs['EconMidEnergyStore'] = true
+            -- recurse over the list of units and do callbacks accordingly
+            local index = 1 
+            for k = 1, self.EnergyDependingUnitsHead - 1 do 
+                local entity = self.EnergyDependingUnits[k]
+
+                if entity and not entity:BeenDestroyed() then 
+                    self.EnergyDependingUnits[index] = entity 
+                    index = index + 1
+                    entity:OnEnergyViable()
                 end
             end
-            self.EconMassStorageState = newState
-
-            return true
         end
-        return false
     end,
 
     -- TRIGGERS BASED ON AN AI BRAIN
     OnStatsTrigger = function(self, triggerName)
+
+        if triggerName == "EnergyDepleted" or triggerName == "EnergyViable" then 
+            self:OnEnergyTrigger(triggerName)
+        end
+
         for k, v in self.TriggerList do
             if v.Name == triggerName then
                 if v.CallingObject then
@@ -344,13 +542,6 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
                 table.remove(self.TriggerList, k)
             end
-        end
-        if triggerName == 'EconLowEnergyStore' or triggerName == 'EconMidEnergyStore' or triggerName == 'EconFullEnergyStore' then
-            self.EconStorageTrigs[triggerName] = false
-            self:ESEnergyStorageUpdate(triggerName)
-        elseif triggerName == 'EconLowMassStore' or triggerName == 'EconMidMassStore' or triggerName == 'EconFullMassStore' then
-            self.EconStorageTrigs[triggerName] = false
-            self:ESMassStorageUpdate(triggerName)
         end
     end,
 
@@ -500,7 +691,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function KillWalls()
                 -- Kill all walls while the ACU is blowing up
                 local tokill = self:GetListOfUnits(categories.WALL, false)
-                if tokill and table.getn(tokill) > 0 then
+                if tokill and not table.empty(tokill) then
                     for index, unit in tokill do
                         unit:Kill()
                     end
@@ -521,7 +712,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function TransferOwnershipOfBorrowedUnits(brains)
                 for index, brain in brains do
                     local units = brain:GetListOfUnits(categories.ALLUNITS, false)
-                    if units and table.getn(units) > 0 then
+                    if units and not table.empty(units) then
                         for _, unit in units do
                             if unit.oldowner == selfIndex then
                                 unit.oldowner = nil
@@ -533,30 +724,46 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
             local function TransferUnitsToBrain(brains)
-                if table.getn(brains) > 0 then
-                    if shareOption == 'FullShare' then 
+                if not table.empty(brains) then
+                    if shareOption == 'FullShare' then
                         local indexes = {}
-                        for _, brain in brains do 
+                        for _, brain in brains do
                             table.insert(indexes, brain.index)
-                        end 
+                        end
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
                         TransferUnfinishedUnitsAfterDeath(units, indexes)
                     end
-                    
+
                     for k, brain in brains do
                         local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                        if units and table.getn(units) > 0 then
-                            TransferUnitsOwnership(units, brain.index)
+                        if units and not table.empty(units) then
+                            local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
+
+                            -- only show message when we actually gift that player some units
+                            if givenUnitCount > 0 then 
+                                Sync.ArmyTransfer = { { from = selfIndex, to = brain.index, reason = "fullshare" } }
+                            end
+
                             WaitSeconds(1)
                         end
                     end
                 end
             end
 
-            -- Sort the destiniation armies by score
+            -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
             local function TransferUnitsToHighestBrain(brains)
-                if table.getn(brains) > 0 then
-                    table.sort(brains, function(a, b) return a.score > b.score end)
+                if not table.empty(brains) then
+                    local ratings = ScenarioInfo.Options.Ratings
+                    for i, brain in brains do 
+                        if ratings[brain.Nickname] then
+                            brain.rating = ratings[brain.Nickname]
+                        else 
+                            -- if there is no rating, create a fake negative rating based on score
+                            brain.rating = - (1 / brain.score)
+                        end
+                    end
+                    -- sort brains by rating
+                    table.sort(brains, function(a, b) return a.rating > b.rating end)
                     TransferUnitsToBrain(brains)
                 end
             end
@@ -565,7 +772,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local function TransferUnitsToKiller()
                 local KillerIndex = 0
                 local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                if units and table.getn(units) > 0 then
+                if units and not table.empty(units) then
                     if victoryOption == 'demoralization' then
                         KillerIndex = ArmyBrains[selfIndex].CommanderKilledBy or selfIndex
                         TransferUnitsOwnership(units, KillerIndex)
@@ -603,7 +810,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 local given = {}
                 for index, brain in brains do
                     local units = brain:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-                    if units and table.getn(units) > 0 then
+                    if units and not table.empty(units) then
                         for _, unit in units do
                             if unit.oldowner == selfIndex then -- The unit was built by me
                                 table.insert(given, unit)
@@ -658,7 +865,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
             -- Kill all units left over
             local tokill = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if tokill and table.getn(tokill) > 0 then
+            if tokill and not table.empty(tokill) then
                 for index, unit in tokill do
                     unit:Kill()
                 end
@@ -671,7 +878,7 @@ AIBrain = Class(moho.aibrain_methods) {
             SUtils.AISendChat('enemies', ArmyBrains[self:GetArmyIndex()].Nickname, 'ilost')
             -- remove PlatoonHandle from all AI units before we kill / transfer the army
             local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL, false)
-            if units and table.getn(units) > 0 then
+            if units and not table.empty(units) then
                 for _, unit in units do
                     if not unit.Dead then
                         if unit.PlatoonHandle and self:PlatoonExists(unit.PlatoonHandle) then
@@ -1233,58 +1440,11 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonFormManager = PlatoonFormManager.CreatePlatoonFormManager(self, baseName, position, radius, useCenter),
             EngineerManager = EngineerManager.CreateEngineerManager(self, baseName, position, radius),
             StrategyManager = StratManager.CreateStrategyManager(self, baseName, position, radius),
-
-            -- Table to track consumption
-            MassConsumption = {
-                Resources = {Units = {}, Drain = 0, },
-                Units = {Units = {}, Drain = 0, },
-                Defenses = {Units = {}, Drain = 0, },
-                Upgrades = {Units = {}, Drain = 0, },
-                Engineers = {Units = {}, Drain = 0, },
-                TotalDrain = 0,
-            },
             BuilderHandles = {},
             Position = position,
             BaseType = Scenario.MasterChain._MASTERCHAIN_.Markers[baseName].type or 'MAIN',
         }
         self.NumBases = self.NumBases + 1
-    end,
-
-    AddConsumption = function(self, locationType, consumptionType, unit, unitBeingBuilt)
-        local consumptionData = self.BuilderManagers[locationType].MassConsumption
-        local bp = unitBeingBuilt:GetBlueprint()
-        local consumptionDrain = (unit:GetBuildRate() / bp.Economy.BuildTime) * bp.Economy.BuildCostMass
-
-        consumptionData[consumptionType].Drain = consumptionData[consumptionType].Drain + consumptionDrain
-        consumptionData.TotalDrain = consumptionData.TotalDrain + consumptionDrain
-
-        unit.ConsumptionData = {
-            ConsumptionType = consumptionType,
-            ConsumptionDrain = consumptionDrain,
-        }
-        table.insert(consumptionData[consumptionType].Units, unit)
-    end,
-
-    RemoveConsumption = function(self, locationType, unit)
-        local consumptionData = self.BuilderManagers[locationType].MassConsumption
-        local consumptionType = unit.ConsumptionData.ConsumptionType
-        if not consumptionType then
-            return
-        end
-
-        if not consumptionData[consumptionType] then
-            WARN('*AI WARNING: Invalid consumptionType - ' .. consumptionType)
-            return
-        end
-
-        for k, v in consumptionData[consumptionType].Units do
-            if v == unit then
-                consumptionData.TotalDrain = consumptionData.TotalDrain - unit.ConsumptionData.ConsumptionDrain
-                consumptionData[consumptionType].Drain = consumptionData[consumptionType].Drain - unit.ConsumptionData.ConsumptionDrain
-                consumptionData[consumptionType].Units[k] = nil
-                break
-            end
-        end
     end,
 
     GetEngineerManagerUnitsBeingBuilt = function(self, category)
@@ -1701,7 +1861,7 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             local afac, lfac, sfac, gatefac
-            if table.getn(airFactories) > 0 then
+            if not table.empty(airFactories) then
                 if not v.PrimaryFactories.Air or v.PrimaryFactories.Air.Dead
                     or v.PrimaryFactories.Air:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(airFactories, v.PrimaryFactories.Air) then
@@ -1711,7 +1871,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(airFactories, v.PrimaryFactories.Air)
             end
 
-            if table.getn(landFactories) > 0 then
+            if not table.empty(landFactories) then
                 if not v.PrimaryFactories.Land or v.PrimaryFactories.Land.Dead
                     or v.PrimaryFactories.Land:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(landFactories, v.PrimaryFactories.Land) then
@@ -1721,7 +1881,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(landFactories, v.PrimaryFactories.Land)
             end
 
-            if table.getn(seaFactories) > 0 then
+            if not table.empty(seaFactories) then
                 if not v.PrimaryFactories.Sea or v.PrimaryFactories.Sea.Dead
                     or v.PrimaryFactories.Sea:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(seaFactories, v.PrimaryFactories.Sea) then
@@ -1731,7 +1891,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(seaFactories, v.PrimaryFactories.Sea)
             end
 
-            if table.getn(gates) > 0 then
+            if not table.empty(gates) then
                 if not v.PrimaryFactories.Gate or v.PrimaryFactories.Gate.Dead then
                     gatefac = self:PBMGetPrimaryFactory(gates)
                     v.PrimaryFactories.Gate = gatefac
@@ -1739,7 +1899,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 self:PBMAssistGivenFactory(gates, v.PrimaryFactories.Gate)
             end
 
-            if not v.RallyPoint or table.getn(v.RallyPoint) == 0 then
+            if not v.RallyPoint or table.empty(v.RallyPoint) then
                 self:PBMSetRallyPoint(airFactories, v, nil)
                 self:PBMSetRallyPoint(landFactories, v, nil)
                 self:PBMSetRallyPoint(seaFactories, v, nil)
@@ -1761,7 +1921,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     PBMSetRallyPoint = function(self, factories, location, rallyLoc, markerType)
-        if table.getn(factories) > 0 then
+        if not table.empty(factories) then
             local rally
             local position = factories[1]:GetPosition()
             for facNum, facData in factories do
@@ -2269,7 +2429,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 -- First go through the list of locations and see if we can build stuff there.
                 for k, v in self.PBM.Locations do
                     -- See if we have platoons to build in that type
-                    if table.getn(platoonList[typev]) > 0 then
+                    if not table.empty(platoonList[typev]) then
                         -- Sort the list of platoons via priority
                         if self.PBM.NeedSort[typev] then
                             self:PBMSortPlatoonsViaPriority(typev)
@@ -2285,7 +2445,7 @@ AIBrain = Class(moho.aibrain_methods) {
                                 numBuildOrders = priFac:GetNumBuildOrders(categories.ALLUNITS)
                                 if numBuildOrders == 0 then
                                     local guards = priFac:GetGuards()
-                                    if guards and table.getn(guards) > 0 then
+                                    if guards and not table.empty(guards) then
                                         for kg, vg in guards do
                                             numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
                                             if numBuildOrders == 0 and vg:IsUnitState('Building') then
@@ -2379,7 +2539,7 @@ AIBrain = Class(moho.aibrain_methods) {
             numBuildOrders = location.PrimaryFactories[platoonType]:GetNumBuildOrders(categories.ALLUNITS)
             if numBuildOrders == 0 then
                 local guards = location.PrimaryFactories[platoonType]:GetGuards()
-                if guards and table.getn(guards) > 0 then
+                if guards and not table.empty(guards) then
                     for kg, vg in guards do
                         numBuildOrders = numBuildOrders + vg:GetNumBuildOrders(categories.ALLUNITS)
                         if numBuildOrders == 0 and vg:IsUnitState('Building') then
@@ -2829,13 +2989,14 @@ AIBrain = Class(moho.aibrain_methods) {
         for k, v in self.BaseMonitor.PlatoonDistressTable do
             -- If already calling for help, don't add another distress call
             if v.Platoon == platoon then
-                continue
+                found = true
+                break
             end
-
+        end
+        if not found then
             -- Add platoon to list desiring aid
             table.insert(self.BaseMonitor.PlatoonDistressTable, {Platoon = platoon, Threat = threat})
         end
-
         -- Create the distress call if it doesn't exist
         if not self.BaseMonitor.PlatoonDistressThread then
             self.BaseMonitor.PlatoonDistressThread = self:ForkThread(self.BaseMonitorPlatoonDistressThread)
@@ -2919,7 +3080,7 @@ AIBrain = Class(moho.aibrain_methods) {
             for k, v in self.BaseMonitor.PlatoonDistressTable do
                 if self:PlatoonExists(v.Platoon) then
                     local platPos = v.Platoon:GetPlatoonPosition()
-                    local tempDist = Utilities.XZDistanceTwoVectors(platPos)
+                    local tempDist = Utilities.XZDistanceTwoVectors(position, platPos)
 
                     -- Platoon too far away to help
                     if tempDist > radius then
@@ -2927,7 +3088,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
 
                     -- Area not scary enough
-                    if v.Threat < theshold then
+                    if v.Threat < threshold then
                         continue
                     end
 
@@ -2993,7 +3154,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     BaseMonitorCheck = function(self)
         local vecs = self:GetStructureVectors()
-        if table.getn(vecs) > 0 then
+        if not table.empty(vecs) then
             -- Find new points to monitor
             for k, v in vecs do
                 local found = false
@@ -3107,7 +3268,7 @@ AIBrain = Class(moho.aibrain_methods) {
                         -- Check for exact position?
                         if threat[3] > v[2] and v[4] and v[5] then
                             local nearUnits = self:GetUnitsAroundPoint(v[5], newPos, v[1], 'Enemy')
-                            if table.getn(nearUnits) > 0 then
+                            if not table.empty(nearUnits) then
                                 local unitPos = nearUnits[1]:GetPosition()
                                 if unitPos then
                                     newPos = {unitPos[1], 0, unitPos[3]}
@@ -3413,6 +3574,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
                     -- Reassign all Army attributes to better suit the AI.
                     self.BrainType = 'AI'
+
+                    if self.EnergyExcessThread then 
+                        KillThread(self.EnergyExcessThread)
+                    end
+
                     self.ConditionsMonitor = BrainConditionsMonitor.CreateConditionsMonitor(self)
                     self.NumBases = 0 -- AddBuilderManagers will increase the number
                     self.BuilderManagers = {}
@@ -4053,5 +4219,34 @@ AIBrain = Class(moho.aibrain_methods) {
                 break
             end
         end
+    end,
+
+    --- Retrieves all units that fit the criteria around some point. Excludes dummy units.
+    -- @param category The categories the units should fit.
+    -- @param position The center point to start looking for units.
+    -- @param radius The radius of the circle we look for units in.
+    -- @param alliance The alliance status ('Ally', 'Enemy', 'Neutral') to those units.
+    -- @return nil if none found or a table.
+    GetUnitsAroundPoint = function(self, category, position, radius, alliance)
+        if alliance then 
+            -- call where we do care about alliance
+            return BrainGetUnitsAroundPoint(self, category - CategoriesDummyUnit, position, radius, alliance)
+        else 
+            -- call where we do not, which is different from providing nil (as there would be a fifth argument then)
+            return BrainGetUnitsAroundPoint(self, category - CategoriesDummyUnit, position, radius)
+        end
+    end,
+
+    --- Returns list of units by category. Excludes dummy units.
+    -- @param category Unit's category, example: categories.TECH2 .
+    -- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
+    -- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
+    -- @return tblUnits Table containing units.
+    GetListOfUnits = function(self, cats, needToBeIdle, requireBuilt)
+        -- defaults to false, prevent sending nil
+        requireBuilt = requireBuilt or false
+
+        -- retrieve units, excluding insignificant units
+        return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 }

@@ -50,10 +50,10 @@ XSB3202 = Class(SSubUnit) {
     
     
     TimedIdleSonarEffects = function( self )
-        local layer = self:GetCurrentLayer()
+        local layer = self.Layer
         local pos = self:GetPosition()
         if self.TimedSonarTTIdleEffects then
-            while not self:IsDead() do
+            while not self.Dead do
                 for kTypeGroup, vTypeGroup in self.TimedSonarTTIdleEffects do
                     local effects = self.GetTerrainTypeEffects( 'FXIdle', layer, pos, vTypeGroup.Type, nil )
                     

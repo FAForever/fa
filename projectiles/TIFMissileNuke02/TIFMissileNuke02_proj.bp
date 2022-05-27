@@ -30,8 +30,8 @@ ProjectileBlueprint {
         'MISSILE',
     },
     Defense = {
-        Health = 25,
-        MaxHealth = 25,
+        Health = 25000,
+        MaxHealth = 25000,
     },
     Description = 'UEF Nuclear Missile',
     DesiredShooterCap = 1,

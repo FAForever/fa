@@ -50,6 +50,7 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'SORTDEFENSE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = 0,
     Defense = {
@@ -147,9 +148,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.35,
     SelectionThickness = 1.1,
-    SizeX = 0.7,
+    SizeX = 0.6, #from 0.7
     SizeY = 0.8,
-    SizeZ = 0.7,
+    SizeZ = 0.6, #from 0.7
     StrategicIconName = 'icon_structure1_directfire',
     StrategicIconSortPriority = 205,
     Veteran = {
@@ -207,8 +208,12 @@ UnitBlueprint {
             ReTargetOnMiss = true,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
-                'MOBILE',
-                'STRUCTURE DEFENSE',
+                'MOBILE EXPERIMENTAL',
+                'MOBILE TECH3',
+                'MOBILE TECH1 ARTILLERY',
+                'MOBILE TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE TECH1',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

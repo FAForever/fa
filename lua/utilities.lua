@@ -26,7 +26,7 @@ function CanBuildInSpot(originUnit, unitId, pos)
     local z2 = pos.z + zDiff
 
     -- Find all the units in that rectangle
-    local units = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local units = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Filter it down to structures and experimentals only
     units = EntityCategoryFilterDown(categories.STRUCTURE + categories.EXPERIMENTAL, units)
@@ -65,7 +65,7 @@ function GetEnemyUnitsInSphere(unit, position, radius)
     local x2 = position.x + radius
     local y2 = position.y + radius
     local z2 = position.z + radius
-    local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local UnitsinRec = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Check for empty rectangle
     if not UnitsinRec then
@@ -91,7 +91,7 @@ function GetTrueEnemyUnitsInSphere(unit, position, radius, categories)
     local x2 = position.x + radius
     local y2 = position.y + radius
     local z2 = position.z + radius
-    local UnitsinRec = GetUnitsInRect(Rect(x1, z1, x2, z2))
+    local UnitsinRec = GetUnitsInRect(x1, z1, x2, z2)
 
     -- Check for empty rectangle
     if not UnitsinRec then
@@ -154,11 +154,11 @@ function GetMidPoint(v1, v2)
 end
 
 function GetRandomFloat(nmin, nmax)
-    return (Random() * (nmax - nmin) + nmin)
+    return Random() * (nmax - nmin) + nmin
 end
 
 function GetRandomInt(nmin, nmax)
-    return math.floor(Random() * (nmax - nmin + 1) + nmin)
+    return Random(nmin, nmax)
 end
 
 function GetRandomOffset(sx, sy, sz, scalar)
@@ -176,9 +176,9 @@ function GetRandomOffset2(sx, sy, sz, scalar)
     sx = sx * scalar
     sy = sy * scalar
     sz = sz * scalar
-    local x = Random(-1.0, 1.0) * sx - (sx * 0.5)
-    local y = Random(-1.0, 1.0) * sy
-    local z = Random(-1.0, 1.0) * sz - (sz * 0.5)
+    local x = (Random() * 2 - 1) * sx - (sx * 0.5)
+    local y = (Random() * 2 - 1) * sy
+    local z = (Random() * 2 - 1) * sz - (sz * 0.5)
 
     return x, y, z
 end
@@ -220,11 +220,11 @@ function GetAngleInBetween(v1, v2)
     return math.acos(dotp) * (360 / (math.pi * 2))
 end
 
---- Computes the full angle between the two vectors in two dimensions: the y dimension is not taken into account. Angle 
+--- Computes the full angle between the two vectors in two dimensions: the y dimension is not taken into account. Angle
 -- is computed in a counter clockwise direction: if the base is to the south ({0, 0, 1}) then the direction to the east ({1, 0, 0}) is 90 degrees.
 -- @param base The base direction from which the angle will be computed in a counter clockwise fashion.
 -- @param direction The direction from which we want to compute the angle given a base.
-function GetAngleCCW(base, direction) 
+function GetAngleCCW(base, direction)
 
     local bn = NormalizeVector(base)
     local dn = NormalizeVector(direction)
@@ -234,7 +234,7 @@ function GetAngleCCW(base, direction)
 
     -- compute the radians, correct it accordingly
     local rads = math.acos(bn[1] * dn[1] + bn[3] * dn[3])
-    if ort[1] * dn[1] + ort[3] * dn[3] < 0 then 
+    if ort[1] * dn[1] + ort[3] * dn[3] < 0 then
         rads = 2 * math.pi - rads
     end
 

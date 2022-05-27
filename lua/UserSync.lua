@@ -1,3 +1,4 @@
+
 -- The global sync table is copied from the sim layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
 Sync = {}
@@ -10,6 +11,7 @@ PreviousSync = {}
 -- the Sync.UnitData table into this table each sync (if there's new data)
 UnitData = {}
 
+local UIUtil = import('/lua/ui/uiutil.lua')
 local reclaim = import('/lua/ui/game/reclaim.lua')
 local UpdateReclaim = reclaim.UpdateReclaim
 local sendEnhancementMessage = import('/lua/ui/notify/notify.lua').sendEnhancementMessage
@@ -17,6 +19,36 @@ local SetPlayableArea = reclaim.SetPlayableArea
 
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
+
+    if Sync.ArmyTransfer then 
+        local army = GetFocusArmy()
+        for k, transfer in Sync.ArmyTransfer do 
+            local other = GetArmiesTable().armiesTable[transfer.from].nickname 
+            if transfer.to == army then 
+                local primary = "Fullshare"
+                local secondary = LOCF('<LOC fullshare_announcement>%s\'s units have been transferred to you', other)
+                local control = nil
+                UIUtil.CreateAnnouncementStd(primary, secondary, control)
+            end
+        end
+    end
+
+    if Sync.ProfilerData then 
+        import("/lua/ui/game/Profiler.lua").ReceiveData(Sync.ProfilerData)
+    end
+
+    if Sync.Benchmarks then 
+        import("/lua/ui/game/Profiler.lua").ReceiveBenchmarks(Sync.Benchmarks)
+    end
+
+    if Sync.BenchmarkOutput then 
+        import("/lua/ui/game/Profiler.lua").ReceiveBenchmarkOutput(Sync.BenchmarkOutput)
+    end
+
+    if Sync.GameHasAIs ~= nil then 
+        import("/lua/ui/game/gamemain.lua").GameHasAIs = Sync.GameHasAIs
+    end
+
     if Sync.RequestingExit then
         ExitGame()
     end
@@ -89,12 +121,12 @@ function OnSync()
         GpgNetSend('EnforceRating')
     end
 
-    if not table.empty(Sync.EnhanceMessage) then
+    if Sync.EnhanceMessage and not table.empty(Sync.EnhanceMessage) then
         for _, messageTable in Sync.EnhanceMessage do
             sendEnhancementMessage(messageTable)
         end
     end
-    
+
     if Sync.NewPlayableArea then
         SetPlayableArea(Sync.NewPlayableArea)
     end
@@ -105,5 +137,13 @@ function OnSync()
 
     if Sync.GameEnded then
         GpgNetSend('GameEnded')
+    end
+
+    if Sync.LobbyOptions then 
+        import('/lua/ui/game/gamemain.lua').LobbyOptions = table.deepcopy(Sync.LobbyOptions)
+    end
+
+    if Sync.MassFabs then
+        import('/lua/ui/game/massfabs.lua').Update(table.deepcopy(Sync.MassFabs))
     end
 end

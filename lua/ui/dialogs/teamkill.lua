@@ -23,7 +23,7 @@ function CreateDialog(teamkill)
     LayoutHelpers.SetDimensions(dialogContent, 360, 180)
 
     dialog = Popup(GetFrame(0), dialogContent)
-    
+
     local title = UIUtil.CreateText(dialogContent, "<LOC teamkill_0001>Teamkill Detected", 14, UIUtil.titleFont)
     LayoutHelpers.AtTopIn(title, dialogContent, 10)
     LayoutHelpers.AtHorizontalCenterIn(title, dialogContent)
@@ -60,7 +60,7 @@ function CreateDialog(teamkill)
 
     dialog.OnShadowClicked = function(self)
     end
-    
+
     dialog.countdownThread = ForkThread(WaitBeforeEnablingReportButton, reportBtn)
 end
 

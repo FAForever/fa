@@ -60,11 +60,11 @@ Bitmap = Class(moho.bitmap_methods, Control) {
             self._filename._texture:Set(texture)
         end
     end,
-    
+
     SetSolidColor = function(self, color)
         self._color:Set(color)
     end,
-    
+
     ResetLayout = function(self)
         Control.ResetLayout(self)
         self.Width:SetFunction(function() return ScaleNumber(self.BitmapWidth()) end)
@@ -74,7 +74,7 @@ Bitmap = Class(moho.bitmap_methods, Control) {
     OnInit = function(self)
         Control.OnInit(self)
     end,
-    
+
     OnDestroy = function(self)
         if self._filename and self._filename._texture then
             self._filename._texture:Destroy()
@@ -84,7 +84,7 @@ Bitmap = Class(moho.bitmap_methods, Control) {
             self._color:Destroy()
         end
     end,
-    
+
     -- callback scripts
     OnAnimationFinished = function(self) end,
     OnAnimationStopped = function(self) end,

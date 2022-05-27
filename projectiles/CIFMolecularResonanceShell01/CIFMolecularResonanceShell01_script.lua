@@ -4,25 +4,12 @@
 
 local CIFMolecularResonanceShell = import('/lua/cybranprojectiles.lua').CIFMolecularResonanceShell
 CIFMolecularResonanceShell01 = Class(CIFMolecularResonanceShell) {
-	OnImpact = function(self, targetType, targetEntity)
-        local army = self.Army
-        
-        CreateLightParticle( self, -1, army, 24, 5, 'glow_03', 'ramp_red_10' )
-        CreateLightParticle( self, -1, army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
-		
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
-            local army = self.Army
-            
-            DamageArea( self, pos, radius, 1, 'Force', true )
-            DamageArea( self, pos, radius, 1, 'Force', true )
-            CreateDecal(pos, rotation, 'nuke_scorch_002_albedo', '', 'Albedo', radius * 2, radius * 2, 200, 100, army)
-        end
-        
+	OnImpact = function(self, targetType, targetEntity)       
 		CIFMolecularResonanceShell.OnImpact(self, targetType, targetEntity)  
+
+        -- make it flashy!
+        CreateLightParticle( self, -1, self.Army, 24, 5, 'glow_03', 'ramp_red_10' )
+        CreateLightParticle( self, -1, self.Army, 8, 16, 'glow_03', 'ramp_antimatter_02' )
 	end,
 	
     CreateImpactEffects = function( self, army, EffectTable, EffectScale )

@@ -58,6 +58,14 @@ gameUIHidden = false
 PostScoreVideo = false
 IsSavedGame = false
 
+-- Lobby options as set by the host in the lobby
+LobbyOptions = false
+
+-- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
+OriginalFocusArmy = -1
+
+GameHasAIs = false
+
 function KillWaitingDialog()
     if waitingDialog then
         waitingDialog:Destroy()
@@ -109,7 +117,7 @@ function OnFirstUpdate()
                     SelectUnits(avatars)
                     selected = GetSelectedUnits()
                 end
-            until table.getsize(selected) > 0 or GameTick() > 50
+            until not table.empty(selected) or GameTick() > 50
         end)
     end
 
@@ -136,6 +144,55 @@ function OnFirstUpdate()
 end
 
 function CreateUI(isReplay)
+
+    -- override some UI globals
+    import("/lua/ui/override/ArmiesTable.lua").Setup()
+    import("/lua/ui/override/SessionClients.lua").Setup()
+
+    -- ensure logger is turned off for the average user
+    if not GetPreference('debug.enable_debug_facilities') then
+        SetPreference('Options.Log', {
+            Debug = false,
+            Info = false,
+            Warn = false,
+            Error = false,
+            Custom = false,
+            Filter = '*debug:'})
+    end
+
+    -- prevents the nvidia stuttering bug with their more recent drivers
+    ConExecute('d3d_WindowsCursor on')  
+
+    -- enable experimental graphics
+    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2 
+        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
+
+        ForkThread(
+            function() 
+
+                WaitSeconds(1.0)
+
+                LOG("Experimental graphics enabled, use at your own risk: ")
+
+                if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
+                    -- allow meshes and effects to be seen from further away
+                    ConExecute("cam_SetLOD WorldCamera 0.7")
+                end
+
+                if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+
+                    -- improve shadow LOD and resolution
+                    ConExecute("ren_ShadowLOD 1024")
+                    ConExecute("ren_ShadowSize 2048")
+                end
+            end
+        )
+    end
+
+    -- keep track of the original focus army
+    import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
+    OriginalFocusArmy = GetFocusArmy()
+
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
 
@@ -174,6 +231,8 @@ function CreateUI(isReplay)
 
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     controls.mfd = mfdControl
+
+    controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
@@ -230,12 +289,6 @@ function CreateUI(isReplay)
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
-    else
-        local clients = GetSessionClients()
-        if table.getsize(clients) <= 1 then
-            -- No need for unnecessary lag when playing alone
-            ConExecute('net_lag 0')
-        end
     end
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
@@ -473,6 +526,17 @@ function DeselectSelens(selection)
     return otherUnits, true
 end
 
+--- A cache used with ObserveSelection to prevent continious table allocations
+local cachedSelection = {
+    oldSelection = { },
+    newSelection = { },
+    added = { },
+    removed = { },
+}
+
+--- Observable to allow mods to do something with a new selection
+ObserveSelection = import("/lua/shared/observable.lua").Create()
+
 -- This function is called whenever the set of currently selected units changes
 -- See /lua/unit.lua for more information on the lua unit object
 -- @param oldSelection: What the selection was before
@@ -490,6 +554,13 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         return
     end
 
+    -- populate observable and send out a notification
+    cachedSelection.oldSelection = oldSelection
+    cachedSelection.newSelection = newSelection
+    cachedSelection.added = added
+    cachedSelection.removed = removed
+    ObserveSelection:Set(cachedSelection)
+
     if not hotkeyLabelsOnSelectionChanged then
         hotkeyLabelsOnSelectionChanged = import('/lua/keymap/hotkeylabels.lua').onSelectionChanged
     end
@@ -499,7 +570,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     -- Deselect Selens if necessary. Also do work on Hotbuild labels
     local changed = false -- Prevent recursion
-    if newSelection and table.getn(newSelection) > 0 then
+    if newSelection and not table.empty(newSelection) then
         newSelection, changed = DeselectSelens(newSelection)
 
         if changed then
@@ -514,9 +585,9 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         local upgradesTo = nil
         local potentialUpgrades = upgradeTab[bp.BlueprintId] or bp.General.UpgradesTo
         if potentialUpgrades then
-            if type(potentialUpgrades) == "string" then 
+            if type(potentialUpgrades) == "string" then
                 upgradesTo = potentialUpgrades
-            elseif type(potentialUpgrades) == "table" then 
+            elseif type(potentialUpgrades) == "table" then
                 local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(newSelection)
                 for _, v in potentialUpgrades do
                     if EntityCategoryContains(buildableCategories, v) then
@@ -554,7 +625,7 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
         local n = table.getn(newSelection)
 
         -- if something died in selection, restore command mode
-        if n > 0 and table.getsize(removed) > 0 and table.getsize(added) == 0 then
+        if n > 0 and not table.empty(removed) and table.empty(added) then
             local CM = import('/lua/ui/game/commandmode.lua')
             local mode, data = unpack(CM.GetCommandMode())
 
@@ -947,10 +1018,10 @@ end
 SendChat = function()
     while true do
         if UnitData.Chat then
-            if table.getn(UnitData.Chat) > 0 then
+            if not table.empty(UnitData.Chat) then
                 for index, chat in UnitData.Chat do
                     local newChat = true
-                    if table.getn(oldData) > 0 then
+                    if not table.empty(oldData) then
                         for index, old in oldData do
                             if (old.oldTime + 3) < GetGameTimeSeconds() then
                                 oldData[index] = nil

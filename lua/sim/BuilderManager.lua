@@ -227,7 +227,7 @@ BuilderManager = Class {
         end
         return false
     end,
-    
+
     -- We delay buildplatoons to give engineers the time to move and start building before we call this builder again.
     IsPlattonBuildDelayed = function(self, DelayEqualBuildPlattons)
         if DelayEqualBuildPlattons then

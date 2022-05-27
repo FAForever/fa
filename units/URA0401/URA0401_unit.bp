@@ -103,6 +103,8 @@ UnitBlueprint {
         'GROUNDATTACK',
         'NEEDMOBILEBUILD',
         'ANTIAIR',
+        'COUNTERINTELLIGENCE',
+        'STEALTH',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DRAGBUILD',
@@ -129,6 +131,7 @@ UnitBlueprint {
     Display = {
         Abilities = {
             '<LOC ability_aa>Anti-Air',
+            '<LOC ability_personalstealth>Personal Stealth',
         },
         AnimationDeath = {
             {
@@ -211,6 +214,7 @@ UnitBlueprint {
         BuildCostEnergy = 480000,
         BuildCostMass = 34000,
         BuildTime = 56250,
+        MaintenanceConsumptionPerSecondEnergy = 600,
     },
     Footprint = {
         MaxSlope = 0.25,
@@ -236,12 +240,22 @@ UnitBlueprint {
         },
         FactionName = 'Cybran',
         Icon = 'air',
+        OrderOverrides = {
+            RULEUTC_StealthToggle = {
+                bitmapId = 'stealth-personal',
+                helpText = 'toggle_stealth_personal',
+            },
+        },
         TechLevel = 'RULEUTL_Experimental',
+        ToggleCaps = {
+            RULEUTC_StealthToggle = true,
+        },
         UnitName = '<LOC ura0401_name>Soul Ripper',
         UnitWeight = 1,
     },
     Intel = {
         VisionRadius = 46,
+        RadarStealth = true,
     },
     Interface = {
         HelpText = '<LOC ura0401_help>Siege Assault Gunship',
@@ -337,8 +351,10 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
+                'ANTIAIR',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'TECH1 MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
@@ -407,8 +423,10 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
+                'ANTIAIR',
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'TECH1 MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
@@ -478,8 +496,7 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.6,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
+                '(AIR * MOBILE - INTELLIGENCE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
@@ -550,8 +567,7 @@ UnitBlueprint {
             SlavedToBody = false,
             TargetCheckInterval = 0.6,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
+                '(AIR * MOBILE - INTELLIGENCE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
@@ -620,9 +636,11 @@ UnitBlueprint {
             RateOfFire = 1.5,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'TECH1 MOBILE',
-                'TECH2 MOBILE',
+                'ANTIAIR',
                 'TECH3 MOBILE',
+                'TECH2 MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'TECH1 MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -691,9 +709,11 @@ UnitBlueprint {
             RateOfFire = 1.5,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'TECH1 MOBILE',
-                'TECH2 MOBILE',
+                'ANTIAIR',
                 'TECH3 MOBILE',
+                'TECH2 MOBILE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'TECH1 MOBILE',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

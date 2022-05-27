@@ -40,11 +40,11 @@ end
 function SetPlayableArea(rect)
     ReclaimChanged = true
     PlayableArea = rect
-    
+
     local newReclaim = {}
     local newOutsidePlayableAreaReclaim = {}
     local ReclaimLists = {Reclaim, OutsidePlayableAreaReclaim}
-    for _,reclaimList in ReclaimLists do 
+    for _,reclaimList in ReclaimLists do
         for id,r in reclaimList do
             r.inPlayableArea = InPlayableArea(r.position)
             if r.inPlayableArea then

@@ -221,7 +221,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CollideFriendly = false,
             CountedProjectile = true,
-            Damage = 30,
+            Damage = 30000,
             DamageType = 'Normal',
             DisplayName = 'EMP Anti Nuke',
             EffectiveRadius = 90,

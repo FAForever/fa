@@ -62,6 +62,7 @@ UnitBlueprint {
         'STEALTH',
         'SUBMERSIBLE',
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
+        'SNIPEMODE',
     },
     CollisionOffsetY = -0.375,
     Defense = {
@@ -265,8 +266,13 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'SUBMERSIBLE',
-                'MOBILE',
-                'STRUCTURE DEFENSE',
+                'LIGHTBOAT TECH2',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE - ANTIAIR)',
+                '(TECH2 * MOBILE * NAVAL - CRUISER)',
+                'MOBILE ANTINAVY',
+                'MOBILE TECH3',
+                'MOBILE TECH2',
+                'MOBILE TECH1',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',

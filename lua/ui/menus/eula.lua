@@ -17,14 +17,14 @@ function CreateEULA(inParent, callback)
     local parent = Group(inParent)
     LayoutHelpers.FillParent(parent, inParent)
     parent.Depth:Set(GetFrame(0):GetTopmostDepth() + 10)
-    
+
     local worldCover = UIUtil.CreateWorldCover(parent, '00000000')
-    
+
     local bg = Bitmap(parent, UIUtil.UIFile('/scx_menu/eula/eula.dds'))
     LayoutHelpers.AtCenterIn(bg, parent)
-    
+
     bg.brackets = UIUtil.CreateDialogBrackets(bg, 40, 25, 40, 24)
-    
+
     local exitButton = UIUtil.CreateButtonStd(bg, '/scx_menu/small-btn/small', "<LOC _Close>", 16, 2)
     exitButton.OnClick = function(self)
         parent:Destroy()
@@ -32,23 +32,23 @@ function CreateEULA(inParent, callback)
             callback()
         end
     end
-    
+
     UIUtil.MakeInputModal(parent, function() exitButton.OnClick(exitButton) end, function() exitButton.OnClick(exitButton) end)
-    
+
     local title = UIUtil.CreateText(bg, "<LOC EULA_TITLE>End User License Agreement", 20)
     LayoutHelpers.AtHorizontalCenterIn(title, bg)
     LayoutHelpers.AtTopIn(title, bg, 35)
 
     LayoutHelpers.AtBottomIn(exitButton, bg, 25)
     LayoutHelpers.AtHorizontalCenterIn(exitButton, bg)
-    
+
     local eulaBody = ItemList(bg)
     LayoutHelpers.AtLeftTopIn(eulaBody, bg, 30, 84)
     LayoutHelpers.SetDimensions(eulaBody, 630, 402)
     eulaBody:SetColors(UIUtil.consoleFGColor(), UIUtil.consoleTextBGColor(), UIUtil.consoleFGColor(), UIUtil.consoleTextBGColor()) -- we don't really want selection here so don't differentiate colors
     eulaBody:SetFont(UIUtil.bodyFont, 12)
     UIUtil.CreateVertScrollbarFor(eulaBody)
-    
+
     local eulaText = import('/lua/ui/help/eula.lua').EULA
     local textBoxWidth = eulaBody.Width()
 
@@ -56,7 +56,7 @@ function CreateEULA(inParent, callback)
     function(text)
         return eulaBody:GetStringAdvance(text)
     end)
-    
+
     for i, v in tempTable do
         eulaBody:AddItem(v)
     end

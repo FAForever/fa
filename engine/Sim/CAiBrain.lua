@@ -266,8 +266,8 @@ end
 
 --- Returns list of units by category.
 -- @param category Unit's category, example: categories.TECH2 .
--- @param needToBeIdle true/false Unit has to be idle.
--- @param requireBuilt true/false defaults to false which excludes units that are NOT finished.
+-- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
+-- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
 -- @return tblUnits Table containing units.
 function CAiBrain:GetListOfUnits(category,  needToBeIdle,  requireBuilt)
 end
@@ -408,8 +408,9 @@ function CAiBrain:PlatoonExists(platoon)
 end
 
 --- Remove an army stats trigger.
--- TODO.
-function CAiBrain:RemoveArmyStatsTrigger()
+-- @param statName String, army's stat, example: "Economy_Ratio_Mass".
+-- @param triggerName String, unique name of the trigger.
+function CAiBrain:RemoveArmyStatsTrigger(statName, triggerName)
 end
 
 --- Sets army's stat to value.

@@ -21,7 +21,7 @@ errorMsg = {
 
 local invalidCharSet = {
     [9] = true,    -- tab
-    [92] = true,   -- \  
+    [92] = true,   -- \
     [47] = true,   -- /
     [58] = true,   -- :
     [42] = true,   -- *
@@ -98,8 +98,8 @@ function IsFilenameInvalid(filename)
     -- check for nil
     if not filename then
         return 'zero'
-    end    
-    
+    end
+
     local len = STR_Utf8Len(filename)
 
     -- check length
@@ -123,12 +123,12 @@ function IsFilenameInvalid(filename)
     if lastChar == " " or lastChar == "." then
         return 'invalidlast'
     end
-    
+
     local firstChar = string.sub(filename, 1, 1)
     if firstChar == " " or firstChar == "." then
         return 'invalidlast'
     end
-    
+
     -- check for invalid names
     if invalidNameSet[string.upper(filename)] then
         return 'invalidname'
@@ -140,15 +140,15 @@ end
 FilePicker = Class(Group) {
     __init = function(self, parent, fileType, onlyShowMine, selectAction, debugName)
         Group.__init(self, parent)
-        self:SetName(debugName or "FilePicker")            
-        
+        self:SetName(debugName or "FilePicker")
+
         self._fileType = fileType
         self._selectAction = selectAction
-        
+
         self._hasSelection = false
-        
+
         self._sortby = {field = 'name', ascending = true}
-        
+
 --[[---------------------------------------------------------------------------
         LAYOUT
 --]]----------------------------------------------------------------------------
@@ -167,32 +167,32 @@ FilePicker = Class(Group) {
 
         self._filenameLabel = UIUtil.CreateText(self, "<LOC uifilepicker_0000>Filename", 16, UIUtil.titleFont)
         LayoutHelpers.Above(self._filenameLabel, self._filenameEdit, 5)
-        
+
         self._filenameErrorMsg = UIUtil.CreateText(self, "", 16, UIUtil.titleFont)
         LayoutHelpers.RightOf(self._filenameErrorMsg, self._filenameLabel, 5)
-        
+
         if not onlyShowMine then
             self._onlyMineCheckbox = UIUtil.CreateCheckboxStd(self, '/dialogs/check-box_btn/radio')
             LayoutHelpers.AtTopIn(self._onlyMineCheckbox, self, -30)
             LayoutHelpers.AtRightIn(self._onlyMineCheckbox, self)
-            
+
             self._onlyMineLabel = UIUtil.CreateText(self, "<LOC uifilepicker_0001>Show only my files", 12, UIUtil.titleFont)
             LayoutHelpers.CenteredLeftOf(self._onlyMineLabel, self._onlyMineCheckbox)
         end
-        
+
         self._filelist = Group(self)
         LayoutHelpers.AtLeftTopIn(self._filelist, self, 0, 20)
         LayoutHelpers.AnchorToTop(self._filelist, self._filenameLabel, 5)
         self._filelist.Width:Set(function() return self.Width() - 2 end)
         self._filelist.top = 0
-        
+
         self._tabs = {}
-        
+
         ForkThread(function()
             self._filelistObjects = {}
-            
+
             self._filelist.CreateOptionElements = function()
-                if table.getn(self._filelistObjects) > 0 then
+                if not table.empty(self._filelistObjects) then
                     for i, v in self._filelistObjects do
                         v:Destroy()
                     end
@@ -210,7 +210,7 @@ FilePicker = Class(Group) {
                     self._filelistObjects[index].Width:Set(function() return self._filelist.Width() - 5 end)
                     self._filelistObjects[index].Depth:Set(function() return self._filelist.Depth() + 10 end)
                     self._filelistObjects[index].selected = false
-                    
+
                     for i, tab in self._tabs do
                         self._filelistObjects[index][tab.tabData.key] = UIUtil.CreateText(self._filelistObjects[index], '', 14, UIUtil.bodyFont)
                         self._filelistObjects[index][tab.tabData.key].Left:Set(tab.Left)
@@ -218,7 +218,7 @@ FilePicker = Class(Group) {
                         self._filelistObjects[index][tab.tabData.key]:SetClipToWidth(true)
                         LayoutHelpers.AtVerticalCenterIn(self._filelistObjects[index][tab.tabData.key], self._filelistObjects[index])
                     end
-                    
+
                     self._filelistObjects[index].HandleEvent = function(control, event)
                         if event.Type == 'MouseEnter' then
                             if self._hasSelection == control.index then
@@ -268,10 +268,10 @@ FilePicker = Class(Group) {
                         end
                     end
                 end
-                
+
                 CreateElement(1)
                 LayoutHelpers.AtLeftTopIn(self._filelistObjects[1], self._filelist, 0, 10)
-                    
+
                 local index = 2
                 while self._filelistObjects[table.getsize(self._filelistObjects)].Bottom() + self._filelistObjects[1].Height() < self._filelist.Bottom() do
                     CreateElement(index)
@@ -281,13 +281,13 @@ FilePicker = Class(Group) {
             end
             self:SetTabConfiguration(1)
             self._filelist.CreateOptionElements()
-                    
+
             local numLines = function() return table.getsize(self._filelistObjects) end
-            
+
             local function DataSize()
                 return table.getsize(self._currentFiles)
             end
-            
+
             -- called when the scrollbar for the control requires data to size itself
             -- GetScrollValues must return 4 values in this order:
             -- rangeMin, rangeMax, visibleMin, visibleMax
@@ -297,17 +297,17 @@ FilePicker = Class(Group) {
                 --LOG(size, ":", self.top, ":", math.min(self._filelist.top + numLines(), size))
                 return 0, size, self._filelist.top, math.min(self._filelist.top + numLines(), size)
             end
-        
+
             -- called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)
             self._filelist.ScrollLines = function(control, axis, delta)
                 control:ScrollSetTop(axis, self._filelist.top + math.floor(delta))
             end
-        
+
             -- called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)
             self._filelist.ScrollPages = function(control, axis, delta)
                 control:ScrollSetTop(axis, self._filelist.top + math.floor(delta) * numLines())
             end
-        
+
             -- called when the scrollbar wants to set a new visible top line
             self._filelist.ScrollSetTop = function(control, axis, top)
                 top = math.floor(top)
@@ -316,7 +316,7 @@ FilePicker = Class(Group) {
                 control.top = math.max(math.min(size - numLines() , top), 0)
                 control:CalcVisible()
             end
-        
+
             -- called to determine if the control is scrollable on a particular access. Must return true or false.
             self._filelist.IsScrollable = function(control, axis)
                 return true
@@ -364,10 +364,10 @@ FilePicker = Class(Group) {
                     end
                 end
             end
-            
-            
+
+
             self._filelist:CalcVisible()
-            
+
             self._filelist.HandleEvent = function(control, event)
                 if event.Type == 'WheelRotation' then
                     local lines = 1
@@ -377,7 +377,7 @@ FilePicker = Class(Group) {
                     control:ScrollLines(nil, lines)
                 end
             end
-            
+
             UIUtil.CreateVertScrollbarFor(self._filelist)
             self._filenameEdit:SetFont(UIUtil.bodyFont, 14)
             if self._onlyMineCheckbox then
@@ -393,13 +393,13 @@ FilePicker = Class(Group) {
             self._filenameEdit:SetText(self._currentFiles[row + 1][2])
             self._currentProfile = self._currentFiles[row + 1][1]
         end
-        
+
         self._filelist.OnDoubleClick = function(control, row)
             self._filelistObjects.OnClick(control, row)
             self:DoSelectBehavior()
         end
-        
-                
+
+
         self._filenameEdit.OnCharPressed = function(control, charcode)
             if IsCharInvalid(charcode) then
                 local sound = Sound({Cue = 'UI_Menu_Error_01', Bank = 'Interface',})
@@ -416,13 +416,13 @@ FilePicker = Class(Group) {
                 return false
             end
         end
-        
+
         self._filenameEdit.OnTextChanged = function(control, newText, oldText)
             if self._filelistObjects then
                 local isNotExisting = true
                 for i, v in self._filelistObjects do
                     if newText == v.name:GetText() and self._selectedIndex == i then
-                        if not v:IsDisabled() then 
+                        if not v:IsDisabled() then
                             v:SetSolidColor('ffbbbbbb')
                             v.name:SetColor('ff000000')
                             v.date:SetColor('ff000000')
@@ -432,7 +432,7 @@ FilePicker = Class(Group) {
                         end
                         isNotExisting = false
                     else
-                        if not v:IsDisabled() then 
+                        if not v:IsDisabled() then
                             v:SetSolidColor(v.baseColor)
                             v.name:SetColor(UIUtil.fontColor)
                             v.date:SetColor(UIUtil.fontColor)
@@ -455,7 +455,7 @@ FilePicker = Class(Group) {
                 self._filenameErrorMsg:SetText("")
             end
         end
-        
+
         self._filenameEdit.OnEnterPressed = function(control, text)
             self._currentProfile = nil
             self:DoSelectBehavior()
@@ -466,7 +466,7 @@ FilePicker = Class(Group) {
         if not onlyShowMine then
             self._onlyMineCheckbox.OnCheck = function(control, checked)
                 local tabConfigID = 1
-                if not checked then 
+                if not checked then
                     tabConfigID = 2
                 end
                 self:SetTabConfiguration(tabConfigID)
@@ -479,7 +479,7 @@ FilePicker = Class(Group) {
     end,
 
     SetTabConfiguration = function(self, configID)
-        if table.getn(self._tabs) > 0 then
+        if not table.empty(self._tabs) then
             for index, tab in self._tabs do
                 tab:Destroy()
             end
@@ -487,28 +487,28 @@ FilePicker = Class(Group) {
         self._tabs = {}
         local function CreateTab(data)
             local btn = Bitmap(self, UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_m.dds'))
-            
+
             btn.lcap = Bitmap(btn, UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_l.dds'))
             btn.lcap.Depth:Set(btn.Depth)
             LayoutHelpers.LeftOf(btn.lcap, btn)
-            
+
             btn.rcap = Bitmap(btn, UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_r.dds'))
             btn.rcap.Depth:Set(btn.Depth)
             LayoutHelpers.RightOf(btn.rcap, btn)
-            
+
             btn.text = UIUtil.CreateText(btn, data.title, 18)
             btn.text:DisableHitTest()
             LayoutHelpers.AtLeftIn(btn.text, btn, 18)
             LayoutHelpers.AtVerticalCenterIn(btn.text, btn, 2)
-            
+
             btn.arrow = Bitmap(btn, UIUtil.UIFile('/dialogs/sort_btn/sort-arrow-down_bmp.dds'))
             btn.arrow:DisableHitTest()
             LayoutHelpers.AtLeftIn(btn.arrow, btn.lcap, 4)
             LayoutHelpers.AtVerticalCenterIn(btn.arrow, btn.lcap)
             btn.arrow:Hide()
-            
+
             btn._checked = false
-            
+
             return btn
         end
         for index, tabData in columConfigurations[configID] do
@@ -537,7 +537,7 @@ FilePicker = Class(Group) {
                 control.rcap:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort_btn_up_r.dds'))
                 control.arrow:Hide()
             end
-            if tabData.sortby then 
+            if tabData.sortby then
                 self._tabs[i]._sortKey = tabData.sortby
                 self._tabs[i].OnClick = function(control, event)
                     control.arrow:Show()
@@ -545,7 +545,7 @@ FilePicker = Class(Group) {
                     self._hasSelection = false
                     self._sortby.field = control._sortKey
                     if control._checked then
-                        self._sortby.ascending = not self._sortby.ascending 
+                        self._sortby.ascending = not self._sortby.ascending
                     end
                     if self._sortby.ascending then
                         control.arrow:SetTexture(UIUtil.UIFile('/dialogs/sort_btn/sort-arrow-down_bmp.dds'))
@@ -583,7 +583,7 @@ FilePicker = Class(Group) {
             end
         end
     end,
-        
+
     DoSelectBehavior = function(self)
         local err = IsFilenameInvalid(self._filenameEdit:GetText())
         if err then
@@ -594,19 +594,19 @@ FilePicker = Class(Group) {
             end
             return false
         end
-        
+
         self._filenameErrorMsg:SetText("")
-    
+
         if self._selectAction then
             self._selectAction(self, self:GetFileInfo())
         end
-    
+
         return true
     end,
 
     RepopulateList = function(self)
         local filesData = GetSpecialFiles(self._fileType)
-        
+
         self._currentDir = filesData.directory
         self._currentExt = filesData.extension
 
@@ -650,24 +650,24 @@ FilePicker = Class(Group) {
             self._filelist:CalcVisible()
         end
     end,
-    
+
     SetFilename = function(self, newText, profile)
         self._currentProfile = profile or Prefs.GetCurrentProfile().Name
         self._filenameEdit:SetText(newText)
     end,
-    
+
     GetProfile = function(self)
         return self._currentProfile or Prefs.GetCurrentProfile().Name
     end,
-    
+
     GetBaseName = function(self)
         return self._filenameEdit:GetText()
     end,
-    
+
     GetExtension = function(self)
         return self._currentExt
     end,
-    
+
     GetDirectory = function(self)
         return self._currentDir
     end,

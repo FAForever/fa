@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 45, --RadarRadius
+        GuardScanRadius = 26, -- Weapon range so that the scout doesn't suicide when attack moved into T1 tanks that are not Aurora
     },
     Audio = {
         AmbientMove = Sound {
@@ -120,7 +120,7 @@ UnitBlueprint {
     Economy = {
         BuildCostEnergy = 80,
         BuildCostMass = 12,
-        BuildTime = 80,
+        BuildTime = 60,
         MinBuildTime = 100,
         TeleportEnergyMod = 0.15,
         TeleportMassMod = 1,
@@ -172,7 +172,7 @@ UnitBlueprint {
         },
         DragCoefficient = 0.2,
         MaxAcceleration = 4.5,
-        MaxBrake = 4.5,
+        MaxBrake = 9,
         MaxSpeed = 4.5,
         MaxSpeedReverse = 4.5,
         MaxSteerForce = 1000,
@@ -224,7 +224,7 @@ UnitBlueprint {
             },
             FiringTolerance = 2,
             Label = 'MainGun',
-            MaxRadius = 25,
+            MaxRadius = 26,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 25,
@@ -250,7 +250,7 @@ UnitBlueprint {
             TargetCheckInterval = 1,
             TargetPriorities = {
                 'MOBILE',
-                'STRUCTURE DEFENSE',
+                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',

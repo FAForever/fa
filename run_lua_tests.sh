@@ -1,28 +1,14 @@
 #!/bin/bash
 
-# Ubuntu has luac5.2 instead
-[ -z "$LUAC" ] && LUAC="luac"
-
-# Simple lua code syntax checker using luac
-
-preprocess_gpg_lua() {
-  file="$1"
-  
-  # 1. GPG-style comments and copyright unicode symbol
-  # 2. C-style equality
-  # 3. C-style continue 
-
-  sed -e "s:^\(\([^\"'#]\|\(\"\|'\)[^\"'#]*\3\)*\)#\(.\|\xa9\)*$:\1:g" \
-      -e 's:\!\=:\~\=:g' \
-      -e 's:\(\bcontinue\b\):\1\(\):g' \
-      "$file"
-}
+# Simple lua code syntax checker using https://github.com/FAForever/lua-lang
+# Assumes that FAF lua is installed as `luac`
 
 had_error=0
+files_checked=0
 check_file() {
   file="$1"
-  
-  output="$(luac -p <(preprocess_gpg_lua "$file") 2>&1 \
+
+  output="$(luac -p "$file" 2>&1 \
     | sed "s:/dev/fd/[0-9]\+:$file:g")"
 
   if [[ $output != "" ]]; then
@@ -31,14 +17,26 @@ check_file() {
   fi
 }
 
-for file in `find . \( -path ./engine -o -path ./testmaps \) -prune -o -name '*.lua' -o -name '*.bp'`; do
-  check_file "$file"
-done
+# Some files have spaces in their name so we use this syntax to make sure the
+# output from `find` is split by line.
+while read file; do
+
+  # file contains table pre-allocation synax ( {&1&4} ) that is not supported at the moment
+  if [ "$file" != "./lua/lazyvar.lua" ]; then 
+    check_file "$file"
+    (( files_checked++ ))
+  fi
+done < <(find . -type d \( -path ./testmaps -o -path ./engine \) -prune -false -o -name '*.lua' -o -name '*.bp')
+
+echo "Checked $files_checked files"
 
 if [[ $had_error != 0 ]]; then
   echo "Syntax errors detected."
+  exit $had_error
 else
   echo "Syntax OK."
 fi
 
-exit $had_error
+pushd tests && lua test_utils.lua && popd
+pushd tests && lua test_stringmatch.lua && popd
+pushd tests && lua test_class.lua && popd

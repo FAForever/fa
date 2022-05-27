@@ -1,0 +1,37 @@
+PropBlueprint {
+    Categories = {
+        'RECLAIMABLE',
+    },
+    Defense = {
+        Health = 50,
+        MaxHealth = 50,
+    },
+    Display = {
+        Mesh = {
+            IconFadeInZoom = 4,
+            LODs = {
+                {
+
+                    # share other rock's albedo and specteam
+                    LODCutoff = 800,
+                    ShaderName = 'NormalMappedTerrain',
+                },
+            },
+        },
+        UniformScale = 0.06,
+    },
+    Economy = {
+        ReclaimEnergyMax = '',
+        ReclaimMassMax = 80,
+        ReclaimTime = 6,
+    },
+    Interface = {
+        HelpText = 'A Torii Gate',
+    },
+    Physics = {
+        BlockPath = false,
+    },
+    SizeX = 1.0,
+    SizeY = 6.0,
+    SizeZ = 6.0,
+}

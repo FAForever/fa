@@ -6,25 +6,19 @@
 --  Summary  :  Thuntho Artillery Shell Projectile script
 --              Seraphim T1 Artillery : XSL0103
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
+
+-- cache for re-using of memory
+local VectorCached = Vector(0, 0, 0)
+
+-- upvalue for performance
+local Random = Random 
+local CreateDecal = CreateDecal
+
+local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
+
 local SThunthoArtilleryShell2 = import('/lua/seraphimprojectiles.lua').SThunthoArtilleryShell2
 
-SIFThunthoArtilleryShell02 = Class(SThunthoArtilleryShell2) {
-    OnImpact = function(self, targetType, targetEntity) 
-        if targetType ~= 'Shield' and targetType ~= 'Water' and targetType ~= 'Air' and targetType ~= 'UnitAir' and targetType ~= 'Projectile' then
-            local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
-            local rotation = RandomFloat(0,2*math.pi)
-            local pos = self:GetPosition()
-            local radius = self.DamageData.DamageRadius
-            local army = self.Army
-            
-            DamageArea( self, pos, radius, 1, 'Force', true )
-            DamageArea( self, pos, radius, 1, 'Force', true )
-            CreateDecal(pos, rotation, 'crater_radial01_albedo', '', 'Albedo', radius-1, radius-1, 100, 10, army)
-        end
-        
-        SThunthoArtilleryShell2.OnImpact(self, targetType, targetEntity)
-    end,
-}
+SIFThunthoArtilleryShell02 = Class(SThunthoArtilleryShell2) { }
 TypeClass = SIFThunthoArtilleryShell02

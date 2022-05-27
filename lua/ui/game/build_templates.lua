@@ -13,7 +13,7 @@ function CreateBuildTemplate()
     GenerateBuildTemplateFromSelection()
     local template = GetActiveBuildTemplate()
     ClearBuildTemplates()
-    if table.getsize(template) > 0 then
+    if not table.empty(template) then
         AddTemplate(template)
     end
 end

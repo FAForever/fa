@@ -55,7 +55,7 @@ function CreateDialog(army,section)
     statList:SetFont('Andale Mono', 12)
     statList:SetColors('FFFFFFFF','00000000','FFFFFF00','FF0000FF')
     local sb = UIUtil.CreateVertScrollbarFor(statList)
-    sb.Left:Set(statusCluster.Left)    
+    sb.Left:Set(statusCluster.Left)
 
     function dialog.OnFrame(self,elapsed)
         local add = false

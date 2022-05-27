@@ -24,13 +24,6 @@ local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
-local Game = import('/lua/game.lua')   ----added for CBFP
-local DefaultBuffField = import('/lua/DefaultBuffField.lua').DefaultBuffField     ----added for CBFP
-
-SeraphimBuffField = Class(DefaultBuffField) {     ----added for CBFP
-    FieldVisualEmitter = '/effects/emitters/seraphim_regenerative_aura_01_emit.bp',     ----added for CBFP
-}
-
 SANAnaitTorpedo = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.SAnaitTorpedoMuzzleFlash,
 }
@@ -106,7 +99,7 @@ SDFThauCannon = Class(DefaultProjectileWeapon) {
         DefaultProjectileWeapon.PlayFxMuzzleSequence(self, muzzle)
         local pos = self.unit:GetPosition()
         local TerrainType = GetTerrainType(pos.x,pos.z)
-        local effectTable = TerrainType.FXOther[self.unit:GetCurrentLayer()][self.FxMuzzleTerrainTypeName]
+        local effectTable = TerrainType.FXOther[self.unit.Layer][self.FxMuzzleTerrainTypeName]
         if effectTable ~= nil then
             local army = self.unit.Army
             for k, v in effectTable do

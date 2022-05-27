@@ -33,6 +33,8 @@ local Text = import('/lua/maui/text.lua').Text
 local TextArea = import('/lua/ui/controls/textarea.lua').TextArea
 local Border = import('/lua/ui/controls/border.lua').Border
 
+local utils = import('/lua/system/utils.lua')
+
 local Trueskill = import('/lua/ui/lobby/trueskill.lua')
 local round = Trueskill.round
 local Player = Trueskill.Player
@@ -45,11 +47,15 @@ local SetUtils = import('/lua/system/setutils.lua')
 local JSON = import('/lua/system/dkson.lua').json
 local UnitsAnalyzer = import('/lua/ui/lobby/UnitsAnalyzer.lua')
 local Changelog = import('/lua/ui/lobby/changelog.lua')
+local UTF =  import('/lua/UTF.lua')
 -- Uveso - aitypes inside aitypes.lua are now also available as a function.
 local aitypes
 local AIKeys = {}
 local AIStrings = {}
 local AITooltips = {}
+
+
+
 
 function GetAITypes()
     AIKeys = {}
@@ -66,7 +72,6 @@ GetAITypes()
 
 --This is a special table that allows us to pass data to blueprints.lua, before the rest of the game is loaded.
 -- do not use this for anything that doesnt do blueprint modding, use GameOptions for that instead, which will load it into sim.
-PreGameData = {}
 
 local IsSyncReplayServer = false
 
@@ -80,6 +85,7 @@ local globalOpts = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
 local teamOpts = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 local AIOpts = import('/lua/ui/lobby/lobbyOptions.lua').AIOpts
 local gameColors = import('/lua/gameColors.lua').GameColors
+
 local numOpenSlots = LobbyComm.maxPlayerSlots
 
 -- Add lobby options from AI mods
@@ -131,6 +137,8 @@ teamIcons = {
     '/lobby/team_icons/team_4_icon.dds',
     '/lobby/team_icons/team_5_icon.dds',
     '/lobby/team_icons/team_6_icon.dds',
+    '/lobby/team_icons/team_7_icon.dds',
+    '/lobby/team_icons/team_8_icon.dds',
 }
 
 DebugEnabled = Prefs.GetFromCurrentProfile('LobbyDebug') or ''
@@ -141,10 +149,6 @@ CurrentConnection = {} -- by Name
 ConnectionEstablished = {} -- by Name
 ConnectedWithProxy = {} -- by UID
 
--- The set of available colours for each slot. Each index in this table contains the set of colour
--- values that may appear in its combobox. Keys in the sub-tables are indexes into allColours,
--- values are the colour values.
-availableColours = {}
 
 allAvailableFactionsList = {}
 
@@ -234,7 +238,7 @@ local GUI = false
 local localPlayerID = false
 local gameInfo = false
 local pmDialog = false
-local lastKickMessage = Prefs.GetFromCurrentProfile('lastKickMessage') or ""
+local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")
 
 local defaultMode =(HasCommandLineArg("/windowed") and "windowed") or Prefs.GetFromCurrentProfile('options').primary_adapter
 local windowedMode = defaultMode == "windowed" or (HasCommandLineArg("/windowed"))
@@ -452,7 +456,20 @@ function GetLocalPlayerData()
 )
 end
 
-function GetAIPlayerData(name, AIPersonality)
+function GetAIPlayerData(name, AIPersonality, slot)
+   local AIColor
+   -- gets the color of the player/AI occupying the slot directly prior if available
+    for i = 1, LobbyComm.maxPlayerSlots do
+        if gameInfo.PlayerOptions[i].StartSpot == slot then
+            if IsColorFree(gameInfo.PlayerOptions[i].PlayerColor, slot) then
+                AIColor =  gameInfo.PlayerOptions[i].PlayerColor
+            end
+            break
+        end
+    end
+    if not AIColor then
+        AIColor = GetAvailableColor()
+    end
     return PlayerData(
         {
             OwnerID = hostID,
@@ -460,6 +477,8 @@ function GetAIPlayerData(name, AIPersonality)
             Ready = true,
             Human = false,
             AIPersonality = AIPersonality,
+            PlayerColor = AIColor,
+            ArmyColor = AIColor,
         }
 )
 end
@@ -517,7 +536,7 @@ local function DoSlotBehavior(slot, key, name)
                 lobbyComm:EjectPeer(gameInfo.PlayerOptions[slot].OwnerID, msg)
 
                 -- Save message for next time
-                Prefs.SetToCurrentProfile('lastKickMessage', str)
+                Prefs.SetToCurrentProfile('lastKickMessage', UTF.EscapeString(str))
                 lastKickMessage = str
             end
 
@@ -840,28 +859,106 @@ function GetPlayerDisplayName(playerInfo)
     end
 end
 
---- Players with a higher deviation have their rating colour tarnished, to make smurfs easier to
--- detect.
-function GetRatingColour(deviation)
-    if deviation < 100 then
-        return "ffffffff"
+-- Refresh (with a sledgehammer) all the items in the observer list.
+local function refreshObserverList()
+    GUI.observerList:DeleteAllItems()
+
+    -- create the table that will hold the data for displaying team rating information
+    local teamRatings = {}
+    local numTeams = 0
+    -- calculate/display team ratings if spawns are fixed
+    if gameInfo.GameOptions['TeamSpawn'] == 'fixed' then
+
+        -- cycle through each player
+        for i, player in gameInfo.PlayerOptions:pairs() do
+
+            -- get the team number (which is 1 higher on the backend)
+            local team = player.Team - 1
+            -- add the player's rating information if the player is on a team
+            if team > 0 then
+                -- make sure the team is included in the teamRatings table
+                if teamRatings[team] == nil  then
+                    -- initialize the team's rating in this table as having 0 mean and 0 deviation, respectively
+                    teamRatings[team] = {0, 0}
+                end
+                -- add the player's rating information (mean and deviation) to the its team's totals
+                teamRatings[team] = {teamRatings[team][1] + player.MEAN, teamRatings[team][2] + player.DEV}
+            end
+        end
+
+        for i, team in teamRatings do
+            numTeams = numTeams + 1
+        end
+
+        -- if there are 1 or 2 teams, list them before observers
+        if numTeams == 1 or numTeams == 2 then
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
+            end
+            for i, rating in teamRatings do
+                GUI.observerList:AddItem(
+                    LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+                )
+            end
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem('')
+            end
+        end
     end
 
-    if deviation > 150 then
-        return "ff333333"
+
+    local observers = false
+
+    for slot, observer in gameInfo.Observers:pairs() do
+
+        if not observers then
+           observers = true
+            if not lobbyComm:IsHost() then
+                GUI.observerList:AddItem(LOC('<LOC lobui_0275>Observers')..':')
+            end
+        end
+
+        observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
+
+        -- Create a label for this observer of the form:
+        -- PlayerName (R:xxx, P:xxx, C:xxx)
+        -- Such conciseness is necessary as the field in the UI is rather narrow...
+        local observer_label = observer.PlayerName .. " (R:" .. observer.PL
+
+        -- Add the ping only if this entry refers to a different client.
+        if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
+            local peer = lobbyComm:GetPeer(observer.OwnerID)
+
+            local ping = 0
+            if peer.ping ~= nil then
+                ping = math.floor(peer.ping)
+            end
+
+            observer_label = observer_label .. ", P:" .. ping
+        end
+
+        -- Add the CPU score if one is available.
+        local score_CPU = CPU_Benchmarks[observer.PlayerName]
+        if score_CPU then
+            observer_label = observer_label .. ", C:" .. score_CPU
+        end
+        observer_label = observer_label .. ")"
+
+        GUI.observerList:AddItem(observer_label)
     end
 
-    -- Linear scale of greyness in between.
-
-    -- Fraction of the way between 100 and 150 we are.
-    local greynessFraction = (deviation - 100) / 50
-
-    -- Grey colour value we want (value between 0 and 255). 51 is 0x33.
-    local greyness = 51 + (1 - greynessFraction) * 204
-
-    -- Shoehorn that into a colour value string. Madly, because Lua.
-    local value = string.format('%02x', greyness)
-    return "ff" .. value .. value .. value
+    -- if there are more than 2 teams (and slots are fixed), list them after observers
+    if numTeams > 2 then
+        if not lobbyComm:IsHost() then
+            GUI.observerList:AddItem('')
+            GUI.observerList:AddItem(LOC('<LOC lobui_0702>Team Ratings:'))
+        end
+        for i, rating in teamRatings do
+            GUI.observerList:AddItem(
+                LOCF('<LOC lobui_0703>Team %d: %d (%d+/-%d)', i, math.round(rating[1] - rating[2] * 3), math.round(rating[1]), math.round(rating[2] * 3))
+            )
+        end
+    end
 end
 
 local WVT = import('/lua/ui/lobby/data/watchedvalue/watchedvaluetable.lua')
@@ -876,8 +973,8 @@ function SetSlotInfo(slotNum, playerInfo)
         GUI.connectdialog = nil
 
         -- Changelog, if necessary.
-        if Changelog.NeedChangelog() then
-            Changelog.CreateUI(GUI)
+        if Changelog.OpenChangelog() then
+            Changelog.Changelog(GetFrame(0))
         end
     end
 
@@ -960,7 +1057,7 @@ function SetSlotInfo(slotNum, playerInfo)
         local slotKeys, slotStrings, slotTooltips = GetSlotMenuTables(slotState, hostKey, slotNum)
         slot.name.slotKeys = slotKeys
 
-        if table.getn(slotKeys) > 0 then
+        if not table.empty(slotKeys) then
             slot.name:AddItems(slotStrings)
             slot.name:Enable()
             Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -977,7 +1074,7 @@ function SetSlotInfo(slotNum, playerInfo)
 
     slot.ratingText:Show()
     slot.ratingText:SetText(playerInfo.PL)
-    slot.ratingText:SetColor(GetRatingColour(playerInfo.DEV))
+    slot.ratingText:SetColor("ffffffff")
 
     -- dynamic tooltip to show rating and deviation for each player
     local tooltipText = {}
@@ -1078,6 +1175,7 @@ function SetSlotInfo(slotNum, playerInfo)
     if isHost then
         HostUtils.RefreshButtonEnabledness()
     end
+    refreshObserverList()
 end
 
 function ClearSlotInfo(slotIndex)
@@ -1110,7 +1208,7 @@ function ClearSlotInfo(slotIndex)
     -- set the text appropriately
     slot.name:ClearItems()
     slot.name:SetTitleText(LOC(stateText))
-    if table.getn(slotKeys) > 0 then
+    if not table.empty(slotKeys) then
         slot.name.slotKeys = slotKeys
         slot.name:AddItems(slotStrings)
         Tooltip.AddComboTooltip(slot.name, slotTooltips)
@@ -1135,12 +1233,20 @@ function ClearSlotInfo(slotIndex)
     UpdateSlotBackground(slotIndex)
     ShowGameQuality()
     RefreshMapPositionForAllControls(slotIndex)
+    Check_Availaible_Color()
+    refreshObserverList()
 end
 
-function IsColorFree(colorIndex)
+function IsColorFree(colorIndex, currentSlotNumber)
     for id, player in gameInfo.PlayerOptions:pairs() do
         if player.PlayerColor == colorIndex then
-            return false
+            if currentSlotNumber then
+                if player.StartSpot != currentSlotNumber then
+                    return false
+                end
+            else
+                return false
+            end
         end
     end
 
@@ -1227,7 +1333,7 @@ local function autobalance_bestworst(players, teams_arg)
     end
 
     -- teams first picks best player and then worst player, repeat
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         for i, t in teams do
             local team = t['team']
             local slots = t['slots']
@@ -1266,7 +1372,7 @@ local function autobalance_avg(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots), sum=0})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         local first_team = true
         for i, t in teams do
             local team = t['team']
@@ -1310,7 +1416,7 @@ local function autobalance_rr(players, teams)
         i = i + 1
     end
 
-    while table.getsize(players) > 0 do
+    while not table.empty(players) do
         for i, pick in team_picks do
             local slot = table.remove(teams[pick.team], 1)
             if not slot then continue end
@@ -1338,7 +1444,7 @@ local function autobalance_random(players, teams_arg)
         table.insert(teams, {team=t, slots=table.deepcopy(slots)})
     end
 
-    while table.getn(players) > 0 do
+    while not table.empty(players) do
         for _, t in teams do
             local team = t['team']
             local slot = table.remove(t['slots'], 1)
@@ -2028,22 +2134,22 @@ local function TryLaunch(skipNoObserversCheck)
         -- Load in the default map options if they are not set manually
 
         -- Not all maps have options
-        if scenarioInfo.options then 
-      
-            -- If we don't validate them first then the people using the default 
+        if scenarioInfo.options then
+
+            -- If we don't validate them first then the people using the default
             -- as a value instead of the index of the value will mess us up
             MapUtil.ValidateScenarioOptions(scenarioInfo.options)
-      
+
             -- For every option, if it's not set yet then add its default value
-            for _, option in scenarioInfo.options do 
-                if not gameInfo.GameOptions[option.key] then 
+            for _, option in scenarioInfo.options do
+                if not gameInfo.GameOptions[option.key] then
                     -- When the value data of the option is formatted as:
                     -- values = {
-                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },		
-                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },	
-                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },	
+                    --     { text = "Easy", help = "We'll have sufficient time to start building up our defense strategy.", key = 1, },
+                    --     { text = "Normal", help = "There's sufficient time - but we'll need to hurry up.", key = 2, },
+                    --     { text = "Heroic", help = "There's little time - no space for errors.", key = 3, },
                     --     { text = "Legendary", help = "We're being dropped in the middle of it - we knew it was a suicide mission when we signed up for it.", key = 4, },
-                    -- },	
+                    -- },
                     local keyVersion = option.values[option.default].key
 
                     -- When the value data of the option is formatted as:
@@ -2056,7 +2162,7 @@ local function TryLaunch(skipNoObserversCheck)
                     gameInfo.GameOptions[option.key] = keyVersion or valueVersion
 
                     -- Can be removed once this code leaves the develop branch
-                    LOG("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
+                    SPEW("Loading default map option: " .. tostring (option.key) .. " = " .. tostring (gameInfo.GameOptions[option.key]))
                 end
             end
         end
@@ -2081,8 +2187,7 @@ local function TryLaunch(skipNoObserversCheck)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
-        PreGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
-        SetPreference('PreGameData',PreGameData)
+        -- launch the game
         lobbyComm:LaunchGame(gameInfo)
     end
 
@@ -2094,41 +2199,6 @@ local function AlertHostMapMissing()
         HostUtils.PlayerMissingMapAlert(localPlayerID)
     else
         lobbyComm:SendData(hostID, {Type = 'MissingMap'})
-    end
-end
-
--- Refresh (with a sledgehammer) all the items in the observer list.
-local function refreshObserverList()
-    GUI.observerList:DeleteAllItems()
-
-    for slot, observer in gameInfo.Observers:pairs() do
-        observer.ObserverListIndex = GUI.observerList:GetItemCount() -- Pin-head William made this zero-based
-
-        -- Create a label for this observer of the form:
-        -- PlayerName (R:xxx, P:xxx, C:xxx)
-        -- Such conciseness is necessary as the field in the UI is rather narrow...
-        local observer_label = observer.PlayerName .. " (R:" .. observer.PL
-
-        -- Add the ping only if this entry refers to a different client.
-        if observer and (observer.OwnerID ~= localPlayerID) and observer.ObserverListIndex then
-            local peer = lobbyComm:GetPeer(observer.OwnerID)
-
-            local ping = 0
-            if peer.ping ~= nil then
-                ping = math.floor(peer.ping)
-            end
-
-            observer_label = observer_label .. ", P:" .. ping
-        end
-
-        -- Add the CPU score if one is available.
-        local score_CPU = CPU_Benchmarks[observer.PlayerName]
-        if score_CPU then
-            observer_label = observer_label .. ", C:" .. score_CPU
-        end
-        observer_label = observer_label .. ")"
-
-        GUI.observerList:AddItem(observer_label)
     end
 end
 
@@ -2148,6 +2218,99 @@ local function UpdateGame()
             GUI.mapView:SetScenario(scenarioInfo)
             ShowMapPositions(GUI.mapView, scenarioInfo)
             ConfigureMapListeners(GUI.mapView, scenarioInfo)
+
+            -- contains information that is available during blueprint loading
+            local preGameData = {}
+
+            -- MAP ASSETS LOADING --
+
+            -- store the (selected) map directory so that we can load individual blueprints from it
+            preGameData.CurrentMapDir = Dirname(gameInfo.GameOptions.ScenarioFile)
+
+            -- STRATEGIC ICON REPLACEMENT --
+
+            -- icon replacements
+            local iconReplacements = { }
+
+            -- retrieve all (selected) mods
+            local allMods = Mods.AllMods()
+            local selectedMods = Mods.GetSelectedMods()
+
+            -- loop over selected mods identifiers
+            for uid, _ in selectedMods do
+
+                -- get the mod, determine path to icon configuration file
+                local mod = allMods[uid]
+
+                -- check for mod integrity
+                if not (mod.name and mod.author) then
+                    WARN("Unable to load icons from mod '" .. uid .. "', the mod_info.lua file is not properly defined. It needs a name and author field.")
+                end
+
+                -- path to configuration file
+                local iconConfigurationPath = mod.location .. "/mod_icons.lua"
+
+                -- see if it exists
+                if DiskGetFileInfo(iconConfigurationPath) then
+
+                    -- see if we can import it
+                    local ok, msg = pcall(
+                        function()
+
+                            -- attempt to load the file
+                            local env = { }
+                            doscript(iconConfigurationPath, env)
+
+                            -- syntax errors are caught internally and instead it just returns the table untouched
+                            if not (env.UnitIconAssignments or env.ScriptedIconAssignments) then
+                                error("Lobby.lua - can not import the icon configuration file at '" .. iconConfigurationPath .. "'. This could be due to missing functionality functionality or a parsing error.")
+                            end
+                        end
+                    )
+
+                    -- if it passes this basic check, then continue
+                    if ok then
+                        local info = { }
+                        info.Name = mod.name
+                        info.Author = mod.author
+                        info.Location = mod.location
+                        info.Identifier = string.lower(utils.StringSplit(mod.location, '/')[2])
+                        info.UID = uid
+                        table.insert(iconReplacements, info)
+                    -- tell us (and then spam the author, not the dev) if it failed
+                    else
+                        WARN("Unable to load icons from mod '" .. mod.name .. "' with uid '" .. uid .. "'. Please inform the author: " .. mod.author)
+                        WARN(msg)
+                    end
+                end
+            end
+
+            preGameData.IconReplacements = iconReplacements
+
+            -- try and set the preferences - it may crash when running multiple instances on a single machine that all try and start at the same time.
+            local ok, msg = pcall(
+                function()
+                    -- store in preferences so that we can retrieve it during blueprint loading
+                    SetPreference('PreGameData', preGameData)
+                end
+            )
+
+            if not ok then
+                WARN("Unable to update preferences. Are you running multiple instances on the same machine?" )
+                WARN(msg)
+            end
+
+            -- PREFETCHING --
+
+            -- we can't prefetch in combination with PreGameData as the prefs file
+            -- is not updated accordingly, as a result when it is retrieved in
+            -- blueprints.lua it may use the old values. As it is more relevant
+            -- to have custom icon support over having a slightly faster loading
+            -- time we skip the prefetching
+
+            -- local mods = Mods.GetGameMods(gameInfo.GameMods)
+            -- PrefetchSession(scenarioInfo.map, mods, true)
+
         else
             AlertHostMapMissing()
             GUI.mapView:Clear()
@@ -2168,7 +2331,6 @@ local function UpdateGame()
         -- host to select presets (rather confusingly, one object represents both potential buttons)
         UIUtil.setEnabled(GUI.restrictedUnitsOrPresetsBtn, not isHost or notReady)
 
-        UIUtil.setEnabled(GUI.LargeMapPreview, notReady)
         UIUtil.setEnabled(GUI.factionSelector, notReady)
         if notReady then
             UpdateFactionSelector()
@@ -2203,8 +2365,6 @@ local function UpdateGame()
             end
         end
     end
-
-    refreshObserverList()
 
     if isHost then
         HostUtils.RefreshButtonEnabledness()
@@ -2296,8 +2456,8 @@ function ShowGameQuality()
         end
     end
 
-    -- Nothing to do if we have only one team...
-    if table.getn(teams:getTeams()) < 2 then
+    -- Rating only meaningful in games with 2 teams
+    if table.getsize(teams:getTeams()) ~= 2 then
         return
     end
 
@@ -2361,11 +2521,12 @@ function OnModsChanged(simMods, UIMods, ignoreRefresh)
 end
 
 function GetAvailableColor()
-    for colorIndex, colorVal in gameColors.PlayerColors do
-        if IsColorFree(colorIndex) then
-            return colorIndex
+    for i = 1, LobbyComm.maxPlayerSlots do
+        if IsColorFree(gameColors.LobbyColorOrder[i]) then
+            return gameColors.LobbyColorOrder[i]
         end
     end
+    WARN('Error: No available colors found.')
 end
 
 --- This function is retarded.
@@ -2432,6 +2593,9 @@ function DisableSlot(slot, exceptReady)
         GUI.slots[slot].ready:Disable()
     end
 end
+
+-- Used for the quick-swap feature
+local playersToSwap = false
 
 -- set up player "slots" which is the line representing a player and player specific options
 function CreateSlotsUI(makeLabel)
@@ -2519,11 +2683,36 @@ function CreateSlotsUI(makeLabel)
 
         -- Slot number
         local slotNumber = UIUtil.CreateText(newSlot, i, 14, 'Arial')
+        newSlot.slotNumber = slotNumber
         LayoutHelpers.SetWidth(slotNumber, COLUMN_WIDTHS[1])
         slotNumber.Height:Set(newSlot.Height)
         newSlot:AddChild(slotNumber)
         newSlot.tooltipnumber = Tooltip.AddControlTooltip(slotNumber, 'slot_number')
-
+        slotNumber.id = i
+        slotNumber.HandleEvent = function(self,event)
+            if lobbyComm:IsHost() then
+                if event.Type == 'ButtonPress' then
+                    if playersToSwap then
+                        --same number clicked
+                        if self.id == playersToSwap then
+                            playersToSwap = false
+                            self:SetColor(UIUtil.fontColor)
+                        elseif gameInfo.PlayerOptions[playersToSwap] then
+                            HostUtils.SwapPlayers(playersToSwap, self.id)
+                            GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
+                            playersToSwap = false
+                        elseif gameInfo.PlayerOptions[self.id] then
+                            HostUtils.SwapPlayers(self.id, playersToSwap)
+                            GUI.slots[playersToSwap].slotNumber:SetColor(UIUtil.fontColor)
+                            playersToSwap = false
+                        end
+                    else
+                        self:SetColor('ff00ffff')
+                        playersToSwap = self.id
+                    end
+                end
+            end
+        end
         -- COUNTRY
         -- Added a bitmap on the left of Rating, the bitmap is a Flag of Country
         local flag = Bitmap(newSlot, UIUtil.SkinnableFile("/countries/world.dds"))
@@ -2630,7 +2819,10 @@ function CreateSlotsUI(makeLabel)
         factionSelector.OnEvent = defaultHandler
 
         -- Team
-        local teamSelector = BitmapCombo(newSlot, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local teamSelector = Combo(newSlot, 17, 9, nil, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        teamSelector:AddItems({' - ', ' 1', ' 2', ' 3', ' 4', ' 5', ' 6', ' 7', ' 8'})
+        teamSelector._text:SetFont('Arial', 14)
+        teamSelector._titleColor = 'White'
         newSlot.team = teamSelector
         newSlot:AddChild(teamSelector)
         LayoutHelpers.SetWidth(teamSelector, COLUMN_WIDTHS[8])
@@ -2838,15 +3030,6 @@ function CreateUI(maxPlayers)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
-    GUI.gameVersionText.HandleEvent = function (self, event)
-        if event.Type == 'MouseEnter' then
-            self:SetColor('ffffff')
-        elseif event.Type == 'MouseExit' then
-            self:SetColor('677983')
-        elseif event.Type == 'ButtonPress' then
-            Changelog.CreateUI(GUI, true)
-        end
-    end
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -2997,6 +3180,7 @@ function CreateUI(maxPlayers)
     LayoutHelpers.DepthOverParent(GUI.mapView, GUI.mapPanel, -1)
 
     GUI.LargeMapPreview = UIUtil.CreateButtonWithDropshadow(GUI.mapPanel, '/BUTTON/zoom/', "")
+    LayoutHelpers.SetDimensions(GUI.LargeMapPreview, 30, 30)
     LayoutHelpers.AtRightIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
     LayoutHelpers.AtBottomIn(GUI.LargeMapPreview, GUI.mapPanel, -1)
     LayoutHelpers.DepthOverParent(GUI.LargeMapPreview, GUI.mapPanel, 2)
@@ -3017,14 +3201,14 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-	-- curated Maps
-	GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-	Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-	LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
-    LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-	GUI.curatedmapsButton.OnClick = function()
-		OpenURL('http://forums.faforever.com/viewtopic.php?f=2&t=17820')
-	end
+    -- Patchnotes Button
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_1000>Patchnotes")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'lob_patchnotes')
+    LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
+    GUI.patchnotesButton.OnClick = function(self, event)
+        Changelog.Changelog(GUI)
+    end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -3112,10 +3296,10 @@ function CreateUI(maxPlayers)
     GUI.chatDisplay = import('/lua/ui/lobby/chatarea.lua').ChatArea(
         GUI.chatPanel,
         function() return GUI.chatPanel.Width() - 20 end,
-        function() return GUI.chatPanel.Height() - GUI.chatBG.Height() - 2 end
+        function() return GUI.chatPanel.Height() - GUI.chatBG.Height() end
     )
-    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 2, 5)
-    LayoutHelpers.DepthOverParent(GUI.chatDisplay, GUI.chatPanel, -1)
+    LayoutHelpers.AtLeftTopIn(GUI.chatDisplay, GUI.chatPanel, 2)
+    LayoutHelpers.DepthUnderParent(GUI.chatDisplay, GUI.chatPanel)
 
     ---------------------------------------------------------------------------
     -- set up all .*Scroll* functions for the chat panel
@@ -3124,12 +3308,12 @@ function CreateUI(maxPlayers)
 
     -- this function get index of 1st line on the last scroll page (when scroll all the way down)
     GUI.chatPanel.GetScrollLastPage = function(self)
-        return table.getsize(GUI.chatDisplay.ChatLines) - self.linesPerScrollPage
+        return table.getn(GUI.chatDisplay.ChatLines) - self.linesPerScrollPage
     end
     -- this function gets scrolling max range and current range
     GUI.chatPanel.GetScrollValues = function(self, axis)
         local max = table.getsize(GUI.chatDisplay.ChatLines)
-        local bottom = math.min(self.top + self.linesPerScrollPage - 1, max)
+        local bottom = math.min(self.top + self.linesPerScrollPage, max)
         return 1, max, self.top, bottom
     end
     -- this function controls how many lines to scroll when clicking on up/down arrows of the scrollbar
@@ -3145,7 +3329,7 @@ function CreateUI(maxPlayers)
         top = math.floor(top)
         if top == self.top then return end
         local delta = self:GetScrollLastPage()
-        self.top = math.max( math.min(delta + 1, top), 1)
+        self.top = math.max(math.min(delta + 1, top), 1)
         self.bottom = self.top + self.linesPerScrollPage
         GUI.chatDisplay:ShowLines(self.top, self.bottom)
         if self.top >= delta + 1 then
@@ -3171,8 +3355,9 @@ function CreateUI(maxPlayers)
         return self.top >= self:GetScrollLastPage()
     end
     -- this function set how many chat lines can fit per scroll page (chatPanel)
-    GUI.chatPanel.SetLinesPerScrollPage = function(self, fontSize)
-        self.linesPerScrollPage = math.floor((self.Height() - 10) / (fontSize + 4))
+    GUI.chatPanel.LinesOnPage = import('/lua/lazyvar.lua').Create()
+    GUI.chatPanel.LinesOnPage.OnDirty = function(var)
+        GUI.chatPanel.linesPerScrollPage = var()
     end
     -- --------- Chat Scrolling Functions -----------------------
 
@@ -3183,7 +3368,6 @@ function CreateUI(maxPlayers)
     end
     -- set initial scrolling based on chat font size
     local fontSize = tonumber(Prefs.GetFromCurrentProfile('LobbyChatFontSize')) or 14
-    GUI.chatPanel:SetLinesPerScrollPage(fontSize)
 
     local newMessageArrow = Button(GUI.chatPanel, '/textures/ui/common/lobby/chat_arrow/arrow_up.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds', '/textures/ui/common/lobby/chat_arrow/arrow_down.dds','/textures/ui/common/lobby/chat_arrow/arrow_dis.dds', "UI_Arrow_Click")
     GUI.newMessageArrow = newMessageArrow
@@ -3206,10 +3390,11 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -5)
     chatBG.Width:Set(GUI.chatPanel.Width() - LayoutHelpers.ScaleNumber(16))
     LayoutHelpers.SetHeight(chatBG, 24)
-
+    
     -- Set up the chat edit buttons and functions
     setupChatEdit(GUI.chatPanel)
-
+    -- finally create chat lines
+    GUI.chatDisplay:CreateLines()
     ---------------------------------------------------------------------------
     -- Option display
     ---------------------------------------------------------------------------
@@ -3340,6 +3525,12 @@ function CreateUI(maxPlayers)
                 Tooltip.AddControlTooltip(line.bg, data.tooltip)
                 Tooltip.AddControlTooltip(line.bg2, data.valueTooltip)
             end
+
+            if data.manualTooltipTitle then
+                Tooltip.AddControlTooltipManual(line.bg, data.manualTooltipTitle, data.manualTooltipDescription )
+                Tooltip.AddControlTooltipManual(line.bg2, data.manualTooltipTitle, data.manualTooltipDescription )
+            end
+
         end
 
         local optionsToUse
@@ -3551,7 +3742,7 @@ function CreateUI(maxPlayers)
 
     -- CLOSE/OPEN EMPTY SLOTS BUTTON --
     GUI.closeEmptySlots = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/closeslots/')
-    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, 0, 47)
+    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -39, 47)
     Tooltip.AddButtonTooltip(GUI.closeEmptySlots, 'lob_close_empty_slots')
     if not isHost then
         GUI.closeEmptySlots:Hide()
@@ -3621,6 +3812,380 @@ function CreateUI(maxPlayers)
         ForkThread(function() UpdateBenchmark(true) end)
     end
 
+    -- Autobalance Button --
+    GUI.PenguinAutoBalance = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autobalance/')
+    LayoutHelpers.RightOf(GUI.PenguinAutoBalance, GUI.becomeObserver, 59)
+    Tooltip.AddButtonTooltip(GUI.PenguinAutoBalance, {text=LOC("<LOC lobui_0444>Autobalance"), body=LOC("<LOC lobui_0445>Automatically balance players into 2 equally sized teams")})
+    if not isHost then
+        GUI.PenguinAutoBalance:Hide()
+    else
+        -- What this does: it balances all occupied slots into two teams with equal numbers of
+        -- players.  If teams are set manually and half of the occupied slots are set to team 1
+        -- and half to team 2, then it balances the players while keeping the team-slot matches.
+        -- If the teams are set manually, but there is an uneven number of players on teams 1
+        -- and 2, then players' teams are changed automatically to be alternating team 1 and team 2.
+        -- If there are an odd number of occupied slots, the last one is set to team - (no team)
+        -- and the others are balanced without it.  Alternatively, if teams are not set manually,
+        -- players will be balanced into the slowest available slot numbers on their teams.
+        -- If there is an odd number of players in that case, the last player will be made an
+        -- observer if human or removed if AI.
+
+        -- How it balances: this function checks every possible balance combination for making 
+        -- the two teams (while keeping their player counts equal to half the number of occupied
+        -- slots, rounded down, and not using the last player if there is an odd number of players).
+        -- To do this, the function sums up all the relevant players' ratings (keeping mean and
+        -- deviation separate - it balances teams to have similar total ratings, and also similar
+        -- total uncertainties (grayness)), and then divides by two. That yields the goal values
+        -- for each team. Any deviation from those values is calculated to help determine a team's
+        -- imbalance value. Then, the various team combinations are tested, and the one with the
+        -- lowest imbalance value is used.
+
+
+        -- Automatically balance an even number of non-observer players into 2 teams in the lobby
+        GUI.PenguinAutoBalance.OnClick = function()
+
+            -- make sure spawns are set to fixed
+            if gameInfo.GameOptions.TeamSpawn ~= 'fixed' then
+                gameInfo.GameOptions.TeamSpawn = 'fixed'
+                -- tell everyone else to set spawns to fixed
+                lobbyComm:BroadcastData {
+                    Type = 'GameOptions',
+                    Options = {['TeamSpawn'] = 'fixed'}
+                }
+                AddChatText(LOC("<LOC lobui_0446>Enabled fixed spawn locations"))
+            end
+
+            -- a table of the target mean, target deviation, and the lowest logged imbalance value
+            local goalValue = {0, 0, 99999}
+
+            local playerCount = 0
+            -- a table of the highest occupied slot's slot number, that slot's player's order number
+            -- in the playerRatings table, and a booleon of whether or not that player is human
+            local lastSlot = {0, 0, false}
+            local playerRatings = {}
+            -- get rating data for each player
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                playerRatings[i] = {player.MEAN, player.DEV, player.StartSpot, player.Team - 1}
+                playerCount = playerCount + 1
+                if player.StartSpot > lastSlot[1] then
+                    lastSlot = {player.StartSpot, i, player.Human}
+                end
+                goalValue[1] = goalValue[1] + player.MEAN
+                goalValue[2] = goalValue[2] + player.DEV
+            end
+
+            -- if there are fewer than 2 players, there is no need to balance
+            if playerCount < 2 then
+                UpdateGame()
+                return
+            end
+
+            -- if there is an odd number of players, remove the last one from the balancing
+            if math.mod(playerCount, 2) == 1 then
+                goalValue[1] = goalValue[1] - playerRatings[lastSlot[2]][1]
+                goalValue[2] = goalValue[2] - playerRatings[lastSlot[2]][2]
+                playerRatings[lastSlot[2]] = nil
+                playerCount = playerCount - 1
+                -- set the player to not be on a team if teams are manual
+                -- otherwise make the player an observer if human or remove it if AI
+                if gameInfo.GameOptions.AutoTeams == 'none' then
+                    for i, player in gameInfo.PlayerOptions:pairs() do
+                        if player.StartSpot == lastSlot[1] then
+                            player.Team = 1 -- no team
+                            break
+                        end
+                    end
+                else
+                    if lastSlot[3] then
+                        HostUtils.ConvertPlayerToObserver(lastSlot[1])
+                    else
+                        HostUtils.RemoveAI(lastSlot[1])
+                    end
+                end
+            end
+
+            -- the goal value is all of the remaining players' ratings divided by 2
+            goalValue[1] = goalValue[1] / 2
+            goalValue[2] = goalValue[2] / 2
+
+            local sortedPlayerRatings = {}
+            local sortedSlotTeams = {}
+            local numPlayersTeam1 = 0
+            local numPlayersTeam2 = 0
+            local sortingValue1
+            local sortingValue2
+            -- sort the players in a weighted cross between displayed and base rating
+            -- the order goes from greatest to lowest result of: mean - (deviation * 2.2)
+            for i, player in playerRatings do
+                local orderNum = 1
+                sortingValue1 = player[1] - (player[2] * 2.2)
+                for i2, player2 in playerRatings do
+                    sortingValue2 = player2[1] - (player2[2] * 2.2)
+                    if sortingValue1 < sortingValue2 or (sortingValue1 == sortingValue2 and i > i2) then
+                        orderNum = orderNum + 1
+                    end
+                end
+                -- these are sorted in parallel
+                sortedPlayerRatings[orderNum] = {player[1], player[2]}
+                sortedSlotTeams[orderNum] = {player[3], player[4]}
+                if player[4] == 1 then
+                    numPlayersTeam1 = numPlayersTeam1 + 1
+                elseif player[4] == 2 then
+                    numPlayersTeam2 = numPlayersTeam2 + 1
+                end
+            end
+
+
+            -- the number of players per team
+            local teamSize = playerCount / 2
+
+
+            -- make the sorted list of slots for each team
+            local sortedTeam1Slots = {}
+            local sortedTeam2Slots = {}
+            local team1OrderNum = 0
+            local team2OrderNum = 0
+
+            local manualTeams
+                
+            if gameInfo.GameOptions.AutoTeams == 'pvsi' then -- odd vs even
+                for i = 1, 16 do
+                    if not gameInfo.ClosedSlots[i] then
+                        if math.mod(i, 2) == 1  then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            elseif gameInfo.GameOptions.AutoTeams == 'tvsb' then -- top vs bottom
+                local midLine = GUI.mapView.Top() + (GUI.mapView.Height() / 2)
+                for i, startPosition in GUI.mapView.startPositions do
+                    if not gameInfo.ClosedSlots[i] then
+                        if startPosition.Top() < midLine then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            elseif gameInfo.GameOptions.AutoTeams == 'lvsr' then -- left vs right
+                local midLine = GUI.mapView.Left() + (GUI.mapView.Width() / 2)
+                for i, startPosition in GUI.mapView.startPositions do
+                    if not gameInfo.ClosedSlots[i] then
+                        if startPosition.Left() < midLine then
+                            team1OrderNum = team1OrderNum + 1
+                            sortedTeam1Slots[team1OrderNum] = i
+                        else
+                            team2OrderNum = team2OrderNum + 1
+                            sortedTeam2Slots[team2OrderNum] = i
+                        end
+                    end
+                end
+            else
+                manualTeams = true
+            end
+
+            -- If the teams were not set properly, set them properly.
+            -- When teams are set manually, they are not set properly if the number of 
+            -- players on either team does not equal the team size.  
+            -- When teams are not set manually, they are not set properly if the number
+            -- of slots on either team is less than the team size.
+            if (manualTeams and (numPlayersTeam1 != teamSize or numPlayersTeam2 != teamSize))
+             or (not manualTeams and (table.getn(sortedTeam1Slots) < teamSize or table.getn(sortedTeam2Slots) < teamSize)) then
+                -- set AutoTeams to none (so, they can be set by slot by this function)
+                gameInfo.GameOptions.AutoTeams = 'none'
+                local counter = 0
+                for i, player in gameInfo.PlayerOptions:pairs() do
+                    for i2, slotTeam in sortedSlotTeams do
+                        if player.StartSpot == slotTeam[1] then
+                            counter = counter + 1
+                            -- set the player's team
+                            if math.mod(counter, 2) == 1  then
+                                player.Team = 2 -- team 1
+                                slotTeam[2] = 1
+                            else
+                                player.Team = 3 -- team 2
+                                slotTeam[2] = 2
+                            end
+                            -- tell everyone else the team number for that slot
+                            lobbyComm:BroadcastData(
+                            {
+                                Type = 'PlayerOptions',
+                                Options = {['Team'] = slotTeam[2] + 1}, -- make team number 1 higher for the backend
+                                Slot = slotTeam[1],
+                            })
+                            break
+                        end
+                    end
+                end
+            end
+
+            -- if teams are set to manual, make the sorted list of slots for each team
+            if gameInfo.GameOptions.AutoTeams == 'none' then
+                sortedTeam1Slots = {}
+                sortedTeam2Slots = {}
+                for i, slotTeam in sortedSlotTeams do 
+                    team1OrderNum = 0
+                    team2OrderNum = 0
+                    for i2, slotTeam2 in sortedSlotTeams do
+                        if slotTeam[1] > slotTeam2[1] or (slotTeam[1] == slotTeam2[1] and i >= i2) then
+                            if slotTeam2[2] == 1 then
+                                team1OrderNum = team1OrderNum + 1
+                            else
+                                team2OrderNum = team2OrderNum + 1
+                            end
+                        end
+                    end
+                    -- add the slot to its team's table
+                    if slotTeam[2] == 1 then
+                        sortedTeam1Slots[team1OrderNum] = slotTeam[1]
+                    else
+                        sortedTeam2Slots[team2OrderNum] = slotTeam[1]
+                    end
+                end
+            end
+
+
+
+            -- a table of team1's mean, deviation, and imbalance value
+            local teamValue
+            -- a table of team members
+            local team1 = {}
+            -- a table of the most balanced team
+            local bestTeam = {}
+            local choosableCount = playerCount - teamSize
+
+            -- the number of iterations is the number of team combinations to check, which is
+            -- exactly half of the number of possible teams, which covers every possibility,
+            -- since the remaining half are just the opposite of what was already checked,
+            -- which means they have the exact same balance
+            -- ie: Player A + Player B vs Player C + Player D == Player C + Player D vs Player A + Player B
+            -- this works because of the order in which the combinations are tested
+            local numIterations
+            if teamSize == 2 then
+                numIterations = 3
+            elseif teamSize == 3 then
+                numIterations = 10
+            elseif teamSize == 4 then
+                numIterations = 35
+            elseif teamSize == 5 then
+                numIterations = 126
+            elseif teamSize == 6 then
+                numIterations = 462
+            elseif teamSize == 7 then
+                numIterations = 1716
+            else
+                numIterations = 6435
+            end
+
+            local currentIteration = 0
+
+            -- test the balance of different combinations of teams, covering balance possibility
+            -- intended for use with 2 teams of even player counts
+            -- combinations are iterated starting with the lowest-numbered players on team1 first,
+            -- and progressively iterating the highest-numbered player on team1 to each higher-numbered
+            -- possible player, and then repeating the process with the next highest-numbered player
+            -- increasing by 1... this process continues until every possible balacnce combination
+            -- of 2 equally sized teams of even player counts has been covered
+            local function testCombinations(team1MemberNumber, firstPlayerToCheck)
+                -- check if this player is the last player on the team
+                local lastPlayer
+                if team1MemberNumber < teamSize then
+                    lastPlayer = false
+                else
+                    lastPlayer = true
+                end
+                -- iterate through the possible players for this team1MemberNumber
+                for i = firstPlayerToCheck, choosableCount + team1MemberNumber do
+                    -- when the number of iterations is reached, every possible balance of even player count
+                    --  of the 2 equally sized teams has been checked, and the function ends
+                    if currentIteration >= numIterations then
+                        return
+                    end
+                    team1[team1MemberNumber] = i
+                    if lastPlayer then
+                        -- test this combination of team members
+                        teamValue = {0, 0, 0}
+                        -- add each team member's base rating and devation to the team's values
+                        for i, player in team1 do
+                            teamValue[1] = teamValue[1] + sortedPlayerRatings[player][1]
+                            teamValue[2] = teamValue[2] + sortedPlayerRatings[player][2]
+                        end
+                        -- calculate the team's imbalance value
+                        teamValue[3] = math.abs(teamValue[2] - goalValue[2]) * 1.2 + math.abs(teamValue[1] - goalValue[1])
+                        -- check if the team's imbalance value is lower than the lowest logged imbalance value
+                        if teamValue[3] < goalValue[3] then
+                            -- if it is lower, then this is the best balance so far, and it is logged over the previous best balance
+                            goalValue[3] = teamValue[3]
+                            -- deepcopy the team's player numbers
+                            for i, player in team1 do
+                                bestTeam[i] = player
+                            end
+                        end
+                        currentIteration = currentIteration + 1
+                    else
+                        -- test a subset of combinations
+                        testCombinations(team1MemberNumber + 1, i + 1)
+                    end
+                end
+            end
+
+            testCombinations(1, 1)
+
+
+            -- specify the players on team 2 (aka, the ones not on team 1)
+            local bestTeam2 = {}
+            for i = 1, playerCount do
+                if not table.find(bestTeam, i) then
+                    table.insert(bestTeam2, i)
+                end
+            end
+
+            -- move players on team1 to the intended slots
+            local team1OrderNum = 0
+            local slotA
+            local slotB
+            for i, player in bestTeam do
+                team1OrderNum = team1OrderNum + 1
+                slotA = sortedSlotTeams[player][1]
+                slotB = sortedTeam1Slots[team1OrderNum]
+                HostUtils.SwapPlayers(slotA, slotB)
+                -- keep track of the slot changes in sortedSlotTeams
+                for i, slotTeam in sortedSlotTeams do
+                    if slotTeam[1] == slotB then
+                        slotTeam[1] = slotA
+                        break
+                    end
+                end
+                sortedSlotTeams[player][1] = slotB
+            end
+
+            -- move players on team2 to the intended slots
+            local team2OrderNum = 0
+            for i, player in bestTeam2 do
+                team2OrderNum = team2OrderNum + 1
+                slotA = sortedSlotTeams[player][1]
+                slotB = sortedTeam2Slots[team2OrderNum]
+                HostUtils.SwapPlayers(slotA, slotB)
+                -- keep track of the slot changes in sortedSlotTeams
+                for i, slotTeam in sortedSlotTeams do
+                    if slotTeam[1] == slotB then
+                        slotTeam[1] = slotA
+                        break
+                    end
+                end
+                sortedSlotTeams[player][1] = slotB
+            end
+            UpdateGame()
+            AddChatText(LOC("<LOC lobui_0626>Finished autobalancing"))
+        end
+    end
+
     -- Observer List
     GUI.observerList = ItemList(GUI.observerPanel)
     GUI.observerList:SetFont(UIUtil.bodyFont, 12)
@@ -3629,16 +4194,36 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightBottomIn(GUI.observerList, GUI.observerPanel, 15)
     GUI.observerList.OnClick = function(self, row, event)
         if isHost and event.Modifiers.Right then
-            UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-                                    "<LOC lobui_0167>Kick Player", function()
-                                        SendSystemMessage("lobui_0756", gameInfo.Observers[row+1].PlayerName)
-                                        lobbyComm:EjectPeer(gameInfo.Observers[row+1].OwnerID, "KickedByHost")
-                                    end,
-                                    "<LOC _Cancel>", nil,
-                                    nil, nil,
-                                    true,
-                                    {worldCover = false, enterButton = 1, escapeButton = 2}
-            )
+            -- determine the number of teams (excluding the no team (-) option that equals 1 on the backend)
+            local teams = {}
+            local numTeams = 0
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                if not teams[player.Team] and player.Team != 1 then
+                    teams[player.Team] = 1
+                    numTeams = numTeams + 1
+                end
+            end
+            -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
+            -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
+            local obsIndex = row + 1
+            if numTeams < 3 then
+                obsIndex = obsIndex - numTeams
+            end
+            
+            -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
+            -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
+                                        "<LOC lobui_0167>Kick Player", function()
+                                            SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
+                                            lobbyComm:EjectPeer(gameInfo.Observers[obsIndex].OwnerID, "KickedByHost")
+                                        end,
+                                        "<LOC _Cancel>", nil,
+                                        nil, nil,
+                                        true,
+                                        {worldCover = false, enterButton = 1, escapeButton = 2}
+                )
+            end
         end
     end
     UIUtil.CreateLobbyVertScrollbar(GUI.observerList, 0, 0, -1)
@@ -3721,7 +4306,7 @@ function setupChatEdit(chatPanel)
     -- in-game keybindings in the lobby.
     -- That would be very bad. We should probably instead just not assign those keybindings yet...
     GUI.chatEdit.OnLoseKeyboardFocus = function(self)
-        GUI.chatEdit:AcquireFocus()
+        self:AcquireFocus()
     end
 
     local commandQueueIndex = 0
@@ -3751,9 +4336,9 @@ function setupChatEdit(chatPanel)
     GUI.chatEdit.OnEscPressed = function(self, text)
         -- The default behaviour buggers up our escape handlers. Just delegate the escape push to
         -- the escape handling mechanism.
-        if HasCommandLineArg("/gpgnet") then
+        if HasCommandLineArg("/gpgnet") or Changelog.isOpen then
             -- Quit to desktop
-            EscapeHandler.HandleEsc(true)
+            EscapeHandler.HandleEsc(not Changelog.isOpen)
         else
             -- Back to main menu
             GUI.exitButton.OnClick()
@@ -3768,7 +4353,7 @@ function setupChatEdit(chatPanel)
         if AddUnicodeCharToEditText(self, keyCode) then
             return
         end
-        if commandQueue and table.getsize(commandQueue) > 0 then
+        if commandQueue and not table.empty(commandQueue) then
             if keyCode == 38 then
                 if commandQueue[commandQueueIndex + 1] then
                     commandQueueIndex = commandQueueIndex + 1
@@ -3788,6 +4373,7 @@ function setupChatEdit(chatPanel)
             end
         end
     end
+    chatPanel.edit = GUI.chatEdit
 end
 
 function RefreshOptionDisplayData(scenarioInfo)
@@ -3826,13 +4412,54 @@ function RefreshOptionDisplayData(scenarioInfo)
             modStr = modNumUI..' UI Mod'
         end
     end
+
+    local description = "No mods enabled."
+
+    if modNum + modNumUI > 0 then
+        description = ""
+
+        local descriptionSimMods = { "", }
+        if modNum > 0 then
+            table.insert(descriptionSimMods, LOC("<LOC enabled_sim_mods>The host enabled the following sim mods:"))
+            for k, mod in Mods.GetGameMods() do
+                table.insert(descriptionSimMods, "\r\n - " .. tostring(mod.name))
+            end
+
+            table.insert(descriptionSimMods, "\r\n")
+        end
+
+        local descriptionUIMods = { "", }
+        if modNumUI > 0 then
+            table.insert(descriptionUIMods, LOC("<LOC enabled_ui_mods>You have enabled the following UI mods:"))
+            for k, mod in Mods.GetUiMods() do
+                table.insert(descriptionUIMods, "\r\n - " .. tostring(mod.name))
+            end
+        end
+
+        descriptionSimMods = tostring(table.concat(descriptionSimMods))
+        descriptionUIMods = tostring(table.concat(descriptionUIMods))
+
+        if modNum > 0 and modNumUI > 0 then
+            description = tostring(table.concat({descriptionSimMods, "\r\n", descriptionUIMods}))
+        else
+            if modNum > 0 then
+                description = descriptionSimMods
+            end
+
+            if modNumUI > 0 then
+                description = descriptionUIMods
+            end
+        end
+    end
+
     if modStr then
         local option = {
             text = modStr,
             value = LOC('<LOC lobby_0003>Check Mod Manager'),
             mod = true,
-            tooltip = 'Lobby_Mod_Option',
-            valueTooltip = 'Lobby_Mod_Option'
+
+            manualTooltipTitle = 'Enabled mods',
+            manualTooltipDescription = description
         }
 
         table.insert(formattedOptions, option)
@@ -4042,7 +4669,7 @@ function AddChatText(text, playerID, scrollToBottom)
     local textColor = "AAAAAA"
     local nameFont = "Arial Gras"
     for id, player in gameInfo.PlayerOptions:pairs() do
-        if player.OwnerID == playerID then
+        if player.OwnerID == playerID and player.Human then
             textColor = nil
             nameColor = gameColors.PlayerColors[player.PlayerColor]
             if not chatPlayerColor then
@@ -4397,10 +5024,18 @@ local MessageHandlers = {
     SetPlayerNotReady = {
         Accept = FromSubjectOrHost,
         Handle = function(data)
-            EnableSlot(data.Slot)
-            GUI.becomeObserver:Enable()
 
+            -- allow the user to make changes
+            EnableSlot(data.Slot)
+
+            -- allow the user to become an observer again
+            GUI.becomeObserver:Enable()
+                
+            -- update player options
             SetPlayerOption(data.Slot, 'Ready', false)
+
+            -- update GUI
+            GUI.slots[data.Slot].ready:SetCheck(false)
         end
     },
 
@@ -4583,6 +5218,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.Closed
             gameInfo.SpawnMex[data.Slot] = false
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     SlotClosedSpawnMex = {
@@ -4591,6 +5227,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
             gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     GameInfo = {
@@ -4616,7 +5253,6 @@ local MessageHandlers = {
         Handle = function(data)
             gameInfo.Observers[data.OldSlot] = nil
             gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
-            refreshObserverList()
             SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
         end
@@ -4628,7 +5264,6 @@ local MessageHandlers = {
             gameInfo.Observers[data.NewSlot] = PlayerData(data.Options)
             gameInfo.PlayerOptions[data.OldSlot] = nil
             ClearSlotInfo(data.OldSlot)
-            refreshObserverList()
             UpdateFactionSelectorForPlayer(gameInfo.Observers[data.NewSlot])
         end
     },
@@ -4651,6 +5286,7 @@ local MessageHandlers = {
         Handle = function(data)
             gameInfo.PlayerOptions[data.OldSlot] = nil
             gameInfo.PlayerOptions[data.NewSlot] = PlayerData(data.Options)
+            gameInfo.PlayerOptions[data.NewSlot].Ready = false
             ClearSlotInfo(data.OldSlot)
             SetSlotInfo(data.NewSlot, gameInfo.PlayerOptions[data.NewSlot])
             UpdateFactionSelectorForPlayer(gameInfo.PlayerOptions[data.NewSlot])
@@ -4777,6 +5413,7 @@ function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, n
     end
 
     lobbyComm.DataReceived = function(self, data)
+
         -- Decide if we should just drop the packet. Violations here are usually people using a
         -- modified lobby.lua to try to do stupid shit.
         if not MessageHandlers[data.Type] then
@@ -5051,6 +5688,7 @@ function SetPlayerOption(slot, key, val, ignoreRefresh)
     local options = {}
     options[key] = val
     SetPlayerOptions(slot, options, ignoreRefresh)
+    refreshObserverList()
 end
 
 function SetGameOptions(options, ignoreRefresh)
@@ -5069,7 +5707,7 @@ function SetGameOptions(options, ignoreRefresh)
         if key == 'RestrictedCategories' then
             local restrictionsEnabled = false
             if val ~= nil then
-                if table.getn(val) ~= 0 then
+                if not table.empty(val) then
                     restrictionsEnabled = true
                 end
             end
@@ -5118,6 +5756,11 @@ end
 
 -- Perform one-time setup of the large map preview
 function CreateBigPreview(parent)
+    local scenarioInfo = MapUtil.LoadScenario(gameInfo.GameOptions.ScenarioFile)
+    if scenarioInfo.hidePreviewMarkers then
+        return
+    end
+
     if LrgMap then
         LrgMap.isHidden = false
         RefreshLargeMap()
@@ -5231,35 +5874,37 @@ function CPUBenchmark()
     local countTime = 0
     --Make everything a local variable
     --This is necessary because we don't want LUA searching through the globals as part of the benchmark
+    local TableInsert = table.insert
+    local TableRemove = table.remove
     local h
     local i
     local j
     local k
     local l
     local m
-    for h = 1, 48, 1 do
+    local n = {}
+    for h = 1, 24, 1 do
         -- If the need for the benchmark no longer exists, abort it now.
         if not lobbyComm then
             return
         end
 
         lastTime = GetSystemTimeSeconds()
-        for i = 1.0, 25.0, 0.0008 do
-            --This instruction set should cover most LUA operators
+        for i = 1.0, 30.4, 0.0008 do
+           --This instruction set should cover most LUA operators
             j = i + i   --Addition
             k = i * i   --Multiplication
             l = k / j   --Division
             m = j - i   --Subtraction
             j = i ^ 4   --Power
             l = -i      --Negation
-            m = {'One', 'Two', 'Three'} --Create Table
-            table.insert(m, 'Four')     --Insert Table Value
-            table.remove(m, 1)          --Remove Table Value
-            l = table.getn(m)           --Get Table Length
+            m = {'1234567890', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', true} --Create Table
+            TableInsert(m, '1234567890')     --Insert Table Value
             k = i < j   --Less Than
             k = i == j  --Equality
             k = i <= j  --Less Than or Equal to
             k = not k
+            n[tostring(i)] = m
         end
         currTime = GetSystemTimeSeconds()
         totalTime = totalTime + currTime - lastTime
@@ -5267,7 +5912,7 @@ function CPUBenchmark()
         if totalTime > countTime then
             --This is necessary in order to make this 'thread' yield so other things can be done.
             countTime = totalTime + .125
-            WaitSeconds(0)
+            coroutine.yield(1)
         end
     end
     BenchTime = math.ceil(totalTime * 100)
@@ -5361,7 +6006,7 @@ function StressCPU(waitTime)
 
         -- lobbyComm is destroyed when the lobby is exited. If the user left the lobby, we no longer
         -- want to run the benchmark (it just introduces lag as the user is trying to do something
-        -- else.
+        -- else).
         if not lobbyComm then
             return
         end
@@ -5447,6 +6092,10 @@ end
 function ShowTitleDialog()
     CreateInputDialog(GUI, "Game Title",
         function(self, text)
+            -- remove new lines from the text
+            text = text:gsub("\r", "")
+            text = text:gsub("\n", "")
+
             SetGameOption("Title", text, true)
             SetGameTitleText(text)
         end, gameInfo.GameOptions.Title
@@ -5681,7 +6330,6 @@ function ShowLobbyOptionsDialog()
 
         Prefs.SetToCurrentProfile('LobbyChatFontSize', sliderValue)
         -- updating chat panel with new font size
-        GUI.chatPanel:SetLinesPerScrollPage(sliderValue)
         GUI.chatPanel:SetFont(nil, sliderValue)
 
         if isScrolledDown then
@@ -6108,32 +6756,45 @@ function indexOf(table, needle)
 end
 
 -- Update the combobox for the given slot so it correctly shows the set of available colours.
--- causes availableColours[slot] to be repopulated.
+-- causes a new availableColours to be populated for each occupied slot
+-- if a slot is specified, that slot's displayed color will be made consistent with its coded color
 function Check_Availaible_Color(slot)
-    availableColours[slot] = {}
-
-    -- For each possible colour, scan the slots to try and find it and, if unsuccessful, add it to
-    -- the available colour set.
-    local allColours = gameColors.PlayerColors
-    for k, v in allColours do
-        local found = false
-        for ii = 1, LobbyComm.maxPlayerSlots do
-            -- Skip this slot and empty slots.
-            if slot ~= ii and gameInfo.PlayerOptions[ii] then
-                if gameInfo.PlayerOptions[ii].PlayerColor == k then
-                    found = true
-                    break
-                end
-            end
-        end
-
-        if not found then
-            availableColours[slot][k] = allColours[k]
+    -- generate a table of used colors
+    local UsedColours = {}
+    for i = 1, LobbyComm.maxPlayerSlots do
+        -- Skips empty slots.
+        if gameInfo.PlayerOptions[i] then
+            table.insert(UsedColours, gameInfo.PlayerOptions[i].PlayerColor)
         end
     end
-    --
-    GUI.slots[slot].color:ChangeBitmapArray(availableColours[slot], true)
-    GUI.slots[slot].color:SetItem(gameInfo.PlayerOptions[slot].PlayerColor)
+
+    -- generate a table of unused colors
+    local unusedColours = {}
+    for i, color in gameColors.PlayerColors do
+        if not table.find(UsedColours, i) then
+            unusedColours[i] = color
+        end
+    end
+
+    for i = 1, LobbyComm.maxPlayerSlots do
+        -- Skips empty slots.
+        if gameInfo.PlayerOptions[i] then
+            local availableColours = {}
+            -- deepcopy the unused colors because using them by reference causes problems with the displayed color list/ChangeBitmapArray
+            for c, color in unusedColours do
+                availableColours[c] = color
+            end
+            -- add this slot's color to its availableColours (you get a nil lazyvar error if it's not included)
+            availableColours[ gameInfo.PlayerOptions[i].PlayerColor] = gameColors.PlayerColors[gameInfo.PlayerOptions[i].PlayerColor]
+            -- set the list of available colors for this slot
+            GUI.slots[i].color:ChangeBitmapArray(availableColours, true)
+        end
+    end
+
+    -- if a slot was entered, set the displayed color for that slot to the coded color for that slot
+    if slot then
+        GUI.slots[slot].color:SetItem(gameInfo.PlayerOptions[slot].PlayerColor)
+    end
 end
 
 function CheckModCompatability()
@@ -6154,9 +6815,16 @@ function WarnIncompatibleMods()
 end
 
 function DoSlotSwap(slot1, slot2)
+
+    -- retrieve player info
     local player1 = gameInfo.PlayerOptions[slot1]
     local player2 = gameInfo.PlayerOptions[slot2]
 
+    -- unready players in the player options
+    player1.Ready = false 
+    player2.Ready = false
+
+    -- swap teams
     local team_bucket = player1.Team
     player1.Team = player2.Team
     player2.Team = team_bucket
@@ -6165,14 +6833,19 @@ function DoSlotSwap(slot1, slot2)
     KeepSameFactionOrRandom(slot1, slot2, player1)
     KeepSameFactionOrRandom(slot2, slot1, player2)
 
+    -- swap the slots
     gameInfo.PlayerOptions[slot2] = player1
     gameInfo.PlayerOptions[slot1] = player2
 
+    -- update slot info
     SetSlotInfo(slot2, player1)
     SetSlotInfo(slot1, player2)
 
+    -- update faction selector
     UpdateFactionSelectorForPlayer(player1)
     UpdateFactionSelectorForPlayer(player2)
+
+    UpdateGame()
 end
 
 function KeepSameFactionOrRandom(slotFrom, slotTo, player)
@@ -6235,6 +6908,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = closed
             gameInfo.SpawnMex[slot] = false
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         SetSlotClosedSpawnMex = function(slot)
@@ -6254,6 +6928,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = true
             gameInfo.SpawnMex[slot] = true
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
@@ -6281,7 +6956,6 @@ function InitHostUtils()
             end
 
             ClearSlotInfo(playerSlot)
-            refreshObserverList()
 
             -- TODO: can probably avoid transmitting the options map here. The slot number should be enough.
             lobbyComm:BroadcastData(
@@ -6358,7 +7032,6 @@ function InitHostUtils()
                 SendSystemMessage("lobui_0227", incomingPlayer.PlayerName)
             end
 
-            refreshObserverList()
             SetSlotInfo(toPlayerSlot, gameInfo.PlayerOptions[toPlayerSlot])
 
             -- This is far from optimally efficient, as it will SetSlotInfo twice when autoteams is enabled.
@@ -6389,6 +7062,11 @@ function InitHostUtils()
         -- @param moveFrom Slot number to move from
         -- @param moveTo Slot number to move to.
         SanityCheckSlotMovement = function(moveFrom, moveTo)
+            if moveTo == moveFrom then
+                -- no need to move a slot to its current location
+                return false
+            end
+
             if gameInfo.ClosedSlots[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
                 return false
@@ -6453,6 +7131,7 @@ function InitHostUtils()
         -- If the target slot is closed, this is a no-op.
         -- If a player or ai occupies both slots, they are swapped.
         SwapPlayers = function(slot1, slot2)
+
             -- Bail out early for the stupid cases.
             if not HostUtils.SanityCheckSlotMovement(slot1, slot2) then
                 return
@@ -6461,20 +7140,10 @@ function InitHostUtils()
             local player1 = gameInfo.PlayerOptions[slot1]
             local player2 = gameInfo.PlayerOptions[slot2]
 
-            -- Unready the move-ee
-            if player1.Human then
-                HostUtils.SetPlayerNotReady(slot1)
-            end
-
             -- If we're moving onto a blank, take the easy way out.
             if not player2 then
                 HostUtils.MovePlayerToEmptySlot(slot1, slot2)
                 return
-            end
-
-            -- If we're switching with a human, we need to clear their ready state for the move
-            if player2.Human then
-                HostUtils.SetPlayerNotReady(slot2)
             end
 
             -- Do the swap on our end
@@ -6517,7 +7186,7 @@ function InitHostUtils()
             refreshObserverList()
         end,
 
-        --- Attempt to add a player to a slot. If no is available, add them as an observer.
+        --- Attempt to add a player to a slot. If none are available, add them as an observer.
         --
         -- @param senderID The peer ID of the player we're adding.
         -- @param slot The slot to insert the player to. A value of less than 1 indicates "any slot"
@@ -6544,7 +7213,7 @@ function InitHostUtils()
             end
 
             -- if a color is requested, attempt to use that color if available, otherwise, assign first available
-            if not IsColorFree(playerData.PlayerColor) then
+            if not IsColorFree(playerData.PlayerColor, slot) then
                 SetPlayerColor(playerData, GetAvailableColor())
             end
 
@@ -6570,7 +7239,7 @@ function InitHostUtils()
         -- @param slot (optional) The slot into which to put this AI. Defaults to the first empty
         --                        slot from the top of the list.
         AddAI = function(name, personality, slot)
-            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality))
+            HostUtils.TryAddPlayer(hostID, slot, GetAIPlayerData(name, personality, slot))
         end,
 
         PlayerMissingMapAlert = function(id)
@@ -6653,6 +7322,17 @@ function InitHostUtils()
 
             -- Launch button enabled if everyone is ready.
             UIUtil.setEnabled(GUI.launchGameButton, singlePlayer or hostObserves or not playerNotReady)
+
+            -- Disable the AutoBalance button if any players are on a tean greater than 2 or buttonState is false
+            local noOtherTeams = true
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                -- Team numbers are 1 higher on the backend
+                if player.Team > 3 then
+                    noOtherTeams = false
+                    break
+                end
+            end
+            UIUtil.setEnabled(GUI.PenguinAutoBalance, noOtherTeams and buttonState)
         end,
 
         -- Update our local gameInfo.GameMods from selected map name and selected mods, then

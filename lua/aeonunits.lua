@@ -49,20 +49,19 @@ AFactoryUnit = Class(FactoryUnit) {
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
-   
+
     OnPaused = function(self)
         -- When factory is paused take some action
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
+        if self:IsUnitState('Building') and self.UnitBeingBuilt then
             self:StopUnitAmbientSound('ConstructLoop')
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
-            self:StartBuildFx(self:GetFocusUnit())
         end
         StructureUnit.OnPaused(self)
     end,
 
     OnUnpaused = function(self)
         FactoryUnit.OnUnpaused(self)
-        if self:IsUnitState('Building') and self.unitBeingBuilt then
+        if self:IsUnitState('Building') and self.UnitBeingBuilt then
             StructureUnit.StopBuildingEffects(self, self.UnitBeingBuilt)
             self:StartBuildFx(self:GetFocusUnit())
         end
@@ -76,7 +75,7 @@ AAirFactoryUnit = Class(AirFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
-  
+
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
@@ -152,7 +151,7 @@ ALandFactoryUnit = Class(LandFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
     end,
-   
+
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
@@ -200,7 +199,7 @@ ASeaFactoryUnit = Class(SeaFactoryUnit) {
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
     end,
-     
+
     OnPaused = function(self)
         AFactoryUnit.OnPaused(self)
     end,
@@ -233,7 +232,6 @@ AShieldStructureUnit = Class(ShieldStructureUnit) {
 
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
-        local bp = self:GetBlueprint()
         if not self.Rotator then
             self.Rotator = CreateRotator(self, 'Pod', 'z', nil, 0, 50, 0)
             self.Trash:Add(self.Rotator)

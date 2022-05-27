@@ -21,11 +21,19 @@ local options = Prefs.GetFromCurrentProfile('options')
 local GetUnitRolloverInfo = import("/lua/keymap/selectedinfo.lua").GetUnitRolloverInfo
 local unitViewLayout = import(UIUtil.GetLayoutFilename('unitview'))
 local unitviewDetail = import('/lua/ui/game/unitviewDetail.lua')
+local Grid = import('/lua/maui/grid.lua').Grid
+local Construction = import('/lua/ui/game/construction.lua')
+local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local selectedUnit = nil
 local updateThread = nil
 local unitHP = {}
 controls = import('/lua/ui/controls.lua').Get()
+
+-- shared between sim and ui
+local OverchargeShared = import('/lua/shared/overcharge.lua')
+
+local UpdateWindowShowQueueOfUnit = (categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY
 
 function OverchargeCanKill()
     if unitHP[1] and unitHP.blueprintId then
@@ -53,8 +61,7 @@ function OverchargeCanKill()
 
             if bp then
                 local targetCategories = __blueprints[unitHP.blueprintId].CategoriesHash
-                -- this one is from DefaultProjectiles.lua OverchargeProjectile EnergyAsDamage()
-                local damage = (math.log((GetEconomyTotals().stored.ENERGY * bp.energyMult + 9700) / 3000) / 0.000095) - 15500
+                local damage = OverchargeShared.EnergyAsDamage(GetEconomyTotals().stored.ENERGY)
 
                 if damage > bp.maxDamage then
                     damage = bp.maxDamage
@@ -221,7 +228,7 @@ local statFuncs = {
             else
                 return string.format('%d / %d', info.tacticalSiloStorageCount, info.tacticalSiloMaxStorageCount), 'tactical'
             end
-        elseif info.userUnit and table.getn(GetAttachedUnitsList({info.userUnit})) > 0 then
+        elseif info.userUnit and not table.empty(GetAttachedUnitsList({info.userUnit})) then
             return string.format('%d', table.getn(GetAttachedUnitsList({info.userUnit}))), 'attached'
         else
             return false
@@ -251,6 +258,54 @@ local statFuncs = {
         return false
     end,
 }
+
+
+function CreateQueueGrid(parent)
+	controls.queue = Bitmap(parent)
+    controls.queue.grid = Bitmap(controls.queue)
+	controls.queue.grid.items = {}	
+	controls.queue.bg = Bitmap(controls.queue)	
+    controls.queue:DisableHitTest()
+	
+	controls.queue.bg.leftBracket = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.rightGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.rightGlowBottom = Bitmap(controls.queue.bg)
+	
+	controls.queue.bg.leftGlowTop = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowMiddle = Bitmap(controls.queue.bg)
+    controls.queue.bg.leftGlowBottom = Bitmap(controls.queue.bg)
+	
+	local function CreateGridUnitIcon(parent)
+        local item =  Bitmap(parent)
+        item.icon = Bitmap(item)
+        item.text = UIUtil.CreateText(item, "", 16, 'Arial Black', true)
+        return item
+    end
+	
+	for id = 1, 7 do
+		controls.queue.grid.items[id] = CreateGridUnitIcon(controls.queue.grid)
+	end
+	
+    controls.queue.grid.UpdateQueue = function (self, queue)
+		if not queue then
+			controls.queue:Hide()
+		else
+            controls.queue:Show()
+			for id, item in self.items do
+				if queue[id] then
+					item:Show()
+					item.icon:SetTexture( UIUtil.UIFile('/icons/units/' ..  queue[id].id .. '_icon.dds', true))
+					item.text:SetText(tostring(queue[id].count))
+				else
+					item:Hide()
+				end
+			end
+		end
+    end	
+    controls.queue:Hide()
+end
 
 function UpdateWindow(info)
     if info.blueprintId == 'unknown' then
@@ -462,7 +517,7 @@ function UpdateWindow(info)
                     else
                         text = massKilledTrue
                     end
-
+					
                     controls.nextVet:SetText(text)
                 else
                     controls.vetBar:Hide()
@@ -474,6 +529,37 @@ function UpdateWindow(info)
         if info.userUnit then
             unitQueue = info.userUnit:GetCommandQueue()
         end
+
+        -- # Build queue upon hovering of unit
+
+        local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
+        local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1
+        local whenObserving = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'only-obs'
+
+        if always or (whenObserving and isObserver) then 
+            if (info.userUnit ~= nil) and EntityCategoryContains(UpdateWindowShowQueueOfUnit, info.userUnit) and (info.userUnit ~= selectedUnit) then
+
+                -- find the main factory we're using the queue of
+                local mainFactory
+                local factory = info.userUnit
+                while true do 
+                    mainFactory = factory:GetGuardedEntity()
+                    if mainFactory == nil then 
+                        break
+                    end
+                    factory = mainFactory
+                end
+                
+                -- show that queue
+                controls.queue.grid:UpdateQueue(SetCurrentFactoryForQueueDisplay(factory))
+                ClearCurrentFactoryForQueueDisplay()
+            else 
+                controls.queue:Hide()
+            end
+        else 
+            controls.queue:Hide()
+        end
+
         if info.focus then
             if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true)) then
                 controls.actionIcon:SetTexture(UIUtil.UIFile('/icons/units/' .. info.focus.blueprintId .. '_icon.dds', true))
@@ -534,7 +620,7 @@ function UpdateWindow(info)
                 end
             end
         end
-        if lines and (table.getn(lines) > 0) then
+        if lines and (not table.empty(lines)) then
             local i = 1
             local maxWidth = 0
             local index = table.getn(lines)
@@ -705,7 +791,7 @@ function CreateUI()
 
     controls.bg.OnFrame = function(self, delta)
         local info = GetRolloverInfo()
-        if not info and selectedUnit then
+        if not info and selectedUnit and options.gui_enhanced_unitview ~= 0 then
             info = GetUnitRolloverInfo(selectedUnit)
         end
 
@@ -730,13 +816,11 @@ function CreateUI()
     LayoutHelpers.AtLeftTopIn(controls.enhancements['RCH'], controls.bg, 10, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['Back'], controls.bg, 42, -30)
     LayoutHelpers.AtLeftTopIn(controls.enhancements['LCH'], controls.bg, 74, -30)
+	CreateQueueGrid(controls.bg)
 end
 
 function OnSelection(units)
-    if options.gui_enhanced_unitview == 0 then
-        return
-    end
-
+    -- set if we have one unit selected, useful for state management for information to show
     if units and table.getn(units) == 1 then
         selectedUnit = units[1]
     else

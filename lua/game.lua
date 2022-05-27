@@ -5,6 +5,11 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+-- This file is used by both sim and UI code. It should therefore at
+-- no moment use logic that is not available in both. Any pull request that 
+-- introduces logic that is not functional in both the ui and the sim will 
+-- be rejected.
+
 FireState = {
     RETURN_FIRE = 0,
     HOLD_FIRE = 1,
@@ -17,41 +22,6 @@ VeteranDefault = {
     Level3 = 250,
     Level4 = 500,
     Level5 = 1000,
-}
-
-local BuffFieldBlueprint = import('/lua/sim/BuffField.lua').BuffFieldBlueprint
-
--- Seraphim ACU Buff Field Upgrades
-BuffFieldBlueprint { -- Seraphim ACU Restoration
-    Name = 'SeraphimACURegenBuffField',
-    AffectsUnitCategories = 'ALLUNITS',
-    AffectsAllies = false,
-    AffectsVisibleEnemies = false,
-    AffectsOwnUnits = true,
-    AffectsSelf = true,
-    DisableInTransport = true,
-    InitiallyEnabled = false,
-    MaintenanceConsumptionPerSecondEnergy = 0,
-    Radius = 15,
-    Buffs = {
-        'SeraphimACURegenAura',
-   },
-}
-
-BuffFieldBlueprint { -- Seraphim ACU Advanced Restoration
-    Name = 'SeraphimAdvancedACURegenBuffField',
-    AffectsUnitCategories = 'ALLUNITS',
-    AffectsAllies = false,
-    AffectsVisibleEnemies = false,
-    AffectsOwnUnits = true,
-    AffectsSelf = true,
-    DisableInTransport = true,
-    InitiallyEnabled = false,
-    MaintenanceConsumptionPerSecondEnergy = 0,
-    Radius = 15,
-    Buffs = {
-        'SeraphimAdvancedACURegenAura',
-   },
 }
 
 -- Return the total time (in seconds), energy, and mass it will take for the given
@@ -266,7 +236,7 @@ end
 -- e.g. restrictions = {categories.TECH1} ->
 function ResolveRestrictions(toggle, cats, army)
     -- Initialize blueprints info only once
-    if table.getsize(bps.ids) == 0 or table.getsize(bps.upgradeable) == 0 then
+    if table.empty(bps.ids) or table.empty(bps.upgradeable) then
         bps.ids = GetUnitsIds()
         bps.upgradeable = GetUnitsUpgradable()
     end
