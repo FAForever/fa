@@ -83,6 +83,17 @@ function SetLayout()
     controls.vetBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
     controls.vetBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
 
+    LayoutHelpers.AtLeftTopIn(controls.vetBar, controls.bg, 192, 68)
+    LayoutHelpers.SetDimensions(controls.vetBar, 56, 3)
+    controls.vetBar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/healthbar_bg.dds'))
+    controls.vetBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
+
+    LayoutHelpers.AtLeftTopIn(controls.ReclaimGroup, controls.bg, 192, 68)
+    LayoutHelpers.SetDimensions(controls.ReclaimGroup, 200, 200)
+    LayoutHelpers.FillParent(controls.ReclaimGroup.MassIcon, controls.ReclaimGroup)
+    controls.ReclaimGroup.MassIcon:SetSolidColor('ffffffff')
+    LOG("Set!")
+    
     LayoutHelpers.Below(controls.nextVet, controls.vetBar)
     controls.nextVet:SetDropShadow(true)
     LayoutHelpers.Above(controls.vetTitle, controls.vetBar)

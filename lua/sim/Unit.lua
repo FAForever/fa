@@ -740,6 +740,8 @@ Unit = Class(moho.unit_methods) {
             IssueReclaim({self}, target)
             IssueGuard({self}, guard)
         end
+
+        self.Brain:AddReclaimer(self, target)
     end,
 
     OnStopReclaim = function(self, target)
@@ -751,6 +753,8 @@ Unit = Class(moho.unit_methods) {
         if target.MaxMassReclaim then -- This is a prop
             target:UpdateReclaimLeft()
         end
+
+        self.Brain:RemoveReclaimer(self, target)
     end,
 
     StartReclaimEffects = function(self, target)

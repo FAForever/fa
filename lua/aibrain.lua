@@ -238,6 +238,14 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyExcessUnitsDisabled = { }
         setmetatable(self.EnergyExcessUnitsDisabled, { __mode = 'v' })
 
+        --- Units that we keep track for reclaim amount computations 
+        self.Reclaimers = { }
+        setmetatable(self.Reclaimers, { __mode = 'v' })
+        self.Reclaimees = { }
+        setmetatable(self.Reclaimees, { __mode = 'v' })
+
+        ForkThread(self.ReclaimerThread, self)
+
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
@@ -330,6 +338,65 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    -- Reclaim tracking
+
+    AddReclaimer = function(self, unit, target)
+        self.Reclaimers[unit.EntityId] = unit
+        self.Reclaimees[unit.EntityId] = target
+    end,
+
+    RemoveReclaimer = function(self, unit, target)
+        self.Reclaimers[unit.EntityId] = nil
+        self.Reclaimees[unit.EntityId] = nil
+    end,
+
+    ReclaimerThread = function(self)
+
+        local CoroutineYield = CoroutineYield
+
+        while true do 
+
+            -- for each reclaimer, check if it still exists
+            for k, reclaimer in self.Reclaimers do 
+                if not reclaimer:BeenDestroyed() and reclaimer:IsUnitState('Reclaiming') then
+                    
+                    -- for each target, check if it still exists
+                    local target = self.Reclaimees[k]
+                    if not target:BeenDestroyed() then
+
+                        -- we're reclaiming a unit
+                        if IsUnit(target) then 
+
+                        -- we're reclaiming a prop
+                        else 
+                            local time, energy, mass = target:GetReclaimCosts(reclaimer)
+                            LOG("time" .. tostring(time))
+                            LOG("energy" .. tostring(energy))
+                            LOG("mass" .. tostring(mass))
+
+                            local multiplier = 1
+                            if time < 0.1 then 
+                                multiplier = time / 0.1
+                            end
+
+                            local massChange = mass / (time * 10) * multiplier
+                            local energyChange = energy / (time * 10) * multiplier
+
+                            LOG("massChange" .. tostring(massChange))
+                            LOG("energyChange" .. tostring(energyChange))
+
+                            reclaimer:SetStat('ReclaimedMass', reclaimer:GetStat('ReclaimedMass', 0).Value + massChange)
+                            reclaimer:SetStat('ReclaimedEnergy', reclaimer:GetStat('ReclaimedEnergy', 0).Value + energyChange)
+                        end
+                    end 
+                end
+            end
+
+
+            CoroutineYield(1)
+        end
     end,
 
     -- Energy storage callbacks

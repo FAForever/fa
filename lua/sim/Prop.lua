@@ -318,7 +318,6 @@ Prop = Class(moho.prop_methods) {
     -- @param reclaimer The unit to compute the duration for.
     -- @return The time it takes and the amount of energy and mass reclaim.
     GetReclaimCosts = function(self, reclaimer)
-
         local maxValue = self.MaxMassReclaim
         if self.MaxEnergyReclaim > maxValue then 
             maxValue = self.MaxEnergyReclaim
