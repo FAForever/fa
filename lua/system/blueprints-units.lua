@@ -32,7 +32,7 @@ local function PostProcessUnit(unit)
 
     -- All of the decisions below are made based on when a unit attack moves, as that is
     -- the default meta to use in competitive play. This is by all means not perfect,
-    -- but it is the best we can do
+    -- but it is the best we can do when we need to consider the performance of it all
 
     local isEngineer = unit.CategoriesHash['ENGINEER']
     local isStructure = unit.CategoriesHash['STRUCTURE']
@@ -53,51 +53,67 @@ local function PostProcessUnit(unit)
         -- if it is set then we use that - allows balance team to make adjustments as they see fit
         if not unit.AI.GuardScanRadius then 
 
-            -- check if we have a primary weapon that is actually a weapon
-            local primaryWeapon = unit.Weapon[1]
-            if primaryWeapon and not 
-                (
-                    primaryWeapon.DummyWeapon or 
-                    primaryWeapon.WeaponCategory == 'Death' or
-                    primaryWeapon.Label == 'DeathImpact' or
-                    primaryWeapon.DisplayName == 'Air Crash'
-                )
-            then 
+            -- structures don't need this value set
+            if isStructure then 
+                LOG("Structure: " .. unit.BlueprintId)
+                unit.AI.GuardScanRadius = 0
 
-                local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
-                local maxRadius = primaryWeapon.MaxRadius or 0
-                
-                -- structures don't need this value set
-                if isStructure then 
-                    unit.AI.GuardScanRadius = 0 
+            -- mobile units do need this value set
+            else 
+                -- check if we have a primary weapon that is actually a weapon
+                local primaryWeapon = unit.Weapon[1]
+                if primaryWeapon and not 
+                    (
+                        primaryWeapon.DummyWeapon or 
+                        primaryWeapon.WeaponCategory == 'Death' or
+                        primaryWeapon.Label == 'DeathImpact' or
+                        primaryWeapon.DisplayName == 'Air Crash'
+                    )
+                then 
 
-                -- land to air units shouldn't get triggered too fast
-                elseif isLand and isAntiAir then 
-                    unit.AI.GuardScanRadius = 0.80 * maxRadius
+                    LOG("Mobile unit with weapon: " .. unit.BlueprintId)
 
-                -- all other units will have the default value of 10% on top of their maximum attack radius
-                else
-                    unit.AI.GuardScanRadius = 1.10 * maxRadius
+                    local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
+                    local maxRadius = primaryWeapon.MaxRadius or 0
+
+                    -- land to air units shouldn't get triggered too fast
+                    if isLand and isAntiAir then 
+                        unit.AI.GuardScanRadius = 0.80 * maxRadius
+
+                    -- all other units will have the default value of 10% on top of their maximum attack radius
+                    else
+                        unit.AI.GuardScanRadius = 1.10 * maxRadius
+                    end
+
+                -- units with no weaponry don't need this value set
+                else 
+                    unit.AI.GuardScanRadius = 0
                 end
 
-            -- units with no weaponry don't need this value set
-            else 
-                unit.AI.GuardScanRadius = 0
+
+                -- cap it, some units have extreme values based on their attack radius
+                if isTech1 and unit.AI.GuardScanRadius > 40 then 
+                    unit.AI.GuardScanRadius = 40 
+                elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
+                    unit.AI.GuardScanRadius = 80
+                elseif isTech3 and unit.AI.GuardScanRadius > 120 then 
+                    unit.AI.GuardScanRadius = 120
+                elseif isExperimental and unit.AI.GuardScanRadius > 160 then 
+                    unit.AI.GuardScanRadius = 160
+                end
+
+                -- sanitize it
+                unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
+
             end
 
-            -- cap it, some units have extreme values based on their attack radius
-            if isTech1 and unit.AI.GuardScanRadius > 40 then 
-                unit.AI.GuardScanRadius = 40 
-            elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
-                unit.AI.GuardScanRadius = 80
-            elseif isTech3 and unit.AI.GuardScanRadius > 120 then 
-                unit.AI.GuardScanRadius = 120
-            elseif isExperimental and unit.AI.GuardScanRadius > 160 then 
-                unit.AI.GuardScanRadius = 160
+            -- make sure the value is at least one, or the game thinks it is not set and 
+            -- defaults it to maxRadius * trackingRadius of primary weapon, or 25.
+            if unit.AI.GuardScanRadius <= 0 then 
+                unit.AI.GuardScanRadius = 1 
             end
-
-            -- sanitize it
-            unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
+        else 
+            LOG("Already set: " .. unit.BlueprintId)
         end
     end
 
@@ -120,7 +136,9 @@ function PostProcessUnits(units)
     for k, unit in units do 
 
         local oldGuardScanRadius = unit.AI.GuardScanRadius
+        local oldGuardScanRadiusWasSet = true
         if not oldGuardScanRadius then 
+            oldGuardScanRadiusWasSet = false
             local primaryWeapon = unit.Weapon[1]
             if primaryWeapon then 
                 local maxRadius = primaryWeapon.MaxRadius or 0
@@ -133,6 +151,6 @@ function PostProcessUnits(units)
 
         PostProcessUnit(unit)
 
-        LOG("Processing: " .. unit.BlueprintId .. " - GuardScanRadius: " .. tostring(oldGuardScanRadius) .. " -> " .. tostring(unit.AI.GuardScanRadius) .. " (" .. tostring(unit.General.UnitName) .. ")")
+        LOG("Processing: " .. unit.BlueprintId .. " - GuardScanRadius: " .. tostring(oldGuardScanRadius) .. " (set:  " .. tostring(oldGuardScanRadiusWasSet) .. ") -> " .. tostring(unit.AI.GuardScanRadius) .. " (" .. tostring(unit.General.UnitName) .. ")")
     end
 end
