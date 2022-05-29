@@ -38,6 +38,9 @@ local function PostProcessUnit(unit)
     local isStructure = unit.CategoriesHash['STRUCTURE']
     local isDummy = unit.CategoriesHash['DUMMYUNIT']
     local isLand = unit.CategoriesHash['LAND']
+    local isAir = unit.CategoriesHash['AIR']
+    local isBomber = unit.CategoriesHash['BOMBER']
+    local isGunship = unit.CategoriesHash['GUNSHIP']
 
     local isTech1 = unit.CategoriesHash['TECH1']
     local isTech2 = unit.CategoriesHash['TECH2']
@@ -107,6 +110,23 @@ local function PostProcessUnit(unit)
                 -- sanitize it
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
 
+            end
+        end
+    end
+
+    -- # sanitize air unit footprints
+
+    if isAir and not isExperimental then 
+        if unit.Footprint then 
+            if isBomber then 
+                unit.Footprint.SizeX = math.floor(3.95 * (unit.Footprint.SizeX or 1)) + 1 
+                unit.Footprint.SizeZ = math.floor(3.95 * (unit.Footprint.SizeZ or 1)) + 1 
+            elseif isGunship then 
+                unit.Footprint.SizeX = math.floor(2.95 * (unit.Footprint.SizeX or 1)) + 1 
+                unit.Footprint.SizeZ = math.floor(2.95 * (unit.Footprint.SizeZ or 1)) + 1 
+            else 
+                unit.Footprint.SizeX = math.floor(1.95 * (unit.Footprint.SizeX or 1)) + 1 
+                unit.Footprint.SizeZ = math.floor(1.95 * (unit.Footprint.SizeZ or 1)) + 1 
             end
         end
     end
