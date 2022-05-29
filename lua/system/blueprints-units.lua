@@ -112,28 +112,9 @@ local function PostProcessUnit(unit)
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
 
             end
-
-            -- make sure the value is at least one, or the game thinks it is not set and 
-            -- defaults it to maxRadius * trackingRadius of primary weapon, or 25.
-            if unit.AI.GuardScanRadius <= 0 then 
-                unit.AI.GuardScanRadius = 1 
-            end
         else 
             LOG("Already set: " .. unit.BlueprintId)
         end
-    end
-
-    -- sanitize air staging radius
-
-    local isAirStaging = unit.CategoriesHash['AIRSTAGINGPLATFORM']
-
-    if not isAirStaging then 
-
-        -- guarantee that the table exists
-        unit.AI = unit.AI or { }
-
-        -- set the scan radius to 0, as this value is only used by an air staging platform
-        unit.AI.StagingPlatformScanRadius = 0
     end
 end
 
