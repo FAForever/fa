@@ -80,16 +80,10 @@ local function PostProcessUnit(unit)
             if primaryWeapon then 
                 local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
                 local maxRadius = primaryWeapon.MaxRadius or 0
-                local trackingRadius = primaryWeapon.TrackingRadius or 1.0
                 
                 -- land to air and air to air units shouldn't get triggered too fast
                 if (isLand or isAir) and isAntiAir then 
                     unit.AI.GuardScanRadius = 0.80 * maxRadius
-
-                -- let bombers use their tracking radius, usually 1.25
-                elseif isAir and isBomber then 
-                    unit.AI.GuardScanRadius = trackingRadius * maxRadius
-                
                 -- all other units have - roughly - the default value of 10% on top of their maximum radius
                 else
                     unit.AI.GuardScanRadius = 1.10 * maxRadius
@@ -106,10 +100,10 @@ local function PostProcessUnit(unit)
             unit.AI.GuardScanRadius = 40 
         elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
             unit.AI.GuardScanRadius = 80
-        elseif isTech3 and unit.AI.GuardScanRadius > 160 then 
+        elseif isTech3 and unit.AI.GuardScanRadius > 120 then 
+            unit.AI.GuardScanRadius = 120
+        elseif isExperimental and unit.AI.GuardScanRadius > 160 then 
             unit.AI.GuardScanRadius = 160
-        elseif isExperimental and unit.AI.GuardScanRadius > 320 then 
-            unit.AI.GuardScanRadius = 320
         end
 
         -- sanitize it

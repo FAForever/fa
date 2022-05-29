@@ -1,7 +1,5 @@
 UnitBlueprint {
-    AI = {
-        GuardScanRadius = 0
-    },
+    AI = { },
     Air = {
         BankFactor = 0.1,
         BankForward = false,
