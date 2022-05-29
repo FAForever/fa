@@ -109,24 +109,26 @@ local function PostProcessUnit(unit)
 
                 -- sanitize it
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
-
             end
         end
     end
 
     -- # sanitize air unit footprints
 
+    -- value used by formations to determine the distance between other air units. Note
+    -- that the value must be of type unsigned integer!
+
     if isAir and not isExperimental then 
         if unit.Footprint then 
             if isBomber then 
-                unit.Footprint.SizeX = math.floor(3.95 * (unit.Footprint.SizeX or 1)) + 1 
-                unit.Footprint.SizeZ = math.floor(3.95 * (unit.Footprint.SizeZ or 1)) + 1 
+                unit.Footprint.SizeX = 4
+                unit.Footprint.SizeZ = 4
             elseif isGunship then 
-                unit.Footprint.SizeX = math.floor(2.95 * (unit.Footprint.SizeX or 1)) + 1 
-                unit.Footprint.SizeZ = math.floor(2.95 * (unit.Footprint.SizeZ or 1)) + 1 
+                unit.Footprint.SizeX = 3
+                unit.Footprint.SizeZ = 3 
             else 
-                unit.Footprint.SizeX = math.floor(1.95 * (unit.Footprint.SizeX or 1)) + 1 
-                unit.Footprint.SizeZ = math.floor(1.95 * (unit.Footprint.SizeZ or 1)) + 1 
+                unit.Footprint.SizeX = 2
+                unit.Footprint.SizeZ = 2
             end
         end
     end
