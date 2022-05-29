@@ -46,12 +46,8 @@ XAB3301 = Class( AStructureUnit ) {
                 CreateLightParticle(self, "spin02", self.Army, 10, 20, 'glow_02', 'ramp_blue_22')
             end
 
-            
-
             if not self.ScryEnabled then
                 self.ScryEnabled = true 
-                
-                LOG("CreateVisibleEntity")
                 
                 self.Animator:SetRate(1)
                 self.RotatorBot:SetTargetSpeed(12)
@@ -67,7 +63,6 @@ XAB3301 = Class( AStructureUnit ) {
 
     DisableVisibleEntity = function(self)
         AStructureUnit.DisableVisibleEntity(self)
-        LOG("DisableVisibleEntity")
 
         self.Animator:SetRate(-1)
         self.RotatorBot:SetTargetSpeed(6)
@@ -76,7 +71,6 @@ XAB3301 = Class( AStructureUnit ) {
         self.TrashAmbientEffects:Destroy()
         self.ScryEnabled = false 
     end,
-
 }
 
 TypeClass = XAB3301

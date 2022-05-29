@@ -1,6 +1,6 @@
 	UnitBlueprint {
     AI = {
-        GuardScanRadius = 30,
+        GuardScanRadius = 30, -- set as a sane default
         NeedUnpack = true,
         TargetBones = {
             'URL0401',

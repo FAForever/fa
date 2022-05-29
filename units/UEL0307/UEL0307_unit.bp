@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 30,
+        GuardScanRadius = 30, -- allow mobile shield to keep a distance when on attack move
     },
     Audio = {
         AmbientMove = Sound {

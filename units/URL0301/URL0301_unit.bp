@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardRadius = 10,
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'Torso',
             'Head',
