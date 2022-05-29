@@ -59,6 +59,10 @@ local function PostProcessUnit(unit)
                 LOG("Structure: " .. unit.BlueprintId)
                 unit.AI.GuardScanRadius = 0
 
+            -- engineers need their factory reclaim bug
+            elseif isEngineer then 
+                unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug 
+
             -- mobile units do need this value set
             else 
                 -- check if we have a primary weapon that is actually a weapon
