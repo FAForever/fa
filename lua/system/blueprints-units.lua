@@ -38,6 +38,9 @@ local function PostProcessUnit(unit)
     local isStructure = unit.CategoriesHash['STRUCTURE']
     local isDummy = unit.CategoriesHash['DUMMYUNIT']
     local isLand = unit.CategoriesHash['LAND']
+    local isAir = unit.CategoriesHash['AIR']
+    local isBomber = unit.CategoriesHash['BOMBER']
+    local isGunship = unit.CategoriesHash['GUNSHIP']
 
     local isTech1 = unit.CategoriesHash['TECH1']
     local isTech2 = unit.CategoriesHash['TECH2']
@@ -106,8 +109,26 @@ local function PostProcessUnit(unit)
 
                 -- sanitize it
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
-
             end
+        end
+    end
+
+    -- # sanitize air unit footprints
+
+    -- value used by formations to determine the distance between other air units. Note
+    -- that the value must be of type unsigned integer!
+
+    if isAir and not isExperimental then 
+        unit.Footprint = unit.Footprint or { }
+        if isBomber then 
+            unit.Footprint.SizeX = 4
+            unit.Footprint.SizeZ = 4
+        elseif isGunship then 
+            unit.Footprint.SizeX = 3
+            unit.Footprint.SizeZ = 3 
+        else 
+            unit.Footprint.SizeX = 2
+            unit.Footprint.SizeZ = 2
         end
     end
 end

@@ -406,8 +406,8 @@ Callbacks.BoxFormationSpawn = function(data)
 
     local posX = (data.pos[1])
     local posZ = (data.pos[3])
-    local offsetX = unitbp.SizeX or 1
-    local offsetZ = unitbp.SizeZ or 1
+    local offsetX = 1.2 * (unitbp.Footprint.SizeX or 1)
+    local offsetZ = 1.2 * (unitbp.Footprint.SizeZ or 1)
 
     if unitbp.Physics.MotionType == 'RULEUMT_None' then
         offsetX = math.ceil(unitbp.Physics.SkirtSizeX or FootprintSize('x'))

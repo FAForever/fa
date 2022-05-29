@@ -277,7 +277,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             CannotAttackGround = true,
             CollideFriendly = false,
-            Damage = 405, # 135
+            Damage = 405, 
             DamageFriendly = false,
             DamageType = 'Normal',
             DisplayName = 'Losaare AA Autocannon',
@@ -285,15 +285,15 @@ UnitBlueprint {
                 Air = 'Air|Land|Water',
                 Land = 'Air|Land|Water',
             },
-            FiringTolerance = 2, # 0
+            FiringTolerance = 2, 
             Label = 'AutoCannon1',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0, # 0.1
-            MuzzleSalvoSize = 1, # 3
+            MuzzleSalvoDelay = 0, 
+            MuzzleSalvoSize = 1,
             MuzzleVelocity = 120,
             ProjectileId = '/projectiles/SAALosaareAutoCannon01/SAALosaareAutoCannon01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
-            ProjectilesPerOnFire = 1, # 3
+            ProjectilesPerOnFire = 1,
             RackBones = {
                 {
                     MuzzleBones = {
@@ -313,19 +313,14 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
+            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
-                'AIR MOBILE TECH3 BOMBER',
-                'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
-                'AIR MOBILE TRANSPORTATION',
-                'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
+            AlwaysRecheckTarget = false,
+            TargetRestrictDisallow = 'UNTARGETABLE,POD',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 0,
+            TrackingRadius = 1.0,
             TurretBoneMuzzle = 'Muzzle',
             TurretBonePitch = 'Muzzle',
             TurretBoneYaw = 'Muzzle',
