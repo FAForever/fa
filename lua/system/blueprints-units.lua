@@ -119,17 +119,16 @@ local function PostProcessUnit(unit)
     -- that the value must be of type unsigned integer!
 
     if isAir and not isExperimental then 
-        if unit.Footprint then 
-            if isBomber then 
-                unit.Footprint.SizeX = 4
-                unit.Footprint.SizeZ = 4
-            elseif isGunship then 
-                unit.Footprint.SizeX = 3
-                unit.Footprint.SizeZ = 3 
-            else 
-                unit.Footprint.SizeX = 2
-                unit.Footprint.SizeZ = 2
-            end
+        unit.Footprint = unit.Footprint or { }
+        if isBomber then 
+            unit.Footprint.SizeX = 4
+            unit.Footprint.SizeZ = 4
+        elseif isGunship then 
+            unit.Footprint.SizeX = 3
+            unit.Footprint.SizeZ = 3 
+        else 
+            unit.Footprint.SizeX = 2
+            unit.Footprint.SizeZ = 2
         end
     end
 end
