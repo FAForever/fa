@@ -61,6 +61,7 @@ local function PostProcessUnit(unit)
 
             -- engineers need their factory reclaim bug
             elseif isEngineer then 
+                LOG("Engineer: " .. unit.BlueprintId)
                 unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug 
 
             -- mobile units do need this value set
