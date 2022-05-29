@@ -118,7 +118,7 @@ local function PostProcessUnit(unit)
     -- value used by formations to determine the distance between other air units. Note
     -- that the value must be of type unsigned integer!
 
-    if isAir and not isExperimental then 
+    if isAir and not (isExperimental or isStructure) then 
         unit.Footprint = unit.Footprint or { }
         if isBomber then 
             unit.Footprint.SizeX = 4
