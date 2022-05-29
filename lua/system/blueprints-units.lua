@@ -116,22 +116,22 @@ end
 function PostProcessUnits(units)
     for k, unit in units do 
 
-        local oldGuardScanRadius = unit.AI.GuardScanRadius
-        local oldGuardScanRadiusWasSet = true
-        if not oldGuardScanRadius then 
-            oldGuardScanRadiusWasSet = false
-            local primaryWeapon = unit.Weapon[1]
-            if primaryWeapon then 
-                local maxRadius = primaryWeapon.MaxRadius or 0
-                local trackingRadius = primaryWeapon.TrackingRadius or 1.0
-                oldGuardScanRadius = trackingRadius * maxRadius
-            else 
-                oldGuardScanRadius = 25 -- default value
-            end
-        end
+        -- local oldGuardScanRadius = unit.AI.GuardScanRadius
+        -- local oldGuardScanRadiusWasSet = true
+        -- if not oldGuardScanRadius then 
+        --     oldGuardScanRadiusWasSet = false
+        --     local primaryWeapon = unit.Weapon[1]
+        --     if primaryWeapon then 
+        --         local maxRadius = primaryWeapon.MaxRadius or 0
+        --         local trackingRadius = primaryWeapon.TrackingRadius or 1.0
+        --         oldGuardScanRadius = trackingRadius * maxRadius
+        --     else 
+        --         oldGuardScanRadius = 25 -- default value
+        --     end
+        -- end
 
         PostProcessUnit(unit)
 
-        LOG("Processing: " .. unit.BlueprintId .. " - GuardScanRadius: " .. tostring(oldGuardScanRadius) .. " -> " .. tostring(unit.AI.GuardScanRadius) .. " (" .. tostring(unit.General.UnitName) .. ")")
+        -- LOG("Processing: " .. unit.BlueprintId .. " - GuardScanRadius: " .. tostring(oldGuardScanRadius) .. " -> " .. tostring(unit.AI.GuardScanRadius) .. " (" .. tostring(unit.General.UnitName) .. ")")
     end
 end
