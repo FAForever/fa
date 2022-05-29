@@ -241,7 +241,7 @@ function CreateChatLines()
     end
     if GUI.chatContainer then
         local curEntries = table.getsize(GUI.chatLines)
-        local neededEntries = math.floor(GUI.chatContainer.Height() / (GUI.chatLines[1].Height() + 2))
+        local neededEntries = math.floor(GUI.chatContainer.Height() / (GUI.chatLines[1].Height() + 0))
         if curEntries - neededEntries == 0 then
             return
         elseif curEntries - neededEntries < 0 then
@@ -249,7 +249,7 @@ function CreateChatLines()
                 local index = i
                 GUI.chatLines[index] = CreateChatLine()
                 LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
-                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
+                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 2 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
         elseif curEntries - neededEntries > 0 then
@@ -273,7 +273,7 @@ function CreateChatLines()
         if not GUI.chatLines[1] then
             GUI.chatLines[1] = CreateChatLine()
             LayoutHelpers.AtLeftTopIn(GUI.chatLines[1], GUI.chatContainer, 0, 0)
-            GUI.chatLines[1].Height:Set(function() return GUI.chatLines[1].name.Height() + 4 end)
+            GUI.chatLines[1].Height:Set(function() return GUI.chatLines[1].name.Height() + 2 end)
             GUI.chatLines[1].Right:Set(GUI.chatContainer.Right)
         end
         local index = 1
@@ -282,7 +282,7 @@ function CreateChatLines()
             if not GUI.chatLines[index] then
                 GUI.chatLines[index] = CreateChatLine()
                 LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
-                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
+                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 2 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
         end
