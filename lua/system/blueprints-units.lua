@@ -36,21 +36,12 @@ local function PostProcessUnit(unit)
 
     local isEngineer = unit.CategoriesHash['ENGINEER']
     local isStructure = unit.CategoriesHash['STRUCTURE']
-    local isShield = unit.categoriesHash['SHIELD']
     local isLand = unit.CategoriesHash['LAND']
-    local isScout = unit.CategoriesHash['SCOUT']
-    local isArtillery = unit.CategoriesHash['ARTILLERY']
-    local isAir = unit.CategoriesHash['AIR']
-    local isCommand = unit.CategoriesHash['COMMAND']
-    local isBomber = unit.CategoriesHash['BOMBER']
-    local isAntiNavy = unit.CategoriesHash['ANTINAVY']
 
     local isTech1 = unit.CategoriesHash['TECH1']
     local isTech2 = unit.CategoriesHash['TECH2']
     local isTech3 = unit.CategoriesHash['TECH3']
     local isExperimental = unit.CategoriesHash['EXPERIMENTAL']
-
-    local isScathis = unit.BlueprintId == 'url0401'
 
     -- do not touch guard scan radius values of engineer-like units, as it is the reason we have
     -- the factory-reclaim-bug that we're keen in keeping that at this point
@@ -59,56 +50,55 @@ local function PostProcessUnit(unit)
         -- guarantee that the table exists
         unit.AI = unit.AI or { }
 
-        -- structures do not need this value set
-        if isStructure then 
-            unit.AI.GuardScanRadius = 0
+        -- if it is set then we use that - allows balance team to make adjustments as they see fit
+        if not unit.AI.GuardScanRadius then 
 
-        -- exceptions as these are tweaked by balance team
-        elseif isLand and isScout then 
-            -- do nothing
-        
-        -- exceptions as these are tweaked by balance team
-        elseif isCommand then 
-            -- do nothing 
-
-        elseif isScathis then 
-            -- do nothing
-
-        else 
-            -- check if we have a primary weapon
+            -- check if we have a primary weapon that is actually a weapon
             local primaryWeapon = unit.Weapon[1]
-            if primaryWeapon then 
+            if primaryWeapon and not 
+                (
+                    primaryWeapon.DummyWeapon or 
+                    primaryWeapon.WeaponCategory == 'Death' or
+                    primaryWeapon.Label == 'DeathImpact' or
+                    primaryWeapon.DisplayName == 'Air Crash'
+                )
+            then 
+
                 local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
                 local maxRadius = primaryWeapon.MaxRadius or 0
                 
-                -- land to air and air to air units shouldn't get triggered too fast
-                if (isLand or isAir) and isAntiAir then 
+                -- structures don't need this value set
+                if isStructure then 
+                    unit.AI.GuardScanRadius = 0 
+
+                -- land to air units shouldn't get triggered too fast
+                elseif isLand and isAntiAir then 
                     unit.AI.GuardScanRadius = 0.80 * maxRadius
-                -- all other units have - roughly - the default value of 10% on top of their maximum radius
+
+                -- all other units will have the default value of 10% on top of their maximum attack radius
                 else
                     unit.AI.GuardScanRadius = 1.10 * maxRadius
                 end
 
-            -- units with no weaponry, like some scouts or spy planes
+            -- units with no weaponry don't need this value set
             else 
                 unit.AI.GuardScanRadius = 0
             end
+
+            -- cap it, some units have extreme values based on their attack radius
+            if isTech1 and unit.AI.GuardScanRadius > 40 then 
+                unit.AI.GuardScanRadius = 40 
+            elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
+                unit.AI.GuardScanRadius = 80
+            elseif isTech3 and unit.AI.GuardScanRadius > 120 then 
+                unit.AI.GuardScanRadius = 120
+            elseif isExperimental and unit.AI.GuardScanRadius > 160 then 
+                unit.AI.GuardScanRadius = 160
+            end
+
+            -- sanitize it
+            unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
         end
-
-        -- cap it, some units have extreme values for their tech level
-        if isTech1 and unit.AI.GuardScanRadius > 40 then 
-            unit.AI.GuardScanRadius = 40 
-        elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
-            unit.AI.GuardScanRadius = 80
-        elseif isTech3 and unit.AI.GuardScanRadius > 120 then 
-            unit.AI.GuardScanRadius = 120
-        elseif isExperimental and unit.AI.GuardScanRadius > 160 then 
-            unit.AI.GuardScanRadius = 160
-        end
-
-        -- sanitize it
-        unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
-
     end
 
     -- sanitize air staging radius
