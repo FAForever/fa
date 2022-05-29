@@ -214,7 +214,10 @@ function CreateUI()
     end
 
     -- music
-    local ambientSoundHandle = PlaySound(Sound({Cue = "AMB_Menu_Loop", Bank = "AmbientTest",}))
+    local ambientSoundHandle = false
+    if not HasCommandLineArg("/nomovie") then
+        ambientSoundHandle = PlaySound(Sound({Cue = "AMB_Menu_Loop", Bank = "AmbientTest",}))
+    end
 
     local musicHandle = false
     function StartMusic()
