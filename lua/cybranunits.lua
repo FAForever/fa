@@ -411,7 +411,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self.AnimationWater then
+        if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -429,7 +429,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.Blueprint.Display.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else

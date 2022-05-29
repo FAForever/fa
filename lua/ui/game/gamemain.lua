@@ -232,6 +232,8 @@ function CreateUI(isReplay)
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     controls.mfd = mfdControl
 
+    controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
+
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
         controls.ordersControl = ordersControl
