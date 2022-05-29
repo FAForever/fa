@@ -2,7 +2,7 @@
 -- Post process a unit
 local function PostProcessUnit(unit)
 
-    -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     unit.CategoriesCount = 0
     unit.CategoriesHash = { }
@@ -13,7 +13,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     unit.DoNotCollideListCount = 0 
     unit.DoNotCollideListHash = { }
@@ -24,7 +24,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- sanitize guard scan radius
+    -- # sanitize guard scan radius
 
     -- The guard scan radius is used when:
     -- - A unit attack moves, it determines how far the unit remains from its target
@@ -56,12 +56,10 @@ local function PostProcessUnit(unit)
 
             -- structures don't need this value set
             if isStructure or isDummy then 
-                LOG("Structure: " .. unit.BlueprintId)
                 unit.AI.GuardScanRadius = 0
 
             -- engineers need their factory reclaim bug
             elseif isEngineer then 
-                LOG("Engineer: " .. unit.BlueprintId)
                 unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug 
 
             -- mobile units do need this value set
@@ -76,8 +74,6 @@ local function PostProcessUnit(unit)
                         primaryWeapon.DisplayName == 'Air Crash'
                     )
                 then 
-
-                    LOG("Mobile unit with weapon: " .. unit.BlueprintId)
 
                     local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
                     local maxRadius = primaryWeapon.MaxRadius or 0
@@ -112,8 +108,6 @@ local function PostProcessUnit(unit)
                 unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
 
             end
-        else 
-            LOG("Already set: " .. unit.BlueprintId)
         end
     end
 end
