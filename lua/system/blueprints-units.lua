@@ -36,6 +36,7 @@ local function PostProcessUnit(unit)
 
     local isEngineer = unit.CategoriesHash['ENGINEER']
     local isStructure = unit.CategoriesHash['STRUCTURE']
+    local isDummy = unit.CategoriesHash['DUMMYUNIT']
     local isLand = unit.CategoriesHash['LAND']
 
     local isTech1 = unit.CategoriesHash['TECH1']
@@ -54,7 +55,7 @@ local function PostProcessUnit(unit)
         if not unit.AI.GuardScanRadius then 
 
             -- structures don't need this value set
-            if isStructure then 
+            if isStructure or isDummy then 
                 LOG("Structure: " .. unit.BlueprintId)
                 unit.AI.GuardScanRadius = 0
 
