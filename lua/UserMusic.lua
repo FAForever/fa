@@ -54,9 +54,10 @@ local PeaceCueIndex = 1
 local currentMusic = nil
 local battleWatch = nil
 local paused = GetVolume("Music") == 0
-
+local nomusicSwitchSet = HasCommandLineArg("/nomusic")
 
 function NotifyBattle()
+    if nomusicSwitchSet then return end -- nomusic set - save threading
     local tick = GameTick()
     local prevNotify = LastBattleNotify
     LastBattleNotify = tick
@@ -76,6 +77,7 @@ function NotifyBattle()
 end
 
 function StartBattleMusic()
+    if nomusicSwitchSet then return end -- nomusic set - save threading
     BattleStart = GameTick()
     PlayMusic(BattleCues[BattleCueIndex], 0) -- immediately
     BattleCueIndex = math.mod(BattleCueIndex,table.getn(BattleCues)) + 1
@@ -93,6 +95,7 @@ function StartBattleMusic()
 end
 
 function StartPeaceMusic()
+    if nomusicSwitchSet then return end -- nomusic set - save threading
     BattleStart = 0
     BattleEventCounter = 0
     LastBattleNotify = GameTick()

@@ -218,7 +218,7 @@ function CreateUI()
 
     local musicHandle = false
     function StartMusic()
-        if not musicHandle then
+        if not musicHandle and not HasCommandLineArg("/nomusic") then
             musicHandle = PlaySound(Sound({Cue = "Main_Menu", Bank = "Music",}))
         end
     end
