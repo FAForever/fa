@@ -225,7 +225,7 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
             ReTargetOnMiss = true,
-            TargetCheckInterval = 0.16,
+            TargetCheckInterval = 0.4,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 '(STRUCTURE * TECH2 * DEFENSE - ANTIMISSILE)',
