@@ -436,32 +436,29 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             
             -- high on storage and sufficient energy income, enable units
-            elseif energyStoredRatio >= enableRatio and energyTrend > enableTrend or energyStored > enableStorage then 
+            elseif (energyStoredRatio >= enableRatio and energyTrend > enableTrend) or energyStored > enableStorage then 
 
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
                     if not unit:BeenDestroyed() then 
-                        if  energyTrend > 100 then 
+                        local ecobp = unit.Blueprint.Economy
+                        self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
+                        
+                        -- update internal state
+                        EnergyExcessUnitsDisabled[id] = nil
+                        EnergyExcessUnitsEnabled[id] = unit
 
-                            local ecobp = unit.Blueprint.Economy
-                            self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
-                            self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
-                            self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
-                            
-                            -- update internal state
-                            EnergyExcessUnitsDisabled[id] = nil
-                            EnergyExcessUnitsEnabled[id] = unit
+                        -- try to enable unit
+                        ok, msg = pcall(unit.OnExcessEnergy, unit)
 
-                            -- try to enable unit
-                            ok, msg = pcall(unit.OnExcessEnergy, unit)
-
-                            -- allow for debugging
-                            if not ok then 
-                                WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
-                            end
-
-                            break
+                        -- allow for debugging
+                        if not ok then 
+                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
                         end
+
+                        break
                     end
                 end
             end
