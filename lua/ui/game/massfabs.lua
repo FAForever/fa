@@ -215,7 +215,7 @@ MassFabPanel = Class(Group) {
         })
     end,
 
-    OnHide = import('gamecommon.lua').SupressShowingWhenRestoringUI,
+    OnHide = import('/lua/ui/game/gamecommon.lua').SupressShowingWhenRestoringUI,
 
 }
 
