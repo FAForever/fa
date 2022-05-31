@@ -530,25 +530,13 @@ function LayouterMetaTable:DisableHitTest(recursive)
     return self
 end
 
-function LayouterMetaTable:HitTest(bool, recursive)
-    if bool == nil then
-        WARN(":HitTest requires 1 positional argument \"bool\"")
-    end
-    if bool then
-        self.c:EnableHitTest(recursive)
-    else
-        self.c:DisableHitTest(recursive)
-    end
-    return self
-end
-
 function LayouterMetaTable:NeedsFrameUpdate(bool)
     self.c:SetNeedsFrameUpdate(bool)
     return self
 end
 
-function LayouterMetaTable:Alpha(alpha)
-    self.c:SetAlpha(alpha)
+function LayouterMetaTable:Alpha(alpha, children)
+    self.c:SetAlpha(alpha, children)
     return self
 end
 
