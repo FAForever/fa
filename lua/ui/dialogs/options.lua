@@ -419,6 +419,24 @@ function CreateDialog(over, exitBehavior)
         for index, option in tabData.items do
             optionGrid:AppendRows(1, true)
             local optCtrl = CreateOption(optionGrid, option)
+
+            optCtrl.HandleEvent = function(self, event)
+                if scrollbar and event.Type == 'WheelRotation' then
+                    local scrollDim = { optionGrid:GetScrollValues('Vert') }
+                    if event.WheelRotation <= 0 then -- scroll down ...
+                        if scrollDim[2] != scrollDim[4] then -- ... if we can
+                            PlaySound(Sound({ Cue = 'UI_Tab_Rollover_01', Bank = 'Interface' }))
+                            scrollbar:DoScrollLines(1)
+                        end
+                    else -- scroll up ...
+                        if scrollDim[1] != scrollDim[3] then -- ... if we can
+                            PlaySound(Sound({ Cue = 'UI_Tab_Rollover_01', Bank = 'Interface' }))
+                            scrollbar:DoScrollLines(-1)
+                        end
+                    end
+                end
+            end
+            
             optionGrid:SetItem(optCtrl, 1, index, true)
             if option.init then
                 option.init()
