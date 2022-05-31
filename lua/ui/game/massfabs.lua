@@ -213,7 +213,9 @@ MassFabPanel = Class(Group) {
         Prefs.SetToCurrentProfile("MassFabsPanelPos", {
             left = self.Left()
         })
-    end
+    end,
+
+    OnHide = import('gamecommon.lua').SupressShowingWhenRestoringUI,
 
 }
 
