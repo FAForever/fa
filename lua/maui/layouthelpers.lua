@@ -501,17 +501,18 @@ function LayouterMetaTable:Hide()
 end
 
 function LayouterMetaTable:Color(color)
-    self.c:SetColor(color)
+    if self.c.SetSolidColor then
+        self.c:SetSolidColor(color)
+    elseif self.c.SetColor then
+        self.c:SetColor(color)
+    else
+        WARN(string.format("Unable to set color for control \"%s\"", self.c:GetName()))
+    end
     return self
 end
 
 function LayouterMetaTable:DropShadow(bool)
     self.c:SetDropShadow(bool)
-    return self
-end
-
-function LayouterMetaTable:SolidColor(color)
-    self.c:SetSolidColor(color)
     return self
 end
 
