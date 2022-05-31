@@ -211,7 +211,7 @@ MassFabPanel = Class(Group) {
 
     _SavePosition = function(self)
         Prefs.SetToCurrentProfile("MassFabsPanelPos", {
-            left = self.Left()
+            left = LayoutHelpers.InvScaleNumber(self.Left())
         })
     end,
 
