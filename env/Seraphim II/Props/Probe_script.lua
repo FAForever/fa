@@ -1,6 +1,6 @@
-#
-# RoadwayMarking01
-#
+--
+-- RoadwayMarking01
+--
 RoadwayMarking01 = Class(import('/lua/sim/Prop.lua').Prop) {
 
     OnCreate = function(self)

@@ -1,6 +1,6 @@
-#
-# LavaSteam04
-#
+--
+-- LavaSteam04
+--
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 LavaSteam04 = Class(Prop) {

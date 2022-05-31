@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /Env/Cybran/Props/CybranAdjacencyNodeTwo_script.lua
-#**  Author(s):  Matt Vainio, Gordon Duclos
-#**
-#**  Summary  :  Cybran Adjacency Node Prop
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /Env/Cybran/Props/CybranAdjacencyNodeTwo_script.lua
+--**  Author(s):  Matt Vainio, Gordon Duclos
+--**
+--**  Summary  :  Cybran Adjacency Node Prop
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 CybranAdjacencyNodeTwo = Class(Prop) {

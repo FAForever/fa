@@ -1,6 +1,6 @@
-#
-# DesertBlowingSand02
-#
+--
+-- DesertBlowingSand02
+--
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 DesertBlowingSand02 = Class(Prop) {

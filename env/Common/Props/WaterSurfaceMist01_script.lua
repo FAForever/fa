@@ -1,6 +1,6 @@
-#
-# WaterSurfaceMist01
-#
+--
+-- WaterSurfaceMist01
+--
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 WaterSurfaceMist01 = Class(Prop) {

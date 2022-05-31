@@ -1,6 +1,6 @@
-#
-# Geyser 02
-#
+--
+-- Geyser 02
+--
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 Geyser02 = Class(Prop) {

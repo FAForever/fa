@@ -1,6 +1,6 @@
-#
-# RoadwayMarking01
-#
+--
+-- RoadwayMarking01
+--
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 RoadwayMarking01 = Class(Prop) {

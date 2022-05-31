@@ -1,6 +1,6 @@
-#
-# MudPot 03
-#
+--
+-- MudPot 03
+--
 local Prop = import('/lua/sim/Prop.lua').Prop
 
 MudPot03 = Class(Prop) {
