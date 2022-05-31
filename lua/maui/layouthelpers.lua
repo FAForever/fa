@@ -692,7 +692,7 @@ end
 
 function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
     AtTopIn(self.c, parent, offset)
-    AtHorizontalCenterIn(self.c, parent, offset)
+    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
     return self
 end
 
