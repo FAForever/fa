@@ -12,6 +12,7 @@ local QuantumBeamGeneratorCollisionBeam = CollisionBeamFile.QuantumBeamGenerator
 local PhasonLaserCollisionBeam = CollisionBeamFile.PhasonLaserCollisionBeam
 local TractorClawCollisionBeam = CollisionBeamFile.TractorClawCollisionBeam
 local Explosion = import('defaultexplosions.lua')
+local utilities = import('/lua/utilities.lua')
 
 local KamikazeWeapon = WeaponFile.KamikazeWeapon
 local BareBonesWeapon = WeaponFile.BareBonesWeapon
@@ -175,9 +176,13 @@ ADFTractorClawStructure = Class(DefaultBeamWeapon) {
     FxMuzzleFlash = {},
 }
 
+local CategoriesChronoDampener = categories.MOBILE - (categories.COMMAND + categories.EXPERIMENTAL + categories.AIR)
+
 ADFChronoDampener = Class(DefaultProjectileWeapon) {
-    FxMuzzleFlash = EffectTemplate.AChronoDampener,
+    FxMuzzleFlash = EffectTemplate.AChronoDampenerLarge,
     FxMuzzleFlashScale = 0.5,
+    FxUnitStun = EffectTemplate.Aeon_HeavyDisruptorCannonMuzzleCharge,
+    FxUnitStunFlash = EffectTemplate.ADisruptorCannonMuzzle01,
 
     RackSalvoFiringState = State(DefaultProjectileWeapon.RackSalvoFiringState) {
         Main = function(self)
@@ -186,15 +191,120 @@ ADFChronoDampener = Class(DefaultProjectileWeapon) {
             WaitTicks(51 - math.mod(GetGameTick(), 50))
 
             while true do
+
                 if bp.Audio.Fire then
                     self:PlaySound(bp.Audio.Fire)
                 end
-                self:DoOnFireBuffs()
+
                 self:PlayFxMuzzleSequence(1)
                 self:StartEconomyDrain()
                 self:OnWeaponFired()
 
-                WaitTicks(51)
+                -- some constants that need to go into blueprint
+                local duration = 35
+                local slices = 10 
+
+                -- extract information from the buff blueprint
+                local buff = bp.Buffs[1]
+                local stunDuration = buff.Duration
+                local sliceSize = buff.Radius / slices
+
+                for i = 1, slices do
+
+                    local radius = i * sliceSize 
+                    local targets = utilities.GetTrueEnemyUnitsInSphere(
+                        self, 
+                        self.unit:GetPosition(), 
+                        radius, 
+                        CategoriesChronoDampener
+                    )
+
+                    for k, target in targets do 
+
+                        if not target:BeenDestroyed() then 
+                            if buff.BuffType == 'STUN' then 
+                                target:SetStunned(0.1 * duration / slices + 0.1)
+                            else 
+
+                                if target.Animator then 
+                                    target.Animator:SetRate(0.1 * i)
+                                end
+
+                                -- slow movement speed
+                                target:SetSpeedMult(0.1 * i) -- TODO: get from blueprint
+
+                                -- slow weapons
+                                for i = 1, target.WeaponCount do
+                                    if not target.WeaponInstances[i]:BeenDestroyed() then 
+                                        target.WeaponInstances[i]:ChangeRateOfFire(0.1 * i * target.WeaponInstances[i].Blueprint.RateOfFire)
+                                    end
+                                end
+                            end
+                        end
+
+                        -- add initial effect
+                        if not target.InitialStunFxApplied then 
+
+                            for k, effect in self.FxUnitStunFlash do 
+                                local emit = CreateEmitterOnEntity(target, target.Army, effect)
+                                emit:ScaleEmitter(math.max(target.Blueprint.SizeX, target.Blueprint.SizeZ))
+                            end
+
+                            target.InitialStunFxApplied = true 
+                        end
+
+                        -- add effect on target
+                        local count = target:GetBoneCount()
+                        for k, effect in self.FxUnitStun do 
+                            local emit = CreateEmitterAtBone(
+                                target, Random(0, count - 1), target.Army, effect
+                            )
+
+                            -- scale the effect a bit
+                            emit:ScaleEmitter(0.5)
+
+                            -- change lod to match outer lod of unit
+                            local lods = target.Blueprint.Display.Mesh.LODs
+                            if lods then
+                                emit:SetEmitterParam("LODCUTOFF", lods[table.getn(lods)].LODCutoff)
+                            end
+                        end
+                    end
+
+                    WaitTicks(duration / slices + 1)
+                end
+
+                -- scan for targets again
+                local targets = utilities.GetTrueEnemyUnitsInSphere(
+                    self, 
+                    self.unit:GetPosition(), 
+                    buff.Radius, 
+                    CategoriesChronoDampener
+                )
+
+                -- reset state of targets
+                for k, target in targets do 
+
+                    target.InitialStunFxApplied = nil
+
+                    if not target:BeenDestroyed() then 
+                        -- slow movement speed
+                        target:SetSpeedMult(1.0) -- TODO: get from blueprint
+
+                        if target.Animator then 
+                            target.Animator:SetRate(1)
+                        end
+
+                        -- slow weapons
+                        for i = 1, target.WeaponCount do
+                            if not target.WeaponInstances[i]:BeenDestroyed() then 
+                                target.WeaponInstances[i]:ChangeRateOfFire(0.1 * i * target.WeaponInstances[i].Blueprint.RateOfFire)
+                            end
+                        end
+                    end
+                end
+
+                WaitTicks(51 - duration)
             end
         end,
 

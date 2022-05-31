@@ -1131,7 +1131,7 @@ UnitBlueprint {
                         OnFire = true,
                     },
                     BuffType = 'STUN',
-                    Duration = 2.5,
+                    Duration = 1,
                     Radius = 35,
                     TargetAllow = 'MOBILE',
                     TargetDisallow = 'EXPERIMENTAL, COMMAND',
