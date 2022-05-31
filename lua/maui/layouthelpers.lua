@@ -520,14 +520,14 @@ function LayouterMetaTable:Texture(texture)
     return self
 end
 
-function LayouterMetaTable:HitTest(bool)
+function LayouterMetaTable:HitTest(bool, recursive)
     if bool == nil then
         WARN(":HitTest requires 1 positional argument \"bool\"")
     end
     if bool then
-        self.c:EnableHitTest()
+        self.c:EnableHitTest(recursive)
     else
-        self.c:DisableHitTest()
+        self.c:DisableHitTest(recursive)
     end
     return self
 end
