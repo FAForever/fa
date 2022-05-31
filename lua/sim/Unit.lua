@@ -4256,6 +4256,10 @@ Unit = Class(moho.unit_methods) {
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
 
+    -- Called by the brain when the unit registered itself
+    OnNoExcessEnergy = function(self) end,
+    OnExcessEnergy = function(self) end,
+
     -- Called by the weapon class, these are expensive!
     OnGotTarget = function(self, Weapon) end,
     OnLostTarget = function(self, Weapon) end,

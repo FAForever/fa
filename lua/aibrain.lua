@@ -374,15 +374,13 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param self The brain itself
     ToggleEnergyExcessUnitsThread = function (self)
 
-        -- allow for protected calls without closures
-
-        local function ProtectedOnExcessEnergy(unitToProcess)
-            unitToProcess:OnExcessEnergy()
-        end
-
-        local function ProtectedOnNoExcessEnergy(unitToProcess)
-            unitToProcess:OnNoExcessEnergy()
-        end
+        local fabricatorParameters = import('/lua/shared/FabricatorBehaviorParams.lua')
+        local disableRatio = fabricatorParameters.DisableRatio
+        local disableStorage = fabricatorParameters.DisableStorage
+        
+        local enableRatio = fabricatorParameters.EnableRatio
+        local enableTrend = fabricatorParameters.EnableTrend
+        local enableStorage = fabricatorParameters.EnableStorage
 
         -- localize scope for better performance
         local pcall = pcall
@@ -410,7 +408,7 @@ AIBrain = Class(moho.aibrain_methods) {
             local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
 
             -- low on storage, start disabling them to fill our storages asap
-            if energyStoredRatio < 0.8 and energyStored < 39000 then 
+            if energyStoredRatio < disableRatio and energyStored < disableStorage then 
 
                 -- while we have units to disable
                 for id, unit in EnergyExcessUnitsEnabled do 
@@ -426,7 +424,7 @@ AIBrain = Class(moho.aibrain_methods) {
                         EnergyExcessUnitsEnabled[id] = nil
 
                         -- try to disable unit
-                        ok, msg = pcall(ProtectedOnNoExcessEnergy, unit)
+                        ok, msg = pcall(unit.OnNoExcessEnergy, unit)
 
                         -- allow for debugging
                         if not ok then 
@@ -438,7 +436,7 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             
             -- high on storage and sufficient energy income, enable units
-            elseif energyStoredRatio >= 0.9 and energyTrend > 100 or energyStored > 41000 then 
+            elseif energyStoredRatio >= enableRatio and energyTrend > enableTrend or energyStored > enableStorage then 
 
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
@@ -455,7 +453,7 @@ AIBrain = Class(moho.aibrain_methods) {
                             EnergyExcessUnitsEnabled[id] = unit
 
                             -- try to enable unit
-                            ok, msg = pcall(ProtectedOnExcessEnergy, unit)
+                            ok, msg = pcall(unit.OnExcessEnergy, unit)
 
                             -- allow for debugging
                             if not ok then 
