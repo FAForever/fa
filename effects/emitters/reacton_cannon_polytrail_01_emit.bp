@@ -1,7 +1,7 @@
 TrailEmitterBlueprint {
 	BlueprintId = 'quantum_cannon_polytrail_01',
 	Lifetime = -1.00,
-    #TrailLength = 10,
+    --TrailLength = 10,
     TrailLength = 0.6,
     Size = 0.2,
     SortOrder = -2,
