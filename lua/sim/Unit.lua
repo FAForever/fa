@@ -343,7 +343,7 @@ Unit = Class(moho.unit_methods) {
         
 
 
-        self.Brain:addJammer(self)
+        self.Brain:AddJammer(self)
         LOG("Added Jammer")
     end,
 

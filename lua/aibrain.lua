@@ -339,11 +339,11 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Jamming Switch Logic
 
-    addJammer = function(self, unit)
+    AddJamer = function(self, unit)
         self.jammers[unit.EntityId] = unit
     end,
 
-    removeJammer = function(self, unit)
+    RemoveJammer = function(self, unit)
         self.jammers[unit.EntityId] = nil
     end,
     
