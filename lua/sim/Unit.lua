@@ -340,9 +340,6 @@ Unit = Class(moho.unit_methods) {
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
-        
-
-
         self.Brain:AddJammer(self)
         LOG("Added Jammer")
     end,

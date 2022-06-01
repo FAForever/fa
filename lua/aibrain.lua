@@ -245,7 +245,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.jammers = { }
         setmetatable(self.jammers, { __mode = 'v' })
 
-        ForkThread(self.jammingToggleThread, self)
+        ForkThread(self.JammingToggleThread, self)
 
         -- populate the possible HQs per faction, layer and tech
         self.HQs = { }
@@ -347,7 +347,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.jammers[unit.EntityId] = nil
     end,
     
-    jammingToggleThread = function(self)
+    JammingToggleThread = function(self)
 
         local CoroutineYield = CoroutineYield
 
