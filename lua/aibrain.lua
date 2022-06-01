@@ -241,6 +241,11 @@ AIBrain = Class(moho.aibrain_methods) {
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
+    
+        self.jammers = { }
+        setmetatable(self.jammers, { __mode = 'v' })
+
+        ForkThread(self.jammingToggleThread, self)
 
         -- populate the possible HQs per faction, layer and tech
         self.HQs = { }
@@ -330,6 +335,39 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    -- Jamming Switch Logic
+
+    addJammer = function(self, unit)
+        self.jammers[unit.EntityId] = unit
+    end,
+
+    removeJammer = function(self, unit)
+        self.jammers[unit.EntityId] = nil
+    end,
+    
+    jammingToggleThread = function(self)
+
+        local CoroutineYield = CoroutineYield
+
+        while true do 
+
+            for jammer in self.jammers do
+                if not jammer:BeenDestroyed() then
+
+                    LOG("ToggleJammer")
+                    -- run logic here
+
+                   jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
+                   jammer:DisableUnitIntel('ToggleBit3', 'Jammer')
+                   
+                end
+
+            end
+
+            CoroutineYield(1)
+        end
     end,
 
     -- Energy storage callbacks
