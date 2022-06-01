@@ -342,10 +342,9 @@ Unit = Class(moho.unit_methods) {
 
         
 
-        if not self.Blueprint.Intel.JammerBlips == nil then
-            self.Brain:addJammer(self)
-            LOG("Added Jammer")
-        end
+
+        self.Brain:addJammer(self)
+        LOG("Added Jammer")
     end,
 
     -------------------------------------------------------------------------------------------
