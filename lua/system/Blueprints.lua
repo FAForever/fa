@@ -716,35 +716,9 @@ function PreModBlueprints(all_bps)
         -- # Adjust weapon blueprints
         
         for i, w in bp.Weapon or {} do
-
             -- add in weapon blueprint id
             local label = w.Label or "Unlabelled"
             w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
-
-            -- add in adjusted target priorities
-            if w.TargetPriorities then
-
-                local priorities = {}
-                local prioritiesHead = 1
-                
-                for g, transcendentPritority in w.TranscendentPriorities or {} do
-                    priorities[prioritiesHead] = transcendentPritority
-                    prioritiesHead = prioritiesHead + 1
-                end
-
-                priorities[prioritiesHead] = 'SPECIALHIGHPRI'
-                prioritiesHead = prioritiesHead + 1
-
-                for _, priority in w.TargetPriorities do
-                    priorities[prioritiesHead] = priority
-                    prioritiesHead = prioritiesHead + 1
-                end
-
-                priorities[prioritiesHead] = 'SPECIALLOWPRI'
-                prioritiesHead = prioritiesHead + 1
-
-                w.TargetPriorities = priorities
-            end
         end
 
         -- # Hotfix for naval wrecks

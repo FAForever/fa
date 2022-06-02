@@ -277,8 +277,9 @@ UnitBlueprint {
             SlavedToBody = true,
             SlavedToBodyArcRange = 5,
             TargetCheckInterval = 0.75,
-            TranscendentPriorities = {'SHIELD', 'PERSONALSHIELD'},
             TargetPriorities = {
+                'SHIELD',
+                'PERSONALSHIELD',
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
