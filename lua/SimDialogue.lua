@@ -2,7 +2,7 @@
 --* File: lua/SimDialog.lua
 --* Summary: Sim accessable UI Controls
 --*
---* Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local dialogues = {}

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  function to generate the vars for operationselect.lua and operationbriefing.lua. uses the ID set in /maps/*_operation.lua, e.g. SCCA_E01.
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 function MakeOpVars(thisID, factionKey, sequenceID)

@@ -4,7 +4,7 @@
 ----                                                                             
 ----  Summary  : Functions to simplify prefetching by base, unit, etc...                  
 ----                                                                             
-----  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.          
+----  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.          
 
 function CreatePrefetchSetFromArmy(armyName)
     local BPList = {}

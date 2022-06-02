@@ -3,7 +3,7 @@
 --* Author: Chad Queen
 --* Summary: Houses information regarding the waypoint commands and lines
 --*
---* Copyright � 2006 Gas Powered Games Corp.  All rights reserved.
+--* Copyright © 2006 Gas Powered Games Corp.  All rights reserved.
 --*****************************************************************************
 
 -- Basic settings for waypoint information

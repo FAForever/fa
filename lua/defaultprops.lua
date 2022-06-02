@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Default Props
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
 local FireEffects = import('/lua/EffectTemplates.lua').TreeBurning01

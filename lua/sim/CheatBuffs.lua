@@ -2,7 +2,7 @@
 --**
 --**  File     :  /lua/sim/CheatBuffs.lua
 --**
---**  Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 BuffBlueprint {

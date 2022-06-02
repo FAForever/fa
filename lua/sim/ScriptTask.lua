@@ -1,7 +1,7 @@
 --*****************************************************************************
 --* File: lua/modules/ScriptTask.lua
 --*
---* Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- Task status values returned from TaskTick(). Note that an integer cast to

@@ -4,7 +4,7 @@
 --* Summary: 3rd party integration options.  This will receive and send commands
 --* by hooking into stdin/out in the supremecommander app.
 --*
---* Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 

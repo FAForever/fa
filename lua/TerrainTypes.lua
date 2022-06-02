@@ -2,7 +2,7 @@
 ----[  File     : TerrainTypes.lua                                                ]--
 ----[  Author(s): Bob Berry, Gordon Duclos                                        ]--
 ----[                                                                             ]--
-----[  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.             ]--
+----[  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.             ]--
 
 --[[ 
 	Each terrain type has a type code that must be unique, with a max of 255. If you

@@ -3,7 +3,7 @@
 --**  File     :  /lua/editor/InstantBuildConditions.lua
 --**  Author(s): Dru Staltman
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')

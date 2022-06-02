@@ -1,4 +1,4 @@
--- Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --
 -- This is the minimal setup required to load the game rules.
 

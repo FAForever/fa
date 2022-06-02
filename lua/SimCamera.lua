@@ -8,7 +8,7 @@
 -- a plan to add multiplayer and headless support for these features but it may be some time before
 -- this gets implemented.
 --
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 
 SingleEvent = import('/lua/system/SingleEvent.lua').SingleEvent
 

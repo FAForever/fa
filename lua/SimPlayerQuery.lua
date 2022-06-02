@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- Author: Bob Berry
 --
 -- This file is the SIM side of the query system. See the documentation in

@@ -1,7 +1,7 @@
 --*****************************************************************************
 --* File: lua/sim/Attacker.lua
 --*
---* Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 Attacker = Class(moho.attacker_methods) {

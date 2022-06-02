@@ -3,7 +3,7 @@
 --* Author: Bob Berry
 --* Summary: Pathfinder debugger
 --*
---* Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')

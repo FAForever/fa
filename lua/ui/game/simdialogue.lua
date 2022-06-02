@@ -2,7 +2,7 @@
 ----* File: lua/ui/game/simdialogue.lua
 ----* Summary: UI controls for sim control
 ----*
-----* Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+----* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 ----*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')

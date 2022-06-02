@@ -2,7 +2,7 @@
 --* File: lua/modules/ui/game/commandgraph.lua
 --* Summary: Command graph display funcs
 --*
---* Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')

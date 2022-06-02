@@ -4,7 +4,7 @@
 --**
 --**  Summary  :  Visibility Markers
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity

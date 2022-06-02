@@ -4,7 +4,7 @@
 --**
 --**  Summary  :  Global buff table and blueprint methods
 --**
---**  Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 -- Global list of all buffs found in the system.

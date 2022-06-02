@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Map for terrain-specific tarmacs.
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --**
 --****************************************************************************
 

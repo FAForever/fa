@@ -1,7 +1,7 @@
 --*****************************************************************************
 --* File: lua/sim/Navigator.lua
 --*
---* Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 NAVSTATUS = {

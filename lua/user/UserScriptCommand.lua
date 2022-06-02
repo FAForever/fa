@@ -2,7 +2,7 @@
 --* File: lua/modules/ui/game/userScriptCommand.lua
 --* Summary: User layer ability handling
 --*
---* Copyright � 2008 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 local CM = import('/lua/ui/game/commandmode.lua')
 

@@ -4,7 +4,7 @@
 --**
 --**  Summary  : Functions to save sim data off for the transmission log
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local transmissions = {}
