@@ -2603,7 +2603,7 @@ Unit = Class(moho.unit_methods) {
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
 
-        -- kept after #3355 for backwards compatibility with mods
+        -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
             for _, b in self.buildBots do
                 ChangeState(b, b.IdleState)

@@ -1,11 +1,11 @@
-#****************************************************************************
-#**  File     :  /lua/simtransmissions.lua
-#**  Author(s): Ted Snook
-#**
-#**  Summary  : Functions to save sim data off for the transmission log
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**  File     :  /lua/simtransmissions.lua
+--**  Author(s): Ted Snook
+--**
+--**  Summary  : Functions to save sim data off for the transmission log
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local transmissions = {}
 local techRestrictions = {}
@@ -44,11 +44,11 @@ function OnPostLoad()
     Sync.UserUnitEnhancements = SimUnitEnhancements
     
     -- Restore build restrictions
-#    for i, val in techRestrictions do
-#        if val.type == 'restriction' then
-#            AddBuildRestriction(val.cats)
-#        elseif val.type == 'allow' then
-#            RemoveBuildRestriction(val.cats)
-#        end
-#    end
+--    for i, val in techRestrictions do
+--        if val.type == 'restriction' then
+--            AddBuildRestriction(val.cats)
+--        elseif val.type == 'allow' then
+--            RemoveBuildRestriction(val.cats)
+--        end
+--    end
 end

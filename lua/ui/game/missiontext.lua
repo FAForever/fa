@@ -3,7 +3,7 @@
 --* Author: Ted Snook
 --* Summary: Mission text HUD
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -361,13 +361,13 @@ end
 function DisplaySubtitles(textControl,captions)
     subtitleThread = ForkThread(
         function()
-            # Display subtitles
+            -- Display subtitles
             local lastOff = 0
             for k,v in captions do
                 WaitSeconds(v.offset - lastOff)
                 textControl:DeleteAllItems()
                 locText = LOC(v.text)
-                #LOG("Wrap: ",locText)
+                --LOG("Wrap: ",locText)
                 local lines = WrapText(locText, textControl.Width(), function(text) return textControl:GetStringAdvance(text) end)
                 for i,line in lines do
                     textControl:AddItem(line)

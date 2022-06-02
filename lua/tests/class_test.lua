@@ -80,7 +80,7 @@ function test_ambiguous_inheritance()
     expect_equal(C4.x, 'S1')
     expect_equal(C4.S.x, 'S1')
 
-    # x is not ambiguous within the new class here, but is ambiguous within the new state S
+    -- x is not ambiguous within the new class here, but is ambiguous within the new state S
     C5 = Class(C1) { x='C5' }
     expect_equal(C5.x, 'C5')
     expect_equal(C5.S.x, 'S1')
@@ -128,7 +128,7 @@ function test_state_switching()
 
     SM2 = Class(SM1) {
         what = 'SM2',
-        One = State { }, # don't inherit from SM1.One, so what='SM2'
+        One = State { }, -- don't inherit from SM1.One, so what='SM2'
         Three = State(SM1.Three) {
             what = 3,
         },

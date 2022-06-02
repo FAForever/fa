@@ -1,17 +1,17 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/defaultvizmarkers.lua
-#**
-#**  Summary  :  Visibility Markers
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/defaultvizmarkers.lua
+--**
+--**  Summary  :  Visibility Markers
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 
 VizMarker = Class(Entity) {
     __init = function(self, spec)
-        #LOG('__VizMarker')
+        --LOG('__VizMarker')
         Entity.__init(self, spec)
         self.X = spec.X
         self.Z = spec.Z
@@ -26,7 +26,7 @@ VizMarker = Class(Entity) {
 
     OnCreate = function(self)
         Entity.OnCreate(self)
-        #LOG('VizMarker OnCreate')
+        --LOG('VizMarker OnCreate')
         Warp(self, Vector(self.X, 0, self.Z))
         if self.Omni != false then
             self:InitIntel(self.Army, 'Omni', self.Radius)

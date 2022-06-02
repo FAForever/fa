@@ -1,16 +1,16 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/editor/InstantBuildConditions.lua
-#**  Author(s): Dru Staltman
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/editor/InstantBuildConditions.lua
+--**  Author(s): Dru Staltman
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Utils = import('/lua/utilities.lua')
 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------#########################################################
 # function: PreBuiltBase = BuildCondition  doc = "Please work function docs."
 #
 # parameter 0: string   aiBrain         = "default_brain"

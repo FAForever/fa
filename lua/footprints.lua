@@ -1,4 +1,4 @@
-# Layer caps
+-- Layer caps
 LAND = 0x01
 SEABED = 0x02
 SUB = 0x04
@@ -6,15 +6,15 @@ WATER = 0x08
 AIR = 0x10
 ORBIT = 0x20
 
-# Flags
+-- Flags
 IgnoreStructures = 0x01
 
-# Each footprint spec causes pathfinding structures to be created over the entire map for units
-# with that footprint, so keep the number of entries here down to the bare minimum we actually
-# need.
-#
-# The script "data/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
-# the blueprints are currently expecting.
+-- Each footprint spec causes pathfinding structures to be created over the entire map for units
+-- with that footprint, so keep the number of entries here down to the bare minimum we actually
+-- need.
+--
+-- The script "data/lua/tests/dump_footprints.lua" can be used to figure out what footprint shapes
+-- the blueprints are currently expecting.
 
 SpecFootprints {
 

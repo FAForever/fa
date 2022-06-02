@@ -1,22 +1,22 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/editor/AMPlatoonHelperFunctions.lua
-#**  Author(s): Dru Staltman
-#**
-#**  Summary  : Functions to help with AM Platoons
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/editor/AMPlatoonHelperFunctions.lua
+--**  Author(s): Dru Staltman
+--**
+--**  Summary  : Functions to help with AM Platoons
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
-##############################################################################################################
-# function: AMLockPlatoon = AddFunction   doc = "Please work function docs."
-# 
-# parameter 0: string	platoon		= "default_platoon"		
-#
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: AMLockPlatoon = AddFunction   doc = "Please work function docs."
+-- 
+-- parameter 0: string	platoon		= "default_platoon"		
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function AMLockPlatoon(platoon)
     if not ScenarioInfo.AMLockTable then
         ScenarioInfo.AMLockTable = {}
@@ -24,12 +24,12 @@ function AMLockPlatoon(platoon)
     ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] = true
 end
 
-##############################################################################################################
-# function: PBMLockAndUnlock = AddFunction   doc = "Please work function docs."
-# 
-# parameter 0: string	platoon		= "default_platoon"		
-#
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: PBMLockAndUnlock = AddFunction   doc = "Please work function docs."
+-- 
+-- parameter 0: string	platoon		= "default_platoon"		
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function PBMLockAndUnlock(platoon)
     if not ScenarioInfo.AMLockTable then
         ScenarioInfo.AMLockTable = {}
@@ -38,13 +38,13 @@ function PBMLockAndUnlock(platoon)
     platoon:AddDestroyCallback(PlatoonDeathUnlockTimer)
 end
 
-##############################################################################################################
-# function: AMUnlockPlatoon = BuildCallback   doc = "Please work function docs."
-# 
-# parameter 0: string	brain		= "default_brain"		
-# parameter 1: string	platoon  	= "default_platoon"		doc = "docs for param1"
-#
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: AMUnlockPlatoon = BuildCallback   doc = "Please work function docs."
+-- 
+-- parameter 0: string	brain		= "default_brain"		
+-- parameter 1: string	platoon  	= "default_platoon"		doc = "docs for param1"
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function AMUnlockPlatoon(brain, platoon)
     if ScenarioInfo.AMLockTable and ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] then
         if platoon.PlatoonData['DiffLockTimerD'..ScenarioInfo.Options.Difficulty] then
@@ -57,14 +57,14 @@ function AMUnlockPlatoon(brain, platoon)
     end
 end
 
-##############################################################################################################
-# function: AMUnlockPlatoonTimer = BuildCallback   doc = "Please work function docs."
-# 
-# parameter 0: string	brain		= "default_brain"		
-# parameter 1: string	platoon  	= "default_platoon"		doc = "docs for param1"
-# parameter 2: int      duration        = "120"
-#
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: AMUnlockPlatoonTimer = BuildCallback   doc = "Please work function docs."
+-- 
+-- parameter 0: string	brain		= "default_brain"		
+-- parameter 1: string	platoon  	= "default_platoon"		doc = "docs for param1"
+-- parameter 2: int      duration        = "120"
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function AMUnlockPlatoonTimer(brain, platoon, duration)
     local callback = function()
                          if ScenarioInfo.AMLockTable and ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] then
@@ -74,13 +74,13 @@ function AMUnlockPlatoonTimer(brain, platoon, duration)
     ScenarioFramework.CreateTimerTrigger( callback, duration )
 end
 
-##############################################################################################################
-# function: AMCheckPlatoonLock = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string	brain		= "default_brain"		
-# parameter 1: string	AMPlatoonName	= "default_master"		doc = "docs for param1"
-#
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: AMCheckPlatoonLock = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string	brain		= "default_brain"		
+-- parameter 1: string	AMPlatoonName	= "default_master"		doc = "docs for param1"
+--
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function AMCheckPlatoonLock(brain, AMPlatoonName)
     if ScenarioInfo.AMLockTable[AMPlatoonName] then 
         return false
@@ -88,13 +88,13 @@ function AMCheckPlatoonLock(brain, AMPlatoonName)
     return true
 end
 
-##############################################################################################################
-# function: ChildCountDifficulty = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"     
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: ChildCountDifficulty = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"     
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function ChildCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 1
@@ -111,13 +111,13 @@ function ChildCountDifficulty(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: MasterCountDifficulty = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"       
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: MasterCountDifficulty = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"       
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function MasterCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master)
     local d1Num = ScenarioInfo.OSPlatoonCounter[master..'_D1'] or 1
@@ -134,7 +134,7 @@ function MasterCountDifficulty(aiBrain, master)
     end
 end
 
-# === utility function === #
+-- === utility function === --
 function UnlockTimer(time, name)
     WaitSeconds( time )
     ScenarioInfo.AMLockTable[name] = false

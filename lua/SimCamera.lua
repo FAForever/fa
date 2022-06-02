@@ -1,23 +1,23 @@
-#
-# SimCamera
-#
-# SimCamera buffers control requests to push to the user layer at sync time. It provides facilities
-# for waiting on the camera to perform certain actions. At the moment, the facilities that wait can
-# not be used in multiplayer and are considered to finish immediately when running the simulation in
-# a headless mode. Thus the primary use for such features is in the single player campaign. We have
-# a plan to add multiplayer and headless support for these features but it may be some time before
-# this gets implemented.
-#
-# Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--
+-- SimCamera
+--
+-- SimCamera buffers control requests to push to the user layer at sync time. It provides facilities
+-- for waiting on the camera to perform certain actions. At the moment, the facilities that wait can
+-- not be used in multiplayer and are considered to finish immediately when running the simulation in
+-- a headless mode. Thus the primary use for such features is in the single player campaign. We have
+-- a plan to add multiplayer and headless support for these features but it may be some time before
+-- this gets implemented.
+--
+-- Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 
 SingleEvent = import('/lua/system/SingleEvent.lua').SingleEvent
 
-# Name / Object table for cameras
+-- Name / Object table for cameras
 Cameras = {}
 
-# The user layer calls this via SimCallback when the camera finishes moving to its target.
+-- The user layer calls this via SimCallback when the camera finishes moving to its target.
 function OnCameraFinish(name)
-    #LOG('Signal')
+    --LOG('Signal')
     Cameras[name]:EventSet()
 end
 
@@ -36,7 +36,7 @@ SimCamera = Class(SingleEvent) {
     end,
 
     MoveTo = function(self,rectRegion,seconds)
-        #LOG('Camera:MoveTo ', repr(rectRegion), ' ',seconds)
+        --LOG('Camera:MoveTo ', repr(rectRegion), ' ',seconds)
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_MOVE',
@@ -48,7 +48,7 @@ SimCamera = Class(SingleEvent) {
     end,
 
     MoveToMarker = function(self,marker,seconds)
-        #LOG('Camera:MoveToMarker ', repr(marker.type), ' ',seconds)
+        --LOG('Camera:MoveToMarker ', repr(marker.type), ' ',seconds)
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_MOVE',
@@ -71,7 +71,7 @@ SimCamera = Class(SingleEvent) {
     end,
 
     SnapToMarker = function(self,marker)
-        #LOG('Camera:SnapToMarker('..repr(marker.type)..')')
+        --LOG('Camera:SnapToMarker('..repr(marker.type)..')')
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_SNAP',
@@ -81,7 +81,7 @@ SimCamera = Class(SingleEvent) {
     end,
 
     TrackEntities = function(self, units, zoom, seconds)
-        #LOG('Camera:TrackEntities')
+        --LOG('Camera:TrackEntities')
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_TRACK_ENTITIES',
@@ -97,7 +97,7 @@ SimCamera = Class(SingleEvent) {
     end,
 
     NoseCam = function(self, ent, pitchAdjust, zoom, seconds, transition)
-        #LOG('Camera:NoseCam')
+        --LOG('Camera:NoseCam')
         local idNum = false
         if ent:GetAIBrain():GetArmyIndex() ~= ArmyBrains[1]:GetArmyIndex() then
             local entBlip = ent:GetBlip(1)
@@ -125,7 +125,7 @@ SimCamera = Class(SingleEvent) {
     end,
 
     SetAccMode = function(self,accModeName)
-        #LOG('Camera:SetAccMode')
+        --LOG('Camera:SetAccMode')
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_SET_ACC_MODE',
@@ -136,7 +136,7 @@ SimCamera = Class(SingleEvent) {
     end,
 
     SetZoom = function(self,zoom,seconds)
-        #LOG('Camera:SetZoom')
+        --LOG('Camera:SetZoom')
         request = {
             Name = self.CameraName,
             Type = 'CAMERA_SET_ZOOM',
@@ -174,37 +174,37 @@ SimCamera = Class(SingleEvent) {
     end,
 
     HoldRotation = function(self)
-        #LOG('Camera:HoldRotation')
+        --LOG('Camera:HoldRotation')
         table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'HoldRotation' } )
     end,
 
     RevertRotation = function(self)
-        #LOG('Camera:RevertRotation')
+        --LOG('Camera:RevertRotation')
         table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'RevertRotation' } )
     end,
 
     UseGameClock = function(self)
-        #LOG('Camera:UseGameClock')
+        --LOG('Camera:UseGameClock')
         table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'UseGameClock' } )
     end,
 
     UseSystemClock = function(self)
-        #LOG('Camera:UseSystemClock')
+        --LOG('Camera:UseSystemClock')
         table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'UseSystemClock' } )
     end,
 
     EnableEaseInOut = function(self)
-        #LOG('Camera:EnableEaseInOut')
+        --LOG('Camera:EnableEaseInOut')
         table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'EnableEaseInOut' } )
     end,
 
     DisableEaseInOut = function(self)
-        #LOG('Camera:DisableEaseInOut')
+        --LOG('Camera:DisableEaseInOut')
         table.insert( Sync.CameraRequests, { Name = self.CameraName, Exec = 'DisableEaseInOut' } )
     end,
 
     Reset = function(self)
-        #LOG('Camera:Reset')
+        --LOG('Camera:Reset')
         table.insert( Sync.CameraRequests, {Name=self.CameraName, Exec='Reset'} )
     end,
 }

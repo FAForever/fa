@@ -1,18 +1,18 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/unittemplates.lua
-#**  Author(s): John Comes
-#**
-#**  Summary  : The Template that links unit types to unit IDs
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/unittemplates.lua
+--**  Author(s): John Comes
+--**
+--**  Summary  : The Template that links unit types to unit IDs
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 UnitTemplates =
 {
-    # Earth Unit List
+    -- Earth Unit List
     {
-        # Engineers
+        -- Engineers
         {
             'Engineer',
             'uel0105', 
@@ -28,9 +28,9 @@ UnitTemplates =
 
     },
     
-    # Aeon Unit List
+    -- Aeon Unit List
     {
-        # Engineers
+        -- Engineers
         {
             'Engineer',
             'ual0105', 
@@ -46,9 +46,9 @@ UnitTemplates =
 
     },
     
-    # Cybran Unit List
+    -- Cybran Unit List
     {
-        # Engineers
+        -- Engineers
         {
             'Engineer',
             'ual0105', 

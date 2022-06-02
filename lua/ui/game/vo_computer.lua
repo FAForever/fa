@@ -17,31 +17,31 @@
 
 
 
-# ------------------------------
-# Opnode ID: Assist
-# Assist
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Assist
+-- Assist
+-- ------------------------------
 
-# UEF computer
+-- UEF computer
 Computer_UEFComputer_Assist_01267 = {text = '<LOC Computer_Assist_010_010>[{i UEFComputer}]: Guarding', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Assist_01267'}
 Computer_UEFComputer_Assist_01266 = {text = '<LOC Computer_Assist_010_020>[{i UEFComputer}]: Assisting', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Assist_01266'}
 Computer_UEFComputer_Assist_01268 = {text = '<LOC Computer_Assist_010_030>[{i UEFComputer}]: Assisting construction', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Assist_01268'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Assist_01267 = {text = '<LOC Computer_Assist_020_010>[{i AeonComputer}]: Guarding', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Assist_01267'}
 Computer_AeonComputer_Assist_01266 = {text = '<LOC Computer_Assist_020_020>[{i AeonComputer}]: Assisting', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Assist_01266'}
 Computer_AeonComputer_Assist_01268 = {text = '<LOC Computer_Assist_020_030>[{i AeonComputer}]: Assisting construction', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Assist_01268'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Assist_01267 = {text = '<LOC Computer_Assist_030_010>[{i CybranComputer}]: Guarding', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Assist_01267'}
 Computer_CybranComputer_Assist_01266 = {text = '<LOC Computer_Assist_030_020>[{i CybranComputer}]: Assisting', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Assist_01266'}
 Computer_CybranComputer_Assist_01268 = {text = '<LOC Computer_Assist_030_030>[{i CybranComputer}]: Assisting construction', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Assist_01268'}
 
 
-# ------------------------------
-# Opnode ID: BasicOrders
-# Basic Orders
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: BasicOrders
+-- Basic Orders
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Basic_Orders_01163 = {text = '<LOC Computer_BasicOrders_010_010>[{i UEFComputer}]: Cannot complete order', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Basic_Orders_01163'}
 Computer_UEFComputer_Basic_Orders_01164 = {text = '<LOC Computer_BasicOrders_010_020>[{i UEFComputer}]: Order received', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Basic_Orders_01164'}
 Computer_UEFComputer_Basic_Orders_01166 = {text = '<LOC Computer_BasicOrders_010_030>[{i UEFComputer}]: Order complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Basic_Orders_01166'}
@@ -57,7 +57,7 @@ Computer_UEFComputer_Basic_Orders_01176 = {text = '<LOC Computer_BasicOrders_010
 Computer_UEFComputer_Basic_Orders_01177 = {text = '<LOC Computer_BasicOrders_010_130>[{i UEFComputer}]: Invalid order', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Basic_Orders_01177'}
 Computer_UEFComputer_Basic_Orders_01178 = {text = '<LOC Computer_BasicOrders_010_140>[{i UEFComputer}]: Destination invalid', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Basic_Orders_01178'}
 Computer_UEFComputer_Basic_Orders_01179 = {text = '<LOC Computer_BasicOrders_010_150>[{i UEFComputer}]: Invalid target', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Basic_Orders_01179'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Basic_Orders_01163 = {text = '<LOC Computer_BasicOrders_020_010>[{i AeonComputer}]: Cannot complete order', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Basic_Orders_01163'}
 Computer_AeonComputer_Basic_Orders_01164 = {text = '<LOC Computer_BasicOrders_020_020>[{i AeonComputer}]: Order received', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Basic_Orders_01164'}
 Computer_AeonComputer_Basic_Orders_01166 = {text = '<LOC Computer_BasicOrders_020_030>[{i AeonComputer}]: Order complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Basic_Orders_01166'}
@@ -73,7 +73,7 @@ Computer_AeonComputer_Basic_Orders_01176 = {text = '<LOC Computer_BasicOrders_02
 Computer_AeonComputer_Basic_Orders_01177 = {text = '<LOC Computer_BasicOrders_020_130>[{i AeonComputer}]: Invalid order', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Basic_Orders_01177'}
 Computer_AeonComputer_Basic_Orders_01178 = {text = '<LOC Computer_BasicOrders_020_140>[{i AeonComputer}]: Destination invalid', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Basic_Orders_01178'}
 Computer_AeonComputer_Basic_Orders_01179 = {text = '<LOC Computer_BasicOrders_020_150>[{i AeonComputer}]: Invalid target', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Basic_Orders_01179'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Basic_Orders_01163 = {text = '<LOC Computer_BasicOrders_030_010>[{i CybranComputer}]: Cannot complete order', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Basic_Orders_01163'}
 Computer_CybranComputer_Basic_Orders_01164 = {text = '<LOC Computer_BasicOrders_030_020>[{i CybranComputer}]: Order received', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Basic_Orders_01164'}
 Computer_CybranComputer_Basic_Orders_01166 = {text = '<LOC Computer_BasicOrders_030_030>[{i CybranComputer}]: Order complete', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Basic_Orders_01166'}
@@ -91,34 +91,34 @@ Computer_CybranComputer_Basic_Orders_01178 = {text = '<LOC Computer_BasicOrders_
 Computer_CybranComputer_Basic_Orders_01179 = {text = '<LOC Computer_BasicOrders_030_150>[{i CybranComputer}]: Invalid target', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Basic_Orders_01179'}
 
 
-# ------------------------------
-# Opnode ID: Changed
-# Changed Objectives
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Changed
+-- Changed Objectives
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Changed_01423 = {text = '<LOC Computer_Changed_010_010>[{i UEFComputer}]: Objective updated', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Changed_01423'}
 Computer_UEFComputer_Changed_01424 = {text = '<LOC Computer_Changed_010_020>[{i UEFComputer}]: Primary objective updated', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Changed_01424'}
 Computer_UEFComputer_Changed_01434 = {text = '<LOC Computer_Changed_010_030>[{i UEFComputer}]: \nSecondary objective updated\n', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Changed_01434'}
 Computer_UEFComputer_Changed_01435 = {text = '<LOC Computer_Changed_010_040>[{i UEFComputer}]: Mission updated', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Changed_01435'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Changed_01423 = {text = '<LOC Computer_Changed_020_010>[{i AeonComputer}]: Objective updated', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Changed_01423'}
 Computer_AeonComputer_Changed_01424 = {text = '<LOC Computer_Changed_020_020>[{i AeonComputer}]: Primary objective updated', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Changed_01424'}
 Computer_AeonComputer_Changed_01434 = {text = '<LOC Computer_Changed_020_030>[{i AeonComputer}]: \nSecondary objective updated\n', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Changed_01434'}
 Computer_AeonComputer_Changed_01435 = {text = '<LOC Computer_Changed_020_040>[{i AeonComputer}]: Mission updated', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Changed_01435'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Changed_01423 = {text = '<LOC Computer_Changed_030_010>[{i CybranComputer}]: Objective updated', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Changed_01423'}
 Computer_CybranComputer_Changed_01424 = {text = '<LOC Computer_Changed_030_020>[{i CybranComputer}]: Primary objective updated', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Changed_01424'}
 Computer_CybranComputer_Changed_01434 = {text = '<LOC Computer_Changed_030_030>[{i CybranComputer}]: \nSecondary objective updated\n', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Changed_01434'}
 Computer_CybranComputer_Changed_01435 = {text = '<LOC Computer_Changed_030_040>[{i CybranComputer}]: Mission updated', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Changed_01435'}
 
 
-# ------------------------------
-# Opnode ID: Combat
-# Combat
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Combat
+-- Combat
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Combat_01200 = {text = '<LOC Computer_Combat_010_010>[{i UEFComputer}]: Attack confirmed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Combat_01200'}
 Computer_UEFComputer_Combat_01201 = {text = '<LOC Computer_Combat_010_020>[{i UEFComputer}]: Target set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Combat_01201'}
 Computer_UEFComputer_Combat_01202 = {text = '<LOC Computer_Combat_010_030>[{i UEFComputer}]: Target locked', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Combat_01202'}
@@ -146,7 +146,7 @@ Computer_UEFComputer_Combat_01227 = {text = '<LOC Computer_Combat_010_240>[{i UE
 Computer_UEFComputer_Combat_01229 = {text = '<LOC Computer_Combat_010_250>[{i UEFComputer}]: Ground unit under attack', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Combat_01229'}
 Computer_UEFComputer_Combat_01231 = {text = '<LOC Computer_Combat_010_260>[{i UEFComputer}]: Mass Extractors under attack', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Combat_01231'}
 Computer_UEFComputer_Combat_01232 = {text = '<LOC Computer_Combat_010_270>[{i UEFComputer}]: Power Generators under attack', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Combat_01232'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Combat_01200 = {text = '<LOC Computer_Combat_020_010>[{i AeonComputer}]: Attack confirmed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Combat_01200'}
 Computer_AeonComputer_Combat_01201 = {text = '<LOC Computer_Combat_020_020>[{i AeonComputer}]: Target set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Combat_01201'}
 Computer_AeonComputer_Combat_01202 = {text = '<LOC Computer_Combat_020_030>[{i AeonComputer}]: Target locked', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Combat_01202'}
@@ -174,7 +174,7 @@ Computer_AeonComputer_Combat_01227 = {text = '<LOC Computer_Combat_020_240>[{i A
 Computer_AeonComputer_Combat_01229 = {text = '<LOC Computer_Combat_020_250>[{i AeonComputer}]: Ground unit under attack', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Combat_01229'}
 Computer_AeonComputer_Combat_01231 = {text = '<LOC Computer_Combat_020_260>[{i AeonComputer}]: Mass Extractors under attack', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Combat_01231'}
 Computer_AeonComputer_Combat_01232 = {text = '<LOC Computer_Combat_020_270>[{i AeonComputer}]: Power Generators under attack', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Combat_01232'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Combat_01200 = {text = '<LOC Computer_Combat_030_010>[{i CybranComputer}]: Attack confirmed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Combat_01200'}
 Computer_CybranComputer_Combat_01201 = {text = '<LOC Computer_Combat_030_020>[{i CybranComputer}]: Target set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Combat_01201'}
 Computer_CybranComputer_Combat_01202 = {text = '<LOC Computer_Combat_030_030>[{i CybranComputer}]: Target locked', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Combat_01202'}
@@ -204,12 +204,12 @@ Computer_CybranComputer_Combat_01231 = {text = '<LOC Computer_Combat_030_260>[{i
 Computer_CybranComputer_Combat_01232 = {text = '<LOC Computer_Combat_030_270>[{i CybranComputer}]: Power Generators under attack', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Combat_01232'}
 
 
-# ------------------------------
-# Opnode ID: CommandCap
-# Command Cap
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: CommandCap
+-- Command Cap
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_CommandCap_01291 = {text = '<LOC Computer_CommandCap_010_010>[{i UEFComputer}]: Command cap exceeded', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandCap_01291'}
 Computer_UEFComputer_CommandCap_01292 = {text = '<LOC Computer_CommandCap_010_020>[{i UEFComputer}]: Command cap reached\n', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandCap_01292'}
 Computer_UEFComputer_CommandCap_01293 = {text = '<LOC Computer_CommandCap_010_030>[{i UEFComputer}]: Command limit reached', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandCap_01293'}
@@ -222,7 +222,7 @@ Computer_UEFComputer_CommandCap_01299 = {text = '<LOC Computer_CommandCap_010_09
 Computer_UEFComputer_CommandCap_01300 = {text = '<LOC Computer_CommandCap_010_100>[{i UEFComputer}]: Unit limit increased', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandCap_01300'}
 Computer_UEFComputer_CommandCap_01301 = {text = '<LOC Computer_CommandCap_010_110>[{i UEFComputer}]: Command cap decreased', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandCap_01301'}
 Computer_UEFComputer_CommandCap_01302 = {text = '<LOC Computer_CommandCap_010_120>[{i UEFComputer}]: Command limit decreased', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandCap_01302'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_CommandCap_01291 = {text = '<LOC Computer_CommandCap_020_010>[{i AeonComputer}]: Command cap exceeded', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandCap_01291'}
 Computer_AeonComputer_CommandCap_01292 = {text = '<LOC Computer_CommandCap_020_020>[{i AeonComputer}]: Command cap reached\n', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandCap_01292'}
 Computer_AeonComputer_CommandCap_01293 = {text = '<LOC Computer_CommandCap_020_030>[{i AeonComputer}]: Command limit reached', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandCap_01293'}
@@ -235,7 +235,7 @@ Computer_AeonComputer_CommandCap_01299 = {text = '<LOC Computer_CommandCap_020_0
 Computer_AeonComputer_CommandCap_01300 = {text = '<LOC Computer_CommandCap_020_100>[{i AeonComputer}]: Unit limit increased', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandCap_01300'}
 Computer_AeonComputer_CommandCap_01301 = {text = '<LOC Computer_CommandCap_020_110>[{i AeonComputer}]: Command cap decreased', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandCap_01301'}
 Computer_AeonComputer_CommandCap_01302 = {text = '<LOC Computer_CommandCap_020_120>[{i AeonComputer}]: Command limit decreased', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandCap_01302'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_CommandCap_01291 = {text = '<LOC Computer_CommandCap_030_010>[{i CybranComputer}]: Command cap exceeded', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandCap_01291'}
 Computer_CybranComputer_CommandCap_01292 = {text = '<LOC Computer_CommandCap_030_020>[{i CybranComputer}]: Command cap reached\n', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandCap_01292'}
 Computer_CybranComputer_CommandCap_01293 = {text = '<LOC Computer_CommandCap_030_030>[{i CybranComputer}]: Command limit reached', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandCap_01293'}
@@ -250,26 +250,26 @@ Computer_CybranComputer_CommandCap_01301 = {text = '<LOC Computer_CommandCap_030
 Computer_CybranComputer_CommandCap_01302 = {text = '<LOC Computer_CommandCap_030_120>[{i CybranComputer}]: Command limit decreased', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandCap_01302'}
 
 
-# ------------------------------
-# Opnode ID: CommandControl
-# CommandControl
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: CommandControl
+-- CommandControl
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_CommandControl_01285 = {text = '<LOC Computer_CommandControl_010_010>[{i UEFComputer}]: Coordinated attack set\n\n', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandControl_01285'}
 Computer_UEFComputer_CommandControl_01286 = {text = '<LOC Computer_CommandControl_010_020>[{i UEFComputer}]: Coordinated attack', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandControl_01286'}
 Computer_UEFComputer_CommandControl_01287 = {text = '<LOC Computer_CommandControl_010_030>[{i UEFComputer}]: Coordinated order set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandControl_01287'}
 Computer_UEFComputer_CommandControl_01288 = {text = '<LOC Computer_CommandControl_010_040>[{i UEFComputer}]: Coordinated', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandControl_01288'}
 Computer_UEFComputer_CommandControl_01289 = {text = '<LOC Computer_CommandControl_010_050>[{i UEFComputer}]: Waypoint adjusted', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandControl_01289'}
 Computer_UEFComputer_CommandControl_01290 = {text = '<LOC Computer_CommandControl_010_060>[{i UEFComputer}]: Building site adjusted', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_CommandControl_01290'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_CommandControl_01285 = {text = '<LOC Computer_CommandControl_020_010>[{i AeonComputer}]: Coordinated attack set\n\n', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandControl_01285'}
 Computer_AeonComputer_CommandControl_01286 = {text = '<LOC Computer_CommandControl_020_020>[{i AeonComputer}]: Coordinated attack', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandControl_01286'}
 Computer_AeonComputer_CommandControl_01287 = {text = '<LOC Computer_CommandControl_020_030>[{i AeonComputer}]: Coordinated order set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandControl_01287'}
 Computer_AeonComputer_CommandControl_01288 = {text = '<LOC Computer_CommandControl_020_040>[{i AeonComputer}]: Coordinated', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandControl_01288'}
 Computer_AeonComputer_CommandControl_01289 = {text = '<LOC Computer_CommandControl_020_050>[{i AeonComputer}]: Waypoint adjusted', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandControl_01289'}
 Computer_AeonComputer_CommandControl_01290 = {text = '<LOC Computer_CommandControl_020_060>[{i AeonComputer}]: Building site adjusted', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_CommandControl_01290'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_CommandControl_01285 = {text = '<LOC Computer_CommandControl_030_010>[{i CybranComputer}]: Coordinated attack set\n\n', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandControl_01285'}
 Computer_CybranComputer_CommandControl_01286 = {text = '<LOC Computer_CommandControl_030_020>[{i CybranComputer}]: Coordinated attack', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandControl_01286'}
 Computer_CybranComputer_CommandControl_01287 = {text = '<LOC Computer_CommandControl_030_030>[{i CybranComputer}]: Coordinated order set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandControl_01287'}
@@ -278,12 +278,12 @@ Computer_CybranComputer_CommandControl_01289 = {text = '<LOC Computer_CommandCon
 Computer_CybranComputer_CommandControl_01290 = {text = '<LOC Computer_CommandControl_030_060>[{i CybranComputer}]: Building site adjusted', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_CommandControl_01290'}
 
 
-# ------------------------------
-# Opnode ID: Commanders
-# Commanders
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Commanders
+-- Commanders
+-- ------------------------------
 
-# UEF Computers
+-- UEF Computers
 Computer_UEFComputer_Commanders_01314 = {text = '<LOC Computer_Commanders_010_010>[{i UEFComputer}]: Commander under attack', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Commanders_01314'}
 Computer_UEFComputer_Commanders_01315 = {text = '<LOC Computer_Commanders_010_020>[{i UEFComputer}]: Commander destroyed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Commanders_01315'}
 Computer_UEFComputer_Commanders_01316 = {text = '<LOC Computer_Commanders_010_030>[{i UEFComputer}]: Allied Commander destroyed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Commanders_01316'}
@@ -299,7 +299,7 @@ Computer_UEFComputer_Commanders_01325 = {text = '<LOC Computer_Commanders_010_12
 Computer_UEFComputer_Commanders_01326 = {text = '<LOC Computer_Commanders_010_130>[{i UEFComputer}]: ACU integrity at 10%!', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Commanders_01326'}
 Computer_UEFComputer_Commanders_01327 = {text = '<LOC Computer_Commanders_010_140>[{i UEFComputer}]: ACU integrity at 5%!', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Commanders_01327'}
 Computer_UEFComputer_Commanders_02450 = {text = '<LOC Computer_Commanders_010_150>[{i UEFComputer}]: ACU self-destruct immiment!', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Commanders_02450'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Commanders_01314 = {text = '<LOC Computer_Commanders_020_010>[{i AeonComputer}]: Commander under attack', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Commanders_01314'}
 Computer_AeonComputer_Commanders_01315 = {text = '<LOC Computer_Commanders_020_020>[{i AeonComputer}]: Commander destroyed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Commanders_01315'}
 Computer_AeonComputer_Commanders_01316 = {text = '<LOC Computer_Commanders_020_030>[{i AeonComputer}]: Allied Commander destroyed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Commanders_01316'}
@@ -315,7 +315,7 @@ Computer_AeonComputer_Commanders_01325 = {text = '<LOC Computer_Commanders_020_1
 Computer_AeonComputer_Commanders_01326 = {text = '<LOC Computer_Commanders_020_130>[{i AeonComputer}]: ACU integrity at 10%!', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Commanders_01326'}
 Computer_AeonComputer_Commanders_01327 = {text = '<LOC Computer_Commanders_020_140>[{i AeonComputer}]: ACU integrity at 5%!', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Commanders_01327'}
 Computer_AeonComputer_Commanders_02450 = {text = '<LOC Computer_Commanders_020_150>[{i AeonComputer}]: ACU self-destruct immiment!', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Commanders_02450'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Commanders_01314 = {text = '<LOC Computer_Commanders_030_010>[{i CybranComputer}]: Commander under attack', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Commanders_01314'}
 Computer_CybranComputer_Commanders_01315 = {text = '<LOC Computer_Commanders_030_020>[{i CybranComputer}]: Commander destroyed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Commanders_01315'}
 Computer_CybranComputer_Commanders_01316 = {text = '<LOC Computer_Commanders_030_030>[{i CybranComputer}]: Allied Commander destroyed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Commanders_01316'}
@@ -333,12 +333,12 @@ Computer_CybranComputer_Commanders_01327 = {text = '<LOC Computer_Commanders_030
 Computer_CybranComputer_Commanders_02450 = {text = '<LOC Computer_Commanders_030_150>[{i CybranComputer}]: ACU self-destruct immiment!', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Commanders_02450'}
 
 
-# ------------------------------
-# Opnode ID: Completed
-# Completed Objectives
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Completed
+-- Completed Objectives
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Completed_01398 = {text = '<LOC Computer_Completed_010_010>[{i UEFComputer}]: Objective completed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Completed_01398'}
 Computer_UEFComputer_Completed_01399 = {text = '<LOC Computer_Completed_010_020>[{i UEFComputer}]: Primary objective complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Completed_01399'}
 Computer_UEFComputer_Completed_01400 = {text = '<LOC Computer_Completed_010_030>[{i UEFComputer}]: Secondary objective complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Completed_01400'}
@@ -346,7 +346,7 @@ Computer_UEFComputer_Completed_01401 = {text = '<LOC Computer_Completed_010_040>
 Computer_UEFComputer_Completed_01402 = {text = '<LOC Computer_Completed_010_050>[{i UEFComputer}]: Bonus objective complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Completed_01402'}
 Computer_UEFComputer_Completed_01403 = {text = '<LOC Computer_Completed_010_060>[{i UEFComputer}]: Operation complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Completed_01403'}
 Computer_UEFComputer_Completed_01404 = {text = '<LOC Computer_Completed_010_070>[{i UEFComputer}]: Mission complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Completed_01404'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Completed_01398 = {text = '<LOC Computer_Completed_020_010>[{i AeonComputer}]: Objective completed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Completed_01398'}
 Computer_AeonComputer_Completed_01399 = {text = '<LOC Computer_Completed_020_020>[{i AeonComputer}]: Primary objective complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Completed_01399'}
 Computer_AeonComputer_Completed_01400 = {text = '<LOC Computer_Completed_020_030>[{i AeonComputer}]: Secondary objective complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Completed_01400'}
@@ -354,7 +354,7 @@ Computer_AeonComputer_Completed_01401 = {text = '<LOC Computer_Completed_020_040
 Computer_AeonComputer_Completed_01402 = {text = '<LOC Computer_Completed_020_050>[{i AeonComputer}]: Bonus objective complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Completed_01402'}
 Computer_AeonComputer_Completed_01403 = {text = '<LOC Computer_Completed_020_060>[{i AeonComputer}]: Operation complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Completed_01403'}
 Computer_AeonComputer_Completed_01404 = {text = '<LOC Computer_Completed_020_070>[{i AeonComputer}]: Mission complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Completed_01404'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Completed_01398 = {text = '<LOC Computer_Completed_030_010>[{i CybranComputer}]: Objective completed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Completed_01398'}
 Computer_CybranComputer_Completed_01399 = {text = '<LOC Computer_Completed_030_020>[{i CybranComputer}]: Primary objective complete', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Completed_01399'}
 Computer_CybranComputer_Completed_01400 = {text = '<LOC Computer_Completed_030_030>[{i CybranComputer}]: Secondary objective complete', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Completed_01400'}
@@ -364,12 +364,12 @@ Computer_CybranComputer_Completed_01403 = {text = '<LOC Computer_Completed_030_0
 Computer_CybranComputer_Completed_01404 = {text = '<LOC Computer_Completed_030_070>[{i CybranComputer}]: Mission complete', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Completed_01404'}
 
 
-# ------------------------------
-# Opnode ID: Construction
-# Construction
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Construction
+-- Construction
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Construction_01269 = {text = '<LOC Computer_Construction_010_010>[{i UEFComputer}]: Building', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Construction_01269'}
 Computer_UEFComputer_Construction_01270 = {text = '<LOC Computer_Construction_010_020>[{i UEFComputer}]: Construction complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Construction_01270'}
 Computer_UEFComputer_Construction_01271 = {text = '<LOC Computer_Construction_010_030>[{i UEFComputer}]: Construction paused', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Construction_01271'}
@@ -378,7 +378,7 @@ Computer_UEFComputer_Construction_01273 = {text = '<LOC Computer_Construction_01
 Computer_UEFComputer_Construction_01274 = {text = '<LOC Computer_Construction_010_060>[{i UEFComputer}]: Construction failed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Construction_01274'}
 Computer_UEFComputer_Construction_01275 = {text = '<LOC Computer_Construction_010_070>[{i UEFComputer}]: Construction area destroyed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Construction_01275'}
 Computer_UEFComputer_Construction_01276 = {text = '<LOC Computer_Construction_010_080>[{i UEFComputer}]: Construction destroyed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Construction_01276'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Construction_01269 = {text = '<LOC Computer_Construction_020_010>[{i AeonComputer}]: Building', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Construction_01269'}
 Computer_AeonComputer_Construction_01270 = {text = '<LOC Computer_Construction_020_020>[{i AeonComputer}]: Construction complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Construction_01270'}
 Computer_AeonComputer_Construction_01271 = {text = '<LOC Computer_Construction_020_030>[{i AeonComputer}]: Construction paused', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Construction_01271'}
@@ -387,7 +387,7 @@ Computer_AeonComputer_Construction_01273 = {text = '<LOC Computer_Construction_0
 Computer_AeonComputer_Construction_01274 = {text = '<LOC Computer_Construction_020_060>[{i AeonComputer}]: Construction failed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Construction_01274'}
 Computer_AeonComputer_Construction_01275 = {text = '<LOC Computer_Construction_020_070>[{i AeonComputer}]: Construction area destroyed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Construction_01275'}
 Computer_AeonComputer_Construction_01276 = {text = '<LOC Computer_Construction_020_080>[{i AeonComputer}]: Construction destroyed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Construction_01276'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Construction_01269 = {text = '<LOC Computer_Construction_030_010>[{i CybranComputer}]: Building', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Construction_01269'}
 Computer_CybranComputer_Construction_01270 = {text = '<LOC Computer_Construction_030_020>[{i CybranComputer}]: Construction complete', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Construction_01270'}
 Computer_CybranComputer_Construction_01271 = {text = '<LOC Computer_Construction_030_030>[{i CybranComputer}]: Construction paused', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Construction_01271'}
@@ -398,26 +398,26 @@ Computer_CybranComputer_Construction_01275 = {text = '<LOC Computer_Construction
 Computer_CybranComputer_Construction_01276 = {text = '<LOC Computer_Construction_030_080>[{i CybranComputer}]: Construction destroyed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Construction_01276'}
 
 
-# ------------------------------
-# Opnode ID: Engineering
-# Engineering
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Engineering
+-- Engineering
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Engineering_01279 = {text = '<LOC Computer_Engineering_010_010>[{i UEFComputer}]: Repairing', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Engineering_01279'}
 Computer_UEFComputer_Engineering_01280 = {text = '<LOC Computer_Engineering_010_020>[{i UEFComputer}]: Repairs complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Engineering_01280'}
 Computer_UEFComputer_Engineering_01281 = {text = '<LOC Computer_Engineering_010_030>[{i UEFComputer}]: Reclaiming', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Engineering_01281'}
 Computer_UEFComputer_Engineering_01282 = {text = '<LOC Computer_Engineering_010_040>[{i UEFComputer}]: Reclamation complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Engineering_01282'}
 Computer_UEFComputer_Engineering_01283 = {text = '<LOC Computer_Engineering_010_050>[{i UEFComputer}]: Capturing', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Engineering_01283'}
 Computer_UEFComputer_Engineering_01284 = {text = '<LOC Computer_Engineering_010_060>[{i UEFComputer}]: Capture complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Engineering_01284'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Engineering_01279 = {text = '<LOC Computer_Engineering_020_010>[{i AeonComputer}]: Repairing', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Engineering_01279'}
 Computer_AeonComputer_Engineering_01280 = {text = '<LOC Computer_Engineering_020_020>[{i AeonComputer}]: Repairs complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Engineering_01280'}
 Computer_AeonComputer_Engineering_01281 = {text = '<LOC Computer_Engineering_020_030>[{i AeonComputer}]: Reclaiming', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Engineering_01281'}
 Computer_AeonComputer_Engineering_01282 = {text = '<LOC Computer_Engineering_020_040>[{i AeonComputer}]: Reclamation complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Engineering_01282'}
 Computer_AeonComputer_Engineering_01283 = {text = '<LOC Computer_Engineering_020_050>[{i AeonComputer}]: Capturing', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Engineering_01283'}
 Computer_AeonComputer_Engineering_01284 = {text = '<LOC Computer_Engineering_020_060>[{i AeonComputer}]: Capture complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Engineering_01284'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Engineering_01279 = {text = '<LOC Computer_Engineering_030_010>[{i CybranComputer}]: Repairing', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Engineering_01279'}
 Computer_CybranComputer_Engineering_01280 = {text = '<LOC Computer_Engineering_030_020>[{i CybranComputer}]: Repairs complete', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Engineering_01280'}
 Computer_CybranComputer_Engineering_01281 = {text = '<LOC Computer_Engineering_030_030>[{i CybranComputer}]: Reclaiming', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Engineering_01281'}
@@ -426,12 +426,12 @@ Computer_CybranComputer_Engineering_01283 = {text = '<LOC Computer_Engineering_0
 Computer_CybranComputer_Engineering_01284 = {text = '<LOC Computer_Engineering_030_060>[{i CybranComputer}]: Capture complete', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Engineering_01284'}
 
 
-# ------------------------------
-# Opnode ID: Experimental
-# Expiremental
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Experimental
+-- Expiremental
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Expiremental_01360 = {text = '<LOC Computer_Experimental_010_010>[{i UEFComputer}]: Experimental unit operational', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Expiremental_01360'}
 Computer_UEFComputer_Expiremental_01361 = {text = '<LOC Computer_Experimental_010_020>[{i UEFComputer}]: Experimental unit under attack', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Expiremental_01361'}
 Computer_UEFComputer_Expiremental_01362 = {text = '<LOC Computer_Experimental_010_030>[{i UEFComputer}]: \nExperimental unit destroyed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Expiremental_01362'}
@@ -442,7 +442,7 @@ Computer_UEFComputer_Expiremental_01366 = {text = '<LOC Computer_Experimental_01
 Computer_UEFComputer_Expiremental_01367 = {text = '<LOC Computer_Experimental_010_080>[{i UEFComputer}]: Experimental unit nearly complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Expiremental_01367'}
 Computer_UEFComputer_Expiremental_01368 = {text = '<LOC Computer_Experimental_010_090>[{i UEFComputer}]: Enemy experimental unit under construction', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Expiremental_01368'}
 Computer_UEFComputer_Expiremental_01369 = {text = '<LOC Computer_Experimental_010_100>[{i UEFComputer}]: Allied experimental unit under construction', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Expiremental_01369'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Expiremental_01360 = {text = '<LOC Computer_Experimental_020_010>[{i AeonComputer}]: Experimental unit operational', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Expiremental_01360'}
 Computer_AeonComputer_Expiremental_01361 = {text = '<LOC Computer_Experimental_020_020>[{i AeonComputer}]: Experimental unit under attack', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Expiremental_01361'}
 Computer_AeonComputer_Expiremental_01362 = {text = '<LOC Computer_Experimental_020_030>[{i AeonComputer}]: \nExperimental unit destroyed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Expiremental_01362'}
@@ -453,7 +453,7 @@ Computer_AeonComputer_Expiremental_01366 = {text = '<LOC Computer_Experimental_0
 Computer_AeonComputer_Expiremental_01367 = {text = '<LOC Computer_Experimental_020_080>[{i AeonComputer}]: Experimental unit nearly complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Expiremental_01367'}
 Computer_AeonComputer_Expiremental_01368 = {text = '<LOC Computer_Experimental_020_090>[{i AeonComputer}]: Enemy experimental unit under construction', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Expiremental_01368'}
 Computer_AeonComputer_Expiremental_01369 = {text = '<LOC Computer_Experimental_020_100>[{i AeonComputer}]: Allied experimental unit under construction', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Expiremental_01369'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Expiremental_01360 = {text = '<LOC Computer_Experimental_030_010>[{i CybranComputer}]: Experimental unit operational', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Expiremental_01360'}
 Computer_CybranComputer_Expiremental_01361 = {text = '<LOC Computer_Experimental_030_020>[{i CybranComputer}]: Experimental unit under attack', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Expiremental_01361'}
 Computer_CybranComputer_Expiremental_01362 = {text = '<LOC Computer_Experimental_030_030>[{i CybranComputer}]: \nExperimental unit destroyed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Expiremental_01362'}
@@ -466,12 +466,12 @@ Computer_CybranComputer_Expiremental_01368 = {text = '<LOC Computer_Experimental
 Computer_CybranComputer_Expiremental_01369 = {text = '<LOC Computer_Experimental_030_100>[{i CybranComputer}]: Allied experimental unit under construction', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Expiremental_01369'}
 
 
-# ------------------------------
-# Opnode ID: Failed
-# Failed Objectives
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Failed
+-- Failed Objectives
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Failed_01405 = {text = '<LOC Computer_Failed_010_010>[{i UEFComputer}]: Objective failed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Failed_01405'}
 Computer_UEFComputer_Failed_01406 = {text = '<LOC Computer_Failed_010_020>[{i UEFComputer}]: Primary objective failed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Failed_01406'}
 Computer_UEFComputer_Failed_01407 = {text = '<LOC Computer_Failed_010_030>[{i UEFComputer}]: Secondary objective failed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Failed_01407'}
@@ -479,7 +479,7 @@ Computer_UEFComputer_Failed_01408 = {text = '<LOC Computer_Failed_010_040>[{i UE
 Computer_UEFComputer_Failed_01420 = {text = '<LOC Computer_Failed_010_050>[{i UEFComputer}]: Mission failed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Failed_01420'}
 Computer_UEFComputer_Failed_01421 = {text = '<LOC Computer_Failed_010_060>[{i UEFComputer}]: You suck, sir', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Failed_01421'}
 Computer_UEFComputer_Failed_01422 = {text = '<LOC Computer_Failed_010_070>[{i UEFComputer}]: That was pathetic', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Failed_01422'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Failed_01405 = {text = '<LOC Computer_Failed_020_010>[{i AeonComputer}]: Objective failed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Failed_01405'}
 Computer_AeonComputer_Failed_01406 = {text = '<LOC Computer_Failed_020_020>[{i AeonComputer}]: Primary objective failed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Failed_01406'}
 Computer_AeonComputer_Failed_01407 = {text = '<LOC Computer_Failed_020_030>[{i AeonComputer}]: Secondary objective failed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Failed_01407'}
@@ -487,7 +487,7 @@ Computer_AeonComputer_Failed_01408 = {text = '<LOC Computer_Failed_020_040>[{i A
 Computer_AeonComputer_Failed_01420 = {text = '<LOC Computer_Failed_020_050>[{i AeonComputer}]: Mission failed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Failed_01420'}
 Computer_AeonComputer_Failed_01421 = {text = '<LOC Computer_Failed_020_060>[{i AeonComputer}]: You suck, sir', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Failed_01421'}
 Computer_AeonComputer_Failed_01422 = {text = '<LOC Computer_Failed_020_070>[{i AeonComputer}]: That was pathetic', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Failed_01422'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Failed_01405 = {text = '<LOC Computer_Failed_030_010>[{i CybranComputer}]: Objective failed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Failed_01405'}
 Computer_CybranComputer_Failed_01406 = {text = '<LOC Computer_Failed_030_020>[{i CybranComputer}]: Primary objective failed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Failed_01406'}
 Computer_CybranComputer_Failed_01407 = {text = '<LOC Computer_Failed_030_030>[{i CybranComputer}]: Secondary objective failed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Failed_01407'}
@@ -497,26 +497,26 @@ Computer_CybranComputer_Failed_01421 = {text = '<LOC Computer_Failed_030_060>[{i
 Computer_CybranComputer_Failed_01422 = {text = '<LOC Computer_Failed_030_070>[{i CybranComputer}]: That was pathetic', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Failed_01422'}
 
 
-# ------------------------------
-# Opnode ID: Intel
-# Intel
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Intel
+-- Intel
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Intel_01194 = {text = '<LOC Computer_Intel_010_010>[{i UEFComputer}]: Enemy detected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Intel_01194'}
 Computer_UEFComputer_Intel_01195 = {text = '<LOC Computer_Intel_010_020>[{i UEFComputer}]: Enemy forces detected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Intel_01195'}
 Computer_UEFComputer_Intel_01196 = {text = '<LOC Computer_Intel_010_030>[{i UEFComputer}]: Enemy units detected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Intel_01196'}
 Computer_UEFComputer_Intel_01197 = {text = '<LOC Computer_Intel_010_040>[{i UEFComputer}]: Enemy installations detected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Intel_01197'}
 Computer_UEFComputer_Intel_01198 = {text = '<LOC Computer_Intel_010_050>[{i UEFComputer}]: Commander Detected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Intel_01198'}
 Computer_UEFComputer_Intel_01199 = {text = '<LOC Computer_Intel_010_060>[{i UEFComputer}]: Experimental Unit Detected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Intel_01199'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Intel_01194 = {text = '<LOC Computer_Intel_020_010>[{i AeonComputer}]: Enemy detected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Intel_01194'}
 Computer_AeonComputer_Intel_01195 = {text = '<LOC Computer_Intel_020_020>[{i AeonComputer}]: Enemy forces detected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Intel_01195'}
 Computer_AeonComputer_Intel_01196 = {text = '<LOC Computer_Intel_020_030>[{i AeonComputer}]: Enemy units detected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Intel_01196'}
 Computer_AeonComputer_Intel_01197 = {text = '<LOC Computer_Intel_020_040>[{i AeonComputer}]: Enemy installations detected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Intel_01197'}
 Computer_AeonComputer_Intel_01198 = {text = '<LOC Computer_Intel_020_050>[{i AeonComputer}]: Commander Detected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Intel_01198'}
 Computer_AeonComputer_Intel_01199 = {text = '<LOC Computer_Intel_020_060>[{i AeonComputer}]: Experimental Unit Detected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Intel_01199'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Intel_01194 = {text = '<LOC Computer_Intel_030_010>[{i CybranComputer}]: Enemy detected', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Intel_01194'}
 Computer_CybranComputer_Intel_01195 = {text = '<LOC Computer_Intel_030_020>[{i CybranComputer}]: Enemy forces detected', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Intel_01195'}
 Computer_CybranComputer_Intel_01196 = {text = '<LOC Computer_Intel_030_030>[{i CybranComputer}]: Enemy units detected', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Intel_01196'}
@@ -525,28 +525,28 @@ Computer_CybranComputer_Intel_01198 = {text = '<LOC Computer_Intel_030_050>[{i C
 Computer_CybranComputer_Intel_01199 = {text = '<LOC Computer_Intel_030_060>[{i CybranComputer}]: Experimental Unit Detected', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Intel_01199'}
 
 
-# ------------------------------
-# Opnode ID: MapExpansion
-# Map Expansion
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: MapExpansion
+-- Map Expansion
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_MapExpansion_01380 = {text = '<LOC Computer_MapExpansion_010_010>[{i UEFComputer}]: Operation area expanded', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MapExpansion_01380'}
 Computer_UEFComputer_MapExpansion_01381 = {text = '<LOC Computer_MapExpansion_010_020>[{i UEFComputer}]: Operational area expanded', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MapExpansion_01381'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_MapExpansion_01380 = {text = '<LOC Computer_MapExpansion_020_010>[{i AeonComputer}]: Operation area expanded', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MapExpansion_01380'}
 Computer_AeonComputer_MapExpansion_01381 = {text = '<LOC Computer_MapExpansion_020_020>[{i AeonComputer}]: Operational area expanded', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MapExpansion_01381'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_MapExpansion_01380 = {text = '<LOC Computer_MapExpansion_030_010>[{i CybranComputer}]: Operation area expanded', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_MapExpansion_01380'}
 Computer_CybranComputer_MapExpansion_01381 = {text = '<LOC Computer_MapExpansion_030_020>[{i CybranComputer}]: Operational area expanded', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_MapExpansion_01381'}
 
 
-# ------------------------------
-# Opnode ID: MissileLaunch
-# Missile Launch
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: MissileLaunch
+-- Missile Launch
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_MissileLaunch_01336 = {text = '<LOC Computer_MissileLaunch_010_010>[{i UEFComputer}]: Missile armed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MissileLaunch_01336'}
 Computer_UEFComputer_MissileLaunch_01337 = {text = '<LOC Computer_MissileLaunch_010_020>[{i UEFComputer}]: Tactical missile armed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MissileLaunch_01337'}
 Computer_UEFComputer_MissileLaunch_01338 = {text = '<LOC Computer_MissileLaunch_010_030>[{i UEFComputer}]: Tactical missile ready for launch', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MissileLaunch_01338'}
@@ -571,7 +571,7 @@ Computer_UEFComputer_MissileLaunch_01356 = {text = '<LOC Computer_MissileLaunch_
 Computer_UEFComputer_MissileLaunch_01357 = {text = '<LOC Computer_MissileLaunch_010_220>[{i UEFComputer}]: Strategic threat neutralized', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MissileLaunch_01357'}
 Computer_UEFComputer_MissileLaunch_01358 = {text = '<LOC Computer_MissileLaunch_010_230>[{i UEFComputer}]: Enemy nuke inbound', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MissileLaunch_01358'}
 Computer_UEFComputer_MissileLaunch_01359 = {text = '<LOC Computer_MissileLaunch_010_240>[{i UEFComputer}]: Enemy missile inbound', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_MissileLaunch_01359'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_MissileLaunch_01336 = {text = '<LOC Computer_MissileLaunch_020_010>[{i AeonComputer}]: Missile armed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MissileLaunch_01336'}
 Computer_AeonComputer_MissileLaunch_01337 = {text = '<LOC Computer_MissileLaunch_020_020>[{i AeonComputer}]: Tactical missile armed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MissileLaunch_01337'}
 Computer_AeonComputer_MissileLaunch_01338 = {text = '<LOC Computer_MissileLaunch_020_030>[{i AeonComputer}]: Tactical missile ready for launch', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MissileLaunch_01338'}
@@ -596,7 +596,7 @@ Computer_AeonComputer_MissileLaunch_01356 = {text = '<LOC Computer_MissileLaunch
 Computer_AeonComputer_MissileLaunch_01357 = {text = '<LOC Computer_MissileLaunch_020_220>[{i AeonComputer}]: Strategic threat neutralized', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MissileLaunch_01357'}
 Computer_AeonComputer_MissileLaunch_01358 = {text = '<LOC Computer_MissileLaunch_020_230>[{i AeonComputer}]: Enemy nuke inbound', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MissileLaunch_01358'}
 Computer_AeonComputer_MissileLaunch_01359 = {text = '<LOC Computer_MissileLaunch_020_240>[{i AeonComputer}]: Enemy missile inbound', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_MissileLaunch_01359'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_MissileLaunch_01336 = {text = '<LOC Computer_MissileLaunch_030_010>[{i CybranComputer}]: Missile armed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_MissileLaunch_01336'}
 Computer_CybranComputer_MissileLaunch_01337 = {text = '<LOC Computer_MissileLaunch_030_020>[{i CybranComputer}]: Tactical missile armed', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_MissileLaunch_01337'}
 Computer_CybranComputer_MissileLaunch_01338 = {text = '<LOC Computer_MissileLaunch_030_030>[{i CybranComputer}]: Tactical missile ready for launch', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_MissileLaunch_01338'}
@@ -623,12 +623,12 @@ Computer_CybranComputer_MissileLaunch_01358 = {text = '<LOC Computer_MissileLaun
 Computer_CybranComputer_MissileLaunch_01359 = {text = '<LOC Computer_MissileLaunch_030_240>[{i CybranComputer}]: Enemy missile inbound', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_MissileLaunch_01359'}
 
 
-# ------------------------------
-# Opnode ID: Move
-# Move
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Move
+-- Move
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Move_01180 = {text = '<LOC Computer_Move_010_010>[{i UEFComputer}]: Destination set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Move_01180'}
 Computer_UEFComputer_Move_01181 = {text = '<LOC Computer_Move_010_020>[{i UEFComputer}]: Destination locked in', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Move_01181'}
 Computer_UEFComputer_Move_01182 = {text = '<LOC Computer_Move_010_030>[{i UEFComputer}]: Waypoint set\n', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Move_01182'}
@@ -643,7 +643,7 @@ Computer_UEFComputer_Move_01190 = {text = '<LOC Computer_Move_010_110>[{i UEFCom
 Computer_UEFComputer_Move_01191 = {text = '<LOC Computer_Move_010_120>[{i UEFComputer}]: Engineers selected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Move_01191'}
 Computer_UEFComputer_Move_01192 = {text = '<LOC Computer_Move_010_130>[{i UEFComputer}]: Buildings selected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Move_01192'}
 Computer_UEFComputer_Move_01193 = {text = '<LOC Computer_Move_010_140>[{i UEFComputer}]: Structures selected', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Move_01193'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Move_01180 = {text = '<LOC Computer_Move_020_010>[{i AeonComputer}]: Destination set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Move_01180'}
 Computer_AeonComputer_Move_01181 = {text = '<LOC Computer_Move_020_020>[{i AeonComputer}]: Destination locked in', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Move_01181'}
 Computer_AeonComputer_Move_01182 = {text = '<LOC Computer_Move_020_030>[{i AeonComputer}]: Waypoint set\n', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Move_01182'}
@@ -658,7 +658,7 @@ Computer_AeonComputer_Move_01190 = {text = '<LOC Computer_Move_020_110>[{i AeonC
 Computer_AeonComputer_Move_01191 = {text = '<LOC Computer_Move_020_120>[{i AeonComputer}]: Engineers selected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Move_01191'}
 Computer_AeonComputer_Move_01192 = {text = '<LOC Computer_Move_020_130>[{i AeonComputer}]: Buildings selected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Move_01192'}
 Computer_AeonComputer_Move_01193 = {text = '<LOC Computer_Move_020_140>[{i AeonComputer}]: Structures selected', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Move_01193'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Move_01180 = {text = '<LOC Computer_Move_030_010>[{i CybranComputer}]: Destination set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Move_01180'}
 Computer_CybranComputer_Move_01181 = {text = '<LOC Computer_Move_030_020>[{i CybranComputer}]: Destination locked in', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Move_01181'}
 Computer_CybranComputer_Move_01182 = {text = '<LOC Computer_Move_030_030>[{i CybranComputer}]: Waypoint set\n', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Move_01182'}
@@ -675,31 +675,31 @@ Computer_CybranComputer_Move_01192 = {text = '<LOC Computer_Move_030_130>[{i Cyb
 Computer_CybranComputer_Move_01193 = {text = '<LOC Computer_Move_030_140>[{i CybranComputer}]: Structures selected', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Move_01193'}
 
 
-# ------------------------------
-# Opnode ID: NewObjectives
-# New Objectives
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: NewObjectives
+-- New Objectives
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_NewExpansion_01388 = {text = '<LOC Computer_NewObjectives_010_010>[{i UEFComputer}]: New objective', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_NewExpansion_01388'}
 Computer_UEFComputer_NewExpansion_01389 = {text = '<LOC Computer_NewObjectives_010_020>[{i UEFComputer}]: New primary objective', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_NewExpansion_01389'}
 Computer_UEFComputer_NewExpansion_01390 = {text = '<LOC Computer_NewObjectives_010_030>[{i UEFComputer}]: New secondary objective', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_NewExpansion_01390'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_NewExpansion_01388 = {text = '<LOC Computer_NewObjectives_020_010>[{i AeonComputer}]: New objective', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_NewExpansion_01388'}
 Computer_AeonComputer_NewExpansion_01389 = {text = '<LOC Computer_NewObjectives_020_020>[{i AeonComputer}]: New primary objective', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_NewExpansion_01389'}
 Computer_AeonComputer_NewExpansion_01390 = {text = '<LOC Computer_NewObjectives_020_030>[{i AeonComputer}]: New secondary objective', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_NewExpansion_01390'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_NewExpansion_01388 = {text = '<LOC Computer_NewObjectives_030_010>[{i CybranComputer}]: New objective', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_NewExpansion_01388'}
 Computer_CybranComputer_NewExpansion_01389 = {text = '<LOC Computer_NewObjectives_030_020>[{i CybranComputer}]: New primary objective', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_NewExpansion_01389'}
 Computer_CybranComputer_NewExpansion_01390 = {text = '<LOC Computer_NewObjectives_030_030>[{i CybranComputer}]: New secondary objective', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_NewExpansion_01390'}
 
 
-# ------------------------------
-# Opnode ID: Patrol
-# Patrol
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Patrol
+-- Patrol
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Patrol_01238 = {text = '<LOC Computer_Patrol_010_010>[{i UEFComputer}]: Patrol route set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Patrol_01238'}
 Computer_UEFComputer_Patrol_01239 = {text = '<LOC Computer_Patrol_010_020>[{i UEFComputer}]: Patrol set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Patrol_01239'}
 Computer_UEFComputer_Patrol_01241 = {text = '<LOC Computer_Patrol_010_030>[{i UEFComputer}]: Patrol point set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Patrol_01241'}
@@ -710,7 +710,7 @@ Computer_UEFComputer_Patrol_01246 = {text = '<LOC Computer_Patrol_010_070>[{i UE
 Computer_UEFComputer_Patrol_01247 = {text = '<LOC Computer_Patrol_010_080>[{i UEFComputer}]: Unable to reach patrol location', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Patrol_01247'}
 Computer_UEFComputer_Patrol_01248 = {text = '<LOC Computer_Patrol_010_090>[{i UEFComputer}]: Patrol stopped', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Patrol_01248'}
 Computer_UEFComputer_Patrol_01249 = {text = '<LOC Computer_Patrol_010_100>[{i UEFComputer}]: Patrol aborted', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Patrol_01249'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Patrol_01238 = {text = '<LOC Computer_Patrol_020_010>[{i AeonComputer}]: Patrol route set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Patrol_01238'}
 Computer_AeonComputer_Patrol_01239 = {text = '<LOC Computer_Patrol_020_020>[{i AeonComputer}]: Patrol set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Patrol_01239'}
 Computer_AeonComputer_Patrol_01241 = {text = '<LOC Computer_Patrol_020_030>[{i AeonComputer}]: Patrol point set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Patrol_01241'}
@@ -721,7 +721,7 @@ Computer_AeonComputer_Patrol_01246 = {text = '<LOC Computer_Patrol_020_070>[{i A
 Computer_AeonComputer_Patrol_01247 = {text = '<LOC Computer_Patrol_020_080>[{i AeonComputer}]: Unable to reach patrol location', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Patrol_01247'}
 Computer_AeonComputer_Patrol_01248 = {text = '<LOC Computer_Patrol_020_090>[{i AeonComputer}]: Patrol stopped', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Patrol_01248'}
 Computer_AeonComputer_Patrol_01249 = {text = '<LOC Computer_Patrol_020_100>[{i AeonComputer}]: Patrol aborted', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Patrol_01249'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Patrol_01238 = {text = '<LOC Computer_Patrol_030_010>[{i CybranComputer}]: Patrol route set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Patrol_01238'}
 Computer_CybranComputer_Patrol_01239 = {text = '<LOC Computer_Patrol_030_020>[{i CybranComputer}]: Patrol set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Patrol_01239'}
 Computer_CybranComputer_Patrol_01241 = {text = '<LOC Computer_Patrol_030_030>[{i CybranComputer}]: Patrol point set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Patrol_01241'}
@@ -734,12 +734,12 @@ Computer_CybranComputer_Patrol_01248 = {text = '<LOC Computer_Patrol_030_090>[{i
 Computer_CybranComputer_Patrol_01249 = {text = '<LOC Computer_Patrol_030_100>[{i CybranComputer}]: Patrol aborted', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Patrol_01249'}
 
 
-# ------------------------------
-# Opnode ID: Resources
-# Resources
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Resources
+-- Resources
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Resources_01303 = {text = '<LOC Computer_Resources_010_010>[{i UEFComputer}]: Mass levels dangerous\n\n', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Resources_01303'}
 Computer_UEFComputer_Resources_01304 = {text = '<LOC Computer_Resources_010_020>[{i UEFComputer}]: Energy levels dangerous', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Resources_01304'}
 Computer_UEFComputer_Resources_01305 = {text = '<LOC Computer_Resources_010_030>[{i UEFComputer}]: Mass levels critical', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Resources_01305'}
@@ -751,7 +751,7 @@ Computer_UEFComputer_Resources_01310 = {text = '<LOC Computer_Resources_010_080>
 Computer_UEFComputer_Resources_01311 = {text = '<LOC Computer_Resources_010_090>[{i UEFComputer}]: Power storage empty', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Resources_01311'}
 Computer_UEFComputer_Resources_01312 = {text = '<LOC Computer_Resources_010_100>[{i UEFComputer}]: Additional Energy storage required', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Resources_01312'}
 Computer_UEFComputer_Resources_01313 = {text = '<LOC Computer_Resources_010_110>[{i UEFComputer}]: Additional Mass storage required', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Resources_01313'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Resources_01303 = {text = '<LOC Computer_Resources_020_010>[{i AeonComputer}]: Mass levels dangerous\n\n', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Resources_01303'}
 Computer_AeonComputer_Resources_01304 = {text = '<LOC Computer_Resources_020_020>[{i AeonComputer}]: Energy levels dangerous', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Resources_01304'}
 Computer_AeonComputer_Resources_01305 = {text = '<LOC Computer_Resources_020_030>[{i AeonComputer}]: Mass levels critical', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Resources_01305'}
@@ -763,7 +763,7 @@ Computer_AeonComputer_Resources_01310 = {text = '<LOC Computer_Resources_020_080
 Computer_AeonComputer_Resources_01311 = {text = '<LOC Computer_Resources_020_090>[{i AeonComputer}]: Power storage empty', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Resources_01311'}
 Computer_AeonComputer_Resources_01312 = {text = '<LOC Computer_Resources_020_100>[{i AeonComputer}]: Additional Energy storage required', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Resources_01312'}
 Computer_AeonComputer_Resources_01313 = {text = '<LOC Computer_Resources_020_110>[{i AeonComputer}]: Additional Mass storage required', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Resources_01313'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Resources_01303 = {text = '<LOC Computer_Resources_030_010>[{i CybranComputer}]: Mass levels dangerous\n\n', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Resources_01303'}
 Computer_CybranComputer_Resources_01304 = {text = '<LOC Computer_Resources_030_020>[{i CybranComputer}]: Energy levels dangerous', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Resources_01304'}
 Computer_CybranComputer_Resources_01305 = {text = '<LOC Computer_Resources_030_030>[{i CybranComputer}]: Mass levels critical', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Resources_01305'}
@@ -777,12 +777,12 @@ Computer_CybranComputer_Resources_01312 = {text = '<LOC Computer_Resources_030_1
 Computer_CybranComputer_Resources_01313 = {text = '<LOC Computer_Resources_030_110>[{i CybranComputer}]: Additional Mass storage required', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Resources_01313'}
 
 
-# ------------------------------
-# Opnode ID: Stop
-# Stop
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Stop
+-- Stop
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Stop_01256 = {text = '<LOC Computer_Stop_010_010>[{i UEFComputer}]: Standing down', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Stop_01256'}
 Computer_UEFComputer_Stop_01257 = {text = '<LOC Computer_Stop_010_020>[{i UEFComputer}]: Orders canceled', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Stop_01257'}
 Computer_UEFComputer_Stop_01258 = {text = '<LOC Computer_Stop_010_030>[{i UEFComputer}]: Build queue cleared', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Stop_01258'}
@@ -792,7 +792,7 @@ Computer_UEFComputer_Stop_01262 = {text = '<LOC Computer_Stop_010_060>[{i UEFCom
 Computer_UEFComputer_Stop_01263 = {text = '<LOC Computer_Stop_010_070>[{i UEFComputer}]: Construction aborted', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Stop_01263'}
 Computer_UEFComputer_Stop_01264 = {text = '<LOC Computer_Stop_010_080>[{i UEFComputer}]: Order aborted', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Stop_01264'}
 Computer_UEFComputer_Stop_01265 = {text = '<LOC Computer_Stop_010_090>[{i UEFComputer}]: \nConstructions aborted\n', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Stop_01265'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Stop_01256 = {text = '<LOC Computer_Stop_020_010>[{i AeonComputer}]: Standing down', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Stop_01256'}
 Computer_AeonComputer_Stop_01257 = {text = '<LOC Computer_Stop_020_020>[{i AeonComputer}]: Orders canceled', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Stop_01257'}
 Computer_AeonComputer_Stop_01258 = {text = '<LOC Computer_Stop_020_030>[{i AeonComputer}]: Build queue cleared', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Stop_01258'}
@@ -802,7 +802,7 @@ Computer_AeonComputer_Stop_01262 = {text = '<LOC Computer_Stop_020_060>[{i AeonC
 Computer_AeonComputer_Stop_01263 = {text = '<LOC Computer_Stop_020_070>[{i AeonComputer}]: Construction aborted', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Stop_01263'}
 Computer_AeonComputer_Stop_01264 = {text = '<LOC Computer_Stop_020_080>[{i AeonComputer}]: Order aborted', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Stop_01264'}
 Computer_AeonComputer_Stop_01265 = {text = '<LOC Computer_Stop_020_090>[{i AeonComputer}]: \nConstructions aborted\n', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Stop_01265'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Stop_01256 = {text = '<LOC Computer_Stop_030_010>[{i CybranComputer}]: Standing down', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Stop_01256'}
 Computer_CybranComputer_Stop_01257 = {text = '<LOC Computer_Stop_030_020>[{i CybranComputer}]: Orders canceled', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Stop_01257'}
 Computer_CybranComputer_Stop_01258 = {text = '<LOC Computer_Stop_030_030>[{i CybranComputer}]: Build queue cleared', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Stop_01258'}
@@ -814,12 +814,12 @@ Computer_CybranComputer_Stop_01264 = {text = '<LOC Computer_Stop_030_080>[{i Cyb
 Computer_CybranComputer_Stop_01265 = {text = '<LOC Computer_Stop_030_090>[{i CybranComputer}]: \nConstructions aborted\n', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Stop_01265'}
 
 
-# ------------------------------
-# Opnode ID: Transports
-# Transports
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: Transports
+-- Transports
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_Transports_01328 = {text = '<LOC Computer_Transports_010_010>[{i UEFComputer}]: Ferry route set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Transports_01328'}
 Computer_UEFComputer_Transports_01329 = {text = '<LOC Computer_Transports_010_020>[{i UEFComputer}]: Ferry set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Transports_01329'}
 Computer_UEFComputer_Transports_01330 = {text = '<LOC Computer_Transports_010_030>[{i UEFComputer}]: Ferry point set', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Transports_01330'}
@@ -827,7 +827,7 @@ Computer_UEFComputer_Transports_01331 = {text = '<LOC Computer_Transports_010_04
 Computer_UEFComputer_Transports_01332 = {text = '<LOC Computer_Transports_010_050>[{i UEFComputer}]: Transport destroyed', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Transports_01332'}
 Computer_UEFComputer_Transports_01333 = {text = '<LOC Computer_Transports_010_060>[{i UEFComputer}]: Invalid transport route', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Transports_01333'}
 Computer_UEFComputer_Transports_01334 = {text = '<LOC Computer_Transports_010_070>[{i UEFComputer}]: Invalid ferry route', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_Transports_01334'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_Transports_01328 = {text = '<LOC Computer_Transports_020_010>[{i AeonComputer}]: Ferry route set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Transports_01328'}
 Computer_AeonComputer_Transports_01329 = {text = '<LOC Computer_Transports_020_020>[{i AeonComputer}]: Ferry set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Transports_01329'}
 Computer_AeonComputer_Transports_01330 = {text = '<LOC Computer_Transports_020_030>[{i AeonComputer}]: Ferry point set', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Transports_01330'}
@@ -835,7 +835,7 @@ Computer_AeonComputer_Transports_01331 = {text = '<LOC Computer_Transports_020_0
 Computer_AeonComputer_Transports_01332 = {text = '<LOC Computer_Transports_020_050>[{i AeonComputer}]: Transport destroyed', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Transports_01332'}
 Computer_AeonComputer_Transports_01333 = {text = '<LOC Computer_Transports_020_060>[{i AeonComputer}]: Invalid transport route', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Transports_01333'}
 Computer_AeonComputer_Transports_01334 = {text = '<LOC Computer_Transports_020_070>[{i AeonComputer}]: Invalid ferry route', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_Transports_01334'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_Transports_01328 = {text = '<LOC Computer_Transports_030_010>[{i CybranComputer}]: Ferry route set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Transports_01328'}
 Computer_CybranComputer_Transports_01329 = {text = '<LOC Computer_Transports_030_020>[{i CybranComputer}]: Ferry set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Transports_01329'}
 Computer_CybranComputer_Transports_01330 = {text = '<LOC Computer_Transports_030_030>[{i CybranComputer}]: Ferry point set', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Transports_01330'}
@@ -845,24 +845,24 @@ Computer_CybranComputer_Transports_01333 = {text = '<LOC Computer_Transports_030
 Computer_CybranComputer_Transports_01334 = {text = '<LOC Computer_Transports_030_070>[{i CybranComputer}]: Invalid ferry route', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_Transports_01334'}
 
 
-# ------------------------------
-# Opnode ID: UnitRevalation
-# Unit Revalation
-# ------------------------------
+-- ------------------------------
+-- Opnode ID: UnitRevalation
+-- Unit Revalation
+-- ------------------------------
 
-# UEF Computer
+-- UEF Computer
 Computer_UEFComputer_UnitRevalation_01370 = {text = '<LOC Computer_UnitRevalation_010_010>[{i UEFComputer}]: Unit schematics downloaded', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_UnitRevalation_01370'}
 Computer_UEFComputer_UnitRevalation_01371 = {text = '<LOC Computer_UnitRevalation_010_020>[{i UEFComputer}]: Unit schematic downloaded', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_UnitRevalation_01371'}
 Computer_UEFComputer_UnitRevalation_01372 = {text = '<LOC Computer_UnitRevalation_010_030>[{i UEFComputer}]: Schematics downloaded', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_UnitRevalation_01372'}
 Computer_UEFComputer_UnitRevalation_01373 = {text = '<LOC Computer_UnitRevalation_010_040>[{i UEFComputer}]: Schematic downloaded', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_UnitRevalation_01373'}
 Computer_UEFComputer_UnitRevalation_01374 = {text = '<LOC Computer_UnitRevalation_010_050>[{i UEFComputer}]: Download complete', bank = 'COMPUTER_UEF_VO', cue = 'UEFComputer_UnitRevalation_01374'}
-# Aeon Computer
+-- Aeon Computer
 Computer_AeonComputer_UnitRevalation_01370 = {text = '<LOC Computer_UnitRevalation_020_010>[{i AeonComputer}]: Unit schematics downloaded', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_UnitRevalation_01370'}
 Computer_AeonComputer_UnitRevalation_01371 = {text = '<LOC Computer_UnitRevalation_020_020>[{i AeonComputer}]: Unit schematic downloaded', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_UnitRevalation_01371'}
 Computer_AeonComputer_UnitRevalation_01372 = {text = '<LOC Computer_UnitRevalation_020_030>[{i AeonComputer}]: Schematics downloaded', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_UnitRevalation_01372'}
 Computer_AeonComputer_UnitRevalation_01373 = {text = '<LOC Computer_UnitRevalation_020_040>[{i AeonComputer}]: Schematic downloaded', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_UnitRevalation_01373'}
 Computer_AeonComputer_UnitRevalation_01374 = {text = '<LOC Computer_UnitRevalation_020_050>[{i AeonComputer}]: Download complete', bank = 'COMPUTER_AEON_VO', cue = 'AeonComputer_UnitRevalation_01374'}
-# Cybran Computer
+-- Cybran Computer
 Computer_CybranComputer_UnitRevalation_01370 = {text = '<LOC Computer_UnitRevalation_030_010>[{i CybranComputer}]: Unit schematics downloaded', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_UnitRevalation_01370'}
 Computer_CybranComputer_UnitRevalation_01371 = {text = '<LOC Computer_UnitRevalation_030_020>[{i CybranComputer}]: Unit schematic downloaded', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_UnitRevalation_01371'}
 Computer_CybranComputer_UnitRevalation_01372 = {text = '<LOC Computer_UnitRevalation_030_030>[{i CybranComputer}]: Schematics downloaded', bank = 'COMPUTER_CYBRAN_VO', cue = 'CybranComputer_UnitRevalation_01372'}

@@ -27,7 +27,7 @@ Movie = Class(moho.movie_methods, Control) {
         Control.OnInit(self)
     end,
     
-    Set = function(self,filename,sound,voice) # sound and voice are optional
+    Set = function(self,filename,sound,voice) -- sound and voice are optional
         self:Reset()
         local ok = self:InternalSet(filename)
         if ok then
@@ -48,7 +48,7 @@ Movie = Class(moho.movie_methods, Control) {
                 end
             )
         else
-            # Force calls to OnStopped()
+            -- Force calls to OnStopped()
             self:OnStopped()
         end
     end,
@@ -74,10 +74,10 @@ Movie = Class(moho.movie_methods, Control) {
     OnFinished = function(self) end,
     OnStopped = function(self) end,
 
-    # Called when a subtitle changes. string should be LOC()'d for display
+    -- Called when a subtitle changes. string should be LOC()'d for display
     OnSubtitle = function(self,string) end,
 
-    # Called when the movie is loaded and ready to play immediately
+    -- Called when the movie is loaded and ready to play immediately
     OnLoaded = function(self)
     end,
 

@@ -1,13 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/tarmacs.lua
-#**  Author(s):  Robert Oates
-#**
-#**  Summary  :  Map for terrain-specific tarmacs.
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#**
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/tarmacs.lua
+--**  Author(s):  Robert Oates
+--**
+--**  Summary  :  Map for terrain-specific tarmacs.
+--**
+--**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
+--**
+--****************************************************************************
 
 local TarmacTable =
 {

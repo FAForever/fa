@@ -1,9 +1,9 @@
-#*****************************************************************************
-#* File: lua/modules/ui/controls/worldview.lua
-#* Summary: World view control
-#*
-#* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
-#*****************************************************************************
+--*****************************************************************************
+--* File: lua/modules/ui/controls/worldview.lua
+--* Summary: World view control
+--*
+--* Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+--*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')

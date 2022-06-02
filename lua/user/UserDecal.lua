@@ -4,7 +4,7 @@ UserDecal = Class(moho.userDecal_methods) {
         _c_CreateDecal(self)
     end,
     
-    # SetPositionByScreen(vector2)
-    # SetTexture(string)
-    # SetScale(vector3)
+    -- SetPositionByScreen(vector2)
+    -- SetTexture(string)
+    -- SetScale(vector3)
 }

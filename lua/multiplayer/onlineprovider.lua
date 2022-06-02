@@ -4,11 +4,11 @@
 --* Summary: 3rd party integration options.  This will receive and send commands
 --* by hooking into stdin/out in the supremecommander app.
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 
-# Called from C++ code when we are launching from gpg.net.
+-- Called from C++ code when we are launching from gpg.net.
 function CreateLobby(autolaunch, protocol, port, playerName, uid, natTraversalProvider, hasSupcom)
 
     local lobbyfile

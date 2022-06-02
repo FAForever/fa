@@ -530,7 +530,7 @@ function UpdateWindow(info)
             unitQueue = info.userUnit:GetCommandQueue()
         end
 
-        -- # Build queue upon hovering of unit
+        -- -- Build queue upon hovering of unit
 
         local always = Prefs.GetFromCurrentProfile('options.gui_queue_on_hover_02') == 'always'
         local isObserver = GameMain.OriginalFocusArmy == -1 or GetFocusArmy() == -1

@@ -77,7 +77,7 @@ end
 -- select a specified selection set in the session
 function ApplySelectionSet(name)
 
-    # get a filtered list of only valid units back from the function
+    -- get a filtered list of only valid units back from the function
     if not selectionSets[name] then return end
     selectionSets[name] = ValidateUnitsList(selectionSets[name])
     local selection = EntityCategoryFilterDown(categories.ALLUNITS - (categories.FACTORY - categories.MOBILE) , selectionSets[name])
@@ -96,8 +96,8 @@ function ApplySelectionSet(name)
         end
         SimCallback({Func = 'OnControlGroupApply', Args = unitIDs})
     
-        # Time the difference between the 2 selection application to
-        # determine if this is a double tap selection
+        -- Time the difference between the 2 selection application to
+        -- determine if this is a double tap selection
         local curTime = GetSystemTimeSeconds()
         local diffTime = curTime - lastSelectionTime
         if diffTime > 1.0 then
@@ -105,7 +105,7 @@ function ApplySelectionSet(name)
         end
         lastSelectionTime = curTime
     
-        # If this is a double tap then we want to soom in onto the central unit of the group
+        -- If this is a double tap then we want to soom in onto the central unit of the group
         if name == lastSelectionName then
             if selection then
                 UIZoomTo(selection)
@@ -115,7 +115,7 @@ function ApplySelectionSet(name)
             lastSelectionName = name
         end        
        
-        # if we are out of units. just set our set to nil
+        -- if we are out of units. just set our set to nil
         if table.getn(selection) == 0 then
             selectionSets[name] = nil
         else        
@@ -127,7 +127,7 @@ function ApplySelectionSet(name)
 end
 
 function AppendSetToSelection(name)
-    # get a filtered list of only valid units back from the function
+    -- get a filtered list of only valid units back from the function
     local setID = tostring(name)
     selectionSets[setID] = ValidateUnitsList(selectionSets[setID])
     local selectionSet = EntityCategoryFilterDown(categories.ALLUNITS - categories.FACTORY, selectionSets[setID])
@@ -138,8 +138,8 @@ function AppendSetToSelection(name)
         end
         SelectUnits(curSelection)
     
-        # Time the difference between the 2 selection application to
-        # determine if this is a double tap selection
+        -- Time the difference between the 2 selection application to
+        -- determine if this is a double tap selection
         local curTime = GetSystemTimeSeconds()
         local diffTime = curTime - lastSelectionTime
         if diffTime > 1.0 then
@@ -147,7 +147,7 @@ function AppendSetToSelection(name)
         end
         lastSelectionTime = curTime
     
-        # If this is a double tap then we want to soom in onto the central unit of the group
+        -- If this is a double tap then we want to soom in onto the central unit of the group
         if name == lastSelectionName then
             UIZoomTo(curSelection)
             lastSelectionName = nil
@@ -160,15 +160,15 @@ function AppendSetToSelection(name)
 end
 
 function FactorySelection(name)
-    # get a filtered list of only valid units back from the function
+    -- get a filtered list of only valid units back from the function
     local setID = tostring(name)
     selectionSets[setID] = ValidateUnitsList(selectionSets[setID])
     local selectionSet = EntityCategoryFilterDown(categories.FACTORY, selectionSets[setID])
     
     SelectUnits(selectionSet)
     
-    # Time the difference between the 2 selection application to
-    # determine if this is a double tap selection
+    -- Time the difference between the 2 selection application to
+    -- determine if this is a double tap selection
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastSelectionTime
     if diffTime > 1.0 then
@@ -176,7 +176,7 @@ function FactorySelection(name)
     end
     lastSelectionTime = curTime
 
-    # If this is a double tap then we want to soom in onto the central unit of the group
+    -- If this is a double tap then we want to soom in onto the central unit of the group
     if name == lastSelectionName then
         UIZoomTo(selectionSet)
         lastSelectionName = nil

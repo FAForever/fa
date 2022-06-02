@@ -1,8 +1,8 @@
-#--[                                                                             ]--
-#--[  File     : TerrainTypes.lua                                                ]--
-#--[  Author(s): Bob Berry, Gordon Duclos                                        ]--
-#--[                                                                             ]--
-#--[  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.             ]--
+----[                                                                             ]--
+----[  File     : TerrainTypes.lua                                                ]--
+----[  Author(s): Bob Berry, Gordon Duclos                                        ]--
+----[                                                                             ]--
+----[  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.             ]--
 
 --[[ 
 	Each terrain type has a type code that must be unique, with a max of 255. If you
@@ -100,9 +100,9 @@
 
 local EmitterBasePath = '/effects/emitters/'
 
-#-- Terrain clutter definitions
-#--
-#--
+---- Terrain clutter definitions
+----
+----
 TerrainClutter = {
     Test = {
         density = 10,
@@ -120,9 +120,9 @@ TerrainClutter = {
     },
 };
 
-#-- Terrain type definitions
-#--
-#--
+---- Terrain type definitions
+----
+----
 TerrainTypes = {
     {
         Name = 'Default',
@@ -279,16 +279,16 @@ TerrainTypes = {
                 Hover04 = { EmitterBasePath .. 'cybran_hover_01_emit.bp', },
                 Hover03 = { EmitterBasePath .. 'air_hover_exhaust_01_emit.bp', },          
                 SerOHWAirMoveExhaust01 = { 
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_01_emit.bp', # faint blue
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_02_emit.bp', # faint rings
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_03_emit.bp', # distortion
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_04_emit.bp', # bright blue, shorter lifetime
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_01_emit.bp', -- faint blue
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_02_emit.bp', -- faint rings
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_03_emit.bp', -- distortion
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_04_emit.bp', -- bright blue, shorter lifetime
 				},      
 				SerOHWAirMoveExhaust02 = { 
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_05_emit.bp', # bright blue, shorter lifetime
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_06_emit.bp', # faint blue
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_07_emit.bp', # distortion
-						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_08_emit.bp', # bright spot
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_05_emit.bp', -- bright blue, shorter lifetime
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_06_emit.bp', -- faint blue
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_07_emit.bp', -- distortion
+						EmitterBasePath .. 'seraphim_ohwalli_strategic_flight_fxtrails_08_emit.bp', -- bright spot
 				},   
             },        
             Land = {
@@ -2297,8 +2297,8 @@ TerrainTypes = {
     },                                
 }
 
-# These are the names of the columns to create and populate (in order) in the editor's
-# TerrainType tool.
+-- These are the names of the columns to create and populate (in order) in the editor's
+-- TerrainType tool.
 EditorColumns = {
     'Name',
     'TypeCode',

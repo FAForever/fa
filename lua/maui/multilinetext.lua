@@ -73,10 +73,10 @@ MultiLineText = Class(Group) {
                 return self._text[1]:GetStringAdvance(text) 
             end)
         self._numLines:Set(table.getsize(wrappedText))
-#        LOG(self._numLines(), ":", table.getsize(wrappedText))
-#        for i, v in self._numLines do
-#            LOG("NumLines:",i,":",v)
-#        end
+--        LOG(self._numLines(), ":", table.getsize(wrappedText))
+--        for i, v in self._numLines do
+--            LOG("NumLines:",i,":",v)
+--        end
         for line = 1, self._numLines() do
             if wrappedText[line] then
                 self._text[line]:SetText(wrappedText[line])

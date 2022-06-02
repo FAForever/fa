@@ -1,10 +1,10 @@
-#
-# Call SingleEvent:OnEvent(fun,arg) to set a trigger function which is called when the event is set.
-# Only one function can be set at a time, and it will only be called once.
-#
-# You can clear the current trigger function by calling OnEvent(nil). If you want to change the trigger function
-# before it has been called, you must clear the old one before setting the new one.
-#
+--
+-- Call SingleEvent:OnEvent(fun,arg) to set a trigger function which is called when the event is set.
+-- Only one function can be set at a time, and it will only be called once.
+--
+-- You can clear the current trigger function by calling OnEvent(nil). If you want to change the trigger function
+-- before it has been called, you must clear the old one before setting the new one.
+--
 SingleEvent = Class {
     OnEvent = function(self, fun, arg)
         if fun and self._EventFun then

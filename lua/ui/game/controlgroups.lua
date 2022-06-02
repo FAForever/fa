@@ -1,7 +1,7 @@
 --*****************************************************************************
 --* File: lua/modules/ui/game/controlgroups.lua
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -167,7 +167,7 @@ function OnSelectionSetChanged(name, units, applied)
 end
 
 function ToggleControlGroups(state)
-    # disable when in Screen Capture mode
+    -- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end

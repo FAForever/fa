@@ -1,8 +1,8 @@
 local Bitmap = import('bitmap.lua').Bitmap
 local lazyvar = import('/lua/lazyvar.lua')
 
-# vertical true means the bar will grow in the vertical direction
-# negative true means for horizontal bars they will grow right to left, for vertical they will grow top to bottom
+-- vertical true means the bar will grow in the vertical direction
+-- negative true means for horizontal bars they will grow right to left, for vertical they will grow top to bottom
 
 StatusBar = Class(Bitmap)
 {
@@ -75,11 +75,11 @@ StatusBar = Class(Bitmap)
         self._rangeMin = rangeMin
         self._rangeMax = rangeMax
         self._range = rangeMax - rangeMin
-        # since the ranges have changed, we need to control to redraw itself
+        -- since the ranges have changed, we need to control to redraw itself
         self:SetValue(self._value())
     end,
     
-    # this allows the bar to move in an incremental value, rather than smoothly
+    -- this allows the bar to move in an incremental value, rather than smoothly
     SetMinimumSlidePercentage = function(self, percentage)
         self._minSlidePercent = percentage
     end,

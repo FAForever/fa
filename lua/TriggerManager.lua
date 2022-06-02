@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/TriggerManager.lua
-#**  Author(s):  Dru Staltman
-#**
-#**  Summary  : The trigger manager.
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/TriggerManager.lua
+--**  Author(s):  Dru Staltman
+--**
+--**  Summary  : The trigger manager.
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TriggerFile = import('/lua/scenariotriggers.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -16,10 +16,10 @@ Manager = {
     TriggerList = {},
     TriggerActions = {},
 
-    #==================================================================================================
-    # Adding data functions below.
-    #    Functions that add triggers and actions to the TM.
-    #==================================================================================================
+    --==================================================================================================
+    -- Adding data functions below.
+    --    Functions that add triggers and actions to the TM.
+    --==================================================================================================
 
     OnCreate = function(self)
         self.Trash = TrashBag()
@@ -31,7 +31,7 @@ Manager = {
         end
     end,
 
-    # Add a table of trigger specs
+    -- Add a table of trigger specs
     AddTriggerTable = function(self, specTable)
         if specTable then
             for num, spec in specTable do
@@ -43,7 +43,7 @@ Manager = {
         end
     end,
 
-    # Add a single trigger to the TM
+    -- Add a single trigger to the TM
     AddTrigger = function(self, spec)
         if not self.Trash then
             self.Trash = TrashBag()
@@ -70,7 +70,7 @@ Manager = {
             spec.Active = true
         end
         spec.WhichActions = {}
-        ### Checks if there is an action that relies on this trigger and adds to list of actions for this trigger
+        ------ Checks if there is an action that relies on this trigger and adds to list of actions for this trigger
         for numAction, action in self.TriggerActions do
             local inserted = false
             for numTable, conditionTable in action.ActionConditions do
@@ -108,7 +108,7 @@ Manager = {
         end
     end,
 
-    # Add a single action to the TM
+    -- Add a single action to the TM
     AddAction = function(self, spec)
         if not self.Trash then
             self.Trash = TrashBag()
@@ -131,7 +131,7 @@ Manager = {
             error('TRIGGER MANAGER ERROR: No ActionConditions defined in action named- ' .. spec.Name, 2)
             return false
         end
-        ## checks if there are any triggers that are conditions of this action and adds to that triggers list
+        ---- checks if there are any triggers that are conditions of this action and adds to that triggers list
         for numTable, conditionTable in spec.ActionConditions do
             for numCond, cond in conditionTable do
                 local shouldInsert = true
@@ -156,11 +156,11 @@ Manager = {
         self.TriggerActions[spec.Name] = spec
     end,
 
-    #==============================================================================
-    # Misc Trigger Functions below.
-    #     Functions that enable/disable triggers and actions.  Used internally
-    #     as well as by external scripts.
-    #==============================================================================
+    --==============================================================================
+    -- Misc Trigger Functions below.
+    --     Functions that enable/disable triggers and actions.  Used internally
+    --     as well as by external scripts.
+    --==============================================================================
     EnableTrigger = function(self, name)
         local trigger = self.TriggerList[name]
         if not trigger then
@@ -291,10 +291,10 @@ Manager = {
         end
     end,
 
-    #=======================================================================
-    # Trigger calling functions below.
-    #     These are the functions that start the triggers for the manager
-    #=======================================================================
+    --=======================================================================
+    -- Trigger calling functions below.
+    --     These are the functions that start the triggers for the manager
+    --=======================================================================
     Area = function(self, spec)
         local params = spec.Parameters
         if not params.Rectangle or table.getn(params.Rectangle) <= 0 then
@@ -820,11 +820,11 @@ Manager = {
 
 
 
-    #==========================================================================
-    # Trigger action functions below.
-    #     These are the functions that perform specific actions defined in
-    #     Trigger actions.
-    #=========================================================================
+    --==========================================================================
+    -- Trigger action functions below.
+    --     These are the functions that perform specific actions defined in
+    --     Trigger actions.
+    --=========================================================================
     ChangeArmyAlliance = function(self, action, conditionList)
         local params = action.Parameters
         if not params.ArmyName then
@@ -1223,11 +1223,11 @@ Manager = {
 
 
 
-    #============================================================================
-    # Trigger evaluation functions below.
-    #    Functions that are run when a trigger is fired. Determines what actions,
-    #    if any, need to be run when a trigger fires
-    #============================================================================
+    --============================================================================
+    -- Trigger evaluation functions below.
+    --    Functions that are run when a trigger is fired. Determines what actions,
+    --    if any, need to be run when a trigger fires
+    --============================================================================
     TriggerFire = function(self, name, ...)
         local trigger = self.TriggerList[name]
         if trigger.Active then
@@ -1251,7 +1251,7 @@ Manager = {
             error('TRIGGER MANAGER ERROR: No action named-' .. actionName, 2)
             return false
         end
-        # Iterates through conditions on the actions and checks if they are all met
+        -- Iterates through conditions on the actions and checks if they are all met
         for listNum, conditionList in self.TriggerActions[actionName].ActionConditions do
             local fireTrigger = true
             for condNum, condName in conditionList do

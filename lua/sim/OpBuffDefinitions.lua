@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/sim/OpBuffDefinitions.lua
-#**
-#**  Summary  : Buffs for Ops
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/sim/OpBuffDefinitions.lua
+--**
+--**  Summary  : Buffs for Ops
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BuffBlueprint {
     Name = 'BaseManagerFactoryDefaultBuildRate',

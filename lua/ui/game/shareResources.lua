@@ -2,7 +2,7 @@
 --* File: lua/modules/ui/game/shareResources.lua
 --* Summary: UI for Sharing (and giving) Resources
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -112,12 +112,12 @@ function createShareResourcesDialog(parent, targetPlayer, targetPlayerName)
     energyStatus:SetRange(0, 100)
     energyStatus:SetValue( energyVal )
 
-    # overriden by caller
+    -- overriden by caller
     dialog.OnOk = function(mass,energy)
         
     end
 
-    # overriden by caller
+    -- overriden by caller
     dialog.OnCancel = function()
         dialog:Destroy()
     end
