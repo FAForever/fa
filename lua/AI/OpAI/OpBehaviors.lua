@@ -1,15 +1,15 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/OpBehaviors.lua
-#**  Author(s): DFS
-#**
-#**  Summary  :
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
-#########################################
-# Platoon Lua Module                    #
-#########################################
+--****************************************************************************
+--**
+--**  File     :  /lua/OpBehaviors.lua
+--**  Author(s): DFS
+--**
+--**  Summary  :
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
+----------------------------------------------------------------------------------
+-- Platoon Lua Module                    --
+----------------------------------------------------------------------------------
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Utilities = import('/lua/utilities.lua')
 local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
@@ -21,7 +21,7 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 
 
-# ===== CDR ADD BEHAVIORS ===== #
+-- ===== CDR ADD BEHAVIORS ===== --
 function CDROverchargeBehavior(platoon)
     local cdr = platoon:GetPlatoonUnits()[1]
     if platoon.CDRData then
@@ -65,7 +65,7 @@ function CDROverChargeThread( cdr )
             if numUnits > 0 then
                 cdr.Fighting = true
                 if cdr:GetUnitBeingBuilt() then
-                    #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR was building something')
+                    --LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR was building something')
                     cdr.UnitBeingBuiltBehavior = cdr:GetUnitBeingBuilt()
                 end
                 plat = aiBrain:MakePlatoon( '', '' )
@@ -74,7 +74,7 @@ function CDROverChargeThread( cdr )
                 local priList = { categories.COMMAND, categories.EXPERIMENTAL, categories.TECH3 * categories.INDIRECTFIRE,
                     categories.TECH3 * categories.MOBILE, categories.TECH2 * categories.INDIRECTFIRE, categories.MOBILE * categories.TECH2,
                     categories.TECH1 * categories.INDIRECTFIRE, categories.TECH1 * categories.MOBILE, categories.ALLUNITS }
-                #LOG('*AI DEBUG: ARMY ' , repr(aiBrain:GetArmyIndex()),  ': CDR AI ACTIVATE - Commander go fight stuff! -- ' .. numUnits)
+                --LOG('*AI DEBUG: ARMY ' , repr(aiBrain:GetArmyIndex()),  ': CDR AI ACTIVATE - Commander go fight stuff! -- ' .. numUnits)
                 local target
                 local continueFighting = true
                 local counter = 0
@@ -135,7 +135,7 @@ function CDROverChargeThread( cdr )
                         IssueMove( {cdr}, {startX, 0, startZ} )
                     end
                 end
-                #LOG('*AI DEBUG: ARMY ', repr(aiBrain:GetArmyIndex()),  ': CDR AI DEACTIVATE - Nothing to see here!')
+                --LOG('*AI DEBUG: ARMY ', repr(aiBrain:GetArmyIndex()),  ': CDR AI DEACTIVATE - Nothing to see here!')
                 if aiBrain:PlatoonExists(plat) then
                     cdr:ForkThread( CDRRepairBuildingUnit, plat )
                 end
@@ -165,7 +165,7 @@ function CDRRepairBuildingUnit( cdr, plat )
 end
 
 function CDRLeashThread(cdr)
-    # if no radius specified return out of function
+    -- if no radius specified return out of function
     local rad
     if cdr.CDRData and cdr.CDRData.LeashRadius then
         rad = cdr.CDRData.LeashRadius
@@ -191,7 +191,7 @@ function CDRLeashThread(cdr)
                 plat:Stop()
                 plat:MoveToLocation( loc, false )
                 cdr.Leashing = true
-                #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI ACTIVATE - Commander leashing to MAIN' )
+                --LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI ACTIVATE - Commander leashing to MAIN' )
                 WaitSeconds( 10 )
                 if not cdr:IsDead() then
                     cdr.Leashing = false
@@ -217,7 +217,7 @@ function CDRRunAwayThread( cdr )
             if cdr.CDRData and cdr.CDRData.LeashPosition then
                 runSpot = ScenarioUtils.MarkerToPosition(cdr.CDRData.LeashPosition)
             end
-            #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI ACTIVATE - CDR RUNNING AWAY' )
+            --LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI ACTIVATE - CDR RUNNING AWAY' )
             local cdrPos = cdr:GetPosition()
             local nmeAir = aiBrain:GetUnitsAroundPoint( categories.AIR, cdrPos, 25, 'Enemy' )
             local nmeLand = aiBrain:GetUnitsAroundPoint( categories.LAND, cdrPos, 25, 'Enemy' )
@@ -243,7 +243,7 @@ function CDRRunAwayThread( cdr )
                         end
                     end
                 until cdr:IsDead() or ( Utilities.XZDistanceTwoVectors( cdrPos, runSpot) > 15 ) or ( nmeAir < 2 and nmeLand < 2 and nmeHardcore == 0 ) or cdr:GetHealthPercent() > .4
-                #LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI DEACTIVATE - Run away no more!')
+                --LOG('*AI DEBUG: ARMY ' .. aiBrain:GetArmyIndex() .. ': CDR AI DEACTIVATE - Run away no more!')
                 cdr.Running = false
                 cdr.Cornered = false
                 if not cdr:IsDead() and not cdr.GivingUp and aiBrain:PlatoonExists(plat) then

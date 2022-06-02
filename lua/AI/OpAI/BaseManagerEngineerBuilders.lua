@@ -18,13 +18,13 @@ local SAI = '/lua/ScenarioPlatoonAI.lua'
 local PlatoonFile = '/lua/platoon.lua'
 
 Builders = {
-    ########################
-    ### ECONOMY BUILDERS ###
-    ########################
+    ------------------------------------------------
+    ------ ECONOMY BUILDERS ------
+    ------------------------------------------------
     {
         BuilderName = 'T1ResourceEngineer',
         TemplateName = 'T1EngineerBuilder',
-        # AI Function
+        -- AI Function
         Priority = 1000,
         InstanceCount = 2,
         BuildConditions = {
@@ -124,59 +124,59 @@ Builders = {
             }
         }
     },
-#    {
-#        BuilderName = 'T1 Engineer Reclaim',
-#        PlatoonAIPlan = 'ReclaimAI',
-#        Priority = 975,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
-#                { MIBC, 'ReclaimablesInArea', { 'MAIN', }},
-#            },
-#        PlatoonType = 'Any',
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            NotPartOfAttackForce = true,
-#        },
-#    },
-#    {
-#        BuilderName = 'T1 Engineer Reclaim Enemy Walls',
-#        PlatoonAIPlan = 'ReclaimUnitsAI',
-#        Priority = 975,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
-#                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 10, categories.WALL, 'Enemy'}},
-#            },
-#        PlatoonType = 'Any',
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Radius = 1000,
-#            Categories = {'WALL'},
-#            ThreatMin = -10,
-#            ThreatMax = 10000,
-#            ThreatRings = 1,
-#            NotPartOfAttackForce = true,
-#        },
-#    },
-#    {
-#        BuilderName = 'T2 Engineer Capture',
-#        PlatoonAIPlan = 'CaptureAI',
-#        Priority = 900,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
-#                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 10, categories.ENERGYPRODUCTION * categories.TECH2, 'Enemy'}},
-#                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 10, categories.DEFENSE, 'Enemy'}},
-#            },
-#        PlatoonType = 'Any',
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Radius = 300,
-#            Categories = {'ENERGYPRODUCTION, MASSPRODUCTION, ARTILLERY, FACTORY'},
-#            ThreatMin = 1,
-#            ThreatMax = 1,
-#            ThreatRings = 1,
-#            NotPartOfAttackForce = true,
-#        },
-#    },
+--    {
+--        BuilderName = 'T1 Engineer Reclaim',
+--        PlatoonAIPlan = 'ReclaimAI',
+--        Priority = 975,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
+--                { MIBC, 'ReclaimablesInArea', { 'MAIN', }},
+--            },
+--        PlatoonType = 'Any',
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            NotPartOfAttackForce = true,
+--        },
+--    },
+--    {
+--        BuilderName = 'T1 Engineer Reclaim Enemy Walls',
+--        PlatoonAIPlan = 'ReclaimUnitsAI',
+--        Priority = 975,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
+--                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 10, categories.WALL, 'Enemy'}},
+--            },
+--        PlatoonType = 'Any',
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Radius = 1000,
+--            Categories = {'WALL'},
+--            ThreatMin = -10,
+--            ThreatMax = 10000,
+--            ThreatRings = 1,
+--            NotPartOfAttackForce = true,
+--        },
+--    },
+--    {
+--        BuilderName = 'T2 Engineer Capture',
+--        PlatoonAIPlan = 'CaptureAI',
+--        Priority = 900,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
+--                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 10, categories.ENERGYPRODUCTION * categories.TECH2, 'Enemy'}},
+--                { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 10, categories.DEFENSE, 'Enemy'}},
+--            },
+--        PlatoonType = 'Any',
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Radius = 300,
+--            Categories = {'ENERGYPRODUCTION, MASSPRODUCTION, ARTILLERY, FACTORY'},
+--            ThreatMin = 1,
+--            ThreatMax = 1,
+--            ThreatRings = 1,
+--            NotPartOfAttackForce = true,
+--        },
+--    },
     {
         BuilderName = 'T2PowerEngineer2',
         TemplateName = 'T2EngineerBuilder',
@@ -199,20 +199,20 @@ Builders = {
             }
         }
     },
-#    {
-#        BuilderName = 'T2EngineerPatrol',
-#        TemplateName = 'T2EngineerGenericSingle',
-#        PlatoonAIPlan = 'ReclaimAI',
-#        Priority = 975,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
-#            },
-#        PlatoonType = 'Any',
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            NotPartOfAttackForce = true,
-#        },
-#    },
+--    {
+--        BuilderName = 'T2EngineerPatrol',
+--        TemplateName = 'T2EngineerGenericSingle',
+--        PlatoonAIPlan = 'ReclaimAI',
+--        Priority = 975,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
+--            },
+--        PlatoonType = 'Any',
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            NotPartOfAttackForce = true,
+--        },
+--    },
     {
         BuilderName = 'T3PowerEngineer',
         TemplateName = 'T3EngineerBuilder',
@@ -261,9 +261,9 @@ Builders = {
         }
     },
 
-    ########################################
-    ##  BASE CONSTRUCTION
-    ########################################
+    --------------------------------------------------------------------------------
+    ----  BASE CONSTRUCTION
+    --------------------------------------------------------------------------------
     {
         BuilderName = 'T1RadarEngineer',
         TemplateName = 'EngineerBuilder',
@@ -407,16 +407,16 @@ Builders = {
             }
         }
     },
-    ########################################
-    ##  BASE DEFENSE CONSTRUCTION
-    ########################################
+    --------------------------------------------------------------------------------
+    ----  BASE DEFENSE CONSTRUCTION
+    --------------------------------------------------------------------------------
     {
         BuilderName = 'T1BaseDEngineerGround',
         TemplateName = 'EngineerGenericSingle',
         Priority = 700,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.DEFENSE * categories.TECH1}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.DEFENSE * categories.TECH1}},
                 { EBC, 'GreaterThanEconStorageRatio', { 0.3, 0.3}},
                 { BMBC, 'NeedStructure', { 'T1GroundDefense', 'BASENAME' }},
             },
@@ -438,8 +438,8 @@ Builders = {
         TemplateName = 'EngineerGenericSingle',
         Priority = 700,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.DEFENSE * categories.TECH1}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH1}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.DEFENSE * categories.TECH1}},
                 { EBC, 'GreaterThanEconStorageRatio', { 0.3, 0.3}},
                 { BMBC, 'NeedStructure', { 'T1AADefense', 'BASENAME' }},
             },
@@ -461,9 +461,9 @@ Builders = {
         TemplateName = 'T2EngineerGenericSingle',
         Priority = 900,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH2}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 15, categories.DEFENSE * categories.TECH2}},
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH2}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 15, categories.DEFENSE * categories.TECH2}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2}},
                 { EBC, 'GreaterThanEconStorageRatio', { 0.2, 0.2}},
                 { BMBC, 'NeedStructure', { 'T2GroundDefense', 'BASENAME' }},
             },
@@ -483,9 +483,9 @@ Builders = {
         TemplateName = 'T2EngineerGenericSingle',
         Priority = 900,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH2}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 15, categories.DEFENSE * categories.TECH2}},
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH2}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 15, categories.DEFENSE * categories.TECH2}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENERGYPRODUCTION * categories.TECH2}},
                 { EBC, 'GreaterThanEconStorageRatio', { 0.2, 0.2}},
                 { BMBC, 'NeedStructure', { 'T2AADefense', 'BASENAME' }},
             },
@@ -542,8 +542,8 @@ Builders = {
         TemplateName = 'T2EngineerBuilder',
         Priority = 850,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH2}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.COUNTERINTELLIGENCE * categories.TECH2}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH2}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 3, categories.COUNTERINTELLIGENCE * categories.TECH2}},
                 { EBC, 'GreaterThanEconStorageRatio', { 0.2, 0.4}},
                 { BMBC, 'NeedStructure', { 'T2RadarJammer', 'BASENAME' }},
             },
@@ -562,8 +562,8 @@ Builders = {
         TemplateName = 'T3EngineerBuilder',
         Priority = 850,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.ENGINEER * categories.TECH3}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 5, categories.ANTIMISSILE * categories.TECH3}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.ENGINEER * categories.TECH3}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 5, categories.ANTIMISSILE * categories.TECH3}},
                 { EBC, 'GreaterThanEconIncome', { 2.5, 100}},
                 { BMBC, 'NeedStructure', { 'T3StrategicMissileDefense', 'BASENAME' }},
             },
@@ -582,8 +582,8 @@ Builders = {
         TemplateName = 'T3EngineerGenericSingle',
         Priority = 875,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.ENGINEER * categories.TECH3}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 20, categories.DEFENSE * categories.TECH3}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.ENGINEER * categories.TECH3}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 20, categories.DEFENSE * categories.TECH3}},
                 { EBC, 'GreaterThanEconStorageRatio', { 0.2, 0.2}},
                 { BMBC, 'NeedStructure', { 'T3AADefense', 'BASENAME' }},
             },
@@ -603,8 +603,8 @@ Builders = {
         TemplateName = 'T3EngineerBuilder',
         Priority = 875,
         BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.ENGINEER * categories.TECH3}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.SHIELD * categories.TECH3}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 8, categories.ENGINEER * categories.TECH3}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 10, categories.SHIELD * categories.TECH3}},
                 { MIBC, 'FactionIndex', {1, 2}},
                 { EBC, 'GreaterThanEconStorageRatio', { 0.1, 0.2}},
                 { BMBC, 'NeedStructure', { 'T3ShieldDefense', 'BASENAME' }},
@@ -621,9 +621,9 @@ Builders = {
     },
 
 
-    ########################################
-    ## EMERGENCY BUILDING TECH 1
-    ########################################
+    --------------------------------------------------------------------------------
+    ---- EMERGENCY BUILDING TECH 1
+    --------------------------------------------------------------------------------
     
     {
         BuilderName = 'T1EmergencyMassExtractionEngineer',
@@ -732,9 +732,9 @@ Builders = {
         }
     },
     
-    ########################################
-    ## EMERGENCY BUILDING TECH 2
-    ########################################
+    --------------------------------------------------------------------------------
+    ---- EMERGENCY BUILDING TECH 2
+    --------------------------------------------------------------------------------
     {
         BuilderName = 'T2PowerEngineer',
         TemplateName = 'T2EngineerBuilder',
@@ -756,9 +756,9 @@ Builders = {
         }
     },
     
-    ########################################
-    ## EMERGENCY BUILDING TECH 3
-    ########################################
+    --------------------------------------------------------------------------------
+    ---- EMERGENCY BUILDING TECH 3
+    --------------------------------------------------------------------------------
     {
         BuilderName = 'T3EmergencyPowerEngineer',
         TemplateName = 'T3EngineerBuilder',
@@ -805,198 +805,198 @@ Builders = {
     
     
     
-    #######################################
-    ###### COMMANDER STUFF ################
-    #######################################
-#    {
-#        BuilderName = 'EngineerT1LandFactory-HaveNone',
-#        TemplateName = 'CommanderBuilder',
-#        Priority = 500,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.COMMAND}},
-#                { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * categories.LAND}},
-#            },
-#        LocationType = 'MAIN',
-#        PlatoonType = 'Any',
-#        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
-#        RequiresConstruction = false,
-#        ExpansionExclude = {'Sea'},
-#        PlatoonData = {
-#            Construction = {
-#                BuildClose = true,
-#                BuildStructures = {
-#                    'T1LandFactory',
-#                },
-#                Location = 'MAIN',
-#            }
-#        }
-#    },
+    ------------------------------------------------------------------------------
+    ------------ COMMANDER STUFF --------------------------------
+    ------------------------------------------------------------------------------
+--    {
+--        BuilderName = 'EngineerT1LandFactory-HaveNone',
+--        TemplateName = 'CommanderBuilder',
+--        Priority = 500,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.COMMAND}},
+--                { UCBC, 'HaveLessThanUnitsWithCategory', { 1, categories.FACTORY * categories.LAND}},
+--            },
+--        LocationType = 'MAIN',
+--        PlatoonType = 'Any',
+--        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
+--        RequiresConstruction = false,
+--        ExpansionExclude = {'Sea'},
+--        PlatoonData = {
+--            Construction = {
+--                BuildClose = true,
+--                BuildStructures = {
+--                    'T1LandFactory',
+--                },
+--                Location = 'MAIN',
+--            }
+--        }
+--    },
     
 
 
 
 
-    #################################
-    #### EXPERIMENTAL BUILDERS ######
-    #################################
-#    {
-#        BuilderName = 'T3 Land Exp1 Engineer 1',
-#        TemplateName = 'T3EngineerBuilder',
-#        Priority = 875,
-#        InstanceCount = 1,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
-#        },
-#        LocationType = 'MAIN',
-#        PlatoonType = 'Any',
-#        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
-#        ExpansionExclude = {'Sea'},
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Construction = {
-#                BuildClose = false,
-#                BaseTemplate = ExBaseTmpl,
-#                NearMarkerType = 'Rally Point',
-#                BuildStructures = {
-#                    'T4LandExperimental1', 
-#                },
-#                Location = 'MAIN',
-#            }
-#        }
-#    },
-#    {
-#        BuilderName = 'T3 Land Exp2 Engineer 1',
-#        TemplateName = 'T3EngineerBuilder',
-#        Priority = 825,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.LAND * categories.EXPERIMENTAL}},
-#            },
-#        LocationType = 'MAIN',
-#        PlatoonType = 'Any',
-#        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
-#        ExpansionExclude = {'Sea'},
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Construction = {
-#                BuildClose = false,
-#                BaseTemplate = ExBaseTmpl,
-#                NearMarkerType = 'Rally Point',
-#                BuildStructures = {
-#                    'T4LandExperimental2', 
-#                },
-#                Location = 'MAIN',
-#            }
-#        }
-#    },
-#    {
-#        BuilderName = 'T3 Air Exp1 Engineer 1',
-#        TemplateName = 'T3EngineerBuilder',
-#        Priority = 875,
-#        InstanceCount = 1,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
-#            },
-#        LocationType = 'MAIN',
-#        PlatoonType = 'Any',
-#        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
-#        ExpansionExclude = {'Sea'},
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Construction = {
-#                BuildClose = false,
-#                NearMarkerType = 'Protected Experimental Construction',
-#                BuildStructures = {
-#                    'T4AirExperimental1', 
-#                },
-#                Location = 'MAIN',
-#            }
-#        }
-#    },
-#    {
-#        BuilderName = 'T3 Land Exp1 Engineer 2',
-#        TemplateName = 'T3EngineerBuilderBig',
-#        Priority = 900,
-#        InstanceCount = 2,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
-#        },
-#        LocationType = 'MAIN',
-#        PlatoonType = 'Any',
-#        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
-#        ExpansionExclude = {'Sea'},
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Construction = {
-#                BuildClose = false,
-#                BaseTemplate = ExBaseTmpl,
-#                NearMarkerType = 'Rally Point',
-#                BuildStructures = {
-#                    'T4LandExperimental1', 
-#                },
-#                Location = 'MAIN',
-#            }
-#        }
-#    },
-#    {
-#        BuilderName = 'T3 Land Exp2 Engineer 2',
-#        TemplateName = 'T3EngineerBuilderBig',
-#        Priority = 850,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.LAND * categories.EXPERIMENTAL}},
-#            },
-#        LocationType = 'MAIN',
-#        PlatoonType = 'Any',
-#        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
-#        ExpansionExclude = {'Sea'},
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Construction = {
-#                BuildClose = false,
-#                BaseTemplate = ExBaseTmpl,
-#                NearMarkerType = 'Rally Point',
-#                BuildStructures = {
-#                    'T4LandExperimental2', 
-#                },
-#                Location = 'MAIN',
-#            }
-#        }
-#    },
-#    {
-#        BuilderName = 'T3 Air Exp1 Engineer 2',
-#        TemplateName = 'T3EngineerBuilderBig',
-#        Priority = 900,
-#        InstanceCount = 3,
-#        BuildConditions = {
-#                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
-#            },
-#        LocationType = 'MAIN',
-#        PlatoonType = 'Any',
-#        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
-#        ExpansionExclude = {'Sea'},
-#        RequiresConstruction = false,
-#        PlatoonData = {
-#            Construction = {
-#                BuildClose = false,
-#                NearMarkerType = 'Protected Experimental Construction',
-#                BuildStructures = {
-#                    'T4AirExperimental1', 
-#                },
-#                Location = 'MAIN',
-#            }
-#        }
-#    },
+    ------------------------------------------------------------------
+    -------- EXPERIMENTAL BUILDERS ------------
+    ------------------------------------------------------------------
+--    {
+--        BuilderName = 'T3 Land Exp1 Engineer 1',
+--        TemplateName = 'T3EngineerBuilder',
+--        Priority = 875,
+--        InstanceCount = 1,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
+--        },
+--        LocationType = 'MAIN',
+--        PlatoonType = 'Any',
+--        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
+--        ExpansionExclude = {'Sea'},
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Construction = {
+--                BuildClose = false,
+--                BaseTemplate = ExBaseTmpl,
+--                NearMarkerType = 'Rally Point',
+--                BuildStructures = {
+--                    'T4LandExperimental1', 
+--                },
+--                Location = 'MAIN',
+--            }
+--        }
+--    },
+--    {
+--        BuilderName = 'T3 Land Exp2 Engineer 1',
+--        TemplateName = 'T3EngineerBuilder',
+--        Priority = 825,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.LAND * categories.EXPERIMENTAL}},
+--            },
+--        LocationType = 'MAIN',
+--        PlatoonType = 'Any',
+--        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
+--        ExpansionExclude = {'Sea'},
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Construction = {
+--                BuildClose = false,
+--                BaseTemplate = ExBaseTmpl,
+--                NearMarkerType = 'Rally Point',
+--                BuildStructures = {
+--                    'T4LandExperimental2', 
+--                },
+--                Location = 'MAIN',
+--            }
+--        }
+--    },
+--    {
+--        BuilderName = 'T3 Air Exp1 Engineer 1',
+--        TemplateName = 'T3EngineerBuilder',
+--        Priority = 875,
+--        InstanceCount = 1,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
+--            },
+--        LocationType = 'MAIN',
+--        PlatoonType = 'Any',
+--        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
+--        ExpansionExclude = {'Sea'},
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Construction = {
+--                BuildClose = false,
+--                NearMarkerType = 'Protected Experimental Construction',
+--                BuildStructures = {
+--                    'T4AirExperimental1', 
+--                },
+--                Location = 'MAIN',
+--            }
+--        }
+--    },
+--    {
+--        BuilderName = 'T3 Land Exp1 Engineer 2',
+--        TemplateName = 'T3EngineerBuilderBig',
+--        Priority = 900,
+--        InstanceCount = 2,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
+--        },
+--        LocationType = 'MAIN',
+--        PlatoonType = 'Any',
+--        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
+--        ExpansionExclude = {'Sea'},
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Construction = {
+--                BuildClose = false,
+--                BaseTemplate = ExBaseTmpl,
+--                NearMarkerType = 'Rally Point',
+--                BuildStructures = {
+--                    'T4LandExperimental1', 
+--                },
+--                Location = 'MAIN',
+--            }
+--        }
+--    },
+--    {
+--        BuilderName = 'T3 Land Exp2 Engineer 2',
+--        TemplateName = 'T3EngineerBuilderBig',
+--        Priority = 850,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.LAND * categories.EXPERIMENTAL}},
+--            },
+--        LocationType = 'MAIN',
+--        PlatoonType = 'Any',
+--        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
+--        ExpansionExclude = {'Sea'},
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Construction = {
+--                BuildClose = false,
+--                BaseTemplate = ExBaseTmpl,
+--                NearMarkerType = 'Rally Point',
+--                BuildStructures = {
+--                    'T4LandExperimental2', 
+--                },
+--                Location = 'MAIN',
+--            }
+--        }
+--    },
+--    {
+--        BuilderName = 'T3 Air Exp1 Engineer 2',
+--        TemplateName = 'T3EngineerBuilderBig',
+--        Priority = 900,
+--        InstanceCount = 3,
+--        BuildConditions = {
+--                { UCBC, 'HaveGreaterThanUnitsWithCategory', { 0, categories.ENGINEER * categories.TECH3}},
+--            },
+--        LocationType = 'MAIN',
+--        PlatoonType = 'Any',
+--        PlatoonAddPlans = {'PlatoonCallForHelpAI'},
+--        ExpansionExclude = {'Sea'},
+--        RequiresConstruction = false,
+--        PlatoonData = {
+--            Construction = {
+--                BuildClose = false,
+--                NearMarkerType = 'Protected Experimental Construction',
+--                BuildStructures = {
+--                    'T4AirExperimental1', 
+--                },
+--                Location = 'MAIN',
+--            }
+--        }
+--    },
 
 
 
 
-    ######################################
-    #### ENGINEERS ASSISTING #############
-    ######################################
+    ----------------------------------------------------------------------------
+    -------- ENGINEERS ASSISTING --------------------------
+    ----------------------------------------------------------------------------
     {
         BuilderName = 'T1EngineerAssistAttack',
-        #PlatoonTemplate = 'EngineerAssist',
+        --PlatoonTemplate = 'EngineerAssist',
         Priority = 900,
         InstanceCount = 1,
         BuildConditions = {
@@ -1016,7 +1016,7 @@ Builders = {
     },
     {
         BuilderName = 'T1EngineerAssistDefense',
-        #PlatoonTemplate = 'EngineerAssist',
+        --PlatoonTemplate = 'EngineerAssist',
         Priority = 950,
         InstanceCount = 1,
         BuildConditions = {
@@ -1035,7 +1035,7 @@ Builders = {
     },
     {
         BuilderName = 'T2EngineerAssistAttack',
-        #PlatoonTemplate = 'T2EngineerAssist',
+        --PlatoonTemplate = 'T2EngineerAssist',
         Priority = 900,
         InstanceCount = 1,
         BuildConditions = {
@@ -1055,7 +1055,7 @@ Builders = {
     },
     {
         BuilderName = 'T2EngineerAssistExperimental',
-        #PlatoonTemplate = 'T3EngineerAssist',
+        --PlatoonTemplate = 'T3EngineerAssist',
         Priority = 850,
         InstanceCount = 1,
         BuildConditions = {
@@ -1075,7 +1075,7 @@ Builders = {
     },
     {
         BuilderName = 'T3EngineerAssistAttack',
-        #PlatoonTemplate = 'T3EngineerAssist',
+        --PlatoonTemplate = 'T3EngineerAssist',
         Priority = 850,
         InstanceCount = 1,
         BuildConditions = {
@@ -1095,7 +1095,7 @@ Builders = {
     },
     {
         BuilderName = 'T3EngineerAssistArtillery',
-        #PlatoonTemplate = 'T3EngineerAssist',
+        --PlatoonTemplate = 'T3EngineerAssist',
         Priority = 850,
         InstanceCount = 3,
         BuildConditions = {
@@ -1115,7 +1115,7 @@ Builders = {
     },
     {
         BuilderName = 'T3EngineerAssistExperimental',
-        #PlatoonTemplate = 'T3EngineerAssist',
+        --PlatoonTemplate = 'T3EngineerAssist',
         Priority = 900,
         InstanceCount = 1,
         BuildConditions = {
@@ -1135,7 +1135,7 @@ Builders = {
     },
     {
         BuilderName = 'T3EngineerAssistBuildNuke',
-        #PlatoonTemplate = 'T3EngineerAssist',
+        --PlatoonTemplate = 'T3EngineerAssist',
         Priority = 850,
         InstanceCount = 3,
         BuildConditions = {
@@ -1155,7 +1155,7 @@ Builders = {
     },
     {
         BuilderName = 'T3EngineerAssistNukeMissile',
-        #PlatoonTemplate = 'T3EngineerAssist',
+        --PlatoonTemplate = 'T3EngineerAssist',
         Priority = 850,
         InstanceCount = 1,
         BuildConditions = {

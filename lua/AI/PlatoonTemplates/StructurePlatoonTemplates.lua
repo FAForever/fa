@@ -1,13 +1,13 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/StructurePlatoonTemplates.lua
-#**
-#**  Summary  : Global platoon templates
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/StructurePlatoonTemplates.lua
+--**
+--**  Summary  : Global platoon templates
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-# ==== Factory Upgrades ==== #
+-- ==== Factory Upgrades ==== --
 PlatoonTemplate {
     Name = 'T1LandFactoryUpgrade',
     Plan = 'UnitUpgradeAI',
@@ -57,7 +57,7 @@ PlatoonTemplate {
 }
 
 
-# ==== Extractor Upgrades === #
+-- ==== Extractor Upgrades === --
 PlatoonTemplate {
     Name = 'T1MassExtractorUpgrade',
     Plan = 'UnitUpgradeAI',
@@ -74,7 +74,7 @@ PlatoonTemplate {
     },
 }
 
-# ==== Radar Upgrades ==== #
+-- ==== Radar Upgrades ==== --
 PlatoonTemplate {
     Name = 'T1RadarUpgrade',
     Plan = 'UnitUpgradeAI',
@@ -91,7 +91,7 @@ PlatoonTemplate {
     }
 }
 
-# ==== Sonar Upgrades ==== #
+-- ==== Sonar Upgrades ==== --
 PlatoonTemplate {
     Name = 'T1SonarUpgrade',
     Plan = 'UnitUpgradeAI',
@@ -108,7 +108,7 @@ PlatoonTemplate {
     }
 }
 
-# ==== Artillery platoons ==== #
+-- ==== Artillery platoons ==== --
 PlatoonTemplate {
     Name = 'T2ArtilleryStructure',
     Plan = 'ArtilleryAI',
@@ -133,7 +133,7 @@ PlatoonTemplate {
     }
 }
 
-# ==== Shield Upgrades ==== #
+-- ==== Shield Upgrades ==== --
 PlatoonTemplate {
     Name = 'T2Shield',
     Plan = 'UnitUpgradeAI',
@@ -187,7 +187,7 @@ PlatoonTemplate {
     }
 }
 
-# ==== Missile systems ==== #
+-- ==== Missile systems ==== --
 PlatoonTemplate {
     Name = 'T2TacticalLauncher',
     Plan = 'TacticalAI',
@@ -220,7 +220,7 @@ PlatoonTemplate {
     }
 }
 
-# ==== Satellite ==== #
+-- ==== Satellite ==== --
 PlatoonTemplate {
     Name = 'T4SatelliteExperimental',
     Plan = 'StrikeForceAI',

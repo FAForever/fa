@@ -1,25 +1,25 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/ai/OpAI/BomberEscort_EditorFunctions
-#**  Author(s): Dru Staltman
-#**
-#**  Summary  : Generic AI Platoon Build Conditions
-#**             Build conditions always return true or false
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/ai/OpAI/BomberEscort_EditorFunctions
+--**  Author(s): Dru Staltman
+--**
+--**  Summary  : Generic AI Platoon Build Conditions
+--**             Build conditions always return true or false
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 
-##############################################################################################################
-# function: BomberEscortChildBomberCountDifficulty = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"     
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: BomberEscortChildBomberCountDifficulty = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"     
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function BomberEscortChildBomberCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_BomberChildren')
     local num = ScenarioInfo.OSPlatoonCounter[master..'_BomberChildren_D'..ScenarioInfo.Options.Difficulty]
@@ -37,13 +37,13 @@ function BomberEscortChildBomberCountDifficulty(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: BomberEscortChildEscortCountDifficulty = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"     
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: BomberEscortChildEscortCountDifficulty = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"     
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function BomberEscortChildEscortCountDifficulty(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_EscortChildren')
     local num = ScenarioInfo.OSPlatoonCounter[master..'_EscortChildren_D'..ScenarioInfo.Options.Difficulty]
@@ -61,13 +61,13 @@ function BomberEscortChildEscortCountDifficulty(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: BomberEscortMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"       
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: BomberEscortMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"       
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function BomberEscortMasterCountDifficulty(aiBrain, master)
     local escortCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_EscortChildren')
     local escortNum = ScenarioInfo.OSPlatoonCounter[master..'_EscortChildren_D'..ScenarioInfo.Options.Difficulty]
@@ -94,16 +94,16 @@ function BomberEscortMasterCountDifficulty(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: BomberEscortAI = AddFunction   doc = "Please work function docs."
-# 
-# parameter 0: string   platoon     = "default_platoon"       
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: BomberEscortAI = AddFunction   doc = "Please work function docs."
+-- 
+-- parameter 0: string   platoon     = "default_platoon"       
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function BomberEscortAI(platoon)
     local aiBrain = platoon:GetBrain()
     local target = false
-    #local cmd = false
+    --local cmd = false
     while aiBrain:PlatoonExists(platoon) do
         target = false
         if table.getn(platoon:GetSquadUnits('artillery')) > 0 then

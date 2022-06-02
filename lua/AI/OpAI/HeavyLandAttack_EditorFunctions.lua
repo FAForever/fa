@@ -1,25 +1,25 @@
-#****************************************************************************
-#**
-#**  File     :  /lua/ai/OpAI/HeavyLandAttack_EditorFunctions
-#**  Author(s): Dru Staltman
-#**
-#**  Summary  : Generic AI Platoon Build Conditions
-#**             Build conditions always return true or false
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /lua/ai/OpAI/HeavyLandAttack_EditorFunctions
+--**  Author(s): Dru Staltman
+--**
+--**  Summary  : Generic AI Platoon Build Conditions
+--**             Build conditions always return true or false
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 
-##############################################################################################################
-# function: HeavyLandAttackChildDirectFire = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"     
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: HeavyLandAttackChildDirectFire = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"     
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function HeavyLandAttackChildDirectFire(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_DirectFireChildren')
     if not counter then
@@ -42,13 +42,13 @@ function HeavyLandAttackChildDirectFire(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: HeavyLandAttackChildArtillery = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"     
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: HeavyLandAttackChildArtillery = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"     
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function HeavyLandAttackChildArtillery(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_ArtilleryChildren')
     if not counter then
@@ -71,13 +71,13 @@ function HeavyLandAttackChildArtillery(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: HeavyLandAttackChildAntiAir = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"     
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: HeavyLandAttackChildAntiAir = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"     
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function HeavyLandAttackChildAntiAir(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_AntiAirChildren')
     if not counter then
@@ -98,13 +98,13 @@ function HeavyLandAttackChildAntiAir(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: HeavyLandAttackChildDefensive = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"     
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: HeavyLandAttackChildDefensive = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"     
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function HeavyLandAttackChildDefensive(aiBrain, master)
     local counter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_DefensiveChildren')
     if not counter then
@@ -125,13 +125,13 @@ function HeavyLandAttackChildDefensive(aiBrain, master)
     end
 end
 
-##############################################################################################################
-# function: HeavyLandAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
-# 
-# parameter 0: string   aiBrain     = "default_brain"       
-# parameter 1: string   master     = "default_master"
-# 
-##############################################################################################################
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- function: HeavyLandAttackMasterCountDifficulty = BuildCondition   doc = "Please work function docs."
+-- 
+-- parameter 0: string   aiBrain     = "default_brain"       
+-- parameter 1: string   master     = "default_master"
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function HeavyLandAttackMasterCountDifficulty(aiBrain, master)
     local directFireCounter = ScenarioFramework.AMPlatoonCounter(aiBrain, master..'_DirectFireChildren')
     if not directFireCounter then

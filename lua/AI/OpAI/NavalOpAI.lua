@@ -3,8 +3,8 @@
 --**  File     :  /lua/ai/OpAI/NavalOpAI.lua
 --**
 --**  Summary  : OpAI that reacts to certain defaulted events
---#**
---**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+----**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local ScenarioFramework = import('/lua/scenarioframework.lua')
