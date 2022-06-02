@@ -345,7 +345,7 @@ UnitBlueprint {
             RateOfFire = 3,
             TargetCheckInterval = 0.16,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.4,
@@ -413,7 +413,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',

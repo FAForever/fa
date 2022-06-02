@@ -346,7 +346,7 @@ UnitBlueprint {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -400,13 +400,12 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -472,13 +471,12 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -544,13 +542,12 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -616,13 +613,12 @@ UnitBlueprint {
             RateOfFire = 1,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',

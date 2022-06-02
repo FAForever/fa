@@ -316,7 +316,7 @@ UnitBlueprint {
                 'ANTIAIR',
                 'GROUNDATTACK',
                 'ENGINEER',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
             TrackingRadius = 1.15,

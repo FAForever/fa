@@ -355,7 +355,7 @@ UnitBlueprint {
                 '(TECH2 * MOBILE * NAVAL - CRUISER)',
                 'ANTINAVY',
                 'MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TrackingRadius = 1.15,

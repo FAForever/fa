@@ -220,7 +220,7 @@ UnitBlueprint {
                 'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1,

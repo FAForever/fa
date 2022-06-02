@@ -335,7 +335,7 @@
                 'TECH3 STRUCTURE',
                 'TECH3 MOBILE',
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Aim_Barrel_Muzzle',

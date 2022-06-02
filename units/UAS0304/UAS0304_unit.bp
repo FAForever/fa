@@ -378,7 +378,7 @@ UnitBlueprint {
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretDualManipulators = false,

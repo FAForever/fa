@@ -259,7 +259,7 @@ UnitBlueprint {
             RateOfFire = 0.5,
             TargetCheckInterval = 1,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.2,

@@ -345,7 +345,7 @@ UnitBlueprint {
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

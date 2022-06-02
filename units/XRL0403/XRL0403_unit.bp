@@ -400,7 +400,7 @@ UnitBlueprint {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -488,7 +488,7 @@ UnitBlueprint {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -575,7 +575,7 @@ UnitBlueprint {
                 'SUBMERSIBLE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
@@ -701,13 +701,12 @@ UnitBlueprint {
             RateOfFire = 1.6,
             TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.4,
@@ -779,7 +778,7 @@ UnitBlueprint {
             TargetCheckInterval = 1,
             TargetPriorities = {
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 0,

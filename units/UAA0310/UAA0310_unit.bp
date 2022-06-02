@@ -117,7 +117,6 @@ UnitBlueprint {
         'TARGETCHASER',
         'SHOWATTACKRETICLE',
         'SHOWQUEUE',
-        'SPECIALHIGHPRI',
         'OVERLAYANTIAIR',
         'OVERLAYANTINAVY',
         'OVERLAYRADAR',
@@ -358,7 +357,7 @@ UnitBlueprint {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
@@ -414,7 +413,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 '(AIR * MOBILE - INTELLIGENCE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -482,7 +481,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 '(AIR * MOBILE - INTELLIGENCE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -550,7 +549,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 '(AIR * MOBILE - INTELLIGENCE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -618,7 +617,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.5,
             TargetPriorities = {
                 '(AIR * MOBILE - INTELLIGENCE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -682,7 +681,7 @@ UnitBlueprint {
             TargetCheckInterval = 2,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
@@ -734,7 +733,7 @@ UnitBlueprint {
             TargetCheckInterval = 2,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             Turreted = false,
@@ -793,7 +792,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 '(AIR * MOBILE - INTELLIGENCE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -869,7 +868,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.25,
             TargetPriorities = {
                 '(AIR * MOBILE - INTELLIGENCE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',

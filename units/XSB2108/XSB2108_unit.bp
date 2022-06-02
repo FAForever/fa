@@ -300,7 +300,7 @@ UnitBlueprint {
             TargetCheckInterval = 0.16,
             TargetPriorities = {
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretDualManipulators = false,

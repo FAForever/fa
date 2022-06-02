@@ -240,7 +240,7 @@ UnitBlueprint {
                 'MOBILE TECH2',
                 'MOBILE TECH1',
                 'COMMAND',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1,

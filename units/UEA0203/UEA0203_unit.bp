@@ -327,7 +327,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'ANTIAIR',
                 'GROUNDATTACK',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
             TurretBoneMuzzle = 'Muzzle',

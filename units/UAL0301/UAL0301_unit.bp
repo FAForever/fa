@@ -817,7 +817,7 @@ UnitBlueprint {
                 'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Arm_Left_Muzzle',

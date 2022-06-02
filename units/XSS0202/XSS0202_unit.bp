@@ -274,7 +274,7 @@ UnitBlueprint {
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.125,
@@ -340,14 +340,13 @@ UnitBlueprint {
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH2 BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.12307692307692,
@@ -413,13 +412,12 @@ UnitBlueprint {
             TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.13333333333333,

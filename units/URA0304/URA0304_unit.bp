@@ -358,7 +358,7 @@ UnitBlueprint {
                 'TECH3 STRUCTURE',
                 'TECH2 STRUCTURE',
                 'TECH1 STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,
@@ -416,7 +416,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
@@ -486,7 +486,7 @@ UnitBlueprint {
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',

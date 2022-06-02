@@ -282,7 +282,7 @@ UnitBlueprint {
                 'PERSONALSHIELD',
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.15,

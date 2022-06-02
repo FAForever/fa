@@ -332,7 +332,7 @@ UnitBlueprint {
                 'MOBILE',
                 '(STRUCTURE * DEFENSE * ANTIAIR)',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TurretDualManipulators = false,
