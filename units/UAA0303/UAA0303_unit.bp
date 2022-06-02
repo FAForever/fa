@@ -309,7 +309,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RangeCategory = 'UWRC_AntiAir',
+        RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
