@@ -181,11 +181,6 @@ function SetUnitThreatValues(unitBPs)
             cache.PersonalShieldThreat = 0
         end
 
-        -- Arbitrary high bonus threat for special high pri
-        if TableFind(bp.Categories, 'SPECIALHIGHPRI') then
-            cache.EconomyThreatLevel = cache.EconomyThreatLevel + 250
-        end
-
         -- No one really cares about air staging, well maybe a little bit.
         if bp.Transport.DockingSlots then
             cache.EconomyThreatLevel = cache.EconomyThreatLevel + bp.Transport.DockingSlots

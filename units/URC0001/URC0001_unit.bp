@@ -31,7 +31,6 @@ UnitBlueprint {
         'OPERATION',
         'LAND',
         'MOBILE',
-        'SPECIALHIGHPRI',
         'VISIBLETORECON',
         'RECLAIMABLE',
     },

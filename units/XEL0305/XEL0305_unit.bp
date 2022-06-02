@@ -308,7 +308,7 @@ UnitBlueprint {
                 'COMMAND',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'TECH1 MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TrackingRadius = 1.2,
