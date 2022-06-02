@@ -323,7 +323,7 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             AlwaysRecheckTarget = false,
-            TargetRestrictDisallow = 'UNTARGETABLE,POD',
+            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
             TrackingRadius = 1.0,
             TurretBoneMuzzle = 'Muzzle02',
