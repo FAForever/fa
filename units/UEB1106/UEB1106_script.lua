@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB1106/UEB1106_script.lua
-#**  Author(s):  Jessica St. Croix
-#**
-#**  Summary  :  UEF Mass Storage
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEB1106/UEB1106_script.lua
+--**  Author(s):  Jessica St. Croix
+--**
+--**  Summary  :  UEF Mass Storage
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TMassStorageUnit = import('/lua/terranunits.lua').TMassStorageUnit
 

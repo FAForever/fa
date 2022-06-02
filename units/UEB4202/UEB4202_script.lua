@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UEB4202/UEB4202_script.lua
---#**  Author(s):  David Tomandl
---#**
---#**  Summary  :  UEF Shield Generator Script
---#**
---#**  Copyright © 20010 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UEB4202/UEB4202_script.lua
+----**  Author(s):  David Tomandl
+----**
+----**  Summary  :  UEF Shield Generator Script
+----**
+----**  Copyright ï¿½ 20010 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local TShieldStructureUnit = import('/lua/terranunits.lua').TShieldStructureUnit
 
 UEB4202 = Class(TShieldStructureUnit) {

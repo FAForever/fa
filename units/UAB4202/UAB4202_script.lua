@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/UAB4202/UAB4202_script.lua
---#**  Author(s):  David Tomandl
---#**
---#**  Summary  :  Aeon Shield Generator Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/UAB4202/UAB4202_script.lua
+----**  Author(s):  David Tomandl
+----**
+----**  Summary  :  Aeon Shield Generator Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
 
 UAB4202 = Class(AShieldStructureUnit) {

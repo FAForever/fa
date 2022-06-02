@@ -29,7 +29,7 @@ UnitBlueprint {
         'OVERLAYSONAR',
         'OVERLAYDEFENSE',
         'SORTINTEL',
-        'NAVAL', #added for shipwreck mod
+        'NAVAL', --added for shipwreck mod
         'CQUEMOV', --"CQUEMOV" enables the selection and move commands during construction
         'LOWSELECTPRIO',
     },

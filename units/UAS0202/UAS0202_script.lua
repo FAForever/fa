@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAS0202/UAS0202_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Aeon Cruiser Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAS0202/UAS0202_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Aeon Cruiser Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AeonWeapons = import('/lua/aeonweapons.lua')
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit

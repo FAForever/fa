@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URB1106/URB1106_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl
-#**
-#**  Summary  :  Cybran Mass Storage
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URB1106/URB1106_script.lua
+--**  Author(s):  Jessica St. Croix, David Tomandl
+--**
+--**  Summary  :  Cybran Mass Storage
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CMassStorageUnit = import('/lua/cybranunits.lua').CMassStorageUnit
 

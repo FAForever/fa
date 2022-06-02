@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UEB2401/UEB2401_script.lua
-#**  Author(s):  John Comes
-#**
-#**  Summary  :  UEF Experimental Artillery Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UEB2401/UEB2401_script.lua
+--**  Author(s):  John Comes
+--**
+--**  Summary  :  UEF Experimental Artillery Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
 local TIFArtilleryWeapon = import('/lua/terranweapons.lua').TIFArtilleryWeapon

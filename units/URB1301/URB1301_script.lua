@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URB1301/URB1301_script.lua
---#**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
---#**
---#**  Summary  :  Cybran Power Generator Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URB1301/URB1301_script.lua
+----**  Author(s):  John Comes, Dave Tomandl, Jessica St. Croix
+----**
+----**  Summary  :  Cybran Power Generator Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit
 
 URB1301 = Class(CEnergyCreationUnit) {

@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URB4207/URB4207_script.lua
---#**  Author(s):  David Tomandl, Greg Kohne
---#**
---#**  Summary  :  Cybran Shield Generator lvl 5 Script
---#**
---#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URB4207/URB4207_script.lua
+----**  Author(s):  David Tomandl, Greg Kohne
+----**
+----**  Summary  :  Cybran Shield Generator lvl 5 Script
+----**
+----**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CShieldStructureUnit = import('/lua/cybranunits.lua').CShieldStructureUnit
 
 URB4207 = Class(CShieldStructureUnit) {

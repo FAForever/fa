@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB4302/UAB4302_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Strategic Missile Defense Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB4302/UAB4302_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Strategic Missile Defense Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AAMSaintWeapon = import('/lua/aeonweapons.lua').AAMSaintWeapon
@@ -19,7 +19,7 @@ UAB4302 = Class(AStructureUnit) {
             IdleState = State(AAMSaintWeapon.IdleState) {
                 OnGotTarget = function(self)
                     local bp = self:GetBlueprint()
-                    #only say we've fired if the parent fire conditions are met
+                    --only say we've fired if the parent fire conditions are met
                     if (bp.WeaponUnpackLockMotion != true or (bp.WeaponUnpackLocksMotion == true and not self.unit:IsUnitState('Moving'))) then
                         if (bp.CountedProjectile == false) or self:CanFire() then
                              nukeFiredOnGotTarget = true
@@ -27,7 +27,7 @@ UAB4302 = Class(AStructureUnit) {
                     end
                     AAMSaintWeapon.IdleState.OnGotTarget(self)
                 end,
-                # uses OnGotTarget, so we shouldn't do this.
+                -- uses OnGotTarget, so we shouldn't do this.
                 OnFire = function(self)
                     if not nukeFiredOnGotTarget then
                         AAMSaintWeapon.IdleState.OnFire(self)

@@ -1,10 +1,10 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/XAC8102/XAC8102_script.lua 
-#** 
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/XAC8102/XAC8102_script.lua 
+--** 
+--** 
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
 
 XAC8102 = Class(ACivilianStructureUnit) {

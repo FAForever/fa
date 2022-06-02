@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB3104/UAB3104_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Aeon Omni Sensor Suite Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB3104/UAB3104_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Aeon Omni Sensor Suite Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local ARadarUnit = import('/lua/aeonunits.lua').ARadarUnit
 

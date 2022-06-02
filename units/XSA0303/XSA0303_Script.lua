@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /units/XSA0303/XSA0303_script.lua
-#**  Author(s):  Greg Kohne
-#**
-#**  Summary  :  Seraphim Air Superiority Fighter Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /units/XSA0303/XSA0303_script.lua
+--**  Author(s):  Greg Kohne
+--**
+--**  Summary  :  Seraphim Air Superiority Fighter Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 local SAALosaareAutoCannonWeapon = import('/lua/seraphimweapons.lua').SAALosaareAutoCannonWeaponAirUnit

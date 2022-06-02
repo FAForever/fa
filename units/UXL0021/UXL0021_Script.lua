@@ -1,13 +1,13 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/Units/UXLTest01/UXL0021_unit.bp
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Test unit for low arc slow moving projectile with multiple 
-#**              emitter types.
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/Units/UXLTest01/UXL0021_unit.bp
+--**  Author(s):  Gordon Duclos
+--**
+--**  Summary  :  Test unit for low arc slow moving projectile with multiple 
+--**              emitter types.
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local WeaponFile = import('/lua/sim/defaultweapons.lua')

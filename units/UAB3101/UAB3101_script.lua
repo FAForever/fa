@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB3101/UAB3101_script.lua
-#**  Author(s):  David Tomandl
-#**
-#**  Summary  :  Aeon Radar Tower Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB3101/UAB3101_script.lua
+--**  Author(s):  David Tomandl
+--**
+--**  Summary  :  Aeon Radar Tower Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local ARadarUnit = import('/lua/aeonunits.lua').ARadarUnit
 

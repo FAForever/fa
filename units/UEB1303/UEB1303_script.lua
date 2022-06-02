@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl
-#**
-#**  Summary  :  UEF T3 Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
+--**  Author(s):  Jessica St. Croix, David Tomandl
+--**
+--**  Summary  :  UEF T3 Mass Fabricator
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local TMassFabricationUnit = import('/lua/terranunits.lua').TMassFabricationUnit
 

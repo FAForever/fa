@@ -1,12 +1,12 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/URC1401/URC1401_script.lua 
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#** 
-#**  Summary  :  Cybran Agricultural Center, Ver1
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/URC1401/URC1401_script.lua 
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+--** 
+--**  Summary  :  Cybran Agricultural Center, Ver1
+--** 
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
 
 URC1401 = Class(CCivilianStructureUnit) {

@@ -1,12 +1,12 @@
-#****************************************************************************
-#** 
-#**  File     :  /cdimage/units/UEC1501/UEC1501_script.lua 
-#**  Author(s):  John Comes, David Tomandl, Gordon Duclos
-#** 
-#**  Summary  :  Earth Manufacturing Center, Ver1
-#** 
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--** 
+--**  File     :  /cdimage/units/UEC1501/UEC1501_script.lua 
+--**  Author(s):  John Comes, David Tomandl, Gordon Duclos
+--** 
+--**  Summary  :  Earth Manufacturing Center, Ver1
+--** 
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local TCivilianStructureUnit = import('/lua/terranunits.lua').TCivilianStructureUnit
 
 UEC1501 = Class(TCivilianStructureUnit) {

@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URL0101/URL0101_script.lua
---#**  Author(s):  John Comes, David Tomandl
---#**
---#**  Summary  :  Cybran Land Scout Script
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URL0101/URL0101_script.lua
+----**  Author(s):  John Comes, David Tomandl
+----**
+----**  Summary  :  Cybran Land Scout Script
+----**
+----**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CWalkingLandUnit = import('/lua/cybranunits.lua').CWalkingLandUnit
 local Entity = import('/lua/sim/Entity.lua').Entity
 

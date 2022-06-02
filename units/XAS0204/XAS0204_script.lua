@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/units/xas0204/xas0204_script.lua
-#**  Author(s):  Dru Staltman, Jessica St. Croix
-#**
-#**  Summary  :  Aeon Submarine Hunter Script
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/units/xas0204/xas0204_script.lua
+--**  Author(s):  Dru Staltman, Jessica St. Croix
+--**
+--**  Summary  :  Aeon Submarine Hunter Script
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
 local AANChronoTorpedoWeapon = import('/lua/aeonweapons.lua').AANChronoTorpedoWeapon
 local AIFQuasarAntiTorpedoWeapon = import('/lua/aeonweapons.lua').AIFQuasarAntiTorpedoWeapon

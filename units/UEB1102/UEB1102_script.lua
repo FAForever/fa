@@ -27,7 +27,7 @@ UEB1102 = Class(TEnergyCreationUnit) {
 
     ActiveState = State {
         Main = function(self)
-            # Play the "activate" sound
+            -- Play the "activate" sound
             local myBlueprint = self:GetBlueprint()
             if myBlueprint.Audio.Activate then
                 self:PlaySound(myBlueprint.Audio.Activate)

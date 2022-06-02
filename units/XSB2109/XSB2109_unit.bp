@@ -219,7 +219,7 @@ UnitBlueprint {
             FireTargetLayerCapsTable = {
                 Water = 'Seabed|Sub|Water',
             },
-            FiringTolerance = 85, #from 30, to allow shooting targets beneath
+            FiringTolerance = 85, --from 30, to allow shooting targets beneath
             Label = 'Turret01',
             MaxRadius = 50,
             MuzzleSalvoDelay = 0.5,
@@ -269,7 +269,7 @@ UnitBlueprint {
             TurretBoneYaw = 'XSB2109',
             TurretDualManipulators = false,
             TurretPitch = 0,
-            TurretPitchRange = 05, #from 0 to enable shooting directly beneath it
+            TurretPitchRange = 05, --from 0 to enable shooting directly beneath it
             TurretPitchSpeed = 35,
             TurretYaw = 0,
             TurretYawRange = 180,
@@ -287,9 +287,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

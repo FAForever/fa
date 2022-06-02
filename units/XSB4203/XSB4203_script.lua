@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/XSB4203/XSB4203_script.lua
-#**
-#**  Summary  :  Seraphim Radar Jammer Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/XSB4203/XSB4203_script.lua
+--**
+--**  Summary  :  Seraphim Radar Jammer Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SRadarJammerUnit = import('/lua/seraphimunits.lua').SRadarJammerUnit
 

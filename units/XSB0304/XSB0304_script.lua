@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/XSB0304/XSB0304_script.lua
---#**  Author(s):  Greg Kohne
---#**
---#**  Summary  :  Seraphim Sub Commander Gateway Unit Script
---#**
---#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/XSB0304/XSB0304_script.lua
+----**  Author(s):  Greg Kohne
+----**
+----**  Summary  :  Seraphim Sub Commander Gateway Unit Script
+----**
+----**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local SQuantumGateUnit = import('/lua/seraphimunits.lua').SQuantumGateUnit
 local EffectTemplates = import('/lua/EffectTemplates.lua')
 

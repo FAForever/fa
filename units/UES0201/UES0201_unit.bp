@@ -242,7 +242,7 @@ UnitBlueprint {
     SizeX = 1.5,
     SizeY = 1.3,
     SizeZ = 5.4,
-    StrategicIconName = 'icon_ship2_directfire', #from antinavy
+    StrategicIconName = 'icon_ship2_directfire', --from antinavy
     StrategicIconSortPriority = 155,
     Veteran = {
         Level1 = 16,

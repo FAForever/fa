@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/URS0203/URS0203_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
-#**
-#**  Summary  :  Cybran Attack Sub Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/URS0203/URS0203_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix
+--**
+--**  Summary  :  Cybran Attack Sub Script
+--**
+--**  Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local CSubUnit = import('/lua/cybranunits.lua').CSubUnit
 local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
@@ -22,10 +22,10 @@ URS0203 = Class(CSubUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CSubUnit.OnStopBeingBuilt(self,builder,layer)
         if(self:GetCurrentLayer() == 'Water') then
-			# Enable weapon
+			-- Enable weapon
 			self:SetWeaponEnabledByLabel('MainGun', true)
         elseif (self:GetCurrentLayer() == 'UnderWater') then
-			# Disable Weapon
+			-- Disable Weapon
 			self:SetWeaponDisableByLabel('MainGun', false)
        end
        self.WeaponsEnabled = true
@@ -34,10 +34,10 @@ URS0203 = Class(CSubUnit) {
 		CSubUnit.OnLayerChange(self, new, old)
 		if self.WeaponsEnabled then
 			if( new == 'Water' ) then
-				# Enable Minigun
+				-- Enable Minigun
 				self:SetWeaponEnabledByLabel('MainGun', true)
 			elseif ( new == 'UnderWater' ) then
-				# Disable Land Minigun
+				-- Disable Land Minigun
 				self:SetWeaponDisableByLabel('MainGun', false)
 			end
 		end

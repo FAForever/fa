@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/URA0401/URA0401_script.lua
---#**  Author(s):  John Comes, Andres Mendez, Gordon Duclos
---#**
---#**  Summary  :  Cybran Gunship Script
---#**
---#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/URA0401/URA0401_script.lua
+----**  Author(s):  John Comes, Andres Mendez, Gordon Duclos
+----**
+----**  Summary  :  Cybran Gunship Script
+----**
+----**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CDFRocketIridiumWeapon = import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon
 local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon
