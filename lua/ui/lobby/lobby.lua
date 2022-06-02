@@ -624,7 +624,8 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
                 GUI.chatEdit:AcquireFocus()
             end,
             nil, nil,
-            true
+            true,
+            {escapeButton = 2, enterButton = 1, worldCover = true}
         )
     end
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
