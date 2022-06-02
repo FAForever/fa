@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Amphibious Tank Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')

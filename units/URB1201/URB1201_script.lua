@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Tier 2 Power Generator Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CEnergyCreationUnit = import('/lua/cybranunits.lua').CEnergyCreationUnit

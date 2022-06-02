@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Mobile Light Artillery Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SHoverLandUnit = import('/lua/seraphimunits.lua').SHoverLandUnit

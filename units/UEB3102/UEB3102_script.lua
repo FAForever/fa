@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Light Sonar Installation Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TSonarUnit = import('/lua/terranunits.lua').TSonarUnit

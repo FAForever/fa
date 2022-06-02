@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Cruiser Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit

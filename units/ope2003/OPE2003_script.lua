@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Operation E2 Civilian Transport Truck
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit

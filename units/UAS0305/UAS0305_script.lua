@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Aeon T3 Sonar
 ----**
-----**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
 local AIFQuasarAntiTorpedoWeapon = import('/lua/aeonweapons.lua').AIFQuasarAntiTorpedoWeapon

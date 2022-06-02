@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Seraphim Unidentified Residual Energy Signature Script
 ----**
-----**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local SEnergyBallUnit = import('/lua/seraphimunits.lua').SEnergyBallUnit
 local SDFUnstablePhasonBeam = import('/lua/seraphimweapons.lua').SDFUnstablePhasonBeam

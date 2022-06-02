@@ -4,7 +4,7 @@
 --**
 --**  Summary  :  Seraphim Heavy Bot Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SDFAireauBolterWeapon = import('/lua/seraphimweapons.lua').SDFAireauBolterWeapon02

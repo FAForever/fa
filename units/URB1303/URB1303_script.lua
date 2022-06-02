@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran T3 Mass Fabricator
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CMassFabricationUnit = import('/lua/cybranunits.lua').CMassFabricationUnit

@@ -8,7 +8,7 @@
 --				and destroy trees. 
 --              Aeon T2 Artillery : uab2303
 --
---  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local AMiasmaProjectile02 = import('/lua/aeonprojectiles.lua').AMiasmaProjectile02
 

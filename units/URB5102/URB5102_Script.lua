@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Transport Beacon Unit
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CTransportBeaconUnit = import('/lua/cybranunits.lua').CTransportBeaconUnit

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Torpedo Cluster Bomber Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AAirUnit = import('/lua/aeonunits.lua').AAirUnit

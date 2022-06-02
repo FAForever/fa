@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Wall Piece Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CWallStructureUnit = import('/lua/cybranunits.lua').CWallStructureUnit
 

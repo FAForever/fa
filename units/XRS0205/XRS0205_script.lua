@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Counter-Intelligence Boat Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit

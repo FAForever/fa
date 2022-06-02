@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Cybran Long Range Sonar Script
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
 

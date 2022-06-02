@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Long Range Sonar Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ASonarUnit = import('/lua/aeonunits.lua').ASonarUnit

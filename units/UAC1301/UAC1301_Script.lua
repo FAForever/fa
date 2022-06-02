@@ -5,7 +5,7 @@
 --** 
 --**  Summary  :  Aeon Templ, Ver1
 --** 
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
 

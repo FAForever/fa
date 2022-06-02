@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Cybran Gunship Script
 ----**
-----**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CDFRocketIridiumWeapon = import('/lua/cybranweapons.lua').CDFRocketIridiumWeapon

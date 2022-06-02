@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Heavy Gunship Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon

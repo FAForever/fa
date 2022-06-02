@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Concrete Slab Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local AConcreteStructureUnit = import('/lua/aeonunits.lua').AConcreteStructureUnit
 

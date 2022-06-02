@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Tier 2 Mass Extractor Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SMassCollectionUnit = import('/lua/seraphimunits.lua').SMassCollectionUnit

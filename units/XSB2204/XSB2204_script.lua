@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Sinnatha Anti-Air Defense
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit

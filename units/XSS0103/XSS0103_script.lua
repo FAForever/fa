@@ -4,7 +4,7 @@
 --**
 --**  Summary  :  Seraphim Frigate Script: XSS0103
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SSeaUnit = import('/lua/seraphimunits.lua').SSeaUnit

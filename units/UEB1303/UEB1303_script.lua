@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF T3 Mass Fabricator
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TMassFabricationUnit = import('/lua/terranunits.lua').TMassFabricationUnit

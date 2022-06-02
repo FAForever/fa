@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Cybran Long Range Artillery Script
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Air Superiority Fighter Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AAirUnit = import('/lua/aeonunits.lua').AAirUnit

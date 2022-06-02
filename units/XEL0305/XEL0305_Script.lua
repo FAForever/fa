@@ -4,7 +4,7 @@
 --**
 --**  Summary  :  UEF Siege Assault Bot Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TerranWeaponFile = import('/lua/terranweapons.lua')

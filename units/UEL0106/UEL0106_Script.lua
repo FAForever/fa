@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Light Assault Bot Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
 local Unit = import('/lua/sim/Unit.lua').Unit

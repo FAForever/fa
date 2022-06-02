@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Mass Storage
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TMassStorageUnit = import('/lua/terranunits.lua').TMassStorageUnit

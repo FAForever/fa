@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  UEF Heavy Shield Generator Script
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local TShieldStructureUnit = import('/lua/terranunits.lua').TShieldStructureUnit
 

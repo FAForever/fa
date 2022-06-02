@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Siege Tank Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit

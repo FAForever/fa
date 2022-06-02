@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Interceptor Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')

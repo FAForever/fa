@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Medium Tank Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit

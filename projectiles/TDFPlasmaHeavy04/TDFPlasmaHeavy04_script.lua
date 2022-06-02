@@ -5,7 +5,7 @@
 --
 --  Summary  :  UEF Heavy Plasma Cannon projectile, UEL0303 : Titan
 --
---  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
 local THeavyPlasmaCannonProjectile = import('/lua/terranprojectiles.lua').THeavyPlasmaCannonProjectile

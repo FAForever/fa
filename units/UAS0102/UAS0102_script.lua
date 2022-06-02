@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Attack Boat Script: UAS0102
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Rocket Bot Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 DRL0204 = Class(import('/lua/cybranunits.lua').CWalkingLandUnit) {
     Weapons = {

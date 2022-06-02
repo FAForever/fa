@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim T1 Power Generator Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 XSB1101 = Class(import('/lua/seraphimunits.lua').SEnergyCreationUnit) {
     AmbientEffects = 'ST1PowerAmbient',

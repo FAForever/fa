@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Cybran Quantum Gate
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local CQuantumGateUnit = import('/lua/cybranunits.lua').CQuantumGateUnit
 local EffectUtil = import('/lua/EffectUtilities.lua')

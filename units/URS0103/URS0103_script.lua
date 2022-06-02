@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Frigate Script
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit

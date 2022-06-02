@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Heavy Tank Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TDFGaussCannonWeapon = import('/lua/terranweapons.lua').TDFGaussCannonWeapon

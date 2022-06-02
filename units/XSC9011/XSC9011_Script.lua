@@ -4,7 +4,7 @@
 --**  Author   :  Greg Kohne
 --**  Summary  :  Jamming Crystal
 --** 
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 

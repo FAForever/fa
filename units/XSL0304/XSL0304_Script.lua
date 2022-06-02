@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Mobile Heavy Artillery
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit

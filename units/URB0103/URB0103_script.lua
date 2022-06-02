@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran T1 Naval Factory Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CSeaFactoryUnit = import('/lua/cybranunits.lua').CSeaFactoryUnit

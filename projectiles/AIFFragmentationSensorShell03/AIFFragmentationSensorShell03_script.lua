@@ -7,7 +7,7 @@
 --				 Child Projectile after 2st split
 --              Aeon Salvation : XAB2307
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local AArtilleryFragmentationSensorShellProjectile = import('/lua/aeonprojectiles.lua').AArtilleryFragmentationSensorShellProjectile03
 local EffectTemplate = import('/lua/EffectTemplates.lua')

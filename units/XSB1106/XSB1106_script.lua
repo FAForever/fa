@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Mass Storage
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SMassStorageUnit = import('/lua/seraphimunits.lua').SMassStorageUnit

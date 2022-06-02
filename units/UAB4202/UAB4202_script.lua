@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Aeon Shield Generator Script
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local AShieldStructureUnit = import('/lua/aeonunits.lua').AShieldStructureUnit
 

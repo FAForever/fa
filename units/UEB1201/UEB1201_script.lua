@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Tier 2 Power Generator Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Submarine Hunter Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
 local AANChronoTorpedoWeapon = import('/lua/aeonweapons.lua').AANChronoTorpedoWeapon

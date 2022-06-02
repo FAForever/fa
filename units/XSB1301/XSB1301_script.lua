@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim T3 Power Generator Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
 

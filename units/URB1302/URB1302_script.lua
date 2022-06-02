@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Tier 2 Mass Extractor Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CMassCollectionUnit = import('/lua/cybranunits.lua').CMassCollectionUnit

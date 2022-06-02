@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Spy Plane Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit

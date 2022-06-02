@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Frigate Script: UAS0103
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit

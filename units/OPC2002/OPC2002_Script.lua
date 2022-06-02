@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Tech for OpC2
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local HoverLandUnit = import('/lua/defaultunits.lua').HoverLandUnit
 

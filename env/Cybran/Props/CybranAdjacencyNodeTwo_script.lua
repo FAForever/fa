@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Adjacency Node Prop
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local Prop = import('/lua/sim/Prop.lua').Prop
 

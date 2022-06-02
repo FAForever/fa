@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Missile Ship Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local ASeaUnit = import('/lua/aeonunits.lua').ASeaUnit
 local AIFMissileTacticalSerpentine02Weapon = import('/lua/aeonweapons.lua').AIFMissileTacticalSerpentine02Weapon

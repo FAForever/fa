@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Terran Carpet Bomber Unit Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 --
 -- Terran Bomber Script : UEA0103

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seaphim Submarine Hunter Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local SSubUnit = import('/lua/seraphimunits.lua').SSubUnit
 local SANUallCavitationTorpedo = import('/lua/seraphimweapons.lua').SANUallCavitationTorpedo

@@ -6,7 +6,7 @@
 --**  Summary  :  Test unit for low arc slow moving projectile with multiple 
 --**              emitter types.
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit

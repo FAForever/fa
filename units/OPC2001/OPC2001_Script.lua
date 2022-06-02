@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Temple Building for OpC2
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local Unit = import('/lua/sim/Unit.lua').Unit
 

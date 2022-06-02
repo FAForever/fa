@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  UEF Quantum Gate Script
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local TQuantumGateUnit = import('/lua/terranunits.lua').TQuantumGateUnit
 

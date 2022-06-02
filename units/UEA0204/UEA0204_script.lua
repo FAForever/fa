@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Torpedo Bomber Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit

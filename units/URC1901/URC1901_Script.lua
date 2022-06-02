@@ -5,7 +5,7 @@
 --** 
 --**  Summary  :  Cybran QAI Mainframe, Ver1
 --** 
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
 

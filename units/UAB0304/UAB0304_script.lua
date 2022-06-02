@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Aeon Unit Script
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local AQuantumGateUnit = import('/lua/aeonunits.lua').AQuantumGateUnit
 local AQuantumGateAmbient = import('/lua/EffectTemplates.lua').AQuantumGateAmbient

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Dostya's Remains
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CWallStructureUnit = import('/lua/cybranunits.lua').CWallStructureUnit

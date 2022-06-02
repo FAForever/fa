@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Heavy Gun Tower Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SStructureUnit = import('/lua/seraphimunits.lua').SStructureUnit

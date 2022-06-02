@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Mobile Anti-Air Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SAAShleoCannonWeapon = import('/lua/seraphimweapons.lua').SAAShleoCannonWeapon

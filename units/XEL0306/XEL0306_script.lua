@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Mobile Missile Platform Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit

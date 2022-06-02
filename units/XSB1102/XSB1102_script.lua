@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  Seraphim Hydrocarbon Power Plant Script
 ----**
-----**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
 XSB1102 = Class(SEnergyCreationUnit) {

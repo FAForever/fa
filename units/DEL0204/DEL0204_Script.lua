@@ -5,7 +5,7 @@
 ----**
 ----**  Summary  :  UEF Mongoose Gatling Bot
 ----**
-----**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+----**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----****************************************************************************
 local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
 local TWeapons = import('/lua/terranweapons.lua')

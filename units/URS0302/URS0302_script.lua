@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Battleship Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
 local CybranWeaponsFile = import('/lua/cybranweapons.lua')

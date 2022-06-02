@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Transport Beacon Unit
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ATransportBeaconUnit = import('/lua/aeonunits.lua').ATransportBeaconUnit

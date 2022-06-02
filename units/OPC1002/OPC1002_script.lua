@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Operation C1 Symbiont Vehicle
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon T1 Engineer Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AConstructionUnit = import('/lua/aeonunits.lua').AConstructionUnit

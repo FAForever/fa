@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Seraphim Cruiser Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SeraphimWeapons = import('/lua/seraphimweapons.lua')

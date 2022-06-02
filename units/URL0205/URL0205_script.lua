@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Mobile Flak Artillery Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CLandUnit = import('/lua/cybranunits.lua').CLandUnit

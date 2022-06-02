@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Aircraft Carrier Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AircraftCarrier = import('/lua/defaultunits.lua').AircraftCarrier

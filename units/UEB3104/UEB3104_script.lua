@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Omni Sensor Suite Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local TRadarUnit = import('/lua/terranunits.lua').TRadarUnit
 

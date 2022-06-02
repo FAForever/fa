@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local Unit = import('/lua/sim/Unit.lua').Unit
 

@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  UEF Radar Jammer Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local TRadarJammerUnit = import('/lua/terranunits.lua').TRadarJammerUnit

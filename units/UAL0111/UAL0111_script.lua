@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Mobile Missile Launcher Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local ALandUnit = import('/lua/aeonunits.lua').ALandUnit

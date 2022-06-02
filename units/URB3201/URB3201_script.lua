@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Cybran Long Range Radar Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit

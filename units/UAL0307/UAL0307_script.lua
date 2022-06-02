@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Mobile Shield Generator Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AShieldHoverLandUnit = import('/lua/aeonunits.lua').AShieldHoverLandUnit

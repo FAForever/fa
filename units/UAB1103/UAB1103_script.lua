@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Aeon Mass Extractor Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local AMassCollectionUnit = import('/lua/aeonunits.lua').AMassCollectionUnit
