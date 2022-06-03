@@ -8,7 +8,7 @@ TrailEmitterBlueprint {
     BlendMode = 3,
     TextureRepeatRate = 1,
     LODCutoff = -1, -- t3 / t4 artillery
-	RepeatTexture = [[/textures/particles/air_contrail_02.dds]],
-	RampTexture = [[/textures/particles/ramp_white_03.dds]],
+	RepeatTexture = '/textures/particles/air_contrail_02.dds',
+	RampTexture = '/textures/particles/ramp_white_03.dds',
 }
 
