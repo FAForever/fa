@@ -36,7 +36,7 @@ end
 
 --- Add a toggle cap to a unit.
 --- Also adds a button to the UI, or enables it, for the unit to use the new command.
----@param capName String Available:
+---@param capName string Available:
 -- RULEUTC_ShieldToggle
 -- RULEUTC_WeaponToggle
 -- RULEUTC_JammingToggle
@@ -90,7 +90,9 @@ function Unit:ClearFocusEntity()
 end
 
 --- TODO.
-function Unit:EnableManipulators([string boneName | int boneIndex],  bool Enable)
+---@param bone string|number boneName or boneIndex
+---@param Enable boolean
+function Unit:EnableManipulators(bone, Enable)
 end
 
 --- TODO.
@@ -225,12 +227,13 @@ end
 
 --- Find out unit's specific statistics.
 -- Example: 'KILLS'.
--- @param statName String, name of the stat to find out.
--- @param [defaultVal] TODO.
+---@param statName string, name of the stat to find out.
+---@param defaultVal? number TODO.
+---@return number
 -- Special case for the Salem:
 --   GetStat("h1_SetSalemAmph", 0 or 1) 
 --   Disable/Enable amphibious mode
-function Unit:GetStat(statName, [defaultVal])
+function Unit:GetStat(statName, defaultVal)
 end
 
 --- Find out number of tactical missile this unit has available.
@@ -355,7 +358,8 @@ function Unit:KillManipulator()
 end
 
 --- TODO.
-function Unit:KillManipulators([boneName|boneIndex])
+---@param bone string|number boneName|boneIndex
+function Unit:KillManipulators(bone)
 end
 
 --- TODO.

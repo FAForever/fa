@@ -54,9 +54,10 @@ end
 function DiskToLocal(SysOrLocalPath)
 end
 
----
---  EndLoggingStats(bool exit) - End logging stats and optionally exit app
-function EndLoggingStats(bool exit)
+
+---End logging stats and optionally exit app
+---@param exit boolean
+function EndLoggingStats(exit)
 end
 
 ---
@@ -75,8 +76,11 @@ function EnumColorNames()
 end
 
 ---
---  quaternion EulerToQuaternion(float roll, float pitch, float yaw) - converts euler angles to a quaternion
-function EulerToQuaternion(float roll,  float pitch,  float yaw)
+---converts euler angles to a quaternion
+---@param roll number float
+---@param pitch number float
+---@param yaw number float
+function EulerToQuaternion(roll, pitch, yaw)
 end
 
 ---
@@ -86,8 +90,10 @@ end
 
 ---
 --  thread = ForkThread(function, ...)Spawns a new thread running the given function with the given args.
+---@param callback function
+---@vararg any arguments to pass into function
 ---@return thread
-function ForkThread(function,  ...)
+function ForkThread(callback,  ...)
 end
 
 ---
@@ -134,12 +140,18 @@ end
 
 ---
 --  quaternion MinLerp(float alpha, quaternion L, quaternion R) - returns minimal lerp between L and R
-function MinLerp(float alpha,  quaternion L,  quaternion R)
+---@param alpha number
+---@param L unknown quaternion
+---@param R unknown quaternion
+function MinLerp(alpha, L, R)
 end
 
 ---
 --  quaternion MinSlerp(float alpha, quaternion L, quaternion R) - returns minimal slerp between L and R
-function MinSlerp(float alpha,  quaternion L,  quaternion R)
+---@param alpha number
+---@param L unknown quaternion
+---@param R unknown quaternion
+function MinSlerp(alpha, L, R)
 end
 
 ---
@@ -154,7 +166,8 @@ end
 
 ---
 --  RPCSound({cue,bank,cutoff}) - Make a sound parameters object
-function RPCSound({cue, bank, cutoff})
+---@param sound {cue:unknown, bank:unknown, cutoff:unknown}
+function RPCSound(sound)
 end
 
 ---
@@ -203,10 +216,10 @@ function ResumeThread(thread)
 end
 
 ---  Print a debug message
--- @param TextOne Debug message
--- @param TextTwo Optional text
+---@param TextOne string Debug message
+---@param TextTwo string? Optional text
 -- Output: "DEBUG: TextOne\000TextTwo"
-function SPEW('TextOne','TextTwo')
+function SPEW(TextOne,TextTwo)
 end
 
 ---
@@ -241,7 +254,8 @@ end
 
 ---
 --  Sound({cue,bank,cutoff}) - Make a sound parameters object
-function Sound({cue, bank, cutoff})
+---@param sound {cue:unknown, bank:unknown, cutoff:unknown}
+function Sound(sound)
 end
 
 ---
@@ -255,8 +269,9 @@ function SuspendCurrentThread()
 end
 
 ---
---  Trace(true) -- turns on debug tracingTrace(false) -- turns it off again
-function Trace(true)
+--  Trace(true) -- turns on debug. tracingTrace(false) -- turns it off again
+---@param enable boolean
+function Trace(enable)
 end
 
 ---
@@ -323,10 +338,10 @@ function Vector2()
 end
 
 ---  Print a warning message
--- @param TextOne Warning message
--- @param TextTwo Optional text
+---@param TextOne string Warning message
+---@param TextTwo string? Optional text
 -- Output: "WARNING: TextOne\000TextTwo"
-function WARN('TextOne','TextTwo')
+function WARN(TextOne, TextTwo)
 end
 
 ---
@@ -336,11 +351,17 @@ end
 
 ---
 --  doscript(script, [env]) -- run another script. The environment table, if given, will be used for the script's global variables.
-function doscript(script,  [env])
+---comment
+---@param script string
+---@param env table?
+---@diagnostic disable-next-line: lowercase-global
+function doscript(script,  env)
 end
 
 ---
 --  exists(name) -> bool -- returns true if the given resource file exists
+---@param name string
+---@diagnostic disable-next-line: lowercase-global
 function exists(name)
 end
 
