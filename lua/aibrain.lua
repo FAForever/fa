@@ -45,10 +45,52 @@ local Points = {
 local CoroutineYield = coroutine.yield
 
 ---@alias AIResult "defeat"|"draw"|"victor"
+---@alias HqTech "TECH2"|"TECH3"
+---@alias HqLayer "LAND"|"AIR"|"NAVY"
+---@alias HqFaction "AEON"|"UEF"|"SERAPHIM"|"CYBRAN"|"NOMADS"
 
 ---@class AIBrain: moho.aibrain_methods
 ---@field Trash TrashBag
 ---@field Result AIResult|nil
+---@field UnitStats table<UnitId, table<string, number>>
+---@field Name string
+---@field AIPlansList table<number,table<number, string>>
+---@field HQs table<HqFaction, table<HqLayer, table<HqTech, number>>>
+---@field EnergyExcessUnitsEnabled table<EntityId, MassFabricationUnit>
+---@field EnergyExcessUnitsDisabled table<EntityId, MassFabricationUnit>
+---@field EnergyDependingUnits Shield[]
+---@field EnergyDependingUnitsHead number
+---@field TriggerList table
+---@field IntelTriggerList table
+---@field UnitBuiltTriggerList table
+---@field VeterancyTriggerList table
+---@field PingCallbackList table
+---@field BuilderManagers table<string, table>
+---@field ConditionsMonitor BrainConditionsMonitor
+---@field BrainType "AI"|"Human"
+---@field LayerPref "LAND"|"AIR"
+---@field ConstantEval boolean
+---@field CurrentPlan string lua file which contains plan
+---@field RepeatExecution boolean
+---@field CurrentPlanScript table
+---@field BaseMonitor AiBaseMonitor
+---@field SelfMonitor AiSelfMonitor
+---@field EconomyTicksMonitor number
+---@field EconomyCurrentTick number
+---@field Sorian boolean
+---@field EconomyData table<number, {EnergyIncome:number, EnergyRequested:number, MassIncome:number, MassRequested:number}>
+---@field AttackManager AttackManager
+---@field AttackData AttackManager
+---@field PBM AiPlatoonBuildManager
+---@field HasPlatoonList boolean
+---@field PlatoonNameCounter table<string, number>|nil
+---@field T4ThreatFound table|nil
+---@field AttackPoints table|nil
+---@field AirAttackPoints table|nil
+---@field TacticalBases table|nil
+---@field EnergyExcessThread thread
+---@field IntelData table<string, number>|nil
+---@field targetoveride boolean
 AIBrain = Class(moho.aibrain_methods) {
 
     -- for the engi mod
@@ -66,6 +108,9 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param unitId UnitId
+    ---@param statName string
+    ---@param value number
     AddUnitStat = function(self, unitId, statName, value)
         if self.UnitStats[unitId] == nil then
             self.UnitStats[unitId] = {}
@@ -162,18 +207,18 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds a HQ so that the engi mod knows we have it
     ---@param self AIBrain
-    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
-    -- @param layer The layer (LAND / AIR / NAVY) as a string
-    -- @param tech The tech (TECH2 / TECH3) as a string
+    ---@param faction HqFaction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    ---@param layer HqLayer The layer (LAND / AIR / NAVY) as a string
+    ---@param tech HqTech The tech (TECH2 / TECH3) as a string
     AddHQ = function (self, faction, layer, tech)
         self.HQs[faction][layer][tech] = self.HQs[faction][layer][tech] + 1
     end,
 
     --- Removes an HQ so that the engi mod knows we lost it for the engi mod.
     ---@param self AIBrain
-    -- @param faction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
-    -- @param layer The layer (LAND / AIR / NAVY) as a string
-    -- @param tech The tech (TECH2 / TECH3) as a string
+    ---@param faction HqFaction The faction (AEON / UEF / SERAPHIM / CYBRAN / NOMADS) as a string
+    ---@param layer HqLayer The layer (LAND / AIR / NAVY) as a string
+    ---@param tech HqTech The tech (TECH2 / TECH3) as a string
     RemoveHQ = function (self, faction, layer, tech)
         self.HQs[faction][layer][tech] = math.max(0, self.HQs[faction][layer][tech] - 1)
     end,
@@ -352,7 +397,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
     ---@param self AIBrain
-    -- @param unit The unit to keep track of
+    ---@param unit MassFabricationUnit The unit to keep track of
     AddDisabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
         self.EnergyExcessUnitsDisabled[unit.EntityId] = unit 
@@ -360,7 +405,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Removes a unit that is enabled / disabled depending on how much energy storage we have
     ---@param self AIBrain
-    -- @param unit The unit to forget about
+    ---@param unit MassFabricationUnit The unit to forget about
     RemoveEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = nil 
         self.EnergyExcessUnitsDisabled[unit.EntityId] = nil 
@@ -449,7 +494,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
     ---@param self AIBrain
-    -- @param entity Entity to be updated according to the 
+    ---@param entity Shield to be updated according to the 
     AddEnergyDependingEntity = function(self, entity)
         self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
         self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
@@ -534,6 +579,7 @@ AIBrain = Class(moho.aibrain_methods) {
     --    TargetAIBrain: AI Brain of the army you want it to trigger off of.
     -- },
     ---@param self AIBrain
+    ---@param triggerSpec unknown
     SetupArmyIntelTrigger = function(self, triggerSpec)
         table.insert(self.IntelTriggerList, triggerSpec)
     end,
@@ -928,6 +974,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param bestPlan string
     SetCurrentPlan = function(self, bestPlan)
         if not bestPlan then
             self.CurrentPlan = self.AIPlansList[self:GetFactionIndex()][1]
@@ -1009,6 +1056,7 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@param planName string
     EvaluatePlan = function(self, planName)
         local plan = import(planName)
         if plan then
@@ -1336,6 +1384,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     BaseMonitorInitializationSorian = function(self, spec)
+        ---@class AiBaseMonitor
         self.BaseMonitor = {
             BaseMonitorStatus = 'ACTIVE',
             BaseMonitorPoints = {},
@@ -1375,6 +1424,7 @@ AIBrain = Class(moho.aibrain_methods) {
             PlatoonDistressThread = false,
             PlatoonAlertSounded = false,
         }
+        ---@class AiSelfMonitor
         self.SelfMonitor = {
             CheckRadius = spec.SelfCheckRadius or 150,
             ArtyCheckRadius = spec.SelfArtyCheckRadius or 300,
@@ -1681,7 +1731,9 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param self AIBrain
     InitializePlatoonBuildManager = function(self)
         if not self.PBM then
+            ---@class AiPlatoonBuildManager
             self.PBM = {
+                BuildCheckInterval = nil,
                 Platoons = {
                     Air = {},
                     Land = {},
@@ -3029,6 +3081,7 @@ AIBrain = Class(moho.aibrain_methods) {
     -- BASE MONITORING SYSTEM
     ---@param self AIBrain
     BaseMonitorInitialization = function(self, spec)
+        ---@class AiBaseMonitor
         self.BaseMonitor = {
             BaseMonitorStatus = 'ACTIVE',
             BaseMonitorPoints = {},

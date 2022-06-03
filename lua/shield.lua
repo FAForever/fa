@@ -125,6 +125,7 @@ for k, bp in __blueprints do
 end
 
 ---@class Shield : moho.shield_methods, Entity
+---@field Brain AIBrain
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
@@ -137,6 +138,8 @@ Shield = Class(moho.shield_methods, Entity) {
         _c_CreateShield(self, spec)
     end,
 
+    ---@param self Shield
+    ---@param spec unknown is this Entity?
     OnCreate = function(self, spec)
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
@@ -293,6 +296,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyDepleted = function(self)
         self.NoEnergyToSustain = true 
 
@@ -302,6 +306,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyViable = function(self)
         self.NoEnergyToSustain = false 
 

@@ -1179,6 +1179,7 @@ MassFabricationUnit = Class(StructureUnit) {
         end
     end,
 
+    ---@param self MassFabricationUnit
     OnStopBeingBuilt = function(self, builder, layer)
         StructureUnit.OnStopBeingBuilt(self, builder, layer)
         self:SetMaintenanceConsumptionActive()

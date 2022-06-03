@@ -38,7 +38,8 @@ local StringSub = string.sub
 local informDevOfLoad = false
 
 --- The global import function used to keep track of modules.
--- @param name The path to the module to load.
+---@param name string The path to the module to load.
+---@return table
 function import(name)
 
     -- attempt to find the module without lowering the string

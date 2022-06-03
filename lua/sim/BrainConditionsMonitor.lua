@@ -8,7 +8,8 @@
 #**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 #****************************************************************************
 
-BrainConditionsMonitor = Class {
+---@class BrainConditionsMonitor
+BrainConditionsMonitor = ClassSimple {
 
     PreCreate = function(self)
         if self.PreCreateFinished then
@@ -212,6 +213,7 @@ BrainConditionsMonitor = Class {
     end,
 }
 
+---@return BrainConditionsMonitor
 function CreateConditionsMonitor(brain)
     local cMonitor = BrainConditionsMonitor()
     cMonitor:Create(brain)

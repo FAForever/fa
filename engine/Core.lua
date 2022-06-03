@@ -86,6 +86,7 @@ end
 
 ---
 --  thread = ForkThread(function, ...)Spawns a new thread running the given function with the given args.
+---@return thread
 function ForkThread(function,  ...)
 end
 
@@ -270,12 +271,20 @@ end
 
 ---
 --  Distance between two 2d points (x1,y1,x2,y2)
-function VDist2()
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+function VDist2(x1, y1, x2, y2)
 end
 
 ---
 --  Square of Distance between two 2d points (x1,y1,x2,y2)
-function VDist2Sq()
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+function VDist2Sq(x1, y1, x2, y2)
 end
 
 ---

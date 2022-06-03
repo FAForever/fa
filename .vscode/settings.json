@@ -27,4 +27,7 @@
     "Lua.runtime.pathStrict": false,
     "Lua.runtime.exportEnvDefault": true,
     "Lua.completion.autoRequire": false,
+    "Lua.diagnostics.globals": [
+        "ScenarioInfo"
+    ],
 }

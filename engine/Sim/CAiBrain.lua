@@ -244,7 +244,7 @@ end
 
 --- Returns the faction of the army represented by this brain.
 -- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim. 5 custom faction like Nomads
--- @return Number.
+---@return number
 function CAiBrain:GetFactionIndex()
 end
 
