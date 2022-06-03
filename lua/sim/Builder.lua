@@ -19,7 +19,8 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 #        BuilderConditions = list of functions that return true/false, list of args,  { < function>, {<args>}}
 # }
 
-Builder = Class {
+---@class Builder
+Builder = ClassSimple {
     Create = function(self, brain, data, locationType)
         # make sure the table of strings exist, they are required for the builder
         local verifyDictionary = { 'Priority', 'BuilderName' }
@@ -240,6 +241,7 @@ end
 #   PlatoonBuildCallbacks = {FunctionsToCallBack when the platoon starts to build}
 #}
 
+---@class FactoryBuilder : Builder
 FactoryBuilder = Class(Builder) {
     Create = function(self,brain,data,locationType)
         Builder.Create(self,brain,data,locationType)
@@ -269,6 +271,7 @@ end
 #   PlatoonAddFunctions = { other functions to run when platoon is formed }
 #}
 
+---@class PlatoonBuilder : Builder
 PlatoonBuilder = Class(Builder) {
     Create = function(self,brain,data,locationType)
         Builder.Create(self,brain,data,locationType)
@@ -359,6 +362,7 @@ end
 #   }
 #}
 
+---@class EngineerBuilder : PlatoonBuilder
 EngineerBuilder = Class(PlatoonBuilder) {
     Create = function(self,brain,data, locationType)
         PlatoonBuilder.Create(self,brain,data, locationType)

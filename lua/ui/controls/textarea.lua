@@ -14,6 +14,7 @@ local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 -- incurred from having to layout a ton of TextFields is absent, we merely have to stave off the
 -- self-harm long enough to finish writing this class so we can call this a solved problem and never
 -- look in this file ever again.
+---@class TextArea : ItemList
 TextArea = Class(ItemList) {
     __init = function(self, parent, width, height)
         ItemList.__init(self, parent)

@@ -25,6 +25,7 @@ local debugInterface = false
 -- from working :sad:
 isOpen = false 
 
+---@class Changelog : Group
 Changelog = Class(Group) {
 
     __init = function(self, parent)

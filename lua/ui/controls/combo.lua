@@ -51,6 +51,7 @@ local defaultBitmaps = {
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------- COMBO
+---@class Combo : Group
 Combo = Class(Group) {
     __init = function(self, parent, pointSize, maxVisibleItems, staticTitle, bitmaps, rolloverCue, clickCue, itemCue, debugName, EnableColor)
         Group.__init(self, parent)
@@ -396,6 +397,7 @@ Combo = Class(Group) {
 -- This combo is used when you have a few bitmaps you want to choose between, no scrollbar.
 -- NOTE: At some point a flexible control combo that uses grid should be made so anything can be in it
 -- bitmap array expects an array of bitmap names or colors
+---@class BitmapCombo : Group
 BitmapCombo = Class(Group) {
     __init = function(self, parent, bitmapArray, defaultIndex, isColor, bitmaps, rolloverCue, clickCue, debugName)
         Group.__init(self, parent)

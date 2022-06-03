@@ -10,6 +10,7 @@
 local Entity = import('/lua/sim/Entity.lua').Entity
 local GetRandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
+---@class Flare : Entity
 Flare = Class(Entity){
         OnCreate = function(self, spec)
             self.Army = self:GetArmy()
@@ -32,6 +33,7 @@ Flare = Class(Entity){
         end,
 }
 
+---@class DepthCharge : Entity
 DepthCharge = Class(Entity){
     OnCreate = function(self, spec)
         self.Army = self:GetArmy()
@@ -53,6 +55,7 @@ DepthCharge = Class(Entity){
     end,
 }
 
+---@class MissileRedirect : Entity
 MissileRedirect = Class(Entity) {
         RedirectBeams = { '/effects/emitters/particle_cannon_beam_02_emit.bp' },
         EndPointEffects = {'/effects/emitters/particle_cannon_end_01_emit.bp' },

@@ -1007,6 +1007,7 @@ Shield = Class(moho.shield_methods, Entity) {
 }
 
 --- A bubble shield attached to a single unit.
+---@class PersonalBubble : Shield
 PersonalBubble = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1078,6 +1079,7 @@ PersonalBubble = Class(Shield) {
 
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
+---@class TransportShield : Shield
 TransportShield = Class(Shield) {
 
     OnCreate = function(self, spec)
@@ -1151,6 +1153,7 @@ TransportShield = Class(Shield) {
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
+---@class PersonalShield : Shield
 PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1244,6 +1247,7 @@ PersonalShield = Class(Shield){
     end,
 }
 
+---@class AntiArtilleryShield : Shield
 AntiArtilleryShield = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1290,6 +1294,7 @@ AntiArtilleryShield = Class(Shield) {
 }
 
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
+---@class CzarShield : PersonalShield
 CzarShield = Class(PersonalShield) {
     OnCreate = function(self, spec)
         PersonalShield.OnCreate(self, spec)

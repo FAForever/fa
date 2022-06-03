@@ -12,6 +12,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
+---@class PlatoonFormManager : BuilderManager
 PlatoonFormManager = Class(BuilderManager) {
     Create = function(self, brain, lType, location, radius)
         BuilderManager.Create(self,brain)

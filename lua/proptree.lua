@@ -244,6 +244,7 @@ Tree = Class(Prop) {
     end,
 }
 
+---@class TreeGroup : Prop
 TreeGroup = Class(Prop) {
 
     --- Break when colliding with a projectile of some sort

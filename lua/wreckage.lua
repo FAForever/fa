@@ -34,6 +34,7 @@ local EntitySetScale = EntityMethods.SetScale
 local EntitySetMesh = EntityMethods.SetMesh
 
 
+---@class Wreckage : Prop
 Wreckage = Class(Prop) {
 
     OnCreate = function(self)

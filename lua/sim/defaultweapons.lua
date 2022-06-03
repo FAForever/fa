@@ -870,6 +870,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     },
 }
 
+---@class KamikazeWeapon : Weapon
 KamikazeWeapon = Class(Weapon) {
     OnFire = function(self)
         local myBlueprint = self.Blueprint
@@ -879,6 +880,7 @@ KamikazeWeapon = Class(Weapon) {
     end,
 }
 
+---@class BareBonesWeapon : Weapon
 BareBonesWeapon = Class(Weapon) {
     Data = {},
 
@@ -891,6 +893,7 @@ BareBonesWeapon = Class(Weapon) {
     end,
 }
 
+---@class OverchargeWeapon : DefaultProjectileWeapon
 OverchargeWeapon = Class(DefaultProjectileWeapon) {
     NeedsUpgrade = false,
     AutoMode = false,
@@ -1064,6 +1067,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     }
 }
 
+---@class DefaultBeamWeapon : DefaultProjectileWeapon
 DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
@@ -1288,6 +1292,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 }
 
 local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
+---@class DeathNukeWeapon : BareBonesWeapon
 DeathNukeWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,
@@ -1320,6 +1325,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
     end,
 }
 
+---@class SCUDeathWeapon : BareBonesWeapon
 SCUDeathWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,
