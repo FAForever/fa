@@ -61,7 +61,12 @@ function CoordinateAttacks()
 end
 
 --- TODO.
-function CreateAimController(weapon, label, turretBone, [barrelBone], [muzzleBone])
+---@param weapon any
+---@param label any
+---@param turretBone any
+---@param barrelBone any?
+---@param muzzleBone any?
+function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
 end
 
 --- Create a manipulator for playing animations.
@@ -93,7 +98,11 @@ function CreateBeamToEntityBone(entity, bone, other, bone, army, thickness, text
 end
 
 --- TODO.
-function CreateBuilderArmController(unit,turretBone, [barrelBone], [aimBone])
+---@param unit any
+---@param turretBone any
+---@param barrelBone any?
+---@param aimBone any?
+function CreateBuilderArmController(unit,turretBone, barrelBone, aimBone)
 end
 
 --- Create a collision detection manipulator
@@ -141,7 +150,13 @@ function CreateEmitterOnEntity(entity, army, emitter_bp_name)
 end
 
 --- TODO.
-function CreateFootPlantController(unit, footBone, kneeBone, hipBone, [straightLegs], [maxFootFall])
+---@param unit any
+---@param footBone any
+---@param kneeBone any
+---@param hipBone any
+---@param straightLegs any?
+---@param maxFootFall any?
+function CreateFootPlantController(unit, footBone, kneeBone, hipBone, straightLegs, maxFootFall)
 end
 
 --- Spawns initial unit for the given army.
@@ -191,15 +206,15 @@ function CreateResourceDeposit(type, x, y, z, size)
 end
 
 --- Create a manipulator which rotates unit's bone.
--- @param unit Unit to create the manipulator for.
--- @param bone String, name of the bone to rotate.
--- @param axis String, 'x', 'Y' or 'z', axis to rotate around.
--- @param [goal] TODO.
--- @param [speed] TODO.
--- @param [accel] TODO.
--- @param [goalspeed] TODO.
+---@param unit Unit to create the manipulator for.
+---@param bone string name of the bone to rotate.
+---@param axis string 'x', 'Y' or 'z', axis to rotate around.
+---@param goal unknown? TODO.
+---@param speed unknown? TODO.
+---@param accel unknown? TODO.
+---@param goalspeed unknown? TODO.
 -- @return manipulator
-function CreateRotator(unit, bone, axis, [goal], [speed], [accel], [goalspeed])
+function CreateRotator(unit, bone, axis, goal, speed, accel, goalspeed)
 end
 
 --- Create a manipulator which copies the motion of src_bone onto dst_bone.
@@ -238,7 +253,17 @@ function CreateTrail(entity, bone, army, trail_blueprint)
 end
 
 --- TODO.
-function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, [layer])
+---@param blueprint any
+---@param army any
+---@param tx any
+---@param ty any
+---@param tz any
+---@param qx any
+---@param qy any
+---@param qz any
+---@param qw any
+---@param layer any?
+function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, layer)
 end
 
 --- TODO.
@@ -258,26 +283,26 @@ function Damage(instigator, target, amount, damageType)
 end
 
 --- Deals damage to the target unit.
--- @param instigator Source of the damage (unit) or nil.
--- @param location Table with position {x, y, z}.
--- @param radius Number, distance from the location to deal the damage.
--- @param amount Number, amount of damage.
--- @param damageType Example: 'Force', 'Normal', 'Nuke', 'Fire', TODO.
--- @param damageFriendly true/false if it should damage allied units.
--- @param [damageSelf] true/false if the unit dealing the damage should take it as well.
-function DamageArea(instigator, location, radius, amount, damageType, damageFriendly, [damageSelf])
+---@param instigator Unit Source of the damage (unit) or nil.
+---@param location {x:number, y:number, z:number} with position {x, y, z}.
+---@param radius number distance from the location to deal the damage.
+---@param amount number amount of damage.
+---@param damageType string 'Force', 'Normal', 'Nuke', 'Fire', TODO.
+---@param damageFriendly boolean if it should damage allied units.
+---@param damageSelf boolean? if the unit dealing the damage should take it as well.
+function DamageArea(instigator, location, radius, amount, damageType, damageFriendly, damageSelf)
 end
 
 --- Deals damage to the target unit.
--- @param instigator Source of the damage (unit) or nil.
--- @param location Table with position {x, y, z}.
--- @param minRadius Number, distance from the location to start dealing damage.
--- @param maxRadius Number, distance from the location to stop dealing damage.
--- @param amount Number, amount of damage.
--- @param damageType Example: 'Force', 'Normal', 'Nuke', 'Fire', TODO.
--- @param damageFriendly true/false if it should damage allied units.
--- @param [damageSelf] true/false if the unit dealing the damage should take it as well.
-function DamageRing(instigator, location, minRadius, maxRadius, amount, damageType, damageFriendly, [damageSelf])
+---@param instigator Unit Source of the damage (unit) or nil.
+---@param location {x:number, y:number, z:number} with position {x, y, z}.
+---@param minRadius number distance from the location to start dealing damage.
+---@param maxRadius number distance from the location to stop dealing damage.
+---@param amount number amount of damage.
+---@param damageType string 'Force', 'Normal', 'Nuke', 'Fire', TODO.
+---@param damageFriendly boolean if it should damage allied units.
+---@param damageSelf boolean if the unit dealing the damage should take it as well.
+function DamageRing(instigator, location, minRadius, maxRadius, amount, damageType, damageFriendly, damageSelf)
 end
 
 --- Get DEBUG info for UI selection.
@@ -426,9 +451,9 @@ end
 
 --- Returns surface elevation at given position.
 -- Takes water into count.
--- @param x Position on x axis.
--- @param z Position on x axis.
-function GetSurfaceHeight(x z)
+---@param x number Position on x axis.
+---@param z number Position on z axis.
+function GetSurfaceHeight(x, z)
 end
 
 --- Returns System time in seconds.
@@ -441,19 +466,19 @@ end
 -- Ignores water surface.
 -- @param x Position on x axis.
 -- @param z Position on x axis.
-function GetTerrainHeight(x z)
+function GetTerrainHeight(x, z)
 end
 
 --- Returns terrain type at given position.
 -- INFO: type = GetTerrainType(x,z).
 -- @param x Position on x axis.
 -- @param z Position on z axis.
-function GetTerrainType(x z)
+function GetTerrainType(x, z)
 end
 
 --- TODO.
 -- INFO: type = GetTerrainTypeOffset(x,z).
-function GetTerrainTypeOffset(x z)
+function GetTerrainTypeOffset(x, z)
 end
 
 --- Returns unit's blueprint given the blueprint's name.
@@ -824,7 +849,13 @@ function ListArmies()
 end
 
 --- TODO.
-function MetaImpact(instigator, location, fMaxRadius, iAmount, affectsCategory, [damageFriendly])
+---@param instigator any
+---@param location any
+---@param fMaxRadius any
+---@param iAmount any
+---@param affectsCategory any
+---@param damageFriendly any?
+function MetaImpact(instigator, location, fMaxRadius, iAmount, affectsCategory, damageFriendly)
 end
 
 --- TODO.
@@ -1030,10 +1061,12 @@ function Warp(entity, location, orientation)
 end
 
 --- TODO.
+---@diagnostic disable-next-line: lowercase-global
 function _c_CreateEntity(spec)
 end
 
 --- TODO.
+---@diagnostic disable-next-line: lowercase-global
 function _c_CreateShield(spec)
 end
 
@@ -1072,13 +1105,15 @@ end
 
 -- Allows set the rights to the army
 -- targetArmyIndex, sourceHumanIndex is 0 based index
--- 'Set or Unset' is boolean
 -- Nothing returns
-function SetCommandSource(targetArmyIndex, sourceHumanIndex, Set or Unset)
+---@param targetArmyIndex any
+---@param sourceHumanIndex any
+---@param enable boolean
+function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end
 
 -- Sets the focus without checking rights
--- armyIndex is 0 based index
+---@param armyIndex number is 0 based index or -1
 -- Nothing returns
-function SetFocusArmy(armyIndex or -1)
+function SetFocusArmy(armyIndex)
 end

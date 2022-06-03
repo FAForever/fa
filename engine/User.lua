@@ -14,7 +14,8 @@ end
 
 ---
 --  handler AddConsoleOutputReciever(func(text))
-function AddConsoleOutputReciever(func(text)
+---@param func fun(text: string): any
+function AddConsoleOutputReciever(func)
 end
 
 ---
@@ -38,8 +39,8 @@ function AnyInputCapture()
 end
 
 ---
---  AudioSetLanguage(name()
-function AudioSetLanguage(name()
+--  AudioSetLanguage(name)
+function AudioSetLanguage(name)
 end
 
 ---
@@ -54,7 +55,8 @@ end
 
 ---
 --  ClearFrame(int head) - destroy all controls in frame, nil head will clear all frames
-function ClearFrame(int head)
+---@param head number int
+function ClearFrame(head)
 end
 
 ---
@@ -64,12 +66,14 @@ end
 
 ---
 --  ConExecute('command string') -- Perform a console command
-function ConExecute('command string')
+---@param command string
+function ConExecute(command)
 end
 
 ---
 --  ConExecuteSave('command string') -- Perform a console command, saved to stack
-function ConExecuteSave('command string')
+---@param command string
+function ConExecuteSave(command)
 end
 
 ---
@@ -79,12 +83,19 @@ end
 
 ---
 --  CopyCurrentReplay(string profile, string newFilename) - copy the current replay to another file
-function CopyCurrentReplay(string profile,  string newFilename)
+---@param profile string
+---@param newFilename string
+function CopyCurrentReplay(profile, newFilename)
 end
 
 ---
 --  CreateUnitAtMouse
-function CreateUnitAtMouse(string blueprintId, int ownerArmyIndex, float offsetMouseWorldPosX, float offsetMouseWorldPosZ, float rotation)
+---@param blueprintId string
+---@param ownerArmyIndex number int
+---@param offsetMouseWorldPosX number float
+---@param offsetMouseWorldPosZ number float
+---@param rotation number float
+function CreateUnitAtMouse(blueprintId, ownerArmyIndex, offsetMouseWorldPosX, offsetMouseWorldPosZ, rotation)
 end
 
 ---
@@ -114,7 +125,8 @@ end
 
 ---
 --  EjectSessionClient(int clientIndex) -- eject another client from your session
-function EjectSessionClient(int clientIndex)
+---@param clientIndex number int
+function EjectSessionClient(clientIndex)
 end
 
 ---
@@ -264,7 +276,8 @@ end
 
 ---
 --  frame GetFrame(int head) - return the root UI frame for a given head
-function GetFrame(int head)
+---@param head number int
+function GetFrame(head)
 end
 
 ---
@@ -349,7 +362,9 @@ end
 
 ---
 --  obj GetPreference(string, [default])
-function GetPreference(string,  [default])
+---@param string string
+---@param default any?
+function GetPreference(string, default)
 end
 
 ---
@@ -389,22 +404,30 @@ end
 
 ---
 --  table GetSpecialFileInfo(string profileName, string basename, string type) - get information on a profile based file, nil if unable to find
-function GetSpecialFileInfo(string profileName,  string basename,  string type)
+---@param profileName string
+---@param basename string
+---@param type string
+function GetSpecialFileInfo(profileName, basename, type)
 end
 
 ---
 --  string GetSpecialFilePath(string profilename, string filename, string type) - Given the base name of a special file, retuns the complete path
-function GetSpecialFilePath(string profilename,  string filename,  string type)
+---@param profilename string
+---@param filename string
+---@param type string
+function GetSpecialFilePath(profilename,  filename,  type)
 end
 
 ---
 --  table GetSpecialFiles(string type)- returns a table of strings which are the names of files in special locations (currently SaveFile, Replay)
-function GetSpecialFiles(string type)
+---@param type string
+function GetSpecialFiles(type)
 end
 
 ---
 --  string GetSpecialFolder(string type)
-function GetSpecialFolder(string type)
+---@param type string
+function GetSpecialFolder(type)
 end
 
 ---
@@ -419,7 +442,9 @@ end
 
 ---
 --  width, height GetTextureDimensions(filename, border = 1)
-function GetTextureDimensions(filename,  border = 1)
+---@param filename string
+---@param border number? default value 1
+function GetTextureDimensions(filename,  border)
 end
 
 ---
@@ -459,7 +484,10 @@ end
 
 ---
 --  GpgNetSend(cmd,args...)
-function GpgNetSend(cmd, args...)
+---comment
+---@param cmd string
+---@vararg any
+function GpgNetSend(cmd, ...)
 end
 
 ---
@@ -539,7 +567,14 @@ end
 
 ---
 --  InternalCreateLobby(class, string protocol, int localPort, int maxConnections, string playerName, string playerUID, Boxed<weak_ptr<INetNATTraversalProvider> > natTraversalProvider)
-function InternalCreateLobby(class,  string protocol,  int localPort,  int maxConnections,  string playerName,  string playerUID,  Boxed<weak_ptr<INetNATTraversalProvider> > natTraversalProvider)
+---@param class any
+---@param protocol string
+---@param localPort number int
+---@param maxConnections number int
+---@param playerName string
+---@param playerUID string
+---@param natTraversalProvider any Boxed<weak_ptr<INetNATTraversalProvider> >
+function InternalCreateLobby(class, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
 ---
@@ -609,12 +644,20 @@ end
 
 ---
 --  IssueBlueprintCommand(command, blueprintid, count, clear = false)
-function IssueBlueprintCommand(command,  blueprintid,  count,  clear = false)
+---comment
+---@param command any
+---@param blueprintid any
+---@param count any
+---@param clear boolean? defaults to false
+function IssueBlueprintCommand(command,  blueprintid,  count,  clear)
 end
 
 ---
 --  IssueCommand(command,[string],[clear])
-function IssueCommand(command, [string], [clear])
+---@param command any
+---@param string any?
+---@param clear boolean?
+function IssueCommand(command, string, clear)
 end
 
 ---
@@ -624,7 +667,12 @@ end
 
 ---
 --  IssueUnitCommand(unitList,command,[string],[clear])
-function IssueUnitCommand(unitList, command, [string], [clear])
+---comment
+---@param unitList any
+---@param command any
+---@param string any?
+---@param clear boolean?
+function IssueUnitCommand(unitList, command, string, clear)
 end
 
 ---
@@ -714,7 +762,9 @@ end
 
 ---
 --  Random([[min,] max])
-function Random([[min, ] max])
+---@param min number?
+---@param max number?
+function Random(min,  max)
 end
 
 ---
@@ -734,12 +784,16 @@ end
 
 ---
 --  RemoveProfileDirectories(string profile) - Removes the profile directory and all special files
-function RemoveProfileDirectories(string profile)
+---@param profile string
+function RemoveProfileDirectories(profile)
 end
 
 ---
 --  RemoveSpecialFile(string profilename, string basename, string type) - remove a profile based file from the disc
-function RemoveSpecialFile(string profilename,  string basename,  string type)
+---@param profilename string
+---@param basename string
+---@param type string
+function RemoveSpecialFile(profilename,  basename,  type)
 end
 
 ---
@@ -844,7 +898,10 @@ end
 
 ---
 --  SessionSendChatMessage([client-or-clients,] message)
-function SessionSendChatMessage([client-or-clients, ] message)
+---comment
+---@param client table|number client or clients
+---@param message any
+function SessionSendChatMessage(client, message)
 end
 
 ---
@@ -879,7 +936,8 @@ end
 
 ---
 --  SetFocusArmy(armyIndex or -1)
-function SetFocusArmy(armyIndex or -1)
+---@param armyIndex number index or -1
+function SetFocusArmy(armyIndex)
 end
 
 ---
@@ -919,7 +977,8 @@ end
 
 ---
 --  SetUIControlsAlpha(float alpha) -- set the alpha multiplier for 2d UI controls
-function SetUIControlsAlpha(float alpha)
+---@param alpha number float
+function SetUIControlsAlpha(alpha)
 end
 
 ---
@@ -956,17 +1015,17 @@ end
 
 ---
 -- SyncPlayableRect
-function INFO: StopSound(handle,[immediate=false])()
+function INFO: StopSound(handle,[immediate=false])
 end
 
 ---
 -- TeamColorMode
-function INFO: SyncPlayableRect(region)()
+function INFO: SyncPlayableRect(region)
 end
 
 ---
 -- ToggleFireState
-function INFO: TeamColorMode(bool)()
+function INFO: TeamColorMode(bool)
 end
 
 ---
