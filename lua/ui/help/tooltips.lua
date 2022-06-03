@@ -891,7 +891,7 @@ Tooltips = {
     },
     Lobby_patchnotes = {
         title = "<LOC tooltipui2000>Patchnotes",
-        description = "<LOC tooltipui2001>Access to all previous patch notes made by the community",
+        description = "<LOC tooltipui2001>Access to all previous patch notes made by and for the community",
     },
     Lobby_Load = {
         title = "<LOC tooltipui0171>Load",
