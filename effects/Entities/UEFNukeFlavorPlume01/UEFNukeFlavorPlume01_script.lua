@@ -1,6 +1,6 @@
-#
-# UEF Nuke Flavor Plume effect
-#
+--
+-- UEF Nuke Flavor Plume effect
+--
 local EmitterProjectile = import('/lua/sim/defaultprojectiles.lua').EmitterProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 

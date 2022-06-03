@@ -15,6 +15,6 @@ ProjectileBlueprint {
         UseGravity = true,
         VelocityAlign = true,
 	    HitAssignedTarget = true,
-	    Lifetime = 0.575, ###Set this on to last for 1.5 seconds total before dying out.
+	    Lifetime = 0.575, ------Set this on to last for 1.5 seconds total before dying out.
     },
 }

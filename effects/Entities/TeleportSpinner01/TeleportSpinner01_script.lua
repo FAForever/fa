@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /effects/entities/TeleportSpinner01/TeleportSpinner01_script.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  Teleport Spinner effect object
-#**
-#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /effects/entities/TeleportSpinner01/TeleportSpinner01_script.lua
+--**  Author(s):  Gordon Duclos
+--**
+--**  Summary  :  Teleport Spinner effect object
+--**
+--**  Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')

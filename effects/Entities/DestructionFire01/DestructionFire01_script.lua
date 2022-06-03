@@ -1,6 +1,6 @@
-#
-# Fire Test Projectile Script
-#
+--
+-- Fire Test Projectile Script
+--
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 
 DestructionFire01 = Class(NullShell) {

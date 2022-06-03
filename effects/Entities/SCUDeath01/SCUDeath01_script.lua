@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
-#**  Author(s):  Gordon Duclos
-#**
-#**  Summary  :  SCU Death Explosion
-#**
-#**  Copyright © 2005,2006 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /effects/Entities/SCUDeath01/SCUDeath01_script.lua
+--**  Author(s):  Gordon Duclos
+--**
+--**  Summary  :  SCU Death Explosion
+--**
+--**  Copyright ï¿½ 2005,2006 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -19,12 +19,12 @@ SCUDeath01 = Class(NullShell) {
         NullShell.OnCreate(self)
         local myBlueprint = self:GetBlueprint()
             
-        # Play the "NukeExplosion" sound
+        -- Play the "NukeExplosion" sound
         if myBlueprint.Audio.NukeExplosion then
             self:PlaySound(myBlueprint.Audio.NukeExplosion)
         end
 		
-		# Create thread that spawns and controls effects
+		-- Create thread that spawns and controls effects
         self:ForkThread(self.EffectThread)
     end,
      
@@ -35,7 +35,7 @@ SCUDeath01 = Class(NullShell) {
             instigator = self
         end
 
-        # Do Damage
+        -- Do Damage
         self:DoDamage( instigator, self.DamageData, nil )  
     end,
     
@@ -48,7 +48,7 @@ SCUDeath01 = Class(NullShell) {
         local position = self:GetPosition()
         self:ForkThread(self.CreateOuterRingWaveSmokeRing)
 
-        # Create full-screen glow flash
+        -- Create full-screen glow flash
         CreateLightParticle(self, -1, army, 10, 4, 'glow_02', 'ramp_red_02')
         WaitSeconds( 0.25 )
         CreateLightParticle(self, -1, army, 10, 20, 'glow_03', 'ramp_fire_06')
@@ -56,13 +56,13 @@ SCUDeath01 = Class(NullShell) {
         
         CreateLightParticle(self, -1, army, 20, 250, 'glow_03', 'ramp_nuke_04')
         
-        # Create ground decals
+        -- Create ground decals
         local orientation = RandomFloat( 0, 2 * math.pi )
         CreateDecal(position, orientation, 'Crater01_albedo', '', 'Albedo', 20, 20, 1200, 0, army)
         CreateDecal(position, orientation, 'Crater01_normals', '', 'Normals', 20, 20, 1200, 0, army)       
         CreateDecal(position, orientation, 'nuke_scorch_003_albedo', '', 'Albedo', 20, 20, 1200, 0, army)    
 
-		# Knockdown force rings
+		-- Knockdown force rings
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
         WaitSeconds(0.1)
         DamageRing(self, position, 0.1, 15, 1, 'Force', true)
@@ -85,7 +85,7 @@ SCUDeath01 = Class(NullShell) {
         
         WaitSeconds( 3 )
 
-        # Slow projectiles down to normal speed
+        -- Slow projectiles down to normal speed
         for k, v in projectiles do
             v:SetAcceleration(-0.45)
         end         

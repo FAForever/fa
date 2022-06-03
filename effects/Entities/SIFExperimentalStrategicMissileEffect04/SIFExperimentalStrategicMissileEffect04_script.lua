@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFExperimentalStrategicMissileEffect04/SIFExperimentalStrategicMissileEffect04_script.lua
-#**  Author(s):  Greg Kohne, Gordon Duclos
-#**
-#**  Summary  :  Seraphim Experimental Nuke effect script, non-damaging
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SIFExperimentalStrategicMissileEffect04/SIFExperimentalStrategicMissileEffect04_script.lua
+--**  Author(s):  Greg Kohne, Gordon Duclos
+--**
+--**  Summary  :  Seraphim Experimental Nuke effect script, non-damaging
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 SIFExperimentalStrategicMissileEffect04 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {

@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  \data\effects\Entities\SBOOhwalliBombEffectController01\SBOOhwalliBombEffectController01_script.lua
-#**  Author(s):  Greg Kohne
-#**
-#**  Summary  :  Ohwalli Bomb effect controller script, non-damaging
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  \data\effects\Entities\SBOOhwalliBombEffectController01\SBOOhwalliBombEffectController01_script.lua
+--**  Author(s):  Greg Kohne
+--**
+--**  Summary  :  Ohwalli Bomb effect controller script, non-damaging
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 local RandomInt = import('/lua/utilities.lua').GetRandomInt
@@ -39,18 +39,18 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     end,
 
     CreateRifts = function(self, army )
-        # Create projectiles in a dispersal pattern, that create x/z direction that 
-        # the effects emitters use a path.
+        -- Create projectiles in a dispersal pattern, that create x/z direction that 
+        -- the effects emitters use a path.
         
         local vx, vy, vz = self:GetVelocity()
         local velocity = 70
         local num_projectiles = 3       
         local horizontal_angle = (2*math.pi) / num_projectiles
         local angleInitial = RandomFloat( 0, horizontal_angle )        
-        local angleVariation = 0.2  #Adjusts horizontal_angle variance spread
+        local angleVariation = 0.2  --Adjusts horizontal_angle variance spread
         local xVec, zVec
         
-        ###Create pre-buildup effects###
+        ------Create pre-buildup effects------
         for k, v in EffectTemplate.SOhwalliBombHit02 do
             emit = CreateEmitterAtEntity(self,army,v)
         end  
@@ -68,31 +68,31 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     MainBlast = function( self, army )
 		WaitSeconds(2.5)
 		
-        ####Create a light for this thing's flash.
+        --------Create a light for this thing's flash.
         CreateLightParticle(self, -1, self:GetArmy(), 80, 14, 'flare_lens_add_03', 'ramp_white_07' )
         
-        # Create our decals
+        -- Create our decals
         CreateDecal( self:GetPosition(), RandomFloat(0.0,6.28), 'Scorch_012_albedo', '', 'Albedo', 80, 80, 1000, 0, self:GetArmy())          
 
-		# Create explosion effects
+		-- Create explosion effects
         for k, v in EffectTemplate.SOhwalliDetonate01 do
             emit = CreateEmitterAtEntity(self,army,v)
         end
         
         self:CreatePlumes()
         
-        ###self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
+        ------self:ShakeCamera( radius, maxShakeEpicenter, minShakeAtRadius, interval )
         self:ShakeCamera( 55, 10, 0, 2.5 )        
 
 		WaitSeconds(0.3)
         
-        # Create upward moving smoke plume
+        -- Create upward moving smoke plume
         local plume = self:CreateProjectile('/effects/entities/SBOOhwalliBombEffect02/SBOOhwalliBombEffect02_proj.bp', 0, 3, 0, 0, 0, 0)
         plume:SetLifetime(1.35)
         plume:SetCollision(false)
         plume:SetVelocityAlign(true)
         
-        # Create explosion dust ring
+        -- Create explosion dust ring
         local vx, vy, vz = self:GetVelocity()
         local num_projectiles = 16        
         local horizontal_angle = (2*math.pi) / num_projectiles
@@ -115,7 +115,7 @@ SBOOhwalliBombEffectController01 = Class(NullShell) {
     end,
     
     CreatePlumes = function(self)
-        # Create fireball plumes to accentuate the explosive detonation
+        -- Create fireball plumes to accentuate the explosive detonation
         local num_projectiles = 7        
         local horizontal_angle = (2*math.pi) / num_projectiles
         local angleInitial = RandomFloat( 0, horizontal_angle )  

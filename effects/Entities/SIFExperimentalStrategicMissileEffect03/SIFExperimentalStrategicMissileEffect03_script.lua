@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /data/projectiles/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_script.lua
-#**  Author(s):  Matt Vainio
-#**
-#**  Summary  :  Inaino Strategic Bomb effect script, non-damaging
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /data/projectiles/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_script.lua
+--**  Author(s):  Matt Vainio
+--**
+--**  Summary  :  Inaino Strategic Bomb effect script, non-damaging
+--**
+--**  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 SIFExperimentalStrategicMissileEffect03 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {
