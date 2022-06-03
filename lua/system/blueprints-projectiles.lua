@@ -1,4 +1,4 @@
-
+---@declare-global
 
 -- Origin of tables of a projectile blueprint
 

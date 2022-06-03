@@ -113,7 +113,7 @@ local function PopulateBlueprintCache(entity, blueprint)
     SharedTypeCache[blueprint.BlueprintId] = cache 
 end
 
----@class Unit : moho_unit_methods
+---@class Unit : moho.unit_methods
 ---@field Brain AIBrain
 Unit = Class(moho.unit_methods) {
 
@@ -4551,6 +4551,7 @@ local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 -- upvalued categories for performance
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
+---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
     Cache = false,

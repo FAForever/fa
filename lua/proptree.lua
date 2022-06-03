@@ -37,6 +37,7 @@ local EffectScaleEmitter = EffectMethods.ScaleEmitter
 local EffectOffsetEmitter = EffectMethods.OffsetEmitter
 local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 
+---@class Tree : Prop
 Tree = Class(Prop) {
 
     --- Initialize the tree

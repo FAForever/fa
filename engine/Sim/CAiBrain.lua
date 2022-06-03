@@ -1,5 +1,6 @@
---- Class CAiBrain
--- @classmod Sim.CAiBrain
+---@declare-global
+---@class moho.aibrain_methods
+local CAiBrain = {}
 
 --- Assigns threat value to given position.
 -- Threat is used for calculation where to attack with unit.
@@ -23,8 +24,7 @@
 --                          AntiSub
 --                          Economy
 --                          Unknown
----@class AIBrain
-local CAiBrain = {}
+
 function CAiBrain:AssignThreatAtPosition(position, threat, [decay], [threatType])
 end
 
@@ -457,8 +457,4 @@ end
 function CAiBrain:TakeResource(type, amount)
 end
 
----
---
-function CAiBrain:moho.aibrain_methods()
-end
-
+return CAiBrain

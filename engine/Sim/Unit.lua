@@ -1,41 +1,40 @@
----@class moho_unit_methods
+---@declare-global
+---@class moho.unit_methods
 local Unit = {}
--- @classmod Sim.Unit
 
 --- Add a command cap to a unit.
--- Also adds a button to the UI, or enables it, for the unit to use the new command.
--- @param capName String Available:
--- RULEUCC_Move
--- RULEUCC_Stop
--- RULEUCC_Attack
--- RULEUCC_Guard
--- RULEUCC_Patrol
--- RULEUCC_RetaliateToggle
--- RULEUCC_Repair
--- RULEUCC_Capture
--- RULEUCC_Transport
--- RULEUCC_CallTransport
--- RULEUCC_Nuke
--- RULEUCC_Tactical
--- RULEUCC_Teleport
--- RULEUCC_Ferry
--- RULEUCC_SiloBuildTactical
--- RULEUCC_SiloBuildNuke
--- RULEUCC_Sacrifice
--- RULEUCC_Pause
--- RULEUCC_Overcharge
--- RULEUCC_Dive
--- RULEUCC_Reclaim
--- RULEUCC_SpecialAction
--- RULEUCC_Dock
--- RULEUCC_Script
--- RULEUCC_Invalid
+--- Also adds a button to the UI, or enables it, for the unit to use the new command.
+---@param capName "RULEUCC_Move"
+--- |"RULEUCC_Stop"
+--- |"RULEUCC_Attack"
+--- |"RULEUCC_Guard"
+--- |"RULEUCC_Patrol"
+--- |"RULEUCC_RetaliateToggle"
+--- |"RULEUCC_Repair"
+--- |"RULEUCC_Capture"
+--- |"RULEUCC_Transport"
+--- |"RULEUCC_CallTransport"
+--- |"RULEUCC_Nuke"
+--- |"RULEUCC_Tactical"
+--- |"RULEUCC_Teleport"
+--- |"RULEUCC_Ferry"
+--- |"RULEUCC_SiloBuildTactical"
+--- |"RULEUCC_SiloBuildNuke"
+--- |"RULEUCC_Sacrifice"
+--- |"RULEUCC_Pause"
+--- |"RULEUCC_Overcharge"
+--- |"RULEUCC_Dive"
+--- |"RULEUCC_Reclaim"
+--- |"RULEUCC_SpecialAction"
+--- |"RULEUCC_Dock"
+--- |"RULEUCC_Script"
+--- |"RULEUCC_Invalid"
 function Unit:AddCommandCap(capName)
 end
 
 --- Add a toggle cap to a unit.
--- Also adds a button to the UI, or enables it, for the unit to use the new command.
--- @param capName String Available:
+--- Also adds a button to the UI, or enables it, for the unit to use the new command.
+---@param capName String Available:
 -- RULEUTC_ShieldToggle
 -- RULEUTC_WeaponToggle
 -- RULEUTC_JammingToggle
@@ -718,8 +717,4 @@ end
 function Unit:base()
 end
 
----
---
-moho.unit_methods = Unit
-
-
+return Unit

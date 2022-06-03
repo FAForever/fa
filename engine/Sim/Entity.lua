@@ -1,6 +1,6 @@
----@class Entity
--- @classmod Sim.Entity
-
+---@declare-global
+---@class moho.entity_methods
+local Entity = {}
 ---
 --  Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
 function Entity:AddManualScroller(scrollSpeed1,  scrollSpeed2)
@@ -316,3 +316,4 @@ end
 function Entity:ShakeCamera(radius,  max,  min,  duration)
 end
 
+return Entity

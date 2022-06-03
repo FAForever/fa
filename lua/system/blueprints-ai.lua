@@ -1,4 +1,4 @@
-
+---@declare-global
 --------------------------------------------------------------------------------
 -- Supreme Commander mod threat calculator
 -- Copyright 2018-2022 Sean 'Balthazar' Wheeldon                       Lua 5.4.2

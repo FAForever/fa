@@ -1,5 +1,6 @@
---- Class CMauiBitmap
--- @classmod User.CMauiBitmap
+---@declare-global
+---@class moho.bitmap_methods
+local CMauiBitmap = {}
 
 ---
 --  GetNumFrames()
@@ -53,7 +54,7 @@ end
 
 ---
 --  Bitmap:SetNewTexture(filename(s), border=1)
-function CMauiBitmap:SetNewTexture(filename(s)
+function CMauiBitmap:SetNewTexture(filenames)
 end
 
 ---
@@ -66,9 +67,12 @@ end
 function CMauiBitmap:SetTiled(bool)
 end
 
----
---  Bitmap:SetUV(float u0, float v0, float u1, float v1)
-function CMauiBitmap:SetUV(float u0,  float v0,  float u1,  float v1)
+---todo
+---@param u0 number float
+---@param v0  number float
+---@param u1  number float
+---@param v1  number float
+function CMauiBitmap:SetUV(u0, v0, u1, v1)
 end
 
 ---
@@ -91,8 +95,4 @@ end
 function CMauiBitmap:base()
 end
 
----
---
-function CMauiBitmap:moho.bitmap_methods()
-end
-
+return CMauiBitmap

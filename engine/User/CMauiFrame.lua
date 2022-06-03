@@ -1,5 +1,6 @@
---- Class CMauiFrame
--- @classmod User.CMauiFrame
+---@declare-global
+---@class moho.frame_methods
+local CMauiFrame = {}
 
 ---
 --  float GetTopmostDepth()
@@ -16,8 +17,4 @@ end
 function CMauiFrame:base()
 end
 
----
---
-function CMauiFrame:moho.frame_methods()
-end
-
+return CMauiFrame

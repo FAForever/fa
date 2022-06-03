@@ -27,7 +27,8 @@
 local TableGetn = table.getn 
 local TableEmpty = table.empty
 
-TrashBag = Class {
+---@class TrashBag
+TrashBag = ClassSimple {
 
     -- Tell the garbage collector that we're a weak table for our values. If an element is ready to be collected
     -- then we're not a reason for it to remain alive. E.g., we don't care if it got cleaned up earlier.

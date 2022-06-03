@@ -124,6 +124,7 @@ for k, bp in __blueprints do
     end
 end
 
+---@class Shield : moho.shield_methods, Entity
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...

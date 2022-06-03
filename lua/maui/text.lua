@@ -11,6 +11,7 @@
 local Control = import('control.lua').Control
 local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
+---@class Text : moho.text_methods, Control
 Text = Class(moho.text_methods, Control) {
 
     __init = function(self, parent, debugname)

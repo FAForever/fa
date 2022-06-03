@@ -1047,10 +1047,6 @@ end
 function base()
 end
 
----
---
-function moho.CollisionBeamEntity()
-end
 
 --- Sinks the entity into the ground.
 -- Used for dead trees for example.
@@ -1058,10 +1054,6 @@ end
 function SinkAway(vy)
 end
 
----
---
-function moho.entity_methods()
-end
 
 ------
 -- New functions from engine patch:

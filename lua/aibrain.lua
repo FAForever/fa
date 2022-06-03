@@ -44,7 +44,7 @@ local Points = {
 
 local CoroutineYield = coroutine.yield
 
----@class AIBrain
+---@class AIBrain: moho.aibrain_methods
 AIBrain = Class(moho.aibrain_methods) {
 
     -- for the engi mod

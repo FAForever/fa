@@ -201,6 +201,14 @@ function Class(...)
     end
 end
 
+---create a simple class which does not inherit from anything
+---@generic T
+---@param specs T
+---@return T
+function ClassSimple(specs)
+    return Class(specs)
+end
+
 --- Computes the hierarchy chain of a function: determine the path from the current function back to 
 -- the base instance. Note that this assumes that the base is always called, which is not always the case.
 local ChainStack = { }

@@ -1,3 +1,4 @@
+---@declare-global
 ---Module: Core
 -- @module Core
 
@@ -6,9 +7,11 @@
 function AITarget()
 end
 
----
---  base = Basename(fullPath,stripExtension?) -- return the last component of a path
-function Basename(fullPath, stripExtension?)
+
+--- return the last component of a path
+---@param fullPath string
+---@param stripExtension boolean?
+function Basename(fullPath, stripExtension)
 end
 
 ---
@@ -115,7 +118,7 @@ end
 -- @param TextOne Log message
 -- @param TextTwo Optional text
 -- Output: "INFO: TextOne\000TextTwo"
-function LOG('TextOne','TextTwo')
+function LOG(TextOne, TextTwo)
 end
 
 ---

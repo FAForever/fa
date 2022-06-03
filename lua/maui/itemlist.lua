@@ -19,6 +19,7 @@ local Control = import('control.lua').Control
 local Dragger = import('dragger.lua').Dragger
 local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
+---@class ItemList : moho.item_list_methods, Control
 ItemList = Class(moho.item_list_methods, Control) {
 
     __init = function(self, parent, debugname)

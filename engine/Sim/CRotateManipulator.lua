@@ -1,5 +1,6 @@
---- Class CRotateManipulator
--- @classmod Sim.CRotateManipulator
+---@declare-global
+---@class moho.RotateManipulator
+local CRotateManipulator = {}
 
 ---
 --  RotateManipulator:ClearGoal()
@@ -51,8 +52,5 @@ end
 function CRotateManipulator:base()
 end
 
----
---
-function CRotateManipulator:moho.RotateManipulator()
-end
+return CRotateManipulator
 

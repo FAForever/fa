@@ -1,5 +1,6 @@
---- Class CMauiEdit
--- @classmod User.CMauiEdit
+---@declare-global
+---@class moho.edit_methods
+local CMauiEdit = {}
 
 ---
 --  AcquireFocus()
@@ -156,8 +157,4 @@ end
 function CMauiEdit:base()
 end
 
----
---
-function CMauiEdit:moho.edit_methods()
-end
-
+return CMauiEdit

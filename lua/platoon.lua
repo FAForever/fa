@@ -23,6 +23,7 @@ local SPAI = import('/lua/ScenarioPlatoonAI.lua')
 --for sorian AI
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
+---@class Platoon : moho.platoon_methods
 Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
