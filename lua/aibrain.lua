@@ -46,18 +46,10 @@ local CoroutineYield = coroutine.yield
 
 AIBrain = Class(moho.aibrain_methods) {
 
-    -- for the engi mod
-
-
    -- HUMAN BRAIN FUNCTIONS HANDLED HERE
     OnCreateHuman = function(self, planName)
         self:CreateBrainShared(planName)
         self.BrainType = 'Human'
-
-        -- for mass fabs tracking
-        self.TotalEnergyConsumed = 0
-        self.TotalEnergyRequired = 0
-        self.TotalMassProduced = 0
 
         -- human-only behavior
         self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
@@ -233,6 +225,10 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyDependingUnitsHead = 1
 
         --- Units that we toggle on / off depending on whether we have excess energy
+        self.EnergyExcessConsumed = 0
+        self.EnergyExcessRequired = 0
+        self.EnergyExcessConverted = 0
+
         self.EnergyExcessUnitsEnabled = { }
         setmetatable(self.EnergyExcessUnitsEnabled, { __mode = 'v' })
         self.EnergyExcessUnitsDisabled = { }
@@ -342,8 +338,8 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
 
         local ecobp = unit.Blueprint.Economy
-        self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
-        self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
+        self.EnergyExcessConsumed = self.EnergyExcessConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
+        self.EnergyExcessConverted = self.EnergyExcessConverted + ecobp.ProductionPerSecondMass
     end,
 
     --- Adds a unit that is enabled / disabled depending on how much energy storage we have. The unit starts disabled
@@ -352,7 +348,7 @@ AIBrain = Class(moho.aibrain_methods) {
     AddDisabledEnergyExcessUnit = function (self, unit)
         self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
         self.EnergyExcessUnitsDisabled[unit.EntityId] = unit
-        self.TotalEnergyRequired = self.TotalEnergyRequired + unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
+        self.EnergyExcessRequired = self.EnergyExcessRequired + unit.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
     end,
 
     --- Removes a unit that is enabled / disabled depending on how much energy storage we have
@@ -361,11 +357,11 @@ AIBrain = Class(moho.aibrain_methods) {
     RemoveEnergyExcessUnit = function (self, unit)
         local ecobp = unit.Blueprint.Economy
         if  self.EnergyExcessUnitsEnabled[unit.EntityId] then
-            self.TotalEnergyConsumed = self.TotalEnergyConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
-            self.TotalMassProduced = self.TotalMassProduced - ecobp.ProductionPerSecondMass
+            self.EnergyExcessConsumed = self.EnergyExcessConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
+            self.EnergyExcessConverted = self.EnergyExcessConverted - ecobp.ProductionPerSecondMass
             self.EnergyExcessUnitsEnabled[unit.EntityId] = nil
         elseif self.EnergyExcessUnitsDisabled[unit.EntityId] then
-            self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
+            self.EnergyExcessRequired = self.EnergyExcessRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
             self.EnergyExcessUnitsDisabled[unit.EntityId] = nil
         end
     end,
@@ -374,15 +370,13 @@ AIBrain = Class(moho.aibrain_methods) {
     -- @param self The brain itself
     ToggleEnergyExcessUnitsThread = function (self)
 
-        -- allow for protected calls without closures
-
-        local function ProtectedOnExcessEnergy(unitToProcess)
-            unitToProcess:OnExcessEnergy()
-        end
-
-        local function ProtectedOnNoExcessEnergy(unitToProcess)
-            unitToProcess:OnNoExcessEnergy()
-        end
+        local fabricatorParameters = import('/lua/shared/FabricatorBehaviorParams.lua')
+        local disableRatio = fabricatorParameters.DisableRatio
+        local disableStorage = fabricatorParameters.DisableStorage
+        
+        local enableRatio = fabricatorParameters.EnableRatio
+        local enableTrend = fabricatorParameters.EnableTrend
+        local enableStorage = fabricatorParameters.EnableStorage
 
         -- localize scope for better performance
         local pcall = pcall
@@ -406,26 +400,27 @@ AIBrain = Class(moho.aibrain_methods) {
         while true do 
 
             local energyStoredRatio = self:GetEconomyStoredRatio('ENERGY')
+            local energyStored = self:GetEconomyStored('ENERGY')
             local energyTrend = 10 * self:GetEconomyTrend('ENERGY')
 
             -- low on storage, start disabling them to fill our storages asap
-            if energyStoredRatio < 0.9 then 
+            if energyStoredRatio < disableRatio and energyStored < disableStorage then 
 
                 -- while we have units to disable
                 for id, unit in EnergyExcessUnitsEnabled do 
                     if not unit:BeenDestroyed() then 
 
                         local ecobp = unit.Blueprint.Economy
-                        self.TotalEnergyConsumed = self.TotalEnergyConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.TotalEnergyRequired = self.TotalEnergyRequired + ecobp.MaintenanceConsumptionPerSecondEnergy
-                        self.TotalMassProduced = self.TotalMassProduced - ecobp.ProductionPerSecondMass
+                        self.EnergyExcessConsumed = self.EnergyExcessConsumed - ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.EnergyExcessRequired = self.EnergyExcessRequired + ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.EnergyExcessConverted = self.EnergyExcessConverted - ecobp.ProductionPerSecondMass
                         
                         -- update internal state
                         EnergyExcessUnitsDisabled[id] = unit
                         EnergyExcessUnitsEnabled[id] = nil
 
                         -- try to disable unit
-                        ok, msg = pcall(ProtectedOnNoExcessEnergy, unit)
+                        ok, msg = pcall(unit.OnNoExcessEnergy, unit)
 
                         -- allow for debugging
                         if not ok then 
@@ -437,32 +432,29 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
             
             -- high on storage and sufficient energy income, enable units
-            elseif energyStoredRatio >= 1.0 and energyTrend > 100 then 
+            elseif (energyStoredRatio >= enableRatio and energyTrend > enableTrend) or energyStored > enableStorage then 
 
                 -- while we have units to retrieve
                 for id, unit in EnergyExcessUnitsDisabled do
                     if not unit:BeenDestroyed() then 
-                        if  energyTrend > 100 then 
+                        local ecobp = unit.Blueprint.Economy
+                        self.EnergyExcessConsumed = self.EnergyExcessConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.EnergyExcessRequired = self.EnergyExcessRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
+                        self.EnergyExcessConverted = self.EnergyExcessConverted + ecobp.ProductionPerSecondMass
+                        
+                        -- update internal state
+                        EnergyExcessUnitsDisabled[id] = nil
+                        EnergyExcessUnitsEnabled[id] = unit
 
-                            local ecobp = unit.Blueprint.Economy
-                            self.TotalEnergyConsumed = self.TotalEnergyConsumed + ecobp.MaintenanceConsumptionPerSecondEnergy
-                            self.TotalEnergyRequired = self.TotalEnergyRequired - ecobp.MaintenanceConsumptionPerSecondEnergy
-                            self.TotalMassProduced = self.TotalMassProduced + ecobp.ProductionPerSecondMass
-                            
-                            -- update internal state
-                            EnergyExcessUnitsDisabled[id] = nil
-                            EnergyExcessUnitsEnabled[id] = unit
+                        -- try to enable unit
+                        ok, msg = pcall(unit.OnExcessEnergy, unit)
 
-                            -- try to enable unit
-                            ok, msg = pcall(ProtectedOnExcessEnergy, unit)
-
-                            -- allow for debugging
-                            if not ok then 
-                                WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
-                            end
-
-                            break
+                        -- allow for debugging
+                        if not ok then 
+                            WARN("ToggleEnergyExcessUnitsThread: " .. repr(msg))
                         end
+
+                        break
                     end
                 end
             end
@@ -470,9 +462,9 @@ AIBrain = Class(moho.aibrain_methods) {
             if self.Army == GetFocusArmy() then
                 syncTable.on = TableSize(EnergyExcessUnitsEnabled)
                 syncTable.off = TableSize(EnergyExcessUnitsDisabled)
-                syncTable.totalEnergyConsumed = self.TotalEnergyConsumed
-                syncTable.totalEnergyRequired = self.TotalEnergyRequired
-                syncTable.totalMassProduced = self.TotalMassProduced
+                syncTable.totalEnergyConsumed = self.EnergyExcessConsumed
+                syncTable.totalEnergyRequired = self.EnergyExcessRequired
+                syncTable.totalMassProduced = self.EnergyExcessConverted
                 
                 Sync.MassFabs = syncTable
             end
