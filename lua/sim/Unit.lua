@@ -159,13 +159,6 @@ Unit = Class(moho.unit_methods) {
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
 
-
-        for k, v in __blueprints do 
-            if k == '/effects/entities/aeonadjacencynode/aeonadjacencynode_mesh'then 
-                reprsl(v)
-            end
-        end
-
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
