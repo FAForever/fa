@@ -3202,8 +3202,8 @@ function CreateUI(maxPlayers)
     end
 
     -- Patchnotes Button
-    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_1000>Patchnotes")
-    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'lob_patchnotes')
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Patchnotes")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'Lobby_patchnotes')
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
