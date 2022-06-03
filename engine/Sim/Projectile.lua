@@ -1,5 +1,5 @@
 ---@declare-global
----@class moho.projectile_methods
+---@class moho.projectile_methods : moho.entity_methods
 local Projectile = {}
 
 ---

@@ -1,6 +1,8 @@
 ---@declare-global
----@class moho.unit_methods
+---@class moho.unit_methods : moho.entity_methods
 local Unit = {}
+
+---@alias UnitId number
 
 --- Add a command cap to a unit.
 --- Also adds a button to the UI, or enables it, for the unit to use the new command.
@@ -247,7 +249,7 @@ function Unit:GetTransportFerryBeacon()
 end
 
 --- Returns the unit's blueprint ID.
--- @return bpID
+---@return UnitId bpID
 function Unit:GetUnitId(self)
 end
 
