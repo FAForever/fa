@@ -6,7 +6,7 @@
 --**
 --**  Summary  :  BrackmanQAIHackCircuitryEffect03, non-damaging
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EmitterProjectile = import('/lua/sim/defaultprojectiles.lua').EmitterProjectile

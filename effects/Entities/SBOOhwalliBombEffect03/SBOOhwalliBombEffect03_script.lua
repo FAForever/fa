@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Ohwalli Strategic Bomb effect script, non-damaging
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 SBOOhwalliBombEffect03 = Class(import('/lua/sim/defaultprojectiles.lua').EmitterProjectile) {

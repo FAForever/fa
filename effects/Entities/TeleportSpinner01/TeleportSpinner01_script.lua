@@ -5,7 +5,7 @@
 --**
 --**  Summary  :  Teleport Spinner effect object
 --**
---**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local NullShell = import('/lua/sim/defaultprojectiles.lua').NullShell
