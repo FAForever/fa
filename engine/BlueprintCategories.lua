@@ -68,7 +68,6 @@ categories = {
     CYBRAN = categoryValue,
     DEBUG = categoryValue,
     DEFENSE = categoryValue,
-    DEFENSE = categoryValue,
     DEFENSIVEBOAT = categoryValue,
     DESTROYER = categoryValue,
     DIESTOOCDEPLETINGSHIELD = categoryValue,
