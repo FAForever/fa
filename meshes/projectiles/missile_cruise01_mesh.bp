@@ -1,0 +1,9 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'TMeshNoLighting',
+            LODCutoff = -1,
+        },
+    },
+    --UniformScale = 0.4,
+}

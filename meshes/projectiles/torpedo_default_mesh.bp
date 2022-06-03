@@ -1,0 +1,11 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'TMeshNoLighting',
+            LODCutoff = 175,
+            MeshName = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_lod0.scm',
+            AlbedoName = '/projectiles/TANAnglerTorpedo01/TANAnglerTorpedo01_albedo.dds',
+        },
+    },
+    UniformScale = 1,
+}
