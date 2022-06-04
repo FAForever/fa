@@ -353,19 +353,23 @@ AIBrain = Class(moho.aibrain_methods) {
 
         while true do 
 
-            for jammer in self.jammers do
+            for i, jammer in self.jammers do
                 if not jammer:BeenDestroyed() then
 
                     LOG("ToggleJammer")
                     -- run logic here
 
-                   --jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
-                   --jammer:DisableUnitIntel('ToggleBit3', 'Jammer')
+                   jammer:DisableUnitIntel('ToggleBit3', 'Jammer')
+                   WaitSeconds(0.2)
+                   jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
                    
+                   
+                else
+                    RemoveJammer(jammer)
                 end
 
             end
-
+            WaitSeconds(10)
             CoroutineYield(1)
         end
     end,
