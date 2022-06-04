@@ -149,11 +149,6 @@ function CreateUI()
     -- BACKGROUND
     local parent = UIUtil.CreateScreenGroup(GetFrame(0), "Main Menu ScreenGroup")
 
-    local backMovie = false
-    if Prefs.GetOption("mainmenu_bgmovie") then
-        backMovie = CreateBackMovie(parent)
-    end
-
     local darker = Bitmap(parent)
     LayoutHelpers.FillParent(darker, parent)
     darker:SetSolidColor('200000')
@@ -213,12 +208,22 @@ function CreateUI()
         self.Left:Set(newLeft)
     end
 
-    -- music
+    -- ambient
     local ambientSoundHandle = false
-    if not HasCommandLineArg("/nomovie") then
-        ambientSoundHandle = PlaySound(Sound({Cue = "AMB_Menu_Loop", Bank = "AmbientTest",}))
+    function StartAmbient()
+        if not ambientSoundHandle and not HasCommandLineArg("/nomovie") then
+            ambientSoundHandle = PlaySound(Sound({Cue = "AMB_Menu_Loop", Bank = "AmbientTest",}))
+        end
     end
 
+    function StopAmbient()
+        if ambientSoundHandle then
+            StopSound(ambientSoundHandle)
+            ambientSoundHandle = false
+        end
+    end
+
+    -- music
     local musicHandle = false
     function StartMusic()
         if not musicHandle and not HasCommandLineArg("/nomusic") then
@@ -234,13 +239,15 @@ function CreateUI()
     end
 
     parent.OnDestroy = function()
-        if ambientSoundHandle then
-            StopSound(ambientSoundHandle)
-            ambientSoundHandle = false
-        end
+        StopAmbient()
         StopMusic()
     end
 
+    local backMovie = false
+    if Prefs.GetOption("mainmenu_bgmovie") then
+        backMovie = CreateBackMovie(parent)
+        StartAmbient()
+    end
     StartMusic()
 
     -- TOP-LEVEL GROUP TO PARENT ALL DYNAMIC CONTENT
@@ -762,11 +769,14 @@ function CreateUI()
         if Prefs.GetOption("mainmenu_bgmovie") and not backMovie then
             backMovie = CreateBackMovie(parent)
             darker.Depth:Set(function() return backMovie.Depth() + 10 end)
+            StartAmbient()
         elseif Prefs.GetOption("mainmenu_bgmovie") == false and backMovie then
             backMovie:Destroy()
             backMovie = false
+            StopAmbient()
         elseif backMovie then
             backMovie:Play()
+            StartAmbient()
         end
         MenuAnimation(true)
     end
