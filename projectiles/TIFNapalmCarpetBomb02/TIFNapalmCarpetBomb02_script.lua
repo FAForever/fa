@@ -10,7 +10,7 @@
 
 local TNapalmHvyCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile
 
--- Used by dea0202
+--- Used by dea0202
 ---@class TIFNapalmCarpetBomb02 : TNapalmHvyCarpetBombProjectile
 TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) { }
 
