@@ -6,7 +6,7 @@
 --  Summary  :  Zthuthaam Artillery Shell Projectile script
 --              Seraphim T2 Artillery XSB2303
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 local SZthuthaamArtilleryShell = import('/lua/seraphimprojectiles.lua').SZthuthaamArtilleryShell

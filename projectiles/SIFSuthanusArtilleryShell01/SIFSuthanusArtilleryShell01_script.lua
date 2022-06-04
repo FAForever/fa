@@ -6,7 +6,7 @@
 --  Summary  :  Suthanus Artillery Shell Projectile script
 --              Seraphim T3 Mobile Artillery : XSL0304
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 local SSuthanusMobileArtilleryShell = import('/lua/seraphimprojectiles.lua').SSuthanusMobileArtilleryShell
 

@@ -169,7 +169,7 @@ UnitBlueprint {
         },
         TransportDropAnimation = {
             {
-                Animation = '[...]XSL0202_aunfold.sca', # /units/XSL0202/XSL0202_aunfold.sca   [146]
+                Animation = '[...]XSL0202_aunfold.sca', -- /units/XSL0202/XSL0202_aunfold.sca   [146]
                 Weight = 100,
             },
         },
@@ -250,7 +250,7 @@ UnitBlueprint {
     SizeX = 1,
     SizeY = 1.1,
     SizeZ = 0.9,
-    StrategicIconName = 'icon_bot2_directfire', # used wrong icon [138]
+    StrategicIconName = 'icon_bot2_directfire', -- used wrong icon [138]
     StrategicIconSortPriority = 125,
     Transport = {
         TransportClass = 2,

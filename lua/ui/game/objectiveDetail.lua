@@ -479,7 +479,7 @@ function ToggleDisplay()
 end
 
 function GetTargetImages(data)
-    # look for an image to display
+    -- look for an image to display
     local overrideImage = UIUtil.UIFile(data.actionImage)
 
     if (overrideImage) then
@@ -490,10 +490,10 @@ function GetTargetImages(data)
         for k,v in data.targets do
             if v.BlueprintId then
                 blueprint = __blueprints[v.BlueprintId]
-                #return GameCommon.GetCachedUnitIconFileNames(blueprint)
+                --return GameCommon.GetCachedUnitIconFileNames(blueprint)
             elseif v.Type == 'Area' then
                 iconName = UIUtil.UIFile('/game/target-area/target-area_bmp.dds')
-                #return iconName, iconName, iconName, iconName
+                --return iconName, iconName, iconName, iconName
             end
         end
         if blueprint then

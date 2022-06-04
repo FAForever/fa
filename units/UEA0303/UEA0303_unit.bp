@@ -107,7 +107,7 @@ UnitBlueprint {
     CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'ASF', # Light
+        ArmorType = 'ASF', -- Light
         EconomyThreatLevel = 0,
         Health = 1800,
         MaxHealth = 1800,

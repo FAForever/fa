@@ -254,7 +254,7 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             CollideFriendly = false,
-            Damage = 45, # 40
+            Damage = 45, -- 40
             DamageRadius = 1,
             DamageType = 'Normal',
             DisplayName = 'Proton Cannon',
@@ -286,7 +286,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
-            RateOfFire = 1.36, # 1.53
+            RateOfFire = 1.36, -- 1.53
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
             TargetCheckInterval = 0.3,

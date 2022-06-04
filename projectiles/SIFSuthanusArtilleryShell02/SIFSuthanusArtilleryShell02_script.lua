@@ -6,7 +6,7 @@
 --  Summary  :  Suthanus Artillery Shell Projectile script
 --              Seraphim T3 Static Artillery : XSB2302
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 local SSuthanusArtilleryShell = import('/lua/seraphimprojectiles.lua').SSuthanusArtilleryShell

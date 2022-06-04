@@ -103,7 +103,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/xrl0305/xrl0305_awalk.sca',
-        AnimationWalkRate = 2,     #8
+        AnimationWalkRate = 2,     --8
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -421,9 +421,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false
-            Water = true, #from false
+            Seabed = true, --from false
+            Sub = true, --from false
+            Water = true, --from false
         },
     },
 }

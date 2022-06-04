@@ -158,6 +158,7 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
+
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -2603,7 +2604,7 @@ Unit = Class(moho.unit_methods) {
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
 
-        -- kept after #3355 for backwards compatibility with mods
+        -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
             for _, b in self.buildBots do
                 ChangeState(b, b.IdleState)

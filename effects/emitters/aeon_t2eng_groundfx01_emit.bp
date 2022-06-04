@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = false,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/quantum_generator_add_03.dds]],
-	RampTexture = [[/textures/particles/ramp_white_03.dds]],
+	Texture = '/textures/particles/quantum_generator_add_03.dds',
+	RampTexture = '/textures/particles/ramp_white_03.dds',
 	XDirectionCurve = {
 		XRange = 0.20,
 		Keys = {

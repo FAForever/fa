@@ -148,7 +148,7 @@ UnitBlueprint {
         },
         TransportDropAnimation = {
             {
-                Animation = '[...]XSL0304_aunfold.sca', # /units/XSL0304/XSL0304_aunfold.sca   [146]
+                Animation = '[...]XSL0304_aunfold.sca', -- /units/XSL0304/XSL0304_aunfold.sca   [146]
                 Weight = 100,
             },
         },

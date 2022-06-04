@@ -2,7 +2,7 @@
 -- File: lua/modules/ui/game/orders.lua
 -- Author: Chris Blackwell
 -- Summary: Unit orders UI
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 local UIUtil = import('/lua/ui/uiutil.lua')
