@@ -1,0 +1,8 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'TMeshNoNormals',
+        },
+        UniformScale = 1,
+    },
+}

@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/quantum_ring_03.dds]],
-	RampTexture = [[/textures/particles/ramp_white_22.dds]],
+	Texture = '/textures/particles/quantum_ring_03.dds',
+	RampTexture = '/textures/particles/ramp_white_22.dds',
 	XDirectionCurve = {
 		XRange = 5.00,
 		Keys = {

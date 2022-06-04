@@ -123,7 +123,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/uel0303/uel0303_awalk.sca',
-        AnimationWalkRate = 3.4,    #5
+        AnimationWalkRate = 3.4,    --5
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {

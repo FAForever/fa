@@ -191,7 +191,7 @@ UnitBlueprint {
     SelectionThickness = 0.83,
     SizeX = 0.55,
     SizeY = 0.45,
-    SizeZ = 1, #from 0.65
+    SizeZ = 1, --from 0.65
     StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
     Veteran = {
@@ -223,7 +223,7 @@ UnitBlueprint {
                     Duration = 3,
                     Radius = 2,
                     TargetAllow = 'TECH1',
-            TargetDisallow = 'TECH2,WALL',  # added for bug fix [162]
+            TargetDisallow = 'TECH2,WALL',  -- added for bug fix [162]
                 },
                 {
                     Add = {
@@ -234,7 +234,7 @@ UnitBlueprint {
                     Duration = 2,
                     Radius = 2,
                     TargetAllow = 'TECH2',
-                    TargetDisallow = 'WALL',  # added for bug fix [162]
+                    TargetDisallow = 'WALL',  -- added for bug fix [162]
                 },
             },
             CollideFriendly = false,
@@ -273,7 +273,7 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
-            RateOfFire = 0.166, # 0.2
+            RateOfFire = 0.166, -- 0.2
             TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE EXPERIMENTAL',

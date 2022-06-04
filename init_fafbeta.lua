@@ -76,11 +76,11 @@ allowedAssetsScd["schook.scd"] = true
 allowedAssetsScd["props.scd"] = true
 allowedAssetsScd["projectiles.scd"] = true
 allowedAssetsScd["objects.scd"] = true
-allowedAssetsScd["moholua.scd"] = true
-allowedAssetsScd["mohodata.scd"] = true
+allowedAssetsScd["moholua.scd"] = false     -- completely embedded in the repository
+allowedAssetsScd["mohodata.scd"] = false    -- completely embedded in the repository
 allowedAssetsScd["mods.scd"] = true
 allowedAssetsScd["meshes.scd"] = true
-allowedAssetsScd["lua.scd"] = true
+allowedAssetsScd["lua.scd"] = false         -- completely embedded in the repository
 allowedAssetsScd["loc_us.scd"] = true
 allowedAssetsScd["loc_es.scd"] = true
 allowedAssetsScd["loc_fr.scd"] = true
@@ -142,9 +142,8 @@ local function MountContent(dir, mountpoint, allowedAssets)
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
             if allowedAssets[mp] then 
+                LOG("Mounting content: " .. entry)
                 MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
             end
         end
     end
@@ -158,9 +157,8 @@ local function MountAllowedContent(dir, pattern, allowedAssets)
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
             if allowedAssets[mp] then 
+                LOG("Mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
             end
         end
     end

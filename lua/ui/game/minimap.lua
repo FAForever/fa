@@ -188,7 +188,7 @@ function CreateMinimap(parent)
 end
 
 function ToggleMinimap()
-    --# disable when in Screen Capture mode
+    ---- disable when in Screen Capture mode
     if import('/lua/ui/game/gamemain.lua').gameUIHidden then
         return
     end

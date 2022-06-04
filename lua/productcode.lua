@@ -1,0 +1,1 @@
+productCode = 'SC1X'

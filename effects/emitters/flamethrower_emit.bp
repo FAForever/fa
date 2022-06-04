@@ -4,8 +4,8 @@ EmitterBlueprint {
 	Repeattime = 50.00,
 	TextureFramecount = 1.00,
 	Blendmode = 3.00,
-	Texture = [[/textures/particles/smoke.dds]],
-	RampTexture = [[/textures/particles/testramp.dds]],
+	Texture = '/textures/particles/smoke.dds',
+	RampTexture = '/textures/particles/testramp.dds',
 	SizeCurve = {
 		XRange = 50.00,
 		Keys = {

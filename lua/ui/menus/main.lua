@@ -22,7 +22,7 @@ local GetVersion = import('/lua/version.lua').GetVersion
 local mapErrorDialog = false
 
 local TOOLTIP_DELAY = 1
-local menuFontColor = 'feff77' --'FFbadbdb' (default grey-blue) #feff77 (light yellow) #edd570 (gold)
+local menuFontColor = 'feff77' --'FFbadbdb' (default grey-blue) --feff77 (light yellow) --edd570 (gold)
 local menuFontColorTitle = 'EEEEEE'
 local menuFontColorAlt = 'feff77' --currently the same as menuFontColor
 

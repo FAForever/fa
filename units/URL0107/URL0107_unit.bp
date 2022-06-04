@@ -215,7 +215,7 @@ UnitBlueprint {
     SelectionSizeZ = 0.6,
     SelectionThickness = 0.7,
     SizeX = 0.7,
-    SizeY = 0.7, #from0.5
+    SizeY = 0.7, --from0.5
     SizeZ = 0.9,
     StrategicIconName = 'icon_land1_directfire',
     StrategicIconSortPriority = 135,

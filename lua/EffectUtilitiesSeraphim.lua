@@ -68,7 +68,7 @@ end
 -- @param effectsBag The trashbag for effects.
 function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBones, locationBone, effectsBag)
 
-    -- # initialize various info used throughout the function
+    -- -- initialize various info used throughout the function
 
     local effect = false
     local army = builder.Army
@@ -83,7 +83,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         offset = bp.Elevation or 0
     end
 
-    -- # Create effects for each build bone
+    -- -- Create effects for each build bone
 
     local CreateAttachedEmitter = CreateAttachedEmitter
     for _, vBone in effectBones do
@@ -93,7 +93,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         end
     end
 
-    -- # Check if unit has been initialised
+    -- -- Check if unit has been initialised
 
     local slider = unitBeingBuilt.ConstructionSlider
     local initialised = unitBeingBuilt.ConstructionInitialised
@@ -102,7 +102,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
 
         unitBeingBuilt.ConstructionInitialised = true
 
-        -- # Add seraphim pool effect
+        -- -- Add seraphim pool effect
 
         local unitBeingBuiltTrash = unitBeingBuilt.Trash
         local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -113,7 +113,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
             TrashBagAdd(unitOnStopBeingBuiltTrash, effect)
         end
 
-        -- # Create slider to move unit
+        -- -- Create slider to move unit
 
         slider = CreateSlider(unitBeingBuilt, 0)
         unitBeingBuilt.ConstructionSlider = slider
@@ -131,7 +131,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
     -- localize for optimal access
     local UnitGetFractionComplete = UnitGetFractionComplete
     local completed = UnitGetFractionComplete(unitBeingBuilt)
-    -- # Gradually move the unit to the plateau
+    -- -- Gradually move the unit to the plateau
     while not unitBeingBuilt.Dead and completed < 1.0 do
         SliderSetGoal(slider, 0, (1 - completed) * sy + offset, 0)
         SliderSetSpeed(slider, completed * completed * completed)
@@ -139,7 +139,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
         CoroutineYield(2)
     end
 
-    -- # Nillify temporary tables
+    -- -- Nillify temporary tables
 
     unitBeingBuilt.ConstructionSlider = nil
     unitBeingBuilt.ConstructionInitialised = nil
@@ -152,14 +152,14 @@ end
 -- @param scaleFactor A scale factor for the effects.
 function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFactor)
 
-    -- # initialize various info used throughout the function
+    -- -- initialize various info used throughout the function
     local army = builder.Army
 
     -- optimize local access
     local EmitterScaleEmitter = EmitterScaleEmitter
     local UnitGetFractionComplete = UnitGetFractionComplete
 
-    -- # Create generic effects
+    -- -- Create generic effects
     local effect = false
 
     -- matches with number of effects being made, pre-allocates the table
@@ -196,7 +196,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
         emittersHead = emittersHead + 1
     end
 
-    -- # Scale effects until the unit is finished
+    -- -- Scale effects until the unit is finished
 
     -- only naval factories are not square, use the Z axis to get largest axis
     local unitScaleMetric = 0.75 * sz
@@ -211,7 +211,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
         CoroutineYield(4)
     end
 
-    -- # Poof - we're finished and clean up
+    -- -- Poof - we're finished and clean up
 
     CreateLightParticleIntel(unitBeingBuilt, -1, army, unitScaleMetric * 3.5, 8, 'glow_02', 'ramp_blue_22')
 
