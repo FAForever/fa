@@ -113,25 +113,15 @@ function CreateScoreUI(parent)
 
     controls.bg:SetNeedsFrameUpdate(true)
     controls.bg.OnFrame = function(self, delta)
-        if controls.collapseArrow:IsChecked() then
-            local newRight = self.Right() + (1000 * delta)
-            if newRight > savedParent.Right() + self.Width() then
-                self.Right:Set(function() return savedParent.Right() + self.Width() end)
-                self:Hide()
-                self:SetNeedsFrameUpdate(false)
-            else
-                self.Right:Set(newRight)
-            end
-        else
-            local newRight = self.Right() - (1000*delta)
-            if newRight < savedParent.Right() - 3 then
-                self.Right:Set(function() return savedParent.Right() - 18 end)
-                self:SetNeedsFrameUpdate(false)
-            else
-                self.Right:Set(newRight)
-            end
+        local newRight = self.Right() + (1000*delta)
+        if newRight > savedParent.Right() + self.Width() then
+            newRight = savedParent.Right() + self.Width()
+            self:Hide()
+            self:SetNeedsFrameUpdate(false)
         end
+        self.Right:Set(newRight)
     end
+
     controls.collapseArrow:SetCheck(true, true)
 end
 
@@ -581,21 +571,9 @@ function DisplayResources(resources, line, mode)
         end
         line.mass_in:SetText('  '..fmtnum(Tmp.Mass * 10))
         line.energy_in:SetText('  '..fmtnum(Tmp.Energy * 10))
-        line.mass.OnHide = nil
-        line.energy.OnHide = nil
-        line.units.OnHide = nil
-        line.mass:Show()
-        line.energy:Show()
-        line.units:Show()
     else
         line.mass_in:SetText('')
         line.energy_in:SetText('')
-        line.mass:Hide()
-        line.energy:Hide()
-        line.units:Hide()
-        line.mass.OnHide = blockOnHide
-        line.energy.OnHide = blockOnHide
-        line.units.OnHide = blockOnHide
     end
 end
 
@@ -765,11 +743,30 @@ function ToggleScoreControl(state)
             controls.collapseArrow:SetCheck(false, true)
             controls.bg:Show()
             controls.bg:SetNeedsFrameUpdate(true)
+            controls.bg.OnFrame = function(self, delta)
+                local newRight = self.Right() - (1000 * delta)
+                if newRight < savedParent.Right() - 3 then
+                    self.Right:Set(function() return savedParent.Right() - 18 end)
+                    self:SetNeedsFrameUpdate(false)
+                else
+                    self.Right:Set(newRight)
+                end
+            end
         else
             Prefs.SetToCurrentProfile("scoreoverlay", false)
             local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
             PlaySound(sound)
             controls.bg:SetNeedsFrameUpdate(true)
+            controls.bg.OnFrame = function(self, delta)
+                local newRight = self.Right() + (1000 * delta)
+                if newRight > savedParent.Right() + self.Width() then
+                    self.Right:Set(function() return savedParent.Right() + self.Width() end)
+                    self:Hide()
+                    self:SetNeedsFrameUpdate(false)
+                else
+                    self.Right:Set(newRight)
+                end
+            end
             controls.collapseArrow:SetCheck(true, true)
         end
     else
@@ -796,6 +793,8 @@ function Expand()
         local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
         PlaySound(sound)
         needExpand = false
+    else
+        controls.collapseArrow:Show()
     end
 end
 
@@ -806,9 +805,12 @@ function Contract()
             PlaySound(sound)
             controls.bg:Hide()
             controls.collapseArrow:Hide()
-            needExpand = true
+            if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
+                needExpand = true
+            end
         else
             needExpand = false
+            controls.collapseArrow:Hide()
         end
     else
         contractOnCreate = true
@@ -822,6 +824,17 @@ function InitialAnimation(state)
         controls.collapseArrow:SetCheck(false, true)
         controls.bg:Show()
         controls.bg:SetNeedsFrameUpdate(true)
+        controls.bg.OnFrame = function(self, delta)
+            local newRight = self.Right() - (1000 * delta)
+            if newRight < savedParent.Right() - 3 then
+                self.Right:Set(function() return savedParent.Right() - 18 end)
+                self:SetNeedsFrameUpdate(false)
+            else
+                self.Right:Set(newRight)
+            end
+        end
+    else
+        controls.collapseArrow:Show()
     end
 end
 
