@@ -5,10 +5,12 @@
 --**
 --**  Summary  :  Ship-based Anti-Torpedo, XES0102
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
 local TDepthChargeProjectile = import('/lua/terranprojectiles.lua').TDepthChargeProjectile
 
+---@class TIMAntiTorpedo02 : TDepthChargeProjectile
 TIMAntiTorpedo02 = Class(TDepthChargeProjectile) {}
-TypeClass = TIMAntiTorpedo02
 
+TypeClass = TIMAntiTorpedo02
