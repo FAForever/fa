@@ -8,9 +8,9 @@
 --  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
--- DEA0202
 local TNapalmHvyCarpetBombProjectile = import('/lua/terranprojectiles.lua').TNapalmHvyCarpetBombProjectile
 
+-- Used by dea0202
 ---@class TIFNapalmCarpetBomb02 : TNapalmHvyCarpetBombProjectile
 TIFNapalmCarpetBomb02 = Class(TNapalmHvyCarpetBombProjectile) { }
 

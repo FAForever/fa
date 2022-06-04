@@ -3,7 +3,7 @@
 
 local TMissileAAProjectile = import('/lua/terranprojectiles.lua').TMissileAAProjectile
 
--- unused
+--- Unused
 ---@class TIMAntiMissile01 : TMissileAAProjectile
 TIMAntiMissile01 = Class(TMissileAAProjectile) {}
 

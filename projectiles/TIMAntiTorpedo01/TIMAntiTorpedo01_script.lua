@@ -1,8 +1,8 @@
 -- Ship-based Anti-Torpedo Script
 
--- UES0201 XES0102 XES0307
 local TDepthChargeProjectile = import('/lua/terranprojectiles.lua').TDepthChargeProjectile
 
+--- Used by ues0201 xes0102 xes0307
 ---@class TIMAntiTorpedo01 : TDepthChargeProjectile
 TIMAntiTorpedo01 = Class(TDepthChargeProjectile) {}
 

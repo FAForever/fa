@@ -1,8 +1,8 @@
 -- Terran Land-based torpedo
--- unused ???
 
 local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
 
+--- Unused
 ---@class TorpedoShipTerran02 : TTorpedoShipProjectile
 TorpedoShipTerran02 = Class(TTorpedoShipProjectile) {
     FxSplashScale = 1,

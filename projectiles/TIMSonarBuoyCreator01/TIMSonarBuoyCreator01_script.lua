@@ -3,10 +3,11 @@
 --   This will create a temporary sonar buoy unit when it hits the water, nothing more.
 --   This projectile is not intended to do damage.
 --
--- unused ???
+
 
 local TTorpedoShipProjectile = import('/lua/terranprojectiles.lua').TTorpedoShipProjectile
 
+-- unused
 ---@class TIMSonarBuoyCreator01 : TTorpedoShipProjectile
 TIMSonarBuoyCreator01 = Class(TTorpedoShipProjectile) {
     FxSplashScale = 0.2,
@@ -31,7 +32,7 @@ TIMSonarBuoyCreator01 = Class(TTorpedoShipProjectile) {
             CreateEmitterAtEntity(self,self:GetArmy(),self.FxExitWaterEmitter[i]):ScaleEmitter(self.FxSplashScale)
         end
 
-        local x,y,z = unpack(self:GetPosition())
+        local x,y,z = unpack(self:GetPositionXYZ())
         CreateUnit('ueb5208', self:GetArmy(), x, y, z, 0, 0, 0, 0)
 
         self:Destroy()
