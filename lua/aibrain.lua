@@ -339,7 +339,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Jamming Switch Logic
 
-    AddJamer = function(self, unit)
+    AddJammer = function(self, unit)
         self.jammers[unit.EntityId] = unit
     end,
 
@@ -359,8 +359,8 @@ AIBrain = Class(moho.aibrain_methods) {
                     LOG("ToggleJammer")
                     -- run logic here
 
-                   jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
-                   jammer:DisableUnitIntel('ToggleBit3', 'Jammer')
+                   --jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
+                   --jammer:DisableUnitIntel('ToggleBit3', 'Jammer')
                    
                 end
 
