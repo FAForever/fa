@@ -19,7 +19,7 @@ local movies = {
 }
 
 function CreateUI()
-    if GetPreference("movie.nologo") then
+    if GetPreference("movie.nologo") or HasCommandLineArg("/nomovie") then
         EngineStartFrontEndUI()
         return
     end
