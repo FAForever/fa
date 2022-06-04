@@ -3086,7 +3086,7 @@ function CreateUI(maxPlayers)
         GUI.TeamCountSelector = Combo.BitmapCombo(GUI.AIClearButton, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.SetWidth(GUI.TeamCountSelector, 44)
         LayoutHelpers.AtTopIn(GUI.TeamCountSelector, GUI.AIClearButton, 5)
-        GUI.TeamCountSelector.Right:Set(function() return GUI.AIFillPanel.Right() - LayoutHelpers.ScaleNumber(8) end)
+        LayoutHelpers.AtRightIn(GUI.TeamCountSelector, GUI.AIFillPanel, 8)
         local tooltipText = {}
         tooltipText['text'] = '<LOC tooltipui0710>Teams Count'
         tooltipText['body'] = '<LOC tooltipui0711>On how many teams share players?'
@@ -3732,7 +3732,7 @@ function CreateUI(maxPlayers)
     local initialState = Prefs.GetFromCurrentProfile("LobbyOpt_AutoTeams") or "none"
     GUI.autoTeams = ToggleButton(GUI.observerPanel, '/BUTTON/autoteam/', autoteamButtonStates, initialState)
 
-    LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, LayoutHelpers.ScaleNumber(-19))
+    LayoutHelpers.RightOf(GUI.autoTeams, GUI.randMap, -19)
     if not isHost then
         GUI.autoTeams:Hide()
     else
