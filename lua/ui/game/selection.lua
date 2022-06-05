@@ -40,6 +40,11 @@ end
 
 -- add a unit to an existing selection set
 function AddUnitToSelectionSet(name, unit)
+    LOG("AddUnitToSelectionSet")
+    reprsl(debug.traceback())
+    reprsl(unit)
+
+    
     if selectionSets[name] then
         table.insert(selectionSets[name],unit)
     end
@@ -47,12 +52,14 @@ end
 
 -- add a selection set based on the current selection
 function AddCurrentSelectionSet(name)
+    LOG("AddCurrentSelectionSet")
     AddSelectionSet(name, GetSelectedUnits())
 end
 
 -- add a selection set based on an array of units
 -- if selectedUnits is nil, clears the selection set
 function AddSelectionSet(name, unitArray)
+    LOG("AddSelectionSet")
     -- remove units from the selection set if it already exists
     if selectionSets[name] then
         for index, unit in selectionSets[name] do
@@ -76,6 +83,7 @@ end
 
 -- select a specified selection set in the session
 function ApplySelectionSet(name)
+    LOG("ApplySelectionSet")
 
     -- get a filtered list of only valid units back from the function
     if not selectionSets[name] then return end
@@ -127,6 +135,8 @@ function ApplySelectionSet(name)
 end
 
 function AppendSetToSelection(name)
+    LOG("AppendSetToSelection")
+
     -- get a filtered list of only valid units back from the function
     local setID = tostring(name)
     selectionSets[setID] = ValidateUnitsList(selectionSets[setID])
@@ -160,6 +170,8 @@ function AppendSetToSelection(name)
 end
 
 function FactorySelection(name)
+    LOG("FactorySelection")
+
     -- get a filtered list of only valid units back from the function
     local setID = tostring(name)
     selectionSets[setID] = ValidateUnitsList(selectionSets[setID])
@@ -186,5 +198,24 @@ function FactorySelection(name)
 end
 
 function ResetSelectionSets(new_sets)
+    LOG("ResetSelectionSets")
+
     selectionSets = new_sets
+end
+
+local hidden_select = false
+function IsHidden()
+    return hidden_select == true
+end
+
+function Hidden(callback)
+    local CM = import('/lua/ui/game/commandmode.lua')
+    local current_command = CM.GetCommandMode()
+    local old_selection = GetSelectedUnits() or {}
+
+    hidden_select = true
+    callback()
+    SelectUnits(old_selection)
+    CM.StartCommandMode(current_command[1], current_command[2])
+    hidden_select = false
 end
