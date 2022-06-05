@@ -18,7 +18,7 @@ local Window = import('/lua/maui/window.lua').Window
 local Prefs = import('/lua/user/prefs.lua')
 
 local minimap = Prefs.GetFromCurrentProfile('stratview') or false
-local minimap_resources = Prefs.GetFromCurrentProfile('minimap_resources') or false
+local minimap_resources = Prefs.GetFromCurrentProfile('MiniMap_resource_icons') or false
 
 controls = {
     displayGroup = false,
