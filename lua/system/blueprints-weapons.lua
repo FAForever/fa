@@ -1,18 +1,5 @@
 
---- We don't want to change certain unit categories as they are quite sensitive to change
-local categoriesToSkip = { }
-categoriesToSkip.COMMAND = true 
-
 local weaponTargetCheckUpperLimit = 6000
-
--- Multiplier depending on range category
-local weaponTargetCheckMultiplier = {
-    UWRC_Countermeasure = 0.5,
-    UWRC_IndirectFire = 1.5,
-    UWRC_AntiNavy = 1.2,
-    UWRC_DirectFire = 1.2,
-    UWRC_AntiAir = 1.2
-}
 
 local function ProcessWeapon(unit, weapon)
 
@@ -69,10 +56,9 @@ local function ProcessWeapon(unit, weapon)
 
     if weapon.TargetCheckInterval == nil then 
         
-        weapon.TargetCheckInterval = math.min(
-                0.5 * (1 / (weapon.RateOfFire or 1))    -- based on attack rate
-            ,   (weapon.MaxRadius or 10) / 40           -- based on attack range
-        )   
+        local intervalByRateOfFire = 0.5 * (1 / (weapon.RateOfFire or 1))
+        local intervalByRadius = (weapon.MaxRadius or 10) / 40
+        weapon.TargetCheckInterval = math.min(intervalByRateOfFire, intervalByRadius)
 
         -- clamp value to something sane
         if weapon.TargetCheckInterval < 0.4 and (not isExperimental) then 
@@ -80,17 +66,14 @@ local function ProcessWeapon(unit, weapon)
         end
 
         -- clamp value to something sane
-        if weapon.TargetCheckInterval < 0.1 then 
-            weapon.TargetCheckInterval = 0.1 
+        if weapon.TargetCheckInterval < 0.2 then 
+            weapon.TargetCheckInterval = 0.2 
         end
 
         -- clamp value to something sane
         if weapon.TargetCheckInterval > 3 then 
             weapon.TargetCheckInterval = 3 
         end
-
-        -- sanitize it
-        weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
     end
 
     -- # process target tracking radius 
@@ -143,26 +126,20 @@ local function ProcessWeapon(unit, weapon)
 
     -- # sanitize values
 
-    -- do not allow bombers to suddenly retarget, as then they won't drop their bomb then
-    if isBomber then
+    -- do not allow the 'bomb weapon' of bombers to suddenly retarget, as then they won't drop their bomb when they do
+    if weapon.NeedToComputeBombDrop then
         weapon.AlwaysRecheckTarget = false
     end
+
+    weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
+    weapon.TrackingRadius = 0.1 * math.floor(10 * weapon.TrackingRadius)
 end
 
 function ProcessWeapons(units)
     for k, unit in units do 
-
-        -- check if we should skip this unit
-        local skip = false 
-        for k, category in unit.Categories do 
-            skip = skip or categoriesToSkip[category]
-        end
-
-        if not skip then 
-            if unit.Weapon then 
-                for k, weapon in unit.Weapon do 
-                    ProcessWeapon(unit, weapon)
-                end
+        if unit.Weapon then 
+            for k, weapon in unit.Weapon do 
+                ProcessWeapon(unit, weapon)
             end
         end
     end
