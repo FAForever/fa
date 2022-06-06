@@ -321,7 +321,6 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -329,7 +328,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Turret_Muzzle_Right',
             TurretBonePitch = 'Turret_Muzzle_Right',
             TurretBoneYaw = 'Turret_Muzzle_Right',
@@ -392,7 +390,6 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -400,7 +397,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Turret_Muzzle_Left',
             TurretBonePitch = 'Turret_Muzzle_Left',
             TurretBoneYaw = 'Turret_Muzzle_Left',

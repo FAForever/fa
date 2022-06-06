@@ -185,7 +185,6 @@ UnitBlueprint {
     },
     Weapon = {
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -232,7 +231,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2.5,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -243,7 +241,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Muzzle_01',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

@@ -329,7 +329,6 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -340,7 +339,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Left_Muzzle',
             TurretBonePitch = 'Left_Muzzle',
             TurretBoneYaw = 'Left_Muzzle',
@@ -405,7 +403,6 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -416,7 +413,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Right_Muzzle',
             TurretBonePitch = 'Right_Muzzle',
             TurretBoneYaw = 'Right_Muzzle',
@@ -488,13 +484,11 @@ UnitBlueprint {
             RateOfFire = 0.1,
             SkipReadyState = true,
             StopOnPrimaryWeaponBusy = true,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE',
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.25,
             TurretDualManipulators = false,
             TurretPitch = -90,
             TurretPitchRange = 20,

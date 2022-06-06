@@ -806,7 +806,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
@@ -890,7 +889,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.133,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
@@ -975,7 +973,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.133,
             SlavedToBody = false,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
@@ -1028,7 +1025,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
@@ -1087,7 +1083,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 5,
             TargetPriorities = {
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS',

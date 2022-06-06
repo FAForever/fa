@@ -311,7 +311,6 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -322,7 +321,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Muzzle',
             TurretBonePitch = 'Muzzle',
             TurretBoneYaw = 'Muzzle',

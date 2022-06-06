@@ -261,7 +261,6 @@ UnitBlueprint {
             RateOfFire = 0.1,
             RenderFireClock = true,
             SlavedToBody = true,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'STRUCTURE DEFENSE',
                 'TECH3 MOBILE',
@@ -270,7 +269,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             Turreted = false,
             WeaponCategory = 'Missile',
             WeaponRepackTimeout = 1,

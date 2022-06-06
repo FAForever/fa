@@ -315,7 +315,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'ANTIAIR',
                 'GROUNDATTACK',
@@ -323,7 +322,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneDualMuzzle = 'Left_Projectile',
             TurretBoneDualPitch = 'Left_Projectile',
             TurretBoneMuzzle = 'Right_Projectile',

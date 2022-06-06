@@ -392,7 +392,6 @@ UnitBlueprint {
             RateOfFire = 0.8,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.625,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -403,7 +402,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Right_Turret_Muzzle01',
             TurretBonePitch = 'Right_Turret_Barrel',
             TurretBoneYaw = 'Right_Turret',
@@ -480,7 +478,6 @@ UnitBlueprint {
             RateOfFire = 0.8,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.625,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -491,7 +488,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Left_Turret_Muzzle01',
             TurretBonePitch = 'Left_Turret_Barrel',
             TurretBoneYaw = 'Left_Turret',
@@ -570,7 +566,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.75,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SUBMERSIBLE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
@@ -630,11 +625,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.13,
-            TargetCheckInterval = 1.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,
@@ -650,7 +643,6 @@ UnitBlueprint {
         {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XRL_Weapon',
@@ -699,7 +691,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1.6,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -709,7 +700,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'AA_Muzzle',
             TurretBonePitch = 'AA_Barrel',
             TurretBoneYaw = 'AA_Turret',
@@ -775,13 +765,11 @@ UnitBlueprint {
             RateOfFire = 0.03,
             SlavedToBody = true,
             SlavedToBodyArcRange = 40,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 0,
             TurretBoneMuzzle = 'Missile_Muzzle',
             TurretBonePitch = 'Missile_Turret',
             TurretBoneYaw = 'Missile_Turret',

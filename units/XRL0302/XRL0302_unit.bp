@@ -230,7 +230,6 @@ UnitBlueprint {
             FiringTolerance = 180,
             Label = 'Suicide',
             MaxRadius = 3,
-            TargetCheckInterval = 999999,
             TargetPriorities = {
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
@@ -276,7 +275,6 @@ UnitBlueprint {
             RateOfFire = 0.5,
             SalvoSize = 1,
             SlavedToBody = true,
-            TargetCheckInterval = 1,
             TargetRestrictDisallow = 'UNTARGETABLE, AIR',
             WeaponCategory = 'Direct Fire',
         },

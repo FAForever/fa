@@ -435,7 +435,6 @@ UnitBlueprint {
             RateOfFire = 0.5,
             SlavedToBody = true,
             SlavedToBodyArcRange = 35,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'TECH2 LIGHTBOAT',
@@ -446,7 +445,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Anti Navy',
@@ -454,7 +452,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -501,7 +498,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -512,13 +508,11 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             Turreted = false,
             WeaponCategory = 'Anti Air',
             WeaponRepackTimeout = 0,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -566,7 +560,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -577,13 +570,11 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             Turreted = false,
             WeaponCategory = 'Anti Air',
             WeaponRepackTimeout = 0,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -631,7 +622,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -642,13 +632,11 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             Turreted = false,
             WeaponCategory = 'Anti Air',
             WeaponRepackTimeout = 0,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -696,7 +684,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -707,7 +694,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             Turreted = false,
             WeaponCategory = 'Anti Air',
             WeaponRepackTimeout = 0,

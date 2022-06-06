@@ -237,7 +237,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.25,
-            TargetCheckInterval = 0.6,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 '(STRUCTURE * TECH2 * DEFENSE - ANTIMISSILE)',
@@ -249,7 +248,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

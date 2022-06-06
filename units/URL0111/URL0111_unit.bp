@@ -258,7 +258,6 @@ UnitBlueprint {
             RateOfFire = 0.3,
             RenderFireClock = true,
             SlavedToBody = true,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'STRUCTURE SHIELD',
                 'STRUCTURE DEFENSE ANTIMISSILE',
@@ -274,7 +273,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretPitch = 0,
             TurretPitchRange = 0,
             TurretPitchSpeed = 0,

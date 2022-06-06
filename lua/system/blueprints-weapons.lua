@@ -6,12 +6,13 @@ categoriesToSkip.COMMAND = true
 local weaponTargetCheckUpperLimit = 6000
 
 -- Multiplier depending on range category
-local weaponTargetCheckMultiplier = { }
-weaponTargetCheckMultiplier.UWRC_Countermeasure = 0.5
-weaponTargetCheckMultiplier.UWRC_IndirectFire = 1.5
-weaponTargetCheckMultiplier.UWRC_AntiNavy = 1.2
-weaponTargetCheckMultiplier.UWRC_DirectFire = 1.2
-weaponTargetCheckMultiplier.UWRC_AntiAir = 1.2
+local weaponTargetCheckMultiplier = {
+    UWRC_Countermeasure = 0.5,
+    UWRC_IndirectFire = 1.5,
+    UWRC_AntiNavy = 1.2,
+    UWRC_DirectFire = 1.2,
+    UWRC_AntiAir = 1.2
+}
 
 local function ProcessWeapon(unit, weapon)
 
@@ -58,78 +59,88 @@ local function ProcessWeapon(unit, weapon)
 
     -- - process target check interval
 
-    weapon.TargetCheckInterval = math.min(
-            0.5 * (1 / (weapon.RateOfFire or 1))    -- based on attack rate
-        ,   (weapon.MaxRadius or 10) / 40           -- based on attack range
-    )   
+    if weapon.TargetCheckInterval == nil then 
+        
+        weapon.TargetCheckInterval = math.min(
+                0.5 * (1 / (weapon.RateOfFire or 1))    -- based on attack rate
+            ,   (weapon.MaxRadius or 10) / 40           -- based on attack range
+        )   
 
-    -- except for counter measure weaponry
-    if weapon.RangeCategory == "UWRC_Countermeasure" then 
-        weapon.TargetCheckInterval = 0.5 
+        -- except for counter measure weaponry
+        if weapon.RangeCategory == "UWRC_Countermeasure" then 
+            weapon.TargetCheckInterval = 0.5 
+        end
+
+        -- clamp value to something sane
+        if weapon.TargetCheckInterval < 0.5 and (not isExperimental) then 
+            weapon.TargetCheckInterval = 0.5 
+        end
+
+        -- clamp value to something sane
+        if weapon.TargetCheckInterval < 0.1 then 
+            weapon.TargetCheckInterval = 0.1 
+        end
+
+        -- clamp value to something sane
+        if weapon.TargetCheckInterval > 3 then 
+            weapon.TargetCheckInterval = 3 
+        end
+
+        -- sanitize it
+        weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
     end
-
-    -- clamp value to something sane
-    if weapon.TargetCheckInterval < 0.5 and (not isExperimental) then 
-        weapon.TargetCheckInterval = 0.5 
-    end
-
-    -- clamp value to something sane
-    if weapon.TargetCheckInterval < 0.1 then 
-        weapon.TargetCheckInterval = 0.1 
-    end
-
-    -- clamp value to something sane
-    if weapon.TargetCheckInterval > 3 then 
-        weapon.TargetCheckInterval = 3 
-    end
-
-    -- sanitize it
-    weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
 
     -- - process target tracking radius 
 
-    -- by default, give every unit a 15% target checking radius
-    weapon.TrackingRadius = 1.15
+    if weapon.TrackingRadius == nil then 
 
-    -- remove target tracking radius for non-aa weaponry part of structures
-    if isStructure and (weapon.RangeCategory ~= "UWRC_AntiAir") then 
-        weapon.TrackingRadius = 1.0
-    end
+        -- by default, give every unit a 15% target checking radius
+        weapon.TrackingRadius = 1.15
 
-    -- give anti air a larger track radius
-    if weapon.RangeCategory == "UWRC_AntiAir" then 
-        weapon.TrackingRadius = 1.3 
-    end
-    
-    -- add significant target checking radius for bombers
-    if isBomber then 
-        weapon.TrackingRadius = 1.5
+        -- remove target tracking radius for non-aa weaponry part of structures
+        if isStructure and (weapon.RangeCategory ~= "UWRC_AntiAir") then 
+            weapon.TrackingRadius = 1.0
+        end
+
+        -- give anti air a larger track radius
+        if weapon.RangeCategory == "UWRC_AntiAir" then 
+            weapon.TrackingRadius = 1.3 
+        end
+        
+        -- add significant target checking radius for bombers
+        if isBomber then 
+            weapon.TrackingRadius = 1.5
+        end
+
     end
 
     -- - process target rechecking
 
-    -- by default, do not recheck targets as that is expensive when a lot of units are stacked on top of another
-    weapon.AlwaysRecheckTarget = false 
+    if weapon.AlwaysRecheckTarget == nil then 
 
-    -- allow target rechecking for artillery and weapons with a very large attack radius
-    if  weapon.RangeCategory == "UWRC_IndirectFire" or 
-        weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then 
-        weapon.AlwaysRecheckTarget = true 
-    end
-
-    -- always allow anti air weapons attached to structures to retarget, as otherwise they may be stuck on a scout
-    if isStructure and weapon.RangeCategory == "UWRC_AntiAir" then 
-        weapon.AlwaysRecheckTarget = true 
-    end
-
-    -- always allow experimentals to retarget
-    if isExperimental then 
-        weapon.AlwaysRecheckTarget = true 
-    end
-
-    -- do not allow bombers to suddenly retarget, as then they won't drop their bomb then
-    if isBomber then 
+        -- by default, do not recheck targets as that is expensive when a lot of units are stacked on top of another
         weapon.AlwaysRecheckTarget = false 
+
+        -- allow target rechecking for artillery and weapons with a very large attack radius
+        if  weapon.RangeCategory == "UWRC_IndirectFire" or 
+            weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then 
+            weapon.AlwaysRecheckTarget = true 
+        end
+
+        -- always allow anti air weapons attached to structures to retarget, as otherwise they may be stuck on a scout
+        if isStructure and weapon.RangeCategory == "UWRC_AntiAir" then 
+            weapon.AlwaysRecheckTarget = true 
+        end
+
+        -- always allow experimentals to retarget
+        if isExperimental then 
+            weapon.AlwaysRecheckTarget = true 
+        end
+
+        -- do not allow bombers to suddenly retarget, as then they won't drop their bomb then
+        if isBomber then 
+            weapon.AlwaysRecheckTarget = false 
+        end
     end
 end
 

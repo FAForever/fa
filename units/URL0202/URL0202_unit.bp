@@ -239,7 +239,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1.8,
             ReTargetOnMiss = true,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -248,7 +247,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle01',
             TurretBonePitch = 'Barrel',
             TurretBoneYaw = 'Turret',

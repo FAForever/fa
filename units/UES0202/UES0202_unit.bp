@@ -348,7 +348,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.1,
             RenderFireClock = true,
-            TargetCheckInterval = 5,
             TargetPriorities = {
                 'NAVAL MOBILE',
                 'TECH3 STRUCTURE',
@@ -357,7 +356,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,
@@ -426,13 +424,11 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 115,
-            TargetCheckInterval = 3,
             TargetPriorities = {
                 'NAVAL MOBILE',
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Turret01_Muzzle',
             TurretBonePitch = 'Front_Turret01_Barrel01',
             TurretBoneYaw = 'Front_Turret01',
@@ -449,7 +445,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -495,7 +490,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -506,7 +500,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Turret02_Projectile02',
             TurretBonePitch = 'Back_Turret02',
             TurretBoneYaw = 'Back_Turret02',
@@ -562,11 +555,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE,STRATEGIC',
             TargetRestrictOnlyAllow = 'TACTICAL,MISSILE',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretBoneMuzzle = 'Center_Turret_Muzzle',
             TurretBonePitch = 'Center_Turret_Barrel',
             TurretBoneYaw = 'Center_Turret',

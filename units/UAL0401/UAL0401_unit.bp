@@ -293,7 +293,6 @@ UnitBlueprint {
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             AimsStraightOnDisable = true,
-            AlwaysRecheckTarget = false,
             Audio = {
                 BeamLoop = Sound {
                     Bank = 'UALWeapon',
@@ -357,7 +356,6 @@ UnitBlueprint {
             RateOfFire = 10,
             SlavedToBody = true,
             SlavedToBodyArcRange = 65,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'SUBCOMMANDER',
@@ -434,7 +432,6 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.15,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -443,7 +440,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1,
             TurretBoneMuzzle = 'Right_Arm_Muzzle01',
             TurretBonePitch = 'Right_Arm_B02',
             TurretBoneYaw = 'Right_Arm_B01',
@@ -524,7 +520,6 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.15,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -533,7 +528,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1,
             TurretBoneMuzzle = 'Left_Arm_Muzzle01',
             TurretBonePitch = 'Left_Arm_B02',
             TurretBoneYaw = 'Left_Arm_B01',

@@ -217,17 +217,14 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UELWeapon',
@@ -281,7 +278,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 '(AIR * MOBILE * EXPERIMENTAL - BOMBER)',
                 'AIR MOBILE GROUNDATTACK',
@@ -293,7 +289,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Muzzle_Left',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

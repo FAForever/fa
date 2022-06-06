@@ -289,13 +289,11 @@ UnitBlueprint {
             RateOfFire = 1.36, -- 1.53
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'NAVAL MOBILE',
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Muzzle',
             TurretBonePitch = 'Front_Turret_Barrel',
             TurretBoneYaw = 'Front_Turret',
@@ -310,7 +308,6 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire Naval',
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URSWeapon',
@@ -364,7 +361,6 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -374,7 +370,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Turret_Barrel',
             TurretBonePitch = 'Back_Turret_Barrel',
             TurretBoneYaw = 'Back_Turret_AA',

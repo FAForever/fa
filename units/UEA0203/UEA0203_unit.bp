@@ -323,7 +323,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'ANTIAIR',
                 'GROUNDATTACK',

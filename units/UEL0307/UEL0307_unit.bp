@@ -257,12 +257,10 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
         },

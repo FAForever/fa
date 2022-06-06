@@ -805,7 +805,6 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
@@ -874,7 +873,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'MOBILE',
                 'COMMAND',
@@ -959,7 +957,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.3,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
@@ -1045,7 +1042,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.2,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
@@ -1104,7 +1100,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',
@@ -1178,7 +1173,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 10,
-            TargetCheckInterval = 0.1,
             TargetPriorities = {
                 'COMMAND',
                 'MOBILE EXPERIMENTAL',
@@ -1190,7 +1184,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Center_Turret',
             TurretBonePitch = 'Center_Turret',
             TurretBoneYaw = 'Center_Turret',
@@ -1245,7 +1238,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.25,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'LIGHTBOAT TECH2', -- cooper
                 'SUBMERSIBLE',
