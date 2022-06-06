@@ -306,6 +306,11 @@ UnitBlueprint {
             WeaponCategory = 'Direct Fire Naval',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.6, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XSS_Weapon',

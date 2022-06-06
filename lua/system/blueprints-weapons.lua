@@ -57,7 +57,7 @@ local function ProcessWeapon(unit, weapon)
     if weapon.TargetCheckInterval == nil then 
         
         local intervalByRateOfFire = 0.5 * (1 / (weapon.RateOfFire or 1))
-        local intervalByRadius = (weapon.MaxRadius or 10) / 40
+        local intervalByRadius = (weapon.MaxRadius or 10) / 30
         weapon.TargetCheckInterval = math.min(intervalByRateOfFire, intervalByRadius)
 
         -- clamp value to something sane
@@ -138,8 +138,14 @@ end
 function ProcessWeapons(units)
     for k, unit in units do 
         if unit.Weapon then 
+            LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
             for k, weapon in unit.Weapon do 
                 ProcessWeapon(unit, weapon)
+
+                LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
+                LOG(" - - WeaponCheckinterval: " .. tostring(weapon.TargetCheckInterval))
+                LOG(" - - AlwaysRecheckTarget: " .. tostring(weapon.AlwaysRecheckTarget))
+                LOG(" - - TrackingRadius: " .. tostring(weapon.TrackingRadius))
             end
         end
     end
