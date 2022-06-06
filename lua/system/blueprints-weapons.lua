@@ -143,10 +143,10 @@ function ProcessWeapons(units)
             for k, weapon in unit.Weapon do 
                 ProcessWeapon(unit, weapon)
 
-                LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
-                LOG(" - - WeaponCheckinterval: " .. tostring(weapon.TargetCheckInterval))
-                LOG(" - - AlwaysRecheckTarget: " .. tostring(weapon.AlwaysRecheckTarget))
-                LOG(" - - TrackingRadius: " .. tostring(weapon.TrackingRadius))
+                -- LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
+                -- LOG(" - - WeaponCheckinterval: " .. tostring(weapon.TargetCheckInterval))
+                -- LOG(" - - AlwaysRecheckTarget: " .. tostring(weapon.AlwaysRecheckTarget))
+                -- LOG(" - - TrackingRadius: " .. tostring(weapon.TrackingRadius))
             end
         end
     end
