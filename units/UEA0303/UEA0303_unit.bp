@@ -338,7 +338,7 @@ UnitBlueprint {
             TurretYaw = 0,
             TurretYawRange = 55,
             TurretYawSpeed = 360,
-            Turreted = false,
+            Turreted = true,
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Anti Air',
         },
