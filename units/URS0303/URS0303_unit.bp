@@ -317,13 +317,11 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'NAVAL MOBILE',
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Front_Right_AA_Turret_Barrel',
             TurretBonePitch = 'Front_Right_AA_Turret_Barrel',
             TurretBoneYaw = 'Front_Right_AA_Turret',
@@ -338,7 +336,6 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URSWeapon',
@@ -388,7 +385,6 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -399,7 +395,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Right_AA_Turret_Barrel',
             TurretBonePitch = 'Back_Right_AA_Turret_Barrel',
             TurretBoneYaw = 'Back_Right_AA_Turret',
@@ -414,7 +409,6 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URSWeapon',
@@ -464,7 +458,6 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -475,7 +468,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Left_AA_Turret_Barrel',
             TurretBonePitch = 'Back_Left_AA_Turret_Barrel',
             TurretBoneYaw = 'Back_Left_AA_Turret',
@@ -490,7 +482,6 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URSWeapon',
@@ -540,7 +531,6 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
@@ -551,7 +541,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Front_Left_AA_Turret_Barrel',
             TurretBonePitch = 'Front_Left_AA_Turret_Barrel',
             TurretBoneYaw = 'Front_Left_AA_Turret',
@@ -606,11 +595,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.5,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE,STRATEGIC',
             TargetRestrictOnlyAllow = 'TACTICAL,MISSILE',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretBoneMuzzle = 'Zapper_Turret',
             TurretBonePitch = 'Zapper_Muzzle',
             TurretBoneYaw = 'Zapper_Turret',

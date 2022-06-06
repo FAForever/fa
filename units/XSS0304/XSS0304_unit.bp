@@ -341,7 +341,6 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 10,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'TECH2 LIGHTBOAT',
@@ -398,11 +397,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.15,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.875,
             TurretBoneMuzzle = 'Left_Turret_Muzzle',
             TurretBonePitch = 'Left_Turret_Barrel',
             TurretBoneYaw = 'Left_Turret_Barrel',
@@ -454,11 +451,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.15,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.875,
             TurretBoneMuzzle = 'Right_Turret_Muzzle',
             TurretBonePitch = 'Right_Turret_Barrel',
             TurretBoneYaw = 'Right_Turret_Barrel',
@@ -475,7 +470,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSS_Weapon',
@@ -519,7 +513,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -529,7 +522,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.12307692307692,
             TurretBoneMuzzle = 'Front_Turret_Muzzle01',
             TurretBonePitch = 'Front_Turret_Barrel01',
             TurretBoneYaw = 'Front_Turret',

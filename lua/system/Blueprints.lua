@@ -65,6 +65,7 @@ doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-weapons.lua")
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
 local function LoadPreGameData()
@@ -798,6 +799,9 @@ function PostModBlueprints(all_bps)
     -- of a units capabilities.
     SetUnitThreatValues(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
+
+    local ok, msg = pcall(ProcessWeapons, all_bps.Unit)
+    LOG(repr(msg))
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
     CalculateLODs(all_bps)

@@ -344,7 +344,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1.6,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'ANTIAIR',
                 'GROUNDATTACK',
@@ -421,7 +420,6 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 175,
-            TargetCheckInterval = 0.6,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',

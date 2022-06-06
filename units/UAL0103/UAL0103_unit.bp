@@ -253,7 +253,6 @@ UnitBlueprint {
             RateOfFire = 0.5,
             SlavedToBody = true,
             SlavedToBodyArcRange = 40,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE EXPERIMENTAL',
                 'TECH3 ANTIMISSILE',
@@ -275,7 +274,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret_Barrel',

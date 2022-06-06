@@ -248,12 +248,10 @@ UnitBlueprint {
             RateOfFire = 3,
             RequireTime = 0,
             SlavedToBody = true,
-            TargetCheckInterval = 0.7,
             TargetPriorities = {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,AIR',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Muzzle',
             TurretBonePitch = 'Muzzle',
             TurretBoneYaw = 'Muzzle',

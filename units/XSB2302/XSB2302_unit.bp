@@ -278,7 +278,6 @@ UnitBlueprint {
             RateOfFire = 0.1,
             RenderFireClock = true,
             -- ShieldDamage = 8000,
-            TargetCheckInterval = 8,
             TargetPriorities = {
                 'EXPERIMENTAL MASSFABRICATION',
                 '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy

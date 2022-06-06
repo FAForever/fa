@@ -339,7 +339,6 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'TECH4',
                 'TECH3 STRUCTURE',
@@ -348,7 +347,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             WeaponCategory = 'Bomb',
         },
         {

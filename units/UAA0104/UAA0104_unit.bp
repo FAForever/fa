@@ -314,7 +314,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.4,
-            TargetCheckInterval = 1.4,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -322,7 +321,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Muzzle_R',
             TurretBonePitch = 'Turret_Right',
             TurretBoneYaw = 'Turret_Right',
@@ -382,7 +380,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.4,
-            TargetCheckInterval = 1.4,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -390,7 +387,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Muzzle_L',
             TurretBonePitch = 'Turret_Left',
             TurretBoneYaw = 'Turret_Left',
@@ -450,7 +446,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.4,
-            TargetCheckInterval = 1.4,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -458,7 +453,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Muzzle_F',
             TurretBonePitch = 'Turret_Front',
             TurretBoneYaw = 'Turret_Front',
@@ -518,7 +512,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.4,
-            TargetCheckInterval = 1.4,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -526,7 +519,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Muzzle_B',
             TurretBonePitch = 'Turret_Back',
             TurretBoneYaw = 'Turret_Back',

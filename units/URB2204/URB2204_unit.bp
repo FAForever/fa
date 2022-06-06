@@ -200,7 +200,6 @@ UnitBlueprint {
     },
     Weapon = {
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'URLWeapon',
@@ -257,7 +256,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 '(AIR * MOBILE * EXPERIMENTAL - BOMBER)',
                 'AIR MOBILE GROUNDATTACK',
@@ -269,7 +267,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Recoil01_Muzzle01',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

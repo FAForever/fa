@@ -309,14 +309,12 @@ UnitBlueprint {
             RateOfFire = 0.588, -- 0.35
             SlavedToBody = true,
             SlavedToBodyArcRange = 155,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Turret_Muzzle',
             TurretBonePitch = 'Front_Turret_Barrel',
             TurretBoneYaw = 'Front_Turret',
@@ -333,7 +331,11 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
+            -- sim-performance related values
+            TargetCheckInterval = 0.6, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -384,7 +386,6 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -394,7 +395,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Turret_Muzzle01',
             TurretBonePitch = 'Back_Turret_Barrel01',
             TurretBoneYaw = 'Back_Turret',

@@ -352,7 +352,6 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'TECH4',
                 'TECH3 STRUCTURE',
@@ -361,7 +360,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             Turreted = false,
             WeaponCategory = 'Bomb',
         },
@@ -412,7 +410,6 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1.5,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -420,7 +417,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Left_Muzzle_AA_01',
             TurretBonePitch = 'Left_Barrel_AA',
             TurretBoneYaw = 'Left_Barrel_AA',
@@ -482,7 +478,6 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1.5,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
@@ -490,7 +485,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Right_Muzzle_AA_01',
             TurretBonePitch = 'Right_Barrel_AA',
             TurretBoneYaw = 'Right_Barrel_AA',

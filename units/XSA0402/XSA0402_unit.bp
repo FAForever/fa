@@ -340,7 +340,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RateOfFire = 0.0714,
         RenderFireClock = true,
-            TargetCheckInterval = 3,
             TargetPriorities = {
                 'STRUCTURE',
                 'TECH3 MOBILE',
@@ -349,7 +348,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Bomb',
@@ -398,7 +396,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -409,7 +406,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Right_Front_Autocannon_Muzzle',
             TurretBonePitch = 'Right_Front_Autocannon_Muzzle',
             TurretBoneYaw = 'Right_Front_Autocannon_Muzzle',
@@ -469,7 +465,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -480,7 +475,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Left_Front_Autocannon_Muzzle',
             TurretBonePitch = 'Left_Front_Autocannon_Muzzle',
             TurretBoneYaw = 'Left_Front_Autocannon_Muzzle',
@@ -540,7 +534,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -551,7 +544,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Right_Rear_Autocannon_Muzzle',
             TurretBonePitch = 'Right_Rear_Autocannon_Muzzle',
             TurretBoneYaw = 'Right_Rear_Autocannon_Muzzle',
@@ -611,7 +603,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
@@ -622,7 +613,6 @@ UnitBlueprint {
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Left_Rear_Autocannon_Muzzle',
             TurretBonePitch = 'Left_Rear_Autocannon_Muzzle',
             TurretBoneYaw = 'Left_Rear_Autocannon_Muzzle',

@@ -201,7 +201,6 @@ UnitBlueprint {
     },
     Weapon = {
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UELWeapon',
@@ -258,7 +257,6 @@ UnitBlueprint {
             RateOfFire = 1.25,			--1.5
             SalvoShotDelay = 0.1,
             SalvoSize = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 '(AIR * MOBILE * EXPERIMENTAL - BOMBER)',
                 'AIR MOBILE GROUNDATTACK',
@@ -270,7 +268,6 @@ UnitBlueprint {
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Barrel',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

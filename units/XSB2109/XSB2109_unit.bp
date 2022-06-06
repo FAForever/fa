@@ -251,7 +251,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.25,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'MOBILE DIRECTFIRE',
@@ -263,7 +262,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Muzzle01',
             TurretBonePitch = 'XSB2109',
             TurretBoneYaw = 'XSB2109',

@@ -286,7 +286,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -295,7 +294,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Left_Arm_Barrel_Muzzle',
             TurretBonePitch = 'Left_Arm_B01',
             TurretBoneYaw = 'Torso',
@@ -359,7 +357,6 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.15,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'TECH1 MOBILE',
                 'TECH2 MOBILE',
@@ -368,7 +365,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Right_Arm_B02_Muzzle',
             TurretBonePitch = 'Right_Arm_B01',
             TurretBoneYaw = 'Right_Arm_B01',

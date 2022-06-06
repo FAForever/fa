@@ -322,7 +322,6 @@
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.05,
             RenderFireClock = true,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'EXPERIMENTAL MASSFABRICATION',
                 '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy

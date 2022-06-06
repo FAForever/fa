@@ -295,7 +295,6 @@ UnitBlueprint {
             RateOfFire = 3,
             SlavedToBody = false,
             SlavedToBodyArcRange = 25,
-            TargetCheckInterval = 0.66,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
@@ -304,7 +303,6 @@ UnitBlueprint {
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret',
             TurretBoneYaw = 'Turret',
