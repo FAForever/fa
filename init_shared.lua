@@ -72,7 +72,7 @@ local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
 allowedAssetsScd["textures.scd"] = true
 allowedAssetsScd["skins.scd"] = true
-allowedAssetsScd["schook.scd"] = true
+allowedAssetsScd["schook.scd"] = false      -- completely embedded in the repository
 allowedAssetsScd["props.scd"] = true
 allowedAssetsScd["projectiles.scd"] = true
 allowedAssetsScd["objects.scd"] = true
@@ -89,9 +89,8 @@ allowedAssetsScd["loc_de.scd"] = true
 allowedAssetsScd["loc_ru.scd"] = true
 allowedAssetsScd["env.scd"] = true
 allowedAssetsScd["effects.scd"] = true
-allowedAssetsScd["editor.scd"] = true
-allowedAssetsScd["ambience.scd"] = true
-allowedAssetsScd["lobbymanager_v105.scd"] = true
+allowedAssetsScd["editor.scd"] = false      -- Unused
+allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
@@ -132,21 +131,6 @@ local function MountDirectory(dir, mountpoint)
     }
 
     UpvaluedPathNext = UpvaluedPathNext + 1
-end
-
---- Mounts all allowed content in a directory, including scd and zip files, to the mountpoint.
--- @param dir The absolute path to the directory
--- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountContent(dir, mountpoint, allowedAssets)
-    for _,entry in IoDir(dir .. '/*') do
-        if entry != '.' and entry != '..' then
-            local mp = StringLower(entry)
-            if allowedAssets[mp] then 
-                LOG("Mounting content: " .. entry)
-                MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
-            end
-        end
-    end
 end
 
 --- Mounts all allowed content in a directory, including scd and zip files, directly.

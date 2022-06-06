@@ -39,7 +39,7 @@ function WithdrawSelectionSetCallback(func)
 end
 
 -- add a unit to an existing selection set
-function AddUnitToSelectionSet(name, unit)
+function AddUnitToSelectionSet(name, unit)    
     if selectionSets[name] then
         table.insert(selectionSets[name],unit)
     end
@@ -76,7 +76,6 @@ end
 
 -- select a specified selection set in the session
 function ApplySelectionSet(name)
-
     -- get a filtered list of only valid units back from the function
     if not selectionSets[name] then return end
     selectionSets[name] = ValidateUnitsList(selectionSets[name])
@@ -187,4 +186,21 @@ end
 
 function ResetSelectionSets(new_sets)
     selectionSets = new_sets
+end
+
+local hidden_select = false
+function IsHidden()
+    return hidden_select == true
+end
+
+function Hidden(callback)
+    local CM = import('/lua/ui/game/commandmode.lua')
+    local current_command = CM.GetCommandMode()
+    local old_selection = GetSelectedUnits() or {}
+
+    hidden_select = true
+    callback()
+    SelectUnits(old_selection)
+    CM.StartCommandMode(current_command[1], current_command[2])
+    hidden_select = false
 end

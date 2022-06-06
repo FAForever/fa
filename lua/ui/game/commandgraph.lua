@@ -16,6 +16,9 @@ local trashBtn = nil
 local dragging = false
 
 function OnCommandGraphShow(show)
+
+    import('/lua/ui/game/reclaim.lua').OnCommandGraphShow(show)
+
     --Table of all map views to display pings in
     local views = import('/lua/ui/game/worldview.lua').GetWorldViews()
     for i, v in views do
