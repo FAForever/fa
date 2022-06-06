@@ -253,6 +253,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'URAWeapon',
@@ -300,8 +305,6 @@ UnitBlueprint {
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
@@ -320,6 +323,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'URAWeapon',
@@ -368,8 +376,6 @@ UnitBlueprint {
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
