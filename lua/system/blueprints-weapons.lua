@@ -43,21 +43,29 @@ local function ProcessWeapon(unit, weapon)
         weapon.AlwaysRecheckTarget = false 
         weapon.DummyWeapon = true 
         weapon.ManualFire = true 
-        weapon.TrackingRadius = 1.0
+        weapon.TrackingRadius = 0.0
         return 
     end
 
     -- Tactical, strategical missile defenses and torpedo defenses
     if weapon.RangeCategory == "UWRC_Countermeasure" then 
-        weapon.TargetCheckInterval = 0.25
+        weapon.TargetCheckInterval = 0.4
         weapon.AlwaysRecheckTarget = false 
-        weapon.TrackingRadius = 1.15
+        weapon.TrackingRadius = 1.10
         weapon.DummyWeapon = false 
         weapon.ManualFire = false
         return 
     end
 
-    -- - process target check interval
+    -- manual launch of tactical and strategic missiles
+    if weapon.ManualFire then 
+        weapon.TargetCheckInterval = weaponTargetCheckUpperLimit
+        weapon.AlwaysRecheckTarget = false 
+        weapon.TrackingRadius = 0.0
+        return
+    end
+
+    -- # process target check interval
 
     if weapon.TargetCheckInterval == nil then 
         
@@ -66,14 +74,9 @@ local function ProcessWeapon(unit, weapon)
             ,   (weapon.MaxRadius or 10) / 40           -- based on attack range
         )   
 
-        -- except for counter measure weaponry
-        if weapon.RangeCategory == "UWRC_Countermeasure" then 
-            weapon.TargetCheckInterval = 0.5 
-        end
-
         -- clamp value to something sane
-        if weapon.TargetCheckInterval < 0.5 and (not isExperimental) then 
-            weapon.TargetCheckInterval = 0.5 
+        if weapon.TargetCheckInterval < 0.4 and (not isExperimental) then 
+            weapon.TargetCheckInterval = 0.4 
         end
 
         -- clamp value to something sane
@@ -90,12 +93,12 @@ local function ProcessWeapon(unit, weapon)
         weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
     end
 
-    -- - process target tracking radius 
+    -- # process target tracking radius 
 
     if weapon.TrackingRadius == nil then 
 
-        -- by default, give every unit a 15% target checking radius
-        weapon.TrackingRadius = 1.15
+        -- by default, give every unit a 5% target checking radius
+        weapon.TrackingRadius = 1.05
 
         -- remove target tracking radius for non-aa weaponry part of structures
         if isStructure and (weapon.RangeCategory ~= "UWRC_AntiAir") then 
@@ -104,43 +107,45 @@ local function ProcessWeapon(unit, weapon)
 
         -- give anti air a larger track radius
         if weapon.RangeCategory == "UWRC_AntiAir" then 
-            weapon.TrackingRadius = 1.3 
+            weapon.TrackingRadius = 1.15 
         end
         
         -- add significant target checking radius for bombers
         if isBomber then 
-            weapon.TrackingRadius = 1.5
+            weapon.TrackingRadius = 1.25
         end
 
     end
 
-    -- - process target rechecking
+    -- # process target rechecking
 
-    if weapon.AlwaysRecheckTarget == nil then 
+    if weapon.AlwaysRecheckTarget == nil then
 
         -- by default, do not recheck targets as that is expensive when a lot of units are stacked on top of another
-        weapon.AlwaysRecheckTarget = false 
+        weapon.AlwaysRecheckTarget = false
 
         -- allow target rechecking for artillery and weapons with a very large attack radius
-        if  weapon.RangeCategory == "UWRC_IndirectFire" or 
-            weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then 
-            weapon.AlwaysRecheckTarget = true 
+        if  weapon.RangeCategory == "UWRC_IndirectFire" or
+            weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then
+            weapon.AlwaysRecheckTarget = true
         end
 
         -- always allow anti air weapons attached to structures to retarget, as otherwise they may be stuck on a scout
-        if isStructure and weapon.RangeCategory == "UWRC_AntiAir" then 
-            weapon.AlwaysRecheckTarget = true 
+        if isStructure and weapon.RangeCategory == "UWRC_AntiAir" then
+            weapon.AlwaysRecheckTarget = true
         end
 
         -- always allow experimentals to retarget
-        if isExperimental then 
-            weapon.AlwaysRecheckTarget = true 
+        if isExperimental then
+            weapon.AlwaysRecheckTarget = true
         end
+    end
 
-        -- do not allow bombers to suddenly retarget, as then they won't drop their bomb then
-        if isBomber then 
-            weapon.AlwaysRecheckTarget = false 
-        end
+    -- # sanitize values
+
+    -- do not allow bombers to suddenly retarget, as then they won't drop their bomb then
+    if isBomber then
+        weapon.AlwaysRecheckTarget = false
     end
 end
 
@@ -155,18 +160,8 @@ function ProcessWeapons(units)
 
         if not skip then 
             if unit.Weapon then 
-                LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
                 for k, weapon in unit.Weapon do 
-                    local TargetCheckInterval = weapon.TargetCheckInterval
-                    local AlwaysRecheckTarget = weapon.AlwaysRecheckTarget 
-                    local TrackingRadius = weapon.TrackingRadius
-
                     ProcessWeapon(unit, weapon)
-
-                    LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
-                    LOG(" - - WeaponCheckinterval: " .. tostring(TargetCheckInterval) .. " -> " .. tostring(weapon.TargetCheckInterval))
-                    LOG(" - - AlwaysRecheckTarget: " .. tostring(AlwaysRecheckTarget) .. " -> " .. tostring(weapon.AlwaysRecheckTarget))
-                    LOG(" - - TrackingRadius: " .. tostring(TrackingRadius) .. " -> " .. tostring(weapon.TrackingRadius))
                 end
             end
         end
