@@ -54,8 +54,8 @@ local function PostProcessUnit(unit)
         -- guarantee that the table exists
         unit.AI = unit.AI or { }
 
-        -- if it is set then we use that - allows balance team to make adjustments as they see fit
-        if not unit.AI.GuardScanRadius then 
+        -- if it is set then we use that - allows us to make adjustments as we see fit
+        if unit.AI.GuardScanRadius == nil then 
 
             -- structures don't need this value set
             if isStructure or isDummy then 

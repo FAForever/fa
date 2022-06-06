@@ -54,6 +54,7 @@ local function ProcessWeapon(unit, weapon)
 
     -- # process target check interval
 
+    -- if it is set then we use that - allows us to make adjustments as we see fit
     if weapon.TargetCheckInterval == nil then 
         
         local intervalByRateOfFire = 0.5 * (1 / (weapon.RateOfFire or 1))
@@ -78,6 +79,7 @@ local function ProcessWeapon(unit, weapon)
 
     -- # process target tracking radius 
 
+    -- if it is set then we use that - allows us to make adjustments as we see fit
     if weapon.TrackingRadius == nil then 
 
         -- by default, give every unit a 5% target checking radius
@@ -102,6 +104,7 @@ local function ProcessWeapon(unit, weapon)
 
     -- # process target rechecking
 
+    -- if it is set then we use that - allows us to make adjustments as we see fit
     if weapon.AlwaysRecheckTarget == nil then
 
         -- by default, do not recheck targets as that is expensive when a lot of units are stacked on top of another

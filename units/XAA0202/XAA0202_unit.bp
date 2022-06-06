@@ -263,6 +263,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XAA_Weapon',
@@ -312,11 +317,6 @@ UnitBlueprint {
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
             TargetPriorities = {
-                'AIR MOBILE TECH3 BOMBER',
-                'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
-                'AIR MOBILE TRANSPORTATION',
-                'AIR MOBILE',
                 'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
