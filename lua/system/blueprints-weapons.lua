@@ -141,7 +141,11 @@ function ProcessWeapons(units)
         if unit.Weapon then 
             LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
             for k, weapon in unit.Weapon do 
-                ProcessWeapon(unit, weapon)
+                if not weapon.DummyWeapon then 
+                    ProcessWeapon(unit, weapon)
+                else
+                    -- LOG("Skipped: "  .. tostring(weapon.DisplayName))
+                end
 
                 -- LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
                 -- LOG(" - - WeaponCheckinterval: " .. tostring(weapon.TargetCheckInterval))
