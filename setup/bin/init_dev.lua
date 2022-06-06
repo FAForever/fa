@@ -10,7 +10,12 @@ local locationOfRepository = 'your-fa-repository-location'
 -- we can not load in additional init files with the current deployment 
 -- system and therefore we copy/paste this section into the other init files.
 
--- imports fa_path to determine where it is installed
+-- imports fa_path to determine where it is installed, this requires you to launch the client once
+-- - fa_path: installation location of forged alliance on your system
+-- - custom_vault_path: location of the vault on your system
+-- - GameVersion: game version that is being run
+-- - GameType: game type chosen by the user
+-- - ClientVersion: client version that is being run
 dofile(InitFileDir .. '/../fa_path.lua')
 
 LOG("Client version: " .. tostring(ClientVersion))
