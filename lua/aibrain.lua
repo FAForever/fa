@@ -238,8 +238,8 @@ AIBrain = Class(moho.aibrain_methods) {
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
     
-        self.jammersToDisable = { }
-        setmetatable(self.jammersToDisable, { __mode = 'v' })
+        self.jammers = { }
+        setmetatable(self.jammers, { __mode = 'v' })
 
         ForkThread(self.JammingToggleThread, self)
 
@@ -335,45 +335,38 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Jamming Switch Logic
 
-    AddJammerToDisable = function(self, unit)
-        self.jammersToDisable[unit.EntityId] = unit
+    AddJammer = function(self, unit)
+        self.jammers[unit.EntityId] = unit
     end,
 
-    RemoveJammerToDisable = function(self, unit)
-        self.jammersToDisable[unit.EntityId] = nil
+    RemoveJammer = function(self, unit)
+        self.jammers[unit.EntityId] = nil
     end,
 
     JammingToggleThread = function(self)
         while true do 
 
-            for i, jammer in self.jammersToDisable do
+            for i, jammer in self.jammers do
                 if not jammer:BeenDestroyed() then
+                    if jammer.resetJammer then
+                        
+                        LOG("ToggleJammer")
+                        -- run logic here
 
-                    LOG("ToggleJammer")
-                    -- run logic here
-
-                   jammer:DisableUnitIntel('ToggleBit3', 'Jammer')
-                   ForkThread(self.JammingReEnableThread, self)
-                   RemoveJammerToDisable(jammer)
-
-                   
-                   
-                   
+                        jammer:DisableUnitIntel('AutoToggle', 'Jammer')
+                        WaitSeconds(0.3)
+                        if not jammer:BeenDestroyed() then
+                            jammer:EnableUnitIntel('AutoToggle', 'Jammer')  
+                            jammer.resetJammer = false
+                        end
+                    end
                 else
-                    RemoveJammerToDisable(jammer)
+                    RemoveJammer(jammer)
                 end
 
             end
             WaitSeconds(0.1)
         end
-    end,
-
-    JammingReEnableThread = function(self, jammer)
-        WaitSeconds(0.2)
-        if not jammer:BeenDestroyed() then
-            jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
-        end
-
     end,
 
     -- Energy storage callbacks
@@ -614,6 +607,16 @@ AIBrain = Class(moho.aibrain_methods) {
     --  val: true or false
     -- calls callback function with blip it saw.
     OnIntelChange = function(self, blip, reconType, val)
+        if reconType == 'LOSNow' then
+            if not val then
+                local unit = blip:GetSource()
+                if unit.Blueprint.Intel.JammerBlips > 0 then
+                    LOG("resetJammerTrue")
+                    unit.resetJammer = true
+                end
+            end
+        end
+
         if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
                 if EntityCategoryContains(v.Category, blip:GetBlueprint().BlueprintId)
