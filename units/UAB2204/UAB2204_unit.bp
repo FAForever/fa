@@ -198,7 +198,6 @@ UnitBlueprint {
     },
     Weapon = {
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 ChargeStart = Sound {
                     Bank = 'UALWeapon',
@@ -216,7 +215,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 150,
             DamageFriendly = false,
-            DamageRadius = 3,				#4
+            DamageRadius = 3,				--4
             DamageType = 'Normal',
             DetonatesAtTargetHeight = true,
             DisplayName = 'Fizz Launcher',
@@ -225,13 +224,13 @@ UnitBlueprint {
                 Land = 'Air',
                 Water = 'Air',
             },
-            FiringRandomness = 1.5,			#2.5
+            FiringRandomness = 1.5,			--2.5
             FiringTolerance = 2,
             Label = 'AAFizz',
-            MaxRadius = 50,				#44
+            MaxRadius = 50,				--44
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 35,			#20
+            MuzzleVelocity = 35,			--20
             ProjectileId = '/projectiles/AAAFizz01/AAAFizz01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             ProjectilesPerOnFire = 1,
@@ -253,9 +252,7 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 '(AIR * MOBILE * EXPERIMENTAL - BOMBER)',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TECH2 BOMBER',
@@ -263,10 +260,9 @@ UnitBlueprint {
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'WepFocus',
             TurretBonePitch = 'Barrel_Right',
             TurretBoneYaw = 'Turret',
@@ -291,9 +287,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false
-            Sub = true, #from false,
-            Water = true, #from false,
+            Seabed = true, --from false
+            Sub = true, --from false,
+            Water = true, --from false,
         },
     },
 }

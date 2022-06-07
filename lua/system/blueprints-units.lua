@@ -2,7 +2,7 @@
 -- Post process a unit
 local function PostProcessUnit(unit)
 
-    -- # create hash tables for quick lookup
+    -- -- create hash tables for quick lookup
 
     unit.CategoriesCount = 0
     unit.CategoriesHash = { }
@@ -13,7 +13,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- # create hash tables for quick lookup
+    -- -- create hash tables for quick lookup
 
     unit.DoNotCollideListCount = 0 
     unit.DoNotCollideListHash = { }
@@ -24,7 +24,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- # sanitize guard scan radius
+    -- -- sanitize guard scan radius
 
     -- The guard scan radius is used when:
     -- - A unit attack moves, it determines how far the unit remains from its target
@@ -54,8 +54,8 @@ local function PostProcessUnit(unit)
         -- guarantee that the table exists
         unit.AI = unit.AI or { }
 
-        -- if it is set then we use that - allows balance team to make adjustments as they see fit
-        if not unit.AI.GuardScanRadius then 
+        -- if it is set then we use that - allows us to make adjustments as we see fit
+        if unit.AI.GuardScanRadius == nil then 
 
             -- structures don't need this value set
             if isStructure or isDummy then 
@@ -113,7 +113,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- # sanitize air unit footprints
+    -- -- sanitize air unit footprints
 
     -- value used by formations to determine the distance between other air units. Note
     -- that the value must be of type unsigned integer!

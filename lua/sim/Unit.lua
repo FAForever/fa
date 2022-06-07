@@ -158,6 +158,7 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
+
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -239,7 +240,8 @@ Unit = Class(moho.unit_methods) {
         -- the entity that produces sound, by default ourself
         self.SoundEntity = self
 
-
+        -- used to fix engine related bugs
+        self.EngineFlags = { }
 
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
@@ -2608,7 +2610,7 @@ Unit = Class(moho.unit_methods) {
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
 
-        -- kept after #3355 for backwards compatibility with mods
+        -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
             for _, b in self.buildBots do
                 ChangeState(b, b.IdleState)
@@ -4242,9 +4244,24 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param duration boolean Stun duration in seconds
     SetStunned = function(self, duration)
         if not self.ImmuneToStun then 
             cUnit.SetStunned(self, duration)
+        end
+    end,
+
+    --- Determines whether or not this unit is actively consuming resources. There is an engine bug
+    --- that allows you to gain free resources by reverting the resources of the last tick to the
+    --- user when it is called with 'false' while the consumption is already set to 'false'
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param flag boolean A flag to determine whether our consumption should be active
+    SetConsumptionActive = function(self, flag)
+        if self.EngineFlags['SetConsumptionActive'] ~= flag then
+            cUnit.SetConsumptionActive(self, flag)
+            self.EngineFlags['SetConsumptionActive'] = flag 
         end
     end,
 
@@ -4261,6 +4278,10 @@ Unit = Class(moho.unit_methods) {
     -- Called by the shield class 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    -- Called by the brain when the unit registered itself
+    OnNoExcessEnergy = function(self) end,
+    OnExcessEnergy = function(self) end,
 
     -- Called by the weapon class, these are expensive!
     OnGotTarget = function(self, Weapon) end,

@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/RushMainLand.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/RushMainLand.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'SetonsCustom',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuilders',
         'T2BalancedUpgradeBuilders',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -23,19 +23,19 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstruction Balance',
 
-        # Engineer Support buildings
+        -- Engineer Support buildings
         'EngineeringSupportBuilder',
 
-        # Build energy at this base
+        -- Build energy at this base
         'EngineerEnergyBuilders',
 
-        # Build Mass high pri at this base
+        -- Build Mass high pri at this base
         'EngineerMassBuildersHighPri',
 
-        # Extractors
+        -- Extractors
         'Time Exempt Extractor Upgrades',
 
-        # ACU Builders
+        -- ACU Builders
         'Land Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
@@ -43,29 +43,29 @@ BaseBuilderTemplate {
         'ACUUpgrades - Tech 2 Engineering',
         'ACUUpgrades - Shields',
 
-        # ACU Defense
+        -- ACU Defense
         'T1ACUDefenses',
         'T2ACUDefenses',
         'T2ACUShields',
         'T3ACUShields',
         'T3ACUNukeDefenses',
 
-        # ==== EXPANSION ==== #
+        -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
-        #'EngineerFirebaseBuilders',
+        --'EngineerFirebaseBuilders',
 
-        # ==== DEFENSES ==== #
-        #'T1BaseDefenses',
+        -- ==== DEFENSES ==== --
+        --'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
 
         'T2MissileDefenses',
         'T2ArtilleryFormBuilders',
 
-        #'T1DefensivePoints',
-        #'T2DefensivePoints',
-        #'T3DefensivePoints',
+        --'T1DefensivePoints',
+        --'T2DefensivePoints',
+        --'T3DefensivePoints',
 
         'T2Shields',
         'ShieldUpgrades',
@@ -74,19 +74,19 @@ BaseBuilderTemplate {
         'T3NukeDefenses',
         'T3NukeDefenseBehaviors',
 
-        #'MiscDefensesEngineerBuilders',
+        --'MiscDefensesEngineerBuilders',
 
-        # ==== NAVAL EXPANSION ==== #
-        #'NavalExpansionBuilders', #DUNCAN - commented out for setons
+        -- ==== NAVAL EXPANSION ==== --
+        --'NavalExpansionBuilders', --DUNCAN - commented out for setons
 
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
 
         'FrequentLandAttackFormBuilders',
         'MassHunterLandFormBuilders',
-        #'MiscLandFormBuilders', #DUNCAN - commented out for setons
+        --'MiscLandFormBuilders', --DUNCAN - commented out for setons
 
         'T1LandAA',
         'T2LandAA',
@@ -96,7 +96,7 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
@@ -112,11 +112,11 @@ BaseBuilderTemplate {
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== ARTILLERY BUILDERS ==== #
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
         'T3ArtilleryFormBuilders',
 
@@ -125,7 +125,7 @@ BaseBuilderTemplate {
         'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
 
@@ -154,14 +154,14 @@ BaseBuilderTemplate {
     },
     BaseSettings = {
         EngineerCount = {
-            #DUNCAN - was 15, 10, 10, 1
+            --DUNCAN - was 15, 10, 10, 1
             Tech1 = 25,
             Tech2 = 10,
             Tech3 = 25,
             SCU = 1,
         },
         FactoryCount = {
-            #DUNCAN - Factory number tweaks, was 5, 1, 0, 1
+            --DUNCAN - Factory number tweaks, was 5, 1, 0, 1
             Land = 8,
             Air = 2,
             Sea = 0,

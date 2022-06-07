@@ -211,7 +211,6 @@ UnitBlueprint {
     },
     Weapon = {
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSB_Weapon',
@@ -258,10 +257,8 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.28,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
                 'EXPERIMENTAL',
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE TECH3 GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
@@ -271,10 +268,9 @@ UnitBlueprint {
                 'AIR MOBILE TECH1 BOMBER',
                 'AIR MOBILE TECH1 GROUNDATTACK',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Muzzle01',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',
@@ -299,9 +295,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true,  #from false
-            Sub = true,  #from false
-            Water = true,  #from false
+            Seabed = true,  --from false
+            Sub = true,  --from false
+            Water = true,  --from false
         },
     },
 }

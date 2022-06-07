@@ -48,7 +48,7 @@ Prop = Class(moho.prop_methods) {
 
     OnCreate = function(self)
 
-        -- # Caching
+        -- -- Caching
 
         self.Trash = TrashBag()
         self.EntityId = EntityGetEntityId(self)
@@ -56,7 +56,7 @@ Prop = Class(moho.prop_methods) {
         self.CachePosition = EntityGetPosition(self)
         self.SyncData = { }
 
-        -- # Reclaim values
+        -- -- Reclaim values
 
         -- used by typical props, wrecks have their own mechanism to set its value
         if not self.Blueprint.UnitWreckage then 
@@ -72,7 +72,7 @@ Prop = Class(moho.prop_methods) {
             )
         end
 
-        -- # Terrain correction
+        -- -- Terrain correction
 
         -- Find props that, for some reason, are below ground at their central bone
         local terrainAltitude = GetTerrainHeight(self.CachePosition[1], self.CachePosition[3])
@@ -83,7 +83,7 @@ Prop = Class(moho.prop_methods) {
             Warp(self, self.CachePosition) 
         end
 
-        -- # Set health and status
+        -- -- Set health and status
 
         local maxHealth = self.Blueprint.Defense.MaxHealth 
         if maxHealth < 50 then 

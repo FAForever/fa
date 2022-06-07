@@ -65,6 +65,7 @@ doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-weapons.lua")
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
 local function LoadPreGameData()
@@ -397,7 +398,7 @@ uniqueBuildAnimations["uas0401"] = aeonBuildNoAnimation
 -- @param bp The blueprint to generate the build mesh for.
 function ExtractBuildMeshBlueprint(bp)
 
-    -- # useful information to make distinctions
+    -- -- useful information to make distinctions
 
     local FactionName = bp.General.FactionName
     local isSubCommander = false 
@@ -411,7 +412,7 @@ function ExtractBuildMeshBlueprint(bp)
         end
     end
 
-    -- # determine build mesh blueprint and add it to the game
+    -- -- determine build mesh blueprint and add it to the game
 
     if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then
 
@@ -656,17 +657,17 @@ function PreModBlueprints(all_bps)
 
         ExtractCloakMeshBlueprint(bp)
 
-        -- # Units with no categories are skipped
+        -- -- Units with no categories are skipped
 
         if not bp.Categories then
             continue
         end
 
-        -- # Construct hash-based categories
+        -- -- Construct hash-based categories
 
         bp.CategoriesHash = table.hash(bp.Categories)
 
-        -- # Allow to add or delete categories for mods
+        -- -- Allow to add or delete categories for mods
 
         if bp.DelCategories then
             for k, v in bp.DelCategories do
@@ -682,7 +683,7 @@ function PreModBlueprints(all_bps)
             bp.AddCategories = nil
         end
 
-        -- # Build range overlay
+        -- -- Build range overlay
 
         if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
@@ -692,7 +693,7 @@ function PreModBlueprints(all_bps)
             end
         end
 
-        -- # Add common category values for easier lookup
+        -- -- Add common category values for easier lookup
 
         -- Add tech category
         for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
@@ -713,41 +714,15 @@ function PreModBlueprints(all_bps)
         -- Add faction category
         bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
 
-        -- # Adjust weapon blueprints
+        -- -- Adjust weapon blueprints
         
         for i, w in bp.Weapon or {} do
-
             -- add in weapon blueprint id
             local label = w.Label or "Unlabelled"
             w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
-
-            -- add in adjusted target priorities
-            if w.TargetPriorities then
-
-                local priorities = {}
-                local prioritiesHead = 1
-                
-                for g, transcendentPritority in w.TranscendentPriorities or {} do
-                    priorities[prioritiesHead] = transcendentPritority
-                    prioritiesHead = prioritiesHead + 1
-                end
-
-                priorities[prioritiesHead] = 'SPECIALHIGHPRI'
-                prioritiesHead = prioritiesHead + 1
-
-                for _, priority in w.TargetPriorities do
-                    priorities[prioritiesHead] = priority
-                    prioritiesHead = prioritiesHead + 1
-                end
-
-                priorities[prioritiesHead] = 'SPECIALLOWPRI'
-                prioritiesHead = prioritiesHead + 1
-
-                w.TargetPriorities = priorities
-            end
         end
 
-        -- # Hotfix for naval wrecks
+        -- -- Hotfix for naval wrecks
 
         if bp.CategoriesHash.NAVAL and not bp.Wreckage then
             bp.Wreckage = {
@@ -766,7 +741,7 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        -- # Synchronize hashed categories with actual categories
+        -- -- Synchronize hashed categories with actual categories
 
         bp.Categories = table.unhash(bp.CategoriesHash)
 
@@ -824,6 +799,9 @@ function PostModBlueprints(all_bps)
     -- of a units capabilities.
     SetUnitThreatValues(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
+
+    local ok, msg = pcall(ProcessWeapons, all_bps.Unit)
+    LOG(repr(msg))
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
     CalculateLODs(all_bps)

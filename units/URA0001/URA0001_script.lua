@@ -11,7 +11,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 local DeprecatedWarnings = { }
 
--- Kept after #3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
+-- Kept after --3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
 
 URA0001 = Class(CAirUnit) {
     spawnedBy = nil,

@@ -300,7 +300,7 @@ UnitBlueprint {
                 Land = 'Seabed|Sub|Water',
             },
             FiringRandomness = 3,
-            FiringTolerance = 6, # [102]
+            FiringTolerance = 6, -- [102]
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',
@@ -328,8 +328,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,#0.08
-            TargetCheckInterval = 2.5,
+            RateOfFire = 0.1,--0.08
             TargetPriorities = {
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',
@@ -340,10 +339,9 @@ UnitBlueprint {
                 'NAVAL * TECH3',
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             Turreted = false,
             WeaponCategory = 'Anti Navy',
         },

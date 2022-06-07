@@ -29,7 +29,6 @@ UnitBlueprint {
     Categories = {
         'SELECTABLE',
         'OPERATION',
-        'SPECIALHIGHPRI',
         'TECH1',
         'VISIBLETORECON',
         'RECLAIMABLE',

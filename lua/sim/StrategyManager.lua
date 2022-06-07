@@ -1,18 +1,18 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/sim/StrategyManager.lua
-#**
-#**  Summary  : Manage Skirmish Strategies
-#**
-#**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved. All lefts reserved too.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/sim/StrategyManager.lua
+--**
+--**  Summary  : Manage Skirmish Strategies
+--**
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved. All lefts reserved too.
+--****************************************************************************
 
 local BuilderManager = import('/lua/sim/BuilderManager.lua').BuilderManager
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local StrategyBuilder = import('/lua/sim/StrategyBuilder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
-#local StrategyList = import('/lua/ai/SkirmishStrategyList.lua').StrategyList
+--local StrategyList = import('/lua/ai/SkirmishStrategyList.lua').StrategyList
 local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
@@ -34,7 +34,7 @@ StrategyManager = Class(BuilderManager) {
 
         self:AddBuilderType('Any')
 
-        #self:LoadStrategies()
+        --self:LoadStrategies()
     end,
 
     AddBuilder = function(self, builderData, locationType, builderType)
@@ -43,7 +43,7 @@ StrategyManager = Class(BuilderManager) {
         return newBuilder
     end,
 
-    # Load all strategies in the Strategy List table
+    -- Load all strategies in the Strategy List table
     LoadStrategies = function(self)
         for i,v in StrategyList do
             self:AddBuilder(v)
@@ -91,10 +91,10 @@ StrategyManager = Class(BuilderManager) {
         BuilderManager.ManagerLoopBody(self,builder,bType)
 
         if builder.Priority >= 70 and builder:GetBuilderStatus() and not builder:IsStrategyActive() then
-            #LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Activating Strategy: '..builder.BuilderName..' Priority: '..builder.Priority)
+            --LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Activating Strategy: '..builder.BuilderName..' Priority: '..builder.Priority)
             self:ExecuteChanges(builder)
         elseif (builder.Priority < 70 or not builder:GetBuilderStatus()) and builder:IsStrategyActive() then
-            #LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Deactivating Strategy: '..builder.BuilderName..' Priority: '..builder.Priority)
+            --LOG('*AI DEBUG: '..self.Brain.Nickname..' '..SUtils.TimeConvert(GetGameTimeSeconds())..' Deactivating Strategy: '..builder.BuilderName..' Priority: '..builder.Priority)
             self:UndoChanges(builder)
         end
     end,

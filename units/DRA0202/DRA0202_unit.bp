@@ -264,6 +264,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'URAWeapon',
@@ -312,19 +317,11 @@ UnitBlueprint {
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
             SlavedToBody = false,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
-                'AIR MOBILE TECH3 BOMBER',
-                'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
-                'AIR MOBILE TRANSPORTATION',
-                'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 2.5,
             TurretBoneMuzzle = 'Projectile_Aim',
             TurretBonePitch = 'Projectile_Aim',
             TurretBoneYaw = 'Projectile_Aim',
@@ -366,7 +363,7 @@ UnitBlueprint {
             MaxRadius = 40,
             MuzzleSalvoDelay = 0.05,
             MuzzleSalvoSize = 4,
-            MuzzleVelocity = 30,#35
+            MuzzleVelocity = 30,--35
             ProjectileId = '/projectiles/CIFCorsairMissile01/CIFCorsairMissile01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.15,
             ProjectilesPerOnFire = 6,
@@ -393,13 +390,11 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 0.8,
             TurretBoneMuzzle = 'Projectile_Aim',
             TurretBonePitch = 'Projectile_Aim',
             TurretBoneYaw = 'Projectile_Aim',

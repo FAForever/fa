@@ -1,0 +1,10 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'MapImager',
+            LODCutoff = 100000,
+        },
+    },
+    IconFadeInZoom = 10000,
+    UniformScale = 0.00208,
+}

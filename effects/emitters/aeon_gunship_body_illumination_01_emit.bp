@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/aeon_gunship_chassis_01.dds]],
-	RampTexture = [[/textures/particles/ramp_disintegrator_02.dds]],
+	Texture = '/textures/particles/aeon_gunship_chassis_01.dds',
+	RampTexture = '/textures/particles/ramp_disintegrator_02.dds',
 	XDirectionCurve = {
 		XRange = 1.50,
 		Keys = {
