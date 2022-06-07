@@ -51,7 +51,7 @@ TDFHeavyPlasmaGatlingCannonWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.THeavyPlasmaGatlingCannonMuzzleFlash,
 }
 
----@class TDFOverchargeWeapon : DefaultProjectileWeapon
+---@class TDFOverchargeWeapon : OverchargeWeapon
 TDFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.TCommanderOverchargeFlash01,
     DesiredWeaponLabel = 'RightZephyr'
