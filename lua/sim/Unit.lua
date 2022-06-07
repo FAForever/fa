@@ -341,10 +341,7 @@ Unit = Class(moho.unit_methods) {
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
 
-        if self.Blueprint.Intel.JammerBlips then
-            self.Brain:AddJammer(self)
-            LOG("Added Jammer")
-        end
+        
     end,
 
     -------------------------------------------------------------------------------------------

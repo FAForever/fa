@@ -242,8 +242,8 @@ AIBrain = Class(moho.aibrain_methods) {
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
     
-        self.jammers = { }
-        setmetatable(self.jammers, { __mode = 'v' })
+        self.jammersToDisable = { }
+        setmetatable(self.jammersToDisable, { __mode = 'v' })
 
         ForkThread(self.JammingToggleThread, self)
 
@@ -339,39 +339,45 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Jamming Switch Logic
 
-    AddJammer = function(self, unit)
-        self.jammers[unit.EntityId] = unit
+    AddJammerToDisable = function(self, unit)
+        self.jammersToDisable[unit.EntityId] = unit
     end,
 
-    RemoveJammer = function(self, unit)
-        self.jammers[unit.EntityId] = nil
+    RemoveJammerToDisable = function(self, unit)
+        self.jammersToDisable[unit.EntityId] = nil
     end,
-    
+
     JammingToggleThread = function(self)
-
-        local CoroutineYield = CoroutineYield
-
         while true do 
 
-            for i, jammer in self.jammers do
+            for i, jammer in self.jammersToDisable do
                 if not jammer:BeenDestroyed() then
 
                     LOG("ToggleJammer")
                     -- run logic here
 
                    jammer:DisableUnitIntel('ToggleBit3', 'Jammer')
-                   WaitSeconds(0.2)
-                   jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
+                   ForkThread(self.JammingReEnableThread, self)
+                   RemoveJammerToDisable(jammer)
+
+                   
                    
                    
                 else
-                    RemoveJammer(jammer)
+                    RemoveJammerToDisable(jammer)
                 end
 
             end
-            WaitSeconds(10)
-            CoroutineYield(1)
+            WaitSeconds(0.1)
         end
+    end,
+
+    JammingReEnableThread = function(self, jammer)
+        WaitSeconds(0.2)
+        if not jammer:BeenDestroyed() then
+            jammer:EnableUnitIntel('ToggleBit3', 'Jammer')
+        end
+
     end,
 
     -- Energy storage callbacks
