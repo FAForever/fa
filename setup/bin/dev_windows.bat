@@ -1,4 +1,4 @@
-ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log" /RunWithTheWind
+ForgedAlliance.exe /init "init_dev.lua" /EnableDiskWatch /showlog /log "dev.log" /RunWithTheWind /nomovie
 
 REM /init               Define what initialisation file to use
 REM /EnableDiskWatch    Allows the game to reload files when it sees they're changed on disk

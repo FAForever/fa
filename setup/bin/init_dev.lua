@@ -10,13 +10,17 @@ local locationOfRepository = 'your-fa-repository-location'
 -- we can not load in additional init files with the current deployment 
 -- system and therefore we copy/paste this section into the other init files.
 
--- imports various values that are set by the client. In particular:
---  - fa_path: installation location of forged alliance on your system
+-- imports fa_path to determine where it is installed, this requires you to launch the client once
+-- - fa_path: installation location of forged alliance on your system
 -- - custom_vault_path: location of the vault on your system
 -- - GameVersion: game version that is being run
 -- - GameType: game type chosen by the user
 -- - ClientVersion: client version that is being run
 dofile(InitFileDir .. '/../fa_path.lua')
+
+LOG("Client version: " .. tostring(ClientVersion))
+LOG("Game version: " .. tostring(GameVersion))
+LOG("Game type: " .. tostring(GameType))
 
 -- upvalued performance
 local dofile = dofile
@@ -68,20 +72,25 @@ local integratedMods = { }
 integratedMods["nvidia fix"] = true
 integratedMods = LowerHashTable(integratedMods)
 
+-- mods that are deprecated, based on folder name
+local deprecatedMods = { }
+deprecatedMods["simspeed++"] = true
+deprecatedMods = LowerHashTable(deprecatedMods)
+
 -- typical FA packages
 local allowedAssetsScd = { }
 allowedAssetsScd["units.scd"] = true
 allowedAssetsScd["textures.scd"] = true
 allowedAssetsScd["skins.scd"] = true
-allowedAssetsScd["schook.scd"] = true
+allowedAssetsScd["schook.scd"] = false      -- completely embedded in the repository
 allowedAssetsScd["props.scd"] = true
 allowedAssetsScd["projectiles.scd"] = true
 allowedAssetsScd["objects.scd"] = true
-allowedAssetsScd["moholua.scd"] = true
-allowedAssetsScd["mohodata.scd"] = true
+allowedAssetsScd["moholua.scd"] = false     -- completely embedded in the repository
+allowedAssetsScd["mohodata.scd"] = false    -- completely embedded in the repository
 allowedAssetsScd["mods.scd"] = true
 allowedAssetsScd["meshes.scd"] = true
-allowedAssetsScd["lua.scd"] = true
+allowedAssetsScd["lua.scd"] = false         -- completely embedded in the repository
 allowedAssetsScd["loc_us.scd"] = true
 allowedAssetsScd["loc_es.scd"] = true
 allowedAssetsScd["loc_fr.scd"] = true
@@ -90,15 +99,14 @@ allowedAssetsScd["loc_de.scd"] = true
 allowedAssetsScd["loc_ru.scd"] = true
 allowedAssetsScd["env.scd"] = true
 allowedAssetsScd["effects.scd"] = true
-allowedAssetsScd["editor.scd"] = true
-allowedAssetsScd["ambience.scd"] = true
-allowedAssetsScd["lobbymanager_v105.scd"] = true
+allowedAssetsScd["editor.scd"] = false      -- Unused
+allowedAssetsScd["ambience.scd"] = false    -- Empty 
 allowedAssetsScd["sc_music.scd"] = true
 allowedAssetsScd = LowerHashTable(allowedAssetsScd)
 
 -- typical backwards compatible packages
 local allowedAssetsNxt = { }
-allowedAssetsNxt["texturepack.nxt"] = true
+allowedAssetsNxt["kyros.nxt"] = true
 allowedAssetsNxt["advanced strategic icons.nxt"] = true
 allowedAssetsNxt["advanced_strategic_icons.nxt"] = true
 allowedAssetsNxt = LowerHashTable(allowedAssetsNxt)
@@ -135,22 +143,6 @@ local function MountDirectory(dir, mountpoint)
     UpvaluedPathNext = UpvaluedPathNext + 1
 end
 
---- Mounts all allowed content in a directory, including scd and zip files, to the mountpoint.
--- @param dir The absolute path to the directory
--- @param mountpoint The path to use in the game (e.g., /maps/...)
-local function MountContent(dir, mountpoint, allowedAssets)
-    for _,entry in IoDir(dir .. '/*') do
-        if entry != '.' and entry != '..' then
-            local mp = StringLower(entry)
-            if allowedAssets[mp] then 
-                MountDirectory(dir .. '/' .. entry, mountpoint .. '/' .. mp)
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
-            end
-        end
-    end
-end
-
 --- Mounts all allowed content in a directory, including scd and zip files, directly.
 -- @param dir The absolute path to the directory
 -- @param mountpoint The path to use in the game (e.g., /maps/...)
@@ -159,9 +151,8 @@ local function MountAllowedContent(dir, pattern, allowedAssets)
         if entry != '.' and entry != '..' then
             local mp = StringLower(entry)
             if allowedAssets[mp] then 
+                LOG("Mounting content: " .. entry)
                 MountDirectory(dir .. "/" .. entry, '/')
-            else 
-                LOG("Prevented loading content that is not allowed: " .. entry)
             end
         end
     end
@@ -185,7 +176,9 @@ local function MountMapContent(dir)
         end
 
         -- do not load archives as maps
-        if StringSub(map, -4) == ".zip" or StringSub(map, -4) == ".scd"  or StringSub(map, -4) == ".rar" then
+        local extension = StringSub(map, -4)
+        if extension == ".zip" or extension == ".scd" or extension == ".rar" then
+            LOG("Prevented loading a map inside a zip / scd / rar file: " .. dir .. "/" .. map)
             continue 
         end
 
@@ -208,22 +201,22 @@ local function MountMapContent(dir)
 
         -- check if it has a scenario file
         if not scenarioFile then 
-            LOG("Map doesn't have a scenario file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no scenario file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not scmapFile then 
-            LOG("Map doesn't have a scmap file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no scmap file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not saveFile then 
-            LOG("Map doesn't have a save file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no save file: " .. dir .. "/" .. map)
             continue 
         end
 
         if not scriptFile then 
-            LOG("Map doesn't have a script file: " .. dir .. "/" .. map)
+            LOG("Prevented loading a map with no script file: " .. dir .. "/" .. map)
             continue 
         end
 
@@ -314,7 +307,7 @@ local loadedMods = { }
 local function MountModContent(dir)
     -- get all directories / mods at the mount point
     for _, mod in io.dir(dir..'/*.*') do
-
+        
         -- prevent capital letters messing things up
         mod = StringLower(mod)
 
@@ -325,12 +318,20 @@ local function MountModContent(dir)
 
         -- do not load integrated mods
         if integratedMods[mod] then 
-            _ALERT("Blocked mod that is integrated: " .. mod )
+            LOG("Prevented loading a mod that is integrated: " .. mod )
+            continue 
+        end 
+
+        -- do not load deprecated mods
+        if deprecatedMods[mod] then 
+            LOG("Prevented loading a mod that is deprecated: " .. mod )
             continue 
         end 
 
         -- do not load archives as mods
-        if StringFind(mod, ".zip") or StringFind(mod, ".scd") or StringFind(mod, ".rar") then
+        local extension = StringSub(mod, -4)
+        if extension == ".zip" or extension == ".scd" or extension == ".rar" then
+            LOG("Prevented loading a mod inside a zip / scd / rar file: " .. dir .. "/" .. mod)
             continue 
         end
 
@@ -344,7 +345,7 @@ local function MountModContent(dir)
 
         -- check if it has a scenario file
         if not infoFile then 
-            _ALERT("Mod doesn't have an info file: " .. dir .. "/" .. mod)
+            LOG("Mod doesn't have an info file: " .. dir .. "/" .. mod)
             continue 
         end
 
@@ -425,17 +426,10 @@ local minimumShaderVersion = 3729
 local shaderCache = SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance/cache'
 for k, file in IoDir(shaderCache .. '/*') do
     if file ~= '.' and file ~= '..' then 
-        local version = tonumber(string.sub(file, -4))
-        if not version or version < minimumShaderVersion then 
-            LOG("Force shader recompilation of file: " .. file)
-            os.remove(shaderCache .. '/' .. file)
-        end
+        LOG("Force shader recompilation of file: " .. file)
+        os.remove(shaderCache .. '/' .. file)
     end
 end
-
--- typical FAF packages
-local allowedAssetsNxy = { }
-allowedAssetsNxy = LowerHashTable(allowedAssetsNxy)
 
 -- load maps / mods from custom vault location, if set by client
 if custom_vault_path then
@@ -453,7 +447,6 @@ end
 MountDirectory(locationOfRepository, '/')
 
 -- load in any .nxt that matches the whitelist / blacklist in FAF gamedata
-MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nx5', allowedAssetsNxy)
 MountAllowedContent(InitFileDir .. '/../gamedata/', '*.nxt', allowedAssetsNxt)
 
 -- load in any .scd that matches the whitelist / blacklist in FA gamedata

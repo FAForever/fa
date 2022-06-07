@@ -20,8 +20,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	Texture = [[/textures/particles/build_shield_01.dds]],
-	RampTexture = [[/textures/particles/ramp_water_01.dds]],
+	Texture = '/textures/particles/build_shield_01.dds',
+	RampTexture = '/textures/particles/ramp_water_01.dds',
 	XDirectionCurve = {
 		XRange = 10.00,
 		Keys = {

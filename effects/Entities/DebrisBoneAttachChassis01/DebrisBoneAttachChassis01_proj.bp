@@ -1,0 +1,21 @@
+ProjectileBlueprint {
+    Physics = {
+        MinBounceCount = 15,
+        MaxBounceCount = 15,
+        BounceVelDamp = 0.5,
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        DirectionX = 0,
+        DirectionXRange = 0.4,
+        DirectionY = 1,
+        DirectionZ = 0,
+        DirectionZRange = 0.4,
+        InitialSpeed = 3,
+        InitialSpeedRange = 2,
+        MaxSpeed = 7,
+        RotationalVelocity = 15,
+        RotationalVelocityRange = 15,
+        VelocityAlign = false,
+    },
+}

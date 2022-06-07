@@ -239,19 +239,19 @@ end
 
 local function GetLineColor(lineID, data)
     if data.type == 'header' then
-        return 'FF282828' --#FF282828
+        return 'FF282828' ----FF282828
     elseif data.type == 'spacer' then
-        return '00000000' --#00000000
+        return '00000000' ----00000000
     elseif data.type == 'entry' then
         if data.selected then
             return UIUtil.factionBackColor
         elseif math.mod(lineID, 2) == 1 then
-            return 'ff202020' --#ff202020
+            return 'ff202020' ----ff202020
         else
-            return 'FF343333' --#FF343333
+            return 'FF343333' ----FF343333
         end
     else
-        return 'FF6B0088' --#FF9D06C6
+        return 'FF6B0088' ----FF9D06C6
     end
 end
 
@@ -289,7 +289,7 @@ end
 
 function CreateToggle(parent, bgColor, txtColor, bgSize, txtSize, txt)
     if not bgSize then bgSize = 20 end
-    if not bgColor then bgColor = 'FF343232' end -- #FF343232
+    if not bgColor then bgColor = 'FF343232' end -- --FF343232
     if not txtColor then txtColor = UIUtil.factionTextColor end
     if not txtSize then txtSize = 18 end
     if not txt then txt = '?' end
@@ -349,7 +349,7 @@ function CreateLine()
 
     line.statistics = UIUtil.CreateText(line, '', 16, "Arial")
     line.statistics:EnableHitTest()
-    line.statistics:SetColor('FF9A9A9A') --#FF9A9A9A'
+    line.statistics:SetColor('FF9A9A9A') ----FF9A9A9A'
     line.statistics:SetAlpha(0.9)
 
     Tooltip.AddControlTooltip(line.statistics,
@@ -417,7 +417,7 @@ function CreateLine()
     end
 
     line.toggle = CreateToggle(line,
-         'FF1B1A1A',  --#FF1B1A1A'
+         'FF1B1A1A',  ----FF1B1A1A'
          UIUtil.factionTextColor,
          line.key.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.toggle, line, keyBindingWidth - 30)
@@ -429,8 +429,8 @@ function CreateLine()
     })
 
     line.assignKeyButton = CreateToggle(line,
-         '645F5E5E',  --#735F5E5E'
-         'FFAEACAC',  --#FFAEACAC'
+         '645F5E5E',  ----735F5E5E'
+         'FFAEACAC',  ----FFAEACAC'
          line.key.Height() + 4, 18, '+')
     LayoutHelpers.AtLeftIn(line.assignKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.assignKeyButton, line)
@@ -445,8 +445,8 @@ function CreateLine()
     end
 
     line.unbindKeyButton = CreateToggle(line,
-         '645F5E5E',  --#645F5E5E'
-         'FFAEACAC',  --#FFAEACAC'
+         '645F5E5E',  ----645F5E5E'
+         'FFAEACAC',  ----FFAEACAC'
          line.key.Height() + 4, 18, 'x')
     LayoutHelpers.AtRightIn(line.unbindKeyButton, line)
     LayoutHelpers.AtVerticalCenterIn(line.unbindKeyButton, line)
@@ -491,7 +491,7 @@ function CreateLine()
         elseif data.type == 'entry' then
             line.toggle:Hide()
             line.key:SetText(data.keyText)
-            line.key:SetColor('ffffffff') --#ffffffff'
+            line.key:SetColor('ffffffff') ----ffffffff'
             line.key:SetFont('Arial', 16)
             line.description:SetText(data.text)
             line.description:SetFont('Arial', 16)
@@ -616,7 +616,7 @@ function CreateUI()
     keyFilter = Bitmap(dialogContent)
 
     keyFilter.label = UIUtil.CreateText(dialogContent, '<LOC key_binding_0023>Filter', 17)
-    keyFilter.label:SetColor('FF929191') -- #FF929191
+    keyFilter.label:SetColor('FF929191') -- --FF929191
     keyFilter.label:SetFont(UIUtil.titleFont, 17)
     LayoutHelpers.AtVerticalCenterIn(keyFilter.label, keyFilter, 2)
     LayoutHelpers.AtLeftIn(keyFilter.label, dialogContent, 9)
@@ -644,16 +644,16 @@ function CreateUI()
 
     local text = LOC("<LOC key_binding_filterInfo>Type key binding or name of action")
     keyFilter.info = UIUtil.CreateText(keyFilter, text, 17, UIUtil.titleFont)
-    keyFilter.info:SetColor('FF727171') -- #FF727171
+    keyFilter.info:SetColor('FF727171') -- --FF727171
     keyFilter.info:DisableHitTest()
     LayoutHelpers.AtHorizontalCenterIn(keyFilter.info, keyFilter, -7)
     LayoutHelpers.AtVerticalCenterIn(keyFilter.info, keyFilter, 2)
 
     keyFilter.text = Edit(keyFilter)
-    keyFilter.text:SetForegroundColor('FFF1ECEC') -- #FFF1ECEC
-    keyFilter.text:SetBackgroundColor('04E1B44A') -- #04E1B44A
+    keyFilter.text:SetForegroundColor('FFF1ECEC') -- --FFF1ECEC
+    keyFilter.text:SetBackgroundColor('04E1B44A') -- --04E1B44A
     keyFilter.text:SetHighlightForegroundColor(UIUtil.highlightColor)
-    keyFilter.text:SetHighlightBackgroundColor("880085EF") --#880085EF
+    keyFilter.text:SetHighlightBackgroundColor("880085EF") ----880085EF
     keyFilter.text.Height:Set(function() return keyFilter.Bottom() - keyFilter.Top() - LayoutHelpers.ScaleNumber(10) end)
     LayoutHelpers.AtLeftIn(keyFilter.text, keyFilter, 5)
     LayoutHelpers.AtRightIn(keyFilter.text, keyFilter)
@@ -680,16 +680,16 @@ function CreateUI()
     end
 
     keyFilter.clear = UIUtil.CreateText(keyFilter.text, 'X', 17, "Arial Bold")
-    keyFilter.clear:SetColor('FF8A8A8A') -- #FF8A8A8A
+    keyFilter.clear:SetColor('FF8A8A8A') -- --FF8A8A8A
     keyFilter.clear:EnableHitTest()
     LayoutHelpers.AtVerticalCenterIn(keyFilter.clear, keyFilter.text, 1)
     LayoutHelpers.AtRightIn(keyFilter.clear, keyFilter.text, 9)
 
     keyFilter.clear.HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' then
-            keyFilter.clear:SetColor('FFC9C7C7') -- #FFC9C7C7
+            keyFilter.clear:SetColor('FFC9C7C7') -- --FFC9C7C7
         elseif event.Type == 'MouseExit' then
-            keyFilter.clear:SetColor('FF8A8A8A') -- #FF8A8A8A
+            keyFilter.clear:SetColor('FF8A8A8A') -- --FF8A8A8A
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             keyFilter.text:SetText('')
             keyFilter.text:AcquireFocus()
@@ -778,7 +778,7 @@ function CreateUI()
             if data then
                 line:Update(data, id)
             else
-                line:SetSolidColor('00000000') --#00000000
+                line:SetSolidColor('00000000') ----00000000
                 line.key:SetText('')
                 line.description:SetText('')
                 line.statistics:SetText('')

@@ -1,11 +1,11 @@
-#****************************************************************************
-#**
-#**  Author(s):  Mikko Tyster
-#**
-#**  Summary  :  UEF T3 Anti-Air
-#**
-#**  Copyright © 2008 Blade Braver!
-#****************************************************************************
+--****************************************************************************
+--**
+--**  Author(s):  Mikko Tyster
+--**
+--**  Summary  :  UEF T3 Anti-Air
+--**
+--**  Copyright © 2008 Blade Braver!
+--****************************************************************************
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon

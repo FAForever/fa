@@ -242,7 +242,7 @@ UnitBlueprint {
     SizeX = 1.5,
     SizeY = 1.3,
     SizeZ = 5.4,
-    StrategicIconName = 'icon_ship2_directfire', #from antinavy
+    StrategicIconName = 'icon_ship2_directfire', --from antinavy
     StrategicIconSortPriority = 155,
     Veteran = {
         Level1 = 16,
@@ -314,13 +314,11 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Turret01_Muzzle01',
             TurretBonePitch = 'Front_Turret01_Barrel01',
             TurretBoneYaw = 'Front_Turret01',
@@ -399,13 +397,11 @@ UnitBlueprint {
             RateOfFire = 0.25,
             SlavedToBody = true,
             SlavedToBodyArcRange = 135,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'NAVAL MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Back_Turret01_Muzzle01',
             TurretBonePitch = 'Back_Turret01_Barrel01',
             TurretBoneYaw = 'Back_Turret01',
@@ -422,7 +418,6 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'UESWeapon',
@@ -473,18 +468,15 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 0.7,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Turret02_Muzzle01',
             TurretBonePitch = 'Front_Turret02_Barrel01',
             TurretBoneYaw = 'Front_Turret02',
@@ -578,15 +570,13 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiNavy',
             RateOfFire = 0.25,
-            TargetCheckInterval = 2,
             TargetPriorities = {
                 'SUBMERSIBLE',
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Anti Navy',
@@ -674,11 +664,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.1,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,

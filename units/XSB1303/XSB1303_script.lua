@@ -1,12 +1,12 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
-#**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
-#**
-#**  Summary  :  Aeon T3 Mass Fabricator
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAB1303/UAB1303_script.lua
+--**  Author(s):  Jessica St. Croix, David Tomandl, John Comes
+--**
+--**  Summary  :  Aeon T3 Mass Fabricator
+--**
+--**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 local SMassFabricationUnit = import('/lua/seraphimunits.lua').SMassFabricationUnit
 

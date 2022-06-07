@@ -37,9 +37,9 @@ end
 
 
 function MoveTo(control, xVal, yVal, time, mode, frameFunction)
-    # Move a control to a specified location or offset over a given time period.
-    # The mode parameter sets whether the values are absolute positions (0, default) or offsets (1)
-    # If frameFunction exists it will be called after the position is updated
+    -- Move a control to a specified location or offset over a given time period.
+    -- The mode parameter sets whether the values are absolute positions (0, default) or offsets (1)
+    -- If frameFunction exists it will be called after the position is updated
     control:SetNeedsFrameUpdate(true)
     local initialXpos = control.Left()
     local initialYpos = control.Top()
@@ -53,9 +53,9 @@ function MoveTo(control, xVal, yVal, time, mode, frameFunction)
         self.Left:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialXpos, xVal)))
         self.Top:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialYpos, yVal)))
 
-        if timeAccum >= time then			# once the accrued time goes over our intended time
-            self:SetNeedsFrameUpdate(false)	# turn off frame updates
-            self.Left:Set(xVal)				# snap to the exact intended location. this is done since we can easily go past our intended destination due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then			-- once the accrued time goes over our intended time
+            self:SetNeedsFrameUpdate(false)	-- turn off frame updates
+            self.Left:Set(xVal)				-- snap to the exact intended location. this is done since we can easily go past our intended destination due to inaccuracy in the frame-by-frame interpolation.
             self.Top:Set(yVal)
         end
 
@@ -64,9 +64,9 @@ function MoveTo(control, xVal, yVal, time, mode, frameFunction)
 end
 
 function ScaleTo(control, newScale, time, origin, frameFunction)
-    # scales the control by a percentage (1.0 = 100%) over time
-    # origin is top left corner by default, but can be set to center (origin = 1)
-    # if frameFunction exists it will be called after the position is updated
+    -- scales the control by a percentage (1.0 = 100%) over time
+    -- origin is top left corner by default, but can be set to center (origin = 1)
+    -- if frameFunction exists it will be called after the position is updated
     control:SetNeedsFrameUpdate(true)
     local initialXpos = control.Left()
     local initialYpos = control.Top()
@@ -86,9 +86,9 @@ function ScaleTo(control, newScale, time, origin, frameFunction)
             self.Top:Set(math.floor(initialYpos + ((initialHeight - self.Height())/2)))
         end
 
-        if timeAccum >= time then 				# once the accrued time goes over our intended time
-            self:SetNeedsFrameUpdate(false)		# turn off frame updates
-            self.Width:Set(newWidth)			# snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then 				-- once the accrued time goes over our intended time
+            self:SetNeedsFrameUpdate(false)		-- turn off frame updates
+            self.Width:Set(newWidth)			-- snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
             self.Height:Set(newHeight)
         end
 
@@ -97,9 +97,9 @@ function ScaleTo(control, newScale, time, origin, frameFunction)
 end
 
 function SizeTo(control, newWidth, newHeight, time, origin, frameFunction)
-    # resizes control to new Height/Width over time
-    # origin is top left corner by default, but can be set to center (origin = 1)
-    # if frameFunction exists it will be called after the position is updated
+    -- resizes control to new Height/Width over time
+    -- origin is top left corner by default, but can be set to center (origin = 1)
+    -- if frameFunction exists it will be called after the position is updated
     control:SetNeedsFrameUpdate(true)
     local initialXpos = control.Left()
     local initialYpos = control.Top()
@@ -117,9 +117,9 @@ function SizeTo(control, newWidth, newHeight, time, origin, frameFunction)
             self.Top:Set(math.floor(initialYpos + ((initialHeight - self.Height())/2)))
         end
 
-        if timeAccum >= time then				# once the accrued time goes over our intended time
-            self:SetNeedsFrameUpdate(false)		# turn off frame updates
-            self.Width:Set(newWidth)			# snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then				-- once the accrued time goes over our intended time
+            self:SetNeedsFrameUpdate(false)		-- turn off frame updates
+            self.Width:Set(newWidth)			-- snap to the exact intended dimensions. this is done since we can easily go past our intended size due to inaccuracy in the frame-by-frame interpolation.
             self.Height:Set(newHeight)
         end
 
@@ -128,10 +128,10 @@ function SizeTo(control, newWidth, newHeight, time, origin, frameFunction)
 end
 
 function MoveAndScaleTo(control, newScale, xVal, yVal, time, mode, origin, frameFunction, initialAlpha, finalAlpha)
-    # moves control to a new position and scales it by a percentage over time
-    # mode sets whether the XY values are absolute positions (0, default) or offsets (1)
-    # origin is top left corner by default, but can be set to center (origin = 1)
-    # if frameFunction exists it will be called after the position is updated
+    -- moves control to a new position and scales it by a percentage over time
+    -- mode sets whether the XY values are absolute positions (0, default) or offsets (1)
+    -- origin is top left corner by default, but can be set to center (origin = 1)
+    -- if frameFunction exists it will be called after the position is updated
 
     control:SetNeedsFrameUpdate(true)
     local initialXpos = control.Left()
@@ -173,9 +173,9 @@ function MoveAndScaleTo(control, newScale, xVal, yVal, time, mode, origin, frame
             self.Top:Set(math.floor(self.Top() + ((initialHeight - self.Height())/2)))
         end
 
-        if timeAccum >= time then				# once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)		# stop frame update
-            self.Left:Set(xVal)					# snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then				-- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false)		-- stop frame update
+            self.Left:Set(xVal)					-- snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
             self.Top:Set(yVal)
             self.Width:Set(newWidth)
             self.Height:Set(newHeight)
@@ -203,10 +203,10 @@ function MoveAndSizeTo(control, newWidth, newHeight, xVal, yVal, time, mode, ori
     if initialAlpha and finalAlpha then	 if finalAlpha == 0 then control:Hide() else control:SetAlpha(finalAlpha,true) end	end
     control:Show()
 else
-    # moves control to a new position and sizes it to the specific dimensions over time
-    # mode sets whether the XY values are absolute positions (0, default) or offsets (1)
-    # origin is top left corner by default, but can be set to center (origin = 1)
-    # if frameFunction exists it will be called after the position is updated
+    -- moves control to a new position and sizes it to the specific dimensions over time
+    -- mode sets whether the XY values are absolute positions (0, default) or offsets (1)
+    -- origin is top left corner by default, but can be set to center (origin = 1)
+    -- if frameFunction exists it will be called after the position is updated
 --	UIManager.draggerActivation =false
     control:SetNeedsFrameUpdate(true)
     local initialXpos = control.Left()
@@ -256,9 +256,9 @@ else
             self.Top:Set(math.floor(self.Top() + ((initialHeight - self.Height())/2)))
         end
 
-        if timeAccum >= time then				# once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)		# stop frame update
-            self.Left:Set(xVal)					# snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
+        if timeAccum >= time then				-- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false)		-- stop frame update
+            self.Left:Set(xVal)					-- snap to the exact intended location and size. this is done since we can easily go past our intended destination/size due to inaccuracy in the frame-by-frame interpolation.
             self.Top:Set(yVal)
             self.Right:Set(xVal + newWidth)
             self.Bottom:Set(yVal + newHeight)
@@ -287,10 +287,10 @@ end
 
 --fades a control in, use control.noFade to set a table of children not to fade in
 function FadeIn(control, time, initialValue, finalValue)
- # fades a control in over time
- # time is specified in seconds
- # initialValue is the initial alpha (default = 0.0)
- # finalValue is the final alpha (default = 1.0)
+ -- fades a control in over time
+ -- time is specified in seconds
+ -- initialValue is the initial alpha (default = 0.0)
+ -- finalValue is the final alpha (default = 1.0)
     control:SetNeedsFrameUpdate(true)
 
     local initAlpha = initialValue or 0.0
@@ -304,8 +304,8 @@ function FadeIn(control, time, initialValue, finalValue)
         timeAccum = timeAccum + elapsedTime
         self:SetAlpha(math.min(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 1),true)
 
-        if timeAccum >= time then				# once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)		# stop frame update
+        if timeAccum >= time then				-- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false)		-- stop frame update
             self:SetAlpha(finalAlpha,true)
         end
         if control.noFade then
@@ -318,10 +318,10 @@ function FadeIn(control, time, initialValue, finalValue)
 end
 
 function FadeOut(control, time, initialValue, finalValue)
- # fades a control in over time
- # time is specified in seconds
- # initialValue is the initial alpha (default = 1.0)
- # finalValue is the final alpha (default = 0.0)
+ -- fades a control in over time
+ -- time is specified in seconds
+ -- initialValue is the initial alpha (default = 1.0)
+ -- finalValue is the final alpha (default = 0.0)
 
     control:SetNeedsFrameUpdate(true)
 
@@ -341,8 +341,8 @@ function FadeOut(control, time, initialValue, finalValue)
                 subctrl:SetAlpha(0)
             end
         end
-        if timeAccum >= time then				# once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)		# stop frame update
+        if timeAccum >= time then				-- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false)		-- stop frame update
             self:SetAlpha(finalAlpha,true)
             if not finalAlpha then
                 control:Hide()
@@ -366,8 +366,8 @@ function FadeHide(control, time)
         timeAccum = timeAccum + elapsedTime
         self:SetAlpha(math.max(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 0),true)
 
-        if timeAccum >= time then				# once accrued time goes over intended time
-            self:SetNeedsFrameUpdate(false)		# stop frame update
+        if timeAccum >= time then				-- once accrued time goes over intended time
+            self:SetNeedsFrameUpdate(false)		-- stop frame update
             self:SetAlpha(finalAlpha,true)
             control:Hide()
         end
@@ -387,16 +387,16 @@ function FadeHideAndMoveX(control,time, xVal)
 
     xVal = initialXpos + xVal
 
-    #control:SetAlpha(initAlpha,true)
-    #control:Show()
+    --control:SetAlpha(initAlpha,true)
+    --control:Show()
 
     control.OnFrame = function(self, elapsedTime)
         timeAccum = timeAccum + elapsedTime
         self.Left:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialXpos, xVal)))
         self:SetAlpha(math.max(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 0),true)
 
-        if timeAccum >= time then			# once the accrued time goes over our intended time
-            self:SetNeedsFrameUpdate(false)	# turn off frame updates
+        if timeAccum >= time then			-- once the accrued time goes over our intended time
+            self:SetNeedsFrameUpdate(false)	-- turn off frame updates
             self.Left:Set(xVal)
             self:SetAlpha(finalAlpha,true)
             control:Hide()
@@ -426,8 +426,8 @@ function FadeInAndMoveX(control,time, xVal, initialValue, finalValue,fct)
         self.Left:Set(math.floor(MATH_Lerp(timeAccum, 0, time, initialXpos, xVal)))
         self:SetAlpha(math.max(MATH_Lerp(timeAccum, 0, time, initAlpha, finalAlpha), 0),true)
 
-        if timeAccum >= time then			# once the accrued time goes over our intended time
-            self:SetNeedsFrameUpdate(false)	# turn off frame updates
+        if timeAccum >= time then			-- once the accrued time goes over our intended time
+            self:SetNeedsFrameUpdate(false)	-- turn off frame updates
             self.Left:Set(xVal)
             self:SetAlpha(finalAlpha,true)
 
@@ -438,8 +438,8 @@ function FadeInAndMoveX(control,time, xVal, initialValue, finalValue,fct)
 end
 
 function PulseOnceAndFade(control, time, alphaBtm, alphaTop, initialAlpha)
-# fades a control in (alphaTop) and out (alphaBtm) over time (time, in seconds)
-# default is 0 to 1 alpha over 1 second
+-- fades a control in (alphaTop) and out (alphaBtm) over time (time, in seconds)
+-- default is 0 to 1 alpha over 1 second
 
     local duration = (time or 1) / 2
     local minAlpha = alphaBtm or 0
@@ -457,7 +457,7 @@ function PulseOnceAndFade(control, time, alphaBtm, alphaTop, initialAlpha)
     control.OnFrame = function(self, frameTime)
         elapsedTime = elapsedTime + frameTime
         if elapsedTime >= duration then
-            direction = direction * -1 # reverse direction
+            direction = direction * -1 -- reverse direction
             elapsedTime = 0
             repeats = repeats + 1
         end
@@ -465,7 +465,7 @@ function PulseOnceAndFade(control, time, alphaBtm, alphaTop, initialAlpha)
         newAlpha = newAlpha + (timeSlice * alphaNorm * direction)
         if newAlpha > 1 then
             newAlpha = 1
-            direction = direction * -1 # reverse direction
+            direction = direction * -1 -- reverse direction
             elapsedTime = 0
             repeats = repeats + 1
         elseif newAlpha < 0 then

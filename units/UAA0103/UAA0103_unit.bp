@@ -300,7 +300,7 @@ UnitBlueprint {
             },
             FiringRandomness = 0,
             FiringTolerance = 6,
-            FixBombTrajectory = true, # [152]
+            FixBombTrajectory = true, -- [152]
             Label = 'Bomb',
             MaxRadius = 40,
             MuzzleSalvoDelay = 0,
@@ -312,9 +312,9 @@ UnitBlueprint {
             RackBones = {
                 {
                     MuzzleBones = {
-                        'UAA0103',  # [102]
+                        'UAA0103',  -- [102]
                     },
-                    RackBone = 'UAA0103',  # [102]
+                    RackBone = 'UAA0103',  -- [102]
                 },
             },
             RackFireTogether = false,
@@ -325,13 +325,11 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.25,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Bomb',

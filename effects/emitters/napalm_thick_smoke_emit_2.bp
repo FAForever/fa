@@ -20,8 +20,8 @@ EmitterBlueprint {
     InterpolateEmission = true,
     TextureStripcount = 1.00,
     SortOrder = 1.00,
-    Texture = [[/textures/particles/napalm_thick_smoke.dds]],
-    RampTexture = [[/textures/particles/ramp_napalm_thick_smoke.dds]],
+    Texture = '/textures/particles/napalm_thick_smoke.dds',
+    RampTexture = '/textures/particles/ramp_napalm_thick_smoke.dds',
     XDirectionCurve = {
         XRange = 20.00,
         Keys = {

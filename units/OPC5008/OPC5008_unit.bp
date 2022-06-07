@@ -11,7 +11,6 @@ UnitBlueprint {
         'UEF',
         'STRUCTURE',
         'CIVILIAN',
-        'SPECIALLOWPRI',
         'VISIBLETORECON',
         'RECLAIMABLE',
     },

@@ -7,7 +7,7 @@ TrailEmitterBlueprint {
     BlendMode = 3,
     TextureRepeatRate = 0.55,
     LODCutoff = 300,
-	RepeatTexture = [[/textures/particles/heavy_quarnoncannon_trail_01.dds]],
-	RampTexture = [[/textures/particles/ramp_blue_17.dds]],
+	RepeatTexture = '/textures/particles/heavy_quarnoncannon_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_blue_17.dds',
 }
 
