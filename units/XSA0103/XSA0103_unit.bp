@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 120,
-        GuardScanRadius = 60,
     },
     Air = {
         AutoLandTime = 1,
@@ -109,7 +108,6 @@ UnitBlueprint {
         'BUILTBYTIER1FACTORY',
         'BUILTBYTIER2FACTORY',
         'BUILTBYTIER3FACTORY',
-
         'SERAPHIM',
         'MOBILE',
         'AIR',
@@ -338,13 +336,11 @@ UnitBlueprint {
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
             RateOfFire = 0.2,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.25,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Bomb',

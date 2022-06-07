@@ -2614,7 +2614,7 @@ function CreateSlotsUI(makeLabel)
     LayoutHelpers.SetDimensions(labelGroup, 791, 21)
     LayoutHelpers.AtLeftTopIn(labelGroup, GUI.playerPanel, 5, 5)
 
-    local slotLabel = makeLabel("#", 14)
+    local slotLabel = makeLabel("--", 14)
     labelGroup:AddChild(slotLabel)
 
     -- No label required for the second column (flag), so skip it. (Even eviler hack)
@@ -3202,8 +3202,8 @@ function CreateUI(maxPlayers)
     end
 
     -- Patchnotes Button
-    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_1000>Patchnotes")
-    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'lob_patchnotes')
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Patchnotes")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'Lobby_patchnotes')
     LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
     LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
     GUI.patchnotesButton.OnClick = function(self, event)
@@ -4306,7 +4306,7 @@ function setupChatEdit(chatPanel)
     -- in-game keybindings in the lobby.
     -- That would be very bad. We should probably instead just not assign those keybindings yet...
     GUI.chatEdit.OnLoseKeyboardFocus = function(self)
-        GUI.chatEdit:AcquireFocus()
+        self:AcquireFocus()
     end
 
     local commandQueueIndex = 0

@@ -2,7 +2,7 @@
 -- File     :  /lua/utilities.lua
 -- Author(s):  John Comes, Gordon Duclos
 -- Summary  :  Utility functions for scripts.
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
 function GetDistanceBetweenTwoEntities(entity1, entity2)

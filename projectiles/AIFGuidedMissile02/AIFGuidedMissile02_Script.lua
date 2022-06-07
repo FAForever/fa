@@ -5,7 +5,7 @@
 --
 --  Summary  :  Aeon Guided Split Missile, DAA0206
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
 local AGuidedMissileProjectile = import('/lua/aeonprojectiles.lua').AGuidedMissileProjectile

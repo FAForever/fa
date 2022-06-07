@@ -5,7 +5,7 @@
 --
 --  Summary  : Seraphim projectile base class definitions
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------
 
 --------------------------------------------------------------------------

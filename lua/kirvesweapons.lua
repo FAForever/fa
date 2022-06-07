@@ -41,7 +41,7 @@ TAAPhalanxWeapon = Class(DefaultProjectileWeapon) {
 SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam,
     FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {}, ####OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
+    FxChargeMuzzleFlash = {}, --------OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
     FxUpackingChargeEffects = OriginalEffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.2,
 }
@@ -51,7 +51,7 @@ SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
 SDFUnstablePhasonBeam2 = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam2,
     FxMuzzleFlash = {},
-    FxChargeMuzzleFlash = {}, ####OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
+    FxChargeMuzzleFlash = {}, --------OriginalEffectTemplate.SExperimentalUnstablePhasonLaserMuzzle01,
     FxUpackingChargeEffects = OriginalEffectTemplate.CMicrowaveLaserCharge01,
     FxUpackingChargeEffectScale = 0.1,
     FxBeamEndPointScale = 0.01,

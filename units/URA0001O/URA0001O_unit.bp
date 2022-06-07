@@ -1,4 +1,5 @@
 UnitBlueprint {
+    AI = { },
     Air = {
         BankFactor = 0.1,
         BankForward = false,

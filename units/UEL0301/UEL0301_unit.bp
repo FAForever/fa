@@ -1,10 +1,11 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'UEL0301',
             'Head',
-#            'Leg_Left_B02',
-#            'Leg_Right_B02',
+--            'Leg_Left_B02',
+--            'Leg_Right_B02',
         },
     },
     Audio = {
@@ -499,7 +500,7 @@ UnitBlueprint {
             PersonalShield = true,
             RegenAssistMult = 10,
             ShieldEnergyDrainRechargeTime = 5,
-            ShieldMaxHealth = 26000,#32000
+            ShieldMaxHealth = 26000,--32000
             ShieldRechargeTime = 170,
             ShieldRegenRate = 50,
             ShieldRegenStartTime = 1,
@@ -811,14 +812,13 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
                 'MOBILE EXPERIMENTAL',
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'MOBILE TECH1',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Arm_Left_Muzzle',
@@ -862,7 +862,6 @@ UnitBlueprint {
             },
             RackRecoilDistance = 0,
             RateOfFire = 1,
-            TargetCheckInterval = 9999999,
             TargetRestrictDisallow = 'UNTARGETABLE',
             Turreted = false,
             WeaponCategory = 'Death',

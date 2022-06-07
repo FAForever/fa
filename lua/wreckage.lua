@@ -39,7 +39,7 @@ Wreckage = Class(Prop) {
 
     OnCreate = function(self)
 
-        -- # Caching
+        -- -- Caching
 
         self.Trash = TrashBag()
         self.EntityId = EntityGetEntityId(self)
@@ -47,7 +47,7 @@ Wreckage = Class(Prop) {
         self.CachePosition = EntityGetPosition(self)
         self.SyncData = { }
 
-        -- # Set state
+        -- -- Set state
 
         self.IsWreckage = true
         self.CanTakeDamage = true 

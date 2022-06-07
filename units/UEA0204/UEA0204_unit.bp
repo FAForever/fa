@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
     },
     Air = {
         AutoLandTime = 1,
@@ -325,8 +324,7 @@ UnitBlueprint {
             RackSalvoReloadTime = 0,
             RackSalvoSize = 1,
             RackSlavedToTurret = false,
-            RateOfFire = 0.1,#0.08
-            TargetCheckInterval = 2.5,
+            RateOfFire = 0.1,--0.08
             TargetPriorities = {
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',
@@ -337,10 +335,9 @@ UnitBlueprint {
                 'NAVAL * TECH3',
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
-            TrackingRadius = 1.15,
             TurretDualManipulators = false,
             Turreted = false,
             WeaponCategory = 'Anti Navy',

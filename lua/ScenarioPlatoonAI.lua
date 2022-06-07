@@ -829,7 +829,8 @@ function CategoryHunterPlatoonAI(platoon)
             -- If we still cant find a target, go to the highest threat position on the map
             else
                 platoon:Stop()
-                platoon:AggressiveMoveToLocation(aiBrain:GetHighestThreatPosition(1, true))
+                local pos, threat = aiBrain:GetHighestThreatPosition(1, true)
+                platoon:AggressiveMoveToLocation(pos)
             end
         end
         WaitSeconds(Random(73, 181) * .1)

@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 75,
-        GuardScanRadius = 60,
     },
     Air = {
         AutoLandTime = 1,
@@ -275,6 +274,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UAAWeapon',
@@ -322,15 +326,11 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Turret_Muzzle_Right',
             TurretBonePitch = 'Turret_Muzzle_Right',
             TurretBoneYaw = 'Turret_Muzzle_Right',
@@ -346,6 +346,11 @@ UnitBlueprint {
             WeaponCategory = 'Anti Air',
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.1,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UAAWeapon',
@@ -393,15 +398,11 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.25,
             TurretBoneMuzzle = 'Turret_Muzzle_Left',
             TurretBonePitch = 'Turret_Muzzle_Left',
             TurretBoneYaw = 'Turret_Muzzle_Left',

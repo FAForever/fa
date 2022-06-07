@@ -1,5 +1,5 @@
 ---@declare-global
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --
 -- This is the top-level lua initialization file. It is run at initialization time
 -- to set up all lua state.
@@ -24,11 +24,24 @@ doscript '/lua/system/Localization.lua'
 doscript '/lua/system/MultiEvent.lua'
 doscript '/lua/system/collapse.lua'
 
---
+-- flag used to detect duplicates
+InitialRegistration = true
+
+-- load buff blueprints
+doscript '/lua/system/BuffBlueprints.lua'
+import('/lua/sim/BuffDefinitions.lua')
+
+-- load AI builder systems
+doscript '/lua/system/GlobalPlatoonTemplate.lua'
+doscript '/lua/system/GlobalBuilderTemplate.lua'
+doscript '/lua/system/GlobalBuilderGroup.lua'
+doscript '/lua/system/GlobalBaseTemplate.lua'
+
+InitialRegistration = false
+
 -- Classes exported from the engine are in the 'moho' table. But they aren't full
 -- classes yet, just lists of exported methods and base classes. Turn them into
 -- real classes.
---
 for name,cclass in moho do
     ConvertCClassToLuaSimplifiedClass(cclass)
 end

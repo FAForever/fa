@@ -39,8 +39,9 @@ ADFReactonCannon = Class(DefaultProjectileWeapon) {
 }
 
 ---@class ADFOverchargeWeapon : DefaultProjectileWeapon
-ADFOverchargeWeapon = Class(DefaultProjectileWeapon) {
+ADFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
     FxMuzzleFlash = EffectTemplate.ACommanderOverchargeFlash01,
+    DesiredWeaponLabel = 'RightDisruptor'
 }
 
 ---@class ADFTractorClaw : DefaultBeamWeapon

@@ -1,0 +1,15 @@
+MeshBlueprint {
+    LODs = {
+        {
+            MeshName = '/effects/Entities/Sphere01/Sphere01_lod0.scm',
+            AlbedoName = 'CybranShield01_Albedo.dds',
+            NormalsName = 'CybranShield01_Normals.dds',
+            SpecularName = 'CybranShield01_Specular.dds',
+            ShaderName = 'ShieldCybran',
+            LODCutoff = 1000,
+        },
+    },
+    IconFadeInZoom = 4,
+    SortOrder = 1000,
+    StraddleWater = true,
+}

@@ -44,17 +44,13 @@ local StringGsub = string.gsub
 -- upvalue table functions for performance
 local TableInsert = table.insert
 
----@class Prop : moho.prop_methods, Entity
-Prop = Class(moho.prop_methods, Entity) {
-
-    -- override the functions provided in the Entity class: we don't need an additional c-object!
-    __init = false,
-    __post_init = false,
+---@class Prop : moho.prop_methods
+Prop = Class(moho.prop_methods) {
 
     ---@param self Prop
     OnCreate = function(self)
 
-        -- # Caching
+        -- -- Caching
 
         self.Trash = TrashBag()
         self.EntityId = EntityGetEntityId(self)
@@ -62,7 +58,7 @@ Prop = Class(moho.prop_methods, Entity) {
         self.CachePosition = EntityGetPosition(self)
         self.SyncData = { }
 
-        -- # Reclaim values
+        -- -- Reclaim values
 
         -- used by typical props, wrecks have their own mechanism to set its value
         if not self.Blueprint.UnitWreckage then 
@@ -78,7 +74,7 @@ Prop = Class(moho.prop_methods, Entity) {
             )
         end
 
-        -- # Terrain correction
+        -- -- Terrain correction
 
         -- Find props that, for some reason, are below ground at their central bone
         local terrainAltitude = GetTerrainHeight(self.CachePosition[1], self.CachePosition[3])
@@ -89,7 +85,7 @@ Prop = Class(moho.prop_methods, Entity) {
             Warp(self, self.CachePosition) 
         end
 
-        -- # Set health and status
+        -- -- Set health and status
 
         local maxHealth = self.Blueprint.Defense.MaxHealth 
         if maxHealth < 50 then 
