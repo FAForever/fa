@@ -345,7 +345,6 @@ Unit = Class(moho.unit_methods) {
         self.resetJammer = false
 
         if self.Blueprint.Intel.JammerBlips > 0 then
-            LOG("AddJammer")
             self.Brain:AddJammer(self)
         end
         
