@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: create and control pre-game splash screens
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -19,7 +19,7 @@ local movies = {
 }
 
 function CreateUI()
-    if GetPreference("movie.nologo") then
+    if GetPreference("movie.nologo") or HasCommandLineArg("/nomovie") then
         EngineStartFrontEndUI()
         return
     end
