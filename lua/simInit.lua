@@ -1,3 +1,4 @@
+---@declare-global
 -- ==========================================================================================
 -- * File       : lua/simInit.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
@@ -100,9 +101,9 @@ function SetupSession()
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
-
+    ---@type table<Army, AIBrain>
     ArmyBrains = {}
-    
+
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
     -- needed by our scenario.

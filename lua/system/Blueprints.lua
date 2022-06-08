@@ -1,3 +1,4 @@
+---@declare-global
 --
 -- Blueprint loading
 --
@@ -813,13 +814,13 @@ function PostModBlueprints(all_bps)
 end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
---- @param pattern           - specifies pattern of files to load, defaults to '*.bp'
---- @param directories       - specifies table of directory paths to load blueprints from, defaults to all directories
---- @param mods              - specifies table of mods to load blueprints from, defaults to active mods
---- @param skipGameFiles     - specifies whether skip loading original game files, defaults to false
---- @param skipExtraction    - specifies whether skip extraction of meshes, defaults to false
---- @param skipRegistration  - specifies whether skip registration of blueprints, defaults to false
---- @param taskNotifier      - specifies reference to a notifier that is updating UI when loading blueprints
+---@param pattern string            - specifies pattern of files to load, defaults to '*.bp'
+---@param directories string[]|nil  - specifies table of directory paths to load blueprints from, defaults to all directories
+---@param mods table                - specifies table of mods to load blueprints from, defaults to active mods
+---@param skipGameFiles boolean     - specifies whether skip loading original game files, defaults to false
+---@param skipExtraction boolean    - specifies whether skip extraction of meshes, defaults to false
+---@param skipRegistration boolean  - specifies whether skip registration of blueprints, defaults to false
+---@param taskNotifier unknown      - specifies reference to a notifier that is updating UI when loading blueprints
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
 --- Sim -> LoadBlueprints() - no arguments, no changes!
 --- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua

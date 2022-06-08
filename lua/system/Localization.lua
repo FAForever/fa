@@ -1,3 +1,4 @@
+---@declare-global
 local loc_table
 
 -- Special tokens that can be included in a loc string via {g Player} etc. The

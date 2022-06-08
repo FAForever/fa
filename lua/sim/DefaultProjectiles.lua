@@ -31,12 +31,13 @@ local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
 -----------------------------------------------------------------
 -- Null Shell
 -----------------------------------------------------------------
+---@class NullShell : Projectile
 NullShell = Class(Projectile) {}
 
 -----------------------------------------------------------------
 -- PROJECTILE WITH ATTACHED EFFECT EMITTERS
 -----------------------------------------------------------------
-
+---@class EmitterProjectile : Projectile
 EmitterProjectile = Class(Projectile) {
     FxTrails = {'/effects/emitters/missile_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
@@ -64,6 +65,7 @@ EmitterProjectile = Class(Projectile) {
 -----------------------------------------------------------------
 -- BEAM PROJECTILES
 -----------------------------------------------------------------
+---@class SingleBeamProjectile : EmitterProjectile
 SingleBeamProjectile = Class(EmitterProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
@@ -78,6 +80,7 @@ SingleBeamProjectile = Class(EmitterProjectile) {
     end,
 }
 
+---@class MultiBeamProjectile : EmitterProjectile
 MultiBeamProjectile = Class(EmitterProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
@@ -94,6 +97,7 @@ MultiBeamProjectile = Class(EmitterProjectile) {
 }
 
 -- Nukes
+---@class NukeProjectile : NullShell
 NukeProjectile = Class(NullShell) {
     MovementThread = function(self)
         local launcher = self:GetLauncher()
@@ -208,6 +212,7 @@ NukeProjectile = Class(NullShell) {
 -----------------------------------------------------------------
 -- POLY-TRAIL PROJECTILES
 -----------------------------------------------------------------
+---@class SinglePolyTrailProjectile : EmitterProjectile
 SinglePolyTrailProjectile = Class(EmitterProjectile) {
 
     PolyTrail = '/effects/emitters/test_missile_trail_emit.bp',
@@ -231,6 +236,7 @@ SinglePolyTrailProjectile = Class(EmitterProjectile) {
 -- upvalue for performance
 
 
+---@class MultiPolyTrailProjectile : EmitterProjectile
 MultiPolyTrailProjectile = Class(EmitterProjectile) {
 
     PolyTrails = {'/effects/emitters/test_missile_trail_emit.bp'},
@@ -278,6 +284,7 @@ MultiPolyTrailProjectile = Class(EmitterProjectile) {
 -----------------------------------------------------------------
 
 -- LIGHTWEIGHT VERSION THAT LIMITS USE TO 1 BEAM, 1 POLYTRAIL, AND STANDARD EMITTERS
+---@class SingleCompositeEmitterProjectile : SinglePolyTrailProjectile
 SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
 
     BeamName = '/effects/emitters/default_beam_01_emit.bp',
@@ -293,6 +300,7 @@ SingleCompositeEmitterProjectile = Class(SinglePolyTrailProjectile) {
 }
 
 -- HEAVYWEIGHT VERSION, ALLOWS FOR MULTIPLE BEAMS, POLYTRAILS, AND STANDARD EMITTERS
+---@class MultiCompositeEmitterProjectile : MultiPolyTrailProjectile
 MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
 
     Beams = {'/effects/emitters/default_beam_01_emit.bp',},
@@ -314,6 +322,7 @@ MultiCompositeEmitterProjectile = Class(MultiPolyTrailProjectile) {
 -----------------------------------------------------------------
 -- TRAIL ON ENTERING WATER PROJECTILE
 -----------------------------------------------------------------
+---@class OnWaterEntryEmitterProjectile : Projectile
 OnWaterEntryEmitterProjectile = Class(Projectile) {
     FxTrails = {'/effects/emitters/torpedo_munition_trail_01_emit.bp',},
     FxTrailScale = 1,
@@ -418,6 +427,7 @@ local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 local EmitterMethods = _G.moho.IEffect
 local EmitterScaleEmitter = EmitterMethods.ScaleEmitter
 
+---@class BaseGenericDebris : DummyProjectile
 BaseGenericDebris = Class(DummyProjectile){
 
     OnImpact = function(self, targetType, targetEntity)
@@ -479,6 +489,7 @@ BaseGenericDebris = Class(DummyProjectile){
 -- PROJECTILE THAT ADJUSTS DAMAGE AND ENERGY COST ON IMPACT
 -----------------------------------------------------------
 
+---@class OverchargeProjectile
 OverchargeProjectile = Class() {
     OnImpact = function(self, targetType, targetEntity)
         -- Stop us doing blueprint damage in the other OnImpact call if we ditch this one without resetting self.DamageData

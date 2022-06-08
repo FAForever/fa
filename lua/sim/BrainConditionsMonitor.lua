@@ -8,7 +8,8 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-BrainConditionsMonitor = Class {
+---@class BrainConditionsMonitor
+BrainConditionsMonitor = ClassSimple {
 
     PreCreate = function(self)
         if self.PreCreateFinished then
@@ -212,13 +213,15 @@ BrainConditionsMonitor = Class {
     end,
 }
 
+---@return BrainConditionsMonitor
 function CreateConditionsMonitor(brain)
     local cMonitor = BrainConditionsMonitor()
     cMonitor:Create(brain)
     return cMonitor
 end
 
-Condition = Class {
+---@class Condition
+Condition = ClassSimple {
     -- Create the thing
     Create = function(self,brain,key)
         self.Status = false
@@ -240,6 +243,7 @@ Condition = Class {
     end
 }
 
+---@class ImportCondition : Condition
 ImportCondition = Class(Condition) {
     Create = function(self,brain,key,filename,funcName,funcData)
         Condition.Create(self,brain,key)
@@ -282,6 +286,7 @@ ImportCondition = Class(Condition) {
     end,
 }
 
+---@class InstantImportCondition : Condition
 InstantImportCondition = Class(Condition) {
     Create = function(self,brain,key,filename,funcName,funcData)
         Condition.Create(self,brain,key)
@@ -331,6 +336,7 @@ InstantImportCondition = Class(Condition) {
     end,
 }
 
+---@class FunctionCondition : Condition
 FunctionCondition = Class(Condition) {
     Create = function(self,brain,key,funcHandle,funcParams)
         Condition.Create(self,brain,key)

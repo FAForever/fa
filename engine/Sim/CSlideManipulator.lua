@@ -1,5 +1,6 @@
---- Class CSlideManipulator
--- @classmod Sim.CSlideManipulator
+---@declare-global
+---@class moho.SlideManipulator
+local CSlideManipulator = {}
 
 ---
 --  CSlideManipulator:SetAcceleration(acc)
@@ -31,8 +32,4 @@ end
 function CSlideManipulator:base()
 end
 
----
---
-function CSlideManipulator:moho.SlideManipulator()
-end
-
+return CSlideManipulator

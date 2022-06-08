@@ -1,5 +1,6 @@
---- Class CAnimationManipulator
--- @classmod Sim.CAnimationManipulator
+---@declare-global
+---@class moho.AnimationManipulator
+local CAnimationManipulator = {}
 
 ---
 --  fraction = AnimationManipulator:GetAnimationFraction()
@@ -61,8 +62,5 @@ end
 function CAnimationManipulator:base()
 end
 
----
---
-function CAnimationManipulator:moho.AnimationManipulator()
-end
+return CAnimationManipulator
 

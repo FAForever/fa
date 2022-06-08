@@ -19,6 +19,7 @@ local Builder = import('/lua/sim/Builder.lua').Builder
 --   }
 --}
 
+---@class StrategyBuilder : Builder
 StrategyBuilder = Class(Builder) {
     Create = function(self,brain,data,locationType)
         Builder.Create(self,brain,data,locationType)

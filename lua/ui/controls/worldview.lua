@@ -147,6 +147,7 @@ DecalFunctions = {
     RULEUCC_Overcharge = OverchargeDecalFunc
 }
 
+---@class WorldView : moho.UIWorldView, Control
 WorldView = Class(moho.UIWorldView, Control) {
 
     Cursor = nil,

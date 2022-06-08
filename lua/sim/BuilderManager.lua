@@ -11,7 +11,8 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
-BuilderManager = Class {
+---@class BuilderManager
+BuilderManager = ClassSimple {
     Create = function(self, brain)
         self.Trash = TrashBag()
         self.Brain = brain

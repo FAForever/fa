@@ -1,3 +1,4 @@
+---@declare-global
 -- The global sync table is copied to the user layer every time the main and sim threads are
 -- synchronized on the sim beat (which is like a tick but happens even when the game is paused)
 Sync = {}

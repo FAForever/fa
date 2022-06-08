@@ -37,6 +37,7 @@ local function ParsePriorities()
     return finalPriorities
 end
 
+---@class Weapon : moho.weapon_methods
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit

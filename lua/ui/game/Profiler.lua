@@ -205,6 +205,7 @@ function CloseWindow()
     end
 end
 
+---@class ProfilerWindow : Window
 ProfilerWindow = Class(Window) {
     __init = function(self, parent)
         Window.__init(self, parent, "Profiler", false, false, false, true, false, "profiler2", {

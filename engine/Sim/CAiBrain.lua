@@ -1,5 +1,6 @@
---- Class CAiBrain
--- @classmod Sim.CAiBrain
+---@declare-global
+---@class moho.aibrain_methods
+local CAiBrain = {}
 
 --- Assigns threat value to given position.
 -- Threat is used for calculation where to attack with unit.
@@ -229,8 +230,8 @@ function CAiBrain:GetEconomyStoredRatio(resource)
 end
 
 --- Returns the relative resource income. (production - usage)
--- @param resource 'ENERGY' or 'MASS'.
--- @return Number. (0.1 = 1)
+---@param resource 'ENERGY'|'MASS'.
+---@return number  (0.1 = 1)
 function CAiBrain:GetEconomyTrend(resource)
 end
 
@@ -243,7 +244,7 @@ end
 
 --- Returns the faction of the army represented by this brain.
 -- 1 UEF, 2 Aeon, 3 Cybran, 4 Seraphim. 5 custom faction like Nomads
--- @return Number.
+---@return number
 function CAiBrain:GetFactionIndex()
 end
 
@@ -456,8 +457,4 @@ end
 function CAiBrain:TakeResource(type, amount)
 end
 
----
---
-function CAiBrain:moho.aibrain_methods()
-end
-
+return CAiBrain
