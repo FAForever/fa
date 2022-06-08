@@ -279,13 +279,14 @@ Window = Class(Group) {
         end
 
         self.ClientGroup = Group(self, 'window client group')
-        self.ClientGroup.Top:Set(self.TitleGroup.Bottom)
-        self.ClientGroup.Left:Set(self.ml.Right)
-        self.ClientGroup.Height:Set(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
-        self.ClientGroup.Width:Set(function() return self.mr.Left() - self.ml.Right() end)
-        self.ClientGroup.Right:Set(self.mr.Left)
-        self.ClientGroup.Bottom:Set(self.bm.Top)
-        self.ClientGroup.Depth:Set(function() return self.window_m.Depth() + 1 end)
+        LayoutHelpers.ReusedLayoutFor(self.ClientGroup)
+            :Top(self.TitleGroup.Bottom)
+            :Left(self.ml.Right)
+            :Height(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
+            :Width(function() return self.mr.Left() - self.ml.Right() end)
+            :Right(self.mr.Left)
+            :Bottom(self.bm.Top)
+            :Over(self.window_m)
 
         self.StartSizing = function(event, xControl, yControl)
             local drag = Dragger()
