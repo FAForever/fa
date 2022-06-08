@@ -42,6 +42,8 @@ local resModeSwitch = {}
 local DisplayResMode = 0
 local DisplayStorage = 0
 
+local created = false 
+
 function armyGroupHeight()
     local height = 0
     for _, line in controls.armyLines do
@@ -51,6 +53,7 @@ function armyGroupHeight()
 end
 
 function CreateScoreUI(parent)
+    created = true
     savedParent = GetFrame(0)
 
     controls.bg = Group(savedParent)
@@ -821,33 +824,37 @@ function ToggleScoreControl(state)
 end
 
 function Expand()
-    if needExpand then
-        controls.bg:Show()
-        controls.collapseArrow:Show()
-        local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
-        PlaySound(sound)
-        needExpand = false
-    else
-        controls.collapseArrow:Show()
+    if created then 
+        if needExpand then
+            controls.bg:Show()
+            controls.collapseArrow:Show()
+            local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
+            PlaySound(sound)
+            needExpand = false
+        else
+            controls.collapseArrow:Show()
+        end
     end
 end
 
 function Contract()
-    if controls.bg then
-        if not controls.bg:IsHidden() then
-            local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
-            PlaySound(sound)
-            controls.bg:Hide()
-            controls.collapseArrow:Hide()
-            if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
-                needExpand = true
+    if created then 
+        if controls.bg then
+            if not controls.bg:IsHidden() then
+                local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
+                PlaySound(sound)
+                controls.bg:Hide()
+                controls.collapseArrow:Hide()
+                if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
+                    needExpand = true
+                end
+            else
+                needExpand = false
+                controls.collapseArrow:Hide()
             end
         else
-            needExpand = false
-            controls.collapseArrow:Hide()
+            contractOnCreate = true
         end
-    else
-        contractOnCreate = true
     end
 end
 
