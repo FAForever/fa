@@ -30,4 +30,5 @@
     "Lua.diagnostics.globals": [
         "ScenarioInfo"
     ],
+    "nuxt.isNuxtApp": false,
 }
