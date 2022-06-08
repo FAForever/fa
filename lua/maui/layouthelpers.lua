@@ -449,13 +449,13 @@ end
 
 function SetWidth(control, width)
     if width then
-        control.Width:SetValue(floor(width * pixelScaleFactor))
+        control.Width:Set(floor(width * pixelScaleFactor))
     end
 end
 
 function SetHeight(control, height)
     if height then
-        control.Height:SetValue(floor(height * pixelScaleFactor))
+        control.Height:Set(floor(height * pixelScaleFactor))
     end
 end
 
