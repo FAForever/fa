@@ -60,6 +60,12 @@ Combo = Class(Group) {
         self.mItemCue = itemCue or "UI_Tab_Click_01"
         self.EnableColor = EnableColor or true
 
+        -- sets the offsets to the auto-attached scrollbar
+        -- these are the better defaults for the FAF design
+        self._scrollbarOffsetRight = -22
+        self._scrollbarOffsetBottom = -6
+        self._scrollbarOffsetTop = -6
+
         bitmaps = bitmaps or defaultBitmaps
 
         pointSize = pointSize or 12
@@ -197,7 +203,7 @@ Combo = Class(Group) {
         -- set the height of the list based on the number of items visible and the font metrics
         self._maxVisibleItems = maxVisibleItems
         self._visibleItems = LazyVar.Create()
-        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading() + 1) end)
+        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) end)
         self._dropdown.Height:Set(function() return self._list.Height() + ddum.Height() + ddlm.Height() end)
         self._visibleItems:Set(1)
 
@@ -316,7 +322,7 @@ Combo = Class(Group) {
             self._scrollbar:Destroy()
         end
         if numItems > self._visibleItems() then
-            self._scrollbar = UIUtil.CreateVertScrollbarFor(self._list)
+            self._scrollbar = UIUtil.CreateVertScrollbarFor(self._list, self._scrollbarOffsetRight, nil, self._scrollbarOffsetBottom, self._scrollbarOffsetTop)
         end
 
         local realDefFinded = false
@@ -334,6 +340,13 @@ Combo = Class(Group) {
         end
 
         self:SetItem(defaultItemIndex)
+    end,
+
+    -- helper function to (re)set scrollbar offsets for dialogs or UI parts using Vanila design (Replays, Multiplayer LAN, etc)
+    SetScrollBarOffsets = function(self, offset_right, offset_bottom, offset_top)
+        self._scrollbarOffsetRight = offset_right or 0
+        self._scrollbarOffsetBottom = offset_bottom or 0
+        self._scrollbarOffsetTop = offset_top or 0
     end,
 
     ClearItems = function(self)
