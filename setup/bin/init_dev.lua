@@ -455,6 +455,9 @@ MountAllowedContent(fa_path .. '/gamedata/', '*.scd', allowedAssetsScd)
 -- get direct access to preferences file, letting us have much more control over its content. This also includes cache and similar
 MountDirectory(SHGetFolderPath('LOCAL_APPDATA') .. 'Gas Powered Games/Supreme Commander Forged Alliance', '/preferences')
 
+-- mount SC_LuaDebugger GUI graphics
+MountDirectory(locationOfRepository .. '/coderes', '/coderes'
+
 -- Load in all the data of the steam installation (movies, maps, sound folders)
 MountDirectory(fa_path .. "/movies", '/movies')
 MountDirectory(fa_path .. "/sounds", '/sounds')
