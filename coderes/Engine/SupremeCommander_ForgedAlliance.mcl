@@ -1,0 +1,21 @@
+<application
+	Title = "Supreme Commander: Forged Alliance"
+	id = "{25A1E4A4-2DBD-4AC0-8650-8EA9A45B183D}"
+	Run = ".\media center shortcut.lnk"
+	BGColor = "RGB(0,0,0)" 
+	Name = "Supreme Commander: Forged Alliance"
+	CompanyName = "Gas Powered Games"
+	StartImage = ".\ForgedAlliance_BoxArt.png" 
+	ThumbnailImage = ".\ForgedAlliance_BoxArt.png" 
+	SharedViewport = ""
+	NowPlayingDirective = ""
+>
+    <capabilitiesRequired
+        directX="True"
+        audio="False" 
+        video="False" 
+        intensiveRendering="True"
+        console="False"
+    />
+</application>
+

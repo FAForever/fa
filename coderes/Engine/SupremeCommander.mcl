@@ -1,0 +1,21 @@
+<application
+	Title = "Supreme Commander"
+	id = "{25A1E6A4-2DBD-4AC0-8650-8EA9A45B183D}"
+	Run = ".\media center shortcut.lnk"
+	BGColor = "RGB(0,0,0)" 
+	Name = "Supreme Commander"
+	CompanyName = "Gas Powered Games"
+	StartImage = ".\boxart_neutral.png" 
+	ThumbnailImage = ".\boxart_neutral.png" 
+	SharedViewport = ""
+	NowPlayingDirective = ""
+>
+    <capabilitiesRequired
+        directX="True"
+        audio="False" 
+        video="False" 
+        intensiveRendering="True"
+        console="False"
+    />
+</application>
+
