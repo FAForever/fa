@@ -54,7 +54,6 @@ end
 
 function CreateScoreUI(parent)
     created = true
-    LOG("I WAS MADE!")
     savedParent = GetFrame(0)
 
     controls.bg = Group(savedParent)
