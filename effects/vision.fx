@@ -5,7 +5,7 @@
 ///	Summary	: Effect file for rendering fog of war.
 ///	Note	: Similiar to range rendering but requires less data (and overhead.)
 ///
-///	Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+///	Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ////////////////////////////////////////////////////////////////////////////////
 
 #define CCW_BOUNDARY_BIAS	 0.00001

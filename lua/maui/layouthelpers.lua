@@ -480,6 +480,7 @@ end
 --*********  Layouter  *************
 --**********************************
 
+---@class Layouter: moho.aibrain_methods
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
@@ -845,6 +846,7 @@ function LayouterMetaTable:__newindex(key, value)
     error("attempt to set new index for a Layouter object")
 end
 
+--- @return Layouter
 function LayoutFor(control)
     local result = {
         c = control

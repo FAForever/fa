@@ -22,8 +22,22 @@ local SetPlayableArea = reclaim.SetPlayableArea
 -- this value with mods is forbidden.
 local hasSeenResult = false
 
+local OnSyncCallbacks = { }
+
+function AddOnSyncCallback(identifier, callback)
+    OnSyncCallbacks[identifier] = callback 
+end
+
+function RemoveOnSyncCallback(identifier)
+    OnSyncCallbacks[identifier] = nil 
+end
+
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
+
+    for k, callback in OnSyncCallbacks do
+        callback(Sync)
+    end
 
     if Sync.ArmyTransfer then 
         local army = GetFocusArmy()

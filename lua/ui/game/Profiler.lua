@@ -149,6 +149,16 @@ list = false
 --- Opens up the window
 function OpenWindow()
 
+    -- DEBUG CODE TO REMOVE
+
+    import('/lua/ui/game/score-alt.lua').CreateScoreUI()
+
+    if true then 
+        return 
+    end
+
+    -- END OF DEBUG CODE
+
     local gameHasAIs = GameMain.GameHasAIs
     local cheatsOn = sessionInfo.Options.CheatsEnabled
     local isThisJip = "jip" == GetArmiesTable()[GameMain.OriginalFocusArmy].nickname
