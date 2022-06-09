@@ -21,10 +21,12 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 
 -- # locals
 
-local debug = false
 local instance = false
 local scenario = SessionGetScenarioInfo()
 local armies = GetArmiesTable().armiesTable
+
+local showDebugLayout = true
+local showRating = true 
 
 -- table to convert key to LOC value
 local ShareNameLookup = { }
@@ -117,11 +119,39 @@ local ArmyEntry = Class(Group) {
             faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(self.Faction())))
         end
 
+        local rating = faction
+        if showRating then 
+            rating = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "",  12, UIUtil.bodyFont))
+                :RightOf(faction, 2)
+                :Top(faction.Top)
+                :Over(scoreboard, 10)
+                :End()
+
+            self.Rating.OnDirty = function()
+                
+                rating:SetText("(" .. math.floor(self.Rating()+0.5) .. ")")
+            end
+        end 
+
+        local name = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "",  12, UIUtil.bodyFont))
+            :RightOf(rating, 2)
+            :Top(rating.Top)
+            :Over(scoreboard, 10)
+            :End()
+
+        self.Name.OnDirty = function()
+            name:SetText(tostring(self.Name()))
+        end
+
+
+
+
+
         -- # initial (sane) values
 
         self.Faction:Set(army.faction)
         self.Name:Set(army.nickname)
-
+        self.Rating:Set(scenario.Options.Ratings[army.nickname] or 0)
     end,
 }
 
@@ -370,9 +400,15 @@ local Scoreboard = Class(Group) {
             Height = scenario.size[2],
             Version = scenario.map_version or 0,
             ReplayID = UIUtil.GetReplayId() or 0
-       })
+        })
 
-       self.Ranked:Set(scenario.Options.Ranked or false)
+        self.Ranked:Set(scenario.Options.Ranked or false)
+
+        -- # other 
+
+        if not showDebugLayout then 
+            debug:Hide()
+        end
     end,
 
 
