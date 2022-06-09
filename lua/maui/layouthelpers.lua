@@ -13,6 +13,9 @@
 -- Offsets are specified in pixels for the "base art" size. If the art is
 -- scaled (ie large UI mode) this factor will keep the layout correct
 
+
+local floor = math.floor
+
 -- Store and set the current pixel scale multiplier. This will be used when the
 -- artwork is scaled up or down so that offsets scale up and down appropriately.
 -- Note that if you add a new layout helper function that uses offsets, you need
@@ -20,7 +23,7 @@
 -- art is changed
 local Prefs = import('/lua/user/prefs.lua')
 local pixelScaleFactor = Prefs.GetFromCurrentProfile('options').ui_scale or 1
-local floor = math.floor
+
 
 function SetPixelScaleFactor(newFactor)
     pixelScaleFactor = newFactor
@@ -30,105 +33,319 @@ function GetPixelScaleFactor()
     return pixelScaleFactor
 end
 
+-- Set the dimensions
+function SetDimensions(control, width, height)
+    SetWidth(control, width)
+    SetHeight(control, height)
+end
+
+function SetWidth(control, width)
+    if width then
+        control.Width:Set(floor(width * pixelScaleFactor))
+    end
+end
+
+function SetHeight(control, height)
+    if height then
+        control.Height:Set(floor(height * pixelScaleFactor))
+    end
+end
+
+-- Set the depth relative to the parent
+function DepthOverParent(control, parent, depth)
+    depth = depth or 1
+    control.Depth:SetFunction(function() return parent.Depth() + depth end)
+end
+
+function DepthUnderParent(control, parent, depth)
+    depth = depth or 1
+    control.Depth:SetFunction(function() return parent.Depth() - depth end)
+end
+
+-- Scale according to the globally set ratio
+function Scale(control)
+    SetDimensions(control, control.Width(), control.Height())
+end
+
+function ScaleNumber(number)
+    return floor(number * pixelScaleFactor)
+end
+
+function InvScaleNumber(number)
+    return floor(number / pixelScaleFactor)
+end
+
 -- These functions will set the controls position to be placed relative to
 -- its parents dimensions. They are generally most useful for elements that
 -- don't change size, they can also be used for controls that stretch
 -- to match parent.
 
-function AtCenterIn(control, parent, vertOffset, horzOffset)
-    vertOffset = vertOffset or 0
-    horzOffset = horzOffset or 0
-    control.Left:SetFunction(function()
-        return floor(parent.Left() + ((parent.Width() - control.Width()) / 2) + (horzOffset * pixelScaleFactor))
-    end)
-    control.Top:SetFunction(function()
-        return floor(parent.Top() + ((parent.Height() - control.Height()) / 2) + (vertOffset * pixelScaleFactor))
-    end)
-end
-
 function AtHorizontalCenterIn(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(function()
-        return floor(parent.Left() + ((parent.Width() - control.Width()) / 2) + (offset * pixelScaleFactor))
-    end)
+	if offset then
+		control.Left:SetFunction(function()
+			return parent.Left() + floor(((parent.Width() - control.Width()) / 2) + (offset * pixelScaleFactor))
+		end)
+	else
+		control.Left:SetFunction(function()
+			return parent.Left() + floor((parent.Width() - control.Width()) / 2)
+		end)
+	end
 end
 
 function AtVerticalCenterIn(control, parent, offset)
-    offset = offset or 0
-    control.Top:SetFunction(function()
-        return floor(parent.Top() + ((parent.Height() - control.Height()) / 2) + (offset * pixelScaleFactor))
-    end)
+    if offset then
+		control.Top:SetFunction(function()
+			return parent.Top() + floor(((parent.Height() - control.Height()) / 2) + (offset * pixelScaleFactor))
+		end)
+	else
+		control.Top:SetFunction(function()
+			return parent.Top() + floor((parent.Height() - control.Height()) / 2)
+		end)
+	end
 end
+
+-- These functions place a controls inside a parent
 
 function AtLeftIn(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(function() return floor(parent.Left() + (offset * pixelScaleFactor)) end)
-end
-
-function AtRightIn(control, parent, offset)
-    offset = offset or 0
-    control.Right:SetFunction(function() return floor(parent.Right() - (offset * pixelScaleFactor)) end)
-end
-
-function AtBottomIn(control, parent, offset)
-    offset = offset or 0
-    control.Bottom:SetFunction(function() return floor(parent.Bottom() - (offset * pixelScaleFactor)) end)
+    if offset and offset ~= 0 then
+		control.Left:SetFunction(function() return parent.Left() + floor(offset * pixelScaleFactor) end)
+	else
+		-- We shouldn't need to let the child refer to the parent if the parent is already laid out
+		-- however, this does change functionallity of the layout, so I've left them commented out for now
+		control.Left:SetFunction(function() return parent.Left() end)
+		--control.Left:SetFunction(parent.Left)
+	end
 end
 
 function AtTopIn(control, parent, offset)
-    offset = offset or 0
-    control.Top:SetFunction(function() return floor(parent.Top() + (offset * pixelScaleFactor)) end)
+    if offset and offset ~= 0 then
+		control.Top:SetFunction(function() return parent.Top() + floor(offset * pixelScaleFactor) end)
+	else
+		control.Top:SetFunction(function() return parent.Top() end)
+		--control.Top:SetFunction(parent.Top)
+	end
 end
 
-function AtLeftTopIn(control, parent, leftOffset, topOffset)
-    leftOffset = leftOffset or 0
-    topOffset = topOffset or 0
-    control.Left:SetFunction(function() return floor(parent.Left() + (leftOffset * pixelScaleFactor)) end)
-    control.Top:SetFunction(function() return floor(parent.Top() + (topOffset * pixelScaleFactor)) end)
+function AtRightIn(control, parent, offset)
+    if offset and offset ~= 0 then
+		control.Right:SetFunction(function() return parent.Right() - floor(offset * pixelScaleFactor) end)
+	else
+		control.Right:SetFunction(function() return parent.Right() end)
+		--control.Right:SetFunction(parent.Right)
+	end
 end
 
-function AtRightTopIn(control, parent, rightOffset, topOffset)
-    rightOffset = rightOffset or 0
-    topOffset = topOffset or 0
-    control.Right:SetFunction(function() return floor(parent.Right() - (rightOffset * pixelScaleFactor)) end)
-    control.Top:SetFunction(function() return floor(parent.Top() + (topOffset * pixelScaleFactor)) end)
+function AtBottomIn(control, parent, offset)
+	if offset and offset ~= 0 then
+		control.Bottom:SetFunction(function() return parent.Bottom() - floor(offset * pixelScaleFactor) end)
+	else
+		control.Bottom:SetFunction(function() return parent.Bottom() end)
+		--control.Bottom:SetFunction(parent.Bottom)
+	end
 end
 
-function AtLeftBottomIn(control, parent, leftOffset, bottomOffset)
-    leftOffset = leftOffset or 0
-    bottomOffset = bottomOffset or 0
-    control.Left:SetFunction(function() return floor(parent.Left() + (leftOffset * pixelScaleFactor)) end)
-    control.Bottom:SetFunction(function() return floor(parent.Bottom() - (bottomOffset * pixelScaleFactor)) end)
+-- Anchor functions lock the appropriate side of a control to the side of another control
+
+function AnchorToLeft(control, parent, offset)
+    if offset and offset ~= 0 then
+		control.Right:SetFunction(function() return parent.Left() - floor(offset * pixelScaleFactor) end)
+	else
+		control.Right:SetFunction(function() return parent.Left() end)
+		--control.Right:SetFunction(parent.Left)
+	end
 end
 
-function AtRightBottomIn(control, parent, rightOffset, bottomOffset)
-    rightOffset = rightOffset or 0
-    bottomOffset = bottomOffset or 0
-    control.Right:SetFunction(function() return floor(parent.Right() - (rightOffset * pixelScaleFactor)) end)
-    control.Bottom:SetFunction(function() return floor(parent.Bottom() - (bottomOffset * pixelScaleFactor)) end)
+function AnchorToTop(control, parent, offset)
+    if offset and offset ~= 0 then
+		control.Bottom:SetFunction(function() return parent.Top() - floor(offset * pixelScaleFactor) end)
+	else
+		control.Bottom:SetFunction(function() return parent.Top() end)
+		--control.Bottom:SetFunction(parent.Top)
+	end
+end
+
+function AnchorToRight(control, parent, offset)
+	if offset and offset ~= 0 then
+		control.Left:SetFunction(function() return parent.Right() + floor(offset * pixelScaleFactor) end)
+	else
+		control.Left:SetFunction(function() return parent.Right() end)
+		--control.Left:SetFunction(parent.Right)
+	end
+end
+
+function AnchorToBottom(control, parent, offset)
+    if offset and offset ~= 0 then
+		control.Top:SetFunction(function() return parent.Bottom() + floor(offset * pixelScaleFactor) end)
+	else
+		control.Top:SetFunction(function() return parent.Bottom() end)
+		--control.Top:SetFunction(parent.Bottom)
+	end
 end
 
 -- These functions use percentages to place the item rather than offsets so they will
 -- stay proportially spaced when the parent resizes
 
 function FromLeftIn(control, parent, percent)
-    percent = percent or 0.00
-    control.Left:SetFunction(function() return floor(parent.Left() + (parent.Width() * percent)) end)
+    if percent and percent ~= 0 then
+		control.Left:SetFunction(function() return parent.Left() + floor(percent * parent.Width()) end)
+	else
+		control.Left:SetFunction(function() return parent.Left() end)
+		--control.Left:SetFunction(parent.Left)
+	end
 end
 
 function FromTopIn(control, parent, percent)
-    percent = percent or 0.00
-    control.Top:SetFunction( function() return floor(parent.Top() + (parent.Height() * percent)) end)
+    if percent and percent ~= 0 then
+		control.Top:SetFunction(function() return parent.Top() + floor(percent * parent.Height()) end)
+	else
+		control.Top:SetFunction(function() return parent.Top() end)
+	end
 end
 
 function FromRightIn(control, parent, percent)
-    percent = percent or 0.00
-    control.Right:SetFunction(function() return floor(parent.Right() - (parent.Width() * percent)) end)
+    if percent and percent ~= 0 then
+		control.Right:SetFunction(function() return parent.Right() - floor(percent * parent.Width()) end)
+	else
+		control.Right:SetFunction(function() return parent.Right() end)
+		--control.Right:SetFunction(parent.Right)
+	end
 end
 
 function FromBottomIn(control, parent, percent)
-    percent = percent or 0.00
-    control.Bottom:SetFunction( function() return floor(parent.Bottom() - (parent.Height() * percent)) end)
+    if percent and percent ~= 0 then
+		control.Bottom:SetFunction(function() return parent.Bottom() - floor(percent * parent.Height()) end)
+	else
+		control.Bottom:SetFunction(function() return parent.Bottom() end)
+		--control.Bottom:SetFunction(parent.Bottom)
+	end
+end
+
+-- These functions reset a control to be calculated from the others
+
+function ResetLeft(control)
+    control.Left:SetFunction(function() return control.Right() - control.Width() end)
+end
+
+function ResetTop(control)
+    control.Top:SetFunction(function() return control.Bottom() - control.Height() end)
+end
+
+function ResetRight(control)
+    control.Right:SetFunction(function() return control.Left() + control.Width() end)
+end
+
+function ResetBottom(control)
+    control.Bottom:SetFunction(function() return control.Top() + control.Height() end)
+end
+
+function ResetWidth(control)
+    control.Width:SetFunction(function() return control.Right() - control.Left() end)
+end
+
+function ResetHeight(control)
+    control.Height:SetFunction(function() return control.Bottom() - control.Top() end)
+end
+
+
+--**************************************
+--*      Composite Functions           *
+--**************************************
+
+function AtCenterIn(control, parent, vertOffset, horzOffset)
+    AtHorizontalCenterIn(control, parent, horzOffset)
+    AtVerticalCenterIn(control, parent, vertOffset)
+end
+
+-- Lock right top of control to left of parent, centered vertically to the parent
+function CenteredLeftOf(control, parent, offset)
+	AnchorToLeft(control, parent, offset)
+    AtVerticalCenterIn(control, parent)
+end
+
+-- Lock bottom left of control to top left of parent, centered horizontally to the parent
+function CenteredAbove(control, parent, offset)
+    AtHorizontalCenterIn(control, parent)
+    AnchorToTop(control, parent, offset)
+end
+
+-- Lock left top of control to right of parent, centered vertically to the parent
+function CenteredRightOf(control, parent, offset)
+	AnchorToRight(control, parent, offset)
+    AtVerticalCenterIn(control, parent)
+end
+
+-- Lock top left of control to bottom left of parent, centered horizontally to the parent
+function CenteredBelow(control, parent, offset)
+    AtHorizontalCenterIn(control, parent)
+    AnchorToBottom(control, parent, offset)
+end
+
+-- Set to a corner inside the parent
+
+function AtLeftTopIn(control, parent, leftOffset, topOffset)
+    AtLeftIn(control, parent, leftOffset)
+    AtTopIn(control, parent, topOffset)
+end
+
+function AtRightTopIn(control, parent, rightOffset, topOffset)
+    AtRightIn(control, parent, rightOffset)
+    AtTopIn(control, parent, topOffset)
+end
+
+function AtLeftBottomIn(control, parent, leftOffset, bottomOffset)
+    AtLeftIn(control, parent, leftOffset)
+    AtBottomIn(control, parent, bottomOffset)
+end
+
+function AtRightBottomIn(control, parent, rightOffset, bottomOffset)
+    AtRightIn(control, parent, rightOffset)
+    AtBottomIn(control, parent, bottomOffset)
+end
+
+-- These functions will set the controls position relative to a sibling
+
+-- Lock right top of control to left top of parent
+function LeftOf(control, parent, offset)
+    AnchorToLeft(control, parent, offset)
+	AtTopIn(control, parent)
+end
+
+-- Lock bottom left of control to top left of parent
+function Above(control, parent, offset)
+	AtLeftIn(control, parent)
+    AnchorToTop(control, parent, offset)
+end
+
+-- Lock left top of control to right top of parent
+function RightOf(control, parent, offset)
+    AnchorToRight(control, parent, offset)
+    AtTopIn(control, parent)
+end
+
+-- Lock top left of control to bottom left of parent
+function Below(control, parent, offset)
+	AtLeftIn(control, parent)
+    AnchorToBottom(control, parent, offset)
+end
+
+
+
+-- These functions will place the control and resize in a specified location within the parent
+-- note that the offset version is more useful than hard coding the location
+-- as it will take advantage of the pixel scale factor
+
+function OffsetIn(control, parent, left, top, right, bottom)
+    AtLeftIn(control, parent, left)
+    AtTopIn(control, parent, top)
+    AtRightIn(control, parent, right)
+    AtBottomIn(control, parent, bottom)
+end
+
+function PercentIn(control, parent, left, top, right, bottom)
+    FromLeftIn(control, parent, left)
+	FromTopIn(control, parent, top)
+	FromRightIn(control, parent, right)
+	FromBottomIn(control, parent, bottom)
 end
 
 -- These functions will stretch the control to fill the parent and provide an optional border
@@ -141,19 +358,11 @@ function FillParent(control, parent)
 end
 
 function FillParentRelativeBorder(control, parent, percent)
-    percent = percent or 0.00
-    control.Top:SetFunction(function() return floor(parent.Top() + (parent.Height() * percent)) end)
-    control.Left:SetFunction(function() return floor(parent.Left() + (parent.Width() * percent)) end)
-    control.Bottom:SetFunction(function() return floor(parent.Bottom() - (parent.Height() * percent)) end)
-    control.Right:SetFunction(function() return floor(parent.Right() - (parent.Width() * percent)) end)
+    PercentIn(control, parent, percent, percent, percent, percent)
 end
 
 function FillParentFixedBorder(control, parent, offset)
-    offset = offset or 0
-    control.Top:SetFunction(function() return floor(parent.Top() + (offset * pixelScaleFactor)) end)
-    control.Left:SetFunction(function() return floor(parent.Left() + (offset * pixelScaleFactor)) end)
-    control.Bottom:SetFunction(function() return floor(parent.Bottom() - (offset * pixelScaleFactor)) end)
-    control.Right:SetFunction(function() return floor(parent.Right() - (offset * pixelScaleFactor)) end)
+    OffsetIn(control, parent, offset, offset, offset, offset)
 end
 
 -- Fill the parent control while preserving the aspect ratio of the item
@@ -180,150 +389,14 @@ function FillParentPreserveAspectRatio(control, parent)
     end)
 end
 
--- These functions will place the control and resize in a specified location within the parent
--- note that the offset version is more useful than hard coding the location
--- as it will take advantage of the pixel scale factor
-
-function PercentIn(control, parent, left, top, right, bottom)
-    left = left or 0.00
-    top = top or 0.00
-    right = right or 0.00
-    bottom = bottom or 0.00
-
-    control.Left:SetFunction(function() return floor(parent.Left() + (left * parent.Width())) end)
-    control.Top:SetFunction(function() return floor(parent.Top() + (top * parent.Height())) end)
-    control.Right:SetFunction(function() return floor(parent.Right() - (right * parent.Width())) end)
-    control.Bottom:SetFunction(function() return floor(parent.Bottom() - (bottom * parent.Height())) end)
-end
-
-function OffsetIn(control, parent, left, top, right, bottom)
-    left = left or 0
-    top = top or 0
-    right = right or 0
-    bottom = bottom or 0
-
-    control.Left:SetFunction(function() return floor(parent.Left() + (left * pixelScaleFactor)) end)
-    control.Top:SetFunction(function() return floor(parent.Top() + (top * pixelScaleFactor)) end)
-    control.Right:SetFunction(function() return floor(parent.Right() - (right * pixelScaleFactor)) end)
-    control.Bottom:SetFunction(function() return floor(parent.Bottom() - (bottom * pixelScaleFactor)) end)
-end
-
--- These functions will set the controls position relative to a sibling
-
--- Lock right top of control to left top of parent
-function LeftOf(control, parent, offset)
-    offset = offset or 0
-    control.Right:SetFunction(function() return floor(parent.Left() - (offset * pixelScaleFactor)) end)
-    control.Top:SetFunction(parent.Top)
-end
-
--- Lock left top of control to right top of parent
-function RightOf(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(function() return floor(parent.Right() + (offset * pixelScaleFactor)) end)
-    control.Top:SetFunction(parent.Top)
-end
-
--- Lock right top of control to left of parent, centered vertically to the parent
-function CenteredLeftOf(control, parent, offset)
-    offset = offset or 0
-    control.Right:SetFunction(function() return floor(parent.Left() - (offset * pixelScaleFactor)) end)
-    control.Top:SetFunction(function() return floor(parent.Top() + ((parent.Height() - control.Height()) / 2)) end)
-end
-
--- Lock left top of control to right of parent, centered vertically to the parent
-function CenteredRightOf(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(function() return floor(parent.Right() + (offset * pixelScaleFactor)) end)
-    control.Top:SetFunction(function() return floor(parent.Top() + ((parent.Height() - control.Height()) / 2)) end)
-end
-
--- Lock bottom left of control to top left of parent
-function Above(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(parent.Left)
-    control.Bottom:SetFunction(function() return parent.Top() - (offset * pixelScaleFactor) end)
-end
-
--- Lock top left of control to bottom left of parent
-function Below(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(parent.Left)
-    control.Top:SetFunction(function() return floor(parent.Bottom() + (offset * pixelScaleFactor)) end)
-end
-
--- Lock bottom left of control to top left of parent, centered horizontally to the parent
-function CenteredAbove(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(function() return floor(parent.Left() + ((parent.Width() - control.Width()) / 2)) end)
-    control.Bottom:SetFunction(function() return floor(parent.Top() - (offset * pixelScaleFactor)) end)
-end
-
--- Lock top left of control to bottom left of parent, centered horizontally to the parent
-function CenteredBelow(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(function() return floor(parent.Left() + ((parent.Width() - control.Width()) / 2)) end)
-    control.Top:SetFunction(function() return floor(parent.Bottom() + (offset * pixelScaleFactor)) end)
-end
-
--- Anchor functions lock the appropriate side of a control to the side of another control
-
--- Lock top of control to parent bottom
-function AnchorToTop(control, parent, offset)
-    offset = offset or 0
-    control.Bottom:SetFunction(function() return floor(parent.Top() - (offset * pixelScaleFactor)) end)
-end
-
--- Lock bottom of control parent top
-function AnchorToBottom(control, parent, offset)
-    offset = offset or 0
-    control.Top:SetFunction(function() return floor(parent.Bottom() + (offset * pixelScaleFactor)) end)
-end
-
--- Lock left of control to parent right
-function AnchorToRight(control, parent, offset)
-    offset = offset or 0
-    control.Left:SetFunction(function() return floor(parent.Right() + (offset * pixelScaleFactor)) end)
-end
-
--- Lock right of control to parent left
-function AnchorToLeft(control, parent, offset)
-    offset = offset or 0
-    control.Right:SetFunction(function() return floor(parent.Left() - (offset * pixelScaleFactor)) end)
-end
-
 -- Reset to the default layout functions
 function Reset(control)
-    control.Left:SetFunction(function() return control.Right() - control.Width() end)
-    control.Top:SetFunction(function() return control.Bottom() - control.Height() end)
-    control.Right:SetFunction(function() return control.Left() + control.Width() end)
-    control.Bottom:SetFunction(function() return control.Top() + control.Height() end)
-    control.Width:SetFunction(function() return control.Right() - control.Left() end)
-    control.Height:SetFunction(function() return control.Bottom() - control.Top() end)
-end
-
-function ResetLeft(control)
-    control.Left:SetFunction(function() return control.Right() - control.Width() end)
-end
-
-function ResetTop(control)
-    control.Top:SetFunction(function() return control.Bottom() - control.Height() end)
-end
-
-function ResetRight(control)
-    control.Right:SetFunction(function() return control.Left() + control.Width() end)
-end
-
-function ResetBottom(control)
-    control.Bottom:SetFunction(function() return control.Top() + control.Height() end)
-end
-
-function ResetWidth(control)
-    control.Width:SetFunction(function() return control.Right() - control.Left() end)
-end
-
-function ResetHeight(control)
-    control.Height:SetFunction(function() return control.Bottom() - control.Top() end)
+	ResetLeft(control)
+	ResetTop(control)
+	ResetRight(control)
+	ResetBottom(control)
+	ResetWidth(control)
+	ResetHeight(control)
 end
 
 --[[
@@ -365,6 +438,19 @@ function RelativeTo(control, parent, fileName, controlName, parentName, topOffse
     end)
 end
 
+function TopRelativeTo(control, parent, fileName, controlName, parentName)
+    local layoutTable = import(fileName()).layout
+    if not layoutTable[controlName] then
+        WARN("Control not found in layout table: " .. controlName)
+    end
+    if not layoutTable[parentName] then
+        WARN("Parent not found in layout table: " .. parentName)
+    end
+    control.Top:SetFunction(function()
+        local layoutTable = import(fileName()).layout
+        return floor(parent.Top() + (layoutTable[controlName].top - layoutTable[parentName].top))
+    end)
+end
 
 function LeftRelativeTo(control, parent, fileName, controlName, parentName)
     local layoutTable = import(fileName()).layout
@@ -377,20 +463,6 @@ function LeftRelativeTo(control, parent, fileName, controlName, parentName)
     control.Left:SetFunction(function()
         local layoutTable = import(fileName()).layout
         return floor(parent.Left() + (layoutTable[controlName].left - layoutTable[parentName].left))
-    end)
-end
-
-function TopRelativeTo(control, parent, fileName, controlName, parentName)
-    local layoutTable = import(fileName()).layout
-    if not layoutTable[controlName] then
-        WARN("Control not found in layout table: " .. controlName)
-    end
-    if not layoutTable[parentName] then
-        WARN("Parent not found in layout table: " .. parentName)
-    end
-    control.Top:SetFunction(function()
-        local layoutTable = import(fileName()).layout
-        return floor(parent.Top() + (layoutTable[controlName].top - layoutTable[parentName].top))
     end)
 end
 
@@ -441,47 +513,6 @@ function DimensionsRelativeTo(control, fileName, controlName)
     end)
 end
 
--- Set the dimensions
-function SetDimensions(control, width, height)
-    SetWidth(control, width)
-    SetHeight(control, height)
-end
-
-function SetWidth(control, width)
-    if width then
-        control.Width:Set(floor(width * pixelScaleFactor))
-    end
-end
-
-function SetHeight(control, height)
-    if height then
-        control.Height:Set(floor(height * pixelScaleFactor))
-    end
-end
-
--- Set the depth relative to the parent
-function DepthOverParent(control, parent, depth)
-    depth = depth or 1
-    control.Depth:SetFunction(function() return parent.Depth() + depth end)
-end
-
-function DepthUnderParent(control, parent, depth)
-    depth = depth or 1
-    control.Depth:SetFunction(function() return parent.Depth() - depth end)
-end
-
--- Scale according to the globally set ratio
-function Scale(control)
-    SetDimensions(control, control.Width(), control.Height())
-end
-
-function ScaleNumber(number)
-    return floor(number * pixelScaleFactor)
-end
-
-function InvScaleNumber(number)
-    return floor(number / pixelScaleFactor)
-end
 
 --**********************************
 --*********  Layouter  *************
@@ -490,7 +521,7 @@ end
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
--- controls' mostly used methods
+-- Controls' mostly used methods
 
 function LayouterMetaTable:Name(debugName)
     self.c:SetName(debugName)
@@ -548,7 +579,7 @@ function LayouterMetaTable:Alpha(alpha, children)
     return self
 end
 
--- raw setting
+-- Raw setting
 
 function LayouterMetaTable:Left(left)
     self.c.Left:Set(left)
@@ -600,7 +631,7 @@ function LayouterMetaTable:FillFixedBorder(parent, offset)
     return self
 end
 
--- double-based positioning
+-- Double-based positioning
 
 function LayouterMetaTable:AtLeftTopIn(parent, leftOffset, topOffset)
     AtLeftTopIn(self.c, parent, leftOffset, topOffset)
@@ -622,7 +653,7 @@ function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
     return self
 end
 
--- centered out of parent
+-- Centered out of parent
 
 function LayouterMetaTable:CenteredLeftOf(parent, offset)
     CenteredLeftOf(self.c, parent, offset)
@@ -644,7 +675,7 @@ function LayouterMetaTable:CenteredBelow(parent, offset)
     return self
 end
 
--- centered--
+-- Centered
 
 function LayouterMetaTable:AtHorizontalCenterIn(parent, offset)
     AtHorizontalCenterIn(self.c, parent, offset)
@@ -661,7 +692,7 @@ function LayouterMetaTable:AtCenterIn(parent, vertOffset, horzOffset)
     return self
 end
 
--- single-in positioning
+-- Single-in positioning
 
 function LayouterMetaTable:AtLeftIn(parent, offset)
     AtLeftIn(self.c, parent, offset)
@@ -683,7 +714,7 @@ function LayouterMetaTable:AtBottomIn(parent, offset)
     return self
 end
 
--- center-in positioning
+-- Center-in positioning
 
 function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
     AtLeftIn(self.c, parent, offset)
@@ -709,7 +740,7 @@ function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
     return self
 end
 
--- center-in positioning
+-- Center-in positioning
 
 function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
     AtLeftIn(self.c, parent, offset)
@@ -735,7 +766,7 @@ function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
     return self
 end
 
--- out-of positioning
+-- Out-of positioning
 
 function LayouterMetaTable:Below(parent, offset)
     Below(self.c, parent, offset)
@@ -757,7 +788,7 @@ function LayouterMetaTable:LeftOf(parent, offset)
     return self
 end
 
--- depth--
+-- Depth
 
 function LayouterMetaTable:Over(parent, depth)
     DepthOverParent(self.c, parent, depth)
@@ -769,7 +800,7 @@ function LayouterMetaTable:Under(parent, depth)
     return self
 end
 
--- anchor--
+-- Anchor
 
 function LayouterMetaTable:AnchorToTop(parent, offset)
     AnchorToTop(self.c, parent, offset)
@@ -792,10 +823,15 @@ function LayouterMetaTable:AnchorToBottom(parent, offset)
 end
 
 
--- resets control's properties to default
+-- Resets control's properties to default
 
 function LayouterMetaTable:ResetLeft()
     ResetLeft(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetTop()
+    ResetTop(self.c)
     return self
 end
 
@@ -809,31 +845,23 @@ function LayouterMetaTable:ResetBottom()
     return self
 end
 
-function LayouterMetaTable:ResetHeight()
-    ResetHeight(self.c)
-    return self
-end
-
-function LayouterMetaTable:ResetTop()
-    ResetTop(self.c)
-    return self
-end
-
 function LayouterMetaTable:ResetWidth()
     ResetWidth(self.c)
     return self
 end
 
--- get control --
+function LayouterMetaTable:ResetHeight()
+    ResetHeight(self.c)
+    return self
+end
 
+-- Get control
 function LayouterMetaTable:Get()
     return self.c
 end
 
--- calculates control's Properties to determine its layout completion
--- and returns it
+-- Calculates control's Properties to determine its layout completion and returns it
 -- remember, if parent has incomplete layout it will warn you anyway
-
 function LayouterMetaTable:End()
     if not pcall(self.c.Top) or not pcall(self.c.Bottom) or not pcall(self.c.Height) then
         WARN(string.format("Incorrect layout for \"%s\" Top-Height-Bottom", self.c:GetName()))
@@ -865,8 +893,7 @@ local layouter = {
 }
 setmetatable(layouter, LayouterMetaTable)
 
--- use if you don't cache layouter object
-
+-- Use if you don't cache layouter object
 function ReusedLayoutFor(control)
     layouter.c = control or false
     return layouter
