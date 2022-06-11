@@ -14,8 +14,8 @@
 -- scaled (ie large UI mode) this factor will keep the layout correct
 
 
-local MapFloor = math.floor
-local MapCeil = math.ceil
+local MathFloor = math.floor
+local MathCeil = math.ceil
 
 -- Store and set the current pixel scale multiplier. This will be used when the
 -- artwork is scaled up or down so that offsets scale up and down appropriately.
@@ -51,7 +51,7 @@ end
 ---@param width? number no change if nil
 function SetWidth(control, width)
     if width then
-        control.Width:SetValue(MapFloor(width * pixelScaleFactor))
+        control.Width:SetValue(MathFloor(width * pixelScaleFactor))
     end
 end
 
@@ -60,7 +60,7 @@ end
 ---@param height? number no change if nil
 function SetHeight(control, height)
     if height then
-        control.Height:SetValue(MapFloor(height * pixelScaleFactor))
+        control.Height:SetValue(MathFloor(height * pixelScaleFactor))
     end
 end
 
@@ -92,7 +92,7 @@ end
 ---@param number number
 ---@return number scaledNumber
 function ScaleNumber(number)
-    return MapFloor(number * pixelScaleFactor)
+    return MathFloor(number * pixelScaleFactor)
 end
 
 --- Unscales a number by the pixel scale factor
@@ -112,7 +112,7 @@ end
 ---@param padding? number fixed padding between control and parent
 function AnchorToLeft(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Right:SetFunction(function() return parent.Left() - MapFloor(padding * pixelScaleFactor) end)
+        control.Right:SetFunction(function() return parent.Left() - MathFloor(padding * pixelScaleFactor) end)
     else
         -- We shouldn't need to let the child refer to the parent if the parent is already laid out
         -- however, this does change functionallity of the layout, so I've left them commented out for now
@@ -127,7 +127,7 @@ end
 ---@param padding? number fixed padding between control and parent
 function AnchorToTop(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Top() - MapFloor(padding * pixelScaleFactor) end)
+        control.Bottom:SetFunction(function() return parent.Top() - MathFloor(padding * pixelScaleFactor) end)
     else
         control.Bottom:SetFunction(function() return parent.Top() end)
         --control.Bottom:SetFunction(parent.Top)
@@ -140,7 +140,7 @@ end
 ---@param padding? number fixed padding between control and parent
 function AnchorToRight(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Left:SetFunction(function() return parent.Right() + MapFloor(padding * pixelScaleFactor) end)
+        control.Left:SetFunction(function() return parent.Right() + MathFloor(padding * pixelScaleFactor) end)
     else
         control.Left:SetFunction(function() return parent.Right() end)
         --control.Left:SetFunction(parent.Right)
@@ -153,7 +153,7 @@ end
 ---@param padding? number fixed padding between control and parent
 function AnchorToBottom(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Top:SetFunction(function() return parent.Bottom() + MapFloor(padding * pixelScaleFactor) end)
+        control.Top:SetFunction(function() return parent.Bottom() + MathFloor(padding * pixelScaleFactor) end)
     else
         control.Top:SetFunction(function() return parent.Bottom() end)
         --control.Top:SetFunction(parent.Bottom)
@@ -175,11 +175,11 @@ end
 function AtHorizontalCenterIn(control, parent, leftOffset)
     if leftOffset then
         control.Left:SetFunction(function()
-            return parent.Left() + MapFloor(((parent.Width() - control.Width()) / 2) + (leftOffset * pixelScaleFactor))
+            return parent.Left() + MathFloor(((parent.Width() - control.Width()) / 2) + (leftOffset * pixelScaleFactor))
         end)
     else
         control.Left:SetFunction(function()
-            return parent.Left() + MapFloor((parent.Width() - control.Width()) / 2)
+            return parent.Left() + MathFloor((parent.Width() - control.Width()) / 2)
         end)
     end
 end
@@ -191,11 +191,11 @@ end
 function AtVerticalCenterIn(control, parent, topOffset)
     if topOffset then
         control.Top:SetFunction(function()
-            return parent.Top() + MapFloor(((parent.Height() - control.Height()) / 2) + (topOffset * pixelScaleFactor))
+            return parent.Top() + MathFloor(((parent.Height() - control.Height()) / 2) + (topOffset * pixelScaleFactor))
         end)
     else
         control.Top:SetFunction(function()
-            return parent.Top() + MapFloor((parent.Height() - control.Height()) / 2)
+            return parent.Top() + MathFloor((parent.Height() - control.Height()) / 2)
         end)
     end
 end
@@ -206,7 +206,7 @@ end
 ---@param leftOffset? number
 function AtLeftIn(control, parent, leftOffset)
     if leftOffset and leftOffset ~= 0 then
-        control.Left:SetFunction(function() return parent.Left() + MapFloor(leftOffset * pixelScaleFactor) end)
+        control.Left:SetFunction(function() return parent.Left() + MathFloor(leftOffset * pixelScaleFactor) end)
     else
         control.Left:SetFunction(function() return parent.Left() end)
         --control.Left:SetFunction(parent.Left)
@@ -219,7 +219,7 @@ end
 ---@param topOffset? number
 function AtTopIn(control, parent, topOffset)
     if topOffset and topOffset ~= 0 then
-        control.Top:SetFunction(function() return parent.Top() + MapFloor(topOffset * pixelScaleFactor) end)
+        control.Top:SetFunction(function() return parent.Top() + MathFloor(topOffset * pixelScaleFactor) end)
     else
         control.Top:SetFunction(function() return parent.Top() end)
         --control.Top:SetFunction(parent.Top)
@@ -232,7 +232,7 @@ end
 ---@param rightOffset? number
 function AtRightIn(control, parent, rightOffset)
     if rightOffset and rightOffset ~= 0 then
-        control.Right:SetFunction(function() return parent.Right() - MapFloor(rightOffset * pixelScaleFactor) end)
+        control.Right:SetFunction(function() return parent.Right() - MathFloor(rightOffset * pixelScaleFactor) end)
     else
         control.Right:SetFunction(function() return parent.Right() end)
         --control.Right:SetFunction(parent.Right)
@@ -245,7 +245,7 @@ end
 ---@param bottomOffset? number
 function AtBottomIn(control, parent, bottomOffset)
     if bottomOffset and bottomOffset ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Bottom() - MapFloor(bottomOffset * pixelScaleFactor) end)
+        control.Bottom:SetFunction(function() return parent.Bottom() - MathFloor(bottomOffset * pixelScaleFactor) end)
     else
         control.Bottom:SetFunction(function() return parent.Bottom() end)
         --control.Bottom:SetFunction(parent.Bottom)
@@ -261,7 +261,7 @@ end
 ---@param leftPercent? number
 function FromLeftIn(control, parent, leftPercent)
     if leftPercent and leftPercent ~= 0 then
-        control.Left:SetFunction(function() return parent.Left() + MapFloor(leftPercent * parent.Width()) end)
+        control.Left:SetFunction(function() return parent.Left() + MathFloor(leftPercent * parent.Width()) end)
     else
         control.Left:SetFunction(function() return parent.Left() end)
         --control.Left:SetFunction(parent.Left)
@@ -274,7 +274,7 @@ end
 ---@param topPercent? number
 function FromTopIn(control, parent, topPercent)
     if topPercent and topPercent ~= 0 then
-        control.Top:SetFunction(function() return parent.Top() + MapFloor(topPercent * parent.Height()) end)
+        control.Top:SetFunction(function() return parent.Top() + MathFloor(topPercent * parent.Height()) end)
     else
         control.Top:SetFunction(function() return parent.Top() end)
         --control.Top:SetFunction(parent.Top)
@@ -287,7 +287,7 @@ end
 ---@param rightPercent? number
 function FromRightIn(control, parent, rightPercent)
     if rightPercent and rightPercent ~= 0 then
-        control.Right:SetFunction(function() return parent.Right() - MapFloor(rightPercent * parent.Width()) end)
+        control.Right:SetFunction(function() return parent.Right() - MathFloor(rightPercent * parent.Width()) end)
     else
         control.Right:SetFunction(function() return parent.Right() end)
         --control.Right:SetFunction(parent.Right)
@@ -300,7 +300,7 @@ end
 ---@param bottomPercent? number
 function FromBottomIn(control, parent, bottomPercent)
     if bottomPercent and bottomPercent ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Bottom() - MapFloor(bottomPercent * parent.Height()) end)
+        control.Bottom:SetFunction(function() return parent.Bottom() - MathFloor(bottomPercent * parent.Height()) end)
     else
         control.Bottom:SetFunction(function() return parent.Bottom() end)
         --control.Bottom:SetFunction(parent.Bottom)
@@ -557,16 +557,16 @@ function FillParentPreserveAspectRatio(control, parent)
     end
 
     control.Top:SetFunction(function()
-        return MapFloor(parent.Top() + ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Top() + ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
     end)
     control.Bottom:SetFunction(function()
-        return MapFloor(parent.Bottom() - ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Bottom() - ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
     end)
     control.Left:SetFunction(function()
-        return MapFloor(parent.Left() + ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Left() + ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
     end)
     control.Right:SetFunction(function()
-        return MapFloor(parent.Right() - ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Right() - ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
     end)
 end
 
@@ -612,12 +612,12 @@ function RelativeTo(control, parent, fileName, controlName, parentName, topOffse
     leftOffset = leftOffset or 0
     control.Top:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MapFloor(parent.Top() + ((layoutTable[controlName].top - layoutTable[parentName].top) * pixelScaleFactor + (topOffset * pixelScaleFactor)))
+        return MathFloor(parent.Top() + ((layoutTable[controlName].top - layoutTable[parentName].top) * pixelScaleFactor + (topOffset * pixelScaleFactor)))
     end)
     
     control.Left:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MapFloor(parent.Left() + ((layoutTable[controlName].left - layoutTable[parentName].left) * pixelScaleFactor + (leftOffset * pixelScaleFactor)))
+        return MathFloor(parent.Left() + ((layoutTable[controlName].left - layoutTable[parentName].left) * pixelScaleFactor + (leftOffset * pixelScaleFactor)))
     end)
 end
 
@@ -637,7 +637,7 @@ function LeftRelativeTo(control, parent, fileName, controlName, parentName)
     end
     control.Left:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MapFloor(parent.Left() + (layoutTable[controlName].left - layoutTable[parentName].left))
+        return MathFloor(parent.Left() + (layoutTable[controlName].left - layoutTable[parentName].left))
     end)
 end
 
@@ -657,7 +657,7 @@ function TopRelativeTo(control, parent, fileName, controlName, parentName)
     end
     control.Top:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MapFloor(parent.Top() + (layoutTable[controlName].top - layoutTable[parentName].top))
+        return MathFloor(parent.Top() + (layoutTable[controlName].top - layoutTable[parentName].top))
     end)
 end
 
@@ -679,7 +679,7 @@ function RightRelativeTo(control, parent, fileName, controlName, parentName)
         local layoutTable = import(fileName()).layout
         local layoutParent = layoutTable[parentName]
         local layoutControl = layoutTable[controlName]
-        return MapFloor(parent.Right() - ((layoutParent.left + layoutParent.width) - (layoutControl.left + layoutControl.width)))
+        return MathFloor(parent.Right() - ((layoutParent.left + layoutParent.width) - (layoutControl.left + layoutControl.width)))
     end)
 end
 
@@ -701,7 +701,7 @@ function BottomRelativeTo(control, parent, fileName, controlName, parentName)
         local layoutTable = import(fileName()).layout
         local layoutParent = layoutTable[parentName]
         local layoutControl = layoutTable[controlName]
-        return MapFloor(parent.Bottom() - ((layoutParent.top + layoutParent.height) - (layoutControl.top + layoutControl.height)))
+        return MathFloor(parent.Bottom() - ((layoutParent.top + layoutParent.height) - (layoutControl.top + layoutControl.height)))
     end)
 end
 
@@ -716,11 +716,11 @@ function DimensionsRelativeTo(control, fileName, controlName)
     end
     control.Width:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MapFloor(layoutTable[controlName].width * pixelScaleFactor)
+        return MathFloor(layoutTable[controlName].width * pixelScaleFactor)
     end)
     control.Height:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MapFloor(layoutTable[controlName].height * pixelScaleFactor)
+        return MathFloor(layoutTable[controlName].height * pixelScaleFactor)
     end)
 end
 
@@ -1205,7 +1205,6 @@ end
 -- Out-of positioning
 
 --- Lock top right of the control to top left of a parent
----@param control Control
 ---@param parent Control
 ---@param padding? number fixed padding between control and parent
 ---@return Layouter
@@ -1215,7 +1214,6 @@ function LayouterMetaTable:LeftOf(parent, padding)
 end
 
 --- Lock top left of the control to top right of a parent
----@param control Control
 ---@param parent Control
 ---@param padding? number fixed padding between control and parent
 ---@return Layouter
@@ -1225,7 +1223,6 @@ function LayouterMetaTable:RightOf(parent, padding)
 end
 
 --- Lock bottom left of the control to top left of a parent
----@param control Control
 ---@param parent Control
 ---@param padding? number fixed padding between control and parent
 ---@return Layouter
@@ -1236,7 +1233,6 @@ end
 
 
 --- Lock top left of the control to bottom left of a parent
----@param control Control
 ---@param parent Control
 ---@param padding? number fixed padding between control and parent
 ---@return Layouter
