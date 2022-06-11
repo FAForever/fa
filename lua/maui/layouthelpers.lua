@@ -309,42 +309,43 @@ end
 
 -- These functions reset a control to be calculated from the others
 
---- Resets a control's left to be calculated from its right and width
---- *Make sure Right and Width are defined!!!*
+--- Resets a control's left to be calculated from its right and width  
+--- **Make sure `Right` and `Width` are defined!!!**
 ---@param control Control 
 function ResetLeft(control)
     control.Left:SetFunction(function() return control.Right() - control.Width() end)
 end
 
---- Resets a control's top to be calculated from its bottom and height
---- **Make sure Bottom and Height are defined!!!**
+--- Resets a control's top to be calculated from its bottom and height  
+--- **Make sure `Bottom` and `Height` are defined!!!**
 ---@param control Control
 function ResetTop(control)
     control.Top:SetFunction(function() return control.Bottom() - control.Height() end)
 end
 
---- Resets a control's left to be calculated from its right and width
----@param control Control make sure Left and Width are defined!!!
+--- Resets a control's left to be calculated from its right and width  
+--- **Make sure `Left` and `Width` are defined!!!**
+---@param control Control
 function ResetRight(control)
     control.Right:SetFunction(function() return control.Left() + control.Width() end)
 end
 
---- Resets a control's bottom to be calculated from its top and height
---- **Make sure Top and Height are Defined!!!**
+--- Resets a control's bottom to be calculated from its top and height  
+--- **Make sure `Top` and `Height` are Defined!!!**
 ---@param control Control
 function ResetBottom(control)
     control.Bottom:SetFunction(function() return control.Top() + control.Height() end)
 end
 
---- Resets a control's width to be calculated from its right and left
---- **Make sure Right and Left are defined!!!**
+--- Resets a control's width to be calculated from its right and left  
+--- **Make sure `Right` and `Left` are defined!!!**
 ---@param control Control
 function ResetWidth(control)
     control.Width:SetFunction(function() return control.Right() - control.Left() end)
 end
 
---- Resets a control's height to be calculated from its top and bottom
---- **Make sure Bottom and Top are defined!!!**
+--- Resets a control's height to be calculated from its top and bottom  
+--- **Make sure `Bottom` and `Top` are defined!!!**
 ---@param control Control
 function ResetHeight(control)
     control.Height:SetFunction(function() return control.Bottom() - control.Top() end)
@@ -570,8 +571,8 @@ function FillParentPreserveAspectRatio(control, parent)
     end)
 end
 
---- Reset to the default layout functions
---- You should call control:ResetLayout() instead unless you cannot rely on overriden behavior
+--- Reset to the default layout functions  
+--- You should call control:ResetLayout() instead unless you cannot rely on overriden behavior  
 --- **Remember to redefine two horizontal and two vertical properties to avoid circular dependencies!**
 ---@param control Control
 function Reset(control)
@@ -595,7 +596,7 @@ end
 --- Sets a control to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string full path and filename of the layout file. Must be a lazy var or function that returns the file name
+---@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 ---@param topOffset? number
@@ -624,7 +625,7 @@ end
 --- Sets a control's left to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string full path and filename of the layout file. must be a lazy var or function that returns the file name
+---@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 function LeftRelativeTo(control, parent, fileName, controlName, parentName)
@@ -644,7 +645,7 @@ end
 --- Sets a control's top to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string full path and filename of the layout file. must be a lazy var or function that returns the file name
+---@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 function TopRelativeTo(control, parent, fileName, controlName, parentName)
@@ -662,11 +663,11 @@ function TopRelativeTo(control, parent, fileName, controlName, parentName)
 end
 
 --- Sets a control's right to be positioned to a parent using a layout table
----@param control Control the control to position
----@param parent Control the control that the above is positioned relative to
----@param fileName string the full path and filename of the layout file. must be a lazy var or function that returns the file name
----@param controlName string the name( table key) of the control to be positioned
----@param parentName string the name (table key) of the control to be positioned relative to
+---@param control Control
+---@param parent Control
+---@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
+---@param controlName string name (table key) of the control to be positioned
+---@param parentName string name (table key) of the control to be positioned relative to
 function RightRelativeTo(control, parent, fileName, controlName, parentName)
     local layoutTable = import(fileName()).layout
     if not layoutTable[controlName] then
@@ -686,7 +687,7 @@ end
 --- Sets a control's bottom to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string full path and filename of the layout file. must be a lazy var or function that returns the file name
+---@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 function BottomRelativeTo(control, parent, fileName, controlName, parentName)
@@ -707,7 +708,7 @@ end
 
 --- Sets a control's dimensions using a layout table
 ---@param control Control
----@param fileName string full path and filename of the layout file. must be a lazy var or function that returns the file name
+---@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 function DimensionsRelativeTo(control, fileName, controlName)
     local layoutTable = import(fileName()).layout
@@ -864,7 +865,7 @@ function LayouterMetaTable:Bottom(bottom)
 end
 
 --- Sets the width of the control
----@param width function|number #width will be scaled
+---@param width function|number #width will be scaled by the pixel factor
 ---@return Layouter
 function LayouterMetaTable:Width(width)
     if iscallable(width) then
@@ -876,7 +877,7 @@ function LayouterMetaTable:Width(width)
 end
 
 --- Sets the height of the control
----@param height function|number #height will be scaled
+---@param height function|number #height will be scaled by the pixel factor
 ---@return Layouter
 function LayouterMetaTable:Height(height)
     if iscallable(height) then
@@ -1012,48 +1013,48 @@ end
 
 -- Resets
 
---- Resets the control's left to be calculated from its right and width
---- *Make sure Right and Width are defined!!!*
+--- Resets the control's left to be calculated from its right and width  
+--- **Make sure `Right` and `Width` are defined!!!**
 ---@return Layouter
 function LayouterMetaTable:ResetLeft()
     ResetLeft(self.c)
     return self
 end
 
---- Resets the control's top to be calculated from its bottom and height
---- **Make sure Bottom and Height are defined!!!**
+--- Resets the control's top to be calculated from its bottom and height  
+--- **Make sure `Bottom` and `Height` are defined!!!**
 ---@return Layouter
 function LayouterMetaTable:ResetTop()
     ResetTop(self.c)
     return self
 end
 
---- Resets the control's right to be calculated from its right and width
---- **Make sure Left and Width are defined!!!**
+--- Resets the control's right to be calculated from its right and width  
+--- **Make sure `Left` and `Width` are defined!!!**
 ---@return Layouter
 function LayouterMetaTable:ResetRight()
     ResetRight(self.c)
     return self
 end
 
---- Resets the control's bottom to be calculated from its top and height
---- **Make sure Top and Height are Defined!!!**
+--- Resets the control's bottom to be calculated from its top and height  
+--- **Make sure `Top` and `Height` are Defined!!!**
 ---@return Layouter
 function LayouterMetaTable:ResetBottom()
     ResetBottom(self.c)
     return self
 end
 
---- Resets the control's width to be calculated from its right and left
---- **Make sure Right and Left are defined!!!**
+--- Resets the control's width to be calculated from its right and left  
+--- **Make sure `Right` and `Left` are defined!!!**
 ---@return Layouter
 function LayouterMetaTable:ResetWidth()
     ResetWidth(self.c)
     return self
 end
 
---- Resets the control's height to be calculated from its top and bottom
---- **Make sure Bottom and Top are defined!!!**
+--- Resets the control's height to be calculated from its top and bottom  
+--- **Make sure `Bottom` and `Top` are defined!!!**
 ---@return Layouter
 function LayouterMetaTable:ResetHeight()
     ResetHeight(self.c)
@@ -1243,8 +1244,8 @@ end
 
 -- Fill parent
 
---- Sets control to fill a parent
---- Note this function copies the parent's side functions, it does not refer
+--- Sets control to fill a parent  
+--- Note this function copies the parent's edge functions, it does not refer
 ---@param parent Control
 ---@return Layouter
 function LayouterMetaTable:Fill(parent)
@@ -1262,7 +1263,7 @@ function LayouterMetaTable:FillFixedBorder(parent, offset)
 end
 
 
--- Calculates control's Properties to determine its layout completion and returns it
+-- Calculates control's Properties to determine its layout completion and returns it  
 -- remember, if parent has incomplete layout it will warn you anyway
 ---@return Control
 function LayouterMetaTable:End()
