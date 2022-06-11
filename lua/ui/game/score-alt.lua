@@ -71,26 +71,31 @@ end
 
 local ArmyEntry = Class(Group) {
 
-    Rating = LazyVar(0),
-    Name = LazyVar(""),
-    Faction = LazyVar(0),
-    Points = LazyVar(0),
-    Defeated = LazyVar(false),
+    __init = function(self, scoreboard, debug, data, index) 
+        Group.__init(self, scoreboard, "scoreboard-army-" .. index)
 
-    IncomeData = LazyVar({
-        IncomeMass = 0,
-        IncomeEnergy = 0,
-        BalanceMass = 0,
-        BalanceEnergy = 0,
-        StorageMass = 0,
-        StorageEnergy = 0,
-    }),
+        -- # prepare lazy values
 
-    __init = function(self, scoreboard, debug, army) 
-        Group.__init(self, scoreboard, "scoreboard-army")
+        self.Rating = LazyVar(0)
+        self.Name = LazyVar("")
+        self.Color = LazyVar("")
+        self.Faction = LazyVar(0)
+        self.Points = LazyVar(0)
+        self.Defeated = LazyVar(false)
+    
+        self.IncomeData = LazyVar({
+            IncomeMass = 0,
+            IncomeEnergy = 0,
+            BalanceMass = 0,
+            BalanceEnergy = 0,
+            StorageMass = 0,
+            StorageEnergy = 0,
+        })
 
-        LOG("Hello!")
-        reprsl(army)
+        -- # store information
+
+        self.Data = data 
+        self.Index = index
 
         -- # do not use self reference as that can be confusing
         local entry = LayoutHelpers.LayoutFor(self)
@@ -101,13 +106,28 @@ local ArmyEntry = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
+        entry.HandleEvent = function(self, event)
+            if event.Type == 'MouseEnter' then 
+                entry.Highlight:SetAlpha(0.6)
+            elseif event.Type == 'MouseExit' then 
+                entry:DetermineBackgroundColor()
+            end
+        end
+
+        entry.Highlight = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Fill(entry)
+            :Color('44ffffff')
+            :End()
+
+        entry:ComputeBackgroundColor()
+
         local debugEntry = LayoutHelpers.LayoutFor(Bitmap(debug))
             :Fill(entry)
             :Color('44ffffff')
             :End()
 
         local faction = LayoutHelpers.LayoutFor(Bitmap(entry))
-            :Texture(UIUtil.UIFile(UIUtil.GetFactionIcon(army.faction)))
+            :Texture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
             :AtLeftIn(entry, 2)
             :AtTopIn(entry, 2)
             :Width(16)
@@ -115,8 +135,18 @@ local ArmyEntry = Class(Group) {
             :Over(entry, 10)
             :End()
         
-        self.Faction.OnDirty = function()
-            faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(self.Faction())))
+        entry.Faction.OnDirty = function()
+            faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(entry.Faction())))
+        end
+
+        local factionBackground = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Fill(faction)
+            :Under(faction, 1)
+            :Color('00ffffff')
+            :End()
+
+        entry.Color.OnDirty = function()
+            factionBackground:SetSolidColor(entry.Color())
         end
 
         local rating = faction
@@ -127,9 +157,8 @@ local ArmyEntry = Class(Group) {
                 :Over(scoreboard, 10)
                 :End()
 
-            self.Rating.OnDirty = function()
-                
-                rating:SetText("(" .. math.floor(self.Rating()+0.5) .. ")")
+            entry.Rating.OnDirty = function()
+                rating:SetText("(" .. math.floor(entry.Rating()+0.5) .. ")")
             end
         end 
 
@@ -139,19 +168,50 @@ local ArmyEntry = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        self.Name.OnDirty = function()
-            name:SetText(tostring(self.Name()))
+        entry.Name.OnDirty = function()
+            name:SetText(tostring(entry.Name()))
         end
-
-
-
-
 
         -- # initial (sane) values
 
-        self.Faction:Set(army.faction)
-        self.Name:Set(army.nickname)
-        self.Rating:Set(scenario.Options.Ratings[army.nickname] or 0)
+        entry.Faction:Set(data.faction)
+        entry.Name:Set(data.nickname)
+        entry.Rating:Set(scenario.Options.Ratings[data.nickname] or 0)
+        entry.Color:Set(data.iconColor)
+
+        -- # other things 
+
+
+    end,
+
+    OnDestroy = function(self)
+        Group.OnDestroy(self)
+        RemoveOnSyncCallback(self:GetName())
+
+    end,
+
+    ComputeBackgroundColor = function(self)
+        local focus = GetFocusArmy()
+        if focus > 0 and self.Index > 0 then 
+            if IsAlly(focus, self.Index) then 
+                self.Highlight:SetSolidColor('99ff99')
+            else 
+                self.Highlight:SetSolidColor('9999ff')
+            end
+        else 
+            self.Highlight:SetSolidColor('ffffff')
+        end
+        
+        self:DetermineBackgroundColor()
+    end,
+
+    DetermineBackgroundColor = function(self)
+        local focus = GetFocusArmy()
+        if focus > 0 and self.Index > 0 and IsAlly(focus, self.Index) then 
+            self.Highlight:SetAlpha(0.1)
+        else 
+            self.Highlight:SetAlpha(0.0)
+        end
     end,
 }
 
@@ -367,7 +427,7 @@ local Scoreboard = Class(Group) {
         local entries = { }
         for k, army in armies do 
             if not army.civilian then 
-                local entry = LayoutHelpers.LayoutFor(ArmyEntry(scoreboard, debug, army))
+                local entry = LayoutHelpers.LayoutFor(ArmyEntry(scoreboard, debug, army, k))
                     :Below(last, 2)
                     :End()
 
