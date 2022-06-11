@@ -238,8 +238,8 @@ AIBrain = Class(moho.aibrain_methods) {
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
     
-        self.jammers = { }
-        setmetatable(self.jammers, { __mode = 'v' })
+        self.Jammers = { }
+        setmetatable(self.Jammers, { __mode = 'v' })
 
         ForkThread(self.JammingToggleThread, self)
 
@@ -335,32 +335,32 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Jamming Switch Logic
 
-    AddJammer = function(self, unit)
-        self.jammers[unit.EntityId] = unit
+    TrackJammer = function(self, unit)
+        self.Jammers[unit.EntityId] = unit
     end,
 
-    RemoveJammer = function(self, unit)
-        self.jammers[unit.EntityId] = nil
+    UntrackJammer = function(self, unit)
+        self.Jammers[unit.EntityId] = nil
     end,
 
     JammingToggleThread = function(self)
 
         while true do 
 
-            for i, jammer in self.jammers do
+            for i, jammer in self.Jammers do
 
                 if not jammer:BeenDestroyed() then 
 
-                    if jammer.resetJammer then
+                    if jammer.ResetJammer then
                         jammer:DisableUnitIntel('AutoToggle', 'Jammer')
                         WaitSeconds(0.3)
                         if not jammer:BeenDestroyed() then
                             jammer:EnableUnitIntel('AutoToggle', 'Jammer')  
-                            jammer.resetJammer = false
+                            jammer.ResetJammer = false
                         end
                     end
                 else
-                    RemoveJammer(jammer)
+                    UntrackJammer(jammer)
                 end
 
             end
@@ -606,11 +606,11 @@ AIBrain = Class(moho.aibrain_methods) {
     --  val: true or false
     -- calls callback function with blip it saw.
     OnIntelChange = function(self, blip, reconType, val)
-        if reconType == 'LOSNow' or econType == 'Omni' then
+        if reconType == 'LOSNow' or reconType == 'Omni' then
             if not val then
                 local unit = blip:GetSource()
                 if unit.Blueprint.Intel.JammerBlips > 0 then
-                    unit.resetJammer = true
+                    unit.ResetJammer = true
                 end
             end
         end
