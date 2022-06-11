@@ -17,12 +17,12 @@
 local MathFloor = math.floor
 local MathCeil = math.ceil
 
+local Prefs = import('/lua/user/prefs.lua')
 -- Store and set the current pixel scale multiplier. This will be used when the
 -- artwork is scaled up or down so that offsets scale up and down appropriately.
 -- Note that if you add a new layout helper function that uses offsets, you need
 -- to scale the offset with this factor or your layout may get funky when the
 -- art is changed
-local Prefs = import('/lua/user/prefs.lua')
 local pixelScaleFactor = Prefs.GetFromCurrentProfile('options').ui_scale or 1
 
 --- Set new scale factor for absolute offset in layout functions
@@ -32,18 +32,9 @@ function SetPixelScaleFactor(newFactor)
 end
 
 --- Get scale factor for absolute offset in layout functions
----@return number pixelScaleFactor 
+---@return number pixelScaleFactor
 function GetPixelScaleFactor()
     return pixelScaleFactor
-end
-
---- Set absolute dimensions of a control
----@param control Control
----@param width? number no change if nil
----@param height? number no change if nil
-function SetDimensions(control, width, height)
-    SetWidth(control, width)
-    SetHeight(control, height)
 end
 
 --- Set absolute width of a control
@@ -64,13 +55,26 @@ function SetHeight(control, height)
     end
 end
 
+--- Set absolute dimensions of a control
+---@param control Control
+---@param width? number no change if nil
+---@param height? number no change if nil
+function SetDimensions(control, width, height)
+    SetWidth(control, width)
+    SetHeight(control, height)
+end
+
+
 --- Set the depth of a control higher than a parent
 ---@param control Control
 ---@param parent Control
 ---@param depth? integer defaults to 1
 function DepthOverParent(control, parent, depth)
-    depth = depth or 1
-    control.Depth:SetFunction(function() return parent.Depth() + depth end)
+    if depth and depth ~= 1 then
+        control.Depth:SetFunction(function() return parent.Depth() + depth end)
+    else
+        control.Depth:SetFunction(function() return parent.Depth() + 1 end)
+    end
 end
 
 --- Set the depth of a control lower than a parent
@@ -78,8 +82,11 @@ end
 ---@param parent Control
 ---@param depth? integer defaults to 1
 function DepthUnderParent(control, parent, depth)
-    depth = depth or 1
-    control.Depth:SetFunction(function() return parent.Depth() - depth end)
+    if depth and depth ~= 1 then
+        control.Depth:SetFunction(function() return parent.Depth() - depth end)
+    else
+        control.Depth:SetFunction(function() return parent.Depth() - 1 end)
+    end
 end
 
 --- Scales a control according to the globally set pixel ratio
@@ -311,7 +318,7 @@ end
 
 --- Resets a control's left to be calculated from its right and width  
 --- **Make sure `Right` and `Width` are defined!!!**
----@param control Control 
+---@param control Control
 function ResetLeft(control)
     control.Left:SetFunction(function() return control.Right() - control.Width() end)
 end
@@ -596,7 +603,7 @@ end
 --- Sets a control to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
+---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 ---@param topOffset? number
@@ -613,19 +620,19 @@ function RelativeTo(control, parent, fileName, controlName, parentName, topOffse
     leftOffset = leftOffset or 0
     control.Top:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MathFloor(parent.Top() + ((layoutTable[controlName].top - layoutTable[parentName].top) * pixelScaleFactor + (topOffset * pixelScaleFactor)))
+        return MathFloor(parent.Top() + (layoutTable[controlName].top - layoutTable[parentName].top + topOffset) * pixelScaleFactor)
     end)
     
     control.Left:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MathFloor(parent.Left() + ((layoutTable[controlName].left - layoutTable[parentName].left) * pixelScaleFactor + (leftOffset * pixelScaleFactor)))
+        return MathFloor(parent.Left() + (layoutTable[controlName].left - layoutTable[parentName].left + leftOffset) * pixelScaleFactor)
     end)
 end
 
 --- Sets a control's left to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
+---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 function LeftRelativeTo(control, parent, fileName, controlName, parentName)
@@ -645,7 +652,7 @@ end
 --- Sets a control's top to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
+---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 function TopRelativeTo(control, parent, fileName, controlName, parentName)
@@ -665,7 +672,7 @@ end
 --- Sets a control's right to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
+---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 function RightRelativeTo(control, parent, fileName, controlName, parentName)
@@ -687,7 +694,7 @@ end
 --- Sets a control's bottom to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
----@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
+---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 ---@param parentName string name (table key) of the control to be positioned relative to
 function BottomRelativeTo(control, parent, fileName, controlName, parentName)
@@ -708,7 +715,7 @@ end
 
 --- Sets a control's dimensions using a layout table
 ---@param control Control
----@param fileName string Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
+---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
 ---@param controlName string name (table key) of the control to be positioned
 function DimensionsRelativeTo(control, fileName, controlName)
     local layoutTable = import(fileName()).layout
