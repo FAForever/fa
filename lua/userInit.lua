@@ -25,6 +25,23 @@ if selectedlanguage ~= nil then
     doscript '/lua/system/Localization.lua'
 end
 
+-- Do we have SC_LuaDebugger window positions in the config ?
+if not GetPreference("Windows.Debug") then
+    -- no, we set them to some sane defaults if they are missing. Othervise Debugger window is messed up
+    SetPreference('Windows.Debug', {
+        x = 10,
+        y = 10,
+        height = 550,
+        width = 900,
+        Sash = { horizontal = 212, vertical = 330 },
+        Watch = {
+            Stack = { block = 154, source = 212, line = 72 },
+            Global = { value = 212, type = 215, name = 220 },
+            Local = { value = 212, type = 134, name = 217 }
+        }
+    })
+end
+
 local AvgFPS = 10
 WaitFrames = coroutine.yield
 
