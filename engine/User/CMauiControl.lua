@@ -1,9 +1,9 @@
---- Class CMauiControl
--- @classmod User.CMauiControl
+---@declare-global
+---@class moho.control_methods
+local CMauiControl = {}
 
----
---  AcquireKeyboardFocus(bool blocksKeyDown)
-function CMauiControl:AcquireKeyboardFocus(bool blocksKeyDown)
+---@param blocksKeyDown boolean
+function CMauiControl:AcquireKeyboardFocus(blocksKeyDown)
 end
 
 ---
@@ -21,9 +21,9 @@ end
 function CMauiControl:Destroy()
 end
 
----
---  Control:DisableHitTest([recursive]) -- hit testing will be skipped for this control
-function CMauiControl:DisableHitTest([recursive])
+---hit testing will be skipped for this control
+---@param recursive boolean?
+function CMauiControl:DisableHitTest(recursive)
 end
 
 ---
@@ -31,9 +31,9 @@ end
 function CMauiControl:Dump()
 end
 
----
---  Control:EnableHitTest([recursive]) -- hit testing will be checked for this control
-function CMauiControl:EnableHitTest([recursive])
+---hit testing will be checked for this control
+---@param recursive boolean?
+function CMauiControl:EnableHitTest(recursive)
 end
 
 ---
@@ -106,9 +106,8 @@ end
 function CMauiControl:SetName(string)
 end
 
----
---  SetNeedsFrameUpdate(bool needsIt)
-function CMauiControl:SetNeedsFrameUpdate(bool needsIt)
+---@param needsIt boolean
+function CMauiControl:SetNeedsFrameUpdate(needsIt)
 end
 
 ---
@@ -126,8 +125,4 @@ end
 function CMauiControl:Show()
 end
 
----
---
-function CMauiControl:moho.control_methods()
-end
-
+return CMauiControl

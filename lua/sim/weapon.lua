@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  : The base weapon class for all weapons in the game.
 -- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -37,6 +37,7 @@ local function ParsePriorities()
     return finalPriorities
 end
 
+---@class Weapon : moho.weapon_methods
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit

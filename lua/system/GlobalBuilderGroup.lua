@@ -1,3 +1,4 @@
+---@declare-global
 ----------------------------------------------------------------------------
 --
 --  File     :  /lua/system/GlobalBuilderGroup.lua

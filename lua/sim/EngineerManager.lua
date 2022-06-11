@@ -10,6 +10,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
+---@class EngineerManager : BuilderManager
 EngineerManager = Class(BuilderManager) {
     Create = function(self, brain, lType, location, radius)
         BuilderManager.Create(self,brain)

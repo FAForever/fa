@@ -1,4 +1,4 @@
-
+---@declare-global
 local MathSqrt = math.sqrt
 
 --- Calculates the LODs of a single prop

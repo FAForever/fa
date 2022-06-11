@@ -1,0 +1,13 @@
+
+MeshBlueprint {
+    LODs = {
+        {
+            AlbedoName = '/meshes/game/ping_move_Albedo.dds',
+            ShaderName = 'CommandFeedback3',
+            LODCutoff = 99999,
+            MeshName = '/meshes/game/ping_move_lod0.scm',
+        },
+    },
+    IconFadeInZoom = 100,
+    UniformScale = 1.0,
+}

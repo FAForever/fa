@@ -15,6 +15,7 @@ local Util = import('utilities.lua')
 -------------------------------
 --   Base class that defines supreme commander specific defaults
 -------------------------------
+---@class SCCollisionBeam : CollisionBeam
 SCCollisionBeam = Class(CollisionBeam) {
     FxImpactUnit = EffectTemplate.DefaultProjectileLandUnitImpact,
     FxImpactLand = {},-- EffectTemplate.DefaultProjectileLandImpact,
@@ -29,6 +30,7 @@ SCCollisionBeam = Class(CollisionBeam) {
 -------------------------------
 --   Ginsu COLLISION BEAM
 -------------------------------
+---@class GinsuCollisionBeam : SCCollisionBeam
 GinsuCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {'/effects/emitters/riot_gun_beam_01_emit.bp',
               '/effects/emitters/riot_gun_beam_02_emit.bp',},
@@ -46,6 +48,7 @@ GinsuCollisionBeam = Class(SCCollisionBeam) {
 ------------------------------------
 --   PARTICLE CANNON COLLISION BEAM
 ------------------------------------
+---@class ParticleCannonCollisionBeam : SCCollisionBeam
 ParticleCannonCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {
 		'/effects/emitters/particle_cannon_beam_01_emit.bp',
@@ -61,6 +64,7 @@ ParticleCannonCollisionBeam = Class(SCCollisionBeam) {
 ------------------------------------
 --   ZAPPER COLLISION BEAM
 ------------------------------------
+---@class ZapperCollisionBeam : SCCollisionBeam
 ZapperCollisionBeam = Class(SCCollisionBeam) {
     FxBeam = {'/effects/emitters/zapper_beam_01_emit.bp'},
     FxBeamEndPoint = {'/effects/emitters/cannon_muzzle_flash_01_emit.bp',
@@ -70,6 +74,7 @@ ZapperCollisionBeam = Class(SCCollisionBeam) {
 ------------------------------------
 --   QUANTUM BEAM GENERATOR COLLISION BEAM
 ------------------------------------
+---@class QuantumBeamGeneratorCollisionBeam : SCCollisionBeam
 QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,
@@ -137,6 +142,7 @@ QuantumBeamGeneratorCollisionBeam = Class(SCCollisionBeam) { -- used by CZAR
     end,    
 }
 
+---@class DisruptorBeamCollisionBeam : SCCollisionBeam
 DisruptorBeamCollisionBeam = Class(SCCollisionBeam) {
     
     FxBeam = {'/effects/emitters/disruptor_beam_01_emit.bp'},
@@ -154,6 +160,7 @@ DisruptorBeamCollisionBeam = Class(SCCollisionBeam) {
     
 }
 
+---@class MicrowaveLaserCollisionBeam01 : SCCollisionBeam
 MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
 
     TerrainImpactType = 'LargeBeam01',
@@ -210,6 +217,7 @@ MicrowaveLaserCollisionBeam01 = Class(SCCollisionBeam) { -- used by ML & cyb ACU
     end,
 }
 
+---@class MicrowaveLaserCollisionBeam02 : MicrowaveLaserCollisionBeam01
 MicrowaveLaserCollisionBeam02 = Class(MicrowaveLaserCollisionBeam01) {
     TerrainImpactScale = 1,
     FxBeamStartPoint = EffectTemplate.CMicrowaveLaserMuzzle01,
@@ -218,6 +226,7 @@ MicrowaveLaserCollisionBeam02 = Class(MicrowaveLaserCollisionBeam01) {
 }
 
 
+---@class PhasonLaserCollisionBeam : SCCollisionBeam
 PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
 
     TerrainImpactType = 'LargeBeam01',
@@ -276,6 +285,7 @@ PhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- used by GC
 
 
 
+---@class TractorClawCollisionBeam : CollisionBeam
 TractorClawCollisionBeam = Class(CollisionBeam) {
     
     FxBeam = {EffectTemplate.ACollossusTractorBeam01},
@@ -287,6 +297,7 @@ TractorClawCollisionBeam = Class(CollisionBeam) {
 ------------------------------------
 --   QUANTUM BEAM GENERATOR COLLISION BEAM
 ------------------------------------
+---@class ExperimentalPhasonLaserCollisionBeam : SCCollisionBeam
 ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit (big size though)
 
     TerrainImpactType = 'LargeBeam01',
@@ -356,6 +367,7 @@ ExperimentalPhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- unknown unit 
 
 
 
+---@class UnstablePhasonLaserCollisionBeam : SCCollisionBeam
 UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death energy ball
 
     TerrainImpactType = 'LargeBeam01',
@@ -415,6 +427,7 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) { -- ythota death ener
 
 
 -- This is for sera destro and sera T2 point defense.
+---@class UltraChromaticBeamGeneratorCollisionBeam : SCCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 
     TerrainImpactType = 'LargeBeam01',
@@ -472,6 +485,7 @@ UltraChromaticBeamGeneratorCollisionBeam = Class(SCCollisionBeam) {
 }
 
 -- This is for sera destro and sera T2 point defense. (adjustment for ship muzzleflash)
+---@class UltraChromaticBeamGeneratorCollisionBeam02 : UltraChromaticBeamGeneratorCollisionBeam
 UltraChromaticBeamGeneratorCollisionBeam02 = Class(UltraChromaticBeamGeneratorCollisionBeam) {
 	FxBeamStartPoint = EffectTemplate.SUltraChromaticBeamGeneratorMuzzle02,
 }
@@ -479,6 +493,7 @@ UltraChromaticBeamGeneratorCollisionBeam02 = Class(UltraChromaticBeamGeneratorCo
 ------------------------------------
 --   HIRO LASER COLLISION BEAM
 ------------------------------------
+---@class TDFHiroCollisionBeam : CollisionBeam
 TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
 
     TerrainImpactType = 'LargeBeam01',
@@ -539,6 +554,7 @@ TDFHiroCollisionBeam = Class(CollisionBeam) { -- used by UEF battlecruser
 ------------------------------------
 --   ORBITAL DEATH LASER COLLISION BEAM
 ------------------------------------
+---@class OrbitalDeathLaserCollisionBeam : SCCollisionBeam
 OrbitalDeathLaserCollisionBeam = Class(SCCollisionBeam) { -- used by satellite
     TerrainImpactType = 'LargeBeam02',
     TerrainImpactScale = 1,

@@ -37,6 +37,7 @@ local EffectScaleEmitter = EffectMethods.ScaleEmitter
 local EffectOffsetEmitter = EffectMethods.OffsetEmitter
 local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 
+---@class Tree : Prop
 Tree = Class(Prop) {
 
     OnDestroy = function(self)
@@ -233,6 +234,7 @@ Tree = Class(Prop) {
     end,
 }
 
+---@class TreeGroup : Prop
 TreeGroup = Class(Prop) {
 
     --- Break when colliding with a projectile of some sort

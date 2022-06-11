@@ -187,9 +187,9 @@ UnitBlueprint {
     SelectionSizeX = 0.35,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.75,
-    SizeX = 0.6, #0.35,
-    SizeY = 0.7, #0.4,
-    SizeZ = 1, # 0.65
+    SizeX = 0.6, --0.35,
+    SizeY = 0.7, --0.4,
+    SizeZ = 1, -- 0.65
     StrategicIconName = 'icon_land1_intel',
     StrategicIconSortPriority = 135,
     Transport = {
@@ -247,14 +247,12 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',

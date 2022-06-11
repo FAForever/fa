@@ -25,6 +25,7 @@ local defaultStyle = {
     }
 }
 
+---@class ChatArea : Group
 ChatArea = Class(Group) {
 
     __init = function(self, parent, width, height)

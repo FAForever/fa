@@ -5,7 +5,7 @@
 --**
 --**  Summary  : A common way to do damage over than direct damage, ie: Dots, area dots, etc.
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 -- upvalue for performance

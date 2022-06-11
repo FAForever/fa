@@ -22,7 +22,6 @@ UnitBlueprint {
         'CIVILIAN',
         'SELECTABLE',
         'LAND',
-        'SPECIALLOWPRI',
         'VISIBLETORECON',
         'RECLAIMABLE',
     },

@@ -115,6 +115,11 @@ local function PopulateBlueprintCache(entity, blueprint)
 end
 
 local cUnit = moho.unit_methods
+---@class Unit : moho.unit_methods, moho.entity_methods
+---@field Brain AIBrain
+---@field Army Army
+---@field UnitId UnitId
+---@field EntityId EntityId
 Unit = Class(moho.unit_methods) {
 
     Cache = false,
@@ -158,6 +163,7 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
+
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -210,6 +216,7 @@ Unit = Class(moho.unit_methods) {
         }
     end,
 
+    ---@param self Unit
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
@@ -239,7 +246,8 @@ Unit = Class(moho.unit_methods) {
         -- the entity that produces sound, by default ourself
         self.SoundEntity = self
 
-
+        -- used to fix engine related bugs
+        self.EngineFlags = { }
 
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
@@ -1158,6 +1166,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
+    ---@param self Unit
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self.Layer
         self.Dead = true
@@ -1278,6 +1287,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
+    ---@param self Unit
     OnKilledUnit = function(self, unitKilled, massKilled)
         if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
         if IsAlly(self.Army, unitKilled.Army) then return end -- No XP for friendly fire...
@@ -2105,6 +2115,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ---@param self Unit
     OnStopBeingBuilt = function(self, builder, layer)
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
@@ -2606,7 +2617,7 @@ Unit = Class(moho.unit_methods) {
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
 
-        -- kept after #3355 for backwards compatibility with mods
+        -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
             for _, b in self.buildBots do
                 ChangeState(b, b.IdleState)
@@ -4240,9 +4251,24 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param duration boolean Stun duration in seconds
     SetStunned = function(self, duration)
         if not self.ImmuneToStun then 
             cUnit.SetStunned(self, duration)
+        end
+    end,
+
+    --- Determines whether or not this unit is actively consuming resources. There is an engine bug
+    --- that allows you to gain free resources by reverting the resources of the last tick to the
+    --- user when it is called with 'false' while the consumption is already set to 'false'
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param flag boolean A flag to determine whether our consumption should be active
+    SetConsumptionActive = function(self, flag)
+        if self.EngineFlags['SetConsumptionActive'] ~= flag then
+            cUnit.SetConsumptionActive(self, flag)
+            self.EngineFlags['SetConsumptionActive'] = flag 
         end
     end,
 
@@ -4259,6 +4285,10 @@ Unit = Class(moho.unit_methods) {
     -- Called by the shield class 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    -- Called by the brain when the unit registered itself
+    OnNoExcessEnergy = function(self) end,
+    OnExcessEnergy = function(self) end,
 
     -- Called by the weapon class, these are expensive!
     OnGotTarget = function(self, Weapon) end,
@@ -4517,6 +4547,7 @@ local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 -- upvalued categories for performance
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
+---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
     Cache = false,

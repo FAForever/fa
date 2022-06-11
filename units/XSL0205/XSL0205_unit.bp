@@ -302,17 +302,14 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
         },
         {
-            AlwaysRecheckTarget = true,
             Audio = {
                 Fire = Sound {
                     Bank = 'XSL_Weapon',
@@ -361,9 +358,7 @@ UnitBlueprint {
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
             SlavedToBody = false,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 '(AIR * MOBILE * EXPERIMENTAL - BOMBER)',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TECH2 BOMBER',
@@ -371,16 +366,15 @@ UnitBlueprint {
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret_Barrel',
             TurretBoneYaw = 'Turret',
             TurretDualManipulators = false,
             TurretPitch = 35,
-            TurretPitchRange = 80, # from 40
+            TurretPitchRange = 80, -- from 40
             TurretPitchSpeed = 180,
             TurretYaw = 0,
             TurretYawRange = 180,
@@ -398,9 +392,9 @@ UnitBlueprint {
         WreckageLayers = {
             Air = false,
             Land = true,
-            Seabed = true, #from false,
-            Sub = true, #from false
-            Water =  true, #from false
+            Seabed = true, --from false,
+            Sub = true, --from false
+            Water =  true, --from false
         },
     },
 }

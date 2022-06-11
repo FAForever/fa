@@ -1,4 +1,4 @@
-
+---@declare-global
 
 -- Origin of tables of a projectile blueprint
 
@@ -21,7 +21,7 @@
 --- Post-processes the provided projectile blueprint
 local function PostProcessProjectile(projectile)
 
-    -- create hash tables for quick lookup
+    -- -- create hash tables for quick lookup
 
     projectile.CategoriesCount = 0
     projectile.CategoriesHash = { }
@@ -32,7 +32,7 @@ local function PostProcessProjectile(projectile)
         end
     end
 
-    -- create hash tables for quick lookup
+    -- -- create hash tables for quick lookup
 
     projectile.DoNotCollideListCount = 0 
     projectile.DoNotCollideListHash = { }

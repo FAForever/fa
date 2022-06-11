@@ -20,8 +20,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	Texture = [[/textures/particles/cloud_speck_alpha_01.dds]],
-	RampTexture = [[/textures/particles/_ramp_gatesparks.dds]],
+	Texture = '/textures/particles/cloud_speck_alpha_01.dds',
+	RampTexture = '/textures/particles/_ramp_gatesparks.dds',
 	XDirectionCurve = {
 		XRange = 20.00,
 		Keys = {

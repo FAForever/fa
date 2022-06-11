@@ -1,3 +1,4 @@
+---@declare-global
 
 -- scope as upvalue for performance
 local sort = table.sort

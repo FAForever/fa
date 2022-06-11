@@ -1,20 +1,20 @@
-#****************************************************************************
-#**
-#**  File     :  /cdimage/units/UAL0205/UAL0205_script.lua
-#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
-#**
-#**  Summary  :  Aeon Mobile Flak Artillery Script
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--****************************************************************************
+--**
+--**  File     :  /cdimage/units/UAL0205/UAL0205_script.lua
+--**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Gordon Duclos
+--**
+--**  Summary  :  Aeon Mobile Flak Artillery Script
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-#Below, changed from ALandUnit to AHoverLandUnit
+--Below, changed from ALandUnit to AHoverLandUnit
 local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
 local AAATemporalFizzWeapon = import('/lua/aeonweapons.lua').AAATemporalFizzWeapon
 local SlowHover = import('/lua/defaultunits.lua').SlowHoverLandUnit
 
 
-#Below, changed from ALandUnit to AHoverLandUnit
+--Below, changed from ALandUnit to AHoverLandUnit
 UAL0205 = Class(AHoverLandUnit, SlowHover) {
     KickupBones = {},
 
