@@ -51,7 +51,7 @@ end
 ---@param width? number no change if nil
 function SetWidth(control, width)
     if width then
-        control.Width:Set(MapFloor(width * pixelScaleFactor))
+        control.Width:SetValue(MapFloor(width * pixelScaleFactor))
     end
 end
 
@@ -60,11 +60,11 @@ end
 ---@param height? number no change if nil
 function SetHeight(control, height)
     if height then
-        control.Height:Set(MapFloor(height * pixelScaleFactor))
+        control.Height:SetValue(MapFloor(height * pixelScaleFactor))
     end
 end
 
---- Set the depth of a control higher than the parent
+--- Set the depth of a control higher than a parent
 ---@param control Control
 ---@param parent Control
 ---@param depth? integer defaults to 1
@@ -73,7 +73,7 @@ function DepthOverParent(control, parent, depth)
     control.Depth:SetFunction(function() return parent.Depth() + depth end)
 end
 
---- Set the depth of a control lower than the parent
+--- Set the depth of a control lower than a parent
 ---@param control Control
 ---@param parent Control
 ---@param depth? integer defaults to 1
@@ -106,52 +106,54 @@ end
 
 -- Anchor functions lock the appropriate side of a control to the side of another control
 
---- Anchors a control to the left of a parent, with optional offset
+--- Anchors a control to the left of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number
-function AnchorToLeft(control, parent, leftOffset)
-    if leftOffset and leftOffset ~= 0 then
-        control.Right:SetFunction(function() return parent.Left() - MapFloor(leftOffset * pixelScaleFactor) end)
+---@param padding? number fixed padding between control and parent
+function AnchorToLeft(control, parent, padding)
+    if padding and padding ~= 0 then
+        control.Right:SetFunction(function() return parent.Left() - MapFloor(padding * pixelScaleFactor) end)
     else
+        -- We shouldn't need to let the child refer to the parent if the parent is already laid out
+        -- however, this does change functionallity of the layout, so I've left them commented out for now
         control.Right:SetFunction(function() return parent.Left() end)
         --control.Right:SetFunction(parent.Left)
     end
 end
 
---- Anchors a control to the top of a parent, with optional offset
+--- Anchors a control to the top of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param upOffset? number
-function AnchorToTop(control, parent, upOffset)
-    if upOffset and upOffset ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Top() - MapFloor(upOffset * pixelScaleFactor) end)
+---@param padding? number fixed padding between control and parent
+function AnchorToTop(control, parent, padding)
+    if padding and padding ~= 0 then
+        control.Bottom:SetFunction(function() return parent.Top() - MapFloor(padding * pixelScaleFactor) end)
     else
         control.Bottom:SetFunction(function() return parent.Top() end)
         --control.Bottom:SetFunction(parent.Top)
     end
 end
 
---- Anchors a control to the right of a parent, with optional offset
+--- Anchors a control to the right of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
-function AnchorToRight(control, parent, rightOffset)
-    if rightOffset and rightOffset ~= 0 then
-        control.Left:SetFunction(function() return parent.Right() + MapFloor(rightOffset * pixelScaleFactor) end)
+---@param padding? number fixed padding between control and parent
+function AnchorToRight(control, parent, padding)
+    if padding and padding ~= 0 then
+        control.Left:SetFunction(function() return parent.Right() + MapFloor(padding * pixelScaleFactor) end)
     else
         control.Left:SetFunction(function() return parent.Right() end)
         --control.Left:SetFunction(parent.Right)
     end
 end
 
---- Anchors a control to the bottom of a parent, with optional offset
+--- Anchors a control to the bottom of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param downOffset? number
-function AnchorToBottom(control, parent, downOffset)
-    if downOffset and downOffset ~= 0 then
-        control.Top:SetFunction(function() return parent.Bottom() + MapFloor(downOffset * pixelScaleFactor) end)
+---@param padding? number fixed padding between control and parent
+function AnchorToBottom(control, parent, padding)
+    if padding and padding ~= 0 then
+        control.Top:SetFunction(function() return parent.Bottom() + MapFloor(padding * pixelScaleFactor) end)
     else
         control.Top:SetFunction(function() return parent.Bottom() end)
         --control.Top:SetFunction(parent.Bottom)
@@ -166,14 +168,14 @@ end
 -- These are generally most useful for elements that don't change size, they can also be
 -- used for controls that stretch to match parent.
 
---- Centers a control horizontally on a parent, with an optional offset
+--- Centers a control horizontally on a parent, with optional right offset
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
-function AtHorizontalCenterIn(control, parent, rightOffset)
-    if rightOffset then
+---@param leftOffset? number
+function AtHorizontalCenterIn(control, parent, leftOffset)
+    if leftOffset then
         control.Left:SetFunction(function()
-            return parent.Left() + MapFloor(((parent.Width() - control.Width()) / 2) + (rightOffset * pixelScaleFactor))
+            return parent.Left() + MapFloor(((parent.Width() - control.Width()) / 2) + (leftOffset * pixelScaleFactor))
         end)
     else
         control.Left:SetFunction(function()
@@ -182,14 +184,14 @@ function AtHorizontalCenterIn(control, parent, rightOffset)
     end
 end
 
---- Centers a control vertically on a parent, with an optional offset
+--- Centers a control vertically on a parent, with optional down offset
 ---@param control Control
 ---@param parent Control
----@param downOffset? number
-function AtVerticalCenterIn(control, parent, downOffset)
-    if downOffset then
+---@param topOffset? number
+function AtVerticalCenterIn(control, parent, topOffset)
+    if topOffset then
         control.Top:SetFunction(function()
-            return parent.Top() + MapFloor(((parent.Height() - control.Height()) / 2) + (downOffset * pixelScaleFactor))
+            return parent.Top() + MapFloor(((parent.Height() - control.Height()) / 2) + (topOffset * pixelScaleFactor))
         end)
     else
         control.Top:SetFunction(function()
@@ -198,54 +200,52 @@ function AtVerticalCenterIn(control, parent, downOffset)
     end
 end
 
---- Places a control inside the left border of a parent, with optional offset
+--- Places a control inside the left edge of a parent, with optional right offset
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
-function AtLeftIn(control, parent, rightOffset)
-    if rightOffset and rightOffset ~= 0 then
-        control.Left:SetFunction(function() return parent.Left() + MapFloor(rightOffset * pixelScaleFactor) end)
+---@param leftOffset? number
+function AtLeftIn(control, parent, leftOffset)
+    if leftOffset and leftOffset ~= 0 then
+        control.Left:SetFunction(function() return parent.Left() + MapFloor(leftOffset * pixelScaleFactor) end)
     else
-        -- We shouldn't need to let the child refer to the parent if the parent is already laid out
-        -- however, this does change functionallity of the layout, so I've left them commented out for now
         control.Left:SetFunction(function() return parent.Left() end)
         --control.Left:SetFunction(parent.Left)
     end
 end
 
---- Places a control inside the top border of a parent, with optional offset
+--- Places a control inside the top edge of a parent, with optional down offset
 ---@param control Control
 ---@param parent Control
----@param downOffset? number
-function AtTopIn(control, parent, downOffset)
-    if downOffset and downOffset ~= 0 then
-        control.Top:SetFunction(function() return parent.Top() + MapFloor(downOffset * pixelScaleFactor) end)
+---@param topOffset? number
+function AtTopIn(control, parent, topOffset)
+    if topOffset and topOffset ~= 0 then
+        control.Top:SetFunction(function() return parent.Top() + MapFloor(topOffset * pixelScaleFactor) end)
     else
         control.Top:SetFunction(function() return parent.Top() end)
         --control.Top:SetFunction(parent.Top)
     end
 end
 
---- Places a control inside the right border of a parent, with optional offset
+--- Places a control inside the right edge of a parent, with optional left offset
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number
-function AtRightIn(control, parent, leftOffset)
-    if leftOffset and leftOffset ~= 0 then
-        control.Right:SetFunction(function() return parent.Right() - MapFloor(leftOffset * pixelScaleFactor) end)
+---@param rightOffset? number
+function AtRightIn(control, parent, rightOffset)
+    if rightOffset and rightOffset ~= 0 then
+        control.Right:SetFunction(function() return parent.Right() - MapFloor(rightOffset * pixelScaleFactor) end)
     else
         control.Right:SetFunction(function() return parent.Right() end)
         --control.Right:SetFunction(parent.Right)
     end
 end
 
---- Places a control inside the bottom border of a parent, with optional offset
+--- Places a control inside the bottom edge of a parent, with optional up offset
 ---@param control Control
 ---@param parent Control
----@param upOffset? number
-function AtBottomIn(control, parent, upOffset)
-    if upOffset and upOffset ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Bottom() - MapFloor(upOffset * pixelScaleFactor) end)
+---@param bottomOffset? number
+function AtBottomIn(control, parent, bottomOffset)
+    if bottomOffset and bottomOffset ~= 0 then
+        control.Bottom:SetFunction(function() return parent.Bottom() - MapFloor(bottomOffset * pixelScaleFactor) end)
     else
         control.Bottom:SetFunction(function() return parent.Bottom() end)
         --control.Bottom:SetFunction(parent.Bottom)
@@ -258,10 +258,10 @@ end
 --- Places the control's left at a percentage along the width of a parent, with 0.00 at the parent's left
 ---@param control Control
 ---@param parent Control
----@param rightPercent? number
-function FromLeftIn(control, parent, rightPercent)
-    if rightPercent and rightPercent ~= 0 then
-        control.Left:SetFunction(function() return parent.Left() + MapFloor(rightPercent * parent.Width()) end)
+---@param leftPercent? number
+function FromLeftIn(control, parent, leftPercent)
+    if leftPercent and leftPercent ~= 0 then
+        control.Left:SetFunction(function() return parent.Left() + MapFloor(leftPercent * parent.Width()) end)
     else
         control.Left:SetFunction(function() return parent.Left() end)
         --control.Left:SetFunction(parent.Left)
@@ -271,22 +271,23 @@ end
 --- Places the control's top at a percentage along the height of a parent, with 0.00 at the parent's top
 ---@param control Control
 ---@param parent Control
----@param downPercent? number
-function FromTopIn(control, parent, downPercent)
-    if downPercent and downPercent ~= 0 then
-        control.Top:SetFunction(function() return parent.Top() + MapFloor(downPercent * parent.Height()) end)
+---@param topPercent? number
+function FromTopIn(control, parent, topPercent)
+    if topPercent and topPercent ~= 0 then
+        control.Top:SetFunction(function() return parent.Top() + MapFloor(topPercent * parent.Height()) end)
     else
         control.Top:SetFunction(function() return parent.Top() end)
+        --control.Top:SetFunction(parent.Top)
     end
 end
 
 --- Places the control's right at a percentage along the width of a parent, with 0.00 at the parent's right
 ---@param control Control
 ---@param parent Control
----@param leftPercent? number
-function FromRightIn(control, parent, leftPercent)
-    if leftPercent and leftPercent ~= 0 then
-        control.Right:SetFunction(function() return parent.Right() - MapFloor(leftPercent * parent.Width()) end)
+---@param rightPercent? number
+function FromRightIn(control, parent, rightPercent)
+    if rightPercent and rightPercent ~= 0 then
+        control.Right:SetFunction(function() return parent.Right() - MapFloor(rightPercent * parent.Width()) end)
     else
         control.Right:SetFunction(function() return parent.Right() end)
         --control.Right:SetFunction(parent.Right)
@@ -296,10 +297,10 @@ end
 --- Places the control's top at a percentage along the height of a parent, with 0.00 at the parent's bottom
 ---@param control Control
 ---@param parent Control
----@param upPercent? number
-function FromBottomIn(control, parent, upPercent)
-    if upPercent and upPercent ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Bottom() - MapFloor(upPercent * parent.Height()) end)
+---@param bottomPercent? number
+function FromBottomIn(control, parent, bottomPercent)
+    if bottomPercent and bottomPercent ~= 0 then
+        control.Bottom:SetFunction(function() return parent.Bottom() - MapFloor(bottomPercent * parent.Height()) end)
     else
         control.Bottom:SetFunction(function() return parent.Bottom() end)
         --control.Bottom:SetFunction(parent.Bottom)
@@ -350,69 +351,69 @@ function ResetHeight(control)
 end
 
 
---**************************************
---*      Composite Functions           *
---**************************************
+--**********
+--* Composite Functions
+--**********
 
---- Places a control in the center of the parent, with optional offsets
+--- Places a control in the center of a parent, with optional offsets
 ---@param control Control
 ---@param parent Control
----@param downOffset? number
----@param rightOffset? number
-function AtCenterIn(control, parent, downOffset, rightOffset)
-    AtHorizontalCenterIn(control, parent, rightOffset)
-    AtVerticalCenterIn(control, parent, downOffset)
+---@param topOffset? number offset of top edge (offset in down direction)
+---@param leftOffset? number offset of left edge (offset in right direction)
+function AtCenterIn(control, parent, topOffset, leftOffset)
+    AtHorizontalCenterIn(control, parent, leftOffset)
+    AtVerticalCenterIn(control, parent, topOffset)
 end
 
---- Lock top right of control to left of parent, centered vertically to the parent
+--- Lock right edge of a control to left of a parent, centered vertically
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number 
-function CenteredLeftOf(control, parent, leftOffset)
-    AnchorToLeft(control, parent, leftOffset)
+---@param padding? number fixed padding between control and parent
+function CenteredLeftOf(control, parent, padding)
+    AnchorToLeft(control, parent, padding)
     AtVerticalCenterIn(control, parent)
 end
 
---- Lock bottom left of control to top left of parent, centered horizontally to the parent
+--- Lock bottom edge of a control to top of a parent, centered horizontally
 ---@param control Control
 ---@param parent Control
----@param upOffset? number 
-function CenteredAbove(control, parent, upOffset)
+---@param padding? number fixed padding between control and parent
+function CenteredAbove(control, parent, padding)
     AtHorizontalCenterIn(control, parent)
-    AnchorToTop(control, parent, upOffset)
+    AnchorToTop(control, parent, padding)
 end
 
---- Lock top left of control to right of parent, centered vertically to the parent
+--- Lock top left of a control to right of a parent, centered vertically
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number 
-function CenteredRightOf(control, parent, rightOffset)
-    AnchorToRight(control, parent, rightOffset)
+---@param padding? number fixed padding between control and parent
+function CenteredRightOf(control, parent, padding)
+    AnchorToRight(control, parent, padding)
     AtVerticalCenterIn(control, parent)
 end
 
---- Lock top left of control to bottom left of parent, centered horizontally to the parent
+--- Lock top left of a control to bottom left of a parent, centered horizontally
 ---@param control Control
 ---@param parent Control
----@param downOffset? number 
-function CenteredBelow(control, parent, downOffset)
+---@param padding? number fixed padding between control and parent
+function CenteredBelow(control, parent, padding)
     AtHorizontalCenterIn(control, parent)
-    AnchorToBottom(control, parent, downOffset)
+    AnchorToBottom(control, parent, padding)
 end
 
 -- Set to a corner inside the parent
 
---- Places top left corner of a control inside of its parent's
+--- Places top left corner of a control inside of a parent's
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
----@param downOffset? number
-function AtLeftTopIn(control, parent, rightOffset, downOffset)
-    AtLeftIn(control, parent, rightOffset)
-    AtTopIn(control, parent, downOffset)
+---@param leftOffset? number
+---@param topOffset? number
+function AtLeftTopIn(control, parent, leftOffset, topOffset)
+    AtLeftIn(control, parent, leftOffset)
+    AtTopIn(control, parent, topOffset)
 end
 
---- Places top right corner of a control inside of its parent's
+--- Places top right corner of a control inside of a parent's
 ---@param control Control
 ---@param parent Control
 ---@param rightOffset? number
@@ -422,7 +423,7 @@ function AtRightTopIn(control, parent, rightOffset, topOffset)
     AtTopIn(control, parent, topOffset)
 end
 
---- Places bottom left corner of a control inside of its parent's
+--- Places bottom left corner of a control inside of a parent's
 ---@param control Control
 ---@param parent Control
 ---@param leftOffset? number
@@ -444,40 +445,40 @@ end
 
 -- These functions will set the controls position relative to another, usually a sibling
 
---- Lock top right of control to top left of parent
+--- Lock top right of a control to top left of a parent
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number
-function LeftOf(control, parent, leftOffset)
-    AnchorToLeft(control, parent, leftOffset)
+---@param padding? number fixed padding between control and parent
+function LeftOf(control, parent, padding)
+    AnchorToLeft(control, parent, padding)
     AtTopIn(control, parent)
 end
 
---- Lock top left of control to top right of parent
+--- Lock top left of a control to top right of a parent
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
-function RightOf(control, parent, rightOffset)
-    AnchorToRight(control, parent, rightOffset)
+---@param padding? number fixed padding between control and parent
+function RightOf(control, parent, padding)
+    AnchorToRight(control, parent, padding)
     AtTopIn(control, parent)
 end
 
---- Lock bottom left of control to top left of parent
+--- Lock bottom left of a control to top left of a parent
 ---@param control Control
 ---@param parent Control
----@param topOffset? number
-function Above(control, parent, topOffset)
+---@param padding? number fixed padding between control and parent
+function Above(control, parent, padding)
     AtLeftIn(control, parent)
-    AnchorToTop(control, parent, topOffset)
+    AnchorToTop(control, parent, padding)
 end
 
---- Lock top left of control to bottom left of parent
+--- Lock top left of a control to bottom left of a parent
 ---@param control Control
 ---@param parent Control
----@param bottomOffset? number
-function Below(control, parent, bottomOffset)
+---@param padding? number fixed padding between control and parent
+function Below(control, parent, padding)
     AtLeftIn(control, parent)
-    AnchorToBottom(control, parent, bottomOffset)
+    AnchorToBottom(control, parent, padding)
 end
 
 
@@ -569,7 +570,8 @@ function FillParentPreserveAspectRatio(control, parent)
     end)
 end
 
---- Reset to the default layout functions  
+--- Reset to the default layout functions
+--- You should call control:ResetLayout() instead unless you cannot rely on overriden behavior
 --- **Remember to redefine two horizontal and two vertical properties to avoid circular dependencies!**
 ---@param control Control
 function Reset(control)
@@ -727,26 +729,45 @@ end
 --*********  Layouter  *************
 --**********************************
 
+---@class Layouter : moho.aibrain_methods
+---@field c Control
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
+
+-- Get control
+---@return Control c
+function LayouterMetaTable:Get()
+    return self.c
+end
+
 -- Controls' mostly used methods
 
+--- Sets the name of the control
+---@param debugName string
+---@return Layouter
 function LayouterMetaTable:Name(debugName)
     self.c:SetName(debugName)
     return self
 end
 
+--- Disables the control
+---@return Layouter
 function LayouterMetaTable:Disable()
     self.c:Disable()
     return self
 end
 
+--- Hides the control
+---@return Layouter
 function LayouterMetaTable:Hide()
     self.c:Hide()
     return self
 end
 
+--- Sets the color of the control
+---@param color string hexcolor
+---@return Layouter
 function LayouterMetaTable:Color(color)
     if self.c.SetSolidColor then
         self.c:SetSolidColor(color)
@@ -758,58 +779,93 @@ function LayouterMetaTable:Color(color)
     return self
 end
 
-function LayouterMetaTable:DropShadow(bool)
-    self.c:SetDropShadow(bool)
+--- Sets if the control has a drop shadow
+---@param hasShadow boolean
+---@return Layouter
+function LayouterMetaTable:DropShadow(hasShadow)
+    self.c:SetDropShadow(hasShadow)
     return self
 end
 
+--- Sets the control's texture
+---@param texture string resource location
+---@param border? Border
+---@return Layouter
 function LayouterMetaTable:Texture(texture, border)
     self.c:SetTexture(texture, border)
     return self
 end
 
-function LayouterMetaTable:EnableHitTest(recursive)
-    self.c:EnableHitTest(recursive)
+--- Enables the control's hit test
+---@param isRecursive boolean
+---@return Layouter
+function LayouterMetaTable:EnableHitTest(isRecursive)
+    self.c:EnableHitTest(isRecursive)
     return self
 end
 
-function LayouterMetaTable:DisableHitTest(recursive)
-    self.c:DisableHitTest(recursive)
+--- Disables the control's hit test
+---@param isRecursive boolean
+---@return Layouter
+function LayouterMetaTable:DisableHitTest(isRecursive)
+    self.c:DisableHitTest(isRecursive)
     return self
 end
 
-function LayouterMetaTable:NeedsFrameUpdate(bool)
-    self.c:SetNeedsFrameUpdate(bool)
+--- Sets if the control needs a frame update
+---@param needsUpdate boolean
+---@return Layouter
+function LayouterMetaTable:NeedsFrameUpdate(needsUpdate)
+    self.c:SetNeedsFrameUpdate(needsUpdate)
     return self
 end
 
-function LayouterMetaTable:Alpha(alpha, children)
-    self.c:SetAlpha(alpha, children)
+--- Sets the alpha of the control
+---@param alpha number
+---@param forChildren boolean
+---@return Layouter
+function LayouterMetaTable:Alpha(alpha, forChildren)
+    self.c:SetAlpha(alpha, forChildren)
     return self
 end
 
 -- Raw setting
 
+--- Sets the left side of the control
+---@param left function|number
+---@return Layouter
 function LayouterMetaTable:Left(left)
     self.c.Left:Set(left)
     return self
 end
 
-function LayouterMetaTable:Right(right)
-    self.c.Right:Set(right)
-    return self
-end
-
+--- Sets the top side of the control
+---@param top function|number
+---@return Layouter
 function LayouterMetaTable:Top(top)
     self.c.Top:Set(top)
     return self
 end
 
+--- Sets the right side of the control
+---@param right function|number
+---@return Layouter
+function LayouterMetaTable:Right(right)
+    self.c.Right:Set(right)
+    return self
+end
+
+--- Sets the bottom side of the control
+---@param bottom function|number
+---@return Layouter
 function LayouterMetaTable:Bottom(bottom)
     self.c.Bottom:Set(bottom)
     return self
 end
 
+--- Sets the width of the control
+---@param width function|number #width will be scaled
+---@return Layouter
 function LayouterMetaTable:Width(width)
     if iscallable(width) then
         self.c.Width:SetFunction(width)
@@ -819,6 +875,9 @@ function LayouterMetaTable:Width(width)
     return self
 end
 
+--- Sets the height of the control
+---@param height function|number #height will be scaled
+---@return Layouter
 function LayouterMetaTable:Height(height)
     if iscallable(height) then
         self.c.Height:SetFunction(height)
@@ -828,249 +887,388 @@ function LayouterMetaTable:Height(height)
     return self
 end
 
--- Fill parent
-
-function LayouterMetaTable:Fill(parent)
-    FillParent(self.c, parent)
-    return self
-end
-
-function LayouterMetaTable:FillFixedBorder(parent, offset)
-    FillParentFixedBorder(self.c, parent, offset)
-    return self
-end
-
--- Double-based positioning
-
-function LayouterMetaTable:AtLeftTopIn(parent, leftOffset, topOffset)
-    AtLeftTopIn(self.c, parent, leftOffset, topOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightBottomIn(parent, rightOffset, bottomOffset)
-    AtRightBottomIn(self.c, parent, rightOffset, bottomOffset)
-    return self
-end
-
-function LayouterMetaTable:AtLeftBottomIn(parent, leftOffset, bottomOffset)
-    AtLeftBottomIn(self.c, parent, leftOffset, bottomOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
-    AtRightTopIn(self.c, parent, rightOffset, topOffset)
-    return self
-end
-
--- Centered out of parent
-
-function LayouterMetaTable:CenteredLeftOf(parent, offset)
-    CenteredLeftOf(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:CenteredRightOf(parent, offset)
-    CenteredRightOf(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:CenteredAbove(parent, offset)
-    CenteredAbove(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:CenteredBelow(parent, offset)
-    CenteredBelow(self.c, parent, offset)
-    return self
-end
-
--- Centered
-
-function LayouterMetaTable:AtHorizontalCenterIn(parent, offset)
-    AtHorizontalCenterIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtVerticalCenterIn(parent, offset)
-    AtVerticalCenterIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtCenterIn(parent, vertOffset, horzOffset)
-    AtCenterIn(self.c, parent, vertOffset, horzOffset)
-    return self
-end
-
--- Single-in positioning
-
-function LayouterMetaTable:AtLeftIn(parent, offset)
-    AtLeftIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtRightIn(parent, offset)
-    AtRightIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtTopIn(parent, offset)
-    AtTopIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtBottomIn(parent, offset)
-    AtBottomIn(self.c, parent, offset)
-    return self
-end
-
--- Center-in positioning
-
-function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
-    AtLeftIn(self.c, parent, offset)
-    AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightCenterIn(parent, offset, verticalOffset)
-    AtRightIn(self.c, parent, offset)
-    AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
-    AtTopIn(self.c, parent, offset)
-    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
-    AtBottomIn(self.c, parent, offset)
-    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
--- Center-in positioning
-
-function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
-    AtLeftIn(self.c, parent, offset)
-    AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightCenterIn(parent, offset, verticalOffset)
-    AtRightIn(self.c, parent, offset)
-    AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
-    AtTopIn(self.c, parent, offset)
-    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
-    AtBottomIn(self.c, parent, offset)
-    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
--- Out-of positioning
-
-function LayouterMetaTable:Below(parent, offset)
-    Below(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:Above(parent, offset)
-    Above(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:RightOf(parent, offset)
-    RightOf(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:LeftOf(parent, offset)
-    LeftOf(self.c, parent, offset)
-    return self
-end
 
 -- Depth
 
+--- Sets the depth of the control higher than a parent
+---@param parent Control
+---@param depth? integer defaults to 1
+---@return Layouter
 function LayouterMetaTable:Over(parent, depth)
     DepthOverParent(self.c, parent, depth)
     return self
 end
 
+
+--- Sets the depth of the control lower than a parent
+---@param parent Control
+---@param depth? integer defaults to 1
+---@return Layouter
 function LayouterMetaTable:Under(parent, depth)
     DepthUnderParent(self.c, parent, depth)
     return self
 end
 
--- Anchor
 
-function LayouterMetaTable:AnchorToTop(parent, offset)
-    AnchorToTop(self.c, parent, offset)
+
+-- Single positioning methods
+
+-- Anchors
+
+--- Anchors the control to the left of a parent, with optional padding
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:AnchorToLeft(parent, padding)
+    AnchorToLeft(self.c, parent, padding)
     return self
 end
 
-function LayouterMetaTable:AnchorToLeft(parent, offset)
-    AnchorToLeft(self.c, parent, offset)
+--- Anchors a control to the top of a parent, with optional offset
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:AnchorToTop(parent, padding)
+    AnchorToTop(self.c, parent, padding)
     return self
 end
 
-function LayouterMetaTable:AnchorToRight(parent, offset)
-    AnchorToRight(self.c, parent, offset)
+--- Anchors a control to the right of a parent, with optional offset
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:AnchorToRight(parent, padding)
+    AnchorToRight(self.c, parent, padding)
     return self
 end
 
-function LayouterMetaTable:AnchorToBottom(parent, offset)
-    AnchorToBottom(self.c, parent, offset)
+--- Anchors a control to the bottom of a parent, with optional offset
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:AnchorToBottom(parent, padding)
+    AnchorToBottom(self.c, parent, padding)
     return self
 end
 
+-- Centered
 
--- Resets control's properties to default
+--- Centers a control horizontally on a parent, with an optional offset
+---@param parent Control
+---@param leftOffset? number in right direction
+---@return Layouter
+function LayouterMetaTable:AtHorizontalCenterIn(parent, leftOffset)
+    AtHorizontalCenterIn(self.c, parent, leftOffset)
+    return self
+end
 
+--- Centers a control vertically on a parent, with an optional offset
+---@param control Control
+---@param parent Control
+---@param topOffset? number in down direction
+---@return Layouter
+function LayouterMetaTable:AtVerticalCenterIn(parent, topOffset)
+    AtVerticalCenterIn(self.c, parent, topOffset)
+    return self
+end
+
+-- Inside
+
+--- Places the control inside the left border of a parent, with optional right offset
+---@param parent Control
+---@param leftOffset? number
+---@return Layouter
+function LayouterMetaTable:AtLeftIn(parent, leftOffset)
+    AtLeftIn(self.c, parent, leftOffset)
+    return self
+end
+
+--- Places the control inside the top border of a parent, with optional down offset
+---@param parent Control
+---@param topOffset? number
+---@return Layouter
+function LayouterMetaTable:AtTopIn(parent, topOffset)
+    AtTopIn(self.c, parent, topOffset)
+    return self
+end
+
+--- Places the control inside the right border of a parent, with optional left offset
+---@param parent Control
+---@param rightOffset? number
+---@return Layouter
+function LayouterMetaTable:AtRightIn(parent, rightOffset)
+    AtRightIn(self.c, parent, rightOffset)
+    return self
+end
+
+--- Places the control inside the bottom border of a parent, with optional up offset
+---@param parent Control
+---@param bottomOffset? number
+---@return Layouter
+function LayouterMetaTable:AtBottomIn(parent, bottomOffset)
+    AtBottomIn(self.c, parent, bottomOffset)
+    return self
+end
+
+-- Resets
+
+--- Resets the control's left to be calculated from its right and width
+--- *Make sure Right and Width are defined!!!*
+---@return Layouter
 function LayouterMetaTable:ResetLeft()
     ResetLeft(self.c)
     return self
 end
 
+--- Resets the control's top to be calculated from its bottom and height
+--- **Make sure Bottom and Height are defined!!!**
+---@return Layouter
 function LayouterMetaTable:ResetTop()
     ResetTop(self.c)
     return self
 end
 
+--- Resets the control's right to be calculated from its right and width
+--- **Make sure Left and Width are defined!!!**
+---@return Layouter
 function LayouterMetaTable:ResetRight()
     ResetRight(self.c)
     return self
 end
 
+--- Resets the control's bottom to be calculated from its top and height
+--- **Make sure Top and Height are Defined!!!**
+---@return Layouter
 function LayouterMetaTable:ResetBottom()
     ResetBottom(self.c)
     return self
 end
 
+--- Resets the control's width to be calculated from its right and left
+--- **Make sure Right and Left are defined!!!**
+---@return Layouter
 function LayouterMetaTable:ResetWidth()
     ResetWidth(self.c)
     return self
 end
 
+--- Resets the control's height to be calculated from its top and bottom
+--- **Make sure Bottom and Top are defined!!!**
+---@return Layouter
 function LayouterMetaTable:ResetHeight()
     ResetHeight(self.c)
     return self
 end
 
--- Get control
-function LayouterMetaTable:Get()
-    return self.c
+--**********
+--* Composite positioning
+--**********
+
+--- Surround positioning
+
+--- Lock right of the control to left of a parent, centered vertically
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:CenteredLeftOf(parent, padding)
+    CenteredLeftOf(self.c, parent, padding)
+    return self
 end
+
+--- Lock bottom of the control to top left of a parent, centered horizontally
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:CenteredAbove(parent, padding)
+    CenteredAbove(self.c, parent, padding)
+    return self
+end
+
+--- Lock left of the control to right of a parent, centered vertically
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:CenteredRightOf(parent, padding)
+    CenteredRightOf(self.c, parent, padding)
+    return self
+end
+
+--- Lock top of the control to bottom left of parent, centered horizontally
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:CenteredBelow(parent, padding)
+    CenteredBelow(self.c, parent, padding)
+    return self
+end
+
+
+-- Inside positioning
+-- note that the inside-edge layouts don't have a function counterpart like
+-- the inside-corner layouts do
+
+--- Places the control in the center of the parent, with optional offsets
+---@param parent Control
+---@param topOffset? number offset of top edge (offset in down direction)
+---@param leftOffset? number offset of left edge (offset in right direction)
+---@return Layouter
+function LayouterMetaTable:AtCenterIn(parent, topOffset, leftOffset)
+    AtCenterIn(self.c, parent, topOffset, leftOffset)
+    return self
+end
+
+--- Places left edge of the control vertically centered inside of a parent's
+---@param parent Control
+---@param leftOffset? number
+---@param topOffset? number
+---@return Layouter
+function LayouterMetaTable:AtLeftCenterIn(parent, leftOffset, topOffset)
+    AtLeftIn(self.c, parent, leftOffset)
+    AtVerticalCenterIn(self.c, parent, topOffset)
+    return self
+end
+
+--- Places top left corner of the control inside of a parent's
+---@param parent Control
+---@param leftOffset? number
+---@param topOffset? number
+---@return Layouter
+function LayouterMetaTable:AtLeftTopIn(parent, leftOffset, topOffset)
+    AtLeftTopIn(self.c, parent, leftOffset, topOffset)
+    return self
+end
+
+--- Places top edge of the control horizontally centered inside of a parent's
+---@param parent Control
+---@param topOffset? number
+---@param leftOffset? number
+---@return Layouter
+function LayouterMetaTable:AtTopCenterIn(parent, topOffset, leftOffset)
+    AtTopIn(self.c, parent, topOffset)
+    AtHorizontalCenterIn(self.c, parent, leftOffset)
+    return self
+end
+
+--- Places top right corner of the control inside of its parent's
+---@param parent Control
+---@param rightOffset? number
+---@param topOffset? number
+---@return Layouter
+function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
+    AtRightTopIn(self.c, parent, rightOffset, topOffset)
+    return self
+end
+
+--- Places right edge of the control vertically centered inside of a parent's
+---@param parent Control
+---@param rightOffset? number
+---@param topOffset? number
+---@return Layouter
+function LayouterMetaTable:AtRightCenterIn(parent, rightOffset, topOffset)
+    AtRightIn(self.c, parent, rightOffset)
+    AtVerticalCenterIn(self.c, parent, topOffset)
+    return self
+end
+
+--- Places bottom right corner of the control inside of a parent's
+---@param parent Control
+---@param rightOffset? number
+---@param bottomOffset? number
+---@return Layouter
+function LayouterMetaTable:AtRightBottomIn(parent, rightOffset, bottomOffset)
+    AtRightBottomIn(self.c, parent, rightOffset, bottomOffset)
+    return self
+end
+
+--- Places bottom edge of the control horizontally centered inside of a parent's
+---@param parent Control
+---@param leftOffset? number
+---@param bottomOffset? number
+---@return Layouter
+function LayouterMetaTable:AtBottomCenterIn(parent, bottomOffset, leftOffset)
+    AtBottomIn(self.c, parent, bottomOffset)
+    AtHorizontalCenterIn(self.c, parent, leftOffset)
+    return self
+end
+
+--- Places bottom left corner of the control inside of a parent's
+---@param parent Control
+---@param leftOffset? number
+---@param bottomOffset? number
+---@return Layouter
+function LayouterMetaTable:AtLeftBottomIn(parent, leftOffset, bottomOffset)
+    AtLeftBottomIn(self.c, parent, leftOffset, bottomOffset)
+    return self
+end
+
+
+-- Out-of positioning
+
+--- Lock top right of the control to top left of a parent
+---@param control Control
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:LeftOf(parent, padding)
+    LeftOf(self.c, parent, padding)
+    return self
+end
+
+--- Lock top left of the control to top right of a parent
+---@param control Control
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:RightOf(parent, padding)
+    RightOf(self.c, parent, padding)
+    return self
+end
+
+--- Lock bottom left of the control to top left of a parent
+---@param control Control
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:Above(parent, padding)
+    Above(self.c, parent, padding)
+    return self
+end
+
+
+--- Lock top left of the control to bottom left of a parent
+---@param control Control
+---@param parent Control
+---@param padding? number fixed padding between control and parent
+---@return Layouter
+function LayouterMetaTable:Below(parent, padding)
+    Below(self.c, parent, padding)
+    return self
+end
+
+-- Fill parent
+
+--- Sets control to fill a parent
+--- Note this function copies the parent's side functions, it does not refer
+---@param parent Control
+---@return Layouter
+function LayouterMetaTable:Fill(parent)
+    FillParent(self.c, parent)
+    return self
+end
+
+--- Sets control to fill a parent's with fixed padding
+---@param parent Control
+---@param offset? number
+---@return Layouter
+function LayouterMetaTable:FillFixedBorder(parent, offset)
+    FillParentFixedBorder(self.c, parent, offset)
+    return self
+end
+
 
 -- Calculates control's Properties to determine its layout completion and returns it
 -- remember, if parent has incomplete layout it will warn you anyway
+---@return Control
 function LayouterMetaTable:End()
     if not pcall(self.c.Top) or not pcall(self.c.Bottom) or not pcall(self.c.Height) then
         WARN(string.format("Incorrect layout for \"%s\" Top-Height-Bottom", self.c:GetName()))
@@ -1091,7 +1289,7 @@ end
 
 --- Returns a layouter for a control
 ---@param control Control
----@return table #layouter
+---@return Layouter
 function LayoutFor(control)
     local result = {
         c = control
@@ -1107,7 +1305,7 @@ setmetatable(layouter, LayouterMetaTable)
 
 --- Use if you don't cache layouter object
 ---@param control Control
----@return table #cached layouter
+---@return Layouter #cached layouter
 function ReusedLayoutFor(control)
     layouter.c = control or false
     return layouter
