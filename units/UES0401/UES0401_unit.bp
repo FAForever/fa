@@ -79,7 +79,6 @@ UnitBlueprint {
     },
     BuildIconSortPriority = 20,
     Categories = {
-        'ANTINAVY',
         'PRODUCTSC1',
         'SELECTABLE',
         'BUILTBYTIER3COMMANDER',
@@ -90,6 +89,7 @@ UnitBlueprint {
         'EXPERIMENTAL',
         'SUBMERSIBLE',
         'ANTINAVY',
+        'ANTIAIR',
         'AIRSTAGINGPLATFORM',
         'INTELLIGENCE',
         'RADAR',
