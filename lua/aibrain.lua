@@ -342,12 +342,12 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Reclaim tracking
 
-    AddReclaimer = function(self, unit, target)
+    TrackReclaimer = function(self, unit, target)
         self.Reclaimers[unit.EntityId] = unit
         self.Reclaimees[unit.EntityId] = target
     end,
 
-    RemoveReclaimer = function(self, unit, target)
+    UntrackReclaimer = function(self, unit, target)
         self.Reclaimers[unit.EntityId] = nil
         self.Reclaimees[unit.EntityId] = nil
     end,

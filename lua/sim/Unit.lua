@@ -741,7 +741,7 @@ Unit = Class(moho.unit_methods) {
             IssueGuard({self}, guard)
         end
 
-        self.Brain:AddReclaimer(self, target)
+        self.Brain:TrackReclaimer(self, target)
     end,
 
     OnStopReclaim = function(self, target)
@@ -754,7 +754,7 @@ Unit = Class(moho.unit_methods) {
             target:UpdateReclaimLeft()
         end
 
-        self.Brain:RemoveReclaimer(self, target)
+        self.Brain:UntrackReclaimer(self, target)
     end,
 
     StartReclaimEffects = function(self, target)
