@@ -1,0 +1,49 @@
+ProjectileBlueprint {
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'ANTINAVY',
+        'TORPEDO',
+        'NOSPLASHDAMAGE',
+    },
+    Defense = {
+        Health = 1,
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/torpedo_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.1,
+    },
+    General = {
+        Category = 'Anti Navy',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'ANTINAVY',
+            'TORPEDO',
+            'NOSPLASHDAMAGE',
+        },
+        Faction = 'Cybran',
+        Weapon = 'Meson Torpedo',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 5,
+        DestroyOnWater = false,
+        InitialSpeed = 30,
+
+        -- This is a bit hacky:
+        -- I am setting the initial speed to VERY FAST.  Thus the gun will shoot in a nearly straight
+        -- line at the target.
+        -- However, I am setting the Max speed to a somewhat slow speed.  That means that the
+        -- projectile will actually travel at this slow speed.  And since it's affected by
+        -- gravity, it will land far earlier than the aiming code thinks that it will.
+        -- And in this situation, that's exactly what we want, because when it hits water,
+        -- we're changing many variables in the projectile's behavior. (see the accompanying script)
+        MaxSpeed = 0,
+        StayUnderwater = false,
+        VelocityAlign = true,
+    },
+}

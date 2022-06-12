@@ -20,7 +20,7 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'ANTINAVY',
-#        'TORPEDO',
+--        'TORPEDO',
         'NOSPLASHDAMAGE',
     },
     Defense = {

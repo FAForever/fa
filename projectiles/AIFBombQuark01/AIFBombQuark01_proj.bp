@@ -28,7 +28,7 @@ ProjectileBlueprint {
         },
         StrategicIconSize = 2,
 
-        # MeshBlueprint = '/meshes/projectiles/bomb_default_mesh.bp',
+        -- MeshBlueprint = '/meshes/projectiles/bomb_default_mesh.bp',
         UniformScale = 0.3,
     },
     DoNotCollideList = {
