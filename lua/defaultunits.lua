@@ -2065,7 +2065,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
 
-        local mult = self.Blueprint.Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
         else
@@ -2085,7 +2085,7 @@ SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
         -- call base class to make sure self.layer is set
         HoverLandUnit.OnLayerChange(self, new, old)
 
-        local mult = self.Blueprint.Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Seabed'  then
             self:SetSpeedMult(mult)
         else
