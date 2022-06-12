@@ -269,9 +269,6 @@ function CreateBuildCubeThread(
     local bx = unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
     local bz = unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
     local by = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(bx, bz)
-    LOG(bx)
-    LOG(bz)
-    LOG(by)
 
     -- create a quick glow effect
     local proj = EntityCreateProjectile(unitBeingBuilt, '/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', 0, 0, 0, nil, nil, nil)
