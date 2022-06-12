@@ -324,17 +324,19 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            local bp = self.Blueprint.Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()
-            if bp.AnimationUpgrade then
+
+            local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
+            if animation then
+
                 local unitBuilding = self.UnitBeingBuilt
                 self.AnimatorUpgradeManip = CreateAnimator(self)
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
                 self:StartUpgradeEffects(unitBuilding)
-                self.AnimatorUpgradeManip:PlayAnim(bp.AnimationUpgrade, false):SetRate(0)
+                self.AnimatorUpgradeManip:PlayAnim(animation, false):SetRate(0)
 
                 while fractionOfComplete < 1 and not self.Dead do
                     fractionOfComplete = unitBuilding:GetFractionComplete()
