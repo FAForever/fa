@@ -7,67 +7,59 @@
 --**
 --**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
+
 local ATorpedoCluster = import('/lua/aeonprojectiles.lua').ATorpedoCluster
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
-local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
+
+-- cache specification table 
+local CachedSpecifications = {
+    X = 0,
+    Z = 0,
+    Radius = 30,
+    LifeTime = 10,
+    Omni = false,
+    Vision = false,
+    Army = 0,
+}
+
+-- upvalue scope for performance
+local CreateTrail = CreateTrail
 
 AANTorpedoCluster01 = Class(ATorpedoCluster) {
 
-    FxEnterWater= { '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
-                    '/effects/emitters/water_splash_plume_01_emit.bp',},
+    FxTrail = import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01,
+
+    FxEnterWater= { 
+        '/effects/emitters/water_splash_ripples_ring_01_emit.bp',
+        '/effects/emitters/water_splash_plume_01_emit.bp',
+    },
 
     OnCreate = function(self)
         ATorpedoCluster.OnCreate(self)
-        self.HasImpacted = false
-
-		CreateTrail(self, -1, self:GetArmy(), import('/lua/EffectTemplates.lua').ATorpedoPolyTrails01)
-        
+		CreateTrail(self, -1, self.Army, self.FxTrail)
     end,
 
     OnEnterWater = function(self) 
-
-        local Velx, Vely, Velz = self:GetVelocity()
-        local NumberOfChildProjectiles = 1        
-        local ChildProjectileBP = '/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp'  
-        local angleRange = math.pi * 0.25
-        local angleInitial = -angleRange / 2
-        local angleIncrement = angleRange / NumberOfChildProjectiles
-        local angleVariation = angleIncrement * 0.4
-        local angle, ca, sa, x, z, proj, mul
+        ATorpedoCluster.OnEnterWater(self)
         
-        self:StayUnderwater(true)
-        for i = 0, NumberOfChildProjectiles  do
-            angle = angleInitial + (i*angleIncrement) + RandomFloat(-angleVariation, angleVariation)
-            ca = math.cos(angle)
-            sa = math.sin(angle)
-            x = Velx * ca - Velz * sa
-            z = Velx * sa + Velz * ca
-            proj = self:CreateChildProjectile(ChildProjectileBP)
+        -- create two child projectiles
+        for i = 0, 1 do
+            proj = self:CreateChildProjectile('/projectiles/AANTorpedoClusterSplit01/AANTorpedoClusterSplit01_proj.bp' )
             proj:PassDamageData(self.DamageData)
-            mul = RandomFloat(1,3)
-            --proj:SetVelocity( x * mul, Vely * mul, z * mul )
         end            
         
         local pos = self:GetPosition()
-        local spec = {
-            X = pos[1],
-            Z = pos[3],
-            Radius = 30,
-            LifeTime = 10,
-            Omni = false,
-            Vision = false,
-            Army = self:GetArmy(),
-        }
+        local spec = CachedSpecifications
+        spec.X = pos[1] 
+        spec.Z = pos[3]
+        spec.Army = self.Army 
+
         local vizEntity = VizMarker(spec)
-        ATorpedoCluster.OnEnterWater(self)
+
         self:Destroy()
-    end,
-    
-    OnImpact = function(self, TargetType, TargetEntity)
-        if (TargetEntity == nil) and (TargetType == "Air") then
-            return
-        end
-        ATorpedoCluster.OnImpact(self, TargetType, TargetEntity)
     end,
 }
 TypeClass = AANTorpedoCluster01
+
+-- kept for mod backwards compatibility
+local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
