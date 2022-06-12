@@ -139,7 +139,7 @@ end
 function ProcessWeapons(units)
     for k, unit in units do 
         if unit.Weapon then 
-            LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
+            -- LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
             for k, weapon in unit.Weapon do 
                 if not weapon.DummyWeapon then 
                     ProcessWeapon(unit, weapon)
