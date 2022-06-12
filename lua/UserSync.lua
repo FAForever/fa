@@ -147,6 +147,9 @@ function OnSync()
     end
 
     if Sync.NewPlayableArea then
+        if not import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
+			import('/lua/ui/game/score-alt.lua').SetPlayableArea(Sync.NewPlayableArea)
+		end
         SetPlayableArea(Sync.NewPlayableArea)
     end
 
