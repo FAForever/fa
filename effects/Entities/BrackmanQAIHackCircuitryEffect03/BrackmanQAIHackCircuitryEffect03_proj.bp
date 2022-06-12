@@ -23,12 +23,10 @@ ProjectileBlueprint {
         'PROJECTILE',
         'INDIRECTFIRE',
     },
-    {
-        Display = {
-            Mesh = {
-                LODs = {
-                    LODCutoff = 300,
-                },
+    Display = {
+        Mesh = {
+            LODs = {
+                LODCutoff = 300,
             },
         },
     },
