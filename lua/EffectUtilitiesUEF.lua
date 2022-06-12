@@ -136,7 +136,7 @@ function CreateUEFBuildSliceBeams(
     -- Determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
     local ox = unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
     local oz = unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
-    local oy = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (ox + oz)
+    local oy = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(ox, oz)
 
     ox = ox * 0.5
     oz = oz * 0.5
@@ -268,7 +268,7 @@ function CreateBuildCubeThread(
 
     local bx = unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
     local bz = unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
-    local by = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (bx + bz)
+    local by = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(bx, bz)
 
     -- create a quick glow effect
     local proj = EntityCreateProjectile(unitBeingBuilt, '/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', 0, 0, 0, nil, nil, nil)
@@ -422,7 +422,7 @@ function CreateUEFCommanderBuildSliceBeams(
     -- Determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
     local ox = unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
     local oz = unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
-    local oy = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (ox + oz)
+    local oy = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(ox, oz)
 
     ox = ox * 0.5
     oz = oz * 0.5

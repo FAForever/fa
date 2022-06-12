@@ -231,7 +231,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
 
         local sx = unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
         local sz = unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
-        local sy = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
+        local sy = unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(sx, sz)
 
         -- -- Create pool of mercury
 
@@ -445,7 +445,7 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
 
     local sx = 0.6 * unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
     local sz = 0.6 * unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
-    local sy = 1.5 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
+    local sy = 1.5 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(sx, sz)
 
     -- -- Create generic build effects
 
@@ -515,7 +515,7 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
 
     local sx = 0.55 * unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
     local sz = 0.55 * unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
-    local sy = 3 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
+    local sy = 3 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(sx, sz)
 
     -- -- Create effects of build animation
 
@@ -621,7 +621,7 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
 
     local sx = 1 * unitBeingBuilt.Blueprint.Physics.MeshExtentsX or unitBeingBuilt.Blueprint.Footprint.SizeX
     local sz = 1 * unitBeingBuilt.Blueprint.Physics.MeshExtentsZ or unitBeingBuilt.Blueprint.Footprint.SizeZ
-    local sy = 2 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or unitBeingBuilt.Blueprint.Footprint.SizeY or (sx + sz)
+    local sy = 2 * unitBeingBuilt.Blueprint.Physics.MeshExtentsY or math.min(sx, sz)
 
     -- -- Create effects of build animation
 
