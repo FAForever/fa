@@ -10,6 +10,14 @@
 
 local ALandFactoryUnit = import('/lua/aeonunits.lua').ALandFactoryUnit
 
-UAB0101 = Class(ALandFactoryUnit) {}
+UAB0101 = Class(ALandFactoryUnit) {
+    GetUpgradeAnimation = function(self, unitBeingBuilt) 
+        if unitBeingBuilt.BlueprintId == 'test001' then 
+            return self.Blueprint.Display.Animation1 
+        else
+            return self.Blueprint.Display.Animation2 
+        end 
+    end,
+}
 
 TypeClass = UAB0101
