@@ -1,3 +1,5 @@
+-- unused by faf
+
 ProjectileBlueprint {
     Audio = {
         Impact = Sound {
@@ -20,6 +22,15 @@ ProjectileBlueprint {
         'SERAPHIM',
         'PROJECTILE',
         'INDIRECTFIRE',
+    },
+    {
+        Display = {
+            Mesh = {
+                LODs = {
+                    LODCutoff = 300,
+                },
+            },
+        },
     },
     General = {
         Category = 'Bomb',
