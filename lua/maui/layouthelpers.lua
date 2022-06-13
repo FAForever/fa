@@ -6,12 +6,13 @@
 --* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
--- Percentage versus offset
--- Percentages are specified as a float, with 0.00 to 1.00 the normal ranges
--- Percentages can change spacing when dimension is expended.
+-- Percentage versus offset:
 --
--- Offsets are specified in pixels for the "base art" size. If the art is
--- scaled (ie large UI mode) this factor will keep the layout correct
+-- Percentages are specified as a float, with 0.00 to 1.00 as the normal ranges
+-- Percentages can change spacing when dimension is expanded.
+--
+-- Offsets are specified in pixels for the "base art" size. If the UI is
+-- scaled (e.g. large UI mode) the pixel scale factor will keep the layout correct.
 
 
 local MathFloor = math.floor
@@ -23,21 +24,22 @@ local Prefs = import('/lua/user/prefs.lua')
 -- Note that if you add a new layout helper function that uses offsets, you need
 -- to scale the offset with this factor or your layout may get funky when the
 -- art is changed
+---@type number
 local pixelScaleFactor = Prefs.GetFromCurrentProfile('options').ui_scale or 1
 
---- Set new scale factor for absolute offset in layout functions
+--- Sets new pixel scale factor for fixed offset in layout functions
 ---@param newFactor number
 function SetPixelScaleFactor(newFactor)
     pixelScaleFactor = newFactor
 end
 
---- Get scale factor for absolute offset in layout functions
+--- Gets pixel scale factor for fixed offset in layout functions
 ---@return number pixelScaleFactor
 function GetPixelScaleFactor()
     return pixelScaleFactor
 end
 
---- Set absolute width of a control
+--- Sets fixed width of a control, scaled by the pixel scale factor
 ---@param control Control
 ---@param width? number no change if nil
 function SetWidth(control, width)
@@ -46,7 +48,7 @@ function SetWidth(control, width)
     end
 end
 
---- Set absolute height of a control
+--- Sets fixed height of a control, scaled by the pixel scale factor
 ---@param control Control
 ---@param height? number no change if nil
 function SetHeight(control, height)
@@ -55,7 +57,7 @@ function SetHeight(control, height)
     end
 end
 
---- Set absolute dimensions of a control
+--- Sets fixed dimensions of a control, scaled by the pixel scale factor
 ---@param control Control
 ---@param width? number no change if nil
 ---@param height? number no change if nil
@@ -65,7 +67,7 @@ function SetDimensions(control, width, height)
 end
 
 
---- Set the depth of a control higher than a parent
+--- Sets depth of a control to be above a parent
 ---@param control Control
 ---@param parent Control
 ---@param depth? integer defaults to 1
@@ -77,7 +79,7 @@ function DepthOverParent(control, parent, depth)
     end
 end
 
---- Set the depth of a control lower than a parent
+--- Sets depth of a control to be below a parent
 ---@param control Control
 ---@param parent Control
 ---@param depth? integer defaults to 1
@@ -89,7 +91,7 @@ function DepthUnderParent(control, parent, depth)
     end
 end
 
---- Scales a control according to the globally set pixel ratio
+--- Scales a control's dimensions by the pixel scale factor
 ---@param control Control
 function Scale(control)
     SetDimensions(control, control.Width(), control.Height())
@@ -110,204 +112,201 @@ function InvScaleNumber(scaledNumber)
 end
 
 
+-- Single positioning functions
 
--- Anchor functions lock the appropriate side of a control to the side of another control
+-- Anchor functions lock the appropriate edge of a control to the edge of another control
 
---- Anchors a control to the left of a parent, with optional padding
+--- Anchors a control's right edge to the left edge of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 function AnchorToLeft(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Right:SetFunction(function() return parent.Left() - MathFloor(padding * pixelScaleFactor) end)
+        control.Right:SetFunction(function() return MathFloor(parent.Left() - padding * pixelScaleFactor) end)
     else
         -- We shouldn't need to let the child refer to the parent if the parent is already laid out
-        -- however, this does change functionallity of the layout, so I've left them commented out for now
-        control.Right:SetFunction(function() return parent.Left() end)
+        -- however, this does change functionallity of the layout, so I've had to refrain
         --control.Right:SetFunction(parent.Left)
+        control.Right:SetFunction(function() return parent.Left() end)
     end
 end
 
---- Anchors a control to the top of a parent, with optional padding
+--- Anchors a control's bottom edge to the top edge of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 function AnchorToTop(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Top() - MathFloor(padding * pixelScaleFactor) end)
+        control.Bottom:SetFunction(function() return MathFloor(parent.Top() - padding * pixelScaleFactor) end)
     else
         control.Bottom:SetFunction(function() return parent.Top() end)
-        --control.Bottom:SetFunction(parent.Top)
     end
 end
 
---- Anchors a control to the right of a parent, with optional padding
+--- Anchors a control's left edge to the right edge of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 function AnchorToRight(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Left:SetFunction(function() return parent.Right() + MathFloor(padding * pixelScaleFactor) end)
+        control.Left:SetFunction(function() return MathFloor(parent.Right() + padding * pixelScaleFactor) end)
     else
         control.Left:SetFunction(function() return parent.Right() end)
-        --control.Left:SetFunction(parent.Right)
     end
 end
 
---- Anchors a control to the bottom of a parent, with optional padding
+--- Anchors a control's top edge to the bottom edge of a parent, with optional padding
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 function AnchorToBottom(control, parent, padding)
     if padding and padding ~= 0 then
-        control.Top:SetFunction(function() return parent.Bottom() + MathFloor(padding * pixelScaleFactor) end)
+        control.Top:SetFunction(function() return MathFloor(parent.Bottom() + padding * pixelScaleFactor) end)
     else
         control.Top:SetFunction(function() return parent.Bottom() end)
-        --control.Top:SetFunction(parent.Bottom)
     end
 end
 
 -- These functions will set the controls position to be placed relative to
--- its parents dimensions. 
--- note that the offset is in the opposite direction as placement, to position 
--- the controls further inside the parent
+-- its parents dimensions.
+-- Note that the offset is in the opposite direction as placement, to position
+-- the controls further inside the parent.
 
 -- These are generally most useful for elements that don't change size, they can also be
 -- used for controls that stretch to match parent.
 
---- Centers a control horizontally on a parent, with optional right offset
+--- Centers a control horizontally on a parent, with optional rightward offset.
+--- This sets the control's left edge.
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number
+---@param leftOffset? number Offset of control's left edge in the rightward direction, scaled by the pixel scale factor. Defaults to 0.
 function AtHorizontalCenterIn(control, parent, leftOffset)
     if leftOffset then
         control.Left:SetFunction(function()
-            return parent.Left() + MathFloor(((parent.Width() - control.Width()) / 2) + (leftOffset * pixelScaleFactor))
+            return MathFloor(parent.Left() + (parent.Width() - control.Width()) / 2 + leftOffset * pixelScaleFactor)
         end)
     else
         control.Left:SetFunction(function()
-            return parent.Left() + MathFloor((parent.Width() - control.Width()) / 2)
+            return MathFloor(parent.Left() + (parent.Width() - control.Width()) / 2)
         end)
     end
 end
 
---- Centers a control vertically on a parent, with optional down offset
+--- Centers a control vertically on a parent, with optional downward offset.
+--- This sets the control's top edge.
 ---@param control Control
 ---@param parent Control
----@param topOffset? number
+---@param topOffset? number Offset of the control's top edge in the downward direction, scaled by the pixel scale factor. Defaults to 0.
 function AtVerticalCenterIn(control, parent, topOffset)
     if topOffset then
         control.Top:SetFunction(function()
-            return parent.Top() + MathFloor(((parent.Height() - control.Height()) / 2) + (topOffset * pixelScaleFactor))
+            return MathFloor(parent.Top() + (parent.Height() - control.Height()) / 2 + topOffset * pixelScaleFactor)
         end)
     else
         control.Top:SetFunction(function()
-            return parent.Top() + MathFloor((parent.Height() - control.Height()) / 2)
+            return MathFloor(parent.Top() + (parent.Height() - control.Height()) / 2)
         end)
     end
 end
 
---- Places a control inside the left edge of a parent, with optional right offset
+--- Places a control's left edge inside of a parent's, with optional rightward offset
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number
+---@param leftOffset? number Offset of the control's left edge in the rightward direction, scaled by the pixel scale factor. Defaults to 0.
 function AtLeftIn(control, parent, leftOffset)
     if leftOffset and leftOffset ~= 0 then
-        control.Left:SetFunction(function() return parent.Left() + MathFloor(leftOffset * pixelScaleFactor) end)
+        control.Left:SetFunction(function() return MathFloor(parent.Left() + leftOffset * pixelScaleFactor) end)
     else
         control.Left:SetFunction(function() return parent.Left() end)
-        --control.Left:SetFunction(parent.Left)
     end
 end
 
---- Places a control inside the top edge of a parent, with optional down offset
+--- Places a control's top edge inside of a parent's, with optional downward offset
 ---@param control Control
 ---@param parent Control
----@param topOffset? number
+---@param topOffset? number Offset of the control's top edge in the downward direction, scaled by the pixel scale factor. Defaults to 0.
 function AtTopIn(control, parent, topOffset)
     if topOffset and topOffset ~= 0 then
-        control.Top:SetFunction(function() return parent.Top() + MathFloor(topOffset * pixelScaleFactor) end)
+        control.Top:SetFunction(function() return MathFloor(parent.Top() + topOffset * pixelScaleFactor) end)
     else
         control.Top:SetFunction(function() return parent.Top() end)
-        --control.Top:SetFunction(parent.Top)
     end
 end
 
---- Places a control inside the right edge of a parent, with optional left offset
+--- Places a control's right edge inside of a parent's, with optional leftward offset
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
+---@param rightOffset? number Offset of the control's right edge in the leftward direction, scaled by the pixel scale factor. Defaults to 0.
 function AtRightIn(control, parent, rightOffset)
     if rightOffset and rightOffset ~= 0 then
-        control.Right:SetFunction(function() return parent.Right() - MathFloor(rightOffset * pixelScaleFactor) end)
+        control.Right:SetFunction(function() return MathFloor(parent.Right() - rightOffset * pixelScaleFactor) end)
     else
         control.Right:SetFunction(function() return parent.Right() end)
-        --control.Right:SetFunction(parent.Right)
     end
 end
 
---- Places a control inside the bottom edge of a parent, with optional up offset
+--- Places a control's bottom edge inside of a parent's, with optional upward offset
 ---@param control Control
 ---@param parent Control
----@param bottomOffset? number
+---@param bottomOffset? number Offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor. Defaults to 0.
 function AtBottomIn(control, parent, bottomOffset)
     if bottomOffset and bottomOffset ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Bottom() - MathFloor(bottomOffset * pixelScaleFactor) end)
+        control.Bottom:SetFunction(function() return MathFloor(parent.Bottom() - bottomOffset * pixelScaleFactor) end)
     else
         control.Bottom:SetFunction(function() return parent.Bottom() end)
-        --control.Bottom:SetFunction(parent.Bottom)
     end
 end
 
 -- These functions use percentages to place the item rather than offsets so they will
 -- stay proportially spaced when the parent resizes
 
---- Places the control's left at a percentage along the width of a parent, with 0.00 at the parent's left
+--- Places the control's left edge at a percentage along the width of a parent,
+--- with 0.00 at the parent's left edge
 ---@param control Control
 ---@param parent Control
----@param leftPercent? number
+---@param leftPercent? number defaults to 0.00 (all the way to left)
 function FromLeftIn(control, parent, leftPercent)
     if leftPercent and leftPercent ~= 0 then
-        control.Left:SetFunction(function() return parent.Left() + MathFloor(leftPercent * parent.Width()) end)
+        control.Left:SetFunction(function() return MathFloor(parent.Left() + leftPercent * parent.Width()) end)
     else
         control.Left:SetFunction(function() return parent.Left() end)
-        --control.Left:SetFunction(parent.Left)
     end
 end
 
---- Places the control's top at a percentage along the height of a parent, with 0.00 at the parent's top
+--- Places the control's top edge at a percentage along the height of a parent,
+--- with 0.00 at the parent's top edge
 ---@param control Control
 ---@param parent Control
----@param topPercent? number
+---@param topPercent? number defaults to 0.00 (all the way at the top)
 function FromTopIn(control, parent, topPercent)
     if topPercent and topPercent ~= 0 then
-        control.Top:SetFunction(function() return parent.Top() + MathFloor(topPercent * parent.Height()) end)
+        control.Top:SetFunction(function() return MathFloor(parent.Top() + topPercent * parent.Height()) end)
     else
         control.Top:SetFunction(function() return parent.Top() end)
-        --control.Top:SetFunction(parent.Top)
     end
 end
 
---- Places the control's right at a percentage along the width of a parent, with 0.00 at the parent's right
+--- Places the control's right edge at a percentage along the width of a parent,
+--- with 0.00 at the parent's right edge
 ---@param control Control
 ---@param parent Control
----@param rightPercent? number
+---@param rightPercent? number defaults to 0.00 (all the way right)
 function FromRightIn(control, parent, rightPercent)
     if rightPercent and rightPercent ~= 0 then
-        control.Right:SetFunction(function() return parent.Right() - MathFloor(rightPercent * parent.Width()) end)
+        control.Right:SetFunction(function() return MathFloor(parent.Right() - rightPercent * parent.Width()) end)
     else
         control.Right:SetFunction(function() return parent.Right() end)
-        --control.Right:SetFunction(parent.Right)
     end
 end
 
---- Places the control's top at a percentage along the height of a parent, with 0.00 at the parent's bottom
+--- Places the control's bottom edge at a percentage along the height of a parent,
+--- with 0.00 at the parent's bottom edge
 ---@param control Control
 ---@param parent Control
----@param bottomPercent? number
+---@param bottomPercent? number defaults to 0.00 (all the way at the bottom)
 function FromBottomIn(control, parent, bottomPercent)
     if bottomPercent and bottomPercent ~= 0 then
-        control.Bottom:SetFunction(function() return parent.Bottom() - MathFloor(bottomPercent * parent.Height()) end)
+        control.Bottom:SetFunction(function() return MathFloor(parent.Bottom() - bottomPercent * parent.Height()) end)
     else
         control.Bottom:SetFunction(function() return parent.Bottom() end)
         --control.Bottom:SetFunction(parent.Bottom)
@@ -316,43 +315,43 @@ end
 
 -- These functions reset a control to be calculated from the others
 
---- Resets a control's left to be calculated from its right and width  
---- **Make sure `Right` and `Width` are defined!!!**
+--- Resets a control's left edge to be calculated from its right edge and width.  
+--- Make sure `control:Right` and `control:Width` are not reset.
 ---@param control Control
 function ResetLeft(control)
     control.Left:SetFunction(function() return control.Right() - control.Width() end)
 end
 
---- Resets a control's top to be calculated from its bottom and height  
---- **Make sure `Bottom` and `Height` are defined!!!**
+--- Resets a control's top edge to be calculated from its bottom edge and height.  
+--- Make sure `control:Bottom` and `control:Height` are not reset.
 ---@param control Control
 function ResetTop(control)
     control.Top:SetFunction(function() return control.Bottom() - control.Height() end)
 end
 
---- Resets a control's left to be calculated from its right and width  
---- **Make sure `Left` and `Width` are defined!!!**
+--- Resets a control's right edge to be calculated from its left edge and width.  
+--- Make sure `control:Left` and `control:Width` are not reset.
 ---@param control Control
 function ResetRight(control)
     control.Right:SetFunction(function() return control.Left() + control.Width() end)
 end
 
---- Resets a control's bottom to be calculated from its top and height  
---- **Make sure `Top` and `Height` are Defined!!!**
+--- Resets a control's bottom edge to be calculated from its top edge and height.  
+--- Make sure `control:Top` and `control:Height` are not reset.
 ---@param control Control
 function ResetBottom(control)
     control.Bottom:SetFunction(function() return control.Top() + control.Height() end)
 end
 
---- Resets a control's width to be calculated from its right and left  
---- **Make sure `Right` and `Left` are defined!!!**
+--- Resets a control's width to be calculated from its left and right edges.  
+--- Make sure `control:Left` and `control:Right` are not reset.
 ---@param control Control
 function ResetWidth(control)
     control.Width:SetFunction(function() return control.Right() - control.Left() end)
 end
 
---- Resets a control's height to be calculated from its top and bottom  
---- **Make sure `Bottom` and `Top` are defined!!!**
+--- Resets a control's height to be calculated from its top and bottom edges.  
+--- Make sure `control:Top` and `control:Bottom` are not reset.
 ---@param control Control
 function ResetHeight(control)
     control.Height:SetFunction(function() return control.Bottom() - control.Top() end)
@@ -363,47 +362,53 @@ end
 --* Composite Functions
 --**********
 
---- Places a control in the center of a parent, with optional offsets
+--- Places a control in the center of a parent, with optional offsets.
+--- This sets the control's left and top edges.  
+--- Note the argument order.
 ---@param control Control
 ---@param parent Control
----@param topOffset? number offset of top edge (offset in down direction)
----@param leftOffset? number offset of left edge (offset in right direction)
+---@param topOffset? number offset of top edge in downward direction, scaled by the pixel scale factor
+---@param leftOffset? number offset of left edge in rightward direction, scaled by the pixel scale factor
 function AtCenterIn(control, parent, topOffset, leftOffset)
     AtHorizontalCenterIn(control, parent, leftOffset)
     AtVerticalCenterIn(control, parent, topOffset)
 end
 
---- Lock right edge of a control to left of a parent, centered vertically
+--- Lock right edge of a control to left edge of a parent, centered vertically.
+--- This sets the control's right and top edges.
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function CenteredLeftOf(control, parent, padding)
     AnchorToLeft(control, parent, padding)
     AtVerticalCenterIn(control, parent)
 end
 
---- Lock bottom edge of a control to top of a parent, centered horizontally
+--- Lock bottom edge of a control to top edge of a parent, centered horizontally.
+--- This sets the control's left and bottom edges.
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function CenteredAbove(control, parent, padding)
     AtHorizontalCenterIn(control, parent)
     AnchorToTop(control, parent, padding)
 end
 
---- Lock top left of a control to right of a parent, centered vertically
+--- Lock left edge of a control to right edge of a parent, centered vertically.
+--- This sets the control's left and top edges.
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function CenteredRightOf(control, parent, padding)
     AnchorToRight(control, parent, padding)
     AtVerticalCenterIn(control, parent)
 end
 
---- Lock top left of a control to bottom left of a parent, centered horizontally
+--- Lock top edge of a control to bottom edge of a parent, centered horizontally.
+--- This sets the control's left and top edges.
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function CenteredBelow(control, parent, padding)
     AtHorizontalCenterIn(control, parent)
     AnchorToBottom(control, parent, padding)
@@ -411,41 +416,41 @@ end
 
 -- Set to a corner inside the parent
 
---- Places top left corner of a control inside of a parent's
+--- Places top left corner of a control inside of a parent's, with optional offsets
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number
----@param topOffset? number
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 function AtLeftTopIn(control, parent, leftOffset, topOffset)
     AtLeftIn(control, parent, leftOffset)
     AtTopIn(control, parent, topOffset)
 end
 
---- Places top right corner of a control inside of a parent's
+--- Places top right corner of a control inside of a parent's, with optional offsets
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
----@param topOffset? number
+---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 function AtRightTopIn(control, parent, rightOffset, topOffset)
     AtRightIn(control, parent, rightOffset)
     AtTopIn(control, parent, topOffset)
 end
 
---- Places bottom left corner of a control inside of a parent's
+--- Places bottom left corner of a control inside of a parent's, with optional offsets
 ---@param control Control
 ---@param parent Control
----@param leftOffset? number
----@param bottomOffset? number
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
 function AtLeftBottomIn(control, parent, leftOffset, bottomOffset)
     AtLeftIn(control, parent, leftOffset)
     AtBottomIn(control, parent, bottomOffset)
 end
 
---- Places bottom right corner of a control inside of its parent's
+--- Places bottom right corner of a control inside of its parent's, with optional offsets
 ---@param control Control
 ---@param parent Control
----@param rightOffset? number
----@param bottomOffset? number
+---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
 function AtRightBottomIn(control, parent, rightOffset, bottomOffset)
     AtRightIn(control, parent, rightOffset)
     AtBottomIn(control, parent, bottomOffset)
@@ -456,7 +461,7 @@ end
 --- Lock top right of a control to top left of a parent
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function LeftOf(control, parent, padding)
     AnchorToLeft(control, parent, padding)
     AtTopIn(control, parent)
@@ -465,7 +470,7 @@ end
 --- Lock top left of a control to top right of a parent
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function RightOf(control, parent, padding)
     AnchorToRight(control, parent, padding)
     AtTopIn(control, parent)
@@ -474,7 +479,7 @@ end
 --- Lock bottom left of a control to top left of a parent
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function Above(control, parent, padding)
     AtLeftIn(control, parent)
     AnchorToTop(control, parent, padding)
@@ -483,18 +488,19 @@ end
 --- Lock top left of a control to bottom left of a parent
 ---@param control Control
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 function Below(control, parent, padding)
     AtLeftIn(control, parent)
     AnchorToBottom(control, parent, padding)
 end
 
 
--- These functions will place the control and resize in a specified location within the parent
--- note that the offset version is more useful than hard coding the location
+-- These functions will place the control and resize in a specified location within the parent.
+-- Note that the offset version is more useful than hard coding the location
 -- as it will take advantage of the pixel scale factor
 
---- Sets all sides of a control to be a certain amount inside of a parent
+--- Sets all edges of a control to be a certain amount inside of a parent.
+--- Offsets are optional and scaled by the pixel scale factor.
 ---@param control Control
 ---@param parent Control
 ---@param left? number
@@ -508,7 +514,8 @@ function OffsetIn(control, parent, left, top, right, bottom)
     AtBottomIn(control, parent, bottom)
 end
 
---- Sets all sides of a control to be a certain percentage inside of a parent
+--- Sets all edges of a control to be a certain percentage inside of a parent.
+--- Percentages are optional.
 ---@param control Control
 ---@param parent Control
 ---@param left? number
@@ -524,8 +531,8 @@ end
 
 -- These functions will stretch the control to fill the parent and provide an optional border
 
---- Sets a control to fill a parent
---- Note this function copies the parent's side functions, it does not refer
+--- Sets a control to fill a parent.
+--- Note that this function copies the parent's edges (it does not refer) so they must be set first.
 ---@param control Control
 ---@param parent Control
 function FillParent(control, parent)
@@ -535,7 +542,7 @@ function FillParent(control, parent)
     control.Right:SetFunction(parent.Right)
 end
 
---- Sets a control to fill a parent's with fixed padding
+--- Sets a control to fill a parent's with fixed padding on all edges
 ---@param control Control
 ---@param parent Control
 ---@param offset? number
@@ -543,7 +550,7 @@ function FillParentFixedBorder(control, parent, offset)
     OffsetIn(control, parent, offset, offset, offset, offset)
 end
 
---- Sets a control to fill a parent's with percent padding
+--- Sets a control to fill a parent's with percent padding on all edges
 ---@param control Control
 ---@param parent Control
 ---@param percent? number
@@ -551,8 +558,7 @@ function FillParentRelativeBorder(control, parent, percent)
     PercentIn(control, parent, percent, percent, percent, percent)
 end
 
---- Sets a control to fill a parent while preversing its width and height ratio
---- Fill the parent control while preserving the aspect ratio of the item
+--- Sets a control's edges to fill a parent while preserving its width-to-height ratio
 ---@param control Control
 ---@param parent Control
 function FillParentPreserveAspectRatio(control, parent)
@@ -565,22 +571,22 @@ function FillParentPreserveAspectRatio(control, parent)
     end
 
     control.Top:SetFunction(function()
-        return MathFloor(parent.Top() + ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Top() + (parent.Height() - control.Height() * GetRatio(control, parent)) / 2)
     end)
     control.Bottom:SetFunction(function()
-        return MathFloor(parent.Bottom() - ((parent.Height() - (control.Height() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Bottom() - (parent.Height() - control.Height() * GetRatio(control, parent)) / 2)
     end)
     control.Left:SetFunction(function()
-        return MathFloor(parent.Left() + ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Left() + (parent.Width() - control.Width() * GetRatio(control, parent)) / 2)
     end)
     control.Right:SetFunction(function()
-        return MathFloor(parent.Right() - ((parent.Width() - (control.Width() * GetRatio(control, parent))) / 2))
+        return MathFloor(parent.Right() - (parent.Width() - control.Width() * GetRatio(control, parent)) / 2)
     end)
 end
 
---- Reset to the default layout functions  
---- You should call control:ResetLayout() instead unless you cannot rely on overriden behavior  
---- **Remember to redefine two horizontal and two vertical properties to avoid circular dependencies!**
+--- Reset all edges and dimensions to the default layout functions.  
+--- You should call `control:ResetLayout()` instead unless you cannot rely on overriden behavior.  
+--- Remember to redefine two horizontal and two vertical properties to avoid circular dependencies.
 ---@param control Control
 function Reset(control)
     ResetLeft(control)
@@ -600,7 +606,8 @@ end
 --     {control_name_2 = {left = 0, top = 0, width = 100, height = 100,},
 -- }
 
---- Sets a control to be positioned to a parent using a layout table
+--- Sets a control's top and left edges to be positioned to a parent using a layout table.  
+--- Note the argument order.
 ---@param control Control
 ---@param parent Control
 ---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
@@ -629,7 +636,7 @@ function RelativeTo(control, parent, fileName, controlName, parentName, topOffse
     end)
 end
 
---- Sets a control's left to be positioned to a parent using a layout table
+--- Sets a control's left edge to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
 ---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
@@ -645,11 +652,11 @@ function LeftRelativeTo(control, parent, fileName, controlName, parentName)
     end
     control.Left:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MathFloor(parent.Left() + (layoutTable[controlName].left - layoutTable[parentName].left))
+        return MathFloor(parent.Left() + layoutTable[controlName].left - layoutTable[parentName].left)
     end)
 end
 
---- Sets a control's top to be positioned to a parent using a layout table
+--- Sets a control's top edge to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
 ---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
@@ -665,11 +672,11 @@ function TopRelativeTo(control, parent, fileName, controlName, parentName)
     end
     control.Top:SetFunction(function()
         local layoutTable = import(fileName()).layout
-        return MathFloor(parent.Top() + (layoutTable[controlName].top - layoutTable[parentName].top))
+        return MathFloor(parent.Top() + layoutTable[controlName].top - layoutTable[parentName].top)
     end)
 end
 
---- Sets a control's right to be positioned to a parent using a layout table
+--- Sets a control's right edge to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
 ---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
@@ -691,7 +698,7 @@ function RightRelativeTo(control, parent, fileName, controlName, parentName)
     end)
 end
 
---- Sets a control's bottom to be positioned to a parent using a layout table
+--- Sets a control's bottom edge to be positioned to a parent using a layout table
 ---@param control Control
 ---@param parent Control
 ---@param fileName LazyVar|function Full path and filename of the layout file. Must be a lazy var or function that returns the filename.
@@ -774,7 +781,7 @@ function LayouterMetaTable:Hide()
 end
 
 --- Sets the color of the control
----@param color string hexcolor
+---@param color string color as a hexcode
 ---@return Layouter
 function LayouterMetaTable:Color(color)
     if self.c.SetSolidColor then
@@ -838,33 +845,34 @@ function LayouterMetaTable:Alpha(alpha, forChildren)
 end
 
 -- Raw setting
+---@alias lazyvarType function|number
 
---- Sets the left side of the control
----@param left function|number
+--- Sets the left edge of the control
+---@param left lazyvarType
 ---@return Layouter
 function LayouterMetaTable:Left(left)
     self.c.Left:Set(left)
     return self
 end
 
---- Sets the top side of the control
----@param top function|number
+--- Sets the top edge of the control
+---@param top lazyvarType
 ---@return Layouter
 function LayouterMetaTable:Top(top)
     self.c.Top:Set(top)
     return self
 end
 
---- Sets the right side of the control
----@param right function|number
+--- Sets the right edge of the control
+---@param right lazyvarType
 ---@return Layouter
 function LayouterMetaTable:Right(right)
     self.c.Right:Set(right)
     return self
 end
 
---- Sets the bottom side of the control
----@param bottom function|number
+--- Sets the bottom edge of the control
+---@param bottom lazyvarType
 ---@return Layouter
 function LayouterMetaTable:Bottom(bottom)
     self.c.Bottom:Set(bottom)
@@ -872,7 +880,7 @@ function LayouterMetaTable:Bottom(bottom)
 end
 
 --- Sets the width of the control
----@param width function|number #width will be scaled by the pixel factor
+---@param width lazyvarType #if a number, width will be scaled by the pixel factor
 ---@return Layouter
 function LayouterMetaTable:Width(width)
     if iscallable(width) then
@@ -884,7 +892,7 @@ function LayouterMetaTable:Width(width)
 end
 
 --- Sets the height of the control
----@param height function|number #height will be scaled by the pixel factor
+---@param height lazyvarType #if a number, height will be scaled by the pixel factor
 ---@return Layouter
 function LayouterMetaTable:Height(height)
     if iscallable(height) then
@@ -898,7 +906,7 @@ end
 
 -- Depth
 
---- Sets the depth of the control higher than a parent
+--- Sets depth of the control to be above a parent
 ---@param parent Control
 ---@param depth? integer defaults to 1
 ---@return Layouter
@@ -908,7 +916,7 @@ function LayouterMetaTable:Over(parent, depth)
 end
 
 
---- Sets the depth of the control lower than a parent
+--- Sets depth of the control to be below a parent
 ---@param parent Control
 ---@param depth? integer defaults to 1
 ---@return Layouter
@@ -923,36 +931,36 @@ end
 
 -- Anchors
 
---- Anchors the control to the left of a parent, with optional padding
+--- Anchors the control's right edge to the left edge of a parent, with optional padding
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AnchorToLeft(parent, padding)
     AnchorToLeft(self.c, parent, padding)
     return self
 end
 
---- Anchors a control to the top of a parent, with optional offset
+--- Anchors the control's bottom edge to the top edge of a parent, with optional padding
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AnchorToTop(parent, padding)
     AnchorToTop(self.c, parent, padding)
     return self
 end
 
---- Anchors a control to the right of a parent, with optional offset
+--- Anchors the control's left edge to the right edge of a parent, with optional padding
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AnchorToRight(parent, padding)
     AnchorToRight(self.c, parent, padding)
     return self
 end
 
---- Anchors a control to the bottom of a parent, with optional offset
+--- Anchors the control's top edge to the bottom edge of a parent, with optional padding
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number fixed padding between control and parent, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AnchorToBottom(parent, padding)
     AnchorToBottom(self.c, parent, padding)
@@ -961,19 +969,21 @@ end
 
 -- Centered
 
---- Centers a control horizontally on a parent, with an optional offset
+--- Centers the control horizontally on a parent, with optional rightward offset.
+--- This sets the control's left edge.
 ---@param parent Control
----@param leftOffset? number in right direction
+---@param leftOffset? number Offset of control's left edge in the rightward direction, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:AtHorizontalCenterIn(parent, leftOffset)
     AtHorizontalCenterIn(self.c, parent, leftOffset)
     return self
 end
 
---- Centers a control vertically on a parent, with an optional offset
+--- Centers the control vertically on a parent, with optional downward offset.
+--- This sets the control's top edge.
 ---@param control Control
 ---@param parent Control
----@param topOffset? number in down direction
+---@param topOffset? number Offset of the control's top edge in the downward direction, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:AtVerticalCenterIn(parent, topOffset)
     AtVerticalCenterIn(self.c, parent, topOffset)
@@ -982,36 +992,36 @@ end
 
 -- Inside
 
---- Places the control inside the left border of a parent, with optional right offset
+--- Places the control's left edge inside of a parent's, with optional rightward offset
 ---@param parent Control
----@param leftOffset? number
+---@param leftOffset? number Offset of the control's left edge in the rightward direction, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:AtLeftIn(parent, leftOffset)
     AtLeftIn(self.c, parent, leftOffset)
     return self
 end
 
---- Places the control inside the top border of a parent, with optional down offset
+--- Places the control's top edge inside of a parent's, with optional downward offset
 ---@param parent Control
----@param topOffset? number
+---@param topOffset? number Offset of the control's top edge in the downward direction, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:AtTopIn(parent, topOffset)
     AtTopIn(self.c, parent, topOffset)
     return self
 end
 
---- Places the control inside the right border of a parent, with optional left offset
+--- Places the control's right edge inside of a parent's, with optional leftward offset
 ---@param parent Control
----@param rightOffset? number
+---@param rightOffset? number Offset of the control's right edge in the leftward direction, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:AtRightIn(parent, rightOffset)
     AtRightIn(self.c, parent, rightOffset)
     return self
 end
 
---- Places the control inside the bottom border of a parent, with optional up offset
+--- Places the control's bottom edge inside of a parent's, with optional upward offset
 ---@param parent Control
----@param bottomOffset? number
+---@param bottomOffset? number Offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:AtBottomIn(parent, bottomOffset)
     AtBottomIn(self.c, parent, bottomOffset)
@@ -1020,48 +1030,48 @@ end
 
 -- Resets
 
---- Resets the control's left to be calculated from its right and width  
---- **Make sure `Right` and `Width` are defined!!!**
+--- Resets the control's left edge to be calculated from its right edge and width.  
+--- Make sure `control:Right` and `control:Width` are not reset.
 ---@return Layouter
 function LayouterMetaTable:ResetLeft()
     ResetLeft(self.c)
     return self
 end
 
---- Resets the control's top to be calculated from its bottom and height  
---- **Make sure `Bottom` and `Height` are defined!!!**
+--- Resets the control's top edge to be calculated from its bottom edge and height.  
+--- Make sure `control:Bottom` and `control:Height` are not reset.
 ---@return Layouter
 function LayouterMetaTable:ResetTop()
     ResetTop(self.c)
     return self
 end
 
---- Resets the control's right to be calculated from its right and width  
---- **Make sure `Left` and `Width` are defined!!!**
+--- Resets the control's right edge to be calculated from its left edge and width.  
+--- Make sure `control:Left` and `control:Width` are not reset.
 ---@return Layouter
 function LayouterMetaTable:ResetRight()
     ResetRight(self.c)
     return self
 end
 
---- Resets the control's bottom to be calculated from its top and height  
---- **Make sure `Top` and `Height` are Defined!!!**
+--- Resets the control's bottom edge to be calculated from its top edge and height.  
+--- Make sure `control:Top` and `control:Height` are not reset.
 ---@return Layouter
 function LayouterMetaTable:ResetBottom()
     ResetBottom(self.c)
     return self
 end
 
---- Resets the control's width to be calculated from its right and left  
---- **Make sure `Right` and `Left` are defined!!!**
+--- Resets the control's width to be calculated from its left and right edges.  
+--- Make sure `control:Left` and `control:Right` are not reset.
 ---@return Layouter
 function LayouterMetaTable:ResetWidth()
     ResetWidth(self.c)
     return self
 end
 
---- Resets the control's height to be calculated from its top and bottom  
---- **Make sure `Bottom` and `Top` are defined!!!**
+--- Resets the control's height to be calculated from its top and bottom edges.  
+--- Make sure `control:Top` and `control:Bottom` are not reset.
 ---@return Layouter
 function LayouterMetaTable:ResetHeight()
     ResetHeight(self.c)
@@ -1074,61 +1084,67 @@ end
 
 --- Surround positioning
 
---- Lock right of the control to left of a parent, centered vertically
+--- Lock right edge of the control to the left edge of a parent, centered vertically.
+--- This sets the control's right and top edges.
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:CenteredLeftOf(parent, padding)
     CenteredLeftOf(self.c, parent, padding)
     return self
 end
 
---- Lock bottom of the control to top left of a parent, centered horizontally
+--- Lock bottom edge of the control to the top edge of a parent, centered horizontally.
+--- This sets the control's left and bottom edges.
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:CenteredAbove(parent, padding)
     CenteredAbove(self.c, parent, padding)
     return self
 end
 
---- Lock left of the control to right of a parent, centered vertically
+--- Lock left edge of the control to the right edge of a parent, centered vertically.
+--- This sets the control's left and top edges.
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:CenteredRightOf(parent, padding)
     CenteredRightOf(self.c, parent, padding)
     return self
 end
 
---- Lock top of the control to bottom left of parent, centered horizontally
+--- Lock top edge of the control to the bottom edge of parent, centered horizontally.
+--- This sets the controls's left and top edges.
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:CenteredBelow(parent, padding)
     CenteredBelow(self.c, parent, padding)
     return self
 end
 
-
 -- Inside positioning
--- note that the inside-edge layouts don't have a function counterpart like
--- the inside-corner layouts do
+-- Note that the inside-edge layouts don't have a function counterpart like
+-- the inside-corner layouts do.
 
---- Places the control in the center of the parent, with optional offsets
+--- Places the control in the center of the parent, with optional offsets.
+--- This sets the control's left and top edges.  
+--- Note the argument order.
 ---@param parent Control
----@param topOffset? number offset of top edge (offset in down direction)
----@param leftOffset? number offset of left edge (offset in right direction)
+---@param topOffset? number offset of top edge in downward direction, scaled by the pixel scale factor
+---@param leftOffset? number offset of left edge in rightward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtCenterIn(parent, topOffset, leftOffset)
     AtCenterIn(self.c, parent, topOffset, leftOffset)
     return self
 end
 
---- Places left edge of the control vertically centered inside of a parent's
+--- Places left edge of the control vertically centered inside of a parent's, with optional offsets.
+--- This sets the control's left and top edges.
 ---@param parent Control
----@param leftOffset? number
----@param topOffset? number
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtLeftCenterIn(parent, leftOffset, topOffset)
     AtLeftIn(self.c, parent, leftOffset)
@@ -1136,20 +1152,22 @@ function LayouterMetaTable:AtLeftCenterIn(parent, leftOffset, topOffset)
     return self
 end
 
---- Places top left corner of the control inside of a parent's
+--- Places top left corner of the control inside of a parent's, with optional offsets
 ---@param parent Control
----@param leftOffset? number
----@param topOffset? number
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtLeftTopIn(parent, leftOffset, topOffset)
     AtLeftTopIn(self.c, parent, leftOffset, topOffset)
     return self
 end
 
---- Places top edge of the control horizontally centered inside of a parent's
+--- Places top edge of the control horizontally centered inside of a parent's, with optional offsets.
+--- Sets the control's left and top edges.  
+--- Note the argument order.
 ---@param parent Control
----@param topOffset? number
----@param leftOffset? number
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtTopCenterIn(parent, topOffset, leftOffset)
     AtTopIn(self.c, parent, topOffset)
@@ -1157,20 +1175,21 @@ function LayouterMetaTable:AtTopCenterIn(parent, topOffset, leftOffset)
     return self
 end
 
---- Places top right corner of the control inside of its parent's
+--- Places top right corner of the control inside of its parent's, with optional offsets
 ---@param parent Control
----@param rightOffset? number
----@param topOffset? number
+---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
     AtRightTopIn(self.c, parent, rightOffset, topOffset)
     return self
 end
 
---- Places right edge of the control vertically centered inside of a parent's
+--- Places right edge of the control vertically centered inside of a parent's, with optional offsets.
+--- Sets the control's right and top edges.
 ---@param parent Control
----@param rightOffset? number
----@param topOffset? number
+---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+---@param topOffset? number offset of the control's top edge in the downward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtRightCenterIn(parent, rightOffset, topOffset)
     AtRightIn(self.c, parent, rightOffset)
@@ -1178,20 +1197,22 @@ function LayouterMetaTable:AtRightCenterIn(parent, rightOffset, topOffset)
     return self
 end
 
---- Places bottom right corner of the control inside of a parent's
+--- Places bottom right corner of the control inside of a parent's, with optional offsets
 ---@param parent Control
----@param rightOffset? number
----@param bottomOffset? number
+---@param rightOffset? number offset of the control's right edge in the leftward direction, scaled by the pixel scale factor
+---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtRightBottomIn(parent, rightOffset, bottomOffset)
     AtRightBottomIn(self.c, parent, rightOffset, bottomOffset)
     return self
 end
 
---- Places bottom edge of the control horizontally centered inside of a parent's
+--- Places bottom edge of the control horizontally centered inside of a parent's, with optional offsets.
+--- Sets the control's left and bottom edges.  
+--- Note the argument order.
 ---@param parent Control
----@param leftOffset? number
----@param bottomOffset? number
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtBottomCenterIn(parent, bottomOffset, leftOffset)
     AtBottomIn(self.c, parent, bottomOffset)
@@ -1199,50 +1220,48 @@ function LayouterMetaTable:AtBottomCenterIn(parent, bottomOffset, leftOffset)
     return self
 end
 
---- Places bottom left corner of the control inside of a parent's
+--- Places bottom left corner of the control inside of a parent's, with optional offsets
 ---@param parent Control
----@param leftOffset? number
----@param bottomOffset? number
+---@param leftOffset? number offset of the control's left edge in the rightward direction, scaled by the pixel scale factor
+---@param bottomOffset? number offset of the control's bottom edge in the upward direction, scaled by the pixel scale factor
 ---@return Layouter
 function LayouterMetaTable:AtLeftBottomIn(parent, leftOffset, bottomOffset)
     AtLeftBottomIn(self.c, parent, leftOffset, bottomOffset)
     return self
 end
 
-
 -- Out-of positioning
 
---- Lock top right of the control to top left of a parent
+--- Lock top right of the control to the top left of a parent
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:LeftOf(parent, padding)
     LeftOf(self.c, parent, padding)
     return self
 end
 
---- Lock top left of the control to top right of a parent
+--- Lock top left of the control to the top right of a parent
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:RightOf(parent, padding)
     RightOf(self.c, parent, padding)
     return self
 end
 
---- Lock bottom left of the control to top left of a parent
+--- Lock bottom left of the control to the top left of a parent
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:Above(parent, padding)
     Above(self.c, parent, padding)
     return self
 end
 
-
---- Lock top left of the control to bottom left of a parent
+--- Lock top left of the control to the bottom left of a parent
 ---@param parent Control
----@param padding? number fixed padding between control and parent
+---@param padding? number Fixed padding between control and parent, scaled by the pixel scale factor. Defaults to 0.
 ---@return Layouter
 function LayouterMetaTable:Below(parent, padding)
     Below(self.c, parent, padding)
@@ -1251,8 +1270,8 @@ end
 
 -- Fill parent
 
---- Sets control to fill a parent  
---- Note this function copies the parent's edge functions, it does not refer
+--- Sets the control to fill a parent.
+--- Note that this function copies the parent's edges (it does not refer) so they must be set first.
 ---@param parent Control
 ---@return Layouter
 function LayouterMetaTable:Fill(parent)
@@ -1260,7 +1279,7 @@ function LayouterMetaTable:Fill(parent)
     return self
 end
 
---- Sets control to fill a parent's with fixed padding
+--- Sets the control to fill a parent's with fixed padding
 ---@param parent Control
 ---@param offset? number
 ---@return Layouter
@@ -1270,8 +1289,8 @@ function LayouterMetaTable:FillFixedBorder(parent, offset)
 end
 
 
--- Calculates control's Properties to determine its layout completion and returns it  
--- remember, if parent has incomplete layout it will warn you anyway
+-- Calculates the control's Properties to determine its layout completion and returns it.  
+-- Remember, if parent has incomplete layout it will warn you anyway.
 ---@return Control
 function LayouterMetaTable:End()
     if not pcall(self.c.Top) or not pcall(self.c.Bottom) or not pcall(self.c.Height) then
@@ -1287,9 +1306,11 @@ function LayouterMetaTable:End()
     return self.c
 end
 
+
 function LayouterMetaTable:__newindex(key, value)
     error("attempt to set new index for a Layouter object")
 end
+
 
 --- Returns a layouter for a control
 ---@param control Control
