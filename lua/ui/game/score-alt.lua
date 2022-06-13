@@ -44,22 +44,6 @@ ShareDescriptionLookup["Defectors"] = "<LOC lobui_0767>"
 ShareDescriptionLookup["CivilianDeserter"] = "<LOC lobui_0765>"
 
 
-local startingWidth = scenario.size[1]
-local startingHeight = scenario.size[2]
-function SetPlayableArea(playableArea)
-    local width = playableArea[3] - playableArea[1]
-    local height = playableArea[4] - playableArea[2]
-    if instance then
-        local mapData = instance.MapData()
-        mapData.Width = width
-        mapData.Height = height
-        instance.MapData:Set(mapData)
-    else
-        startingWidth = width
-        startingHeight = height
-    end
-end
-
 local function SyncCallback(sync)
     if instance then 
         local focus = GetFocusArmy()
@@ -69,6 +53,17 @@ local function SyncCallback(sync)
 
         if score.general.currentunits and score.general.currentcap then 
             instance.UnitData:Set({ Count = score.general.currentunits , Cap = score.general.currentcap })
+        end
+        
+        if sync.NewPlayableArea then
+            local width = sync.NewPlayableArea[3] - sync.NewPlayableArea[1]
+            local height = sync.NewPlayableArea[4] - sync.NewPlayableArea[2]
+
+            -- update existing data
+            local mapData = instance.MapData()
+            mapData.Width = width
+            mapData.Height = height
+            instance.MapData:Set(mapData)
         end
     end
 end
@@ -462,8 +457,8 @@ local Scoreboard = Class(Group) {
         self.MapData:Set({
             Name = scenario.name,
             Description = scenario.description or "No description set by the author.",
-            Width = startingWidth,
-            Height = startingHeight,
+            Width = scenario.size[1],
+            Height = scenario.size[2],
             Version = scenario.map_version or 0,
             ReplayID = UIUtil.GetReplayId() or 0
         })
