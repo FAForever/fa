@@ -84,8 +84,6 @@ UnitBlueprint {
         'FACTORY',
         'DIRECTFIRE',
         'AMPHIBIOUS',
-        'ANTIAIR',
-        'ANTINAVY',
         'SNIPER',
         'NEEDMOBILEBUILD',
         'SONAR',

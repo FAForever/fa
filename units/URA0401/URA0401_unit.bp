@@ -102,7 +102,6 @@ UnitBlueprint {
         'EXPERIMENTAL',
         'GROUNDATTACK',
         'NEEDMOBILEBUILD',
-        'ANTIAIR',
         'COUNTERINTELLIGENCE',
         'STEALTH',
         'VISIBLETORECON',
