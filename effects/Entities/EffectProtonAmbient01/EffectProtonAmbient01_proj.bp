@@ -3,7 +3,7 @@ ProjectileBlueprint {
     Display = {
         Mesh = {
             LODs = {
-                LODCutoff = 300,
+                LODCutoff = 200,
             },
         },
     },
