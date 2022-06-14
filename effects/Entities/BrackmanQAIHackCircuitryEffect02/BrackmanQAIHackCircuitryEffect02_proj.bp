@@ -23,13 +23,6 @@ ProjectileBlueprint {
         'PROJECTILE',
         'INDIRECTFIRE',
     },
-    Display = {
-        Mesh = {
-            LODs = {
-                LODCutoff = 300,
-            },
-        },
-    },
     General = {
         Category = 'Bomb',
         Faction = 'Seraphim',

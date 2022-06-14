@@ -1,5 +1,4 @@
 ProjectileBlueprint {
-    DevStatus = 'STABLE',
     Display = {
         UniformScale = 1,
     },    
