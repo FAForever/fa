@@ -25,6 +25,8 @@ local hasSeenResult = false
 -- Here's an opportunity for user side script to examine the Sync table for the new tick
 function OnSync()
 
+    reprsl(__EngineStats)
+
     if Sync.ArmyTransfer then 
         local army = GetFocusArmy()
         for k, transfer in Sync.ArmyTransfer do 
