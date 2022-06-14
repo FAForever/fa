@@ -1,5 +1,5 @@
 
-# Game version 3737 (15th of May, 2022)
+# Game version 3738 (19th of June, 2022)
 
 The past month has been exciting - there is no other word that we can use.
 
