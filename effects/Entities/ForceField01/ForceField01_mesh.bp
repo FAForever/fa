@@ -1,8 +1,10 @@
+-- used by ueb0304
+
 MeshBlueprint {
     LODs = {
         {
             ShaderName = 'UEFQuantumGate',
-            LODCutoff = 1000,
+            LODCutoff = 500,
         },
     },
     SortOrder = 1000,
