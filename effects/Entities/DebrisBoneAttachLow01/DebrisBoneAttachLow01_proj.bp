@@ -1,4 +1,11 @@
 ProjectileBlueprint {
+    Display = {
+        Mesh = {
+            LODs = {
+                LODCutoff = 200,
+            },
+        },
+    },
     Physics = {
         Acceleration = -0.4,
         MinBounceCount = 5,

@@ -1,6 +1,11 @@
 ProjectileBlueprint {
     DevStatus = 'STABLE',
     Display = {
+        Mesh = {
+            LODs = {
+                LODCutoff = 300,
+            },
+        },
     },
     Physics = {
         MinBounceCount = 10000,
