@@ -47,6 +47,12 @@ local Warnings = { }
 --- List of callbacks that is being populated throughout this file
 local Callbacks = {}
 
+function AddCallback(name, fn)
+    if not Callbacks[name] then 
+        Callbacks[name] = fn
+    end
+end
+
 function DoCallback(name, data, units)
     local fn = Callbacks[name];
     if fn then
@@ -57,7 +63,7 @@ function DoCallback(name, data, units)
 end
 
 --- Common utility function to retrieve the actual units.
-local function SecureUnits(units)
+function SecureUnits(units)
     local secure = {}
     if units and type(units) ~= 'table' then
         units = {units}
