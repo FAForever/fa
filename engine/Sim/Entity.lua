@@ -3,7 +3,7 @@
 local Entity = {}
 
 ---@alias Army number
----@alias EntityId number
+---@alias EntityId string
 
 ---
 --  Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
