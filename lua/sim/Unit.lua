@@ -342,10 +342,11 @@ Unit = Class(moho.unit_methods) {
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
-        self.ResetJammer = false
+        
 
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
+            self.ResetJammer = -1
         end
         
     end,
@@ -1964,6 +1965,11 @@ Unit = Class(moho.unit_methods) {
         end
 
         ChangeState(self, self.DeadState)
+
+        if self.Blueprint.Intel.JammerBlips > 0 then
+            self.Brain:UntrackJammer(self)
+        end
+
     end,
 
     -- Generic function for showing a table of bones

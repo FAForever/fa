@@ -344,27 +344,30 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     JammingToggleThread = function(self)
-
         while true do 
-
             for i, jammer in self.Jammers do
-
-                if not jammer:BeenDestroyed() then 
-
+                if jammer.ResetJammer == 0 then
                     if jammer.ResetJammer then
                         jammer:DisableUnitIntel('AutoToggle', 'Jammer')
-                        WaitSeconds(0.3)
-                        if not jammer:BeenDestroyed() then
-                            jammer:EnableUnitIntel('AutoToggle', 'Jammer')  
-                            jammer.ResetJammer = false
-                        end
+                        self:ForkThread(self.JammingFollowUpThread, jammer)
+                        jammer.ResetJammer = -1
                     end
                 else
-                    UntrackJammer(jammer)
+                    if jammer.ResetJammer > 0 then
+                        jammer.ResetJammer = jammer.ResetJammer - 1
+                    end
+                    
                 end
-
             end
-            WaitSeconds(10)
+            WaitSeconds(1)
+        end
+    end,
+
+    JammingFollowUpThread = function(self, unit)
+        WaitSeconds(1)
+        if not unit:BeenDestroyed() then
+            unit:EnableUnitIntel('AutoToggle', 'Jammer')  
+            unit.ResetJammer = -1
         end
     end,
 
@@ -610,7 +613,7 @@ AIBrain = Class(moho.aibrain_methods) {
             if not val then
                 local unit = blip:GetSource()
                 if unit.Blueprint.Intel.JammerBlips > 0 then
-                    unit.ResetJammer = true
+                    unit.ResetJammer = 15
                 end
             end
         end
