@@ -4,6 +4,54 @@
 ---- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------
 
+---@alias SaveFile "AirAttacks" | "AirScout" | "BasicLandAttack" | "BomberEscort" | "HeavyLandAttack" | "LandAssualt" | "LeftoverCleanup" | "LightAirAttack" | "NavalAttacks" | "NavalFleet"
+
+-- types that originate from the map
+
+---@class MarkerChain                           # Name reference to a marker chain as defined in the map
+---@class Area                                  # Name reference to a area as defined in the map
+---@class Marker                                # Name reference to a marker as defined in the map
+---@class UnitGroup                             # Name reference to a unit group as defined in the map
+
+-- types commonly used in repository
+
+---@class BuildCondition                        # { file, function, parameters }
+---@class FileFunctionRef                       # { file, function }
+
+---@class BuildGroup                            
+---@field Name UnitGroup 
+---@field Priority number
+
+-- types used by AddOpAI
+
+---@class MasterPlatoonFunction                 # { file, function }
+
+---@class PlatoonData
+---@field TransportReturn Marker                # Location for transports to return to
+---@field PatrolChains MarkerChain[]            # Selection of patrol chains to guide the constructed units
+---@field PatrolChain MarkerChain               # Patrol chain to guide the construced units
+---@field AttackChain MarkerChain               # Attack chain to guide the constructed units
+---@field LandingChain MarkerChain              # Landing chain to guide the transports carrying the constructed units
+---@field Area Area                             # An area, use depends on master platoon function
+---@field Location Marker                       # A location, use depends on master platoon function
+
+---@class AddOpAIData
+---@field MasterPlatoonFunction FileFunctionRef     # Behavior of instances upon completion
+---@field PlatoonData PlatoonData                   # Parameters of the master platoon function
+---@field Priority number                           # Priority over other builders
+
+-- types used by AddUnitAI
+
+---@class AddUnitAIData                         
+---@field Amount number                         # Number of engineers that can assist building
+---@field KeepAlive boolean                     # ??
+---@field BuildCondition BuildCondition[]       # Build conditions that must be met before building can start, can be empty
+---@field PlatoonAIFunction FileFunctionRef     # A { file, function } reference to the platoon AI function
+---@field MaxAssist number                      # Number of engineers that can assist construction
+---@field Retry boolean                         # Flag that allows the AI to retry
+---@field PlatoonData PlatoonData               # Parameters of the platoon AI function
+
+
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
@@ -73,14 +121,15 @@ local BuildingCounterDefaultValues = {
     },
 }
 
-BaseManager = Class {
-    -- TO DO LIST:
-    -- Expansion at mass positions (Probably a must, but may not fit here - perhaps an OpAI which is enable/disable through bool)
-    -- Maybe build T2 shields if no T3 engs are available for Seraphim/UEF
-    -- Artillery, Nukes, and TML control (At least toggling nukes and TML required, much want for control of where to attack)
-    -- Engineer counts when needing higher tech level engineers (possibly not needed since recovery is hard and not always wanted)
+---@class BaseManager
+---@field Trash TrashBag
+---@field AIBrain AIBrain
 
-    -- This function just sets up variables local to the new BaseManager Instance
+BaseManager = ClassSimple {
+
+    --- Introduces all the relevant fields to the base manager, internally called by the engine
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return nil
     Create = function(self)
         self.Trash = TrashBag()
 
@@ -181,10 +230,16 @@ BaseManager = Class {
         }
     end,
 
-    -- Level Table format
-    -- {
-    --     GroupName = Priority, -- Name not in quotes
-    -- }
+    --- Initialises the base manager. 
+    ---@see See the functions StartNonZeroBase, StartDifficultyBase, StartBase or StartEmptyBase to the initial state of the base
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param brain AIBrain             # An instance of the Brain class that we're managing a base for
+    ---@param baseName UnitGroup        # Name reference to a unit group as defined in the map that represnts the base, usually appended with _D1, _D2 or _D3 
+    ---@param markerName Marker         # Name reference to a marker as defined in the map that represents the center of the base
+    ---@param radius number             # Radius of the base - any structure that is within this distance to the center of the base is considered part of the base
+    ---@param levelTable any            # A table of { { UnitGroup, Priority } } that represents the priority of various sections of the base
+    ---@param diffultySeparate any      # Flag that indicates we have a base that expands based on difficulty
+    ---@return nil
     Initialize = function(self, brain, baseName, markerName, radius, levelTable, diffultySeparate)
         self.Active = true
         if self.Initialized then
@@ -234,23 +289,43 @@ BaseManager = Class {
         end
     end,
 
+    --- Checks whether this base manager has been initialised, note - throws an error.
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return nil
     InitializedCheck = function(self)
         if not self.Initialized then
-            error('*AI ERROR: BaseManager named "'..self.BaseName..'" is not inialized', 2)
+            error('*AI ERROR: BaseManager named "' .. self.BaseName .. '" is not inialized', 2)
         end
     end,
 
-    -- If base is inactive, all functionality at the base manager should stop
+    --- Enables or disables the base entirely, it may take a while before all base functionality is stopped
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param status boolean        # Flag that indicates whether the base should be active
+    ---@return nil
     BaseActive = function(self, status)
         self.Active = status
     end,
 
-    -- Allows LD to pass in tables with Difficulty tags at the end of table names ('_D1', '_D2', '_D3')
+    --- Initialises the base manager using the _D1, _D2 and _D3 difficulty tables.
+    ---@see See the functions StartNonZeroBase, StartDifficultyBase, StartBase or StartEmptyBase to the initial state of the base
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param brain AIBrain             # An instance of the Brain class that we're managing a base for
+    ---@param baseName UnitGroup        # Name reference to a unit group as defined in the map that represnts the base, usually appended with _D1, _D2 or _D3 
+    ---@param markerName Marker         # Name reference to a marker as defined in the map that represents the center of the base
+    ---@param radius number             # Radius of the base - any structure that is within this distance to the center of the base is considered part of the base
+    ---@param levelTable any            # A table of { { UnitGroup, Priority } } that represents the priority of various sections of the base
+    ---@return nil
     InitializeDifficultyTables = function(self, brain, baseName, markerName, radius, levelTable)
         self:Initialize(brain, baseName, markerName, radius, levelTable, true)
     end,
 
     -- Auto trashbags all threads on a base manager
+
+    --- Allocates a thread running the function where the base manager is prepended as the first argument. The thread is inserted in the trashbag of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param fn function           # A function to run on the forked thread
+    ---@param ... unknown           # Parameters of the function where the base manager is prepended as the first argument
+    ---@return thread               # An instance of the Thread class
     ForkThread = function(self, fn, ...)
         if fn then
             local thread = ForkThread(fn, self, unpack(arg))
@@ -261,8 +336,16 @@ BaseManager = Class {
         end
     end,
 
-    -- When the condition function evaluates to true, the unit with the specified name will be built.
-    -- if OnBuilt is specified, that function will be called when the unit is successfully built
+    --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals
+    ---@param self BaseManager                      # An instance of the BaseManager class
+    ---@param sUnitName UnitGroup                   # Name reference to a unit group as defined in the map
+    ---@param bRetry boolean                        # Whether or not we should retry after failing to build
+    ---@param nNumEngineers number                  # Number of engineers that can assist building
+    ---@param tPlatoonAIFunction FileFunctionRef    # A { file, function } reference to the platoon AI function
+    ---@param tPlatoonData PlatoonData              # Parameters of the platoon AI function
+    ---@param fCondition BuildCondition[]           # Build conditions that must be met before building can start, can be empty
+    ---@param bKeepAlive boolean                    # ??
+    ---@return nil
     ConditionalBuild = function(self, sUnitName, bRetry, nNumEngineers, tPlatoonAIFunction, tPlatoonData,  fCondition, bKeepAlive)
         if type(fCondition) ~= 'function' then error('Parameter fCondition must be a function.') return end
 
@@ -282,7 +365,22 @@ BaseManager = Class {
         })
     end,
 
-    -- Note: if "type" is a unit name, then this creates an AI to build the unit when the conditions are met.
+    --- Instructs the base to attempt to build a specific unit group as defined in the map. These are usually experimentals.
+    ---@see Functionally the same as ConditionalBuild
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param unit UnitGroup            # Name reference to a unit group as defined in the map
+    ---@param data AddUnitAIData        # Parameters that describe the build conditions, the platoon function and the data of the platoon function
+    ---@return boolean                  # True or false to indicate success
+    AddUnitAI = function(self, unit, data)
+        return self:AddOpAI(unit, data)
+    end,
+    
+    --- Attaches an OpAI instance to the base manager that uses the base to build platoons.
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param ptype SaveFile            # Save file that is used to find child quantities
+    ---@param name string               # A name set by you to allow you to retrieve the returned AI instance
+    ---@param data AddOpAIData          # Parameters that describe the build conditions, the platoon function and the data of the platoon function
+    ---@return OpAI | boolean           # An instance of the OpAI class or false
     AddOpAI = function(self, ptype, name, data)
         if not self.AIBrain then
             error('*AI ERROR: No AI Brain for base manager')
@@ -307,6 +405,10 @@ BaseManager = Class {
         return self.OpAITable[name]
     end,
 
+    --- Retrieves a previously made OpAI instance
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param name string       # A name previously set by you to attach an OpAI instance to the base manager
+    ---@return OpAI | boolean    # An instance of the OpAI class or false
     GetOpAI = function(self, name)
         if self.OpAITable[name] then
             return self.OpAITable[name]
@@ -315,7 +417,10 @@ BaseManager = Class {
         end
     end,
 
-    -- Make sure name of OpAI doesn't already exist
+    --- Checks whether the intended OpAI name is unique. Only useful when hooking / modding an existing mission
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param name string       # A name to check
+    ---@return boolean          # True of unique, otherwise false
     CheckOpAIName = function(self, name)
         if self.OpAITable[name] then
             error('*AI ERROR: Duplicate OpAI name: ' .. name .. ' - for base manager: ' .. self.BaseName)
@@ -349,7 +454,13 @@ BaseManager = Class {
         return self.OpAITable[name]
     end,
 
-    -- Add a group created in the editor to the base manager to be maintained by the manager
+    --- Adds a build group to the base manager that it needs to maintain
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param groupName UnitGroup   # Name reference to a unit group as defined in the map that represents the unit group to build 
+    ---@param priority number       # Priority that indicates how important this build group is in comparison to others
+    ---@param spawn boolean         # Flag that indicates whether the build group is immediately spawned
+    ---@param initial boolean       # ??
+    ---@return nil
     AddBuildGroup = function(self, groupName, priority, spawn, initial)
         -- Make sure the group exists
         if not self:FindGroup(groupName) then
@@ -374,16 +485,30 @@ BaseManager = Class {
         end
     end,
 
+    --- Adds a build group based based on difficult to the base manager that it needs to maintain
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param groupName UnitGroup   # Name reference to a unit group as defined in the map that represents the unit group to build, appends the _D1, _D2 or _D3 to indicate difficulty
+    ---@param priority number       # Priority that indicates how important this build group is in comparison to others
+    ---@param spawn boolean         # Flag that indicates whether the build group is immediately spawned
+    ---@param initial boolean       # ??
+    ---@return nil
     AddBuildGroupDifficulty = function(self, groupName, priority, spawn, initial)
         groupName = groupName .. '_D' .. ScenarioInfo.Options.Difficulty
         self:AddBuildGroup(groupName, priority, spawn, initial)
     end,
 
+    --- Removes a build group from the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param groupName UnitGroup   # Name reference to a unit group as defined in the map that represents the unit group to be removed
+    ---@return nil
     ClearGroupTemplate = function(self, groupName)
-        self.AIBrain.BaseTemplate[self.BaseName .. groupLevel] = {Template = {}, List = {}, UnitNames = {}, BuildCounter = {}}
+        self.AIBrain.BaseTemplate[self.BaseName .. groupName] = {Template = {}, List = {}, UnitNames = {}, BuildCounter = {}}
     end,
 
-    -- Find a build group in the class
+    --- Finds a build group from the base manager
+    ---@param self BaseManager          # An instance of the BaseManager class
+    ---@param groupName UnitGroup       # Name reference to a unit group as defined in the map that represents the unit group to be removed
+    ---@return BuildGroup | boolean     # The build group in linked to the unit group or false
     FindGroup = function(self, groupName)
         for num, data in self.LevelNames do
             if data.Name == groupName then
@@ -393,14 +518,24 @@ BaseManager = Class {
         return false
     end,
 
+    --- Retrieves the center of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return Vector               # A { x, y, z } array-based table
     GetPosition = function(self)
         return self.Position
     end,
 
+    --- Retrieves the radius of the base manager, which is used to search for factories and engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number
     GetRadius = function(self)
         return self.Radius
     end,
 
+    --- Defines the radius of the base manager, which is used to search for factories and engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param rad number            # New radius of the base manager
+    ---@return nil
     SetRadius = function(self, rad)
         self.Radius = rad
     end,
@@ -408,6 +543,7 @@ BaseManager = Class {
     ---------------------------------------------------------------------------
     -- Functions for tracking the number of engineers working in a base manager
     ---------------------------------------------------------------------------
+
     AddCurrentEngineer = function(self, num)
         if not num then
             num = 1
@@ -1622,6 +1758,7 @@ BaseManager = Class {
 }
 
 function CreateBaseManager(brain, baseName, markerName, radius, levelTable)
+   
     local bManager = BaseManager()
     bManager:Create()
     if brain and baseName and markerName and radius then
@@ -1630,3 +1767,5 @@ function CreateBaseManager(brain, baseName, markerName, radius, levelTable)
 
     return bManager
 end
+
+
