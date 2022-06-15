@@ -8,15 +8,10 @@
 
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Border = import('/lua/maui/border.lua').Border
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local Text = import('/lua/maui/text.lua').Text
-
-
-local unselectedCheckboxFile = UIUtil.UIFile('/widgets/rad_un.dds')
-local selectedCheckboxFile = UIUtil.UIFile('/widgets/rad_sel.dds')
 
 local statusCluster = import('/lua/ui/game/gamemain.lua').GetStatusCluster()
 local controlCluster = import('/lua/ui/game/gamemain.lua').GetControlCluster()
@@ -238,3 +233,7 @@ PathDebugger = Class(moho.PathDebugger_methods) {
         _c_CreatePathDebugger(self,spec)
     end,
 }
+
+
+-- kept for mod compatibility, as they may depend on these
+local Border = import('/lua/maui/border.lua').Border

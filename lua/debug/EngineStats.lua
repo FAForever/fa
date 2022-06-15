@@ -3,7 +3,7 @@
 --* Author: Bob Berry
 --* Summary: Displays Engine Statistics
 --*
---* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -35,7 +35,7 @@ function Toggle(section)
     LayoutHelpers.AnchorToLeft(dialog, statusCluster, -384)
     dialog:SetNeedsFrameUpdate(true)
 
-    statList = ItemList(dialog,"root stat list")
+    local statList = ItemList(dialog,"root stat list")
     LayoutHelpers.Below( statList, statusCluster, 1 )
     LayoutHelpers.Above( statList, controlCluster, 1 )
     LayoutHelpers.AtLeftIn(statList, statusCluster, 30)

@@ -14,7 +14,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
 -- default style set
-styles = {
+local styles = {
     backgrounds = {
         notitle = {
             tl = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ul.dds'),

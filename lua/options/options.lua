@@ -64,7 +64,7 @@ As an example:
 
 --]]
 
-optionsOrder = {
+local optionsOrder = {
     "gameplay",
     "ui",
     "video",
@@ -163,7 +163,7 @@ local function getMusicVolumeOption()
         
     end
 end
-options = {
+local options = {
     gameplay = {
         title = "<LOC _Gameplay>",
         key = 'gameplay',
@@ -1024,14 +1024,14 @@ options = {
                 type = 'toggle',
                 default = 4,
                 update = function(control,value)
-                    logic = import('/lua/options/optionsLogic.lua')
+                    local logic = import('/lua/options/optionsLogic.lua')
 
-                    aaoptions = GetAntiAliasingOptions()
+                    local aaoptions = GetAntiAliasingOptions()
 
-                    aamax = 0
-                    aamed = 0
+                    local aamax = 0
+                    local aamed = 0
                     if 0 < table.getn(aaoptions) then
-                        aahigh = aaoptions[table.getn(aaoptions)]
+                        local aahigh = aaoptions[table.getn(aaoptions)]
                         aamed = aaoptions[math.ceil(table.getn(aaoptions)/2)]
                     end
 

@@ -6,7 +6,7 @@ local lockZoomEnable = false
 function lockZoom()
     if lockZoomEnable then
         local options = Prefs.GetFromCurrentProfile('options')
-        value = options.wheel_sensitivity
+        local value = options.wheel_sensitivity
         ConExecute("cam_ZoomAmount " .. tostring(value / 100))
 
         lockZoomEnable = false
@@ -54,7 +54,7 @@ end
 
 -- Function to toggle things like shields etc
 -- Unit toggle rules copied from orders.lua, used for converting to the numbers needed for the togglescriptbit function
-unitToggleRules = {
+local unitToggleRules = {
     Shield =  0,
     Weapon = 1,
     Jamming = 2,

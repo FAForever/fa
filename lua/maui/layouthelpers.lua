@@ -702,32 +702,6 @@ function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
     return self
 end
 
--- center-in positioning
-
-function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
-    AtLeftIn(self.c, parent, offset)
-    AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightCenterIn(parent, offset, verticalOffset)
-    AtRightIn(self.c, parent, offset)
-    AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
-    AtTopIn(self.c, parent, offset)
-    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
-    AtBottomIn(self.c, parent, offset)
-    AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
 -- out-of positioning
 
 function LayouterMetaTable:Below(parent, offset)

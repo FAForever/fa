@@ -225,7 +225,7 @@ function WrapText(text, lineWidth, advanceFunction)
                 local letter = ""
                 for letterIndex = 1, STR_Utf8Len(word) do
                     letter = STR_Utf8SubString(word, letterIndex, 1)
-                    letterWidth = advanceFunction(letter)
+                    local letterWidth = advanceFunction(letter)
                     if wordWidth + letterWidth > lineWidth then
                         result[curLine] = STR_Utf8SubString(word, startIndex, letterIndex - startIndex)
                         curLine = curLine + 1

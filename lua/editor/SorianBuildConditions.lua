@@ -8,9 +8,6 @@
 --**
 --****************************************************************************
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local MABC = import('/lua/editor/MarkerBuildConditions.lua')
 local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
@@ -359,8 +356,8 @@ function PoolThreatGreaterThanEnemyBase(aiBrain, locationType, ucat, ttype, utty
     end
 
     if aiBrain:GetCurrentEnemy() then
-        enemy = aiBrain:GetCurrentEnemy()
-        enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+        local enemy = aiBrain:GetCurrentEnemy()
+        local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     else
         return false
     end
@@ -386,8 +383,8 @@ end
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function LessThanThreatAtEnemyBase(aiBrain, ttype, number)
     if aiBrain:GetCurrentEnemy() then
-        enemy = aiBrain:GetCurrentEnemy()
-        enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
+        local enemy = aiBrain:GetCurrentEnemy()
+        local enemyIndex = aiBrain:GetCurrentEnemy():GetArmyIndex()
     else
         return false
     end
@@ -444,7 +441,7 @@ function UnfinishedUnits(aiBrain, locationType, category)
     end
     local unfinished = aiBrain:GetUnitsAroundPoint(category, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in unfinished do
-        donePercent = unit:GetFractionComplete()
+        local donePercent = unit:GetFractionComplete()
         if donePercent < 1 and SUtils.GetGuards(aiBrain, unit) < 1 then
             return true
         end
@@ -467,7 +464,7 @@ function ShieldDamaged(aiBrain, locationType)
     local shields = aiBrain:GetUnitsAroundPoint(categories.STRUCTURE * categories.SHIELD, engineerManager:GetLocationCoords(), engineerManager.Radius, 'Ally')
     for num, unit in shields do
         if not unit.Dead and unit:ShieldIsOn() then
-            shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
+            local shieldPercent = (unit.MyShield:GetHealth() / unit.MyShield:GetMaxHealth())
             if shieldPercent < 1 and SUtils.GetGuards(aiBrain, unit) < 3 then
                 return true
             end
@@ -754,3 +751,8 @@ function AIOutnumbered(aiBrain, bool)
     end
     return false
 end
+
+-- kept for mod compatibility, as they may depend on these
+local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local Utils = import('/lua/utilities.lua')
