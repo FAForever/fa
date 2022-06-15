@@ -139,7 +139,7 @@ UnitBlueprint {
             '<LOC ability_aa>Anti-Air',
             '<LOC ability_transport>Transport',
         },
-        AnimationPermOpen = '/units/UAA0104/UAA0104_aopen01.sca',
+        AnimationPermOpen = '/units/UAA0104/UAA0104_aopen01Fix.sca',
         ForcedBuildSpin = 90,
         LayerChangeEffects = {
             AirLand = {
