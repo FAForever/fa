@@ -1689,6 +1689,7 @@ end
 
 function OperationCameraThread(location, heading, faction, track, unit, unlock, time)
     local cam = import('/lua/simcamera.lua').SimCamera('WorldCamera')
+    local marker
     LockInput()
     cam:UseGameClock()
     WaitTicks(1)
@@ -1701,7 +1702,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
             pitch = .3
         end
         local pos = unit:GetPosition()
-        local marker = {
+        marker = {
             orientation = VECTOR3(heading, .5, 0),
             position = {pos[1], pos[2] - 15, pos[3] },
             zoom = zoomVar,
@@ -1711,7 +1712,7 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
     else
         -- Only do the 2.5 second wait if a faction is given; that means its a commander
         if faction then
-            local marker = {
+            marker = {
                 orientation = VECTOR3(heading + 3.14149, .2, 0),
                 position = {location[1], location[2] + 1, location[3] },
                 zoom = FLOAT(15),
@@ -1720,25 +1721,25 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
             WaitSeconds(2.5)
         end
         if faction == 1 then -- UEF
-            local marker = {
+            marker = {
                 orientation = {heading + 3.14149, .38, 0 },
                 position = {location[1], location[2] + 7.5, location[3] },
                 zoom = 58,
             }
-        elseif faction == 2 then -- Aaeon
-            local marker = {
+        elseif faction == 2 then -- Aeon
+            marker = {
                 orientation = VECTOR3(heading + 3.14149, .45, 0),
                 position = {location[1], location[2], location[3] },
                 zoom = FLOAT(50),
             }
         elseif faction == 3 then -- Cybran
-            local marker = {
+            marker = {
                 orientation = VECTOR3(heading + 3.14149, .45, 0),
                 position = {location[1], location[2] + 5, location[3] },
                 zoom = FLOAT(45),
             }
         else
-            local marker = {
+            marker = {
                 orientation = VECTOR3(heading + 3.14149, .38, 0),
                 position = location,
                 zoom = 45,

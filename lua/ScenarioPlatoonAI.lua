@@ -1042,6 +1042,7 @@ end
 -- Utility Function
 -- Gets engineers using StartBaseEngineers to their location
 function StartBaseTransports(platoon, data, aiBrain)
+    local cmd
     -- Move the unit using transports
     if data.UseTransports then
         if data.TransportRoute then
@@ -1062,9 +1063,9 @@ function StartBaseTransports(platoon, data, aiBrain)
 
         -- Unload transports
         if type(data.LandingLocation) == 'string' then
-            local cmd = platoon:UnloadAllAtLocation(ScenarioUtils.MarkerToPosition(data.LandingLocation))
+            cmd = platoon:UnloadAllAtLocation(ScenarioUtils.MarkerToPosition(data.LandingLocation))
         else
-            local cmd = platoon:UnloadAllAtLocation(data.LandingLocation)
+            cmd = platoon:UnloadAllAtLocation(data.LandingLocation)
         end
         -- Wait for unload to end
         while platoon:IsCommandsActive(cmd) do
@@ -1086,7 +1087,7 @@ function StartBaseTransports(platoon, data, aiBrain)
                 return false
             end
         end
-        local cmd = platoon:UseFerryBeacon(categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon])
+        cmd = platoon:UseFerryBeacon(categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon])
         while platoon:IsCommandsActive(cmd) do
             WaitSeconds(3)
             if not aiBrain:PlatoonExists(platoon) then

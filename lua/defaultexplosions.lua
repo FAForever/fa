@@ -112,7 +112,7 @@ end
 -- @param unit The unit to get the diameter of.
 function GetAverageBoundingXZRadius(unit)
     local bp = unit:GetBlueprint()
-    return ((0 + bp.SizeZ or bp.SizeX or 0) * 0.5)
+    return (((bp.SizeX or 0) + (bp.SizeZ or 0)) * 0.5)
 end
 
 --- Retrieves bounding radius over x/z axis. Do not use in critical code, instead
@@ -130,7 +130,7 @@ end
 -- @param unit The unit to get the diameter of.
 function GetAverageBoundingXYZRadius(unit)
     local bp = unit:GetBlueprint()
-    return ((0 + bp.SizeY or bp.SizeX or 0 + bp.SizeZ or 0) * 0.333)
+    return ((bp.SizeX or 0) + (bp.SizeY or 0) + (bp.SizeZ or 0) * 0.333)
 end
 
 --- Retrieves bounding radius over all axis. Do not use in critical code, instead
