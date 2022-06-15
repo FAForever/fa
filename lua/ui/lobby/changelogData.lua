@@ -3,6 +3,9 @@ gamePatches = {
     {
         version = 3737,
         name = "Developers patch",
+        descriptionRU = {
+
+        },
         description = {
            " ### Features",
            "",
