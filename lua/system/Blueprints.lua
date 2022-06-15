@@ -59,7 +59,7 @@ local current_mod
 
 -- upvalue for performance
 pcall = pcall 
-doscript = doscript
+local doscript = doscript
 DiskFindFiles = DiskFindFiles
 
 doscript("/lua/system/blueprints-ai.lua")
@@ -80,7 +80,7 @@ local function LoadPreGameData()
 
     -- try and load the pre game data of prefs file
     local preGameData = false 
-    ok, msg = pcall(
+    local ok, msg = pcall(
         function() 
             local data = { }
             doscript(file, data)

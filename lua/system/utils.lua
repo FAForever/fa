@@ -591,7 +591,7 @@ end
 function StringComma(value)
     local str = value or 0
     while true do
-      str, k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
+      str,  k = string.gsub(str, "^(-?%d+)(%d%d%d)", '%1,%2')
       if k == 0 then
         break
       end

@@ -7,9 +7,7 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
-local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
 ---@class BuilderManager
 BuilderManager = ClassSimple {
@@ -304,7 +302,7 @@ BuilderManager = ClassSimple {
                         end
                         self.NumGet = 0
                         numTicks = numTicks + 1
-                        numTest = 0
+                        local numTest = 0
                     end
                     self:ManagerLoopBody(bData,bType)
                 end
@@ -315,3 +313,7 @@ BuilderManager = ClassSimple {
         end
     end,
 }
+
+-- kept for mod compatibility, as they may depend on these
+local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
+local AIUtils = import('/lua/ai/aiutilities.lua')

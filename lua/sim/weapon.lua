@@ -10,7 +10,6 @@
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
-local Set = import('/lua/system/setutils.lua')
 local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
 local cachedPriorities = false
 local RecycledPriTable = {}
@@ -613,3 +612,6 @@ Weapon = Class(moho.weapon_methods) {
         self:SetEnabled(enable)
     end,
 }
+
+-- kept for mod compatibility, as they may depend on these
+local Set = import('/lua/system/setutils.lua')

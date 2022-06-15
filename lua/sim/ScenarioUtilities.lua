@@ -6,7 +6,6 @@
 ----[             Created from examples provided by Jeff Petkau.                  ]--
 ----[                                                                             ]--
 ----[  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.             ]--
-local Entity = import('/lua/sim/Entity.lua').Entity
 
 function EnableLoadBalance(enabled, unitThreshold) --distributeTime)
     if not ScenarioInfo.LoadBalance then
@@ -441,7 +440,7 @@ function CreateResources()
 end
 
 function CreateWreckage(unit, needToRotate)
-    prop = unit:CreateWreckageProp(0)
+    local prop = unit:CreateWreckageProp(0)
     if needToRotate then -- Some units like naval and air need to rotate for effect like after death in game
         local roll = 0.5 + Random() - 2 * Random(0, 1) -- Random angle +-(0.5->1.5) radian
         local pitch = 0.5 + Random() - 2 * Random(0, 1)
@@ -1634,3 +1633,6 @@ function FilterFunctions(tableOne, tableTwo)
     end
     return tableOne
 end
+
+-- kept for mod compatibility, as they may depend on these
+local Entity = import('/lua/sim/Entity.lua').Entity

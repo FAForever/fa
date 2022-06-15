@@ -6,7 +6,6 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local explosion = import('/lua/defaultexplosions.lua')
 
@@ -23,12 +22,8 @@ local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Wreckage = import('/lua/wreckage.lua')
 local Set = import('/lua/system/setutils.lua')
-local Factions = import('/lua/factions.lua').GetFactions(true)
 
 local DeprecatedWarnings = { }
-
--- allows us to skip ai-specific functionality
-local GameHasAIs = ScenarioInfo.GameHasAIs
 
 -- cached categories for performance
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
@@ -1055,7 +1050,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Keep track of incoming damage, but only if it is from a unit
         if instigator and IsUnit(instigator) and instigator ~= self then
-            amountForVet = math.min(amount, preAdjHealth) -- Don't let massive alpha (OC, Percy etc) skew which unit gets vet
+            local amountForVet = math.min(amount, preAdjHealth) -- Don't let massive alpha (OC, Percy etc) skew which unit gets vet
             self.totalDamageTaken = self.totalDamageTaken + amountForVet
 
             -- We want to keep track of damage from things that cannot gain vet (deathweps etc)
@@ -4592,3 +4587,9 @@ DummyUnit = Class(moho.unit_methods) {
     CheckAssistFocus = function(self) end,
     UpdateAssistersConsumption = function (self) end,
 }
+
+-- kept for mod compatibility, as they may depend on these
+local Entity = import('/lua/sim/Entity.lua').Entity
+local Factions = import('/lua/factions.lua').GetFactions(true)
+    -- allows us to skip ai-specific functionality
+local GameHasAIs = ScenarioInfo.GameHasAIs

@@ -1,6 +1,5 @@
 local ScriptTask = import('/lua/sim/ScriptTask.lua').ScriptTask
 local TASKSTATUS = import('/lua/sim/ScriptTask.lua').TASKSTATUS
-local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT
 local GiveUnitsToPlayer = import('/lua/simutils.lua').GiveUnitsToPlayer
 local SpawnPing = import('/lua/SimPing.lua').SpawnPing
 
@@ -59,3 +58,6 @@ GiveTask = Class(ScriptTask) {
         return TASKSTATUS.Done
     end,
 }
+
+-- kept for mod compatibility, as they may depend on these
+local AIRESULT = import('/lua/sim/ScriptTask.lua').AIRESULT

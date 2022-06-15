@@ -7,8 +7,8 @@
 -- serialized by name.
 -- 
 
-__serialize_name_for_object = {}
-__serialize_object_for_name = {}
+local __serialize_name_for_object = {}
+local __serialize_object_for_name = {}
 
 
 local function export_name(name, thing)

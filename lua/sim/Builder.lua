@@ -7,8 +7,6 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
-local AIUtils = import('/lua/ai/aiutilities.lua')
-
 ---- Root builder class
 -- Builder Sped
 -- {
@@ -387,3 +385,5 @@ function CreateEngineerBuilder(brain, data, locationType)
     return false
 end
 
+-- kept for mod compatibility, as they may depend on these
+local AIUtils = import('/lua/ai/aiutilities.lua')

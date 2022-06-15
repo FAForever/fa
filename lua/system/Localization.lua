@@ -59,7 +59,7 @@ local function loadLanguage(la)
     -- reload strings file...
     loc_table = {}
     doscript(dbFilename(la), loc_table)
-    __language = la
+    local __language = la
 
     if (la ~= 'us') and (usdb ~= {}) then
         table.assimilate(loc_table, usdb)
@@ -180,7 +180,7 @@ end
 
 -- Call LOC() on all elements of a table
 function LOC_ALL(t)
-    r = {}
+    local r = {}
     for k,v in t do
         r[k] = LOC(v)
     end
