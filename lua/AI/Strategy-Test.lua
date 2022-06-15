@@ -29,16 +29,14 @@ Strategy =
                 { EBC, 'GreaterThanEconTrend', { -1, -2}},
         },
         FailureThreshold = 50,
-        
+
         BuilderData = {},
-        
+
         ExecuteFunction = function()
             return true
         end,
-        
+
         EvaluateFunction = function()
             return Priority
         end,
-        
-        
 }

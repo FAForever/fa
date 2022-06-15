@@ -115,7 +115,7 @@ function AIGetSortedScoutingLocations(aiBrain, maxNum)
     local retMarkers = {}
     local numMarkers = table.getn(markers)
     for i = 1, numMarkers do
-        rand = Random(1, numMarkers + 1 - i)
+        local rand = Random(1, numMarkers + 1 - i)
         table.insert(retMarkers, markers[rand])
         table.remove(markers, rand)
     end
@@ -749,7 +749,7 @@ function AIFindDefensiveArea(aiBrain, unit, category, range)
                 end
 
                 local units = aiBrain:GetUnitsAroundPoint(categories.MOBILE, checkPos, gridSize, 'Enemy')
-                for k, v in units do
+                for v in units do
                     if EntityCategoryContains(categories.TECH3, v) then
                         tempNum = tempNum - 10
                     elseif EntityCategoryContains(categories.TECH2, v) then
@@ -1094,7 +1094,7 @@ function GetNearestPathingPoint(position)
     end
     local x = math.floor(position[1] / 8)
     local z = math.floor(position[3] / 8)
-    retPos = {(x * 8) , 0,  (z * 8)}
+    local retPos = {(x * 8) , 0,  (z * 8)}
     if retPos[1] == 0 then
         retPos[1] = 1
     elseif retPos[1] == ScenarioInfo.size[1] then
@@ -2208,7 +2208,7 @@ function AIFindPingTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPri
                 local platoonUnits = platoon:GetPlatoonUnits()
                 for _, w in platoonUnits do
                     if not w.Dead then
-                        unit = w
+                        local unit = w
                         break
                     end
                 end
@@ -2252,7 +2252,7 @@ function AIFindAirAttackTargetInRangeSorian(aiBrain, platoon, squad, atkPri, pos
             local platoonUnits = platoon:GetPlatoonUnits()
             for _, v in platoonUnits do
                 if not v.Dead then
-                    unit = v
+                    local unit = v
                     break
                 end
             end
@@ -2359,7 +2359,7 @@ function AIFindBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRange, atkPr
             local platoonUnits = platoon:GetPlatoonUnits()
             for _, w in platoonUnits do
                 if not w.Dead then
-                    unit = w
+                    local unit = w
                     break
                 end
             end
@@ -2405,7 +2405,7 @@ function AIFindUndefendedBrainTargetInRangeSorian(aiBrain, platoon, squad, maxRa
             local platoonUnits = platoon:GetPlatoonUnits()
             for _, w in platoonUnits do
                 if not w.Dead then
-                    unit = w
+                    local unit = w
                     break
                 end
             end

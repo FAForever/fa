@@ -7,12 +7,8 @@
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Utilities = import('/lua/utilities.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
 local UCBC = import('/lua/editor/UnitCountBuildConditions.lua')
 local SBC = import('/lua/editor/SorianBuildConditions.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
@@ -1127,7 +1123,7 @@ TempestBehavior = function(self)
             self:Stop()
             self.Patrolling = true
             scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
-            for k, v in scoutPath do
+            for v in scoutPath do
                 self:Patrol(v)
             end
         end
@@ -2895,3 +2891,9 @@ function GetClosestShieldProtectingTargetSorian(attackingUnit, targetUnit)
 
     return closest
 end
+
+-- kept for mod compatibility, as they may depend on these
+local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
+local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
+local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
+local TriggerFile = import('/lua/scenariotriggers.lua')

@@ -8,19 +8,12 @@
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 local BaseTmplFile = import('/lua/basetemplates.lua')
-local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local Utils = import('/lua/utilities.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local StructureUpgradeTemplates = import('/lua/upgradeTemplates.lua').StructureUpgradeTemplates
-local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
 local RebuildStructuresTemplate = import('/lua/BuildingTemplates.lua').RebuildStructuresTemplate
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
 local aiEconomy
-local allowedEnergyStorageRatio = 0.7
-local allowedMassStorageRatio = 0.6
-
 local TriggerFile = import('/lua/scenariotriggers.lua')
 
 function AISetEconomyNumbers(aiBrain)
@@ -279,7 +272,7 @@ function DoHackyLogic(buildingType, builder)
                 if not unitInstance then
                     unitInstance = builder.UnitBeingBuilt
                 end
-                aiBrain = builder:GetAIBrain()
+                local aiBrain = builder:GetAIBrain()
                 if unitInstance then
                     TriggerFile.CreateUnitStopBeingBuiltTrigger(function(unitBeingBuilt)
                         local newPlatoon = aiBrain:MakePlatoon('', '')
@@ -318,7 +311,6 @@ function AIBuildBaseTemplateOrdered(aiBrain, builder, buildingType , closeToBuil
             end -- for loop
         end -- end else
     end -- if what to build
-    return -- unsuccessful build
 end
 
 function AIBuildBaseTemplateFromLocation(baseTemplate, location)
@@ -576,7 +568,6 @@ function WallBuilder(aiBrain, builder, buildingType , closeToBuilder, relative, 
         end
         i = i + 1
     end
-    return
 end
 
 function GetBuildingDirection(main, loc)
@@ -771,3 +762,11 @@ function AIMaintainBuildList(aiBrain, builder, buildingTemplate, brainBaseTempla
     end
     return false
 end
+
+-- kept for mod compatibility, as they may depend on these
+local BaseTemplates = import('/lua/basetemplates.lua').BaseTemplates
+local StructureUpgradeTemplates = import('/lua/upgradeTemplates.lua').StructureUpgradeTemplates
+local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
+local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
+local allowedEnergyStorageRatio = 0.7
+local allowedMassStorageRatio = 0.6
