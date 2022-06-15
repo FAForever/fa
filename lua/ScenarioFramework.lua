@@ -7,7 +7,6 @@
 
 local TriggerFile = import('scenariotriggers.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates
 local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 local SimCamera = import('/lua/SimCamera.lua').SimCamera
@@ -1721,25 +1720,25 @@ function OperationCameraThread(location, heading, faction, track, unit, unlock, 
             WaitSeconds(2.5)
         end
         if faction == 1 then -- UEF
-            marker = {
+            local marker = {
                 orientation = {heading + 3.14149, .38, 0 },
                 position = {location[1], location[2] + 7.5, location[3] },
                 zoom = 58,
             }
         elseif faction == 2 then -- Aaeon
-            marker = {
+            local marker = {
                 orientation = VECTOR3(heading + 3.14149, .45, 0),
                 position = {location[1], location[2], location[3] },
                 zoom = FLOAT(50),
             }
         elseif faction == 3 then -- Cybran
-            marker = {
+            local marker = {
                 orientation = VECTOR3(heading + 3.14149, .45, 0),
                 position = {location[1], location[2] + 5, location[3] },
                 zoom = FLOAT(45),
             }
         else
-            marker = {
+            local marker = {
                 orientation = VECTOR3(heading + 3.14149, .38, 0),
                 position = location,
                 zoom = 45,
@@ -2215,3 +2214,6 @@ function KillIAmOffMapThread(self)
     self.TimeIHaveBeenOffMap = 0
     self.TimeIHaveBeenOnMap = 0
 end
+
+-- kept for mod compatibility, as they may depend on these
+local UnitUpgradeTemplates = import('/lua/upgradeTemplates.lua').UnitUpgradeTemplates

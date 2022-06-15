@@ -9,7 +9,6 @@
 local AIDefaultPlansList = import('/lua/aibrainplans.lua').AIPlansList
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
-local PCBC = import('/lua/editor/platooncountbuildconditions.lua')
 local Utilities = import('/lua/utilities.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Behaviors = import('/lua/ai/aibehaviors.lua')
@@ -20,7 +19,6 @@ local PlatoonFormManager = import('/lua/sim/PlatoonFormManager.lua')
 local BrainConditionsMonitor = import('/lua/sim/BrainConditionsMonitor.lua')
 local EngineerManager = import('/lua/sim/EngineerManager.lua')
 
-local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local StratManager = import('/lua/sim/StrategyManager.lua')
 
@@ -4480,3 +4478,7 @@ AIBrain = Class(moho.aibrain_methods) {
         return BrainGetListOfUnits(self, cats - CategoriesDummyUnit, needToBeIdle, requireBuilt)
     end,
 }
+
+-- kept for mod compatibility, as they may depend on these
+local PCBC = import('/lua/editor/platooncountbuildconditions.lua')
+local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')

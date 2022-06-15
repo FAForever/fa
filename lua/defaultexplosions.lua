@@ -14,18 +14,13 @@ local util = import('utilities.lua')
 local GetRandomFloat = util.GetRandomFloat
 local GetRandomInt = util.GetRandomInt
 local GetRandomOffset = util.GetRandomOffset
-local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
 local EfctUtil = import('EffectUtilities.lua')
 local ApplyWindDirection = EfctUtil.ApplyWindDirection
 local CreateEffects = EfctUtil.CreateEffects
-local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
-local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
 local CreateBoneEffects = EfctUtil.CreateBoneEffects
 local CreateBoneEffectsOffset = EfctUtil.CreateBoneEffectsOffset
-local CreateRandomEffects = EfctUtil.CreateRandomEffects
-local ScaleEmittersParam = EfctUtil.ScaleEmittersParam
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ExplosionSmall = EffectTemplate.ExplosionSmall
@@ -117,7 +112,7 @@ end
 -- @param unit The unit to get the diameter of.
 function GetAverageBoundingXZRadius(unit)
     local bp = unit:GetBlueprint()
-    return ((bp.SizeX or 0 + bp.SizeZ or 0) * 0.5)
+    return ((0 + bp.SizeZ or bp.SizeX or 0) * 0.5)
 end
 
 --- Retrieves bounding radius over x/z axis. Do not use in critical code, instead
@@ -135,7 +130,7 @@ end
 -- @param unit The unit to get the diameter of.
 function GetAverageBoundingXYZRadius(unit)
     local bp = unit:GetBlueprint()
-    return ((bp.SizeX or 0 + bp.SizeY or 0 + bp.SizeZ or 0) * 0.333)
+    return ((0 + bp.SizeY or bp.SizeX or 0 + bp.SizeZ or 0) * 0.333)
 end
 
 --- Retrieves bounding radius over all axis. Do not use in critical code, instead
@@ -759,7 +754,7 @@ end
 -- *****************
 function CreateExplosionMesh(object, projBP, posX, posY, posZ, scale, scaleVelocity, Lifetime, velX, velY, VelZ, orientRot, orientX, orientY, orientZ)
 
-    proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
+    local proj = object:CreateProjectile(projBP, posX, posY, posZ, nil, nil, nil)
     proj:SetScale(scale,scale,scale):SetScaleVelocity(scaleVelocity):SetLifetime(Lifetime):SetVelocity(velX, velY, VelZ)
 
     local orient = {0, 0, 0, 0}
@@ -813,3 +808,10 @@ function OldCreateWreckageEffects(object)
         CreateEmitterAtEntity(object, object.Army, v):SetEmitterParam('LIFETIME', GetRandomFloat(100, 1000))
     end
 end
+
+-- kept for mod compatibility, as they may depend on these
+local GetRandomOffset2 = util.GetRandomOffset2
+local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
+local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
+local CreateRandomEffects = EfctUtil.CreateRandomEffects
+local ScaleEmittersParam = EfctUtil.ScaleEmittersParam

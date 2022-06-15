@@ -5,7 +5,6 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------
 
-local Utilities = import('/lua/utilities.lua')
 local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
@@ -373,7 +372,7 @@ function LandAssaultWithTransports(platoon)
     else
         landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
     end
-    cmd = platoon:UnloadAllAtLocation(landingLocation)
+    local cmd = platoon:UnloadAllAtLocation(landingLocation)
     local attached = true
     while attached do
         attached = false
@@ -761,7 +760,7 @@ function EngineersBuildPlatoon(platoon)
 end
 
 function GetHumanEnemies(armyIndex)
-    humans = {}
+    local humans = {}
 
     for i, brain in ArmyBrains do
         if brain.BrainType == 'Human' and IsEnemy(armyIndex, brain:GetArmyIndex()) then
@@ -1063,9 +1062,9 @@ function StartBaseTransports(platoon, data, aiBrain)
 
         -- Unload transports
         if type(data.LandingLocation) == 'string' then
-            cmd = platoon:UnloadAllAtLocation(ScenarioUtils.MarkerToPosition(data.LandingLocation))
+            local cmd = platoon:UnloadAllAtLocation(ScenarioUtils.MarkerToPosition(data.LandingLocation))
         else
-            cmd = platoon:UnloadAllAtLocation(data.LandingLocation)
+            local cmd = platoon:UnloadAllAtLocation(data.LandingLocation)
         end
         -- Wait for unload to end
         while platoon:IsCommandsActive(cmd) do
@@ -1087,7 +1086,7 @@ function StartBaseTransports(platoon, data, aiBrain)
                 return false
             end
         end
-        cmd = platoon:UseFerryBeacon(categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon])
+        local cmd = platoon:UseFerryBeacon(categories.ALLUNITS, ScenarioInfo.VarTable[data.MoveBeacon])
         while platoon:IsCommandsActive(cmd) do
             WaitSeconds(3)
             if not aiBrain:PlatoonExists(platoon) then
@@ -2414,3 +2413,6 @@ function MoveAlongRoute(platoon, route)
     end
     return true
 end
+
+-- kept for mod compatibility, as they may depend on these
+local Utilities = import('/lua/utilities.lua')

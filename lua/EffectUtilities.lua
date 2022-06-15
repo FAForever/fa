@@ -609,7 +609,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
             nodeList[i].mesh = true
             if emitterNodeEffects[i] ~= nil and not table.empty(emitterNodeEffects[i]) then
                 for _, vEmit in emitterNodeEffects[i] do
-                    emit = CreateAttachedEmitter(nodeList[i].entity, 0, unit.Army, vEmit)
+                    local emit = CreateAttachedEmitter(nodeList[i].entity, 0, unit.Army, vEmit)
                     info.Trash:Add(emit)
                     unit.Trash:Add(emit)
                 end

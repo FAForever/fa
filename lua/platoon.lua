@@ -15,7 +15,6 @@ local Utilities = import('/lua/utilities.lua')
 local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
 local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
 local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
-local Behaviors = import('/lua/ai/aibehaviors.lua')
 local AIAttackUtils = import('/lua/AI/aiattackutilities.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local SPAI = import('/lua/ScenarioPlatoonAI.lua')
@@ -1211,7 +1210,7 @@ Platoon = Class(moho.platoon_methods) {
 
                 highPri = true
 
-                targetData = aiBrain.InterestList.HighPriority[1]
+                local targetData = aiBrain.InterestList.HighPriority[1]
                 targetData.LastScouted = GetGameTimeSeconds()
                 targetArea = targetData.Position
 
@@ -1222,7 +1221,7 @@ Platoon = Class(moho.platoon_methods) {
                 aiBrain.IntelData.AirHiPriScouts = 0
                 aiBrain.IntelData.AirLowPriScouts = aiBrain.IntelData.AirLowPriScouts + 1
 
-                targetData = aiBrain.InterestList.LowPriority[1]
+                local targetData = aiBrain.InterestList.LowPriority[1]
                 targetData.LastScouted = GetGameTimeSeconds()
                 targetArea = targetData.Position
 
@@ -1404,7 +1403,7 @@ Platoon = Class(moho.platoon_methods) {
                             --LOG('*AI DEBUG: ARMY '.. aiBrain:GetArmyIndex() ..': --- POOL DISTRESS RESPONSE ---')
                             local group = {}
                             for k,v in platoonUnits do
-                                vPos = table.copy(v:GetPosition())
+                                local vPos = table.copy(v:GetPosition())
                                 if VDist2(vPos[1], vPos[3], locData.Location[1], locData.Location[3]) < locData.Radius then
                                     table.insert(group, v)
                                 end
@@ -3671,7 +3670,7 @@ Platoon = Class(moho.platoon_methods) {
            target = AIUtils.AIFindBrainTargetInRange(aiBrain, self, 'Attack', 1500, {'STRUCTURE FACTORY'},  aiBrain:GetCurrentEnemy())
            if target then
                local markerList = AIUtils.AIGetMarkerLocations(aiBrain, 'Mass')
-               markers = AIUtils.AISortMarkersFromLastPos(aiBrain,markerList,7,false,false,false,false,target)
+               local markers = AIUtils.AISortMarkersFromLastPos(aiBrain,markerList,7,false,false,false,false,target)
                targetLocation = markers[5]
 
                LOG('*AI DEBUG:  Waiting for transports....')
@@ -3887,7 +3886,7 @@ Platoon = Class(moho.platoon_methods) {
             local threatThreshold = self.PlatoonData.ThreatSupport or self.BaseMonitor.AlertLevel or 1
             local platoonPos = self:GetPlatoonPosition()
             local transporting = false
-            units = self:GetPlatoonUnits()
+            local units = self:GetPlatoonUnits()
             for k, v in units do
                 if not v.Dead and v:IsUnitState('Attached') then
                     transporting = true
@@ -3946,7 +3945,7 @@ Platoon = Class(moho.platoon_methods) {
                                 poscounter = 0
                             end
                             threatatPos = aiBrain:GetThreatAtPosition(moveLocation, 0, true, 'AntiSurface')
-                            artyThreatatPos = aiBrain:GetThreatAtPosition(moveLocation, 0, true, 'Artillery')
+                            local artyThreatatPos = aiBrain:GetThreatAtPosition(moveLocation, 0, true, 'Artillery')
                             myThreatatPos = aiBrain:GetThreatAtPosition(moveLocation, 0, true, 'Overall', aiBrain:GetArmyIndex())
                         until not self:IsCommandsActive(cmd) or breakResponse or ((threatatPos + artyThreatatPos) - myThreatatPos) <= threatThreshold or (inWater != AIAttackUtils.InWaterCheck(self))
 
@@ -4108,7 +4107,7 @@ Platoon = Class(moho.platoon_methods) {
         unit:SetTargetPriorities(atkPriTable)
 
         while aiBrain:PlatoonExists(self) do
-            target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
+            local target = AIUtils.AIFindBrainTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
             local newtarget = false
             if aiBrain.AttackPoints and not table.empty(aiBrain.AttackPoints) then
                 newtarget = AIUtils.AIFindPingTargetInRangeSorian(aiBrain, self, 'Artillery', maxRadius, atkPri, true)
@@ -4224,7 +4223,7 @@ Platoon = Class(moho.platoon_methods) {
                 if EntityCategoryContains(categories.STRUCTURE, target) then
                     IssueTactical({unit}, target)
                 else
-                    targPos = SUtils.LeadTarget(self, target)
+                    local targPos = SUtils.LeadTarget(self, target)
                     if targPos then
                         IssueTactical({unit}, targPos)
                     end
@@ -4701,7 +4700,7 @@ Platoon = Class(moho.platoon_methods) {
             end
             if target and newtarget and not target.Dead and target:GetFractionComplete() == 1
             and SUtils.XZDistanceTwoVectorsSq(target:GetPosition(), basePosition) < T4Radius * T4Radius then
-                blip = target:GetBlip(armyIndex)
+                local blip = target:GetBlip(armyIndex)
                 self:Stop()
                 self:AttackTarget(target)
                 patrolling = false
@@ -5216,7 +5215,7 @@ Platoon = Class(moho.platoon_methods) {
 
                 highPri = true
 
-                targetData = aiBrain.InterestList.HighPriority[1]
+                local targetData = aiBrain.InterestList.HighPriority[1]
                 targetData.LastScouted = GetGameTimeSeconds()
                 targetArea = targetData.Position
 
@@ -5227,7 +5226,7 @@ Platoon = Class(moho.platoon_methods) {
                 aiBrain.IntelData.AirHiPriScouts = 0
                 aiBrain.IntelData.AirLowPriScouts = aiBrain.IntelData.AirLowPriScouts + 1
 
-                targetData = aiBrain.InterestList.LowPriority[1]
+                local targetData = aiBrain.InterestList.LowPriority[1]
                 targetData.LastScouted = GetGameTimeSeconds()
                 targetArea = targetData.Position
 
@@ -6825,3 +6824,6 @@ Platoon = Class(moho.platoon_methods) {
     end,
 
 }
+
+-- kept for mod compatibility, as they may depend on these
+local Behaviors = import('/lua/ai/aibehaviors.lua')

@@ -9,14 +9,10 @@ local Unit = import('/lua/sim/Unit.lua').Unit
 local explosion = import('defaultexplosions.lua')
 local EffectUtil = import('EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 local AdjacencyBuffs = import('/lua/sim/AdjacencyBuffs.lua')
 local FireState = import('/lua/game.lua').FireState
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
-
--- allows us to skip ai-specific functionality
-local GameHasAIs = ScenarioInfo.GameHasAIs
 
 -- compute once and store as upvalue for performance
 local StructureUnitRotateTowardsEnemiesLand = categories.STRUCTURE + categories.LAND + categories.NAVAL
@@ -2276,7 +2272,7 @@ CommandUnit = Class(WalkingLandUnit) {
         end
 
         if teleDelay then
-            energyCostMod = (time + teleDelay) / time
+            local energyCostMod = (time + teleDelay) / time
             time = time + teleDelay
             energyCost = energyCost * energyCostMod
 
@@ -2505,3 +2501,8 @@ ShieldLandUnit = Class(LandUnit) {}
 -- SHIELD SEA UNITS
 ---@class ShieldSeaUnit : SeaUnit
 ShieldSeaUnit = Class(SeaUnit) {}
+
+-- kept for mod compatibility, as they may depend on these
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+--- allows us to skip ai-specific functionality
+local GameHasAIs = ScenarioInfo.GameHasAIs

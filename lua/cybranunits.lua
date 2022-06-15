@@ -23,10 +23,8 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local CommandUnit = DefaultUnitsFile.CommandUnit
 
-local Util = import('utilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('EffectUtilities.lua')
-local CreateCybranBuildBeams = false
 
 -- upvalued effect utility functions for performance
 local SpawnBuildBotsOpti = EffectUtil.SpawnBuildBotsOpti
@@ -122,7 +120,7 @@ CConstructionTemplate = Class() {
     --- When pausing, send the bots back after a bit.
     OnPaused = function(self, delay)
         -- delay until they move back
-        delay = delay or 0.5 + 2 * Random()
+        delay = 0.5 + 2 * Random() or delay
 
         -- make sure thread is not running already
         if self.ReturnBotsThreadInstance then 
@@ -873,3 +871,7 @@ CCommandUnit = Class(CommandUnit, CConstructionTemplate) {
         end
     end,
 }
+
+-- kept for mod compatibility, as they may depend on these
+local Util = import('utilities.lua')
+local CreateCybranBuildBeams = false
