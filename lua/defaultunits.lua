@@ -407,14 +407,6 @@ StructureUnit = Class(Unit) {
         Unit.StopBeingBuiltEffects(self, builder, layer)
     end,
 
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        Unit.StartBuildingEffects(self, unitBeingBuilt, order)
-    end,
-
-    StopBuildingEffects = function(self, unitBeingBuilt)
-        Unit.StopBuildingEffects(self, unitBeingBuilt)
-    end,
-
     StartUpgradeEffects = function(self, unitBeingBuilt)
         unitBeingBuilt:HideBone(0, true)
     end,
