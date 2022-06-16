@@ -1444,18 +1444,6 @@ MobileUnit = Class(Unit) {
         end
     end,
 
-    StopBeingBuiltEffects = function(self, builder, layer)
-        Unit.StopBeingBuiltEffects(self, builder, layer)
-    end,
-
-    StartBuildingEffects = function(self, unitBeingBuilt, order)
-        Unit.StartBuildingEffects(self, unitBeingBuilt, order)
-    end,
-
-    StopBuildingEffects = function(self, unitBeingBuilt)
-        Unit.StopBuildingEffects(self, unitBeingBuilt)
-    end,
-
     CreateReclaimEffects = function(self, target)
         EffectUtil.PlayReclaimEffects(self, target, self.BuildEffectBones or {0, }, self.ReclaimEffectsBag)
     end,
