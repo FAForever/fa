@@ -194,13 +194,13 @@ UnitBlueprint {
         RollOffPoints = {
             {
                 UnitSpin = 180,
-                X = -1,
+                X = -2.5,
                 Y = 0,
                 Z = -10,
             },
             {
                 UnitSpin = 0,
-                X = -1,
+                X = -2.5,
                 Y = 0,
                 Z = 10,
             },
