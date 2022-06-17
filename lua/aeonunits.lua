@@ -71,19 +71,7 @@ AFactoryUnit = Class(FactoryUnit) {
 ---------------------------------------------------------------
 --  AIR STRUCTURES
 ---------------------------------------------------------------
-AAirFactoryUnit = Class(AirFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    OnPaused = function(self)
-        AFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AFactoryUnit.OnUnpaused(self)
-    end,
-}
+AAirFactoryUnit = Class(AirFactoryUnit, AFactoryUnit) {}
 
 ---------------------------------------------------------------
 --  AIR UNITS
@@ -147,19 +135,7 @@ AHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 ---------------------------------------------------------------
 --  LAND FACTORY STRUCTURES
 ---------------------------------------------------------------
-ALandFactoryUnit = Class(LandFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        AFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    OnPaused = function(self)
-        AFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AFactoryUnit.OnUnpaused(self)
-    end,
-}
+ALandFactoryUnit = Class(LandFactoryUnit, AFactoryUnit) {}
 
 ---------------------------------------------------------------
 --  LAND UNITS
@@ -194,18 +170,10 @@ ASonarUnit = Class(SonarUnit) {}
 ---------------------------------------------------------------
 --  SEA FACTORY STRUCTURES
 ---------------------------------------------------------------
-ASeaFactoryUnit = Class(SeaFactoryUnit) {
+ASeaFactoryUnit = Class(SeaFactoryUnit, AFactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local thread = self:ForkThread(CreateAeonFactoryBuildingEffects, unitBeingBuilt, self.BuildEffectBones, 'Attachpoint01', self.BuildEffectsBag)
         unitBeingBuilt.Trash:Add(thread)
-    end,
-
-    OnPaused = function(self)
-        AFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        AFactoryUnit.OnUnpaused(self)
     end,
 }
 

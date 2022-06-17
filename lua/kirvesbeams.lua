@@ -38,10 +38,6 @@ UnstablePhasonLaserCollisionBeam = Class(SCCollisionBeam) {
     SplatTexture = 'czar_mark01_albedo',
     ScorchSplatDropTime = 0.25,
 
-    OnImpact = function(self, impactType, targetEntity)
-        CollisionBeam.OnImpact(self, impactType, targetEntity)
-    end,
-
     OnDisable = function(self)
         CollisionBeam.OnDisable(self)
         KillThread(self.Scorching)
