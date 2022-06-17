@@ -416,10 +416,6 @@ CAMZapperWeapon03 = Class(DefaultBeamWeapon) {
     end,
 
     IdleState = State (DefaultBeamWeapon.IdleState) {
-        Main = function(self)
-            DefaultBeamWeapon.IdleState.Main(self)
-        end,
-
         OnGotTarget = function(self)
             DefaultBeamWeapon.IdleState.OnGotTarget(self)
             self.SphereEffectEntity:SetMesh(self.SphereEffectActiveMesh)
