@@ -2,8 +2,8 @@
 ---@class moho.entity_methods
 local Entity = {}
 
----@alias Army number
----@alias EntityId string
+---@class Army: number
+---@class EntityId: string
 
 ---
 --  Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
