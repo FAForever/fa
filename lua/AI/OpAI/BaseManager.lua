@@ -544,6 +544,9 @@ BaseManager = ClassSimple {
     -- Functions for tracking the number of engineers working in a base manager
     ---------------------------------------------------------------------------
 
+    --- Add to the engineer count, useful when gifting the base engineers.
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param num number        # Amount to add to the engineer count.
     AddCurrentEngineer = function(self, num)
         if not num then
             num = 1
@@ -551,6 +554,9 @@ BaseManager = ClassSimple {
         self.CurrentEngineerCount = self.CurrentEngineerCount + num
     end,
 
+    --- Subtract from the engineer count
+    ---@param self BaseManager  # An instance of the BaseManager class
+    ---@param num number        # Amount to subtract from the engineer count.
     SubtractCurrentEngineer = function(self, num)
         if not num then
             num = 1
@@ -558,18 +564,30 @@ BaseManager = ClassSimple {
         self.CurrentEngineerCount = self.CurrentEngineerCount - 1
     end,
 
+    --- Retrieve the engineer count
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number               # Number of active engineers
     GetCurrentEngineerCount = function(self)
         return self.CurrentEngineerCount
     end,
 
+    --- Retrieve the maximum number of engineers, the base manager won't build more engineers than this
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number               # Maximum number of engineers for this base manager
     GetMaximumEngineers = function(self)
         return self.EngineerQuantity
     end,
 
+    --- Add an engineer to the engineer pool of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param unit Unit             # Engineer to add
     AddConstructionEngineer = function(self, unit)
         table.insert(self.ConstructionEngineers, unit)
     end,
 
+    --- Remove an engineer from the engineer pool of the base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param unit Unit             # Engineer to remove
     RemoveConstructionEngineer = function(self, unit)
         for k, v in self.ConstructionEngineers do
             if v.EntityId == unit.EntityId then
@@ -579,26 +597,44 @@ BaseManager = ClassSimple {
         end
     end,
 
+    --- Defines the maximum number of construction engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num number            # New maximum number of construction engineers
     SetMaximumConstructionEngineers = function(self, num)
         self.MaximumConstructionEngineers = num
     end,
 
+    --- Retrieves the maximum number of construction engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number               # Maximum number of construction engineers
     GetConstructionEngineerMaximum = function(self)
         return self.MaximumConstructionEngineers
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return integer
     GetConstructionEngineerCount = function(self)
         return table.getn(self.ConstructionEngineers)
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param bool any
     SetConstructionAlwaysAssist = function(self, bool)
         self.ConstructionAssistBool = bool
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return unknown
     ConstructionAlwaysAssist = function(self)
         return self.ConstructionAssistBool
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return boolean
     ConstructionNeedsAssister = function(self)
         if not self:ConstructionAlwaysAssist() or self:GetConstructionEngineerCount() == 0 then
             return false
@@ -606,6 +642,10 @@ BaseManager = ClassSimple {
         return true
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param unit any
+    ---@return boolean
     IsConstructionUnit = function(self, unit)
         if not unit or unit.Dead then
             return false
@@ -620,6 +660,9 @@ BaseManager = ClassSimple {
         return false
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num any
     SetPermanentAssistCount = function(self, num)
         if num > self.EngineerQuantity then
             error('*Base Manager Error: More permanent assisters than total engineers')
@@ -627,28 +670,46 @@ BaseManager = ClassSimple {
         self.PermanentAssistCount = num
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return unknown
     GetPermanentAssistCount = function(self)
         return self.PermanentAssistCount
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num any
     SetNumPermanentAssisting = function(self, num)
         self.NumPermanentAssisting = num
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number
     IncrementPermanentAssisting = function(self)
         self.NumPermanentAssisting = self.NumPermanentAssisting + 1
         return self.NumPermanentAssisting
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number
     DecrementPermanentAssisting = function(self)
         self.NumPermanentAssisting = self.NumPermanentAssisting - 1
         return self.NumPermanentAssisting
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return unknown
     GetNumPermanentAssisting = function(self)
         return self.NumPermanentAssisting
     end,
 
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return boolean
     NeedPermanentFactoryAssist = function(self)
         if table.getn(self:GetAllBaseFactories()) >= 1 and self:GetPermanentAssistCount() > self:GetNumPermanentAssisting() then
             return true
@@ -656,6 +717,17 @@ BaseManager = ClassSimple {
         return false
     end,
 
+    SetEngineerCountByDifficulty = function(self, count)
+
+    end, 
+
+    SetEngineerCountAlt = function(self, count)
+
+    end,
+
+    ---comment
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param count any
     SetEngineerCount = function(self, count)
         -- If we have a table, we have various possible ways of counting engineers
         -- {tNum1, tNum2, tNum3} - This is a difficulty defined total number of engs
@@ -683,27 +755,45 @@ BaseManager = ClassSimple {
         end
     end,
 
+    --- Defines the total engineer count of this base manager
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param num number            # 
     SetTotalEngineerCount = function(self, num)
         self.EngineerQuantity = num
         ScenarioInfo.VarTable[self.BaseName .. '_EngineerNumber'] = num
     end,
 
+    --- Retrieves the amount of engineers that are building
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@return number               # Amount of engineers that are building
     GetEngineersBuilding = function(self)
         return self.EngineersBuilding
     end,
 
+    --- Adds or subtracts from the number of engineers that are building
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param count number          # Amount to add or subtract
     SetEngineersBuilding = function(self, count)
         self.EngineersBuilding = self.EngineersBuilding + count
     end,
 
+    --- Defines the number of support command units this base manager should maintain
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param count number          # Number of support command units
     SetSupportACUCount = function(self, count)
         ScenarioInfo.VarTable[self.BaseName ..'_sACUNumber'] = count
     end,
 
+    --- Defines the factory build rate buff that is applied to all factories
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param buffName string       # Name of a buff instance
     SetFactoryBuildRateBuff = function(self, buffName)
         self.FactoryBuildRateBuff = buffName
     end,
 
+    --- Defines the engineer build rate buff that is applied to all engineers
+    ---@param self BaseManager      # An instance of the BaseManager class
+    ---@param buffName string       # Name of a buff instance
     SetEngineerBuildRateBuff = function(self, buffName)
         self.EngineerBuildRateBuff = buffName
     end,
