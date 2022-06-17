@@ -888,19 +888,41 @@ FactoryUnit = Class(StructureUnit) {
     end,
 
     CalculateRollOffPoint = function(self)
+
+        local px, py, pz = self:GetPositionXYZ()
+        LOG(string.format("Origin point: (%d, %d, %d)", px, py, pz))
+
+        -- retrieve roll off points
         local bp = self.Blueprint.Physics.RollOffPoints
-        local px, py, pz = unpack(self:GetPosition())
+        if not bp then 
+            return 0, px, py, pz 
+        end
 
-        if not bp then return 0, px, py, pz end
+        -- retrieve rally point
+        local rallyPoint = self:GetRallyPoint()
+        if not rallyPoint then 
+            return 0, px, py, pz
+        end
 
-        local vectorObj = self:GetRallyPoint()
+        local correctedRolloffX = self.Blueprint.Physics.CorrectNavalRollOffPoints or false 
+        LOG(correctedRolloffX)
+        if correctedRolloffX then 
+            local bone = (self:IsValidBone('Attachpoint') and 'Attachpoint') or (self:IsValidBone('Attachpoint01') and 'Attachpoint01')
+            local bx, by, bz = self:GetPositionXYZ(bone)
+            LOG(string.format("Attachment point: (%d, %d, %d)", bx, by, bz))
+            correctedRolloffX = bx - px
+        end
 
-        if not vectorObj then return 0, px, py, pz end
 
+        -- find the nearest roll off point
         local bpKey = 1
         local distance, lowest = nil
         for k, v in bp do
-            distance = VDist2(vectorObj[1], vectorObj[3], v.X + px, v.Z + pz)
+            if correctedRolloffX then 
+                LOG(string.format("%s: %d -> %d", self.Blueprint.BlueprintId, v.X, correctedRolloffX or 0 ))
+            end
+
+            distance = VDist2(rallyPoint[1], rallyPoint[3], (correctedRolloffX or v.X) + px, v.Z + pz)
             if not lowest or distance < lowest then
                 bpKey = k
                 lowest = distance

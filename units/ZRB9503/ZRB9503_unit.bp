@@ -196,15 +196,15 @@ UnitBlueprint {
         RollOffPoints = {
             {
                 UnitSpin = 180,
-                X = -2,
+                X = -3,
                 Y = 0,
-                Z = -8,
+                Z = -10,
             },
             {
                 UnitSpin = 0,
-                X = -2,
+                X = -3,
                 Y = 0,
-                Z = 8,
+                Z = 10,
             },
         },
         SkirtOffsetX = -6,
