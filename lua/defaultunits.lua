@@ -1382,8 +1382,13 @@ SeaFactoryUnit = Class(FactoryUnit) {
 
     CalculateRollOffPoint = function(self)
 
+        -- backwards compatible, don't try and fix mods that rely on the old logic
+        if not self.Blueprint.Physics.ComputeRollOffPoint then
+            return FactoryUnit.CalculateRollOffPoint(self)
+        end
+
+        -- retrieve our position
         local px, py, pz = self:GetPositionXYZ()
-        LOG(string.format("Origin point: (%d, %d, %d)", px, py, pz))
 
         -- retrieve roll off points
         local bp = self.Blueprint.Physics.RollOffPoints
@@ -1397,15 +1402,10 @@ SeaFactoryUnit = Class(FactoryUnit) {
             return 0, px, py, pz
         end
 
-        local correctedRolloffX = self.Blueprint.Physics.CorrectNavalRollOffPoints or false 
-        LOG(correctedRolloffX)
-        if correctedRolloffX then 
-            local bone = (self:IsValidBone('Attachpoint') and 'Attachpoint') or (self:IsValidBone('Attachpoint01') and 'Attachpoint01')
-            local bx, by, bz = self:GetPositionXYZ(bone)
-            LOG(string.format("Attachment point: (%d, %d, %d)", bx, by, bz))
-            correctedRolloffX = bx - px
-        end
-
+        -- find the attachpoint for the build location
+        local bone = (self:IsValidBone('Attachpoint') and 'Attachpoint') or (self:IsValidBone('Attachpoint01') and 'Attachpoint01')
+        local bx, by, bz = self:GetPositionXYZ(bone)
+        local ropx = bx - px
         local modz = 1.0 + 0.1 * self.UnitBeingBuilt.Blueprint.SizeZ
 
         -- find the nearest roll off point
@@ -1413,27 +1413,15 @@ SeaFactoryUnit = Class(FactoryUnit) {
         local distance, lowest = nil
         for k, rolloffPoint in bp do
 
-
-
-
-
-            local ropx = correctedRolloffX
             local ropz = modz * rolloffPoint.Z
-
-            LOG(ropx)
-            LOG(ropz) 
-
-            if correctedRolloffX then 
-                LOG(string.format("%s: %d -> %d", self.Blueprint.BlueprintId, rolloffPoint.X, correctedRolloffX or 0 ))
-            end
-
-            distance = VDist2(rallyPoint[1], rallyPoint[3], (ropx) + px, ropz + pz)
+            distance = VDist2(rallyPoint[1], rallyPoint[3], ropx + px, ropz + pz)
             if not lowest or distance < lowest then
                 bpKey = k
                 lowest = distance
             end
         end
 
+        -- finalize the computation
         local fx, fy, fz, spin
         local bpP = bp[bpKey]
         local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
@@ -1443,7 +1431,7 @@ SeaFactoryUnit = Class(FactoryUnit) {
             spin = bpP.UnitSpin
         end
 
-        fx = correctedRolloffX + px
+        fx = ropx + px
         fy = bpP.Y + py
         fz = modz * bpP.Z + pz
 
