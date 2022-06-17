@@ -624,7 +624,8 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
                 GUI.chatEdit:AcquireFocus()
             end,
             nil, nil,
-            true
+            true,
+            {escapeButton = 2, enterButton = 1, worldCover = true}
         )
     end
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
@@ -2614,7 +2615,7 @@ function CreateSlotsUI(makeLabel)
     LayoutHelpers.SetDimensions(labelGroup, 791, 21)
     LayoutHelpers.AtLeftTopIn(labelGroup, GUI.playerPanel, 5, 5)
 
-    local slotLabel = makeLabel("#", 14)
+    local slotLabel = makeLabel("--", 14)
     labelGroup:AddChild(slotLabel)
 
     -- No label required for the second column (flag), so skip it. (Even eviler hack)
@@ -2737,7 +2738,7 @@ function CreateSlotsUI(makeLabel)
         newSlot:AddChild(numGamesText)
 
         -- Name
-        local nameLabel = Combo(newSlot, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local nameLabel = Combo(newSlot, 14, 16, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.name = nameLabel
         nameLabel._text:SetFont('Arial Gras', 15)
         newSlot:AddChild(nameLabel)
@@ -3030,15 +3031,6 @@ function CreateUI(maxPlayers)
     GUI.gameVersionText:SetColor('677983')
     GUI.gameVersionText:SetDropShadow(true)
     LayoutHelpers.AtLeftTopIn(GUI.gameVersionText, GUI.panel, 70, 3)
-    GUI.gameVersionText.HandleEvent = function (self, event)
-        if event.Type == 'MouseEnter' then
-            self:SetColor('ffffff')
-        elseif event.Type == 'MouseExit' then
-            self:SetColor('677983')
-        elseif event.Type == 'ButtonPress' then
-            Changelog.Changelog(GUI)
-        end
-    end
 
     -- Player Slots
     GUI.playerPanel = Group(GUI.panel, "playerPanel")
@@ -3077,15 +3069,16 @@ function CreateUI(maxPlayers)
         LayoutHelpers.SetWidth(GUI.AIFillPanel, 278)
         UIUtil.SurroundWithBorder(GUI.AIFillPanel, '/scx_menu/lan-game-lobby/frame/')
         GUI.AIFillCombo = Combo.Combo(GUI.AIFillPanel, 14, 12, false, nil)
-        LayoutHelpers.AtLeftTopIn(GUI.AIFillCombo, GUI.AIFillPanel)
-        GUI.AIFillCombo.Width:Set(GUI.AIFillPanel.Width)
+        LayoutHelpers.AtHorizontalCenterIn(GUI.AIFillCombo, GUI.AIFillPanel)
+        LayoutHelpers.AtTopIn(GUI.AIFillCombo, GUI.AIFillPanel, 5)
+        GUI.AIFillCombo.Width:Set(function() return GUI.AIFillPanel.Width() - LayoutHelpers.ScaleNumber(15) end)
         GUI.AIFillCombo:AddItems(AIStrings)
         GUI.AIFillCombo:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
         Tooltip.AddComboTooltip(GUI.AIFillCombo, AITooltips)
         GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillCombo, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
         LayoutHelpers.SetWidth(GUI.AIFillButton, 129)
         LayoutHelpers.SetHeight(GUI.AIFillButton, 30)
-        LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillCombo, -10, 25)
+        LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillCombo, -10, 20)
         GUI.AIClearButton = UIUtil.CreateButtonStd(GUI.AIFillButton, '/BUTTON/medium/', LOC('<LOC lobui_0463>Clear Slots'), 12)
         GUI.AIClearButton.Width:Set(GUI.AIFillButton.Width)
         GUI.AIClearButton.Height:Set(GUI.AIFillButton.Height)
@@ -3093,7 +3086,7 @@ function CreateUI(maxPlayers)
         GUI.TeamCountSelector = Combo.BitmapCombo(GUI.AIClearButton, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.SetWidth(GUI.TeamCountSelector, 44)
         LayoutHelpers.AtTopIn(GUI.TeamCountSelector, GUI.AIClearButton, 5)
-        GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right)
+        LayoutHelpers.AtRightIn(GUI.TeamCountSelector, GUI.AIFillPanel, 8)
         local tooltipText = {}
         tooltipText['text'] = '<LOC tooltipui0710>Teams Count'
         tooltipText['body'] = '<LOC tooltipui0711>On how many teams share players?'
@@ -3210,16 +3203,14 @@ function CreateUI(maxPlayers)
         Prefs.SetToCurrentProfile('LobbyHideDefaultOptions', tostring(checked))
     end
 
-    -- curated Maps
-    -- GUI.curatedmapsButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC lobui_0433>Curated Maps")
-    -- Tooltip.AddButtonTooltip(GUI.curatedmapsButton, 'lob_curated_maps')
-    -- LayoutHelpers.AtBottomIn(GUI.curatedmapsButton, GUI.optionsPanel, -51)
-    -- LayoutHelpers.AtHorizontalCenterIn(GUI.curatedmapsButton, GUI.optionsPanel, -55)
-    -- GUI.curatedmapsButton.OnClick = function()
-    --     OpenURL('http://forum.faforever.com/topic/347')
-    -- end
-
-    -- GUI.curatedmapsButton:Disable()
+    -- Patchnotes Button
+    GUI.patchnotesButton = UIUtil.CreateButtonWithDropshadow(GUI.panel, '/Button/medium/', "<LOC _Patchnotes>Patchnotes")
+    Tooltip.AddButtonTooltip(GUI.patchnotesButton, 'Lobby_patchnotes')
+    LayoutHelpers.AtBottomIn(GUI.patchnotesButton, GUI.optionsPanel, -51)
+    LayoutHelpers.AtHorizontalCenterIn(GUI.patchnotesButton, GUI.optionsPanel, -55)
+    GUI.patchnotesButton.OnClick = function(self, event)
+        Changelog.Changelog(GUI)
+    end
 
     -- A buton that, for the host, is "game options", but for everyone else shows a ready-only mod
     -- manager.
@@ -3397,9 +3388,9 @@ function CreateUI(maxPlayers)
     local chatBG = Bitmap(GUI.chatPanel)
     GUI.chatBG = chatBG
     chatBG:SetSolidColor('FF212123')
-    LayoutHelpers.Below(chatBG, GUI.chatDisplay, 1)
-    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -5)
-    chatBG.Width:Set(GUI.chatPanel.Width() - LayoutHelpers.ScaleNumber(16))
+    LayoutHelpers.Below(chatBG, GUI.chatDisplay, 0)
+    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -2)
+    chatBG.Width:Set(GUI.chatPanel.Width)
     LayoutHelpers.SetHeight(chatBG, 24)
     
     -- Set up the chat edit buttons and functions
@@ -3753,12 +3744,12 @@ function CreateUI(maxPlayers)
 
     -- CLOSE/OPEN EMPTY SLOTS BUTTON --
     GUI.closeEmptySlots = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/closeslots/')
-    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -39, 47)
     Tooltip.AddButtonTooltip(GUI.closeEmptySlots, 'lob_close_empty_slots')
     if not isHost then
         GUI.closeEmptySlots:Hide()
-        LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -40, 47)
+        LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -40, 43)
     else
+        LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -31, 43)
         GUI.closeEmptySlots.OnClick = function(self, modifiers)
             if lobbyComm:IsHost() then
                 if modifiers.Ctrl then
@@ -3797,7 +3788,7 @@ function CreateUI(maxPlayers)
 
     -- GO OBSERVER BUTTON --
     GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/observer/')
-    LayoutHelpers.RightOf(GUI.becomeObserver, GUI.closeEmptySlots, -19)
+    LayoutHelpers.RightOf(GUI.becomeObserver, GUI.closeEmptySlots, -25)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
         if IsPlayer(localPlayerID) then
@@ -3817,7 +3808,7 @@ function CreateUI(maxPlayers)
 
     -- CPU BENCH BUTTON --
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/', '', 11)
-    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -19)
+    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -25)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), body=LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
     GUI.rerunBenchmark.OnClick = function(self, modifiers)
         ForkThread(function() UpdateBenchmark(true) end)
@@ -3825,7 +3816,7 @@ function CreateUI(maxPlayers)
 
     -- Autobalance Button --
     GUI.PenguinAutoBalance = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autobalance/')
-    LayoutHelpers.RightOf(GUI.PenguinAutoBalance, GUI.becomeObserver, 59)
+    LayoutHelpers.RightOf(GUI.PenguinAutoBalance, GUI.rerunBenchmark, -25)
     Tooltip.AddButtonTooltip(GUI.PenguinAutoBalance, {text=LOC("<LOC lobui_0444>Autobalance"), body=LOC("<LOC lobui_0445>Automatically balance players into 2 equally sized teams")})
     if not isHost then
         GUI.PenguinAutoBalance:Hide()
@@ -4193,6 +4184,7 @@ function CreateUI(maxPlayers)
                 sortedSlotTeams[player][1] = slotB
             end
             UpdateGame()
+            AddChatText(LOC("<LOC lobui_0626>Finished autobalancing"))
         end
     end
 
@@ -4204,16 +4196,36 @@ function CreateUI(maxPlayers)
     LayoutHelpers.AtRightBottomIn(GUI.observerList, GUI.observerPanel, 15)
     GUI.observerList.OnClick = function(self, row, event)
         if isHost and event.Modifiers.Right then
-            UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
-                                    "<LOC lobui_0167>Kick Player", function()
-                                        SendSystemMessage("lobui_0756", gameInfo.Observers[row+1].PlayerName)
-                                        lobbyComm:EjectPeer(gameInfo.Observers[row+1].OwnerID, "KickedByHost")
-                                    end,
-                                    "<LOC _Cancel>", nil,
-                                    nil, nil,
-                                    true,
-                                    {worldCover = false, enterButton = 1, escapeButton = 2}
-            )
+            -- determine the number of teams (excluding the no team (-) option that equals 1 on the backend)
+            local teams = {}
+            local numTeams = 0
+            for i, player in gameInfo.PlayerOptions:pairs() do
+                if not teams[player.Team] and player.Team != 1 then
+                    teams[player.Team] = 1
+                    numTeams = numTeams + 1
+                end
+            end
+            -- adjust index by 1 because base 0 vs 1, and adjust index by 0-2 to account for team rating rows
+            -- (if there's fewer than 3 teams, the team rating rows are listed before observers instead of after)
+            local obsIndex = row + 1
+            if numTeams < 3 then
+                obsIndex = obsIndex - numTeams
+            end
+            
+            -- the host can get the kick dialog brought up for observer list rows that are players (aka, they have
+            -- a positive observer index and thereby aren't team ratings) and that aren't the local player (the host)
+            if obsIndex > 0 and gameInfo.Observers[obsIndex].OwnerID != localPlayerID then
+                UIUtil.QuickDialog(GUI, "<LOC lobui_0166>Are you sure?",
+                                        "<LOC lobui_0167>Kick Player", function()
+                                            SendSystemMessage("lobui_0756", gameInfo.Observers[obsIndex].PlayerName)
+                                            lobbyComm:EjectPeer(gameInfo.Observers[obsIndex].OwnerID, "KickedByHost")
+                                        end,
+                                        "<LOC _Cancel>", nil,
+                                        nil, nil,
+                                        true,
+                                        {worldCover = false, enterButton = 1, escapeButton = 2}
+                )
+            end
         end
     end
     UIUtil.CreateLobbyVertScrollbar(GUI.observerList, 0, 0, -1)
@@ -4269,7 +4281,7 @@ end
 function setupChatEdit(chatPanel)
     GUI.chatEdit = Edit(chatPanel)
     LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 4, 3)
-    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - LayoutHelpers.ScaleNumber(9))
+    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - LayoutHelpers.ScaleNumber(4))
     LayoutHelpers.SetHeight(GUI.chatEdit, 22)
     GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
     GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
@@ -4277,7 +4289,7 @@ function setupChatEdit(chatPanel)
     GUI.chatEdit:SetDropShadow(true)
     GUI.chatEdit:AcquireFocus()
 
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(chatPanel, -15, -2, 0)
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(chatPanel, -15, 25, 0)
 
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)
@@ -4296,7 +4308,7 @@ function setupChatEdit(chatPanel)
     -- in-game keybindings in the lobby.
     -- That would be very bad. We should probably instead just not assign those keybindings yet...
     GUI.chatEdit.OnLoseKeyboardFocus = function(self)
-        GUI.chatEdit:AcquireFocus()
+        self:AcquireFocus()
     end
 
     local commandQueueIndex = 0
@@ -5208,6 +5220,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.Closed
             gameInfo.SpawnMex[data.Slot] = false
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     SlotClosedSpawnMex = {
@@ -5216,6 +5229,7 @@ local MessageHandlers = {
             gameInfo.ClosedSlots[data.Slot] = data.ClosedSpawnMex
             gameInfo.SpawnMex[data.Slot] = data.ClosedSpawnMex
             ClearSlotInfo(data.Slot)
+            PossiblyAnnounceGameFull()
         end
     },
     GameInfo = {
@@ -6896,6 +6910,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = closed
             gameInfo.SpawnMex[slot] = false
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         SetSlotClosedSpawnMex = function(slot)
@@ -6915,6 +6930,7 @@ function InitHostUtils()
             gameInfo.ClosedSlots[slot] = true
             gameInfo.SpawnMex[slot] = true
             ClearSlotInfo(slot)
+            PossiblyAnnounceGameFull()
         end,
 
         ConvertPlayerToObserver = function(playerSlot, ignoreMsg)
@@ -7048,6 +7064,11 @@ function InitHostUtils()
         -- @param moveFrom Slot number to move from
         -- @param moveTo Slot number to move to.
         SanityCheckSlotMovement = function(moveFrom, moveTo)
+            if moveTo == moveFrom then
+                -- no need to move a slot to its current location
+                return false
+            end
+
             if gameInfo.ClosedSlots[moveTo] then
                 LOG("HostUtils.MovePlayerToEmptySlot: requested slot " .. moveTo .. " is closed")
                 return false

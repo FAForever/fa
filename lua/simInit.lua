@@ -1,3 +1,4 @@
+---@declare-global
 -- ==========================================================================================
 -- * File       : lua/simInit.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
@@ -18,6 +19,8 @@
 
 -- Do global initialization and set up common global functions
 doscript '/lua/globalInit.lua'
+
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 WaitTicks = coroutine.yield
 
@@ -73,6 +76,9 @@ end
 --but before any armies are created.
 function SetupSession()
 
+    ScenarioInfo.TriggerManager = import('/lua/TriggerManager.lua').Manager
+    TriggerManager = ScenarioInfo.TriggerManager
+
     -- assume there are no AIs
     ScenarioInfo.GameHasAIs = false
 
@@ -95,9 +101,9 @@ function SetupSession()
     end
 
     -- LOG('SetupSession: ', repr(ScenarioInfo))
-
+    ---@type table<Army, AIBrain>
     ArmyBrains = {}
-    
+
     -- ScenarioInfo is a table filled in by the engine with fields from the _scenario.lua
     -- file we're using for this game. We use it to store additional global information
     -- needed by our scenario.
@@ -218,7 +224,10 @@ end
 -- use it to store off various useful bits of info.
 -- The global variable "ArmyBrains" contains an array of AI brains, one for each army.
 function OnCreateArmyBrain(index, brain, name, nickname)
-    --LOG(string.format("OnCreateArmyBrain %d %s %s",index,name,nickname))
+
+    ScenarioUtils.InitializeStartLocation(name)
+    ScenarioUtils.SetPlans(name)
+
     ArmyBrains[index] = brain
     ArmyBrains[index].Name = name
     ArmyBrains[index].Nickname = nickname
@@ -251,6 +260,12 @@ end
 -- any units yet) and we're ready to start the game. It's responsible for setting up
 -- the initial units and any other gameplay state we need.
 function BeginSession()
+
+    -- make sure the hook happens before scripts start working
+    import ("/lua/sim/MarkerUtilities.lua")
+
+    ScenarioUtils.CreateProps()
+    ScenarioUtils.CreateResources()
 
     -- brains can have adjusted this value by now, ready to sync
     Sync.GameHasAIs = ScenarioInfo.GameHasAIs
@@ -335,6 +350,11 @@ function BeginSession()
     if syncStartPositions then
         Sync.StartPositions = syncStartPositions
     end
+
+    import('/lua/sim/score.lua').init()
+
+    --start watching for victory conditions
+    ForkThread(import('/lua/victory.lua').CheckVictory, ScenarioInfo)
 end
 
 function GameTimeLogger()
@@ -358,6 +378,16 @@ end
 
 -- OnPostLoad called after loading a saved game
 function OnPostLoad()
+    import('/lua/ScenarioFramework.lua').OnPostLoad()
+    import('/lua/SimObjectives.lua').OnPostLoad()
+    import('/lua/sim/SimUIState.lua').OnPostLoad()
+    import('/lua/SimPing.lua').OnArmyChange()
+    import('/lua/SimPingGroup.lua').OnPostLoad()
+    import('/lua/SimDialogue.lua').OnPostLoad()
+    import('/lua/SimSync.lua').OnPostLoad()
+    if GetFocusArmy() ~= -1 then
+        Sync.SetAlliedVictory = ArmyBrains[GetFocusArmy()].RequestingAlliedVictory or false
+    end
 end
 
 -- Set up list of files to prefetch
@@ -398,4 +428,16 @@ function AIModTemplatesPreloader()
             end
         end
     end
+end
+
+for k,file in DiskFindFiles('/lua/AI/PlatoonTemplates', '*.lua') do
+    import(file)
+end
+
+for k,file in DiskFindFiles('/lua/AI/AIBuilders', '*.lua') do
+    import(file)
+end
+
+for k,file in DiskFindFiles('/lua/AI/AIBaseTemplates', '*.lua') do
+    import(file)
 end

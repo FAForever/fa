@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = false,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/sparkle_white_add_08.dds]],
-	RampTexture = [[/textures/particles/ramp_white_04.dds]],
+	Texture = '/textures/particles/sparkle_white_add_08.dds',
+	RampTexture = '/textures/particles/ramp_white_04.dds',
 	XDirectionCurve = {
 		XRange = 1.00,
 		Keys = {

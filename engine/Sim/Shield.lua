@@ -1,8 +1,4 @@
---- Class Shield
--- @classmod Sim.Shield
-
----
---
-function Shield:moho.shield_methods()
-end
-
+---@declare-global
+---@class moho.shield_methods
+local Shield = {}
+return Shield

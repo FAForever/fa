@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Game selection UI
 --*
---* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright ï¿½ 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 local UIUtil = import('/lua/ui/uiutil.lua')
@@ -32,6 +32,10 @@ local scenarios = MapUtil.EnumerateSkirmishScenarios()
 local gameOptions = {}
 gameOptions[1] = import('/lua/ui/lobby/lobbyOptions.lua').teamOptions
 gameOptions[2] = import('/lua/ui/lobby/lobbyOptions.lua').globalOpts
+
+--- A noop for the purpose of the FAF binary not containing this definition
+--
+InternalStartSteamDiscoveryService = function() end
 
 local tabData = {
     {

@@ -176,7 +176,7 @@ function CreateUI(isReplay)
 
                 if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
                     -- allow meshes and effects to be seen from further away
-                    ConExecute("cam_SetLOD WorldCamera 0.7")
+                    ConExecute("cam_SetLOD WorldCamera 0.65")
                 end
 
                 if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
@@ -231,6 +231,8 @@ function CreateUI(isReplay)
 
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     controls.mfd = mfdControl
+
+    controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
@@ -287,14 +289,6 @@ function CreateUI(isReplay)
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
-    else
-        -- check if we should reduce network delay / lag
-        local clients = GetSessionClients()
-        if table.getsize(clients) <= 1 then
-            if not HasCommandLineArg("/RunWithTheWind") then 
-                ConExecute('net_lag 0')
-            end
-        end
     end
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then

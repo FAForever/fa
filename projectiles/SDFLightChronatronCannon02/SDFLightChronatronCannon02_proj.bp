@@ -42,7 +42,7 @@ ProjectileBlueprint {
         InitialSpeedRange = 3,
         InitialSpeedReduceDistance = 30,
         LeadTarget = false,
-        TrackTarget = true,#added to match ACU overcharge
+        TrackTarget = true,--added to match ACU overcharge
         RotationalVelocity = 9000,
         TurnRate = 360,
         VelocityAlign = true,

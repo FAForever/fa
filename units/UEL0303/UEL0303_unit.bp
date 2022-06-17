@@ -123,7 +123,7 @@ UnitBlueprint {
             },
         },
         AnimationWalk = '/units/uel0303/uel0303_awalk.sca',
-        AnimationWalkRate = 3.4,    #5
+        AnimationWalkRate = 3.4,    --5
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
@@ -314,16 +314,14 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.25,
             TargetPriorities = {
                 'TECH3 MOBILE',
                 'TECH2 MOBILE',
                 'TECH1 MOBILE',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneDualMuzzle = 'Muzzle_L',
             TurretBoneDualPitch = 'ArmL_B04',
             TurretBoneMuzzle = 'Muzzle_R',

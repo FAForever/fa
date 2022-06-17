@@ -269,7 +269,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_IndirectFire',
             RateOfFire = 0.05,
             RenderFireClock = true,
-            TargetCheckInterval = 15,
             TargetPriorities = {
                 'EXPERIMENTAL MASSFABRICATION',
                 '(EXPERIMENTAL * ARTILLERY - FACTORY)', -- don't include fatboy
@@ -283,7 +282,7 @@ UnitBlueprint {
                 'TECH3 STRUCTURE',
                 'TECH3 MOBILE',
                 'STRUCTURE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
             TurretBoneMuzzle = 'Turret_Muzzle',

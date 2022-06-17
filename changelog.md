@@ -1,3 +1,161 @@
+
+Game version 3737 (15th of May, 2022)
+===================================
+
+### Features
+
+ - (Engine patch) Introduction of alternative profiling function for better accuracy (ff630c8)
+
+ - (Engine patch) Maximum game speed is set to +50 (adc06ef5)
+    Note that the interface (for replays, for example) has not been adjusted yet. Usually anything
+    above +10 is only applicable in the first few minutes of the game.
+
+ - Add button to lobby to access patch notes (#3842)
+    Another contribution of Rowey: introduces a button in the lobby to access the patch notes.
+
+ - Add Cloak Enhancement restriction option (#3844)
+    Allows the host to restrict the cloak enhancement of the Cybran ACU / SACU.
+
+ - Add proper recursive logging (#3861, #3869) 
+    Introduces the functions 'reprs' and 'reprsl'. They are abbreviations for 'Recursive printing safe' and
+    'Recursive printing safe to log'. It introduces an alternative to 'repr' which can get stuck in a recursive
+    loop when trying to stringify units, projectiles, weapons and / or props. The old repr functions is available
+    as 'repru', which is an abbreviation for 'Recursive printing unsafe'. The function 'repr' refers to 'reprs'.
+
+### Bug fixes
+
+ - (Engine patch) Disable mesh rendering for minimap (#7)
+
+ - (Engine patch) Fix a crash when restarting a map with a Salem (#6)
+
+ - (Engine patch) Fix a crash when air units have a collision of 'None' (1b17fe7)
+
+ - (Engine patch) Excludes negative income and problems from this (1b17fe7)
+    The problem in question is complicated and happens in every game, but it noticeable when it
+    happens to a commander. The negative income causes the commander to not be 'fully built', and that causes
+    a player to lose the game. This could happen when the commander was being repaired.
+
+ - (Engine patch) Fix a crash when the mouse is pointing towards the sky, away from the terrain (3bf0ba5)
+
+ - Fix mass fabricator behavior for multiplayer (#3852)
+    Fixes an issue where the new fabricators could seriously hamper the performance of the game
+
+ - Fix reclaim effects (#3865) 
+    Fixes an issue where the beam glitches out when reclaiming a unit
+
+ - Fix destruction sound of units being played twice (#3868)
+    Was especially noticeable on the Spiderbot
+
+### Performance
+
+ - (Engine patch) Improve performance of common table operations (ff630c8, da692d3)
+
+ - Optimize abstract projectile classes (#3847, #3855, #3866, #3867)
+    Further reduces the load on the CPU when projectiles are taking part in the simulation
+
+ - Clean up defaultunits.lua (#3806) 
+    Improves documentation, while removing engine calls, empty functions and duplicated code
+
+### Other 
+
+ - Fix coloring of lobby buttons (#3846) 
+    Rowey has keen eyes - fixes a few textures having the wrong colors when in the lobby when
+    you select the UEF faction
+
+ - Minor autobalance-related improvements (#3849)
+    Prevents a no-op swap where a player is switched with him / herself
+
+ - Fix two UI layout functions (#3848)
+    Fixes the UI functions 'OffsetIn' and 'PercentIn' of LayoutHelpers.lua
+
+ - Announce game full on slot closure (#3862)
+    Enables the game full announcement to happen when you close slots
+
+### Contributors
+
+ - Strogo (#7, #6)
+ - KionX (1b17fe7, ff630c8, 3bf0ba5, 564ff89, adc06ef5)
+ - Rowey (#3842, #3846, #3844)
+ - Jip (#3847, #3855, #3866, #3867, #3865,
+        #3868, #3861, #3869)
+ - 4z0t (#3852, #3848)
+ - Penguin (#3849, #3862)
+
+Game version 3736 (6th of May, 2022)
+===================================
+
+### Features
+
+ - Introduction of automated fabricator behavior (#3813, #3814, #3822, #3838, #3840)
+    Automates the fabricators depending on your energy storage and energy trend:
+     - Less than 90% storage: fabricators are turned off, one by one until the storage is full again.
+     - Full storage and more than 100 energy income: fabricators are turned on, as long as the conditions are met
+
+    There is no particular order in enabling and disabling the fabricators. Only one fabricator is enabled or disabled 
+    at any moment. This is an intended limitation to encourage the construction of one tech 3 fabricator over 
+    16 tech 2 fabricators.
+
+    The fabricators production toggle enables or disables the automated behavior of fabricators. When toggled off both 
+    the behavior and the production is removed. When toggled on the behavior is enabled again but does not follow suite: 
+    the fabricator will be enabled over time assuming that you meet its conditions: full storage and  more than 
+    100 energy income.
+
+    This feature is experimental and may be removed again in the future. Please use the Discord channels and the forums to 
+    provide feedback on this feature. Note that the feature is not intended to play the game for you - it should therefore 
+    not always make an optimal choice. As an example, if you want certain fabricators enabled but they remain off then you 
+    should build more power to sustain all fabricators or disable other fabricators manually.
+
+ - Allow the cheat window to spawn multiple units at once (#3825)
+
+ - Re-implement the changelog dialog (#3833)
+    Adapts the changelog into one that is more versatile. It puts an emphasis on the amount of work that has been done in 
+    the past, can be dismissed by pressing escape, highlights the lines that you're hovering over and has a button with a 
+    link to the more user-friendly version of balance patches.
+
+### Bug fixes
+
+ - Fix UI issue with some co-op maps (#3816)
+    Fixes the playable area not being set for various co-op maps
+
+ - Fix invulnerable Continentals (#3830)
+    Continentals could end up being invulnerable, making the ideal ghetto gunship. This was damaging to the game balance 
+    and therefore corrected.
+
+ - Fix rendering issues with the minimap (#3834)
+
+ - Fix behavior when kicking observers (#3836)
+    Removes the 'offset' that was introduced by 3732 and a host can no longer eject him/herself.
+
+### Performance
+
+ - Improve performance of entity allocations (#3824)
+
+ - Re-introduce input delay when there is one or fewer players (#3837)
+    Six years ago the input delay was removed when a single player game was detected. This would allow your units to respond 
+    immediately. This brought in some serious side effects such as a (massive) loss of performance over the duration of a 
+    game. Particular players playing against AI may notice a significant speed up and more stable performance.
+
+### Other 
+
+ - Remove deprecation warnings (#3827)
+    The deprecation warnings ended up being confusion to map and mod makers alike. They are removed until a better 
+    alternative is available.
+
+ - Update description of fabricators (#3817)
+    We have been rewarded by another contribution from Rowey - an event unlike any other. We're blessed to have him with us.
+
+### Contributors
+
+ - 4z0t (#3816)
+ - Rowey (#3817)
+ - Strogo (#3834)
+ - Penguin (#3836)
+ - Jip  (#3813, #3814, #3822, #3838, #3840,
+        (#3825, #3827, #3824, #3826, #3822,
+         #3833, #3830)
+
+With thanks to speed2 for reporting some of the issues through Github.
+
 Game version 3735 (24th of April, 2022)
 ===================================
 

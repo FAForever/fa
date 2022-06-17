@@ -1,5 +1,6 @@
---- Class CCollisionManipulator
--- @classmod Sim.CCollisionManipulator
+---@declare-global
+---@class moho.CollisionManipulator
+local CCollisionManipulator = {}
 
 ---
 --  Fixme: this should just use base manipulator enable/disable
@@ -21,8 +22,5 @@ end
 function CCollisionManipulator:base()
 end
 
----
---
-function CCollisionManipulator:moho.CollisionManipulator()
-end
+return CCollisionManipulator
 

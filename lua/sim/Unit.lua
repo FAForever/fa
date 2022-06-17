@@ -36,6 +36,7 @@ local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFIC
 -- upvalue for performance
 local rawget = rawget 
 local IsAlly = IsAlly
+local armies = ListArmies()
 
 -- Structures that are reused for performance reasons
 -- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -113,6 +114,12 @@ local function PopulateBlueprintCache(entity, blueprint)
     SharedTypeCache[blueprint.BlueprintId] = cache 
 end
 
+local cUnit = moho.unit_methods
+---@class Unit : moho.unit_methods, moho.entity_methods
+---@field Brain AIBrain
+---@field Army Army
+---@field UnitId UnitId
+---@field EntityId EntityId
 Unit = Class(moho.unit_methods) {
 
     Cache = false,
@@ -156,6 +163,7 @@ Unit = Class(moho.unit_methods) {
     ---- INITIALIZATION
     -------------------------------------------------------------------------------------------
     OnPreCreate = function(self)
+
         -- Each unit has a sync table to replicate values to the global sync table to be copied to the user layer at sync time.
         self.Sync = {}
         self.Sync.id = self:GetEntityId()
@@ -181,71 +189,71 @@ Unit = Class(moho.unit_methods) {
         }
 
         self.EventCallbacks = {
-            OnKilled = {},
-            OnUnitBuilt = {},
-            OnStartBuild = {},
-            OnReclaimed = {},
-            OnStartReclaim = {},
-            OnStopReclaim = {},
-            OnStopBeingBuilt = {},
-            OnCaptured = {},
-            OnCapturedNewUnit = {},
-            OnDamaged = {},
-            OnStartCapture = {},
-            OnStopCapture = {},
-            OnFailedCapture = {},
-            OnStartBeingCaptured = {},
-            OnStopBeingCaptured = {},
-            OnFailedBeingCaptured = {},
-            OnFailedToBuild = {},
-            OnVeteran = {},
-            OnGiven = {},
-            ProjectileDamaged = {},
-            SpecialToggleEnableFunction = false,
-            SpecialToggleDisableFunction = false,
-            OnAttachedToTransport = {}, -- Returns self, transport, bone
-            OnDetachedFromTransport = {}, -- Returns self, transport, bone
+            -- OnKilled = {},
+            -- OnUnitBuilt = {},
+            -- OnStartBuild = {},
+            -- OnReclaimed = {},
+            -- OnStartReclaim = {},
+            -- OnStopReclaim = {},
+            -- OnStopBeingBuilt = {},
+            -- OnCaptured = {},
+            -- OnCapturedNewUnit = {},
+            -- OnDamaged = {},
+            -- OnStartCapture = {},
+            -- OnStopCapture = {},
+            -- OnFailedCapture = {},
+            -- OnStartBeingCaptured = {},
+            -- OnStopBeingCaptured = {},
+            -- OnFailedBeingCaptured = {},
+            -- OnFailedToBuild = {},
+            -- OnVeteran = {},
+            -- OnGiven = {},
+            -- ProjectileDamaged = {},
+            -- SpecialToggleEnableFunction = false,
+            -- SpecialToggleDisableFunction = false,
+            -- OnAttachedToTransport = {}, -- Returns self, transport, bone
+            -- OnDetachedFromTransport = {}, -- Returns self, transport, bone
         }
     end,
 
+    ---@param self Unit
     OnCreate = function(self)
-        local blueprint = self:GetBlueprint()
+        local bp = self:GetBlueprint()
 
         -- populate blueprint cache if we haven't done that yet
-        if not SharedTypeCache[blueprint.BlueprintId] then 
-            PopulateBlueprintCache(self, blueprint)
+        if not SharedTypeCache[bp.BlueprintId] then 
+            PopulateBlueprintCache(self, bp)
         end
 
         -- copy reference from meta table to inner table
-        self.Cache = SharedTypeCache[blueprint.BlueprintId]
+        self.Cache = SharedTypeCache[bp.BlueprintId]
 
         -- cache often accessed values into inner table
-        self.UnitId = self:GetUnitId()
-        self.Brain = self:GetAIBrain()
-        self.Blueprint = blueprint
+        self.Blueprint = bp
         self.FootPrintSize = math.max(self.Blueprint.Footprint.SizeX, self.Blueprint.Footprint.SizeZ)
-        self.Audio = self.Cache.Audio
+        self.techCategory = bp.TechCategory
+        self.layerCategory = bp.LayerCategory
+        self.factionCategory = bp.FactionCategory
+        self.MovementEffects = bp.Display.MovementEffects
+        self.Audio = bp.Audio
 
-        -- cache unique values into inner table
+        -- cache engine calls
         self.EntityId = self:GetEntityId()
         self.Army = self:GetArmy()
-        self.Layer = self:GetCurrentLayer()
+        self.UnitId = self:GetUnitId()
+        self.Brain = self:GetAIBrain()
 
         -- the entity that produces sound, by default ourself
         self.SoundEntity = self
 
-        local bp = self.Blueprint
-
-        -- cache commonly used values from the engine
-        -- self.Layer = self:GetCurrentLayer() -- Not required: ironically OnLayerChange is called _before_ OnCreate is called!
+        -- used to fix engine related bugs
+        self.EngineFlags = { }
 
         -- Store size information for performance
         self.Footprint = { SizeX = bp.Footprint.SizeX, SizeZ = bp.Footprint.SizeZ }
-        self.FootPrintSize = math.max(self.Footprint.SizeX, self.Footprint.SizeZ)
         self.SkirtOffset = { OffsetX = bp.Physics.SkirtOffsetX, OffsetZ = bp.Physics.SkirtOffsetZ }
         self.SkirtSize = { SizeX = bp.Physics.SkirtSizeX, SizeZ = bp.Physics.SkirtSizeZ }
         self.Size = { SizeX = bp.SizeX, SizeY = bp.SizeY, SizeZ = bp.SizeZ }
-        self.CollisionOffsetY = bp.CollisionOffsetY
 
         -- Set number of effects per damage depending on its volume
         local x, y, z = self.Size.SizeX, self.Size.SizeY, self.Size.SizeZ
@@ -286,25 +294,10 @@ Unit = Class(moho.unit_methods) {
         self.UpgradeEffectsBag = TrashBag()
         self.TeleportFxBag = TrashBag()
 
-        -- Store targets and attackers for proper Stealth management
-        self.Targets = {}
-        self.WeaponTargets = {}
-        self.WeaponAttackers = {}
-
         -- Set up veterancy
         self.xp = 0
         self.Instigators = {}
         self.totalDamageTaken = 0
-
-        self.debris_Vector = Vector(0, 0, 0)
-
-        -- Store build information for performance
-        self.BuildExtentsX = bp.Physics.MeshExtentsX or bp.Footprint.SizeX
-        self.BuildExtentsZ = bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
-        self.BuildExtentsY = bp.Physics.MeshExtentsY or math.max(self.BuildExtentsX, self.BuildExtentsZ)
-        self.Elevation = bp.Physics.Elevation
-        self.MeshBlueprint = bp.Display.MeshBlueprint
-        self.MeshBuildBlueprint = bp.Display.MeshBuildBlueprint
 
         -- Store weapon information for performance
         self.WeaponCount = self:GetWeaponCount() or 0
@@ -314,18 +307,6 @@ Unit = Class(moho.unit_methods) {
             self.WeaponInstances[weapon.Label] = weapon
             self.WeaponInstances[k] = weapon
         end
-
-        -- Store animations for performance
-        self.AnimationWater = bp.Display.AnimationWater
-
-        -- Store common accessed information for performance
-        self.Audio = bp.Audio
-        self.Brain = self:GetAIBrain()
-        self.UnitId = self:GetUnitId()
-        self.techCategory = bp.TechCategory
-        self.layerCategory = bp.LayerCategory
-        self.factionCategory = bp.FactionCategory
-        self.MovementEffects = bp.Display.MovementEffects
 
         -- Define Economic modifications
         local bpEcon = bp.Economy
@@ -343,8 +324,7 @@ Unit = Class(moho.unit_methods) {
             Affects = {},
         }
 
-        local bpVision = bp.Intel.VisionRadius
-        self:SetIntelRadius('Vision', bpVision or 0)
+        self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
 
         self.CanTakeDamage = true
         self.CanBeKilled = true
@@ -358,23 +338,15 @@ Unit = Class(moho.unit_methods) {
         self.MaintenanceConsumption = false
         self.ActiveConsumption = false
         self.ProductionEnabled = true
-        self.EnergyModifier = 0
-        self.MassModifier = 0
-
-        -- Cheating
-        if self:GetAIBrain().CheatEnabled then
-            AIUtils.ApplyCheatBuffs(self)
-        end
-
-        self.Dead = false
-
-        -- Ensure transport slots are available
-        self.attachmentBone = nil
-
-        -- Set up Adjacency container
-        self.AdjacentUnits = {}
 
         self.Repairers = {}
+
+        -- Cheating
+        if self.Brain.CheatEnabled then
+            AIUtils.ApplyCheatBuffs(self)
+        end
+        -- Flags for scripts
+        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
     end,
 
     -------------------------------------------------------------------------------------------
@@ -393,6 +365,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetRandomOffset = function(self, scalar)
+        local bp = self.blueprint
         local size = self.Size
         local sx, sy, sz = size.SizeX, size.SizeY, size.SizeZ
         local heading = self:GetHeading()
@@ -402,7 +375,7 @@ Unit = Class(moho.unit_methods) {
         sz = sz * scalar
 
         local rx = Random() * sx - (sx * 0.5)
-        local y  = Random() * sy + (self.CollisionOffsetY or 0)
+        local y  = Random() * sy + (bp.CollisionOffsetY or 0)
         local rz = Random() * sz - (sz * 0.5)
 
         local cosh = math.cos(heading)
@@ -1018,8 +991,8 @@ Unit = Class(moho.unit_methods) {
             local mai_mass = myBlueprint.Economy.MaintenanceConsumptionPerSecondMass or 0
 
             -- Apply economic bonuses
-            mai_energy = mai_energy * (100 + self.EnergyModifier) * (self.EnergyMaintAdjMod or 1) * 0.01
-            mai_mass = mai_mass * (100 + self.MassModifier) * (self.MassMaintAdjMod or 1) * 0.01
+            mai_energy = mai_energy * (100 + (self.EnergyModifier or 0)) * (self.EnergyMaintAdjMod or 1) * 0.01
+            mai_mass = mai_mass * (100 + (self.MassModifier or 0)) * (self.MassMaintAdjMod or 1) * 0.01
 
             energy_rate = energy_rate + mai_energy
             mass_rate = mass_rate + mai_mass
@@ -1119,10 +1092,6 @@ Unit = Class(moho.unit_methods) {
                 self:Kill(instigator, damageType, excessDamageRatio)
             end
         end
-
-        if health < 1 or self.Dead then
-            self.debris_Vector = vector or ''
-        end
     end,
 
     ManageDamageEffects = function(self, newHealth, oldHealth)
@@ -1193,6 +1162,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
+    ---@param self Unit
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self.Layer
         self.Dead = true
@@ -1215,9 +1185,7 @@ Unit = Class(moho.unit_methods) {
             -- Handle ships that can walk on land
             self:PlayUnitSound('AmphibiousFloatingKilledOnLand')
         else
-            if not self:PlayUnitSound('Killed') then 
-                self:PlayUnitSound('Destroyed')
-            end
+            self:PlayUnitSound('Killed')
         end
 
         -- apply death animation on half built units (do not apply for ML and mega)
@@ -1315,6 +1283,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
+    ---@param self Unit
     OnKilledUnit = function(self, unitKilled, massKilled)
         if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
         if IsAlly(self.Army, unitKilled.Army) then return end -- No XP for friendly fire...
@@ -1511,15 +1480,15 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- check for exclusions from projectile perspective
-        for k = 1, other.Cache.DoNotCollideCatsCount do 
-            if self.Cache.CategoriesHash[other.Cache.DoNotCollideCats[k]] then 
+        for k = 1, other.Blueprint.DoNotCollideListCount do 
+            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then 
                 return false 
             end
         end
 
         -- check for exclusions from unit perspective
         for k = 1, self.Cache.DoNotCollideCatsCount do 
-            if other.Cache.CategoriesHash[self.Cache.DoNotCollideCats[k]] then 
+            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then 
                 return false 
             end
         end
@@ -2142,6 +2111,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ---@param self Unit
     OnStopBeingBuilt = function(self, builder, layer)
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
@@ -2643,7 +2613,7 @@ Unit = Class(moho.unit_methods) {
     StopBuildingEffects = function(self, built)
         self.BuildEffectsBag:Destroy()
 
-        -- kept after #3355 for backwards compatibility with mods
+        -- kept after --3355 for backwards compatibility with mods
         if self.buildBots then
             for _, b in self.buildBots do
                 ChangeState(b, b.IdleState)
@@ -3748,10 +3718,7 @@ Unit = Class(moho.unit_methods) {
     -- UNIT CALLBACKS
     -------------------------------------------------------------------------------------------
     AddUnitCallback = function(self, fn, type)
-        if not fn then
-            error('*ERROR: Tried to add a callback type - ' .. type .. ' with a nil function')
-            return
-        end
+        self.EventCallbacks[type] = self.EventCallbacks[type] or { }
         table.insert(self.EventCallbacks[type], fn)
     end,
 
@@ -3768,10 +3735,6 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnCapturedCallback = function(self, cbOldUnit, cbNewUnit)
-        if not cbOldUnit and not cbNewUnit then
-            error('*ERROR: Tried to add an OnCaptured callback without any functions', 2)
-            return
-        end
         if cbOldUnit then
             self:AddUnitCallback(cbOldUnit, 'OnCaptured')
         end
@@ -3795,13 +3758,16 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnUnitBuiltCallback = function(self, fn, category)
+        self.EventCallbacks.OnUnitBuilt = self.EventCallbacks.OnUnitBuilt or { }
         table.insert(self.EventCallbacks['OnUnitBuilt'], {category=category, cb=fn})
     end,
 
     DoOnUnitBuiltCallbacks = function(self, unit)
-        for _, v in self.EventCallbacks['OnUnitBuilt'] or {} do
-            if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
-                v.cb(self, unit)
+        if self.EventCallbacks.OnUnitBuilt then 
+            for _, v in self.EventCallbacks.OnUnitBuilt do
+                if unit and not unit.Dead and EntityCategoryContains(v.category, unit) then
+                    v.cb(self, unit)
+                end
             end
         end
     end,
@@ -3819,12 +3785,9 @@ Unit = Class(moho.unit_methods) {
     end,
 
     AddOnDamagedCallback = function(self, fn, amount, repeatNum)
-        if not fn then
-            error('*ERROR: Tried to add an OnDamaged callback with a nil function')
-            return
-        end
         local num = amount or -1
         repeatNum = repeatNum or 1
+        self.EventCallbacks.OnDamaged = self.EventCallbacks.OnDamaged or { }
         table.insert(self.EventCallbacks.OnDamaged, {Func = fn, Amount=num, Called=0, Repeat = repeatNum})
     end,
 
@@ -4220,8 +4183,12 @@ Unit = Class(moho.unit_methods) {
     OnAttachedToTransport = function(self, transport, bone)
         self:MarkWeaponsOnTransport(true)
         if self:ShieldIsOn() or self.MyShield.Charging then
-            self:DisableShield()
+            if not self.MyShield.SkipAttachmentCheck then 
+                self:DisableShield()
+            end
+
             self:DisableDefaultToggleCaps()
+
         end
         self:DoUnitCallbacks('OnAttachedToTransport', transport, bone)
     end,
@@ -4280,6 +4247,36 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Stuns the unit, if it isn't set to be immune by the flag unit.ImmuneToStun
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param duration boolean Stun duration in seconds
+    SetStunned = function(self, duration)
+        if not self.ImmuneToStun then 
+            cUnit.SetStunned(self, duration)
+        end
+    end,
+
+    --- Determines whether or not this unit is actively consuming resources. There is an engine bug
+    --- that allows you to gain free resources by reverting the resources of the last tick to the
+    --- user when it is called with 'false' while the consumption is already set to 'false'
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param flag boolean A flag to determine whether our consumption should be active
+    SetConsumptionActive = function(self, flag)
+        if self.EngineFlags['SetConsumptionActive'] ~= flag then
+            cUnit.SetConsumptionActive(self, flag)
+            self.EngineFlags['SetConsumptionActive'] = flag 
+        end
+    end,
+
+    --- Determines the upgrade animation to use. Allows you to manage units (by hooking) that can upgrade to
+    --- more than just one unit type, as an example tech 1 factories that can become HQs or
+    --- support factories.
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
+    GetUpgradeAnimation = function(self, unitBeingBuilt) 
+        return self.Blueprint.Display.AnimationUpgrade
+    end,
+
     --- Various callback-like functions
 
     -- Called when the C function unit.SetConsumptionActive is called
@@ -4293,6 +4290,10 @@ Unit = Class(moho.unit_methods) {
     -- Called by the shield class 
     OnShieldEnabled = function(self) end,
     OnShieldDisabled = function(self) end,
+
+    -- Called by the brain when the unit registered itself
+    OnNoExcessEnergy = function(self) end,
+    OnExcessEnergy = function(self) end,
 
     -- Called by the weapon class, these are expensive!
     OnGotTarget = function(self, Weapon) end,
@@ -4532,7 +4533,6 @@ Unit = Class(moho.unit_methods) {
 
         return self.UnitBeingBuilt
     end,
-
 }
 
 -- upvalued math functions for performance
@@ -4552,6 +4552,7 @@ local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 -- upvalued categories for performance
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
+---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
     Cache = false,

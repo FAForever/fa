@@ -1,5 +1,6 @@
 
 -- cache for performance
+local Entity = import('/lua/sim/Entity.lua').Entity
 local ReclaimObjectAOE = import('/lua/EffectTemplates.lua').ReclaimObjectAOE
 local ReclaimBeams = import('/lua/EffectTemplates.lua').ReclaimBeams
 local ReclaimObjectEnd = import('/lua/EffectTemplates.lua').ReclaimObjectEnd
@@ -7,10 +8,11 @@ local ReclaimObjectEnd = import('/lua/EffectTemplates.lua').ReclaimObjectEnd
 -- upvalue for performance
 local Random = Random 
 
-local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local Warp = Warp
 local CreateEmitterOnEntity = CreateEmitterOnEntity
 local CreateEmitterAtEntity = CreateEmitterAtEntity
 local CreateLightParticleIntel = CreateLightParticleIntel
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 
 local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 
@@ -24,16 +26,27 @@ function PlayReclaimEffects(reclaimer, reclaimed, buildEffectBones, effectsBag)
     -- cache army
     local army = reclaimer.Army
 
+    -- find reclaim end point
+    local reclaimEndpoint = reclaimer.ReclaimEndpoint 
+    if not reclaimEndpoint then 
+        reclaimEndpoint = Entity()
+        reclaimer.ReclaimEndpoint = reclaimEndpoint
+        reclaimer.Trash:Add(reclaimEndpoint)
+    end
+
+    -- move end point
+    Warp(reclaimEndpoint, reclaimed:GetPosition())
+
     -- create beams
     for _, bone in buildEffectBones do
         for _, emitter in ReclaimBeams do
-            effectsBag:Add(AttachBeamEntityToEntity(reclaimer, bone, reclaimed, -1, army, emitter))
+            effectsBag:Add(AttachBeamEntityToEntity(reclaimer, bone, reclaimEndpoint, -1, army, emitter))
         end
     end
 
     -- create particle effects
     for _, v in ReclaimObjectAOE do
-        effectsBag:Add(CreateEmitterOnEntity(reclaimed, army, v))
+        effectsBag:Add(CreateEmitterOnEntity(reclaimEndpoint, army, v))
     end
 end
 

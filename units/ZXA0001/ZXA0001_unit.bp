@@ -4,7 +4,12 @@ UnitBlueprint {
         'REPAIR',
         'ENGINEER',
         'INVULNERABLE',
-        'INSIGNIFICANTUNIT'
+        'INSIGNIFICANTUNIT',
+
+        -- backwards compatible priorities for mods 
+        'HIGHPRIAIR',
+        'SPECIALLOWPRI', 
+        'SPECIALHIGHPRI',
     },
     CollisionOffsetY = -0.5,
     Defense = {

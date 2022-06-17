@@ -1,5 +1,6 @@
---- Class CPlatoon
--- @classmod Sim.CPlatoon
+---@declare-global
+---@class moho.platoon_methods
+local CPlatoon = {}
 
 --- Orders platoon to attack target unit.
 -- If squad is specified, attacks only with the squad.
@@ -305,8 +306,4 @@ end
 function CPlatoon:UseTeleporter(gameObject, [squad])
 end
 
----
---
-function CPlatoon:moho.platoon_methods()
-end
-
+return CPlatoon

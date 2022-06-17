@@ -1,6 +1,6 @@
---- Class IAniManipulator
--- @classmod Sim.IAniManipulator
-
+---@declare-global
+---@class moho.manipulator_methods
+local IAniManipulator = {}
 ---
 --  Manipulator:Disable() -- disable a manipulator. This immediately removes it from the bone computation, which may result in the bone's position snapping.
 function IAniManipulator:Disable()
@@ -16,8 +16,4 @@ end
 function IAniManipulator:SetPrecedence(integer)
 end
 
----
---
-function IAniManipulator:moho.manipulator_methods()
-end
-
+return IAniManipulator

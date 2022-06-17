@@ -19,6 +19,7 @@ local teamIcons = {
 
 --- A small button representing an ACU, with support for showing colour and team affiliation, with
 -- an exciting pulsating blue mouse-over effect.
+---@class ACUButton : Group
 ACUButton = Class(Group) {
     __init = function(self, parent, enabled)
         Group.__init(self, parent)

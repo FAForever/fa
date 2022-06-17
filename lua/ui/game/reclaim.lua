@@ -83,7 +83,7 @@ function InPlayableArea(pos)
     end
     return true
 end
-
+---@class WorldLabel : Group
 local WorldLabel = Class(Group) {
     __init = function(self, parent, position)
         Group.__init(self, parent)

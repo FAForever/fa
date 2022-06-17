@@ -180,18 +180,19 @@ UnitBlueprint {
         MeshExtentsZ = 14,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
+        ComputeRollOffPoint = true,
         RollOffPoints = {
             {
                 UnitSpin = 180,
-                X = -4,
+                X = -6,
                 Y = 0,
-                Z = -10,
+                Z = -8,
             },
             {
                 UnitSpin = 0,
-                X = -4,
+                X = -6,
                 Y = 0,
-                Z = 10,
+                Z = 8,
             },
         },
         SkirtOffsetX = -6,
@@ -204,7 +205,7 @@ UnitBlueprint {
     SelectionSizeZ = 8.8,
     SelectionThickness = 0.2,
     SizeX = 4,
-    SizeY = 3, #from 2, for beam weapons
+    SizeY = 3, --from 2, for beam weapons
     SizeZ = 10,
     StrategicIconName = 'icon_factoryhq3_naval',
     StrategicIconSortPriority = 210,

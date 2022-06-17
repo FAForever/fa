@@ -37,16 +37,8 @@ local EffectScaleEmitter = EffectMethods.ScaleEmitter
 local EffectOffsetEmitter = EffectMethods.OffsetEmitter
 local EffectSetEmitterCurveParam = EffectMethods.SetEmitterCurveParam
 
+---@class Tree : Prop
 Tree = Class(Prop) {
-
-    --- Initialize the tree
-    OnCreate = function (self, spec)
-        Prop.OnCreate(self, spec)
-        self.NoBurn = false
-        self.Burning = false 
-        self.Fallen = false
-        self.Dead = false 
-    end,
 
     OnDestroy = function(self)
         Prop.OnDestroy(self)
@@ -77,7 +69,6 @@ Tree = Class(Prop) {
     --- When damaged in some fashion - note that the tree can only be destroyed by disintegrating 
     -- damage and that the base class is not called accordingly.
     OnDamage = function(self, instigator, amount, direction, type)
-
         if not self.Dead then 
 
             local canFall = not self.Fallen 
@@ -243,6 +234,7 @@ Tree = Class(Prop) {
     end,
 }
 
+---@class TreeGroup : Prop
 TreeGroup = Class(Prop) {
 
     --- Break when colliding with a projectile of some sort

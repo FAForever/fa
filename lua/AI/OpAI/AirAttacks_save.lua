@@ -173,150 +173,150 @@ Scenario = {
             { 'uea0305', -1, 1, 'attack', 'AttackFormation' },
         },
 
-    #########################################################################
-    ####################### XPACK PLATOONS ##################################
-    #########################################################################
+    --------------------------------------------------------------------------------------------------------------------------------------------------
+    ---------------------------------------------- XPACK PLATOONS --------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------------------------------------
 
-    #### COMMON ####
-        #### T1
+    -------- COMMON --------
+        -------- T1
 
-        #### T2
+        -------- T2
 
-        #### T3
+        -------- T3
         ['OST_AirAttacks_T3HeavyGunshipPlatoon1'] = {
             'OST_AirAttacks_T3HeavyGunshipPlatoon1', '',
-            { 'uea0303', -1, 1, 'attack', 'AttackFormation' },  #Air Sup
-            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  #XPack T3 Gunship
-            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  #Interceptor
+            { 'uea0303', -1, 1, 'attack', 'AttackFormation' },  --Air Sup
+            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  --XPack T3 Gunship
+            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  --Interceptor
         },
         ['OST_AirAttacks_T3HeavyGunshipPlatoon2'] = {
             'OST_AirAttacks_T3HeavyGunshipPlatoon2', '',
-            { 'uea0304', -1, 1, 'attack', 'AttackFormation' },  #Strat Bomber
-            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  #XPack T3 Gunship
-            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+            { 'uea0304', -1, 1, 'attack', 'AttackFormation' },  --Strat Bomber
+            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  --XPack T3 Gunship
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
         },
         ['OST_AirAttacks_T3HeavyGunshipPlatoon3'] = {
             'OST_AirAttacks_T3HeavyGunshipPlatoon3', '',
-            { 'uea0303', -1, 1, 'attack', 'AttackFormation' },  #Air Sup
-            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  #XPack T3 Gunship
-            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+            { 'uea0303', -1, 1, 'attack', 'AttackFormation' },  --Air Sup
+            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  --XPack T3 Gunship
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
         },
         ['OST_AirAttacks_T3HeavyGunshipPlatoon4'] = {
             'OST_AirAttacks_T3HeavyGunshipPlatoon4', '',
-            { 'uea0304', -1, 1, 'attack', 'AttackFormation' },  #Strat Bomber
-            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  #XPack T3 Gunship
-            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  #Interceptor
+            { 'uea0304', -1, 1, 'attack', 'AttackFormation' },  --Strat Bomber
+            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  --XPack T3 Gunship
+            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  --Interceptor
         },
 
 
-        #### Seraphim T2
+        -------- Seraphim T2
         ['OST_AirAttacks_T2SeraphimPlatoon1'] = {
             'OST_AirAttacks_T2SeraphimPlatoon1', '',
-            { 'uea0203', -1, 1, 'attack', 'AttackFormation' },  #Gunship
-            { 'xsa0202', -1, 1, 'attack', 'AttackFormation' },  #Combat Fighter
+            { 'uea0203', -1, 1, 'attack', 'AttackFormation' },  --Gunship
+            { 'xsa0202', -1, 1, 'attack', 'AttackFormation' },  --Combat Fighter
         },
         ['OST_AirAttacks_T2SeraphimPlatoon2'] = {
             'OST_AirAttacks_T2SeraphimPlatoon2', '',
-            { 'xsa0202', -1, 1, 'attack', 'AttackFormation' },  #Combat Fighter
-            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+            { 'xsa0202', -1, 1, 'attack', 'AttackFormation' },  --Combat Fighter
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
         },
         ['OST_AirAttacks_T2SeraphimPlatoon3'] = {
             'OST_AirAttacks_T2SeraphimPlatoon3', '',
-            { 'xsa0202', -1, 1, 'attack', 'AttackFormation' },  #Combat Fighter
+            { 'xsa0202', -1, 1, 'attack', 'AttackFormation' },  --Combat Fighter
         },
 
 
-    #### UEF SPECIFC ####
-        #### T2
+    -------- UEF SPECIFC --------
+        -------- T2
         ['OST_AirAttacks_T2UEFPlatoon1'] = {
             'OST_AirAttacks_T2UEFPlatoon1', '',
-            { 'uea0203', -1, 1, 'attack', 'AttackFormation' },  #Gunship
-            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'uea0203', -1, 1, 'attack', 'AttackFormation' },  --Gunship
+            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
         },
         ['OST_AirAttacks_T2UEFPlatoon2'] = {
             'OST_AirAttacks_T2UEFPlatoon2', '',
-            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
-            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
         },
         ['OST_AirAttacks_T2UEFPlatoon3'] = {
             'OST_AirAttacks_T2UEFPlatoon3', '',
-            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'dea0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
         },
 
-    #### AEON SPECIFIC ####
-        #### T1
+    -------- AEON SPECIFIC --------
+        -------- T1
 
-        #### T2
+        -------- T2
         ['OST_AirAttacks_T2AeonPlatoon1'] = {
             'OST_AirAttacks_T2AeonPlatoon1', '',
-            { 'uea0203', -1, 1, 'attack', 'AttackFormation' },  #Gunship
-            { 'xaa0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'uea0203', -1, 1, 'attack', 'AttackFormation' },  --Gunship
+            { 'xaa0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
         },
         ['OST_AirAttacks_T2AeonPlatoon2'] = {
             'OST_AirAttacks_T2AeonPlatoon2', '',
-            { 'xaa0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
-            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+            { 'xaa0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
         },
         ['OST_AirAttacks_T2AeonPlatoon3'] = {
             'OST_AirAttacks_T2AeonPlatoon3', '',
-            { 'xaa0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'xaa0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
         },
         ['OST_AirAttacks_T2AeonPlatoon4'] = {
             'OST_AirAttacks_T2AeonPlatoon4', '',
-            { 'daa0206', -1, 1, 'attack', 'AttackFormation' },  #Mercy
+            { 'daa0206', -1, 1, 'attack', 'AttackFormation' },  --Mercy
         },
 
-        #### T3
+        -------- T3
         ['OST_AirAttacks_T3AeonAntiNaval1'] = {
             'OST_AirAttacks_T3AeonAntiNaval1', '',
-            { 'xaa0306', -1, 1, 'attack', 'AttackFormation' },  #XPack Torp Bomber
+            { 'xaa0306', -1, 1, 'attack', 'AttackFormation' },  --XPack Torp Bomber
         },
         ['OST_AirAttacks_T3AeonAntiNaval2'] = {
             'OST_AirAttacks_T3AeonAntiNaval2', '',
-            { 'xaa0306', -1, 1, 'attack', 'AttackFormation' },  #XPack Torp Bomber
-            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  #XPack T3 Gunship
+            { 'xaa0306', -1, 1, 'attack', 'AttackFormation' },  --XPack Torp Bomber
+            { 'uea0305', -1, 1, 'attack', 'AttackFormation' },  --XPack T3 Gunship
         },
 
-    #### CYBRAN SPECIFIC ####
-        #### T1
+    -------- CYBRAN SPECIFIC --------
+        -------- T1
         ['OST_AirAttacks_T1CybranPlatoon1'] = {
             'OST_AirAttacks_T1CybranPlatoon1', '',
-            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
-            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  #XPack Light Gunships
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
+            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  --XPack Light Gunships
         },
         ['OST_AirAttacks_T1CybranPlatoon2'] = {
             'OST_AirAttacks_T1CybranPlatoon2', '',
-            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  #Interceptor
-            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  #XPack Light Gunships
+            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  --Interceptor
+            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  --XPack Light Gunships
         },
         ['OST_AirAttacks_T1CybranPlatoon3'] = {
             'OST_AirAttacks_T1CybranPlatoon3', '',
-            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  #XPack Light Gunships
+            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  --XPack Light Gunships
         },
         ['OST_AirAttacks_T1CybranPlatoon4'] = {
             'OST_AirAttacks_T1CybranPlatoon4', '',
-            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
-            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  #Interceptor
-            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  #XPack Light Gunship
+            { 'uea0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
+            { 'uea0102', -1, 1, 'attack', 'AttackFormation' },  --Interceptor
+            { 'xra0105', -1, 1, 'attack', 'AttackFormation' },  --XPack Light Gunship
         },
 
-        #### T2
+        -------- T2
         ['OST_AirAttacks_T2CybranPlatoon1'] = {
             'OST_AirAttacks_T2CybranPlatoon1', '',
-            { 'ura0203', -1, 1, 'attack', 'AttackFormation' },  #Gunship
-            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'ura0203', -1, 1, 'attack', 'AttackFormation' },  --Gunship
+            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
         },
         ['OST_AirAttacks_T2CybranPlatoon2'] = {
             'OST_AirAttacks_T2CybranPlatoon2', '',
-            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
-            { 'ura0103', -1, 1, 'attack', 'AttackFormation' },  #Bomber
+            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
+            { 'ura0103', -1, 1, 'attack', 'AttackFormation' },  --Bomber
         },
         ['OST_AirAttacks_T2CybranPlatoon3'] = {
             'OST_AirAttacks_T2CybranPlatoon3', '',
-            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  #XPack Combat Fighter
+            { 'dra0202', -1, 1, 'attack', 'AttackFormation' },  --XPack Combat Fighter
         },
 
-        #### T3
+        -------- T3
     },
     --[[                                                                           ]]--
     --[[  Armies                                                                   ]]--
@@ -585,10 +585,10 @@ Scenario = {
                                 {'default_brain','default_builder_name', 2 },
                                 {'default_brain','default_builder_name','2'}
                             },
-                            #[3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
-                            #    {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
-                            #    {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
-                            #},
+                            --[3] = {'/lua/editor/otherarmyunitcountbuildconditions.lua', 'BrainGreaterThanNumCategory',
+                            --    {'default_brain','Player', 5 , categories.NAVAL * categories.MOBILE },
+                            --    {'default_brain','Player','5','categories.NAVAL * categories.MOBILE'}
+                            --},
                         },
                         PlatoonData = {
                             {type = 5, name = 'AMPlatoons', value = {
@@ -1031,16 +1031,16 @@ Scenario = {
                     },
 
 
-    #########################################################################
-    ####################### XPACK PLATOONS ##################################
-    #########################################################################
+    --------------------------------------------------------------------------------------------------------------------------------------------------
+    ---------------------------------------------- XPACK PLATOONS --------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------------------------------------------------------
 
-    #### COMMON ####
-            #### T1
+    -------- COMMON --------
+            -------- T1
 
-            #### T2
+            -------- T2
 
-            #### T3
+            -------- T3
                     ['OSB_Child_AirAttacks_T3HeavyGunshipPlatoon1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T3HeavyGunshipPlatoon1',
                         Priority = 699,
@@ -1192,7 +1192,7 @@ Scenario = {
 
 
 
-                ########## Seraphim stuff.
+                -------------------- Seraphim stuff.
                     ['OSB_Child_AirAttacks_T2SeraphimPlatoon1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T2SeraphimPlatoon1',
                         Priority = 696,
@@ -1305,8 +1305,8 @@ Scenario = {
                         ChildrenType = {'CombatFighters'},
                     },
 
-    #### UEF SPECIFIC ####
-            #### T2
+    -------- UEF SPECIFIC --------
+            -------- T2
                     ['OSB_Child_AirAttacks_T2UEFPlatoon1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T2UEFPlatoon1',
                         Priority = 696,
@@ -1419,10 +1419,10 @@ Scenario = {
                         ChildrenType = {'CombatFighters'},
                     },
 
-    #### AEON SPECIFIC ####
-            #### T1
+    -------- AEON SPECIFIC --------
+            -------- T1
 
-            #### T2
+            -------- T2
                     ['OSB_Child_AirAttacks_T2AeonPlatoon1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T2AeonPlatoon1',
                         Priority = 696,
@@ -1571,7 +1571,7 @@ Scenario = {
                         },
                         ChildrenType = {'GuidedMissiles'},
                     },
-            #### T3
+            -------- T3
                     ['OSB_Child_AirAttacks_T3AeonAntiNaval1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T3AeonAntiNaval1',
                         Priority = 699,
@@ -1647,8 +1647,8 @@ Scenario = {
                         ChildrenType = { 'HeavyTorpedoBombers', 'HeavyGunships', },
                     },
 
-    #### CYBRAN SPECIFIC ####
-            #### T1
+    -------- CYBRAN SPECIFIC --------
+            -------- T1
                     ['OSB_Child_AirAttacks_T1CybranPlatoon1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T1CybranPlatoon1',
                         Priority = 693,
@@ -1782,7 +1782,7 @@ Scenario = {
                         ChildrenType = { 'Bombers', 'Interceptors', 'LightGunships'},
                     },
 
-            #### T2
+            -------- T2
                     ['OSB_Child_AirAttacks_T2CybranPlatoon1'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T2CybranPlatoon1',
                         Priority = 696,
@@ -1895,9 +1895,9 @@ Scenario = {
                         ChildrenType = {'CombatFighters'},
                     },
 
-            #### T3
+            -------- T3
 
-########################################################################################
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
                     ['OSB_Master_AirAttacks'] =  {
                         PlatoonTemplate = 'OST_BLANK_TEMPLATE',

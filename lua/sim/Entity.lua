@@ -10,8 +10,10 @@
 -- administrator of the repository to discuss your changes before assuming
 -- that your changes will get merged in.
 
-local _c_CreateEntity = _c_CreateEntity 
-
+-- This file gets imported by UI mods sometimes, not sure why. But it prevents 
+-- us from scoping this as an upvalue
+-- local _c_CreateEntity = _c_CreateEntity 
+---@class Entity : moho.entity_methods
 Entity = Class(moho.entity_methods) {
 
     --- Called during class initialisation

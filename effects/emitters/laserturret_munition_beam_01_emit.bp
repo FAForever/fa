@@ -3,6 +3,6 @@ BeamBlueprint {
     TextureName = '/textures/particles/beam_red_03.dds',
     Length = 1.5,
     Thickness = 0.05,
-    StartColor = {x=1,y=1,z=1,w=0}, # R,G,B,A
-    EndColor = {x=1,y=1,z=1,w=0}, # R,G,B,A
+    StartColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
 }
