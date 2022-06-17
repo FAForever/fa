@@ -132,6 +132,10 @@ local function PostProcessUnit(unit)
             unit.Footprint.SizeZ = 2
         end
     end
+
+    if unit.CategoriesHash['FACTORY'] and unit.CategoriesHash['NAVAL'] then 
+        unit.Physics.CorrectNavalRollOffPoints = true
+    end
 end
 
 --- Post-processes all units
