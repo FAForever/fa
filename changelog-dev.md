@@ -5,7 +5,7 @@ The past month has been exciting - there is no other word that we can use.
 
 From a development perspective we're on the verge of being able to provide a modern, interactive development environment to our community. With the work of Eluvatar a Visual Studio Code (VSC) extension is close to release that provides intellisense support for map scripters, mod makers and game developers. And with the work of Ejsstiil the Lua debugger that ships with the game is fully functional again when you work from your development environment. Programmers understand how critical these features are for the development of essentially anything.
 
-And from a user perspective the game has never been more performing. Specifically the unfamously slow ASF battles has been tackled. For the majority of matches the game no longer slows down, with the assumption that there is no potato processor participating in the match.
+And from a user perspective the game has never been more performing. Specifically the infamously slow ASF battles has been tackled. For the majority of matches the game no longer slows down, with the assumption that there is no potato processor participating in the match.
 
 All of that shadows all of the other critical work that has been done the past month with thanks to all the remaining contributors, including SpikeyNoob, Hdt80bro and LilJoe7k4 who made their first contributions to the game repository.
 
@@ -36,7 +36,7 @@ Jip
 - (#3887) Introduce Intellisense support for the FA Visual Studio Code (VSC) extension
     As map scripters, mod makers and game developers we have been living in a cave. But no more - thanks to the work on the extension and the work in this pull request we are slowly introducing annotation across the repository.
 
-    For this with programming experience: it is like the introduction of Typescript, after working for years on ends in Javascript.
+    For those with programming experience: it is like the introduction of Typescript, after working for years on ends in Javascript.
 
     This also works when you have no development environment for the FA repository on your system, see the readme on the Github page of the FA repository for more information.
 
