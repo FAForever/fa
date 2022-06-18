@@ -6,12 +6,10 @@
 ------------------------------------------------------------------------------
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
 local AMPlatoonHelperFunctions = import('/lua/editor/AMPlatoonHelperFunctions.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local TriggerFile = import('/lua/scenariotriggers.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
 local BMBC = import('/lua/editor/basemanagerbuildconditions.lua')
@@ -1141,7 +1139,7 @@ function BaseManagerTMLAI(platoon)
                 if EntityCategoryContains(categories.STRUCTURE, target) or simpleTargetting then
                     IssueTactical({unit}, target)
                 else
-                    targPos = SUtils.LeadTarget(platoon, target)
+                    local targPos = SUtils.LeadTarget(platoon, target)
                     if targPos then
                         IssueTactical({unit}, targPos)
                     end
@@ -1287,3 +1285,7 @@ function UnitUpgradeThread(unit)
         WaitSeconds(5)
     end
 end
+
+-- kept for mod compatibility, as they may depend on these
+local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
+local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
