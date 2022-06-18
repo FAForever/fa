@@ -94,12 +94,21 @@ local IMAPCell = ClassSimple {
 
     PopulateCell = function(self)
 
+        -- localize for performance
+
+        local cz = self.CZ
+        local z = self.Z
+        local cx = self.CX
+        local x = self.X
+        local tags = self.Tags
+        local data = self.TagsData
+
         -- gather information of this cell
 
-        for lz = 1, self.CZ do 
-            local z = lz + self.Z * self.CZ
-            for lx = 1, self.CX do 
-                local x = lx + self.X * self.CX
+        for lz = 1, cz do 
+            local z = lz + z * cz
+            for lx = 1, cx do 
+                local x = lx + x * cx
 
                 -- keep track of tag count
 
@@ -108,39 +117,38 @@ local IMAPCell = ClassSimple {
                     tag = -1 
                 end
 
-                self.Tags[tag] = (self.Tags[tag] or 0) + 1
+                tags[tag] = (tags[tag] or 0) + 1
 
                 -- keep track of tag data
 
-                if not (self.TagsData[tag]) then 
-                    self.TagsData[tag] = {
-                        BoundingBox = { L = 4096, R = 0, T = 4096, B = 0 },
+                if not (data[tag]) then 
+                    data[tag] = {
+                        -- BoundingBox = { L = 4096, R = 0, T = 4096, B = 0 },
                         Center = { X = 0, Z = 0 }
                     }
                 end
 
-                local data = self.TagsData[tag]
-                data.Center.X = data.Center.X + x
-                data.Center.Z = data.Center.Z + z
+                local center = data[tag].Center
+                center.X = center.X + x
+                center.Z = center.Z + z
 
-                data.BoundingBox.L = MathMin(data.BoundingBox.L, x)
-                data.BoundingBox.R = MathMax(data.BoundingBox.R, x)
-                data.BoundingBox.T = MathMin(data.BoundingBox.T, z)
-                data.BoundingBox.B = MathMax(data.BoundingBox.B, z)
+                -- data.BoundingBox.L = MathMin(data.BoundingBox.L, x)
+                -- data.BoundingBox.R = MathMax(data.BoundingBox.R, x)
+                -- data.BoundingBox.T = MathMin(data.BoundingBox.T, z)
+                -- data.BoundingBox.B = MathMax(data.BoundingBox.B, z)
             end
         end
 
         -- post processing
 
-        -- compute center for 
-        for tag, count in self.Tags do 
-            self.TagsData[tag].Center.X = math.floor((1 / count) * self.TagsData[tag].Center.X + 0.5)
-            self.TagsData[tag].Center.Z = math.floor((1 / count) * self.TagsData[tag].Center.Z + 0.5)
+        -- compute center for iMAP
+        for tag, count in tags do 
+            data[tag].Center.X = math.floor((1 / count) * data[tag].Center.X + 0.5)
+            data[tag].Center.Z = math.floor((1 / count) * data[tag].Center.Z + 0.5)
 
-            local tagAtCenter = PathSlabs[self.TagsData[tag].Center.Z][self.TagsData[tag].Center.X]
-            self.TagsData[tag].Obstructed = tagAtCenter ~= tag or tag == -1
+            local tagAtCenter = PathSlabs[data[tag].Center.Z][data[tag].Center.X]
+            data[tag].Obstructed = tagAtCenter ~= tag or tag == -1
         end
-
 
         self.Obstructed = self.Tags[-1] > (0.9 * self.MaximumNumberOfTags)
         self.NoObstructions = not self.Tags[-1]
@@ -186,6 +194,7 @@ function ProcessMap()
     local minz = 0 
     local maxz = 15
 
+    local startTotal = GetSystemTimeSecondsOnlyForProfileUse()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     -- prepare terrain / surface samples
@@ -201,6 +210,10 @@ function ProcessMap()
             end
         end
     end
+
+    local stop = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("Terrain sampling: " .. tostring(stop - start))
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     -- compute pathability / water places
 
@@ -222,6 +235,10 @@ function ProcessMap()
             end
         end
     end
+
+    local stop = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("Pathing checks: " .. tostring(stop - start))
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     -- cheap horizontal scan
 
@@ -283,6 +300,10 @@ function ProcessMap()
         end
     end
 
+    local stop = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("Horizontal Fatboy sweep: " .. tostring(stop - start))
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+
     -- cheap vertical scan 
 
     for x = 1, mx do 
@@ -332,6 +353,10 @@ function ProcessMap()
         end
     end
 
+    local stop = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("Vertical Fatboy sweep: " .. tostring(stop - start))
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+
     -- flooding to label
 
     local tag = 1
@@ -376,7 +401,9 @@ function ProcessMap()
         end
     end
 
-    LOG(tag)
+    local stop = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("Labelling: " .. tostring(stop - start))
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
 
     -- edge detection for drawing
 
@@ -398,6 +425,10 @@ function ProcessMap()
         end
     end
 
+    local stop = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("Edge detection: " .. tostring(stop - start))
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+
     -- cells 
 
     local cells = { }
@@ -409,9 +440,10 @@ function ProcessMap()
     end
 
     local stop = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("iMAP creation: " .. tostring(stop - start))
 
-    LOG(stop - start)
-
+    local stopTotal = GetSystemTimeSecondsOnlyForProfileUse()
+    WARN("Total time taken: " .. tostring(stopTotal - startTotal))
     -- 
 
     -- test 
