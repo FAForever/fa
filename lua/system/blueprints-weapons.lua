@@ -28,7 +28,6 @@ local function ProcessWeapon(unit, weapon)
     if weapon.DamageType == "DeathExplosion" or weapon.Label == "DeathWeapon" or weapon.Label == "DeathImpact" then 
         weapon.TargetCheckInterval = weaponTargetCheckUpperLimit
         weapon.AlwaysRecheckTarget = false 
-        weapon.ManualFire = true 
         weapon.TrackingRadius = 0.0
         return 
     end
