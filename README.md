@@ -44,11 +44,11 @@ Folder          | Description
 Files that are unchanged are retrieved from the base game. Folders with an asterisk (*) are not shipped to the user with the client. See the installation instructions in the contribution section for more information.
 
 Repositories that are directly related to the game:
- - A [Lua profiler](https://github.com/FAForever/FAFProfiler)
- - A [Lua benchmark tool](https://gitlab.com/supreme-commander-forged-alliance/other/profiler)
- - The [executable patcher](https://github.com/FAForever/FA_Patcher)
- - The [executable patches](https://github.com/FAForever/FA-Binary-Patches)
- - A [debugger](https://github.com/FAForever/FADeepProbe) to help with exceptions 
+ - [Executable patcher](https://github.com/FAForever/FA_Patcher)
+ - [Executable patches](https://github.com/FAForever/FA-Binary-Patches)
+ - [Exception debugger](https://github.com/FAForever/FADeepProbe)
+ - [FA Lua intellisense extension](https://github.com/FAForever/fa-lua-vscode-extension)
+ - [FA Lua intellisense langauge server](https://github.com/FAForever/fa-lua-language-server)
 
 Changelog
 ---------
