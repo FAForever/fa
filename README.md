@@ -21,16 +21,21 @@ This repository contains the changes to the Lua side of the game, such as balanc
 
 Folder          | Description
 --------------- | -----------
+`coderes*`      | Various textures required for the Lua debugger to work
 `effects`       | Blueprints, textures and meshes of effects and HLSL shaders that are used to render the game
 `engine*`       | Engine documentation: all objects and their functions are documented
 `env`           | Props, decals, splats, stratum layer and environmental effects
-`etc*`          | Legacy - a rudimentary implementation of versioning control 
+`etc*`          | Legacy - a rudimentary implementation of versioning control
+`images*`       | Images used by the repository, such as the banner at the top
 `loc`           | Localization files for the game, see the translation guidelines
 `lua`           | Lua files that control all the behavior outside of the physics simulation
 `meshes`        | Meshes that do not belong to props, units or projectiles. E.g. the world border
 `projectiles`   | Blueprint files, textures and meshes of projectiles
+`promotion*`    | Promotion material related to content surrounding the repository
 `props`         | Blueprint files, textures and meshes of props
 `schook`        | Legacy - the **s**upreme **c**ommander **hook** folder that was used due to licensing issues
+`scripts*`      | Scripts used to automate tasks surrounding the game repository
+`setup*`        | Development files that allow you to launch the game using the repository
 `testmaps*`     | Test maps. E.g. the benchmark map shipped with the game
 `tests*`        | Unit tests that run on engine-oblivion functions. E.g. Testing string operations
 `textures`      | Textures used by the engine (as fallback) and UI
