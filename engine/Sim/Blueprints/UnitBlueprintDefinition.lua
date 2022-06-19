@@ -1,0 +1,419 @@
+---@meta
+---@declare-global
+
+--- read more here: https://wiki.faforever.com/en/Blueprints
+---@class UnitBlueprint: BlueprintBase
+---@field AI BpAI
+---@field Air BpAir
+---@field Adjacency BpAdjacency|string
+---@field Audio BpAudio
+---@field AverageDensity number -- Unit average density in tons / m^3 (Default is 0.49).
+---@field Buffs BpBuffs
+---@field BuildIconSortPriority integer -- set to an integer that describes the unit's position in the list of build icons.
+---@field Categories CategoryName[] -- a list of capitalized strings that describe categories to which the unit belongs. Many other parts of the game refer to these categories to affect how units interact.
+---@field CollisionOffsetX number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
+---@field CollisionOffsetY number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
+---@field CollisionOffsetZ number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
+---@field CollisionShape "None"|"Box" -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
+---@field Defense BpDefense -- Defense information for the unit.
+---@field Description string -- description of the unit. For example the description for the UEF tech 1 Tank MA12 Striker is '<LOC uel0201_desc>Medium Tank'. <LOC xxx_desc> is used for localisation which is defined in the strings_db.lua (in the file loc_XX.scd in the subdirectory \loc\XX; XX is the shortcut for the localised language). If the localisation part is not set, the description in tags will be used for any language, which would be "Medium Tank" for this example.
+---@field Display BpDisplay
+---@field Economy BpEconomy
+---@field Enhancements BpEnhancements
+---@field General BpGeneral
+---@field Intel BpIntel
+---@field Interface BpInterface
+---@field LifeBarHeight number -- Height of lifebar in OGrids.
+---@field LifeBarOffset number -- Vertical offset from unit for lifebar.
+---@field LifeBarRender boolean -- Should render lifebar or not.
+---@field LifeBarSize number -- Size of lifebar in OGrids.
+---@field Physics BpPhysics
+---@field SelectionCenterOffsetX number -- X center offset of selection box
+---@field SelectionCenterOffsetY number -- Y center offset of selection box
+---@field SelectionCenterOffsetZ number -- Z center offset of selection box
+---@field SelectionSizeX number -- define the frame around the selected unit.
+---@field SelectionSizeY number -- adjusts the height of the selection box.
+---@field SelectionSizeZ number -- define the frame around the selected unit.
+---@field SelectionThickness number -- Use this to modify the thickness of the rendered selection indicator for the unit.
+---@field SelectionYOffset number -- How far to reduce top of collision box for selection (default 0.5)
+---@field SizeX number -- The collision box is used to detect hits on the unit. If you change the model size the collision box should be adapted.
+---@field SizeY number -- The collision box is used to detect hits on the unit. If you change the model size the collision box should be adapted.
+---@field SizeZ number -- The collision box is used to detect hits on the unit. If you change the model size the collision box should be adapted.
+---@field StrategicIconName string -- into here https://wiki.faforever.com/en/Blueprints#strategiciconname
+---@field StrategicIconSortPriority integer -- describes the unit's position in the list of selected units when different unit types are selected. 0 renders on top, 255 on bottom.
+---@field Transport BpTransport
+---@field UseOOBTestZoom number -- Use OOB hit test for this unit when camera is below this zoom level. Usually we use screen space to do unit selection, but occasionally we want to use the unit's oriented bounding box (OBB) instead. So we have UseOOBTestZoom.
+---@field Veteran BpVeteran
+---@field Weapon BpWeapon[] -- See https://wiki.faforever.com/en/Blueprints/Weapon
+---@field Wreckage BpWreckage
+
+---@class BpAI
+---@field AttackAngle number -- Under what angle the unit attacks its target after getting an attack order
+---@field AutoSurfaceToAttack boolean -- Automatically surface to attack ground targets.
+---@field BeaconName string -- This is the beacon that this unit will create under some circumstances.
+---@field GuardFormationName string -- The formation name used for guarding this unit. Known formations: 'GuardFormation'
+---@field GuardRadius number -- How far a unit on patrol will look off it's patrol path to go attack.
+---@field GuardReturnRadius number -- Maximum range from the guarded unit before initiating return.
+---@field GuardScanRadius number -- Guard range for the unit.
+---@field InitialAutoMode boolean -- Initial auto mode behaviour for the unit.
+---@field NeedUnpack boolean -- Unit should unpack before firing weapon.
+---@field RefuelingMultiplier number -- This muliplier is applied when a staging platform is refueling an air unit.
+---@field RefuelingRepairAmount number -- This amount of repair per second offered to refueling air units.
+---@field TargetBones string[] -- Some target bones setup for other units to aim at instead of the default center pos.
+
+---@class BpAir
+---@field AutoLandTime number -- Timer to automatically initiate landing on ground if idle.
+---@field BankFactor number -- How much aircraft banks in turns; negative to lean out.
+---@field BankForward boolean -- True if aircraft banks forward/back as well as sideways.
+---@field BombDropThreshold number -- Distance from the target unit will start firing bombs.
+---@field BreakOffDistance number -- Distance to break off before turning around for another attack run.
+---@field BreakOffTrigger number -- Distance to target to trigger the breaking off attack.
+---@field CanFly boolean -- Is the unit capable of flight?
+---@field CirclingDirChange boolean -- Whether unit should ever change flight direction while circling.
+---@field CirclingDirChangeFrequencySec number -- How often will it change direction when it's attack motion is back and forth like a gunship.
+---@field CirclingElevationChangeRatio number -- Elevation change ratio of unit when circling.
+---@field CirclingFlightChangeFrequency number -- Frequency of flight pattern change for unit.
+---@field CirclingRadiusChangeMaxRatio number -- Max circling radius ratio for unit.
+---@field CirclingRadiusChangeMinRatio number -- Min circling radius ratio for unit.
+---@field CirclingRadiusVsAirMult number -- Multiplier to the circling radius when targeting another air unit.
+---@field CirclingTurnMult number -- Adjust turning ability when in circling mode.
+---@field CombatTurnSpeed number -- Maximum combat turn speed of the unit for special maneuvers.
+---@field EngageDistance number -- Distance to being engaging enemy target in attack task.
+---@field FlyInWater boolean -- Can this unit fly under water?
+---@field HoverOverAttack boolean -- Whether unit should hover over the target directly to attack. (Used for cases like the CZAR)
+---@field KLift number -- Controller proportional parameter for vertical motion.
+---@field KLiftDamping number -- Controller damping parameter for vertical motion
+---@field KMove number -- Controller proportional parameter for horizontal motion.
+---@field KMoveDamping number -- Controller damping parameter for horizontal motion.
+---@field KRoll number -- Controller proportional parameter for roll changes.
+---@field KRollDamping number -- Controller damping parameter for roll changes.
+---@field KTurn number -- Controller proportional parameter for heading changes.
+---@field KTurnDamping number -- Controller damping parameter for heading changes.
+---@field LiftFactor number -- How much altitude the unit can gain/loose per second.
+---@field MaxAirspeed number -- Maximum airspeed.
+---@field MaxEngineThrust number -- Max thrust for the engine. Directly influences speed and acceleration.
+---@field MaxEngineTorque number -- (?)(Found in various aircraft blueprints)
+---@field MinAirspeed number -- Minimum combat airspeed.
+---@field NeedToComputeBombDrop boolean -- Doesn't drop bombs until path is computed?
+---@field PredictAheadForBombDrop number -- ??Time in seconds or distance to target??
+---@field RandomBreakOffDistanceMult number -- Random multiplier applied to break off distance for winged aircrafts.
+---@field RandomMaxChangeCombatStateTime number -- Random max time to switch combat state in seconds for winged aircrafts.
+---@field RandomMinChangeCombatStateTime number -- Random min time to switch combat state in seconds for winged aircrafts.
+---@field StartTurnDistance number -- Distance from target at which to start turning to align with it.
+---@field TightTurnMultiplier number -- Additional turning multiplier ability during a tight turn maneuver.
+---@field TransportHoverHeight number -- This transport will stay at this height when picking up and dropping off units.
+---@field TurnSpeed number -- Regular turn speed of the unit.
+---@field Winged boolean -- Does the unit use wings for forward flight?
+
+---@class BpAdjacency
+---@field EnergyBuildBonus BpAdjacencyBonus[] - Energy consumption reduction bestowed by energy production facilities.
+---@field EnergyMaintenanceBonus BpAdjacencyBonus[] - Energy consumption (for maintenance i.e. shields intel etc.?) reduction bestowed by energy production facilities.
+---@field EnergyProductionBonus BpAdjacencyBonus[] - Energy production increase bestowed by energy storage facilities.
+---@field EnergyWeaponBonus BpAdjacencyBonus[] - Energy consumption (for weapons esp artilleries) reduction bestowed by energy production facilities.
+---@field MassBuildBonus BpAdjacencyBonus[] - Mass consumption reduction bestowed by mass production facilities.
+---@field MassProductionBonus BpAdjacencyBonus[] - Mass production increase bestowed by mass storage facilities.
+
+---@class BpAdjacencyBonus
+---@field Category string|CategoryName
+---@field Modifier number
+
+---@class BpAudio
+---@field Activate BpSoundResult
+---@field ActiveLoop BpSoundResult
+---@field AirUnitWaterImpact BpSoundResult
+---@field AmbientMove BpSoundResult
+---@field AmbientMoveLand BpSoundResult
+---@field AmbientMoveWater BpSoundResult
+---@field BarrelLoop BpSoundResult
+---@field BarrelStart BpSoundResult
+---@field BarrelStop BpSoundResult
+---@field BeamLoop BpSoundResult
+---@field BeamStart BpSoundResult
+---@field BeamStop BpSoundResult
+---@field CaptureLoop BpSoundResult
+---@field ChargeStart BpSoundResult
+---@field Close BpSoundResult
+---@field CommanderArrival BpSoundResult
+---@field Construct BpSoundResult
+---@field ConstructLoop BpSoundResult
+---@field ConstructStart BpSoundResult
+---@field ConstructStop BpSoundResult
+---@field DeathExplosion BpSoundResult
+---@field Destroyed BpSoundResult
+---@field DoneBeingBuilt BpSoundResult
+---@field EnhanceEnd BpSoundResult
+---@field EnhanceFail BpSoundResult
+---@field EnhanceLoop BpSoundResult
+---@field EnhanceStart BpSoundResult
+---@field EnterWater BpSoundResult
+---@field Fire BpSoundResult
+---@field FireUnderWater BpSoundResult
+---@field FootFallGeneric BpSoundResult
+---@field FootFallGenericSeabed BpSoundResult
+---@field HoverKilledOnWater BpSoundResult
+---@field Killed BpSoundResult
+---@field Landed BpSoundResult
+---@field Landing BpSoundResult
+---@field Load BpSoundResult
+---@field MoveSharpTurn BpSoundResult
+---@field MuzzleChargeStart BpSoundResult
+---@field NuclearLaunchDetectedAeon BpSoundResult
+---@field NuclearLaunchDetectedCybran BpSoundResult
+---@field NuclearLaunchDetectedUEF BpSoundResult
+---@field NuclearMissileInterceptedAeon BpSoundResult
+---@field NuclearMissileInterceptedCybran BpSoundResult
+---@field NuclearMissileInterceptedUEF BpSoundResult
+---@field Open BpSoundResult
+---@field Pack BpSoundResult
+---@field ReclaimLoop BpSoundResult
+---@field Refueling BpSoundResult
+---@field ShieldOff BpSoundResult
+---@field ShieldOn BpSoundResult
+---@field StartCapture BpSoundResult
+---@field StartMove BpSoundResult
+---@field StartMoveAir BpSoundResult
+---@field StartMoveLand BpSoundResult
+---@field StartMoveWater BpSoundResult
+---@field StartReclaim BpSoundResult
+---@field StopMove BpSoundResult
+---@field StopMoveLand BpSoundResult
+---@field StopMoveWater BpSoundResult
+---@field SubmergeStart BpSoundResult
+---@field SurfaceStart BpSoundResult
+---@field TakeOff BpSoundResult
+---@field Thruster BpSoundResult
+---@field TransitionLand BpSoundResult
+---@field TransitionWater BpSoundResult
+---@field UISelection BpSoundResult
+---@field Unload BpSoundResult
+---@field Unpack BpSoundResult
+
+---@class BpSound
+---@field Bank string
+---@field Cue string
+---@field LodCutoff string
+
+--- TODO bp sound result?
+---@class BpSoundResult
+
+---@alias BpBuffs {Regen: {Level1: number, Level2: number, Level3: number, Level4: number, Level5: number}}
+---@class BpDefense
+---@field ArmorType "Light"|"Normal"|"Commander"|"Structure" -- The armor type name.
+---@field Health number -- Starting health value for the unit.
+---@field MaxHealth number -- Max health value for the unit. (It just could get higher through veteran buff or an enhancement)
+---@field RegenRate number -- Amount of health to regenerate per second.
+---@field Shield BpDefense.Shield -- When a unit has a shield here are settings defined; Shield attributes are:
+---@field ThreatLevel number -- Amount of threat this poses to the enemy.
+
+---@class BpDefense.Shield
+---@field OwnerShieldMesh string -- Define the PersonalShield_mesh when PersonalShield = true
+---@field PassOverkillDamage boolean
+---@field PersonalShield boolean -- Define a personal shield.
+---@field ShieldEnergyDrainRechargeTime number -- The amount of time the shield takes to come back online when its disabled due to insufficient energy
+---@field ShieldMaxHealth number -- The max health of the shield.
+---@field ShieldRechargeTime number -- The time it takes for the shield to come back online when powered down
+---@field ShieldRegenRate number -- The amount of health the shield regenerates per second when it's not taking damage
+---@field ShieldRegenStartTime number -- The delay after getting hit by ordinance the shield starts recharging
+---@field ShieldSize number -- The radius of the shield.
+---@field ShieldVerticalOffset number -- How many supcom units the shield is moved up (or down if negative) from normal
+---@field StartsOff boolean -- Appears to do nothing but seems to be meant to make the shield turned off by default
+---@field StartOn boolean -- (?)
+
+--- todo display
+---@class BpDisplay
+
+---@class BpEconomy
+---@field AdjacentEnergyProductionMod number -- ?
+---@field AdjacentMassProductionMod number -- ?
+---@field AdjacentStructureEnergyMod number -- ?
+---@field BuildableCategory CategoryName[] -- This define what units could be produced.
+---@field BuildCostEnergy number -- Energy cost to build this unit.
+---@field BuildCostMass number -- Mass cost to build this unit.
+---@field BuildRate number -- How fast this unit build other units.
+---@field BuildTime number -- The needed time when producing this unit; This is only a factor of time, not the real time to produce the unit.
+---@field InitialRallyX number -- Default rally point X for the factory.
+---@field InitialRallyZ number -- Default rally point Z for the factory.
+---@field MaintenanceConsumptionPerSecondEnergy number -- Amount that define which amount of energy the unit is consuming per second; Used for Shields.
+---@field MaxBuildDistance number -- Maximum build range of the unit. The target must be within this range before the builder can perform operation.
+---@field MaxEnergyUse number -- The maximum Amount of Energy the Unit can produce (see PARAGON xab1401)
+---@field MaxMassUse number -- The maximum Amount of Mass the Unit can produce (see PARAGON xab1401)
+---@field MinBuildTime number -- ?
+---@field NaturalProducer boolean -- Produces resource naturally and does not consume anything.
+---@field NeedToFaceTargetToBuild boolean -- Builder needs to face target before it can build/repair.
+---@field ProductionPerSecondEnergy number -- Amount of energy produced per second.
+---@field ProductionPerSecondMass number -- Amount of mass produced per second.
+---@field RebuildBonusIds string[] -- You will get bonus if you rebuild this unit over the wreckage of these wreckages. Multible BonusID's could be added.
+---@field SacrificeMass number -- Builder will kill self but provide this amount of health to the unit it is helping.
+---@field StorageEnergy number -- Enery storage capacity provided by this unit; This gets added to the main resource pool and is not stored in the unit itself.
+---@field StorageMass number -- Mass storage capacity provided by this unit; This gets added to the main resource pool and is not stored in the unit itself.
+---@field TeleportEnergyMod number -- Multiply by the unit's energy cost to get the energy per tick cost of teleporting.
+---@field TeleportMassMod number -- Multiply by the unit's mass cost to get the mass per tick cost of teleporting.
+---@field TeleportTimeMod number -- Multiply by the unit's build time to get the time required to teleport.
+
+--- TODO setup definitions
+---@class BpEnhancements
+
+---@class BpGeneral
+---@field CapCost integer -- Cost of the unit towards unit cap (default is 1.0)
+---@field Category string
+---@field Classification string
+---@field CommandCaps BpGeneral.CommandCaps -- Command capability flags for this unit;
+---@field FactionName string -- Faction the unit belongs to. Factions are 'Aeon', 'Cybran' and 'UEF'.
+---@field QuickSelectPriority integer -- Indicates unit has it's own avatar button in the quick select interface, and it's sorting priority.
+---@field TarmacDecal unknown
+---@field TarmacGlowDecal unknown
+---@field TechLevel string -- This define the tech level. 'RULEUTL_Basic' for tech 1, 'RULEUTL_Advanced' for tech 2, 'RULEUTL_Secret' for tech 3 and 'RULEUTL_Experimental' for experimental.
+---@field UnitName string -- The name of the unit.
+---@field UnitWeight number
+---@field UpgradesFrom string -- What unit, if any, was this unit upgrade from.
+---@field UpgradesTo string -- What unit, if any, does this unit upgrade to.
+
+---@class BpGeneral.CommandCaps
+---@field RULEUCC_Attack boolean -- Whether the unit has an attack command.
+---@field RULEUCC_CallTransport boolean -- Whether the unit can ask to be transported by a transport unit.
+---@field RULEUCC_Capture boolean -- Whether the unit has a capture command.
+---@field RULEUCC_CloakToggle boolean -- Whether the unit has a cloak toggle button.
+---@field RULEUCC_Dive boolean -- Whether the unit has a dive toggle button (like on submarines).
+---@field RULEUCC_Dock boolean -- Whether the unit has a dock button (like on planes).
+---@field RULEUCC_GenericToggle boolean
+---@field RULEUCC_Guard boolean -- Whether the unit can guard other units.
+---@field RULEUCC_Ferry boolean -- Whether the unit has the ferry command (transports).
+---@field RULEUCC_IntelToggle boolean -- Whether the unit has a toggle for intelligence (radar, sonar, cloaking, stealth, etc.).
+---@field RULEUCC_JammingToggle boolean -- Whether the unit has a toggle for radar jamming.
+---@field RULEUCC_Move boolean -- Whether the unit has a move command
+---@field RULEUCC_Nuke boolean -- Whether the unit can be commanded to launch a strategic missile.
+---@field RULEUCC_Overcharge boolean -- Whether the unit has the Overcharge command (ACU).
+---@field RULEUCC_Patrol boolean -- Whether the unit has the patrol command.
+---@field RULEUCC_Pause boolean -- Whether this unit can pause construction of units/structures
+---@field RULEUCC_ProductionToggle boolean -- Whether this unit can pause some sort of production that also drains resources.
+---@field RULEUCC_Reclaim boolean -- Whether the unit has the reclaim command.
+---@field RULEUCC_Repair boolean -- Whether the unit has the repair command.
+---@field RULEUCC_RetaliateToggle boolean -- Whether the unit can control the retaliation of it's weapons
+---@field RULEUCC_Sacrifice boolean -- Whether the unit has the sacrifice command.
+---@field RULEUCC_ShieldToggle boolean -- Whether the unit has an on/off toggle for a shield.
+---@field RULEUCC_SiloBuildNuke boolean -- Whether the unit can be commanded to build strategic missiles.
+---@field RULEUCC_SiloBuildTactical boolean -- Whether the unit can be commanded to build tactical missiles.
+---@field RULEUCC_SpecialAction boolean
+---@field RULEUCC_SpecialToggle boolean
+---@field RULEUCC_StealthToggle boolean -- Whether the unit has an on/off toggle for the stealth ability.
+---@field RULEUCC_Stop boolean -- whether the unit can issue a stop command to itself
+---@field RULEUCC_Tactical boolean
+---@field RULEUCC_Teleport boolean -- Whether the unit can be commanded to teleport itself (upgraded ACUs).
+---@field RULEUCC_Transport boolean -- Whether the unit can be ordered to transport other units (transports).
+---@field RULEUCC_WeaponToggle boolean
+
+---@class BpIntel
+---@field Cloak boolean -- Single unit cloaking.
+---@field CloakFieldRadius number -- How far our cloaking goes.
+---@field FreeIntel boolean -- The intel is free. Without this the unit will try drain energy for it's intelligence (radar, sonar, etc) and turn off if you run out.
+---@field JamRadius {Max: number, Min: number} -- How far we create fake blips.
+---@field JammerBlips number -- How many blips does a jammer produce
+---@field OmniRadius number -- How far our omni coverage goes.
+---@field RadarRadius number -- How far our radar coverage goes.
+---@field RadarStealth boolean -- Single unit radar stealth.
+---@field RadarStealthFieldRadius number -- How far our radar stealth goes.
+---@field ReactivateTime number -- When you run out of power, how long until this unit turns back on.
+---@field ShowIntelOnSelect boolean -- Show intel radius of unit if selected.
+---@field SonarRadius number -- How far radar coverage goes.
+---@field SonarStealth boolean -- Single unit sonar stealth.
+---@field SonarStealthFieldRadius number -- How far our sonar stealth goes.
+---@field SpoofRadius {Max: number, Min: number} -- How far off displace blip.
+---@field VisionRadius number -- How far we can see above water (and land?).
+---@field WaterVisionRadius number -- How far we can see underwater.
+
+---@class BpInterface
+---@field HelpText string
+
+---@class BpPhysics
+---@field AttackElevation number -- Preferred attack height when attacking ground targets. (used by dive bombers)>
+---@field BackUpDistance number -- Distance that the unit will just back up if it is easier to do so.
+---@field BankingSlope number -- How much the unit banks in corners (negative to lean outwards).
+---@field BuildOnLayerCaps BpPhysics.BuildOnLayerCaps -- Unit may be built on these layers (only applies to structures); Subcategories are:
+---@field BuildRestriction string -- Special build restrictions (mass deposit, thermal vent, etc).
+---@field CatchUpAcc number, -- Acceleration to allow unit to catch up to the target when it starts to drift.
+---@field DragCoefficient number
+---@field Elevation number -- Prefferred height above (-below) land or water surface.
+---@field FlattenSkirt boolean -- If true, terrain under building's skirt will be flattened.
+---@field FuelRechargeRate number -- Unit fuels up at this rate per second.
+---@field FuelUseTime number -- Unit has fuel for this number of seconds.
+---@field LayerChangeOffsetHeight number -- An offset to the layer change height used during the transition between seabed/water and land.
+---@field LayerTransitionDuration number -- Transition time in seconds when going from water/land and land/water.
+---@field MaxAcceleration number -- Maximum acceleration for the unit.
+---@field MaxBrake number -- Maximum braking acceleration for the unit.
+---@field MaxGroundVariation number -- Maximum elevation difference across skirt for build site.
+---@field MaxSpeed number -- Maximum speed for the unit.
+---@field MaxSpeedReverse number -- Maximum speed for the unit in reverse.
+---@field MaxSteerForce number -- Maximum steer force magnitude that can be applied to acceleration.
+---@field MeshExtentsX number
+---@field MeshExtentsY number
+---@field MeshExtentsZ number
+---@field MinSpeedPercent number
+---@field MotionType string -- Method of locomotion.
+---@field OccupyRects string -- Set up the occupy rectangles of the unit that will override the footprint.
+---@field RaisedPlatforms string -- Raised platform definition for ground units to move on.
+---@field RollDamping number -- How much damping there is against rolling motion (1 = no motion at all).
+---@field RollStability number -- How stable the unit is against rolling (0 to 1).
+---@field RollOffPoints BpPhysics.RollOffPoints[]
+---@field RotateBodyWhileMoving boolean -- Ability to rotate body to aim weapon slaved to body while in still in motion.
+---@field RotateOnSpot boolean -- This unit can tries to rotate on the spot.
+---@field SkirtOffsetX number -- Offset of left edge of skirt from left edge of footprint. (Should be -- = 0)
+---@field SkirtOffsetZ number -- Offset of top edge of skirt from left edge of footprint. (Should be -- = 0)
+---@field SkirtSizeX number -- Unit construction pad Size X for building.
+---@field SkirtSizeZ number -- Unit construction pad Size Z for building.
+---@field StandUpright boolean -- Stands upright regardless of terrain,
+---@field TurnFacingRate number -- Turn facing damping for the unit, usually used for hover units only.
+---@field TurnRadius number -- Turn radius for the unit, in wolrd units.
+---@field TurnRate number -- Turn radius for the unit, in degrees per second.
+---@field WobbleFactor number -- How much wobbling for the unit while hovering.
+---@field WobbleSpeed number -- How fast is the wobble, The faster the less stable looking.
+
+---@class BpPhysics.BuildOnLayerCaps
+---@field LAYER_Air boolean -- If true, unit will leave factory flying.
+---@field LAYER_Land boolean -- If true, unit will be built standing or hovering on land.
+---@field LAYER_Orbit boolean -- if true, unit will be build in orbit (Like the Novax Sattelite pops out of its launching box in Orbit)
+---@field LAYER_Seabed boolean -- If true, unit will leave factory partly underwater (standing on the floor of the water body).
+---@field LAYER_Sub boolean -- If true, unit will leave factory completely submerged underwater (floating or standing on the floor of the water body).
+---@field LAYER_Water boolean -- If true, unit will leave factory partly above the water floating.
+
+---@class BpPhysics.RollOffPoints
+---@field UnitSpin integer
+---@field X number
+---@field Y number
+---@field Z number
+
+---@class BpTransport
+---@field AirClass boolean -- These define that the unit can only land on air staging platforms.
+---@field CanFireFromTransport boolean -- Define if the unit can fire out of a transport.
+---@field Class2AttachSize integer -- Number of class 1 attach points this affects.
+---@field Class3AttachSize integer -- Number of class 1 attach points this affects.
+---@field Class4AttachSize integer -- Number of class 1 attach points this affects.
+---@field ClassGenericUpTo integer -- Generic slots up to the specified class.
+---@field ClassSAttachSize integer -- Number of class 1 attach points this affects.
+---@field RepairRate number -- Repairs units attached to me at this % of max health per second.
+---@field StorageSlots integer -- How many internal storage slots avaible for the transport on top of attach points.
+---@field TransportClass integer -- Type of attach points required on transports.
+
+---@class BpVeteran
+---@field Level1 integer -- Define how much kills are required for reaching veteran level 1
+---@field Level2 integer -- Define how much kills are required for reaching veteran level 2
+---@field Level3 integer -- Define how much kills are required for reaching veteran level 3
+---@field Level4 integer -- Define how much kills are required for reaching veteran level 4
+---@field Level5 integer -- Define how much kills are required for reaching veteran level 5
+
+--- TODO, possibly in seperate file, more info here https://wiki.faforever.com/en/Blueprints/Weapon
+---@class BpWeapon
+
+---@class BpWreckage
+---@field Blueprint string
+---@field EnergyMult number -- the amount of energy you get when reclaiming expressed as a multiplier of the energy cost when it was alive>
+---@field HealthMult number -- the amount of health this wreck has so it can take damage from weapons that do area damage>
+---@field MassMult number -- the amount of mass you get when reclaiming expressed as a multiplier of the mass cost when it was alive>
+---@field ReclaimTimeMultiplier number -- the time it takes to reclaim this wreck expressed as a multiplier of the build time>
+---@field WreckageLayers BpWeapon.WreckageLayers
+
+---@class BpWeapon.WreckageLayers
+---@field Air boolean
+---@field Land boolean
+---@field Seabed boolean
+---@field Sub boolean
+---@field Water boolean

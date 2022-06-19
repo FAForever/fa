@@ -217,7 +217,7 @@ categories = {
     WALL = categoryValue,
 }
 
----@alias CategorieNames
+---@alias CategoryName
 ---|"ABILITYBUTTON"
 ---|"ADVANCEDCOMBATPRESET"
 ---|"AEON"

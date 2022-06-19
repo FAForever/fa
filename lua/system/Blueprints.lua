@@ -273,6 +273,8 @@ local function GetSource()
     return DiskToLocal(there)
 end
 
+---@param group string
+---@param bp BlueprintBase
 local function StoreBlueprint(group, bp)
     local id = bp.BlueprintId
     local t = original_blueprints[group]
@@ -289,6 +291,7 @@ end
 -- Figure out what to name this blueprint based on the name of the file it came from.
 -- Returns the entire filename. Either this or SetLongId() should really be got rid of.
 --
+---@param bp BlueprintBase
 local function SetBackwardsCompatId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = lower(bp.Source)
@@ -297,6 +300,7 @@ end
 -- Figure out what to name this blueprint based on the name of the file it came from.
 -- Returns the full resource name except with ".bp" stripped off
 --
+---@param bp BlueprintBase
 local function SetLongId(bp)
     bp.Source = bp.Source or GetSource()
     if not bp.BlueprintId then
@@ -311,6 +315,7 @@ end
 -- Returns just the base filename, without any blueprint type info or extension. Used
 -- for units only.
 --
+---@param bp BlueprintBase
 local function SetShortId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = bp.BlueprintId or
@@ -322,6 +327,7 @@ end
 --
 -- Also fill in a default value for bp.MeshBlueprint if one was not given at all.
 --
+---@param bp BlueprintBase
 function ExtractMeshBlueprint(bp)
     local disp = bp.Display or {}
     bp.Display = disp
@@ -396,7 +402,7 @@ uniqueBuildAnimations["ual0401"] = aeonBuildNoAnimation
 uniqueBuildAnimations["uas0401"] = aeonBuildNoAnimation
 
 --- Extracts the build mesh blueprint information. Adds the Display.BuildMeshBlueprint field to the blueprint and registers the build mesh.
--- @param bp The blueprint to generate the build mesh for.
+---@param bp UnitBlueprint The blueprint to generate the build mesh for.
 function ExtractBuildMeshBlueprint(bp)
 
     -- -- useful information to make distinctions
@@ -464,6 +470,7 @@ function MeshBlueprint(bp)
     StoreBlueprint('Mesh', bp)
 end
 
+---@param bp UnitBlueprint
 function UnitBlueprint(bp)
     -- save info about mods that changed this blueprint
     bp.Mod = current_mod
@@ -471,11 +478,13 @@ function UnitBlueprint(bp)
     StoreBlueprint('Unit', bp)
 end
 
+---@param bp PropBlueprint
 function PropBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Prop', bp)
 end
 
+---@param bp ProjectileBlueprint
 function ProjectileBlueprint(bp)
     -- save info about mods that changed this blueprint
     bp.Mod = current_mod
@@ -483,16 +492,19 @@ function ProjectileBlueprint(bp)
     StoreBlueprint('Projectile', bp)
 end
 
+---@param bp TrailEmitterBlueprint
 function TrailEmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('TrailEmitter', bp)
 end
 
+---@param bp EmitterBlueprint
 function EmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Emitter', bp)
 end
 
+---@param bp BeamBlueprint
 function BeamBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Beam', bp)

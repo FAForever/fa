@@ -117,6 +117,7 @@ end
 local cUnit = moho.unit_methods
 ---@class Unit : moho.unit_methods, moho.entity_methods
 ---@field Brain AIBrain
+---@field Buffs {Affects: BlueprintBuff.Affects, buffTable: table<string, table>}
 ---@field Army Army
 ---@field UnitId UnitId
 ---@field EntityId EntityId
