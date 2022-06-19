@@ -11,10 +11,10 @@ git push faforever HEAD:develop
 
 read
 
-git checkout faforever/fafbeta
-git pull faforever faforever/fafbeta 
+git checkout faforever/deploy/fafbeta
+git pull faforever deploy/fafbeta 
 git pull faforever develop --rebase
-git push faforever HEAD:faforever/fafbeta 
+git push faforever HEAD:deploy/fafbeta 
 
 read
 
