@@ -91,9 +91,8 @@ Jip
 - (#3845) Reduce table allocations when defining weapon target priorities
 
 - (#3875, #3945) Reduce memory impact of units, weapons and props
-    todo 
 
-- (#3891) Sanitize guard scan radius of units
+- (#3891, 6fefe78) Sanitize guard scan radius of units
     The guard scan radius is used by units on attack move or patrol to find and engage hostile units in their surrounding. The value was all over the place and could cause serious slowdowns, especially during the late game.
 
 - (#3892, #3903) Sanitize footprints of air units
@@ -169,6 +168,7 @@ Jip
 - Eluvatar: (#3887, #3968)
 - Uveso: (#3941)
 - M0rph3us (#3969, #3967, #3965)
+- KionX (6fefe78)
 
 ## Translators
 
