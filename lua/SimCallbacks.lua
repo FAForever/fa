@@ -705,13 +705,15 @@ do
             end
         end
 
+        -- user feedback
         if rechecks > 0 then 
-            if rechecks == 1 then 
-                print("1 weapon target recheck")
-            else 
-                print(string.format("%d weapon target rechecks", rechecks))
+            if units[1].Army == GetFocusArmy() then
+                if rechecks == 1 then 
+                    print("1 weapon target recheck")
+                else 
+                    print(string.format("%d weapon target rechecks", rechecks))
+                end
             end
-
         end
     end
 end
