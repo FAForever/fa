@@ -165,9 +165,9 @@ end
 
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
 ---construct a class
----@generic T: fa-class
----@vararg table?
----@return fun(specs: T): T
+---@generic T: fa-class, Base: table
+---@param ... Base
+---@return fun(specs: T): T|Base
 function Class(...)
 
     -- arg = { 
