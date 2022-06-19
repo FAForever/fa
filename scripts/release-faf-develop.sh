@@ -11,6 +11,13 @@ git push faforever HEAD:develop
 
 read
 
+git checkout faforever/fafbeta
+git pull faforever faforever/fafbeta 
+git pull faforever develop --rebase
+git push faforever HEAD:faforever/fafbeta 
+
+read
+
 git checkout faforever/master 
 git pull faforever master 
 git pull faforever develop --rebase

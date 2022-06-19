@@ -9122,3 +9122,5 @@ lobui_0807="Эта игра будет нерейтинговой."
 replay_id="Ид повтора"
 map_version="Версия карты"
 fullshare_announcement="Вам были переданы юниты игрока %s"
+
+ChangelogDescriptionIdentifier="descriptionRU"
