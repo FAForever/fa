@@ -31,9 +31,15 @@ Jip
 
 - (#3946) Fix damage of child projectiles, such as Cybran tactical missiles after they split
 
+- (#3961) Fix issue with the attachment bones of the tech 2 Aeon Transport
+    As a consequence the tech 2 Aeon transport can now carry up to 3 tech 3 units, instead of 2
+
+- (#3966) Fix roll off points for various factories
+    The roll off points were not properly aligned, as a consequence ships had trouble leaving the dock. This was especially noticeable on the naval factories of the Cybran faction
+
 ## Features
 
-- (#3887) Introduce Intellisense support for the FA Visual Studio Code (VSC) extension
+- (#3887, #3968) Introduce Intellisense support for the FA Visual Studio Code (VSC) extension
     As map scripters, mod makers and game developers we have been living in a cave. But no more - thanks to the work on the extension and the work in this pull request we are slowly introducing annotation across the repository.
 
     For those with programming experience: it is like the introduction of Typescript, after working for years on ends in Javascript.
@@ -62,7 +68,12 @@ Jip
 - (#3835) Introduce a builder pattern to create UI elements
     An alternative, more modern approach to creating, positioning and checking of UI elements.
 
-### For map, mod and AI developers 
+- (#3972) Add the ability to manually recheck weapon targets of the selected units via a hotkey
+    As per #3857 the weapons of the majority of units do not recheck their targets. Usually this is not required, but it does cause a big hit on performance. This new hotkey is introduced to allow you to let your units retarget on command for those situations where that is required
+
+    You can find the hotkey by searching for 'recheck' in the hotkeys menu
+
+### For map, mod and AI developers
 
 - (#3884) Add support for a unit.IsCivilian flag
     Introduces an easy to use flag to indicate whether a unit belongs to a civilian army
@@ -102,6 +113,9 @@ Jip
 - (#3943, #3951) Reduce impact of mesh entities on FPS
     Aligns the rendering of various mesh-based entities with their respective size. As an example, the adjancency node was rendered up to the same distance as that of shields.
 
+- (#3967, #3965) reduce impact of projectiles on FPS
+    Sanitizes the LODCutoff of projectiles that have a mesh. The average projectile is emitter based, but some use a mesh. These meshes were visible at extreme ranges, causing them to be rendered even though they were completely hidden behind the strategical overlay of projectiles (dots)
+
 ## Other changes
 
 - (#3885) Fix argumentations for the Hunter AI
@@ -137,17 +151,28 @@ Jip
 
 - (#3941) Fix categories missmatch for the Atlantis
 
+- (#3969) Fix the Flayer (AA) missiles of the tech 2 UEF Cruiser
+    The missiles were using a torpedo mesh, instead of the typical UEF AA Flayer mesh used by sams
+
 ## Contributors
 
 - LilJoe7k4: (#3845)
 - speed2: (#3885)
 - 4z0t: (#3879, #3883, #3835)
-- Jip: (#3895, #3894, #3884, #3875, #3863, #3891, #3892, #3903, #3923, #3913, #3924, #3857, #3931, #3912, #3724, #3944, #3947, #3946, #3945, #3948, #3950)
+- Jip: (#3895, #3894, #3884, #3875, #3863, #3891, #3892, #3903, #3923, #3913, #3924, #3857, #3931, #3912, #3724, #3944, #3947, #3946, #3945, #3948, #3950, #3972)
 - Ejsstiil: (#3896, #3889, #3899, #3907, #3908, #3909, #3904, #3906, #3901, #3926, #3925, #3937)
-- Madmax: (#3863, #3951, #3943)
+- Madmax: (#3863, #3951, #3943, #3961)
 - SpikeyNoob: (#3905)
 - Tagada: (#3876)
 - Rowey: (#3921, #3881, #3882)
 - Hdt80bro: (#3933)
-- Eluvatar: (#3887)
+- Eluvatar: (#3887, #3968)
 - Uveso: (#3941)
+- M0rph3us (#3969, #3967, #3965)
+
+## Translators
+
+- 4z0t (Russian)
+- M0rph3us (French)
+- Unknow (French)
+- Carchagassky (French)
