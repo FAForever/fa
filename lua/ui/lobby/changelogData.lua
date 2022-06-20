@@ -1,15 +1,15 @@
 last_version = 3739
 
----@alias PatchType "Hotfix"|"Developers patch"|"Balance patch"
+---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
 
----@class Patch
+---@class PatchNotes
 ---@field version string                # Patch version
----@field name PatchType                # Patch type
----@field descriptionFR table<string>   # French translation
----@field descriptionRU table<string>   # Russian translation
----@field description table<string>     # Default changelog in English
+---@field name PatchNotesType           # Patch type
+---@field descriptionFR string[]        # French translation
+---@field descriptionRU string[]        # Russian translation
+---@field description string[]          # Default changelog in English
 
----@type Patch[]
+---@type PatchNotes[]
 gamePatches = {
     {
         version = 3739,
