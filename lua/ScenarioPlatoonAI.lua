@@ -272,19 +272,6 @@ function LandAssaultWithTransports(platoon)
     local aiBrain = platoon:GetBrain()
     local data = platoon.PlatoonData
 
-    for varName, varData in data do
-        if not(varName == 'ReadyVariable' or varName == 'WaitVariable' or varName == 'LandingList' or
-               varName == 'LandingChain' or varName == 'TransportReturn' or varName == 'AttackPoints' or
-               varName == 'AttackChain' or varName == 'AMPlatoons' or varName == 'PlatoonName'
-               or varName == 'AMMasterPlatoon' or varName == 'UsePool' or varName == 'LocationType'
-               or varName == 'BuilderName' or varName == 'LockTimer' or varName == 'DiffLockTimerD1'
-               or varName == 'DiffLockTimerD2' or varName == 'DiffLockTimerD3' or varName == 'AssaultChains'
-               or varName == 'Ratio' or varName == 'LockTimer' or varName == 'MovePath' or varName == 'PatrolChain'
-               or varName == 'RandomPatrol') and varName ~= 'Categories' then
-            error('*SCENARIO PLATOON AI ERROR: LandAssaultWithTransports does not accept variable named-'..varName, 2)
-        end
-    end
-
     if not data.AttackPoints and not data.AttackChain and not data.AssaultChains then
         error('*SCENARIO PLATOON AI ERROR: LandAssaultWithTransports requires AttackPoints in PlatoonData to operate', 2)
     elseif not data.LandingList and not data.LandingChain and not data.AssaultChains then
