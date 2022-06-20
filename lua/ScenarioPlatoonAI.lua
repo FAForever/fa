@@ -263,6 +263,7 @@ end
 --- | LandingList        | (REQUIRED or LandingChain) List of possible locations for transports to unload units
 --- | LandingChain       | (REQUIRED or LandingList) Chain of possible landing locations
 --- | TransportReturn    | Location for transports to return to (they will attack with land units if this isn't set)
+--- | TransportChain     | (or TransportRoute) Route to move along the transports before dropping the units.
 --- | AttackPoints       | (REQUIRED or AttackChain or PatrolChain) List of locations to attack. The platoon attacks the highest threat first
 --- | AttackChain        | (REQUIRED or AttackPoints or PatrolChain) Marker Chain of postitions to attack
 --- | PatrolChain        | (REQUIRED or AttackChain or AttackPoints) Chain of patrolling
@@ -276,6 +277,11 @@ function LandAssaultWithTransports(platoon)
         error('*SCENARIO PLATOON AI ERROR: LandAssaultWithTransports requires AttackPoints in PlatoonData to operate', 2)
     elseif not data.LandingList and not data.LandingChain and not data.AssaultChains then
         error('*SCENARIO PLATOON AI ERROR: LandAssaultWithTransports requires LandingList in PlatoonData to operate', 2)
+    end
+
+    -- Fix wrongly named variable from the GPG era.
+    if data.MovePath then
+        data.TransportChain = data.MovePath
     end
 
     local assaultAttackChain, assaultLandingChain
@@ -345,8 +351,11 @@ function LandAssaultWithTransports(platoon)
         return
     end
 
-    if data.MovePath and not MoveAlongRoute(platoon, ScenarioUtils.ChainToPositions(data.MovePath)) then
-        return
+    -- Move the transports along desired route
+    if data.TransportRoute then
+        ScenarioFramework.PlatoonMoveRoute(platoon, data.TransportRoute)
+    elseif data.TransportChain then
+        ScenarioFramework.PlatoonMoveChain(platoon, data.TransportChain)
     end
 
     -- Find landing location and unload units at right spot
