@@ -1052,51 +1052,39 @@ end
 function ReturnTransportsToPool(platoon, data)
     -- Put transports back in TPool
     local aiBrain = platoon:GetBrain()
-    for _, unit in platoon:GetPlatoonUnits() do
-        if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-            -- If a route was given, reverse the route on return
-            if data.TransportRoute then
-                aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                for i=table.getn(data.TransportRoute), 1, -1 do
-                    if type(data.TransportRoute[1]) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportRoute[i]))
-                    else
-                        IssueMove({unit}, data.TransportRoute[i])
-                    end
-                end
-                if data.TransportReturn then
-                    if type(data.TransportReturn) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportReturn))
-                    else
-                        IssueMove({unit}, data.TransportReturn)
-                    end
-                end
-                -- If a route chain was given, reverse the route on return
-            elseif data.TransportChain then
-                local transPositionChain = {}
-                transPositionChain = ScenarioUtils.ChainToPositions(data.TransportChain)
-                aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                for i=table.getn(transPositionChain), 1, -1 do
-                    IssueMove({unit}, transPositionChain[i])
-                end
-                if data.TransportReturn then
-                    if type(data.TransportReturn) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportReturn))
-                    else
-                        IssueMove({unit}, data.TransportReturn)
-                    end
-                end
-                -- Return to Transport Return if no route
+    local transports = platoon:GetSquadUnits('Scout')
+
+    if table.empty(transports) then
+        return
+    end
+
+    for _, unit in transports do
+        aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
+    end
+
+    -- If a route or chain was given, reverse it on return
+    if data.TransportRoute then
+        for i = table.getn(data.TransportRoute), 1, -1 do
+            if type(data.TransportRoute[i]) == 'string' then
+                IssueMove(transports, ScenarioUtils.MarkerToPosition(data.TransportRoute[i]))
             else
-                if data.TransportReturn then
-                    aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                    if type(data.TransportReturn) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportReturn))
-                    else
-                        IssueMove({unit}, data.TransportReturn)
-                    end
-                end
+                IssueMove(transports, data.TransportRoute[i])
             end
+        end
+        -- If a route chain was given, reverse the route on return
+    elseif data.TransportChain then
+        local transPositionChain = ScenarioUtils.ChainToPositions(data.TransportChain)
+        for i = table.getn(transPositionChain), 1, -1 do
+            IssueMove(transports, transPositionChain[i])
+        end
+    end
+
+    -- Return to Transport Return position
+    if data.TransportReturn then
+        if type(data.TransportReturn) == 'string' then
+            IssueMove(transports, ScenarioUtils.MarkerToPosition(data.TransportReturn))
+        else
+            IssueMove(transports, data.TransportReturn)
         end
     end
 end
