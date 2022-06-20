@@ -1793,7 +1793,7 @@ function GetLoadTransports(platoon)
             table.insert(remainingSize2, unit)
         elseif unit:GetBlueprint().Transport.TransportClass == 1 then
             table.insert(remainingSize1, unit)
-        else
+        elseif not EntityCategoryContains(categories.TRANSPORTATION, unit) then
             table.insert(remainingSize1, unit)
         end
     end
