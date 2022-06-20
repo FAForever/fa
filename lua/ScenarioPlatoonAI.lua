@@ -822,22 +822,6 @@ function StartBaseEngineerThread(platoon)
     local platoonUnits = platoon:GetPlatoonUnits()
     local data = platoon.PlatoonData
     local baseName
-    -- Check for bad variables
-    for varName, varData in data do
-        if not(varName == 'ReadyVariable' or varName == 'WaitVariable' or varName == 'LandingLocation' or
-               varName == 'MoveBeacon' or varName == 'Construction' or varName == 'BuildBaseTemplate' or
-               varName == 'MaintainBaseTemplate' or varName == 'BuildingTemplate' or varName == 'PatrolRoute' or
-               varName == 'PatrolChain'  or varName == 'TransportRoute' or varName == 'TransportChain' or
-               varName == 'DisbandAfterPatrol' or varName == 'RandomPatrol' or varName == 'UseTransports' or
-               varName == 'LocationType' or varName == 'AssistFactories' or varName == 'Busy' or
-               varName == 'ReassignAssist' or varName == 'FactoryAssistList' or varName == 'BuilderName' or
-               varName == 'NamedUnitBuild' or varName == 'LocationType' or varName == 'MaintainDiffLevel'
-               or varName == 'LockTimer' or varName == 'DiffLockTimerD1' or varName == 'DiffLockTimerD2'
-               or varName == 'DiffLockTimerD3' or varName == 'GroupBuildOnce' or varName == 'NamedUnitFinishedCallback'
-               or varName == 'NamedUnitBuildReportCallback') then
-            error('*SCENARIO PLATOON AI ERROR: StartBaseEngineerThread does not accept variable named-'..varName, 2)
-        end
-    end
     -- Check Construction table for bad variables
     if data.Construction then
         for varName, varData in data.Construction do
