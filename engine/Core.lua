@@ -36,6 +36,8 @@ end
 
 ---
 --  base = Dirname(fullPath) -- return a path with trailing filename removed
+---comment
+---@param fullPath string
 function Dirname(fullPath)
 end
 
@@ -161,7 +163,14 @@ end
 
 ---
 --  Create a point vector(px,py,pz, vx,vy,vz)
-function PointVector()
+---@param px number
+---@param py number
+---@param pz number
+---
+---@param vx number
+---@param vy number
+---@param vz number
+function PointVector(px,py,pz, vx,vy,vz)
 end
 
 ---
@@ -229,6 +238,7 @@ end
 
 ---
 --  int STR_Utf8Len(string) - return the number of characters in a UTF-8 string
+---@param string string
 function STR_Utf8Len(string)
 end
 
@@ -239,11 +249,13 @@ end
 
 ---
 --  string STR_itox(int) - converts an integer into a hexidecimal string
+---@param int number
 function STR_itox(int)
 end
 
 ---
 --  int STR_xtoi(string) - converts a hexidecimal string to an integer
+---@param string string
 function STR_xtoi(string)
 end
 
@@ -304,12 +316,16 @@ end
 
 ---
 --  Distance between two 3d points (v1,v2)
-function VDist3()
+---@param v1 number
+---@param v2 number
+function VDist3(v1,v2)
 end
 
 ---
 --  Square of Distance between two 3d points (v1,v2)
-function VDist3Sq()
+---@param v1 number
+---@param v2 number
+function VDist3Sq(v1,v2)
 end
 
 ---
@@ -329,12 +345,17 @@ end
 
 ---
 --  Create a vector (x,y,z)
-function Vector()
+---@param x number
+---@param y number
+---@param z number
+function Vector(x,y,z)
 end
 
 ---
 --  Create a vector (x,y)
-function Vector2()
+---@param x number
+---@param y number
+function Vector2(x,y)
 end
 
 ---  Print a warning message

@@ -7,17 +7,16 @@
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 local Utilities = import('/lua/utilities.lua')
-local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
-local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
-local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
 local UCBC = import('/lua/editor/UnitCountBuildConditions.lua')
 local SBC = import('/lua/editor/SorianBuildConditions.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
--- CDR ADD BEHAVIORS
+
+---CDR ADD BEHAVIORS
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
 function CDRRunAway(aiBrain, cdr)
     if cdr:GetHealthPercent() < 0.7 then
         AIUtils.AIFindDefensiveArea(aiBrain, cdr, categories.DEFENSE * categories.ANTIAIR, 10000)
@@ -55,7 +54,7 @@ function CDRRunAway(aiBrain, cdr)
                         if canTeleport then
                             IssueTeleport({cdr}, runSpot)
                         else
-                            cmd = plat:MoveToLocation(runSpot, false)
+                           local cmd = plat:MoveToLocation(runSpot, false)
                         end
                     end
                 end
@@ -74,6 +73,9 @@ function CDRRunAway(aiBrain, cdr)
     end
 end
 
+---Commander Overcharge Function
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
 function CDROverCharge(aiBrain, cdr)
     local weapBPs = cdr:GetBlueprint().Weapon
     local weapon
@@ -154,7 +156,7 @@ function CDROverCharge(aiBrain, cdr)
             overCharging = false
             if counter >= 5 or not target or target.Dead or Utilities.XZDistanceTwoVectors(cdrPos, target:GetPosition()) > maxRadius then
                 counter = 0
-                searchRadius = 30
+                local searchRadius = 30
                 repeat
                     searchRadius = searchRadius + 30
                     for k, v in priList do
@@ -177,8 +179,8 @@ function CDROverCharge(aiBrain, cdr)
                     -- If inside base dont check threat, just shoot!
                     if Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) > 45 then
                         enemyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface')
-                        enemyCdrThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'Commander')
-                        friendlyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                        local enemyCdrThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'Commander')
+                        local friendlyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
                         if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) then
                             break
                         end
@@ -195,8 +197,8 @@ function CDROverCharge(aiBrain, cdr)
                     end
                 elseif distressLoc then
                     enemyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface')
-                    enemyCdrThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'Commander')
-                    friendlyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                    local friendlyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                    local enemyCdrThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'Commander')
                     if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 3) then
                         break
                     end
@@ -243,12 +245,18 @@ function CDROverCharge(aiBrain, cdr)
     end
 end
 
+---Reverts any Priorty that the Command Unit had.
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
 function CDRRevertPriorityChange(aiBrain, cdr)
     if cdr.PreviousPriority and cdr.Platoon and aiBrain:PlatoonExists(cdr.Platoon) then
         aiBrain:PBMSetPriority(cdr.Platoon, cdr.PreviousPriority)
     end
 end
 
+---Retuns the Command Unit back Home
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
 function CDRReturnHome(aiBrain, cdr)
     -- This is a reference... so it will autoupdate
     local cdrPos = cdr:GetPosition()
@@ -273,10 +281,15 @@ function CDRReturnHome(aiBrain, cdr)
     end
 end
 
+---comment
+---@param cdr CommandUnit
+---@param plat Platoon
 function SetCDRHome(cdr, plat)
     cdr.CDRHome = table.copy(cdr:GetPosition())
 end
 
+---comment
+---@param platoon Platoon
 function CommanderBehavior(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead and not v.CommanderThread then
@@ -285,6 +298,8 @@ function CommanderBehavior(platoon)
     end
 end
 
+---comment
+---@param platoon Platoon 
 function CommanderBehaviorImproved(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead and not v.CommanderThread then
@@ -293,6 +308,9 @@ function CommanderBehaviorImproved(platoon)
     end
 end
 
+---comment
+---@param cdr CommandUnit
+---@param platoon Platoon
 function CommanderThread(cdr, platoon)
     SetCDRHome(cdr, platoon)
 
@@ -324,6 +342,9 @@ function CommanderThread(cdr, platoon)
     end
 end
 
+---comment
+---@param cdr CommandUnit
+---@param platoon Platoon
 function CommanderThreadImproved(cdr, platoon)
     local aiBrain = cdr:GetAIBrain()
     aiBrain:BuildScoutLocations()
@@ -371,11 +392,14 @@ function CommanderThreadImproved(cdr, platoon)
     end
 end
 
--- Generic Unit Behaviors
+---Generic Unit Behaviors
+---@param platoon Platoon
 function BuildOnceAI(platoon)
     platoon:BuildOnceAI()
 end
 
+---comment
+---@param self Platoon
 function AirUnitRefit(self)
     for k, v in self:GetPlatoonUnits() do
         if not v.Dead and not v.RefitThread then
@@ -384,6 +408,10 @@ function AirUnitRefit(self)
     end
 end
 
+---comment
+---@param unit Unit
+---@param plan integer
+---@param data integer
 function AirUnitRefitThread(unit, plan, data)
     unit.PlanName = plan
     if data then
@@ -426,9 +454,6 @@ function AirUnitRefitThread(unit, plan, data)
                         if EntityCategoryContains(categories.AIRSTAGINGPLATFORM, closest) and not closest.AirStaging then
                             closest.AirStaging = closest:ForkThread(AirStagingThread)
                             closest.Refueling = {}
-                        elseif EntityCategoryContains(categories.CARRIER, closest) and not closest.CarrierStaging then
-                            closest.CarrierStaging = closest:ForkThread(CarrierStagingThread)
-                            closest.Refueling = {}
                         end
                         table.insert(closest.Refueling, unit)
                         unit.Loading = true
@@ -440,6 +465,8 @@ function AirUnitRefitThread(unit, plan, data)
     end
 end
 
+---comment
+---@param unit Unit
 function AirStagingThread(unit)
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
@@ -478,6 +505,8 @@ function AirStagingThread(unit)
     end
 end
 
+---comment
+---@param platoon Platoon
 function AirLandToggle(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead and not v.AirLandToggleThread then
@@ -486,6 +515,8 @@ function AirLandToggle(platoon)
     end
 end
 
+---comment
+---@param unit Unit
 function AirLandToggleThread(unit)
     local bp = unit:GetBlueprint()
     local weapons = bp.Weapon
@@ -574,16 +605,9 @@ local SurfacePriorities = {
     'EXPERIMENTAL LAND',
 }
 
--------------------------------------------------------
--- Function: CommanderOverrideCheck
--- Args:
--- platoon - the single-experimental platoon to run the behavior on
--- Description:
--- Checks if an enemy commander is within range of the unit's main weapon but not currently targeted.
--- If true, forces weapons to reacquire targets
--- Returns:
--- the commander that was found, else nil
--------------------------------------------------------
+---Checks if an enemy commander is within range of the unit's main weapon but not currently targeted. If true, forces weapons to reacquire targets.
+---@param self Platoon
+---@return boolean          # the commander that was found, else nil
 CommanderOverrideCheck = function(self)
     local aiBrain = self:GetBrain()
     local experimental = self:GetPlatoonUnits()[1]
@@ -608,15 +632,9 @@ CommanderOverrideCheck = function(self)
     return commanders[1]
 end
 
--------------------------------------------------------
--- Function: GetExperimentalUnit
--- Args:
--- platoon - the platoon
--- Description:
--- Finds the experiemental unit in the platoon (assumes platoons are only experimentals)
--- Returns:
--- experimental or nil
--------------------------------------------------------
+---Finds the experiemental unit in the platoon (assumes platoons are only experimentals)
+---@param platoon Platoon
+---@return boolean                # experimental or nil
 GetExperimentalUnit = function(platoon)
     local unit = nil
     for k, v in platoon:GetPlatoonUnits() do
@@ -625,19 +643,11 @@ GetExperimentalUnit = function(platoon)
             break
         end
     end
-
     return unit
 end
 
--------------------------------------------------------
--- Function: AssignExperimentalPriorities
--- Args:
--- platoon - the single-experimental platoon to run the behavior on
--- Description:
--- Sets the experimental's land weapon target priorities to the SurfacePriorities table.
--- Returns:
--- nil
--------------------------------------------------------
+---Sets the experimental's land weapon target priorities to the SurfacePriorities table.
+---@param platoon Platoon
 AssignExperimentalPriorities = function(platoon)
     local experimental = GetExperimentalUnit(platoon)
     if experimental then
@@ -645,16 +655,11 @@ AssignExperimentalPriorities = function(platoon)
     end
 end
 
--------------------------------------------------------
--- Function: WreckBase
--- Args:
--- platoon - the single-experimental platoon to run the behavior on
--- scoutLocation - the base to wreck
--- Description:
--- Finds a unit in the base we're currently wrecking.
--- Returns:
--- Unit to wreck, base. Else nil.
--------------------------------------------------------
+---Finds a unit in the base we're currently wrecking.
+---@param self Platoon      # the single-experimental platoon to run the behavior on.
+---@param base integer         # the base to wreck
+---@return boolean          # Unit to wreck, base. Else nil.
+---@return integer
 WreckBase = function(self, base)
     for _, priority in SurfacePriorities do
         local numUnitsAtBase = 0
@@ -673,16 +678,10 @@ WreckBase = function(self, base)
     end
 end
 
--------------------------------------------------------
--- Function: FindExperimentalTarget
--- Args:
--- platoon - the single-experimental platoon to run the behavior on
--- Description:
--- Goes through the SurfacePriorities table looking for the enemy base (high priority scouting location. See ScoutingAI in platoon.lua)
--- with the most number of the highest priority targets.
--- Returns:
--- target unit, target base, else nil
--------------------------------------------------------
+--- Goes through the SurfacePriorities table looking for the enemy base (high priority scouting location. See ScoutingAI in platoon.lua)
+---@param self Platoon
+---@return integer
+---@return integer
 FindExperimentalTarget = function(self)
     local aiBrain = self:GetBrain()
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
@@ -734,17 +733,8 @@ FindExperimentalTarget = function(self)
     return false, false
 end
 
--- Indivitual Unit Behaviors
--------------------------------------------------------
--- Function: BehemothBehavior
--- Args:
--- self - the single-experimental platoon to run the behavior on
--- Description:
--- Generic experimental AI. Find a base with good stuff to destroy, and go attack it.
--- If an enemy commander comes within range of the main weapon, attack it.
--- Returns:
--- nil (function loops until experimental dies)
--------------------------------------------------------
+--- Generic experimental AI. Find a base with good stuff to destroy, and go attack it. If an enemy commander comes within range of the main weapon, attack it.
+---@param self Unit
 function BehemothBehavior(self)
     AssignExperimentalPriorities(self)
 
@@ -807,16 +797,9 @@ function BehemothBehavior(self)
     end
 end
 
--------------------------------------------------------
--- Function: GetShieldRadiusAboveGroundSquared
--- Args:
--- unit - the shield to check the radius of
--- Description:
--- Since a shield can be vertically offset, its blueprint radius is not truly indicative of its
--- protective coverage at ground level. This function gets the square of the actual protective radius of the shield
--- Returns:
--- The square of the shield's radius at the surface.
--------------------------------------------------------
+---Since a shield can be vertically offset, its blueprint radius is not truly indicative of its protective coverage at ground level. This function gets the square of the actual protective radius of the shield
+---@param shield Unit
+---@return number               # The square of the shield's radius at the surface.
 function GetShieldRadiusAboveGroundSquared(shield)
     local BP = shield:GetBlueprint().Defense.Shield
     local width = BP.ShieldSize
@@ -825,16 +808,10 @@ function GetShieldRadiusAboveGroundSquared(shield)
     return width * width - height * height
 end
 
--------------------------------------------------------
--- Function: GetClosestShieldProtectingTarget
--- Args:
--- unit - the attacking unit
--- unit - the unit being attacked
--- Description:
--- Gets the closest shield protecting the target unit
--- Returns:
--- The shield, else false
--------------------------------------------------------
+---Gets the closest shield protecting the target unit
+---@param attackingUnit Unit
+---@param targetUnit Unit
+---@return boolean                  # The shield, else false
 function GetClosestShieldProtectingTarget(attackingUnit, targetUnit)
     if attackingUnit.Dead or targetUnit.Dead then
         return false
@@ -873,28 +850,24 @@ function GetClosestShieldProtectingTarget(attackingUnit, targetUnit)
     return closest
 end
 
--------------------------------------------------------
--- Function: FatBoyBehavior
--- Args:
--- self - the single-experimental platoon to run the behavior on
--- Description:
--- Find a base to attack. Sit outside of the base in weapon range and build units.
--- Returns:
--- nil (function loops until experimental dies)
--------------------------------------------------------
+---Find a base to attack. Sit outside of the base in weapon range and build units.
+---@param platoon Platoon
+---@return boolean
 function InWaterCheck(platoon)
     local t4Pos = platoon:GetPlatoonPosition()
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
     return inWater
 end
 
+---Find a base to attack. Sit outside of the base in weapon range and build units.
+---@param self Platoon
 function FatBoyBehavior(self)
     local aiBrain = self:GetBrain()
     AssignExperimentalPriorities(self)
 
     local experimental = GetExperimentalUnit(self)
     local targetUnit = false
-    local lastBase = false
+    local lastBase = nil
 
     local mainWeapon = experimental:GetWeapon(1)
     local weaponRange = mainWeapon:GetBlueprint().MaxRadius
@@ -961,15 +934,8 @@ function FatBoyBehavior(self)
     end
 end
 
--------------------------------------------------------
--- Function: FatBoyBuildCheck
--- Args:
--- self - single-fatboy platoon to build a unit with
--- Description:
--- Builds a random T3 land unit
--- Returns:
--- nil
--------------------------------------------------------
+---Builds a random T3 land unit
+---@param self Platoon
 function FatBoyBuildCheck(self)
     local aiBrain = self:GetBrain()
     local experimental = GetExperimentalUnit(self)
@@ -1015,6 +981,11 @@ end
 -- Returns:
 -- nil
 -------------------------------------------------------
+
+---AI for fatboy child platoons. Wrecks the base that the fatboy has selected. Once the base is wrecked, the units will return to guard the fatboy until a new target base is reached, at which point they will attack it.
+---@param self Platoon
+---@param parent any                # ????
+---@param base string
 function FatboyChildBehavior(self, parent, base)
     local aiBrain = self:GetBrain()
     local targetUnit = false
@@ -1045,6 +1016,8 @@ function FatboyChildBehavior(self, parent, base)
     end
 end
 
+---comment
+---@param self Platoon
 TempestBehavior = function(self)
     local aiBrain = self:GetBrain()
     local unit
@@ -1126,7 +1099,7 @@ TempestBehavior = function(self)
         if aiBrain:PlatoonExists(self) and not self.Patrolling then
             self:Stop()
             self.Patrolling = true
-            scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
+            local scoutPath = AIUtils.AIGetSortedNavalLocations(self:GetBrain())
             for k, v in scoutPath do
                 self:Patrol(v)
             end
@@ -1135,12 +1108,19 @@ TempestBehavior = function(self)
     end
 end
 
+---comment
+---@param unit Unit
 function TempestUnitDeath(unit)
     if unit.Tempest and not unit.Tempest.Dead and unit.Tempest.BuiltUnitCount then
         unit.Tempest.BuildUnitCount = unit.Tempest.BuildUnitCount - 1
     end
 end
 
+---comment
+---@param unit Unit
+---@param platoon Platoon
+---@param position integer
+---@param heading integer
 function TempestBuiltUnitMoveOut(unit, platoon, position, heading)
     if heading >= 270 or heading <= 90 then
         position =  {position[1], position[2], position[3] + 20}
@@ -1160,17 +1140,8 @@ function TempestBuiltUnitMoveOut(unit, platoon, position, heading)
     until counter == 4 or platoon.Patrolling
 end
 
--------------------------------------------------------
--- Function: CzarBehavior
--- Args:
--- self - the single-experimental platoon to run the behavior on
--- Description:
--- Finds a good base to attack and attacks it.  Prefers to find a commander to kill.
--- Is unique in that it will issue a ground attack and then a move to keep the beam
--- on while moving, instead of attacking specific targets
--- Returns:
--- nil (function loops until experimental dies)
--------------------------------------------------------
+---Finds a good base to attack and attacks it.  Prefers to find a commander to kill. Is unique in that it will issue a ground attack and then a move to keep the beam on while moving, instead of attacking specific targets
+---@param self Platoon
 CzarBehavior = function(self)
     local experimental = GetExperimentalUnit(self)
     if not experimental then
@@ -1226,16 +1197,8 @@ CzarBehavior = function(self)
     end
 end
 
--------------------------------------------------------
--- Function: AhwassaBehavior
--- Args:
--- self - the single-experimental platoon to run the behavior on
--- Description:
--- Finds a good base to attack and attacks it.
--- Is unique in that it will look for a cluster of units to hit with its large AOE bomb.
--- Returns:
--- nil (function loops until experimental dies)
--------------------------------------------------------
+--- Finds a good base to attack and attacks it. Is unique in that it will look for a cluster of units to hit with its large AOE bomb.
+---@param self Platoon
 AhwassaBehavior = function(self)
     local aiBrain = self:GetBrain()
     local experimental = GetExperimentalUnit(self)
@@ -1264,16 +1227,8 @@ AhwassaBehavior = function(self)
     end
 end
 
--------------------------------------------------------
--- Function: TickBehavior
--- Args:
--- self - the single-experimental platoon to run the behavior on
--- Description:
--- Finds a good base to attack and attacks it.
--- Is unique in that it will look for a cluster of units to hit with its gunshipness.
--- Returns:
--- nil (function loops until experimental dies)
--------------------------------------------------------
+---Finds a good base to attack and attacks it. Is unique in that it will look for a cluster of units to hit with its gunshipness.
+---@param self Platoon
 TickBehavior = function(self)
     local aiBrain = self:GetBrain()
     local experimental = GetExperimentalUnit(self)
@@ -1302,17 +1257,10 @@ TickBehavior = function(self)
     end
 end
 
--------------------------------------------------------
--- Function: GetHighestThreatClusterLocation
--- Args:
--- aiBrain - aiBrain for experimental
--- experimental - the unit itself
--- Description:
--- Finds the commander first, or a high economic threat that has a lot of units
--- Good for AoE type attacks
--- Returns:
--- position of best place to attack, nil if nothing found
--------------------------------------------------------
+---Finds the commander first, or a high economic threat that has a lot of units Good for AoE type attacks.
+---@param aiBrain AIBrain
+---@param experimental Unit
+---@return nil                  #position of best place to attack, nil if nothing found
 GetHighestThreatClusterLocation = function(aiBrain, experimental)
     if not aiBrain or not experimental then
         return nil
@@ -1399,7 +1347,8 @@ GetHighestThreatClusterLocation = function(aiBrain, experimental)
     return nil
 end
 
--- Sorian AI Functions
+---Sorian AI Functions
+---@param aiBrain AIBrain
 function NukeCheck(aiBrain)
     local Nukes
     local lastNukes = 0
@@ -1456,6 +1405,8 @@ function NukeCheck(aiBrain)
     end
 end
 
+---comment
+---@param platoon Platoon
 function AirLandToggleSorian(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead and not v.AirLandToggleThreadSorian then
@@ -1464,6 +1415,8 @@ function AirLandToggleSorian(platoon)
     end
 end
 
+---comment
+---@param unit Unit
 function AirLandToggleThreadSorian(unit)
 
     local bp = unit:GetBlueprint()
@@ -1591,6 +1544,9 @@ local T4WeaponPrioritiesSorian = {
     'ALLUNITS',
 }
 
+---comment
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
 function CDRRunAwaySorian(aiBrain, cdr)
     local shieldPercent
     local cdrPos = cdr:GetPosition()
@@ -1695,6 +1651,9 @@ function CDRRunAwaySorian(aiBrain, cdr)
     end
 end
 
+---comment
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
 function CDROverChargeSorian(aiBrain, cdr)
     local weapBPs = cdr:GetBlueprint().Weapon
     local weapon
@@ -1724,12 +1683,10 @@ function CDROverChargeSorian(aiBrain, cdr)
     local distressLoc = aiBrain:BaseMonitorDistressLocation(cdrPos)
 
     if (cdr:HasEnhancement('Shield') or cdr:HasEnhancement('ShieldGeneratorField') or cdr:HasEnhancement('ShieldHeavy')) and cdr:ShieldIsOn() then
-        shieldPercent = (cdr.MyShield:GetHealth() / cdr.MyShield:GetMaxHealth())
+        local shieldPercent = (cdr.MyShield:GetHealth() / cdr.MyShield:GetMaxHealth())
     else
-        shieldPercent = 1
+        local shieldPercent = 1
     end
-
-
 
     if Utilities.XZDistanceTwoVectors(cdrPos, cdr:GetPosition()) > distressRange then
         return
@@ -1802,8 +1759,8 @@ function CDROverChargeSorian(aiBrain, cdr)
                 if target then
                     local targetPos = target:GetPosition()
                     enemyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface')
-                    enemyCdrThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'Commander')
-                    friendlyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                    local enemyCdrThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'Commander')
+                    local friendlyThreat = aiBrain:GetThreatAtPosition(targetPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
                     if enemyThreat - enemyCdrThreat >= friendlyThreat + cdrThreat then
                         return
                     end
@@ -1819,8 +1776,8 @@ function CDROverChargeSorian(aiBrain, cdr)
                     end
                 elseif distressLoc then
                     enemyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface')
-                    enemyCdrThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'Commander')
-                    friendlyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+                    local enemyCdrThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'Commander')
+                    local friendlyThreat = aiBrain:GetThreatAtPosition(distressLoc, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
                     if enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) then
                         return
                     end
@@ -1847,14 +1804,14 @@ function CDROverChargeSorian(aiBrain, cdr)
             end
 
             if (cdr:HasEnhancement('Shield') or cdr:HasEnhancement('ShieldGeneratorField') or cdr:HasEnhancement('ShieldHeavy')) and cdr:ShieldIsOn() then
-                shieldPercent = (cdr.MyShield:GetHealth() / cdr.MyShield:GetMaxHealth())
+               local shieldPercent = (cdr.MyShield:GetHealth() / cdr.MyShield:GetMaxHealth())
             else
-                shieldPercent = 1
+               local shieldPercent = 1
             end
 
             enemyThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'AntiSurface')
-            enemyCdrThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'Commander')
-            friendlyThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
+            local enemyCdrThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'Commander')
+            local friendlyThreat = aiBrain:GetThreatAtPosition(cdrPos, 1, true, 'AntiSurface', aiBrain:GetArmyIndex())
             if ((aiBrain:GetNumUnitsAroundPoint(categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy') == 0)
                 and (not distressLoc or (Utilities.XZDistanceTwoVectors(distressLoc, cdrPos) > distressRange)
                 and (Utilities.XZDistanceTwoVectors(cdr.CDRHome, cdr:GetPosition()) < maxRadius))) or enemyThreat - enemyCdrThreat >= friendlyThreat + (cdrThreat / 1.5) or (aiBrain:GetNumUnitsAroundPoint(categories.LAND - categories.SCOUT, cdrPos, maxRadius, 'Enemy')) >= 15 or (cdr:GetHealthPercent() < .80 or shieldPercent < .30) then
@@ -1874,6 +1831,10 @@ function CDROverChargeSorian(aiBrain, cdr)
     end
 end
 
+---comment
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
+---@param Mult number
 function CDRReturnHomeSorian(aiBrain, cdr, Mult)
     -- This is a reference... so it will autoupdate
     local cdrPos = cdr:GetPosition()
@@ -1903,6 +1864,8 @@ function CDRReturnHomeSorian(aiBrain, cdr, Mult)
     end
 end
 
+---comment
+---@param cdr CommandUnit
 function CDRFinishUnit(cdr)
     if cdr.UnitBeingBuiltBehavior and not cdr.UnitBeingBuiltBehavior:BeenDestroyed() then
         IssueClearCommands({cdr})
@@ -1919,6 +1882,8 @@ function CDRFinishUnit(cdr)
     end
 end
 
+---comment
+---@param platoon Platoon
 function CommanderBehaviorSorian(platoon)
     for _, v in platoon:GetPlatoonUnits() do
         if not v.Dead and not v.CommanderThread then
@@ -1927,6 +1892,9 @@ function CommanderBehaviorSorian(platoon)
     end
 end
 
+---comment
+---@param aiBrain AIBrain
+---@param cdr CommandUnit
 function CDRHideBehavior(aiBrain, cdr)
     if cdr:IsIdleState() then
         cdr.GoingHome = false
@@ -1964,6 +1932,9 @@ function CDRHideBehavior(aiBrain, cdr)
     end
 end
 
+---comment
+---@param cdr CommandUnit
+---@param platoon Platoon
 function CommanderThreadSorian(cdr, platoon)
     if platoon.PlatoonData.aggroCDR then
         local mapSizeX, mapSizeZ = GetMapSize()
@@ -1982,8 +1953,8 @@ function CommanderThreadSorian(cdr, platoon)
         SUtils.AISendChat('all', ArmyBrains[aiBrain:GetArmyIndex()].Nickname, 'badmap')
     end
 
-    moveOnNext = false
-    moveWait = 0
+    local moveOnNext = false
+    local moveWait = 0
     local Mult = cdr.Mult or 1
     local Delay = platoon.PlatoonData.Delay or 165
     local WaitTaunt = 600 + Random(1, 600)
@@ -2050,6 +2021,8 @@ function CommanderThreadSorian(cdr, platoon)
     end
 end
 
+---comment
+---@param self Platoon
 function AirUnitRefitSorian(self)
     for k, v in self:GetPlatoonUnits() do
         if not v.Dead and not v.RefitThread then
@@ -2058,6 +2031,10 @@ function AirUnitRefitSorian(self)
     end
 end
 
+---comment
+---@param unit Unit
+---@param plan any
+---@param data any
 function AirUnitRefitThreadSorian(unit, plan, data)
     unit.PlanName = plan
     if data then
@@ -2101,9 +2078,6 @@ function AirUnitRefitThreadSorian(unit, plan, data)
                         if EntityCategoryContains(categories.AIRSTAGINGPLATFORM, closest) and not closest.AirStaging then
                             closest.AirStaging = closest:ForkThread(AirStagingThreadSorian)
                             closest.Refueling = {}
-                        elseif EntityCategoryContains(categories.CARRIER, closest) and not closest.CarrierStaging then
-                            closest.CarrierStaging = closest:ForkThread(CarrierStagingThread)
-                            closest.Refueling = {}
                         end
                         table.insert(closest.Refueling, unit)
                         unit.Loading = true
@@ -2115,6 +2089,8 @@ function AirUnitRefitThreadSorian(unit, plan, data)
     end
 end
 
+---comment
+---@param unit Unit
 function AirStagingThreadSorian(unit)
     local aiBrain = unit:GetAIBrain()
     while not unit.Dead do
@@ -2173,6 +2149,8 @@ function AirStagingThreadSorian(unit)
     end
 end
 
+---comment
+---@param platoon Platoon
 AssignExperimentalPrioritiesSorian = function(platoon)
     local platoonUnits = platoon:GetPlatoonUnits()
     for k, v in platoonUnits do
@@ -2182,6 +2160,9 @@ AssignExperimentalPrioritiesSorian = function(platoon)
     end
 end
 
+---comment
+---@param self Platoon
+---@param priTable any
 SetLandTargetPrioritiesSorian = function(self, priTable)
     for i = 1, self:GetWeaponCount() do
         local wep = self:GetWeapon(i)
@@ -2199,6 +2180,11 @@ SetLandTargetPrioritiesSorian = function(self, priTable)
     end
 end
 
+---comment
+---@param self Platoon
+---@param base any
+---@return boolean
+---@return any
 WreckBaseSorian = function(self, base)
     for _, priority in SurfacePrioritiesSorian do
         local numUnitsAtBase = 0
@@ -2220,6 +2206,10 @@ WreckBaseSorian = function(self, base)
     return false, false
 end
 
+---comment
+---@param self Platoon
+---@return boolean
+---@return boolean
 FindExperimentalTargetSorian = function(self)
     local aiBrain = self:GetBrain()
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
@@ -2270,6 +2260,9 @@ FindExperimentalTargetSorian = function(self)
     return false, false
 end
 
+---comment
+---@param self Platoon
+---@return boolean
 CommanderOverrideCheckSorian = function(self)
     local platoonUnits = self:GetPlatoonUnits()
     local experimental
@@ -2310,6 +2303,10 @@ CommanderOverrideCheckSorian = function(self)
     return commanders[1]
 end
 
+---comment
+---@param aiBrain AIBrain
+---@param experimental Unit
+---@return nil
 GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
     if not aiBrain or not aiBrain:PlatoonExists(experimental) then
         return nil
@@ -2398,6 +2395,14 @@ GetHighestThreatClusterLocationSorian = function(aiBrain, experimental)
     return nil
 end
 
+---comment
+---@param aiBrain AIBrain
+---@param platoon Platoon
+---@param layer any
+---@param dest any
+---@param aggro any
+---@param pathDist any
+---@return boolean
 ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
     local cmd = false
     local platoonUnits = platoon:GetPlatoonUnits()
@@ -2424,6 +2429,8 @@ ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
     return cmd
 end
 
+---comment
+---@param self Platoon
 CzarBehaviorSorian = function(self)
     local aiBrain = self:GetBrain()
     if not aiBrain:PlatoonExists(self) then
@@ -2479,6 +2486,8 @@ CzarBehaviorSorian = function(self)
     end
 end
 
+---comment
+---@param self Platoon
 AhwassaBehaviorSorian = function(self)
     local aiBrain = self:GetBrain()
     if not aiBrain:PlatoonExists(self) then
@@ -2497,7 +2506,7 @@ AhwassaBehaviorSorian = function(self)
         self:MergeWithNearbyPlatoonsSorian('ExperimentalAIHubSorian', 50, true)
         if targetLocation and targetLocation ~= oldTargetLocation then
             IssueClearCommands(platoonUnits)
-            cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, 'AttackDest', 62500)
+            local cmd = ExpPathToLocation(aiBrain, self, 'Air', targetLocation, 'AttackDest', 62500)
             IssueAttack(platoonUnits, targetLocation)
             WaitSeconds(25)
         end
@@ -2508,6 +2517,8 @@ AhwassaBehaviorSorian = function(self)
     end
 end
 
+---comment
+---@param self Platoon
 TickBehaviorSorian = function(self)
     local aiBrain = self:GetBrain()
     if not aiBrain:PlatoonExists(self) then
@@ -2537,6 +2548,8 @@ TickBehaviorSorian = function(self)
     end
 end
 
+---comment
+---@param self Platoon
 function ScathisBehaviorSorian(self)
     local aiBrain = self:GetBrain()
 
@@ -2615,6 +2628,9 @@ function ScathisBehaviorSorian(self)
     end
 end
 
+---comment
+---@param platoon Platoon
+---@return boolean
 function InWaterCheck(platoon)
     local t4Pos = platoon:GetPlatoonPosition()
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
@@ -2622,6 +2638,8 @@ function InWaterCheck(platoon)
     return inWater
 end
 
+---comment
+---@param self Platoon
 function FatBoyBehaviorSorian(self)
     if not self:GatherUnitsSorian() then
         return
@@ -2730,6 +2748,8 @@ function FatBoyBehaviorSorian(self)
     end
 end
 
+---comment
+---@param self Platoon
 function BehemothBehaviorSorian(self)
     if not self:GatherUnitsSorian() then
         return
@@ -2858,6 +2878,10 @@ function BehemothBehaviorSorian(self)
     end
 end
 
+---comment
+---@param attackingUnit Unit
+---@param targetUnit Unit
+---@return boolean
 function GetClosestShieldProtectingTargetSorian(attackingUnit, targetUnit)
     if not targetUnit or not attackingUnit then
         return false
@@ -2895,3 +2919,9 @@ function GetClosestShieldProtectingTargetSorian(attackingUnit, targetUnit)
 
     return closest
 end
+
+-- kept for mod compatibility, as they may depend on these
+local AIBuildStructures = import('/lua/ai/aibuildstructures.lua')
+local UnitUpgradeTemplates = import('/lua/upgradetemplates.lua').UnitUpgradeTemplates
+local StructureUpgradeTemplates = import('/lua/upgradetemplates.lua').StructureUpgradeTemplates
+local TriggerFile = import('/lua/scenariotriggers.lua')
