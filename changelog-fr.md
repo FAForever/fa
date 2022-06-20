@@ -1,4 +1,16 @@
 
+
+Note de patch 3739 (20 juin 2022)
+==========================
+
+## Bug fixes
+
+- (#3978) Corriger les améliorations des missiles tactiques des (S)ACUs
+
+## Contributors
+
+- Jip (#3978)
+
 Note de patch 3738 (19 juin 2022)
 =================================
 
@@ -38,8 +50,6 @@ Jip
 - (#3966) Correction des points d'arrêt pour diverses usines
     Les points d'ancrage n'étaient pas correctement alignés, en conséquence les vaisseaux avaient du mal à quitter le quai. Ceci était particulièrement visible sur les usines navales de la faction Cybran.
 
-Traduit avec www.DeepL.com/Translator (version gratuite)n
-
 ## Fonctionnalités
 
 - (#3887, #3968) Introduction de la prise en charge d'Intellisense pour l'extension FA Visual Studio Code (VSC)
@@ -75,8 +85,6 @@ Traduit avec www.DeepL.com/Translator (version gratuite)n
     Conformément à la #3857, les armes de la majorité des unités ne revérifient pas leurs cibles. Habituellement, cela n'est pas nécessaire, mais cela entraîne une baisse importante des performances. Ce nouveau raccourci est introduit pour vous permettre de laisser vos unités recibler sur commande pour les situations où cela est nécessaire.
 
     Vous pouvez trouver le raccourci en recherchant 'recheck' dans le menu des raccourcis.
-
-Traduit avec www.DeepL.com/Translator (version gratuite)
 
 ### Pour les développeurs de cartes, de mods et d'IA
 

@@ -1,6 +1,16 @@
 
-
 Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
+
+Game version 3739 (20th of June, 2022)
+======================================
+
+## Bug fixes
+
+- (#3978) Fix tactical missile enhancements of (S)ACUs
+
+## Contributors
+
+- Jip (#3978)
 
 Game version 3738 (19th of June, 2022)
 ======================================
