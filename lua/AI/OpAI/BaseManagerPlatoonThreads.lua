@@ -859,23 +859,31 @@ function BuildBaseManagerStructure(aiBrain, eng, baseManager, levelName, buildin
                 end
             end
             if category and eng:CanBuild(category) then
+                local engineerPos = eng:GetPosition()
+                local closest = false
                 -- Iterate through build locations
                 for num, location in v do
                     -- Check if it can be built and then build
                     if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) and baseManager:CheckUnitBuildCounter(location, buildCounter) then
-                        -- Removed transport call as the pathing check was creating problems with base manager rebuilding
-                        -- TODO: develop system where base managers more easily rebuild in far away or hard to reach locations
-                        -- and TransportUnitsToLocation(platoon, {location[1], 0, location[2]}) then
-                        IssueClearCommands({eng})
-                        aiBrain:BuildStructure(eng, category, location, false)
-
-                        local unitName = false
-                        if namesTable[location[1]][location[2]] then
-                            unitName = namesTable[location[1]][location[2]]
+                        if not closest or VDist2(location[1], location[3], engineerPos[1], engineerPos[3]) < VDist2(closest[1], closest[3], engineerPos[1], engineerPos[3]) then
+                            closest = location
                         end
-
-                        return true, unitName
                     end
+                end
+
+                if closest then
+                    -- Removed transport call as the pathing check was creating problems with base manager rebuilding
+                    -- TODO: develop system where base managers more easily rebuild in far away or hard to reach locations
+                    -- and TransportUnitsToLocation(platoon, {closest[1], 0, closest[2]}) then
+                    IssueClearCommands({eng})
+                    aiBrain:BuildStructure(eng, category, closest, false)
+
+                    local unitName = false
+                    if namesTable[closest[1]][closest[2]] then
+                        unitName = namesTable[closest[1]][closest[2]]
+                    end
+
+                    return true, unitName
                 end
             end
         end
