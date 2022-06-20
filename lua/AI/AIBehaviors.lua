@@ -54,7 +54,7 @@ function CDRRunAway(aiBrain, cdr)
                         if canTeleport then
                             IssueTeleport({cdr}, runSpot)
                         else
-                           local cmd = plat:MoveToLocation(runSpot, false)
+                           cmd = plat:MoveToLocation(runSpot, false)
                         end
                     end
                 end
@@ -410,8 +410,8 @@ end
 
 ---comment
 ---@param unit Unit
----@param plan integer
----@param data integer
+---@param plan string
+---@param data table
 function AirUnitRefitThread(unit, plan, data)
     unit.PlanName = plan
     if data then
@@ -984,8 +984,8 @@ end
 
 ---AI for fatboy child platoons. Wrecks the base that the fatboy has selected. Once the base is wrecked, the units will return to guard the fatboy until a new target base is reached, at which point they will attack it.
 ---@param self Platoon
----@param parent any                # ????
----@param base string
+---@param parent any
+---@param base table
 function FatboyChildBehavior(self, parent, base)
     local aiBrain = self:GetBrain()
     local targetUnit = false
@@ -2033,8 +2033,8 @@ end
 
 ---comment
 ---@param unit Unit
----@param plan any
----@param data any
+---@param plan string
+---@param data table
 function AirUnitRefitThreadSorian(unit, plan, data)
     unit.PlanName = plan
     if data then
@@ -2162,7 +2162,7 @@ end
 
 ---comment
 ---@param self Platoon
----@param priTable any
+---@param priTable string
 SetLandTargetPrioritiesSorian = function(self, priTable)
     for i = 1, self:GetWeaponCount() do
         local wep = self:GetWeapon(i)
