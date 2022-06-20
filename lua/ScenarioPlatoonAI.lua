@@ -359,25 +359,14 @@ function LandAssaultWithTransports(platoon)
     end
 
     -- Find landing location and unload units at right spot
-    local landingLocation
-    if ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty == 3 then
-        landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
-    else
-        landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
-    end
-    cmd = platoon:UnloadAllAtLocation(landingLocation)
-    local attached = true
-    while attached do
-        attached = false
-        WaitSeconds(3)
+    local landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
+    local cmd = platoon:UnloadAllAtLocation(landingLocation)
+
+    -- Wait until the units are dropped
+    while platoon:IsCommandsActive(cmd) do
+        WaitSeconds(1)
         if not aiBrain:PlatoonExists(platoon) then
             return
-        end
-        for num, unit in platoon:GetPlatoonUnits() do
-            if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) and unit:IsUnitState('Attached') then
-                attached = true
-                break
-            end
         end
     end
 
