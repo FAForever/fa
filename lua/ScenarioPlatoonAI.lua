@@ -1787,12 +1787,12 @@ function GetLoadTransports(platoon)
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
     -- Old load transports
-    local monitorUnits = {}
+    local unitsToDrop = {}
     for num, data in transportTable do
         if not table.empty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
-            for _, v in data.Units do table.insert(monitorUnits, v) end
+            for _, v in data.Units do table.insert(unitsToDrop, v) end
         end
     end
 
@@ -1803,7 +1803,7 @@ function GetLoadTransports(platoon)
             return false
         end
         attached = true
-        for _, v in monitorUnits do
+        for _, v in unitsToDrop do
             if not v.Dead and not v:IsIdleState() then
                 attached = false
                 break
@@ -1827,11 +1827,9 @@ function GetLoadTransports(platoon)
         pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     end
 
-    for _, unit in platoon:GetPlatoonUnits() do
-        if not EntityCategoryContains(categories.TRANSPORTATION, unit) then
-            if not unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
-            end
+    for _, unit in unitsToDrop do
+        if not unit.Dead and not unit:IsUnitState('Attached') then
+            aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
         end
     end
 
