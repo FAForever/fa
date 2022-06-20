@@ -1,5 +1,47 @@
-last_version = 3738
+last_version = 3739
+
+---@alias PatchNotesType "Hotfix"|"Developers patch"|"Balance patch"
+
+---@class PatchNotes
+---@field version string                # Patch version
+---@field name PatchNotesType           # Patch type
+---@field descriptionFR string[]        # French translation
+---@field descriptionRU string[]        # Russian translation
+---@field description string[]          # Default changelog in English
+
+---@type PatchNotes[]
 gamePatches = {
+    {
+        version = 3739,
+        name = "Hotfix",
+        descriptionFR = {           
+            "## Correction de Bug",
+            "",
+            "- (#3978) Corriger les améliorations des missiles tactiques des (S)ACUs",
+            "",
+            "## Contributeurs",
+            "",
+            "- Jip (#3978)",
+        },
+        descriptionRU = {
+            "## Исправление ошибок",
+            "",
+            "- (#3978) Исправить усовершенствования тактических ракет (S)ACU",
+            "",
+            "## Авторы",
+            "",
+            "- Jip (#3978)",
+        },
+        description = {
+            "## Bug fixes",
+            "",
+            "- (#3978) Fix tactical missile enhancements of (S)ACUs",
+            "",
+            "## Contributors",
+            "",
+            "- Jip (#3978)",
+        }
+    },
     {
         version = 3738,
         name = "Developers patch",
