@@ -370,6 +370,11 @@ function LandAssaultWithTransports(platoon)
         end
     end
 
+    -- Send transports back to base if desired
+    if platoon.PlatoonData.TransportReturn then
+        ReturnTransportsToPool(platoon, data)
+    end
+
     if data.PatrolChain then
         if data.RandomPatrol then
             ScenarioFramework.PlatoonPatrolRoute(platoon, GetRandomPatrolRoute(ScenarioUtils.ChainToPositions(data.PatrolChain)))
@@ -378,16 +383,8 @@ function LandAssaultWithTransports(platoon)
         end
     else
         -- Patrol attack route by creating attack route
-        local attackRoute = {}
-        attackRoute = PlatoonChooseHighestAttackRoute(aiBrain, attackPositions, 1)
-        -- Send transports back to base if desired
-        if platoon.PlatoonData.TransportReturn then
-            ReturnTransportsToPool(platoon, data)
-        end
-
-        for _, v in attackRoute do
-            platoon:Patrol(v)
-        end
+        local attackRoute = PlatoonChooseHighestAttackRoute(aiBrain, attackPositions, 1)
+        ScenarioFramework.PlatoonPatrolRoute(platoon, attackRoute)
     end
 
     for num, unit in platoon:GetPlatoonUnits() do
