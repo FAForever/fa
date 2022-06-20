@@ -3,11 +3,11 @@
 Note de patch 3739 (20 juin 2022)
 ==========================
 
-## Bug fixes
+## Correction de Bug
 
 - (#3978) Corriger les améliorations des missiles tactiques des (S)ACUs
 
-## Contributors
+## Contributeurs
 
 - Jip (#3978)
 
