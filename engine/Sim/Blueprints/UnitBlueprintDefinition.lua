@@ -219,8 +219,76 @@
 ---@field StartsOff boolean -- Appears to do nothing but seems to be meant to make the shield turned off by default
 ---@field StartOn boolean -- (?)
 
---- todo display
 ---@class BpDisplay
+---@field Abilities string[] -- Shows the abilities of the unit. Multiple abilities could be added like 'string1', 'string2', etc.
+---@field AINames string[] -- Names that the AI can use to name the unit, provided the AI is programmed to do this.
+---@field AnimationActivate string -- The animation that is played when the unit is completed (seen in experimentals, e.g. Megalith - XRL0403)
+---@field AnimationBuild string -- Animation that is played when the unit is building
+---@field AnimationDeath BpDisplay.AnimationDeath[] -- Multiple animations could be added
+---@field AnimationOpen string -- Animation open file is linked here: '/units/UnitID/UnitID_aopen.sca'
+---@field AnimationPermOpen unknown -- The animation that is played when the unit is done building
+---@field AnimationSurface unknown -- The animation that is played when the unit surfaces.
+---@field AnimationUpgrade string -- The animation that is played when the unit is upgraded
+---@field AnimationWalk string -- Animation walk file is linked here: '/units/UnitID/UnitID_??.sca'
+---@field AnimationWalkRate number -- Controls the speed of the animation. Adjusting this number can cause or prevent "skating".
+---@field BlinkingLights unknown -- ?
+---@field BlinkingLightsFx unknown -- ?
+---@field BuildAttachBone unknown -- ?
+---@field DamageEffects unknown -- ?
+---@field ForcedBuildSpin unknown -- ?
+---@field IdleEffects table<string, BpDisplay.Effects>  -- Effects displayed when the unit is idle (e.g. glow beneath hovering units), multiple layers can be used. The key should be the name of the layer where effects should be displayed.
+---@field LayerChangeEffects table<string, BpDisplay.Effects> BpDisplay.LayerChangeEffects -- Effects displayed when the unit changes layers (e.g. when an aircraft lands or takes off). Defines for what transition the effects are created. 'string' is composed of 2 names of layers, first one is the old layer and the second is the new one. E.g.effects are needed for an aircraft landing, so the old layer is Air and the new one is Land, then the 'string' will be AirLand (LandAir would be the opposite - take off). Note: there is NO space between layer names.
+---@field Mesh BpDisplay.Mesh
+---@field MotionChangeEffects table<string, BpDisplay.Effects>
+---@field MovementEffects table<string, BpDisplay.MovementEffects> -- Effects displayed during movement of the unit. Key should be Name of the layer for which the effects are displayed.
+---@field PlaceholderMeshName string -- ?
+---@field SpawnRandomRotation boolean -- ?
+---@field Tarmacs unknown -- ?
+---@field UniformScale number -- This is the scale of the unit size. This will only change the visual size, when changing this the collision hitbox should be adapted under SizeX, SizeY and SizeZ as well.
+
+---@class BpDisplay.AnimationDeath
+---@field Animation string -- animation death file is linked here: '/units/UnitID/UnitID_??.sca'
+---@field AnimationRateMax number -- the maximum speed this animation is played at
+---@field AnimationRateMin number -- the minimum speed this animation is played at
+---@field Weight number -- This number affects how often a death animation is used when there are more than one. This value is relative rather than absolute.
+
+---@class BpDisplay.Effects
+---@field Effects BpDisplay.Effect[]
+
+---@class BpDisplay.Effect
+---@field Bones string[] -- Names of bones to which the effect will be attached.
+---@field Offset {[1]:number, [2]:number, [3]:number} -- Controls position of the effect relatively to the bone it's attached to. n1, n2 and n3 are respectively x, y and z coordinates (0, 0, 0 by default).
+---@field Scale number -- Controls scale of the effect (1 by default).
+---@field Type string -- Defines what effect will be used.
+
+---@class BpDisplay.Mesh
+---@field IconFadeInZoom number -- The zoom level at which the strategic icon begins showing. Higher values increase how zoomed out you must be for the icon to appear.
+---@field LODs BpDisplay.Mesh.Lod[] -- Defines different Levels Of Detail, so that units become less detailed when player zooms out (to improve performance)
+
+---@class BpDisplay.Mesh.Lod
+---@field MeshName string -- lod0 file is linked here: '/units/UnitID/UnitID_LOD0.scm' where 0 is the index in the LODs list
+---@field AlbedoName string -- lod0 albedo file is linked here: '/units/UnitID/UnitID_Albedo.dds' where 0 is the index in the LODs list
+---@field NormalsName string -- lod0 normalsts file is linked here: '/units/UnitID/UnitID_NormalsTS.dds' where 0 is the index in the LODs list
+---@field SpecularName string -- lod0 specteam file is linked here: '/units/UnitID/UnitID_SpecTeam.dds' where 0 is the index in the LODs list
+---@field LODCutoff number -- Defines zoom level when this LOD is no longer used (higher value increases how zoomed out you must be).
+---@field Scrolling boolean -- ?
+---@field ShaderName string -- ? known ShaderName's: 'Unit', 'Insect', 'Seraphim'
+
+---@class BpDisplay.MovementEffects: BpDisplay.Effects
+---@field Contrails { Bones: string[] } -- Contrails shown behind aircraft (in SupCom usually behind tips of wings). --Bones are Names of the bones which will have the contrails attached.
+---@field Treads BpDisplay.MovementEffects.Treads -- For units with treads or wheels, e.g. tanks, UEF engineers.
+
+---@class BpDisplay.MovementEffects.Treads
+---@field ScrollTreads boolean -- Should the treads be scrolled when unit is moving?
+---@field TreadMarks BpDisplay.MovementEffects.Treads.TreadMarks
+
+---@class BpDisplay.MovementEffects.Treads.TreadMarks
+---@field BoneName string -- Name of the bone to which the tread marks will be attached.
+---@field TreadMarks string -- Name of the tread marks to be used (e.g. light tank might have different than a heavier one).
+---@field TreadMarksInterval number -- Defines how often should they be created on the ground.
+---@field TreadMarksSizeX number -- <Defines how big/stretched should the tread marks be on the X axis.
+---@field TreadMarksSizeZ number -- Defines how big/stretched should the tread marks be on the Z axis.
+---@field TreadOffset {[1]:number, [2]:number, [3]:number} -- Defines the offset of tread marks to bone defined in BoneName. 'n1', 'n2', 'n3' are respectively x, y and z coordinates.
 
 ---@class BpEconomy
 ---@field AdjacentEnergyProductionMod number -- ?
