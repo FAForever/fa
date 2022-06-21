@@ -349,7 +349,7 @@ AIBrain = Class(moho.aibrain_methods) {
         self.Jammers[unit.EntityId] = nil
     end,
 
-    --- Creates a thread that interates over all jammer units to reset them
+    --- Creates a thread that interates over all jammer units to reset them when vision is lost on them
     ---@param self AIBrain 
     JammingToggleThread = function(self)
         while true do
@@ -367,7 +367,7 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    --- Toggles a given unit's jammer on and off
+    --- Toggles a given unit's jammer
     ---@param self AIBrain
     ---@param unit Unit         # Jammer to be toggled
     JammingFollowUpThread = function(self, unit)
