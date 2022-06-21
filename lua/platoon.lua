@@ -24,6 +24,7 @@ local SPAI = import('/lua/ScenarioPlatoonAI.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
 ---@class Platoon : moho.platoon_methods
+---@field PlatoonData table
 Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
