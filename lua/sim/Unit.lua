@@ -343,7 +343,6 @@ Unit = Class(moho.unit_methods) {
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
         
-
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1

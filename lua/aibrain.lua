@@ -335,38 +335,46 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Jamming Switch Logic
 
+    --- Adds a unit to a list of all units with jammers
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer unit
     TrackJammer = function(self, unit)
         self.Jammers[unit.EntityId] = unit
     end,
 
+    --- Removes a unit to a list of all units with jammers
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer unit
     UntrackJammer = function(self, unit)
         self.Jammers[unit.EntityId] = nil
     end,
 
+    --- Creates a thread that interates over all jammer units to reset them
+    ---@param self AIBrain 
     JammingToggleThread = function(self)
-        while true do 
+        while true do
             for i, jammer in self.Jammers do
                 if jammer.ResetJammer == 0 then
-                    if jammer.ResetJammer then
-                        jammer:DisableUnitIntel('AutoToggle', 'Jammer')
-                        self:ForkThread(self.JammingFollowUpThread, jammer)
-                        jammer.ResetJammer = -1
-                    end
+                    self:ForkThread(self.JammingFollowUpThread, jammer)
+                    jammer.ResetJammer = -1
                 else
                     if jammer.ResetJammer > 0 then
                         jammer.ResetJammer = jammer.ResetJammer - 1
                     end
-                    
                 end
             end
             WaitSeconds(1)
         end
     end,
 
+    --- Toggles a given unit's jammer on and off
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer to be toggled
     JammingFollowUpThread = function(self, unit)
+        unit:DisableUnitIntel('AutoToggle', 'Jammer')
         WaitSeconds(1)
         if not unit:BeenDestroyed() then
-            unit:EnableUnitIntel('AutoToggle', 'Jammer')  
+            unit:EnableUnitIntel('AutoToggle', 'Jammer')
             unit.ResetJammer = -1
         end
     end,
