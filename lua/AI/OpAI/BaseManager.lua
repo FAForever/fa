@@ -1856,10 +1856,19 @@ BaseManager = ClassSimple {
     end,
 }
 
+--- Prepares a base manager, note that you still need to call one of the Start functions
+---@param brain AIBrain
+---@param baseName string
+---@param markerName Marker
+---@param radius number
+---@param levelTable any
+---@return BaseManager
 function CreateBaseManager(brain, baseName, markerName, radius, levelTable)
-   
+
+    ---@type BaseManager
     local bManager = BaseManager()
     bManager:Create()
+
     if brain and baseName and markerName and radius then
         bManager:Initialize(brain, baseName, markerName, radius, levelTable)
     end
