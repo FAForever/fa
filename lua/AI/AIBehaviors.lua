@@ -13,6 +13,22 @@ local UCBC = import('/lua/editor/UnitCountBuildConditions.lua')
 local SBC = import('/lua/editor/SorianBuildConditions.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
+---@alias commander unknown
+---@alias notDeadUnit unknown
+---@alias base unknown
+---@alias bestUnit unknown
+---@alias bestbase unknown
+---@alias shieldRadius unknown
+---@alias inWater unknown
+---@alias parent unknown
+---@alias position unknown
+---@alias heading unknown
+---@alias layer unknown
+---@alias dest unknown
+---@alias aggro unknown
+---@alias pathDist unknown
+---@alias cmd unknown
+
 
 ---CDR ADD BEHAVIORS
 ---@param aiBrain AIBrain
@@ -607,7 +623,7 @@ local SurfacePriorities = {
 
 ---Checks if an enemy commander is within range of the unit's main weapon but not currently targeted. If true, forces weapons to reacquire targets.
 ---@param self Platoon
----@return boolean          # the commander that was found, else nil
+---@return commander|nil          # the commander that was found, else nil
 CommanderOverrideCheck = function(self)
     local aiBrain = self:GetBrain()
     local experimental = self:GetPlatoonUnits()[1]
@@ -634,7 +650,7 @@ end
 
 ---Finds the experiemental unit in the platoon (assumes platoons are only experimentals)
 ---@param platoon Platoon
----@return boolean                # experimental or nil
+---@return Unit|nil
 GetExperimentalUnit = function(platoon)
     local unit = nil
     for k, v in platoon:GetPlatoonUnits() do
@@ -657,9 +673,9 @@ end
 
 ---Finds a unit in the base we're currently wrecking.
 ---@param self Platoon      # the single-experimental platoon to run the behavior on.
----@param base integer         # the base to wreck
----@return boolean          # Unit to wreck, base. Else nil.
----@return integer
+---@param base unknown         # the base to wreck
+---@return notDeadUnit|nil          # Unit to wreck, base. Else nil.
+---@return base|nil
 WreckBase = function(self, base)
     for _, priority in SurfacePriorities do
         local numUnitsAtBase = 0
@@ -680,8 +696,8 @@ end
 
 --- Goes through the SurfacePriorities table looking for the enemy base (high priority scouting location. See ScoutingAI in platoon.lua)
 ---@param self Platoon
----@return integer
----@return integer
+---@return bestbase
+---@return bestUnit
 FindExperimentalTarget = function(self)
     local aiBrain = self:GetBrain()
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
@@ -799,7 +815,7 @@ end
 
 ---Since a shield can be vertically offset, its blueprint radius is not truly indicative of its protective coverage at ground level. This function gets the square of the actual protective radius of the shield
 ---@param shield Unit
----@return number               # The square of the shield's radius at the surface.
+---@return shieldRadius               # The square of the shield's radius at the surface.
 function GetShieldRadiusAboveGroundSquared(shield)
     local BP = shield:GetBlueprint().Defense.Shield
     local width = BP.ShieldSize
@@ -811,7 +827,7 @@ end
 ---Gets the closest shield protecting the target unit
 ---@param attackingUnit Unit
 ---@param targetUnit Unit
----@return boolean                  # The shield, else false
+---@return boolean|false                  # The shield, else false
 function GetClosestShieldProtectingTarget(attackingUnit, targetUnit)
     if attackingUnit.Dead or targetUnit.Dead then
         return false
@@ -852,7 +868,7 @@ end
 
 ---Find a base to attack. Sit outside of the base in weapon range and build units.
 ---@param platoon Platoon
----@return boolean
+---@return inWater
 function InWaterCheck(platoon)
     local t4Pos = platoon:GetPlatoonPosition()
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])
@@ -984,8 +1000,8 @@ end
 
 ---AI for fatboy child platoons. Wrecks the base that the fatboy has selected. Once the base is wrecked, the units will return to guard the fatboy until a new target base is reached, at which point they will attack it.
 ---@param self Platoon
----@param parent any
----@param base table
+---@param parent parent
+---@param base base
 function FatboyChildBehavior(self, parent, base)
     local aiBrain = self:GetBrain()
     local targetUnit = false
@@ -1119,8 +1135,8 @@ end
 ---comment
 ---@param unit Unit
 ---@param platoon Platoon
----@param position integer
----@param heading integer
+---@param position position
+---@param heading heading
 function TempestBuiltUnitMoveOut(unit, platoon, position, heading)
     if heading >= 270 or heading <= 90 then
         position =  {position[1], position[2], position[3] + 20}
@@ -1260,7 +1276,7 @@ end
 ---Finds the commander first, or a high economic threat that has a lot of units Good for AoE type attacks.
 ---@param aiBrain AIBrain
 ---@param experimental Unit
----@return nil                  #position of best place to attack, nil if nothing found
+---@return position|nil                  #position of best place to attack, nil if nothing found
 GetHighestThreatClusterLocation = function(aiBrain, experimental)
     if not aiBrain or not experimental then
         return nil
@@ -2182,9 +2198,9 @@ end
 
 ---comment
 ---@param self Platoon
----@param base any
----@return boolean
----@return any
+---@param base base
+---@return notDeadUnit|false
+---@return base|false
 WreckBaseSorian = function(self, base)
     for _, priority in SurfacePrioritiesSorian do
         local numUnitsAtBase = 0
@@ -2208,8 +2224,8 @@ end
 
 ---comment
 ---@param self Platoon
----@return boolean
----@return boolean
+---@return bestbase|boolean
+---@return bestUnit|boolean
 FindExperimentalTargetSorian = function(self)
     local aiBrain = self:GetBrain()
     if not aiBrain.InterestList or not aiBrain.InterestList.HighPriority then
@@ -2262,7 +2278,7 @@ end
 
 ---comment
 ---@param self Platoon
----@return boolean
+---@return commander
 CommanderOverrideCheckSorian = function(self)
     local platoonUnits = self:GetPlatoonUnits()
     local experimental
@@ -2398,11 +2414,11 @@ end
 ---comment
 ---@param aiBrain AIBrain
 ---@param platoon Platoon
----@param layer any
----@param dest any
----@param aggro any
----@param pathDist any
----@return boolean
+---@param layer layer
+---@param dest dest
+---@param aggro aggro
+---@param pathDist pathDist
+---@return cmd|boolean
 ExpPathToLocation = function(aiBrain, platoon, layer, dest, aggro, pathDist)
     local cmd = false
     local platoonUnits = platoon:GetPlatoonUnits()
@@ -2630,7 +2646,7 @@ end
 
 ---comment
 ---@param platoon Platoon
----@return boolean
+---@return inWater|boolean
 function InWaterCheck(platoon)
     local t4Pos = platoon:GetPlatoonPosition()
     local inWater = GetTerrainHeight(t4Pos[1], t4Pos[3]) < GetSurfaceHeight(t4Pos[1], t4Pos[3])

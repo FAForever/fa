@@ -1,6 +1,8 @@
 ---@declare-global
 ---Module: Core
 -- @module Core
+---@alias Vector unknown
+
 
 ---
 --  Create a target object
@@ -161,15 +163,13 @@ end
 function OrientFromDir(vector)
 end
 
----
---  Create a point vector(px,py,pz, vx,vy,vz)
----@param px number
----@param py number
----@param pz number
----
----@param vx number
----@param vy number
----@param vz number
+---Create a point vector(px,py,pz, vx,vy,vz)
+---@param px Vector
+---@param py Vector
+---@param pz Vector
+---@param vx Vector
+---@param vy Vector
+---@param vz Vector
 function PointVector(px,py,pz, vx,vy,vz)
 end
 
@@ -179,9 +179,13 @@ end
 function RPCSound(sound)
 end
 
----
---  Create a 2d Rectangle (x0,y0,x1,y1)
-function Rect()
+
+---Create a 2d Rectangle (x0,y0,x1,y1)
+---@param x0 integer
+---@param y0 integer
+---@param x1 integer
+---@param y1 integer
+function Rect(x0,y0,x1,y1)
 end
 
 ---
@@ -286,9 +290,10 @@ end
 function Trace(enable)
 end
 
----
---  Addition of two vectors
-function VAdd()
+---Addition of two vectors
+---@param v1 Vector
+---@param v2 Vector
+function VAdd(v1, v2)
 end
 
 ---
@@ -316,15 +321,15 @@ end
 
 ---
 --  Distance between two 3d points (v1,v2)
----@param v1 number
----@param v2 number
+---@param v1 Vector
+---@param v2 Vector
 function VDist3(v1,v2)
 end
 
 ---
 --  Square of Distance between two 3d points (v1,v2)
----@param v1 number
----@param v2 number
+---@param v1 Vector
+---@param v2 Vector
 function VDist3Sq(v1,v2)
 end
 
@@ -345,16 +350,16 @@ end
 
 ---
 --  Create a vector (x,y,z)
----@param x number
----@param y number
----@param z number
+---@param x Vector
+---@param y Vector
+---@param z Vector
 function Vector(x,y,z)
 end
 
 ---
 --  Create a vector (x,y)
----@param x number
----@param y number
+---@param x Vector
+---@param y Vector
 function Vector2(x,y)
 end
 
