@@ -1,8 +1,8 @@
 ------------------------------------------------------------------------
--- File     :  /lua/ai/ScenarioPlatoonAI.lua
--- Author(s):  Drew Staltman
--- Summary  :  Houses a number of AI threads that are used in operations
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--- File     :  /lua/ai/ScenarioPlatoonAI.lua
+--- Author(s):  Drew Staltman
+--- Summary  :  Houses a number of AI threads that are used in operations
+--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------------
 
 local Utilities = import('/lua/utilities.lua')
@@ -11,12 +11,78 @@ local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local BuildingTemplates = import('/lua/BuildingTemplates.lua').BuildingTemplates
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
+--- Retrieves all human brains that are hostile to the given army index
+---@param armyIndex number|string   # Army index to check alliance with
+---@return table AIBrain[]
+function GetHumanEnemies(armyIndex)
+    humans = {}
+
+    for i, brain in ArmyBrains do
+        if brain.BrainType == 'Human' and IsEnemy(armyIndex, brain:GetArmyIndex()) then
+            table.insert(humans, brain)
+        end
+    end
+
+    return humans
+end
+
 --------------------------------------------------------
---  PlatoonAttackClosestUnit
---      Attacks Closest Unit the AI Brain knows about
---  function: PlatoonAttackClosestUnit = AddFunction
---      parameter 0: string: platoon = "default_platoon"
+---  function: BuildOnce = AddFunction
+---      parameter 0: string: platoon = "default_platoon"
 --------------------------------------------------------
+function BuildOnce(platoon)
+    local aiBrain = platoon:GetBrain()
+    if aiBrain.HasPlatoonList then
+        aiBrain:PBMSetPriority(platoon, 0)
+    else
+        platoon.BuilderHandle:SetPriority(0)
+    end
+end
+
+--------------------------------------------------------
+---  function: DefaultOSBasePatrol = AddFunction
+---      parameter 0: string: platoon = "default_platoon"
+--------------------------------------------------------
+function DefaultOSBasePatrol(platoon)
+    local aiBrain = platoon:GetBrain()
+    local master = string.sub(platoon.PlatoonData.BuilderName, 11)
+    local chain = false
+    if platoon.PlatoonData.LocationType and Scenario.Chains[aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'] then
+        chain = aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'
+    elseif Scenario.Chains[master .. '_BasePatrolChain'] then
+        chain = master .. '_BasePatrolChain'
+    elseif Scenario.Chains[aiBrain.Name .. '_BasePatrolChain'] then
+        chain = aiBrain.Name .. '_BasePatrolChain'
+    end
+    if chain then
+        platoon.PlatoonData.PatrolChain = chain
+        PatrolThread(platoon)
+    end
+end
+
+-------------------------------------------------------------------------------
+---  PlatoonAssignOrders
+---      Assigns orders from the editor to a platoon
+---  PlatoonData
+---      OrderName - Name of the Order from the editor
+---      Target - Handle to Unit used in orders that require a target (OPTIONAL)
+---  function: PlatoonAssignOrders = AddFunction
+---      parameter 0: string: platoon = "default_platoon"
+-------------------------------------------------------------------------------
+function PlatoonAssignOrders(platoon)
+    platoon:Stop()
+    local data = platoon.PlatoonData
+    if not data.OrderName then
+        error('*SCENARIO PLATOON AI ERROR: No OrderName given to PlatoonAssignOrders AI Function', 2)
+        return false
+    end
+    ScenarioUtils.AssignOrders(data.OrderName, platoon, data.Target)
+end
+
+--- Attacks the closest unit the AIBrain is aware of, based on intel
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | (no platoon data)     |               |
 function PlatoonAttackClosestUnit(platoon)
     local aiBrain = platoon:GetBrain()
     local target
@@ -44,65 +110,10 @@ function PlatoonAttackClosestUnit(platoon)
     end
 end
 
---------------------------------------------------------
---  function: BuildOnce = AddFunction
---      parameter 0: string: platoon = "default_platoon"
---------------------------------------------------------
-function BuildOnce(platoon)
-    local aiBrain = platoon:GetBrain()
-    if aiBrain.HasPlatoonList then
-        aiBrain:PBMSetPriority(platoon, 0)
-    else
-        platoon.BuilderHandle:SetPriority(0)
-    end
-end
-
---------------------------------------------------------
---  function: DefaultOSBasePatrol = AddFunction
---      parameter 0: string: platoon = "default_platoon"
---------------------------------------------------------
-function DefaultOSBasePatrol(platoon)
-    local aiBrain = platoon:GetBrain()
-    local master = string.sub(platoon.PlatoonData.BuilderName, 11)
-    local chain = false
-    if platoon.PlatoonData.LocationType and Scenario.Chains[aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'] then
-        chain = aiBrain.Name .. '_' .. platoon.PlatoonData.LocationType .. '_BasePatrolChain'
-    elseif Scenario.Chains[master .. '_BasePatrolChain'] then
-        chain = master .. '_BasePatrolChain'
-    elseif Scenario.Chains[aiBrain.Name .. '_BasePatrolChain'] then
-        chain = aiBrain.Name .. '_BasePatrolChain'
-    end
-    if chain then
-        platoon.PlatoonData.PatrolChain = chain
-        PatrolThread(platoon)
-    end
-end
-
--------------------------------------------------------------------------------
---  PlatoonAssignOrders
---      Assigns orders from the editor to a platoon
---  PlatoonData
---      OrderName - Name of the Order from the editor
---      Target - Handle to Unit used in orders that require a target (OPTIONAL)
---  function: PlatoonAssignOrders = AddFunction
---      parameter 0: string: platoon = "default_platoon"
--------------------------------------------------------------------------------
-function PlatoonAssignOrders(platoon)
-    platoon:Stop()
-    local data = platoon.PlatoonData
-    if not data.OrderName then
-        error('*SCENARIO PLATOON AI ERROR: No OrderName given to PlatoonAssignOrders AI Function', 2)
-        return false
-    end
-    ScenarioUtils.AssignOrders(data.OrderName, platoon, data.Target)
-end
-
------------------------------------------------------------
---  PlatoonAttackHighestThreat
---      Attacks Location on the map with the highest threat
---  function: PlatoonAttackHighestThreat = AddFunction
---      parameter 0: string: platoon = "default_platoon"
------------------------------------------------------------
+--- Attacks the closest unit the AIBrain is aware of, based on intel
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | (no platoon data)     |               |
 function PlatoonAttackHighestThreat(platoon)
     local patrol = false
     local aiBrain = platoon:GetBrain()
@@ -121,15 +132,10 @@ function PlatoonAttackHighestThreat(platoon)
     end
 end
 
--------------------------------------------------------------------
---  PlatoonAttackLocation
---      Attack moves to a specific location on the map
---      After reaching location will attack highest threat
---  PlatoonData
---      Location - (REQUIRED) location on the map to attack move to
---  function: PlatoonAttackLocation = AddFunction
---      parameter 0: string: platoon = "default_platoon"
--------------------------------------------------------------------
+--- Attack moves to a specific location on the map, once arrived it will attack the highest threat
+--- | Platoon data value    | Description |
+--- | --------------------- | ----------- |
+--- | Location              | (REQUIRED) location on the map to attack move to
 function PlatoonAttackLocation(platoon)
     platoon:Stop()
     local data = platoon.PlatoonData
@@ -249,29 +255,19 @@ function TransportPool(platoon)
     end
 end
 
--------------------------------------------------------------------------------------------------------------------
---  LandAssaultWithTransports
---      Grabs a specific number of transports from the TransportPool platoon
---      Loads units onto transports
---      Sets a ready variable if required
---      Waits while another variable has not been set if needed
---      Flys to lowest threat in a list of locations and unloads land units
---      Transports return to a location and are re-added to transport pool
---      Attacks a list of locations starting with highest threat from a list
---  PlatoonData
---      ReadyVariable - ScenarioInfo.VarTable[ReadyVariable] Variable set when units are on transports
---      WaitVariable - ScenarioInfo.VarTable[WaitVariable] Variable checked before transports leave
---      LandingList - (REQUIRED or LandingChain) List of possible locations for transports to unload units
---      LandingChain - (REQUIRED or LandingList) Chain of possible landing locations
---      TransportReturn - Location for transports to return to (they will attack with land units if this isn't set)
---      AttackPoints - (REQUIRED or AttackChain or PatrolChain) List of locations to attack.
---      The platoon attacks the highest threat first
---      AttackChain - (REQUIRED or AttackPoints or PatrolChain) Marker Chain of postitions to attack
---      PatrolChain - (REQUIRED or AttackChain or AttackPoints) Chain of patrolling
---      RandomPatrol - Bool if you want the patrol things to be random rather than in order
---  function: LandAssaultWithTransports = AddFunction
---      parameter 0: string: platoon = "default_platoon"
--------------------------------------------------------------------------------------------------------------------
+--- Grabs a specific number of transports from the transports pool and loads units into the transport. Once ready a scenario variable can be set. Can wait on another scenario variable. Attempts to land at the location with the least threat and uses the accompanying attack chain for the units that have landed.
+--- | Platoon data value | Description |
+--- | ------------------ | ----------- |
+--- | ReadyVariable      | `ScenarioInfo.VarTable[ReadyVariable]` Variable set when units are on transports
+--- | WaitVariable       | `ScenarioInfo.VarTable[WaitVariable]` Variable checked before transports leave
+--- | LandingList        | (REQUIRED or LandingChain) List of possible locations for transports to unload units
+--- | LandingChain       | (REQUIRED or LandingList) Chain of possible landing locations
+--- | TransportReturn    | Location for transports to return to (they will attack with land units if this isn't set)
+--- | AttackPoints       | (REQUIRED or AttackChain or PatrolChain) List of locations to attack. The platoon attacks the highest threat first
+--- | AttackChain        | (REQUIRED or AttackPoints or PatrolChain) Marker Chain of postitions to attack
+--- | PatrolChain        | (REQUIRED or AttackChain or AttackPoints) Chain of patrolling
+--- | RandomPatrol       | Bool if you want the patrol things to be random rather than in order
+---@param platoon Platoon
 function LandAssaultWithTransports(platoon)
     local aiBrain = platoon:GetBrain()
     local data = platoon.PlatoonData
@@ -417,16 +413,12 @@ function LandAssaultWithTransports(platoon)
     end
 end
 
-----------------------------------------------------------------
---  MoveToThread
---      Moves to a set of locations
---  PlatoonData
---      MoveToRoute - List of locations to move to
---      MoveChain - Chain of locations to move
---      UseTransports - boolean, if true, use transports to move
---  function: MoveToThread = AddFunction
---      parameter 0: string: platoon = "default_platoon"
-----------------------------------------------------------------
+--- Platoon moves to a set of locations
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | MoveToRoute           | List of locations to move to |
+--- | MoveChain             | Chain of locations to move |
+--- | UseTransports         | Boolean, if true, use transports to move |
 function MoveToThread(platoon)
     local data = platoon.PlatoonData
 
@@ -461,15 +453,11 @@ function MoveToThread(platoon)
     end
 end
 
---------------------------------------------------------
---  PatrolThread
---      Patrols a set of locations
---  PlatoonData
---      PatrolRoute - List of locations to patrol
---      PatrolChain - Chain of locations to patrol
---  function: PatrolThread = AddFunction
---      parameter 0: string: platoon = "default_platoon"
---------------------------------------------------------
+--- Platoon patrols a set of locations
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | PatrolRoute           | List of locations to patrol |
+--- | PatrolChain           | Chain of locations to patrol |
 function PatrolThread(platoon)
     local data = platoon.PlatoonData
     platoon:Stop()
@@ -494,15 +482,11 @@ function PatrolThread(platoon)
     end
 end
 
---------------------------------------------------------------------
---  RandomPatrolThread
---      Gives a platoon a random patrol path from a set of locations
---  PlatoonData
---      PatrolRoute - List of locations to patrol
---      PatrolChain - Chain of locations to patrol
---  function: RandomPatrolThread = AddFunction
---      parameter 0: string: platoon = "default_platoon"
---------------------------------------------------------------------
+--- Platoon patrols a random set of locations
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | PatrolRoutes          | List of locations to patrol
+--- | PatrolChains          | Chain of locations to patrol
 function RandomPatrolThread(platoon)
     local data = platoon.PlatoonData
     platoon:Stop()
@@ -530,14 +514,10 @@ function RandomPatrolThread(platoon)
     end
 end
 
---------------------------------------------------------------------
---  RandomDefensePatrolThread
---      Gives a platoon a random patrol path from a set of locations
---  PlatoonData
---      PatrolChain - Chain of locations to patrol
---  function: RandomDefensePatrolThread = AddFunction
---      parameter 0: string: platoon = "default_platoon"
---------------------------------------------------------------------
+--- Gives a platoon a random patrol path from a set of locations
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | PatrolChain           | Chain of locations to patrol
 function RandomDefensePatrolThread(platoon)
     local data = platoon.PlatoonData
     platoon:Stop()
@@ -554,14 +534,10 @@ function RandomDefensePatrolThread(platoon)
     end
 end
 
-------------------------------------------------------------------
---  PatrolChainPickerThread
---      Gives a platoon a random patrol chain from a set of chains
---  PlatoonData
---      PatrolChains - List of chains to choose from
---  function: PatrolChainPickerThread = AddFunction
---      parameter 0: string: platoon = "default_platoon"
-------------------------------------------------------------------
+--- Gives a platoon a random patrol path from a set of chains
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | PatrolChains          | Chains of locations to patrol
 function PatrolChainPickerThread(platoon)
     local data = platoon.PlatoonData
     platoon:Stop()
@@ -577,12 +553,10 @@ function PatrolChainPickerThread(platoon)
     end
 end
 
--------------------------------------------------------------------------
---  SplitPatrolThread
---      Gives random patrol chain from the list to each unit of a platoon
---  PlatoonData
---      PatrolChains - List of chains to choose from
--------------------------------------------------------------------------
+--- Gives a random patrol chain form the list to each unit of the platoon
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | PatrolChains          | List of chains to choose from
 function SplitPatrolThread(platoon)
     local data = platoon.PlatoonData
     platoon:Stop()
@@ -601,10 +575,10 @@ function SplitPatrolThread(platoon)
     end
 end
 
--------------------------------------------------------
---  function: EngineersBuildPlatoon = AddFunction
---      parameter 0: string platoon = "default_platoon"
--------------------------------------------------------
+--- The default engineer build platoon
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | (no platoon data)     |
 function EngineersBuildPlatoon(platoon)
     local aiBrain = platoon:GetBrain()
     local platoonUnits = platoon:GetPlatoonUnits()
@@ -760,28 +734,10 @@ function EngineersBuildPlatoon(platoon)
     end
 end
 
-function GetHumanEnemies(armyIndex)
-    humans = {}
-
-    for i, brain in ArmyBrains do
-        if brain.BrainType == 'Human' and IsEnemy(armyIndex, brain:GetArmyIndex()) then
-            table.insert(humans, brain)
-        end
-    end
-
-    return humans
-end
-
-----------------------------------------------------------------------------------------------
---  CategoryHunterPlatoonAI
---      Sends out units to hunt and attack Experimental Air units (Soul Ripper, Czar, etc)
---      It cheats to find the air units.  This should *NOT* ever be used in skirmish.
---      This platoon only seeks out PLAYER experimentals.  It will never find any other army's
---  PlatoonData -
---      CategoryList : The categories we are going to find and attack
---  function: CategoryHunterPlatoonAI = AddFunction
---      parameter 0: string: platoon = "default_platoon"
-----------------------------------------------------------------------------------------------
+--- Sends out units to hunt and attack Experimental Air units (Soul Ripper, Czar, etc). It cheats to find the air units.  This should *NOT* ever be used in skirmish. This platoon only seeks out PLAYER experimentals. It won't register experimentals from other AIs
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | CategoryList          | The categories we are going to find and attack
 function CategoryHunterPlatoonAI(platoon)
     local aiBrain = platoon:GetBrain()
     local platoonUnits = platoon:GetPlatoonUnits()
@@ -837,52 +793,48 @@ function CategoryHunterPlatoonAI(platoon)
     end
 end
 
--------------------------------------------------------------------------------------------------------------------------
---  StartBaseEngineerThread
---      Upgrades engineer to desired tech level
---      Moves an engineer to a location with either transports or using a transport beacon
---      Builds specific buildings found in PlatoonData.Construction
---      Can maintain a base found in PlatoonData
---      Can patrol a route either while maintaining a base or just prior to disbanding back into the PoolPlatoon
-
---  PlatoonData -
---      ReadyVariable - ScenarioInfo.VarTable[ReadyVariable] Variable set when units are on transports
---      WaitVariable - ScenarioInfo.VarTable[WaitVariable] Variable checked before transports leave
---      LandingLocation - Location for transports to drop engineers
---      MoveBeacon - TransportBeacon to use to move engineer to location
---      Construction - Table that holds data for a specific building order
---              - only the buildings specified in BuildStructures be built
---          -> BuildingTemplate - building template found in BaseTemplates.lua
---              (only required if trying to build different factions buildings)
---          -> BaseTemplate - Name of base template to use.  This template is generated from bases made in the editor
---          -> BuildClose - Bool if you want to have unit pick closest of next building to build
---          -> BuildStructures - List of buildings to build in order, ex:T1AirFactory, T2ShieldDefense, etc
-
---      BuildBaseTemplate - BaseTemplate of the base to build once
---      MaintainBaseTemplate - BaseTemplate of base to build any non-existing buildings for.
---      AssistFactories - Bool; will assist factories in a Location Type when set true; break off and rebuild if maintain
---      LocationType - PBM Location Type to have the engineers assist build factories in
---      BuildingTemplate - building template found in BaseTemplates.lua
---              (only required if trying to build different factions buildings)
---      PatrolRoute - Route of locations to patrol while maintaining or after platoon disbanded
---      PatrolChain - Chain of locations to patrol while maintaining or after platoon disbanded
---      TransportRoute - List of locations for the transport to use to get to the location
---      TransportChain - Chain of locations for the transport to use to get to landing location
---      DisbandAfterPatrol - bool, if true, platoon will disband if its not maintaining a base and given a patrol order
---      RandomPatrol - bool, if true, platoon will sort PatrolRoute randomly
---      UseTransports - bool, if true, platoons will use transports to move
---      NamedUnitBuild - table of unit names; platoon will build these specific units and only build them once
---      GroupBuildOnce - name of a group to build each thing in the group only once
-
---  Order of events:
---  Grab transports, set ready variable, wait for wait variable, travel using transports,
---      travel using beacon, build structures in Construction block, build base using BuildBaseTemplate,
---      the platoon will assist factories if assigned to do so, they will break off and rebuild if Maintain is set,
---      maintain a base using MaintainBaseTemplate (will patrol here if PatrolRoute given),
---      patrol using PatrolRoute, platoon can disband if given a patrol and is not maintaining a base
---  function: StartBaseEngineerThread = AddFunction
---      parameter 0: string: platoon = "default_platoon"
--------------------------------------------------------------------------------------------------------------------------
+--- Upgrades / retrieves an engineer of the desired tech. Then moves the engineer to a location, possibly with a transport. Builds the specific buildings found in PlatoonData.Construction, and then maintains or patrols the base depending on what is defined.
+--- | Platoon data value    | Description   |
+--- | --------------------- | ------------- |
+--- | ReadyVariable         | (optional) `ScenarioInfo.VarTable[ReadyVariable]` Variable set when units are on transports
+--- | WaitVariable          | (optional) `ScenarioInfo.VarTable[WaitVariable]` Variable checked before transports leave
+--- | LandingLocation       | (optional) Location for transports to drop engineers
+--- | MoveBeacon            | (optional) TransportBeacon to use to move engineer to location
+--- | Construction          | A table, see _Construction Data_ below for more information
+--- | BuildBaseTemplate     | BaseTemplate of the base to build once
+--- | MaintainBaseTemplate  | BaseTemplate of base to build any non-existing buildings for.
+--- | AssistFactories       | Bool; will assist factories in a Location Type when set true; break off and rebuild if maintain
+--- | LocationType          | Platoon base manager location type to have the engineers assist build factories in
+--- | BuildingTemplate      | building template found in BaseTemplates.lua (only required if trying to build different factions buildings)
+--- | PatrolRoute           | Route of locations to patrol while maintaining or after platoon disbanded
+--- | PatrolChain           | Chain of locations to patrol while maintaining or after platoon disbanded
+--- | TransportRoute        | List of locations for the transport to use to get to the location
+--- | TransportChain        | Chain of locations for the transport to use to get to landing location
+--- | DisbandAfterPatrol    | bool, if true, platoon will disband if its not maintaining a base and given a patrol order
+--- | RandomPatrol          | bool, if true, platoon will sort PatrolRoute randomly
+--- | UseTransports         | bool, if true, platoons will use transports to move
+--- | NamedUnitBuild        | table of unit names; platoon will build these specific units and only build them once
+--- | GroupBuildOnce        | name of a group to build each thing in the group only once
+---
+--- | Construction data value   | Description   |
+--- | ------------------------- | ------------- |
+--- | BuildingTemplate          | building template found in BaseTemplates.lua (only required if trying to build different factions buildings)
+--- | BaseTemplate              | Name of base template to use.  This template is generated from bases made in the editor
+--- | BuildClose                | Bool if you want to have unit pick closest of next building to build
+--- | BuildStructures           | List of buildings to build in order, ex:T1AirFactory, T2ShieldDefense, etc
+---
+--- Order of events:
+--- - Grab transports
+--- - set ready variable
+--- - wait for wait variable
+--- - travel using transports
+--- - travel using beacon
+--- - build structures in Construction block
+--- - build base using BuildBaseTemplate
+--- - the platoon will assist factories if assigned to do so, they will break off and rebuild if Maintain is set
+--- - maintain a base using MaintainBaseTemplate (will patrol here if PatrolRoute given)
+--- - patrol using PatrolRoute, platoon can disband if given a patrol and is not maintaining a base
+---@param platoon any
 function StartBaseEngineerThread(platoon)
     local aiBrain = platoon:GetBrain()
     local platoonUnits = platoon:GetPlatoonUnits()
@@ -1039,9 +991,9 @@ function StartBaseEngineerThread(platoon)
     end
 end
 
--- UTILITY FUNCTIONS
--- Utility Function
--- Gets engineers using StartBaseEngineers to their location
+
+--- Utility Function
+--- Gets engineers using StartBaseEngineers to their location
 function StartBaseTransports(platoon, data, aiBrain)
     -- Move the unit using transports
     if data.UseTransports then
@@ -1099,8 +1051,8 @@ function StartBaseTransports(platoon, data, aiBrain)
     return true
 end
 
--- Utility Function
--- Takes transports in platoon, returns them to pool, flys them back to return location
+--- Utility Function
+--- Takes transports in platoon, returns them to pool, flys them back to return location
 function ReturnTransportsToPool(platoon, data)
     -- Put transports back in TPool
     local aiBrain = platoon:GetBrain()
@@ -1153,8 +1105,8 @@ function ReturnTransportsToPool(platoon, data)
     end
 end
 
--- Utility Function
--- Uses UnitBuild block to build specific units on the map using StartBaseEngineer
+--- Utility Function
+--- Uses UnitBuild block to build specific units on the map using StartBaseEngineer
 function StartBaseBuildUnits(eng, engTable, data, aiBrain)
     local unitBeingBuilt
     local unitTable = data.NamedUnitBuild
@@ -1193,8 +1145,8 @@ function StartBaseBuildUnits(eng, engTable, data, aiBrain)
     return true
 end
 
--- Utility Function
--- Uses GroupBuildOnce and builds each thing in said group once and only once
+--- Utility Function
+--- Uses GroupBuildOnce and builds each thing in said group once and only once
 function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
     local unitBeingBuilt
     if data.GroupBuildOnce then
@@ -1227,8 +1179,8 @@ function StartBaseGroupOnceBuild(eng, engTable, data, aiBrain)
     return true
 end
 
--- Utility Function
--- Uses Construction blocks in engineers using StartBaseEngineer
+--- Utility Function
+--- Uses Construction blocks in engineers using StartBaseEngineer
 function StartBaseConstruction(eng, engTable, data, aiBrain)
     local cons = data.Construction
     local buildingTmpl
@@ -1269,8 +1221,8 @@ function StartBaseConstruction(eng, engTable, data, aiBrain)
     return true
 end
 
--- Utility Function
--- Builds a base using BuildBaseTemplate for engineers using StartBaseEngineer
+--- Utility Function
+--- Builds a base using BuildBaseTemplate for engineers using StartBaseEngineer
 function StartBaseBuildBase(eng, engTable, data, aiBrain)
     local unitBeingBuilt
     if data.BuildBaseTemplate then
@@ -1312,8 +1264,8 @@ function StartBaseBuildBase(eng, engTable, data, aiBrain)
     return true
 end
 
--- Utility Function
--- Maintains a base for engs using StartBaseEngineer
+--- Utility Function
+--- Maintains a base for engs using StartBaseEngineer
 function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
     local unitBeingBuilt
     if data.MaintainBaseTemplate then
@@ -1390,8 +1342,8 @@ function StartBaseMaintainBase(platoon, eng, engTable, data, aiBrain)
     return true
 end
 
--- Utility Function
--- Sends engineers on patrol for StartBaseEngineer
+--- Utility Function
+--- Sends engineers on patrol for StartBaseEngineer
 function EngPatrol(eng, engTable, data)
     table.insert(engTable, eng)
     -- Patrol an area if nothing else to do
@@ -1421,8 +1373,8 @@ function EngPatrol(eng, engTable, data)
     return true
 end
 
--- Utility Function
--- Resets main engineer and engTablef or StartBaseEngineer
+--- Utility Function
+--- Resets main engineer and engTablef or StartBaseEngineer
 function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
     if engTable and not table.empty(engTable) then
         for num, unit in engTable do
@@ -1444,8 +1396,8 @@ function AssistOtherEngineer(eng, engTable, unitBeingBuilt)
     return eng, engTable
 end
 
--- Utility Function
--- Has an engineer build a certain type of structure using a base template
+--- Utility Function
+--- Has an engineer build a certain type of structure using a base template
 function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, buildingTemplate)
     local structureCategory
     if not buildingTemplate then
@@ -1487,8 +1439,8 @@ function EngineerBuildStructure(aiBrain, builder, building, brainBaseTemplate, b
     return false
 end
 
--- Utility Function
--- Stops factory assisting when an eng platoon is maintaining a base
+--- Utility Function
+--- Stops factory assisting when an eng platoon is maintaining a base
 function BreakOffFactoryAssist(platoon, data)
     local aiBrain = platoon:GetBrain()
     if platoon.PlatoonData.FactoryAssistList then
@@ -1507,8 +1459,8 @@ function BreakOffFactoryAssist(platoon, data)
     end
 end
 
--- Utility Function
--- Tell engineers to assist factories in a locationType
+--- Utility Function
+--- Tell engineers to assist factories in a locationType
 function EngineersAssistFactories(platoon, locationType)
     locationType = locationType or platoon.PlatoonData.LocationType
     local aiBrain = platoon:GetBrain()
@@ -1662,8 +1614,8 @@ function EngineersAssistFactories(platoon, locationType)
     end
 end
 
--- Utility Function
--- Reorganizes engineer assisting if there is an imbalance
+--- Utility Function
+--- Reorganizes engineer assisting if there is an imbalance
 function ReorganizeEngineers(platoon, engTable)
     local unbalanced = true
     local aiBrain = platoon:GetBrain()
@@ -1718,8 +1670,8 @@ function ReorganizeEngineers(platoon, engTable)
     end
 end
 
--- Utility Function
--- Assign engineers to factories to assist
+--- Utility Function
+--- Assign engineers to factories to assist
 function EngAssist(platoon, engTable)
     local aiBrain = platoon:GetBrain()
     -- Have engineers assist the factories
@@ -1757,8 +1709,8 @@ function EngAssist(platoon, engTable)
     end
 end
 
--- Utility Function
--- Check all factories in given table to see if there is imbalance
+--- Utility Function
+--- Check all factories in given table to see if there is imbalance
 function CheckFactoryAssistBalance(factoryTable)
     local facLowNum = -1
     local facHighNum = 0
@@ -1776,8 +1728,8 @@ function CheckFactoryAssistBalance(factoryTable)
     return false
 end
 
--- Utility Function
--- Set Ready Variable and wait for Wait Variable if given
+--- Utility Function
+--- Set Ready Variable and wait for Wait Variable if given
 function ReadyWaitVariables(data)
     -- Set ready and check wait variable after upgraded and/or loaded on transport
     -- Just prior to moving the unit
@@ -1796,8 +1748,8 @@ function ReadyWaitVariables(data)
     return true
 end
 
--- Utility Function
--- Get and load transports with platoon units
+--- Utility Function
+--- Get and load transports with platoon units
 function GetLoadTransports(platoon)
     local numTransports = GetTransportsThread(platoon)
     if not numTransports then
@@ -1916,8 +1868,8 @@ function GetLoadTransports(platoon)
     return true
 end
 
--- Utility function
--- Sorts units onto transports distributing equally
+--- Utility function
+--- Sorts units onto transports distributing equally
 function SortUnitsOnTransports(transportTable, unitTable, numSlots)
     local leftoverUnits = {}
     numSlots = numSlots or -1
@@ -1972,8 +1924,8 @@ function SortUnitsOnTransports(transportTable, unitTable, numSlots)
     return transportTable, leftoverUnits
 end
 
--- Utility function
--- Generates a random patrol route for RandomPatrolThread
+--- Utility function
+--- Generates a random patrol route for RandomPatrolThread
 function GetRandomPatrolRoute(patrol)
     local randPatrol = {}
     local tempPatrol = {}
@@ -1992,8 +1944,8 @@ function GetRandomPatrolRoute(patrol)
     return randPatrol
 end
 
--- Utility Function
--- Returns location with lowest non-negative threat
+--- Utility Function
+--- Returns location with lowest non-negative threat
 function PlatoonChooseLowestNonNegative(aiBrain, locationList, ringSize, location)
     local bestLocation = {}
     local bestThreat = 0
@@ -2018,8 +1970,8 @@ function PlatoonChooseLowestNonNegative(aiBrain, locationList, ringSize, locatio
     return bestLocation
 end
 
--- Utility Function
--- Returns location with lowest threat (including negative)
+--- Utility Function
+--- Returns location with lowest threat (including negative)
 function PlatoonChooseLowest(aiBrain, locationList, ringSize, location)
     local bestLocation = {}
     local locationSet = false
@@ -2044,8 +1996,8 @@ function PlatoonChooseLowest(aiBrain, locationList, ringSize, location)
     return bestLocation
 end
 
--- Utility Function
--- Returns location with the highest threat
+--- Utility Function
+--- Returns location with the highest threat
 function PlatoonChooseHighest(aiBrain, locationList, ringSize, location)
     local bestLocation = locationList[1]
     local highestThreat = 0
@@ -2063,8 +2015,8 @@ function PlatoonChooseHighest(aiBrain, locationList, ringSize, location)
     return bestLocation
 end
 
--- Utility Function
--- Returns location randomly with threat > 0
+--- Utility Function
+--- Returns location randomly with threat > 0
 function PlatoonChooseRandomNonNegative(aiBrain, locationList, ringSize)
     local landingList = {}
     for _, v in locationList do
@@ -2080,8 +2032,8 @@ function PlatoonChooseRandomNonNegative(aiBrain, locationList, ringSize)
     return loc
 end
 
--- Utility Function
--- Arranges a route from highest to lowest based on threat
+--- Utility Function
+--- Arranges a route from highest to lowest based on threat
 function PlatoonChooseHighestAttackRoute(aiBrain, locationList, ringSize)
     local attackRoute = {}
     local tempRoute = {}
@@ -2104,8 +2056,8 @@ function PlatoonChooseHighestAttackRoute(aiBrain, locationList, ringSize)
     return attackRoute
 end
 
--- Utility Function
--- Arranges a route from lowest to highest on threat
+--- Utility Function
+--- Arranges a route from lowest to highest on threat
 function PlatoonChooseLowestAttackRoute(aiBrain, locationList, ringSize)
     local attackRoute = {}
     local tempRoute = {}
@@ -2128,8 +2080,8 @@ function PlatoonChooseLowestAttackRoute(aiBrain, locationList, ringSize)
     return attackRoute
 end
 
--- Utility Function
--- Function that gets the correct number of transports for a platoon
+--- Utility Function
+--- Function that gets the correct number of transports for a platoon
 function GetTransportsThread(platoon)
     local data = platoon.PlatoonData
     local aiBrain = platoon:GetBrain()
@@ -2275,8 +2227,8 @@ function GetTransportsThread(platoon)
     return numTransports
 end
 
--- Utility Function
--- Returns the number of transports required to move the platoon
+--- Utility Function
+--- Returns the number of transports required to move the platoon
 function GetNumTransports(platoon)
     local transportNeeded = {
         Small = 0,
@@ -2300,8 +2252,8 @@ function GetNumTransports(platoon)
     return transportNeeded
 end
 
--- Utility Function
--- Returns the number of slots the transport has available
+--- Utility Function
+--- Returns the number of slots the transport has available
 function GetNumTransportSlots(unit)
     local bones = {
         Large = 0,
@@ -2322,8 +2274,8 @@ function GetNumTransportSlots(unit)
     return bones
 end
 
--- Utility Function
--- NOT USED - Creates a route to something
+--- Utility Function
+--- NOT USED - Creates a route to something
 function GetRouteToVector(platoon, squad)
     local aiBrain = platoon:GetBrain()
     local data = platoon.PlatoonData
@@ -2392,8 +2344,8 @@ function GetRouteToVector(platoon, squad)
     end
 end
 
--- Utility Function
--- Moves a platoon along a route holding up the thread until finished
+--- Utility Function
+--- Moves a platoon along a route holding up the thread until finished
 function MoveAlongRoute(platoon, route)
     local cmd = false
     local aiBrain = platoon:GetBrain()
