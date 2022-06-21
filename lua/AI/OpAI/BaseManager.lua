@@ -124,7 +124,6 @@ local BuildingCounterDefaultValues = {
 ---@class BaseManager
 ---@field Trash TrashBag
 ---@field AIBrain AIBrain
-
 BaseManager = ClassSimple {
 
     --- Introduces all the relevant fields to the base manager, internally called by the engine
