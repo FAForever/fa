@@ -8,23 +8,34 @@
 
 -- types that originate from the map
 
----@class MarkerChain                           # Name reference to a marker chain as defined in the map
----@class Area                                  # Name reference to a area as defined in the map
----@class Marker                                # Name reference to a marker as defined in the map
----@class UnitGroup                             # Name reference to a unit group as defined in the map
+---@class MarkerChain: string                   # Name reference to a marker chain as defined in the map
+---@class Area: string                          # Name reference to a area as defined in the map
+---@class Marker: string                        # Name reference to a marker as defined in the map
+---@class UnitGroup: string                     # Name reference to a unit group as defined in the map
 
 -- types commonly used in repository
 
----@class BuildCondition                        # { file, function, parameters }
----@class FileFunctionRef                       # { file, function }
+---@class FileName: string
+---@class FunctionName: string
 
----@class BuildGroup                            
----@field Name UnitGroup 
+---@class BuildCondition
+---@field [1] FileName
+---@field [2] FunctionName
+---@field [3] any
+
+---@class FileFunctionRef
+---@field [1] FileName
+---@field [2] FunctionName
+
+---@class BuildGroup                       
+---@field Name UnitGroup
 ---@field Priority number
 
 -- types used by AddOpAI
 
----@class MasterPlatoonFunction                 # { file, function }
+---@class MasterPlatoonFunction
+---@field [1] FileName
+---@field [2] FunctionName
 
 ---@class PlatoonData
 ---@field TransportReturn Marker                # Location for transports to return to
@@ -50,7 +61,6 @@
 ---@field MaxAssist number                      # Number of engineers that can assist construction
 ---@field Retry boolean                         # Flag that allows the AI to retry
 ---@field PlatoonData PlatoonData               # Parameters of the platoon AI function
-
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
