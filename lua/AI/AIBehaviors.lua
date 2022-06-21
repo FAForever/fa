@@ -984,24 +984,10 @@ function FatBoyBuildCheck(self)
     end
 end
 
--------------------------------------------------------
--- Function: FatboyChildBehavior
--- Args:
--- self - the platoon of fatboy children to run the behavior on
--- parent - the parent fatboy that the child platoon belongs to
--- base - the base to be attacked
--- Description:
--- AI for fatboy child platoons. Wrecks the base that the fatboy has selected.
--- Once the base is wrecked, the units will return to guard the fatboy until a new
--- target base is reached, at which point they will attack it.
--- Returns:
--- nil
--------------------------------------------------------
-
 ---AI for fatboy child platoons. Wrecks the base that the fatboy has selected. Once the base is wrecked, the units will return to guard the fatboy until a new target base is reached, at which point they will attack it.
----@param self Platoon
----@param parent parent
----@param base base
+---@param self Platoon                          # the platoon of fatboy children to run the behavior on
+---@param parent parent                         # the parent fatboy that the child platoon belongs to
+---@param base base                             # the base to be attacked
 function FatboyChildBehavior(self, parent, base)
     local aiBrain = self:GetBrain()
     local targetUnit = false
