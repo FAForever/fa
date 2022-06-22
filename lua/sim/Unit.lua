@@ -1962,13 +1962,12 @@ Unit = Class(moho.unit_methods) {
         if self.EventCallbacks then
             self.EventCallbacks = nil
         end
-
-        ChangeState(self, self.DeadState)
-
+        
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:UntrackJammer(self)
         end
-
+        
+        ChangeState(self, self.DeadState)
     end,
 
     -- Generic function for showing a table of bones
