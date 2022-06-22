@@ -466,7 +466,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1.2,
             TargetPriorities = {
-                'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
@@ -537,7 +536,6 @@ UnitBlueprint {
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1.2,
             TargetPriorities = {
-                'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
