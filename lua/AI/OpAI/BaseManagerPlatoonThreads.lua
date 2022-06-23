@@ -530,7 +530,7 @@ function BaseManagerAssistThread(platoon)
         beingBuiltCategories = {'MASSEXTRACTION', 'MASSPRODUCTION', 'ENERGYPRODUCTION', 'FACTORY', 'EXPERIMENTAL', 'DEFENSE', 'MOBILE LAND', 'ALLUNITS' }
     end
 
-    local assistRange = assistData.AssistRange or 80
+    local assistRange = assistData.AssistRange or bManager.Radius
     local counter = 0
     local unit = platoonUnits[1]
     while counter < (assistData.Time or 200) do
