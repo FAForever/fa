@@ -232,7 +232,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 2,
-                    Radius = 2,
+                    Radius = 2.55,
                     TargetAllow = 'TECH2',
                     TargetDisallow = 'WALL',  -- added for bug fix [162]
                 },
