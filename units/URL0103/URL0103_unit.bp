@@ -221,7 +221,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 3,
-                    Radius = 2,
+                    Radius = 2.3,
                     TargetAllow = 'TECH1',
             TargetDisallow = 'TECH2,WALL',  -- added for bug fix [162]
                 },
@@ -232,7 +232,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 2,
-                    Radius = 2,
+                    Radius = 2.55,
                     TargetAllow = 'TECH2',
                     TargetDisallow = 'WALL',  -- added for bug fix [162]
                 },
@@ -250,7 +250,7 @@ UnitBlueprint {
             FiringTolerance = 1,
             Label = 'MainGun',
             MaxRadius = 30,
-            MinRadius = 5,
+            MinRadius = 1,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
             MuzzleVelocity = 14,
