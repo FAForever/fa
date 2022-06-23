@@ -471,8 +471,8 @@ function PermanentFactoryAssist(platoon)
                 local guards = v:GetGuards()
                 local numGuards = 0
                 for gNum, gUnit in guards do
-                    if not gUnit.Dead and not EntityCategoryContains(categories.FACTORY, gUnit)
-                    and bManager.PermanentAssisters and bManager.PermanentAssisters[gUnit] then -- Make sure this guy is a permanent assister and not a transient assister
+                     -- Make sure this guy is a permanent assister and not a transient assister
+                    if not gUnit.Dead and not EntityCategoryContains(categories.FACTORY, gUnit) and bManager.PermanentAssisters[gUnit] then
                         numGuards = numGuards + 1
                     end
                 end
@@ -493,8 +493,6 @@ function PermanentFactoryAssist(platoon)
             IssueGuard({unit}, lowFac)
 
             -- Add to the list of units that are permanently assisting in this base manager
-            if not bManager.PermanentAssisters then bManager.PermanentAssisters = {} end
-
             bManager.PermanentAssisters[unit] = true
         end
         WaitTicks(Random(79, 181))
@@ -507,9 +505,7 @@ function PermanentAssisterDead(unit)
         bManager:DecrementPermanentAssisting()
 
         -- Remove from permanent assister list
-        if bManager.PermanentAssisters then
-            bManager.PermanentAssisters[unit] = nil
-        end
+        bManager.PermanentAssisters[unit] = nil
     end
 end
 
