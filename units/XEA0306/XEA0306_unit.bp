@@ -320,6 +320,7 @@ UnitBlueprint {
         TransportClass = 10,
         Class1Capacity = 28,
 
+        SlotsMedium = 12,
         SlotsLarge = 6,
     },
     UseOOBTestZoom = 200,
