@@ -96,7 +96,6 @@ local function ProcessWeapon(unit, weapon)
         if isBomber then 
             weapon.TrackingRadius = 1.25
         end
-
     end
 
     -- # process target rechecking
@@ -107,7 +106,7 @@ local function ProcessWeapon(unit, weapon)
         -- by default, do not recheck targets as that is expensive when a lot of units are stacked on top of another
         weapon.AlwaysRecheckTarget = false
 
-        -- allow target rechecking for artillery and weapons with a very large attack radius
+        -- allow 
         if  weapon.RangeCategory == 'UWRC_DirectFire' or
             weapon.RangeCategory == "UWRC_IndirectFire" or
             weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then

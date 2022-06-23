@@ -301,6 +301,7 @@ UnitBlueprint {
             TurretYawSpeed = 720,
             Turreted = true,
             WeaponCategory = 'Kamikaze',
+            ManualFire = true,
         },
         {
             AboveWaterTargetsOnly = true,
