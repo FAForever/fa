@@ -1,4 +1,4 @@
-FUnitBlueprint {
+UnitBlueprint {
     AI = {
         BeaconName = 'UEB5102',
         TargetBones = {
