@@ -319,6 +319,8 @@ UnitBlueprint {
         Class3AttachSize = 4,
         TransportClass = 10,
         Class1Capacity = 28,
+
+        SlotsLarge = 6,
     },
     UseOOBTestZoom = 200,
     Veteran = {

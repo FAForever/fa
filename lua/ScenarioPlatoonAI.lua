@@ -2212,6 +2212,8 @@ function GetNumTransportSlots(unit)
         Medium = 0,
         Small = 0,
     }
+
+    -- compute count based on bones
     for i = 1, unit:GetBoneCount() do
         if unit:GetBoneName(i) ~= nil then
             if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
@@ -2223,6 +2225,17 @@ function GetNumTransportSlots(unit)
             end
         end
     end
+
+    -- retrieve number of slots set by blueprint, if it is set
+    local largeSlotsByBlueprint = unit.Blueprint.Transport.SlotsLarge or bones.Large 
+    local mediumSlotsByBlueprint = unit.Blueprint.Transport.SlotsMedium or bones.Medium 
+    local smallSlotsByBlueprint = unit.Blueprint.Transport.SlotsSmall or bones.Small 
+
+    -- take the minimum of the two
+    bones.Large = math.min(bones.Large, largeSlotsByBlueprint)
+    bones.Medium = math.min(bones.Medium, mediumSlotsByBlueprint)
+    bones.Small = math.min(bones.Small, smallSlotsByBlueprint)
+
     return bones
 end
 
