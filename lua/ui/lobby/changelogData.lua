@@ -12,7 +12,7 @@ last_version = 3740
 ---@type PatchNotes[]
 gamePatches = {
     {
-        version = 3739,
+        version = 3740,
         name = "Hotfix",
         description = {
             "## Bug fixes",
@@ -32,6 +32,9 @@ gamePatches = {
             "(#3989, #3993) Allow all direct fire weapons to retarget as usual",
             "    Prevents units from 'being stuck' attacking a factory while an engineer is next to it. This type of issue",
             "    shows up a lot more often in matchmaking",
+            "",
+            "I'd also like to use this opportunity to note that we're making the game better for the community. If a change ",
+            "appears to be the reverse of that then we're always open to discuss why you think that is the case. ",
             "",
             "## Other changes",
             "",
