@@ -144,7 +144,7 @@ function ProcessWeapons(units)
     }
 
     for k, unit in units do 
-        if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId)] then
+        if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId or "")] then
             if unit.Weapon then 
                 for k, weapon in unit.Weapon do
                     if not weapon.DummyWeapon then
