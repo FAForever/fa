@@ -12,7 +12,6 @@ local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
 -- local DeprecatedWarnings = { }
 
----@alias Blueprint table
 ---@alias Position {[1]: number, [2]: number, [3]: number} table of {x, y, z}
 ---@alias AdjacencyBeam {Unit: Unit, Trash: TrashBag}
 
@@ -36,7 +35,7 @@ end
 ---@param x number
 ---@param y number
 ---@param z number
----@return Emitter[] emitters
+---@return moho.IEffect[] emitters
 function CreateEffectsWithOffset(obj, army, EffectTable, x, y, z)
     local emitters = {}
     for _, v in EffectTable  do
@@ -52,7 +51,7 @@ end
 ---@param xRange number
 ---@param yRange number
 ---@param zRange number
----@return Emitter[] emitters
+---@return moho.IEffect[] emitters
 function CreateEffectsWithRandomOffset(obj, army, EffectTable, xRange, yRange, zRange)
     local emitters = {}
     for _, v in EffectTable do
@@ -66,7 +65,7 @@ end
 ---@param bone string
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
----@return Emitter[] emitters
+---@return moho.IEffect[] emitters
 function CreateBoneEffects(obj, bone, army, EffectTable)
     local emitters = {}
     for _, v in EffectTable do
@@ -83,7 +82,7 @@ end
 ---@param x number
 ---@param y number
 ---@param z number
----@return Emitter[] emitters
+---@return moho.IEffect[] emitters
 function CreateBoneEffectsOffset(obj, bone, army, EffectTable, x, y, z)
     local emitters = {}
     for _, v in EffectTable do
@@ -125,7 +124,7 @@ end
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
 ---@param NumEffects integer
----@return Emitter[] emitters
+---@return moho.IEffect[] emitters
 function CreateRandomEffects(obj, army, EffectTable, NumEffects)
     local NumTableEntries = table.getn(EffectTable)
     local emitters = {}
@@ -136,7 +135,7 @@ function CreateRandomEffects(obj, army, EffectTable, NumEffects)
 end
 
 --- Sets the param of each effect to a random ranged float
----@param Emitters Effect[]
+---@param Emitters moho.IEffect[]
 ---@param param string
 ---@param minRange number
 ---@param maxRange number

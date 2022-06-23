@@ -249,7 +249,7 @@ function PlayReclaimEndEffects(reclaimer, reclaimed)
 end
 
 --- Applies the wind direction to an emitter.
----@param emitter Effect Emitter to apply the wind direction to
+---@param emitter moho.IEffect Emitter to apply the wind direction to
 ---@param factor number
 function ApplyWindDirection(emitter, factor)
     local r = 1 + Random()
