@@ -133,6 +133,7 @@ local function ProcessWeapon(unit, weapon)
 
     weapon.TargetCheckInterval = 0.1 * math.floor(10 * weapon.TargetCheckInterval)
     weapon.TrackingRadius = 0.1 * math.floor(10 * weapon.TrackingRadius)
+    LOG(unit.BlueprintId)
 end
 
 function ProcessWeapons(units)
@@ -144,7 +145,7 @@ function ProcessWeapons(units)
     }
 
     for k, unit in units do 
-        if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId)] then
+        if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId or "")] then
             if unit.Weapon then 
                 for k, weapon in unit.Weapon do
                     if not weapon.DummyWeapon then
