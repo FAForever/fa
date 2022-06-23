@@ -136,20 +136,21 @@ local function ProcessWeapon(unit, weapon)
 end
 
 function ProcessWeapons(units)
-    for k, unit in units do 
-        if unit.Weapon then 
-            -- LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
-            for k, weapon in unit.Weapon do 
-                if not weapon.DummyWeapon then 
-                    ProcessWeapon(unit, weapon)
-                else
-                    -- LOG("Skipped: "  .. tostring(weapon.DisplayName))
-                end
 
-                -- LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
-                -- LOG(" - - WeaponCheckinterval: " .. tostring(weapon.TargetCheckInterval))
-                -- LOG(" - - AlwaysRecheckTarget: " .. tostring(weapon.AlwaysRecheckTarget))
-                -- LOG(" - - TrackingRadius: " .. tostring(weapon.TrackingRadius))
+    local StringLower = string.lower
+
+    local unitsToSkip = {
+        daa0206 = true,
+    }
+
+    for k, unit in units do 
+        if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId)] then
+            if unit.Weapon then 
+                for k, weapon in unit.Weapon do
+                    if not weapon.DummyWeapon then
+                        ProcessWeapon(unit, weapon)
+                    end
+                end
             end
         end
     end
