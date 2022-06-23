@@ -208,7 +208,7 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
+        SizeX = 2,
         SizeZ = 6,
     },
     General = {
