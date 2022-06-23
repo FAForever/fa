@@ -221,7 +221,7 @@ UnitBlueprint {
                     AppliedToTarget = true,
                     BuffType = 'STUN',
                     Duration = 3,
-                    Radius = 2.3,
+                    Radius = 2,
                     TargetAllow = 'TECH1',
             TargetDisallow = 'TECH2,WALL',  -- added for bug fix [162]
                 },
