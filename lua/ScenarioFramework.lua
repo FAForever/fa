@@ -539,6 +539,25 @@ function PlatoonPatrolRoute(platoon, route, squad)
     end
 end
 
+-- commands platoon to attack a route
+function PlatoonAttackRoute(platoon, route, squad)
+    for _, v in route do
+        if type(v) == 'string' then
+            if squad then
+                platoon:AggressiveMoveToLocation(ScenarioUtils.MarkerToPosition(v), squad)
+            else
+                platoon:AggressiveMoveToLocation(ScenarioUtils.MarkerToPosition(v))
+            end
+        else
+            if squad then
+                platoon:AggressiveMoveToLocation(v, squad)
+            else
+                platoon:AggressiveMoveToLocation(v)
+            end
+        end
+    end
+end
+
 function PlatoonMoveChain(platoon, chain, squad)
     for _, v in ScenarioUtils.ChainToPositions(chain) do
         if squad then
