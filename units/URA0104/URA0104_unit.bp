@@ -208,8 +208,8 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 8,
-        SizeZ = 8,
+        SizeX = 1,
+        SizeZ = 6,
     },
     General = {
         Category = 'Transport',
