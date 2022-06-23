@@ -456,7 +456,7 @@ end
 function PermanentFactoryAssist(platoon)
     local aiBrain = platoon:GetBrain()
     local bManager = aiBrain.BaseManagers[platoon.PlatoonData.BaseName]
-    local assisting = false
+    local assistFac = false
     local unit = platoon:GetPlatoonUnits()[1]
 
     TriggerFile.CreateUnitDeathTrigger(PermanentAssisterDead, unit)
@@ -486,9 +486,9 @@ function PermanentFactoryAssist(platoon)
                 end
             end
         end
-        -- If the disparity between factories is more than 1, reorganize engineers
-        if (not assisting and lowFac) or (high and low and lowFac and high > low + 1 and highFac == unit:GetGuardedUnit()) then
-            assisting = true
+        -- If we don't have a factory or our factory is dead, or the disparity between factories is more than 1, reorganize engineers.
+        if ((not assistFac or assistFac.Dead) and lowFac) or (high and low and lowFac and high > low + 1 and highFac == unit:GetGuardedUnit()) then
+            assistFac = lowFac
             platoon:Stop()
             IssueGuard({unit}, lowFac)
 
