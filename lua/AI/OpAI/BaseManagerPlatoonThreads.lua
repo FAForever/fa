@@ -825,7 +825,7 @@ function BaseManagerEngineerThread(platoon)
                             end
                         until eng.Dead or eng:IsIdleState()
                         if not eng.Dead then
-                            baseManager.UnfinishedBuildings[unitName] = false
+                            baseManager.UnfinishedBuildings[unitName] = nil
                             baseManager:DecrementUnitBuildCounter(unitName)
                         end
                     end
@@ -920,19 +920,19 @@ function BuildUnfinishedStructures(platoon)
             end
         end
         -- Check all unfinished buildings to see if they need someone workin on them
-        for k, v in bManager.UnfinishedBuildings do
-            if v and ScenarioInfo.UnitNames[armyIndex][k] and not ScenarioInfo.UnitNames[armyIndex][k].Dead then
-                if not beingBuiltList[k] then
+        for unitName, _ in bManager.UnfinishedBuildings do
+            if ScenarioInfo.UnitNames[armyIndex][unitName] and not ScenarioInfo.UnitNames[armyIndex][unitName].Dead then
+                if not beingBuiltList[unitName] then
                     unfinishedBuildings = true
                     IssueClearCommands({eng})
-                    IssueRepair({eng}, ScenarioInfo.UnitNames[armyIndex][k])
+                    IssueRepair({eng}, ScenarioInfo.UnitNames[armyIndex][unitName])
                     repeat
                         WaitSeconds(3)
                         if not aiBrain:PlatoonExists(platoon) then
                             return
                         end
                     until eng:IsIdleState()
-                    bManager.UnfinishedBuildings[v] = false
+                    bManager.UnfinishedBuildings[unitName] = nil
                 end
             end
         end
