@@ -108,7 +108,8 @@ local function ProcessWeapon(unit, weapon)
         weapon.AlwaysRecheckTarget = false
 
         -- allow target rechecking for artillery and weapons with a very large attack radius
-        if  weapon.RangeCategory == "UWRC_IndirectFire" or
+        if  weapon.RangeCategory == 'UWRC_DirectFire' or
+            weapon.RangeCategory == "UWRC_IndirectFire" or
             weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then
             weapon.AlwaysRecheckTarget = true
         end
