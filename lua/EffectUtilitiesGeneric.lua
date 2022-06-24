@@ -253,7 +253,7 @@ end
 ---@param factor number
 function ApplyWindDirection(emitter, factor)
     local r = 1 + Random()
-    factor = factor / 100
+    factor = factor * 0.01
     IEffectSetEmitterCurveParam(emitter, "XDIR_CURVE", factor, factor * r)
     IEffectSetEmitterCurveParam(emitter, "YDIR_CURVE", factor * 0.25, factor * (0.5 + Random()))
     IEffectSetEmitterCurveParam(emitter, "ZDIR_CURVE", factor, factor * r)
