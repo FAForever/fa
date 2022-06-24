@@ -213,7 +213,7 @@ function PlayReclaimEffects(reclaimer, reclaimed, buildEffectBones, effectsBag)
     if not reclaimEndpoint then
         reclaimEndpoint = Entity()
         reclaimer.ReclaimEndpoint = reclaimEndpoint
-        reclaimer.Trash:Add(reclaimEndpoint)
+        TrashBagAdd(reclaimer.Trash, reclaimEndpoint)
     end
 
     -- move end point
@@ -221,14 +221,14 @@ function PlayReclaimEffects(reclaimer, reclaimed, buildEffectBones, effectsBag)
 
     -- create beams
     for _, bone in buildEffectBones do
-        for _, emitter in ReclaimBeams do
-            effectsBag:Add(AttachBeamEntityToEntity(reclaimer, bone, reclaimEndpoint, -1, army, emitter))
+        for _, effect in ReclaimBeams do
+            TrashBagAdd(effectsBag, AttachBeamEntityToEntity(reclaimer, bone, reclaimEndpoint, -1, army, effect))
         end
     end
 
     -- create particle effects
-    for _, v in ReclaimObjectAOE do
-        effectsBag:Add(CreateEmitterOnEntity(reclaimEndpoint, army, v))
+    for _, effect in ReclaimObjectAOE do
+        TrashBagAdd(effectsBag, CreateEmitterOnEntity(reclaimEndpoint, army, effect))
     end
 end
 
@@ -240,8 +240,8 @@ function PlayReclaimEndEffects(reclaimer, reclaimed)
     army = reclaimer.Army or -1
 
     -- create particle effects
-    for _, v in ReclaimObjectEnd do
-        CreateEmitterAtEntity(reclaimed, army, v)
+    for _, effect in ReclaimObjectEnd do
+        CreateEmitterAtEntity(reclaimed, army, effect)
     end
 
     -- create light effect
@@ -252,9 +252,9 @@ end
 ---@param emitter moho.IEffect Emitter to apply the wind direction to
 ---@param factor number
 function ApplyWindDirection(emitter, factor)
-    local r = 1 + Random()
     factor = factor * 0.01
-    IEffectSetEmitterCurveParam(emitter, "XDIR_CURVE", factor, factor * r)
+    local r = factor * (1 + Random())
+    IEffectSetEmitterCurveParam(emitter, "XDIR_CURVE", factor, r)
     IEffectSetEmitterCurveParam(emitter, "YDIR_CURVE", factor * 0.25, factor * (0.5 + Random()))
-    IEffectSetEmitterCurveParam(emitter, "ZDIR_CURVE", factor, factor * r)
+    IEffectSetEmitterCurveParam(emitter, "ZDIR_CURVE", factor, r)
 end
