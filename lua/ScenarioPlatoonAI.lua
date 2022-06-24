@@ -263,6 +263,7 @@ end
 --- | LandingList        | (REQUIRED or LandingChain) List of possible locations for transports to unload units
 --- | LandingChain       | (REQUIRED or LandingList) Chain of possible landing locations
 --- | TransportReturn    | Location for transports to return to (they will attack with land units if this isn't set)
+--- | TransportChain     | (or TransportRoute) Route to move along the transports before dropping the units.
 --- | AttackPoints       | (REQUIRED or AttackChain or PatrolChain) List of locations to attack. The platoon attacks the highest threat first
 --- | AttackChain        | (REQUIRED or AttackPoints or PatrolChain) Marker Chain of postitions to attack
 --- | PatrolChain        | (REQUIRED or AttackChain or AttackPoints) Chain of patrolling
@@ -272,23 +273,15 @@ function LandAssaultWithTransports(platoon)
     local aiBrain = platoon:GetBrain()
     local data = platoon.PlatoonData
 
-    for varName, varData in data do
-        if not(varName == 'ReadyVariable' or varName == 'WaitVariable' or varName == 'LandingList' or
-               varName == 'LandingChain' or varName == 'TransportReturn' or varName == 'AttackPoints' or
-               varName == 'AttackChain' or varName == 'AMPlatoons' or varName == 'PlatoonName'
-               or varName == 'AMMasterPlatoon' or varName == 'UsePool' or varName == 'LocationType'
-               or varName == 'BuilderName' or varName == 'LockTimer' or varName == 'DiffLockTimerD1'
-               or varName == 'DiffLockTimerD2' or varName == 'DiffLockTimerD3' or varName == 'AssaultChains'
-               or varName == 'Ratio' or varName == 'LockTimer' or varName == 'MovePath' or varName == 'PatrolChain'
-               or varName == 'RandomPatrol') and varName ~= 'Categories' then
-            error('*SCENARIO PLATOON AI ERROR: LandAssaultWithTransports does not accept variable named-'..varName, 2)
-        end
-    end
-
     if not data.AttackPoints and not data.AttackChain and not data.AssaultChains then
         error('*SCENARIO PLATOON AI ERROR: LandAssaultWithTransports requires AttackPoints in PlatoonData to operate', 2)
     elseif not data.LandingList and not data.LandingChain and not data.AssaultChains then
         error('*SCENARIO PLATOON AI ERROR: LandAssaultWithTransports requires LandingList in PlatoonData to operate', 2)
+    end
+
+    -- Fix wrongly named variable from the GPG era.
+    if data.MovePath then
+        data.TransportChain = data.MovePath
     end
 
     local assaultAttackChain, assaultLandingChain
@@ -358,31 +351,28 @@ function LandAssaultWithTransports(platoon)
         return
     end
 
-    if data.MovePath and not MoveAlongRoute(platoon, ScenarioUtils.ChainToPositions(data.MovePath)) then
-        return
+    -- Move the transports along desired route
+    if data.TransportRoute then
+        ScenarioFramework.PlatoonMoveRoute(platoon, data.TransportRoute)
+    elseif data.TransportChain then
+        ScenarioFramework.PlatoonMoveChain(platoon, data.TransportChain)
     end
 
     -- Find landing location and unload units at right spot
-    local landingLocation
-    if ScenarioInfo.Options.Difficulty and ScenarioInfo.Options.Difficulty == 3 then
-        landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
-    else
-        landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
-    end
-    cmd = platoon:UnloadAllAtLocation(landingLocation)
-    local attached = true
-    while attached do
-        attached = false
-        WaitSeconds(3)
+    local landingLocation = PlatoonChooseRandomNonNegative(aiBrain, landingPositions, 1)
+    local cmd = platoon:UnloadAllAtLocation(landingLocation)
+
+    -- Wait until the units are dropped
+    while platoon:IsCommandsActive(cmd) do
+        WaitSeconds(1)
         if not aiBrain:PlatoonExists(platoon) then
             return
         end
-        for num, unit in platoon:GetPlatoonUnits() do
-            if not unit.Dead and not EntityCategoryContains(categories.TRANSPORTATION, unit) and unit:IsUnitState('Attached') then
-                attached = true
-                break
-            end
-        end
+    end
+
+    -- Send transports back to base if desired
+    if platoon.PlatoonData.TransportReturn then
+        ReturnTransportsToPool(platoon, data)
     end
 
     if data.PatrolChain then
@@ -393,16 +383,8 @@ function LandAssaultWithTransports(platoon)
         end
     else
         -- Patrol attack route by creating attack route
-        local attackRoute = {}
-        attackRoute = PlatoonChooseHighestAttackRoute(aiBrain, attackPositions, 1)
-        -- Send transports back to base if desired
-        if platoon.PlatoonData.TransportReturn then
-            ReturnTransportsToPool(platoon, data)
-        end
-
-        for _, v in attackRoute do
-            platoon:Patrol(v)
-        end
+        local attackRoute = PlatoonChooseHighestAttackRoute(aiBrain, attackPositions, 1)
+        ScenarioFramework.PlatoonPatrolRoute(platoon, attackRoute)
     end
 
     for num, unit in platoon:GetPlatoonUnits() do
@@ -840,22 +822,6 @@ function StartBaseEngineerThread(platoon)
     local platoonUnits = platoon:GetPlatoonUnits()
     local data = platoon.PlatoonData
     local baseName
-    -- Check for bad variables
-    for varName, varData in data do
-        if not(varName == 'ReadyVariable' or varName == 'WaitVariable' or varName == 'LandingLocation' or
-               varName == 'MoveBeacon' or varName == 'Construction' or varName == 'BuildBaseTemplate' or
-               varName == 'MaintainBaseTemplate' or varName == 'BuildingTemplate' or varName == 'PatrolRoute' or
-               varName == 'PatrolChain'  or varName == 'TransportRoute' or varName == 'TransportChain' or
-               varName == 'DisbandAfterPatrol' or varName == 'RandomPatrol' or varName == 'UseTransports' or
-               varName == 'LocationType' or varName == 'AssistFactories' or varName == 'Busy' or
-               varName == 'ReassignAssist' or varName == 'FactoryAssistList' or varName == 'BuilderName' or
-               varName == 'NamedUnitBuild' or varName == 'LocationType' or varName == 'MaintainDiffLevel'
-               or varName == 'LockTimer' or varName == 'DiffLockTimerD1' or varName == 'DiffLockTimerD2'
-               or varName == 'DiffLockTimerD3' or varName == 'GroupBuildOnce' or varName == 'NamedUnitFinishedCallback'
-               or varName == 'NamedUnitBuildReportCallback') then
-            error('*SCENARIO PLATOON AI ERROR: StartBaseEngineerThread does not accept variable named-'..varName, 2)
-        end
-    end
     -- Check Construction table for bad variables
     if data.Construction then
         for varName, varData in data.Construction do
@@ -1056,51 +1022,39 @@ end
 function ReturnTransportsToPool(platoon, data)
     -- Put transports back in TPool
     local aiBrain = platoon:GetBrain()
-    for _, unit in platoon:GetPlatoonUnits() do
-        if EntityCategoryContains(categories.TRANSPORTATION, unit) then
-            -- If a route was given, reverse the route on return
-            if data.TransportRoute then
-                aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                for i=table.getn(data.TransportRoute), 1, -1 do
-                    if type(data.TransportRoute[1]) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportRoute[i]))
-                    else
-                        IssueMove({unit}, data.TransportRoute[i])
-                    end
-                end
-                if data.TransportReturn then
-                    if type(data.TransportReturn) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportReturn))
-                    else
-                        IssueMove({unit}, data.TransportReturn)
-                    end
-                end
-                -- If a route chain was given, reverse the route on return
-            elseif data.TransportChain then
-                local transPositionChain = {}
-                transPositionChain = ScenarioUtils.ChainToPositions(data.TransportChain)
-                aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                for i=table.getn(transPositionChain), 1, -1 do
-                    IssueMove({unit}, transPositionChain[i])
-                end
-                if data.TransportReturn then
-                    if type(data.TransportReturn) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportReturn))
-                    else
-                        IssueMove({unit}, data.TransportReturn)
-                    end
-                end
-                -- Return to Transport Return if no route
+    local transports = platoon:GetSquadUnits('Scout')
+
+    if table.empty(transports) then
+        return
+    end
+
+    for _, unit in transports do
+        aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
+    end
+
+    -- If a route or chain was given, reverse it on return
+    if data.TransportRoute then
+        for i = table.getn(data.TransportRoute), 1, -1 do
+            if type(data.TransportRoute[i]) == 'string' then
+                IssueMove(transports, ScenarioUtils.MarkerToPosition(data.TransportRoute[i]))
             else
-                if data.TransportReturn then
-                    aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'None')
-                    if type(data.TransportReturn) == 'string' then
-                        IssueMove({unit}, ScenarioUtils.MarkerToPosition(data.TransportReturn))
-                    else
-                        IssueMove({unit}, data.TransportReturn)
-                    end
-                end
+                IssueMove(transports, data.TransportRoute[i])
             end
+        end
+        -- If a route chain was given, reverse the route on return
+    elseif data.TransportChain then
+        local transPositionChain = ScenarioUtils.ChainToPositions(data.TransportChain)
+        for i = table.getn(transPositionChain), 1, -1 do
+            IssueMove(transports, transPositionChain[i])
+        end
+    end
+
+    -- Return to Transport Return position
+    if data.TransportReturn then
+        if type(data.TransportReturn) == 'string' then
+            IssueMove(transports, ScenarioUtils.MarkerToPosition(data.TransportReturn))
+        else
+            IssueMove(transports, data.TransportReturn)
         end
     end
 end
@@ -1793,7 +1747,7 @@ function GetLoadTransports(platoon)
             table.insert(remainingSize2, unit)
         elseif unit:GetBlueprint().Transport.TransportClass == 1 then
             table.insert(remainingSize1, unit)
-        else
+        elseif not EntityCategoryContains(categories.TRANSPORTATION, unit) then
             table.insert(remainingSize1, unit)
         end
     end
@@ -1817,12 +1771,12 @@ function GetLoadTransports(platoon)
     transportTable, currLeftovers = SortUnitsOnTransports(transportTable, currLeftovers, -1)
 
     -- Old load transports
-    local monitorUnits = {}
+    local unitsToDrop = {}
     for num, data in transportTable do
         if not table.empty(data.Units) then
             IssueClearCommands(data.Units)
             IssueTransportLoad(data.Units, data.Transport)
-            for _, v in data.Units do table.insert(monitorUnits, v) end
+            for _, v in data.Units do table.insert(unitsToDrop, v) end
         end
     end
 
@@ -1833,7 +1787,7 @@ function GetLoadTransports(platoon)
             return false
         end
         attached = true
-        for _, v in monitorUnits do
+        for _, v in unitsToDrop do
             if not v.Dead and not v:IsIdleState() then
                 attached = false
                 break
@@ -1857,11 +1811,9 @@ function GetLoadTransports(platoon)
         pool = aiBrain:GetPlatoonUniquelyNamed('ArmyPool')
     end
 
-    for _, unit in platoon:GetPlatoonUnits() do
-        if not EntityCategoryContains(categories.TRANSPORTATION, unit) then
-            if not unit:IsUnitState('Attached') then
-                aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
-            end
+    for _, unit in unitsToDrop do
+        if not unit.Dead and not unit:IsUnitState('Attached') then
+            aiBrain:AssignUnitsToPlatoon(pool, {unit}, 'Unassigned', 'None')
         end
     end
 
@@ -2260,6 +2212,8 @@ function GetNumTransportSlots(unit)
         Medium = 0,
         Small = 0,
     }
+
+    -- compute count based on bones
     for i = 1, unit:GetBoneCount() do
         if unit:GetBoneName(i) ~= nil then
             if string.find(unit:GetBoneName(i), 'Attachpoint_Lrg') then
@@ -2271,6 +2225,17 @@ function GetNumTransportSlots(unit)
             end
         end
     end
+
+    -- retrieve number of slots set by blueprint, if it is set
+    local largeSlotsByBlueprint = unit.Blueprint.Transport.SlotsLarge or bones.Large 
+    local mediumSlotsByBlueprint = unit.Blueprint.Transport.SlotsMedium or bones.Medium 
+    local smallSlotsByBlueprint = unit.Blueprint.Transport.SlotsSmall or bones.Small 
+
+    -- take the minimum of the two
+    bones.Large = math.min(bones.Large, largeSlotsByBlueprint)
+    bones.Medium = math.min(bones.Medium, mediumSlotsByBlueprint)
+    bones.Small = math.min(bones.Small, smallSlotsByBlueprint)
+
     return bones
 end
 

@@ -2,7 +2,7 @@
 -- Post process a unit
 local function PostProcessUnit(unit)
 
-    -- -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     unit.CategoriesCount = 0
     unit.CategoriesHash = { }
@@ -13,7 +13,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     unit.DoNotCollideListCount = 0 
     unit.DoNotCollideListHash = { }
@@ -24,7 +24,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- -- sanitize guard scan radius
+    -- # sanitize guard scan radius
 
     -- The guard scan radius is used when:
     -- - A unit attack moves, it determines how far the unit remains from its target
@@ -114,24 +114,47 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- -- sanitize air unit footprints
+    -- # sanitize air unit footprints
 
     -- value used by formations to determine the distance between other air units. Note
     -- that the value must be of type unsigned integer!
 
-    if isAir and not (isExperimental or isStructure or (isTransport and not isGunship)) then 
+    if  isAir and
+        not (
+            isExperimental or
+            isStructure or
+            (isTransport and not isGunship) -- uef tech 2 gunship is also a transport :)
+        ) 
+    then 
+        
         unit.Footprint = unit.Footprint or { }
+
+        -- determine footprint size based on type
         if isBomber then 
             unit.Footprint.SizeX = 4
             unit.Footprint.SizeZ = 4
         elseif isGunship then 
             unit.Footprint.SizeX = 3
-            unit.Footprint.SizeZ = 3 
+            unit.Footprint.SizeZ = 3
         else 
             unit.Footprint.SizeX = 2
             unit.Footprint.SizeZ = 2
         end
+
+        -- limit their footprint size based on tech
+        if isTech1 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 2)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 2)
+        elseif isTech2 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 3)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 3)
+        elseif isTech3 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 4)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 4)
+        end
     end
+
+    -- # Allow naval factories to correct their roll off points, as they are critical for ships not being stuck
 
     if unit.CategoriesHash['FACTORY'] and unit.CategoriesHash['NAVAL'] then 
         unit.Physics.CorrectNavalRollOffPoints = true
@@ -141,23 +164,6 @@ end
 --- Post-processes all units
 function PostProcessUnits(units)
     for k, unit in units do 
-
-        -- local oldGuardScanRadius = unit.AI.GuardScanRadius
-        -- local oldGuardScanRadiusWasSet = true
-        -- if not oldGuardScanRadius then 
-        --     oldGuardScanRadiusWasSet = false
-        --     local primaryWeapon = unit.Weapon[1]
-        --     if primaryWeapon then 
-        --         local maxRadius = primaryWeapon.MaxRadius or 0
-        --         local trackingRadius = primaryWeapon.TrackingRadius or 1.0
-        --         oldGuardScanRadius = trackingRadius * maxRadius
-        --     else 
-        --         oldGuardScanRadius = 25 -- default value
-        --     end
-        -- end
-
         PostProcessUnit(unit)
-
-        -- LOG("Processing: " .. unit.BlueprintId .. " - GuardScanRadius: " .. tostring(oldGuardScanRadius) .. " -> " .. tostring(unit.AI.GuardScanRadius) .. " (" .. tostring(unit.General.UnitName) .. ")")
     end
 end

@@ -161,6 +161,7 @@ BaseManager = ClassSimple {
         self.EngineersBuilding = 0
         self.NumPermanentAssisting = 0
         self.PermanentAssistCount = 0
+        self.PermanentAssisters = {}
         self.MaximumConstructionEngineers = 2
 
         self.BuildingCounterData = {
