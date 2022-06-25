@@ -188,7 +188,7 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
 
     -- make the end entity move around
     local ox, oy, oz = origin[1], origin[2], origin[3]
-    local blueprint = unitBeingBuilt:GetBlueprint()
+    local blueprint = unitBeingBuilt.Blueprint
 
     -- cache values for computing random offsets
     local vc = VectorCached

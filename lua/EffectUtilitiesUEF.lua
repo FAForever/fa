@@ -149,7 +149,7 @@ end
 function CreateBuildCubeThread(unitBeingBuilt, builder, onBeingBuiltEffectsBag)
     -- used to differentiate between using a slice beam and a default build beam
     unitBeingBuilt.BuildingCube = true
-    local buildbp = unitBeingBuilt:GetBlueprint()
+    local buildbp = unitBeingBuilt.Blueprint
     local Physics = buildbp.Physics
 
     -- cache information used throughout the function
@@ -247,7 +247,7 @@ end
 ---@param unitBeingBuilt Unit The unit being build (unused)
 ---@param buildEffectsBag TrashBag The effects bag of the unit being built
 function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, buildEffectsBag)
-    local buildAttachBone = builder:GetBlueprint().Display.BuildAttachBone
+    local buildAttachBone = builder.Blueprint.Display.BuildAttachBone
     TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, buildAttachBone, builder.Army, '/effects/emitters/uef_mobile_unit_build_01_emit.bp'))
 end
 
@@ -347,7 +347,7 @@ end
 ---@return number y the y coord of both points
 ---@return number height the height of the build size
 function CalculateUEFBuildPoints(builder, unitBeingBuilt)
-    local buildbp = unitBeingBuilt:GetBlueprint()
+    local buildbp = unitBeingBuilt.Blueprint
     local Physics = buildbp.Physics
     -- determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
     local sx = Physics.MeshExtentsX or buildbp.Footprint.SizeX

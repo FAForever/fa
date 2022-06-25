@@ -183,7 +183,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, trash, onStopBeingBuiltTr
     local slider = nil
     if unitBeingBuilt.Cache.HashedCats["HOVER"] then
         -- set elevation offset
-        offset = unitBeingBuilt:GetBlueprint().Elevation or 0
+        offset = unitBeingBuilt.Blueprint.Elevation or 0
         -- create a slider
         slider = CreateSlider(unitBeingBuilt, 0)
         SliderSetWorldUnits(slider, true)
@@ -225,7 +225,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, trash, onStopBeingBuiltTr
         WaitTicks(2)
     end
     -- set correct shader of unitBeingBuilt so that it happens instantly after finishing
-    unitBeingBuilt:SetMesh(unitBeingBuilt:GetBlueprint().Display.MeshBlueprint, true)
+    unitBeingBuilt:SetMesh(unitBeingBuilt.Blueprint.Display.MeshBlueprint, true)
 end
 
 --- The build animation for Aeon buildings in general.
@@ -244,8 +244,8 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     local army = unitBeingBuilt.Army
     local unitBeingBuiltTrash = unitBeingBuilt.Trash
     local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local Physics = unitBeingBuilt:GetBlueprint().Physics
-    local Footprint = unitBeingBuilt:GetBlueprint().Footprint
+    local Physics = unitBeingBuilt.Blueprint.Physics
+    local Footprint = unitBeingBuilt.Blueprint.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
     local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
@@ -291,8 +291,8 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         -- -- Initialize various info used throughout the function
         local unitBeingBuiltTrash = unitBeingBuilt.Trash
         local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-        local Physics = unitBeingBuilt:GetBlueprint().Physics
-        local Footprint = unitBeingBuilt:GetBlueprint().Footprint
+        local Physics = unitBeingBuilt.Blueprint.Physics
+        local Footprint = unitBeingBuilt.Blueprint.Footprint
         local sx = Physics.MeshExtentsX or Footprint.SizeX
         local sz = Physics.MeshExtentsZ or Footprint.SizeZ
         local sy = Physics.MeshExtentsY or Footprint.SizeY or MathMin(sz, sz)
@@ -429,7 +429,7 @@ end
 function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     -- -- Initialize various info used throughout the function
     local army = unitBeingBuilt.Army
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local sx = 0.6 * bp.Physics.MeshExtentsX or bp.Footprint.SizeX
     local sz = 0.6 * bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
 
@@ -462,7 +462,7 @@ function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local sx = 0.55 * bp.Physics.MeshExtentsX or bp.Footprint.SizeX
     local sz = 0.55 * bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
 
@@ -529,8 +529,8 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
     -- -- Initialize various info used throughout the function
     local army = unitBeingBuilt.Army
 
-    local Physics = unitBeingBuilt:GetBlueprint().Physics
-    local Footprint = unitBeingBuilt:GetBlueprint().Footprint
+    local Physics = unitBeingBuilt.Blueprint.Physics
+    local Footprint = unitBeingBuilt.Blueprint.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
     local sy = 2 * Physics.MeshExtentsY or Footprint.SizeY or MathMin(sx, sz)

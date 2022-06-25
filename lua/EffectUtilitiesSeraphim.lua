@@ -61,7 +61,7 @@ end
 function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBones, locationBone, effectsBag)
     -- -- initialize various info used throughout the function
     local army = builder.Army
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local Physics = bp.Physics
     local Footprint = bp.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
@@ -147,7 +147,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     local emittersHead = 1
 
     -- determine a sane LOD cutoff for the size of the unit
-    local bp = unitBeingBuilt:GetBlueprint()
+    local bp = unitBeingBuilt.Blueprint
     local lods = bp.Display.Mesh.LODs
     local count = TableGetn(lods)
 
