@@ -230,8 +230,7 @@ local UnitBuildEffects = {
 }
 
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, BuildEffectsBag)
-
-    CreateCybranBuildBeams(builder, unitBeingBuilt, BuildBones.BuildEffectBones, BuildEffectsBag)
+    CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, BuildEffectsBag, false)
 
     for _, vB in BuildBones.BuildEffectBones do
         for _, vE in BuildEffects do
