@@ -527,7 +527,6 @@ function UpdateWindow(info)
             end
         else 
 
-            LOG(repr(info))
             if info.entityId then 
                 local reclaimedMass, reclaimedEnergy
                 local unit = GetUnitById(info.entityId)

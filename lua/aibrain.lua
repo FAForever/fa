@@ -295,8 +295,8 @@ AIBrain = Class(moho.aibrain_methods) {
         --- Units that we keep track for reclaim amount computations 
         self.Reclaimers = { }
         setmetatable(self.Reclaimers, { __mode = 'v' })
-        self.Reclaimees = { }
-        setmetatable(self.Reclaimees, { __mode = 'v' })
+        self.ReclaimersToBe = { }
+        setmetatable(self.ReclaimersToBe, { __mode = 'v' })
 
         ForkThread(self.ReclaimerThread, self)
 
@@ -397,14 +397,25 @@ AIBrain = Class(moho.aibrain_methods) {
 
     -- Reclaim tracking
 
+    --- Tracks a reclaim event to update individual unit statistics
+    ---@param self any
+    ---@param unit any
+    ---@param target any
     TrackReclaimer = function(self, unit, target)
-        self.Reclaimers[unit.EntityId] = unit
-        self.Reclaimees[unit.EntityId] = target
+        if target.IsProp then
+            self.ReclaimersToBe[unit] = target
+        end
     end,
 
+    --- Untracks the reclaim event
+    ---@param self any
+    ---@param unit any
+    ---@param target any
     UntrackReclaimer = function(self, unit, target)
-        self.Reclaimers[unit.EntityId] = nil
-        self.Reclaimees[unit.EntityId] = nil
+        if target.IsProp then
+            self.Reclaimers[unit] = nil
+            self.ReclaimersToBe[unit] = nil
+        end
     end,
 
     ReclaimerThread = function(self)
@@ -413,44 +424,42 @@ AIBrain = Class(moho.aibrain_methods) {
 
         while true do 
 
+            CoroutineYield(2)
+
             -- for each reclaimer, check if it still exists
-            for k, reclaimer in self.Reclaimers do 
-                if not reclaimer:BeenDestroyed() and reclaimer:IsUnitState('Reclaiming') then
-                    
-                    -- for each target, check if it still exists
-                    local target = self.Reclaimees[k]
-                    if not target:BeenDestroyed() then
+            for reclaimer, target in self.Reclaimers do
 
-                        -- we're reclaiming a unit
-                        if IsUnit(target) then 
+                if IsDestroyed(reclaimer) or IsDestroyed(target) then
+                    break
+                end
 
-                        -- we're reclaiming a prop
-                        else 
-                            local time, energy, mass = target:GetReclaimCosts(reclaimer)
-                            LOG("time" .. tostring(time))
-                            LOG("energy" .. tostring(energy))
-                            LOG("mass" .. tostring(mass))
+                local time, energy, mass = target:GetReclaimCosts(reclaimer)
 
-                            local multiplier = 1
-                            if time < 0.1 then 
-                                multiplier = time / 0.1
-                            end
+                local multiplier = 1
+                if time < 0.1 then 
+                    multiplier = time / 0.1
+                end
 
-                            local massChange = mass / (time * 10) * multiplier
-                            local energyChange = energy / (time * 10) * multiplier
+                local massChange = 2 * mass / (time * 10) * multiplier
+                local energyChange = 2 * energy / (time * 10) * multiplier
 
-                            LOG("massChange" .. tostring(massChange))
-                            LOG("energyChange" .. tostring(energyChange))
+                if massChange > 0 then 
+                    reclaimer.ReclaimedMass = reclaimer.ReclaimedMass + massChange
+                    reclaimer:SetStat('ReclaimedMass', reclaimer.ReclaimedMass)
+                end
 
-                            reclaimer:SetStat('ReclaimedMass', reclaimer:GetStat('ReclaimedMass', 0).Value + massChange)
-                            reclaimer:SetStat('ReclaimedEnergy', reclaimer:GetStat('ReclaimedEnergy', 0).Value + energyChange)
-                        end
-                    end 
+                if energyChange > 0 then 
+                    reclaimer.ReclaimedEnergy = reclaimer.ReclaimedEnergy + energyChange 
+                    reclaimer:SetStat('ReclaimedEnergy', reclaimer.ReclaimedEnergy)
                 end
             end
 
-
             CoroutineYield(1)
+
+            for reclaimer, target in self.ReclaimersToBe do 
+                self.Reclaimers[reclaimer] = target 
+                self.ReclaimersToBe[reclaimer] = nil
+            end
         end
     end,
 

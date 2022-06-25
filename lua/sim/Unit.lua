@@ -347,6 +347,15 @@ Unit = Class(moho.unit_methods) {
         end
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
+
+        if self.Blueprint.CategoriesHash['ENGINEER'] then 
+            self:GetStat('ReclaimedMass', 0)
+            self:GetStat('ReclaimedEnergy', 0)
+
+            self.ReclaimedMass = 0
+            self.ReclaimedEnergy = 0
+        end
+
     end,
 
     -------------------------------------------------------------------------------------------

@@ -47,6 +47,8 @@ local TableInsert = table.insert
 ---@class Prop : moho.prop_methods
 Prop = Class(moho.prop_methods) {
 
+    IsProp = true,
+
     ---@param self Prop
     OnCreate = function(self)
 
