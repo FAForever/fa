@@ -202,7 +202,7 @@ function SpawnBuildBots(builder, unitBeingBuilt, buildEffectsBag)
         local numUnits = numBots - TableGetsize(buildBots)
         if numUnits > 0 then
             local x, y, z = unpack(builder:GetPosition())
-            y = y + builder.Blueprint.SizeY * 0.5
+            y = y + builder:GetBlueprint().SizeY * 0.5
             local qx, qy, qz, qw = unpack(builder:GetOrientation())
             local angle = 180
             local vecMul = 0.5
@@ -346,8 +346,8 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
 
     TableInsert(adjacencyBeamsBag, info)
 
-    local uBp = unit.Blueprint
-    local aBp = adjacentUnit.Blueprint
+    local uBp = unit:GetBlueprint()
+    local aBp = adjacentUnit:GetBlueprint()
     local faction = uBp.General.FactionName
 
     -- Determine which effects we will be using
@@ -698,7 +698,7 @@ function CreateAdjacencyBeams(unit, adjacentUnit, adjacencyBeamsBag)
 end
 
 function PlaySacrificingEffects(unit, targetUnit)
-    if unit.Blueprint.General.FactionName == 'Aeon' then
+    if unit:GetBlueprint().General.FactionName == 'Aeon' then
         local unitArmy = unit.Army
         local unitTrash = unit.Trash
         for _, effect in EffectTemplate.ASacrificeOfTheAeon01 do
@@ -708,7 +708,7 @@ function PlaySacrificingEffects(unit, targetUnit)
 end
 
 function PlaySacrificeEffects(unit, targetUnit)
-    if unit.Blueprint.General.FactionName == 'Aeon' then
+    if unit:GetBlueprint().General.FactionName == 'Aeon' then
         for _, effect in EffectTemplate.ASacrificeOfTheAeon02 do
             CreateEmitterAtEntity(targetUnit, unit.Army, effect)
         end
@@ -860,7 +860,7 @@ function PlayTeleportChargingEffects(unit, teleDest, effectsBag, teleDelay)
         return
     end
 
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
     local offsetY = TeleportGetUnitYOffset(unit)
     local unitArmy = unit.Army
@@ -993,13 +993,13 @@ end
 
 function TeleportGetUnitYOffset(unit)
     -- Returns how high to create effects to make the effects appear in the center of the unit
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
     return bp.Display.TeleportEffects.FxChargeAtDestOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) / 2)
 end
 
 function TeleportGetUnitSizes(unit)
     -- Returns the sizes of the unit, to be used for teleportation effects
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
     local telefx = bp.Display.TeleportEffects
     return telefx.FxSizeX or bp.Physics.MeshExtentsX or bp.SizeX or 1,
            telefx.FxSizeY or bp.Physics.MeshExtentsY or bp.SizeY or 1,
@@ -1018,7 +1018,7 @@ end
 
 function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, effectsBag)
     -- Creates charge up effects at the unit
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
     local bones = bp.Display.TeleportEffects.ChargeFxAtUnitBones or {Bone = 0, Offset = {0, 0.25, 0}}
     local unitArmy = unit.Army
     local emitters = {}
@@ -1060,7 +1060,7 @@ function TeleportCreateCybranSphere(unit, location, initialScale)
 end
 
 function TeleportChargingProgress(unit, fraction)
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
 
     if bp.Display.TeleportEffects.PlayChargeFxAtDestination ~= false then
         fraction = MathMin(MathMax(fraction, 0.01), 1)
@@ -1105,7 +1105,7 @@ end
 
 function PlayTeleportOutEffects(unit, EffectsBag)
     -- Fired when the unit is being teleported, just before the unit is taken from its original location
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
 
     if bp.Display.TeleportEffects.PlayTeleportOutFx ~= false then
@@ -1138,7 +1138,7 @@ end
 
 function DoTeleportInDamage(unit)
     -- Check for teleport dummy weapon and deal the specified damage. Also show fx.
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
     local Yoffset = TeleportGetUnitYOffset(unit)
 
     local dmg = 0
@@ -1192,7 +1192,7 @@ end
 
 function PlayTeleportInEffects(unit, effectsBag)
     -- Fired when the unit is being teleported, just after the unit is taken from its original location
-    local bp = unit.Blueprint
+    local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
     local offsetY = TeleportGetUnitYOffset(unit)
     local decalOrient = UtilGetRandomFloat(0, MathTau)
