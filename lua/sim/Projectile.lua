@@ -51,6 +51,7 @@ local EntitySetMaxHealth = _G.moho.entity_methods.SetMaxHealth
 local EntitySetHealth = _G.moho.entity_methods.SetHealth
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 local EntityDestroy = _G.moho.entity_methods.Destroy
+local UnitAddBuff = import('/lua/sim/Unit.lua').Unit.AddBuff
 
 local ProjectileGetLauncher = _G.moho.projectile_methods.GetLauncher
 
@@ -592,12 +593,19 @@ Projectile = Class(moho.projectile_methods) {
             -- Check for valid target
             for k, v in data.Buffs do
                 if v.Add.OnImpact == true then
-                    if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
+                    local isAreaEffect = v.Radius and v.Radius > 0
+                    if v.AppliedToTarget ~= true or isAreaEffect then
                         target = self:GetLauncher()
+                        -- let destroyed launchers still stun units (fix bug #3997)
+                        if not target and v.BuffType == 'STUN' and isAreaEffect then
+                            -- all the AddBuff method will do with the instigator for stunning is
+                            -- get its Army anyway; set that and we're good
+                            UnitAddBuff({Army = self.Army}, v, self:GetPosition())
+                        end
                     end
                     -- Check for target validity
                     if target and IsUnit(target) then
-                        if v.Radius and v.Radius > 0 then
+                        if isAreaEffect then
                             -- This is a radius buff
                             -- get the position of the projectile
                             target:AddBuff(v, self:GetPosition())
