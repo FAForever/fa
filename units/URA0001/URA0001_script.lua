@@ -56,7 +56,7 @@ URA0001 = Class(CAirUnit) {
     OnImpact = function(self, with)
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffectsOpti(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
         end
 
         self:ForkThread(self.DeathThread, self.OverKillRatio)
