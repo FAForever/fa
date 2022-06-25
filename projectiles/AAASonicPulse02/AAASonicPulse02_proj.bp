@@ -1,0 +1,43 @@
+ProjectileBlueprint {
+    Audio = {
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'AEON_Expl_Med_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactTerrain = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Land_Gen_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'ANTIAIR',
+    },
+    Display = {
+        StrategicIconSize = 1,
+    },
+    General = {
+        Category = 'Anti Air',
+        Faction = 'Aeon',
+        TechLevel = 1,
+        Weapon = 'Sonic Pulse Battery',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 120,
+        Lifetime = 1,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

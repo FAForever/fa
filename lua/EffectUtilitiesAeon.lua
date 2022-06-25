@@ -2,15 +2,13 @@
 local AeonBuildBeams01 = import('/lua/EffectTemplates.lua').AeonBuildBeams01
 local AeonBuildBeams02 = import('/lua/EffectTemplates.lua').AeonBuildBeams02
 
--- globals as upvalues for performance
 local AttachBeamEntityToEntity = AttachBeamEntityToEntity
 local CreateAttachedEmitter = CreateAttachedEmitter
 local CreateEmitterOnEntity = CreateEmitterOnEntity
-
 local WaitTicks = WaitTicks
-local TrashBagAdd = TrashBag.Add
 
--- moho functions as upvalues for performance
+local MathMin = math.min
+
 local EntityCreateProjectile = moho.entity_methods.CreateProjectile
 local EntityGetOrientation = moho.entity_methods.GetOrientation
 local EntitySetOrientation = moho.entity_methods.SetOrientation
@@ -21,6 +19,7 @@ local SliderSetGoal = moho.SlideManipulator.SetGoal
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
 local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
+local TrashBagAdd = TrashBag.Add
 
 
 function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
@@ -489,7 +488,7 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
     local Footprint = unitBeingBuilt.Blueprint.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
-    local sy = 2 * Physics.MeshExtentsY or Footprint.SizeY or (sx + sz)
+    local sy = 2 * Physics.MeshExtentsY or Footprint.SizeY or MathMin(sx, sz)
 
     CreateAeonGenericBuildEffects(unitBeingBuilt, army, sx, sy, sz)
 

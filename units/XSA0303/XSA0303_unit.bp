@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
+        GuardScanRadius = 45,       -- 150% of range
     },
     Air = {
         AutoLandTime = 1,

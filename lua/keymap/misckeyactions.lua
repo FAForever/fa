@@ -389,3 +389,7 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
 
     SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
 end
+
+function RecheckTargetsOfWeapons()
+    SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
+end

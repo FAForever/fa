@@ -6,6 +6,8 @@ local WaitSeconds = WaitSeconds
 local WaitTicks = WaitTicks
 local Warp = Warp
 
+local MathMin = math.min
+
 local EntityCreateProjectile = moho.entity_methods.CreateProjectile
 local EntityGetPositionXYZ = moho.entity_methods.GetPositionXYZ
 local EntitySetScale = moho.entity_methods.SetScale
@@ -154,10 +156,11 @@ function CreateBuildCubeThread(unitBeingBuilt, builder, onBeingBuiltEffectsBag)
     local vc = VectorCached
     local px, py, pz = EntityGetPositionXYZ(unitBeingBuilt)
     py = py + (Physics.MeshExtentsOffsetY or 0)
-
+  
     local bx = Physics.MeshExtentsX or buildbp.Footprint.SizeX
     local bz = Physics.MeshExtentsZ or buildbp.Footprint.SizeZ
-    local by = Physics.MeshExtentsY or buildbp.Footprint.SizeY or (bx + bz)
+    local by = Physics.MeshExtentsY or buildbp.Footprint.SizeY or MathMin(bx, bz)
+
 
     -- create a quick glow effect
     local proj = EntityCreateProjectile(unitBeingBuilt, '/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', 0, 0, 0)
@@ -351,7 +354,7 @@ function CalculateUEFBuildPoints(builder, unitBeingBuilt)
     local sz = Physics.MeshExtentsZ or buildbp.Footprint.SizeZ
     sx = sx * 0.5
     sz = sz * 0.5
-    local sy = Physics.MeshExtentsY or buildbp.Footprint.SizeY or (sx + sz)
+    local sy = Physics.MeshExtentsY or buildbp.Footprint.SizeY or MathMin(sx, sz)
     local x, y, z = EntityGetPositionXYZ(unitBeingBuilt)
     y = y + (Physics.MeshExtentsOffsetY or 0)
 

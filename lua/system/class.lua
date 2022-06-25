@@ -418,22 +418,22 @@ function ConstructClass(bases, specs)
                 end
             end
         end
+    end
 
-        -- post-process the states to make sure that they're unique and have the correct meta table set
-        for k, v in class do 
-            -- any member that has a meta table set is by definition a state
-            if type(v) == "table" and v.__State then 
+    -- post-process the states to make sure that they're unique and have the correct meta table set
+    for k, v in class do 
+        -- any member that has a meta table set is by definition a state
+        if type(v) == "table" and v.__State then 
 
-                -- copy the content into a new table
-                local d = Deepcopy(v) 
+            -- copy the content into a new table
+            local d = Deepcopy(v) 
 
-                -- set meta table information
-                d.__index = d 
-                setmetatable(d, class)
+            -- set meta table information
+            d.__index = d 
+            setmetatable(d, class)
 
-                -- override previous entry
-                class[k] = d
-            end
+            -- override previous entry
+            class[k] = d
         end
     end
 
