@@ -13,6 +13,7 @@ local Random = Random
 local WaitTicks = WaitTicks
 local Warp = Warp
 local setmetatable = setmetatable
+local unpack = unpack
 
 local MathTau = 2 * math.pi
 local MathSin = math.sin
@@ -68,11 +69,10 @@ function SpawnBuildBots(builder)
     if not bots then
         builder.BuildBotsNext = 1
         builder.BuildBots = { }
+        bots = builder.BuildBots
 
         -- make it weak so that the garbage collection can clean up the table when the unit is destroyed
-        setmetatable(builder.BuildBots, { __mode = "v" })
-
-        bots = builder.BuildBots
+        setmetatable(bots, { __mode = "v" })
     end
 
     -- get information about the builder
@@ -188,7 +188,7 @@ function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, 
 
     -- make the end entity move around
     local ox, oy, oz = origin[1], origin[2], origin[3]
-    local blueprint = unitBeingBuilt.Blueprint
+    local blueprint = unitBeingBuilt:GetBlueprint()
 
     -- cache values for computing random offsets
     local vc = VectorCached

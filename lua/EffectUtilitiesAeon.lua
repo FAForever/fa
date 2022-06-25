@@ -15,6 +15,7 @@ local EntityGetOrientation = moho.entity_methods.GetOrientation
 local EntitySetOrientation = moho.entity_methods.SetOrientation
 local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
 local IEffectSetEmitterCurveParam = moho.IEffect.SetEmitterCurveParam
+local IEffectOffsetEmitter = moho.IEffect.OffsetEmitter
 local ProjectileSetScale = moho.projectile_methods.SetScale
 local SliderSetGoal = moho.SlideManipulator.SetGoal
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
@@ -23,6 +24,14 @@ local UnitGetFractionComplete = moho.unit_methods.GetFractionComplete
 local TrashBagAdd = TrashBag.Add
 
 
+--- Creates an Aeon mercury pool build effect
+---@param unitBeingBuilt Unit Unit to attach mercury pool to
+---@param army integer Army of the pool
+---@param sx number Size x of the pool
+---@param sy number Size y of the pool
+---@param sz number Size z of the pool
+---@param scale number Scale of secondary build effect
+---@return Entity pool
 function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -32,23 +41,32 @@ function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
     TrashBagAdd(onDeathTrash, pool)
     TrashBagAdd(onFinishedTrash, pool)
     EntitySetOrientation(pool, EntityGetOrientation(unitBeingBuilt), true)
-    ProjectileSetScale(pool, sx, sy * 1.5, sz)
+    ProjectileSetScale(pool, sx, sy, sz)
 
     -- -- Create effects of build animation
-    local effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-    IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx * 1.5)
-    IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz * 1.5)
-    TrashBagAdd(onDeathTrash, effect)
-    TrashBagAdd(onFinishedTrash, effect)
+    local emitter = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    IEffectSetEmitterCurveParam(emitter, 'X_POSITION_CURVE', 0, sx * 1.5)
+    IEffectSetEmitterCurveParam(emitter, 'Z_POSITION_CURVE', 0, sz * 1.5)
+    TrashBagAdd(onDeathTrash, emitter)
+    TrashBagAdd(onFinishedTrash, emitter)
 
-    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    IEffectScaleEmitter(effect, scale)
-    TrashBagAdd(onDeathTrash, effect)
-    TrashBagAdd(onFinishedTrash, effect)
+    emitter = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    IEffectScaleEmitter(emitter, scale)
+    TrashBagAdd(onDeathTrash, emitter)
+    TrashBagAdd(onFinishedTrash, emitter)
 
     return pool
 end
 
+--- Creates an Aeon mercury pool build effect
+---@param unitBeingBuilt Unit Unit to attach mercury pool to
+---@param army integer
+---@param bone string Bone to place pool at
+---@param sx number Size x of the pool
+---@param sy number Size y of the pool
+---@param sz number Size z of the pool
+---@param scale number Scale of secondary build effect
+---@return Entity pool
 function CreateMercuryPoolOnBone(unitBeingBuilt, army, bone, sx, sy, sz, scale)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -61,48 +79,48 @@ function CreateMercuryPoolOnBone(unitBeingBuilt, army, bone, sx, sy, sz, scale)
     ProjectileSetScale(pool, sx, sy, sz)
 
     -- -- Create effects of build animation
-    local effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-    IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
-    IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
-    TrashBagAdd(onDeathTrash, effect)
-    TrashBagAdd(onFinishedTrash, effect)
+    local emitter = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    IEffectSetEmitterCurveParam(emitter, 'X_POSITION_CURVE', 0, sx * 1.5)
+    IEffectSetEmitterCurveParam(emitter, 'Z_POSITION_CURVE', 0, sz * 1.5)
+    TrashBagAdd(onDeathTrash, emitter)
+    TrashBagAdd(onFinishedTrash, emitter)
 
-    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    IEffectScaleEmitter(effect, scale)
-    TrashBagAdd(onDeathTrash, effect)
-    TrashBagAdd(onFinishedTrash, effect)
+    emitter = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    IEffectScaleEmitter(emitter, scale)
+    TrashBagAdd(onDeathTrash, emitter)
+    TrashBagAdd(onFinishedTrash, emitter)
 
     return pool
 end
 
 --- Creates some generic build effects for Aeon
----@param unitBeingBuilt Unit
+---@param unitBeingBuilt Unit Unit to attach build effects to
 ---@param army integer
----@param sx number size x
----@param sy number size y
----@param sz number size z
-function CreateAeonGenericBuildEffects(unitBeingBuilt, army, sx, sy, sz)
+---@param sx number Size x of the emitter curve parameter
+---@param sz number Size z of the emitter curve parameter
+---@param scale number Scale of the build effect
+function CreateAeonGenericBuildEffects(unitBeingBuilt, army, sx, sz, scale)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
     -- -- Create effects of build animation
-    local effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-    IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
-    IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
-    TrashBagAdd(onDeathTrash, effect)
-    TrashBagAdd(onFinishedTrash, effect)
+    local emitter = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    IEffectSetEmitterCurveParam(emitter, 'X_POSITION_CURVE', 0, sx)
+    IEffectSetEmitterCurveParam(emitter, 'Z_POSITION_CURVE', 0, sz)
+    TrashBagAdd(onDeathTrash, emitter)
+    TrashBagAdd(onFinishedTrash, emitter)
 
-    effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
-    IEffectScaleEmitter(effect, sy)
-    TrashBagAdd(onDeathTrash, effect)
-    TrashBagAdd(onFinishedTrash, effect)
+    emitter = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    IEffectScaleEmitter(emitter, scale)
+    TrashBagAdd(onDeathTrash, emitter)
+    TrashBagAdd(onFinishedTrash, emitter)
 end
 
 --- Creates generic Aeon build sparkles
----@param unitBeingBuilt Unit
+---@param unitBeingBuilt Unit Unit to attach sparkles to
 ---@param army integer
----@param sx number
----@param sz number
+---@param sx number Size x of the emitter curve parameter
+---@param sz number Size z of the emitter curve parameter
 function CreateAeonGenericBuildSparkles(unitBeingBuilt, army, sx, sz)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -110,13 +128,13 @@ function CreateAeonGenericBuildSparkles(unitBeingBuilt, army, sx, sz)
     local quartSx, quartSz = sx * 0.25, sz * 0.25
     for k = 1, 10 do
         local doubFrac = k / 5
-        effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-        IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, doubFrac * quartSx)
-        IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, doubFrac * quartSz)
-        IEffectScaleEmitter(effect, 2.0)
-        effect:OffsetEmitter(0, 2 - doubFrac, 0)
-        TrashBagAdd(onDeathTrash, effect)
-        TrashBagAdd(onFinishedTrash, effect)
+        local emitter = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        IEffectSetEmitterCurveParam(emitter, 'X_POSITION_CURVE', 0, doubFrac * quartSx)
+        IEffectSetEmitterCurveParam(emitter, 'Z_POSITION_CURVE', 0, doubFrac * quartSz)
+        IEffectScaleEmitter(emitter, 2.0)
+        IEffectOffsetEmitter(emitter, 0, 2 - doubFrac, 0)
+        TrashBagAdd(onDeathTrash, emitter)
+        TrashBagAdd(onFinishedTrash, emitter)
     end
 end
 
@@ -130,8 +148,8 @@ function CreateAeonConstructionUnitBuildingEffects(builder, unitBeingBuilt, buil
     TrashBagAdd(buildEffectsBag, CreateEmitterOnEntity(builder, army, '/effects/emitters/aeon_build_01_emit.bp') )
 
     -- create beam builder -> target
-    for _, v in AeonBuildBeams01 do
-        TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, -1, unitBeingBuilt, -1, army, v))
+    for _, effect in AeonBuildBeams01 do
+        TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, -1, unitBeingBuilt, -1, army, effect))
     end
 end
 
@@ -143,10 +161,10 @@ end
 function CreateAeonCommanderBuildingEffects(builder, unitBeingBuilt, buildEffectBones, buildEffectsBag)
     local army = builder.Army
     -- create beam builder -> target
-    for _, vBone in buildEffectBones do
-        TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, vBone, army, '/effects/emitters/aeon_build_02_emit.bp'))
-        for _, v in AeonBuildBeams01 do
-            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, vBone, unitBeingBuilt, -1, army, v))
+    for _, bone in buildEffectBones do
+        TrashBagAdd(buildEffectsBag, CreateAttachedEmitter(builder, bone, army, '/effects/emitters/aeon_build_02_emit.bp'))
+        for _, effect in AeonBuildBeams01 do
+            TrashBagAdd(buildEffectsBag, AttachBeamEntityToEntity(builder, bone, unitBeingBuilt, -1, army, effect))
         end
     end
 end
@@ -165,7 +183,7 @@ local function SharedBuildThread(pool, unitBeingBuilt, trash, onStopBeingBuiltTr
     local slider = nil
     if unitBeingBuilt.Cache.HashedCats["HOVER"] then
         -- set elevation offset
-        offset = unitBeingBuilt.Blueprint.Elevation or 0
+        offset = unitBeingBuilt:GetBlueprint().Elevation or 0
         -- create a slider
         slider = CreateSlider(unitBeingBuilt, 0)
         SliderSetWorldUnits(slider, true)
@@ -207,13 +225,13 @@ local function SharedBuildThread(pool, unitBeingBuilt, trash, onStopBeingBuiltTr
         WaitTicks(2)
     end
     -- set correct shader of unitBeingBuilt so that it happens instantly after finishing
-    unitBeingBuilt:SetMesh(unitBeingBuilt.Blueprint.Display.MeshBlueprint, true)
+    unitBeingBuilt:SetMesh(unitBeingBuilt:GetBlueprint().Display.MeshBlueprint, true)
 end
 
 --- The build animation for Aeon buildings in general.
 ---@param unitBeingBuilt Unit The unit we're trying to build
----@param builder Unit
----@param effectsBag TrashBag The build effects bag containing the pool and emitters
+---@param builder Unit Unused
+---@param effectsBag TrashBag The build effects bag containing the pool and emitters (unused)
 function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     -- -- Hold up for orientation to receive an update
     WaitTicks(2)
@@ -226,13 +244,13 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     local army = unitBeingBuilt.Army
     local unitBeingBuiltTrash = unitBeingBuilt.Trash
     local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local Physics = unitBeingBuilt.Blueprint.Physics
-    local Footprint = unitBeingBuilt.Blueprint.Footprint
+    local Physics = unitBeingBuilt:GetBlueprint().Physics
+    local Footprint = unitBeingBuilt:GetBlueprint().Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
     local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
 
-    local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, (sx + sz) * 0.3)
+    local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy * 1.5, sz, (sx + sz) * 0.3)
 
     -- -- Create a thread to scale the pool
     local thread = ForkThread(SharedBuildThread,
@@ -273,13 +291,13 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         -- -- Initialize various info used throughout the function
         local unitBeingBuiltTrash = unitBeingBuilt.Trash
         local unitOnStopBeingBuiltTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-        local Physics = unitBeingBuilt.Blueprint.Physics
-        local Footprint = unitBeingBuilt.Blueprint.Footprint
+        local Physics = unitBeingBuilt:GetBlueprint().Physics
+        local Footprint = unitBeingBuilt:GetBlueprint().Footprint
         local sx = Physics.MeshExtentsX or Footprint.SizeX
         local sz = Physics.MeshExtentsZ or Footprint.SizeZ
         local sy = Physics.MeshExtentsY or Footprint.SizeY or MathMin(sz, sz)
 
-        local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, (sx + sz) * 0.3)
+        local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy * 1.5, sz, (sx + sz) * 0.3)
 
         -- -- Create a thread to scale the pool and move the unit accordingly
         local thread = ForkThread(SharedBuildThread,
@@ -344,13 +362,13 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
 
     -- -- Apply build effects
     for k, _ in ColossusEffectBones do
-        local effect = CreateEmitterAtBone(unitBeingBuilt, k, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-        IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, 1)
-        IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, 1)
-        IEffectScaleEmitter(effect, 1.0)
+        local emitter = CreateEmitterAtBone(unitBeingBuilt, k, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+        IEffectSetEmitterCurveParam(emitter, 'X_POSITION_CURVE', 0, 1)
+        IEffectSetEmitterCurveParam(emitter, 'Z_POSITION_CURVE', 0, 1)
+        IEffectScaleEmitter(emitter, 1.0)
 
-        TrashBagAdd(onDeathTrash, effect)
-        TrashBagAdd(onFinishedTrash, effect)
+        TrashBagAdd(onDeathTrash, emitter)
+        TrashBagAdd(onFinishedTrash, emitter)
     end
 
     -- -- Apply a manual animation
@@ -387,7 +405,7 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
 end
 
 --- Creates the Aeon Tempest build effects, including particles and an animation.
----@param unitBeingBuilt Unit The Colossus that is being built.
+---@param unitBeingBuilt Unit The Colossus that is being built
 function CreateAeonColossusBuildingEffects(unitBeingBuilt)
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -407,11 +425,11 @@ function CreateAeonColossusBuildingEffects(unitBeingBuilt)
 end
 
 --- Creates the Aeon CZAR build effects, including particles.
----@param unitBeingBuilt Unit The CZAR that is being built.
+---@param unitBeingBuilt Unit The CZAR that is being built
 function CreateAeonCZARBuildingEffects(unitBeingBuilt)
     -- -- Initialize various info used throughout the function
     local army = unitBeingBuilt.Army
-    local bp = unitBeingBuilt.Blueprint
+    local bp = unitBeingBuilt:GetBlueprint()
     local sx = 0.6 * bp.Physics.MeshExtentsX or bp.Footprint.SizeX
     local sz = 0.6 * bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
 
@@ -420,8 +438,8 @@ function CreateAeonCZARBuildingEffects(unitBeingBuilt)
 end
 
 --- A helper function for the full build animation of the Tempest.
----@param unitBeingBuilt Unit The Tempest that is being built.
----@param animator Animator The animator that is applied.
+---@param unitBeingBuilt Unit The Tempest that is being built
+---@param animator Animator The animator that is applied
 local function CreateAeonTempestBuildingEffectsThread(unitBeingBuilt, animator)
     local fraction = UnitGetFractionComplete(unitBeingBuilt)
     while fraction < 1 do
@@ -438,13 +456,13 @@ local function CreateAeonTempestBuildingEffectsThread(unitBeingBuilt, animator)
 end
 
 --- Creates the Aeon Tempest build effects, including particles and an animation.
----@param unitBeingBuilt Unit The tempest that is being built.
+---@param unitBeingBuilt Unit The tempest that is being built
 function CreateAeonTempestBuildingEffects(unitBeingBuilt)
     -- -- Initialize various info used throughout the function
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
-    local bp = unitBeingBuilt.Blueprint
+    local bp = unitBeingBuilt:GetBlueprint()
     local sx = 0.55 * bp.Physics.MeshExtentsX or bp.Footprint.SizeX
     local sz = 0.55 * bp.Physics.MeshExtentsZ or bp.Footprint.SizeZ
 
@@ -488,14 +506,14 @@ local function CreateAeonParagonBuildingEffectsThread(unitBeingBuilt, sx, sy, sz
             fraction = cFraction
             if k < cFraction then
                 local doubFrac = 2 * (1.1 - k)
-                local effect = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
-                IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, doubFrac * quartSx)
-                IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, doubFrac * quartSz)
-                IEffectScaleEmitter(effect, 2.0)
-                effect:OffsetEmitter(0, 2 - doubFrac, 0)
+                local emitter = CreateEmitterOnEntity(unitBeingBuilt, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+                IEffectSetEmitterCurveParam(emitter, 'X_POSITION_CURVE', 0, doubFrac * quartSx)
+                IEffectSetEmitterCurveParam(emitter, 'Z_POSITION_CURVE', 0, doubFrac * quartSz)
+                IEffectScaleEmitter(emitter, 2.0)
+                IEffectOffsetEmitter(emitter, 0, 2 - doubFrac, 0)
 
-                TrashBagAdd(onDeathTrash, effect)
-                TrashBagAdd(onFinishedTrash, effect)
+                TrashBagAdd(onDeathTrash, emitter)
+                TrashBagAdd(onFinishedTrash, emitter)
 
                 k = k + 0.08
             end
@@ -511,8 +529,8 @@ function CreateAeonParagonBuildingEffects(unitBeingBuilt)
     -- -- Initialize various info used throughout the function
     local army = unitBeingBuilt.Army
 
-    local Physics = unitBeingBuilt.Blueprint.Physics
-    local Footprint = unitBeingBuilt.Blueprint.Footprint
+    local Physics = unitBeingBuilt:GetBlueprint().Physics
+    local Footprint = unitBeingBuilt:GetBlueprint().Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
     local sy = 2 * Physics.MeshExtentsY or Footprint.SizeY or MathMin(sx, sz)

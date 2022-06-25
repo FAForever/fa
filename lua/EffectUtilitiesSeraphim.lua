@@ -10,8 +10,8 @@ local MathMax = math.max
 local MathMin = math.min
 local TableGetn = table.getn
 
-local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
-local EmitterSetEmitterParam = moho.IEffect.SetEmitterParam
+local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
+local IEffectSetEmitterParam = moho.IEffect.SetEmitterParam
 local SliderSetGoal = moho.SlideManipulator.SetGoal
 local SliderSetSpeed = moho.SlideManipulator.SetSpeed
 local SliderSetWorldUnits = moho.SlideManipulator.SetWorldUnits
@@ -56,12 +56,12 @@ end
 ---@param builder Unit The factory that is building the unit
 ---@param unitBeingBuilt Unit The unit that is being built by the factory
 ---@param effectBones string[] The bones of the factory to spawn effects for
----@param locationBone string The main build bone where the unit spawns on top of
+---@param locationBone string The main build bone where the unit spawns on top of (unused)
 ---@param effectsBag TrashBag The trashbag for effects
 function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBones, locationBone, effectsBag)
     -- -- initialize various info used throughout the function
     local army = builder.Army
-    local bp = unitBeingBuilt.Blueprint
+    local bp = unitBeingBuilt:GetBlueprint()
     local Physics = bp.Physics
     local Footprint = bp.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
@@ -139,7 +139,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     local army = builder.Army
 
     -- optimize local access
-    local EmitterScaleEmitter = EmitterScaleEmitter
+    local IEffectScaleEmitter = IEffectScaleEmitter
     local UnitGetFractionComplete = UnitGetFractionComplete
 
     -- matches with number of effects being made, pre-allocates the table
@@ -147,7 +147,7 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     local emittersHead = 1
 
     -- determine a sane LOD cutoff for the size of the unit
-    local bp = unitBeingBuilt.Blueprint
+    local bp = unitBeingBuilt:GetBlueprint()
     local lods = bp.Display.Mesh.LODs
     local count = TableGetn(lods)
 
@@ -158,8 +158,8 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     -- smaller inner, dark-purple effect
     for _, effect in BuildEffectsEmitters do
         local emitter = CreateAttachedEmitter(unitBeingBuilt, -1, army, effect)
-        EmitterScaleEmitter(emitter, scaleFactor)
-        EmitterSetEmitterParam(emitter, "LODCUTOFF", lods[1].LODCutoff)
+        IEffectScaleEmitter(emitter, scaleFactor)
+        IEffectSetEmitterParam(emitter, "LODCUTOFF", lods[1].LODCutoff)
 
         TrashBagAdd(effectsBag, emitter)
         emitters[emittersHead] = emitter
@@ -169,8 +169,8 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     -- large outer radius effect
     for _, effect in BuildEffectBaseEmitters do
         local emitter = CreateAttachedEmitter(unitBeingBuilt, -1, army, effect)
-        EmitterScaleEmitter(emitter,scaleFactor)
-        EmitterSetEmitterParam(emitter, "LODCUTOFF", LODCutoff)
+        IEffectScaleEmitter(emitter,scaleFactor)
+        IEffectSetEmitterParam(emitter, "LODCUTOFF", LODCutoff)
 
         TrashBagAdd(effectsBag, emitter)
         emitters[emittersHead] = emitter
@@ -184,8 +184,9 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
     local scaledUnitMetric = unitScaleMetric * scaleFactor
     local complete = UnitGetFractionComplete(unitBeingBuilt)
     while not unitBeingBuilt.Dead and complete < 1.0 do
+        local emitterScale = 1 + scaledUnitMetric * complete
         for k = 1, emittersHead - 1 do
-            EmitterScaleEmitter(emitters[k], 1 + scaledUnitMetric * complete)
+            IEffectScaleEmitter(emitters[k], emitterScale)
         end
 
         complete = UnitGetFractionComplete(unitBeingBuilt)
