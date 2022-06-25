@@ -65,8 +65,6 @@ UnitBlueprint {
         'BOT',
         'DIRECTFIRE',
         'AMPHIBIOUS',
-        'ANTIAIR',
-        'ANTINAVY',
         'NEEDMOBILEBUILD',
         'INTELLIGENCE',
         'COUNTERINTELLIGENCE',
