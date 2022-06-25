@@ -10,6 +10,7 @@ local WaitTicks = WaitTicks
 local MathMin = math.min
 
 local EntityCreateProjectile = moho.entity_methods.CreateProjectile
+local EntityCreateProjectileAtBone = moho.entity_methods.CreateProjectileAtBone
 local EntityGetOrientation = moho.entity_methods.GetOrientation
 local EntitySetOrientation = moho.entity_methods.SetOrientation
 local IEffectScaleEmitter = moho.IEffect.ScaleEmitter
@@ -27,7 +28,7 @@ function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
 
     -- -- Create the mercury pool
-    local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', nil, 0, 0, nil, nil, nil)
+    local pool = EntityCreateProjectile(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', 0, 0, 0)
     TrashBagAdd(onDeathTrash, pool)
     TrashBagAdd(onFinishedTrash, pool)
     EntitySetOrientation(pool, EntityGetOrientation(unitBeingBuilt), true)
@@ -37,6 +38,32 @@ function CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, scale)
     local effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
     IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx * 1.5)
     IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz * 1.5)
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
+
+    effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_03_emit.bp')
+    IEffectScaleEmitter(effect, scale)
+    TrashBagAdd(onDeathTrash, effect)
+    TrashBagAdd(onFinishedTrash, effect)
+
+    return pool
+end
+
+function CreateMercuryPoolOnBone(unitBeingBuilt, army, bone, sx, sy, sz, scale)
+    local onDeathTrash = unitBeingBuilt.Trash
+    local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
+
+    -- -- Create the mercury pool
+    local pool = EntityCreateProjectileAtBone(unitBeingBuilt, '/effects/entities/AeonBuildEffect/AeonBuildEffect01_proj.bp', bone)
+    TrashBagAdd(onDeathTrash, pool)
+    TrashBagAdd(onFinishedTrash, pool)
+    EntitySetOrientation(pool, EntityGetOrientation(unitBeingBuilt), true)
+    ProjectileSetScale(pool, sx, sy, sz)
+
+    -- -- Create effects of build animation
+    local effect = CreateEmitterOnEntity(pool, army, '/effects/emitters/aeon_being_built_ambient_02_emit.bp')
+    IEffectSetEmitterCurveParam(effect, 'X_POSITION_CURVE', 0, sx)
+    IEffectSetEmitterCurveParam(effect, 'Z_POSITION_CURVE', 0, sz)
     TrashBagAdd(onDeathTrash, effect)
     TrashBagAdd(onFinishedTrash, effect)
 
@@ -302,9 +329,9 @@ local ColossusPuddleBones = {
 local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator, puddleBones)
     WaitTicks(2)
     -- -- Store information used throughout the function
-    local sx = 1
-    local sy = 1.5
-    local sz = 1
+    local sx = 1.5
+    local sy = 2.25
+    local sz = 1.5
     local army = unitBeingBuilt.Army
     local onDeathTrash = unitBeingBuilt.Trash
     local onFinishedTrash = unitBeingBuilt.OnBeingBuiltEffectsBag
@@ -312,7 +339,7 @@ local function CreateAeonColossusBuildingEffectsThread(unitBeingBuilt, animator,
     -- -- Create pools of mercury
     local pools = { false, false }
     for k, bone in puddleBones do
-        pools[k] = CreateMercuryPool(unitBeingBuilt, bone, sx, sy, sz, sy*sy)
+        pools[k] = CreateMercuryPoolOnBone(unitBeingBuilt, army, bone, sx, sy, sz, sy)
     end
 
     -- -- Apply build effects
