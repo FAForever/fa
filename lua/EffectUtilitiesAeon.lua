@@ -203,7 +203,7 @@ function CreateAeonBuildBaseThread(unitBeingBuilt, builder, effectsBag)
     local Footprint = unitBeingBuilt.Blueprint.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
-    local sy = Physics.MeshExtentsY or Footprint.SizeYX or (sx + sz)
+    local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
 
     local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, (sx + sz) * 0.3)
 
@@ -250,7 +250,7 @@ function CreateAeonFactoryBuildingEffects(builder, unitBeingBuilt, buildEffectBo
         local Footprint = unitBeingBuilt.Blueprint.Footprint
         local sx = Physics.MeshExtentsX or Footprint.SizeX
         local sz = Physics.MeshExtentsZ or Footprint.SizeZ
-        local sy = Physics.MeshExtentsY or Footprint.SizeY or (sx + sz)
+        local sy = Physics.MeshExtentsY or Footprint.SizeY or MathMin(sz, sz)
 
         local pool = CreateMercuryPool(unitBeingBuilt, army, sx, sy, sz, (sx + sz) * 0.3)
 

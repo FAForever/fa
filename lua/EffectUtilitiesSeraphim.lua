@@ -7,6 +7,7 @@ local CreateSlider = CreateSlider
 local WaitTicks = WaitTicks
 
 local MathMax = math.max
+local MathMin = math.min
 local TableGetn = table.getn
 
 local EmitterScaleEmitter = moho.IEffect.ScaleEmitter
@@ -65,7 +66,7 @@ function CreateSeraphimFactoryBuildingEffects(builder, unitBeingBuilt, effectBon
     local Footprint = bp.Footprint
     local sx = Physics.MeshExtentsX or Footprint.SizeX
     local sz = Physics.MeshExtentsZ or Footprint.SizeZ
-    local sy = Physics.MeshExtentsY or Footprint.SizeYX or (sx + sz)
+    local sy = Physics.MeshExtentsY or Footprint.SizeYX or MathMin(sx, sz)
 
     -- do not apply offsets for subs and air units
     local offset = 0

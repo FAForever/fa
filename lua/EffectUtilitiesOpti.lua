@@ -136,7 +136,6 @@ end
 ---@param buildEffectsBag TrashBag The bag that we use to store / trash all effects
 ---@param noBuilderBeams boolean Whether or not the builder is a building
 function CreateCybranBuildBeams(builder, bots, unitBeingBuilt, buildEffectsBag, noBuilderBeams)
-    CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, buildEffectsBag, false)
     -- delay slightly for dramatic effect
     WaitTicks(2 + Random(1, 4))
 
