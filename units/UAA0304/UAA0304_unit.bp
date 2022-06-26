@@ -274,15 +274,10 @@ UnitBlueprint {
             BombDropThreshold = 3.5,
             Buffs = {
                 {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
+                    BuffType = 'STUN-ALT',
                     Duration = 3,
-                    Radius = 5.8, -- this is the closest approximation in order to make the stun range the same as DamageRadius (5.25)
-                    TargetAllow = 'ALLUNITS',
-                    TargetDisallow = 'EXPERIMENTAL,COMMAND,WALL',
+                    Radius = 5.25,
+                    TargetAllow = 'TECH1,TECH2,TECH3',
                 },
             },
             CollideFriendly = false,
