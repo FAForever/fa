@@ -398,7 +398,7 @@ end
 --- Platoon moves to a set of locations
 --- | Platoon data value    | Description   |
 --- | --------------------- | ------------- |
---- | MoveToRoute           | List of locations to move to |
+--- | MoveRoute             | List of locations to move to |
 --- | MoveChain             | Chain of locations to move |
 --- | UseTransports         | Boolean, if true, use transports to move |
 function MoveToThread(platoon)
