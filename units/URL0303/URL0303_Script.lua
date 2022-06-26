@@ -11,6 +11,7 @@ local cWeapons = import('/lua/cybranweapons.lua')
 local CDFLaserDisintegratorWeapon = cWeapons.CDFLaserDisintegratorWeapon01
 local CDFElectronBolterWeapon = cWeapons.CDFElectronBolterWeapon
 local MissileRedirect = import('/lua/defaultantiprojectile.lua').MissileRedirect
+local DefaultDamage = import('/lua/sim/DefaultDamage.lua')
 
 local EMPDeathWeapon = Class(Weapon) {
     OnCreate = function(self)
@@ -80,28 +81,19 @@ URL0303 = Class(CWalkingLandUnit) {
     end,
 
     DoDeathWeapon = function(self)
-        if self:IsBeingBuilt() then return end
-
-        CWalkingLandUnit.DoDeathWeapon(self) -- Handle the normal DeathWeapon procedures
-
-        -- Now handle our special buff and FX
-        local original_bp = table.deepcopy(self:GetBlueprint().Buffs)
-        local bp
-        for k, v in original_bp do
-            if v.Add.OnDeath then
-                bp = v
-            end
-            if self.ChargingInProgress then
-                bp.Duration = bp.DurationWhenCharging
-            end
+        if self:IsBeingBuilt() then
+            return
         end
 
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
-        if bp ~= nil then
-            self:AddBuff(bp)
+        CWalkingLandUnit.DoDeathWeapon(self)
+
+        local buff = self.Blueprint.Buffs[1]
+        local duration = buff.Duration
+        if self.ChargingInProgress then
+            duration = buff.DurationWhenCharging
         end
 
-        -- Play EMP Effect
+        DefaultDamage.ApplyAreaStun(self:GetPosition(), duration, buff.Radius, buff.TargetAllow, buff.TargetDisallow, self.Army)
         CreateLightParticle(self, -1, self.Army, 24, 62, 'flare_lens_add_02', 'ramp_red_10')
     end,
 }

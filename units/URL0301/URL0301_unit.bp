@@ -689,15 +689,14 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             Buffs = {
-                Buffs = {
-                    {
-                        BuffType = 'STUN-ALT',
-                        Duration = 3,
-                        Radius = 3,
-                        TargetAllow = 'TECH1,TECH2,TECH3',
-                        TargetDisallow = 'SUBCOMMANDER',
-                    },
+                {
+                    BuffType = 'STUN-ALT',
+                    Duration = 3,
+                    Radius = 3,
+                    TargetAllow = 'TECH1,TECH2,TECH3',
+                    TargetDisallow = 'SUBCOMMANDER',
                 },
+            },
             ChargeDelay = 0.5,
             CollideFriendly = false,
             Damage = 300,
