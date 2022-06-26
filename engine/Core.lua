@@ -2,6 +2,16 @@
 ---Module: Core
 -- @module Core
 
+---@class Vector
+---@field [1] number
+---@field [2] number
+---@field [3] number
+
+---@class Point
+---@field [1] number
+---@field [2] number
+---@field [3] number
+
 ---
 --  Create a target object
 function AITarget()
