@@ -689,58 +689,22 @@ UnitBlueprint {
             },
             BallisticArc = 'RULEUBA_LowArc',
             Buffs = {
-                {
-                    Add = {
-                        OnImpact = true,
+                Buffs = {
+                    {
+                        BuffType = 'STUN-ALT',
+                        Duration = 3,
+                        Radius = 3,
+                        TargetAllow = 'TECH1,TECH2,TECH3',
+                        TargetDisallow = 'SUBCOMMANDER',
                     },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
-                    Duration = 4,
-                    Radius = 3,
-                    TargetAllow = 'TECH1',
-                    TargetDisallow = 'TECH2,TECH3,EXPERIMENTAL,COMMAND,SUBCOMMANDER,SHIELD,WALL',
                 },
-                {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
-                    Duration = 3.5,
-                    Radius = 3,
-                    TargetAllow = 'TECH2,SHIELD',
-                    TargetDisallow = 'TECH1,TECH3,EXPERIMENTAL,COMMAND,SUBCOMMANDER,WALL',
-                },
-                {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
-                    Duration = 3,
-                    Radius = 3,
-                    TargetAllow = 'TECH3',
-                    TargetDisallow = 'TECH1,TECH2,EXPERIMENTAL,COMMAND,SUBCOMMANDER,SHIELD,WALL',
-                },
-                {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
-                    Duration = 0.3,
-                    Radius = 3,
-                    TargetAllow = 'SUBCOMMANDER',
-                    TargetDisallow = 'TECH1,TECH2,SHIELD,WALL',
-                },
-            },
             ChargeDelay = 0.5,
             CollideFriendly = false,
             Damage = 300,
             DamageType = 'Normal',
             DisplayName = 'Disintegrator Pulse Laser',
             FireTargetLayerCapsTable = {
-                Land = 'Land|Water|Seabed',                            --Seabed fire caps removed (IceDreamer)
+                Land = 'Land|Water|Seabed',
                 Water = 'Land|Water|Seabed',
             },
             FiringTolerance = 2,
