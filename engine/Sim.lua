@@ -2,6 +2,10 @@
 ---Module: Sim
 -- @module Sim
 
+-- TODO
+---@class Decal
+
+-- TODO
 ---@class SimCommand
 
 --- Restrict the army from building the unit category.
