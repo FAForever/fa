@@ -2328,3 +2328,12 @@ function MoveAlongRoute(platoon, route)
     end
     return true
 end
+
+--- Enables Stealth on platoon's units
+function PlatoonEnableStealth(platoon)
+    for _, unit in platoon:GetPlatoonUnits() do
+        if not unit.Dead and unit:TestToggleCaps('RULEUTC_StealthToggle') then
+            unit:SetScriptBit('RULEUTC_StealthToggle', false)
+        end
+    end
+end
