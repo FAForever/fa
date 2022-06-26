@@ -772,7 +772,7 @@ end
 
 --- Order a group of units to run a script sequence, as an example: { TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }
 ---@param tblUnits Unit[]       # Units to issue the command to
----@param order Unit            # Unit to share the resources with
+---@param order table           # Task / order to apply
 ---@return SimCommand           # Command that has been issued
 function IssueScript(tblUnits, order)
 end
