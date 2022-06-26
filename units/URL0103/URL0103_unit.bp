@@ -204,30 +204,16 @@ UnitBlueprint {
                 },
             },
             BallisticArc = 'RULEUBA_HighArc',
+
             Buffs = {
                 {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
-                    Duration = 3,
-                    Radius = 2,
-                    TargetAllow = 'TECH1',
-            TargetDisallow = 'TECH2,WALL',  -- added for bug fix [162]
-                },
-                {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
+                    BuffType = 'STUN-ALT',
                     Duration = 2,
-                    Radius = 2.55,
-                    TargetAllow = 'TECH2',
-                    TargetDisallow = 'WALL',  -- added for bug fix [162]
+                    Radius = 2,
+                    TargetAllow = 'TECH1,TECH2'
                 },
             },
+
             CollideFriendly = false,
             Damage = 230, -- 195
             DamageFriendly = false,

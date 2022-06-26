@@ -452,7 +452,7 @@ Shield = Class(moho.shield_methods, Entity) {
     OnDamage = function(self, instigator, amount, vector, damageType)
 
         -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" then 
+        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == 'Stun' then
             return 
         end
 

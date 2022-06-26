@@ -1038,6 +1038,25 @@ Unit = Class(moho.unit_methods) {
             return 
         end
 
+        -- only applies to units
+        if damageType == 'Stun' then
+
+            -- don't stun air units
+            if self.Layer == 'Air' then
+                return
+            end
+
+            local allowed = instigator.CategoriesAllowed
+            if instigator.CategoriesDisallowed then
+                allowed = allowed - instigator.CategoriesDisallowed
+            end
+
+            -- do the stun if it is a fit
+            if EntityCategoryContains(allowed, self) then
+                self:SetStunned(0.1 * (amount or 10.0))
+            end
+        end
+
         if self.CanTakeDamage then
             self:DoOnDamagedCallbacks(instigator)
 

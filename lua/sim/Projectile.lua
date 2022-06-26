@@ -589,8 +589,20 @@ Projectile = Class(moho.projectile_methods) {
         -- Check for buff
         if not TableEmpty(data.Buffs) then
 
-            -- Check for valid target
             for k, v in data.Buffs do
+
+                -- # new buff mechanics
+
+                if v.BuffType == 'STUN-ALT' then
+                    if v.Radius and v.Radius > 0 then
+                        DefaultDamage.ApplyAreaStun(self:GetPosition(), v.Duration, v.Radius, v.TargetAllow, v.TargetDisallow, self.Army)
+                    else
+                        DefaultDamage.ApplyStun(target, v.Duration, v.TargetAllow, v.TargetDisallow, self.Army)
+                    end
+                end
+
+                -- # old buff mechanics
+
                 if v.Add.OnImpact == true then
                     if v.AppliedToTarget ~= true or (v.Radius and v.Radius > 0) then
                         target = self:GetLauncher()

@@ -218,13 +218,13 @@ Prop = Class(moho.prop_methods) {
     OnDamage = function(self, instigator, amount, direction, damageType)
 
         -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" then 
+        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == 'Stun' then
             return 
         end
 
         -- if we're immune then we're good
-        if not self.CanTakeDamage then 
-            return 
+        if not self.CanTakeDamage then
+            return
         end
 
         -- adjust our health
