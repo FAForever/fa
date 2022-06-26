@@ -251,7 +251,6 @@ end
 --- | Objective data        | Description   |
 --- | --------------------- | ------------- |
 --- | Units                 | Table of units to kill
---- | NumRequired           | Number of units required for the objective to pass
 --- | MarkUnits             | Flag to to mark the units with an objective arrow the units are marked with an objective arrow
 --- | Hidden                | Flag to hide the objective from the UI
 --- | FlashVisible          | Flag to give a short visibility burst
