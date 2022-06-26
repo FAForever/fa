@@ -361,9 +361,9 @@ UnitBlueprint {
             RateOfFire = 0.15,
             TargetCheckInterval = 0.5,
             TargetPriorities = {
-                'TECH1 MOBILE',
-                'TECH2 MOBILE',
                 'TECH3 MOBILE',
+                'TECH2 MOBILE',
+                'TECH1 MOBILE',
                 '(STRUCTURE * DEFENSE)',
                 '(ALLUNITS - SPECIALLOWPRI)',
             },
