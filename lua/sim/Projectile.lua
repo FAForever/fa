@@ -597,7 +597,7 @@ Projectile = Class(moho.projectile_methods) {
                     if v.Radius and v.Radius > 0 then
                         DefaultDamage.ApplyAreaStun(self:GetPosition(), v.Duration, v.Radius, v.TargetAllow, v.TargetDisallow, self.Army)
                     else
-                        DefaultDamage.ApplyStun(target, v.Duration, v.TargetAllow, v.TargetDisallow, self.Army)
+                        DefaultDamage.ApplyStun(target, self:GetPosition(), v.Duration, v.TargetAllow, v.TargetDisallow, self.Army)
                     end
                 end
 

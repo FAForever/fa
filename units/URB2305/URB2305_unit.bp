@@ -238,11 +238,7 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_None',
             Buffs = {
                 {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
+                    BuffType = 'STUN-ALT',
                     Duration = 15,
                     Radius = 40,
                     TargetAllow = 'ALLUNITS',

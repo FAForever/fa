@@ -3867,6 +3867,7 @@ Unit = Class(moho.unit_methods) {
             category = category - ParseEntityCategory(buffTable.TargetDisallow)
         end
 
+        -- backwards compatibility with mods
         if bt == 'STUN' then
             local targets
             if buffTable.Radius and buffTable.Radius > 0 then

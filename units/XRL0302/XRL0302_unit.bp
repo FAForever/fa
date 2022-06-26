@@ -38,15 +38,10 @@ UnitBlueprint {
     },
     Buffs = {
         Stun = {   
-            Add = {
-                OnImpact = true,
-                OnDeath = true,
-            },
-            AppliedToTarget = false,
-            BuffType = 'STUN',
+            BuffType = 'STUN-ALT',
             Duration = 2,
             Radius = 7,
-            TargetAllow = 'MOBILE', --ALLUNITS
+            TargetAllow = 'MOBILE',
             TargetDisallow = 'EXPERIMENTAL, WALL, COMMAND',
         },
     },

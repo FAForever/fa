@@ -87,7 +87,7 @@ URL0303 = Class(CWalkingLandUnit) {
 
         CWalkingLandUnit.DoDeathWeapon(self)
 
-        local buff = self.Blueprint.Buffs[1]
+        local buff = self.Blueprint.Buffs.Stun
         local duration = buff.Duration
         if self.ChargingInProgress then
             duration = buff.DurationWhenCharging

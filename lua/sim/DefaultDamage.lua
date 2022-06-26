@@ -95,11 +95,11 @@ end
 ---@param allowed string | nil      # String representation of allowed categories, nil allows all units
 ---@param disallowed string | nil   # String representation of disallowed categories, nil disallows no units
 ---@param army number               # Army where the stun damage originates from
-function ApplyStun (target, duration, allowed, disallowed, army)
+function ApplyStun (target, position, duration, allowed, disallowed, army)
     StunEntityInstances[army]:SetAllowedCategories(allowed)
     StunEntityInstances[army]:SetDisallowedCategories(disallowed)
 
-    Damage(StunEntityInstances[army], target, 10 * duration, 'Stun')
+    Damage(StunEntityInstances[army], position, target, 10 * duration, 'Stun')
 end
 
 -- scope as upvalue for performance

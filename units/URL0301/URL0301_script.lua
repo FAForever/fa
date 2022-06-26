@@ -25,7 +25,7 @@ URL0301 = Class(CCommandUnit) {
             OnCreate = function(self)
                 CDFLaserDisintegratorWeapon.OnCreate(self)
                 -- Disable buff
-                self:DisableBuff('STUN')
+                self:DisableBuff('STUN-ALT')
             end,
         },
         NMissile = Class(CAAMissileNaniteWeapon) {},
@@ -189,10 +189,10 @@ URL0301 = Class(CCommandUnit) {
             wep:ChangeMaxRadius(self:GetBlueprint().Weapon[1].MaxRadius or 25)
         elseif enh == 'EMPCharge' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:ReEnableBuff('STUN')
+            wep:ReEnableBuff('STUN-ALT')
         elseif enh == 'EMPChargeRemove' then
             local wep = self:GetWeaponByLabel('RightDisintegrator')
-            wep:DisableBuff('STUN')
+            wep:DisableBuff('STUN-ALT')
         end
     end,
 

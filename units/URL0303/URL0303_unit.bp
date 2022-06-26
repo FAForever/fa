@@ -28,12 +28,7 @@ UnitBlueprint {
     },
     Buffs = {
         Stun = {
-            Add = {
-                OnDeath = true,
-                OnImpact = true,
-            },
-            AppliedToTarget = true,
-            BuffType = 'STUN',
+            BuffType = 'STUN-ALT',
             Duration = 1.5,
             DurationWhenCharging = 3,
             Radius = 10,
@@ -269,15 +264,11 @@ UnitBlueprint {
             BallisticArc = 'RULEUBA_LowArc',
             Buffs = {
                 {
-                    Add = {
-                        OnImpact = true,
-                    },
-                    AppliedToTarget = true,
-                    BuffType = 'STUN',
+                    BuffType = 'STUN-ALT',
                     Duration = 1.5,
                     Radius = 0,
                     TargetAllow = 'TECH1,TECH2',
-                    TargetDisallow = 'TECH3,EXPERIMENTAL,COMMAND,NAVAL,STRUCTURE',
+                    TargetDisallow = 'NAVAL,STRUCTURE',
                 },
             },
             CollideFriendly = false,
