@@ -51,7 +51,6 @@ local EntitySetMaxHealth = _G.moho.entity_methods.SetMaxHealth
 local EntitySetHealth = _G.moho.entity_methods.SetHealth
 local EntityGetPositionXYZ = _G.moho.entity_methods.GetPositionXYZ
 local EntityDestroy = _G.moho.entity_methods.Destroy
-local UnitAddBuff = import('/lua/sim/Unit.lua').Unit.AddBuff
 
 local ProjectileGetLauncher = _G.moho.projectile_methods.GetLauncher
 
@@ -600,7 +599,7 @@ Projectile = Class(moho.projectile_methods) {
                         if not target and v.BuffType == 'STUN' and isAreaEffect then
                             -- all the AddBuff method will do with the instigator for stunning is
                             -- get its Army anyway; set that and we're good
-                            UnitAddBuff({Army = self.Army}, v, self:GetPosition())
+                            import('/lua/sim/Unit.lua').Unit.AddBuff({Army = self.Army}, v, self:GetPosition())
                         end
                     end
                     -- Check for target validity
