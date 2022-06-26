@@ -452,8 +452,8 @@ Shield = Class(moho.shield_methods, Entity) {
     OnDamage = function(self, instigator, amount, vector, damageType)
 
         -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" or damageType == 'Stun' then
-            return 
+        if damageType == "TreeForce" or damageType == "TreeFire" then
+            return
         end
 
         -- Only called when a shield is directly impacted, so not for Personal Shields
@@ -462,6 +462,11 @@ Shield = Class(moho.shield_methods, Entity) {
     end,
 
     ApplyDamage = function(self, instigator, amount, vector, dmgType, doOverspill)
+
+        -- only applies units
+        if dmgType == 'Stun' then
+            return
+        end
 
         -- cache information used throughout the function
 
