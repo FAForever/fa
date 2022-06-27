@@ -1,4 +1,16 @@
 
+---@class ArmiesTableEntry
+---@field authorizedCommandSources number[]     # Sources (that reference army index) that can control this army without cheating
+---@field civilian boolean                      # Flag to indicate it is a civilian army
+---@field color string                          # Color of the player, usually the same as the `iconColor` field
+---@field faction 0 | 1 | 2 | 3                 # Faction of the army
+---@field human boolean                         # Flag to indicate a human controls the army
+---@field iconColor string                      # Color of the icon, usually the same as the `color` field
+---@field name string                           # Name of the army, as defined in the scenario file of the map
+---@field nickname string                       # Name of the player
+---@field outOfGame boolean                     # Flag to indicate the player has been defeated
+---@field showScore boolean                     # Flag to show the score
+
 -- keep a reference to the actual function
 local GlobalGetArmiesTable = _G.GetArmiesTable
 
@@ -44,6 +56,9 @@ function Setup()
 end
 
 --- Override global function to return our cache
+
+--- Return the regular armies table
+---@return ArmiesTableEntry[]
 _G.GetArmiesTable = function()
     return Cached
 end

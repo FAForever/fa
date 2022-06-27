@@ -5,13 +5,9 @@
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
-local Text = import('/lua/maui/text.lua').Text
-local Grid = import('/lua/maui/Grid.lua').Grid
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
 
 local LazyVar = import('/lua/Lazyvar.lua').Create
 
@@ -21,11 +17,13 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 
 -- # locals
 
+---@type Scoreboard
 local instance = false
 local scenario = SessionGetScenarioInfo()
 local armies = GetArmiesTable().armiesTable
+local ScoreData = { }
 
-local showDebugLayout = true
+local showDebugLayout = false
 local showRating = true 
 
 -- table to convert key to LOC value
@@ -43,6 +41,7 @@ ShareDescriptionLookup["TransferToKiller"] = "<LOC lobui_0763>"
 ShareDescriptionLookup["Defectors"] = "<LOC lobui_0767>"
 ShareDescriptionLookup["CivilianDeserter"] = "<LOC lobui_0765>"
 
+local ArmyStatistics = { }
 local function SyncCallback(sync)
     if instance then 
         local focus = GetFocusArmy()
@@ -64,41 +63,55 @@ local function SyncCallback(sync)
             mapData.Height = height
             instance.MapData:Set(mapData)
         end
+
+        if not table.empty(sync.Score) then
+            ArmyStatistics = sync.Score
+        end
+
+        instance:ProcessArmyStatistics(ArmyStatistics)
     end
 end
 
 -- # classes
 
+---@class ArmyEntry
 local ArmyEntry = Class(Group) {
 
+    --- 
+    ---@param self ArmyEntry
+    ---@param scoreboard Scoreboard
+    ---@param debug boolean
+    ---@param data ArmiesTableEntry
+    ---@param index number
     __init = function(self, scoreboard, debug, data, index) 
         Group.__init(self, scoreboard, "scoreboard-army-" .. index)
 
         -- # prepare lazy values
 
-        self.Rating = LazyVar(0)
-        self.Name = LazyVar("")
-        self.Color = LazyVar("")
-        self.Faction = LazyVar(0)
-        self.Points = LazyVar(0)
-        self.Defeated = LazyVar(false)
-    
-        self.IncomeData = LazyVar({
+        local entry = self
+        entry.Rating = LazyVar(0)
+        entry.Name = LazyVar("")
+        entry.Color = LazyVar("")
+        entry.Faction = LazyVar(0)
+        entry.Points = LazyVar(0)
+        entry.Defeated = LazyVar(false)
+
+        entry.IncomeData = LazyVar({
             IncomeMass = 0,
             IncomeEnergy = 0,
-            BalanceMass = 0,
-            BalanceEnergy = 0,
             StorageMass = 0,
             StorageEnergy = 0,
         })
 
         -- # store information
 
-        self.Data = data 
-        self.Index = index
+        entry.Data = data 
+        entry.Debug = debug
+        entry.Index = index
 
-        -- # do not use self reference as that can be confusing
-        local entry = LayoutHelpers.LayoutFor(self)
+        -- # player faction, color, rating and name
+
+        local entry = LayoutHelpers.LayoutFor(entry)
             :Left(scoreboard.Left)
             :Right(scoreboard.Right)
             :Top(20)                -- dummy value
@@ -117,9 +130,8 @@ local ArmyEntry = Class(Group) {
         entry.Highlight = LayoutHelpers.LayoutFor(Bitmap(entry))
             :Fill(entry)
             :Color('44ffffff')
+            :Over(scoreboard, 5)
             :End()
-
-        entry:ComputeBackgroundColor()
 
         local debugEntry = LayoutHelpers.LayoutFor(Bitmap(debug))
             :Fill(entry)
@@ -134,7 +146,7 @@ local ArmyEntry = Class(Group) {
             :Height(16)
             :Over(entry, 10)
             :End()
-        
+
         entry.Faction.OnDirty = function()
             faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(entry.Faction())))
         end
@@ -172,24 +184,99 @@ local ArmyEntry = Class(Group) {
             name:SetText(tostring(entry.Name()))
         end
 
+        -- # economy
+
+        local armyIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Texture(UIUtil.UIFile('/textures/ui/icons_strategic/commander_generic.dds'))
+            :AtRightIn(scoreboard, 2)
+            :Top(name.Top)
+            :Width(16)
+            :Height(16)
+            :Over(scoreboard, 10)
+            :End()
+
+        local energyIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Texture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
+            :LeftOf(armyIcon, 2)
+            :Top(armyIcon.Top)
+            :Width(16)
+            :Height(16)
+            :Over(scoreboard, 10)
+            :End()
+
+        local energy = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
+            :LeftOf(energyIcon, 2)
+            :Top(energyIcon.Top)
+            :Over(scoreboard, 10)
+            :End()
+
+        local massIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
+            :LeftOf(energy, 2)
+            :Top(energy.Top)
+            :Width(16)
+            :Height(16)
+            :Over(scoreboard, 10)
+            :End()
+
+        local mass = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
+            :LeftOf(massIcon, 2)
+            :Top(massIcon.Top)
+            :Over(scoreboard, 10)
+            :End()
+
+        entry.IncomeData.OnDirty = function()
+            local incomeData = entry.IncomeData()
+
+            -- show storage
+            if IsKeyDown('Shift') then
+                mass:SetText(self:SanitizeNumber(incomeData.StorageMass))
+                energy:SetText(self:SanitizeNumber(incomeData.StorageEnergy))
+
+            -- show raw income
+            else
+                mass:SetText(self:SanitizeNumber(incomeData.IncomeMass))
+                energy:SetText(self:SanitizeNumber(incomeData.IncomeEnergy))
+            end
+        end
+
+        local scoreIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Texture(UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
+            :AtRightIn(scoreboard, 140)
+            :Top(mass.Top)
+            :Width(16)
+            :Height(16)
+            :Over(scoreboard, 10)
+            :End()
+
+        local score = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
+            :LeftOf(scoreIcon, 2)
+            :Top(scoreIcon.Top)
+            :Over(scoreboard, 10)
+            :End()
+
         -- # initial (sane) values
 
         entry.Faction:Set(data.faction)
         entry.Name:Set(data.nickname)
         entry.Rating:Set(scenario.Options.Ratings[data.nickname] or 0)
         entry.Color:Set(data.iconColor)
+        entry.IncomeData:Set(entry.IncomeData())
+        entry:ComputeBackgroundColor()
 
-        -- # other things 
-
+        -- # other things
 
     end,
 
+    ---comment
+    ---@param self any
     OnDestroy = function(self)
         Group.OnDestroy(self)
         RemoveOnSyncCallback(self:GetName())
-
     end,
 
+    ---comment
+    ---@param self any
     ComputeBackgroundColor = function(self)
         local focus = GetFocusArmy()
         if focus > 0 and self.Index > 0 then 
@@ -205,6 +292,8 @@ local ArmyEntry = Class(Group) {
         self:DetermineBackgroundColor()
     end,
 
+    ---comment
+    ---@param self any
     DetermineBackgroundColor = function(self)
         local focus = GetFocusArmy()
         if focus > 0 and self.Index > 0 and IsAlly(focus, self.Index) then 
@@ -213,9 +302,40 @@ local ArmyEntry = Class(Group) {
             self.Highlight:SetAlpha(0.0)
         end
     end,
+
+    ---comment
+    ---@param self any
+    ---@param number any
+    ---@return string
+    SanitizeNumber = function(self, number)
+
+        if not number then
+            return ""
+        end
+
+        if number < 1000 then 
+            return string.format("%4d", number)
+        else
+            return string.format("%4dk", 0.1 * math.floor(0.01* number))
+        end
+    end,
+
+    --- Updates the economy 
+    ---@param incomeMass number
+    ---@param incomeEnergy number
+    ---@param storageMass number
+    ---@param storageEnergy number
+    UpdateEconomy = function(self, incomeMass, incomeEnergy, storageMass, storageEnergy)
+        local incomeData = self.IncomeData()
+        incomeData.IncomeMass = incomeMass
+        incomeData.IncomeEnergy = incomeEnergy
+        incomeData.StorageMass = storageMass
+        incomeData.StorageEnergy = storageEnergy
+        self.IncomeData:Set(incomeData)
+    end,
 }
 
----@class Scoreboard : Group
+---@class Scoreboard
 local Scoreboard = Class(Group) {
 
     Time = LazyVar(0),
@@ -422,22 +542,19 @@ local Scoreboard = Class(Group) {
 
         -- # Populate body
 
+        self.ArmyEntries = { }
         local last = header 
-
-        local entries = { }
         for k, army in armies do 
             if not army.civilian then 
                 local entry = LayoutHelpers.LayoutFor(ArmyEntry(scoreboard, debug, army, k))
                     :Below(last, 2)
                     :End()
 
-                table.insert(entries, entry)
-
-                last = entries[k]
+                self.ArmyEntries[k] = entry
+                last = entry
             end
         end
 
-        
         -- # initial (sane) values
 
         self.Time:Set(GetGameTime())
@@ -478,6 +595,19 @@ local Scoreboard = Class(Group) {
 
     end,
 
+    --- Processes the army statistics to make them visible on the scoreboard
+    ---@param self Scoreboard
+    ---@param armyStatistics table      # Army statistics as passed over the sync
+    ProcessArmyStatistics = function(self, armyStatistics)
+        for k, statistics in armyStatistics do 
+            self.ArmyEntries[k]:UpdateEconomy(
+                statistics.resources.massin.rate and (math.floor(10 * statistics.resources.massin.rate + 0.5)),
+                statistics.resources.energyin.rate and (math.floor(10 * statistics.resources.energyin.rate + 0.5)),
+                statistics.resources.storage.storedMass,
+                statistics.resources.storage.storedEnergy
+            )
+        end
+    end
 }
 
 -- # old public interface
