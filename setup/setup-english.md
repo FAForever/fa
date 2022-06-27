@@ -84,7 +84,7 @@ Setup the FA Lua Extension
 ----------------
 Releases can be found [here](https://github.com/FAForever/fa-lua-vscode-extension/releases). 
 
-To setup you will want to download the `.vsix` file and install it in VS Code. Follow the steps in the image and you will be able to select the extension file downloaded. 
+To setup you will want to download the `.vsix` file and install it in VS Code. Follow the steps in the image and you will be able to select the extension file downloaded.  
 ![Extension install](/images/setup/extension-install.png)
 > Note: Whenever there is a new version of the extension you will have to download it and install it again
 
@@ -183,7 +183,9 @@ Helpful hotkeys and resource you can use in game
 
 * <kbd>Alt</kbd> + <kbd>F2</kbd> to invoke the unit spawning page, great for making units for free or taking control of an AI.
 * <kbd>F9</kbd> to open the log window if you close it or it's not open for whatever reason.
-* TODO how to open perf view.
+* <kbd>~</kbd> to Open the Console
+* In the Console run `ren_ShowNetworkStats` for the sim rate / package drops, on the top right
+* In the Console run `ShowStats` for engine stats, on the left
 
 Frequently asked Questions (FAQ)
 --------------------------------
