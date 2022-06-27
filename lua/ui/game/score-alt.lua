@@ -97,10 +97,10 @@ local ArmyEntry = Class(Group) {
         entry.Defeated = LazyVar(false)
 
         entry.IncomeData = LazyVar({
-            IncomeMass = 0,
-            IncomeEnergy = 0,
-            StorageMass = 0,
-            StorageEnergy = 0,
+            IncomeMass = false,
+            IncomeEnergy = false,
+            StorageMass = false,
+            StorageEnergy = false,
         })
 
         -- # store information
@@ -202,12 +202,14 @@ local ArmyEntry = Class(Group) {
             :Width(16)
             :Height(16)
             :Over(scoreboard, 10)
+            :Hide()
             :End()
 
         local energy = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
             :LeftOf(energyIcon, 2)
             :Top(energyIcon.Top)
             :Over(scoreboard, 10)
+            :Hide()
             :End()
 
         local massIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
@@ -217,12 +219,14 @@ local ArmyEntry = Class(Group) {
             :Width(16)
             :Height(16)
             :Over(scoreboard, 10)
+            :Hide()
             :End()
 
         local mass = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
             :LeftOf(massIcon, 2)
             :Top(massIcon.Top)
             :Over(scoreboard, 10)
+            :Hide()
             :End()
 
         entry.IncomeData.OnDirty = function()
@@ -230,13 +234,43 @@ local ArmyEntry = Class(Group) {
 
             -- show storage
             if IsKeyDown('Shift') then
-                mass:SetText(self:SanitizeNumber(incomeData.StorageMass))
-                energy:SetText(self:SanitizeNumber(incomeData.StorageEnergy))
+                if incomeData.StorageMass then 
+                    mass:SetText(self:SanitizeNumber(incomeData.StorageMass))
+                    mass:Show()
+                    massIcon:Show()
+                else 
+                    mass:SetText("")
+                    massIcon:Hide()
+                end
 
-            -- show raw income
+                if incomeData.StorageEnergy then 
+                    energy:SetText(self:SanitizeNumber(incomeData.StorageEnergy))
+                    energyIcon:Show()
+                else 
+                    energy:SetText("")
+                    energy:Show()
+                    energyIcon:Hide()
+                end
+
+            -- show income
             else
-                mass:SetText(self:SanitizeNumber(incomeData.IncomeMass))
-                energy:SetText(self:SanitizeNumber(incomeData.IncomeEnergy))
+                if incomeData.IncomeMass then 
+                    mass:SetText(self:SanitizeNumber(incomeData.IncomeMass))
+                    mass:Show()
+                    massIcon:Show()
+                else 
+                    mass:SetText("")
+                    massIcon:Hide()
+                end
+
+                if incomeData.IncomeEnergy then 
+                    energy:SetText(self:SanitizeNumber(incomeData.IncomeEnergy))
+                    energy:Show()
+                    energyIcon:Show()
+                else 
+                    energy:SetText("")
+                    energyIcon:Hide()
+                end
             end
         end
 
@@ -247,12 +281,14 @@ local ArmyEntry = Class(Group) {
             :Width(16)
             :Height(16)
             :Over(scoreboard, 10)
+            :Hide()
             :End()
 
         local score = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
             :LeftOf(scoreIcon, 2)
             :Top(scoreIcon.Top)
             :Over(scoreboard, 10)
+            :Hide()
             :End()
 
         -- # initial (sane) values
@@ -303,7 +339,7 @@ local ArmyEntry = Class(Group) {
         end
     end,
 
-    ---comment
+    --- comment
     ---@param self any
     ---@param number any
     ---@return string
