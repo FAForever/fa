@@ -970,7 +970,9 @@ BaseManager = ClassSimple {
                     local unit = ScenarioInfo.UnitNames[armyIndex][v.UnitName]
                     if unit and not unit.Dead then
                         -- Cybran engie stations are never in 'Idle' state but in 'AssistingCommander' state
-                        if not EntityCategoryContains(ParseEntityCategory(v.FinalUnit), unit) and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander')) and not unit:IsBeingBuilt() then
+                        -- Factories are not in Idle state when assisting other factories (so gotta une unit.UnitBeingBuilt to make sure they're not building anything),
+                        -- so if the basemanager grabs the factory for assisting before this upgrade thread, then it would never get upgraded
+                        if unit.UnitId ~= v.FinalUnit and (unit:IsIdleState() or unit:IsUnitState('AssistingCommander') or not unit.UnitBeingBuilt) and not unit:IsBeingBuilt() then
                             self:ForkThread(self.BaseManagerUpgrade, unit, v.UnitName)
                         end
                     end
