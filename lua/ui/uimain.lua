@@ -146,6 +146,7 @@ function NoteGameSpeedChanged(clientIndex, newSpeed)
     -- I'm not going to change it and risk the wrath of the producers.
     print(LOCF("<LOC Engine0006>%s: adjusting game speed to %+d", client.name, newSpeed))
     import('/lua/ui/game/score.lua').NoteGameSpeedChanged(newSpeed)
+    import('/lua/ui/game/objectives2.lua').NoteGameSpeedChanged(newSpeed)
 end
 
 function NoteGameOver()
