@@ -74,8 +74,8 @@ end
 
 -- # classes
 
----@class ArmyEntry
-local ArmyEntry = Class(Group) {
+---@class ScoreboardArmyLine
+local ScoreboardArmyLine = Class(Group) {
 
     MassGiftPercentage = 0.2,
     EnergyGiftPercentage = 0.2,
@@ -87,7 +87,7 @@ local ArmyEntry = Class(Group) {
     StatisticsHighlightAlpha = 0.4,
 
     --- 
-    ---@param self ArmyEntry
+    ---@param self ScoreboardArmyLine
     ---@param scoreboard Scoreboard
     ---@param debug boolean
     ---@param data ArmiesTableEntry
@@ -121,7 +121,7 @@ local ArmyEntry = Class(Group) {
 
         -- # player faction, color, rating and name
 
-        ---@type ArmyEntry
+        ---@type ScoreboardArmyLine
         local entry = LayoutHelpers.LayoutFor(entry)
             :Left(scoreboard.Left)
             :Right(scoreboard.Right)
@@ -851,7 +851,7 @@ local Scoreboard = Class(Group) {
         local last = header 
         for k, army in armies do 
             if not army.civilian then 
-                local entry = LayoutHelpers.LayoutFor(ArmyEntry(scoreboard, debug, army, k))
+                local entry = LayoutHelpers.LayoutFor(ScoreboardArmyLine(scoreboard, debug, army, k))
                     :Below(last, 2)
                     :End()
 
