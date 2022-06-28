@@ -77,6 +77,15 @@ end
 ---@class ArmyEntry
 local ArmyEntry = Class(Group) {
 
+    MassGiftPercentage = 0.2,
+    EnergyGiftPercentage = 0.2,
+
+    EntryAlpha = 0.1,
+    EntryHighlightAlpha = 0.2,
+
+    StatisticsAlpha = 0.0,
+    StatisticsHighlightAlpha = 0.4,
+
     --- 
     ---@param self ArmyEntry
     ---@param scoreboard Scoreboard
@@ -95,6 +104,7 @@ local ArmyEntry = Class(Group) {
         entry.Faction = LazyVar(0)
         entry.Points = LazyVar(0)
         entry.Defeated = LazyVar(false)
+        entry.Score = LazyVar(-1)
 
         entry.IncomeData = LazyVar({
             IncomeMass = false,
@@ -111,17 +121,18 @@ local ArmyEntry = Class(Group) {
 
         -- # player faction, color, rating and name
 
+        ---@type ArmyEntry
         local entry = LayoutHelpers.LayoutFor(entry)
             :Left(scoreboard.Left)
             :Right(scoreboard.Right)
-            :Top(20)                -- dummy value
+            :Top(20) -- dummy value
             :Height(20)
             :Over(scoreboard, 10)
             :End()
 
         entry.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                entry.Highlight:SetAlpha(0.6)
+                entry.Highlight:SetAlpha(entry.EntryHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
                 entry:DetermineBackgroundColor()
             end
@@ -186,35 +197,53 @@ local ArmyEntry = Class(Group) {
 
         -- # economy
 
-        local armyIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
-            :Texture(UIUtil.UIFile('/textures/ui/icons_strategic/commander_generic.dds'))
+        local army = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Color('ffffff')
+            :AtTopIn(entry, 2)
             :AtRightIn(scoreboard, 2)
-            :Top(name.Top)
             :Width(16)
             :Height(16)
+            :Alpha(entry.StatisticsAlpha)
+            :Over(scoreboard, 20)
+            :End()
+
+        army.HandleEvent = function(self, event)
+            if event.Type == 'MouseEnter' then 
+                self:SetAlpha(entry.StatisticsHighlightAlpha)
+            elseif event.Type == 'MouseExit' then 
+                self:SetAlpha(entry.StatisticsAlpha)
+            end
+        end
+
+        local armyIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Texture(UIUtil.UIFile('/textures/ui/icons_strategic/commander_generic.dds'))
+            :Fill(army)
             :Over(scoreboard, 10)
             :End()
+
+        local energy = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Color('ffffff')
+            :LeftOf(army, 2)
+            :Top(armyIcon.Top)
+            :Width(50)
+            :Height(16)
+            :Alpha(entry.StatisticsAlpha)
+            :Over(scoreboard, 20)
+            :End()
+
+        energy.HandleEvent = function(self, event)
+            if event.Type == 'MouseEnter' then 
+                self:SetAlpha(entry.StatisticsHighlightAlpha)
+            elseif event.Type == 'MouseExit' then 
+                self:SetAlpha(entry.StatisticsAlpha)
+            end
+
+            entry:EnergyEventBehavior(event)
+        end
 
         local energyIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
             :Texture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
-            :LeftOf(armyIcon, 2)
-            :Top(armyIcon.Top)
-            :Width(16)
-            :Height(16)
-            :Over(scoreboard, 10)
-            :Hide()
-            :End()
-
-        local energy = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
-            :LeftOf(energyIcon, 2)
-            :Top(energyIcon.Top)
-            :Over(scoreboard, 10)
-            :Hide()
-            :End()
-
-        local massIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
-            :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-            :LeftOf(energy, 2)
+            :AtLeftIn(energy, 2)
             :Top(energy.Top)
             :Width(16)
             :Height(16)
@@ -222,9 +251,46 @@ local ArmyEntry = Class(Group) {
             :Hide()
             :End()
 
-        local mass = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
-            :LeftOf(massIcon, 2)
-            :Top(massIcon.Top)
+        local energyText = LayoutHelpers.LayoutFor(UIUtil.CreateText(entry, "0",  12, UIUtil.bodyFont))
+            :RightOf(energyIcon, 2)
+            :Top(energy.Top)
+            :Over(scoreboard, 10)
+            :Hide()
+            :End()
+
+        local mass = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Color('ffffff')
+            :LeftOf(energy, 2)
+            :Top(energy.Top)
+            :Width(50)
+            :Height(16)
+            :Alpha(entry.StatisticsAlpha)
+            :Over(scoreboard, 20)
+            :End()
+
+        mass.HandleEvent = function(self, event)
+            if event.Type == 'MouseEnter' then 
+                self:SetAlpha(entry.StatisticsHighlightAlpha)
+            elseif event.Type == 'MouseExit' then 
+                self:SetAlpha(entry.StatisticsAlpha)
+            end
+
+            entry:MassEventBehavior(event)
+        end
+
+        local massIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
+            :AtLeftIn(mass, 2)
+            :Top(mass.Top)
+            :Width(16)
+            :Height(16)
+            :Over(scoreboard, 10)
+            :Hide()
+            :End()
+
+        local massText = LayoutHelpers.LayoutFor(UIUtil.CreateText(entry, "0",  12, UIUtil.bodyFont))
+            :RightOf(massIcon, 2)
+            :Top(mass.Top)
             :Over(scoreboard, 10)
             :Hide()
             :End()
@@ -235,61 +301,91 @@ local ArmyEntry = Class(Group) {
             -- show storage
             if IsKeyDown('Shift') then
                 if incomeData.StorageMass then 
-                    mass:SetText(self:SanitizeNumber(incomeData.StorageMass))
-                    mass:Show()
+                    massText:SetText(self:SanitizeNumber(incomeData.StorageMass))
+                    massText:Show()
                     massIcon:Show()
                 else 
-                    mass:SetText("")
+                    massText:SetText("")
                     massIcon:Hide()
                 end
 
                 if incomeData.StorageEnergy then 
-                    energy:SetText(self:SanitizeNumber(incomeData.StorageEnergy))
+                    energyText:SetText(self:SanitizeNumber(incomeData.StorageEnergy))
                     energyIcon:Show()
                 else 
-                    energy:SetText("")
-                    energy:Show()
+                    energyText:SetText("")
+                    energyText:Show()
                     energyIcon:Hide()
                 end
 
             -- show income
             else
                 if incomeData.IncomeMass then 
-                    mass:SetText(self:SanitizeNumber(incomeData.IncomeMass))
-                    mass:Show()
+                    massText:SetText(self:SanitizeNumber(incomeData.IncomeMass))
+                    massText:Show()
                     massIcon:Show()
                 else 
-                    mass:SetText("")
+                    massText:SetText("")
                     massIcon:Hide()
                 end
 
                 if incomeData.IncomeEnergy then 
-                    energy:SetText(self:SanitizeNumber(incomeData.IncomeEnergy))
-                    energy:Show()
+                    energyText:SetText(self:SanitizeNumber(incomeData.IncomeEnergy))
+                    energyText:Show()
                     energyIcon:Show()
                 else 
-                    energy:SetText("")
+                    energyText:SetText("")
                     energyIcon:Hide()
                 end
             end
         end
 
-        local scoreIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
-            :Texture(UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
-            :AtRightIn(scoreboard, 140)
+        local score = LayoutHelpers.LayoutFor(Bitmap(entry))
+            :Color('ffffff')
+            :LeftOf(mass, 2)
             :Top(mass.Top)
+            :Width(50)
+            :Height(16)
+            :Alpha(entry.StatisticsAlpha)
+            :Over(scoreboard, 20)
+            :End()
+
+        score.HandleEvent = function(self, event)
+            if event.Type == 'MouseEnter' then 
+                self:SetAlpha(entry.StatisticsHighlightAlpha)
+            elseif event.Type == 'MouseExit' then 
+                self:SetAlpha(entry.StatisticsAlpha)
+            end
+
+            entry:ScoreEventBehavior(event)
+        end
+
+        local scoreIcon = LayoutHelpers.LayoutFor(Bitmap(score))
+            :Texture(UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
+            :AtLeftIn(score, 2)
+            :Top(score.Top)
             :Width(16)
             :Height(16)
             :Over(scoreboard, 10)
             :Hide()
             :End()
 
-        local score = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "0",  12, UIUtil.bodyFont))
-            :LeftOf(scoreIcon, 2)
-            :Top(scoreIcon.Top)
+        local scoreText = LayoutHelpers.LayoutFor(UIUtil.CreateText(score, "0",  12, UIUtil.bodyFont))
+            :RightOf(scoreIcon, 2)
+            :Top(score.Top)
             :Over(scoreboard, 10)
             :Hide()
             :End()
+
+        self.Score.OnDirty = function()
+            local data = self.Score() 
+            if data > 0 then 
+                score:Show()
+                scoreText:SetText(self:SanitizeNumber(data))
+            else 
+                score:Hide()
+            end
+        end
 
         -- # initial (sane) values
 
@@ -298,10 +394,9 @@ local ArmyEntry = Class(Group) {
         entry.Rating:Set(scenario.Options.Ratings[data.nickname] or 0)
         entry.Color:Set(data.iconColor)
         entry.IncomeData:Set(entry.IncomeData())
+        entry.Score:Set(entry.Score())
+
         entry:ComputeBackgroundColor()
-
-        -- # other things
-
     end,
 
     ---comment
@@ -333,7 +428,7 @@ local ArmyEntry = Class(Group) {
     DetermineBackgroundColor = function(self)
         local focus = GetFocusArmy()
         if focus > 0 and self.Index > 0 and IsAlly(focus, self.Index) then 
-            self.Highlight:SetAlpha(0.1)
+            self.Highlight:SetAlpha(self.EntryAlpha)
         else 
             self.Highlight:SetAlpha(0.0)
         end
@@ -368,6 +463,180 @@ local ArmyEntry = Class(Group) {
         incomeData.StorageMass = storageMass
         incomeData.StorageEnergy = storageEnergy
         self.IncomeData:Set(incomeData)
+    end,
+
+    UpdateScore = function(self, score)
+        self.Score:Set(score)
+    end,
+
+    ---
+    ---@param self any
+    ---@param from number
+    ---@param to number
+    ---@return string
+    NotToSelfMessage = function(self, from, to)
+        return "You can't send resources to yourself!"
+    end,
+
+    ---comment
+    ---@param self any
+    ---@param from number
+    ---@param to number
+    ---@return string
+    MassGiftMessage = function(self, from, to)
+        return "Sent %d mass to %s"
+    end,
+
+    ---comment
+    ---@param self any
+    ---@param from number
+    ---@param to number
+    ---@return string
+    MassDumpMessage = function(self, from, to)
+        return "Dropped %d mass to %s"
+    end,
+
+    ---comment
+    ---@param self any
+    ---@param from number
+    ---@param to number
+    ---@return string
+    MassAskMessage = function(self, from, to)
+        return "Could %s gift me mass?"
+    end,
+
+    ---comment
+    ---@param self any
+    ---@return string
+    MassEmptyMessage = function(self)
+        return "Your mass storage is empty"
+    end,
+
+    ---comment
+    ---@param self any
+    ---@return string
+    MassFullMessage = function(self)
+        return "Their mass storage is full"
+    end,
+
+    ---comment
+    ---@param self any
+    ---@param event any
+    MassEventBehavior = function(self, event)
+        local focusArmyIndex = GetFocusArmy()
+        if event.Type == 'ButtonPress' and event.Modifiers.Left then
+
+            -- check if we're self
+            if focusArmyIndex == self.Index then 
+                SessionSendChatMessage(
+                    FindClients(),
+                    {
+                        from = ArmyStatistics[focusArmyIndex].name,
+                        to = ArmyStatistics[focusArmyIndex].name,
+                        Chat = true,
+                        text = string.format(self:NotToSelfMessage())
+                    }
+                )
+
+                return
+            end
+
+            -- check if we're allies
+            if IsAlly(focusArmyIndex, self.Index) then
+
+                -- ask for resources
+                if event.Modifiers.Shift then
+
+                    SessionSendChatMessage(
+                        FindClients(),
+                        {
+                            from = ArmyStatistics[focusArmyIndex].name,
+                            to = 'allies',
+                            Chat = true,
+                            text = string.format(self:MassAskMessage(focusArmyIndex, self.Index), ArmyStatistics[self.Index].name)
+                        }
+                    )
+
+                -- give resources
+                else
+                    local percentage = self.MassGiftPercentage
+                    if event.Modifiers.Ctrl then
+                        percentage = 1.0
+                    end
+
+                    local stored = ArmyStatistics[focusArmyIndex].resources.storage.storedMass
+                    local missing = ArmyStatistics[self.Index].resources.storage.maxMass - ArmyStatistics[self.Index].resources.storage.storedMass
+                    local amount = math.min(percentage * stored, missing)
+                    local percentile = amount / stored
+
+                    if amount > 1 then
+
+                        local message = self:MassGiftMessage(focusArmyIndex, self.Index)
+                        if event.Modifiers.Ctrl then
+                            message = self:MassDumpMessage(focusArmyIndex, self.Index)
+                        end
+
+                        SimCallback(
+                            {
+                                Func = "GiveResourcesToPlayer",
+                                Args = { 
+                                    From = focusArmyIndex,
+                                    To = self.Index,
+                                    Mass = percentile,
+                                    Energy = 0,
+                                }
+                            }
+                        )
+
+                        SessionSendChatMessage(
+                            FindClients(),
+                            {
+                                from = ArmyStatistics[focusArmyIndex].name,
+                                to = 'allies',
+                                Chat = true,
+                                text = string.format(message, amount, ArmyStatistics[self.Index].name)
+                            }
+                        )
+
+                    else 
+
+                        if stored <= 1 then 
+                            SessionSendChatMessage(
+                                FindClients(),
+                                {
+                                    from = ArmyStatistics[focusArmyIndex].name,
+                                    to = ArmyStatistics[focusArmyIndex].name,
+                                    Chat = true,
+                                    text = string.format(self:MassEmptyMessage())
+                                }
+                            )
+                        else 
+                            SessionSendChatMessage(
+                                FindClients(),
+                                {
+                                    from = ArmyStatistics[focusArmyIndex].name,
+                                    to = ArmyStatistics[focusArmyIndex].name,
+                                    Chat = true,
+                                    text = string.format(self:MassFullMessage())
+                                }
+                            )
+                        end
+                    end
+                end
+            end
+        end
+    end,
+
+    EnergyEventBehavior = function(self, event)
+        local focusArmy = GetFocusArmy()
+    end,
+
+    ScoreEventBehavior = function(self, event)
+        
+    end,
+
+    ArmyEventBehavior = function(self, event)
+        
     end,
 }
 
@@ -641,6 +910,10 @@ local Scoreboard = Class(Group) {
                 statistics.resources.energyin.rate and (math.floor(10 * statistics.resources.energyin.rate + 0.5)),
                 statistics.resources.storage.storedMass,
                 statistics.resources.storage.storedEnergy
+            )
+
+            self.ArmyEntries[k]:UpdateScore(
+                statistics.general.score
             )
         end
     end
