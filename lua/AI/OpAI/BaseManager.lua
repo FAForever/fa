@@ -1051,7 +1051,6 @@ BaseManager = ClassSimple {
             if self.EngineerBuildRateBuff then
                 Buff.ApplyBuff(v, self.EngineerBuildRateBuff)
             end
-            self:DecrementUnitBuildCounter(v.UnitName)
             if uncapturable then
                 v:SetCapturable(false)
                 v:SetReclaimable(false)
