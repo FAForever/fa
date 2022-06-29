@@ -126,6 +126,14 @@ TConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 --------------------------------------------------------------
 ---@class TConstructionUnit : ConstructionUnit
 TConstructionUnit = Class(ConstructionUnit) {
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
+        if self.Layer == 'Water' then
+            self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
+        end
+    end,
+
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then

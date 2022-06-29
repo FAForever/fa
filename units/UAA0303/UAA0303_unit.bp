@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
+        GuardScanRadius = 45,       -- 150% of range
     },
     Air = {
         AutoLandTime = 1,
@@ -77,15 +78,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Air',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
         },
     },
     BuildIconSortPriority = 25,

@@ -2,7 +2,7 @@
 ---@class moho.unit_methods : moho.entity_methods
 local Unit = {}
 
----@alias UnitId number
+---@class UnitId: string
 
 --- Add a command cap to a unit.
 --- Also adds a button to the UI, or enables it, for the unit to use the new command.

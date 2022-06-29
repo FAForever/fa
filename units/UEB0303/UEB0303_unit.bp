@@ -189,6 +189,7 @@ UnitBlueprint {
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
+        ComputeRollOffPoint = true,
         RollOffPoints = {
             {
                 UnitSpin = 180,

@@ -2,7 +2,7 @@
 ---@declare-global
 
 --- dummy value just so we have something to assign the categories to
----@alias CategorieType userdata
+---@class CategorieType: userdata
 ---@type CategorieType
 local categoryValue
 

@@ -801,8 +801,8 @@ function PostModBlueprints(all_bps)
     SetUnitThreatValues(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
-    local ok, msg = pcall(ProcessWeapons, all_bps.Unit)
-    LOG(repr(msg))
+    ProcessWeapons(all_bps.Unit)
+    BlueprintLoaderUpdateProgress()
 
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
     CalculateLODs(all_bps)
