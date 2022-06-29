@@ -196,23 +196,6 @@ URL0301 = Class(CCommandUnit) {
         end
     end,
 
-    -- Death
-    OnKilled = function(self, instigator, type, overkillRatio)
-        local bp
-        for k, v in self:GetBlueprint().Buffs do
-            if v.Add.OnDeath then
-                bp = v
-            end
-        end
-        -- If we could find a blueprint with v.Add.OnDeath, then add the buff
-        if bp ~= nil then
-            -- Apply Buff
-            self:AddBuff(bp)
-        end
-        -- Otherwise, we should finish killing the unit
-        CCommandUnit.OnKilled(self, instigator, type, overkillRatio)
-    end,
-
     IntelEffects = {
         Cloak = {
             {
