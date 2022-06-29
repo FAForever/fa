@@ -77,34 +77,31 @@ end
 ---@class ScoreboardArmyLine
 local ScoreboardArmyLine = Class(Group) {
 
-    MassGiftPercentage = 0.2,
-    EnergyGiftPercentage = 0.2,
+    massGiftPercentage = 0.2,
+    energyGiftPercentage = 0.2,
 
-    EntryAlpha = 0.1,
+    entryAlpha = 0.1,
     EntryHighlightAlpha = 0.2,
 
-    StatisticsAlpha = 0.0,
-    StatisticsHighlightAlpha = 0.4,
+    statisticsAlpha = 0.0,
+    statisticsHighlightAlpha = 0.4,
 
     --- 
-    ---@param self ScoreboardArmyLine
+    ---@param entry ScoreboardArmyLine
     ---@param scoreboard Scoreboard
     ---@param debug boolean
     ---@param data ArmiesTableEntry
     ---@param index number
-    __init = function(self, scoreboard, debug, data, index) 
-        Group.__init(self, scoreboard, "scoreboard-army-" .. index)
+    __init = function(entry, scoreboard, debug, data, index) 
+        Group.__init(entry, scoreboard, "scoreboard-army-" .. index)
 
         -- # prepare lazy values
 
-        local entry = self
-        entry.Rating = LazyVar(0)
-        entry.Name = LazyVar("")
-        entry.Color = LazyVar("")
-        entry.Faction = LazyVar(0)
-        entry.Points = LazyVar(0)
-        entry.Defeated = LazyVar(false)
-        entry.Score = LazyVar(-1)
+        entry.rating = LazyVar(0)
+        entry.name = LazyVar("")
+        entry.color = LazyVar("")
+        entry.faction = LazyVar(0)
+        entry.score = LazyVar(-1)
 
         entry.IncomeData = LazyVar({
             IncomeMass = false,
@@ -158,8 +155,8 @@ local ScoreboardArmyLine = Class(Group) {
             :Over(entry, 10)
             :End()
 
-        entry.Faction.OnDirty = function()
-            faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(entry.Faction())))
+        entry.faction.OnDirty = function(self)
+            faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(self())))
         end
 
         local factionBackground = LayoutHelpers.LayoutFor(Bitmap(entry))
@@ -168,8 +165,8 @@ local ScoreboardArmyLine = Class(Group) {
             :Color('00ffffff')
             :End()
 
-        entry.Color.OnDirty = function()
-            factionBackground:SetSolidColor(entry.Color())
+        entry.color.OnDirty = function(self)
+            factionBackground:SetSolidColor(self())
         end
 
         local rating = faction
@@ -180,8 +177,8 @@ local ScoreboardArmyLine = Class(Group) {
                 :Over(scoreboard, 10)
                 :End()
 
-            entry.Rating.OnDirty = function()
-                rating:SetText("(" .. math.floor(entry.Rating()+0.5) .. ")")
+            entry.rating.OnDirty = function(self)
+                rating:SetText("(" .. math.floor(self()+0.5) .. ")")
             end
         end 
 
@@ -191,8 +188,8 @@ local ScoreboardArmyLine = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        entry.Name.OnDirty = function()
-            name:SetText(tostring(entry.Name()))
+        entry.name.OnDirty = function(self)
+            name:SetText(tostring(self()))
         end
 
         -- # economy
@@ -203,15 +200,15 @@ local ScoreboardArmyLine = Class(Group) {
             :AtRightIn(scoreboard, 2)
             :Width(16)
             :Height(16)
-            :Alpha(entry.StatisticsAlpha)
+            :Alpha(entry.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         army.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.StatisticsHighlightAlpha)
+                self:SetAlpha(entry.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.StatisticsAlpha)
+                self:SetAlpha(entry.statisticsAlpha)
             end
         end
 
@@ -227,15 +224,15 @@ local ScoreboardArmyLine = Class(Group) {
             :Top(armyIcon.Top)
             :Width(50)
             :Height(16)
-            :Alpha(entry.StatisticsAlpha)
+            :Alpha(entry.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         energy.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.StatisticsHighlightAlpha)
+                self:SetAlpha(entry.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.StatisticsAlpha)
+                self:SetAlpha(entry.statisticsAlpha)
             end
 
             entry:EnergyEventBehavior(event)
@@ -264,15 +261,15 @@ local ScoreboardArmyLine = Class(Group) {
             :Top(energy.Top)
             :Width(50)
             :Height(16)
-            :Alpha(entry.StatisticsAlpha)
+            :Alpha(entry.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         mass.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.StatisticsHighlightAlpha)
+                self:SetAlpha(entry.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.StatisticsAlpha)
+                self:SetAlpha(entry.statisticsAlpha)
             end
 
             entry:MassEventBehavior(event)
@@ -295,8 +292,8 @@ local ScoreboardArmyLine = Class(Group) {
             :Hide()
             :End()
 
-        entry.IncomeData.OnDirty = function()
-            local incomeData = entry.IncomeData()
+        entry.IncomeData.OnDirty = function(self)
+            local incomeData = self()
 
             -- show storage
             if IsKeyDown('Shift') then
@@ -346,22 +343,22 @@ local ScoreboardArmyLine = Class(Group) {
             :Top(mass.Top)
             :Width(50)
             :Height(16)
-            :Alpha(entry.StatisticsAlpha)
+            :Alpha(entry.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         score.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.StatisticsHighlightAlpha)
+                self:SetAlpha(entry.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.StatisticsAlpha)
+                self:SetAlpha(entry.statisticsAlpha)
             end
 
             entry:ScoreEventBehavior(event)
         end
 
         local scoreIcon = LayoutHelpers.LayoutFor(Bitmap(score))
-            :Texture(UIUtil.UIFile('/game/beacons/beacon-quantum-gate_btn_up.dds'))
+            :Texture(UIUtil.UIFile('/game/unit_view_icons/score.png'))
             :AtLeftIn(score, 2)
             :Top(score.Top)
             :Width(16)
@@ -377,8 +374,8 @@ local ScoreboardArmyLine = Class(Group) {
             :Hide()
             :End()
 
-        self.Score.OnDirty = function()
-            local data = self.Score() 
+        self.Score.OnDirty = function(self)
+            local data = self() 
             if data > 0 then 
                 score:Show()
                 scoreText:SetText(self:SanitizeNumber(data))
@@ -389,12 +386,12 @@ local ScoreboardArmyLine = Class(Group) {
 
         -- # initial (sane) values
 
-        entry.Faction:Set(data.faction)
-        entry.Name:Set(data.nickname)
-        entry.Rating:Set(scenario.Options.Ratings[data.nickname] or 0)
-        entry.Color:Set(data.iconColor)
+        entry.faction:Set(data.faction)
+        entry.name:Set(data.nickname)
+        entry.rating:Set(scenario.Options.Ratings[data.nickname] or 0)
+        entry.color:Set(data.iconColor)
         entry.IncomeData:Set(entry.IncomeData())
-        entry.Score:Set(entry.Score())
+        entry.score:Set(entry.score())
 
         entry:ComputeBackgroundColor()
     end,
@@ -428,7 +425,7 @@ local ScoreboardArmyLine = Class(Group) {
     DetermineBackgroundColor = function(self)
         local focus = GetFocusArmy()
         if focus > 0 and self.Index > 0 and IsAlly(focus, self.Index) then 
-            self.Highlight:SetAlpha(self.EntryAlpha)
+            self.Highlight:SetAlpha(self.entryAlpha)
         else 
             self.Highlight:SetAlpha(0.0)
         end
@@ -559,7 +556,7 @@ local ScoreboardArmyLine = Class(Group) {
 
                 -- give resources
                 else
-                    local percentage = self.MassGiftPercentage
+                    local percentage = self.massGiftPercentage
                     if event.Modifiers.Ctrl then
                         percentage = 1.0
                     end
@@ -643,48 +640,52 @@ local ScoreboardArmyLine = Class(Group) {
 ---@class Scoreboard
 local Scoreboard = Class(Group) {
 
-    Time = LazyVar(0),
+    __init = function(scoreboard, parent)
+        Group.__init(scoreboard, parent, "scoreboard")
 
-    SimSpeed = LazyVar(0),
-    SimSpeedDesired = LazyVar(0),
+        -- # prepare lazy values
 
-    UnitData = LazyVar({
-        Count = 0, 
-        Cap = 0,
-    }),
+        scoreboard.time = LazyVar(0)
 
-    GameType = LazyVar({
-        Name = "",
-        Description = "",
-    }),
+        scoreboard.simSpeed = LazyVar(0)
+        scoreboard.simSpeedDesired = LazyVar(0)
+    
+        scoreboard.unitData = LazyVar({
+            Count = 0, 
+            Cap = 0,
+        })
+    
+        scoreboard.gameType = LazyVar({
+            Name = "",
+            Description = "",
+        })
+    
+        scoreboard.mapData = LazyVar({
+             Name = "", 
+             Description = "",
+             Width = 0, 
+             Height = 0, 
+             Version = 0,
+             ReplayID = 0
+        })
+    
+        scoreboard.ranked = LazyVar(true)
 
-    MapData = LazyVar({
-         Name = "", 
-         Description = "",
-         Width = 0, 
-         Height = 0, 
-         Version = 0,
-         ReplayID = 0
-    }),
 
-    Ranked = LazyVar(true),
-
-    __init = function(self, parent)
-        Group.__init(self, parent, "scoreboard")
-
-        -- # do not use self reference as that can be confusing
-        local scoreboard = LayoutHelpers.LayoutFor(self)
+        LayoutHelpers.LayoutFor(scoreboard)
             :Over(parent, 10)
             :AtCenterIn(parent)
             :Width(400)
             :Height(400)
             :End()
 
-        local debug = LayoutHelpers.LayoutFor(Group(scoreboard))
+        scoreboard.debug = Group(scoreboard)
+        LayoutHelpers.LayoutFor(scoreboard.debug)
             :Fill(scoreboard)
             :End()
             
-        LayoutHelpers.LayoutFor(Bitmap(debug))
+        scoreboard.debugBitmap = Bitmap(debug)
+        LayoutHelpers.LayoutFor(scoreboard.debugBitmap)
             :Fill(scoreboard)
             :Color('ff000000')
             :End()
@@ -769,8 +770,8 @@ local Scoreboard = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        scoreboard.Time.OnDirty = function()
-            time:SetText(self.Time())
+        scoreboard.time.OnDirty = function(self)
+            time:SetText(self())
         end
 
         local unitIcon = LayoutHelpers.LayoutFor(Bitmap(scoreboard))
@@ -789,8 +790,8 @@ local Scoreboard = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        self.UnitData.OnDirty = function()
-            local data = self.UnitData()
+        self.UnitData.OnDirty = function(self)
+            local data = self()
             unit:SetText(string.format("%d/%d", data.Count or 0, data.Cap or 0))
         end
 
@@ -802,8 +803,8 @@ local Scoreboard = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        self.GameType.OnDirty = function()
-            local data = self.GameType()
+        self.GameType.OnDirty = function(self)
+            local data = self()
             local name = LOC(tostring(data.Name))
             local description = LOC(tostring(data.Description)) .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
 
@@ -829,14 +830,14 @@ local Scoreboard = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        self.MapData.OnDirty = function()
-            local data = self.MapData()
+        self.MapData.OnDirty = function(self)
+            local data = self()
 
             local name = LOC(tostring(data.Name))
-            local description = LOC(tostring(data.Description)) .. "\r\n\r\n" .. LOC("<LOC map_version>Map version") .. ": " .. tostring(data.Version)
+            local description = LOC(string.format("%s\r\n\r\n%s: %s", tostring(data.Description)), LOC("<LOC map_version>Map version"), tostring(data.Version))
             local width = math.ceil(data.Width / 51.2 - 0.5) 
             local height = math.ceil(data.Height / 51.2 - 0.5)
-            local size = "(" .. tostring(width) .. "x" .. tostring(height) .. ")"
+            local size = string.format("(%d, %d)", width, height)
 
             map:SetText(size .. " " .. name)
             Tooltip.AddForcedControlTooltipManual(map, name, description)
