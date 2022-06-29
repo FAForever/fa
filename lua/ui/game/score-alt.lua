@@ -75,13 +75,12 @@ end
 -- # classes
 
 ---@class ScoreboardUtilities
-local ScoreboardUtilities = ClassSimple {
+local scoreboardUtilities = {
     
     --- Sanitzes a number for use on the scoreboard 
-    ---@param self ScoreboardUtilities
     ---@param number number
     ---@return string
-    SanitizeNumber = function(self, number)
+    SanitizeNumber = function(number)
         if not number then
             return ""
         end
@@ -95,58 +94,50 @@ local ScoreboardUtilities = ClassSimple {
 
 
     --- Used when trying to gift resources to yourself
-    ---@param self ScoreboardUtilities
     ---@param from number
     ---@param to number
     ---@return string
-    NotToSelfMessage = function(self, from, to)
+    NotToSelfMessage = function(from, to)
         return "You can't send resources to yourself!"
     end,
 
     --- Used when gifting mass to another player
-    ---@param self ScoreboardUtilities
     ---@param from number
     ---@param to number
     ---@return string
-    MassGiftMessage = function(self, from, to)
+    MassGiftMessage = function(from, to)
         return "Sent %d mass to %s"
     end,
 
     --- Used when dumping mass to another player
-    ---@param self ScoreboardUtilities
     ---@param from number
     ---@param to number
     ---@return string
-    MassDumpMessage = function(self, from, to)
+    MassDumpMessage = function(from, to)
         return "Dropped %d mass to %s"
     end,
 
     --- Used when asking for mass
-    ---@param self ScoreboardUtilities
     ---@param from number
     ---@param to number
     ---@return string
-    MassAskMessage = function(self, from, to)
+    MassAskMessage = function(from, to)
         return "Could %s gift me mass?"
     end,
 
     --- Used when the mass storage of the sender is empty 
-    ---@param self ScoreboardUtilities
     ---@return string
-    MassEmptyMessage = function(self)
+    MassEmptyMessage = function()
         return "Your mass storage is empty"
     end,
 
     --- Used when the mass storage of the receiver is full
-    ---@param self ScoreboardUtilities
     ---@return string
-    MassFullMessage = function(self)
+    MassFullMessage = function()
         return "Their mass storage is full"
     end,
 
 }
-
-local Utilities = ScoreboardUtilities()
 
 ---@class ScoreboardArmyLine
 local ScoreboardArmyLine = Class(Group) {
@@ -372,7 +363,7 @@ local ScoreboardArmyLine = Class(Group) {
             -- show storage
             if IsKeyDown('Shift') then
                 if incomeData.StorageMass then 
-                    massText:SetText(Utilities:SanitizeNumber(incomeData.StorageMass))
+                    massText:SetText(scoreboardUtilities.SanitizeNumber(incomeData.StorageMass))
                     massText:Show()
                     massIcon:Show()
                 else 
@@ -381,7 +372,7 @@ local ScoreboardArmyLine = Class(Group) {
                 end
 
                 if incomeData.StorageEnergy then 
-                    energyText:SetText(Utilities:SanitizeNumber(incomeData.StorageEnergy))
+                    energyText:SetText(scoreboardUtilities.SanitizeNumber(incomeData.StorageEnergy))
                     energyIcon:Show()
                 else 
                     energyText:SetText("")
@@ -392,7 +383,7 @@ local ScoreboardArmyLine = Class(Group) {
             -- show income
             else
                 if incomeData.IncomeMass then 
-                    massText:SetText(Utilities:SanitizeNumber(incomeData.IncomeMass))
+                    massText:SetText(scoreboardUtilities.SanitizeNumber(incomeData.IncomeMass))
                     massText:Show()
                     massIcon:Show()
                 else 
@@ -401,7 +392,7 @@ local ScoreboardArmyLine = Class(Group) {
                 end
 
                 if incomeData.IncomeEnergy then 
-                    energyText:SetText(Utilities:SanitizeNumber(incomeData.IncomeEnergy))
+                    energyText:SetText(scoreboardUtilities.SanitizeNumber(incomeData.IncomeEnergy))
                     energyText:Show()
                     energyIcon:Show()
                 else 
@@ -452,7 +443,7 @@ local ScoreboardArmyLine = Class(Group) {
             local data = self() 
             if data > 0 then 
                 score:Show()
-                scoreText:SetText(Utilities:SanitizeNumber(data))
+                scoreText:SetText(scoreboardUtilities.SanitizeNumber(data))
             else 
                 score:Hide()
             end
@@ -538,7 +529,7 @@ local ScoreboardArmyLine = Class(Group) {
                         from = ArmyStatistics[focusArmyIndex].name,
                         to = ArmyStatistics[focusArmyIndex].name,
                         Chat = true,
-                        text = string.format(Utilities:NotToSelfMessage())
+                        text = string.format(scoreboardUtilities.NotToSelfMessage())
                     }
                 )
                 return
@@ -554,7 +545,7 @@ local ScoreboardArmyLine = Class(Group) {
                             from = ArmyStatistics[focusArmyIndex].name,
                             to = 'allies',
                             Chat = true,
-                            text = string.format(Utilities:MassAskMessage(focusArmyIndex, self.Index), ArmyStatistics[self.Index].name)
+                            text = string.format(scoreboardUtilities.MassAskMessage(focusArmyIndex, self.Index), ArmyStatistics[self.Index].name)
                         }
                     )
                 -- give resources
@@ -570,9 +561,9 @@ local ScoreboardArmyLine = Class(Group) {
                     local percentile = amount / stored
 
                     if amount > 1 then
-                        local message = Utilities:MassGiftMessage(focusArmyIndex, self.Index)
+                        local message = scoreboardUtilities.MassGiftMessage(focusArmyIndex, self.Index)
                         if event.Modifiers.Ctrl then
-                            message = Utilities:MassDumpMessage(focusArmyIndex, self.Index)
+                            message = scoreboardUtilities.MassDumpMessage(focusArmyIndex, self.Index)
                         end
 
                         SimCallback(
@@ -603,7 +594,7 @@ local ScoreboardArmyLine = Class(Group) {
                                     from = ArmyStatistics[focusArmyIndex].name,
                                     to = ArmyStatistics[focusArmyIndex].name,
                                     Chat = true,
-                                    text = string.format(Utilities:MassEmptyMessage())
+                                    text = string.format(scoreboardUtilities.MassEmptyMessage())
                                 }
                             )
                         else 
@@ -613,7 +604,7 @@ local ScoreboardArmyLine = Class(Group) {
                                     from = ArmyStatistics[focusArmyIndex].name,
                                     to = ArmyStatistics[focusArmyIndex].name,
                                     Chat = true,
-                                    text = string.format(Utilities:MassFullMessage())
+                                    text = string.format(scoreboardUtilities.MassFullMessage())
                                 }
                             )
                         end
