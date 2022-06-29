@@ -679,13 +679,11 @@ local Scoreboard = Class(Group) {
             :Height(400)
             :End()
 
-        scoreboard.debug = Group(scoreboard)
-        LayoutHelpers.LayoutFor(scoreboard.debug)
+        local debug = LayoutHelpers.LayoutFor(Group(scoreboard))
             :Fill(scoreboard)
             :End()
             
-        scoreboard.debugBitmap = Bitmap(debug)
-        LayoutHelpers.LayoutFor(scoreboard.debugBitmap)
+        LayoutHelpers.LayoutFor(Bitmap(debug))
             :Fill(scoreboard)
             :Color('ff000000')
             :End()
