@@ -74,6 +74,80 @@ end
 
 -- # classes
 
+---@class ScoreboardUtilities
+local ScoreboardUtilities = ClassSimple {
+    
+    --- Sanitzes a number for use on the scoreboard 
+    ---@param self ScoreboardUtilities
+    ---@param number number
+    ---@return string
+    SanitizeNumber = function(self, number)
+        if not number then
+            return ""
+        end
+
+        if number < 1000 then 
+            return string.format("%4d", number)
+        else
+            return string.format("%4dk", 0.1 * math.floor(0.01* number))
+        end
+    end,
+
+
+    --- Used when trying to gift resources to yourself
+    ---@param self ScoreboardUtilities
+    ---@param from number
+    ---@param to number
+    ---@return string
+    NotToSelfMessage = function(self, from, to)
+        return "You can't send resources to yourself!"
+    end,
+
+    --- Used when gifting mass to another player
+    ---@param self ScoreboardUtilities
+    ---@param from number
+    ---@param to number
+    ---@return string
+    MassGiftMessage = function(self, from, to)
+        return "Sent %d mass to %s"
+    end,
+
+    --- Used when dumping mass to another player
+    ---@param self ScoreboardUtilities
+    ---@param from number
+    ---@param to number
+    ---@return string
+    MassDumpMessage = function(self, from, to)
+        return "Dropped %d mass to %s"
+    end,
+
+    --- Used when asking for mass
+    ---@param self ScoreboardUtilities
+    ---@param from number
+    ---@param to number
+    ---@return string
+    MassAskMessage = function(self, from, to)
+        return "Could %s gift me mass?"
+    end,
+
+    --- Used when the mass storage of the sender is empty 
+    ---@param self ScoreboardUtilities
+    ---@return string
+    MassEmptyMessage = function(self)
+        return "Your mass storage is empty"
+    end,
+
+    --- Used when the mass storage of the receiver is full
+    ---@param self ScoreboardUtilities
+    ---@return string
+    MassFullMessage = function(self)
+        return "Their mass storage is full"
+    end,
+
+}
+
+local Utilities = ScoreboardUtilities()
+
 ---@class ScoreboardArmyLine
 local ScoreboardArmyLine = Class(Group) {
 
@@ -81,29 +155,29 @@ local ScoreboardArmyLine = Class(Group) {
     energyGiftPercentage = 0.2,
 
     entryAlpha = 0.1,
-    EntryHighlightAlpha = 0.2,
+    entryHighlightAlpha = 0.2,
 
     statisticsAlpha = 0.0,
     statisticsHighlightAlpha = 0.4,
 
     --- 
-    ---@param entry ScoreboardArmyLine
+    ---@param armyLine ScoreboardArmyLine
     ---@param scoreboard Scoreboard
     ---@param debug boolean
     ---@param data ArmiesTableEntry
     ---@param index number
-    __init = function(entry, scoreboard, debug, data, index) 
-        Group.__init(entry, scoreboard, "scoreboard-army-" .. index)
+    __init = function(armyLine, scoreboard, debug, data, index) 
+        Group.__init(armyLine, scoreboard, "scoreboard-armyLine-" .. index)
 
         -- # prepare lazy values
 
-        entry.rating = LazyVar(0)
-        entry.name = LazyVar("")
-        entry.color = LazyVar("")
-        entry.faction = LazyVar(0)
-        entry.score = LazyVar(-1)
+        armyLine.rating = LazyVar(0)
+        armyLine.name = LazyVar("")
+        armyLine.color = LazyVar("")
+        armyLine.faction = LazyVar(0)
+        armyLine.score = LazyVar(-1)
 
-        entry.IncomeData = LazyVar({
+        armyLine.IncomeData = LazyVar({
             IncomeMass = false,
             IncomeEnergy = false,
             StorageMass = false,
@@ -112,14 +186,14 @@ local ScoreboardArmyLine = Class(Group) {
 
         -- # store information
 
-        entry.Data = data 
-        entry.Debug = debug
-        entry.Index = index
+        armyLine.debug = debug
+        armyLine.armyIndex = index
+        armyLine.armyData = data 
 
         -- # player faction, color, rating and name
 
         ---@type ScoreboardArmyLine
-        local entry = LayoutHelpers.LayoutFor(entry)
+        local armyLine = LayoutHelpers.LayoutFor(armyLine)
             :Left(scoreboard.Left)
             :Right(scoreboard.Right)
             :Top(20) -- dummy value
@@ -127,45 +201,45 @@ local ScoreboardArmyLine = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        entry.HandleEvent = function(self, event)
+        armyLine.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                entry.Highlight:SetAlpha(entry.EntryHighlightAlpha)
+                armyLine.Highlight:SetAlpha(armyLine.entryHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                entry:DetermineBackgroundColor()
+                armyLine:DetermineBackgroundColor()
             end
         end
 
-        entry.Highlight = LayoutHelpers.LayoutFor(Bitmap(entry))
-            :Fill(entry)
+        armyLine.Highlight = LayoutHelpers.LayoutFor(Bitmap(armyLine))
+            :Fill(armyLine)
             :Color('44ffffff')
             :Over(scoreboard, 5)
             :End()
 
         local debugEntry = LayoutHelpers.LayoutFor(Bitmap(debug))
-            :Fill(entry)
+            :Fill(armyLine)
             :Color('44ffffff')
             :End()
 
-        local faction = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local faction = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Texture(UIUtil.UIFile(UIUtil.GetFactionIcon(data.faction)))
-            :AtLeftIn(entry, 2)
-            :AtTopIn(entry, 2)
+            :AtLeftIn(armyLine, 2)
+            :AtTopIn(armyLine, 2)
             :Width(16)
             :Height(16)
-            :Over(entry, 10)
+            :Over(armyLine, 10)
             :End()
 
-        entry.faction.OnDirty = function(self)
+        armyLine.faction.OnDirty = function(self)
             faction:SetTexture(UIUtil.UIFile(UIUtil.GetFactionIcon(self())))
         end
 
-        local factionBackground = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local factionBackground = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Fill(faction)
             :Under(faction, 1)
             :Color('00ffffff')
             :End()
 
-        entry.color.OnDirty = function(self)
+        armyLine.color.OnDirty = function(self)
             factionBackground:SetSolidColor(self())
         end
 
@@ -177,7 +251,7 @@ local ScoreboardArmyLine = Class(Group) {
                 :Over(scoreboard, 10)
                 :End()
 
-            entry.rating.OnDirty = function(self)
+            armyLine.rating.OnDirty = function(self)
                 rating:SetText("(" .. math.floor(self()+0.5) .. ")")
             end
         end 
@@ -188,57 +262,57 @@ local ScoreboardArmyLine = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        entry.name.OnDirty = function(self)
+        armyLine.name.OnDirty = function(self)
             name:SetText(tostring(self()))
         end
 
         -- # economy
 
-        local army = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local army = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Color('ffffff')
-            :AtTopIn(entry, 2)
+            :AtTopIn(armyLine, 2)
             :AtRightIn(scoreboard, 2)
             :Width(16)
             :Height(16)
-            :Alpha(entry.statisticsAlpha)
+            :Alpha(armyLine.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         army.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.statisticsHighlightAlpha)
+                self:SetAlpha(armyLine.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.statisticsAlpha)
+                self:SetAlpha(armyLine.statisticsAlpha)
             end
         end
 
-        local armyIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local armyIcon = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Texture(UIUtil.UIFile('/textures/ui/icons_strategic/commander_generic.dds'))
             :Fill(army)
             :Over(scoreboard, 10)
             :End()
 
-        local energy = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local energy = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Color('ffffff')
             :LeftOf(army, 2)
             :Top(armyIcon.Top)
             :Width(50)
             :Height(16)
-            :Alpha(entry.statisticsAlpha)
+            :Alpha(armyLine.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         energy.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.statisticsHighlightAlpha)
+                self:SetAlpha(armyLine.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.statisticsAlpha)
+                self:SetAlpha(armyLine.statisticsAlpha)
             end
 
-            entry:EnergyEventBehavior(event)
+            armyLine:EnergyEventBehavior(event)
         end
 
-        local energyIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local energyIcon = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Texture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
             :AtLeftIn(energy, 2)
             :Top(energy.Top)
@@ -248,34 +322,34 @@ local ScoreboardArmyLine = Class(Group) {
             :Hide()
             :End()
 
-        local energyText = LayoutHelpers.LayoutFor(UIUtil.CreateText(entry, "0",  12, UIUtil.bodyFont))
+        local energyText = LayoutHelpers.LayoutFor(UIUtil.CreateText(armyLine, "0",  12, UIUtil.bodyFont))
             :RightOf(energyIcon, 2)
             :Top(energy.Top)
             :Over(scoreboard, 10)
             :Hide()
             :End()
 
-        local mass = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local mass = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Color('ffffff')
             :LeftOf(energy, 2)
             :Top(energy.Top)
             :Width(50)
             :Height(16)
-            :Alpha(entry.statisticsAlpha)
+            :Alpha(armyLine.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         mass.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.statisticsHighlightAlpha)
+                self:SetAlpha(armyLine.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.statisticsAlpha)
+                self:SetAlpha(armyLine.statisticsAlpha)
             end
 
-            entry:MassEventBehavior(event)
+            armyLine:MassEventBehavior(event)
         end
 
-        local massIcon = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local massIcon = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
             :AtLeftIn(mass, 2)
             :Top(mass.Top)
@@ -285,20 +359,20 @@ local ScoreboardArmyLine = Class(Group) {
             :Hide()
             :End()
 
-        local massText = LayoutHelpers.LayoutFor(UIUtil.CreateText(entry, "0",  12, UIUtil.bodyFont))
+        local massText = LayoutHelpers.LayoutFor(UIUtil.CreateText(armyLine, "0",  12, UIUtil.bodyFont))
             :RightOf(massIcon, 2)
             :Top(mass.Top)
             :Over(scoreboard, 10)
             :Hide()
             :End()
 
-        entry.IncomeData.OnDirty = function(self)
+        armyLine.IncomeData.OnDirty = function(self)
             local incomeData = self()
 
             -- show storage
             if IsKeyDown('Shift') then
                 if incomeData.StorageMass then 
-                    massText:SetText(entry:SanitizeNumber(incomeData.StorageMass))
+                    massText:SetText(Utilities:SanitizeNumber(incomeData.StorageMass))
                     massText:Show()
                     massIcon:Show()
                 else 
@@ -307,7 +381,7 @@ local ScoreboardArmyLine = Class(Group) {
                 end
 
                 if incomeData.StorageEnergy then 
-                    energyText:SetText(entry:SanitizeNumber(incomeData.StorageEnergy))
+                    energyText:SetText(Utilities:SanitizeNumber(incomeData.StorageEnergy))
                     energyIcon:Show()
                 else 
                     energyText:SetText("")
@@ -318,7 +392,7 @@ local ScoreboardArmyLine = Class(Group) {
             -- show income
             else
                 if incomeData.IncomeMass then 
-                    massText:SetText(entry:SanitizeNumber(incomeData.IncomeMass))
+                    massText:SetText(Utilities:SanitizeNumber(incomeData.IncomeMass))
                     massText:Show()
                     massIcon:Show()
                 else 
@@ -327,7 +401,7 @@ local ScoreboardArmyLine = Class(Group) {
                 end
 
                 if incomeData.IncomeEnergy then 
-                    energyText:SetText(entry:SanitizeNumber(incomeData.IncomeEnergy))
+                    energyText:SetText(Utilities:SanitizeNumber(incomeData.IncomeEnergy))
                     energyText:Show()
                     energyIcon:Show()
                 else 
@@ -337,24 +411,24 @@ local ScoreboardArmyLine = Class(Group) {
             end
         end
 
-        local score = LayoutHelpers.LayoutFor(Bitmap(entry))
+        local score = LayoutHelpers.LayoutFor(Bitmap(armyLine))
             :Color('ffffff')
             :LeftOf(mass, 2)
             :Top(mass.Top)
             :Width(50)
             :Height(16)
-            :Alpha(entry.statisticsAlpha)
+            :Alpha(armyLine.statisticsAlpha)
             :Over(scoreboard, 20)
             :End()
 
         score.HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then 
-                self:SetAlpha(entry.statisticsHighlightAlpha)
+                self:SetAlpha(armyLine.statisticsHighlightAlpha)
             elseif event.Type == 'MouseExit' then 
-                self:SetAlpha(entry.statisticsAlpha)
+                self:SetAlpha(armyLine.statisticsAlpha)
             end
 
-            entry:ScoreEventBehavior(event)
+            armyLine:ScoreEventBehavior(event)
         end
 
         local scoreIcon = LayoutHelpers.LayoutFor(Bitmap(score))
@@ -374,11 +448,11 @@ local ScoreboardArmyLine = Class(Group) {
             :Hide()
             :End()
 
-        entry.score.OnDirty = function(self)
+        armyLine.score.OnDirty = function(self)
             local data = self() 
             if data > 0 then 
                 score:Show()
-                scoreText:SetText(entry:SanitizeNumber(data))
+                scoreText:SetText(Utilities:SanitizeNumber(data))
             else 
                 score:Hide()
             end
@@ -386,14 +460,14 @@ local ScoreboardArmyLine = Class(Group) {
 
         -- # initial (sane) values
 
-        entry.faction:Set(data.faction)
-        entry.name:Set(data.nickname)
-        entry.rating:Set(scenario.Options.Ratings[data.nickname] or 0)
-        entry.color:Set(data.iconColor)
-        entry.IncomeData:Set(entry.IncomeData())
-        entry.score:Set(entry.score())
+        armyLine.faction:Set(data.faction)
+        armyLine.name:Set(data.nickname)
+        armyLine.rating:Set(scenario.Options.Ratings[data.nickname] or 0)
+        armyLine.color:Set(data.iconColor)
+        armyLine.IncomeData:Set(armyLine.IncomeData())
+        armyLine.score:Set(armyLine.score())
 
-        entry:ComputeBackgroundColor()
+        armyLine:ComputeBackgroundColor()
     end,
 
     ---comment
@@ -406,9 +480,9 @@ local ScoreboardArmyLine = Class(Group) {
     ---comment
     ---@param self any
     ComputeBackgroundColor = function(self)
-        local focus = GetFocusArmy()
-        if focus > 0 and self.Index > 0 then 
-            if IsAlly(focus, self.Index) then 
+        local focusArmyIndex = GetFocusArmy()
+        if focusArmyIndex > 0 and self.Index > 0 then 
+            if IsAlly(focusArmyIndex, self.Index) then 
                 self.Highlight:SetSolidColor('99ff99')
             else 
                 self.Highlight:SetSolidColor('9999ff')
@@ -423,28 +497,11 @@ local ScoreboardArmyLine = Class(Group) {
     ---comment
     ---@param self any
     DetermineBackgroundColor = function(self)
-        local focus = GetFocusArmy()
-        if focus > 0 and self.Index > 0 and IsAlly(focus, self.Index) then 
+        local focusArmyIndex = GetFocusArmy()
+        if focusArmyIndex > 0 and self.Index > 0 and IsAlly(focusArmyIndex, self.Index) then 
             self.Highlight:SetAlpha(self.entryAlpha)
         else 
             self.Highlight:SetAlpha(0.0)
-        end
-    end,
-
-    --- comment
-    ---@param self any
-    ---@param number any
-    ---@return string
-    SanitizeNumber = function(self, number)
-
-        if not number then
-            return ""
-        end
-
-        if number < 1000 then 
-            return string.format("%4d", number)
-        else
-            return string.format("%4dk", 0.1 * math.floor(0.01* number))
         end
     end,
 
@@ -466,55 +523,6 @@ local ScoreboardArmyLine = Class(Group) {
         self.score:Set(score)
     end,
 
-    ---
-    ---@param self any
-    ---@param from number
-    ---@param to number
-    ---@return string
-    NotToSelfMessage = function(self, from, to)
-        return "You can't send resources to yourself!"
-    end,
-
-    ---comment
-    ---@param self any
-    ---@param from number
-    ---@param to number
-    ---@return string
-    MassGiftMessage = function(self, from, to)
-        return "Sent %d mass to %s"
-    end,
-
-    ---comment
-    ---@param self any
-    ---@param from number
-    ---@param to number
-    ---@return string
-    MassDumpMessage = function(self, from, to)
-        return "Dropped %d mass to %s"
-    end,
-
-    ---comment
-    ---@param self any
-    ---@param from number
-    ---@param to number
-    ---@return string
-    MassAskMessage = function(self, from, to)
-        return "Could %s gift me mass?"
-    end,
-
-    ---comment
-    ---@param self any
-    ---@return string
-    MassEmptyMessage = function(self)
-        return "Your mass storage is empty"
-    end,
-
-    ---comment
-    ---@param self any
-    ---@return string
-    MassFullMessage = function(self)
-        return "Their mass storage is full"
-    end,
 
     ---comment
     ---@param self any
@@ -522,7 +530,6 @@ local ScoreboardArmyLine = Class(Group) {
     MassEventBehavior = function(self, event)
         local focusArmyIndex = GetFocusArmy()
         if event.Type == 'ButtonPress' and event.Modifiers.Left then
-
             -- check if we're self
             if focusArmyIndex == self.Index then 
                 SessionSendChatMessage(
@@ -531,29 +538,25 @@ local ScoreboardArmyLine = Class(Group) {
                         from = ArmyStatistics[focusArmyIndex].name,
                         to = ArmyStatistics[focusArmyIndex].name,
                         Chat = true,
-                        text = string.format(self:NotToSelfMessage())
+                        text = string.format(Utilities:NotToSelfMessage())
                     }
                 )
-
                 return
             end
 
             -- check if we're allies
             if IsAlly(focusArmyIndex, self.Index) then
-
                 -- ask for resources
                 if event.Modifiers.Shift then
-
                     SessionSendChatMessage(
                         FindClients(),
                         {
                             from = ArmyStatistics[focusArmyIndex].name,
                             to = 'allies',
                             Chat = true,
-                            text = string.format(self:MassAskMessage(focusArmyIndex, self.Index), ArmyStatistics[self.Index].name)
+                            text = string.format(Utilities:MassAskMessage(focusArmyIndex, self.Index), ArmyStatistics[self.Index].name)
                         }
                     )
-
                 -- give resources
                 else
                     local percentage = self.massGiftPercentage
@@ -567,10 +570,9 @@ local ScoreboardArmyLine = Class(Group) {
                     local percentile = amount / stored
 
                     if amount > 1 then
-
-                        local message = self:MassGiftMessage(focusArmyIndex, self.Index)
+                        local message = Utilities:MassGiftMessage(focusArmyIndex, self.Index)
                         if event.Modifiers.Ctrl then
-                            message = self:MassDumpMessage(focusArmyIndex, self.Index)
+                            message = Utilities:MassDumpMessage(focusArmyIndex, self.Index)
                         end
 
                         SimCallback(
@@ -584,7 +586,6 @@ local ScoreboardArmyLine = Class(Group) {
                                 }
                             }
                         )
-
                         SessionSendChatMessage(
                             FindClients(),
                             {
@@ -594,9 +595,7 @@ local ScoreboardArmyLine = Class(Group) {
                                 text = string.format(message, amount, ArmyStatistics[self.Index].name)
                             }
                         )
-
                     else 
-
                         if stored <= 1 then 
                             SessionSendChatMessage(
                                 FindClients(),
@@ -604,7 +603,7 @@ local ScoreboardArmyLine = Class(Group) {
                                     from = ArmyStatistics[focusArmyIndex].name,
                                     to = ArmyStatistics[focusArmyIndex].name,
                                     Chat = true,
-                                    text = string.format(self:MassEmptyMessage())
+                                    text = string.format(Utilities:MassEmptyMessage())
                                 }
                             )
                         else 
@@ -614,7 +613,7 @@ local ScoreboardArmyLine = Class(Group) {
                                     from = ArmyStatistics[focusArmyIndex].name,
                                     to = ArmyStatistics[focusArmyIndex].name,
                                     Chat = true,
-                                    text = string.format(self:MassFullMessage())
+                                    text = string.format(Utilities:MassFullMessage())
                                 }
                             )
                         end
@@ -850,12 +849,12 @@ local Scoreboard = Class(Group) {
         local last = header 
         for k, army in armies do 
             if not army.civilian then 
-                local entry = LayoutHelpers.LayoutFor(ScoreboardArmyLine(scoreboard, debug, army, k))
+                local armyLine = LayoutHelpers.LayoutFor(ScoreboardArmyLine(scoreboard, debug, army, k))
                     :Below(last, 2)
                     :End()
 
-                scoreboard.armyEntries[k] = entry
-                last = entry
+                scoreboard.armyEntries[k] = armyLine
+                last = armyLine
             end
         end
 
