@@ -47,10 +47,10 @@ local function SyncCallback(sync)
         local focus = GetFocusArmy()
         local score = sync.Score[focus]
 
-        instance.Time:Set(GetGameTime())
+        instance.time:Set(GetGameTime())
 
         if score.general.currentunits and score.general.currentcap then 
-            instance.UnitData:Set({ Count = score.general.currentunits , Cap = score.general.currentcap })
+            instance.unitData:Set({ Count = score.general.currentunits , Cap = score.general.currentcap })
         end
 
         if sync.NewPlayableArea then 
@@ -58,10 +58,10 @@ local function SyncCallback(sync)
             local height = sync.NewPlayableArea[4] - sync.NewPlayableArea[2]
 
             -- update existing data
-            local mapData = instance.MapData()
+            local mapData = instance.mapData()
             mapData.Width = width
             mapData.Height = height
-            instance.MapData:Set(mapData)
+            instance.mapData:Set(mapData)
         end
 
         if not table.empty(sync.Score) then
@@ -298,7 +298,7 @@ local ScoreboardArmyLine = Class(Group) {
             -- show storage
             if IsKeyDown('Shift') then
                 if incomeData.StorageMass then 
-                    massText:SetText(self:SanitizeNumber(incomeData.StorageMass))
+                    massText:SetText(entry:SanitizeNumber(incomeData.StorageMass))
                     massText:Show()
                     massIcon:Show()
                 else 
@@ -307,7 +307,7 @@ local ScoreboardArmyLine = Class(Group) {
                 end
 
                 if incomeData.StorageEnergy then 
-                    energyText:SetText(self:SanitizeNumber(incomeData.StorageEnergy))
+                    energyText:SetText(entry:SanitizeNumber(incomeData.StorageEnergy))
                     energyIcon:Show()
                 else 
                     energyText:SetText("")
@@ -318,7 +318,7 @@ local ScoreboardArmyLine = Class(Group) {
             -- show income
             else
                 if incomeData.IncomeMass then 
-                    massText:SetText(self:SanitizeNumber(incomeData.IncomeMass))
+                    massText:SetText(entry:SanitizeNumber(incomeData.IncomeMass))
                     massText:Show()
                     massIcon:Show()
                 else 
@@ -327,7 +327,7 @@ local ScoreboardArmyLine = Class(Group) {
                 end
 
                 if incomeData.IncomeEnergy then 
-                    energyText:SetText(self:SanitizeNumber(incomeData.IncomeEnergy))
+                    energyText:SetText(entry:SanitizeNumber(incomeData.IncomeEnergy))
                     energyText:Show()
                     energyIcon:Show()
                 else 
@@ -374,11 +374,11 @@ local ScoreboardArmyLine = Class(Group) {
             :Hide()
             :End()
 
-        self.Score.OnDirty = function(self)
+        entry.score.OnDirty = function(self)
             local data = self() 
             if data > 0 then 
                 score:Show()
-                scoreText:SetText(self:SanitizeNumber(data))
+                scoreText:SetText(entry:SanitizeNumber(data))
             else 
                 score:Hide()
             end
@@ -463,7 +463,7 @@ local ScoreboardArmyLine = Class(Group) {
     end,
 
     UpdateScore = function(self, score)
-        self.Score:Set(score)
+        self.score:Set(score)
     end,
 
     ---
@@ -788,7 +788,7 @@ local Scoreboard = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        self.UnitData.OnDirty = function(self)
+        scoreboard.unitData.OnDirty = function(self)
             local data = self()
             unit:SetText(string.format("%d/%d", data.Count or 0, data.Cap or 0))
         end
@@ -801,7 +801,7 @@ local Scoreboard = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        self.GameType.OnDirty = function(self)
+        scoreboard.gameType.OnDirty = function(self)
             local data = self()
             local name = LOC(tostring(data.Name))
             local description = LOC(tostring(data.Description)) .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
@@ -828,11 +828,11 @@ local Scoreboard = Class(Group) {
             :Over(scoreboard, 10)
             :End()
 
-        self.MapData.OnDirty = function(self)
+        scoreboard.mapData.OnDirty = function(self)
             local data = self()
 
             local name = LOC(tostring(data.Name))
-            local description = LOC(string.format("%s\r\n\r\n%s: %s", tostring(data.Description)), LOC("<LOC map_version>Map version"), tostring(data.Version))
+            local description = string.format("%s\r\n\r\n%s: %s", LOC(tostring(data.Description)), LOC("<LOC map_version>Map version"), tostring(data.Version))
             local width = math.ceil(data.Width / 51.2 - 0.5) 
             local height = math.ceil(data.Height / 51.2 - 0.5)
             local size = string.format("(%d, %d)", width, height)
@@ -846,7 +846,7 @@ local Scoreboard = Class(Group) {
 
         -- # Populate body
 
-        self.ArmyEntries = { }
+        scoreboard.armyEntries = { }
         local last = header 
         for k, army in armies do 
             if not army.civilian then 
@@ -854,27 +854,27 @@ local Scoreboard = Class(Group) {
                     :Below(last, 2)
                     :End()
 
-                self.ArmyEntries[k] = entry
+                scoreboard.armyEntries[k] = entry
                 last = entry
             end
         end
 
         -- # initial (sane) values
 
-        self.Time:Set(GetGameTime())
-        self.SimSpeed:Set(0)
-        self.SimSpeedDesired:Set(0)
-        self.UnitData:Set({
+        scoreboard.time:Set(GetGameTime())
+        scoreboard.simSpeed:Set(0)
+        scoreboard.simSpeedDesired:Set(0)
+        scoreboard.unitData:Set({
             Count = 0,
             Cap = scenario.Options.UnitCap,
         })
 
-        self.GameType:Set({
+        scoreboard.gameType:Set({
             Name = ShareNameLookup[scenario.Options.Share],
             Description = ShareDescriptionLookup[scenario.Options.Share]
         })
 
-        self.MapData:Set({
+        scoreboard.mapData:Set({
             Name = scenario.name,
             Description = scenario.description or "No description set by the author.",
             Width = scenario.size[1],
@@ -883,7 +883,7 @@ local Scoreboard = Class(Group) {
             ReplayID = UIUtil.GetReplayId() or 0
         })
 
-        self.Ranked:Set(scenario.Options.Ranked or false)
+        scoreboard.ranked:Set(scenario.Options.Ranked or false)
 
         -- # other 
 
@@ -894,24 +894,24 @@ local Scoreboard = Class(Group) {
 
 
     --- Allows you to expand / contract the scoreboard accordingly
-    --- @param self Scoreboard 
-    SetCollapsed = function(self, state)
+    --- @param scoreboard Scoreboard 
+    SetCollapsed = function(scoreboard, state)
 
     end,
 
     --- Processes the army statistics to make them visible on the scoreboard
-    ---@param self Scoreboard
+    ---@param scoreboard Scoreboard
     ---@param armyStatistics table      # Army statistics as passed over the sync
-    ProcessArmyStatistics = function(self, armyStatistics)
+    ProcessArmyStatistics = function(scoreboard, armyStatistics)
         for k, statistics in armyStatistics do 
-            self.ArmyEntries[k]:UpdateEconomy(
+            scoreboard.armyEntries[k]:UpdateEconomy(
                 statistics.resources.massin.rate and (math.floor(10 * statistics.resources.massin.rate + 0.5)),
                 statistics.resources.energyin.rate and (math.floor(10 * statistics.resources.energyin.rate + 0.5)),
                 statistics.resources.storage.storedMass,
                 statistics.resources.storage.storedEnergy
             )
 
-            self.ArmyEntries[k]:UpdateScore(
+            scoreboard.armyEntries[k]:UpdateScore(
                 statistics.general.score
             )
         end
