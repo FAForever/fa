@@ -146,7 +146,7 @@ function ScaleEmittersParam(Emitters, param, minRange, maxRange)
 end
 
 ---@deprecated
---- Please use CreateCybranBuildBeamsOpti instead
+--- You can use CreateCybranBuildBeamsOpti instead
 ---@param builder Unit
 ---@param unitBeingBuilt Unit
 ---@param BuildEffectBones string[]
