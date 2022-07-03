@@ -558,152 +558,14 @@ local session = SessionGetScenarioInfo()
 --   -    uid: 0
 local clients = GetSessionClients()
 
-local timePerSample = 10
-local timeperConvertedSample = 180
-local totalSamples = 20
-
 local samples = { }
-local samplesHead = 1
-
-local performance = {
-    map = "",
-    mapVersion = 0,
-    mapSize = "",
-    ai = false,
-    head = 1,
-    transformedSamples = { },
-}
-
-local samples = { }
-
-for k = -10, 10 do 
+for k = 1, 21 do 
     samples[k] = {
-        units = { min = 10000, max = 0 },
-        props = { min = 10000, max = 0 },
-        projectiles = { min = 10000, max = 0 },
-        shields = { min = 10000, max = 0 },
-        blips = { min = 10000, max = 0 },
-        others = { min = 10000, max = 0 },
+        Samples = 0
     }
 end
 
 local function PerformanceTrackingThread()
-
-    local focusArmy = GetFocusArmy()
-
-    ---comment Transforms the 
-    local function TransformSamples()
-
-        LOG("Transforming samples!")
-
-        if samplesHead > 1 then
-
-            local rate = 50
-            local units = 0
-            local props = 0
-            local projectiles = 0
-            local shields = 0
-            local blips = 0
-            local others = 0
-
-            for k = 1, samplesHead - 1 do
-                rate = math.min(rate, samples[k].rate)
-                units = units + samples[k].units
-                props = props + samples[k].props
-                projectiles = projectiles + samples[k].projectiles
-                shields = shields + samples[k].shields
-                blips = blips + samples[k].blips
-                others = others + samples[k].others
-                samples[k] = nil
-            end
-
-            local factor = 1 / (samplesHead  - 1)
-            table.insert(performance.transformedSamples,
-                {
-                -- type of entities
-                    rate = rate,
-                    units = factor * units,
-                    props = factor * props,
-                    projectiles = factor * projectiles,
-                    shields = factor * shields,
-                    blips = factor * blips,
-                    others = factor * others,
-                }
-            )
-        end
-
-        samplesHead = 1
-    end
-
-    --- Adds a sample that is transformed and combined at the end of the game
-    ---@param armies any
-    ---@param clients any
-    ---@param engineStats any
-    local function AddSample(armies, clients, engineStats)
-
-        LOG("Tracking sample!")
-
-        -- # Retrieve client statistics
-
-        local rate = 0
-        local army = armies[focusArmy]
-        for k, client in clients do 
-            if client.name == army.nickname then
-                rate = client.maxSP or -1
-            end
-        end
-
-        -- # Retrieve engine statistics
-
-        local propCount = 0
-        local unitCount = 0
-        local projectileCount = 0
-        local shieldCount = 0
-        local blipCount = 0
-        local otherCount = 0
-
-        -- their order is not set in stone, hence the extensive search
-        for k, stat in engineStats.Children do
-            if stat.Name == 'EntityCount' then
-                for _, entry in stat.Children do
-                    if entry.Name == 'Prop' then
-                        propCount = entry.Value
-                    elseif entry.Name == 'Unit' then
-                        unitCount = entry.Value
-                    elseif entry.Name == 'Projectile' then
-                        projectileCount = entry.Value
-                    elseif entry.Name == 'Blip' then
-                        blipCount = entry.Value
-                    elseif entry.Name == 'Other' then
-                        otherCount = entry.Value 
-                    elseif entry.Name == 'Shield' then
-                        shieldCount = entry.Value
-                    end
-                end
-            end
-        end
-
-        -- # Track the sample
-
-        samples[samplesHead] = {
-            tick = GameTick(),
-            rate = rate,
-            units = unitCount,
-            props = propCount,
-            projectiles = projectileCount,
-            shields = shieldCount,
-            blips = blipCount,
-            others = otherCount,
-        }
-
-        samplesHead = samplesHead + 1
-
-        -- # Combine samples
-
-        if samplesHead > (timeperConvertedSample / timePerSample) then
-            TransformSamples()
-        end
-    end
 
     local function StoreSamples(exitType)
 
@@ -712,36 +574,68 @@ local function PerformanceTrackingThread()
         --     return
         -- end
 
-        -- get the last few samples in
-        TransformSamples()
-
         LOG("Storing samples!")
 
+        mapName = session.name
+        mapVersion = session.map_version or 1
+
         -- get / store the preference table
-        local pref = GetPreference('PerformanceTrackingV1') or { Head = 1, Samples = { } }
-        pref.Samples[pref.Head] = performance
-        pref.Head = pref.Head + 1
-        if pref.Head > 100 then
-            pref.Head = 1 
+        local identifier = string.format("%s - %s", tostring(mapName), tostring(mapVersion))
+        local data = GetPreference('PerformanceTrackingV1') or { }
+
+        local mapData = data[identifier]
+        if mapData then 
+            for k = 1, 21 do
+                
+                if samples[k].Samples > 0 then
+                    if mapData[k].Samples > 0 then
+                        
+                        -- combine them
+                        mapData[k].UnitCount.Min = math.min(samples[k].UnitCount.Min, mapData[k].UnitCount.Min)
+                        mapData[k].UnitCount.Max = math.max(samples[k].UnitCount.Max, mapData[k].UnitCount.Max)
+                        mapData[k].EntityCount.Min = math.min(samples[k].EntityCount.Min, mapData[k].EntityCount.Min)
+                        mapData[k].EntityCount.Max = math.max(samples[k].EntityCount.Max, mapData[k].EntityCount.Max)
+
+                        -- slowly converge to exclude outliers over time
+                        local avgUnitCount = 0.5 * (mapData[k].UnitCount.Min + mapData[k].UnitCount.Max)
+                        local avgEntityCount = 0.5 * (mapData[k].EntityCount.Min + mapData[k].EntityCount.Max)
+
+                        -- linear interpolation
+                        mapData[k].UnitCount.Min = 0.9 * mapData[k].UnitCount.Min + 0.1 * avgUnitCount
+                        mapData[k].UnitCount.Max = 0.9 * mapData[k].UnitCount.Max + 0.1 * avgUnitCount
+                        mapData[k].EntityCount.Min = 0.9 * mapData[k].EntityCount.Min + 0.1 * avgEntityCount
+                        mapData[k].EntityCount.Max = 0.9 * mapData[k].EntityCount.Max + 0.1 * avgEntityCount
+
+                        mapData[k].Samples = mapData[k].Samples + samples[k].Samples
+                    else
+                        -- first time at this rate, just take them as ground truth
+                        mapData[k].UnitCount = { }
+                        mapData[k].EntityCount = { }
+
+                        mapData[k].UnitCount.Min = samples[k].UnitCount.Min
+                        mapData[k].UnitCount.Max = samples[k].UnitCount.Max
+                        mapData[k].EntityCount.Min = samples[k].EntityCount.Min
+                        mapData[k].EntityCount.Max = samples[k].EntityCount.Max
+                        mapData[k].Samples = samples[k].Samples
+                    end
+                end
+            end
+
+            mapData.Samples = mapData.Samples + 1
+        else  
+            -- use as ground truth
+            data[identifier] = samples
+            data[identifier].Samples = 1
         end
 
-        SetPreference('PerformanceTrackingV1', pref)
+        reprsl(data)
+
+        SetPreference('PerformanceTrackingV1', data)
     end
 
     WaitSeconds(1.0)
 
-    -- # Populate meta data
-
-    performance.map = session.name
-    performance.mapVersion = session.map_version or 1
-
-    for k, army in armies do 
-        if (not army.human) and (not army.civilian) then
-            performance.ai = true
-        end
-    end
-
-    samples = { }
+    local focusArmy = GetFocusArmy()
 
     -- # Add on exit callbacks to store information
 
@@ -753,14 +647,63 @@ local function PerformanceTrackingThread()
     while true do
 
         -- wait ten seconds between a sample. The wait depends on frame time which is unstable.
-        for k = 1, timePerSample do 
-            WaitSeconds(0.1)
-        end
+        WaitSeconds(1.0)
 
-        -- refresh their state and make a sample
+        -- # Refresh state of data
+
         clients = GetSessionClients()
         engineStats = __EngineStats
-        AddSample(armies, clients, engineStats)
+
+        -- # Retrieve sim rate
+
+        local rate = 0
+        local army = armies[focusArmy]
+        for k, client in clients do 
+            if client.name == army.nickname then
+                rate = client.maxSP or -1
+            end
+        end
+
+        rate = math.clamp(rate, -10, 10) + 11
+
+        -- # Retrieve engine statistics
+
+        local unitCount = 0
+        local entityCount = 0
+
+        -- their order is not set in stone, hence the extensive search
+        for k, stat in engineStats.Children do
+            if stat.Name == 'EntityCount' then
+                for _, entry in stat.Children do
+                    if entry.Name == 'Unit' then
+                        unitCount = entry.Value
+                    end
+                end
+
+                entityCount = stat.Value
+            end
+        end
+
+        -- # Track the sample
+
+        LOG("Sampling at rate: " .. tostring(rate))
+
+        local sample = samples[rate]
+        if sample.Samples > 0 then 
+            sample.UnitCount.Min = math.min(sample.UnitCount.Min, unitCount)
+            sample.UnitCount.Max = math.max(sample.UnitCount.Max, unitCount)
+            sample.EntityCount.Min = math.min(sample.EntityCount.Min, entityCount)
+            sample.EntityCount.Max = math.max(sample.EntityCount.Max, entityCount)
+        else 
+            sample.UnitCount = { }
+            sample.EntityCount = { }
+            sample.UnitCount.Min = unitCount
+            sample.UnitCount.Max = unitCount
+            sample.EntityCount.Min = entityCount
+            sample.EntityCount.Max = entityCount
+        end
+
+        sample.Samples = sample.Samples + 1
     end
 end
 
