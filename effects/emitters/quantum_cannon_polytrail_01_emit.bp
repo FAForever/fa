@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'quantum_cannon_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 5.0,
+    Size = 0.15,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 0.1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/quantum_cannon_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_trail_03.dds',
+}
+

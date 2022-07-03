@@ -25,6 +25,7 @@
     -- SetName(string name)
     -- Dump()
 
+---@class Control : moho.control_methods
 Control = Class(moho.control_methods) {
 
     -- reset the control's layout to the defaults, in this case
@@ -48,6 +49,10 @@ Control = Class(moho.control_methods) {
         self._isDisabled = false
     end,
 
+    -- The function is called when event occurs for this control.
+    -- If returns false then calls parent HandleEvent
+    -- If returns true then doesn't
+    -- Requires HitTest to be true
     HandleEvent = function(self, event)
         return false
     end,

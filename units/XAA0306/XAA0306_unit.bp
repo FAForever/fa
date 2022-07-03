@@ -1,7 +1,6 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
         TargetBones = {
             'XAA0306',
         },
@@ -81,15 +80,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Air',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
         },
     },
     BuildIconSortPriority = 30,
@@ -296,7 +286,7 @@ UnitBlueprint {
             HeadingArcCenter = 0,
             HeadingArcRange = 30,
             Label = 'Bomb',
-            MaxRadius = 32,#42
+            MaxRadius = 32,--42
             MinRadius = 4,
             MuzzleSalvoDelay = 0.4,
             MuzzleSalvoSize = 4,
@@ -320,7 +310,6 @@ UnitBlueprint {
             RackSalvoSize = 2,
             RackSlavedToTurret = false,
             RateOfFire = 0.08,
-            TargetCheckInterval = 2.5,
             TargetPriorities = {
                 'CRUISER',
                 '(NAVAL * TECH2 * SHIELD)',
@@ -333,7 +322,7 @@ UnitBlueprint {
                 'MOBILE',
                 '(STRUCTURE * DEFENSE * ANTIAIR)',
                 '(STRUCTURE * DEFENSE - ANTIMISSILE)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE, HOVER',
             TurretDualManipulators = false,

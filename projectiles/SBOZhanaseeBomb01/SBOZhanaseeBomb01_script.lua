@@ -5,7 +5,7 @@
 --
 --  Summary  :  Zhanasee Bomb script, used on XSA0304
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 local SZhanaseeBombProjectile = import('/lua/seraphimprojectiles.lua').SZhanaseeBombProjectile
 local DefaultExplosion = import('/lua/defaultexplosions.lua')

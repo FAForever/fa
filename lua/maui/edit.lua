@@ -34,6 +34,7 @@ local Control = import('control.lua').Control
 local AddUnicodeCharToEditText = import('/lua/UTF.lua').AddUnicodeCharToEditText
 local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
+---@class Edit : moho.edit_methods, Control
 Edit = Class(moho.edit_methods, Control) {
 
     __init = function(self, parent, debugname)

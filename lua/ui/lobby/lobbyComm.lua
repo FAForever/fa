@@ -45,6 +45,7 @@ function GetDefaultPlayerOptions(playerName)
     }
 end
 
+---@class DiscoveryService
 DiscoveryService = Class(moho.discovery_service_methods) {
     RemoveGame = function(self, index)
                      LOG('DiscoveryService.RemoveGame(' .. tostring(index) .. ')')
@@ -65,6 +66,7 @@ function CreateDiscoveryService()
     return service
 end
 
+---@class LobbyComm : moho.lobby_methods
 LobbyComm = Class(moho.lobby_methods) {
 
     --  General events you should override

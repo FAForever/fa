@@ -1,0 +1,11 @@
+BeamBlueprint {
+    Lifetime = 3.0,
+    TextureName = '/textures/particles/transport_beam_03.dds',
+    Thickness = 0.853,
+    StartColor = {x=0.1,y=0.1,z=0.15,w=0}, -- R,G,B,GLOW
+    EndColor = {x=0.0,y=0.0,z=0,w=0}, -- R,G,B,GLOW
+    Length = -0.3,
+    UShift = 0.0,
+    VShift = -0.15,
+    RepeatRate= 0.0,
+}

@@ -1,0 +1,169 @@
+EmitterBlueprint {
+	BlueprintId = 'tt_water02_surface03_01',
+	Lifetime = 50.00,
+	Repeattime = 50.00,
+	TextureFramecount = 1.00,
+	Blendmode = 0.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = 100.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = true,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = true,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = -99.00,
+	Texture = '/textures/particles/water_splash_alpha_10.dds',
+	RampTexture = '/textures/particles/ramp_white_01.dds',
+	XDirectionCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=28.970,y=0.000,z=0.100 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.989,y=0.100,z=0.100 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=0.000,z=0.100 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=0.000,y=10.714,z=0.000 },
+			{ x=3.694,y=6.429,z=0.000 },
+			{ x=5.013,y=2.619,z=0.000 },
+			{ x=6.728,y=4.524,z=0.000 },
+			{ x=9.499,y=5.619,z=0.000 },
+			{ x=11.609,y=4.524,z=0.000 },
+			{ x=13.325,y=3.095,z=0.000 },
+			{ x=14.248,y=7.048,z=0.000 },
+			{ x=16.755,y=4.048,z=0.000 },
+			{ x=17.942,y=3.619,z=0.000 },
+			{ x=19.921,y=4.048,z=0.000 },
+			{ x=22.296,y=7.619,z=0.000 },
+			{ x=24.670,y=3.095,z=0.000 },
+			{ x=27.309,y=2.619,z=0.000 },
+			{ x=29.024,y=5.034,z=0.000 },
+			{ x=32.850,y=3.190,z=0.000 },
+			{ x=35.620,y=7.619,z=0.000 },
+			{ x=38.127,y=4.190,z=0.000 },
+			{ x=40.106,y=5.619,z=0.000 },
+			{ x=42.744,y=3.667,z=0.000 },
+			{ x=44.855,y=8.619,z=0.000 },
+			{ x=46.174,y=7.667,z=0.000 },
+			{ x=48.153,y=5.143,z=0.000 },
+			{ x=49.868,y=4.190,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=24.934,y=11.000,z=0.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.066,y=-0.010,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=21.300,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=0.000,z=3.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.070,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=0.000,y=1.190,z=1.500 },
+			{ x=25.000,y=0.000,z=4.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=26.913,y=0.582,z=0.125 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.462,y=0.852,z=0.200 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=0.000,z=1.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 50.00,
+		Keys = {
+			{ x=25.000,y=0.000,z=0.000 },
+		},
+	},
+}
+

@@ -1,0 +1,13 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'TMeshOuterCloud',
+            AlbedoName = 'Plume02_Glow.dds',
+            NormalsName = 'Plume02_Alpha.dds',
+            LODCutoff = -1.0,
+        },
+    },
+    --UniformScale = 0.229,
+}
+
+

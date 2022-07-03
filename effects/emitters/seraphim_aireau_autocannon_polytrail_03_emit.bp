@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_aireau_autocannon_polytrail_03',
+	Lifetime = -1.00,
+    TrailLength = 4,
+    Size = 0.5,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RampTexture = '/textures/particles/ser_aireau_munition_03.dds',
+	RepeatTexture = '/textures/particles/ramp_phalanx_munition_01.dds',
+}

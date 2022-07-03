@@ -1,0 +1,8 @@
+BeamBlueprint {
+    Lifetime = 3.0,
+    TextureName = '/textures/particles/beam_cyan_03.dds',
+    Length = 1.5,
+    Thickness = 0.05,
+    StartColor = {x=0.39,y=0,z=0.6,w=0.09}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0.05}, -- R,G,B,A
+}

@@ -1,3 +1,4 @@
+-- used by xab2307
 EmitterBlueprint {
     BlueprintId = 'aeon_quanticcluster_fxtrail_02',
     Lifetime = -1.00,
@@ -10,9 +11,9 @@ EmitterBlueprint {
     AlignRotation = false,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = -1.00,
+    LODCutoff = -1.00, -- t3 / t4 artillery
     EmitIfVisible = true,
-    CatchupEmit = false,
+    CatchupEmit = true,
     CreateIfVisible = false,
     SnapToWaterline = false,
     OnlyEmitOnWater = false,
@@ -23,8 +24,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/cloud_smoke_alpha_14.dds]],
-    RampTexture = [[/textures/particles/ramp_blue_20.dds]],
+    Texture = '/textures/particles/cloud_smoke_alpha_14.dds',
+    RampTexture = '/textures/particles/ramp_blue_20.dds',
     XDirectionCurve = {
         XRange = 0.10,
         Keys = {

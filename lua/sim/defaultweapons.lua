@@ -10,6 +10,7 @@ local Game = import('/lua/game.lua')
 local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleration.lua').CalculateBallisticAcceleration
 
 -- Most weapons derive from this class, including beam weapons later in this file
+---@class DefaultProjectileWeapon: Weapon
 DefaultProjectileWeapon = Class(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
@@ -208,19 +209,8 @@ DefaultProjectileWeapon = Class(Weapon) {
 
     -- Played when a muzzle is fired. Mostly used for muzzle flashes
     PlayFxMuzzleSequence = function(self, muzzle)
-
-        local ok, msg = pcall (
-            function()
-                for k, v in self.FxMuzzleFlash do
-                    CreateAttachedEmitter(self.unit, muzzle, self.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
-                end
-            end
-        )
-
-        if not ok then 
-            WARN(msg)
-            LOG(self.Blueprint.BlueprintId)
-            LOG(self.unit.Blueprint.BlueprintId)
+        for k, v in self.FxMuzzleFlash do
+            CreateAttachedEmitter(self.unit, muzzle, self.Army, v):ScaleEmitter(self.FxMuzzleFlashScale)
         end
     end,
 
@@ -880,6 +870,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     },
 }
 
+---@class KamikazeWeapon : Weapon
 KamikazeWeapon = Class(Weapon) {
     OnFire = function(self)
         local myBlueprint = self.Blueprint
@@ -889,6 +880,7 @@ KamikazeWeapon = Class(Weapon) {
     end,
 }
 
+---@class BareBonesWeapon : Weapon
 BareBonesWeapon = Class(Weapon) {
     Data = {},
 
@@ -901,6 +893,7 @@ BareBonesWeapon = Class(Weapon) {
     end,
 }
 
+---@class OverchargeWeapon : DefaultProjectileWeapon
 OverchargeWeapon = Class(DefaultProjectileWeapon) {
     NeedsUpgrade = false,
     AutoMode = false,
@@ -1074,6 +1067,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     }
 }
 
+---@class DefaultBeamWeapon : DefaultProjectileWeapon
 DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
@@ -1298,6 +1292,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 }
 
 local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
+---@class DeathNukeWeapon : BareBonesWeapon
 DeathNukeWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,
@@ -1330,6 +1325,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
     end,
 }
 
+---@class SCUDeathWeapon : BareBonesWeapon
 SCUDeathWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,

@@ -1,0 +1,146 @@
+-- used by ueb1101
+EmitterBlueprint {
+	BlueprintId = 'economy_electricity_01',
+	Lifetime = -1.00,
+	Repeattime = 4.00,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = true,
+	LODCutoff = 150.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	InterpolateEmission = true,
+	TextureStripcount = 4.00,
+	SortOrder = 0.00,
+	Texture = '/textures/particles/electricity_bolts_add_01.dds',
+	RampTexture = '/textures/particles/ramp_blue_02.dds',
+	XDirectionCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=1.50,z=0.00 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=2.00,z=0.50 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.10,z=0.00 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	SizeCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.18,y=0.00,z=0.00 },
+		},
+	},
+	XPosCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	YPosCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.02,y=0.00,z=0.35 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.25,z=0.05 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.25,z=0.05 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=1.20,y=180.00,z=360.00 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.06,y=0.00,z=0.00 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=1.93,y=2.00,z=4.00 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 4.00,
+		Keys = {
+			{ x=2.00,y=0.00,z=0.00 },
+		},
+	},
+}
+

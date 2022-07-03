@@ -21,7 +21,7 @@ Copy the contents of `repository/setup/bin` into the `bin` folder. Open `init_de
 local locationOfRepository = 'your-fa-repository-location'
 ```
 
-Change that to match the path to the `repository` on your system. You can start the game by calling `start_dev.bat` or `start_dev.sh`. You can inspect them to find out what they do. When you use the scripts the game will start with your `repository` as a source. 
+Change that to match the path to the `repository` on your system. You can start the game by calling `dev_windows.bat` or `dev_linux.sh`. You can inspect them to find out what they do. When you use the scripts the game will start with your `repository` as a source.
 
 Base game files
 ---------------

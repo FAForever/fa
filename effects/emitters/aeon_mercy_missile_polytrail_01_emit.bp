@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_mercy_missile_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 4.75,
+    Size = 0.175,
+    SortOrder = 0.1,
+    BlendMode = 3,
+    TextureRepeatRate = 0.25,
+    LODCutoff = 200,
+	RepeatTexture = '/textures/particles/trail_aeon_01.dds',
+	RampTexture = '/textures/particles/ramp_blue_17.dds',
+}
+

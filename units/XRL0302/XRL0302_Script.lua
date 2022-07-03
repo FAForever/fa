@@ -13,10 +13,25 @@ local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
 --- A unique death weapon for the Fire Beetle
 local DeathWeaponKamikaze = Class(Weapon) {
+    OnFire = function(self)
+        -- do regular death weapon of unit if we didn't already
+        if not self.unit.Dead then 
+            self.unit:Kill()
+        end
+    end,
+}
+
+--- A unique death weapon for the Fire Beetle
+local DeathWeaponEMP = Class(Weapon) {
 
     FxDeath = EffectTemplate.CMobileKamikazeBombExplosion,
 
-    OnFire = function(self)
+    OnCreate = function(self)
+        Weapon.OnCreate(self)
+        self:SetWeaponEnabled(false)
+    end,
+
+    Fire = function(self)
 
         -- get information
         local blueprint = self:GetBlueprint()
@@ -39,29 +54,10 @@ local DeathWeaponKamikaze = Class(Weapon) {
             CreateDecal( position, rotation, 'scorch_010_albedo', '', 'Albedo', 11, 11, 250, 120, army)
         end
 
-        -- do regular death weapon of unit if we didn't already
-        if not self.unit.Dead then 
-            self.unit:DoDeathWeapon()
-        end
-
-        -- do damage
+        -- do the damage
         DamageArea(self.unit, position, blueprint.DamageRadius, blueprint.Damage, blueprint.DamageType or 'Normal', blueprint.DamageFriendly or false)
         self.unit:PlayUnitSound('Destroyed')
         self.unit:Destroy()
-    end,
-}
-
---- A unique death weapon for the Fire Beetle
-local DeathWeaponEMP = Class(Weapon) {
-    OnCreate = function(self)
-        Weapon.OnCreate(self)
-        self:SetWeaponEnabled(false)
-    end,
-
-    Fire = function(self)
-        local blueprint = self:GetBlueprint()
-        DamageArea(self.unit, self.unit:GetPosition(), blueprint.DamageRadius,
-                   blueprint.Damage, blueprint.DamageType, blueprint.DamageFriendly)
     end,
 }
 
@@ -96,8 +92,8 @@ XRL0302 = Class(CWalkingLandUnit) {
     OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
 
-        self.EffectsBag = {}
-        self.AmbientExhaustEffectsBag = {}
+        self.EffectsBagXRL = TrashBag()
+        self.AmbientExhaustEffectsBagXRL = TrashBag()
         self.CreateTerrainTypeEffects(self, self.IntelEffects.Cloak, 'FXIdle',  self.Layer, nil, self.EffectsBag)
         self.PeriodicFXThread = self:ForkThread(self.EmitPeriodicEffects)
     end,
@@ -139,14 +135,6 @@ XRL0302 = Class(CWalkingLandUnit) {
             WaitSeconds(3)
         end
     end,
-
-    --- Called when the unit dies - if it dies to some instigator then the suicide weapon is activated.
-    OnKilled = function(self, instigator, type, overkillRatio)
-        CWalkingLandUnit.OnKilled(self, instigator, type, overkillRatio)
-        if instigator then
-            self:GetWeaponByLabel('Suicide'):FireWeapon()
-        end
-    end,
     
     --- Called when the unit dies by Unit.OnKilled.
     DoDeathWeapon = function(self)
@@ -157,14 +145,8 @@ XRL0302 = Class(CWalkingLandUnit) {
         CWalkingLandUnit.DoDeathWeapon(self)
 
         -- clean up some effects
-        if self.EffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'EffectsBag')
-            self.EffectsBag = nil
-        end
-        if self.AmbientExhaustEffectsBag then
-            EffectUtil.CleanupEffectBag(self, 'AmbientExhaustEffectsBag')
-            self.AmbientExhaustEffectsBag = nil
-        end
+        self.EffectsBagXRL:Destroy()
+        self.AmbientExhaustEffectsBagXRL:Destroy()
 
         -- stop the periodice effects
         self.PeriodicFXThread:Destroy()

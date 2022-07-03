@@ -1,13 +1,9 @@
---- Class Prop
--- @classmod Sim.Prop
-
+---@declare-global
+---@class moho.prop_methods
+local Prop = {}
 ---
 --  derived from Entity
 function Prop:base()
 end
 
----
---
-function Prop:moho.prop_methods()
-end
-
+return Prop

@@ -10,7 +10,7 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = 400.00,
+    LODCutoff = 800, -- teleport effect
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -23,8 +23,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/sparkle_02.dds]],
-    RampTexture = [[/textures/particles/ramp_blue_12.dds]],
+    Texture = '/textures/particles/sparkle_02.dds',
+    RampTexture = '/textures/particles/ramp_blue_12.dds',
     XDirectionCurve = {
         XRange = 50.00,
         Keys = {

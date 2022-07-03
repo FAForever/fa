@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'disruptor_cannon_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 6.5,
+    Size = 0.05,
+    SortOrder = 0,
+    BlendMode = 3.0,
+    TextureRepeatRate = .5,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_03.dds',
+	RampTexture = '/textures/particles/ramp_blue_06.dds',
+}

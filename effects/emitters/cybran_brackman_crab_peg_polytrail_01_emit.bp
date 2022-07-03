@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'cybran_brackman_crab_peg_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 5.39,
+    Size = 0.205,
+    SortOrder = -102,
+    BlendMode = 3,
+    TextureRepeatRate = 0.1,
+    LODCutoff = 300,
+	RepeatTexture = '/textures/particles/trail_white_04.dds',
+	RampTexture = '/textures/particles/ramp_white_26.dds',
+}

@@ -36,6 +36,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateSeraphimFactoryBuildingEffects = EffectUtil.CreateSeraphimFactoryBuildingEffects
 
 -- FACTORIES
+---@class SFactoryUnit : FactoryUnit
 SFactoryUnit = Class(FactoryUnit) {
     StartBuildFx = function(self, unitBeingBuilt)
         local BuildBones = self.BuildEffectBones
@@ -216,17 +217,20 @@ SAirFactoryUnit = Class(AirFactoryUnit, SFactoryUnit) {
 }
 
 -- AIR UNITS
+---@class SAirUnit : AirUnit
 SAirUnit = Class(AirUnit) {
     ContrailEffects = {'/effects/emitters/contrail_ser_polytrail_01_emit.bp'}
 }
 
 --  AIR STAGING STRUCTURES
+---@class SAirStagingPlatformUnit : AirStagingPlatformUnit
 SAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 -- WALL  STRUCTURES
 SConcreteStructureUnit = Class(ConcreteStructureUnit) { }
 
 -- Construction Units
+---@class SConstructionUnit : ConstructionUnit
 SConstructionUnit = Class(ConstructionUnit) {
     OnCreate = function(self)
         ConstructionUnit.OnCreate(self)
@@ -289,6 +293,7 @@ SConstructionUnit = Class(ConstructionUnit) {
 }
 
 -- ENERGY CREATION UNITS
+---@class SEnergyCreationUnit : EnergyCreationUnit
 SEnergyCreationUnit = Class(EnergyCreationUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
@@ -301,6 +306,7 @@ SEnergyCreationUnit = Class(EnergyCreationUnit) {
 }
 
 -- ENERGY STORAGE STRUCTURES
+---@class SEnergyStorageUnit : EnergyStorageUnit
 SEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 -- HOVERING LAND UNITS
@@ -377,18 +383,23 @@ SLandFactoryUnit = Class(LandFactoryUnit, SFactoryUnit) {
 SLandUnit = Class(DefaultUnitsFile.LandUnit) {}
 
 -- MASS COLLECTION UNITS
+---@class SMassCollectionUnit : MassCollectionUnit
 SMassCollectionUnit = Class(MassCollectionUnit) {}
 
 -- MASS FABRICATION STRUCTURES
+---@class SMassFabricationUnit : MassFabricationUnit
 SMassFabricationUnit = Class(MassFabricationUnit) {}
 
 -- MASS STORAGE UNITS
+---@class SMassStorageUnit : MassStorageUnit
 SMassStorageUnit = Class(MassStorageUnit) {}
 
 -- RADAR STRUCTURES
+---@class SRadarUnit : RadarUnit
 SRadarUnit = Class(RadarUnit) {}
 
 -- RADAR STRUCTURES
+---@class SSonarUnit : SonarUnit
 SSonarUnit = Class(SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
@@ -458,12 +469,15 @@ SSeaFactoryUnit = Class(SeaFactoryUnit, SFactoryUnit) {
 SSeaUnit = Class(DefaultUnitsFile.SeaUnit) {}
 
 -- SHIELD LAND UNITS
+---@class SShieldHoverLandUnit : ShieldHoverLandUnit
 SShieldHoverLandUnit = Class(ShieldHoverLandUnit) {}
 
 -- SHIELD LAND UNITS
+---@class SShieldLandUnit : ShieldLandUnit
 SShieldLandUnit = Class(ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
+---@class SShieldStructureUnit : ShieldStructureUnit
 SShieldStructureUnit = Class(ShieldStructureUnit) {
     OnShieldEnabled = function(self)
         ShieldStructureUnit.OnShieldEnabled(self)
@@ -485,6 +499,7 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
 }
 
 -- STRUCTURES
+---@class SStructureUnit : StructureUnit
 SStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
@@ -500,15 +515,19 @@ SWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 SWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
+---@class SCivilianStructureUnit : SStructureUnit
 SCivilianStructureUnit = Class(SStructureUnit) {}
 
 -- QUANTUM GATE UNITS
+---@class SQuantumGateUnit : QuantumGateUnit
 SQuantumGateUnit = Class(QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
+---@class SRadarJammerUnit : RadarJammerUnit
 SRadarJammerUnit = Class(RadarJammerUnit) {}
 
 -- Seraphim energy ball units
+---@class SEnergyBallUnit : SHoverLandUnit
 SEnergyBallUnit = Class(SHoverLandUnit) {
     timeAlive = 0,
 

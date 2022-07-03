@@ -1,0 +1,14 @@
+MeshBlueprint {
+    IconFadeInZoom = 130,
+    LODs = {
+        {
+            MeshName = 'uel0001_lod0.scm',
+            AlbedoName = 'uel0001_albedo.dds',
+            NormalsName = 'uel0001_normals.dds',
+            SpecularName = 'uel0001_specteam.dds',
+            LookupName = '/effects/entities/PhaseShield/PhaseShieldLookup.dds',
+            ShaderName = 'PhaseShield',
+            LODCutoff = 195,
+        },
+    },
+}

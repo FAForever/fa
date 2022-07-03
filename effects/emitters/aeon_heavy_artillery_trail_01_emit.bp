@@ -1,4 +1,5 @@
-EmitterBlueprint {
+--  used by uab2302
+    EmitterBlueprint {
     BlueprintId = 'aeon_heavy_artillery_trail_01',
     Lifetime = -1.00,
     Repeattime = 50.00,
@@ -10,12 +11,10 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = -1.00,
+    LODCutoff = -1.00, -- t3 / t4 artillery
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
-    SnapToWaterline = false,
-    OnlyEmitOnWater = false,
     ParticleResistance = false,
     InterpolateEmission = true,
     TextureStripcount = 1.00,
@@ -23,8 +22,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/muzzle_flash_add_03.dds]],
-    RampTexture = [[/textures/particles/ramp_blue_06.dds]],
+    Texture = '/textures/particles/muzzle_flash_add_03.dds',
+    RampTexture = '/textures/particles/ramp_blue_06.dds',
     XDirectionCurve = {
         XRange = 50.00,
         Keys = {

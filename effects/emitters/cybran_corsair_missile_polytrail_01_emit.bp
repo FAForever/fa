@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'cybran_corsair_missile_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 3.5,
+    Size = 0.1,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 0.1,
+    LODCutoff = 300,
+	RepeatTexture = '/textures/particles/nano_dart_trail.dds',
+	RampTexture = '/textures/particles/ramp_red_12.dds',
+}

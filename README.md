@@ -1,5 +1,5 @@
 
-FAF Gametype | FAF Develop game type | FAF Beta balance gametype
+FAF | FAF Develop| FAF Beta balance
  ------------ | ------------- | -----------
 [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffaf)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafdevelop)](https://github.com/FAForever/fa/actions/workflows/build.yaml) | [![Build](https://github.com/FAForever/fa/actions/workflows/build.yaml/badge.svg?branch=deploy%2Ffafbeta)](https://github.com/FAForever/fa/actions/workflows/build.yaml)
 
@@ -21,16 +21,21 @@ This repository contains the changes to the Lua side of the game, such as balanc
 
 Folder          | Description
 --------------- | -----------
+`coderes*`      | Various textures required for the Lua debugger to work
 `effects`       | Blueprints, textures and meshes of effects and HLSL shaders that are used to render the game
 `engine*`       | Engine documentation: all objects and their functions are documented
 `env`           | Props, decals, splats, stratum layer and environmental effects
-`etc*`          | Legacy - a rudimentary implementation of versioning control 
+`etc*`          | Legacy - a rudimentary implementation of versioning control
+`images*`       | Images used by the repository, such as the banner at the top
 `loc`           | Localization files for the game, see the translation guidelines
 `lua`           | Lua files that control all the behavior outside of the physics simulation
 `meshes`        | Meshes that do not belong to props, units or projectiles. E.g. the world border
 `projectiles`   | Blueprint files, textures and meshes of projectiles
+`promotion*`    | Promotion material related to content surrounding the repository
 `props`         | Blueprint files, textures and meshes of props
 `schook`        | Legacy - the **s**upreme **c**ommander **hook** folder that was used due to licensing issues
+`scripts*`      | Scripts used to automate tasks surrounding the game repository
+`setup*`        | Development files that allow you to launch the game using the repository
 `testmaps*`     | Test maps. E.g. the benchmark map shipped with the game
 `tests*`        | Unit tests that run on engine-oblivion functions. E.g. Testing string operations
 `textures`      | Textures used by the engine (as fallback) and UI
@@ -39,11 +44,11 @@ Folder          | Description
 Files that are unchanged are retrieved from the base game. Folders with an asterisk (*) are not shipped to the user with the client. See the installation instructions in the contribution section for more information.
 
 Repositories that are directly related to the game:
- - A [Lua profiler](https://github.com/FAForever/FAFProfiler)
- - A [Lua benchmark tool](https://gitlab.com/supreme-commander-forged-alliance/other/profiler)
- - The [executable patcher](https://github.com/FAForever/FA_Patcher)
- - The [executable patches](https://github.com/FAForever/FA-Binary-Patches)
- - A [debugger](https://github.com/FAForever/FADeepProbe) to help with exceptions 
+ - [Executable patcher](https://github.com/FAForever/FA_Patcher)
+ - [Executable patches](https://github.com/FAForever/FA-Binary-Patches)
+ - [Exception debugger](https://github.com/FAForever/FADeepProbe)
+ - [FA Lua intellisense extension](https://github.com/FAForever/fa-lua-vscode-extension)
+ - [FA Lua intellisense langauge server](https://github.com/FAForever/fa-lua-language-server)
 
 Changelog
 ---------
