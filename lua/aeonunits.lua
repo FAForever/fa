@@ -86,9 +86,7 @@ AAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 ---------------------------------------------------------------
 --  WALL  STRUCTURES
 ---------------------------------------------------------------
-AConcreteStructureUnit = Class(ConcreteStructureUnit) {
-    AdjacencyBeam = false,
-}
+AConcreteStructureUnit = Class(ConcreteStructureUnit) { }
 
 ---------------------------------------------------------------
 --  Construction Units
@@ -103,11 +101,6 @@ AConstructionUnit = Class(ConstructionUnit) {
 --  ENERGY CREATION UNITS
 ---------------------------------------------------------------
 AEnergyCreationUnit = Class(EnergyCreationUnit) {
-    OnCreate = function(self)
-        EnergyCreationUnit.OnCreate(self)
-        self.NumUsedAdjacentUnits = 0
-    end,
-
     OnStopBeingBuilt = function(self,builder,layer)
         EnergyCreationUnit.OnStopBeingBuilt(self, builder, layer)
         if self.AmbientEffects then
