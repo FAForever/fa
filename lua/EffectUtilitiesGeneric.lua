@@ -38,7 +38,7 @@ end
 
 --- Creates all effects in a table at an entity and adds them to a trashbag.
 --- Call `CreateEffectsOpti` if you don't need the effects for later.
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param trashbag TrashBag
@@ -51,7 +51,7 @@ end
 --- Creates all effects in a table, with an offset from an entity.
 --- It does not return a table with all of the effects.
 --- Call `CreateEffectsWithOffsetInTrashbag` if you'd like to capture them.
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param x number
@@ -82,7 +82,7 @@ end
 --- Creates all effects in a table, with random offsets from an entity.
 --- It does not return a table with all of the effects.
 --- Call `CreateEffectsWithRandomOffsetInTrashbag` if you'd like to capture them.
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param xRange number
@@ -97,7 +97,7 @@ end
 --- Creates all effects in a table, with random offsets from an entity, and adds them
 --- to a trashbag.
 --- Call `CreateEffectsWithRandomOffsetOpti` if you don't need the effects for later.
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param xRange number
@@ -113,8 +113,8 @@ end
 --- Creates all effects in a table at an entity's bone.
 --- It does not return a table with all of the effects.
 --- Call `CreateBoneEffectsInTrashbag` if you'd like to capture them.
----@param obj Entity
----@param bone string
+---@param obj Entity | Unit
+---@param bone string | number
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 function CreateBoneEffectsOpti(obj, bone, army, effectTable)
@@ -127,7 +127,7 @@ end
 --- to a trashbag.
 --- Call `CreateBoneEffectsOpti` if you don't need the effects for later.
 ---@param obj Entity
----@param bone string
+---@param bone string | number
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param trashbag TrashBag
@@ -140,8 +140,8 @@ end
 --- Creates all effects in a table at an entity's bone, with offset.
 --- It does not return a table with all of the effects.
 --- Call `CreateBoneEffectsOffsetInTrashbag` if you'd like to capture them.
----@param obj Entity
----@param bone string
+---@param obj Entity | Unit
+---@param bone string | number
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param x number
@@ -156,8 +156,8 @@ end
 --- Creates all effects in a table at an entity's bone, with offset, and adds them
 --- to a trashbag.
 --- Call `CreateBoneEffectsOffsetOpti` if you don't need the effects for later.
----@param obj Entity
----@param bone string
+---@param obj Entity | Unit
+---@param bone string | number
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param x number
@@ -173,7 +173,7 @@ end
 --- Creates a number of random effects out of a table at an entity.
 --- It does not return a table with all of the effects.
 --- Call `CreateRandomEffectsInTrashbag` if you'd like to capture them.
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param numEffects integer number of random effects to create
@@ -187,7 +187,7 @@ end
 --- Creates a number of random effects out of a table at an entity, and adds them
 --- to a trashbag.
 --- Call `CreateRandomEffectsOpti` if you don't need the effects for later.
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army integer
 ---@param effectTable string[] Emitter blueprint names
 ---@param numEffects integer number of random effects to create
@@ -201,7 +201,7 @@ end
 
 --- Played when reclaiming starts.
 ---@param reclaimer Unit Unit that is reclaiming
----@param reclaimed Unit Unit that is reclaimed
+---@param reclaimed Unit | Prop Unit / prop that is being reclaimed
 ---@param buildEffectBones string[] Bones of the reclaimer to create beams from towards the reclaimed
 ---@param effectsBag TrashBag Trashbag that stores the effects
 function PlayReclaimEffects(reclaimer, reclaimed, buildEffectBones, effectsBag)
@@ -234,7 +234,7 @@ end
 
 --- Played when reclaiming has been completed.
 ---@param reclaimer Unit Unit that is reclaiming
----@param reclaimed Unit Unit that is reclaimed (and no longer exists after this effect)
+---@param reclaimed Unit | Prop Unit / prop that is reclaimed
 function PlayReclaimEndEffects(reclaimer, reclaimed)
     -- cache army of reclaiming unit
     army = reclaimer.Army or -1

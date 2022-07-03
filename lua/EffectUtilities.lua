@@ -29,7 +29,7 @@ function CreateEffects(obj, army, EffectTable)
 end
 
 --- Creates all effects in a table, with an offset from an entity
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
 ---@param x number
@@ -45,7 +45,7 @@ function CreateEffectsWithOffset(obj, army, EffectTable, x, y, z)
 end
 
 --- Creates all effects in a table, with random offsets from an entity
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
 ---@param xRange number
@@ -61,8 +61,8 @@ function CreateEffectsWithRandomOffset(obj, army, EffectTable, xRange, yRange, z
 end
 
 --- Creates all effects in a table at an entity's bone
----@param obj Entity
----@param bone string
+---@param obj Entity | Unit
+---@param bone string | number
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
 ---@return moho.IEffect[] emitters
@@ -75,8 +75,8 @@ function CreateBoneEffects(obj, bone, army, EffectTable)
 end
 
 --- Creates all effects in a table at an entity's bone, with offset
----@param obj Entity
----@param bone string
+---@param obj Entity | Unit
+---@param bone string | number
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
 ---@param x number
@@ -92,7 +92,7 @@ function CreateBoneEffectsOffset(obj, bone, army, EffectTable, x, y, z)
 end
 
 --- Creates all effects in a table at each bone in a table for an entity
----@param obj Entity
+---@param obj Entity | Unit
 ---@param BoneTable string[]
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
@@ -105,8 +105,8 @@ function CreateBoneTableEffects(obj, BoneTable, army, EffectTable)
 end
 
 --- Creates all effects in a table at each bone in a table for an entity
----@param obj Entity
----@param BoneTable string[]
+---@param obj Entity | Unit
+---@param BoneTable string[] | number[]
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
 ---@param ScaleMin number
@@ -120,7 +120,7 @@ function CreateBoneTableRangedScaleEffects(obj, BoneTable, EffectTable, army, Sc
 end
 
 --- Creates a number of random effects out of a table at an entity
----@param obj Entity
+---@param obj Entity | Unit
 ---@param army number
 ---@param EffectTable string[] Emitter blueprint names
 ---@param NumEffects integer
@@ -153,13 +153,6 @@ end
 ---@param BuildEffectsBag TrashBag
 function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
 
-    -- -- deprecation warning for more effcient alternative
-    -- if not DeprecatedWarnings.CreateCybranBuildBeams then 
-    --     DeprecatedWarnings.CreateCybranBuildBeams = true 
-    --     WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
-    --     WARN("Source: " .. repr(debug.getinfo(2)))
-    -- end
-
     WaitSeconds(0.2)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
     local BeamEndEntities = {}
@@ -190,19 +183,12 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Build
 end
 
 ---@deprecated
---- Please use SpawnBuildBotsOpti instead
+--- You can use SpawnBuildBotsOpti instead
 ---@param builder Unit
 ---@param unitBeingBuilt Unit
 ---@param BuildEffectsBag any unused
 ---@return Unit[]?
 function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
-
-    -- -- deprecation warning for more effcient alternative
-    -- if not DeprecatedWarnings.SpawnBuildBots then 
-    --     DeprecatedWarnings.SpawnBuildBots = true 
-    --     WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
-    --     WARN("Source: " .. repr(debug.getinfo(2)))
-    -- end
 
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
     -- clamped to a max of 10 to avoid insane FPS drop
@@ -261,19 +247,12 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
 end
 
 ---@deprecated
---- Please use CreateCybranEngineerBuildEffectsOpti instead
+--- You can use CreateCybranEngineerBuildEffectsOpti instead
 ---@param builder Unit
 ---@param BuildBones string[]
 ---@param BuildBots Unit[]
 ---@param BuildEffectsBag TrashBag
 function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildEffectsBag)
-
-    -- -- deprecation warning for more effcient alternative
-    -- if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
-    --     DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
-    --     WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
-    --     WARN("Source: " .. repr(debug.getinfo(2)))
-    -- end
 
     -- Create build constant build effect for each build effect bone defined
     if BuildBones and BuildBots then
@@ -799,7 +778,7 @@ end
 
 --- Creates an enhancement effect at an unit's bone
 ---@param unit Unit
----@param bone string
+---@param bone string | number
 ---@param TrashBag TrashBag
 function CreateEnhancementEffectAtBone(unit, bone, TrashBag)
     for _, vEffect in EffectTemplate.UpgradeBoneAmbient do
@@ -809,7 +788,7 @@ end
 
 --- Creates an enhancement ambient at an unit
 ---@param unit Unit
----@param bone string
+---@param bone string | number
 ---@param TrashBag TrashBag
 function CreateEnhancementUnitAmbient(unit, bone, TrashBag)
     for _, vEffect in EffectTemplate.UpgradeUnitAmbient do
