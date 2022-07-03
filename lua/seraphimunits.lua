@@ -495,10 +495,7 @@ SShieldStructureUnit = Class(ShieldStructureUnit) {
 SStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
-SSubUnit = Class(DefaultUnitsFile.SubUnit) {
-    IdleSubBones = {},
-    IdleSubEffects = {}
-}
+SSubUnit = Class(DefaultUnitsFile.SubUnit) { }
 
 -- TRANSPORT BEACON UNITS
 STransportBeaconUnit = Class(DefaultUnitsFile.TransportBeaconUnit) {}
