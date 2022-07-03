@@ -224,10 +224,7 @@ AStructureUnit = Class(StructureUnit) {}
 ---------------------------------------------------------------
 --  SUBMARINE UNITS
 ---------------------------------------------------------------
-ASubUnit = Class(DefaultUnitsFile.SubUnit) {
-    IdleSubBones = {},
-    IdleSubEffects = {}
-}
+ASubUnit = Class(DefaultUnitsFile.SubUnit) { }
 
 ---------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
