@@ -102,15 +102,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTFA',
@@ -241,8 +232,8 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 10,
-        SizeZ = 10,
+        SizeX = 4,
+        SizeZ = 8,
     },
     General = {
         Category = 'Transport',
@@ -319,6 +310,9 @@ UnitBlueprint {
         Class3AttachSize = 4,
         TransportClass = 10,
         Class1Capacity = 28,
+
+        SlotsMedium = 12,
+        SlotsLarge = 6,
     },
     UseOOBTestZoom = 200,
     Veteran = {

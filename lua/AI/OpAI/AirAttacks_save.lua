@@ -733,7 +733,7 @@ Scenario = {
                                 {type = 2, name = 'APPEND_PlatoonChild', value = 'OSB_Master_AirAttacks'},
                             }},
                         },
-                        ChildrenType = { 'AirSuperiority', 'Gunships', 'Interceptors', },
+                        ChildrenType = { 'AirSuperiority', 'Gunships', 'Bombers', },
                     },
                     ['OSB_Child_AirAttacks_T3Platoon4'] =  {
                         PlatoonTemplate = 'OST_AirAttacks_T3Platoon4',

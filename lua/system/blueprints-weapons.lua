@@ -28,7 +28,6 @@ local function ProcessWeapon(unit, weapon)
     if weapon.DamageType == "DeathExplosion" or weapon.Label == "DeathWeapon" or weapon.Label == "DeathImpact" then 
         weapon.TargetCheckInterval = weaponTargetCheckUpperLimit
         weapon.AlwaysRecheckTarget = false 
-        weapon.ManualFire = true 
         weapon.TrackingRadius = 0.0
         return 
     end
@@ -97,7 +96,6 @@ local function ProcessWeapon(unit, weapon)
         if isBomber then 
             weapon.TrackingRadius = 1.25
         end
-
     end
 
     -- # process target rechecking
@@ -108,8 +106,9 @@ local function ProcessWeapon(unit, weapon)
         -- by default, do not recheck targets as that is expensive when a lot of units are stacked on top of another
         weapon.AlwaysRecheckTarget = false
 
-        -- allow target rechecking for artillery and weapons with a very large attack radius
-        if  weapon.RangeCategory == "UWRC_IndirectFire" or
+        -- allow 
+        if  weapon.RangeCategory == 'UWRC_DirectFire' or
+            weapon.RangeCategory == "UWRC_IndirectFire" or
             weapon.MaxRadius > 50 and (weapon.RangeCategory ~= "UWRC_AntiNavy") then
             weapon.AlwaysRecheckTarget = true
         end
@@ -137,20 +136,21 @@ local function ProcessWeapon(unit, weapon)
 end
 
 function ProcessWeapons(units)
-    for k, unit in units do 
-        if unit.Weapon then 
-            -- LOG("Processing: " .. unit.BlueprintId .. " (" .. tostring(unit.General.UnitName) .. ")")
-            for k, weapon in unit.Weapon do 
-                if not weapon.DummyWeapon then 
-                    ProcessWeapon(unit, weapon)
-                else
-                    -- LOG("Skipped: "  .. tostring(weapon.DisplayName))
-                end
 
-                -- LOG(" - Weapon label: " .. tostring(weapon.DisplayName))
-                -- LOG(" - - WeaponCheckinterval: " .. tostring(weapon.TargetCheckInterval))
-                -- LOG(" - - AlwaysRecheckTarget: " .. tostring(weapon.AlwaysRecheckTarget))
-                -- LOG(" - - TrackingRadius: " .. tostring(weapon.TrackingRadius))
+    local StringLower = string.lower
+
+    local unitsToSkip = {
+        daa0206 = true,
+    }
+
+    for k, unit in units do 
+        if not unitsToSkip[StringLower(unit.Blueprint.BlueprintId or "")] then
+            if unit.Weapon then 
+                for k, weapon in unit.Weapon do
+                    if not weapon.DummyWeapon then
+                        ProcessWeapon(unit, weapon)
+                    end
+                end
             end
         end
     end

@@ -97,15 +97,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTFA',
@@ -217,8 +208,8 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 8,
-        SizeZ = 8,
+        SizeX = 3,
+        SizeZ = 5,
     },
     General = {
         Category = 'Transport',

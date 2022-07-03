@@ -199,8 +199,8 @@ Combo = Class(Group) {
 
         -- set the height of the list based on the number of items visible and the font metrics
         self._maxVisibleItems = maxVisibleItems
-        self._visibleItems = LazyVar.Create(1)
-        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) end)
+        self._visibleItems = LazyVar.Create()
+        self._list.Height:Set(function() return self._visibleItems() * (self._text.FontAscent() + self._text.FontDescent() + self._text.FontExternalLeading()) + 1 end)
         self._dropdown.Height:Set(function() return self._list.Height() + ddum.Height() + ddlm.Height() end)
 
         -- set up button logic
