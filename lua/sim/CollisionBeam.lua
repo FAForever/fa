@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  :
 -- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 --
 -- CollisionBeam is the simulation (gameplay-relevant) portion of a beam. It wraps a special effect
@@ -14,6 +14,7 @@
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
+---@class CollisionBeam : moho.CollisionBeamEntity
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     FxBeam = {},

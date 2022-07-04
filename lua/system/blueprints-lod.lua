@@ -1,4 +1,4 @@
-
+---@declare-global
 local MathSqrt = math.sqrt
 
 --- Calculates the LODs of a single prop
@@ -10,6 +10,9 @@ local function CalculateLODOfProp(prop)
 
     -- give more emphasis to the x / z value as that is easier to see in the average camera angle
     local weighted = 0.40 * sx + 0.2 * sy + 0.4 * sz 
+    if prop.ScriptClass == 'Tree' or prop.ScriptClass == 'TreeGroup' then 
+        weighted = 3 
+    end
 
     -- 1 -> ~ 330
     -- 2 -> ~ 470
@@ -18,7 +21,7 @@ local function CalculateLODOfProp(prop)
     -- 5 -> ~ 750
     -- 6 -> ~ 820
     -- https://www.desmos.com/calculator/amw5fi5569 (1.5 * sqrt(100 * 500 * x))
-    local lod = 1.45 * MathSqrt(100 * 500 * weighted)
+    local lod = 1.30 * MathSqrt(100 * 500 * weighted)
     
     if prop.Display and prop.Display.Mesh and prop.Display.Mesh.LODs then
 
@@ -53,33 +56,8 @@ local function CalculateLODsOfProps(props)
     end
 end
 
---- Calculates the LODs of a single emitter
--- @param emitter Emitter to compute the LODs for
-local function CalculateLODOfEmitter(emitter)
-    if 
-        -- if the LOD is set to infinity
-        emitter.LODCutoff == -1 and 
-
-        -- and this is not an emitter from a mod
-        not string.find(emitter.BlueprintId, "mods") 
-    then 
-        -- then we can safely set it to 160
-        emitter.LODCutoff = 160
-    end
-end
-
---- Defaults the LOD of emitters if it is not set
--- @param emitters List of emitters to tweak the LODs for
-local function CalculateLODsOfEmitters(emitters)
-    for k, emitter in emitters do 
-        CalculateLODOfEmitter(emitter)
-    end
-end
-
 --- Calculates the LODs of all entities
 -- @param bps All available blueprints
 function CalculateLODs(bps)
     CalculateLODsOfProps(bps.Prop)
-    CalculateLODsOfEmitters(bps.Emitter)
-    CalculateLODsOfEmitters(bps.TrailEmitter)
 end

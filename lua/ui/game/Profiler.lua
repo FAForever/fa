@@ -155,6 +155,7 @@ function OpenWindow()
     if not (gameHasAIs or cheatsOn or isThisJip) then
         WARN("Unable to open Profiler window: no AIs or no cheats")
         return
+
     end
 
     -- make hotkey act as a toggle
@@ -204,6 +205,7 @@ function CloseWindow()
     end
 end
 
+---@class ProfilerWindow : Window
 ProfilerWindow = Class(Window) {
     __init = function(self, parent)
         Window.__init(self, parent, "Profiler", false, false, false, true, false, "profiler2", {

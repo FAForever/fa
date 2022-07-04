@@ -1,5 +1,6 @@
---- Class UnitWeapon
--- @classmod Sim.UnitWeapon
+---@declare-global
+---@class moho.weapon_methods
+local UnitWeapon = {}
 
 ---
 --  UnitWeapon:CanFire()
@@ -156,8 +157,4 @@ end
 function UnitWeapon:WeaponHasTarget()
 end
 
----
---
-function UnitWeapon:moho.weapon_methods()
-end
-
+return UnitWeapon

@@ -71,11 +71,15 @@ optionsOrder = {
     "sound",
 }
 
+local Prefs = import('/lua/user/prefs.lua')
 local SetMusicVolume = import('/lua/UserMusic.lua').SetMusicVolume
 local savedMasterVol = false
 local savedFXVol = false
 local savedMusicVol = false
 local savedVOVol = false
+local nomusicSwitchSet = HasCommandLineArg("/nomusic")
+local savedBgMovie = false
+local noMovieSwitchSet = HasCommandLineArg("/nomovie")
 
 function PlayTestSound()
     local sound = Sound{ Bank = 'Interface', Cue = 'UI_Action_MouseDown' }
@@ -99,6 +103,66 @@ function PlayTestVoice()
     end
 end
 
+local function getMusicVolumeOption()
+
+    if not nomusicSwitchSet then
+
+        -- original option
+        return {
+            title = "<LOC OPTIONS_0027>Music Volume",
+            key = 'music_volume',
+            type = 'slider',
+            default = 100,
+
+            init = function()
+                savedMusicVol = GetVolume("Music")
+                SetMusicVolume(savedMusicVol)
+            end,
+
+            cancel = function()
+                if savedMusicVol then
+                    SetMusicVolume(savedMusicVol)
+                end
+            end,
+
+            set = function(key, value, startup)
+                SetMusicVolume(value / 100)
+                savedMusicVol = value / 100
+            end,
+            update = function(key, value)
+                SetMusicVolume(value / 100)
+            end,
+            custom = {
+                min = 0,
+                max = 100,
+                inc = 1,
+            },
+        }
+
+    else
+        
+        -- replaced option with an "disableable" type. It preserves the original value in config.
+        -- on empty profile it is defaulted to 100 as in original option
+        return {
+            title = "<LOC OPTIONS_0027>Music Volume",
+            key = 'music_volume',
+            type = 'toggle',
+            default = 100,
+            ignore = function(value)
+                return savedMusicVol
+            end,
+            set = function(key, value, startup)
+                savedMusicVol = value
+            end,
+            custom = {
+                states = {
+                    { text = "<LOC _Command_Line_Override>", key = 'overridden' },
+                },
+            },
+        }
+        
+    end
+end
 options = {
     gameplay = {
         title = "<LOC _Gameplay>",
@@ -450,11 +514,22 @@ options = {
                 default = true,
                 set = function(key,value,startup)
                 end,
+                init = function ()
+                    savedBgMovie = Prefs.GetOption("mainmenu_bgmovie")
+                end,
                 custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = false },
-                        {text = "<LOC _On>", key = true },
-                    },
+                    states = (function()
+                        if noMovieSwitchSet then
+                            return {
+                                { text = "<LOC _Command_Line_Override>", key = savedBgMovie },
+                            }
+                        else
+                            return {
+                                { text = "<LOC _Off>", key = false },
+                                { text = "<LOC _On>", key = true },
+                            }
+                        end
+                    end)(),
                 },
             },
             {
@@ -1161,7 +1236,24 @@ options = {
                         {text = "<LOC _On>", key = 1 },
                     },
                 },
-            }
+            },
+
+            {
+                title = "Experimental graphics",
+                key = 'experimental_graphics',
+                type = 'toggle',
+                default = 0,
+                update = function(control,value)
+                end,
+                set = function(key,value,startup)
+                end,
+                custom = {
+                    states = {
+                        {text = "<LOC _Off>", key = 0},
+                        {text = "<LOC _On>", key = 1},
+                    },
+                },
+            },
         },
     },
     sound = {
@@ -1231,36 +1323,7 @@ options = {
                     inc = 1,
                 },
             },
-            {
-                title = "<LOC OPTIONS_0027>Music Volume",
-                key = 'music_volume',
-                type = 'slider',
-                default = 100,
-
-                init = function()
-                    savedMusicVol = GetVolume("Music")
-                    SetMusicVolume(savedMusicVol)
-                end,
-
-                cancel = function()
-                    if savedMusicVol then
-                        SetMusicVolume(savedMusicVol)
-                    end
-                end,
-
-                set = function(key,value,startup)
-                    SetMusicVolume(value / 100)
-                    savedMusicVol = value/100
-                end,
-                update = function(key,value)
-                    SetMusicVolume(value / 100)
-                end,
-                custom = {
-                    min = 0,
-                    max = 100,
-                    inc = 1,
-                },
-            },
+            getMusicVolumeOption(),
             {
                 title = "<LOC OPTIONS_0066>VO Volume",
                 key = 'vo_volume',

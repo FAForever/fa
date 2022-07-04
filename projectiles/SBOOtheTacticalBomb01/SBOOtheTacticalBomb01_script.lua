@@ -5,7 +5,7 @@
 --
 --  Summary  :  Othe Tactical Bomb script, XSA0103
 --
---  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------------------
 
 local SOtheTacticalBomb = import('/lua/seraphimprojectiles.lua').SOtheTacticalBomb

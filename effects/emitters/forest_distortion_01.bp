@@ -1,3 +1,4 @@
+-- used by trees
 EmitterBlueprint {
 	BlueprintId = 'destruction_damaged_fire_distort_01',
 	Lifetime = -1.00,
@@ -23,8 +24,8 @@ EmitterBlueprint {
 	LowFidelity = false,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/distort_ring_02.dds]],
-	RampTexture = [[/textures/particles/ramp_white_premod_01.dds]],
+	Texture = '/textures/particles/distort_ring_02.dds',
+	RampTexture = '/textures/particles/ramp_white_premod_01.dds',
 	XDirectionCurve = {
 		XRange = 15.00,
 		Keys = {

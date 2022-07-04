@@ -2,7 +2,6 @@
 
 
 do
-    local oldGetUnitsInRect = _G.GetUnitsInRect
 
     -- upvalue for performance
     local EntityCategoryFilterDown = EntityCategoryFilterDown
@@ -17,6 +16,7 @@ do
     -- @param brx Bottom right x coordinate.
     -- @param brz Bottom right z coordinate.
     -- @return nil if none found or a table.
+    local oldGetUnitsInRect = _G.GetUnitsInRect
     _G.GetUnitsInRect = function(rtlx, tlz, brx, brz)
 
         -- try and retrieve units
@@ -34,4 +34,37 @@ do
 
         return units
     end
+end
+
+do 
+
+    -- upvalue for performance
+    local Random = Random
+
+    local oldDrawCircle = _G.DrawCircle
+    _G.DrawCircle = function(position, diameter, color)
+
+        -- cause a desync if only one player calls this function
+        Random()
+
+        oldDrawCircle(position, diameter, color)
+    end
+
+    local oldDrawLine = _G.DrawLine
+    _G.DrawLine = function(a, b, color)
+
+        -- cause a desync if only one player calls this function
+        Random()
+
+        oldDrawLine(a, b, color)
+    end
+
+    local oldDrawLinePop = _G.DrawLinePop
+    _G.DrawLinePop = function(a, b, color)
+
+        -- cause a desync if only one player calls this function
+        Random()
+
+        oldDrawLinePop(a, b, color)
+    end 
 end

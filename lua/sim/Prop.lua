@@ -3,6 +3,7 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local PlayReclaimEndEffects = import('/lua/EffectUtilities.lua').PlayReclaimEndEffects
 
 local DeprecatedWarnings = { }
+
 local minimumLabelMass = 10
 
 -- upvalue globals for performance
@@ -43,15 +44,13 @@ local StringGsub = string.gsub
 -- upvalue table functions for performance
 local TableInsert = table.insert
 
-Prop = Class(moho.prop_methods, Entity) {
+---@class Prop : moho.prop_methods
+Prop = Class(moho.prop_methods) {
 
-    -- override the functions provided in the Entity class: we don't need an additional c-object!
-    __init = false,
-    __post_init = false,
-
+    ---@param self Prop
     OnCreate = function(self)
 
-        -- # Caching
+        -- -- Caching
 
         self.Trash = TrashBag()
         self.EntityId = EntityGetEntityId(self)
@@ -59,7 +58,7 @@ Prop = Class(moho.prop_methods, Entity) {
         self.CachePosition = EntityGetPosition(self)
         self.SyncData = { }
 
-        -- # Reclaim values
+        -- -- Reclaim values
 
         -- used by typical props, wrecks have their own mechanism to set its value
         if not self.Blueprint.UnitWreckage then 
@@ -75,7 +74,7 @@ Prop = Class(moho.prop_methods, Entity) {
             )
         end
 
-        -- # Terrain correction
+        -- -- Terrain correction
 
         -- Find props that, for some reason, are below ground at their central bone
         local terrainAltitude = GetTerrainHeight(self.CachePosition[1], self.CachePosition[3])
@@ -86,7 +85,7 @@ Prop = Class(moho.prop_methods, Entity) {
             Warp(self, self.CachePosition) 
         end
 
-        -- # Set health and status
+        -- -- Set health and status
 
         local maxHealth = self.Blueprint.Defense.MaxHealth 
         if maxHealth < 50 then 
@@ -438,11 +437,11 @@ Prop = Class(moho.prop_methods, Entity) {
     -- This should never be called - use the actual value.
     GetCachePosition = function(self)
 
-        if not DeprecatedWarnings.GetCachePosition then 
-            DeprecatedWarnings.GetCachePosition = true 
-            WARN("GetCachePosition is deprecated: use self.CachePosition instead")
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.GetCachePosition then 
+        --     DeprecatedWarnings.GetCachePosition = true 
+        --     SPEW("GetCachePosition is deprecated: use self.CachePosition instead")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         return self.CachePosition
     end,
@@ -450,11 +449,11 @@ Prop = Class(moho.prop_methods, Entity) {
     -- This should never be called - use the actual value. When set to false the prop can't take damage.
     SetCanTakeDamage = function(self, val)
 
-        if not DeprecatedWarnings.SetCanTakeDamage then 
-            DeprecatedWarnings.SetCanTakeDamage = true 
-            WARN("SetCanTakeDamage is deprecated: set self.CanTakeDamage instead")
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetCanTakeDamage then 
+        --     DeprecatedWarnings.SetCanTakeDamage = true 
+        --     SPEW("SetCanTakeDamage is deprecated: set self.CanTakeDamage instead")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.CanTakeDamage = val
     end,
@@ -462,11 +461,11 @@ Prop = Class(moho.prop_methods, Entity) {
     -- This should never be called - use the actual value. When set to false the prop can't be killed.
     SetCanBeKilled = function(self, val)
 
-        if not DeprecatedWarnings.SetCanBeKilled then 
-            DeprecatedWarnings.SetCanBeKilled = true 
-            WARN("SetCanBeKilled is deprecated: set self.SetCanBeKilled instead")
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetCanBeKilled then 
+        --     DeprecatedWarnings.SetCanBeKilled = true 
+        --     SPEW("SetCanBeKilled is deprecated: set self.SetCanBeKilled instead")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.CanBeKilled = val
     end,
@@ -474,11 +473,11 @@ Prop = Class(moho.prop_methods, Entity) {
     -- This should never be called - use the actual value. Retrieves whether the prop can be killed.
     CheckCanBeKilled = function(self, other)
 
-        if not DeprecatedWarnings.CheckCanBeKilled then 
-            DeprecatedWarnings.CheckCanBeKilled = true 
-            WARN("CheckCanBeKilled is deprecated: use self.CheckCanBeKilled instead")
-            WARN("Stacktrace:" .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.CheckCanBeKilled then 
+        --     DeprecatedWarnings.CheckCanBeKilled = true 
+        --     SPEW("CheckCanBeKilled is deprecated: use self.CheckCanBeKilled instead")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         return self.CanBeKilled
     end,

@@ -466,6 +466,29 @@ globalOpts = {
         },
     },
     {
+        default = 1,
+        label = "<LOC lobui_0790>Manual Unit Sharing",
+        help = "<LOC lobui_0791>Are players allowed to manually give units?",
+        key = 'ManualUnitShare',
+        values = {
+            {
+                text = "<LOC _Yes>Yes",
+                help = "<LOC lobui_0792>Manual unit sharing are allowed",
+                key = 'all',
+            },
+            {
+                text = "<LOC lobui_0793>Yes except builders",
+                help = "<LOC lobui_0794>No manual sharing of engineers/factories",
+                key = 'no_builders',
+            },
+            {
+                text = "<LOC _No>No",
+                help = "<LOC lobui_0795>No manual sharing of units",
+                key = 'none',
+            },
+        },
+    },
+    {
         default = 2,
         label = "<LOC aireplace_0001>AI Replacement",
         help = "<LOC aireplace_0002>Toggle AI Replacement if a player disconnects.",

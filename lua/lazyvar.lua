@@ -1,7 +1,11 @@
 --
 -- LazyVar module
 --
-
+local pcall = pcall
+local TableInsert = table.insert
+local iscallable = iscallable
+local ipairs = ipairs
+local setmetatable = setmetatable
 
 local EvalContext = nil
 
@@ -16,7 +20,7 @@ local WeakKeyMeta = { __mode = 'k' }
 ExtendedErrorMessages = false
 
 function LazyVarMetaTable:__call()
-    if self.compute then
+    if self[1]==nil then
         if self.busy then
             error("circular dependency in lazy evaluation for variable " .. (self.trace or ''), 2)
         end
@@ -47,7 +51,7 @@ end
 function LazyVarMetaTable:SetDirty(onDirtyList)
     if self[1]~=nil then
         if self.OnDirty then
-            table.insert(onDirtyList, self)
+            TableInsert(onDirtyList, self)
         end
         self[1] = nil
         local u for u in self.used_by do 
@@ -105,7 +109,7 @@ function LazyVarMetaTable:Destroy()
 end
 
 function Create(initial)
-    result = {&1&4}
+    local result = {&1&4}
     setmetatable(result, LazyVarMetaTable)
     if initial == nil then 
         result[1] = 0

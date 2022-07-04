@@ -5,7 +5,7 @@
 --**
 --**  Summary  : Seraphim T2 Transport Script
 --**
---**  Copyright � 2007 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local explosion = import('/lua/defaultexplosions.lua')

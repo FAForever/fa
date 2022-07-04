@@ -163,11 +163,35 @@ function CreateUI(isReplay)
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')  
 
+    -- enable experimental graphics
+    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2 
+        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
+
+        ForkThread(
+            function() 
+
+                WaitSeconds(1.0)
+
+                LOG("Experimental graphics enabled, use at your own risk: ")
+
+                if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
+                    -- allow meshes and effects to be seen from further away
+                    ConExecute("cam_SetLOD WorldCamera 0.65")
+                end
+
+                if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+
+                    -- improve shadow LOD and resolution
+                    ConExecute("ren_ShadowLOD 1024")
+                    ConExecute("ren_ShadowSize 2048")
+                end
+            end
+        )
+    end
+
     -- keep track of the original focus army
     import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
     OriginalFocusArmy = GetFocusArmy()
-
-
 
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
@@ -207,6 +231,8 @@ function CreateUI(isReplay)
 
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     controls.mfd = mfdControl
+
+    controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
@@ -263,14 +289,6 @@ function CreateUI(isReplay)
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
-    else
-        -- check if we should reduce network delay / lag
-        local clients = GetSessionClients()
-        if table.getsize(clients) <= 1 then
-            if not HasCommandLineArg("/RunWithTheWind") then 
-                ConExecute('net_lag 0')
-            end
-        end
     end
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then

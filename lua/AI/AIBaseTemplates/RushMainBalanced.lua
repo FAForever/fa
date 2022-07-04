@@ -1,21 +1,21 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AIBaseTemplates/RushMainBalanced.lua
-#**
-#**  Summary  : Manage engineers for a location
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AIBaseTemplates/RushMainBalanced.lua
+--**
+--**  Summary  : Manage engineers for a location
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
 BaseBuilderTemplate {
     BaseTemplateName = 'RushMainBalanced',
     Builders = {
-        # ==== ECONOMY ==== #
-        # Factory upgrades
+        -- ==== ECONOMY ==== --
+        -- Factory upgrades
         'T1BalancedUpgradeBuilders',
         'T2BalancedUpgradeBuilders',
 
-        # Engineer Builders
+        -- Engineer Builders
         'EngineerFactoryBuilders',
         'T1EngineerBuilders',
         'T2EngineerBuilders',
@@ -23,48 +23,48 @@ BaseBuilderTemplate {
         'EngineerFactoryConstruction',
         'EngineerFactoryConstruction Balance',
 
-        # Engineer Support buildings
+        -- Engineer Support buildings
         'EngineeringSupportBuilder',
 
-        # Build energy at this base
+        -- Build energy at this base
         'EngineerEnergyBuilders',
 
-        # Build Mass high pri at this base
+        -- Build Mass high pri at this base
         'EngineerMassBuildersHighPri',
 
-        # Extractors
+        -- Extractors
         'Time Exempt Extractor Upgrades',
 
-        # ACU Builders
+        -- ACU Builders
         'Balanced Rush Initial ACU Builders',
         'ACUBuilders',
         'ACUUpgrades',
         'ACUUpgrades - Tech 2 Engineering',
         'ACUUpgrades - Shields',
 
-        # ACU Defense
+        -- ACU Defense
         'T1ACUDefenses',
         'T2ACUDefenses',
         'T2ACUShields',
         'T3ACUShields',
         'T3ACUNukeDefenses',
 
-        # ==== EXPANSION ==== #
+        -- ==== EXPANSION ==== --
         'EngineerExpansionBuildersFull',
         'EngineerExpansionBuildersSmall',
         'EngineerFirebaseBuilders',
 
-        # ==== DEFENSES ==== #
-        #'T1BaseDefenses',
+        -- ==== DEFENSES ==== --
+        --'T1BaseDefenses',
         'T2BaseDefenses',
         'T3BaseDefenses',
 
         'T2MissileDefenses',
         'T2ArtilleryFormBuilders',
 
-        #'T1DefensivePoints',
-        #'T2DefensivePoints',
-        #'T3DefensivePoints',
+        --'T1DefensivePoints',
+        --'T2DefensivePoints',
+        --'T3DefensivePoints',
 
         'T2Shields',
         'ShieldUpgrades',
@@ -73,12 +73,12 @@ BaseBuilderTemplate {
         'T3NukeDefenses',
         'T3NukeDefenseBehaviors',
 
-        #'MiscDefensesEngineerBuilders',
+        --'MiscDefensesEngineerBuilders',
 
-        # ==== NAVAL EXPANSION ==== #
+        -- ==== NAVAL EXPANSION ==== --
         'NavalExpansionBuilders',
 
-        # ==== LAND UNIT BUILDERS ==== #
+        -- ==== LAND UNIT BUILDERS ==== --
         'T1LandFactoryBuilders',
         'T2LandFactoryBuilders',
         'T3LandFactoryBuilders',
@@ -95,7 +95,7 @@ BaseBuilderTemplate {
         'T2ReactionDF',
         'T3ReactionDF',
 
-        # ==== AIR UNIT BUILDERS ==== #
+        -- ==== AIR UNIT BUILDERS ==== --
         'T1AirFactoryBuilders',
         'T2AirFactoryBuilders',
         'T3AirFactoryBuilders',
@@ -111,11 +111,11 @@ BaseBuilderTemplate {
         'T3AntiAirBuilders',
         'BaseGuardAirFormBuilders',
 
-        # ==== UNIT CAP BUILDERS ==== #
+        -- ==== UNIT CAP BUILDERS ==== --
         'UnitCapAirAttackFormBuilders',
         'UnitCapLandAttackFormBuilders',
 
-        # ==== ARTILLERY BUILDERS ==== #
+        -- ==== ARTILLERY BUILDERS ==== --
         'T3ArtilleryGroup',
         'T3ArtilleryFormBuilders',
 
@@ -124,7 +124,7 @@ BaseBuilderTemplate {
         'NukeBuildersEngineerBuilders',
         'NukeFormBuilders',
 
-        # ==== EXPERIMENTALS ==== #
+        -- ==== EXPERIMENTALS ==== --
         'MobileLandExperimentalEngineers',
         'MobileLandExperimentalForm',
 
@@ -159,7 +159,7 @@ BaseBuilderTemplate {
             SCU = 3,
         },
         FactoryCount = {
-            #DUNCAN - Factory number tweaks, was 6, 4, 0, 1
+            --DUNCAN - Factory number tweaks, was 6, 4, 0, 1
             Land = 7,
             Air = 4,
             Sea = 0,
@@ -203,14 +203,14 @@ BaseBuilderTemplate {
         end
 
         if true then
-            #return 1000, 'rushbalanced'
+            --return 1000, 'rushbalanced'
         end
 
-        #If we're playing on an island map, do not use this plan often
+        --If we're playing on an island map, do not use this plan often
         if isIsland then
             return Random(25, 50), 'rushbalanced'
 
-        #DUNCAN - Dont use balanced on small 5km maps
+        --DUNCAN - Dont use balanced on small 5km maps
         elseif mapSizeX > 256 and mapSizeZ > 256 and mapSizeX <= 512 and mapSizeZ <= 512 then
             return Random(75, 100), 'rushbalanced'
 

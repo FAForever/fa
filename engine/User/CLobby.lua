@@ -1,5 +1,6 @@
---- Class CLobby
--- @classmod User.CLobby
+---@declare-global
+---@class moho.lobby_methods
+local CLobby = {}
 
 ---
 --  void CLobby.ConnectToPeer(self,address,name,uid
@@ -86,8 +87,5 @@ end
 function CLobby:SendData(self, targetID, table)
 end
 
----
---
-function CLobby:moho.lobby_methods()
-end
+return CLobby
 

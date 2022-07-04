@@ -1,9 +1,9 @@
 
-# Override
+-- Override
 
 This folder contains overrides to various UI globals as they are inefficient with their current implementation. A
 
-# Memory argument
+-- Memory argument
 
 s an example say we have the function `GetSessionClients`. It returns a table in a similar format to:
 
@@ -47,13 +47,13 @@ table: 11E9C870
 
 And these are unique, as the memory adres they point to are unique too. That shows us that, even when we're on the same frame, it returns a new table because the memory address of the tables are unique. Therefore we cache it and provide an interface for the UI to be updated when the clients are updated.
 
-# Functions that we Override
+-- Functions that we Override
 
 Due to the memory argument:
  - GetArmiesTable
  - GetSessionClients
 
-# Sources
+-- Sources
 
 The number of bytes per entry is based on this article:
  - https://wowwiki-archive.fandom.com/wiki/Lua_object_memory_sizes

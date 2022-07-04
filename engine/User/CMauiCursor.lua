@@ -1,5 +1,6 @@
---- Class CMauiCursor
--- @classmod User.CMauiCursor
+---@declare-global
+---@class moho.cursor_methods
+local CMauiCursor = {}
 
 ---
 --  Cursor:ResetToDefault()
@@ -21,8 +22,4 @@ end
 function CMauiCursor:Show()
 end
 
----
---
-function CMauiCursor:moho.cursor_methods()
-end
-
+return CMauiCursor

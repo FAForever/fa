@@ -1,4 +1,4 @@
-
+---@declare-global
 -- TrashBag is a class to help manage objects that need destruction. You add objects to it with Add().
 -- When TrashBag:Destroy() is called, it calls Destroy() in turn on all its contained objects.
 --
@@ -16,19 +16,25 @@
 -- local TrashBag = TrashBag
 -- local TrashAdd = TrashBag.Add
 -- local TrashDestroy = TrashBag.Destroy
+-- local TrashEmpty = TrashBag.Empty
 
 -- END COPY HERE --
 
-TrashBag = Class {
+-- This threshold is chosen to prevent the construction of effects to trigger the check, 
+-- looking over at /lua/EffectTemplate.lua there can be up to nine emitters (oblivion_cannon_hit_08_emit)
+-- for a given effect.
+
+local TableGetn = table.getn 
+local TableEmpty = table.empty
+
+---@class TrashBag
+TrashBag = ClassSimple {
 
     -- Tell the garbage collector that we're a weak table for our values. If an element is ready to be collected
     -- then we're not a reason for it to remain alive. E.g., we don't care if it got cleaned up earlier.
     -- http://lua-users.org/wiki/GarbageCollectionTutorial
     -- http://lua-users.org/wiki/WeakTablesTutorial
     __mode = 'v',
-
-    -- Keep track of the number of elements in the trash bag
-    Next = 1,
 
     --- Add an entity to the trash bag.
     Add = function(self, entity)
@@ -45,12 +51,7 @@ TrashBag = Class {
         --     return 
         -- end
 
-        -- Keeping track of separate counter for performance (table-loops benchmark). The 
-        -- counter is updated _after_ the table has been set, this is faster because the table
-        -- operation depends on the counter value and doesn't have to wait for it in this case.
-
-        self[self.Next] = entity
-        self.Next = self.Next + 1
+        self[TableGetn(self) + 1] = entity
     end,
 
     --- Destroy all (remaining) entities in the trash bag.
@@ -62,16 +63,17 @@ TrashBag = Class {
         --     return 
         -- end
 
-        -- Check if values are still relevant
-        for k = 1, self.Next - 1 do 
+        -- Remove any value still in the trashbag
+        for k, v in self do
             if self[k] then 
                 self[k]:Destroy()
                 self[k] = nil
             end
         end 
-
-        -- allow us to be re-used, useful for effects
-        self.Next = 1
-    end
+    end,
     
+    -- Check if the trashbag is empty. True if empty, false otherwise
+    Empty = function(self)
+        return TableEmpty(self)
+    end
 }

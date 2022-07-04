@@ -38,6 +38,7 @@ local QuantumGateUnit = DefaultUnitsFile.QuantumGateUnit
 local RadarJammerUnit = DefaultUnitsFile.RadarJammerUnit
 local ShieldSeaUnit = DefaultUnitsFile.ShieldSeaUnit
 local TransportBeaconUnit = DefaultUnitsFile.TransportBeaconUnit
+local AmphibiousLandUnit = DefaultUnitsFile.AmphibiousLandUnit
 
 local EffectUtil = import('EffectUtilities.lua')
 local CreateBuildCubeThread = EffectUtil.CreateBuildCubeThread
@@ -46,6 +47,7 @@ local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 --------------------------------------------------------------
 --  AIR FACTORY STRUCTURES
 --------------------------------------------------------------
+---@class TAirFactoryUnit : AirFactoryUnit
 TAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
@@ -104,22 +106,34 @@ TAirFactoryUnit = Class(AirFactoryUnit) {
 --------------------------------------------------------------
 --  AIR STAGING STRUCTURES
 --------------------------------------------------------------
+---@class TAirStagingPlatformUnit : AirStagingPlatformUnit
 TAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 --------------------------------------------------------------
 --  AIR UNITS
 --------------------------------------------------------------
+---@class TAirUnit : AirUnit
 TAirUnit = Class(AirUnit) {}
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
 --------------------------------------------------------------
+---@class TConcreteStructureUnit : ConcreteStructureUnit
 TConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
 --------------------------------------------------------------
 --  Construction Units
 --------------------------------------------------------------
+---@class TConstructionUnit : ConstructionUnit
 TConstructionUnit = Class(ConstructionUnit) {
+
+    OnStopBeingBuilt = function(self, builder, layer)
+        ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
+        if self.Layer == 'Water' then
+            self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
+        end
+    end,
+
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         -- Different effect if we have building cube
         if unitBeingBuilt.BuildingCube then
@@ -130,7 +144,7 @@ TConstructionUnit = Class(ConstructionUnit) {
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self.AnimationWater then
+        if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -148,7 +162,7 @@ TConstructionUnit = Class(ConstructionUnit) {
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.Blueprint.Display.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else
@@ -164,21 +178,25 @@ TConstructionUnit = Class(ConstructionUnit) {
 --------------------------------------------------------------
 -- ENERGY CREATION STRUCTURES
 --------------------------------------------------------------
+---@class TEnergyCreationUnit : EnergyCreationUnit
 TEnergyCreationUnit = Class(EnergyCreationUnit) {}
 
 --------------------------------------------------------------
 -- ENERGY STORAGE STRUCTURES
 --------------------------------------------------------------
+---@class TEnergyStorageUnit : EnergyStorageUnit
 TEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 --------------------------------------------------------------
 --  HOVER LAND UNITS
 --------------------------------------------------------------
+---@class THoverLandUnit : HoverLandUnit
 THoverLandUnit = Class(HoverLandUnit) {}
 
 --------------------------------------------------------------
 --  LAND FACTORY STRUCTURES
 --------------------------------------------------------------
+---@class TLandFactoryUnit : LandFactoryUnit
 TLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
@@ -192,27 +210,32 @@ TLandFactoryUnit = Class(LandFactoryUnit) {
 --------------------------------------------------------------
 --  LAND UNITS
 --------------------------------------------------------------
+---@class TLandUnit : LandUnit
 TLandUnit = Class(LandUnit) {}
 
 --------------------------------------------------------------
 --  MASS COLLECTION UNITS
 --------------------------------------------------------------
+---@class TMassCollectionUnit : MassCollectionUnit
 TMassCollectionUnit = Class(MassCollectionUnit) {}
 
 --------------------------------------------------------------
 -- MASS FABRICATION STRUCTURES
 --------------------------------------------------------------
+---@class TMassFabricationUnit : MassFabricationUnit
 TMassFabricationUnit = Class(MassFabricationUnit) {}
 
 --------------------------------------------------------------
 -- MASS STORAGE STRUCTURES
 --------------------------------------------------------------
+---@class TMassStorageUnit : MassStorageUnit
 TMassStorageUnit = Class(MassStorageUnit) {}
 
 --------------------------------------------------------------
 --  MOBILE FACTORY UNIT
 --------------------------------------------------------------
-TMobileFactoryUnit = Class(LandUnit) {
+---@class TMobileFactoryUnit : AmphibiousLandUnit
+TMobileFactoryUnit = Class(AmphibiousLandUnit) {
     StartBeingBuiltEffects = function(self, builder, layer)
         self:SetMesh(self:GetBlueprint().Display.BuildMeshBlueprint, true)
         if self:GetBlueprint().General.UpgradesFrom  ~= builder.UnitId then
@@ -225,16 +248,19 @@ TMobileFactoryUnit = Class(LandUnit) {
 --------------------------------------------------------------
 --  RADAR STRUCTURES
 --------------------------------------------------------------
+---@class TRadarUnit : RadarUnit
 TRadarUnit = Class(RadarUnit) {}
 
 --------------------------------------------------------------
 --  SONAR STRUCTURES
 --------------------------------------------------------------
+---@class TSonarUnit : SonarUnit
 TSonarUnit = Class(SonarUnit) {}
 
 --------------------------------------------------------------
 --  SEA FACTORY STRUCTURES
 --------------------------------------------------------------
+---@class TSeaFactoryUnit : SeaFactoryUnit
 TSeaFactoryUnit = Class(SeaFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         WaitSeconds(0.1)
@@ -293,23 +319,28 @@ TSeaFactoryUnit = Class(SeaFactoryUnit) {
 --------------------------------------------------------------
 --  SEA UNITS
 --------------------------------------------------------------
+---@class TSeaUnit : SeaUnit
 TSeaUnit = Class(SeaUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD LAND UNITS
 --------------------------------------------------------------
+---@class TShieldLandUnit : ShieldLandUnit
 TShieldLandUnit = Class(ShieldLandUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD STRUCTURES
 --------------------------------------------------------------
+---@class TShieldStructureUnit : ShieldStructureUnit
 TShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 --------------------------------------------------------------
 --  STRUCTURES
 --------------------------------------------------------------
+---@class TStructureUnit : StructureUnit
 TStructureUnit = Class(StructureUnit) {}
 
+---@class TRadarJammerUnit : RadarJammerUnit
 TRadarJammerUnit = Class(RadarJammerUnit) {
     OnIntelEnabled = function(self)
         if not self.MySpinner then
@@ -329,41 +360,49 @@ TRadarJammerUnit = Class(RadarJammerUnit) {
 --------------------------------------------------------------
 --  SUBMARINE UNITS
 --------------------------------------------------------------
+---@class TSubUnit : SubUnit
 TSubUnit = Class(SubUnit) {}
 
 --------------------------------------------------------------
 --  TRANSPORT BEACON UNITS
 --------------------------------------------------------------
+---@class TTransportBeaconUnit : TransportBeaconUnit
 TTransportBeaconUnit = Class(TransportBeaconUnit) {}
 
 --------------------------------------------------------------
 --  WALKING LAND UNITS
 --------------------------------------------------------------
+---@class TWalkingLandUnit : WalkingLandUnit
 TWalkingLandUnit = Class(WalkingLandUnit) { }
 
 --------------------------------------------------------------
 --  WALL  STRUCTURES
 --------------------------------------------------------------
+---@class TWallStructureUnit : WallStructureUnit
 TWallStructureUnit = Class(WallStructureUnit) {}
 
 --------------------------------------------------------------
 --  CIVILIAN STRUCTURES
 --------------------------------------------------------------
+---@class TCivilianStructureUnit : StructureUnit
 TCivilianStructureUnit = Class(StructureUnit) {}
 
 --------------------------------------------------------------
 --  QUANTUM GATE UNITS
 --------------------------------------------------------------
+---@class TQuantumGateUnit : QuantumGateUnit
 TQuantumGateUnit = Class(QuantumGateUnit) {}
 
 --------------------------------------------------------------
 --  SHIELD SEA UNITS
 --------------------------------------------------------------
+---@class TShieldSeaUnit : ShieldSeaUnit
 TShieldSeaUnit = Class(ShieldSeaUnit) {}
 
 --------------------------------------------------------------
 --  Pod Tower Unit (Kennels)
 --------------------------------------------------------------
+---@class TPodTowerUnit : TStructureUnit
 TPodTowerUnit = Class(TStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         TStructureUnit.OnStopBeingBuilt(self, builder, layer)

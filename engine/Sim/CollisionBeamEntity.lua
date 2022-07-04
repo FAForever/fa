@@ -1,5 +1,6 @@
---- Class CollisionBeamEntity
--- @classmod Sim.CollisionBeamEntity
+---@declare-global
+---@class moho.CollisionBeamEntity
+local CollisionBeamEntity = {}
 
 ---
 --  CollisionBeamEntity:Enable()
@@ -26,3 +27,4 @@ end
 function CollisionBeamEntity:__init()
 end
 
+return CollisionBeamEntity

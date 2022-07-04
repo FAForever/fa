@@ -12,6 +12,7 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 local Builder = import('/lua/sim/Builder.lua')
 local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 
+---@class FactoryBuilderManager : BuilderManager
 FactoryBuilderManager = Class(BuilderManager) {
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain)

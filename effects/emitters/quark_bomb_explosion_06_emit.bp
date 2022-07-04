@@ -1,3 +1,4 @@
+-- used by ueb2302
 EmitterBlueprint {
     BlueprintId = 'quark_bomb_explosion_06',
     Lifetime = 2.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = -1.00,
+    LODCutoff = 300.00,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -23,8 +24,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/sparkle_blue_add_05.dds]],
-    RampTexture = [[/textures/particles/ramp_nuke_04.dds]],
+    Texture = '/textures/particles/sparkle_blue_add_05.dds',
+    RampTexture = '/textures/particles/ramp_nuke_04.dds',
     XDirectionCurve = {
         XRange = 2.00,
         Keys = {
