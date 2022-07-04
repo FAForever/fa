@@ -1,4 +1,4 @@
---*****************************************************************************
+﻿--*****************************************************************************
 --* File: lua/modules/ui/game/commandmode.lua
 --* Author: Chris Blackwell
 --* Summary: Manages the current command mode, which determines what action
