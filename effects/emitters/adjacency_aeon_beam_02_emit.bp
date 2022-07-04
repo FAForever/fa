@@ -1,0 +1,12 @@
+BeamBlueprint {
+    Lifetime = 2,
+    TextureName = '/textures/particles/adjacency_aeon_beam_02.dds',
+    Thickness = 0.035,
+    StartColor = {x=0.4,y=0.6,z=1,w=0.8}, -- R,G,B,Glow
+    EndColor =   {x=0.4,y=0.6,z=1,w=0.8}, -- R,G,B,Glow
+    Blendmode = 3,
+    RepeatRate = 0.4,
+    Length = 8,
+    UShift = 0.0,
+    VShift = -0.16,
+}

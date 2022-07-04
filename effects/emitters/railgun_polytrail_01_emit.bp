@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'railgun_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 1.00,
+    Size = 0.07,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 100,
+	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_railgun_01.dds',
+}
+

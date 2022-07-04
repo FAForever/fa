@@ -34,6 +34,7 @@ ProjectileBlueprint {
                     AlbedoName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_albedo.dds',
                     MeshName = '/projectiles/AANTorpedoChronoPack01/AANTorpedoChronoPack01_lod0.scm',
                     ShaderName = 'TMeshGlow',
+                    LODCutoff = 120,
                 },
             },
         },

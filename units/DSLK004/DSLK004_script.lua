@@ -27,16 +27,16 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_04_emit.bp',
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_05_emit.bp',
         '/Effects/Emitters/seraphim_experimental_phasonproj_muzzle_flash_06_emit.bp',
-        '/units/DSLK004/effects/seraphim_electricity_emit.bp'
+        '/Effects/Emitters/seraphim_electricity_emit.bp'
     },
     FxBeam = {
-        '/units/DSLK004/effects/seraphim_lightning_beam_01_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_beam_01_emit.bp',
     },
     FxBeamEndPoint = {
-        '/units/DSLK004/effects/seraphim_lightning_hit_01_emit.bp',
-        '/units/DSLK004/effects/seraphim_lightning_hit_02_emit.bp',
-        '/units/DSLK004/effects/seraphim_lightning_hit_03_emit.bp',
-        '/units/DSLK004/effects/seraphim_lightning_hit_04_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_01_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_02_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_03_emit.bp',
+        '/Effects/Emitters/seraphim_lightning_hit_04_emit.bp',
     },
 
 
@@ -131,7 +131,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
             local fxBeam
             local bp = self.FxBeam[Random(1, table.getn(self.FxBeam))]
             if self.TargetEntity then
-                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, 0, self.Army, bp)
+                fxBeam = AttachBeamEntityToEntity(self.OriginUnit, self.OriginBone, self.TargetEntity, -2, self.Army, bp)
             else
                 fxBeam = CreateBeamEmitter(bp, self.Army)
                 AttachBeamToEntity(fxBeam, self, 0, self.Army)
@@ -152,7 +152,7 @@ local PhasonCollisionBeam = Class(SCCollisionBeam) {
 
 local PhasonCollisionBeam2 = Class(PhasonCollisionBeam) {
 
-    FxBeam = { '/units/DSLK004/effects/seraphim_lightning_beam_02_emit.bp', },
+    FxBeam = { '/Effects/Emitters/seraphim_lightning_beam_02_emit.bp', },
     TerrainImpactScale = 0.1,
 
     OnImpact = function(self, impactType, targetEntity)
@@ -232,8 +232,8 @@ DSLK004 = Class(SLandUnit) {
         SLandUnit.OnStopBeingBuilt(self,builder,layer)
 
         local EfctTempl = {
-            '/units/DSLK004/effects/orbeffect_01.bp',
-            '/units/DSLK004/effects/orbeffect_02.bp',
+            '/Effects/Emitters/orbeffect_01.bp',
+            '/Effects/Emitters/orbeffect_02.bp',
         }
         for k, v in EfctTempl do
             CreateAttachedEmitter(self, 'Orb', self.Army, v)

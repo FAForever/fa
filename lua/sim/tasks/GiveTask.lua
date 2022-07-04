@@ -5,6 +5,7 @@ local GiveUnitsToPlayer = import('/lua/simutils.lua').GiveUnitsToPlayer
 local SpawnPing = import('/lua/SimPing.lua').SpawnPing
 
 local transferList =  {}
+---@class GiveTask : ScriptTask
 GiveTask = Class(ScriptTask) {
     OnCreate = function(self, commandData)
         ScriptTask.OnCreate(self, commandData)

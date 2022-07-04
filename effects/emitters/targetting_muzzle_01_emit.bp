@@ -10,7 +10,7 @@ EmitterBlueprint {
     AlignRotation = false,
     AlignToBone = true,
     Flat = false,
-    LODCutoff = 100.00,
+    LODCutoff = 150.00,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -23,7 +23,7 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/sparkle_red_add_02.dds]],
+    Texture = '/textures/particles/sparkle_red_add_02.dds',
     XDirectionCurve = {
         XRange = 3.00,
         Keys = {

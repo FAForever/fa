@@ -241,15 +241,15 @@ function CreateChatLines()
     end
     if GUI.chatContainer then
         local curEntries = table.getsize(GUI.chatLines)
-        local neededEntries = math.floor(GUI.chatContainer.Height() / (GUI.chatLines[1].Height() + 2))
+        local neededEntries = math.floor(GUI.chatContainer.Height() / (GUI.chatLines[1].Height() + 0))
         if curEntries - neededEntries == 0 then
             return
         elseif curEntries - neededEntries < 0 then
             for i = curEntries + 1, neededEntries do
                 local index = i
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
-                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
+                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 2 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
         elseif curEntries - neededEntries > 0 then
@@ -273,7 +273,7 @@ function CreateChatLines()
         if not GUI.chatLines[1] then
             GUI.chatLines[1] = CreateChatLine()
             LayoutHelpers.AtLeftTopIn(GUI.chatLines[1], GUI.chatContainer, 0, 0)
-            GUI.chatLines[1].Height:Set(function() return GUI.chatLines[1].name.Height() + 4 end)
+            GUI.chatLines[1].Height:Set(function() return GUI.chatLines[1].name.Height() + 2 end)
             GUI.chatLines[1].Right:Set(GUI.chatContainer.Right)
         end
         local index = 1
@@ -281,8 +281,8 @@ function CreateChatLines()
             index = index + 1
             if not GUI.chatLines[index] then
                 GUI.chatLines[index] = CreateChatLine()
-                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 2)
-                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 4 end)
+                LayoutHelpers.Below(GUI.chatLines[index], GUI.chatLines[index-1], 0)
+                GUI.chatLines[index].Height:Set(function() return GUI.chatLines[index].name.Height() + 2 end)
                 GUI.chatLines[index].Right:Set(GUI.chatContainer.Right)
             end
         end
@@ -1258,7 +1258,9 @@ function CreateConfigWindow()
         br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
         borderColor = 'ff415055',
     }
-    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', nil, windowTextures)
+
+    local defPosition = Prefs.GetFromCurrentProfile('chat_config') or nil
+    GUI.config = Window(GetFrame(0), '<LOC chat_0008>Chat Options', nil, nil, nil, true, true, 'chat_config', defPosition, windowTextures)
     GUI.config.Depth:Set(GetFrame(0):GetTopmostDepth() + 1)
     Tooltip.AddButtonTooltip(GUI.config._closeBtn, 'chat_close')
     LayoutHelpers.AnchorToBottom(GUI.config, GetFrame(0), -700)
@@ -1305,7 +1307,7 @@ function CreateConfigWindow()
                 {type = 'color', name = '<LOC _Links>', key = 'link_color', tooltip = 'chat_color'},
                 {type = 'color', name = '<LOC notify_0033>', key = 'notify_color', tooltip = 'chat_color'},
                 {type = 'splitter'},
-                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 2},
+                {type = 'slider', name = '<LOC chat_0009>Chat Font Size', key = 'font_size', tooltip = 'chat_fontsize', min = 12, max = 18, inc = 1},
                 {type = 'slider', name = '<LOC chat_0010>Window Fade Time', key = 'fade_time', tooltip = 'chat_fadetime', min = 5, max = 30, inc = 1},
                 {type = 'slider', name = '<LOC chat_0011>Window Alpha', key = 'win_alpha', tooltip = 'chat_alpha', min = 20, max = 100, inc = 1},
                 {type = 'splitter'},
@@ -1459,9 +1461,19 @@ function CreateConfigWindow()
         index = index + 1
     end
 
+    local applyBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC OPTIONS_0139>', 16)
+    LayoutHelpers.Below(applyBtn, optionGroup.options[index-1], 4)
+    LayoutHelpers.AtLeftIn(applyBtn, optionGroup)
+    applyBtn.OnClick = function(self)
+        ChatOptions = table.merged(ChatOptions, tempOptions)
+        Prefs.SetToCurrentProfile("chatoptions", ChatOptions)
+        GUI.bg:OnOptionsSet()
+    end
+
     local resetBtn = UIUtil.CreateButtonStd(optionGroup, '/widgets02/small', '<LOC _Reset>', 16)
     LayoutHelpers.Below(resetBtn, optionGroup.options[index-1], 4)
-    LayoutHelpers.AtHorizontalCenterIn(resetBtn, optionGroup)
+    LayoutHelpers.AtRightIn(resetBtn, optionGroup)
+    LayoutHelpers.ResetLeft(resetBtn)
     resetBtn.OnClick = function(self)
         for option, value in defOptions do
             for i, control in optionGroup.options do
@@ -1505,6 +1517,13 @@ function CreateConfigWindow()
 
 
     GUI.config.Bottom:Set(function() return okBtn.Bottom() + 5 end)
+    if defPosition ~= nil then
+        GUI.config.Top:Set(defPosition.top)
+        GUI.config.Left:Set(defPosition.left)
+    else
+        GUI.config.Top:Set(function() return LayoutHelpers.ScaleNumber(90) end)
+    end
+    GUI.config:SetPositionLock(false) -- allow window to be draggable, didn't worked in Window() call
 end
 
 function CloseChatConfig()

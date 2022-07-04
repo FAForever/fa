@@ -1,0 +1,14 @@
+-- used by ueb2302
+TrailEmitterBlueprint {
+	BlueprintId = 'default_polytrail_07',
+	Lifetime = -1.00,
+    TrailLength = 17,
+    Size = 0.1,
+    SortOrder = 0,
+    BlendMode = 0,
+    TextureRepeatRate = 1,
+    LODCutoff = -1, -- t3 / t4 artillery
+	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_white_04.dds',
+}
+

@@ -26,15 +26,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 60,
     Categories = {
         'PRODUCTFA',
@@ -324,7 +315,6 @@ UnitBlueprint {
             RateOfFire = 0.35,
             SlavedToBody = true,
             SlavedToBodyArcRange = 45,
-            TargetCheckInterval = 1,
             TargetPriorities = {
                 'STRUCTURE EXPERIMENTAL',
                 'TECH3 ANTIMISSILE',
@@ -343,10 +333,9 @@ UnitBlueprint {
                 'MOBILE TECH3',
                 'MOBILE TECH2',
                 '(MOBILE * TECH1 + COMMAND)',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Turret_Muzzle',
             TurretBonePitch = 'Turret',
             TurretBoneYaw = 'Turret',

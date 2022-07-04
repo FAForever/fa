@@ -1,0 +1,153 @@
+-- used by billy nuke uel0001 
+EmitterBlueprint {
+	BlueprintId = 'nuke_head_fire_01',
+	Lifetime = 80.00,
+	Repeattime = 80.00,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = 300.00,
+	EmitIfVisible = false,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	ParticleResistance = true,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	Texture = '/textures/particles/fire_cloud_add_02.dds',
+	RampTexture = '/textures/particles/ramp_white_02.dds',
+	XDirectionCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=-0.300,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=39.578,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.634,y=0.000,z=0.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.950,y=1.000,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=45.805,y=92.857,z=0.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=39.050,y=0.018,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=33.245,y=0.154,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.317,y=1.349,z=2.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=0.000,z=10.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.528,y=0.000,z=10.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=39.789,y=5.000,z=2.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=42.955,y=6.667,z=2.000 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=41.162,y=0.000,z=5.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=40.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=41.794,y=1.276,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 80.00,
+		Keys = {
+			{ x=38.733,y=0.500,z=0.000 },
+		},
+	},
+}
+

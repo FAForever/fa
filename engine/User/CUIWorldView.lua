@@ -1,5 +1,6 @@
---- Class CUIWorldView
--- @classmod User.CUIWorldView
+---@declare-global
+---@class moho.UIWorldView
+local CUIWorldView = {}
 
 ---
 --  EnableResourceRendering(bool)
@@ -86,8 +87,4 @@ end
 function CUIWorldView:base()
 end
 
----
---
-function CUIWorldView:moho.UIWorldView()
-end
-
+return CUIWorldView

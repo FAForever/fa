@@ -10,7 +10,7 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = 1000.00,
+    LODCutoff = 400.00,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -23,8 +23,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/water_particle.dds]],
-    RampTexture = [[/textures/particles/ramp_water_01.dds]],
+    Texture = '/textures/particles/water_particle.dds',
+    RampTexture = '/textures/particles/ramp_water_01.dds',
     XDirectionCurve = {
         XRange = 50.00,
         Keys = {

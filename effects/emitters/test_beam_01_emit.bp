@@ -1,0 +1,8 @@
+BeamBlueprint {
+    Lifetime = 3.0,
+    TextureName = '/textures/particles/test_marker_01.dds',
+    Thickness = 0.5,
+    StartColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    Length = 5,
+}

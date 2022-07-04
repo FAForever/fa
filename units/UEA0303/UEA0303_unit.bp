@@ -1,7 +1,7 @@
 UnitBlueprint {
     AI = {
         GuardReturnRadius = 125,
-        GuardScanRadius = 100,
+        GuardScanRadius = 45,       -- 150% of range
     },
     Air = {
         AutoLandTime = 1,
@@ -80,15 +80,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 30,
     Categories = {
         'PRODUCTSC1',
@@ -108,7 +99,7 @@ UnitBlueprint {
     CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 9,
-        ArmorType = 'ASF', # Light
+        ArmorType = 'ASF', -- Light
         EconomyThreatLevel = 0,
         Health = 1800,
         MaxHealth = 1800,
@@ -272,6 +263,11 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.4, 
+            AlwaysRecheckTarget = false, 
+            TrackingRadius = 1.0,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'UEAWeapon',
@@ -295,17 +291,17 @@ UnitBlueprint {
             FiringTolerance = 0,
             Label = 'LeftBeam',
             MaxRadius = 30,
-            MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
+            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoSize = 2,
             MuzzleVelocity = 120,
             ProjectileId = '/projectiles/TDFGinsu01/TDFGinsu01_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
                 {
                     MuzzleBones = {
-                        'Muzzle02',
+                        'Aim',
                     },
-                    RackBone = 'Muzzle02',
+                    RackBone = 'Aim',
                 },
             },
             RackFireTogether = false,
@@ -319,18 +315,14 @@ UnitBlueprint {
             RateOfFire = 1,
             SlavedToBody = true,
             SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
             TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 0,
-            TurretBoneMuzzle = 'Muzzle02',
-            TurretBonePitch = 'Muzzle02',
-            TurretBoneYaw = 'Muzzle02',
+            TurretBoneMuzzle = 'Aim',
+            TurretBonePitch = 'Aim',
+            TurretBoneYaw = 'Aim',
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 55,
@@ -342,77 +334,7 @@ UnitBlueprint {
             UseFiringSolutionInsteadOfAimBone = true,
             WeaponCategory = 'Anti Air',
         },
-        {
-            Audio = {
-                Fire = Sound {
-                    Bank = 'UEAWeapon',
-                    Cue = 'UEA0303_Pulse_Beam',
-                    LodCutoff = 'Weapon_LodCutoff',
-                },
-            },
-            AutoInitiateAttackCommand = true,
-            BallisticArc = 'RULEUBA_None',
-            CannotAttackGround = true,
-            CollideFriendly = false,
-            Damage = 200,
-            DamageFriendly = false,
-            DamageRadius = 0,
-            DamageType = 'Normal',
-            DisplayName = 'Ginsu Pulse Beam',
-            FireTargetLayerCapsTable = {
-                Air = 'Air|Land|Water',
-                Land = 'Air|Land|Water',
-            },
-            FiringTolerance = 0,
-            Label = 'RightBeam',
-            MaxRadius = 30,
-            MuzzleSalvoDelay = 0,
-            MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
-            PrefersPrimaryWeaponTarget = true,
-            ProjectileId = '/projectiles/TDFGinsu01/TDFGinsu01_proj.bp',
-            ProjectileLifetimeUsesMultiplier = 1.25,
-            RackBones = {
-                {
-                    MuzzleBones = {
-                        'Muzzle01',
-                    },
-                    RackBone = 'Muzzle01',
-                },
-            },
-            RackFireTogether = false,
-            RackRecoilDistance = 0,
-            RackReloadTimeout = 10,
-            RackSalvoChargeTime = 0,
-            RackSalvoReloadTime = 0,
-            RackSalvoSize = 1,
-            RackSlavedToTurret = false,
-            RangeCategory = 'UWRC_AntiAir',
-            RateOfFire = 1,
-            SlavedToBody = true,
-            SlavedToBodyArcRange = 50,
-            TargetCheckInterval = 0.5, # 0.3
-            TargetPriorities = {
-                'AIR MOBILE',
-                'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
-            },
-            TargetRestrictDisallow = 'UNTARGETABLE,LAND,POD,STRUCTURE,NAVAL',
-            TargetRestrictOnlyAllow = 'AIR',
-            TurretBoneMuzzle = 'Muzzle01',
-            TurretBonePitch = 'Muzzle01',
-            TurretBoneYaw = 'Muzzle01',
-            TurretDualManipulators = false,
-            TurretPitch = 0,
-            TurretPitchRange = 55,
-            TurretPitchSpeed = 360,
-            TurretYaw = 0,
-            TurretYawRange = 55,
-            TurretYawSpeed = 360,
-            Turreted = true,
-            UseFiringSolutionInsteadOfAimBone = true,
-            WeaponCategory = 'Anti Air',
-        },
+       
         {
             AboveWaterTargetsOnly = true,
             Damage = 200,

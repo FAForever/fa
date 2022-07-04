@@ -6,8 +6,5 @@
 function CBoneEntityManipulator:base()
 end
 
----
---
-function CBoneEntityManipulator:moho.BoneEntityManipulator()
-end
+
 

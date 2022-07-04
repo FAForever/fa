@@ -1,4 +1,4 @@
-
+---@declare-global
 --- Class structure
 
 -- Simple class
@@ -33,9 +33,20 @@
 -- - state
 -- - class 
 
+--- look up hierarchy to help determine the relationships between classes. 
+
+-- function: 1E0F3E00 (OnDestroy, id = 1) = { base instance }
+-- function: 1F45AA80 (OnGotTarget, id = 1) = { base instance }
+-- function: 1F3902D8 (OnCreate, id = 1) = { function: 1F37B500 (OnCreate, id = 1) }
+-- function: 1F40F0E0 (OnKilled, id = 1) = { function: 1F3D3EE0 (OnKilled, id = 1) }
+-- function: 1DE7E1C0 (BuilderParamCheck, id = 1) = { base instance }
+
+-- It allows us to track a function back to the base instance.
+local Hierarchy = { }
+
 --- Debug utilities
 
-local debug = false 
+local enableDebugging = false 
 
 local HierarchyDebugLookup = { }
 local HierarchyDebugLookupCFunctions = { }
@@ -51,9 +62,9 @@ local function PrintHierarchy()
         if HierarchyDebugLookupCFunctions[key] then 
             return "base instance (cfunction)"
         elseif HierarchyDebugLookup[key] then 
-            return tostring(key) .. " (" .. tostring(HierarchyDebugLookup[key].func)  .. ", id = " .. tostring(HierarchyDebugLookup[key].identity) .. ")"
+            return tostring(key) .. " (" .. tostring(HierarchyDebugLookup[key].func)  .. ", id = " .. tostring(HierarchyDebugLookup[key].identity) .. ", type = " .. tostring(HierarchyDebugLookup[key].type) .. ")"
         else 
-            return "base instance (lua function)"
+            return "base instance (lua function or table)"
         end
     end
 
@@ -79,6 +90,7 @@ local unpack = unpack
 local getmetatable = getmetatable
 local setmetatable = setmetatable
 
+local TableInsert = table.insert
 local TableEmpty = table.empty 
 local TableGetn = table.getn 
 
@@ -109,8 +121,15 @@ local function IsSimpleClass(arg)
     return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
 end
 
+---@class fa-class: table
+---@field __init? fun(self, ...)
+---@field __post_init? fun(self, ...)
+
 --- Prepares the construction of a state, , referring to the paragraphs of text at the top of this file.
 local StateIdentifier = 0
+---@generic T: fa-class
+---@param ... T
+---@return T
 function State(...)
 
     -- arg = { 
@@ -145,6 +164,10 @@ function State(...)
 end
 
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
+---construct a class
+---@generic T: fa-class
+---@vararg table?
+---@return fun(specs: T): T
 function Class(...)
 
     -- arg = { 
@@ -178,17 +201,13 @@ function Class(...)
     end
 end
 
---- look up hierarchy to help determine the relationships between classes. Can be printed using 'PrintHierarchy' 
--- defined in the debug module. An example output is:
-
--- function: 1E0F3E00 (OnDestroy, id = 1) = { base instance }
--- function: 1F45AA80 (OnGotTarget, id = 1) = { base instance }
--- function: 1F3902D8 (OnCreate, id = 1) = { function: 1F37B500 (OnCreate, id = 1) }
--- function: 1F40F0E0 (OnKilled, id = 1) = { function: 1F3D3EE0 (OnKilled, id = 1) }
--- function: 1DE7E1C0 (BuilderParamCheck, id = 1) = { base instance }
-
--- It allows us to track a function back to the base instance.
-local Hierarchy = { }
+---create a simple class which does not inherit from anything
+---@generic T
+---@param specs T
+---@return T
+function ClassSimple(specs)
+    return Class(specs)
+end
 
 --- Computes the hierarchy chain of a function: determine the path from the current function back to 
 -- the base instance. Note that this assumes that the base is always called, which is not always the case.
@@ -224,7 +243,7 @@ local function ComputeHierarchyChain(a, cache)
         end
     end
 
-    if debug then 
+    if enableDebugging then 
         LOG("Chain for: " .. tostring(a) .. " (" .. tostring(HierarchyDebugLookup[a].func)  .. ", id = " .. tostring(HierarchyDebugLookup[a].identity) .. ")")
         for k, v in cache do 
             LOG(tostring(k) .. ": " .. tostring(v))
@@ -258,6 +277,11 @@ end
 
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file.
 local Seen = { }
+---create a class
+---@generic Base: table, T:table
+---@param bases Base
+---@param specs T
+---@return T
 function ConstructClass(bases, specs)
 
     -- cache as locals for performance
@@ -294,16 +318,22 @@ function ConstructClass(bases, specs)
         -- keep track of hierarchy chains
         for ks, s in specs do 
             local t = type(s)
-            if t == "function" or t == "cfunction" then 
+            if t == "function" or t == "cfunction" or t == "table" then 
                 for kb, base in bases do 
                     -- we're trying to override something here
                     if base[ks] ~= nil then 
-
                         -- keep track of the names and give them some unique identifier
-                        if debug then 
+                        if enableDebugging then 
                             HierarchyDebugLookupCount[ks] = HierarchyDebugLookupCount[ks] or 0
                             HierarchyDebugLookupCount[ks] = HierarchyDebugLookupCount[ks] + 1
-                            HierarchyDebugLookup[s] = { func = ks, identity = HierarchyDebugLookupCount[ks] }  
+
+                            -- allow us to track states specifically
+                            local ts = t 
+                            if t == "table" and s.__State then 
+                                ts = "state"
+                            end
+
+                            HierarchyDebugLookup[s] = { func = ks, identity = HierarchyDebugLookupCount[ks], type = ts }  
                         end
 
                         -- link to or create a table
@@ -321,7 +351,6 @@ function ConstructClass(bases, specs)
         -- check for collisions 
         for k, base in bases do 
             for l, element in base do 
-                -- todo, refine this a bit
                 if not exclusions[l] then 
                     -- first time we've seen this key, keep track of it
                     if seen[l] == nil then 
@@ -334,22 +363,42 @@ function ConstructClass(bases, specs)
                     -- we've got two elements with the same key but different values, but our specs has a function to define the behavior: we're good
                     elseif specs[l] ~= nil then
                         -- do nothing
+                    else
+                        local t = type(element)
 
-                    -- we've got two elements with the same key but different values, check if they're not secretly a state with matching identifiers
-                    elseif type(element) == "table" and (seen[l].__StateIdentifier == element.__StateIdentifier) then
-                        -- do nothing 
+                        -- we've got two elements with the same key but different values that are states, check if their state identifiers match
+                        if t == "table" and element.__State and (element.__StateIdentifier == seen[l].__StateIdentifier) then
+                            -- do nothing, it is the same state
 
-                    else 
-                        -- check if one is part of the hierarchy of the other
-                        local hierarchy = CheckHierarchy(seen[l], element)
-                        if hierarchy then 
-                            class[l] = hierarchy 
-                            seen[l] = hierarchy 
+                        -- the following two statements are TECHNICALLY wrong, and should be fixed by manually determining the state
 
-                        -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambigious!
-                        else    
-                            error("Class initialisation: field '" .. tostring(l).. "' is ambigious between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
-                            LOG(repr(debug.traceback()))
+                        -- we've got two elements with the same key but different values that are states - oh no!
+                        elseif t == "table" and element.__State and (element.__StateIdentifier < seen[l].__StateIdentifier) then 
+                            WARN("ambiguous state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")
+                            WARN(debug.traceback())
+
+                            -- do nothing
+                        
+                        -- we've got two elements with the same key but different values that are states - oh no!
+                        elseif t == "table" and element.__State and (element.__StateIdentifier > seen[l].__StateIdentifier) then 
+                            WARN("ambiguous state with identifier: " .. tostring(l) .. ", behavior is unpredictable. Solution is to choose the desired state of the basis in the specifications - this needs to be done by the author of the mod.")                           
+                            WARN(debug.traceback())
+
+                            -- switch them up, use the state made last
+                            class[l] = element 
+                            seen[l] = element 
+
+                        else 
+                            -- check if one is part of the hierarchy of the other
+                            local hierarchy = CheckHierarchy(seen[l], element)
+                            if hierarchy then 
+                                class[l] = hierarchy 
+                                seen[l] = hierarchy 
+
+                            -- we've got two elements with the same key but they're not part of each others hierarchy chain: ambigious!
+                            else    
+                                error("Class initialisation: field '" .. tostring(l).. "' is ambigious between the bases. They use the same field for different values. You need to create a field in the specifications that defines the behavior.")
+                            end
                         end
                     end
                 end
@@ -369,22 +418,22 @@ function ConstructClass(bases, specs)
                 end
             end
         end
+    end
 
-        -- post-process the states to make sure that they're unique and have the correct meta table set
-        for k, v in class do 
-            -- any member that has a meta table set is by definition a state
-            if type(v) == "table" and v.__State then 
+    -- post-process the states to make sure that they're unique and have the correct meta table set
+    for k, v in class do 
+        -- any member that has a meta table set is by definition a state
+        if type(v) == "table" and v.__State then 
 
-                -- copy the content into a new table
-                local d = Deepcopy(v) 
+            -- copy the content into a new table
+            local d = Deepcopy(v) 
 
-                -- set meta table information
-                d.__index = d 
-                setmetatable(d, class)
+            -- set meta table information
+            d.__index = d 
+            setmetatable(d, class)
 
-                -- override previous entry
-                class[k] = d
-            end
+            -- override previous entry
+            class[k] = d
         end
     end
 
@@ -499,7 +548,7 @@ function ConvertCClassToLuaSimplifiedClass(cclass)
         cclass[k] = val 
 
         -- allow us to print it out
-        if debug then 
+        if enableDebugging then 
             HierarchyDebugLookupCFunctions[val] = true
         end
     end

@@ -2,6 +2,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Group = import('/lua/maui/group.lua').Group
 
 --- A Group for arranging controls horizontally in fixed-width columns.
+---@class ColumnLayout : Group
 ColumnLayout = Class(Group) {
     --- Create a new ColumnLayout
     --

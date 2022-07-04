@@ -1,0 +1,11 @@
+BeamBlueprint {
+    Lifetime = 10,
+    TextureName = '/textures/particles/riotgun_beam_01.dds',
+    Thickness = 0.1,
+    StartColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    Length = 2000,
+    RepeatRate = 0.125,
+    UShift = 0.0,
+    VShift = -0.95,
+}

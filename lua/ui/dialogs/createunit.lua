@@ -685,45 +685,50 @@ function CreateDialog(x, y)
 
     if SpawnThread then KillThread(SpawnThread) end
 
-    local function spreadSpawn(id, count, vet)
+    local function spreadSpawn(ids, count, vet)
 
-        -- store selection so that units do not go of and try to build the unit we're 
-        -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
-        local selection = GetSelectedUnits()
-        SelectUnits(nil);
+        if table.getn(ids) > 0 then 
 
-        -- enables command mode for spawning units
-        import('/lua/ui/game/commandmode.lua').StartCommandMode(
-            "build", 
-            { 
-                -- default information required
-                name = id, 
+            -- store selection so that units do not go of and try to build the unit we're 
+            -- cheating in, is reset in EndCommandMode of '/lua/ui/game/commandmode.lua'
+            local selection = GetSelectedUnits()
+            SelectUnits(nil);
 
-                -- inform this is part of a cheat
-                cheat = true, 
+            -- enables command mode for spawning units
+            import('/lua/ui/game/commandmode.lua').StartCommandMode(
+                "build", 
+                { 
+                    -- default information required
+                    ids = ids, 
+                    index = 2,
 
-                -- information for spawning
-                bpId = id,
-                count = tonumber(count:GetText()) or 1,
-                vet = tonumber(vet:GetText()) or 0,
-                yaw = (tonumber(orientation:GetText()) or 0) / 57.295779513,
-                army = currentArmy,
-                selection = selection,
-            }
-        )
+                    -- inform this is part of a cheat
+                    cheat = true, 
 
-        -- options for user to exit the spawn mode
-        local function IsCancelKeyDown() return IsKeyDown('ESCAPE') or IsKeyDown(2) end
+                    -- information for spawning
+                    name = ids[1],
+                    bpId = ids[1],
+                    count = tonumber(count:GetText()) or 1,
+                    vet = tonumber(vet:GetText()) or 0,
+                    yaw = (tonumber(orientation:GetText()) or 0) / 57.295779513,
+                    army = currentArmy,
+                    selection = selection,
+                }
+            )
 
-        WaitSeconds(0.15)
+            -- options for user to exit the spawn mode
+            local function IsCancelKeyDown() return IsKeyDown('ESCAPE') or IsKeyDown(2) end
 
-        -- check if user wants to exit
-        while not dialog do
-            if IsCancelKeyDown() then 
-                import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
-                break 
+            WaitSeconds(0.15)
+
+            -- check if user wants to exit
+            while not dialog do
+                if IsCancelKeyDown() then 
+                    import('/lua/ui/game/commandmode.lua').EndCommandMode(true)
+                    break 
+                end
+                WaitSeconds(0.1)
             end
-            WaitSeconds(0.1)
         end
     end
 
@@ -731,9 +736,7 @@ function CreateDialog(x, y)
     LayoutHelpers.AtBottomIn(createBtn, dialog)
     LayoutHelpers.LeftOf(createBtn, cancelBtn, 5)
     createBtn.OnClick = function(button)
-        for unitID, _ in CreationList do
-            SpawnThread = ForkThread(spreadSpawn, unitID, count, veterancyLevel)
-        end
+        ForkThread(spreadSpawn, table.keys(CreationList), count, veterancyLevel)
         cancelBtn.OnClick()
     end
 
@@ -1048,7 +1051,7 @@ function CreateDialog(x, y)
                         self:SetSolidColor(LineColors.Sel_Up)
                     end
                 elseif event.Type == 'ButtonDClick' and event.Modifiers.Left then
-                    SpawnThread = ForkThread(spreadSpawn, self.unitID, count, veterancyLevel)
+                    SpawnThread = ForkThread(spreadSpawn, { self.unitID }, count, veterancyLevel)
                     cancelBtn:OnClick()
                 elseif event.Type == 'MouseMotion' then
                     MoveMouseover(event.MouseX,event.MouseY)

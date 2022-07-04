@@ -1,0 +1,155 @@
+EmitterBlueprint {
+	BlueprintId = 'fragmentation_shell_phosphor_01',
+	Lifetime = 2.20,
+	Repeattime = 2.20,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = 200.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = false,
+	ParticleResistance = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 5.00,
+	LowFidelity = true,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = '/textures/particles/glow.dds',
+	RampTexture = '/textures/particles/ramp_blue_05.dds',
+	XDirectionCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.025,y=8.000,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.042,y=2.500,z=1.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.126,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=1.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.106,y=0.000,z=1.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=1.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.077,y=0.031,z=0.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.088,y=0.889,z=0.100 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=180.000,z=0.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 2.20,
+		Keys = {
+			{ x=1.100,y=0.000,z=0.000 },
+		},
+	},
+}
+

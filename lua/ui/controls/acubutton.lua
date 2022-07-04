@@ -13,10 +13,13 @@ local teamIcons = {
     '/lobby/team_icons/team_4_icon.dds',
     '/lobby/team_icons/team_5_icon.dds',
     '/lobby/team_icons/team_6_icon.dds',
+    '/lobby/team_icons/team_7_icon.dds',
+    '/lobby/team_icons/team_8_icon.dds',
 }
 
 --- A small button representing an ACU, with support for showing colour and team affiliation, with
 -- an exciting pulsating blue mouse-over effect.
+---@class ACUButton : Group
 ACUButton = Class(Group) {
     __init = function(self, parent, enabled)
         Group.__init(self, parent)

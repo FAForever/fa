@@ -1,3 +1,4 @@
+-- used by ueb2302
 EmitterBlueprint {
     BlueprintId = 'antimatter_hit_13',
     Lifetime = 12.00,
@@ -10,7 +11,7 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = true,
-    LODCutoff = -1.00,
+    LODCutoff = -1.00, -- t3 / t4 artillery
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -23,8 +24,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/muzzle_flash_add_09.dds]],
-    RampTexture = [[/textures/particles/ramp_nuke_04.dds]],
+    Texture = '/textures/particles/muzzle_flash_add_09.dds',
+    RampTexture = '/textures/particles/ramp_nuke_04.dds',
     XDirectionCurve = {
         XRange = 12.00,
         Keys = {

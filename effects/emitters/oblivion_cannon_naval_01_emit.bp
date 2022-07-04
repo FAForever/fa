@@ -10,7 +10,7 @@ EmitterBlueprint {
     AlignRotation = true,
     AlignToBone = false,
     Flat = false,
-    LODCutoff = -1.00,
+    LODCutoff = 500.00,
     EmitIfVisible = true,
     CatchupEmit = true,
     CreateIfVisible = false,
@@ -19,8 +19,8 @@ EmitterBlueprint {
     InterpolateEmission = true,
     TextureStripcount = 1.00,
     SortOrder = 0.00,
-    Texture = [[/textures/particles/quantum_generator_add_03.dds]],
-    RampTexture = [[/textures/particles/ramp_blue_02.dds]],
+    Texture = '/textures/particles/quantum_generator_add_03.dds',
+    RampTexture = '/textures/particles/ramp_blue_02.dds',
     XDirectionCurve = {
         XRange = 50.00,
         Keys = {

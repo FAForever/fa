@@ -114,6 +114,7 @@ function DepopulateDefaultElement(element)
     end)
 end
 
+---@class ProfilerScrollArea : Group
 ProfilerScrollArea = Class(Group) {
     __init = function(self, parent)
         Group.__init(self, parent)

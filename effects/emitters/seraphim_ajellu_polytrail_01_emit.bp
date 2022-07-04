@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_ajellu_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 1.5,
+    Size = 0.04,
+    SortOrder = -102,
+    BlendMode = 0,
+    TextureRepeatRate = .5,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_02.dds',
+	RampTexture = '/textures/particles/ramp_trail_10.dds',
+}
+

@@ -5,16 +5,27 @@
 --  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 ------------------------------------------------------------------
 
--- Legacy shield state:
+-- Legacy shield flags:
 --  - _IsUp: determines whether the shield is up
 
--- Current hield state:
+-- Shield flags:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
 --  - DepletedByDamage: flag that indicates the shield sustained too much damage and needs to recharge
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
+
+-- Shield flags for mods:
+--  - SkipAttachmentCheck: flag that allows us to skip all attachment checks, as an example when the unit is attached to a transport
+
+-- Shield states:
+-- - OnState
+-- - OffState
+-- - RechargeState
+-- - DamageDrainedState
+-- - EnergyDrainedState
+-- - DeadState
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
@@ -34,6 +45,7 @@ local TableAssimilate = table.assimilate
 local Warp = Warp
 local IsEntity = IsEntity
 local IsUnit = IsUnit
+local IsAlly = IsAlly
 local IsEnemy = IsEnemy
 local Random = Random
 local GetGameTick = GetGameTick
@@ -98,6 +110,9 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
+
+    -- flags for mods
+    -- SkipAttachmentCheck = false, -- defaults to nil, same as false
 }
 
 -- scan blueprints for the largest shield radius
@@ -115,6 +130,8 @@ for k, bp in __blueprints do
     end
 end
 
+---@class Shield : moho.shield_methods, Entity
+---@field Brain AIBrain
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
@@ -127,6 +144,8 @@ Shield = Class(moho.shield_methods, Entity) {
         _c_CreateShield(self, spec)
     end,
 
+    ---@param self Shield
+    ---@param spec unknown is this Entity?
     OnCreate = function(self, spec)
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
@@ -146,6 +165,8 @@ Shield = Class(moho.shield_methods, Entity) {
         self.RegenStartTime = spec.ShieldRegenStartTime
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
+        self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
@@ -192,9 +213,10 @@ Shield = Class(moho.shield_methods, Entity) {
         self.OverlappingShieldsCount = 0
         self.OverlappingShieldsTick = -1
 
-        -- manage overspill 
-        self.DamageReduction = { }
-        self.DamageReductionTick = { }
+        -- manage overspill
+        self.DamagedTick = { }
+        self.DamagedRegular = { }
+        self.DamagedOverspill = { }
 
         -- manage regeneration thread
         self.RegenThreadSuspended = true
@@ -238,18 +260,23 @@ Shield = Class(moho.shield_methods, Entity) {
             local fromSuspension = false
             local tick = GetGameTick()
             local health = EntityGetHealth(self)
+            local maxHealth = EntityGetMaxHealth(self)
 
             -- check if we need to suspend ourself
             if 
                 -- we're at zero health or lower
                     health <= 0 
                 -- we're full health
-                or  health == EntityGetMaxHealth(self) 
+                or  health == maxHealth
                 -- we're not enabled
                 or  not self.Enabled 
                 -- we're not recharged
                 or  not self.Recharged
             then 
+                -- adjust shield bar one last time
+                self:UpdateShieldRatio(health / maxHealth)
+
+                -- suspend ourselves and wait
                 self.RegenThreadSuspended = true 
                 SuspendCurrentThread()
                 self.RegenThreadSuspended = false
@@ -265,13 +292,11 @@ Shield = Class(moho.shield_methods, Entity) {
                     -- adjust health, rate is in seconds 
                     EntityAdjustHealth(self, self.Owner, 0.1 * self.RegenRate)
 
-                    -- adjust shield bar
-                    self:UpdateShieldRatio(-1)
-
                 -- if not, yield for the difference in ticks
-                else 
-                    CoroutineYield(self.RegenThreadStartTick - tick )
                 end
+
+                -- adjust shield bar as we may be assisted
+                self:UpdateShieldRatio(health / maxHealth)
             end
 
             -- wait till next tick
@@ -279,6 +304,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyDepleted = function(self)
         self.NoEnergyToSustain = true 
 
@@ -288,6 +314,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyViable = function(self)
         self.NoEnergyToSustain = false 
 
@@ -442,7 +469,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
         -- damage correction for overcharge
         
-        if dmgType == 'Overcharge' and dmgType ~= "ShieldSpill" then
+        if dmgType == 'Overcharge' then
             local wep = instigator:GetWeaponByLabel('OverCharge')
             if self.StaticShield then -- fixed damage for static shields
                 amount = wep:GetBlueprint().Overcharge.structureDamage * 2
@@ -459,24 +486,26 @@ Shield = Class(moho.shield_methods, Entity) {
             local instigatorId = (instigator and instigator.EntityId) or false
             if instigatorId then 
 
-                -- check if source has applied damage this tick
-                if self.DamageReductionTick[instigatorId] == tick then 
+                -- reset our status quo for this instigator
+                if self.DamagedTick[instigatorId] ~= tick then 
+                    self.DamagedTick[instigatorId] = tick 
+                    self.DamagedRegular[instigatorId] = false 
+                    self.DamagedOverspill[instigatorId] = 0 
+                end
 
-                    -- if it did, reduce it from the damage that we're doing
-                    amount = amount - self.DamageReduction[instigatorId]
-
-                    -- if nothing is left, bail out
-                    if amount < 0 then 
+                -- anything but shield spill damage is regular damage, remove any previous overspill damage from the same instigator during the same tick
+                if dmgType ~= "ShieldSpill" then 
+                    self.DamagedRegular[instigatorId] = tick 
+                    amount = amount - self.DamagedOverspill[instigatorId]
+                    self.DamagedOverspill[instigatorId] = 0 
+                else 
+                    -- if we have already received regular damage from this instigator at this tick, skip the overspill damage
+                    if self.DamagedRegular[instigatorId] == tick then 
                         return 
                     end
 
-                    -- further reduce future damage
-                    self.DamageReduction[instigatorId] = self.DamageReduction[instigatorId] + amount 
-
-                -- otherwise, inform us that we're applying damage this tick
-                else 
-                    self.DamageReduction[instigatorId] = amount 
-                    self.DamageReductionTick[instigatorId] = tick
+                    -- keep track of overspill damage if we have not received any actual damage yet
+                    self.DamagedOverspill[instigatorId] = self.DamagedOverspill[instigatorId] + amount 
                 end
             end
         end
@@ -488,9 +517,6 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- take some damage
             EntityAdjustHealth(self, instigator, -absorbed)
-
-            -- adjust shield bar
-            self:UpdateShieldRatio(-1)
 
             -- check to spawn impact effect
             local r = Random(1, self.Size)
@@ -633,13 +659,26 @@ Shield = Class(moho.shield_methods, Entity) {
         end
 
         -- special behavior for projectiles that represent strategic missiles
-        local otherHashedCats = other.BlueprintCache.HashedCats
+        local otherHashedCats = other.Cache.HashedCats
         if otherHashedCats['STRATEGIC'] and otherHashedCats['MISSILE'] then
             return false
         end
 
         -- otherwise, only collide if we're hostile to the other army
         return IsEnemy(self.Army, other.Army)
+    end,
+
+    --- Called when a shield collides with a collision beam to check if the collision is valid
+    -- @param self The shield we're checking the collision for
+    -- @param firingWeapon The weapon the beam originates from that we're checking the collision with
+    OnCollisionCheckWeapon = function(self, firingWeapon)
+
+        -- if we're allied, check if we allow that type of collision
+        if self.Army == firingWeapon.Army or IsAlly(self.Army, firingWeapon.Army) then
+            return firingWeapon.Blueprint.CollideFriendly
+        end
+
+        return true
     end,
 
     TurnOn = function(self)
@@ -727,7 +766,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
-            if UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory then
+            if (not self.SkipAttachmentCheck) and (UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory) then
                 ChangeState(self, self.OffState)
 
             -- if we're still out of energy, go wait for that to fix itself
@@ -889,62 +928,36 @@ Shield = Class(moho.shield_methods, Entity) {
 
         Main = function(self)
 
-            if not DeprecatedWarnings.DamageRechargeState then 
-                DeprecatedWarnings.DamageRechargeState = true 
-                WARN("DamageRechargeState is deprecated: use shield.RechargeState instead.")
-                WARN("Unit type of owner: " .. self.Owner.UnitId)
-            end
+            -- if not DeprecatedWarnings.DamageRechargeState then 
+            --     DeprecatedWarnings.DamageRechargeState = true 
+            --     SPEW("DamageRechargeState is deprecated: use shield.RechargeState instead.")
+            --     SPEW("Unit type of owner: " .. self.Owner.UnitId)
+            --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+            -- end
 
             -- back to the regular onstate
             ChangeState(self, self.RechargeState)
         end,
     },
 
-    OnCollisionCheckWeapon = function(self, firingWeapon)
-
-        if not DeprecatedWarnings.OnCollisionCheckWeapon then 
-            DeprecatedWarnings.OnCollisionCheckWeapon = true 
-            WARN("OnCollisionCheckWeapon is deprecated.")
-            WARN(debug.tracestack())
-        end
-
-        local weaponBP = firingWeapon:GetBlueprint()
-        local collide = weaponBP.CollideFriendly
-        if collide == false then
-            if not (IsEnemy(self.Army, firingWeapon.unit.Army)) then
-                return false
-            end
-        end
-        -- Check DNC list
-        if weaponBP.DoNotCollideList then
-            for _, v in pairs(weaponBP.DoNotCollideList) do
-                if EntityCategoryContains(ParseEntityCategory(v), self) then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
-
     GetCachePosition = function(self)
 
-        if not DeprecatedWarnings.GetCachePosition then 
-            DeprecatedWarnings.GetCachePosition = true 
-            WARN("GetCachePosition is deprecated: use shield:GetPosition() or shield:GetPositionXYZ() instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.GetCachePosition then 
+        --     DeprecatedWarnings.GetCachePosition = true 
+        --     SPEW("GetCachePosition is deprecated: use shield:GetPosition() or shield:GetPositionXYZ() instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         return self:GetPosition()
     end,
 
     SetRechargeTime = function(self, rechargeTime, energyRechargeTime)
 
-        if not DeprecatedWarnings.SetRechargeTime then 
-            DeprecatedWarnings.SetRechargeTime = true 
-            WARN("SetRechargeTime is deprecated: set the values shield.ShieldRechargeTime and shield.ShieldEnergyDrainRechargeTime instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetRechargeTime then 
+        --     DeprecatedWarnings.SetRechargeTime = true 
+        --     SPEW("SetRechargeTime is deprecated: set the values shield.ShieldRechargeTime and shield.ShieldEnergyDrainRechargeTime instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.ShieldRechargeTime = rechargeTime
         self.ShieldEnergyDrainRechargeTime = energyRechargeTime
@@ -952,61 +965,62 @@ Shield = Class(moho.shield_methods, Entity) {
 
     SetVerticalOffset = function(self, offset)
 
-        if not DeprecatedWarnings.SetVerticalOffset then 
-            DeprecatedWarnings.SetVerticalOffset = true 
-            WARN("SetVerticalOffset is deprecated: set the value shield.ShieldVerticalOffset instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetVerticalOffset then 
+        --     DeprecatedWarnings.SetVerticalOffset = true 
+        --     SPEW("SetVerticalOffset is deprecated: set the value shield.ShieldVerticalOffset instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.ShieldVerticalOffset = offset
     end,
 
     SetSize = function(self, size)
 
-        if not DeprecatedWarnings.SetSize then 
-            DeprecatedWarnings.SetSize = true 
-            WARN("SetSize is deprecated: set the value shield.Size instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetSize then 
+        --     DeprecatedWarnings.SetSize = true 
+        --     SPEW("SetSize is deprecated: set the value shield.Size instead.")
+        --     SPEW("Source: " .. repr(debug.traceback()))
+        -- end
 
         self.Size = size
     end,
 
     SetShieldRegenRate = function(self, rate)
 
-        if not DeprecatedWarnings.SetShieldRegenRate then 
-            DeprecatedWarnings.SetShieldRegenRate = true 
-            WARN("SetShieldRegenRate is deprecated: set the value shield.RegenRate instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetShieldRegenRate then 
+        --     DeprecatedWarnings.SetShieldRegenRate = true 
+        --     SPEW("SetShieldRegenRate is deprecated: set the value shield.RegenRate instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.RegenRate = rate
     end,
 
     SetShieldRegenStartTime = function(self, time)
 
-        if not DeprecatedWarnings.SetShieldRegenStartTime then 
-            DeprecatedWarnings.SetShieldRegenStartTime = true 
-            WARN("SetShieldRegenStartTime is deprecated: set the value shield.RegenStartTime instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.SetShieldRegenStartTime then 
+        --     DeprecatedWarnings.SetShieldRegenStartTime = true 
+        --     SPEW("SetShieldRegenStartTime is deprecated: set the value shield.RegenStartTime instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.RegenStartTime = time
     end,
 
     SetType = function(self, type)
 
-        if not DeprecatedWarnings.ShieldType then 
-            DeprecatedWarnings.ShieldType = true 
-            WARN("ShieldType is deprecated: set the value shield.ShieldType instead.")
-            WARN("Source: " .. repr(debug.traceback()))
-        end
+        -- if not DeprecatedWarnings.ShieldType then 
+        --     DeprecatedWarnings.ShieldType = true 
+        --     SPEW("ShieldType is deprecated: set the value shield.ShieldType instead.")
+        --     SPEW("Stacktrace: " .. repr(debug.traceback()))
+        -- end
 
         self.ShieldType = type
     end,
 }
 
 --- A bubble shield attached to a single unit.
+---@class PersonalBubble : Shield
 PersonalBubble = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1078,6 +1092,7 @@ PersonalBubble = Class(Shield) {
 
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
+---@class TransportShield : Shield
 TransportShield = Class(Shield) {
 
     OnCreate = function(self, spec)
@@ -1105,11 +1120,11 @@ TransportShield = Class(Shield) {
 
     OnState = State(Shield.OnState) {
         Main = function(self)
+            Shield.OnState.Main(self)
+
             -- prevent ourself and our content from taking damage
             self:SetContentsVulnerable(false)
             self.Owner.CanTakeDamage = false 
-
-            Shield.OnState.Main(self)
         end,
 
         AddProtectedUnit = function(self, unit)
@@ -1120,30 +1135,38 @@ TransportShield = Class(Shield) {
 
     OffState = State(Shield.OffState) {
         Main = function(self)
+            Shield.OffState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-
-            Shield.OffState.Main(self)
         end,
+    },
 
-        AddProtectedUnit = function(self, unit)
-            self.protectedUnits[unit] = true
+    DamageDrainedState = State(Shield.DamageDrainedState) {
+        Main = function(self)
+            Shield.DamageDrainedState.Main(self)
+
+            -- allow ourself and our content to take damage
+            self:SetContentsVulnerable(true)
+            self.Owner.CanTakeDamage = true 
         end
     },
 
-    RechargeState = State(Shield.RechargeState) {
+    EnergyDrainedState = State(Shield.EnergyDrainedState) {
         Main = function(self)
+            Shield.EnergyDrainedState.Main(self)
+
             -- allow ourself and our content to take damage
             self:SetContentsVulnerable(true)
             self.Owner.CanTakeDamage = true 
-            Shield.RechargeState.Main(self)
         end
     },
 }
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
+---@class PersonalShield : Shield
 PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1237,6 +1260,7 @@ PersonalShield = Class(Shield){
     end,
 }
 
+---@class AntiArtilleryShield : Shield
 AntiArtilleryShield = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1283,6 +1307,7 @@ AntiArtilleryShield = Class(Shield) {
 }
 
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
+---@class CzarShield : PersonalShield
 CzarShield = Class(PersonalShield) {
     OnCreate = function(self, spec)
         PersonalShield.OnCreate(self, spec)

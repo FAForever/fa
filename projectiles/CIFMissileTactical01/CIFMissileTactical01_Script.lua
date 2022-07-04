@@ -60,14 +60,6 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
         return dist
     end,
     
-    PassDamageData = function(self, damageData)
-        CLOATacticalMissileProjectile.PassDamageData(self,damageData)
-        local launcherbp = self:GetLauncher():GetBlueprint()
-        self.ChildDamageData = table.copy(self.DamageData)
-        self.ChildDamageData.DamageAmount = launcherbp.SplitDamage.DamageAmount or 0
-        self.ChildDamageData.DamageRadius = launcherbp.SplitDamage.DamageRadius or 1
-    end,
-    
     OnImpact = function(self, targetType, targetEntity)       
         CreateLightParticle( self, -1, self.Army, 3, 7, 'glow_03', 'ramp_fire_11' )
             
@@ -88,6 +80,9 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
             local angle = (2*math.pi) / self.NumChildMissiles
             local spreadMul = 1  -- Adjusts the width of the dispersal
 
+            self.DamageData.DamageAmount = self.Launcher.Blueprint.SplitDamage.DamageAmount or 0
+            self.DamageData.DamageRadius = self.Launcher.Blueprint.SplitDamage.DamageRadius or 1
+
             -- Launch projectiles at semi-random angles away from split location
             for i = 0, (self.NumChildMissiles - 1) do
                 local xVec = vx + math.sin(i*angle) * spreadMul
@@ -96,7 +91,7 @@ CIFMissileTactical01 = Class(CLOATacticalMissileProjectile) {
                 local proj = self:CreateChildProjectile(ChildProjectileBP)
                 proj:SetVelocity(xVec,yVec,zVec)
                 proj:SetVelocity(velocity)
-                proj:PassDamageData(self.ChildDamageData)
+                proj:PassDamageData(self.DamageData)
             end
         end
         CLOATacticalMissileProjectile.OnDamage(self, instigator, amount, vector, damageType)

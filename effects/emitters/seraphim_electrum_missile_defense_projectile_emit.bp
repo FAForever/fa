@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_electrum_missile_defense_projectile',
+	Lifetime = -1.00,
+    TrailLength = 2,
+    Size = 0.1,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = .5,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/plasma_alpha_05.dds',
+	RampTexture = '/textures/particles/ramp_trail_07.dds',
+}
+

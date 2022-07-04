@@ -1,0 +1,18 @@
+ProjectileBlueprint {
+    Display = {
+        CameraFollowsProjectile = true,
+        MeshBlueprint = '/meshes/projectiles/depthcharge_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 1.5,
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 28,
+        LeadTarget = false,
+        TurnRate = 360,
+        VelocityAlign = true,
+    },
+}

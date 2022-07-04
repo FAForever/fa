@@ -1,0 +1,157 @@
+EmitterBlueprint {
+	BlueprintId = 'tt_rocky13_footfall01_01',
+	Lifetime = 6.00,
+	Repeattime = 6.00,
+	TextureFramecount = 1.00,
+	Blendmode = 0.00,
+	LocalVelocity = false,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = 100.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	ParticleResistance = true,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	LowFidelity = false,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = '/textures/particles/cloud_smoke_alpha_10.dds',
+	RampTexture = '/textures/particles/ramp_grey_03.dds',
+	XDirectionCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.400 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=0.372,y=0.238,z=0.100 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.127,y=0.000,z=0.400 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=0.000,y=18.000,z=0.000 },
+			{ x=1.000,y=0.000,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.166,y=25.000,z=15.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=0.071,y=0.778,z=0.000 },
+			{ x=3.000,y=0.300,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=-0.001,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=2.873,y=0.167,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.018,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.040,y=0.462,z=0.100 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.063,y=1.111,z=0.100 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.042,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 6.00,
+		Keys = {
+			{ x=3.000,y=0.000,z=0.000 },
+		},
+	},
+}
+

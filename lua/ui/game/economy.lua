@@ -169,7 +169,7 @@ function CommonLogic()
             group.reclaimDelta:SetHidden(hidden)
             group.reclaimTotal:SetHidden(hidden)
 
-            return true
+            return false
         end
 
         Tooltip.AddControlTooltip(group.reclaimDelta, prefix..'_reclaim_display')

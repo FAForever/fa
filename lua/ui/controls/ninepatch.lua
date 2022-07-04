@@ -2,6 +2,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local ScaleNumber = import('/lua/maui/layouthelpers.lua').ScaleNumber
 
+---@class NinePatch : Group
 NinePatch = Class(Group) {
     __init = function(self, parent, center, topLeft, topRight, bottomLeft, bottomRight, left, right, top, bottom)
         Group.__init(self, parent)
