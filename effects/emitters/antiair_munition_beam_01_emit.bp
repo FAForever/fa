@@ -1,0 +1,9 @@
+BeamBlueprint {
+    Lifetime = 3.0,
+    TextureName = '/textures/particles/beam_blue_04.dds',
+    Length = 0.25,
+    Thickness = 0.01,
+    Blendmode = 4,
+    StartColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+}

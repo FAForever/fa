@@ -1,0 +1,158 @@
+-- used by ADFCannonOblivionWeapon03 uab2301 
+EmitterBlueprint {
+	BlueprintId = 'oblivion_cannon_flash_05',
+	Lifetime = 12.00,
+	Repeattime = 12.00,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = true,
+	Flat = false,
+	LODCutoff = 300.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = false,
+	ParticleResistance = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	LowFidelity = true,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = '/textures/particles/sparkle_02.dds',
+	RampTexture = '/textures/particles/ramp_white_02.dds',
+	XDirectionCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.031,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.001,z=0.000 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=0.000,y=0.000,z=0.000 },
+			{ x=11.000,y=0.000,z=0.000 },
+			{ x=11.000,y=1.000,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=5.620,y=2.000,z=0.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=1.000,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=1.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.206,y=3.138,z=0.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.158,y=0.381,z=0.500 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=5.842,y=0.000,z=0.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=5.747,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 12.00,
+		Keys = {
+			{ x=6.000,y=0.000,z=0.000 },
+		},
+	},
+}
+

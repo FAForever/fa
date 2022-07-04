@@ -1,0 +1,8 @@
+BeamBlueprint {
+    Lifetime = 10,
+    TextureName = '/textures/particles/beam_red_02.dds',
+    Thickness = 3,
+    StartColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=1,w=0}, -- R,G,B,A
+    Length = 5000,
+}

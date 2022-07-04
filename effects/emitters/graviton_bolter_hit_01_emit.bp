@@ -1,0 +1,146 @@
+-- used by ADFGraviton01 uab2101
+EmitterBlueprint {
+	BlueprintId = 'graviton_bolter_hit_01',
+	Lifetime = 0.00,
+	Repeattime = 3.00,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = true,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = true,
+	LODCutoff = 150.00,
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 0.00,
+	Texture = '/textures/particles/smoke.dds',
+	RampTexture = '/textures/particles/ramp_green_01.dds',
+	XDirectionCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=-0.37,z=0.00 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=2.86,z=0.00 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=10.00,z=4.00 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=1.00,z=0.00 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	SizeCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	XPosCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	YPosCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=1.00,z=0.10 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=1.00,z=0.10 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=180.00,z=360.00 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=10.00 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=1.00,z=0.00 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 3.00,
+		Keys = {
+			{ x=1.50,y=0.00,z=0.00 },
+		},
+	},
+}
+

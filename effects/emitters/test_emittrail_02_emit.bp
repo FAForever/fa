@@ -1,0 +1,145 @@
+EmitterBlueprint {
+	BlueprintId = 'test_emittrail_02',
+	Lifetime = -0.20,
+	Repeattime = 0.20,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = false,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = 150.00,
+	EmitIfVisible = false,
+	CatchupEmit = false,
+	CreateIfVisible = false,
+	SnapToWaterline = false,
+	OnlyEmitOnWater = false,
+	InterpolateEmission = true,
+	TextureStripcount = 0.00,
+	SortOrder = -10.00,
+	Texture = '/textures/particles/test_marker_01.dds',
+	RampTexture = '/textures/particles/test_ramp_red_blue_01.dds',
+	XDirectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=-0.00,y=0.00,z=0.00 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 0.20,
+		Keys = {
+            { x=0.00,y=10.00,z=00.00 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=2.0,z=0.00 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	SizeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	XPosCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.0,z=0.00 },
+		},
+	},
+	YPosCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.0,z=0.00 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.0,z=0.00 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.3,z=0.0 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.3,z=0.0 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=2.00,z=4.00 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 0.20,
+		Keys = {
+			{ x=0.00,y=0.00,z=0.00 },
+		},
+	},
+}
+

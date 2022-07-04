@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'caamissilenanite01_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 8,
+    Size = 0.15,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_red_09.dds',
+}
+

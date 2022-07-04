@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_tau_cannon_projectile_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 1.5,
+    Size = 0.15,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = .1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_03.dds',
+	RampTexture = '/textures/particles/ramp_white_04.dds',
+}
+

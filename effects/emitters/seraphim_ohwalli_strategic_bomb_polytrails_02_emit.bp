@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_ohwalli_strategic_bomb_polytrails_02',
+	Lifetime = -1.00,
+    TrailLength = 6.0,
+    Size = 1.0,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 0.05,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_ser_01.dds',
+	RampTexture = '/textures/particles/ramp_trail_08.dds',
+}
+

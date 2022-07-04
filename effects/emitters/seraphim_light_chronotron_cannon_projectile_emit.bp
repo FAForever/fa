@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_light_chronotron_cannon_projectile',
+	Lifetime = -1.00,
+    TrailLength = 2.0,
+    Size = 0.3,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = .1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_ser_01.dds',
+	RampTexture = '/textures/particles/ramp_trail_aeon_01.dds',
+}

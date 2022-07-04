@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_phasic_autogun_projectile',
+	Lifetime = -1.00,
+    TrailLength = 0.25,
+    Size = 0.08,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_01.dds',
+	RampTexture = '/textures/particles/ramp_blue_16.dds',
+}
+
