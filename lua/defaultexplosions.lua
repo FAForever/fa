@@ -19,13 +19,9 @@ local GetRandomOffset2 = util.GetRandomOffset2
 -- upvalue for performance
 local EfctUtil = import('EffectUtilities.lua')
 local ApplyWindDirection = EfctUtil.ApplyWindDirection
-local CreateEffects = EfctUtil.CreateEffects
-local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
-local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
-local CreateBoneEffects = EfctUtil.CreateBoneEffects
-local CreateBoneEffectsOffset = EfctUtil.CreateBoneEffectsOffset
-local CreateRandomEffects = EfctUtil.CreateRandomEffects
-local ScaleEmittersParam = EfctUtil.ScaleEmittersParam
+local CreateEffectsOpti = EfctUtil.CreateEffectsOpti
+local CreateBoneEffectsOpti = EfctUtil.CreateBoneEffectsOpti
+local CreateBoneEffectsOffsetOpti = EfctUtil.CreateBoneEffectsOffsetOpti
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ExplosionSmall = EffectTemplate.ExplosionSmall
@@ -282,11 +278,11 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
 
             -- create the emitters  
             if baseEffects then 
-                CreateEffects(unit, army, baseEffects)
+                CreateEffectsOpti(unit, army, baseEffects)
             end
 
             if environmentEffects then 
-                CreateEffects(unit, army, environmentEffects)       
+                CreateEffectsOpti(unit, army, environmentEffects)       
             end    
 
             -- create the flash
@@ -374,7 +370,7 @@ function CreateDefaultHitExplosion(obj, scale)
         )
         
         -- create the fire cloud
-        CreateEffects(obj, army, FireCloudMed01)
+        CreateEffectsOpti(obj, army, FireCloudMed01)
     end
 end
 
@@ -390,7 +386,7 @@ function CreateDefaultHitExplosionOffset(obj, scale, xOffset, yOffset, zOffset)
         return
     end
 
-    CreateBoneEffectsOffset(obj, -1, obj.Army, DefaultHitExplosion01, xOffset, yOffset, zOffset)
+    CreateBoneEffectsOffsetOpti(obj, -1, obj.Army, DefaultHitExplosion01, xOffset, yOffset, zOffset)
 end
 
 
@@ -401,7 +397,7 @@ end
 function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
     local army = obj.Army
     CreateFlash(obj, boneName, scale * 0.5, army)
-    CreateBoneEffects(obj, boneName, army, FireCloudMed01)
+    CreateBoneEffectsOpti(obj, boneName, army, FireCloudMed01)
 end
 
 function CreateTimedStuctureUnitExplosion(obj)
@@ -497,7 +493,7 @@ function _CreateScalableUnitExplosion(obj)
     end
 
     -- Create Generic emitter effects
-    CreateEffects(obj, army, EffectTable)
+    CreateEffectsOpti(obj, army, EffectTable)
 
     -- Create Light particle flash
     CreateFlash(obj, -1, scale, army)

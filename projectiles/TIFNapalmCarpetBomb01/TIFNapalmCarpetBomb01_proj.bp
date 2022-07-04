@@ -28,6 +28,7 @@ ProjectileBlueprint {
             LODs = {
                 {
                     ShaderName = 'TMeshAlpha',
+                    LODCutoff = 215,
                 },
             },
         },

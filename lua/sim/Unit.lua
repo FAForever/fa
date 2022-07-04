@@ -4268,6 +4268,15 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Determines the upgrade animation to use. Allows you to manage units (by hooking) that can upgrade to
+    --- more than just one unit type, as an example tech 1 factories that can become HQs or
+    --- support factories.
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
+    GetUpgradeAnimation = function(self, unitBeingBuilt) 
+        return self.Blueprint.Display.AnimationUpgrade
+    end,
+
     --- Various callback-like functions
 
     -- Called when the C function unit.SetConsumptionActive is called
