@@ -67,15 +67,7 @@ SFactoryUnit = Class(FactoryUnit) {
 }
 
 -- AIR STRUCTURES
-SAirFactoryUnit = Class(AirFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
-
+SAirFactoryUnit = Class(AirFactoryUnit, SFactoryUnit) {
     FinishBuildThread = function(self, unitBeingBuilt, order)
         self:SetBusy(true)
         self:SetBlockCommandQueue(true)
@@ -221,14 +213,6 @@ SAirFactoryUnit = Class(AirFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- AIR UNITS
@@ -334,15 +318,7 @@ SHoverLandUnit = Class(DefaultUnitsFile.HoverLandUnit) {
 }
 
 -- LAND FACTORY STRUCTURES
-SLandFactoryUnit = Class(LandFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
-
+SLandFactoryUnit = Class(LandFactoryUnit, SFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
@@ -402,14 +378,6 @@ SLandFactoryUnit = Class(LandFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- LAND UNITS
@@ -431,15 +399,7 @@ SRadarUnit = Class(RadarUnit) {}
 SSonarUnit = Class(SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
-SSeaFactoryUnit = Class(SeaFactoryUnit) {
-    StartBuildFx = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFx(self, unitBeingBuilt)
-    end,
-
-    StartBuildFxUnpause = function(self, unitBeingBuilt)
-        SFactoryUnit.StartBuildFxUnpause(self, unitBeingBuilt)
-    end,
-
+SSeaFactoryUnit = Class(SeaFactoryUnit, SFactoryUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         -- Set goal for rotator
         local unitid = self:GetBlueprint().General.UpgradesTo
@@ -499,14 +459,6 @@ SSeaFactoryUnit = Class(SeaFactoryUnit) {
            end
         end,
     },
-
-    OnPaused = function(self)
-        SFactoryUnit.OnPaused(self)
-    end,
-
-    OnUnpaused = function(self)
-        SFactoryUnit.OnUnpaused(self)
-    end,
 }
 
 -- SEA UNITS
