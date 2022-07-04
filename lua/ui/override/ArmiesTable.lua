@@ -15,9 +15,6 @@ local TickInterval = 2.0
 -- when FastInterval() is called again before ResetInterval() is.
 local TickIntervalResetCounter = 0
 
---- Handle to the tick thread that updates the cache
-local HandleToTickThread = false 
-
 --- A simple tick thread that updates the cache
 local function TickThread()
     while true do 
@@ -30,16 +27,6 @@ local function TickThread()
         -- update the cache and inform observers
         Cached = GlobalGetArmiesTable()
         Observable:Set(Cached)
-    end
-end
-
---- Starts the tick thread to update the cache, should be called only once
-function Setup()
-    if not HandleToTickThread then 
-        HandleToTickThread = ForkThread(TickThread)
-    else 
-        WARN("Tried to start a second tick thread for updating the cache of GetArmiesTable:")
-        LOG(repr(debug.getinfo(2)))
     end
 end
 
@@ -66,3 +53,5 @@ function ResetInterval()
         TickInterval = 2.0
     end
 end
+
+ForkThread(TickThread)

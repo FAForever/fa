@@ -565,77 +565,77 @@ for k = 1, 21 do
     }
 end
 
-local function PerformanceTrackingThread()
+local function StoreSamples(exitType)
 
-    local function StoreSamples(exitType)
+    -- this is usually testing, no need to keep track of that
+    -- if exitType == 'RestartSession' then
+    --     return
+    -- end
 
-        -- this is usually testing, no need to keep track of that
-        -- if exitType == 'RestartSession' then
-        --     return
-        -- end
+    LOG("Storing samples!")
 
-        LOG("Storing samples!")
+    mapName = session.name
+    mapVersion = session.map_version or 1
 
-        mapName = session.name
-        mapVersion = session.map_version or 1
+    -- get / store the preference table
+    local identifier = string.format("%s - %s", tostring(mapName), tostring(mapVersion))
+    local data = GetPreference('PerformanceTrackingV1') or { }
 
-        -- get / store the preference table
-        local identifier = string.format("%s - %s", tostring(mapName), tostring(mapVersion))
-        local data = GetPreference('PerformanceTrackingV1') or { }
+    local mapData = data[identifier]
+    if mapData then 
+        for k = 1, 21 do
+            
+            if samples[k].Samples > 0 then
+                if mapData[k].Samples > 0 then
+                    
+                    -- combine them
+                    mapData[k].UnitCount.Min = math.min(samples[k].UnitCount.Min, mapData[k].UnitCount.Min)
+                    mapData[k].UnitCount.Max = math.max(samples[k].UnitCount.Max, mapData[k].UnitCount.Max)
+                    mapData[k].EntityCount.Min = math.min(samples[k].EntityCount.Min, mapData[k].EntityCount.Min)
+                    mapData[k].EntityCount.Max = math.max(samples[k].EntityCount.Max, mapData[k].EntityCount.Max)
 
-        local mapData = data[identifier]
-        if mapData then 
-            for k = 1, 21 do
-                
-                if samples[k].Samples > 0 then
-                    if mapData[k].Samples > 0 then
-                        
-                        -- combine them
-                        mapData[k].UnitCount.Min = math.min(samples[k].UnitCount.Min, mapData[k].UnitCount.Min)
-                        mapData[k].UnitCount.Max = math.max(samples[k].UnitCount.Max, mapData[k].UnitCount.Max)
-                        mapData[k].EntityCount.Min = math.min(samples[k].EntityCount.Min, mapData[k].EntityCount.Min)
-                        mapData[k].EntityCount.Max = math.max(samples[k].EntityCount.Max, mapData[k].EntityCount.Max)
+                    -- slowly converge to exclude outliers over time
+                    local avgUnitCount = 0.5 * (mapData[k].UnitCount.Min + mapData[k].UnitCount.Max)
+                    local avgEntityCount = 0.5 * (mapData[k].EntityCount.Min + mapData[k].EntityCount.Max)
 
-                        -- slowly converge to exclude outliers over time
-                        local avgUnitCount = 0.5 * (mapData[k].UnitCount.Min + mapData[k].UnitCount.Max)
-                        local avgEntityCount = 0.5 * (mapData[k].EntityCount.Min + mapData[k].EntityCount.Max)
+                    -- linear interpolation
+                    mapData[k].UnitCount.Min = 0.9 * mapData[k].UnitCount.Min + 0.1 * avgUnitCount
+                    mapData[k].UnitCount.Max = 0.9 * mapData[k].UnitCount.Max + 0.1 * avgUnitCount
+                    mapData[k].EntityCount.Min = 0.9 * mapData[k].EntityCount.Min + 0.1 * avgEntityCount
+                    mapData[k].EntityCount.Max = 0.9 * mapData[k].EntityCount.Max + 0.1 * avgEntityCount
 
-                        -- linear interpolation
-                        mapData[k].UnitCount.Min = 0.9 * mapData[k].UnitCount.Min + 0.1 * avgUnitCount
-                        mapData[k].UnitCount.Max = 0.9 * mapData[k].UnitCount.Max + 0.1 * avgUnitCount
-                        mapData[k].EntityCount.Min = 0.9 * mapData[k].EntityCount.Min + 0.1 * avgEntityCount
-                        mapData[k].EntityCount.Max = 0.9 * mapData[k].EntityCount.Max + 0.1 * avgEntityCount
+                    mapData[k].Samples = mapData[k].Samples + samples[k].Samples
+                else
+                    -- first time at this rate, just take them as ground truth
+                    mapData[k].UnitCount = { }
+                    mapData[k].EntityCount = { }
 
-                        mapData[k].Samples = mapData[k].Samples + samples[k].Samples
-                    else
-                        -- first time at this rate, just take them as ground truth
-                        mapData[k].UnitCount = { }
-                        mapData[k].EntityCount = { }
-
-                        mapData[k].UnitCount.Min = samples[k].UnitCount.Min
-                        mapData[k].UnitCount.Max = samples[k].UnitCount.Max
-                        mapData[k].EntityCount.Min = samples[k].EntityCount.Min
-                        mapData[k].EntityCount.Max = samples[k].EntityCount.Max
-                        mapData[k].Samples = samples[k].Samples
-                    end
+                    mapData[k].UnitCount.Min = samples[k].UnitCount.Min
+                    mapData[k].UnitCount.Max = samples[k].UnitCount.Max
+                    mapData[k].EntityCount.Min = samples[k].EntityCount.Min
+                    mapData[k].EntityCount.Max = samples[k].EntityCount.Max
+                    mapData[k].Samples = samples[k].Samples
                 end
             end
-
-            mapData.Samples = mapData.Samples + 1
-        else  
-            -- use as ground truth
-            data[identifier] = samples
-            data[identifier].Samples = 1
         end
 
-        reprsl(data)
-
-        SetPreference('PerformanceTrackingV1', data)
+        mapData.Samples = mapData.Samples + 1
+    else  
+        -- use as ground truth
+        data[identifier] = samples
+        data[identifier].Samples = 1
     end
 
-    WaitSeconds(1.0)
+    SetPreference('PerformanceTrackingV1', data)
+end
+
+local function PerformanceTrackingThread()
 
     local focusArmy = GetFocusArmy()
+
+    -- # Wait until the game is ready
+
+    WaitSeconds(1.0)
 
     -- # Add on exit callbacks to store information
 
@@ -646,10 +646,11 @@ local function PerformanceTrackingThread()
 
     while true do
 
-        -- wait ten seconds between a sample. The wait depends on frame time which is unstable.
+        -- # Wait between samples
+
         WaitSeconds(1.0)
 
-        -- # Refresh state of data
+        -- # Refresh data
 
         clients = GetSessionClients()
         engineStats = __EngineStats
@@ -684,7 +685,7 @@ local function PerformanceTrackingThread()
             end
         end
 
-        -- # Track the sample
+        -- # Store the sample
 
         LOG("Sampling at rate: " .. tostring(rate))
 
@@ -707,6 +708,4 @@ local function PerformanceTrackingThread()
     end
 end
 
-function PerformanceTracking()
-    ForkThread(PerformanceTrackingThread)
-end
+ForkThread(PerformanceTrackingThread)
