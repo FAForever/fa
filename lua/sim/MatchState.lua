@@ -26,15 +26,25 @@ end
 local function CollectDefeatedBrains(aliveBrains, condition, delay)
     local defeatedBrains = { }
     for k, brain in aliveBrains do
-
-        local criticalUnits = brain:GetListOfUnits(brain, condition)
-        if criticalUnits then 
-            for k, unit in criticalUnits do 
-                if not IsDestroyed(unit) and unit:GetFractionComplete() == 1 then
-                    defeatedBrains[k] = brain 
+        local criticalUnits = brain:GetListOfUnits(condition)
+        if criticalUnits then
+            -- critical units found, make sure they all exist properly
+            local oneCriticalUnitAlive = false
+            for k, unit in criticalUnits do
+                if (not IsDestroyed(unit)) and (unit:GetFractionComplete() == 1) then
+                    oneCriticalUnitAlive = true
                     break
                 end
             end
+
+            -- no critical units alive or finished, brain is defeated
+            if not oneCriticalUnitAlive then 
+                defeatedBrains[k] = brain
+            end
+
+        -- no critical units found, brain is defeated
+        else 
+            defeatedBrains[k] = brain
         end
 
         WaitTicks(delay)
@@ -90,22 +100,28 @@ local function MatchStateThread()
     -- keep scanning the gamestate for changes in alliances and brain state
     while true do
 
+        LOG("Checking victory conditions!")
+
         -- check for defeat
         local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 4)
-        local defeatedBrainsCount = table.getn(defeatedBrains)
+        local defeatedBrainsCount = table.getsize(defeatedBrains)
         if defeatedBrainsCount > 0 then
 
             -- take into account cascading effects
-            local lastDefeatedBrainsCount = defeatedBrainsCount
+            local lastDefeatedBrainsCount
             repeat 
                 WaitTicks(4)
+                
+                lastDefeatedBrainsCount = defeatedBrainsCount
+
                 -- re-compute the defeated brains until it no longer increases
                 defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 1)
-                defeatedBrainsCount = table.getn(defeatedBrains)
+                defeatedBrainsCount = table.getsize(defeatedBrains)
             until defeatedBrainsCount == lastDefeatedBrainsCount
 
             -- call them out as being defeated and exclude them
             for k, brain in defeatedBrains do
+                LOG("Defeated brain: " .. tostring(k))
 
                 -- take the army out of the game, adjust command sources
                 SetArmyOutOfGame(k)
@@ -124,7 +140,7 @@ local function MatchStateThread()
 
         -- loop through the brains that are still alive to check for alliance differences
 
-        if table.getn(aliveBrains) > 0 then 
+        if table.getsize(aliveBrains) > 0 then 
 
             -- check for draw
             local draw = true
@@ -142,6 +158,7 @@ local function MatchStateThread()
                     brain:OnDraw()
 
                     -- communicate to the server that this brain has been defeated
+                    LOG("Draw!")
                     table.insert(Sync.GameResult, { k, string.format("%s %i", 'draw', 0) })
 
                     -- stop considering it a brain that is still alive
@@ -174,7 +191,8 @@ local function MatchStateThread()
                     brain:OnVictory()
 
                     -- communicate to the server that this brain has been defeated
-                    table.insert(Sync.GameResult, { k, string.format("%s %i", 'victory', 0) })
+                    LOG("Victory!")
+                    table.insert(Sync.GameResult, { k, string.format("%s %i", 'victory', 10) })
 
                     -- stop considering it a brain that is still alive
                     aliveBrains[k] = nil

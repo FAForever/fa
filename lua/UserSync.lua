@@ -384,13 +384,19 @@ function OnSync()
     -- game manipulation and / or rating manipulation. See also the in-game rules:
     -- - https://www.faforever.com/rules
 
+    --- Processes game results to adjust UI capabilities
+    for _, gameResult in Sync.GameResult do
+        local armyIndex, result = unpack(gameResult)
+        import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
+    end
+
     if not SessionIsReplay() then
 
         --- Sends the defeat / victory / draw game results over to the server
         for _, gameResult in Sync.GameResult do
             local armyIndex, result = unpack(gameResult)
+            SPEW(string.format("(%s) Sending game result: %s %s", tostring(GameTick()), armyIndex, result))
             GpgNetSend('GameResult', armyIndex, result)
-            import('/lua/ui/game/gameresult.lua').DoGameResult(armyIndex, result)
         end
 
         --- Sends the (unit) statistics over to the server
@@ -401,7 +407,7 @@ function OnSync()
         end
 
         --- Sends potential team kill events to the server
-        if Sync.Teamkill and not SessionIsReplay() then
+        if Sync.Teamkill then
             local armies, clients = GetArmiesTable().armiesTable, GetSessionClients()
             local victim, instigator = Sync.Teamkill.victim, Sync.Teamkill.instigator
             local data = {time=Sync.Teamkill.killTime, victim={}, instigator={}}

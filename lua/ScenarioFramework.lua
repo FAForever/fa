@@ -37,7 +37,7 @@ function EndOperation(_success, _allPrimary, _allSecondary, _allBonus)
         _opData = import(opFile)
     end
 
-    import('/lua/victory.lua').CallEndGame() -- We need this here to populate the score screen
+    import('/lua/sim/matchstate.lua').CallEndGame() -- We need this here to populate the score screen
 
     ForkThread(function()
         WaitSeconds(3) -- Wait for the stats to be synced

@@ -6,7 +6,6 @@ local ArmyScore = {}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 scoreData = {interval = historyInterval, current = ArmyScore, history = {}}
 
-local victory = import('/lua/victory.lua')
 -- Some of these values pre-existed and are used in other places, that's why their naming is not consistent
 local categoriesToCollect = {
     land = categories.LAND,
@@ -45,7 +44,7 @@ function CalculateBrainScore(brain)
 end
 
 local function ScoreResourcesThread()
-    while not victory.gameOver do
+    while true do
         WaitSeconds(1)
         for index, brain in ArmyBrains do
             if ArmyIsCivilian(index) then continue end
@@ -87,20 +86,18 @@ local function ScoreResourcesThread()
 end
 
 local function ScoreHistoryThread()
-    while not victory.gameOver do
-        WaitSeconds(scoreData.interval)
-        local data = {}
-        for index, brain in ArmyBrains do
-            local Score = scoreData.current[index]
-            if ArmyIsCivilian(index) then continue end
-            if (Score.Defeated ~= nil) and (Score.Defeated < 0) then continue end
-            if (Score.Defeated ~= nil) and (Score.Defeated < GetGameTimeSeconds()) then
-                Score.Defeated = -1
-            end
-            data[index] = table.deepcopy(Score)
+    WaitSeconds(scoreData.interval)
+    local data = {}
+    for index, brain in ArmyBrains do
+        local Score = scoreData.current[index]
+        if ArmyIsCivilian(index) then continue end
+        if (Score.Defeated ~= nil) and (Score.Defeated < 0) then continue end
+        if (Score.Defeated ~= nil) and (Score.Defeated < GetGameTimeSeconds()) then
+            Score.Defeated = -1
         end
-        table.insert(scoreData.history, data)
+        data[index] = table.deepcopy(Score)
     end
+    table.insert(scoreData.history, data)
 end
 
 local function ScoreThread()
@@ -185,7 +182,7 @@ local function ScoreThread()
     local lastConsumedEnergy = 0
     local estimatedTicksSinceLastUpdate = 0
 
-    while not victory.gameOver do
+    while true do
         local updInterval = scoreInterval / table.getsize(ArmyBrains)
         for index, brain in ArmyBrains do
             local CurTime = GetGameTimeSeconds()
@@ -265,8 +262,6 @@ function init()
     ForkThread(ScoreThread)
     table.insert(GameOverListeners, function()
         Sync.ScoreAccum = scoreData
-        if victory.gameOver then
-            Sync.StatsToSend = ArmyScore
-        end
+        Sync.StatsToSend = ArmyScore
     end)
 end
