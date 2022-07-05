@@ -5,6 +5,7 @@
 -- Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
 -------------------------------------------------------------------
 
+local Entity = import('/lua/sim/Entity.lua').Entity
 local WeaponFile = import('/lua/sim/DefaultWeapons.lua')
 local CollisionBeamFile = import('defaultcollisionbeams.lua')
 local DisruptorBeamCollisionBeam = CollisionBeamFile.DisruptorBeamCollisionBeam
@@ -51,6 +52,8 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     BeamType = TractorClawCollisionBeam,
     FxMuzzleFlash = {},
 
+    TractorEffect = import('/lua/EffectTemplates.lua').AQuantumGateAmbient,
+
     --- Called by the engine when the weapon is created
     ---@param self ADFTractorClaw
     OnCreate = function(self)
@@ -69,8 +72,6 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     ---@param self ADFTractorClaw
     ---@param muzzle string
     PlayFxBeamStart = function(self, muzzle)
-        LOG("PlayFxBeamStart")
-
         -- get the real target behind a blip
         local target = self:GetCurrentTarget()
         target = self:GetRealTarget(target)
@@ -79,7 +80,6 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         if self:IsTargetAlreadyUsed(target) or self.TractorThreadInstance then
             self:ForkThread(
                 function(self)
-                    LOG("Target already used!")
                     self:ResetTarget()
                     self:SetEnabled(false)
                     self:AimManipulatorSetEnabled(false)
@@ -92,8 +92,9 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         end
 
         -- create vacuum suck up from ground effects on the unit targetted.
-        for _, v in EffectTemplate.ACollossusTractorBeamVacuum01 do
-            CreateEmitterAtEntity(target, target.Army, v):ScaleEmitter(0.125 * target.FootPrintSize)
+        for _, effect in EffectTemplate.ACollossusTractorBeamVacuum01 do
+            CreateEmitterAtEntity(target, target.Army, effect):ScaleEmitter(0.125 * target.FootPrintSize)
+            CreateEmitterAtEntity(target, target.Army, effect):ScaleEmitter(0.125 * target.FootPrintSize)
         end
 
         -- create a flash
@@ -144,18 +145,9 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         return target
     end,
 
-    --- Called by the engine when the weapon gets a target
-    ---@param self ADFTractorClaw
-    OnGotTarget = function(self)
-        LOG(string.format("Got a target!"))
-        DefaultBeamWeapon.OnGotTarget(self)
-    end,
-
     --- Called by the engine when the weapon lost a target
     ---@param self ADFTractorClaw
     OnLostTarget = function(self)
-        LOG(string.format("Lost a target!"))
-
         self:AimManipulatorSetEnabled(true)
         DefaultBeamWeapon.OnLostTarget(self)
         DefaultBeamWeapon.PlayFxBeamEnd(self, self.Beams[1].Beam)
