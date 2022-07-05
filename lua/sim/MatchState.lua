@@ -185,7 +185,7 @@ local function MatchStateThread()
             end
 
         -- apparently no undefeated brains are left
-        else 
+        else
             CallEndGame()
             break
         end
