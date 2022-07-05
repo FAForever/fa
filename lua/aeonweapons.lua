@@ -45,42 +45,75 @@ ADFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
 }
 
 ---@class ADFTractorClaw : DefaultBeamWeapon
+---@field TractorTrashbag TrashBag
+---@field TractorThreadInstance thread
 ADFTractorClaw = Class(DefaultBeamWeapon) {
     BeamType = TractorClawCollisionBeam,
     FxMuzzleFlash = {},
 
-    PlayFxBeamStart = function(self, muzzle)
-        local target = self:GetCurrentTarget()
-        if not target or
-            EntityCategoryContains(categories.STRUCTURE, target) or
-            EntityCategoryContains(categories.COMMAND, target) or
-            EntityCategoryContains(categories.EXPERIMENTAL, target) or
-            EntityCategoryContains(categories.NAVAL, target) or
-            EntityCategoryContains(categories.SUBCOMMANDER, target) or
-            not EntityCategoryContains(categories.ALLUNITS, target) then
-            return
-        end
+    --- Called by the engine when the weapon is created
+    ---@param self ADFTractorClaw
+    OnCreate = function(self)
+        DefaultBeamWeapon.OnCreate(self)
 
-        -- Can't pass recon blips down
+        self.TractorTrashbag = TrashBag()
+    end,
+
+    --- Called by the engine when the weapon is destroyed
+    ---@param self ADFTractorClaw
+    OnDestroy = function(self)
+        self.TractorTrashbag:Destroy()
+    end,
+
+    --- Called when the beam effect starts
+    ---@param self ADFTractorClaw
+    ---@param muzzle string
+    PlayFxBeamStart = function(self, muzzle)
+        LOG("PlayFxBeamStart")
+
+        -- get the real target behind a blip
+        local target = self:GetCurrentTarget()
         target = self:GetRealTarget(target)
 
-        if self:IsTargetAlreadyUsed(target) then
+        -- the colossus has three weapons, we don't want them to overlap. If it does happen, reset the tractor beam
+        if self:IsTargetAlreadyUsed(target) or self.TractorThreadInstance then
+            self:ForkThread(
+                function(self)
+                    LOG("Target already used!")
+                    self:ResetTarget()
+                    self:SetEnabled(false)
+                    self:AimManipulatorSetEnabled(false)
+                    WaitSeconds(0.5)
+                    self:SetEnabled(true)
+                    self:AimManipulatorSetEnabled(true)
+                end
+            )
             return
         end
 
-        -- Create vacuum suck up from ground effects on the unit targetted.
+        -- create vacuum suck up from ground effects on the unit targetted.
         for _, v in EffectTemplate.ACollossusTractorBeamVacuum01 do
             CreateEmitterAtEntity(target, target.Army, v):ScaleEmitter(0.125 * target.FootPrintSize)
         end
 
+        -- create a flash
+        CreateLightParticle(target, -1, self.Army, 5, 5, 'glow_02', 'ramp_blue_22')
+
+        -- slow down the rate of fire
+        self:ChangeRateOfFire(1.0)
+        
+        -- run the default beam start, such as the beam effect
         DefaultBeamWeapon.PlayFxBeamStart(self, muzzle)
 
-        self.TT1 = self:ForkThread(self.TractorThread, target)
+        -- keep track of the status quo of the tractor weapon
+        self.TractorThreadInstance = self:ForkThread(self.TractorThread, target)
         self:ForkThread(self.TractorWatchThread, target)
     end,
 
-    -- Override this function in the unit to check if another weapon already has this
-    -- unit as a target.  Target argument should not be a recon blip
+    --- Checks whether our target is unique for this unit
+    ---@param self ADFTractorClaw
+    ---@param target Unit
+    ---@return boolean
     IsTargetAlreadyUsed = function(self, target)
         local weap
         for i = 1, self.unit:GetWeaponCount() do
@@ -94,7 +127,10 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         return false
     end,
 
-    -- Recon blip check
+    --- In case the target is a blip, retrieve the unit
+    ---@param self ADFTractorClaw
+    ---@param target Unit | Blip
+    ---@return Unit
     GetRealTarget = function(self, target)
         if target and not IsUnit(target) then
             local unitTarget = target:GetSource()
@@ -108,26 +144,51 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         return target
     end,
 
+    --- Called by the engine when the weapon gets a target
+    ---@param self ADFTractorClaw
+    OnGotTarget = function(self)
+        LOG(string.format("Got a target!"))
+        DefaultBeamWeapon.OnGotTarget(self)
+    end,
+
+    --- Called by the engine when the weapon lost a target
+    ---@param self ADFTractorClaw
     OnLostTarget = function(self)
+        LOG(string.format("Lost a target!"))
+
         self:AimManipulatorSetEnabled(true)
         DefaultBeamWeapon.OnLostTarget(self)
         DefaultBeamWeapon.PlayFxBeamEnd(self, self.Beams[1].Beam)
     end,
 
+    --- Applies the tractor thread behavior
+    ---@param self ADFTractorClaw
+    ---@param target Unit
     TractorThread = function(self, target)
-        self.unit.Trash:Add(target)
+        -- sanity checks
         local beam = self.Beams[1].Beam
         if not beam then return end
 
         local muzzle = self:GetBlueprint().MuzzleSpecial
         if not muzzle then return end
 
+        -- do not allow collisions to the target
+        target.DisallowCollisions = true
+
+        -- do not allow the target to become target of another weapon
         target:SetDoNotTarget(true)
+
+        -- compute the distance and adjust our muzzle bone
         local pos0 = beam:GetPosition(0)
         local pos1 = beam:GetPosition(1)
         local dist = VDist3(pos0, pos1)
-
         self.Slider = CreateSlider(self.unit, muzzle, 0, 0, dist, -1, true)
+
+        -- rotate the target 
+        self.TractorTrashbag:Add(self.Slider)
+        self.TractorTrashbag:Add(CreateRotator(target, 0, 'x', nil, 0, 15, 20 + Random(0, 40)))
+        self.TractorTrashbag:Add(CreateRotator(target, 0, 'y', nil, 0, 15, 20 + Random(0, 40)))
+        self.TractorTrashbag:Add(CreateRotator(target, 0, 'z', nil, 0, 15, 20 + Random(0, 40)))
 
         WaitTicks(1)
         WaitFor(self.Slider)
@@ -139,39 +200,57 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
 
         self.AimControl:SetResetPoseTime(10)
 
-        self.Slider:SetSpeed(15)
+        self.Slider:SetSpeed(8)
         self.Slider:SetGoal(0, 0, 0)
 
         WaitTicks(1)
         WaitFor(self.Slider)
 
-        if not target.Dead then
+        if not IsDestroyed(target) then
+
             target.DestructionExplosionWaitDelayMin = 0
             target.DestructionExplosionWaitDelayMax = 0
 
-            for kEffect, vEffect in EffectTemplate.ACollossusTractorBeamCrush01 do
-                CreateEmitterAtBone(self.unit, muzzle, self.unit.Army, vEffect)
+            -- create fancy explosion
+            for k, effect in EffectTemplate.ACollossusTractorBeamCrush01 do
+                CreateEmitterAtBone(self.unit, muzzle, self.unit.Army, effect)
             end
 
+            -- create a flash
+            CreateLightParticle(target, -1, self.Army, 10, 5, 'glow_02', 'ramp_blue_22')
+
+            -- take out the unit, set the weapon owner as the instigator
             target:Kill(self.unit)
         end
 
-        self.AimControl:SetResetPoseTime(2)
+        -- reset our rate of fire
+        self:ChangeRateOfFire(1.0)
     end,
 
+    --- Checks the tractor thread behavior
+    ---@param self ADFTractorClaw
+    ---@param target Unit
     TractorWatchThread = function(self, target)
+
+        -- keep checking and stunning the target
         while not target.Dead do
+            target:SetStunned(0.1)
             WaitTicks(1)
         end
-        KillThread(self.TT1)
-        self.TT1 = nil
-        if self.Slider then
-            self.Slider:Destroy()
-            self.Slider = nil
-        end
-            self.unit:DetachAll(self:GetBlueprint().MuzzleSpecial or 0)
-            self:ResetTarget()
-            self.AimControl:SetResetPoseTime(2)
+
+        -- if the unit is destroyed, take out the tractor thread instance and the sliders / rotators
+        KillThread(self.TractorThreadInstance)
+        self.TractorThreadInstance = nil
+        self.TractorTrashbag:Destroy()
+
+        -- detache the anything attached to our muzzle
+        self.unit:DetachAll(self.Blueprint.MuzzleSpecial or 0)
+
+        -- adjust our rate of fire
+        self:ChangeRateOfFire(1.0)
+
+        -- reset target to start searching for a new target
+        self:ResetTarget()
     end,
 }
 
