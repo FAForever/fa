@@ -58,6 +58,43 @@ local veterancyRegenBuffs = {
     {25, 50, 75, 100,125}, -- Experimental
 }
 
+-- Allow units to require more or less mass to level up. Decimal multipliers mean
+-- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
+local veterancyMultipliers = {
+    TECH1 = 2,
+    TECH2 = 1.5,
+    TECH3 = 1.25,
+    SUBCOMMANDER = 2,
+    EXPERIMENTAL = 2,
+    COMMAND = 2,
+}
+
+local intelTypeTbl = { 'JamRadius', 'SpoofRadius' }
+local intelTypeBool = { 'RadarStealth', 'SonarStealth', 'Cloak' }
+local intelTypeNum = {
+    'RadarRadius', 'SonarRadius', 'OmniRadius',
+    'RadarStealthFieldRadius', 'SonarStealthFieldRadius', 'CloakFieldRadius',
+}
+local IntelMap = {
+    Cloak = 'Cloak',
+    CloakField = 'CloakField',
+    CloakFieldRadius = 'CloakField',
+    JamRadius = 'Spoof',
+    SpoofRadius = 'Spoof',
+
+    RadarRadius = 'Radar',
+    RadarStealth = 'RadarStealth',
+    RadarStealthField = 'RadarStealthField',
+    RadarStealthFieldRadius = 'RadarStealthField',
+
+    Sonar = 'Sonar',
+    SonarRadius = 'Sonar',
+    SonarStealth = 'SonarStealth',
+    SonarStealthFieldRadius = 'SonarStealthField',
+
+    OmniRadius = 'Omni',
+}
+
 local TrashBag = TrashBag
 local TrashAdd = TrashBag.Add
 local TrashDestroy = TrashBag.Destroy
@@ -173,20 +210,6 @@ Unit = Class(moho.unit_methods) {
         if not self.Trash then
             self.Trash = TrashBag()
         end
-
-        self.IntelDisables = {
-            Radar = {NotInitialized = true},
-            Sonar = {NotInitialized = true},
-            Omni = {NotInitialized = true},
-            RadarStealth = {NotInitialized = true},
-            SonarStealth = {NotInitialized = true},
-            RadarStealthField = {NotInitialized = true},
-            SonarStealthField = {NotInitialized = true},
-            Cloak = {NotInitialized = true},
-            CloakField = {NotInitialized = true}, -- We really shouldn't use this. Cloak/Stealth fields are pretty busted
-            Spoof = {NotInitialized = true},
-            Jammer = {NotInitialized = true},
-        }
 
         self.EventCallbacks = {
             -- OnKilled = {},
@@ -324,8 +347,6 @@ Unit = Class(moho.unit_methods) {
             Affects = {},
         }
 
-        self:SetIntelRadius('Vision', bp.Intel.VisionRadius or 0)
-
         self.CanTakeDamage = true
         self.CanBeKilled = true
 
@@ -346,7 +367,25 @@ Unit = Class(moho.unit_methods) {
             AIUtils.ApplyCheatBuffs(self)
         end
         -- Flags for scripts
-        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
+        self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
+
+        
+        local bpInt = bp.Intel
+        self:SetIntelRadius('Vision', bpInt.VisionRadius or 0)
+        if bpInt then
+            -- only make the table when needed, and only add the intel used by the unit
+            self.IntelDisables = {}
+            for intel, _ in bpInt do
+                local field = IntelMap[intel]
+                if field then
+                    self.IntelDisables[field] = {Construction = true}
+                end
+            end
+            -- manage the loss of intel when energy is depleted
+            if not bpInt.FreeIntel then
+                self.Brain:AddEnergyDependingEntity(self)
+            end
+        end
     end,
 
     -------------------------------------------------------------------------------------------
@@ -2132,32 +2171,23 @@ Unit = Class(moho.unit_methods) {
             self.Sync.VeteranLevel = 0
 
             -- Values can be setting up manually via bp.
-            if bp.VeteranMass then
-                self.Sync.manualVeterancy = {
-                    [1] = bp.VeteranMass[1],
-                    [2] = bp.VeteranMass[1] + bp.VeteranMass[2],
-                    [3] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3],
-                    [4] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4],
-                    [5] = bp.VeteranMass[1] + bp.VeteranMass[2] + bp.VeteranMass[3] + bp.VeteranMass[4] + bp.VeteranMass[5],
-                }
+            local vetMass = bp.VeteranMass
+            if vetMass then
+                local manualVeterancy = {nil, nil, nil, nil, nil}
+                manualVeterancy[1] = vetMass[1]
+                manualVeterancy[2] = vetMass[2] + manualVeterancy[1]
+                manualVeterancy[3] = vetMass[3] + manualVeterancy[2]
+                manualVeterancy[4] = vetMass[4] + manualVeterancy[3]
+                manualVeterancy[5] = vetMass[5] + manualVeterancy[4]
+                self.Sync.manualVeterancy = manualVeterancy
             else
-                -- Allow units to require more or less mass to level up. Decimal multipliers mean
-                -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
-                local techMultipliers = {
-                    TECH1 = 2,
-                    TECH2 = 1.5,
-                    TECH3 = 1.25,
-                    SUBCOMMANDER = 2,
-                    EXPERIMENTAL = 2,
-                    COMMAND = 2,
-                }
-                local defaultMult = techMultipliers[self.techCategory] or 2
+                local defaultMult = veterancyMultipliers[self.techCategory] or 2
 
                 self.Sync.myValue = math.max(math.floor(bp.Economy.BuildCostMass * (bp.VeteranMassMult or defaultMult)), 1)
             end
         end
 
-        self:EnableUnitIntel('NotInitialized', nil)
+        self:EnableUnitIntel('Construction')
         self:ForkThread(self.StopBeingBuiltEffects, builder, layer)
 
         if self.Layer == 'Water' then
@@ -2641,10 +2671,19 @@ Unit = Class(moho.unit_methods) {
     -- present to zero, and when going from zero disablers to one.
 
     DisableUnitIntel = function(self, disabler, intel)
+        if not self.IntelDisables then
+            self.IntelDisables = {}
+        end
         local function DisableOneIntel(disabler, intel)
+            local intelDisables = self.IntelDisables[intel]
+            if not intelDisables then
+                intelDisables = {}
+                self.IntelDisables[intel] = intelDisables
+            end
             local intDisabled = false
-            if Set.Empty(self.IntelDisables[intel]) then
-                local active = self.Blueprint.Intel.ActiveIntel
+            if Set.Empty(intelDisables) then
+                local bpIntel = self.Blueprint.Intel
+                local active = bpIntel.ActiveIntel
                 if active and active[intel] then
                     return
                 end
@@ -2652,30 +2691,23 @@ Unit = Class(moho.unit_methods) {
 
                 -- Handle the cloak FX timing
                 if intel == 'Cloak' or intel == 'CloakField' then
-                    if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
+                    if disabler ~= 'Construction' and bpIntel[intel] then
                         self:UpdateCloakEffect(false, intel)
                     end
                 end
 
                 intDisabled = true
             end
-            self.IntelDisables[intel][disabler] = true
+            intelDisables[disabler] = true
             return intDisabled
         end
 
         local intDisabled = false
-
-        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here with certain units that have Intel changes on layer change
-        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
-        if self.IntelDisables['Radar']['NotInitialized'] then
-            return
-        end
-
         if intel then
             intDisabled = DisableOneIntel(disabler, intel)
         else
             -- Loop over all intels and add disabler
-            for intel, v in self.IntelDisables do
+            for intel, _ in self.IntelDisables do
                 intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- Beware of short-circuiting
             end
         end
@@ -2686,45 +2718,40 @@ Unit = Class(moho.unit_methods) {
     end,
 
     EnableUnitIntel = function(self, disabler, intel)
+        if not self.IntelDisables then
+            self.IntelDisables = {}
+        end
         local function EnableOneIntel(disabler, intel)
-            local intEnabled = false
-            if self.IntelDisables[intel][disabler] then -- Must check for explicit true contained
-                self.IntelDisables[intel][disabler] = nil
-                if Set.Empty(self.IntelDisables[intel]) then
+            local intelDisables = self.IntelDisables[intel]
+            if not intelDisables then
+                intelDisables = {}
+                self.IntelDisables[intel] = intelDisables
+            end
+            if intelDisables[disabler] then -- Must check for explicit true contained
+                intelDisables[disabler] = nil
+                if Set.Empty(intelDisables) then
                     self:EnableIntel(intel)
 
                     -- Handle the cloak FX timing
                     if intel == 'Cloak' or intel == 'CloakField' then
-                        if disabler ~= 'NotInitialized' and self.Blueprint.Intel[intel] then
+                        if disabler ~= 'Construction' and self.Blueprint.Intel[intel] then
                             self:UpdateCloakEffect(true, intel)
                         end
                     end
-
-                    intEnabled = true
+                    return true
                 end
             end
-            return intEnabled
+            return false
         end
 
         local intEnabled = false
-
-        -- We need this guard because the engine emits an early OnLayerChange event that would screw us up here.
-        -- The NotInitialized disabler is removed in OnStopBeingBuilt, when the Unit's intel engine state is properly initialized.
-        if self.IntelDisables['Radar']['NotInitialized'] == true and disabler ~= 'NotInitialized' then
-            return
-        end
-
         if intel then
             intEnabled = EnableOneIntel(disabler, intel)
         else
             -- Loop over all intels and remove disabler
-            for intel, v in self.IntelDisables do
+            for intel, _ in self.IntelDisables do
                 intEnabled = EnableOneIntel(disabler, intel) or intEnabled -- Beware of short-circuiting
             end
-        end
-
-        if not self.IntelThread then
-            self.IntelThread = self:ForkThread(self.IntelWatchThread)
         end
 
         if intEnabled then
@@ -2798,78 +2825,25 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ShouldWatchIntel = function(self)
-        if self.Blueprint.Intel.FreeIntel then
-            return false
-        end
-        local bpVal = self.Blueprint.Economy.MaintenanceConsumptionPerSecondEnergy
-        -- Check enhancements
-        if not bpVal or bpVal <= 0 then
-            local enh = self.Blueprint.Enhancements
-            if enh then
-                for k, v in enh do
-                    if self:HasEnhancement(k) and v.MaintenanceConsumptionPerSecondEnergy and v.MaintenanceConsumptionPerSecondEnergy > 0 then
-                        bpVal = v.MaintenanceConsumptionPerSecondEnergy
-                        break
-                    end
-                end
-            end
-        end
-        local watchPower = false
-        if bpVal and bpVal > 0 then
-            local intelTypeTbl = {'JamRadius', 'SpoofRadius'}
-            local intelTypeBool = {'RadarStealth', 'SonarStealth', 'Cloak'}
-            local intelTypeNum = {'RadarRadius', 'SonarRadius', 'OmniRadius', 'RadarStealthFieldRadius', 'SonarStealthFieldRadius', 'CloakFieldRadius', }
-            local bpInt = self.Blueprint.Intel
-            if bpInt then
-                for _, v in intelTypeTbl do
-                    for ki, vi in bpInt[v] do
-                        if vi > 0 then
-                            watchPower = true
-                            break
-                        end
-                    end
-                    if watchPower then break end
-                end
-                for _, v in intelTypeBool do
-                    if bpInt[v] then
-                        watchPower = true
-                        break
-                    end
-                end
-                for _, v in intelTypeNum do
-                    if bpInt[v] > 0 then
-                        watchPower = true
-                        break
-                    end
-                end
-            end
-        end
-        return watchPower
-    end,
-
-    IntelWatchThread = function(self)
-        local aiBrain = self:GetAIBrain()
-        local bp = self.Blueprint
-        local recharge = bp.Intel.ReactivateTime or 10
-        while self:ShouldWatchIntel() do
+    IntelFlickerThread = function(self)
+        local recharge = self.Blueprint.Intel.ReactivateTime or 10
+        while self.IntelThread do
+            self:DisableUnitIntel('Energy')
+            WaitSeconds(recharge)
+            self:EnableUnitIntel('Energy')
             WaitSeconds(0.5)
+        end
+    end;
 
-            -- Checking for less than 1 because sometimes there's more
-            -- than 0 and less than 1 in stock and that last bit of
-            -- energy isn't used. This results in the radar being
-            -- on even though there's no energy to run it. Shields
-            -- have a similar bug with a similar fix.
-            if aiBrain:GetEconomyStored('ENERGY') < 1 and not self.ToggledOff then
-                self:DisableUnitIntel('Energy', nil)
-                WaitSeconds(recharge)
-                self:EnableUnitIntel('Energy', nil)
-            end
+    OnEnergyDepleted = function(self)
+        if not self.IntelThread then
+            self.IntelThread = self:ForkThread(self.IntelFlickerThread)
         end
-        if self.IntelThread then
-            self.IntelThread = nil
-        end
-    end,
+    end;
+
+    OnEnergyViable = function(self)
+        self.IntelThread = nil
+    end;
 
     AddDetectedByHook = function(self, hook)
         if not self.DetectedByHooks then
