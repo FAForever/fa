@@ -99,9 +99,6 @@ local function MatchStateThread()
 
     -- keep scanning the gamestate for changes in alliances and brain state
     while true do
-
-        LOG("Checking victory conditions!")
-
         -- check for defeat
         local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 4)
         local defeatedBrainsCount = table.getsize(defeatedBrains)
@@ -121,8 +118,6 @@ local function MatchStateThread()
 
             -- call them out as being defeated and exclude them
             for k, brain in defeatedBrains do
-                LOG("Defeated brain: " .. tostring(k))
-
                 -- take the army out of the game, adjust command sources
                 SetArmyOutOfGame(k)
                 ObserverAfterDeath(k)
@@ -158,7 +153,6 @@ local function MatchStateThread()
                     brain:OnDraw()
 
                     -- communicate to the server that this brain has been defeated
-                    LOG("Draw!")
                     table.insert(Sync.GameResult, { k, string.format("%s %i", 'draw', 0) })
 
                     -- stop considering it a brain that is still alive
@@ -191,7 +185,6 @@ local function MatchStateThread()
                     brain:OnVictory()
 
                     -- communicate to the server that this brain has been defeated
-                    LOG("Victory!")
                     table.insert(Sync.GameResult, { k, string.format("%s %i", 'victory', 10) })
 
                     -- stop considering it a brain that is still alive
