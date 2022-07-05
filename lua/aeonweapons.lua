@@ -75,7 +75,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         -- get the real target behind a blip
         local target = self:GetCurrentTarget()
         target = self:GetRealTarget(target)
-
+        self.Target = target
         -- the colossus has three weapons, we don't want them to overlap. If it does happen, reset the tractor beam
         if self:IsTargetAlreadyUsed(target) or self.TractorThreadInstance then
             self:ForkThread(
@@ -148,6 +148,13 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
     --- Called by the engine when the weapon lost a target
     ---@param self ADFTractorClaw
     OnLostTarget = function(self)
+
+        -- reset the state of the target
+        if not IsDestroyed(self.Target) then 
+            self.Target:SetDoNotTarget(false)
+            self.Target.DisallowCollisions = false 
+        end
+
         self:AimManipulatorSetEnabled(true)
         DefaultBeamWeapon.OnLostTarget(self)
         DefaultBeamWeapon.PlayFxBeamEnd(self, self.Beams[1].Beam)
@@ -226,7 +233,6 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
 
         -- keep checking and stunning the target
         while not target.Dead do
-            target:SetStunned(0.1)
             WaitTicks(1)
         end
 
@@ -242,6 +248,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
         self:ChangeRateOfFire(1.0)
 
         -- reset target to start searching for a new target
+        WaitSeconds(0.5)
         self:ResetTarget()
     end,
 }
