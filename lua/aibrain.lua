@@ -35,12 +35,6 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
-local observer = false
-local Points = {
-    defeat = -10,
-    draw = 0,
-    victory = 10
-}
 
 local CoroutineYield = coroutine.yield
 
@@ -48,6 +42,7 @@ local CoroutineYield = coroutine.yield
 ---@alias HqTech "TECH2"|"TECH3"
 ---@alias HqLayer "LAND"|"AIR"|"NAVY"
 ---@alias HqFaction "AEON"|"UEF"|"SERAPHIM"|"CYBRAN"|"NOMADS"
+---@alias BrainState "Defeat" | "Victory" | "InProgress" | "Draw"
 
 ---@class AIBrain: moho.aibrain_methods
 ---@field Trash TrashBag
@@ -91,7 +86,11 @@ local CoroutineYield = coroutine.yield
 ---@field EnergyExcessThread thread
 ---@field IntelData table<string, number>|nil
 ---@field targetoveride boolean
+---@field BrainState BrainState
 AIBrain = Class(moho.aibrain_methods) {
+
+    -- The state of the brain in the match
+    BrainState = 'InProgress',
 
     --- HUMAN BRAIN FUNCTIONS HANDLED HERE
     ---@param self AIBrain
@@ -736,28 +735,19 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@deprecated 
     ReportScore = function(self)
-        local kills = self:GetArmyStat('Enemies_Commanders_Destroyed', 0).Value
-        local score = Points[self.Result] or 0 + kills
-        table.insert(Sync.GameResult, {self:GetArmyIndex(), string.format("%s %i", self.Result or 'score', score)})
     end,
 
     ---@param self AIBrain
     ---@param result AIResult
+    ---@deprecated
     SetResult = function(self, result)
-        if self.Result then return end
-        if not Points[result] then
-            WARN("brain:SetResult() " .. result .. " not a valid result")
-            return
-        end
-
-        self.Result = result
-        self:ReportScore()
     end,
 
     ---@param self AIBrain
     OnDefeat = function(self)
-        self:SetResult("defeat")
+        self.BrainState = 'Defeat'
 
         SetArmyOutOfGame(self:GetArmyIndex())
 
@@ -1009,17 +999,17 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     OnVictory = function(self)
-        self:SetResult("victory")
+        self.BrainState = 'Victory'
     end,
 
     ---@param self AIBrain
     OnDraw = function(self)
-        self:SetResult("draw")
+        self.BrainState = 'Draw'
     end,
 
     ---@param self AIBrain
     IsDefeated = function(self)
-        return self.Result == "defeat"
+        return self.BrainState == "Defeat"
     end,
 
     ---@param self AIBrain
