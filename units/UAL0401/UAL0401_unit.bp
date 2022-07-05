@@ -383,6 +383,9 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3,
+
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {
@@ -456,6 +459,9 @@ UnitBlueprint {
             WeaponUnpacks = false,
         },
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.3,
+
             AboveWaterFireOnly = true,
             AboveWaterTargetsOnly = true,
             Audio = {

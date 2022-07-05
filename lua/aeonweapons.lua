@@ -153,7 +153,7 @@ ADFTractorClaw = Class(DefaultBeamWeapon) {
                 CreateEmitterAtBone(self.unit, muzzle, self.unit.Army, vEffect)
             end
 
-            target:Kill(self.unit, 'Damage', 100)
+            target:Kill(self.unit)
         end
 
         self.AimControl:SetResetPoseTime(2)
