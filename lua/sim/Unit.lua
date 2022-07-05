@@ -68,13 +68,6 @@ local veterancyMultipliers = {
     EXPERIMENTAL = 2,
     COMMAND = 2,
 }
-
-local intelTypeTbl = { 'JamRadius', 'SpoofRadius' }
-local intelTypeBool = { 'RadarStealth', 'SonarStealth', 'Cloak' }
-local intelTypeNum = {
-    'RadarRadius', 'SonarRadius', 'OmniRadius',
-    'RadarStealthFieldRadius', 'SonarStealthFieldRadius', 'CloakFieldRadius',
-}
 local IntelMap = {
     Cloak = 'Cloak',
     CloakField = 'CloakField',
