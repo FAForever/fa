@@ -380,7 +380,9 @@ function OnSync()
 
     -- Game <-> server communications
 
-    -- Adjusting the behavior of this part of the sync is strictly forbidden
+    -- Adjusting the behavior of this part of the sync is strictly forbidden and is considered
+    -- game manipulation and / or rating manipulation. See also the in-game rules:
+    -- - https://www.faforever.com/rules
 
     if not SessionIsReplay() then
 
