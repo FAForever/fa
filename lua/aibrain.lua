@@ -749,8 +749,6 @@ AIBrain = Class(moho.aibrain_methods) {
     OnDefeat = function(self)
         self.BrainState = 'Defeat'
 
-        SetArmyOutOfGame(self:GetArmyIndex())
-
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
 
