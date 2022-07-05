@@ -86,11 +86,11 @@ local CoroutineYield = coroutine.yield
 ---@field EnergyExcessThread thread
 ---@field IntelData table<string, number>|nil
 ---@field targetoveride boolean
----@field BrainState BrainState
+---@field Status BrainState
 AIBrain = Class(moho.aibrain_methods) {
 
     -- The state of the brain in the match
-    BrainState = 'InProgress',
+    Status = 'InProgress',
 
     --- HUMAN BRAIN FUNCTIONS HANDLED HERE
     ---@param self AIBrain
@@ -747,7 +747,7 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     OnDefeat = function(self)
-        self.BrainState = 'Defeat'
+        self.Status = 'Defeat'
 
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
@@ -997,17 +997,17 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     OnVictory = function(self)
-        self.BrainState = 'Victory'
+        self.Status = 'Victory'
     end,
 
     ---@param self AIBrain
     OnDraw = function(self)
-        self.BrainState = 'Draw'
+        self.Status = 'Draw'
     end,
 
     ---@param self AIBrain
     IsDefeated = function(self)
-        return self.BrainState == "Defeat"
+        return self.Status == "Defeat"
     end,
 
     ---@param self AIBrain
