@@ -5,7 +5,7 @@ local Conditions = {
     eradication = categories.ALLUNITS - categories.WALL,
 }
 
---- Ends the game
+--- Ends the game, processing all events including sending score and statistics to the UI
 function CallEndGame()
     ForkThread(function()
         WaitSeconds(2.9)
