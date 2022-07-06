@@ -384,9 +384,9 @@ Unit = Class(moho.unit_methods) {
                 if maint and maint > 0 then
                     self.Brain:AddEnergyDependingEntity(self)
                 else
-                    -- flag that we are not yet an energy dependent unit, but may be in the future
-                    -- a nil value means that it always has consumption, so we don't need to manage it
-                    self.HasIntelEnergyConsumption = false
+                    -- we don't currently have a maintenance cost, so it must come from an enhancement
+                    -- use this field to keep track of whether we've set the dependency
+                    self.EnhanceableIntelEnergyDependency = false
                 end
             end
         end
@@ -2848,31 +2848,12 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    IntelFlickerThread = function(self)
-        local bpIntel = self.Blueprint.Intel
-        local recharge = bpIntel.ReactivateTime or 10
-        local discharge = bpIntel.DeactivateTime or 0.5
-        while self.HasIntelEnergyConsumption ~= false and self.IntelIsFlickering do
-            self:DisableUnitIntel('Energy')
-            WaitSeconds(recharge)
-            self:EnableUnitIntel('Energy')
-            WaitSeconds(discharge)
-        end
-    end;
-
     OnEnergyDepleted = function(self)
-        if not self.IntelIsFlickering then
-            if self.HasIntelEnergyConsumption ~= false then
-                self:ForkThread(self.IntelFlickerThread)
-            end
-            -- if an enhancement is created while energy is depleted, this will flag it
-            -- to start the flicker thread immediately
-            self.IntelIsFlickering = true
-        end
+        self:DisableUnitIntel('Energy')
     end;
 
     OnEnergyViable = function(self)
-        self.IntelIsFlickering = nil
+        self:EnableUnitIntel('Energy')
     end;
 
     AddDetectedByHook = function(self, hook)
@@ -3005,7 +2986,7 @@ Unit = Class(moho.unit_methods) {
             for _, remEnh in bp.RemoveEnhancements do
                 RemoveUnitEnhancement(self, remEnh)
             end
-            if self.HasIntelEnergyConsumption then
+            if self.EnhanceableIntelEnergyDependency == true then
                 for _, remEnh in bp.RemoveEnhancements do
                     local maint = self.Blueprint.Enhancements[remEnh].MaintenanceConsumptionPerSecondEnergy
                     if maint and maint > 0 then
@@ -3016,11 +2997,9 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-        -- if nil, then we've been told there's no need to check for intel maintenance
-        -- (either because it already exists or there's no intel)
-        if self.HasIntelEnergyConsumption == false or removeEnergyDependency then
-            -- hopefully this enhancement's maintencance is for an intel trait
-            -- no way to really check
+        -- check against false because this field will be `nil` when the energy dependency
+        -- doesn't change with enhancements (i.e. the dependency will already exist)
+        if self.EnhanceableIntelEnergyDependency == false or removeEnergyDependency then
             local maint = bp.MaintenanceConsumptionPerSecondEnergy
             if maint and maint > 0 then
                 if removeEnergyDependency then
@@ -3028,20 +3007,14 @@ Unit = Class(moho.unit_methods) {
                     -- instead of adding a new one
                     removeEnergyDependency = false
                 else
-                    self.HasIntelEnergyConsumption = true
-                    local brain = self:GetAIBrain()
-                    brain:AddEnergyDependingEntity(self)
-                    -- we're stalling, so start flickering
-                    if brain:GetEconomyStored('ENERGY') < 1 then
-                        self.IntelIsFlickering = true
-                        self:ForkThread(self.IntelFlickerThread)
-                    end
+                    self.EnhanceableIntelEnergyDependency = true
+                    self.Brain:AddEnergyDependingEntity(self)
                 end
             end
         end
         if removeEnergyDependency then
-            self.HasIntelEnergyConsumption = false
-            self:GetAIBrain():RemoveEnergyDependingEntity(self)
+            self.EnhanceableIntelEnergyDependency = false
+            self.Brain:RemoveEnergyDependingEntity(self)
         end
 
         self:RequestRefreshUI()
