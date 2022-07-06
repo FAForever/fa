@@ -2,6 +2,12 @@
 ---Module: Sim
 -- @module Sim
 
+-- TODO
+---@class Decal
+
+-- TODO
+---@class SimCommand
+
 --- Restrict the army from building the unit category.
 -- The categories can be combined using + - * (), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
 -- @param army Army's index.
@@ -568,233 +574,238 @@ end
 function IsUnit(entity)
 end
 
---- Orders group of units to attack move to target position.
--- @param tblUnits Table containing units, same as group of units.
--- @param position Table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of units to attack move to target position.
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param position Point    # Position to attack move to
+---@return SimCommand       # Command that has been issued
 function IssueAggressiveMove(tblUnits, position)
 end
 
---- Orders group of units to attack the target unit.
--- @param tblUnits Table containing units, same as group of units.
--- @param target Unit to attack.
--- @return Returns the issued command.
+--- Order a group of units to attack a target
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param target Unit       # Unit to attack
+---@return SimCommand       # Command that has been issued
 function IssueAttack(tblUnits, target)
 end
 
---- Orders a group of factories to build units.
--- Works on mobile factories like Fatboy as well.
--- @param tblUnits Table containing factories.
--- @param blueprintID ID of the unit to build, example: 'uel0103'.
--- @param count How many units to build.
--- @return Returns the issued command.
+--- Order a group of units to build a unit
+---@param tblUnits Unit[]       # Units to issue the command to, usually factories
+---@param blueprintID string    # BlueprintId of the unit to build
+---@param count number          # Number of units to build
+---@return SimCommand           # Command that has been issued
 function IssueBuildFactory(tblUnits, blueprintID, count)
 end
 
---- Orders a group of engineers to build the nearest structures to them. 
--- Example: IssueBuildMobile({builder}, Vector(pos.x, pos.y, pos.z-2), msid, {}).
--- @param tblUnits Table containing engineers.
--- @param position Table with position {x, y, z}.
--- @param blueprintID ID of the unit to build, example: 'ueb0103'.
--- @param table ListOfCells, format is { {x, z}, ... }. Similar to brain:BuildStructure, used to determine alternative positions. Doesn't appear to function properly.
--- @return Returns the issued command.
+--- Order a group of units to build a unit, each unit is assigned the closest building
+---@param tblUnits Unit[]       # Units to issue the command to, usually engineers
+---@param position Point        # Position to build at
+---@param blueprintID string    # BlueprintId of the unit to build
+---@param table number          # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
+---@return SimCommand           # Command that has been issued
 function IssueBuildMobile(tblUnits, position, blueprintID, table)
 end
 
---- Orders a group of engineers to capture the target unit.
--- @param tblUnits Table containing engineers.
--- @param target Unit to capture.
--- @return Returns the issued command.
+--- Order a group of units to capture a target, usually engineers
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param target Unit       # Unit to capture
+---@return SimCommand       # Command that has been issued
 function IssueCapture(tblUnits, target)
 end
 
---- Clears all commands of given units.
--- That includes build queue as well.
--- @param tblUnits Table containing units.
+--- Clears out all commands issued on the group of units, this happens immediately
+---@param tblUnits Unit[]   # Units to issue the command to
+---@return SimCommand       # Command that has been issued
 function IssueClearCommands(tblUnits)
 end
 
---- Clears factory command without affecting current build queue.
--- Used to change rally point while the factories are building units.
--- @param tblUnits Table containing factories.
+--- Clears out all commands issued on the group of factories without affecting the build queue, allows you to change the rally point
+---@param tblUnits Unit[]   # Units to issue the command to
+---@return SimCommand       # Command that has been issued
 function IssueClearFactoryCommands(tblUnits)
 end
 
---- Orders unit to destroy itself.
--- This doesn't leave wreckage.
--- @param tblUnits Table containing units.
+--- Order a group of units to destroy themselves, doesn't leave a wreckage
+---@see                     # The global `IssueKillSelf` is for an alternative that does leave a wreckage
+---@param tblUnits Unit[]   # Units to issue the command to
+---@return SimCommand       # Command that has been issued
 function IssueDestroySelf(tblUnits)
 end
 
---- Orders a group of unit to dive.
--- Surfaces the unit if they are already under water.
--- @param tblUnits Table containing units.
+--- Order a group of units to dive
+---@param tblUnits Unit[]   # Units to issue the command to
+---@return SimCommand       # Command that has been issued
 function IssueDive(tblUnits)
 end
 
---- Orders a group of factories to assisnt a target factory.
--- @param tblUnits Table containing factories.
--- @param target Factory to assist.
--- @return Returns the issued command.
+--- Order a group of factories to assist another factory
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param target Unit       # Factory to assist
+---@return SimCommand       # Command that has been issued
 function IssueFactoryAssist(tblUnits, target)
 end
 
---- Sets a factory rally point.
--- Doesn't remove the current one, use IssueClearCommands for that.
--- @param position Table with position {x, y, z}.
+--- Order a group of factories to set their rally point
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param position Point    # Position to set the rally point
+---@return SimCommand       # Command that has been issued
 function IssueFactoryRallyPoint(tblUnits, position)
 end
 
---- TODO.
+--- Order a group of units to setup a ferry
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param position Point    # Position to add to the ferry route
+---@return SimCommand       # Command that has been issued
 function IssueFerry(tblUnits, position)
 end
 
---- Orders group of units to attack move in formation to target position.
--- @param tblUnits Table containing units.
--- @param position Table with position {x, y, z}.
--- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
--- @return Returns the issued command.
+--- Order a group of units to attack move to a position in formation
+--- @param tblUnits Unit[]              # Units to issue the command to
+--- @param position Point               # Position to attack move to
+--- @param formation UnitFormations     # Unit formation to use as defined in `formations.lua`
+--- @param degrees number               # Orientation the platoon takes when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
+--- @return SimCommand                  # Command that has been issued
 function IssueFormAggressiveMove(tblUnits, position, formation, degrees)
 end
 
---- Orders group of units to attack the target unit.
--- Moves to the unit in a formation.
--- @param tblUnits Table containing units.
--- @param target Unit to attack.
--- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
--- @return Returns the issued command.
+--- Order a group of units to attack a target in formation
+--- @param tblUnits Unit[]              # Units to issue the command to
+--- @param target Unit                  # Unit to attack
+--- @param formation UnitFormations     # Unit formation to use as defined in `formations.lua`
+--- @param degrees number               # Orientation the platoon takes when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
+--- @return SimCommand                  # Command that has been issued
 function IssueFormAttack(tblUnits, target, formation, degrees)
 end
 
---- Oders group of units to move in formation to target position.
--- @param tblUnits Table containing units.
--- @param position Table with position {x, y, z}.
--- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
--- @return Returns the issued command.
+--- Order a group of units to move to a position in formation
+--- @param tblUnits Unit[]              # Units to issue the command to
+--- @param position Point               # Position to move to
+--- @param formation UnitFormations     # Unit formation to use as defined in `formations.lua`
+--- @param degrees number               # Orientation the platoon takes when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
+--- @return SimCommand                  # Command that has been issued
 function IssueFormMove(tblUnits, position, formation, degrees)
 end
 
---- Oders group of units to patrol in formation on target position.
--- Call this at least twice for two different positions to have any meaning.
--- @param tblUnits Table containing units.
--- @param position Table with position {x, y, z}.
--- @param formation Formation to use, 'AttackFormation', 'GrowthFormation'.
--- @param degrees The orientation the platoon should take when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
--- @return Returns the issued command.
+--- Order a group of units to patrol to a position in formation,
+--- @param tblUnits Unit[]              # Units to issue the command to
+--- @param position Point               # Position to add to the patrol
+--- @param formation UnitFormations     # Unit formation to use as defined in `formations.lua`
+--- @param degrees number               # Orientation the platoon takes when it reaches the position. South is 0 degrees, east is 90 degrees, etc.
+--- @return SimCommand                  # Command that has been issued
 function IssueFormPatrol(tblUnits, position, formation, degrees)
 end
 
---- Orders group of unit to assist the target unit.
--- @param tblUnits Table containing units.
--- @param target Unit to assist.
--- @return Returns the issued command.
+--- Order a group of units to guard a target
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param target Unit       # Unit to guard
+---@return SimCommand       # Command that has been issued
 function IssueGuard(tblUnits, target)
 end
 
---- Orders group of units to self-destruct.
--- Thisl leaves wreckages.
--- @param tblUnits Table containing units.
+--- Order a group of units to kill themselves
+---@see                     # The global `IssueDestroySelf` is an alternative that does not leave a wreckage
+---@param tblUnits Unit[]   # Units to issue the command to
+---@return SimCommand       # Command that has been issued
 function IssueKillSelf(tblUnits)
 end
 
---- Oders group of units to move to target position.
--- @param tblUnits Table containing units.
--- @param position Table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of units to move to a position
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param position Point    # Position to move to
+---@return SimCommand       # Command that has been issued
 function IssueMove(tblUnits, position)
 end
 
---- Orders group of units to move off factory.
--- This is used to move units out of factories when they are finished.
--- @param tblUnits Table containing units.
--- @param position Table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of units to move off a factory build site
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param position Point    # Position to move to
+---@return SimCommand       # Command that has been issued
 function IssueMoveOffFactory(tblUnits, position)
 end
 
---- Launches a nuke at target position.
--- @param tblUnits Table containing Nuke Launchers.
--- @param position Table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of units to launch a strategic missile at a position
+---@see                     # the function `IssueTactical` for tactical missiles
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param position Point    # Position to launch to
+---@return SimCommand       # Command that has been issued
 function IssueNuke(tblUnits, position)
 end
 
---- Orders unit to fire OverCharge weapon at the target.
--- @param tblUnits Table containing units.
--- @param target Unit to OC.
+--- Order a group of units to use Overcharge at a target
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param target Unit       # Unit to overcharge
+---@return SimCommand       # Command that has been issued
 function IssueOverCharge(tblUnits, target)
 end
 
---- Oders group of units to patrol on target position.
--- Call this at least twice for two different positions to have any meaning.
--- @param tblUnits Table containing units.
--- @param position Table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of units to patrol to a position
+---@param tblUnits Unit[]   # Units to issue the command to
+---@param position Point    # Position to add to the patrol
+---@return SimCommand       # Command that has been issued
 function IssuePatrol(tblUnits, position)
 end
 
---- Pauses the unit.
--- @param unit Unit to pause.
+--- Order a unit to pause, this happens immediately
+---@param unit Unit         # Units to pause
 function IssuePause(unit)
 end
 
---- Orders group of units to reclaim the target entity.
--- @param tblUnits Table containing units.
--- @param target Unit or prop to reclaim.
--- @return Returns the issued command.
+--- Order a group of units to reclaim a target
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param target Unit | Prop    # Prop or unit to reclaim
+---@return SimCommand           # Command that has been issued
 function IssueReclaim(tblUnits, target)
 end
 
---- Orders group of units to repair the target unit.
--- @param tblUnits Table containing units.
--- @param target Unit to repair.
--- @return Returns the issued command.
+--- Order a group of units to repair a target
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param target Unit           # Unit to repair
+---@return SimCommand           # Command that has been issued
 function IssueRepair(tblUnits, target)
 end
 
---- Orders group of unit to use Sacrifice on target unit.
--- @param tblUnits Table containing units that can use sacrifice.
--- @param target Unit to to sacrifice into.
--- TODO This is untested.
--- @return Returns the issued command.
+--- Order a group of units to sacrifice, sharing their resources to a target
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param target Unit           # Unit to share the resources with
+---@return SimCommand           # Command that has been issued
 function IssueSacrifice(tblUnits, target)
 end
 
---- Orders group of unit to do scripted task.
--- Currently used for ACU/sACU upgrading. Valid enhancement names are in the unut's blueprint or here http://wiki.faforever.com/index.php?title=Mission_Scripting#Enhancements .
--- @param tblUnits Table containing units.
--- @param oder Working format example: {TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering"}.
--- @return Returns the issued command.
+--- Order a group of units to run a script sequence, as an example: { TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param order table           # Task / order to apply
+---@return SimCommand           # Command that has been issued
 function IssueScript(tblUnits, order)
 end
 
---- TODO.
-function IssueSiloBuildNuke()
+--- Order a group of units to build a nuke
+---@param tblUnits Unit[]       # Units to issue the command to, usually strategic missile launchers / defense
+---@return SimCommand           # Command that has been issued
+function IssueSiloBuildNuke(tblUnits)
 end
 
---- TODO.
+--- Order a group of units to build a tactical missile
+---@param tblUnits Unit[]       # Units to issue the command to, usually tactical missile launchers
+---@return SimCommand           # Command that has been issued
 function IssueSiloBuildTactical()
 end
 
---- Order group of units to stop.
--- @param tblUnits Table containing units.
+--- Order a group of units to stop, this happens immediately
+---@param tblUnits Unit[]       # Units to issue the command to
 function IssueStop(tblUnits)
 end
 
---- Orders group of units to fire a tactical missile at target or location.
--- @param tblUnits Table containing missle launchers.
--- @param target Unit to fire at or table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of units to launch a tactical missile
+---@see                         # the function `IssueNuke` for strategical missiles
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param target Unit | Point   # Unit or point to launch at
+---@return SimCommand           # Command that has been issued
 function IssueTactical(tblUnits, target)
 end
 
---- Orders group of units to teleport to target position.
--- @param tblUnits Table containing units.
--- @param position Table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of units to teleport to a position
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param position Point        # Position to teleport to
+---@return SimCommand           # Command that has been issued
 function IssueTeleport(tblUnits, position)
 end
 
@@ -802,17 +813,17 @@ end
 function IssueTeleportToBeacon()
 end
 
---- Orders group of units to load into the transport.
--- @param tblUnits Table containing units.
--- @param transport Transport unit to load into.
--- @return Returns the issued command.
+--- Order a group of units to attach themselves to a transport
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param transport Unit        # Transport to be loaded
+---@return SimCommand           # Command that has been issued
 function IssueTransportLoad(tblUnits, transport)
 end
 
---- Orders group of transports to drop units at target position.
--- @param tblUnits Table containing transports.
--- @param position Table with position {x, y, z}.
--- @return Returns the issued command.
+--- Order a group of transports to unload their cargo at a position
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param position Point        # Position to unload
+---@return SimCommand           # Command that has been issued
 function IssueTransportUnload(tblUnits, position)
 end
 
@@ -822,14 +833,19 @@ end
 -- @param category Unit category (categories.BOMBER).
 -- @param position Table with position {x, y, z}.
 -- @return Returns the issued command.
+
+--- Order a group of transports or carriers to unload specific units, appears to work only for carriers
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param position Point        # Position to unload
+---@param category Categories   # Unit types to unload
+---@return SimCommand           # Command that has been issued
 function IssueTransportUnloadSpecific(tblUnits, category, position)
 end
 
---- Orders group of units to upgrade.
--- Used for factories, radars, etc.
--- @param tblUnits Table containing units.
--- @param blueprintID ID of the blueprint to upgrade to.
--- @return Returns the issued command.
+--- Order a group of units to upgrade
+---@param tblUnits Unit[]       # Units to issue the command to
+---@param blueprintID string    # BlueprintId of unit to upgrade to
+---@return SimCommand           # Command that has been issued
 function IssueUpgrade(tblUnits, blueprintID)
 end
 
@@ -849,12 +865,7 @@ function ListArmies()
 end
 
 --- TODO.
----@param instigator any
----@param location any
----@param fMaxRadius any
----@param iAmount any
----@param affectsCategory any
----@param damageFriendly any?
+---@deprecated
 function MetaImpact(instigator, location, fMaxRadius, iAmount, affectsCategory, damageFriendly)
 end
 
