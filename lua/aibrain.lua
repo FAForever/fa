@@ -2011,8 +2011,8 @@ AIBrain = Class(moho.aibrain_methods) {
                 if not v.PrimaryFactories.Air or v.PrimaryFactories.Air.Dead
                     or v.PrimaryFactories.Air:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(airFactories, v.PrimaryFactories.Air) then
-                        fac = self:PBMGetPrimaryFactory(airFactories)
-                        v.PrimaryFactories.Air = fac
+                        afac = self:PBMGetPrimaryFactory(airFactories)
+                        v.PrimaryFactories.Air = afac
                 end
                 self:PBMAssistGivenFactory(airFactories, v.PrimaryFactories.Air)
             end
