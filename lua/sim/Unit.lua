@@ -47,6 +47,7 @@ local TrashEmpty = TrashBag.Empty
 
 local armies = ListArmies()
 
+
 -- Structures that are reused for performance reasons
 -- Maps unit.techCategory to a number so we can do math on it for naval units
 local veterancyTechLevels = {
@@ -78,6 +79,8 @@ local veterancyRegenBuffs = {
     {25, 50, 75, 100,125}, -- Experimental
 }
 
+-- The keys in this table are what shows up in `Blueprint.Intel` and the values
+-- are the corresponding intel fields inside `Unit.IntelDisables`
 local IntelMap = {
     Cloak = 'Cloak',
     CloakField = 'CloakField',
@@ -382,6 +385,7 @@ Unit = Class(moho.unit_methods) {
                     self.Brain:AddEnergyDependingEntity(self)
                 else
                     -- flag that we are not yet an energy dependent unit, but may be in the future
+                    -- a nil value means that it always has consumption, so we don't need to manage it
                     self.HasIntelEnergyConsumption = false
                 end
             end
@@ -2173,13 +2177,12 @@ Unit = Class(moho.unit_methods) {
             -- Values can be setting up manually via bp.
             local vetMass = bp.VeteranMass
             if vetMass then
-                local manualVeterancy = {nil, nil, nil, nil, nil}
-                manualVeterancy[1] = vetMass[1]
-                manualVeterancy[2] = vetMass[2] + manualVeterancy[1]
-                manualVeterancy[3] = vetMass[3] + manualVeterancy[2]
-                manualVeterancy[4] = vetMass[4] + manualVeterancy[3]
-                manualVeterancy[5] = vetMass[5] + manualVeterancy[4]
-                self.Sync.manualVeterancy = manualVeterancy
+                local vet1 = vetMass[1]
+                local vet2 = vetMass[2] + vet1
+                local vet3 = vetMass[3] + vet2
+                local vet4 = vetMass[4] + vet3
+                local vet5 = vetMass[5] + vet4
+                self.Sync.manualVeterancy = {vet1, vet2, vet3, vet4, vet5}
             else
                 local defaultMult = veterancyMultipliers[self.techCategory] or 2
 
@@ -2986,6 +2989,7 @@ Unit = Class(moho.unit_methods) {
                 for _, remEnh in bp.RemoveEnhancements do
                     local maint = self.Blueprint.Enhancements[remEnh].MaintenanceConsumptionPerSecondEnergy
                     if maint and maint > 0 then
+                        -- the removed enhancement was responsible for the energy consumption
                         removeEnergyDependency = true
                         break
                     end
