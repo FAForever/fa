@@ -1304,10 +1304,15 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     toggle.isChecked = isChecked
     toggle.isCheckable = true 
     toggle.uncheckColor = 'FF999898' -- #FF999898
-    toggle.checkedColor = UIUtil.factionTextColor -- 'FFF7DE0B' -- '#FFF7DE0B'
     toggle.checkedTooltip = 'Remove this mod from the list of favorite mods'
     toggle.uncheckTooltip = 'Add this mod to the list of favorite mods that you can later activate by clicking on the Star button located in top left corner of this dialog'
-            
+    
+    if UIUtil.GetCurrentSkinName() == 'random' then
+       toggle.checkedColor = 'FFFFFF' -- #FFFFFF
+    else
+       toggle.checkedColor = UIUtil.factionTextColor -- 'FFF7DE0B' -- '#FFF7DE0B'
+    end
+    
     toggle.Icon = Bitmap(parent, GUI.modFavoriteIcon)
 --    toggle.Icon.Depth:Set(100)
     toggle.Icon:DisableHitTest()
