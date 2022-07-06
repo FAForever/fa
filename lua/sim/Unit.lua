@@ -2673,87 +2673,107 @@ Unit = Class(moho.unit_methods) {
     -- As an optimisation, EnableIntel and DisableIntel are only called when going from one disabler
     -- present to zero, and when going from zero disablers to one.
 
-    DisableUnitIntel = function(self, disabler, intel)
+    --- Adds an intel disabler. Returns if it's the first one for the intel field.
+    ---@param self Unit
+    ---@param disabler string
+    ---@param intel string
+    ---@return boolean
+    DisableOneIntel = function(self, disabler, intel)
         if not self.IntelDisables then
             self.IntelDisables = {}
         end
-        local function DisableOneIntel(disabler, intel)
-            local intelDisables = self.IntelDisables[intel]
-            if not intelDisables then
-                intelDisables = {}
-                self.IntelDisables[intel] = intelDisables
-            end
-            local intDisabled = false
-            if Set.Empty(intelDisables) then
-                local bpIntel = self.Blueprint.Intel
-                local active = bpIntel.ActiveIntel
-                if active and active[intel] then
-                    return
-                end
-                self:DisableIntel(intel)
-
-                -- Handle the cloak FX timing
-                if intel == 'Cloak' or intel == 'CloakField' then
-                    if disabler ~= 'Construction' and bpIntel[intel] then
-                        self:UpdateCloakEffect(false, intel)
-                    end
-                end
-
-                intDisabled = true
-            end
-            intelDisables[disabler] = true
-            return intDisabled
+        local intelDisables = self.IntelDisables[intel]
+        if not intelDisables then
+            intelDisables = {}
+            self.IntelDisables[intel] = intelDisables
         end
+        local intDisabled = false
+        if Set.Empty(intelDisables) then
+            local bpIntel = self.Blueprint.Intel
+            local active = bpIntel.ActiveIntel
+            if active and active[intel] then
+                return
+            end
+            self:DisableIntel(intel)
 
+            -- Handle the cloak FX timing
+            if intel == 'Cloak' or intel == 'CloakField' then
+                if disabler ~= 'Construction' and bpIntel[intel] then
+                    self:UpdateCloakEffect(false, intel)
+                end
+            end
+
+            intDisabled = true
+        end
+        intelDisables[disabler] = true
+        return intDisabled
+    end;
+
+    --- Adds a disabler to an intel field (or all of them if absent). If it's the first disabler for
+    --- any field it touches, it calls `OnIntelDisabled`.
+    ---@param self Unit
+    ---@param disabler string
+    ---@param intel? string
+    DisableUnitIntel = function(self, disabler, intel)
         local intDisabled = false
         if intel then
-            intDisabled = DisableOneIntel(disabler, intel)
+            intDisabled = self:DisableOneIntel(disabler, intel)
         else
             -- Loop over all intels and add disabler
             for intel, _ in self.IntelDisables do
-                intDisabled = DisableOneIntel(disabler, intel) or intDisabled -- Beware of short-circuiting
+                intDisabled = self:DisableOneIntel(disabler, intel) or intDisabled -- Beware of short-circuiting
             end
         end
 
         if intDisabled then
-            self:OnIntelDisabled(disabler, intel)
+            self:OnIntelDisabled()
         end
     end,
 
-    EnableUnitIntel = function(self, disabler, intel)
+    --- Removes an intel disabler. Returns if it was the last one for the intel field.
+    ---@param self Unit
+    ---@param disabler string
+    ---@param intel string
+    ---@return boolean
+    EnableOneIntel = function(self, disabler, intel)
         if not self.IntelDisables then
             self.IntelDisables = {}
         end
-        local function EnableOneIntel(disabler, intel)
-            local intelDisables = self.IntelDisables[intel]
-            if not intelDisables then
-                intelDisables = {}
-                self.IntelDisables[intel] = intelDisables
-            end
-            if intelDisables[disabler] then -- Must check for explicit true contained
-                intelDisables[disabler] = nil
-                if Set.Empty(intelDisables) then
-                    self:EnableIntel(intel)
-
-                    -- Handle the cloak FX timing
-                    if intel == 'Cloak' or intel == 'CloakField' then
-                        if disabler ~= 'Construction' and self.Blueprint.Intel[intel] then
-                            self:UpdateCloakEffect(true, intel)
-                        end
-                    end
-                    return true
-                end
-            end
-            return false
+        local intelDisables = self.IntelDisables[intel]
+        if not intelDisables then
+            intelDisables = {}
+            self.IntelDisables[intel] = intelDisables
         end
+        if intelDisables[disabler] then -- Must check for explicit true contained
+            intelDisables[disabler] = nil
+            if Set.Empty(intelDisables) then
+                self:EnableIntel(intel)
 
+                -- Handle the cloak FX timing
+                if intel == 'Cloak' or intel == 'CloakField' then
+                    if disabler ~= 'Construction' and self.Blueprint.Intel[intel] then
+                        self:UpdateCloakEffect(true, intel)
+                    end
+                end
+                return true
+            end
+        end
+        return false
+    end;
+
+    --- Removes a disabler from an intel field (or all of them if absent). If it's the last disabler for
+    --- any field it touches, it calls `OnIntelEnabled`.
+    ---@param self Unit
+    ---@param disabler string
+    ---@param intel? string
+    EnableUnitIntel = function(self, disabler, intel)
         local intEnabled = false
         if intel then
-            intEnabled = EnableOneIntel(disabler, intel)
+            intEnabled = self:EnableOneIntel(disabler, intel)
         else
             -- Loop over all intels and remove disabler
             for intel, _ in self.IntelDisables do
-                intEnabled = EnableOneIntel(disabler, intel) or intEnabled -- Beware of short-circuiting
+                intEnabled = self:EnableOneIntel(disabler, intel) or intEnabled -- Beware of short-circuiting
             end
         end
 
