@@ -34,8 +34,17 @@ local GameHasAIs = ScenarioInfo.GameHasAIs
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
 -- upvalue for performance
-local rawget = rawget 
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
 local IsAlly = IsAlly
+local rawget = rawget
+
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+local TrashEmpty = TrashBag.Empty
+
+
 local armies = ListArmies()
 
 -- Structures that are reused for performance reasons
@@ -49,15 +58,6 @@ local veterancyTechLevels = {
     EXPERIMENTAL = 5,
 }
 
--- Regen values by tech level and veterancy level
-local veterancyRegenBuffs = {
-    {1,  2,  3,  4,  5}, -- T1
-    {3,  6,  9,  12, 15}, -- T2
-    {6,  12, 18, 24, 30}, -- T3 / ACU
-    {9,  18, 27, 36, 45}, -- SACU
-    {25, 50, 75, 100,125}, -- Experimental
-}
-
 -- Allow units to require more or less mass to level up. Decimal multipliers mean
 -- faster leveling, >1 mean slower. Doing this here means doing it once instead of every kill.
 local veterancyMultipliers = {
@@ -68,6 +68,16 @@ local veterancyMultipliers = {
     EXPERIMENTAL = 2,
     COMMAND = 2,
 }
+
+-- Regen values by tech level and veterancy level
+local veterancyRegenBuffs = {
+    {1,  2,  3,  4,  5},   -- T1
+    {3,  6,  9,  12, 15},  -- T2
+    {6,  12, 18, 24, 30},  -- T3 / ACU
+    {9,  18, 27, 36, 45},  -- SACU
+    {25, 50, 75, 100,125}, -- Experimental
+}
+
 local IntelMap = {
     Cloak = 'Cloak',
     CloakField = 'CloakField',
@@ -87,14 +97,6 @@ local IntelMap = {
 
     OmniRadius = 'Omni',
 }
-
-local TrashBag = TrashBag
-local TrashAdd = TrashBag.Add
-local TrashDestroy = TrashBag.Destroy
-local TrashEmpty = TrashBag.Empty
-
-local AttachBeamEntityToEntity = AttachBeamEntityToEntity
-local CreateEmitterAtBone = CreateEmitterAtBone
 
 SyncMeta = {
     __index = function(t, key)
@@ -362,7 +364,6 @@ Unit = Class(moho.unit_methods) {
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil
 
-        
         local bpInt = bp.Intel
         self:SetIntelRadius('Vision', bpInt.VisionRadius or 0)
         if bpInt then
@@ -376,7 +377,13 @@ Unit = Class(moho.unit_methods) {
             end
             -- manage the loss of intel when energy is depleted
             if not bpInt.FreeIntel then
-                self.Brain:AddEnergyDependingEntity(self)
+                local maint = bp.Economy.MaintenanceConsumptionPerSecondEnergy
+                if maint and maint > 0 then
+                    self.Brain:AddEnergyDependingEntity(self)
+                else
+                    -- flag that we are not yet an energy dependent unit, but may be in the future
+                    self.HasIntelEnergyConsumption = false
+                end
             end
         end
     end,
@@ -2819,23 +2826,30 @@ Unit = Class(moho.unit_methods) {
     end,
 
     IntelFlickerThread = function(self)
-        local recharge = self.Blueprint.Intel.ReactivateTime or 10
-        while self.IntelThread do
+        local bpIntel = self.Blueprint.Intel
+        local recharge = bpIntel.ReactivateTime or 10
+        local discharge = bpIntel.DeactivateTime or 0.5
+        while self.HasIntelEnergyConsumption ~= false and self.IntelIsFlickering do
             self:DisableUnitIntel('Energy')
             WaitSeconds(recharge)
             self:EnableUnitIntel('Energy')
-            WaitSeconds(0.5)
+            WaitSeconds(discharge)
         end
     end;
 
     OnEnergyDepleted = function(self)
-        if not self.IntelThread then
-            self.IntelThread = self:ForkThread(self.IntelFlickerThread)
+        if not self.IntelIsFlickering then
+            if self.HasIntelEnergyConsumption ~= false then
+                self:ForkThread(self.IntelFlickerThread)
+            end
+            -- if an enhancement is created while energy is depleted, this will flag it
+            -- to start the flicker thread immediately
+            self.IntelIsFlickering = true
         end
     end;
 
     OnEnergyViable = function(self)
-        self.IntelThread = nil
+        self.IntelIsFlickering = nil
     end;
 
     AddDetectedByHook = function(self, hook)
@@ -2962,11 +2976,48 @@ Unit = Class(moho.unit_methods) {
             end
         end
 
+        local removeEnergyDependency = false
         AddUnitEnhancement(self, enh, bp.Slot or '')
         if bp.RemoveEnhancements then
-            for _, v in bp.RemoveEnhancements do
-                RemoveUnitEnhancement(self, v)
+            for _, remEnh in bp.RemoveEnhancements do
+                RemoveUnitEnhancement(self, remEnh)
             end
+            if self.HasIntelEnergyConsumption then
+                for _, remEnh in bp.RemoveEnhancements do
+                    local maint = self.Blueprint.Enhancements[remEnh].MaintenanceConsumptionPerSecondEnergy
+                    if maint and maint > 0 then
+                        removeEnergyDependency = true
+                        break
+                    end
+                end
+            end
+        end
+        -- if nil, then we've been told there's no need to check for intel maintenance
+        -- (either because it already exists or there's no intel)
+        if self.HasIntelEnergyConsumption == false or removeEnergyDependency then
+            -- hopefully this enhancement's maintencance is for an intel trait
+            -- no way to really check
+            local maint = bp.MaintenanceConsumptionPerSecondEnergy
+            if maint and maint > 0 then
+                if removeEnergyDependency then
+                    -- the dependency hasn't been removed yet, so cancel removal
+                    -- instead of adding a new one
+                    removeEnergyDependency = false
+                else
+                    self.HasIntelEnergyConsumption = true
+                    local brain = self:GetAIBrain()
+                    brain:AddEnergyDependingEntity(self)
+                    -- we're stalling, so start flickering
+                    if brain:GetEconomyStored('ENERGY') < 1 then
+                        self.IntelIsFlickering = true
+                        self:ForkThread(self.IntelFlickerThread)
+                    end
+                end
+            end
+        end
+        if removeEnergyDependency then
+            self.HasIntelEnergyConsumption = false
+            self:GetAIBrain():RemoveEnergyDependingEntity(self)
         end
 
         self:RequestRefreshUI()

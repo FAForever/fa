@@ -541,13 +541,32 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    --- Adds an entity to the list of entities that receive callbacks when the energy storage is depleted or viable, expects the functions OnEnergyDepleted and OnEnergyViable on the unit
+    ---@alias EnergyDependentEntity {OnEnergyDepleted: fun(self), OnEnergyViable: fun(self)}
+
+    --- Adds an entity to the list of entities that receive callbacks when the energy storage is
+    --- depleted or viable. Expects the functions `OnEnergyDepleted` and `OnEnergyViable` on the unit
     ---@param self AIBrain
-    ---@param entity Shield to be updated according to the 
+    ---@param entity EnergyDependentEntity
     AddEnergyDependingEntity = function(self, entity)
-        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity 
+        self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity
         self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
     end,
+
+    --- Removes an entity from the list of entities that receive callbacks when the energy storage is
+    --- depleted or viable
+    ---@param self AIBrain
+    ---@param entity EnergyDependentEntity
+    RemoveEnergyDependingEntity = function(self, entity)
+        local energyDependingUnits = self.EnergyDependingUnits
+        for i = 1, self.EnergyDependingUnitsHead - 1 do
+            if energyDependingUnits[i] == entity then
+                table.remove(energyDependingUnits, i)
+                self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead - 1
+                return true
+            end
+        end
+        return false
+    end;
 
     ---@param self AIBrain
     OnEnergyTrigger = function(self, triggerName)
