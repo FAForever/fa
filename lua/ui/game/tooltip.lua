@@ -21,33 +21,33 @@ local mouseoverDisplay = false
 local createThread = false
 
 -- creates a tooltip box from ID table and with optional parameters
--- @param - ID is a table, e.g. { text = 'tooltip header', body = 'tooltip description' } 
--- @param - extendedBool indicates whether to just create tooltip header or also tooltip description
--- @param - width is optional width of tooltip or it is auto calculated based on length of header/description
--- @param - forced determine if the tooltip should override hiding tooltips set in game options
--- @param - padding is optional space between tooltip description text and border of tooltip 
--- @param - descFontSize is optional font size for description text of tooltip 
--- @param - textFontSize is optional font size for header text of tooltip  
--- @param - position is optional string indicating position of tooltip relative to its parent: left, right, center (default)
-function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced, padding, descFontSize, textFontSize, position)
+-- @param ID table e.g. { text = 'tooltip header', body = 'tooltip description' } 
+-- @param extended boolean indicates whether to just create tooltip header or also tooltip description
+-- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
+-- @param forced boolean determine if the tooltip should override hiding tooltips set in game options
+-- @param padding number is optional space between tooltip description text and border of tooltip 
+-- @param descFontSize number is optional font size for description text of tooltip 
+-- @param textFontSize number is optional font size for header text of tooltip  
+-- @param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
+function CreateMouseoverDisplay(parent, ID, delay, extended, width, forced, padding, descFontSize, textFontSize, position)
 
-    -- # values used throughout the function
+    -- values used throughout the function
     local totalTime = 0
     local alpha = 0.0
     local text = ""
     local body = ""
     if not position then position = 'center' end
     
-    -- # remove previous instance
+    -- remove previous instance
     if mouseoverDisplay then
         mouseoverDisplay:Destroy()
         mouseoverDisplay = false
     end
 
-    -- # determine if we want to show this tooltip (game options can prevent that)
+    -- determine if we want to show this tooltip (game options can prevent that)
     if not forced and not Prefs.GetOption('tooltips') then return end
 
-    -- # determine delay
+    -- determine delay
     local createDelay = 0
     if delay and Prefs.GetOption('tooltip_delay') then
         createDelay = math.max(delay, Prefs.GetOption('tooltip_delay'))
@@ -55,7 +55,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced, 
         createDelay = Prefs.GetOption('tooltip_delay') or 0
     end
 
-    -- # retrieve tooltip title / description
+    -- retrieve tooltip title / description
     if type(ID) == 'string' then
         if TooltipInfo['Tooltips'][ID] then
             text = TooltipInfo['Tooltips'][ID]['title']
@@ -70,7 +70,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced, 
                 end
             end
         else
-            if extendedBool then
+            if extended then
                 WARN("No tooltip in table for key: "..ID)
             end
             text = ID
@@ -83,7 +83,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced, 
         WARN('UNRECOGNIZED TOOLTIP ENTRY - Not a string or table! ', repr(ID))
     end
 
-    if extendedBool then 
+    if extended then 
         -- creating a tooltip with header text and body description
         mouseoverDisplay = CreateExtendedToolTip(parent, text, body, width, padding, descFontSize, textFontSize)
     else 
@@ -91,8 +91,8 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced, 
         mouseoverDisplay = CreateToolTip(parent, text)
     end
 
-    -- # adjust position to show tooltip on left/right side of its parent and within main window
-    if extendedBool then
+    -- adjust position to show tooltip on left/right side of its parent and within main window
+    if extended then
         local Frame = GetFrame(0)
         if parent.Top() - mouseoverDisplay.Height() < 0 then
             mouseoverDisplay.Top:Set(function() return parent.Bottom() + 10 end)
@@ -122,8 +122,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced, 
         end
     end
 
-    -- -- some hack
-
+    -- some hack
     if ID == "mfd_defense" then
         local size = table.getn(mouseoverDisplay.desc)
         mouseoverDisplay.desc[size]:SetColor('ffff0000')
@@ -187,12 +186,12 @@ function CreateToolTip(parent, text)
 end
 
 -- creates a tooltip box with title text and/or description and with optional parameters
--- @param - text is a string displayed in header of tooltip
--- @param - desc is a string displayed in description of tooltip, this text is wrapped into multiple if longer than width
--- @param - width is optional width of tooltip or it is auto calculated based on length of header/description
--- @param - padding is optional space between tooltip description text and border of tooltip 
--- @param - descFontSize is optional font size for description text of tooltip 
--- @param - textFontSize is optional font size for header text of tooltip 
+-- @param text string displayed in header of tooltip
+-- @param desc string displayed in description of tooltip, this text is wrapped into multiple if longer than width
+-- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
+-- @param padding is optional space between tooltip description text and border of tooltip 
+-- @param descFontSize number is optional font size for description text of tooltip 
+-- @param textFontSize number is optional font size for header text of tooltip
 function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize, textFontSize)
     text = LOC(text)
     desc = LOC(desc)
@@ -247,12 +246,9 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
             tooltip.desc[1] = UIUtil.CreateText(tooltip, "", descFontSize, UIUtil.bodyFont)
             tooltip.desc[1].Width:Set(tooltip.Width)
             if text == nil then
---                tooltip.desc[1].Top:Set(tooltip.Top)
---                tooltip.desc[1].Left:Set(tooltip.Left)
                 tooltip.desc[1].Top:Set(function() return tooltip.Top() + padding end)
                 tooltip.desc[1].Left:Set(function() return tooltip.Left() + padding end)
             else
---                LayoutHelpers.Below(tooltip.desc[1], tooltip.title, padding)
                 tooltip.desc[1].Top:Set(function() return tooltip.bg.Bottom() + padding end)
                 tooltip.desc[1].Left:Set(function() return tooltip.Left() + padding end)
             end
@@ -327,8 +323,6 @@ function CreateExtendedToolTip(parent, text, desc, width, padding, descFontSize,
             tooltip.Height:Set(function() return tooltip.descTotalHeight end)
         elseif desc == nil then
             tooltip.Height:Set(function() return textHeight end)
---            tooltip.Width:Set(function() return tooltip.bg.Width() end)
---            tooltip.Width:Set(function() return tooltip.title.Width() end)
         else
             tooltip.Height:Set(function() return textHeight + tooltip.descTotalHeight end)
         end
@@ -367,14 +361,14 @@ function AddControlTooltip(control, tooltipID, delay, width)
 end
 
 -- creates a tooltip box with specified title and description
--- @param - title is a string displayed in tooltip header
--- @param - description is a string displayed in tooltip body
--- @param - delay is optional milliseconds used to delay tooltip popup
--- @param - width is optional width of tooltip or it is auto calculated based on length of header/description
--- @param - padding is optional space between tooltip description text and border of tooltip 
--- @param - descFontSize is optional font size for description text of tooltip 
--- @param - textFontSize is optional font size for header text of tooltip  
--- @param - position is optional string indicating position of tooltip relative to its parent: left, right, center (defaulT)
+-- @param title string displayed in tooltip header
+-- @param description string displayed in tooltip body
+-- @param delay number is optional milliseconds used to delay tooltip popup
+-- @param width number is optional width of tooltip or it is auto calculated based on length of header/description
+-- @param padding is optional space between tooltip description text and border of tooltip 
+-- @param descFontSize number is optional font size for description text of tooltip 
+-- @param textFontSize number is optional font size for header text of tooltip  
+-- @param position string is optional string indicating position of tooltip relative to its parent: left, right, center (default)
 function AddControlTooltipManual(control, title, description, delay, width, padding, descFontSize, textFontSize, position)
 
     if not control.oldHandleEvent then
@@ -475,7 +469,7 @@ function SetTooltipText(control, id)
     end
 end
 
--- Add tooltipsfrom every AI mod to TooltipInfo table
+-- Add tooltips from every AI mod to TooltipInfo table
 function AddModAILobbyTooltips()
     -- get all sim mods installed in /mods/
     local simMods = import('/lua/mods.lua').AllMods()
@@ -493,5 +487,6 @@ function AddModAILobbyTooltips()
         end
     end
 end
+
 -- Add tooltips for AI mods
 AddModAILobbyTooltips()
