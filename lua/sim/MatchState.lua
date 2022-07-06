@@ -30,7 +30,7 @@ local function CollectDefeatedBrains(aliveBrains, condition, delay)
         if criticalUnits then
             -- critical units found, make sure they all exist properly
             local oneCriticalUnitAlive = false
-            for k, unit in criticalUnits do
+            for _, unit in criticalUnits do
                 if (not IsDestroyed(unit)) and (unit:GetFractionComplete() == 1) then
                     oneCriticalUnitAlive = true
                     break
@@ -90,7 +90,7 @@ local function MatchStateThread()
 
     -- consider all non-civilian brains to be alive and kicking
     local aliveBrains = { }
-    for k, brain in ArmyBrains do
+    for _, brain in ArmyBrains do
         local index = brain:GetArmyIndex()
         if not ArmyIsCivilian(index) then
             aliveBrains[index] = brain
@@ -126,7 +126,7 @@ local function MatchStateThread()
                 brain:OnDefeat()
 
                 -- communicate to the server that this brain has been defeated
-                table.insert(Sync.GameResult, { k, string.format("%s %i", 'defeat', -10) })
+                table.insert(Sync.GameResult, { k, "defeat -10" })
 
                 -- stop considering it a brain that is still alive
                 aliveBrains[k] = nil
@@ -139,7 +139,7 @@ local function MatchStateThread()
 
             -- check for draw
             local draw = true
-            for k, brain in aliveBrains do
+            for _, brain in aliveBrains do
                 draw = draw and brain.OfferingDraw
             end
 
@@ -153,7 +153,7 @@ local function MatchStateThread()
                     brain:OnDraw()
 
                     -- communicate to the server that this brain has been defeated
-                    table.insert(Sync.GameResult, { k, string.format("%s %i", 'draw', 0) })
+                    table.insert(Sync.GameResult, { k, "draw 0" })
 
                     -- stop considering it a brain that is still alive
                     aliveBrains[k] = nil
@@ -165,7 +165,7 @@ local function MatchStateThread()
 
             -- check for win
             local win = true 
-            for k, brain in aliveBrains do
+            for _, brain in aliveBrains do
                 win = win and brain.RequestingAlliedVictory
             end
 
@@ -185,7 +185,7 @@ local function MatchStateThread()
                     brain:OnVictory()
 
                     -- communicate to the server that this brain has been defeated
-                    table.insert(Sync.GameResult, { k, string.format("%s %i", 'victory', 10) })
+                    table.insert(Sync.GameResult, { k, "victory 10" })
 
                     -- stop considering it a brain that is still alive
                     aliveBrains[k] = nil
