@@ -24,6 +24,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
 local ModsBlacklist = import('/etc/faf/blacklist.lua').Blacklist
 local SetUtils = import('/lua/system/setutils.lua')
+local Links = import('/lua/system/utils.links.lua')
 
 local GUI = { 
     isOpen = false, 
@@ -635,23 +636,6 @@ function GetModAuthor(mod)
     return author
 end
 
-local invalidModLinks = {}
--- Gets a website url for a given mod
-function GetModURL(mod)
-    local url = mod.url
-    if not url then
-    elseif type(url) == 'string' then
-        if string.find(url, 'http') then
-            url = url:gsub("https", "http", 1) 
-        end
-    elseif not invalidModLinks[mod.uid] then
-        WARN('Mod Manager found invalid url "' .. type(url) .. '" instead of string in mod: '  .. tostring(mod.name) )
-        invalidModLinks[mod.uid] = true
-    end 
-        
-    return url
-end
-
 -- Append the given list of mods to the UI, applying the given label and activeness state to each.
 function AppendMods(modlist, active, enabled, labelParam, labelSet)
     for k, mod in modlist do
@@ -717,7 +701,8 @@ function LoadMods()
         mod.units = {}
         mod.title = GetModNameVersion(mod)
         mod.author = GetModAuthor(mod)
-        mod.url = GetModURL(mod)
+        mod.url    = Links.validate(mod.url)
+        mod.github = Links.validate(mod.github)
 
         if not mod.icon or mod.icon == '' or not DiskGetFileInfo(mod.icon) then
             mod.icon = GUI.modFallbackIcon
@@ -1221,7 +1206,7 @@ function CreateListElement(parent, mod, index)
     LayoutHelpers.AtRightTopIn(group.type, group.bg, 10, 6)
      
     -- check if the mod has 2 website links: mod info website and Github website
-    if IsUrl(mod.url) and IsUrl(mod.github) then  
+    if mod.url and mod.github then  
         -- creating a link for opening a website with info about the mod
         group.website = CreateLinkButton(group.bg, mod.url, GUI.modWebisteIcon, 'Open website with information about the mod \n' .. mod.url) 
         LayoutHelpers.SetDimensions(group.website, 20, 20)
@@ -1233,8 +1218,8 @@ function CreateListElement(parent, mod, index)
         LayoutHelpers.LeftOf(group.github, group.website, 5)
     
     -- check if the mod has website URL or Github URL
-    elseif IsUrl(mod.url) then 
-        if string.find(mod.url, 'github') then  
+    elseif mod.url then 
+        if Links.repo(mod.url) then  
             -- creating a link for opening a website with source code for the mod 
             group.website = CreateLinkButton(group.bg, mod.url, GUI.modSourceIcon, 'Open website with source code for the mod \n' .. mod.url)  
             LayoutHelpers.SetDimensions(group.website, 20, 20)
@@ -1290,10 +1275,6 @@ function CreateListElement(parent, mod, index)
     return group
 end
 
-function IsUrl(str)
-    return type(str) == 'string' and string.find(str, 'http')
-end
-
 function CreateLinkButton(parent, url, iconPath, description)
     local btn = Bitmap(parent) 
     btn.url = url
@@ -1308,7 +1289,7 @@ function CreateLinkButton(parent, url, iconPath, description)
         elseif event.Type == 'MouseExit' then
             self:SetAlpha(0.5, false)
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-            OpenURL(self.url)
+            Links.open(self.url)
         end
         return true 
     end
