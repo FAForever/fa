@@ -2849,11 +2849,25 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnEnergyDepleted = function(self)
-        self:DisableUnitIntel('Energy')
+        if self.IntelReactivateThread then
+            KillThread(self.IntelReactivateThread)
+            self.IntelReactivateThread = nil
+        else
+            self:DisableUnitIntel('Energy')
+        end
     end;
 
     OnEnergyViable = function(self)
+        if not self.IntelReactivateThread then
+            self.IntelReactivateThread = self:ForkThread(self.IntelReactivate)
+        end
+    end;
+
+    IntelReactivate = function(self)
+        local recharge = self.Blueprint.Intel.ReactivateTime or 10
+        WaitSeconds(recharge)
         self:EnableUnitIntel('Energy')
+        self.IntelReactivateThread = nil
     end;
 
     AddDetectedByHook = function(self, hook)
