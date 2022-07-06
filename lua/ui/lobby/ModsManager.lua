@@ -1210,11 +1210,11 @@ function CreateListElement(parent, mod, index)
     LayoutHelpers.SetDimensions(group.type, 30, 24) 
         
     if mod.type == 'GAME' then
-        AddTooltip(group.type, mod.status, 'This mod is changing game for all players and it will prevent ranking of the current game', 400)
+        AddTooltip(group.type, mod.status, 'This mod is changing game for all players and it will prevent ranking of the current game', 400, nil, nil, 'right')
     elseif mod.type == 'UI' then
-        AddTooltip(group.type, mod.status, 'This mod is changing only UI for current player and it will not prevent ranking of the current game', 400)
+        AddTooltip(group.type, mod.status, 'This mod is changing only UI for current player and it will not prevent ranking of the current game', 400, nil, nil, 'right')
     else 
-        AddTooltip(group.type, mod.status, nil, 200)
+        AddTooltip(group.type, mod.status, nil, 200, nil, nil, 'right')
     end
 
     group.ui = mod.ui_only
@@ -1283,7 +1283,7 @@ function CreateListElement(parent, mod, index)
 
         if body then
             group.type:EnableHitTest()
-            AddTooltip(group.type, mod.status, body, 400)
+            AddTooltip(group.type, mod.status, body, 400, nil, nil, 'right')
         end
     end
     
@@ -1312,8 +1312,8 @@ function CreateLinkButton(parent, url, iconPath, description)
         end
         return true 
     end
-    AddTooltip(btn, 'Open URL', description, 400)
---    LayoutHelpers.SetDimensions(btn, iconSize, iconSize)
+    AddTooltip(btn, 'Open URL', description, 400, nil, nil, 'right')
+
     return btn
 end
 
@@ -1410,7 +1410,7 @@ function CreateSortComboBox()
     end
 
     sortCombo:AddItems(sortCombo.itemNames, 1)
-    AddTooltip(sortCombo, 'Sort Mod List', sortCombo.tooltip, 375)
+    AddTooltip(sortCombo, 'Sort Mod List', sortCombo.tooltip, 375, nil, nil, 'right')
 
     local sortByLabel = UIUtil.CreateText(dialogContent, ' Sort mods by ', 14, UIUtil.bodyFont)
     sortByLabel:SetColor('B9BFB9')
