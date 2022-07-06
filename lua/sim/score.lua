@@ -2,6 +2,7 @@ historyInterval = 10
 scoreInterval = 1
 alliesScore = true
 
+local GameIsOver = false
 local ArmyScore = {}
 local scoreOption = ScenarioInfo.Options.Score or "no"
 scoreData = {interval = historyInterval, current = ArmyScore, history = {}}
@@ -44,7 +45,7 @@ function CalculateBrainScore(brain)
 end
 
 local function ScoreResourcesThread()
-    while true do
+    while not GameIsOver do
         WaitSeconds(1)
         for index, brain in ArmyBrains do
             if ArmyIsCivilian(index) then continue end
@@ -86,18 +87,20 @@ local function ScoreResourcesThread()
 end
 
 local function ScoreHistoryThread()
-    WaitSeconds(scoreData.interval)
-    local data = {}
-    for index, brain in ArmyBrains do
-        local Score = scoreData.current[index]
-        if ArmyIsCivilian(index) then continue end
-        if (Score.Defeated ~= nil) and (Score.Defeated < 0) then continue end
-        if (Score.Defeated ~= nil) and (Score.Defeated < GetGameTimeSeconds()) then
-            Score.Defeated = -1
+    while not GameIsOver do 
+        WaitSeconds(scoreData.interval)
+        local data = {}
+        for index, brain in ArmyBrains do
+            local Score = scoreData.current[index]
+            if ArmyIsCivilian(index) then continue end
+            if (Score.Defeated ~= nil) and (Score.Defeated < 0) then continue end
+            if (Score.Defeated ~= nil) and (Score.Defeated < GetGameTimeSeconds()) then
+                Score.Defeated = -1
+            end
+            data[index] = table.deepcopy(Score)
         end
-        data[index] = table.deepcopy(Score)
+        table.insert(scoreData.history, data)
     end
-    table.insert(scoreData.history, data)
 end
 
 local function ScoreThread()
@@ -182,7 +185,7 @@ local function ScoreThread()
     local lastConsumedEnergy = 0
     local estimatedTicksSinceLastUpdate = 0
 
-    while true do
+    while not GameIsOver do
         local updInterval = scoreInterval / table.getsize(ArmyBrains)
         for index, brain in ArmyBrains do
             local CurTime = GetGameTimeSeconds()
@@ -261,6 +264,7 @@ end
 function init()
     ForkThread(ScoreThread)
     table.insert(GameOverListeners, function()
+        GameIsOver = true
         Sync.ScoreAccum = scoreData
         Sync.StatsToSend = ArmyScore
     end)

@@ -210,12 +210,6 @@ function OnSync()
         import('/lua/ui/game/score.lua').currentScores = Sync.Score
     end
 
-    if not table.empty(Sync.ScoreAccum) then
-        import('/lua/ui/dialogs/hotstats.lua').scoreData = Sync.ScoreAccum
-    end
-
-
-
     if Sync.PausedBy then
         if not PreviousSync.PausedBy then
             import('/lua/ui/game/gamemain.lua').OnPause(Sync.PausedBy, Sync.TimeoutsRemaining)
@@ -376,6 +370,11 @@ function OnSync()
 
     if Sync.ChangeCameraZoom != nil then
         import('/lua/ui/game/gamemain.lua').SimChangeCameraZoom(Sync.ChangeCameraZoom)
+    end
+
+    if not table.empty(Sync.ScoreAccum) then
+        LOG("Score data received!")
+        import('/lua/ui/dialogs/hotstats.lua').scoreData = Sync.ScoreAccum
     end
 
     -- Game <-> server communications
