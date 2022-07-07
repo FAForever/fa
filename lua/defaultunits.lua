@@ -2477,10 +2477,6 @@ ACUUnit = Class(CommandUnit) {
             if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
-            else
-                ForkThread(function()
-                    instigatorBrain:ReportScore()
-                end)
             end
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army
