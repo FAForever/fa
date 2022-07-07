@@ -9,10 +9,16 @@
 ---- DEFAULT FUNCTIONS FOR ADJACENCY
 ------------------------------------------------------------------------------------------------------------------------------------
 
+---@param buff BlueprintBuff
+---@param unit StructureUnit
+---@param instigator StructureUnit
 DefaultBuffRemove = function(buff, unit, instigator)
     unit:DestroyAdjacentEffects(instigator)
 end
 
+---@param buff BlueprintBuff
+---@param unit StructureUnit
+---@param instigator StructureUnit
 DefaultBuffAffect = function(buff, unit, instigator)
     unit:CreateAdjacentEffect(instigator)
 end

@@ -264,7 +264,8 @@ end
 
 ---
 --  Sound({cue,bank,cutoff}) - Make a sound parameters object
----@param sound {cue:unknown, bank:unknown, cutoff:unknown}
+---@param sound BpSound
+---@return BpSoundResult
 function Sound(sound)
 end
 
