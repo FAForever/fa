@@ -2,6 +2,10 @@
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
+---@return WeaponBlueprint
+function UnitWeapon:GetBlueprint()
+end
+
 ---
 --  UnitWeapon:CanFire()
 function UnitWeapon:CanFire()
@@ -65,11 +69,6 @@ end
 ---
 --  bool = UnitWeapon:FireWeapon()
 function UnitWeapon:FireWeapon()
-end
-
----
---  blueprint = UnitWeapon:GetBlueprint()
-function UnitWeapon:GetBlueprint()
 end
 
 ---
