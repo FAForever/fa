@@ -4,6 +4,10 @@ local Unit = {}
 
 ---@class UnitId: string
 
+---@return UnitBlueprint
+function Unit:GetBlueprint()
+end
+
 --- Add a command cap to a unit.
 --- Also adds a button to the UI, or enables it, for the unit to use the new command.
 ---@param capName "RULEUCC_Move"

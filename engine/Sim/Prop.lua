@@ -1,8 +1,11 @@
 ---@declare-global
 ---@class moho.prop_methods : moho.entity_methods
 local Prop = {}
----
---  derived from Entity
+
+---@return PropBlueprint
+function Prop:GetBlueprint()
+end
+
 function Prop:AddBoundedProp()
 end
 
