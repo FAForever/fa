@@ -2673,11 +2673,12 @@ Unit = Class(moho.unit_methods) {
     -- As an optimisation, EnableIntel and DisableIntel are only called when going from one disabler
     -- present to zero, and when going from zero disablers to one.
 
-    --- Adds an intel disabler. Returns if it's the first one for the intel field.
+    ---Add a disabler for an intel field. Return if it's the first one for the intel field
     ---@param self Unit
     ---@param disabler string
     ---@param intel string
     ---@return boolean
+    ---@see DisableUnitIntel
     DisableOneIntel = function(self, disabler, intel)
         if not self.IntelDisables then
             self.IntelDisables = {}
@@ -2709,11 +2710,12 @@ Unit = Class(moho.unit_methods) {
         return intDisabled
     end;
 
-    --- Adds a disabler to an intel field (or all of them if absent). If it's the first disabler for
-    --- any field it touches, it calls `OnIntelDisabled`.
+    ---Add a disabler to an intel field (or all of them if absent). Call `OnIntelDisabled` if it's the
+    ---first disabler for any of the intel fields
     ---@param self Unit
     ---@param disabler string
     ---@param intel? string
+    ---@see DisableOneIntel
     DisableUnitIntel = function(self, disabler, intel)
         local intDisabled = false
         if intel then
@@ -2730,11 +2732,12 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    --- Removes an intel disabler. Returns if it was the last one for the intel field.
+    ---Remove a disabler from an intel field. Return if it was the last one for the intel field
     ---@param self Unit
     ---@param disabler string
     ---@param intel string
     ---@return boolean
+    ---@see EnableUnitIntel
     EnableOneIntel = function(self, disabler, intel)
         if not self.IntelDisables then
             self.IntelDisables = {}
@@ -2761,11 +2764,12 @@ Unit = Class(moho.unit_methods) {
         return false
     end;
 
-    --- Removes a disabler from an intel field (or all of them if absent). If it's the last disabler for
-    --- any field it touches, it calls `OnIntelEnabled`.
+    ---Remove a disabler from an intel field (or all of them if absent). Call `OnIntelEnabled` if it's
+    ---the last disabler for any of the intel fields
     ---@param self Unit
     ---@param disabler string
     ---@param intel? string
+    ---@see EnableOneIntel
     EnableUnitIntel = function(self, disabler, intel)
         local intEnabled = false
         if intel then
@@ -2848,6 +2852,10 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ---Stop the intel reactivation thread if it exists, otherwise disable intel. Called when the player
+    ---stops power stalling by the AIBrain.
+    ---This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel
+    ---@param self Unit
     OnEnergyDepleted = function(self)
         if self.IntelReactivateThread then
             KillThread(self.IntelReactivateThread)
@@ -2857,12 +2865,18 @@ Unit = Class(moho.unit_methods) {
         end
     end;
 
+    ---Create the intel reactivation thread, called when the player stops power stalling by the AIBrain.
+    ---This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel
+    ---@param self Unit
     OnEnergyViable = function(self)
         if not self.IntelReactivateThread then
             self.IntelReactivateThread = self:ForkThread(self.IntelReactivate)
         end
     end;
 
+    ---Enable unit intel after the reactivation time has passed (`Blueprint.Intel.ReactivateTime` or
+    ---10 seconds)
+    ---@param self Unit
     IntelReactivate = function(self)
         local recharge = self.Blueprint.Intel.ReactivateTime or 10
         WaitSeconds(recharge)

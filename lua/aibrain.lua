@@ -543,8 +543,8 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@alias EnergyDependentEntity {OnEnergyDepleted: fun(self), OnEnergyViable: fun(self)}
 
-    --- Adds an entity to the list of entities that receive callbacks when the energy storage is
-    --- depleted or viable. Expects the functions `OnEnergyDepleted` and `OnEnergyViable` on the unit
+    ---Add an entity to the list of entities that receive callbacks when the energy storage is
+    ---depleted or viable. Expects the functions `OnEnergyDepleted` and `OnEnergyViable` on the unit
     ---@param self AIBrain
     ---@param entity EnergyDependentEntity
     AddEnergyDependingEntity = function(self, entity)
@@ -552,8 +552,8 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
     end,
 
-    --- Removes an entity from the list of entities that receive callbacks when the energy storage is
-    --- depleted or viable
+    ---Remove an entity from the list of entities that receive callbacks when the energy storage is
+    ---depleted or viable
     ---@param self AIBrain
     ---@param entity EnergyDependentEntity
     RemoveEnergyDependingEntity = function(self, entity)
