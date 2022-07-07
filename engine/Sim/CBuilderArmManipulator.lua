@@ -1,5 +1,5 @@
 ---@declare-global
----@class moho.BuilderArmManipulator
+---@class moho.BuilderArmManipulator : moho.manipulator_methods
 local CBuilderArmManipulator = {}
 
 ---
@@ -10,11 +10,6 @@ end
 ---
 --  CBuilderArmManipulator:SetHeadingPitch(heading, pitch)
 function CBuilderArmManipulator:SetHeadingPitch(heading,  pitch)
-end
-
----
---  derived from IAniManipulator
-function CBuilderArmManipulator:base()
 end
 
 return CBuilderArmManipulator

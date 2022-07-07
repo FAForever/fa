@@ -1,5 +1,5 @@
 ---@declare-global
----@class CAiAttackerImpl
+---@class moho.CAiAttackerImpl_methods
 local CAiAttackerImpl = {}
 
 ---
@@ -81,3 +81,5 @@ end
 --  Stop the attacker
 function CAiAttackerImpl:Stop()
 end
+
+return CAiAttackerImpl

@@ -1,10 +1,13 @@
---- Class CBoneEntityManipulator
--- @classmod Sim.CBoneEntityManipulator
+---@declare-global
+---@class moho.BoneEntityManipulator : moho.manipulator_methods
+local CBoneEntityManipulator = {}
 
 ---
 --  derived from IAniManipulator
-function CBoneEntityManipulator:base()
+function CBoneEntityManipulator:SetPivot()
 end
+
+return CBoneEntityManipulator
 
 
 

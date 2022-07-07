@@ -8,74 +8,99 @@
 -- TODO
 ---@class SimCommand
 
---- Restrict the army from building the unit category.
--- The categories can be combined using + - * (), example: (categories.TECH3 * categories:NAVAL) + categories.urb0202.
--- @param army Army's index.
--- @param category Unit category.
+---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
+
+--- Restrict the army from building the unit category, which can be combined using the typical category arithmetics (+ for union, - for subtraction, * for intersection)
+---@param army number
+---@param category Categories
 function AddBuildRestriction(army, category)
 end
 
---- TODO.
--- @param army Army's index.
+---@param army number
+---@deprecated It is unknown what this function does and where it gets its value from.
 function ArmyGetHandicap(army)
 end
 
---- TODO.
--- @param army Army's index.
+--- Initialises the prebuilt units of an army via `brain:OnSpawnPreBuiltUnits`
+---@param army number
 function ArmyInitializePrebuiltUnits(army)
 end
 
---- Return true if the indicated army is civilian.
--- @param army Army's index.
+--- Return true if the indicated army is a civilian army.
+---@param army number
+---@return boolean
 function ArmyIsCivilian(army)
 end
 
 --- Return true if the indicated army has been defeated.
--- @param army Army's index.
+---@param army number | string
 function ArmyIsOutOfGame(army)
 end
 
---- TODO.
-function AttachBeamEntityToEntity(self, bone, other, bone, army, blueprint)
+--- Attaches a beam between two entities
+---@param entityA Entity | Unit | Prop
+---@param boneA number | string
+---@param entityB Entity | Unit | Prop
+---@param boneB number | string
+---@param army number
+---@param blueprint BeamBlueprint
+---@return moho.IEffect
+function AttachBeamEntityToEntity(entityA, boneA, entityB, boneB, army, blueprint)
 end
 
---- TODO.
--- @param army Army's index.
-function AttachBeamToEntity(emitter, entity, tobone, army)
+--- Attaches a beam to an entity
+---@param emitter BeamBlueprint
+---@param entity Entity | Unit | Prop
+---@param bone number | string
+---@param army number
+---@return moho.IEffect
+function AttachBeamToEntity(emitter, entity, bone, army)
 end
 
 --- Sets language for playing voices.
 -- Available languages are in '/gamedata/loc'.
 -- Game currently defaults on 'us' language if the localized voices don't exists.
 -- @param language String of the language shortcut, example: 'us'.
+
+--- Sets the language for voice overs, available languages are in '/gamedata/loc'. The game defaults to 'us' language if the localized voices do not exist
+---@param language Language
 function AudioSetLanguage(language)
 end
 
 --- Change a unit's army, return the new unit.
 -- @param unit Unit to be given.
 -- @param army Army's index to recieve the unit.
+
+--- Changes the army of a unit, returning a new unit.
+---@param unit Unit
+---@param army number
+---@return Unit
 function ChangeUnitArmy(unit, army)
 end
 
---- Return true if cheats are enabled.
--- Logs the cheat attempt no matter what.
+--- Returns true if cheats are enabled, logs the cheat attempt no matter what
+---@return boolean
 function CheatsEnabled()
 end
 
---- TODO.
+--- It is not known what this does or what its parameters are.
+---@deprecated
 function CoordinateAttacks()
 end
 
---- TODO.
----@param weapon any
----@param label any
----@param turretBone any
----@param barrelBone any?
----@param muzzleBone any?
+--- Creates a bone manipulator for a weapon, allowing it to aim at a target
+---@param weapon Weapon
+---@param label string
+---@param turretBone number | string
+---@param barrelBone number | string
+---@param muzzleBone number | string
+---@return CAimManipulator
 function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
 end
 
---- Create a manipulator for playing animations.
+--- Creates a bone manipulator for a unit, allowing it to be animated
+---@param unit Unit
+---@return moho.manipulator_methods
 function CreateAnimator(unit)
 end
 

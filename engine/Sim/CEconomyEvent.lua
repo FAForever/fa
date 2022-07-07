@@ -1,8 +1,6 @@
---- Class CEconomyEvent
--- @classmod Sim.CEconomyEvent
+---@declare-global
+---@class moho.EconomyEvent
+local CEconomyEvent = {}
 
----
---
-function CEconomyEvent:moho.EconomyEvent()
-end
+return CEconomyEvent
 
