@@ -1,5 +1,5 @@
 ---@declare-global
----@class moho.RotateManipulator
+---@class moho.RotateManipulator : moho.manipulator_methods
 local CRotateManipulator = {}
 
 ---
@@ -45,11 +45,6 @@ end
 ---
 --  RotateManipulator:SetTargetSpeed(degrees_per_second)
 function CRotateManipulator:SetTargetSpeed(degrees_per_second)
-end
-
----
---  derived from IAniManipulator
-function CRotateManipulator:base()
 end
 
 return CRotateManipulator

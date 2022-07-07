@@ -1,5 +1,5 @@
 ---@declare-global
----@class moho.SlideManipulator
+---@class moho.SlideManipulator : moho.manipulator_methods
 local CSlideManipulator = {}
 
 ---
@@ -25,11 +25,6 @@ end
 ---
 --  CSlideManipulator:SetWorldUnits(bool)
 function CSlideManipulator:SetWorldUnits(bool)
-end
-
----
---  derived from IAniManipulator
-function CSlideManipulator:base()
 end
 
 return CSlideManipulator

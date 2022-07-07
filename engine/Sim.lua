@@ -88,7 +88,7 @@ end
 ---@param turretBone number | string
 ---@param barrelBone number | string
 ---@param muzzleBone number | string
----@return moho.AimManipulator
+---@return CAimManipulator
 function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
 end
 

@@ -1,5 +1,5 @@
 ---@declare-global
----@class moho.AimManipulator
+---@class moho.AimManipulator : moho.manipulator_methods
 local CAimManipulator = {}
 
 ---

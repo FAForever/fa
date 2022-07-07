@@ -1,7 +1,7 @@
 ---@declare-global
 ---@class moho.IEffect
 local IEffect = {}
----
+
 --  Effect:OffsetEmitter(x,y,z)
 function IEffect:OffsetEmitter(x, y, z)
 end
@@ -32,6 +32,9 @@ end
 ---@param value number
 ---@return moho.IEffect
 function IEffect:SetEmitterParam(name,  value)
+end
+
+function IEffect:Destroy()
 end
 
 return IEffect
