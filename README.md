@@ -17,14 +17,14 @@ You can download the client on our [website](https://faforever.com/). In order t
 Changelog
 ---------
 
-Here is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
+THere is the complete [changelog](changelog.md). There is an [alternative changelog](http://patchnotes.faforever.com/) for balance patches in a user-friendly format. 
 
 Contributing
 ------------
 
 There are instructions [in English](setup/setup-english.md) and [in Russian](setup/setup-russian.md) to help you set up a development environment. It is important that you discuss your contributions beforehand. You can do this by making a comment on an existing issue or, if it doesn't exist yet, by opening a new issue. Not all pull requests are merged by default. It is important that the changes align with the vision of the project. 
 
-Before contributing, make yourself aware of the [contribution guidelines](CONTRIBUTING.md), the [annotation guidelines](CONTRIBUTING.md) and the [translation guidelines](loc/guidelines.md).
+Before contributing, make yourself aware of the [contribution guidelines](contributing.md), the [annotation guidelines](annotation.md) and the [translation guidelines](loc/guidelines.md).
 
 About this repository
 ---------------------
