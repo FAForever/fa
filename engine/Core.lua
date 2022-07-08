@@ -7,10 +7,20 @@
 ---@field [2] number
 ---@field [3] number
 
+---@class Vector2D
+---@field [1] number
+---@field [2] number
+
 ---@class Point
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
+
+---@class Rectangle
+---@field [1] number x1
+---@field [2] number z1
+---@field [3] number x2
+---@field [4] number z2
 
 ---
 --  Create a target object
@@ -75,9 +85,10 @@ end
 function EntityCategoryEmpty()
 end
 
----
---  Get a list of units blueprint names from a category
-function EntityCategoryGetUnitList()
+--- Get a list of units blueprint names from a category
+---@param category CategorieType
+---@return table<string>
+function EntityCategoryGetUnitList(category)
 end
 
 ---
@@ -345,6 +356,7 @@ end
 
 ---
 --  Create a vector (x,y)
+---@return Vector2D
 function Vector2()
 end
 

@@ -1028,7 +1028,7 @@ options = {
 
                     aaoptions = GetAntiAliasingOptions()
 
-                    aamax = 0
+                    aahigh = 0
                     aamed = 0
                     if 0 < table.getn(aaoptions) then
                         aahigh = aaoptions[table.getn(aaoptions)]

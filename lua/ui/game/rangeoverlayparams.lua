@@ -34,7 +34,20 @@ local glowIntelNormal = '00'
 local glowIntelSelect = '08'
 local glowIntelOver = '10'
 
+---@class RangeOverlay
+---@field key string
+---@field Label string
+---@field Categories CategorieType
+---@field NormalColor string
+---@field SelectColor string
+---@field RolloverColor string
+---@field Inner table<number>
+---@field Outer table<number>
+---@field Type number
+---@field Combo boolean
+---@field Tooltip string
 
+---@type table<string, RangeOverlay>
 RangeOverlayParams = {
     AllMilitary = {
         key = 'allmilitary',

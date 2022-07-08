@@ -1,4 +1,22 @@
+---@class BuildTemplateBuilding
+---@field [1] string unit id
+---@field [2] integer build order
+---@field [3] integer position x
+---@field [4] integer position z
+
+---@class BuildQueue
+---@field [1] number
+---@field [2] number
+--@field [3...] BuildTemplateBuilding
+
+---@class BuildTemplate
+---@field templateData table
+---@field name string
+---@field icon string unit id
+
+
 local Prefs = import('/lua/user/prefs.lua')
+---@type table<BuildTemplate>
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
 local UIUtil = import('/lua/ui/uiutil.lua')
 
