@@ -52,7 +52,6 @@ UnitBlueprint {
         'DIRECTFIRE',
         'EXPERIMENTAL',
         'BOT',
-        'ANTIAIR',
         'AMPHIBIOUS',
         'NEEDMOBILEBUILD',
         'VISIBLETORECON',
