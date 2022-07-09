@@ -126,11 +126,11 @@ Tree = Class(Prop) {
         motor:Whack(dx, dy, dz, depth, true)
 
         -- no longer be able to catch fire after a while
-        WaitTicks(150)
+        WaitTicks(150 + Random(0, 50))
         self.NoBurn = true 
 
         -- make it sink after a while
-        WaitTicks(150)
+        WaitTicks(150 + Random(0, 50))
         self:SinkAway(-.1)
 
         -- get rid of it when it is completely below the terrain
@@ -187,7 +187,7 @@ Tree = Class(Prop) {
         self.PlayPropAmbientSound(self, 'BurnLoop')
 
         -- wait a bit before we change to a scorched tree
-        WaitTicks(50)
+        WaitTicks(50 + Random(0, 10))
         EntitySetMesh(self, self.Blueprint.Display.MeshBlueprintWrecked)
 
         -- more fire effects
@@ -207,7 +207,7 @@ Tree = Class(Prop) {
         end
 
         -- wait a bit before we make a scorch mark
-        WaitTicks(50)
+        WaitTicks(50 + Random(0, 10))
         CreateScorchMarkSplat( self, 0.5, -1 )
 
         -- try and spread the fire
