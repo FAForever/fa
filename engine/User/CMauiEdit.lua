@@ -1,6 +1,10 @@
 ---@declare-global
----@class moho.edit_methods
+---@class moho.edit_methods : moho.control_methods
 local CMauiEdit = {}
+
+---
+function CMauiEdit:AbandonFocus()
+end
 
 ---
 --  AcquireFocus()
@@ -150,11 +154,6 @@ end
 ---
 --  Edit:ShowCaret(bool)
 function CMauiEdit:ShowCaret(bool)
-end
-
----
---  derived from CMauiControl
-function CMauiEdit:base()
 end
 
 return CMauiEdit

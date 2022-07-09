@@ -1,18 +1,13 @@
---- Class CMauiBorder
--- @classmod User.CMauiBorder
+---@declare-global
+---@class moho.border_methods : moho.control_methods
+local CMauiBorder = {}
 
 ---
---  SetSolidColor(color)
+function CMauiBorder:SetNewTextures(color)
+end
+
+---
 function CMauiBorder:SetSolidColor(color)
 end
 
----
---  derived from CMauiControl
-function CMauiBorder:base()
-end
-
----
---
-function CMauiBorder:moho.border_methods()
-end
-
+return CMauiBorder

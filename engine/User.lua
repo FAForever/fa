@@ -45,6 +45,11 @@ end
 function AnyInputCapture()
 end
 
+--- Set the audio language
+---@param language Language
+function AudioSetLanguage(language)
+end
+
 --- Clear and disable the build templates
 function ClearBuildTemplates()
 end
@@ -136,20 +141,31 @@ end
 function EngineStartSplashScreens()
 end
 
---- See if a unit category contains this unit
-function EntityCategoryContains()
+--- Return true if a unit category contains this unit
+---@param category moho.EntityCategory
+---@param unit Unit
+function EntityCategoryContains(category, unit)
 end
 
 --- Filter a list of units to only those found in the category
-function EntityCategoryFilterDown()
+---@param category moho.EntityCategory
+---@param units table<Unit>
+---@return table<Unit>
+function EntityCategoryFilterDown(category, units)
 end
 
 --- Filter a list of units to exclude those found in the category
-function EntityCategoryFilterOut()
+---@param category moho.EntityCategory
+---@param units table<Unit>
+---@return table<Unit>
+function EntityCategoryFilterOut(category, units)
 end
 
 --- Execute some lua code in the sim
-function ExecLuaInSim()
+---@param func function
+---@param ... any this may actually be a comma-separated string of args instead of a vararg
+---@return any
+function ExecLuaInSim(func, ...)
 end
 
 --- Request that the application shut down
@@ -170,11 +186,15 @@ end
 function FormatTime(seconds)
 end
 
---- Get the current game time in ticks. The game time is the simulation time, that stops when the game is paused.
+--- Get the current game time in ticks. The game time is the simulation time,
+--- that stops when the game is paused.
+---@return integer
 function GameTick()
 end
 
---- Get the current game time in seconds. The game time is the simulation time, that stops when the game is paused.
+--- Get the current game time in seconds. The game time is the simulation time,
+--- that stops when the game is paused.
+---@return number
 function GameTime()
 end
 
@@ -183,6 +203,7 @@ function GenerateBuildTemplateFromSelection()
 end
 
 --- Get active build template back to Lua
+---@return BuildTemplate
 function GetActiveBuildTemplate()
 end
 
@@ -197,7 +218,7 @@ function GetArmiesTable()
 end
 
 --- Return a table of avatar units for the army
----@return table
+---@return table<Unit>
 function GetArmyAvatars()
 end
 
@@ -207,26 +228,32 @@ function GetArmyScore(armyIndex)
 end
 
 --- Get a list of units assisting me
-function GetAssistingUnitsList()
+---@param units table<Unit>
+---@return table<Unit>
+function GetAssistingUnitsList(units)
 end
 
 --- Get a list of units blueprint attached to transports
-function GetAttachedUnitsList()
+---@param units table<Unit>
+---@return table<Unit>
+function GetAttachedUnitsList(units)
 end
 
 ---
-function GetBlueprint()
+---@param obj Unit | Prop
+---@return UnitBlueprint | PropBlueprint
+function GetBlueprint(obj)
 end
 
 ---
----@param name any
----@return 
+---@param name string
+---@return UserCamera
 function GetCamera(name)
 end
 
 ---
 ---@return CommandArgTable
-function GetCommandLineArg(option,  number)
+function GetCommandLineArg(option, number)
 end
 
 --- Return 'splash', 'frontend' or 'game' depending on the current state of the ui
@@ -350,14 +377,14 @@ function GetNumRootFrames()
 end
 
 ---
----@return obj
+---@return any
 function GetOptions()
 end
 
 ---
 ---@param string string
 ---@param default any?
----@return obj
+---@return any
 function GetPreference(string, default)
 end
 
@@ -435,7 +462,8 @@ end
 ---
 ---@param filename string
 ---@param border number? default value 1
----@return number width, number height
+---@return number width
+---@return number height
 function GetTextureDimensions(filename,  border)
 end
 
@@ -454,7 +482,7 @@ end
 ---@param unitSet any
 ---@return table<string> orders
 ---@return table<OrderInfo> availableToggles
----@return table<CategorieType> buildableCategories
+---@return table<moho.EntityCategory> buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
@@ -732,7 +760,7 @@ end
 
 --- Parse a string to generate a new entity category
 ---@param cat string
----@return CategorieType
+---@return moho.EntityCategory
 function ParseEntityCategory(cat)
 end
 
@@ -751,7 +779,7 @@ end
 ---
 ---@param sound BpSoundResult
 ---@param prepareOnly? boolean
----@return handle
+---@return SoundHandle
 function PlaySound(sound, prepareOnly)
 end
 
@@ -761,30 +789,32 @@ function PlayTutorialVO(params)
 end
 
 ---
----@param sound Sound
+---@param sound BpSoundResult
 ---@param duck? boolean
+---@return SoundHandle
 function PlayVoice(sound, duck)
 end
 
---- Make 'dragger' the active dragger from a particular frame.
+--- Make `dragger` the active dragger from a particular frame.
 --- You can pass nil to cancel the current dragger.
 ---@param originFrame Frame
 ---@param keycode string
 ---@param dragger Dragger | nil
-function PostDragger(originFrame,  keycode,  dragger)
+function PostDragger(originFrame, keycode, dragger)
 end
 
 --- Start a background load with the given map and mods.
 --- If `hipri` is true, this will interrupt any previous loads in progress.
 ---@param mapname string
----@param mods table<Mod>
+---@param mods table<ModInfo>
 ---@param hipri? boolean
-function PrefetchSession(mapname,  mods,  hipri)
+function PrefetchSession(mapname, mods, hipri)
 end
 
----
----@param min? number
----@param max number
+--- Generate a random number between `min` and `max`
+---@param min? number defaults to 0
+---@param max number defaults to 1
+---@return number
 ---@overload fun(max?: number)
 function Random(min, max)
 end
@@ -975,7 +1005,7 @@ end
 
 ---
 ---@param overlay string
----@param categories CategorieType
+---@param categories EntityCategory
 ---@param normalColor string
 ---@param selectColor string
 ---@param rolloverColor string
@@ -1138,22 +1168,6 @@ end
 ---@param luaobj any
 ---@param spec any
 function _c_CreatePathDebugger(luaobj, spec)
-end
-
--- TODO due to how neglected these last functions seem to have been, PLEASE CHECK
--- then move to `/User/CDiscoveryService.lua`
-moho.discovery_service_methods = {}
-
-function moho.CDiscoveryService:Edit()
-end
-
--- which is it????
----  CDiscoveryService.GetCount(self)
-function GetGameCount()
-end
-
----
-function moho.CDiscoveryService.Reset(self)
 end
 
 ------

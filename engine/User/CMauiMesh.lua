@@ -1,18 +1,13 @@
---- Class CMauiMesh
--- @classmod User.CMauiMesh
+---@declare-global
+---@class moho.mesh_methods : moho.control_methods
+local CMauiMesh = {}
 
 ---
---  SetOrientation(quaternion)
 function CMauiMesh:SetOrientation(quaternion)
 end
 
 ---
---  derived from CMauiControl
-function CMauiMesh:base()
+function CMauiMesh:SetMesh()
 end
 
----
---
-function CMauiMesh:moho.mesh_methods()
-end
-
+return CMauiMesh

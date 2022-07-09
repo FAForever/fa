@@ -3,88 +3,83 @@
 local CLobby = {}
 
 ---
---  void CLobby.ConnectToPeer(self,address,name,uid
-function CLobby:ConnectToPeer()
+function CLobby:BroadcastData()
 end
 
 ---
---  void CLobby.DebugDump()
+function CLobby:ConnectToPeer(address, name, uid)
+end
+
+---
 function CLobby:DebugDump()
 end
 
 ---
---  CLobby.Destroy(self)
-function CLobby:Destroy(self)
+function CLobby:Destroy()
 end
 
 ---
---  void CLobby.DisconnectFromPeer(self,uid
-function CLobby:DisconnectFromPeer()
+function CLobby:DisconnectFromPeer(uid)
 end
 
 ---
---  void CLobby.EjectPeer(self,targetID,reason)
-function CLobby:EjectPeer(self, targetID, reason)
+function CLobby:EjectPeer(targetID, reason)
 end
 
 ---
---  int CLobby.GetLocalPlayerID(self)
-function CLobby:GetLocalPlayerID(self)
+---@return integer
+function CLobby:GetLocalPlayerID()
 end
 
 ---
---  string CLobby.GetLocalPlayerName(self)
-function CLobby:GetLocalPlayerName(self)
+---@return string
+function CLobby:GetLocalPlayerName()
 end
 
 ---
---  int-or-nil CLobby.GetLocalPort(self)
-function CLobby:GetLocalPort(self)
+---@return integer | nil
+function CLobby:GetLocalPort()
 end
 
 ---
---  table CLobby.GetPeer(self,uid)
-function CLobby:GetPeer(self, uid)
+---@return table
+function CLobby:GetPeer(uid)
 end
 
 ---
---  table CLobby.GetPeers(self)
-function CLobby:GetPeers(self)
+---@return table
+function CLobby:GetPeers()
 end
 
 ---
---  void CLobby.HostGame(self)
-function CLobby:HostGame(self)
+function CLobby:HostGame()
 end
 
 ---
---  bool CLobby.IsHost(self)
-function CLobby:IsHost(self)
+---@return boolean
+function CLobby:IsHost()
 end
 
 ---
---  void CLobby.JoinGame(self, string-or-boxedInt32 address, string-or-nil remotePlayerName, string remotePlayerUID)
-function CLobby:JoinGame(self,  string-or-boxedInt32 address,  string-or-nil remotePlayerName,  string remotePlayerUID)
+function CLobby:JoinGame(string-or-boxedInt32 address,  string-or-nil remotePlayerName, string remotePlayerUID)
 end
 
 ---
---  void CLobby.LaunchGame(self,gameConfig)
-function CLobby:LaunchGame(self, gameConfig)
+function CLobby:LaunchGame(gameConfig)
 end
 
 ---
---  string CLobby.MakeValidGameName(self,origName)
-function CLobby:MakeValidGameName(self, origName)
+---@return string
+function CLobby:MakeValidGameName(origName)
 end
 
 ---
---  string CLobby.MakeValidPlayerName(self,uid,origName)
-function CLobby:MakeValidPlayerName(self, uid, origName)
+---@return string
+function CLobby:MakeValidPlayerName(uid, origName)
 end
 
 ---
---  void CLobby.SendData(self,targetID,table)
-function CLobby:SendData(self, targetID, table)
+function CLobby:SendData(targetID, table)
 end
 
 return CLobby

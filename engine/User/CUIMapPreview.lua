@@ -1,5 +1,10 @@
---- Class CUIMapPreview
--- @classmod User.CUIMapPreview
+---@declare-global
+---@class moho.ui_map_preview_methods : moho.control_methods
+local CUIMapPreview = {}
+
+---
+function CUIMapPreview:ClearTexture()
+end
 
 ---
 --  CUIMapPreview:SetTexture(texture_name)
@@ -11,13 +16,4 @@ end
 function CUIMapPreview:SetTextureFromMap(map_name)
 end
 
----
---  derived from CMauiControl
-function CUIMapPreview:base()
-end
-
----
---
-function CUIMapPreview:moho.ui_map_preview_methods()
-end
-
+return CUIMapPreview

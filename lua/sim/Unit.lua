@@ -5,6 +5,84 @@
 -- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 
+local classes = {}
+for name, classMethods in moho do
+    local class = {}
+    for method, fun in classMethods do
+        if type(fun) == "cfunction" then
+            class[method] = fun
+        end
+    end
+    classes[name] = class
+
+end
+
+local function isParent(class, parent, className, parentName)
+    local n = 0
+    for method, _ in parent do
+        if type(method) == "string" then
+            if not class[method] then
+                return false
+            end
+            if class[method] ~= parent[method] then
+                return false
+            end
+            n = n + 1
+        end
+    end
+    LOG(className .. " " .. parentName .. " " .. n)
+    return n ~= 0
+end
+for _, class in classes do
+    for parName, parent in classes do
+        if class ~= parent then
+            if isParent(class, parent, _, parName) then
+                table.insert(class, parName)
+            end
+        end
+    end
+end
+
+local function removeCircular(class, index, parent)
+    for parentIndex, parentsParent in ipairs(parent) do
+        if classes[parentsParent] == class then
+            --table.remove(class, index)
+            table.remove(parent, parentIndex)
+            return
+        end
+    end
+end
+for _, class in classes do
+    for index, parent in ipairs(class) do
+        removeCircular(class, index, classes[parent])
+    end
+end
+
+for _, class in classes do
+    for _, parent in ipairs(class) do
+        for method, _ in classes[parent] do
+            if type(method) == "string" then
+                class[method] = nil
+            end
+        end
+    end
+end
+
+for name, class in classes do
+    local info = name
+    if class[1] then
+        info = info .. ": " .. class[1]
+        for i = 2, table.getn(class) do
+            info = info .. ", " .. class[i]
+        end
+    end
+    LOG(info)
+    for method, f in class do
+        if type(method) == "string" then
+            LOG(string.format("    %-30s %s", method, string.sub(repr(f), 12)))
+        end
+    end
+end
 -- Imports. Localise commonly used subfunctions for speed
 local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')

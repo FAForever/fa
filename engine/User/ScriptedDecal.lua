@@ -1,18 +1,20 @@
---- Class ScriptedDecal
--- @classmod User.ScriptedDecal
+---@declare-global
+---@class moho.userDecal_methods
+local ScriptedDecal = {}
 
 ---
---  Set the position based on wolrd coords
+function ScriptedDecal:Destroy()
+end
+
+--- Set the position based on world coords
 function ScriptedDecal:SetPosition()
 end
 
----
---  Set the position based on screen space mouse coords
+--- Set the position based on screen space mouse coords
 function ScriptedDecal:SetPositionByScreen()
 end
 
----
---  Scale the text
+--- Scale the text
 function ScriptedDecal:SetScale()
 end
 
@@ -21,8 +23,4 @@ end
 function ScriptedDecal:SetTexture()
 end
 
----
---
-function ScriptedDecal:moho.userDecal_methods()
-end
-
+return ScriptedDecal

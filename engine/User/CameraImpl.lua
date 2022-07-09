@@ -1,123 +1,100 @@
---- Class CameraImpl
--- @classmod User.CameraImpl
+
+---@class Camera
+Camera = {}
 
 ---
---  Camera:EnableEaseInOut()
-function CameraImpl:EnableEaseInOut()
+function Camera:EnableEaseInOut()
 end
 
 ---
---  Camera:GetFocusPosition()
-function CameraImpl:GetFocusPosition()
+function Camera:GetFocusPosition()
 end
 
 ---
---  Camera:GetMaxZoom()
-function CameraImpl:GetMaxZoom()
+function Camera:GetMaxZoom()
 end
 
 ---
---  Camera:GetMinZoom()
-function CameraImpl:GetMinZoom()
+function Camera:GetMinZoom()
 end
 
 ---
---  Camera:GetTargetZoom()
-function CameraImpl:GetTargetZoom()
+function Camera:GetTargetZoom()
 end
 
 ---
---  Camera:GetZoom()
-function CameraImpl:GetZoom()
+function Camera:GetZoom()
 end
 
 ---
---  Camera:HoldRotation()
-function CameraImpl:HoldRotation()
+function Camera:HoldRotation()
 end
 
 ---
---  Camera:MoveTo(position, orientationHPR, zoom, seconds)
-function CameraImpl:MoveTo(position,  orientationHPR,  zoom,  seconds)
+function Camera:MoveTo(position, orientationHPR, zoom, seconds)
 end
 
 ---
---  Camera:MoveTo(region[,seconds])
-function CameraImpl:MoveToRegion()
+function Camera:MoveToRegion(region, seconds?)
 end
 
 ---
---  Camera:NoseCam(ent,pitchAdjust,zoom,seconds,transition)
-function CameraImpl:NoseCam(ent, pitchAdjust, zoom, seconds, transition)
+function Camera:NoseCam(ent, pitchAdjust, zoom, seconds, transition)
 end
 
 ---
---  Camera:Reset()
-function CameraImpl:Reset()
+function Camera:Reset()
 end
 
 ---
---  Camera:RestoreSettings(settings)
-function CameraImpl:RestoreSettings(settings)
+function Camera:RestoreSettings(settings)
 end
 
 ---
---  Camera:RevertRotation()
-function CameraImpl:RevertRotation()
+function Camera:RevertRotation()
 end
 
 ---
---  Camera:SaveSettings()
-function CameraImpl:SaveSettings()
+function Camera:SaveSettings()
 end
 
 ---
---  Camera:SetAccMode(accTypeName)
-function CameraImpl:SetAccMode(accTypeName)
+function Camera:SetAccMode(accTypeName)
+end
+
+--- Set zoom scale to allow zooming past or before the point where map fills control
+function Camera:SetMaxZoomMult()
 end
 
 ---
---  Camera:SetMaxZoomMult() - set zoom scale to allow zooming past or before the point where map fills control
-function CameraImpl:SetMaxZoomMult()
+function Camera:SetTargetZoom(zoom)
 end
 
 ---
---  Camera:SetTargetZoom(zoom)
-function CameraImpl:SetTargetZoom(zoom)
+function Camera:SetZoom(zoom, seconds)
 end
 
 ---
---  Camera:SetZoom(zoom,seconds)
-function CameraImpl:SetZoom(zoom, seconds)
+function Camera:SnapTo(position, orientationHPR, zoom)
 end
 
 ---
---  Camera:SnapTo(position, orientationHPR, zoom)
-function CameraImpl:SnapTo(position,  orientationHPR,  zoom)
+function Camera:Spin(headingRate, zoomRate?)
 end
 
 ---
---  Camera:Spin(headingRate[,zoomRate])
-function CameraImpl:Spin(headingRate[, zoomRate])
+function Camera:TargetEntities(ents, zoom, seconds)
 end
 
 ---
---  Camera:TargetEntities(ents,zoom,seconds)
-function CameraImpl:TargetEntities(ents, zoom, seconds)
+function Camera:TrackEntities(ents, zoom, seconds)
 end
 
 ---
---  Camera:TrackEntities(ents,zoom,seconds)
-function CameraImpl:TrackEntities(ents, zoom, seconds)
+function Camera:UseGameClock()
 end
 
 ---
---  Camera:UseGameClock()
-function CameraImpl:UseGameClock()
-end
-
----
---  Camera:UseSystemClock()
-function CameraImpl:UseSystemClock()
+function Camera:UseSystemClock()
 end
 

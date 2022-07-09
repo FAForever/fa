@@ -86,7 +86,7 @@ function EntityCategoryEmpty()
 end
 
 --- Get a list of units blueprint names from a category
----@param category CategorieType
+---@param category moho.EntityCategory
 ---@return table<string>
 function EntityCategoryGetUnitList(category)
 end

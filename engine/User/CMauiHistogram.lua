@@ -1,5 +1,10 @@
---- Class CMauiHistogram
--- @classmod User.CMauiHistogram
+---@declare-global
+---@class moho.histogram_methods : moho.control_methods
+local CMauiHistogram = {}
+
+---
+function CMauiHistogram:SetData()
+end
 
 ---
 --  SetXIncrement(int)
@@ -11,13 +16,4 @@ end
 function CMauiHistogram:SetYIncrement(int)
 end
 
----
---  derived from CMauiControl
-function CMauiHistogram:base()
-end
-
----
---
-function CMauiHistogram:moho.histogram_methods()
-end
-
+return CMauiHistogram

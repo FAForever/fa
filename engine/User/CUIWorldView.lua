@@ -1,6 +1,15 @@
 ---@declare-global
----@class moho.UIWorldView
+---@class moho.UIWorldView : moho.control_methods
 local CUIWorldView = {}
+
+---
+--  moho.UIWorldView:__init(parent_control, cameraName, depth, isMiniMap, trackCamera)
+function CUIWorldView:__init(parent_control,  cameraName,  depth,  isMiniMap,  trackCamera)
+end
+
+---
+function CUIWorldView:CameraReset()
+end
 
 ---
 --  EnableResourceRendering(bool)
@@ -77,14 +86,5 @@ end
 function CUIWorldView:ZoomScale(x,  y,  wheelRot,  wheelDelta)
 end
 
----
---  moho.UIWorldView:__init(parent_control, cameraName, depth, isMiniMap, trackCamera)
-function CUIWorldView:__init(parent_control,  cameraName,  depth,  isMiniMap,  trackCamera)
-end
-
----
---  derived from CMauiControl
-function CUIWorldView:base()
-end
 
 return CUIWorldView

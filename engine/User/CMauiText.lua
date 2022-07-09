@@ -1,6 +1,10 @@
 ---@declare-global
----@class moho.text_methods
+---@class moho.text_methods : moho.control_methods
 local CMauiText = {}
+
+---
+function CMauiText:GetStringAdvance()
+end
 
 ---
 --  string Text:GetText()
@@ -40,11 +44,6 @@ end
 ---
 --  Text:SetText(text)
 function CMauiText:SetText(text)
-end
-
----
---  derived from CMauiControl
-function CMauiText:base()
 end
 
 return CMauiText

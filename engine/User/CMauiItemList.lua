@@ -1,6 +1,11 @@
 ---@declare-global
----@class moho.item_list_methods
+---@class moho.item_list_methods : moho.control_methods
 local CMauiItemList = {}
+
+---
+function CMauiItemList:AddItem()
+end
+
 ---
 --  itemlist = ItemList:DeleteAllItems()
 function CMauiItemList:DeleteAllItems()
@@ -89,11 +94,6 @@ end
 ---
 --  ShowSelection(bool) - enable or disable the highlighting of the selected item
 function CMauiItemList:ShowSelection(bool)
-end
-
----
---  derived from CMauiControl
-function CMauiItemList:base()
 end
 
 return CMauiItemList

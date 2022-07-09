@@ -1,5 +1,10 @@
---- Class CUIWorldMesh
--- @classmod User.CUIWorldMesh
+---@declare-global
+---@class moho.world_mesh_methods
+local CUIWorldMesh = {}
+
+---
+function CUIWorldMesh:Destroy()
+end
 
 ---
 --  Vector WorldMesh:GetInterpolatedAlignedBox()
@@ -76,8 +81,4 @@ end
 function CUIWorldMesh:SetStance(vector position,  [quaternion orientation])
 end
 
----
---
-function CUIWorldMesh:moho.world_mesh_methods()
-end
-
+return CUIWorldMesh

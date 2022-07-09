@@ -1,5 +1,10 @@
---- Class CMauiMovie
--- @classmod User.CMauiMovie
+---@declare-global
+---@class moho.movie_methods : moho.control_methods
+local CMauiMovie = {}
+
+---
+function CMauiMovie:GetFrameRate()
+end
 
 ---
 --  int GetNumFrames() - returns the number of frames in the movie
@@ -31,13 +36,4 @@ end
 function CMauiMovie:Stop()
 end
 
----
---  derived from CMauiControl
-function CMauiMovie:base()
-end
-
----
---
-function CMauiMovie:moho.movie_methods()
-end
-
+return CMauiMovie

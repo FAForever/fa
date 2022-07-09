@@ -1,28 +1,21 @@
---- Class CMauiScrollbar
--- @classmod User.CMauiScrollbar
+---@declare-global
+---@class moho.scrollbar_methods : moho.control_methods
+local CMauiScrollbar = {}
 
 ---
---  DoScrollPages(float)
 function CMauiScrollbar:DoScrollPages(float)
 end
 
 ---
---  Scrollbar:SetTextures(background, thumbMiddle, thumbTop, thumbBottom)
-function CMauiScrollbar:SetNewTextures()
+function CMauiScrollbar:DoScrollLines(float)
 end
 
 ---
---  Scrollbar:SetScrollable(scrollable) -- set the scrollable object connected to this scrollbar
+function CMauiScrollbar:SetNewTextures(background, thumbMiddle, thumbTop, thumbBottom)
+end
+
+--- Set the scrollable object connected to this scrollbar
 function CMauiScrollbar:SetScrollable(scrollable)
 end
 
----
---  derived from CMauiControl
-function CMauiScrollbar:base()
-end
-
----
---
-function CMauiScrollbar:moho.scrollbar_methods()
-end
-
+return CMauiScrollbar
