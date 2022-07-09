@@ -83,8 +83,12 @@ local function MatchStateThread()
 
     -- determine game conditions
     local condition = Conditions[ScenarioInfo.Options.Victory]
-    if not condition and not (ScenarioInfo.Options.Victory == 'sandbox') then
-        SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
+    
+    if not condition then
+        if ScenarioInfo.Options.Victory ~= 'sandbox' then
+            SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
+        end
+        
         return
     end
 
