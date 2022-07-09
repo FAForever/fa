@@ -111,6 +111,8 @@ UnitBlueprint {
         'FACTORY',
         'NEEDMOBILEBUILD',
         'AMPHIBIOUS',
+        'ANTIAIR',
+        'ANTINAVY',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'DRAGBUILD',
