@@ -2,21 +2,37 @@
 ---Module: Core
 -- @module Core
 
+---@class Quaternion
+---@field [1] number
+---@field [2] number
+---@field [3] number
+---@field [4] number
+
 ---@class Vector
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
 
----@class Point
+---@class Vector2
+---@field [1] number
+---@field [2] number
+
+---@class Position
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
 
+---@class Rectangle     # A point-to-point based rectangle, where the first point is usually in the top left corner
+---@field x0 number
+---@field y0 number
+---@field x1 number
+---@field y1 number
+
 ---
 --  Create a target object
+
 function AITarget()
 end
-
 
 --- return the last component of a path
 ---@param fullPath string
@@ -24,38 +40,42 @@ end
 function Basename(fullPath, stripExtension)
 end
 
----
---  Begin logging stats
+--- Likely used for debugging, but the use is unknown
+---@unknown
 function BeginLoggingStats()
 end
 
----
---
+
+--- Called during blueprint loading to update the loading animation
 function BlueprintLoaderUpdateProgress()
 end
 
----
---  create an empty prefetch set
+--- Create an empty prefetch set
+---@unknown
 function CreatePrefetchSet()
 end
 
----
---  thread=CurrentThread() -- get a handle to the running thread for later use with ResumeThread() or KillThread()
+--- Returns the current running thread
+---@return thread?
 function CurrentThread()
 end
 
----
---  base = Dirname(fullPath) -- return a path with trailing filename removed
+---comment
+---@param fullPath any
+---@result 
 function Dirname(fullPath)
 end
 
----
---  files = DiskFindFiles(directory, pattern)returns a list of files in a directory
+--- Returns all files in the directory that matches the pattern
+---@param directory any
+---@param pattern any
+---@return string[]
 function DiskFindFiles(directory,  pattern)
 end
 
----
---  info = DiskGetFileInfo(filename)returns a table describing the given file, or false if the file doesn't exist.
+--- Returns a table of information for the given file, or false if the file doesn't exist 
+---@param filename string
+---@return File | boolean
 function DiskGetFileInfo(filename)
 end
 
@@ -77,7 +97,11 @@ end
 
 ---
 --  Get a list of units blueprint names from a category
-function EntityCategoryGetUnitList()
+
+--- Computes a list of unit blueprint names that match the categories
+---@param categories Categories
+---@return string[]
+function EntityCategoryGetUnitList(categories)
 end
 
 ---
@@ -85,11 +109,11 @@ end
 function EnumColorNames()
 end
 
----
----converts euler angles to a quaternion
+--- Converts euler angles to a quaternion
 ---@param roll number float
 ---@param pitch number float
 ---@param yaw number float
+---@return Quaternion
 function EulerToQuaternion(roll, pitch, yaw)
 end
 
@@ -100,8 +124,10 @@ end
 
 ---
 --  thread = ForkThread(function, ...)Spawns a new thread running the given function with the given args.
+
+--- Creates a new thread, passing all additional arguments to the callback
 ---@param callback function
----@vararg any arguments to pass into function
+---@vararg any
 ---@return thread
 function ForkThread(callback,  ...)
 end
@@ -151,27 +177,35 @@ end
 ---
 --  quaternion MinLerp(float alpha, quaternion L, quaternion R) - returns minimal lerp between L and R
 ---@param alpha number
----@param L unknown quaternion
----@param R unknown quaternion
+---@param L Quaternion
+---@param R Quaternion
 function MinLerp(alpha, L, R)
 end
 
 ---
 --  quaternion MinSlerp(float alpha, quaternion L, quaternion R) - returns minimal slerp between L and R
 ---@param alpha number
----@param L unknown quaternion
----@param R unknown quaternion
+---@param L Quaternion
+---@param R Quaternion
 function MinSlerp(alpha, L, R)
 end
 
----
---  quaternion OrientFromDir(vector)
+--- Converts an orientation to a quaternion
+---@param vector Vector
+---@return Quaternion
 function OrientFromDir(vector)
 end
 
----
---  Create a point vector(px,py,pz, vx,vy,vz)
-function PointVector()
+
+--- Creates a point vector
+---@param px number
+---@param py number
+---@param pz number
+---@param vx number
+---@param vy number
+---@param vz number
+---@unknown
+function PointVector(px, py, pz, vx, vy, vz)
 end
 
 ---
@@ -180,9 +214,13 @@ end
 function RPCSound(sound)
 end
 
----
---  Create a 2d Rectangle (x0,y0,x1,y1)
-function Rect()
+--- Constructs a rectangle, usually the first point is in the top-left corner and the second is in the bottom-right corner
+---@param x0 number
+---@param y0 number
+---@param x1 number
+---@param y1 number
+---@return Rectangle
+function Rect(x0, y0, x1, y1)
 end
 
 ---
@@ -220,8 +258,9 @@ end
 function RegisterUnitBlueprint()
 end
 
----
---  ResumeThread(thread) -- resume a thread that had been suspended with SuspendCurrentThread(). Does nothing if the thread wasn't suspended.
+--- Resumes the thread after suspending it, does nothing if the thread wasn't suspended
+---@see # Counterpart of SuspendCurrentThread
+---@param thread thread
 function ResumeThread(thread)
 end
 
@@ -276,6 +315,9 @@ end
 
 ---
 --  SuspendCurrentThread() -- suspend this thread indefinitely. Some external event must eventually call ResumeThread() to resume it.
+
+--- Suspends the current thread indefinitely. Only a call to `ResumeThread(thread)` can resume it
+---@see ResumeThread
 function SuspendCurrentThread()
 end
 
@@ -285,18 +327,19 @@ end
 function Trace(enable)
 end
 
----
---  Addition of two vectors
-function VAdd()
+--- Adds vector `b` to vector `a`
+---@param a Vector
+---@param b Vector
+function VAdd(a, b)
 end
 
----
---  Difference of two vectors
-function VDiff()
+--- Subtracts vector `b` from vector `a`
+---@param a Vector
+---@param b Vector
+function VDiff(a, b)
 end
 
----
---  Distance between two 2d points (x1,y1,x2,y2)
+--- Computes the distance between two points
 ---@param x1 number
 ---@param y1 number
 ---@param x2 number
@@ -304,8 +347,7 @@ end
 function VDist2(x1, y1, x2, y2)
 end
 
----
---  Square of Distance between two 2d points (x1,y1,x2,y2)
+--- Computes the squared distance between two points
 ---@param x1 number
 ---@param y1 number
 ---@param x2 number
@@ -313,39 +355,47 @@ end
 function VDist2Sq(x1, y1, x2, y2)
 end
 
----
---  Distance between two 3d points (v1,v2)
+--- Computes the distance between the vectors `a` and `b`
+---@param a Vector
+---@param b Vector
 function VDist3()
 end
 
----
---  Square of Distance between two 3d points (v1,v2)
-function VDist3Sq()
+--- Computes the squared distance between the vectors `a` and `b`
+---@deprecated It is faster to compute it in Lua
+---@param a Vector
+---@param b Vector
+function VDist3Sq(a, b)
 end
 
----
---  Dot product of two vectors
-function VDot()
+--- Computes the dot product between the vectors `a` and `b`
+---@param a Vector
+---@param b Vector
+function VDot(a, b)
 end
 
----
---  Multiplication of vector with scalar
-function VMult()
+--- Scales the vector `v` with the scalar `s`
+---@param v Vector
+---@param s number
+function VMult(v, s)
+end
+--- Computes the vector perpendicular to the plane described by the vectors `a` and `b`
+---@param a Vector
+---@param b Vector
+function VPerpDot(a, b)
 end
 
----
---  Perp dot product of two vectors
-function VPerpDot()
+--- Populates a new table with the corresponding meta table
+---@param x number
+---@param y number
+---@param z number
+function Vector(x, y, z)
 end
 
----
---  Create a vector (x,y,z)
-function Vector()
-end
-
----
---  Create a vector (x,y)
-function Vector2()
+--- Populates a new table with the corresponding meta table
+---@param x number
+---@param y number
+function Vector2(x, y)
 end
 
 ---  Print a warning message
@@ -355,9 +405,9 @@ end
 function WARN(TextOne, TextTwo)
 end
 
----
---  WaitFor(event) -- suspend this thread until the event is set
-function WaitFor(event)
+--- Suspends the thread until the manipulator reaches its goal
+---@param manipulator moho.manipulator_methods
+function WaitFor(manipulator)
 end
 
 ---
