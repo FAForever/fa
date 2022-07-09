@@ -57,7 +57,7 @@ UnitBlueprint {
         'LAND',
         'TECH2',
         'DIRECTFIRE',
-        'SHIELD',
+        'PERSONALSHIELD',
         'VISIBLETORECON',
         'RECLAIMABLE',
         'TANK',
