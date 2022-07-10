@@ -130,6 +130,7 @@ UnitBlueprint {
         'SELECTABLE',
         'SERAPHIM',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',

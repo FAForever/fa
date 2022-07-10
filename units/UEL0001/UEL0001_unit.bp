@@ -118,6 +118,7 @@ UnitBlueprint {
         'SELECTABLE',
         'UEF',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',
