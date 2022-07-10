@@ -5,8 +5,10 @@ local Entity = {}
 ---@alias Army number
 ---@alias EntityId number
 
----
---  Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
+--- Does not appear to be used
+---@unknown
+---@param scrollSpeed1 number
+---@param scrollSpeed2 number
 function Entity:AddManualScroller(scrollSpeed1,  scrollSpeed2)
 end
 
@@ -15,13 +17,15 @@ end
 function Entity:AddPingPongScroller(ping1,  pingSpeed1,  pong1,  pongSpeed1,  ping2,  pingSpeed2,  pong2,  pongSpeed2)
 end
 
----
---  AddShooter(shooter)
+--- Does not appear to be used
+---@unknown
+---@param shooter any
 function Entity:AddShooter(shooter)
 end
 
----
---  Entity:AddThreadScroller(sideDist, scrollMult)
+--- Attaches a thread scroller to an entity, animating the bottom section of their textures / UVs
+---@param sideDist number
+---@param scrollMult number
 function Entity:AddThreadScroller(sideDist,  scrollMult)
 end
 
@@ -32,11 +36,20 @@ end
 
 ---
 --  Entity:AdjustHealth(instigator, delta)
+
+--- Adjusts the health of the entity
+---@param instigator Unit
+---@param delta number
 function Entity:AdjustHealth(instigator,  delta)
 end
 
 ---
 --  Entity:AttachBoneTo(selfbone, entity, bone)
+
+--- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone` accordingly
+---@param selfbone number | string
+---@param entity Entity
+---@param bone number | string
 function Entity:AttachBoneTo(selfbone,  entity,  bone)
 end
 
@@ -50,8 +63,9 @@ end
 function Entity:AttachTo(entity,  bone)
 end
 
----
---  Entity:BeenDestroyed()
+
+--- Returns whether the C-side of this entity has been destroyed
+---@see # As an alternative: `IsDestroyed(entity)`
 function Entity:BeenDestroyed()
 end
 
@@ -75,14 +89,15 @@ end
 function Entity:Destroy()
 end
 
----
---  Entity:DetachAll(bone,[skipBallistic])
-function Entity:DetachAll(bone, [skipBallistic])
+---comment
+---@param bone any
+---@param skipBallistic? boolean
+function Entity:DetachAll(bone, skipBallistic)
 end
 
----
---  Entity:DetachFrom([skipBallistic])
-function Entity:DetachFrom([skipBallistic])
+---comment
+---@param skipBallistic? boolean
+function Entity:DetachFrom(skipBallistic)
 end
 
 ---
@@ -177,14 +192,18 @@ end
 function Entity:GetParent()
 end
 
----
---  Entity:GetPosition([bone_name])
-function Entity:GetPosition([bone_name])
+--- Returns the position of the entity at a given bone, or at its center bone as a table that is refreshed on each call
+---@param bone? string | number
+---@return Vector
+function Entity:GetPosition(bone)
 end
 
----
---  Entity:GetPositionXYZ([bone_name])
-function Entity:GetPositionXYZ([bone_name])
+--- Returns the position of the entity at a given bone, or at its center bone as three separate numbers
+---@param bone? string | number
+---@return number X coordinate
+---@return number Y coordinate
+---@return number Z coordinate
+function Entity:GetPositionXYZ(bone)
 end
 
 ---
@@ -194,7 +213,7 @@ end
 
 ---
 --  InitIntel(army,type,<radius>)
-function Entity:InitIntel(army, type, <radius>)
+function Entity:InitIntel(army, type, radius)
 end
 
 ---
@@ -204,7 +223,12 @@ end
 
 ---
 --  Entity:IsValidBone(nameOrIndex,allowNil=false)
-function Entity:IsValidBone(nameOrIndex, allowNil=false)
+
+--- Returns whether the bone is a valid bone for the entity
+---@param bone number | string
+---@param allowNil boolean Flag that to consider nil a valid bone, defaults to false
+---@return boolean
+function Entity:IsValidBone(bone, allowNil)
 end
 
 ---
@@ -249,7 +273,14 @@ end
 
 ---
 --  Entity:SetCollisionShape(['Box'|'Sphere'|'None'], centerX, Y, Z, size) -- size is radius for sphere, x,y,z extent for box
-function Entity:SetCollisionShape(['Box'|'Sphere'|'None'],  centerX,  Y,  Z,  size)
+
+--- Defines the collision shape of the entity. Should not be used excessively due to its performance impact
+---@param type 'Box' | 'Sphere' | 'None' 
+---@param centerX number
+---@param Y number
+---@param Z number
+---@param size number
+function Entity:SetCollisionShape(type,  centerX,  Y,  Z,  size)
 end
 
 ---
@@ -273,8 +304,12 @@ function Entity:SetMaxHealth(maxhealth)
 end
 
 ---
---  Entity:SetMesh(meshBp, bool keepActor): Change mesh on the fly
-function Entity:SetMesh(meshBp,  bool keepActor)
+--  Entity:SetMesh(meshBp, keepActor): Change mesh on the fly
+
+--- Change the mesh of the entity
+---@param meshBp string
+---@param keepActor boolean All manipulators are kept if set
+function Entity:SetMesh(meshBp,  keepActor)
 end
 
 ---
@@ -289,7 +324,11 @@ end
 
 ---
 --  Entity:SetPosition(vector,[immediate])
-function Entity:SetPosition(vector, [immediate])
+
+---@see Warp
+---@param vector Position
+---@param immediate boolean Defaults to false, should not be required
+function Entity:SetPosition(vector, )
 end
 
 ---
