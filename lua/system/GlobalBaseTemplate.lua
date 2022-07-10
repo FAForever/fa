@@ -4,10 +4,6 @@
 ---@alias BaseBuilderTemplateNamesSorian 'SorianExpansionAirFull' | 'SorianExpansionBalancedFull' | 'SorianExpansionBalancedSmall' | 'SorianExpansionTurtleFull' | 'SorianExpansionWaterFull' | 'SorianMainAir' | 'SorianMainBalanced' | 'SorianMainRush' | 'SorianMainTurtle' | 'SorianMainWater' | 'SorianNavalExpansionLarge' | 'SorianNavalExpansionSmall' | 
 ---@alias BaseBuilderTemplateNames BaseBuilderTemplateNamesBase | BaseBuilderTemplateNamesSorian | string
 
--- Global list of all BaseBuilderTemplates found in the system.
----@type table<string, BaseBuilderTemplateSpec>
-BaseBuilderTemplates = {}
-
 ---@alias BaseBuilderTemplate string
 
 ---@class BaseBuilderTemplateFactoryCount
@@ -38,6 +34,10 @@ BaseBuilderTemplates = {}
 ---@field BaseSettings BaseBuilderTemplateSettings
 ---@field ExpansionFunction fun(aiBrain: AIBrain, location: Position, markerType: string)
 ---@field FirstBaseFunction fun(aiBrain: AIBrain)?
+
+-- Global list of all BaseBuilderTemplates found in the system.
+---@type table<string, BaseBuilderTemplateSpec>
+BaseBuilderTemplates = {}
 
 --- Register a base builder template, or override an existing base builder template
 ---@param spec BaseBuilderTemplateSpec

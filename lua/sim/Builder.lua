@@ -19,17 +19,6 @@ local AIUtils = import('/lua/ai/aiutilities.lua')
 --        BuilderConditions = list of functions that return true/false, list of args,  { < function>, {<args>}}
 -- }
 
----@alias BuilderType 'Land' | 'Air' | 'Any'
-
----@alias RefToFile string
----@alias RefToFunction string
----@alias RefParameters table
-
----@class BuilderConditions
----@field [1] RefToFile
----@field [2] RefToFunction
----@field [3] RefParameters
-
 ---@class Builder
 Builder = ClassSimple {
     Create = function(self, brain, data, locationType)
