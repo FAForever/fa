@@ -2,6 +2,7 @@
 ---@class moho.aibrain_methods
 local CAiBrain = {}
 
+---@alias BrainArcType 'high' | 'low' | 'none'
 ---@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
 
 --- Assigns a threat value to a given position, which is applied to the iMAP threat grid
@@ -50,36 +51,32 @@ end
 function CAiBrain:CanBuildPlatoon(template, factories)
 end
 
---- Returns true if structure can be built at given location.
--- @param blueprintID Unit's bp ID to build, example 'ueb0101'.
--- @param location Table with position {x, y z}.
--- @return true/false
+--- Returns true if the structure can be built at the given location
+---@param blueprintID string As an example: `ueb0101`
+---@param location Position
 function CAiBrain:CanBuildStructureAt(blueprintID, location)
 end
 
---- Returns true in case terrain is not blocking weapon fire from attackPosition to targetPosition.
--- @param attackPosition  Table with position {x, y z}
--- @param targetPosition position Table with position {x, y z}
--- @param arcType Types: 'high', 'low', 'none'.
--- @return true/false
+--- Returns true if the terrain is **not*8 blocking weapon fire from the attack position to the target position
+---@param attackPosition Position
+---@param targetPosition Position
+---@param arcType BrainArcType
 function CAiBrain:CheckBlockingTerrain(attackPosition, targetPosition, arcType)
 end
 
---- Spawns a resource building near position.
--- Used for spawning prebuild base resource structures.
--- @param blueprintID Unit's bp ID to spawn, example 'ueb0101'.
--- @param posX Position on X axis.
--- @param posY Position on Z axis (wrong name, also named like this in the functions that uses it, but it actually is the Z axis as Y is elevation).
--- @return Spawned unit or nil.
+--- Spawns a resource building near the given position, used for spawning the prebuild base
+---@param blueprintID string
+---@param posX number
+---@param posY number
+---@return Unit?
 function CAiBrain:CreateResourceBuildingNearest(blueprintID, posX, posY)
 end
 
---- Spawn a structure near position.
--- Used for spawning prebuild base.
--- @param blueprintID Unit's bp ID to spawn, example 'ueb0101'.
--- @param posX Position on X axis.
--- @param posY Position on Z axis (wrong name, also named like this in the functions that uses it, but it actually is the Z axis as Y is elevation).
--- @return Spawned unit or nil.
+--- Spawns a structure near the given position, used for spawning the prebuild base
+---@param blueprintID string
+---@param posX number
+---@param posY number
+---@return Unit?
 function CAiBrain:CreateUnitNearSpot(blueprintID, posX, posY)
 end
 
@@ -90,17 +87,17 @@ end
 function CAiBrain:DecideWhatToBuild(builder, buildingType, buildingTemplate)
 end
 
---- Disbands a given platoon.
--- @param platoon Platoon to disband.
+--- Disbands the platoon
+---@param platoon Platoon
 function CAiBrain:DisbandPlatoon(platoon)
 end
 
---- Disbands a given platoon.
--- @param name Unique name of a platoon to disband.
+--- Disbands the platoon via the unique name that a platoon can be accompanied by
+---@param name string
 function CAiBrain:DisbandPlatoonUniquelyNamed(name)
 end
 
---- TODO.
+---@unknown
 function CAiBrain:FindClosestArmyWithBase()
 end
  
@@ -117,12 +114,10 @@ end
 -- @return PlaceToBuild {x, z, y}
 function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance, BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
 end
-
---- Return an unit that matches the unit name.
--- Can specify idle or not.
--- @param category Unit's category, example: categories.TECH2 * categories.ENGINEER .
--- @param needToBeIdle true/false.
--- @return Unit.
+--- Returns a unit that matches the categories, if available
+---@param category Categories
+---@param needToBeIdle boolean
+---@return Unit?
 function CAiBrain:FindUnit(category, needToBeIdle)
 end
 
@@ -130,6 +125,8 @@ end
 -- TODO untested.
 -- @param upgradeList Table, see '/lua/upgradetemplates.lua'.
 -- @return TODO.
+
+---@unknown
 function CAiBrain:FindUnitToUpgrade(upgradeList)
 end
 
@@ -142,11 +139,18 @@ end
 
 --- Returns the ArmyIndex of the army represented by this brain.
 -- @return Number.
+
+--- Returns the army index
+---@return number
 function CAiBrain:GetArmyIndex()
 end
 
 --- Retrun army start position.
 -- return x, z
+
+--- Returns the army start position
+---@return number X coordinate
+---@return number Z coordinate
 function CAiBrain:GetArmyStartPos()
 end
 
@@ -154,10 +158,14 @@ end
 -- @param statName String, name of the stats to get.
 -- @param defaultValue Ff the stat doesn't exists, it creates it and returns this value.
 -- @return Number.
+
+--- Returns the statistic of the army, if it doesn't exist it creates it and returns the default value
+---@param statName string
+---@param defaultValue number | string | table
 function CAiBrain:GetArmyStat(statName, defaultValue)
 end
 
---- TODO.
+---@unknown
 function CAiBrain:GetAttackVectors()
 end
 
@@ -165,6 +173,11 @@ end
 -- @param location Table with location, it's not a position but location created by PBMAddBuildLocation function.
 -- @param radius Number in game units.
 -- @return tblUnits List of factories.
+
+--- Returns a list of factories at a location
+---@param location Position
+---@param radius number
+---@return FactoryUnit
 function CAiBrain:GetAvailableFactories(location, radius)
 end
 
@@ -183,6 +196,10 @@ end
 --- Return how many units of the given categories exist.
 -- @param category Unit's category, example: categories.TECH2 .
 -- @return Number.
+
+--- Returns the number of units of the given categories
+---@param category categories
+---@return number
 function CAiBrain:GetCurrentUnits(category)
 end
 
@@ -252,6 +269,12 @@ end
 -- @param needToBeIdle true/false Unit has to be idle (appears to be not functional).
 -- @param requireBuilt true/false defaults to false which excludes units that are NOT finished (appears to be not functional).
 -- @return tblUnits Table containing units.
+
+--- Returns a list of units that match the categories
+---@param category Categories
+---@param needToBeIdle boolean
+---@param requireBuilt boolean Appears to be not functional
+---@return Unit[]
 function CAiBrain:GetListOfUnits(category,  needToBeIdle,  requireBuilt)
 end
 
@@ -276,12 +299,12 @@ end
 function CAiBrain:GetNumPlatoonsWithAI()
 end
 
---- Return number of units around position.
--- @param category Unit's category, example: categories.TECH2 .
--- @param position Table with position {x, y, z}.
--- @param radius Number in game units.
--- @param alliance Types: 'Ally', 'Enemy', 'Neutral'.
--- @return Number.
+--- Returns the number of units around a position that match the categories
+---@param category Categories
+---@param position Position
+---@param radius number
+---@param alliance 'Ally' | 'Enemy'
+---@return number
 function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
 
@@ -343,6 +366,12 @@ end
 -- @param radius Number in game units.
 -- @param alliance Types: 'Ally', 'Enemy', 'Neutral'.
 -- @return tblUnits Table containing units.
+
+--- Returns the units around a position that match the categories
+---@param category Categories
+---@param position Position
+---@param radius number
+---@param alliance 'Ally' | 'Enemy'
 function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
