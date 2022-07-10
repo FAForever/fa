@@ -3,11 +3,13 @@
 local CMauiMesh = {}
 
 ---
+---@param quaternion Quaternion
 function CMauiMesh:SetOrientation(quaternion)
 end
 
 ---
-function CMauiMesh:SetMesh()
+---@param mesh string
+function CMauiMesh:SetMesh(mesh)
 end
 
 return CMauiMesh

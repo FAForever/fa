@@ -7,13 +7,13 @@ function CMauiHistogram:SetData()
 end
 
 ---
---  SetXIncrement(int)
-function CMauiHistogram:SetXIncrement(int)
+---@param inc number
+function CMauiHistogram:SetXIncrement(inc)
 end
 
 ---
---  SetYIncrement(int)
-function CMauiHistogram:SetYIncrement(int)
+---@param inc number
+function CMauiHistogram:SetYIncrement(inc)
 end
 
 return CMauiHistogram

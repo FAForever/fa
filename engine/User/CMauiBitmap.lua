@@ -11,11 +11,13 @@ function CMauiBitmap:GetFrame()
 end
 
 ---
+---@param color string
 function CMauiBitmap:InternalSetSolidColor(color)
 end
 
 ---
-function CMauiBitmap:Loop(bool)
+---@param loop boolean
+function CMauiBitmap:Loop(loop)
 end
 
 ---
@@ -31,15 +33,18 @@ function CMauiBitmap:SetForwardPattern()
 end
 
 ---
-function CMauiBitmap:SetFrame(int)
+---@param frame number
+function CMauiBitmap:SetFrame(frame)
 end
 
 ---
+---@param pattern table<number> an array of integers reflecting texture indicies
 function CMauiBitmap:SetFramePattern(pattern)
 end
 
 ---
-function CMauiBitmap:SetFrameRate(float)
+---@param frameRate number
+function CMauiBitmap:SetFrameRate(frameRate)
 end
 
 ---
@@ -47,7 +52,9 @@ function CMauiBitmap:SetLoopPingPongPattern()
 end
 
 ---
-function CMauiBitmap:SetNewTexture(filename(s), border=1)
+---@param filename string | table<string>
+---@param border? number defaults to 1
+function CMauiBitmap:SetNewTexture(filename, border)
 end
 
 ---
@@ -55,10 +62,11 @@ function CMauiBitmap:SetPingPongPattern()
 end
 
 ---
-function CMauiBitmap:SetTiled(bool)
+---@param tiled boolean
+function CMauiBitmap:SetTiled(tiled)
 end
 
---- TODO
+---
 ---@param u0 number
 ---@param v0 number
 ---@param u1 number
@@ -67,6 +75,7 @@ function CMauiBitmap:SetUV(u0, v0, u1, v1)
 end
 
 --- Allow two bitmaps to use the same textures
+---@param bitmap Bitmap
 function CMauiBitmap:ShareTextures(bitmap)
 end
 
@@ -75,7 +84,8 @@ function CMauiBitmap:Stop()
 end
 
 ---
-function CMauiBitmap:UseAlphaHitTest(bool)
+---@param doHit boolean
+function CMauiBitmap:UseAlphaHitTest(doHit)
 end
 
 return CMauiBitmap

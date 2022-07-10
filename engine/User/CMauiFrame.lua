@@ -7,13 +7,13 @@ function CMauiFrame:GetTargetHead()
 end
 
 ---
---  float GetTopmostDepth()
+---@return number
 function CMauiFrame:GetTopmostDepth()
 end
 
 ---
---  SetTargetHead(int)
-function CMauiFrame:SetTargetHead(int)
+---@param head number
+function CMauiFrame:SetTargetHead(head)
 end
 
 return CMauiFrame

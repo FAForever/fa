@@ -7,153 +7,152 @@ function CMauiEdit:AbandonFocus()
 end
 
 ---
---  AcquireFocus()
 function CMauiEdit:AcquireFocus()
 end
 
 ---
---  Edit:ClearText()
 function CMauiEdit:ClearText()
 end
 
 ---
---  Edit:Disable()
 function CMauiEdit:DisableInput()
 end
 
 ---
---  Edit:EnableInput()
 function CMauiEdit:EnableInput()
 end
 
 ---
---  color Edit:GetBackgroundColor()
+---@return string
 function CMauiEdit:GetBackgroundColor()
 end
 
 ---
---  color Edit:GetCaretColor()
+---@return string
 function CMauiEdit:GetCaretColor()
 end
 
 ---
---  int GetCaretPosition
+---@return number
 function CMauiEdit:GetCaretPosition()
 end
 
 ---
---  int GetFontHeight()
+---@return number
 function CMauiEdit:GetFontHeight()
 end
 
 ---
---  color Edit:GetForegroundColor()
+---@return string
 function CMauiEdit:GetForegroundColor()
 end
 
 ---
---  color GetHighlightBackgroundColor()
+---@return string
 function CMauiEdit:GetHighlightBackgroundColor()
 end
 
 ---
---  color GetHighlightForegroundColor()
+---@return string
 function CMauiEdit:GetHighlightForegroundColor()
 end
 
 ---
---  int Edit:GetMaxChars()
+---@return number
 function CMauiEdit:GetMaxChars()
 end
 
----
---  number Edit:GetAdvance(string) - get the advance of a string using the same font as the control
-function CMauiEdit:GetStringAdvance()
+--- Get the advance of a string using the same font as the control
+---@param text string
+function CMauiEdit:GetStringAdvance(text)
 end
 
 ---
---  string Edit:GetText()
+---@return string
 function CMauiEdit:GetText()
 end
 
 ---
---  bool Edit:IsBackgroundVisible()
+---@return boolean
 function CMauiEdit:IsBackgroundVisible()
 end
 
 ---
---  bool Edit:IsCaretVisible()
+---@return boolean
 function CMauiEdit:IsCaretVisible()
 end
 
 ---
---  bool Edit:IsEnabled()
+---@return boolean
 function CMauiEdit:IsEnabled()
 end
 
 ---
---  edit:SetCaretCycle(float seconds, uint32 minAlpha, uint32 maxAlpha)
-function CMauiEdit:SetCaretCycle(float seconds,  uint32 minAlpha,  uint32 maxAlpha)
+---@param seconds number
+---@param minAlpha number
+---@param maxAlpha number
+function CMauiEdit:SetCaretCycle(seconds, minAlpha, maxAlpha)
 end
 
 ---
---  SetCaretPosition(int)
-function CMauiEdit:SetCaretPosition(int)
+---@param pos number
+function CMauiEdit:SetCaretPosition(pos)
 end
 
 ---
---  SetDropShadow(bool)
-function CMauiEdit:SetDropShadow(bool)
+---@param show boolean
+function CMauiEdit:SetDropShadow(show)
 end
 
 ---
---  Edit:SetMaxChars(int size)
-function CMauiEdit:SetMaxChars(int size)
+---@param size number
+function CMauiEdit:SetMaxChars(size)
 end
 
 ---
---  Edit:SetNewBackgroundColor(color)
+---@param color string
 function CMauiEdit:SetNewBackgroundColor(color)
 end
 
 ---
---  Edit:SetNewCaretColor(color)
+---@param color string
 function CMauiEdit:SetNewCaretColor(color)
 end
 
 ---
---  Edit:SetNewFont(family, pointsize)
-function CMauiEdit:SetNewFont(family,  pointsize)
+---@param family string
+---@param pointsize number
+function CMauiEdit:SetNewFont(family, pointsize)
 end
 
 ---
---  Edit:SetNewForegroundColor(color)
+---@param color string
 function CMauiEdit:SetNewForegroundColor(color)
 end
 
 ---
---  SetNewHighlightBackgroundColor(color)
+---@param color string
 function CMauiEdit:SetNewHighlightBackgroundColor(color)
 end
 
 ---
---  SetNewHightlightForegroundColor(color)
-function CMauiEdit:SetNewHighlightForegroundColor()
+---@param color string
+function CMauiEdit:SetNewHighlightForegroundColor(color)
 end
 
 ---
---  Edit:SetText(string text)
-function CMauiEdit:SetText(string text)
+---@param text string
+function CMauiEdit:SetText(text)
 end
 
 ---
---  Edit:ShowBackground(bool)
-function CMauiEdit:ShowBackground(bool)
+---@param show boolean
+function CMauiEdit:ShowBackground(show)
 end
 
 ---
---  Edit:ShowCaret(bool)
-function CMauiEdit:ShowCaret(bool)
+---@param show boolean
+function CMauiEdit:ShowCaret(show)
 end
 
 return CMauiEdit

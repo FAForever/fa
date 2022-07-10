@@ -7,13 +7,13 @@ function CUIMapPreview:ClearTexture()
 end
 
 ---
---  CUIMapPreview:SetTexture(texture_name)
-function CUIMapPreview:SetTexture(texture_name)
+---@param textureName string
+function CUIMapPreview:SetTexture(textureName)
 end
 
 ---
---  CUIMapPreview:SetTextureFromMap(map_name)
-function CUIMapPreview:SetTextureFromMap(map_name)
+---@param mapName string
+function CUIMapPreview:SetTextureFromMap(mapName)
 end
 
 return CUIMapPreview

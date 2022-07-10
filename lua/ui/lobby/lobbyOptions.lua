@@ -5,6 +5,58 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+---@alias AIMultiplierOptionValue '1.0' | '1.1' | '1.2' | '1.3' | '1.4' | '1.5' | '1.6' | '1.7' | '1.8' | '1.9' | '2.0' | '2.1' | '2.2' | '2.3' | '2.4' | '2.5' | '2.6' | '2.7' | '2.8' | '2.9' | '3.0' | '3.1' | '3.2' | '3.3' | '3.4' | '3.5' | '3.6' | '3.7' | '3.8' | '3.9' | '4.0' | '4.1' | '4.2' | '4.3' | '4.4' | '4.5' | '4.6' | '4.7' | '4.8' | '4.9' | '5.0' | '5.1' | '5.2' | '5.3' | '5.4' | '5.5' | '5.6' | '5.7' | '5.8' | '5.9'
+---@alias AIExpansionOptionValue '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
+---| '99999' unlimited expansions allowed
+
+--- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
+---@class ScenarioOptions
+---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
+---@field TeamLock 'locked' | 'unlocked'
+---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
+---
+---@field AIReplacement 'Off' | 'On'
+---@field AllowObservers boolean
+---@field CheatsEnabled 'false' | 'true'
+---@field CivilianAlliance 'enemy' | 'neutral' | 'removed'
+---@field DisconnectionDelay02 '10' | '30' | '90'
+---@field FogOfWar 'none' | 'explored'
+---@field GameSpeed 'normal' | 'fast' | 'adjustable'
+---@field ManualUnitShare 'none' | 'no_builders' | 'all'
+---@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60'
+---@field PrebuiltUnits 'Off' | 'On'
+---@field Ranked 'false' | 'true
+---@field RevealCivilians 'No' | 'Yes'
+---@field RandomMap 'Off' | 'Official' | 'All'
+---@field Score 'no' | 'yes'
+---@field Share 'FullShare' | 'ShareUntilDeath' | 'TransferToKiller' | 'Defectors' | 'CivilianDeserter'
+---@field ShareUnitCap 'none' | 'allies' | 'all'
+---@field Timeouts '0' | '3'| '-1'
+---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
+---@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox'
+---
+---@field BuildMult AIMultiplierOptionValue
+---@field CheatMult AIMultiplierOptionValue
+---@field LandExpansionsAllowed AIExpansionOptionValue
+---@field NavalExpansionsAllowed AIExpansionOptionValue
+---@field OmniCheat 'off' | 'on'
+---@field TMLRandom '0' | '2.5' | '5' | '7.5' | '10' | '12.5' | '15' | '17.5' | '20'
+
+---@class ScenarioOption
+---@field default number
+---@field help string
+---@field key string
+---@field label string
+---@field mponly? boolean
+---@field values table<any | ScenarioOptionValue> can only contain arbitrary values if `value_text` and `value_help` are set to fromat them
+---@field value_text? string if present, will format arbitrary values in `values`
+---@field value_help? string if present, will format arbitrary values in `values`
+
+---@class ScenarioOptionValue
+---@field text string
+---@field help string
+---@field key any
+
 -- options that show up in the team options panel
 teamOptions =
 {

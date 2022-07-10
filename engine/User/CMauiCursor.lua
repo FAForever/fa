@@ -7,10 +7,16 @@ function CMauiCursor:ResetToDefault()
 end
 
 ---
-function CMauiCursor:SetDefaultTexture(filename,  hotspotX,  hotspotY)
+---@param filename string
+---@param hotspotX number
+---@param hotspotY number
+function CMauiCursor:SetDefaultTexture(filename, hotspotX, hotspotY)
 end
 
 ---
+---@param filename string
+---@param hotspotX number
+---@param hotspotY number
 function CMauiCursor:SetNewTexture(filename, hotspotX, hotspotY)
 end
 

@@ -1,17 +1,9 @@
----@declare-global
----Module: User
---@module User
-
-
----@class SoundHandle
-
-
 --- No clue what this does
 ---@param entityId number
 ---@param onTime number
 ---@param offTime number
 ---@param totalTime number
-function AddBlinkyBox(entityId,  onTime,  offTime,  totalTime)
+function AddBlinkyBox(entityId, onTime, offTime, totalTime)
 end
 
 ---
@@ -59,7 +51,7 @@ function ClearCurrentFactoryForQueueDisplay()
 end
 
 --- Destroy all controls in frame, `nil` head will clear all frames
----@param head integer | nil
+---@param head number | nil
 function ClearFrame(head)
 end
 
@@ -90,7 +82,7 @@ end
 
 --- CreateUnitAtMouse
 ---@param blueprintId string
----@param ownerArmyIndex integer
+---@param ownerArmyIndex number
 ---@param offsetMouseWorldPosX number
 ---@param offsetMouseWorldPosZ number
 ---@param rotation number
@@ -110,8 +102,8 @@ function DebugFacilitiesEnabled()
 end
 
 ---
----@param queueIndex integer
----@param count integer
+---@param queueIndex number
+---@param count number
 function DecreaseBuildCountInQueue(queueIndex, count)
 end
 
@@ -125,7 +117,7 @@ function DisableWorldSounds()
 end
 
 --- Eject another client from your session
----@param clientIndex integer
+---@param clientIndex number
 function EjectSessionClient(clientIndex)
 end
 
@@ -188,7 +180,7 @@ end
 
 --- Get the current game time in ticks. The game time is the simulation time,
 --- that stops when the game is paused.
----@return integer
+---@return number
 function GameTick()
 end
 
@@ -208,12 +200,13 @@ function GetActiveBuildTemplate()
 end
 
 ---
----@return table<integer>
+---@return table<number>
 function GetAntiAliasingOptions()
 end
 
 ---
----@return ArmyInfo
+--- Note that this is cached by `/lua/ui/lobbby/override/ArmiesTable.lua`
+---@return table<ArmyInfo>
 function GetArmiesTable()
 end
 
@@ -223,7 +216,7 @@ function GetArmyAvatars()
 end
 
 ---
----@return integer
+---@return number
 function GetArmyScore(armyIndex)
 end
 
@@ -247,7 +240,7 @@ end
 
 ---
 ---@param name string
----@return UserCamera
+---@return Camera
 function GetCamera(name)
 end
 
@@ -262,6 +255,7 @@ function GetCurrentUIState()
 end
 
 ---
+---@return Cursor
 function GetCursor()
 end
 
@@ -277,12 +271,12 @@ function GetFireState(units)
 end
 
 ---
----@return integer
+---@return number
 function GetFocusArmy()
 end
 
 --- Return the root UI frame for a given head
----@param head integer
+---@param head number
 ---@return Frame
 function GetFrame(head)
 end
@@ -298,12 +292,12 @@ end
 function GetGameSpeed()
 end
 
---- Returns a formatted string displaying the time the game has been played
+--- Return a formatted string displaying the time the game has been played
 ---@return string
 function GetGameTime()
 end
 
---- Returns game time in seconds
+--- Return game time in seconds
 ---@return number
 function GetGameTimeSeconds()
 end
@@ -372,7 +366,7 @@ function GetMovieVolume()
 end
 
 --- Return the current number of root frames (typically one per head)
----@return integer
+---@return number
 function GetNumRootFrames()
 end
 
@@ -417,7 +411,7 @@ function GetSimRate()
 end
 
 ---
----@return integer
+---@return number
 function GetSimTicksPerSecond()
 end
 
@@ -461,13 +455,13 @@ end
 
 ---
 ---@param filename string
----@param border number? default value 1
+---@param border number? defaults to 1
 ---@return number width
 ---@return number height
 function GetTextureDimensions(filename,  border)
 end
 
---- Get the alpha multiplier for 2d UI controls
+--- Get the alpha multiplier for 2D UI controls
 ---@return number
 function GetUIControlsAlpha()
 end
@@ -487,12 +481,13 @@ function GetUnitCommandData(unitSet)
 end
 
 --- Given a RULEUCC type command, return the equivalent UNITCOMMAND command
+---@param rule string
 ---@return string
-function GetUnitCommandFromCommandCap(string)
+function GetUnitCommandFromCommandCap(rule)
 end
 
 --- Return a table of the currently selected units
----@return table
+---@return table<Unit>
 function GetValidAttackingUnits()
 end
 
@@ -533,9 +528,9 @@ end
 function IN_RemoveKeyMapTable(keyMapTable)
 end
 
----comment
+---
 ---@param queueIndex any
----@param count integer
+---@param count number
 function IncreaseBuildCountInQueue(queueIndex, count)
 end
 
@@ -594,8 +589,8 @@ end
 ---
 ---@param class any
 ---@param protocol string
----@param localPort integer
----@param maxConnections integer
+---@param localPort number
+---@param maxConnections number
 ---@param playerName string
 ---@param playerUID string
 ---@param natTraversalProvider userdata
@@ -651,15 +646,15 @@ function InternalSaveGame(filename,  friendlyname,  oncompletion)
 end
 
 ---
----@param army1 integer
----@param army2 integer
+---@param army1 number
+---@param army2 number
 ---@return boolean
 function IsAlly(army1, army2)
 end
 
 ---
----@param army1 integer
----@param army2 integer
+---@param army1 number
+---@param army2 number
 ---@return boolean
 function IsEnemy(army1, army2)
 end
@@ -671,8 +666,8 @@ function IsKeyDown(keyCode)
 end
 
 ---
----@param army1 integer
----@param army2 integer
+---@param army1 number
+---@param army2 number
 ---@return boolean
 function IsNeutral(army1, army2)
 end
@@ -685,7 +680,7 @@ end
 ---
 ---@param command string
 ---@param blueprintid string
----@param count integer
+---@param count number
 ---@param clear boolean? defaults to false
 function IssueBlueprintCommand(command, blueprintid, count, clear)
 end
@@ -711,14 +706,14 @@ function IssueUnitCommand(unitList, command, string, clear)
 end
 
 --- Given a MS Windows char code, returns the Maui char code
----@param charcode integer
----@return integer
+---@param charcode number
+---@return number
 function KeycodeMSWToMaui(charcode)
 end
 
 --- Given a char code from a key event, returns the MS Windows char code
----@param charcode integer
----@return integer
+---@param charcode number
+---@return number
 function KeycodeMauiToMSW(charcode)
 end
 
@@ -734,7 +729,7 @@ function LaunchReplaySession(filename)
 end
 
 --- Launch a new single player session
----@param sessionInfo SessionInfo
+---@param sessionInfo UIScenarioInfo
 function LaunchSinglePlayerSession(sessionInfo)
 end
 
@@ -779,7 +774,7 @@ end
 ---
 ---@param sound BpSoundResult
 ---@param prepareOnly? boolean
----@return SoundHandle
+---@return moho.sound_methods
 function PlaySound(sound, prepareOnly)
 end
 
@@ -791,7 +786,7 @@ end
 ---
 ---@param sound BpSoundResult
 ---@param duck? boolean
----@return SoundHandle
+---@return moho.sound_methods
 function PlayVoice(sound, duck)
 end
 
@@ -812,10 +807,11 @@ function PrefetchSession(mapname, mods, hipri)
 end
 
 --- Generate a random number between `min` and `max`
----@param min? number defaults to 0
+---@param min number defaults to 0
 ---@param max number defaults to 1
 ---@return number
----@overload fun(max?: number)
+---@overload fun(max: number): number
+---@overload fun(): number
 function Random(min, max)
 end
 
@@ -884,18 +880,18 @@ end
 function SessionEndGame()
 end
 
---- Return a table of command sources.
+--- Return a table of command sources
 ---@return table<string>
 function SessionGetCommandSourceNames()
 end
 
 --- Return the local command source, or `0` if the local client can't issue commands
----@return integer
+---@return number
 function SessionGetLocalCommandSource()
 end
 
 --- Return the table of scenario info that was originally passed to the sim on launch
----@return ScenarioInfoTable
+---@return UIScenarioInfo
 function SessionGetScenarioInfo()
 end
 
@@ -943,7 +939,7 @@ function SessionResume()
 end
 
 ---
----@param client? integer | table<integer> client or clients
+---@param client? number | table<number> client or clients
 ---@param message string
 function SessionSendChatMessage(client, message)
 end
@@ -983,7 +979,7 @@ function SetFireState(units, fireState)
 end
 
 ---
----@param armyIndex integer index or -1
+---@param armyIndex number index or -1
 function SetFocusArmy(armyIndex)
 end
 
@@ -1005,7 +1001,7 @@ end
 
 ---
 ---@param overlay string
----@param categories EntityCategory
+---@param categories moho.EntityCategory
 ---@param normalColor string
 ---@param selectColor string
 ---@param rolloverColor string
@@ -1034,7 +1030,7 @@ end
 function SetPreference(key, obj)
 end
 
---- Set the alpha multiplier for 2d UI controls
+--- Set the alpha multiplier for 2D UI controls
 ---@param alpha number
 function SetUIControlsAlpha(alpha)
 end
@@ -1058,13 +1054,13 @@ end
 --       If bool is specified and true, sends the current selection with the command
 
 ---
----@param handle SoundHandle
+---@param handle moho.sound_methods
 ---@return boolean
 function SoundIsPrepared(handle)
 end
 
 ---
----@param handle SoundHandle
+---@param handle moho.sound_methods
 function StartSound(handle)
 end
 
@@ -1073,7 +1069,7 @@ function StopAllSounds()
 end
 
 ---
----@param handle SoundHandle
+---@param handle moho.sound_methods
 ---@param immediate? boolean defaults to false
 function StopSound(handle, immediate)
 end
@@ -1099,7 +1095,7 @@ end
 
 ---
 ---@param units table<Unit>
----@param bit integer
+---@param bit number
 ---@param state boolean
 function ToggleScriptBit(units, bit, state)
 end

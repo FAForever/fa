@@ -2,6 +2,12 @@
 ---Module: Core
 -- @module Core
 
+---@class Quaternion
+---@field [1] number
+---@field [2] number
+---@field [3] number
+---@field [4] number
+
 ---@class Vector
 ---@field [1] number
 ---@field [2] number

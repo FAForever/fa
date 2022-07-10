@@ -1,178 +1,202 @@
+---@declare-global
 ---@class UserUnit
--- @classmod User.UserUnit
+local UserUnit = {}
+
+---@class MissileInfo
+---@field nukeSiloBuildCount number
+---@field nukeSiloMaxStorageCount number
+---@field nukeSiloStorageCount number
+---@field tacticalSiloBuildCount number
+---@field tacticalSiloMaxStorageCount number
+---@field tacticalSiloStorageCount number
+
+---@class EconData
+---@field energyConsumed number
+---@field energyProduced number
+---@field energyRequested number
+---@field massConsumed number
+---@field massProduced number
+---@field massRequested number
 
 ---
---  UserUnit:CanAttackTarget(target, rangeCheck)
-function UserUnit:CanAttackTarget(target,  rangeCheck)
+---@param target UserUnit
+---@param rangeCheck boolean
+function UserUnit:CanAttackTarget(target, rangeCheck)
 end
 
----
---  GetArmy() -- returns the army index
+--- Return the army index
+---@return number
 function UserUnit:GetArmy()
 end
 
 ---
---  blueprint = UserUnit:GetBlueprint()
+---@retrun UnitBluepritn
 function UserUnit:GetBlueprint()
 end
 
----
---  GetBuildRate() -- return current unit build rate
+--- Return current unit build rate
+---@return number
 function UserUnit:GetBuildRate()
 end
 
----
---  table GetCommandQueue() - returns table of commands
+--- Return table of commands
+---@return table<OrderInfo>
 function UserUnit:GetCommandQueue()
 end
 
----
---  GetCreator() -- returns the units creator, or nil
+--- Return the unit's creator, or nil
+---@return UserUnit | nil
 function UserUnit:GetCreator()
 end
 
----
---  string GetCustomName() -- get the current custom name, nil if none
+--- Get the current custom name, nil if none
+---@return string | nil
 function UserUnit:GetCustomName()
 end
 
----
---  GetEconData() - returns a table of economy data
+--- Return a table of economy data
+---@return EconData
 function UserUnit:GetEconData()
 end
 
 ---
---  Entity:GetEntityId()
+---@return string
 function UserUnit:GetEntityId()
 end
 
----
---  GetFocus() -- returns the unit this unit is currently focused on, or nil
+--- Return the unit this unit is currently focused on, or nil
+---@return UserUnit | nil
 function UserUnit:GetFocus()
 end
 
 ---
---  UserUnit:GetFootPrintSize()
+---@return {SizeX: number, SizeZ: number}
 function UserUnit:GetFootPrintSize()
 end
 
 ---
---  GetFuelRatio()
+---@return number
 function UserUnit:GetFuelRatio()
 end
 
----
---  GetGuardedEntity() -- returns the units guard target, or nil
+--- Return the unit's guard target, or nil
+---@return UserUnit | nil
 function UserUnit:GetGuardedEntity()
 end
 
----
---  GetHealth() -- return current health
+--- Return current health
+---@return number
 function UserUnit:GetHealth()
 end
 
----
---  GetMaxHealth() -- return max health
+--- Return max health
+---@return number
 function UserUnit:GetMaxHealth()
 end
 
----
---  table GetMissileInfo() - returns a table of the missile info for this unit
+--- Return a table of the missile info for this unit
+---@return MissileInfo
 function UserUnit:GetMissileInfo()
 end
 
----
---  VECTOR3 GetPosition() - returns the current world posititon of the unit
+--- Return the current world position of the unit
+---@return Position
 function UserUnit:GetPosition()
 end
 
----
---  table GetSelectionSets() -- get table of all selection sets unit belongs to
+--- Get table of all selection sets unit belongs to
+---@return table<string>
 function UserUnit:GetSelectionSets()
 end
 
 ---
---  GetShieldRatio()
+---@return number
 function UserUnit:GetShieldRatio()
 end
 
 ---
---  GetStat(Name[,defaultVal])
-function UserUnit:GetStat(Name[, defaultVal])
+---@param name string
+---@param defaultVal? any
+---@return any
+function UserUnit:GetStat(name, defaultVal)
 end
 
 ---
---  UserUnit:GetUnitId()
+---@return string
 function UserUnit:GetUnitId()
 end
 
 ---
---  GetWorkProgress()
+---@return number
 function UserUnit:GetWorkProgress()
 end
 
----
---  bool HasSelectionSet(string) -- see if a unit belongs to a given selection set
-function UserUnit:HasSelectionSet(string)
+--- See if a unit belongs to a given selection set
+---@param selSet string
+---@return boolean
+function UserUnit:HasSelectionSet(selSet)
 end
 
----
---  See if this unit already has an unload from transport queued up
+--- See if this unit already has an unload from transport queued up
+---@return boolean
 function UserUnit:HasUnloadCommandQueuedUp()
 end
 
 ---
---  bool = UserUnit:IsAutoMode()
+---@return boolean
 function UserUnit:IsAutoMode()
 end
 
 ---
---  bool = UserUnit:IsAutoSurfaceMode()
+---@return boolean
 function UserUnit:IsAutoSurfaceMode()
 end
 
----
---  IsDead() -- return true if the unit has been destroyed
+--- Return true if the unit has been destroyed
+---@return boolean
 function UserUnit:IsDead()
 end
 
----
---  IsIdle() -- return true if the unit is idle
+--- Return true if the unit is idle
+---@return boolean
 function UserUnit:IsIdle()
 end
 
 ---
---  bool = UserUnit:IsInCategory(category)
+---@param category moho.EntityCategory
+---@return boolean
 function UserUnit:IsInCategory(category)
 end
 
----
---  IsOverchargePaused() -- return current overcharge paused status
+--- Return current overcharge paused status
+---@return boolean
 function UserUnit:IsOverchargePaused()
 end
 
 ---
---  bool = UserUnit:IsRepeatQueue()
+---@return boolean
 function UserUnit:IsRepeatQueue()
 end
 
 ---
---  flag = UserUnit:IsStunned()
+---@return boolean
 function UserUnit:IsStunned()
 end
 
 ---
---  UserUnit:ProcessInfoPair()
-function UserUnit:ProcessInfo()
+---@param command string
+---@param value string
+function UserUnit:ProcessInfo(command, value)
 end
 
----
---  RemoveSelectionSet(string) -- remove a selection set name from a unit
-function UserUnit:RemoveSelectionSet(string)
+--- Remove a selection set name from a unit
+---@param selSet string
+function UserUnit:RemoveSelectionSet(selSet)
 end
 
----
---  SetCustomName(string) -- Set a custom name for the unit
-function UserUnit:SetCustomName(string)
+--- Set a custom name for the unit
+---@param name string
+function UserUnit:SetCustomName(name)
 end
 
+return UserUnit

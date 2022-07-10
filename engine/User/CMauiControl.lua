@@ -15,7 +15,7 @@ end
 function CMauiControl:ApplyFunction(func)
 end
 
----\
+---
 function CMauiControl:ClearChildren()
 end
 
@@ -51,13 +51,13 @@ end
 function CMauiControl:GetName()
 end
 
---- Return the parent of this control, or nil if it doesn't have one.
+--- Return the parent of this control, or nil if it doesn't have one
 ---@return Control
 function CMauiControl:GetParent()
 end
 
 ---
----@return integer
+---@return number
 function CMauiControl:GetRenderPass()
 end
 
@@ -70,7 +70,7 @@ end
 function CMauiControl:Hide()
 end
 
---- Given x,y coordinates, tells you if the control is under the coordinates
+--- Given x,y coordinates, tell you if the control is under the coordinates
 ---@return boolean
 function CMauiControl:HitTest(x, y)
 end
@@ -88,7 +88,7 @@ end
 function CMauiControl:NeedsFrameUpdate()
 end
 
---- Set the alpha of a given control, if children is true, also sets childrens alpha
+--- Set the alpha of a given control, if children is true, also set children's alpha
 ---@param alpha number
 ---@param children boolean
 function CMauiControl:SetAlpha(alpha, children)
@@ -114,7 +114,7 @@ function CMauiControl:SetParent(newParentControl)
 end
 
 ---
----@return integer
+---@return number
 function CMauiControl:SetRenderPass()
 end
 

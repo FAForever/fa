@@ -6,33 +6,32 @@ local CMauiMovie = {}
 function CMauiMovie:GetFrameRate()
 end
 
----
---  int GetNumFrames() - returns the number of frames in the movie
+--- Return the number of frames in the movie
+---@return number
 function CMauiMovie:GetNumFrames()
 end
 
 ---
---  bool Movie:InternalSet(filename)
+---@param filename string
+---@return boolean
 function CMauiMovie:InternalSet(filename)
 end
 
 ---
---  IsLoaded()
+---@return boolean
 function CMauiMovie:IsLoaded()
 end
 
 ---
---  Loop(bool)
-function CMauiMovie:Loop(bool)
+---@param loop boolean
+function CMauiMovie:Loop(loop)
 end
 
 ---
---  Play()
 function CMauiMovie:Play()
 end
 
 ---
---  Stop()
 function CMauiMovie:Stop()
 end
 

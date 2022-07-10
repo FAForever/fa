@@ -1,3 +1,5 @@
+---@class ArmyInfo
+---@field 
 
 -- keep a reference to the actual function
 local GlobalGetArmiesTable = _G.GetArmiesTable
