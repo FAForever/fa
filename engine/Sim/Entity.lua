@@ -5,6 +5,8 @@ local Entity = {}
 ---@alias Army number
 ---@alias EntityId number
 
+---@alias EntityIntelTypes 'Radar' | 'Sonar' | 'Cloak' | 'CloakField' | 'Spoof' | 'RadarStealth' | 'RadarStealthField' | 'SonarStealth' | 'SonarStealthField'
+
 ---
 --  Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
 function Entity:AddManualScroller(scrollSpeed1,  scrollSpeed2)
