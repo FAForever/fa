@@ -2,38 +2,21 @@
 ---@class moho.aibrain_methods
 local CAiBrain = {}
 
---- Assigns threat value to given position.
--- Threat is used for calculation where to attack with unit.
--- Or what place to avoid with engineers.
--- @param position Table with position {x, y z}.
--- @param threat Number reptresenting the threat.
--- @param decay Number, the thread is decreasing by time.
--- @param threatType Types:
---                          Overall
---                          OverallNotAssigned
---                          StructuresNotMex
---                          Structures
---                          Naval
---                          Air
---                          Land
---                          Experimental
---                          Commander
---                          Artillery
---                          AntiAir
---                          AntiSurface
---                          AntiSub
---                          Economy
---                          Unknown
+---@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
 
-function CAiBrain:AssignThreatAtPosition(position, threat, [decay], [threatType])
+--- Assigns a threat value to a given position, which is applied to the iMAP threat grid
+---@param position Position
+---@param threat number
+---@param decay number
+---@param threatType BrainThreatType
+function CAiBrain:AssignThreatAtPosition(position, threat, decay, threatType)
 end
 
---- Assign unit to platoon.
--- If the unit is already in a platoon, it gets removed from it.
--- @param platoon Either platoon or string with platoon's unique name.
--- @param unit Unit to assign.
--- @param squad Platoon's squad to assign the unit to, types: 'Attack', 'Artillery', 'Guard' 'None', 'Scout', 'Support', 'Unassigned'.
--- @param formation Types: 'AttackFormation', 'GrowthFormation', 'NoFormation'.
+--- Assigns a unit to a platoon
+---@param platoon Platoon | string Either a reference to a platoon, or the unique name of the platoon
+---@param unit Unit
+---@param squad PlatoonSquads
+---@param formation UnitFormations
 function CAiBrain:AssignUnitsToPlatoon(platoon, unit, squad, formation)
 end
 
@@ -44,19 +27,18 @@ end
 function CAiBrain:BuildPlatoon(template, factories, count)
 end
 
---- Orders the builder to build a unit.
--- @param builder Unit, (engineer) to use.
--- @param blueprintID Unit's bp ID to build, example: 'ueb0101'.
--- @param buildLocation Table {x, z, 0}.
--- @param buildRelative: true/false. true = build coordinates are relative to the starting location, false = absolute coords
--- @return true/false
+--- Order a unit to build a structure
+---@param builder Unit
+---@param blueprintID string
+---@param buildLocation Position
+---@param buildRelative boolean if true, the location is used as an offset to the builders current location
 function CAiBrain:BuildStructure(builder, blueprintID, buildLocation, buildRelative)
 end
 
---- Orders a mobile factory to build a unit.
--- @param builder Unit, mobile factory.
--- @param unitToBuild BlueprintID of unit to build, example 'uel0303'.
--- @param count Number, how many units to build.
+--- Order a factory to build a unit
+---@param builder Unit
+---@param unitToBuild string BlueprintId, as an example: `uel0303`
+---@param count number
 function CAiBrain:BuildUnit(builder, unitToBuild, count)
 end
 
@@ -98,7 +80,7 @@ end
 -- @param posX Position on X axis.
 -- @param posY Position on Z axis (wrong name, also named like this in the functions that uses it, but it actually is the Z axis as Y is elevation).
 -- @return Spawned unit or nil.
-function CAiBrain:CreateUnitNearSpot(blueprintID, posX, posY).
+function CAiBrain:CreateUnitNearSpot(blueprintID, posX, posY)
 end
 
 --- Returns UnitID for buildingType

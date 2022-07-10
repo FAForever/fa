@@ -23,6 +23,8 @@ local SPAI = import('/lua/ScenarioPlatoonAI.lua')
 --for sorian AI
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
+---@alias PlatoonSquads 'Attack' | 'Artillery' | 'Guard' 'None' | 'Scout' | 'Support' | 'Unassigned'.
+
 ---@class Platoon : moho.platoon_methods
 ---@field PlatoonData table
 Platoon = Class(moho.platoon_methods) {
