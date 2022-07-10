@@ -28,13 +28,33 @@
 ---@field x1 number
 ---@field y1 number
 
+--#region Entity-related functions
+
+--#endregion
+
+--#region Thread-related functions
+
+--#endregion
+
+--#region File-related functions
+
+--#endregion
+
+--#region Blueprint-related functions
+
+--#endregion
+
+--#region All other functions
+
+--#endregion
+
 ---
 --  Create a target object
 
 function AITarget()
 end
 
---- return the last component of a path
+--- Returns the last component of a path
 ---@param fullPath string
 ---@param stripExtension boolean?
 function Basename(fullPath, stripExtension)
@@ -79,8 +99,9 @@ end
 function DiskGetFileInfo(filename)
 end
 
----
---  localPath = DiskToLocal(SysOrLocalPath)Converts a system path to a local path. Leaves path alone if already local.
+--- Converts a system path to a local path (based on the init file directories), returns the path if it is already local
+---@param SysOrLocalPath string
+---@return string
 function DiskToLocal(SysOrLocalPath)
 end
 
@@ -90,13 +111,11 @@ end
 function EndLoggingStats(exit)
 end
 
----
---  Test for an empty category
-function EntityCategoryEmpty()
+--- Checks for the empty category
+---@param categories Categories
+---@return boolean
+function EntityCategoryEmpty(categories)
 end
-
----
---  Get a list of units blueprint names from a category
 
 --- Computes a list of unit blueprint names that match the categories
 ---@param categories Categories
@@ -106,6 +125,7 @@ end
 
 ---
 --  table EnumColorNames() - returns a table containing strings of all the color names
+---@unknown
 function EnumColorNames()
 end
 
@@ -117,13 +137,11 @@ end
 function EulerToQuaternion(roll, pitch, yaw)
 end
 
----
---  path = FileCollapsePath(fullPath) -- collapse out any intermediate /./ or /../ directory names from a path
+--- Collapse all intermediate `/./` or `/../` directory names from a path
+---@param fullPath string
+---@return string
 function FileCollapsePath(fullPath)
 end
-
----
---  thread = ForkThread(function, ...)Spawns a new thread running the given function with the given args.
 
 --- Creates a new thread, passing all additional arguments to the callback
 ---@param callback function
@@ -132,58 +150,61 @@ end
 function ForkThread(callback,  ...)
 end
 
----
---  cue,bank = GetCueBank(params)
-function GetCueBank(params)
+--- Retrieves the cue and bank of a sound table
+---@param sound BpAudio
+---@return string The cue identifier within the bank
+---@return string The bank identifier
+function GetCueBank(sound)
 end
 
----
---  GetMovieDuration(localFileName)
+--- Retrieves the movie duration
+---@param localFileName string
+---@return number
 function GetMovieDuration(localFileName)
 end
 
----
---  GetVersion() -> string
+--- Retrieves the game version, as set by `version.lua`
+---@return string
 function GetVersion()
 end
 
----
---  Has the c++ object been destroyed?
-function IsDestroyed()
+--- Checks if the C-side of an object is destroyed / de-allocated
+---@param entity Entity | Unit | Prop | Weapon
+---@return boolean
+function IsDestroyed(entity)
 end
 
----
---  KillThread(thread) -- destroy a thread started with ForkThread()
+--- Destroys the c-side of a thread
+---@param thread thread
 function KillThread(thread)
 end
 
----  Print a log message
--- @param TextOne Log message
--- @param TextTwo Optional text
--- Output: "INFO: TextOne\000TextTwo"
+--- Logs a message to the moho logger, this shouldn't be used in production code
+---@param TextOne string
+---@param TextTwo string
 function LOG(TextOne, TextTwo)
 end
 
----
---  Round a number to the nearest integer
-function MATH_IRound()
+--- Rounds a number to the nearest integer
+---@param number number
+function MATH_IRound(number)
 end
 
----
---  MATH_Lerp(s, a, b) or MATH_Lerp(s, sMin, sMax, a, b) -> number -- linear interpolation from a (at s=0 or s=sMin) to b (at s=1 or s=sMax)
+--- Applies linear interpolation between two values `a` and `b`
+---@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
+---@param a number
+---@param b number
 function MATH_Lerp(s,  a,  b)
 end
 
----
---  quaternion MinLerp(float alpha, quaternion L, quaternion R) - returns minimal lerp between L and R
+--- Applies linear interpolation between two quaternions `L` and `R`
 ---@param alpha number
 ---@param L Quaternion
 ---@param R Quaternion
 function MinLerp(alpha, L, R)
 end
 
----
---  quaternion MinSlerp(float alpha, quaternion L, quaternion R) - returns minimal slerp between L and R
+--- Applies spherical linear interpolation between two quaternions `L` and `R`
 ---@param alpha number
 ---@param L Quaternion
 ---@param R Quaternion
@@ -196,21 +217,20 @@ end
 function OrientFromDir(vector)
 end
 
-
 --- Creates a point vector
+---@unknown
 ---@param px number
 ---@param py number
 ---@param pz number
 ---@param vx number
 ---@param vy number
 ---@param vz number
----@unknown
 function PointVector(px, py, pz, vx, vy, vz)
 end
 
 ---
 --  RPCSound({cue,bank,cutoff}) - Make a sound parameters object
----@param sound {cue:unknown, bank:unknown, cutoff:unknown}
+---@param sound { cue:string, bank:string, cutoff:number }
 function RPCSound(sound)
 end
 
@@ -225,37 +245,37 @@ end
 
 ---
 --  BeamBlueprint { spec } - define a beam effect
-function RegisterBeamBlueprint()
+function RegisterBeamBlueprint(spec)
 end
 
 ---
 --  EmitterBlueprint { spec } - define a particle emitter
-function RegisterEmitterBlueprint()
+function RegisterEmitterBlueprint(spec)
 end
 
 ---
 --  MeshBlueprint { spec } - define mesh properties
-function RegisterMeshBlueprint()
+function RegisterMeshBlueprint(spec)
 end
 
 ---
 --  ProjectileBlueprint { spec } - define a type of projectile
-function RegisterProjectileBlueprint()
+function RegisterProjectileBlueprint(spec)
 end
 
 ---
 --  PropBlueprint { spec } - define a type of prop
-function RegisterPropBlueprint()
+function RegisterPropBlueprint(spec)
 end
 
 ---
 --  TrailEmitterBlueprint { spec } - define a polytrail emitter
-function RegisterTrailEmitterBlueprint()
+function RegisterTrailEmitterBlueprint(spec)
 end
 
 ---
 --  UnitBlueprint { spec } - define a type of unit
-function RegisterUnitBlueprint()
+function RegisterUnitBlueprint(spec)
 end
 
 --- Resumes the thread after suspending it, does nothing if the thread wasn't suspended
