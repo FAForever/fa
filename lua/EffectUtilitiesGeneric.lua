@@ -222,13 +222,13 @@ function PlayReclaimEffects(reclaimer, reclaimed, buildEffectBones, effectsBag)
     -- create beams
     for _, bone in buildEffectBones do
         for _, effect in ReclaimBeams do
-            TrashBagAdd(effectsBag, AttachBeamEntityToEntity(reclaimer, bone, reclaimed, -1, army, effect))
+            TrashBagAdd(effectsBag, AttachBeamEntityToEntity(reclaimer, bone, reclaimEndpoint, -1, army, effect))
         end
     end
 
     -- create particle effects
     for _, effect in ReclaimObjectAOE do
-        TrashBagAdd(effectsBag, CreateEmitterOnEntity(reclaimed, army, effect))
+        TrashBagAdd(effectsBag, CreateEmitterOnEntity(reclaimEndpoint, army, effect))
     end
 end
 
