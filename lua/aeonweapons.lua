@@ -53,7 +53,14 @@ ADFTractorClaw = Class(Weapon) {
     VacuumFx = EffectTemplate.ACollossusTractorBeamVacuum01,
     TractorFx = EffectTemplate.ATractorAmbient,
     CrushFx = EffectTemplate.ACollossusTractorBeamCrush01,
-    TractorMuzzleFx = { EffectTemplate.ACollossusTractorBeamGlow02 },
+    TractorMuzzleFx = { EffectTemplate.ACollossusTractorBeamGlow01 },
+    BeamFx = { EffectTemplate.ACollossusTractorBeam01 },
+
+    SliderVelocity = {
+        TECH3 = 12,
+        TECH2 = 15,
+        TECH1 = 18,
+    },
 
     ---comment
     ---@param self ADFTractorClaw
@@ -95,7 +102,7 @@ ADFTractorClaw = Class(Weapon) {
         unit.Tractored = true
         self.RunningTractorThread = true
         local muzzle = self.Blueprint.MuzzleSpecial
-        self.TractorThreadInstance = self:ForkThread(self.TractorThread, unit, muzzle)
+        self.TractorThreadInstance = ForkThread(self.TractorThread, self, unit, muzzle)
     end,
 
     --- Disables the weapon to make sure we try and get a new target
@@ -136,79 +143,130 @@ ADFTractorClaw = Class(Weapon) {
     ---@param muzzle string
     TractorThread = function(self, target, muzzle)
 
+        local unit = self.unit
+        local trash = TrashBag()
+        self.Trash:Add(trash)
+
         -- apparently `CreateEmitterAtBone` doesn't attach to the bone, only positions it at the bone
-        local effectsEntity = Entity({Owner = self.unit})
-        Warp(effectsEntity, self.unit:GetPosition(self.Blueprint.TurretBoneMuzzle))
-        effectsEntity:AttachTo(self.unit, self.Blueprint.TurretBoneMuzzle)
-        self.TractorTrash:Add(effectsEntity)
+        local effectsEntity = Entity({Owner = unit})
+        Warp(effectsEntity, unit:GetPosition(self.Blueprint.TurretBoneMuzzle))
+        effectsEntity:AttachTo(unit, self.Blueprint.TurretBoneMuzzle)
+        trash:Add(effectsEntity)
 
         -- create vacuum effect
         for k, effect in self.VacuumFx do
-            CreateEmitterOnEntity(target, self.Army, effect):ScaleEmitter(0.25 * target.FootPrintSize)
+            trash:Add(CreateEmitterOnEntity(target, self.Army, effect):ScaleEmitter(0.75))
         end
 
         -- create tractor effect
         for k, effect in self.TractorFx do 
-            self.TractorTrash:Add(CreateEmitterOnEntity(target, self.Army, effect))
+            trash:Add(CreateEmitterOnEntity(target, self.Army, effect))
         end
 
         -- create start effect
-        for k, effect in self.TractorMuzzleFx do 
-            self.TractorTrash:Add(CreateEmitterOnEntity(effectsEntity, self.Army, effect))
+        for k, effect in self.TractorMuzzleFx do
+            trash:Add(CreateEmitterOnEntity(effectsEntity, self.Army, effect))
         end
 
         -- compute the distance to set the slider
-        local bonePosition = self.unit:GetPosition(muzzle)
+        local bonePosition = unit:GetPosition(muzzle)
         local targetPosition = target:GetPosition()
         local distance = VDist3(bonePosition, targetPosition)
 
-        self.Slider = CreateSlider(self.unit, muzzle, 0, 0, distance, -1, true)
-        self.TractorTrash:Add(self.Slider)
+        local slider = CreateSlider(unit, muzzle, 0, 0, distance, -1, true)
+        trash:Add(slider)
 
         WaitTicks(1)
-        WaitFor(self.Slider)
+        WaitFor(slider)
 
-        if not IsDestroyed(target) then
+        if (not IsDestroyed(target)) and (not IsDestroyed(unit)) then
 
             -- attach the slider to the target
             target:SetDoNotTarget(false)
-            target:AttachBoneTo(-1, self.unit, muzzle)
+            target:AttachBoneTo(-1, unit, muzzle)
             target:SetDoNotTarget(true)
+            target.DisallowCollisions = true
+
+            local velocity = self.SliderVelocity[target.Blueprint.TechCategory] or 15
 
             -- start pulling back the slider
-            self.Slider:SetSpeed(15)
-            self.Slider:SetGoal(0, 0, 0)
+            slider:SetSpeed(velocity)
+            slider:SetGoal(0, 0, 0)
 
-            self.TractorTrash:Add(CreateRotator(target, 0, 'x', nil, 0, 15, 20 + Random(0, 40)))
-            self.TractorTrash:Add(CreateRotator(target, 0, 'y', nil, 0, 15, 20 + Random(0, 40)))
-            self.TractorTrash:Add(CreateRotator(target, 0, 'z', nil, 0, 15, 20 + Random(0, 40)))
+            trash:Add(CreateRotator(target, 0, 'x', nil, 0, 15, 20 + Random(0, 40)))
+            trash:Add(CreateRotator(target, 0, 'y', nil, 0, 15, 20 + Random(0, 40)))
+            trash:Add(CreateRotator(target, 0, 'z', nil, 0, 15, 20 + Random(0, 40)))
 
             WaitTicks(1)
-            WaitFor(self.Slider)
+            WaitFor(slider)
 
             -- we're at the arm, do destruction effects
-            if (not IsDestroyed(target)) and (not IsDestroyed(self.unit)) and (not IsDestroyed(self)) then
-                target.DestructionExplosionWaitDelayMin = 0
-                target.DestructionExplosionWaitDelayMax = 0
+            if (not IsDestroyed(target)) and (not IsDestroyed(unit)) and (not IsDestroyed(self)) then
 
                 -- create crush effect
                 for k, effect in self.CrushFx do
-                    CreateEmitterAtBone(self.unit, muzzle, self.unit.Army, effect)
+                    CreateEmitterAtBone(unit, muzzle, unit.Army, effect)
                 end
 
-                CreateLightParticle(self.unit, muzzle, self.Army, 1, 4, 'glow_02', 'ramp_blue_16')
+                -- create light particles
+                CreateLightParticle(unit, muzzle, self.Army, 1, 4, 'glow_02', 'ramp_blue_16')
                 WaitTicks(1)
-                CreateLightParticle(self.unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
 
-                target:Kill(self.unit)
-                self.unit:DetachAll(muzzle)
-                self:ResetTarget()
+                if not IsDestroyed(unit) then 
+                    CreateLightParticle(unit, muzzle, self.Army, 4, 2, 'glow_02', 'ramp_blue_16')
+
+                    -- deattach the unit, destroy the slider
+                    unit:DetachAll(muzzle)
+                    slider:Destroy()
+
+                    -- create thread to take into account the fall
+                    self:ForkThread(self.TargetFallThread, target, trash, muzzle)
+                    self:ResetTarget()
+                end
+            else 
+                target.DisallowCollisions = false
+                trash:Destroy()
             end
+        else 
+            target.DisallowCollisions = false
+            trash:Destroy()
         end
 
         self.TractorThreadInstance = nil
-        self.TractorTrash:Destroy()
         self.RunningTractorThread = false
+    end,
+
+    TargetFallThread = function(self, target, trash, muzzle)
+
+        -- let the unit fall down
+        local tx, ty, tz = target:GetPositionXYZ()
+        local surfaceHeight = GetSurfaceHeight(tx, tz)
+        while not IsDestroyed(target) and ty - 2 > surfaceHeight do
+            tx, ty, tz = target:GetPositionXYZ()
+            WaitTicks(1)
+        end
+
+        -- let it create the wreck, with the rotator manipulators attached
+        target.PlayDeathAnimation = false
+        target.DestructionExplosionWaitDelayMin = 0
+        target.DestructionExplosionWaitDelayMax = 0
+        local oldDestroyUnit = target.DestroyUnit
+        target.DestroyUnit = function(target, overkillRatio)
+            self:ForkThread(self.TrashDelayedDestroyThread, trash)
+            oldDestroyUnit(target, overkillRatio)
+        end
+
+        -- do the damage, or just kill it if the colossus didn't survive
+        if not IsDestroyed(self.unit) and not IsDestroyed(target) then
+            Damage(self.unit, self.unit:GetPosition(muzzle), target, target:GetHealth() + 1, 'Disintegrate')
+        elseif not IsDestroyed(target) then
+            target:Kill()
+        end
+    end,
+
+    TrashDelayedDestroyThread = function(self, trash)
+        WaitTicks(1)
+        trash:Destroy()
     end,
 }
 
