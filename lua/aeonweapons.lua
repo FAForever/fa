@@ -79,10 +79,12 @@ ADFTractorClaw = Class(Weapon) {
 
                     -- reset target state
                     local target = self:GetCurrentTarget()
-                    local unit = self:GetUnitBehindTarget(target)
-                    if unit then
-                        unit.DisallowCollisions = false
-                        unit:SetDoNotTarget(false)
+                    if not IsDestroyed(target) then 
+                        local unit = self:GetUnitBehindTarget(target)
+                        if unit then
+                            unit.DisallowCollisions = false
+                            unit:SetDoNotTarget(false)
+                        end
                     end
 
                     -- detach everything from this weapon
