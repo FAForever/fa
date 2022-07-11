@@ -25,6 +25,7 @@
     -- SetName(string name)
     -- Dump()
 
+---@class Control : moho.control_methods
 Control = Class(moho.control_methods) {
 
     -- reset the control's layout to the defaults, in this case

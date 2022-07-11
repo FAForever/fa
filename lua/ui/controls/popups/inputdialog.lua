@@ -5,6 +5,7 @@ local Edit = import('/lua/maui/edit.lua').Edit
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 
 --- A popup that asks the user for a string.
+---@class InputDialog : Popup
 InputDialog = Class(Popup) {
     __init = function(self, parent, title, fallbackInputbox, str)
         -- For ridiculous reasons, the lobby *must* keep keyboard focus on the chat input, or

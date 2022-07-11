@@ -6,12 +6,10 @@
 ------------------------------------------------------------------------------
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
 local AMPlatoonHelperFunctions = import('/lua/editor/AMPlatoonHelperFunctions.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 local TriggerFile = import('/lua/scenariotriggers.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
 local BMBC = import('/lua/editor/basemanagerbuildconditions.lua')
@@ -456,7 +454,7 @@ end
 function PermanentFactoryAssist(platoon)
     local aiBrain = platoon:GetBrain()
     local bManager = aiBrain.BaseManagers[platoon.PlatoonData.BaseName]
-    local assisting = false
+    local assistFac = false
     local unit = platoon:GetPlatoonUnits()[1]
 
     TriggerFile.CreateUnitDeathTrigger(PermanentAssisterDead, unit)
@@ -471,8 +469,8 @@ function PermanentFactoryAssist(platoon)
                 local guards = v:GetGuards()
                 local numGuards = 0
                 for gNum, gUnit in guards do
-                    if not gUnit.Dead and not EntityCategoryContains(categories.FACTORY, gUnit)
-                    and bManager.PermanentAssisters and bManager.PermanentAssisters[gUnit] then -- Make sure this guy is a permanent assister and not a transient assister
+                     -- Make sure this guy is a permanent assister and not a transient assister
+                    if not gUnit.Dead and not EntityCategoryContains(categories.FACTORY, gUnit) and bManager.PermanentAssisters[gUnit] then
                         numGuards = numGuards + 1
                     end
                 end
@@ -486,15 +484,13 @@ function PermanentFactoryAssist(platoon)
                 end
             end
         end
-        -- If the disparity between factories is more than 1, reorganize engineers
-        if (not assisting and lowFac) or (high and low and lowFac and high > low + 1 and highFac == unit:GetGuardedUnit()) then
-            assisting = true
+        -- If we don't have a factory or our factory is dead, or the disparity between factories is more than 1, reorganize engineers.
+        if ((not assistFac or assistFac.Dead) and lowFac) or (high and low and lowFac and high > low + 1 and highFac == unit:GetGuardedUnit()) then
+            assistFac = lowFac
             platoon:Stop()
             IssueGuard({unit}, lowFac)
 
             -- Add to the list of units that are permanently assisting in this base manager
-            if not bManager.PermanentAssisters then bManager.PermanentAssisters = {} end
-
             bManager.PermanentAssisters[unit] = true
         end
         WaitTicks(Random(79, 181))
@@ -507,9 +503,7 @@ function PermanentAssisterDead(unit)
         bManager:DecrementPermanentAssisting()
 
         -- Remove from permanent assister list
-        if bManager.PermanentAssisters then
-            bManager.PermanentAssisters[unit] = nil
-        end
+        bManager.PermanentAssisters[unit] = nil
     end
 end
 
@@ -530,7 +524,7 @@ function BaseManagerAssistThread(platoon)
         beingBuiltCategories = {'MASSEXTRACTION', 'MASSPRODUCTION', 'ENERGYPRODUCTION', 'FACTORY', 'EXPERIMENTAL', 'DEFENSE', 'MOBILE LAND', 'ALLUNITS' }
     end
 
-    local assistRange = assistData.AssistRange or 80
+    local assistRange = assistData.AssistRange or bManager.Radius
     local counter = 0
     local unit = platoonUnits[1]
     while counter < (assistData.Time or 200) do
@@ -825,7 +819,7 @@ function BaseManagerEngineerThread(platoon)
                             end
                         until eng.Dead or eng:IsIdleState()
                         if not eng.Dead then
-                            baseManager.UnfinishedBuildings[unitName] = false
+                            baseManager.UnfinishedBuildings[unitName] = nil
                             baseManager:DecrementUnitBuildCounter(unitName)
                         end
                     end
@@ -859,23 +853,31 @@ function BuildBaseManagerStructure(aiBrain, eng, baseManager, levelName, buildin
                 end
             end
             if category and eng:CanBuild(category) then
+                local engineerPos = eng:GetPosition()
+                local closest = false
                 -- Iterate through build locations
                 for num, location in v do
                     -- Check if it can be built and then build
                     if num > 1 and aiBrain:CanBuildStructureAt(category, {location[1], 0, location[2]}) and baseManager:CheckUnitBuildCounter(location, buildCounter) then
-                        -- Removed transport call as the pathing check was creating problems with base manager rebuilding
-                        -- TODO: develop system where base managers more easily rebuild in far away or hard to reach locations
-                        -- and TransportUnitsToLocation(platoon, {location[1], 0, location[2]}) then
-                        IssueClearCommands({eng})
-                        aiBrain:BuildStructure(eng, category, location, false)
-
-                        local unitName = false
-                        if namesTable[location[1]][location[2]] then
-                            unitName = namesTable[location[1]][location[2]]
+                        if not closest or VDist2(location[1], location[3], engineerPos[1], engineerPos[3]) < VDist2(closest[1], closest[3], engineerPos[1], engineerPos[3]) then
+                            closest = location
                         end
-
-                        return true, unitName
                     end
+                end
+
+                if closest then
+                    -- Removed transport call as the pathing check was creating problems with base manager rebuilding
+                    -- TODO: develop system where base managers more easily rebuild in far away or hard to reach locations
+                    -- and TransportUnitsToLocation(platoon, {closest[1], 0, closest[2]}) then
+                    IssueClearCommands({eng})
+                    aiBrain:BuildStructure(eng, category, closest, false)
+
+                    local unitName = false
+                    if namesTable[closest[1]][closest[2]] then
+                        unitName = namesTable[closest[1]][closest[2]]
+                    end
+
+                    return true, unitName
                 end
             end
         end
@@ -912,19 +914,19 @@ function BuildUnfinishedStructures(platoon)
             end
         end
         -- Check all unfinished buildings to see if they need someone workin on them
-        for k, v in bManager.UnfinishedBuildings do
-            if v and ScenarioInfo.UnitNames[armyIndex][k] and not ScenarioInfo.UnitNames[armyIndex][k].Dead then
-                if not beingBuiltList[k] then
+        for unitName, _ in bManager.UnfinishedBuildings do
+            if ScenarioInfo.UnitNames[armyIndex][unitName] and not ScenarioInfo.UnitNames[armyIndex][unitName].Dead then
+                if not beingBuiltList[unitName] then
                     unfinishedBuildings = true
                     IssueClearCommands({eng})
-                    IssueRepair({eng}, ScenarioInfo.UnitNames[armyIndex][k])
+                    IssueRepair({eng}, ScenarioInfo.UnitNames[armyIndex][unitName])
                     repeat
                         WaitSeconds(3)
                         if not aiBrain:PlatoonExists(platoon) then
                             return
                         end
                     until eng:IsIdleState()
-                    bManager.UnfinishedBuildings[v] = false
+                    bManager.UnfinishedBuildings[unitName] = nil
                 end
             end
         end
@@ -1141,7 +1143,7 @@ function BaseManagerTMLAI(platoon)
                 if EntityCategoryContains(categories.STRUCTURE, target) or simpleTargetting then
                     IssueTactical({unit}, target)
                 else
-                    targPos = SUtils.LeadTarget(platoon, target)
+                    local targPos = SUtils.LeadTarget(platoon, target)
                     if targPos then
                         IssueTactical({unit}, targPos)
                     end
@@ -1287,3 +1289,7 @@ function UnitUpgradeThread(unit)
         WaitSeconds(5)
     end
 end
+
+-- kept for mod compatibility, as they may depend on these
+local AIAttackUtils = import('/lua/ai/aiattackutilities.lua')
+local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')

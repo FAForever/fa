@@ -27,15 +27,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
-        },
-    },
     BuildIconSortPriority = 50,
     Categories = {
         'PRODUCTFA',
@@ -237,17 +228,14 @@ UnitBlueprint {
                 },
             },
             RateOfFire = 0.5,
-            TargetCheckInterval = 1,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.2,
             Turreted = false,
             SlavedToBody = false,
         },
         {
-            AlwaysRecheckTarget = true,
             ArtilleryShieldBlocks = true,
             Audio = {
                 Fire = Sound {
@@ -301,18 +289,15 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 2,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                'AIR MOBILE HIGHPRIAIR',
                 'AIR MOBILE TECH3 BOMBER',
                 'AIR MOBILE BOMBER',
                 'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
                 'AIR MOBILE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS'
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneDualMuzzle = 'Turret_Muzzle01',
             TurretBoneDualPitch = 'Turret_Barrel',
             TurretBoneMuzzle = 'Turret_Muzzle01',

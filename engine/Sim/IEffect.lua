@@ -1,7 +1,7 @@
---- Class IEffect
--- @classmod Sim.IEffect
+---@declare-global
+---@class moho.IEffect
+local IEffect = {}
 
----
 --  Effect:OffsetEmitter(x,y,z)
 function IEffect:OffsetEmitter(x, y, z)
 end
@@ -16,9 +16,10 @@ end
 function IEffect:ScaleEmitter(param,  scale)
 end
 
----
---  effect:SetBeamParam('name', value)
-function IEffect:SetBeamParam('name',  value)
+---todo
+---@param name string
+---@param value number
+function IEffect:SetBeamParam(name,  value)
 end
 
 ---
@@ -26,13 +27,14 @@ end
 function IEffect:SetEmitterCurveParam(param_name,  height,  size)
 end
 
----
---  effect:SetEmitterParam('name', value)returns the effect so you can chain calls like:effect:SetEmitterParam('x',1):ScaleEmitter(3.7)
-function IEffect:SetEmitterParam('name',  value)
+--- returns the effect so you can chain calls like `effect:SetEmitterParam('x',1):ScaleEmitter(3.7)`
+---@param name string
+---@param value number
+---@return moho.IEffect
+function IEffect:SetEmitterParam(name,  value)
 end
 
----
---
-function IEffect:moho.IEffect()
+function IEffect:Destroy()
 end
 
+return IEffect

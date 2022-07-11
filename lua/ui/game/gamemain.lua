@@ -176,7 +176,7 @@ function CreateUI(isReplay)
 
                 if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
                     -- allow meshes and effects to be seen from further away
-                    ConExecute("cam_SetLOD WorldCamera 0.7")
+                    ConExecute("cam_SetLOD WorldCamera 0.65")
                 end
 
                 if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
@@ -231,6 +231,8 @@ function CreateUI(isReplay)
 
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     controls.mfd = mfdControl
+
+    controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)

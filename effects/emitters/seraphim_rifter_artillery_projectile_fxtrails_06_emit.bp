@@ -24,8 +24,8 @@ EmitterBlueprint {
     LowFidelity = true,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/miasma_mod_01.dds]],
-    RampTexture = [[/textures/particles/ramp_white_07.dds]],
+    Texture = '/textures/particles/miasma_mod_01.dds',
+    RampTexture = '/textures/particles/ramp_white_07.dds',
     XDirectionCurve = {
         XRange = 50.00,
         Keys = {

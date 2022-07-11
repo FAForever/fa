@@ -406,8 +406,8 @@ Callbacks.BoxFormationSpawn = function(data)
 
     local posX = (data.pos[1])
     local posZ = (data.pos[3])
-    local offsetX = unitbp.SizeX or 1
-    local offsetZ = unitbp.SizeZ or 1
+    local offsetX = 1.2 * (unitbp.Footprint.SizeX or 1)
+    local offsetZ = 1.2 * (unitbp.Footprint.SizeZ or 1)
 
     if unitbp.Physics.MotionType == 'RULEUMT_None' then
         offsetX = math.ceil(unitbp.Physics.SkirtSizeX or FootprintSize('x'))
@@ -671,6 +671,48 @@ do
             -- upgrading to t3 form t1
             if data.UpgradeTo == "xrb0304" then 
                 IssueUpgrade( xrb0204, "xrb0304")
+            end
+        end
+    end
+end
+
+do
+    --- Allows the player to force a target recheck on the selected units
+    ---@param data table            # an empty table
+    ---@param units table<Unit>     # table of units
+    Callbacks.RecheckTargetsOfWeapons = function(data, units)
+
+        -- make sure we have valid units with the correct command source
+        units = SecureUnits(units)
+        local tick = GetGameTick()
+        local rechecks = 0 
+
+        -- reset their weapons
+        for k, unit in units do
+            if
+                -- unit should still exist
+                not unit:BeenDestroyed() and
+                (   -- do not allow players to spam this
+                    not unit.RecheckTargetsOfWeaponsTick or
+                    (tick - unit.RecheckTargetsOfWeaponsTick > 10)
+                ) 
+            then
+                rechecks = rechecks + 1
+                unit.RecheckTargetsOfWeaponsTick = tick
+                for l = 1, unit.WeaponCount do
+                    unit:GetWeapon(l):ResetTarget()
+                end
+            end
+        end
+
+        -- user feedback
+        if rechecks > 0 then 
+            if units[1].Army == GetFocusArmy() then
+                if rechecks == 1 then 
+                    print("1 weapon target recheck")
+                else 
+                    print(string.format("%d weapon target rechecks", rechecks))
+                end
             end
         end
     end

@@ -25,6 +25,7 @@ local debugInterface = false
 -- from working :sad:
 isOpen = false 
 
+---@class Changelog : Group
 Changelog = Class(Group) {
 
     __init = function(self, parent)
@@ -237,7 +238,9 @@ Changelog = Class(Group) {
             self.ContentPatchesList:SetSelection(index)
             self.HeaderSubtitle:SetText(patch.name)
             self.ContentNotesList:DeleteAllItems()
-            for k, line in patch.description do 
+
+            local altDescription = LOC("<LOC ChangelogDescriptionIdentifier>")
+            for k, line in patch[altDescription] or patch.description do 
                 self.ContentNotesList:AddItem(line)
             end
         end

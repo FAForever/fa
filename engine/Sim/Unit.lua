@@ -1,40 +1,46 @@
---- Class Unit
--- @classmod Sim.Unit
+---@declare-global
+---@class moho.unit_methods : moho.entity_methods
+local Unit = {}
+
+---@class UnitId: string
+
+---@return UnitBlueprint
+function Unit:GetBlueprint()
+end
 
 --- Add a command cap to a unit.
--- Also adds a button to the UI, or enables it, for the unit to use the new command.
--- @param capName String Available:
--- RULEUCC_Move
--- RULEUCC_Stop
--- RULEUCC_Attack
--- RULEUCC_Guard
--- RULEUCC_Patrol
--- RULEUCC_RetaliateToggle
--- RULEUCC_Repair
--- RULEUCC_Capture
--- RULEUCC_Transport
--- RULEUCC_CallTransport
--- RULEUCC_Nuke
--- RULEUCC_Tactical
--- RULEUCC_Teleport
--- RULEUCC_Ferry
--- RULEUCC_SiloBuildTactical
--- RULEUCC_SiloBuildNuke
--- RULEUCC_Sacrifice
--- RULEUCC_Pause
--- RULEUCC_Overcharge
--- RULEUCC_Dive
--- RULEUCC_Reclaim
--- RULEUCC_SpecialAction
--- RULEUCC_Dock
--- RULEUCC_Script
--- RULEUCC_Invalid
+--- Also adds a button to the UI, or enables it, for the unit to use the new command.
+---@param capName "RULEUCC_Move"
+--- |"RULEUCC_Stop"
+--- |"RULEUCC_Attack"
+--- |"RULEUCC_Guard"
+--- |"RULEUCC_Patrol"
+--- |"RULEUCC_RetaliateToggle"
+--- |"RULEUCC_Repair"
+--- |"RULEUCC_Capture"
+--- |"RULEUCC_Transport"
+--- |"RULEUCC_CallTransport"
+--- |"RULEUCC_Nuke"
+--- |"RULEUCC_Tactical"
+--- |"RULEUCC_Teleport"
+--- |"RULEUCC_Ferry"
+--- |"RULEUCC_SiloBuildTactical"
+--- |"RULEUCC_SiloBuildNuke"
+--- |"RULEUCC_Sacrifice"
+--- |"RULEUCC_Pause"
+--- |"RULEUCC_Overcharge"
+--- |"RULEUCC_Dive"
+--- |"RULEUCC_Reclaim"
+--- |"RULEUCC_SpecialAction"
+--- |"RULEUCC_Dock"
+--- |"RULEUCC_Script"
+--- |"RULEUCC_Invalid"
 function Unit:AddCommandCap(capName)
 end
 
 --- Add a toggle cap to a unit.
--- Also adds a button to the UI, or enables it, for the unit to use the new command.
--- @param capName String Available:
+--- Also adds a button to the UI, or enables it, for the unit to use the new command.
+---@param capName string Available:
 -- RULEUTC_ShieldToggle
 -- RULEUTC_WeaponToggle
 -- RULEUTC_JammingToggle
@@ -88,7 +94,9 @@ function Unit:ClearFocusEntity()
 end
 
 --- TODO.
-function Unit:EnableManipulators([string boneName | int boneIndex],  bool Enable)
+---@param bone string|number boneName or boneIndex
+---@param Enable boolean
+function Unit:EnableManipulators(bone, Enable)
 end
 
 --- TODO.
@@ -223,12 +231,13 @@ end
 
 --- Find out unit's specific statistics.
 -- Example: 'KILLS'.
--- @param statName String, name of the stat to find out.
--- @param [defaultVal] TODO.
+---@param statName string, name of the stat to find out.
+---@param defaultVal? number TODO.
+---@return number
 -- Special case for the Salem:
 --   GetStat("h1_SetSalemAmph", 0 or 1) 
 --   Disable/Enable amphibious mode
-function Unit:GetStat(statName, [defaultVal])
+function Unit:GetStat(statName, defaultVal)
 end
 
 --- Find out number of tactical missile this unit has available.
@@ -247,7 +256,7 @@ function Unit:GetTransportFerryBeacon()
 end
 
 --- Returns the unit's blueprint ID.
--- @return bpID
+---@return UnitId bpID
 function Unit:GetUnitId(self)
 end
 
@@ -353,7 +362,8 @@ function Unit:KillManipulator()
 end
 
 --- TODO.
-function Unit:KillManipulators([boneName|boneIndex])
+---@param bone string|number boneName|boneIndex
+function Unit:KillManipulators(bone)
 end
 
 --- TODO.
@@ -717,8 +727,4 @@ end
 function Unit:base()
 end
 
----
---
-function Unit:moho.unit_methods()
-end
-
+return Unit

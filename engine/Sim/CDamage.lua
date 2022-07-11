@@ -1,5 +1,6 @@
---- Class CDamage
--- @classmod Sim.CDamage
+---@declare-global
+---@class moho.CDamage
+local CDamage = {}
 
 ---
 --  CDamage:GetTarget()
@@ -16,8 +17,5 @@ end
 function CDamage:SetTarget()
 end
 
----
---
-function CDamage:moho.CDamage()
-end
+return CDamage
 

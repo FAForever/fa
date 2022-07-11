@@ -23,8 +23,8 @@ EmitterBlueprint {
 	LowFidelity = true,
 	MedFidelity = true,
 	HighFidelity = true,
-	Texture = [[/textures/particles/sonic_pulsar.dds]],
-	RampTexture = [[/textures/particles/ramp_pulsar_01.dds]],
+	Texture = '/textures/particles/sonic_pulsar.dds',
+	RampTexture = '/textures/particles/ramp_pulsar_01.dds',
 	XDirectionCurve = {
 		XRange = 10.00,
 		Keys = {

@@ -1,5 +1,6 @@
---- Class Projectile
--- @classmod Sim.Projectile
+---@declare-global
+---@class moho.projectile_methods : moho.entity_methods
+local Projectile = {}
 
 ---
 --  Change the detonate below height for the projectile
@@ -152,8 +153,4 @@ end
 function Projectile:base()
 end
 
----
---
-function Projectile:moho.projectile_methods()
-end
-
+return Projectile

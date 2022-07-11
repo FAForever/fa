@@ -1,5 +1,6 @@
---- Class CAiAttackerImpl
--- @classmod Sim.CAiAttackerImpl
+---@declare-global
+---@class moho.CAiAttackerImpl_methods
+local CAiAttackerImpl = {}
 
 ---
 --  Loop through the weapons to see if the target can be attacked
@@ -81,8 +82,4 @@ end
 function CAiAttackerImpl:Stop()
 end
 
----
---
-function CAiAttackerImpl:moho.CAiAttackerImpl_methods()
-end
-
+return CAiAttackerImpl

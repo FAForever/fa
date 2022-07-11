@@ -1,73 +1,71 @@
---- Class CAiNavigatorImpl
--- @classmod Sim.CAiNavigatorImpl
+---@declare-global
+---@class moho.navigator_methods
+local CNavigator = {}
 
 ---
 --
-function CAiNavigatorImpl:AtGoal()
+function CNavigator:AtGoal()
 end
 
 ---
 --  Broadcast event to resume any listening task that is currently suspended
-function CAiNavigatorImpl:BroadcastResumeTaskEvent()
+function CNavigator:BroadcastResumeTaskEvent()
 end
 
 ---
 --
-function CAiNavigatorImpl:CanPathToGoal()
+function CNavigator:CanPathToGoal()
 end
 
 ---
 --
-function CAiNavigatorImpl:FollowingLeader()
+function CNavigator:FollowingLeader()
 end
 
 ---
 --  This returns the current navigator target position for the unit
-function CAiNavigatorImpl:GetCurrentTargetPos()
+function CNavigator:GetCurrentTargetPos()
 end
 
 ---
 --  This returns the current goal position of our navigator
-function CAiNavigatorImpl:GetGoalPos()
+function CNavigator:GetGoalPos()
 end
 
 ---
 --
-function CAiNavigatorImpl:GetStatus()
+function CNavigator:GetStatus()
 end
 
 ---
 --
-function CAiNavigatorImpl:HasGoodPath()
+function CNavigator:HasGoodPath()
 end
 
 ---
 --
-function CAiNavigatorImpl:IgnoreFormation()
+function CNavigator:IgnoreFormation()
 end
 
 ---
 --
-function CAiNavigatorImpl:IsIgnorningFormation()
+function CNavigator:IsIgnorningFormation()
 end
 
 ---
 --  Set the navigator's destination as another unit (chase/follow)
-function CAiNavigatorImpl:SetDestUnit()
+function CNavigator:SetDestUnit()
 end
 
 ---
 --  Set the navigator's destination as a particular position
-function CAiNavigatorImpl:SetGoal()
+function CNavigator:SetGoal()
 end
 
 ---
 -- :Set flag in navigator so the unit will know whether to stop at final goal:or speed through it. This would be set to True during a patrol or a series:of waypoints in a complex path.
-function CAiNavigatorImpl:SetSpeedThroughGoal()
+function CNavigator:SetSpeedThroughGoal()
 end
 
----
---
-function CAiNavigatorImpl:moho.navigator_methods()
-end
+return CNavigator
 

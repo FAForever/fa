@@ -1,4 +1,4 @@
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- 
 -- This is the code that registers the things that need to be
 -- serialized by name instead of by value.  Any C functions need to be

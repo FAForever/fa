@@ -22,25 +22,25 @@ local createThread = false
 
 function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced)
 
-    -- # values used throughout the function
+    -- -- values used throughout the function
 
     local totalTime = 0
     local alpha = 0.0
     local text = ""
     local body = ""
 
-    -- # remove previous instance
+    -- -- remove previous instance
 
     if mouseoverDisplay then
         mouseoverDisplay:Destroy()
         mouseoverDisplay = false
     end
 
-    -- # determine if we want to show this tooltip (game options can prevent that)
+    -- -- determine if we want to show this tooltip (game options can prevent that)
 
     if not forced and not Prefs.GetOption('tooltips') then return end
 
-    -- # determine delay
+    -- -- determine delay
 
     local createDelay = 0
     if delay and Prefs.GetOption('tooltip_delay') then
@@ -51,7 +51,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced)
 
 
 
-    -- # retrieve tooltip title / description
+    -- -- retrieve tooltip title / description
 
     if type(ID) == 'string' then
         if TooltipInfo['Tooltips'][ID] then
@@ -80,7 +80,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced)
         WARN('UNRECOGNIZED TOOLTIP ENTRY - Not a string or table! ', repr(ID))
     end
 
-    -- # create the tooltip
+    -- -- create the tooltip
 
     if extendedBool then
         mouseoverDisplay = CreateExtendedToolTip(parent, text, body, width)
@@ -88,7 +88,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced)
         mouseoverDisplay = CreateToolTip(parent, text)
     end
 
-    -- # adjust the tooltip
+    -- -- adjust the tooltip
 
     if extendedBool then
         local Frame = GetFrame(0)
@@ -116,7 +116,7 @@ function CreateMouseoverDisplay(parent, ID, delay, extendedBool, width, forced)
         end
     end
 
-    -- # some hack
+    -- -- some hack
 
     if ID == "mfd_defense" then
         local size = table.getn(mouseoverDisplay.desc)

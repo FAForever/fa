@@ -8,7 +8,7 @@
 -- Legacy shield flags:
 --  - _IsUp: determines whether the shield is up
 
--- Current shield flags:
+-- Shield flags:
 --  - Enabled: flag that indicates the shield is enabled or not (via the toggle of the user)
 --  - Recharged : flag that indicates whether the shield is recharged
 --  - DepletedByEnergy: flag that indicates the shield is drained of energy and needs to recharge
@@ -16,7 +16,10 @@
 --  - NoEnergyToSustain: flag that indicates the shield does not have sufficient energy to recharge
 --  - RolledFromFactory: flag that allows us to skip the first attachment check
 
--- Current shield states:
+-- Shield flags for mods:
+--  - SkipAttachmentCheck: flag that allows us to skip all attachment checks, as an example when the unit is attached to a transport
+
+-- Shield states:
 -- - OnState
 -- - OffState
 -- - RechargeState
@@ -107,6 +110,9 @@ local DEFAULT_OPTIONS = {
     ShieldRegenRate = 1,
     ShieldRegenStartTime = 5,
     PassOverkillDamage = false,
+
+    -- flags for mods
+    -- SkipAttachmentCheck = false, -- defaults to nil, same as false
 }
 
 -- scan blueprints for the largest shield radius
@@ -124,6 +130,8 @@ for k, bp in __blueprints do
     end
 end
 
+---@class Shield : moho.shield_methods, Entity
+---@field Brain AIBrain
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)
         -- This key deviates in name from the blueprints...
@@ -136,6 +144,8 @@ Shield = Class(moho.shield_methods, Entity) {
         _c_CreateShield(self, spec)
     end,
 
+    ---@param self Shield
+    ---@param spec unknown is this Entity?
     OnCreate = function(self, spec)
         -- cache information that is used frequently
         self.Army = EntityGetArmy(self)
@@ -155,6 +165,8 @@ Shield = Class(moho.shield_methods, Entity) {
         self.RegenStartTime = spec.ShieldRegenStartTime
         self.PassOverkillDamage = spec.PassOverkillDamage
         self.ImpactMeshBp = spec.ImpactMesh
+        self.SkipAttachmentCheck = spec.SkipAttachmentCheck
+
         if spec.ImpactEffects ~= '' then
             self.ImpactEffects = EffectTemplate[spec.ImpactEffects]
         else
@@ -292,6 +304,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyDepleted = function(self)
         self.NoEnergyToSustain = true 
 
@@ -301,6 +314,7 @@ Shield = Class(moho.shield_methods, Entity) {
         end
     end,
 
+    ---@param self Shield
     OnEnergyViable = function(self)
         self.NoEnergyToSustain = false 
 
@@ -752,7 +766,7 @@ Shield = Class(moho.shield_methods, Entity) {
             self.Owner:SetMaintenanceConsumptionActive()
 
             -- if we're attached to a transport then our shield should be off
-            if UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory then
+            if (not self.SkipAttachmentCheck) and (UnitIsUnitState(self.Owner, 'Attached') and self.RolledFromFactory) then
                 ChangeState(self, self.OffState)
 
             -- if we're still out of energy, go wait for that to fix itself
@@ -1006,6 +1020,7 @@ Shield = Class(moho.shield_methods, Entity) {
 }
 
 --- A bubble shield attached to a single unit.
+---@class PersonalBubble : Shield
 PersonalBubble = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1077,6 +1092,7 @@ PersonalBubble = Class(Shield) {
 
 --- A personal bubble that can render a set of encompassed units invincible.
 -- Useful for shielded transports (to work around the area-damage bug).
+---@class TransportShield : Shield
 TransportShield = Class(Shield) {
 
     OnCreate = function(self, spec)
@@ -1150,6 +1166,7 @@ TransportShield = Class(Shield) {
 
 --- A shield that sticks to the surface of the unit. Doesn't have its own collision physics, just
 -- grants extra health.
+---@class PersonalShield : Shield
 PersonalShield = Class(Shield){
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1243,6 +1260,7 @@ PersonalShield = Class(Shield){
     end,
 }
 
+---@class AntiArtilleryShield : Shield
 AntiArtilleryShield = Class(Shield) {
     OnCreate = function(self, spec)
         Shield.OnCreate(self, spec)
@@ -1289,6 +1307,7 @@ AntiArtilleryShield = Class(Shield) {
 }
 
 -- Pretty much the same as personal shield (no collisions), but has its own mesh and special effects.
+---@class CzarShield : PersonalShield
 CzarShield = Class(PersonalShield) {
     OnCreate = function(self, spec)
         PersonalShield.OnCreate(self, spec)

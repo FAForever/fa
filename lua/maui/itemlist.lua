@@ -19,6 +19,7 @@ local Control = import('control.lua').Control
 local Dragger = import('dragger.lua').Dragger
 local ScaleNumber = import('layouthelpers.lua').ScaleNumber
 
+---@class ItemList : moho.item_list_methods, Control
 ItemList = Class(moho.item_list_methods, Control) {
 
     __init = function(self, parent, debugname)
@@ -120,11 +121,11 @@ ItemList = Class(moho.item_list_methods, Control) {
         self:OnClick(row)
     end,
 
-    # The selection changed via keyboard (up,down,pageup,pagedown,home,end etc)
+    -- The selection changed via keyboard (up,down,pageup,pagedown,home,end etc)
     OnKeySelect = function(self, row)
     end,
 
-    # updated when mouseover item changes, -1 when no mouseover
+    -- updated when mouseover item changes, -1 when no mouseover
     OnMouseoverItem = function(self, row)
     end,
 }

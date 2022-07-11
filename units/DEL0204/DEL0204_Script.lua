@@ -1,12 +1,12 @@
---#****************************************************************************
---#**
---#**  File     :  /cdimage/units/DEL0204/DEL0204_script.lua
---#**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
---#**
---#**  Summary  :  UEF Mongoose Gatling Bot
---#**
---#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+----****************************************************************************
+----**
+----**  File     :  /cdimage/units/DEL0204/DEL0204_script.lua
+----**  Author(s):  John Comes, David Tomandl, Jessica St. Croix, Matt Vainio
+----**
+----**  Summary  :  UEF Mongoose Gatling Bot
+----**
+----**  Copyright Â© 2005 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 local TWalkingLandUnit = import('/lua/terranunits.lua').TWalkingLandUnit
 local TWeapons = import('/lua/terranweapons.lua')
 local TDFPlasmaCannonWeapon = TWeapons.TDFPlasmaCannonWeapon
@@ -24,7 +24,7 @@ DEL0204 = Class(TWalkingLandUnit)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(0)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxWeaponPackSequence(self)
             end,
 
@@ -44,7 +44,7 @@ DEL0204 = Class(TWalkingLandUnit)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },

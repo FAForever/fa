@@ -1,5 +1,6 @@
---- Class ReconBlip
--- @classmod Sim.ReconBlip
+---@declare-global
+---@class moho.blip_methods : moho.entity_methods
+local ReconBlip = {}
 
 ---
 --  unit = ReconBlip:GetSource()
@@ -41,13 +42,8 @@ end
 function ReconBlip:IsSeenNow()
 end
 
----
---  derived from Entity
-function ReconBlip:base()
+function ReconBlip:GetBlueprint()
 end
 
----
---
-function ReconBlip:moho.blip_methods()
-end
+return ReconBlip
 

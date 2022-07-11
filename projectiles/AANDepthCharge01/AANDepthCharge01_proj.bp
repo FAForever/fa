@@ -1,0 +1,63 @@
+ProjectileBlueprint {
+    Audio = {
+        EnterWater = Sound {
+            Bank = 'URAWeapon',
+            Cue = 'URA0204_Torpedo_Water',
+            LodCutoff = 'UnitMove_LodCutoff',
+        },
+        Impact = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Impacts',
+            Cue = 'Impact_Water_Splash_AEON',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Categories = {
+        'AEON',
+        'PROJECTILE',
+        'ANTINAVY',
+    },
+    Defense = {
+        Health = 1,
+    },
+    Display = {
+        CameraFollowTimeout = 2,
+        CameraFollowsProjectile = true,
+        Mesh = {
+            LODs = {
+                {
+                    LODCutoff = 150,
+                    ShaderName = 'TMeshAlpha',
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.45,
+    },
+    DoNotCollideList = {
+        'TORPEDO',
+    },
+    General = {
+        Category = 'Anti Navy',
+        Faction = 'Aeon',
+        Weapon = 'Harmonic Depth Charge',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 1,
+        DestroyOnWater = false,
+        Lifetime = 15,
+        MaxSpeed = 10,
+        StayUnderwater = true,
+        StayUpright = true,
+        TrackTarget = false,
+        TurnRate = 230,
+        VelocityAlign = true,
+    },
+}

@@ -1,27 +1,15 @@
-#***************************************************************************
-#*
-#**  File     :  /lua/ai/AISeaAttackBuilders.lua
-#**
-#**  Summary  : Default economic builders for skirmish
-#**
-#**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
-#****************************************************************************
+--***************************************************************************
+--*
+--**  File     :  /lua/ai/AISeaAttackBuilders.lua
+--**
+--**  Summary  : Default economic builders for skirmish
+--**
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+--****************************************************************************
 
-local BBTmplFile = '/lua/basetemplates.lua'
-local BuildingTmpl = 'BuildingTemplates'
-local BaseTmpl = 'BaseTemplates'
-local ExBaseTmpl = 'ExpansionBaseTemplates'
-local Adj2x2Tmpl = 'Adjacency2x2'
 local UCBC = '/lua/editor/UnitCountBuildConditions.lua'
-local MIBC = '/lua/editor/MiscBuildConditions.lua'
-local MABC = '/lua/editor/MarkerBuildConditions.lua'
 local IBC = '/lua/editor/InstantBuildConditions.lua'
-local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
-local EBC = '/lua/editor/EconomyBuildConditions.lua'
-local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
 local TBC = '/lua/editor/ThreatBuildConditions.lua'
-local SAI = '/lua/ScenarioPlatoonAI.lua'
-local PlatoonFile = '/lua/platoon.lua'
 local SBC = '/lua/editor/SorianBuildConditions.lua'
 local SIBC = '/lua/editor/SorianInstantBuildConditions.lua'
 
@@ -34,11 +22,11 @@ function SeaAttackCondition(aiBrain, locationType, targetNumber)
     if not engineerManager then
         return true
     end
-    #if aiBrain:GetCurrentEnemy() then
-    #	local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
-    #	targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSurface')
-    #	targetNumber = targetNumber + aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSub')
-    #end
+    --if aiBrain:GetCurrentEnemy() then
+    --	local estartX, estartZ = aiBrain:GetCurrentEnemy():GetArmyStartPos()
+    --	targetNumber = aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSurface')
+    --	targetNumber = targetNumber + aiBrain:GetThreatAtPosition({estartX, 0, estartZ}, 1, true, 'AntiSub')
+    --end
 
     local position = engineerManager:GetLocationCoords()
     local radius = engineerManager.Radius
@@ -53,12 +41,12 @@ function SeaAttackCondition(aiBrain, locationType, targetNumber)
         return true
     elseif SUtils.ThreatBugcheck(aiBrain) then -- added to combat buggy inflated threat
         return true
-    elseif UC.PoolGreaterAtLocation(aiBrain, locationType, 0, categories.MOBILE * categories.NAVAL * categories.TECH3) and (surfaceThreat + subThreat) > 1125 then #5 Units x 225
+    elseif UC.PoolGreaterAtLocation(aiBrain, locationType, 0, categories.MOBILE * categories.NAVAL * categories.TECH3) and (surfaceThreat + subThreat) > 1125 then --5 Units x 225
         return true
     elseif UC.PoolGreaterAtLocation(aiBrain, locationType, 0, categories.MOBILE * categories.NAVAL * categories.TECH2)
-    and UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL * categories.TECH3) and (surfaceThreat + subThreat) > 280 then #7 Units x 40
+    and UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL * categories.TECH3) and (surfaceThreat + subThreat) > 280 then --7 Units x 40
         return true
-    elseif UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL - categories.TECH1) and (surfaceThreat + subThreat) > 42 then #7 Units x 6
+    elseif UC.PoolLessAtLocation(aiBrain, locationType, 1, categories.MOBILE * categories.NAVAL - categories.TECH1) and (surfaceThreat + subThreat) > 42 then --7 Units x 6
         return true
     end
     return false
@@ -75,7 +63,7 @@ BuilderGroup {
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'NoRushTimeCheck', { 600 }},
             { UCBC, 'FactoryGreaterAtLocation', { 'LocationType', 0, categories.NAVAL * categories.FACTORY * categories.TECH1 } },
-            #{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
+            --{ UCBC, 'FactoryLessAtLocation', { 'LocationType', 2, 'FACTORY NAVAL TECH3' }},
             { SIBC, 'GreaterThanEconEfficiencyOverTime', { 0.9, 1.1 }},
         },
         BuilderType = 'Sea',
@@ -253,7 +241,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian T3 Naval Nuke Sub',
         PlatoonTemplate = 'T3SeaNukeSub',
-        Priority = 0, #700,
+        Priority = 0, --700,
         BuilderConditions = {
             { IBC, 'BrainNotLowPowerMode', {} },
             { SBC, 'NoRushTimeCheck', { 600 }},
@@ -297,7 +285,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Sea Hunters T1',
         PlatoonTemplate = 'SeaHuntSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 10,
         InstanceCount = 2,
@@ -314,7 +302,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Sea Hunters T2',
         PlatoonTemplate = 'SeaHuntSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 10,
         InstanceCount = 2,
@@ -331,7 +319,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Sea Hunters T3',
         PlatoonTemplate = 'SeaHuntSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 10,
         InstanceCount = 2,
@@ -347,14 +335,11 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Sea StrikeForce T2',
         PlatoonTemplate = 'SeaStrikeSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 100,
         InstanceCount = 5,
         BuilderType = 'Any',
-        BuilderData = {
-        UseFormation = 'AttackFormation',
-        },
         BuilderConditions = {
             { UCBC, 'PoolGreaterAtLocation', { 'LocationType', 0, 'MOBILE TECH2 NAVAL' } },
             { UCBC, 'HaveUnitsWithCategoryAndAlliance', { true, 1, categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY, 'Enemy'}},
@@ -362,6 +347,7 @@ BuilderGroup {
             { SBC, 'NoRushTimeCheck', { 0 }},
         },
         BuilderData = {
+            UseFormation = 'AttackFormation',
             SearchRadius = 6000,
             PrioritizedCategories = {
                 'STRUCTURE DEFENSE ANTINAVY TECH2',
@@ -379,7 +365,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Frequent Sea Attack T1',
         PlatoonTemplate = 'SeaAttackSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
@@ -387,7 +373,7 @@ BuilderGroup {
         BuilderData = {
         UseFormation = 'AttackFormation',
             ThreatWeights = {
-                #IgnoreStrongerTargetsRatio = 100.0,
+                --IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -407,7 +393,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Frequent Sea Attack T2',
         PlatoonTemplate = 'SeaAttackSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
@@ -415,7 +401,7 @@ BuilderGroup {
         BuilderData = {
         UseFormation = 'AttackFormation',
             ThreatWeights = {
-                #IgnoreStrongerTargetsRatio = 100.0,
+                --IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -435,7 +421,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Frequent Sea Attack T3',
         PlatoonTemplate = 'SeaAttackSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
@@ -443,7 +429,7 @@ BuilderGroup {
         BuilderData = {
         UseFormation = 'AttackFormation',
             ThreatWeights = {
-                #IgnoreStrongerTargetsRatio = 100.0,
+                --IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -467,7 +453,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Big Sea Attack T1',
         PlatoonTemplate = 'SeaAttackSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
@@ -475,7 +461,7 @@ BuilderGroup {
         BuilderData = {
         UseFormation = 'AttackFormation',
             ThreatWeights = {
-                #IgnoreStrongerTargetsRatio = 100.0,
+                --IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -495,7 +481,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Big Sea Attack T2',
         PlatoonTemplate = 'SeaAttackSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
@@ -503,7 +489,7 @@ BuilderGroup {
         BuilderData = {
         UseFormation = 'AttackFormation',
             ThreatWeights = {
-                #IgnoreStrongerTargetsRatio = 100.0,
+                --IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -523,7 +509,7 @@ BuilderGroup {
     Builder {
         BuilderName = 'Sorian Big Sea Attack T3',
         PlatoonTemplate = 'SeaAttackSorian',
-        #PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
+        --PlatoonAddPlans = {'DistressResponseAISorian', 'PlatoonCallForHelpAISorian'},
         PlatoonAddPlans = {'AirLandToggleSorian'},
         Priority = 1,
         InstanceCount = 5,
@@ -531,7 +517,7 @@ BuilderGroup {
         BuilderData = {
         UseFormation = 'AttackFormation',
             ThreatWeights = {
-                #IgnoreStrongerTargetsRatio = 100.0,
+                --IgnoreStrongerTargetsRatio = 100.0,
                 PrimaryThreatTargetType = 'Naval',
                 SecondaryThreatTargetType = 'Economic',
                 SecondaryThreatWeight = 0.1,
@@ -553,3 +539,18 @@ BuilderGroup {
     BuilderGroupName = 'SorianMassHunterSeaFormBuilders',
     BuildersType = 'PlatoonFormBuilder',
 }
+
+
+-- kept for mod compatibility, as they may depend on these
+local BBTmplFile = '/lua/basetemplates.lua'
+local BuildingTmpl = 'BuildingTemplates'
+local BaseTmpl = 'BaseTemplates'
+local ExBaseTmpl = 'ExpansionBaseTemplates'
+local Adj2x2Tmpl = 'Adjacency2x2'
+local MIBC = '/lua/editor/MiscBuildConditions.lua'
+local MABC = '/lua/editor/MarkerBuildConditions.lua'
+local OAUBC = '/lua/editor/OtherArmyUnitCountBuildConditions.lua'
+local EBC = '/lua/editor/EconomyBuildConditions.lua'
+local PCBC = '/lua/editor/PlatoonCountBuildConditions.lua'
+local SAI = '/lua/ScenarioPlatoonAI.lua'
+local PlatoonFile = '/lua/platoon.lua'

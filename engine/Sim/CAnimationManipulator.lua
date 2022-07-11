@@ -1,5 +1,6 @@
---- Class CAnimationManipulator
--- @classmod Sim.CAnimationManipulator
+---@declare-global
+---@class moho.AnimationManipulator : moho.manipulator_methods
+local CAnimationManipulator = {}
 
 ---
 --  fraction = AnimationManipulator:GetAnimationFraction()
@@ -18,7 +19,7 @@ end
 
 ---
 --  AnimManipulator:PlayAnim(entity, animName, looping=false)
-function CAnimationManipulator:PlayAnim(entity,  animName,  looping=false)
+function CAnimationManipulator:PlayAnim(entity,  animName,  looping)
 end
 
 ---
@@ -33,7 +34,7 @@ end
 
 ---
 --  AnimationManipulator:SetBoneEnabled(bone, value, include_decscendants=true)
-function CAnimationManipulator:SetBoneEnabled(bone,  value,  include_decscendants=true)
+function CAnimationManipulator:SetBoneEnabled(bone,  value,  include_decscendants)
 end
 
 ---
@@ -56,13 +57,5 @@ end
 function CAnimationManipulator:SetRate(rate)
 end
 
----
---  derived from IAniManipulator
-function CAnimationManipulator:base()
-end
-
----
---
-function CAnimationManipulator:moho.AnimationManipulator()
-end
+return CAnimationManipulator
 

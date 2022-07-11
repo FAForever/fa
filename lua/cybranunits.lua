@@ -63,6 +63,7 @@ local TrashBag = _G.TrashBag
 local TrashBagAdd = TrashBag.Add
 
 --- A class to managing the build bots. Make sure to call all the relevant functions.
+---@class CConstructionTemplate : 
 CConstructionTemplate = Class() {
 
     --- Prepares the values required to support bots
@@ -260,6 +261,7 @@ CConstructionTemplate = Class() {
 
 --- The build bot class for drones. It removes a lot of
 -- the basic functionality of a unit to save on performance.
+---@class CBuildBotUnit : DummyUnit
 CBuildBotUnit = Class(DummyUnit) {
 
     -- Keep track of the builder that made the bot
@@ -323,6 +325,7 @@ CBuildBotUnit = Class(DummyUnit) {
 }
 
 -- AIR FACTORY STRUCTURES
+---@class CAirFactoryUnit : AirFactoryUnit
 CAirFactoryUnit = Class(AirFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
@@ -362,12 +365,15 @@ CAirFactoryUnit = Class(AirFactoryUnit) {
 }
 
 -- AIR STAGING STRUCTURES
+---@class CAirStagingPlatformUnit : AirStagingPlatformUnit
 CAirStagingPlatformUnit = Class(AirStagingPlatformUnit) {}
 
 -- AIR UNITS
+---@class CAirUnit : AirUnit
 CAirUnit = Class(AirUnit) {}
 
 -- WALL STRUCTURES
+---@class CConcreteStructureUnit : ConcreteStructureUnit
 CConcreteStructureUnit = Class(ConcreteStructureUnit) {}
 
 -- CONSTRUCTION UNITS
@@ -380,7 +386,6 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
-        -- If created with F2 on land, then play the transform anim.
         if self.Layer == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
@@ -411,7 +416,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
     end,
 
     LayerChangeTrigger = function(self, new, old)
-        if self.AnimationWater then
+        if self.Blueprint.Display.AnimationWater then
             if self.TerrainLayerTransitionThread then
                 self.TerrainLayerTransitionThread:Destroy()
                 self.TerrainLayerTransitionThread = nil
@@ -429,7 +434,7 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
         end
 
         if water then
-            self.TransformManipulator:PlayAnim(self.AnimationWater)
+            self.TransformManipulator:PlayAnim(self.Blueprint.Display.AnimationWater)
             self.TransformManipulator:SetRate(1)
             self.TransformManipulator:SetPrecedence(0)
         else
@@ -455,9 +460,11 @@ CEnergyCreationUnit = Class(DefaultUnitsFile.EnergyCreationUnit) {
 }
 
 -- ENERGY STORAGE STRUCTURES
+---@class CEnergyStorageUnit : EnergyStorageUnit
 CEnergyStorageUnit = Class(EnergyStorageUnit) {}
 
 -- LAND FACTORY STRUCTURES
+---@class CLandFactoryUnit : LandFactoryUnit
 CLandFactoryUnit = Class(LandFactoryUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         if not unitBeingBuilt then return end
@@ -518,10 +525,11 @@ CRadarUnit = Class(DefaultUnitsFile.RadarUnit) {}
 CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 
 -- SEA FACTORY STRUCTURES
+---@class CSeaFactoryUnit : SeaFactoryUnit
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeamsOpti, nil, unitBeingBuilt, self.BuildEffectsBag, false)
         unitBeingBuilt.Trash:Add(thread)
     end,
 
@@ -580,15 +588,19 @@ CSeaFactoryUnit = Class(SeaFactoryUnit) {
 }
 
 -- SEA UNITS
+---@class CSeaUnit : SeaUnit
 CSeaUnit = Class(SeaUnit) {}
 
 -- SHIELD LAND UNITS
+---@class CShieldLandUnit : ShieldLandUnit
 CShieldLandUnit = Class(ShieldLandUnit) {}
 
 -- SHIELD STRUCTURES
+---@class CShieldStructureUnit : ShieldStructureUnit
 CShieldStructureUnit = Class(ShieldStructureUnit) {}
 
 -- STRUCTURES
+---@class CStructureUnit : StructureUnit
 CStructureUnit = Class(StructureUnit) {}
 
 -- SUBMARINE UNITS
@@ -604,14 +616,18 @@ CWalkingLandUnit = DefaultUnitsFile.WalkingLandUnit
 CWallStructureUnit = Class(DefaultUnitsFile.WallStructureUnit) {}
 
 -- CIVILIAN STRUCTURES
+---@class CCivilianStructureUnit : CStructureUnit
 CCivilianStructureUnit = Class(CStructureUnit) {}
 
 -- QUANTUM GATE UNITS
+---@class CQuantumGateUnit : QuantumGateUnit
 CQuantumGateUnit = Class(QuantumGateUnit) {}
 
 -- RADAR JAMMER UNITS
+---@class CRadarJammerUnit : RadarJammerUnit
 CRadarJammerUnit = Class(RadarJammerUnit) {}
 
+---@class CConstructionEggUnit : CStructureUnit
 CConstructionEggUnit = Class(CStructureUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         LandFactoryUnit.OnStopBeingBuilt(self, builder, layer)

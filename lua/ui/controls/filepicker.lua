@@ -137,6 +137,7 @@ function IsFilenameInvalid(filename)
     return nil
 end
 
+---@class FilePicker : Group
 FilePicker = Class(Group) {
     __init = function(self, parent, fileType, onlyShowMine, selectAction, debugName)
         Group.__init(self, parent)

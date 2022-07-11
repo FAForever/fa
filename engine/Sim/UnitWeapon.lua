@@ -1,5 +1,10 @@
---- Class UnitWeapon
--- @classmod Sim.UnitWeapon
+---@declare-global
+---@class moho.weapon_methods
+local UnitWeapon = {}
+
+---@return WeaponBlueprint
+function UnitWeapon:GetBlueprint()
+end
 
 ---
 --  UnitWeapon:CanFire()
@@ -64,11 +69,6 @@ end
 ---
 --  bool = UnitWeapon:FireWeapon()
 function UnitWeapon:FireWeapon()
-end
-
----
---  blueprint = UnitWeapon:GetBlueprint()
-function UnitWeapon:GetBlueprint()
 end
 
 ---
@@ -156,8 +156,4 @@ end
 function UnitWeapon:WeaponHasTarget()
 end
 
----
---
-function UnitWeapon:moho.weapon_methods()
-end
-
+return UnitWeapon

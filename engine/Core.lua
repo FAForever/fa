@@ -1,14 +1,27 @@
+---@declare-global
 ---Module: Core
 -- @module Core
+
+---@class Vector
+---@field [1] number
+---@field [2] number
+---@field [3] number
+
+---@class Point
+---@field [1] number
+---@field [2] number
+---@field [3] number
 
 ---
 --  Create a target object
 function AITarget()
 end
 
----
---  base = Basename(fullPath,stripExtension?) -- return the last component of a path
-function Basename(fullPath, stripExtension?)
+
+--- return the last component of a path
+---@param fullPath string
+---@param stripExtension boolean?
+function Basename(fullPath, stripExtension)
 end
 
 ---
@@ -51,9 +64,10 @@ end
 function DiskToLocal(SysOrLocalPath)
 end
 
----
---  EndLoggingStats(bool exit) - End logging stats and optionally exit app
-function EndLoggingStats(bool exit)
+
+---End logging stats and optionally exit app
+---@param exit boolean
+function EndLoggingStats(exit)
 end
 
 ---
@@ -72,8 +86,11 @@ function EnumColorNames()
 end
 
 ---
---  quaternion EulerToQuaternion(float roll, float pitch, float yaw) - converts euler angles to a quaternion
-function EulerToQuaternion(float roll,  float pitch,  float yaw)
+---converts euler angles to a quaternion
+---@param roll number float
+---@param pitch number float
+---@param yaw number float
+function EulerToQuaternion(roll, pitch, yaw)
 end
 
 ---
@@ -83,7 +100,10 @@ end
 
 ---
 --  thread = ForkThread(function, ...)Spawns a new thread running the given function with the given args.
-function ForkThread(function,  ...)
+---@param callback function
+---@vararg any arguments to pass into function
+---@return thread
+function ForkThread(callback,  ...)
 end
 
 ---
@@ -115,7 +135,7 @@ end
 -- @param TextOne Log message
 -- @param TextTwo Optional text
 -- Output: "INFO: TextOne\000TextTwo"
-function LOG('TextOne','TextTwo')
+function LOG(TextOne, TextTwo)
 end
 
 ---
@@ -130,12 +150,18 @@ end
 
 ---
 --  quaternion MinLerp(float alpha, quaternion L, quaternion R) - returns minimal lerp between L and R
-function MinLerp(float alpha,  quaternion L,  quaternion R)
+---@param alpha number
+---@param L unknown quaternion
+---@param R unknown quaternion
+function MinLerp(alpha, L, R)
 end
 
 ---
 --  quaternion MinSlerp(float alpha, quaternion L, quaternion R) - returns minimal slerp between L and R
-function MinSlerp(float alpha,  quaternion L,  quaternion R)
+---@param alpha number
+---@param L unknown quaternion
+---@param R unknown quaternion
+function MinSlerp(alpha, L, R)
 end
 
 ---
@@ -150,7 +176,8 @@ end
 
 ---
 --  RPCSound({cue,bank,cutoff}) - Make a sound parameters object
-function RPCSound({cue, bank, cutoff})
+---@param sound {cue:unknown, bank:unknown, cutoff:unknown}
+function RPCSound(sound)
 end
 
 ---
@@ -199,10 +226,10 @@ function ResumeThread(thread)
 end
 
 ---  Print a debug message
--- @param TextOne Debug message
--- @param TextTwo Optional text
+---@param TextOne string Debug message
+---@param TextTwo string? Optional text
 -- Output: "DEBUG: TextOne\000TextTwo"
-function SPEW('TextOne','TextTwo')
+function SPEW(TextOne,TextTwo)
 end
 
 ---
@@ -237,7 +264,9 @@ end
 
 ---
 --  Sound({cue,bank,cutoff}) - Make a sound parameters object
-function Sound({cue, bank, cutoff})
+---@param sound BpSound
+---@return BpSoundResult
+function Sound(sound)
 end
 
 ---
@@ -251,8 +280,9 @@ function SuspendCurrentThread()
 end
 
 ---
---  Trace(true) -- turns on debug tracingTrace(false) -- turns it off again
-function Trace(true)
+--  Trace(true) -- turns on debug. tracingTrace(false) -- turns it off again
+---@param enable boolean
+function Trace(enable)
 end
 
 ---
@@ -267,12 +297,20 @@ end
 
 ---
 --  Distance between two 2d points (x1,y1,x2,y2)
-function VDist2()
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+function VDist2(x1, y1, x2, y2)
 end
 
 ---
 --  Square of Distance between two 2d points (x1,y1,x2,y2)
-function VDist2Sq()
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+function VDist2Sq(x1, y1, x2, y2)
 end
 
 ---
@@ -311,10 +349,10 @@ function Vector2()
 end
 
 ---  Print a warning message
--- @param TextOne Warning message
--- @param TextTwo Optional text
+---@param TextOne string Warning message
+---@param TextTwo string? Optional text
 -- Output: "WARNING: TextOne\000TextTwo"
-function WARN('TextOne','TextTwo')
+function WARN(TextOne, TextTwo)
 end
 
 ---
@@ -324,11 +362,17 @@ end
 
 ---
 --  doscript(script, [env]) -- run another script. The environment table, if given, will be used for the script's global variables.
-function doscript(script,  [env])
+---comment
+---@param script string
+---@param env table?
+---@diagnostic disable-next-line: lowercase-global
+function doscript(script,  env)
 end
 
 ---
 --  exists(name) -> bool -- returns true if the given resource file exists
+---@param name string
+---@diagnostic disable-next-line: lowercase-global
 function exists(name)
 end
 

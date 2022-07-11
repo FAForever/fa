@@ -2,7 +2,7 @@
 -- Post process a unit
 local function PostProcessUnit(unit)
 
-    -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     unit.CategoriesCount = 0
     unit.CategoriesHash = { }
@@ -13,7 +13,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     unit.DoNotCollideListCount = 0 
     unit.DoNotCollideListHash = { }
@@ -24,7 +24,7 @@ local function PostProcessUnit(unit)
         end
     end
 
-    -- sanitize guard scan radius
+    -- # sanitize guard scan radius
 
     -- The guard scan radius is used when:
     -- - A unit attack moves, it determines how far the unit remains from its target
@@ -32,79 +32,132 @@ local function PostProcessUnit(unit)
 
     -- All of the decisions below are made based on when a unit attack moves, as that is
     -- the default meta to use in competitive play. This is by all means not perfect,
-    -- but it is the best we can do
+    -- but it is the best we can do when we need to consider the performance of it all
 
     local isEngineer = unit.CategoriesHash['ENGINEER']
     local isStructure = unit.CategoriesHash['STRUCTURE']
-    local isShield = unit.categoriesHash['SHIELD']
+    local isDummy = unit.CategoriesHash['DUMMYUNIT']
     local isLand = unit.CategoriesHash['LAND']
-    local isScout = unit.CategoriesHash['SCOUT']
-    local isArtillery = unit.CategoriesHash['ARTILLERY']
     local isAir = unit.CategoriesHash['AIR']
+    local isBomber = unit.CategoriesHash['BOMBER']
+    local isGunship = unit.CategoriesHash['GUNSHIP']
+    local isTransport = unit.CategoriesHash['TRANSPORTATION']
+
+    local isTech1 = unit.CategoriesHash['TECH1']
+    local isTech2 = unit.CategoriesHash['TECH2']
+    local isTech3 = unit.CategoriesHash['TECH3']
+    local isExperimental = unit.CategoriesHash['EXPERIMENTAL']
 
     -- do not touch guard scan radius values of engineer-like units, as it is the reason we have
-    -- the factory-reclaim-bug that we're keen in keeping at this point
+    -- the factory-reclaim-bug that we're keen in keeping that at this point
     if not isEngineer then 
 
         -- guarantee that the table exists
         unit.AI = unit.AI or { }
 
-        -- structures do not need this value set
-        if isStructure then 
-            unit.AI.GuardScanRadius = 0
+        -- if it is set then we use that - allows us to make adjustments as we see fit
+        if unit.AI.GuardScanRadius == nil then 
 
-        -- any other unit should use primary weapon
-        else 
-            -- check if we have a primary weapon
-            local primaryWeapon = unit.Weapon[1]
-            if primaryWeapon then 
+            -- structures don't need this value set
+            if isStructure or isDummy then 
+                unit.AI.GuardScanRadius = 0
 
-                local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
-                local maxRadius = primaryWeapon.MaxRadius
-                
-                -- scouts should try and stay at the edge to prevent dying
-                if isScout then 
-                    unit.AI.GuardScanRadius = maxRadius
+            -- engineers need their factory reclaim bug
+            elseif isEngineer then 
+                unit.AI.GuardScanRadius = 26 -- allows for factory reclaim bug 
 
-                -- surface to air units should move in close
-                elseif isLand and isAntiAir then 
-                    unit.AI.GuardScanRadius = 0.65 * maxRadius
+            -- mobile units do need this value set
+            else 
+                -- check if we have a primary weapon that is actually a weapon
+                local primaryWeapon = unit.Weapon[1]
+                if primaryWeapon and not 
+                    (
+                        primaryWeapon.DummyWeapon or 
+                        primaryWeapon.WeaponCategory == 'Death' or
+                        primaryWeapon.Label == 'DeathImpact' or
+                        primaryWeapon.DisplayName == 'Air Crash'
+                    )
+                then 
 
-                -- this value doesn't make sense when doing an aggressive move for air to air, we give it some sane value for when they patrol
-                elseif isAir and isAntiAir then 
-                    unit.AI.GuardScanRadius = 0.60 * maxRadius                    
+                    local isAntiAir = primaryWeapon.RangeCategory == 'UWRC_AntiAir'
+                    local maxRadius = primaryWeapon.MaxRadius or 0
 
-                -- artillery should try and stay at the outer edge
-                elseif isArtillery then 
-                    unit.AI.GuardScanRadius = 1.05 * maxRadius
+                    -- land to air units shouldn't get triggered too fast
+                    if isLand and isAntiAir then 
+                        unit.AI.GuardScanRadius = 0.80 * maxRadius
 
-                -- shields should try to get near the front
-                elseif isShield then 
-                    unit.AI.GuardScanRadius = 0.85 * maxRadius
+                    -- all other units will have the default value of 10% on top of their maximum attack radius
+                    else
+                        unit.AI.GuardScanRadius = 1.10 * maxRadius
+                    end
 
-                -- any other unit should stay at roughly the other edge of their primary weapon
+                -- units with no weaponry don't need this value set
                 else 
-                    unit.AI.GuardScanRadius = 4 * maxRadius
+                    unit.AI.GuardScanRadius = 0
                 end
 
-            -- units with no weaponry, like some scouts or spy planes
-            else 
-                unit.AI.GuardScanRadius = 0
+
+                -- cap it, some units have extreme values based on their attack radius
+                if isTech1 and unit.AI.GuardScanRadius > 40 then 
+                    unit.AI.GuardScanRadius = 40 
+                elseif isTech2 and unit.AI.GuardScanRadius > 80 then 
+                    unit.AI.GuardScanRadius = 80
+                elseif isTech3 and unit.AI.GuardScanRadius > 120 then 
+                    unit.AI.GuardScanRadius = 120
+                elseif isExperimental and unit.AI.GuardScanRadius > 160 then 
+                    unit.AI.GuardScanRadius = 160
+                end
+
+                -- sanitize it
+                unit.AI.GuardScanRadius = math.floor(unit.AI.GuardScanRadius)
             end
         end
     end
 
-    -- sanitize air staging radius
+    -- # sanitize air unit footprints
 
-    local isAirStaging = unit.CategoriesHash['AIRSTAGINGPLATFORM']
+    -- value used by formations to determine the distance between other air units. Note
+    -- that the value must be of type unsigned integer!
 
-    if not isAirStaging then 
+    if  isAir and
+        not (
+            isExperimental or
+            isStructure or
+            (isTransport and not isGunship) -- uef tech 2 gunship is also a transport :)
+        ) 
+    then 
+        
+        unit.Footprint = unit.Footprint or { }
 
-        -- guarantee that the table exists
-        unit.AI = unit.AI or { }
+        -- determine footprint size based on type
+        if isBomber then 
+            unit.Footprint.SizeX = 4
+            unit.Footprint.SizeZ = 4
+        elseif isGunship then 
+            unit.Footprint.SizeX = 3
+            unit.Footprint.SizeZ = 3
+        else 
+            unit.Footprint.SizeX = 2
+            unit.Footprint.SizeZ = 2
+        end
 
-        -- set the scan radius to 0, as this value is only used by an air staging platform
-        unit.AI.StagingPlatformScanRadius = 0
+        -- limit their footprint size based on tech
+        if isTech1 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 2)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 2)
+        elseif isTech2 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 3)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 3)
+        elseif isTech3 then 
+            unit.Footprint.SizeX = math.min(unit.Footprint.SizeX, 4)
+            unit.Footprint.SizeZ = math.min(unit.Footprint.SizeZ, 4)
+        end
+    end
+
+    -- # Allow naval factories to correct their roll off points, as they are critical for ships not being stuck
+
+    if unit.CategoriesHash['FACTORY'] and unit.CategoriesHash['NAVAL'] then 
+        unit.Physics.CorrectNavalRollOffPoints = true
     end
 end
 

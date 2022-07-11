@@ -5,13 +5,13 @@
 -- Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 -----------------------------------------------------------------
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
-local CreateCybranBuildBeams = import('/lua/EffectUtilities.lua').CreateCybranBuildBeams
+local CreateCybranBuildBeamsOpti = import('/lua/EffectUtilities.lua').CreateCybranBuildBeamsOpti
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 local DeprecatedWarnings = { }
 
--- Kept after #3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
+-- Kept after --3335 for backwards compatibility. Use URA0001O, URA0002O or URA0003O instead.
 
 URA0001 = Class(CAirUnit) {
     spawnedBy = nil,
@@ -36,7 +36,7 @@ URA0001 = Class(CAirUnit) {
     CreateBuildEffects = function(self, unitBeingBuilt, order)
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_01', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
         self.BuildEffectsBag:Add(AttachBeamEntityToEntity(self, 'Muzzle_03', self, 'Muzzle_02', self.Army, '/effects/emitters/build_beam_02_emit.bp'))
-        CreateCybranBuildBeams(self, unitBeingBuilt, {'Muzzle_03',}, self.BuildEffectsBag)
+        CreateCybranBuildBeamsOpti(self, nil, unitBeingBuilt, self.BuildEffectsBag, false)
     end,
 
     OnStartCapture = function(self, target)

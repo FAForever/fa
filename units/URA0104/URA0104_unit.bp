@@ -85,15 +85,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -208,7 +199,7 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
+        SizeX = 2,
         SizeZ = 6,
     },
     General = {
@@ -343,12 +334,10 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Front_Down_Turret_Muzzle',
             TurretBonePitch = 'Front_Down_Turret',
             TurretBoneYaw = 'Front_Down_Turret',
@@ -409,15 +398,13 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 3,
-            TargetCheckInterval = 0.16,
             TargetPriorities = {
                 'AIR MOBILE',
                 'AIR MOBILE -INTELLIGENCE',
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Up_Turret_Muzzle',
             TurretBonePitch = 'Back_Up_Turret',
             TurretBoneYaw = 'Back_Up_Turret',

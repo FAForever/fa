@@ -1,0 +1,9 @@
+MeshBlueprint {
+    LODs = {
+        {
+            ShaderName = 'Seraphim',
+            LookupName = '/textures/environment/Falloff_seraphim_lookup.dds',    
+            LODCutoff = 300        
+        },
+    },
+}

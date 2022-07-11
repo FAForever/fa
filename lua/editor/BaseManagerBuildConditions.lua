@@ -338,17 +338,6 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
     -- Return out if the list is empty or all buildings are finished
     if table.empty(bManager.UnfinishedBuildings) then
         return false
-    else
-        local allFinished = true
-        for _, v in bManager.UnfinishedBuildings do
-            if v then
-               allFinished = false
-               break
-            end
-        end
-        if allFinished then
-            return false
-        end
     end
 
     -- Check list
@@ -362,9 +351,9 @@ function UnfinishedBuildingsCheck(aiBrain, baseName)
         end
     end
 
-    for k, v in bManager.UnfinishedBuildings do
-        if v and ScenarioInfo.UnitNames[armyIndex][k] and not ScenarioInfo.UnitNames[armyIndex][k].Dead then
-            if not beingBuiltList[k] then
+    for unitName, _ in bManager.UnfinishedBuildings do
+        if ScenarioInfo.UnitNames[armyIndex][unitName] and not ScenarioInfo.UnitNames[armyIndex][unitName].Dead then
+            if not beingBuiltList[unitName] then
                 return true
             end
         end

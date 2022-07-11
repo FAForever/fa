@@ -1,33 +1,37 @@
---#****************************************************************************
---#**
---#**  File     :  /lua/sim/buff.lua
---#**
---#**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
---#****************************************************************************
+---@declare-global
+----****************************************************************************
+----**
+----**  File     :  /lua/sim/buff.lua
+----**
+----**  Copyright © 2008 Gas Powered Games, Inc.  All rights reserved.
+----****************************************************************************
 
---# The Unit's BuffTable for applied buffs looks like this:
---#
---# Unit.Buffs = {
---#    Affects = {
---#        <AffectType (Regen/MaxHealth/etc)> = {
---#            BuffName = {
---#                Count = i,
---#                Add = X,
---#                Mult = X,
---#            }
---#        }
---#    }
---#    BuffTable = {
---#        <BuffType (LEVEL/CATEGORY)> = {
---#            BuffName = {
---#                Count = i,
---#                Trash = trashbag,
---#            }
---#        }
---#    }
+---- The Unit's BuffTable for applied buffs looks like this:
+----
+---- Unit.Buffs = {
+----    Affects = {
+----        <AffectType (Regen/MaxHealth/etc)> = {
+----            BuffName = {
+----                Count = i,
+----                Add = X,
+----                Mult = X,
+----            }
+----        }
+----    }
+----    BuffTable = {
+----        <BuffType (LEVEL/CATEGORY)> = {
+----            BuffName = {
+----                Count = i,
+----                Trash = trashbag,
+----            }
+----        }
+----    }
 
 --Function to apply a buff to a unit.
 --This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
+---@param unit Unit
+---@param buffName string
+---@param instigator Unit
 function ApplyBuff(unit, buffName, instigator)
 
     -- do not buff dead units
@@ -177,6 +181,10 @@ end
 --afterRemove is a bool that defines if this buff is affecting after the removal of a buff.
 --We reaffect the unit to make sure that buff type is recalculated accurately without the buff that was on the unit.
 --However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
+---@param unit Unit
+---@param buffName string
+---@param instigator Unit
+---@param afterRemove boolean
 function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     local buffDef = Buffs[buffName]
 
@@ -272,10 +280,12 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
             unit:SetAccMult(val)
             unit:SetTurnMult(val)
         elseif atype == 'Stun' and not afterRemove then
-            unit:SetStunned(buffDef.Duration or 1, instigator)
-            if unit.Anims then
-                for k, manip in unit.Anims do
-                    manip:SetRate(0)
+            if not unit.ImmuneToStun then 
+                unit:SetStunned(buffDef.Duration or 1, instigator)
+                if unit.Anims then
+                    for k, manip in unit.Anims do
+                        manip:SetRate(0)
+                    end
                 end
             end
         elseif atype == 'WeaponsEnable' then
@@ -461,7 +471,13 @@ local UniqueBuffs = { }
 UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
 UniqueBuffs['SeraphimAdvancedACURegenAura'] = BuffRegenFieldCalculate
 
--- Calculates the buff from all the buffs of the same time the unit has.
+--- Calculates the buff from all the buffs of the same time the unit has.
+---@param unit Unit
+---@param buffName string
+---@param affectType string
+---@param initialVal number
+---@param initialBool? boolean
+---@return number, boolean
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     -- Check if we have a separate buff calculation system

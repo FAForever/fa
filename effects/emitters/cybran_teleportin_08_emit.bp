@@ -23,8 +23,8 @@ EmitterBlueprint {
     LowFidelity = false,
     MedFidelity = true,
     HighFidelity = true,
-    Texture = [[/textures/particles/ring_distort_01.dds]],
-    RampTexture = [[/textures/particles/testramp.dds]],
+    Texture = '/textures/particles/ring_distort_01.dds',
+    RampTexture = '/textures/particles/testramp.dds',
     XDirectionCurve = {
         XRange = 7.00,
         Keys = {

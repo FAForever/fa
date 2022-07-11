@@ -9,7 +9,7 @@ TrailEmitterBlueprint {
     EmitIfVisible = true,
     TextureRepeatRate = 0.5,
     LODCutoff = 300.00,
-    RepeatTexture = [[/textures/particles/hrailgunsd_trail_01.dds]],
-    RampTexture = [[/textures/particles/ramp_railgun_01.dds]],
+    RepeatTexture = '/textures/particles/hrailgunsd_trail_01.dds',
+    RampTexture = '/textures/particles/ramp_railgun_01.dds',
 }
 

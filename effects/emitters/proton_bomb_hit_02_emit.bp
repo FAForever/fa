@@ -20,8 +20,8 @@ EmitterBlueprint {
 	InterpolateEmission = true,
 	TextureStripcount = 1.00,
 	SortOrder = 0.00,
-	Texture = [[/textures/particles/neutron_bomb_01.dds]],
-	RampTexture = [[/textures/particles/ramp_sonic_pulse_02.dds]],
+	Texture = '/textures/particles/neutron_bomb_01.dds',
+	RampTexture = '/textures/particles/ramp_sonic_pulse_02.dds',
 	XDirectionCurve = {
 		XRange = 17.00,
 		Keys = {

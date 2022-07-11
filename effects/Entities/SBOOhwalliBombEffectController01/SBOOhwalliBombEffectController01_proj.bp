@@ -1,0 +1,23 @@
+ProjectileBlueprint {
+    General = {
+        Category = 'Bomb',
+        Faction = 'Seraphim',
+        TechLevel = 1,
+        Weapon = 'Khamaseen Strategic Bomb 2',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        TrackTarget = false,
+        TurnRate = 360,
+        VelocityAlign = true,
+        StayUpright = false,
+        Lifetime = 5,
+        UseGravity = false,
+        RotationalVelocity= 0,
+        RotationalAcceleration = 0,
+        Acceleration = 0,
+    },
+}

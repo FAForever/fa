@@ -11,7 +11,7 @@ GameColors = {
 
     -- If you end up working with this file, suggestion to install the Color Highlight extension:
     -- - https://marketplace.visualstudio.com/items?itemName=naumovs.color-highlight
-    -- and temporarily pre-append a # to each color :)
+    -- and temporarily pre-append a -- to each color :)
 
     -- Faction colours
     ArmyColors = {

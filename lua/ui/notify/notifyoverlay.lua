@@ -127,6 +127,12 @@ function createEnhancementOverlay(args)
         local worldView = import('/lua/ui/game/worldview.lua').viewLeft
         local pos = worldView:Project(overlay.pos)
 
+        if pos.x < 0 or pos.y < 0 or pos.x > worldView.Width() or pos.y > worldView:Height() then
+            self:Hide()
+        else
+            self:Show()
+        end
+
         LayoutHelpers.AtLeftTopIn(overlay, worldView, (pos.x - overlay.Width() / 2) / LayoutHelpers.GetPixelScaleFactor(), (pos.y - overlay.Height() / 2 + 1) / LayoutHelpers.GetPixelScaleFactor())
 
         local timeRemaining = math.ceil(overlay.eta - seconds)

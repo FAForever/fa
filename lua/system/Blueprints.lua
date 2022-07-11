@@ -1,3 +1,4 @@
+---@declare-global
 --
 -- Blueprint loading
 --
@@ -65,6 +66,7 @@ doscript("/lua/system/blueprints-ai.lua")
 doscript("/lua/system/blueprints-lod.lua")
 doscript("/lua/system/blueprints-projectiles.lua")
 doscript("/lua/system/blueprints-units.lua")
+doscript("/lua/system/blueprints-weapons.lua")
 
 --- Load in the pre game data that is defined in the lobby through the preference file.
 local function LoadPreGameData()
@@ -271,6 +273,8 @@ local function GetSource()
     return DiskToLocal(there)
 end
 
+---@param group string
+---@param bp BlueprintBase
 local function StoreBlueprint(group, bp)
     local id = bp.BlueprintId
     local t = original_blueprints[group]
@@ -287,6 +291,7 @@ end
 -- Figure out what to name this blueprint based on the name of the file it came from.
 -- Returns the entire filename. Either this or SetLongId() should really be got rid of.
 --
+---@param bp BlueprintBase
 local function SetBackwardsCompatId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = lower(bp.Source)
@@ -295,6 +300,7 @@ end
 -- Figure out what to name this blueprint based on the name of the file it came from.
 -- Returns the full resource name except with ".bp" stripped off
 --
+---@param bp BlueprintBase
 local function SetLongId(bp)
     bp.Source = bp.Source or GetSource()
     if not bp.BlueprintId then
@@ -309,6 +315,7 @@ end
 -- Returns just the base filename, without any blueprint type info or extension. Used
 -- for units only.
 --
+---@param bp BlueprintBase
 local function SetShortId(bp)
     bp.Source = bp.Source or GetSource()
     bp.BlueprintId = bp.BlueprintId or
@@ -320,6 +327,7 @@ end
 --
 -- Also fill in a default value for bp.MeshBlueprint if one was not given at all.
 --
+---@param bp BlueprintBase
 function ExtractMeshBlueprint(bp)
     local disp = bp.Display or {}
     bp.Display = disp
@@ -394,10 +402,10 @@ uniqueBuildAnimations["ual0401"] = aeonBuildNoAnimation
 uniqueBuildAnimations["uas0401"] = aeonBuildNoAnimation
 
 --- Extracts the build mesh blueprint information. Adds the Display.BuildMeshBlueprint field to the blueprint and registers the build mesh.
--- @param bp The blueprint to generate the build mesh for.
+---@param bp UnitBlueprint The blueprint to generate the build mesh for.
 function ExtractBuildMeshBlueprint(bp)
 
-    -- # useful information to make distinctions
+    -- -- useful information to make distinctions
 
     local FactionName = bp.General.FactionName
     local isSubCommander = false 
@@ -411,7 +419,7 @@ function ExtractBuildMeshBlueprint(bp)
         end
     end
 
-    -- # determine build mesh blueprint and add it to the game
+    -- -- determine build mesh blueprint and add it to the game
 
     if FactionName == 'Aeon' or FactionName == 'UEF' or FactionName == 'Cybran' or FactionName == 'Seraphim' then
 
@@ -462,6 +470,7 @@ function MeshBlueprint(bp)
     StoreBlueprint('Mesh', bp)
 end
 
+---@param bp UnitBlueprint
 function UnitBlueprint(bp)
     -- save info about mods that changed this blueprint
     bp.Mod = current_mod
@@ -469,11 +478,13 @@ function UnitBlueprint(bp)
     StoreBlueprint('Unit', bp)
 end
 
+---@param bp PropBlueprint
 function PropBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Prop', bp)
 end
 
+---@param bp ProjectileBlueprint
 function ProjectileBlueprint(bp)
     -- save info about mods that changed this blueprint
     bp.Mod = current_mod
@@ -481,16 +492,19 @@ function ProjectileBlueprint(bp)
     StoreBlueprint('Projectile', bp)
 end
 
+---@param bp TrailEmitterBlueprint
 function TrailEmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('TrailEmitter', bp)
 end
 
+---@param bp EmitterBlueprint
 function EmitterBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Emitter', bp)
 end
 
+---@param bp BeamBlueprint
 function BeamBlueprint(bp)
     SetBackwardsCompatId(bp)
     StoreBlueprint('Beam', bp)
@@ -656,17 +670,17 @@ function PreModBlueprints(all_bps)
 
         ExtractCloakMeshBlueprint(bp)
 
-        -- # Units with no categories are skipped
+        -- -- Units with no categories are skipped
 
         if not bp.Categories then
             continue
         end
 
-        -- # Construct hash-based categories
+        -- -- Construct hash-based categories
 
         bp.CategoriesHash = table.hash(bp.Categories)
 
-        -- # Allow to add or delete categories for mods
+        -- -- Allow to add or delete categories for mods
 
         if bp.DelCategories then
             for k, v in bp.DelCategories do
@@ -682,7 +696,7 @@ function PreModBlueprints(all_bps)
             bp.AddCategories = nil
         end
 
-        -- # Build range overlay
+        -- -- Build range overlay
 
         if bp.CategoriesHash.ENGINEER then -- show build range overlay for engineers
             if not bp.AI then bp.AI = {} end
@@ -692,7 +706,7 @@ function PreModBlueprints(all_bps)
             end
         end
 
-        -- # Add common category values for easier lookup
+        -- -- Add common category values for easier lookup
 
         -- Add tech category
         for _, category in {'EXPERIMENTAL', 'SUBCOMMANDER', 'COMMAND', 'TECH1', 'TECH2', 'TECH3'} do
@@ -713,41 +727,15 @@ function PreModBlueprints(all_bps)
         -- Add faction category
         bp.FactionCategory = string.upper(bp.General.FactionName or 'Unknown')
 
-        -- # Adjust weapon blueprints
+        -- -- Adjust weapon blueprints
         
         for i, w in bp.Weapon or {} do
-
             -- add in weapon blueprint id
             local label = w.Label or "Unlabelled"
             w.BlueprintId = bp.BlueprintId .. "-" .. i .. "-" .. label
-
-            -- add in adjusted target priorities
-            if w.TargetPriorities then
-
-                local priorities = {}
-                local prioritiesHead = 1
-                
-                for g, transcendentPritority in w.TranscendentPriorities or {} do
-                    priorities[prioritiesHead] = transcendentPritority
-                    prioritiesHead = prioritiesHead + 1
-                end
-
-                priorities[prioritiesHead] = 'SPECIALHIGHPRI'
-                prioritiesHead = prioritiesHead + 1
-
-                for _, priority in w.TargetPriorities do
-                    priorities[prioritiesHead] = priority
-                    prioritiesHead = prioritiesHead + 1
-                end
-
-                priorities[prioritiesHead] = 'SPECIALLOWPRI'
-                prioritiesHead = prioritiesHead + 1
-
-                w.TargetPriorities = priorities
-            end
         end
 
-        -- # Hotfix for naval wrecks
+        -- -- Hotfix for naval wrecks
 
         if bp.CategoriesHash.NAVAL and not bp.Wreckage then
             bp.Wreckage = {
@@ -766,61 +754,7 @@ function PreModBlueprints(all_bps)
             }
         end
 
-        -- # Hotfix for Guard Scan Radius value
-
-        -- Mod in AI.GuardScanRadius = Longest weapon range * longest tracking radius
-        -- Takes ACU/SCU enhancements into account
-        -- fixes move-attack range issues
-        -- Most Air units have the GSR defined already, this is just making certain they don't get included
-        local modGSR = not (bp.AI and bp.AI.GuardScanRadius) and (
-                       (bp.CategoriesHash.MOBILE and (bp.CategoriesHash.LAND or bp.CategoriesHash.NAVAL) and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE or bp.CategoriesHash.ANTINAVY or bp.CategoriesHash.ENGINEER)) or
-                       (bp.CategoriesHash.STRUCTURE and (bp.CategoriesHash.DIRECTFIRE or bp.CategoriesHash.INDIRECTFIRE) and (bp.CategoriesHash.DEFENSE or bp.CategoriesHash.ARTILLERY)) or bp.CategoriesHash.DUMMYGSRWEAPON
-                       )
-
-        if modGSR then
-            local br = nil
-
-            if bp.CategoriesHash.ENGINEER and not bp.CategoriesHash.SUBCOMMANDER and not bp.CategoriesHash.COMMAND then
-                br = 26
-            elseif bp.CategoriesHash.SCOUT then
-                br = 10
-            elseif bp.Weapon then
-                local range = 0
-                local tracking = 1.05
-
-                for i, w in bp.Weapon do
-                    local ignore = w.CountedProjectile or w.RangeCategory == 'UWRC_AntiAir' or w.WeaponCategory == 'Defense'
-                    if not ignore then
-                        if w.MaxRadius then
-                            range = math.max(w.MaxRadius, range)
-                        end
-                        if w.TrackingRadius then
-                            tracking = math.max(w.TrackingRadius, tracking)
-                        end
-                    end
-                end
-
-                for name, array in bp.Enhancements or {} do
-                    for key, value in array do
-                        if key == 'NewMaxRadius' then
-                            range = math.max(value, range)
-                        end
-                    end
-                end
-
-                br = (range * tracking)
-            end
-
-            if br then
-                if not bp.AI then bp.AI = {} end
-                bp.AI.GuardScanRadius = br
-                if not bp.AI.GuardReturnRadius then
-                    bp.AI.GuardReturnRadius = 3
-                end
-            end
-        end
-
-        -- # Synchronize hashed categories with actual categories
+        -- -- Synchronize hashed categories with actual categories
 
         bp.Categories = table.unhash(bp.CategoriesHash)
 
@@ -879,6 +813,9 @@ function PostModBlueprints(all_bps)
     SetUnitThreatValues(all_bps.Unit)
     BlueprintLoaderUpdateProgress()
 
+    ProcessWeapons(all_bps.Unit)
+    BlueprintLoaderUpdateProgress()
+
     -- re-computes all the LODs of various entities to match the LOD with the size of the entity.
     CalculateLODs(all_bps)
     BlueprintLoaderUpdateProgress()
@@ -889,13 +826,13 @@ function PostModBlueprints(all_bps)
 end
 -----------------------------------------------------------------------------------------------
 --- Loads all blueprints with optional parameters
---- @param pattern           - specifies pattern of files to load, defaults to '*.bp'
---- @param directories       - specifies table of directory paths to load blueprints from, defaults to all directories
---- @param mods              - specifies table of mods to load blueprints from, defaults to active mods
---- @param skipGameFiles     - specifies whether skip loading original game files, defaults to false
---- @param skipExtraction    - specifies whether skip extraction of meshes, defaults to false
---- @param skipRegistration  - specifies whether skip registration of blueprints, defaults to false
---- @param taskNotifier      - specifies reference to a notifier that is updating UI when loading blueprints
+---@param pattern string            - specifies pattern of files to load, defaults to '*.bp'
+---@param directories string[]|nil  - specifies table of directory paths to load blueprints from, defaults to all directories
+---@param mods table                - specifies table of mods to load blueprints from, defaults to active mods
+---@param skipGameFiles boolean     - specifies whether skip loading original game files, defaults to false
+---@param skipExtraction boolean    - specifies whether skip extraction of meshes, defaults to false
+---@param skipRegistration boolean  - specifies whether skip registration of blueprints, defaults to false
+---@param taskNotifier unknown      - specifies reference to a notifier that is updating UI when loading blueprints
 --- NOTE now it supports loading blueprints on UI-side in addition to loading on Sim-side
 --- Sim -> LoadBlueprints() - no arguments, no changes!
 --- UI  -> LoadBlueprints('*_unit.bp', {'/units'}, mods, true, true, true, taskNotifier)  used in ModsManager.lua

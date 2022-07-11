@@ -1,3 +1,4 @@
+---@declare-global
 -- ==========================================================================================
 -- * File       : lua/system/utils.lua
 -- * Authors    : Gas Powered Games, FAF Community, HUSSAR
@@ -705,9 +706,9 @@ end
 --- timer:Start() -- then execute some LUA code
 --- timer:Stop()
 --- or
---- timer:Start('task1') -- then execute task #1
+--- timer:Start('task1') -- then execute task --1
 --- timer:Stop('task1')
---- timer:Start('task2') -- then execute task #2
+--- timer:Start('task2') -- then execute task --2
 --- timer:Stop('task2')
 function CreateTimer()
     return {
