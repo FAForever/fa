@@ -19,10 +19,10 @@ function CallEndGame()
 end
 
 --- Finds and collectors the brains that are defeated
----@param aliveBrains AIBrain[] # Table of brains that are relevant to check for defeat
----@param condition Categories  # Categories to check for units that are required to remain in the game
----@param delay number          # Delay between each brain to spread the load over various ticks
----@return AIBrain[]            # Table of brains that are considered defeated, can be empty
+---@param aliveBrains AIBrain[]         # Table of brains that are relevant to check for defeat
+---@param condition moho.EntityCategory # Categories to check for units that are required to remain in the game
+---@param delay number                  # Delay between each brain to spread the load over various ticks
+---@return AIBrain[]                    # Table of brains that are considered defeated, can be empty
 local function CollectDefeatedBrains(aliveBrains, condition, delay)
     local defeatedBrains = { }
     for k, brain in aliveBrains do

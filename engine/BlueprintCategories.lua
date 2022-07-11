@@ -1,12 +1,10 @@
 ---@meta
 ---@declare-global
 
---- dummy value just so we have something to assign the categories to
----@class CategorieType: userdata
----@type CategorieType
+---@type moho.EntityCategory
 local categoryValue
 
----@class Categories : table<string, CategorieType>
+---@class Categories : table<string, moho.EntityCategory>
 categories = {
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,
@@ -215,6 +213,32 @@ categories = {
     VISIBLETORECON = categoryValue,
     VOLATILE = categoryValue,
     WALL = categoryValue,
+
+    AdvancedCoolingUpgrade = categoryValue,
+    CloakingGenerator = categoryValue,
+    Cybran = categoryValue,
+    DamageStabilization = categoryValue,
+    EMPCharge = categoryValue,
+    EngineeringFocusingModule = categoryValue,
+    EngineeringThroughput = categoryValue,
+    EnhancedSensors = categoryValue,
+    FocusConvertor = categoryValue,
+    HighExplosiveOrdnance = categoryValue,
+    Missile = categoryValue,
+    NaniteMissileSystem = categoryValue,
+    Overcharge = categoryValue,
+    Pod = categoryValue,
+    RadarJammer = categoryValue,
+    ResourceAllocation = categoryValue,
+    SelfRepairSystem = categoryValue,
+    SensorRangeEnhancer = categoryValue,
+    Shield = categoryValue,
+    ShieldGeneratorField = categoryValue,
+    ShieldHeavy = categoryValue,
+    StabilitySuppressant = categoryValue,
+    StealthGenerator = categoryValue,
+    Switchback = categoryValue,
+    SystemIntegrityCompensator = categoryValue,
 }
 
 ---@alias CategoryName
@@ -425,3 +449,28 @@ categories = {
 ---|"VISIBLETORECON"
 ---|"VOLATILE"
 ---|"WALL"
+---
+---| "AdvancedCoolingUpgrade"
+---| "CloakingGenerator"
+---| "Cybran"
+---| "DamageStabilization"
+---| "EMPCharge"
+---| "EngineeringFocusingModule"
+---| "EngineeringThroughput"
+---| "EnhancedSensors"
+---| "FocusConvertor"
+---| "HighExplosiveOrdnance"
+---| "Missile"
+---| "NaniteMissileSystem"
+---| "Overcharge"
+---| "Pod"
+---| "RadarJammer"
+---| "ResourceAllocation"
+---| "SelfRepairSystem"
+---| "SensorRangeEnhancer"
+---| "Shield"
+---| "ShieldGeneratorField"
+---| "ShieldHeavy"
+---| "StabilitySuppressant"
+---| "StealthGenerator"
+---| "Switchback"
