@@ -48,6 +48,7 @@ ADFOverchargeWeapon = Class(WeaponFile.OverchargeWeapon) {
 
 ---@class ADFTractorClaw
 ---@field TractorTrash TrashBag
+---@field RunningTractorThread boolean
 ADFTractorClaw = Class(Weapon) {
 
     VacuumFx = EffectTemplate.ACollossusTractorBeamVacuum01,
@@ -62,18 +63,38 @@ ADFTractorClaw = Class(Weapon) {
         TECH1 = 18,
     },
 
-    ---comment
+    --- Adds logic to catch edge cases
     ---@param self ADFTractorClaw
-    ---@param spec any
+    ---@param spec table
     OnCreate = function(self, spec)
         Weapon.OnCreate(self, spec)
 
+        -- make us quite a bit slower
         self.AimControl:SetResetPoseTime(4.0)
-        self.TractorTrash = TrashBag()
-        self.Trash:Add(self.TractorTrash)
+
+        -- add a unit callback to fix edge cases
+        self.unit:AddUnitCallback(
+            function(colossus, instigator)
+                if self.RunningTractorThread then
+
+                    -- reset target state
+                    local target = self:GetCurrentTarget()
+                    local unit = self:GetUnitBehindTarget(target)
+                    if unit then
+                        unit.DisallowCollisions = false
+                        unit:SetDoNotTarget(false)
+                    end
+
+                    -- detach everything from this weapon
+                    self.unit:DetachAll(self.Blueprint.MuzzleSpecial)
+                    self:SetEnabled(false)
+                end
+            end,
+            'OnKilled'
+        )
     end,
 
-    ---comment
+    --- Attempts to perform the tracting
     ---@param self ADFTractorClaw
     OnFire = function(self)
         -- only tractor one target at a time
@@ -137,7 +158,7 @@ ADFTractorClaw = Class(Weapon) {
         end
     end,
 
-    ---comment
+    --- Performs the tractoring, starting from this point all is good
     ---@param self ADFTractorClaw
     ---@param target Unit
     ---@param muzzle string
@@ -236,6 +257,11 @@ ADFTractorClaw = Class(Weapon) {
         self.RunningTractorThread = false
     end,
 
+    --- Semi-realistic fall from the tractor claw to the ground
+    ---@param self ADFTractorClaw
+    ---@param target Unit
+    ---@param trash TrashBag
+    ---@param muzzle string
     TargetFallThread = function(self, target, trash, muzzle)
 
         -- let the unit fall down
@@ -264,6 +290,9 @@ ADFTractorClaw = Class(Weapon) {
         end
     end,
 
+    --- Delayed destruction of the trashbag, allows the wreck to copy over the rotators
+    ---@param self ADFTractorClaw
+    ---@param trash TrashBag
     TrashDelayedDestroyThread = function(self, trash)
         WaitTicks(1)
         trash:Destroy()
