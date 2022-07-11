@@ -42,6 +42,8 @@ local resModeSwitch = {}
 local DisplayResMode = 0
 local DisplayStorage = 0
 
+local created = false 
+
 function armyGroupHeight()
     local height = 0
     for _, line in controls.armyLines do
@@ -51,6 +53,7 @@ function armyGroupHeight()
 end
 
 function CreateScoreUI(parent)
+    created = true
     savedParent = GetFrame(0)
 
     controls.bg = Group(savedParent)
@@ -238,6 +241,8 @@ ShareDescriptionLookup["ShareUntilDeath"] = "lobui_0745"
 ShareDescriptionLookup["TransferToKiller"] = "lobui_0763"
 ShareDescriptionLookup["Defectors"] = "lobui_0767"
 ShareDescriptionLookup["CivilianDeserter"] = "lobui_0765"
+
+local mapSizeUI = false
 
 function SetupPlayerLines()
     local function CreateArmyLine(data, armyIndex)
@@ -448,8 +453,8 @@ function SetupPlayerLines()
         previous = group.ShareConditions
         previous = AddDash()
 
-        -- ui for map name
-        group.Size = UIUtil.CreateText(group, tostring(data.Size.Width) .. "x" .. tostring(data.Size.Height), 10, UIUtil.bodyFont)
+        -- ui for map size
+        group.Size = UIUtil.CreateText(group, data.SizeText, 10, UIUtil.bodyFont)
         LayoutHelpers.RightOf(group.Size, previous)
         LayoutHelpers.AtVerticalCenterIn(group.Size, group)
         group.Size:SetColor('ffffffff')
@@ -509,7 +514,17 @@ function SetupPlayerLines()
     mapData.ShareConditionsDescription = mapData.ShareConditionsDescription .. "\r\n\r\n" .. LOC("<LOC info_game_settings_dialog>Other game settings can be found in the map information dialog (F12).")
 
     -- add size to the score board
-    mapData.Size = { Width = math.floor(sessionInfo.size[1] / 51.2), Height = math.floor(sessionInfo.size[2] / 51.2) }
+    local mapWidth = sessionInfo.size[1]
+    local mapHeight = sessionInfo.size[2]
+    local areaData = Sync.NewPlayableArea
+    if areaData then
+        -- use the playable area if provided by the map
+        mapWidth = areaData[3] - areaData[1]
+        mapHeight = areaData[4] - areaData[2]
+    end
+    mapData.SizeText = MapSizeText(mapWidth, mapHeight)
+    sessionInfo.PlayableAreaWidth = mapWidth
+    sessionInfo.PlayableAreaHeight = mapHeight
 
     -- add map title / description to the scoreboard
     mapData.MapTitle = LOCF("<LOC gamesel_0002>%s", sessionInfo.name)
@@ -529,6 +544,7 @@ function SetupPlayerLines()
     -- construct UI elements
     local mapUI = CreateMapNameLine(mapData)
     controls.armyLines[index] = mapUI
+    mapSizeUI = mapUI.Size
 
     resModeSwitch.icon = UIUtil.CreateText(controls.armyGroup, '⃝', 13, 'Calibri')
     resModeSwitch.icon.Depth:Set(mapUI.Depth() + 1)
@@ -557,6 +573,13 @@ function SetupPlayerLines()
     local bodyText = 'I - '..LOC('<LOC tooltipui0714>Income')..'\n B - '..
         LOC('<LOC tooltipui0715>Balance')..'\n S - '..LOC('<LOC uvd_0006>Storage')
     Tooltip.AddControlTooltip(resModeSwitch.icon, {text = '', body = bodyText}, 1)
+end
+
+function MapSizeText(width, height)
+    -- round half down; this won't let fractional map sizes (e.g. from the map gen) make it needlessly long
+    local widthKm = math.ceil(width / 51.2 - 0.5)
+    local heightKm = math.ceil(height / 51.2 - 0.5)
+    return tostring(widthKm) .. "x" .. tostring(heightKm)
 end
 
 function DisplayResources(resources, line, mode)
@@ -709,6 +732,20 @@ function _OnBeat()
         end
         prevArmy = curFA
     end
+    
+    -- this will be needed only for very few maps that change the playable area after initialization
+    local areaData = Sync.NewPlayableArea
+    if areaData then
+        local width = areaData[3] - areaData[1]
+        local height = areaData[4] - areaData[2]
+        if width ~= sessionInfo.PlayableAreaWidth or height ~= sessionInfo.PlayableAreaHeight then
+            sessionInfo.PlayableAreaWidth = width
+            sessionInfo.PlayableAreaHeight = height
+            if mapSizeUI then
+                mapSizeUI:SetText(MapSizeText(width, height))
+            end
+        end
+    end
 end
 
 function SetUnitText(current, cap)
@@ -787,33 +824,37 @@ function ToggleScoreControl(state)
 end
 
 function Expand()
-    if needExpand then
-        controls.bg:Show()
-        controls.collapseArrow:Show()
-        local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
-        PlaySound(sound)
-        needExpand = false
-    else
-        controls.collapseArrow:Show()
+    if created then 
+        if needExpand then
+            controls.bg:Show()
+            controls.collapseArrow:Show()
+            local sound = Sound({Cue = "UI_Score_Window_Open", Bank = "Interface",})
+            PlaySound(sound)
+            needExpand = false
+        else
+            controls.collapseArrow:Show()
+        end
     end
 end
 
 function Contract()
-    if controls.bg then
-        if not controls.bg:IsHidden() then
-            local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
-            PlaySound(sound)
-            controls.bg:Hide()
-            controls.collapseArrow:Hide()
-            if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
-                needExpand = true
+    if created then 
+        if controls.bg then
+            if not controls.bg:IsHidden() then
+                local sound = Sound({Cue = "UI_Score_Window_Close", Bank = "Interface",})
+                PlaySound(sound)
+                controls.bg:Hide()
+                controls.collapseArrow:Hide()
+                if Prefs.GetFromCurrentProfile("scoreoverlay") ~= false then
+                    needExpand = true
+                end
+            else
+                needExpand = false
+                controls.collapseArrow:Hide()
             end
         else
-            needExpand = false
-            controls.collapseArrow:Hide()
+            contractOnCreate = true
         end
-    else
-        contractOnCreate = true
     end
 end
 

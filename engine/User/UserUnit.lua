@@ -1,4 +1,4 @@
---- Class UserUnit
+---@class UserUnit
 -- @classmod User.UserUnit
 
 ---

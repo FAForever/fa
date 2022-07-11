@@ -1,6 +1,6 @@
---- Class CMauiItemList
--- @classmod User.CMauiItemList
-
+---@declare-global
+---@class moho.item_list_methods
+local CMauiItemList = {}
 ---
 --  itemlist = ItemList:DeleteAllItems()
 function CMauiItemList:DeleteAllItems()
@@ -96,8 +96,4 @@ end
 function CMauiItemList:base()
 end
 
----
---
-function CMauiItemList:moho.item_list_methods()
-end
-
+return CMauiItemList

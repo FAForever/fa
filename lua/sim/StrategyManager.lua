@@ -16,6 +16,7 @@ local AIBuildUnits = import('/lua/ai/aibuildunits.lua')
 local AIAddBuilderTable = import('/lua/ai/AIAddBuilderTable.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
+---@class StrategyManager : BuilderManager
 StrategyManager = Class(BuilderManager) {
     Create = function(self, brain, lType, location, radius, useCenterPoint)
         BuilderManager.Create(self,brain)

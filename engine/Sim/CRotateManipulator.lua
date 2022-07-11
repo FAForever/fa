@@ -1,5 +1,6 @@
---- Class CRotateManipulator
--- @classmod Sim.CRotateManipulator
+---@declare-global
+---@class moho.RotateManipulator : moho.manipulator_methods
+local CRotateManipulator = {}
 
 ---
 --  RotateManipulator:ClearGoal()
@@ -46,13 +47,5 @@ end
 function CRotateManipulator:SetTargetSpeed(degrees_per_second)
 end
 
----
---  derived from IAniManipulator
-function CRotateManipulator:base()
-end
-
----
---
-function CRotateManipulator:moho.RotateManipulator()
-end
+return CRotateManipulator
 

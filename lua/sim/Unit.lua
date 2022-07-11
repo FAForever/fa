@@ -115,6 +115,12 @@ local function PopulateBlueprintCache(entity, blueprint)
 end
 
 local cUnit = moho.unit_methods
+---@class Unit : moho.unit_methods, moho.entity_methods
+---@field Brain AIBrain
+---@field Buffs {Affects: BlueprintBuff.Affects, buffTable: table<string, table>}
+---@field Army Army
+---@field UnitId UnitId
+---@field EntityId EntityId
 Unit = Class(moho.unit_methods) {
 
     Cache = false,
@@ -211,6 +217,7 @@ Unit = Class(moho.unit_methods) {
         }
     end,
 
+    ---@param self Unit
     OnCreate = function(self)
         local bp = self:GetBlueprint()
 
@@ -1163,6 +1170,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     -- On killed: this function plays when the unit takes a mortal hit. Plays death effects and spawns wreckage, dependant on overkill
+    ---@param self Unit
     OnKilled = function(self, instigator, type, overkillRatio)
         local layer = self.Layer
         self.Dead = true
@@ -1283,6 +1291,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
+    ---@param self Unit
     OnKilledUnit = function(self, unitKilled, massKilled)
         if not massKilled or massKilled == 0 then return end -- Make sure engine calls aren't passed with massKilled == 0
         if IsAlly(self.Army, unitKilled.Army) then return end -- No XP for friendly fire...
@@ -2114,6 +2123,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    ---@param self Unit
     OnStopBeingBuilt = function(self, builder, layer)
         if self.Dead or self:BeenDestroyed() then -- Sanity check, can prevent strange shield bugs and stuff
             self:Kill()
@@ -4270,6 +4280,15 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
+    --- Determines the upgrade animation to use. Allows you to manage units (by hooking) that can upgrade to
+    --- more than just one unit type, as an example tech 1 factories that can become HQs or
+    --- support factories.
+    ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
+    ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
+    GetUpgradeAnimation = function(self, unitBeingBuilt) 
+        return self.Blueprint.Display.AnimationUpgrade
+    end,
+
     --- Various callback-like functions
 
     -- Called when the C function unit.SetConsumptionActive is called
@@ -4545,6 +4564,7 @@ local UnitGetUnitId = _G.moho.unit_methods.GetUnitId
 -- upvalued categories for performance
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
+---@class DummyUnit : moho.unit_methods
 DummyUnit = Class(moho.unit_methods) {
 
     Cache = false,

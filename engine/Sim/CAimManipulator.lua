@@ -1,5 +1,6 @@
---- Class CAimManipulator
--- @classmod Sim.CAimManipulator
+---@declare-global
+---@class moho.AimManipulator : moho.manipulator_methods
+local CAimManipulator = {}
 
 ---
 --  AimManipulator:OnTarget()
@@ -36,8 +37,5 @@ end
 function CAimManipulator:base()
 end
 
----
---
-function CAimManipulator:moho.AimManipulator()
-end
+return CAimManipulator
 

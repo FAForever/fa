@@ -44,8 +44,10 @@ local StringGsub = string.gsub
 -- upvalue table functions for performance
 local TableInsert = table.insert
 
+---@class Prop : moho.prop_methods
 Prop = Class(moho.prop_methods) {
 
+    ---@param self Prop
     OnCreate = function(self)
 
         -- -- Caching

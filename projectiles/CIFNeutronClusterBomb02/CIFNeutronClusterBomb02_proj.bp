@@ -1,0 +1,43 @@
+ProjectileBlueprint {
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'INDIRECTFIRE',
+    },
+    Display = {
+        CameraFollowsProjectile = true,
+        Mesh = {
+            LODs = {
+                {
+                    AlbedoName = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_albedo.dds',
+                    LODCutoff = 150,
+                    MeshName = '/projectiles/CIFNeutronClusterBomb02/CIFNeutronClusterBomb02_lod0.scm',
+                    ShaderName = 'TMeshGlow',
+                },
+            },
+        },
+        StrategicIconSize = 1,
+        UniformScale = 0.8,
+    },
+    General = {
+        Category = 'Bomb',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'INDIRECTFIRE',
+        },
+        Faction = 'Cybran',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 2,
+        InitialSpeed = 1,
+        InitialSpeedRange = 0,
+        MaxSpeed = 105,
+        RotationalVelocity = 200,
+        RotationalVelocityRange = 100,
+        VelocityAlign = false,
+    },
+}

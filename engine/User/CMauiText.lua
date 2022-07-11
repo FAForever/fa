@@ -1,5 +1,6 @@
---- Class CMauiText
--- @classmod User.CMauiText
+---@declare-global
+---@class moho.text_methods
+local CMauiText = {}
 
 ---
 --  string Text:GetText()
@@ -33,7 +34,7 @@ end
 
 ---
 --  Text:SetNewFont(family, pointsize)
-function CMauiText:SetNewFont(family,  pointsize)
+function CMauiText:SetNewFont(family, pointsize)
 end
 
 ---
@@ -46,8 +47,4 @@ end
 function CMauiText:base()
 end
 
----
---
-function CMauiText:moho.text_methods()
-end
-
+return CMauiText

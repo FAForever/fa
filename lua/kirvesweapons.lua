@@ -10,17 +10,20 @@ local CollisionBeamFile = import('/lua/kirvesbeams.lua')
 
 
 
+---@class TargetingLaser : DefaultBeamWeapon
 TargetingLaser = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.TargetingCollisionBeam,
     FxMuzzleFlash = {'/effects/emitters/particle_cannon_muzzle_01_emit.bp'},
     FxBeamEndPointScale = 0.01,
 }
 
+---@class TargetingLaserInvisible : TargetingLaser
 TargetingLaserInvisible = Class(TargetingLaser) {
     BeamType = CollisionBeamFile.TargetingCollisionBeamInvisible,
     FxMuzzleFlash = {},
 }
 
+---@class TAAPhalanxWeapon : DefaultProjectileWeapon
 TAAPhalanxWeapon = Class(DefaultProjectileWeapon) {
     FxMuzzleFlash = EffectTemplate.TPhalanxGunMuzzleFlash,
     FxShellEject  = EffectTemplate.TPhalanxGunShells,
@@ -34,6 +37,7 @@ TAAPhalanxWeapon = Class(DefaultProjectileWeapon) {
     end,
 }
 
+---@class SDFUnstablePhasonBeam : DefaultBeamWeapon
 SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam,
     FxMuzzleFlash = {},
@@ -43,6 +47,7 @@ SDFUnstablePhasonBeam = Class(DefaultBeamWeapon) {
 }
 
 
+---@class SDFUnstablePhasonBeam2 : DefaultBeamWeapon
 SDFUnstablePhasonBeam2 = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.UnstablePhasonLaserCollisionBeam2,
     FxMuzzleFlash = {},
@@ -52,6 +57,7 @@ SDFUnstablePhasonBeam2 = Class(DefaultBeamWeapon) {
     FxBeamEndPointScale = 0.01,
 }
 
+---@class Dummy : DefaultBeamWeapon
 Dummy = Class(DefaultBeamWeapon) {
     BeamType = CollisionBeamFile.TargetingCollisionBeam,
 

@@ -10,6 +10,8 @@
 --
 -- Basic create formation scripts
 
+---@alias UnitFormations 'AttackFormation' | 'GrowthFormation'
+
 
 SurfaceFormations = {
     'AttackFormation',

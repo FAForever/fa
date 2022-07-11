@@ -1,8 +1,6 @@
---- Class CFootPlantManipulator
--- @classmod Sim.CFootPlantManipulator
+---@declare-global
+---@class moho.EconomyEvent : moho.manipulator_methods
+local CFootPlantManipulator = {}
 
----
---
-function CFootPlantManipulator:moho.FootPlantManipulator()
-end
+return CFootPlantManipulator
 

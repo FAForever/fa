@@ -72,6 +72,7 @@ local ForkThread = ForkThread
 local CategoriesDoNotCollide = categories.TORPEDO + categories.MISSILE + categories.DIRECTFIRE
 local OnImpactDestroyCategories = categories.ANTIMISSILE * categories.ALLPROJECTILES
 
+---@class Projectile : moho.projectile_methods
 Projectile = Class(moho.projectile_methods) {
 
     DestroyOnImpact = true,
@@ -771,6 +772,7 @@ Projectile = Class(moho.projectile_methods) {
 
 --- A dummy projectile that solely inherits what it needs. Useful for 
 -- effects that require projectiles without additional overhead.
+---@class DummyProjectile : moho.projectile_methods
 DummyProjectile = Class(moho.projectile_methods) {
 
     OnCreate = function(self, inWater)

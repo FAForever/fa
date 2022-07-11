@@ -71,12 +71,15 @@ optionsOrder = {
     "sound",
 }
 
+local Prefs = import('/lua/user/prefs.lua')
 local SetMusicVolume = import('/lua/UserMusic.lua').SetMusicVolume
 local savedMasterVol = false
 local savedFXVol = false
 local savedMusicVol = false
 local savedVOVol = false
 local nomusicSwitchSet = HasCommandLineArg("/nomusic")
+local savedBgMovie = false
+local noMovieSwitchSet = HasCommandLineArg("/nomovie")
 
 function PlayTestSound()
     local sound = Sound{ Bank = 'Interface', Cue = 'UI_Action_MouseDown' }
@@ -511,11 +514,22 @@ options = {
                 default = true,
                 set = function(key,value,startup)
                 end,
+                init = function ()
+                    savedBgMovie = Prefs.GetOption("mainmenu_bgmovie")
+                end,
                 custom = {
-                    states = {
-                        {text = "<LOC _Off>", key = false },
-                        {text = "<LOC _On>", key = true },
-                    },
+                    states = (function()
+                        if noMovieSwitchSet then
+                            return {
+                                { text = "<LOC _Command_Line_Override>", key = savedBgMovie },
+                            }
+                        else
+                            return {
+                                { text = "<LOC _Off>", key = false },
+                                { text = "<LOC _On>", key = true },
+                            }
+                        end
+                    end)(),
                 },
             },
             {

@@ -1,0 +1,10 @@
+ProjectileBlueprint {
+    Display = {
+        StrategicIconSize = 1,
+    },
+    Physics = {
+        DestroyOnWater = true,
+        InitialSpeed = 28,
+        VelocityAlign = true,
+    },
+}

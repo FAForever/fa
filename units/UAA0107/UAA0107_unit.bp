@@ -126,7 +126,6 @@ UnitBlueprint {
         Abilities = {
             '<LOC ability_transport>Transport',
         },
-        AnimationOpen = '/units/UAA0104/UAA0104_aopen01.sca',
         LayerChangeEffects = {
             AirLand = {
                 Effects = {
@@ -222,7 +221,7 @@ UnitBlueprint {
             LAYER_Sub = false,
             LAYER_Water = false,
         },
-        Elevation = 8,
+        Elevation = 15,
         FuelRechargeRate = 70,
         FuelUseTime = 800,
         MaxSpeed = 0.5,

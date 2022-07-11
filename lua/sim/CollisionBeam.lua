@@ -14,6 +14,7 @@
 local DefaultDamage = import('/lua/sim/defaultdamage.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 
+---@class CollisionBeam : moho.CollisionBeamEntity
 CollisionBeam = Class(moho.CollisionBeamEntity) {
 
     FxBeam = {},

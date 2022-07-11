@@ -1,0 +1,33 @@
+ProjectileBlueprint {
+    Categories = {
+        'CYBRAN',
+        'PROJECTILE',
+        'ANTIMISSILE',
+    },
+    Display = {
+        MeshBlueprint = '/meshes/projectiles/missile_default_mesh.bp',
+        StrategicIconSize = 1,
+        UniformScale = 0.5,
+    },
+    General = {
+        Category = 'Defense',
+        EntityCategory = {
+            'CYBRAN',
+            'PROJECTILE',
+            'ANTIMISSILE',
+        },
+        Faction = 'Cybran',
+    },
+    Interface = {
+        HelpText = 0,
+    },
+    Physics = {
+        Acceleration = 50,
+        DestroyOnWater = true,
+        MaxSpeed = 30,
+        TrackTarget = true,
+        TurnRate = 360,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

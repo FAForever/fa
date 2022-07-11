@@ -624,7 +624,8 @@ function ReallyCreateLobby(protocol, localPort, desiredPlayerName, localPlayerUI
                 GUI.chatEdit:AcquireFocus()
             end,
             nil, nil,
-            true
+            true,
+            {escapeButton = 2, enterButton = 1, worldCover = true}
         )
     end
     EscapeHandler.PushEscapeHandler(GUI.exitLobbyEscapeHandler)
@@ -2737,7 +2738,7 @@ function CreateSlotsUI(makeLabel)
         newSlot:AddChild(numGamesText)
 
         -- Name
-        local nameLabel = Combo(newSlot, 14, 12, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
+        local nameLabel = Combo(newSlot, 14, 16, true, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         newSlot.name = nameLabel
         nameLabel._text:SetFont('Arial Gras', 15)
         newSlot:AddChild(nameLabel)
@@ -3068,15 +3069,16 @@ function CreateUI(maxPlayers)
         LayoutHelpers.SetWidth(GUI.AIFillPanel, 278)
         UIUtil.SurroundWithBorder(GUI.AIFillPanel, '/scx_menu/lan-game-lobby/frame/')
         GUI.AIFillCombo = Combo.Combo(GUI.AIFillPanel, 14, 12, false, nil)
-        LayoutHelpers.AtLeftTopIn(GUI.AIFillCombo, GUI.AIFillPanel)
-        GUI.AIFillCombo.Width:Set(GUI.AIFillPanel.Width)
+        LayoutHelpers.AtHorizontalCenterIn(GUI.AIFillCombo, GUI.AIFillPanel)
+        LayoutHelpers.AtTopIn(GUI.AIFillCombo, GUI.AIFillPanel, 5)
+        GUI.AIFillCombo.Width:Set(function() return GUI.AIFillPanel.Width() - LayoutHelpers.ScaleNumber(15) end)
         GUI.AIFillCombo:AddItems(AIStrings)
         GUI.AIFillCombo:SetTitleText(LOC('<LOC lobui_0461>Choose AI for autofilling'))
         Tooltip.AddComboTooltip(GUI.AIFillCombo, AITooltips)
         GUI.AIFillButton = UIUtil.CreateButtonStd(GUI.AIFillCombo, '/BUTTON/medium/', LOC('<LOC lobui_0462>Fill Slots'), 12)
         LayoutHelpers.SetWidth(GUI.AIFillButton, 129)
         LayoutHelpers.SetHeight(GUI.AIFillButton, 30)
-        LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillCombo, -10, 25)
+        LayoutHelpers.AtLeftTopIn(GUI.AIFillButton, GUI.AIFillCombo, -10, 20)
         GUI.AIClearButton = UIUtil.CreateButtonStd(GUI.AIFillButton, '/BUTTON/medium/', LOC('<LOC lobui_0463>Clear Slots'), 12)
         GUI.AIClearButton.Width:Set(GUI.AIFillButton.Width)
         GUI.AIClearButton.Height:Set(GUI.AIFillButton.Height)
@@ -3084,7 +3086,7 @@ function CreateUI(maxPlayers)
         GUI.TeamCountSelector = Combo.BitmapCombo(GUI.AIClearButton, teamIcons, 1, false, nil, "UI_Tab_Rollover_01", "UI_Tab_Click_01")
         LayoutHelpers.SetWidth(GUI.TeamCountSelector, 44)
         LayoutHelpers.AtTopIn(GUI.TeamCountSelector, GUI.AIClearButton, 5)
-        GUI.TeamCountSelector.Right:Set(GUI.AIFillPanel.Right)
+        LayoutHelpers.AtRightIn(GUI.TeamCountSelector, GUI.AIFillPanel, 8)
         local tooltipText = {}
         tooltipText['text'] = '<LOC tooltipui0710>Teams Count'
         tooltipText['body'] = '<LOC tooltipui0711>On how many teams share players?'
@@ -3386,9 +3388,9 @@ function CreateUI(maxPlayers)
     local chatBG = Bitmap(GUI.chatPanel)
     GUI.chatBG = chatBG
     chatBG:SetSolidColor('FF212123')
-    LayoutHelpers.Below(chatBG, GUI.chatDisplay, 1)
-    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -5)
-    chatBG.Width:Set(GUI.chatPanel.Width() - LayoutHelpers.ScaleNumber(16))
+    LayoutHelpers.Below(chatBG, GUI.chatDisplay, 0)
+    LayoutHelpers.AtLeftIn(chatBG, GUI.chatDisplay, -2)
+    chatBG.Width:Set(GUI.chatPanel.Width)
     LayoutHelpers.SetHeight(chatBG, 24)
     
     -- Set up the chat edit buttons and functions
@@ -3742,12 +3744,12 @@ function CreateUI(maxPlayers)
 
     -- CLOSE/OPEN EMPTY SLOTS BUTTON --
     GUI.closeEmptySlots = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/closeslots/')
-    LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -39, 47)
     Tooltip.AddButtonTooltip(GUI.closeEmptySlots, 'lob_close_empty_slots')
     if not isHost then
         GUI.closeEmptySlots:Hide()
-        LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -40, 47)
+        LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -40, 43)
     else
+        LayoutHelpers.AtLeftTopIn(GUI.closeEmptySlots, GUI.defaultOptions, -31, 43)
         GUI.closeEmptySlots.OnClick = function(self, modifiers)
             if lobbyComm:IsHost() then
                 if modifiers.Ctrl then
@@ -3786,7 +3788,7 @@ function CreateUI(maxPlayers)
 
     -- GO OBSERVER BUTTON --
     GUI.becomeObserver = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/observer/')
-    LayoutHelpers.RightOf(GUI.becomeObserver, GUI.closeEmptySlots, -19)
+    LayoutHelpers.RightOf(GUI.becomeObserver, GUI.closeEmptySlots, -25)
     Tooltip.AddButtonTooltip(GUI.becomeObserver, 'lob_become_observer')
     GUI.becomeObserver.OnClick = function()
         if IsPlayer(localPlayerID) then
@@ -3806,7 +3808,7 @@ function CreateUI(maxPlayers)
 
     -- CPU BENCH BUTTON --
     GUI.rerunBenchmark = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/cputest/', '', 11)
-    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -19)
+    LayoutHelpers.RightOf(GUI.rerunBenchmark, GUI.becomeObserver, -25)
     Tooltip.AddButtonTooltip(GUI.rerunBenchmark,{text=LOC("<LOC lobui_0425>Run CPU Benchmark Test"), body=LOC("<LOC lobui_0426>Recalculates your CPU rating.")})
     GUI.rerunBenchmark.OnClick = function(self, modifiers)
         ForkThread(function() UpdateBenchmark(true) end)
@@ -3814,7 +3816,7 @@ function CreateUI(maxPlayers)
 
     -- Autobalance Button --
     GUI.PenguinAutoBalance = UIUtil.CreateButtonStd(GUI.observerPanel, '/BUTTON/autobalance/')
-    LayoutHelpers.RightOf(GUI.PenguinAutoBalance, GUI.becomeObserver, 59)
+    LayoutHelpers.RightOf(GUI.PenguinAutoBalance, GUI.rerunBenchmark, -25)
     Tooltip.AddButtonTooltip(GUI.PenguinAutoBalance, {text=LOC("<LOC lobui_0444>Autobalance"), body=LOC("<LOC lobui_0445>Automatically balance players into 2 equally sized teams")})
     if not isHost then
         GUI.PenguinAutoBalance:Hide()
@@ -4279,7 +4281,7 @@ end
 function setupChatEdit(chatPanel)
     GUI.chatEdit = Edit(chatPanel)
     LayoutHelpers.AtLeftTopIn(GUI.chatEdit, GUI.chatBG, 4, 3)
-    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - LayoutHelpers.ScaleNumber(9))
+    GUI.chatEdit.Width:Set(GUI.chatBG.Width() - LayoutHelpers.ScaleNumber(4))
     LayoutHelpers.SetHeight(GUI.chatEdit, 22)
     GUI.chatEdit:SetFont(UIUtil.bodyFont, 16)
     GUI.chatEdit:SetForegroundColor(UIUtil.fontColor)
@@ -4287,7 +4289,7 @@ function setupChatEdit(chatPanel)
     GUI.chatEdit:SetDropShadow(true)
     GUI.chatEdit:AcquireFocus()
 
-    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(chatPanel, -15, -2, 0)
+    GUI.chatDisplayScroll = UIUtil.CreateLobbyVertScrollbar(chatPanel, -15, 25, 0)
 
     GUI.chatEdit:SetMaxChars(200)
     GUI.chatEdit.OnCharPressed = function(self, charcode)

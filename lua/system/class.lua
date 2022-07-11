@@ -1,4 +1,4 @@
-
+---@declare-global
 --- Class structure
 
 -- Simple class
@@ -121,8 +121,15 @@ local function IsSimpleClass(arg)
     return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
 end
 
+---@class fa-class: table
+---@field __init? fun(self, ...)
+---@field __post_init? fun(self, ...)
+
 --- Prepares the construction of a state, , referring to the paragraphs of text at the top of this file.
 local StateIdentifier = 0
+---@generic T: fa-class
+---@param ... T
+---@return T
 function State(...)
 
     -- arg = { 
@@ -157,6 +164,10 @@ function State(...)
 end
 
 --- Prepares the construction of a class, referring to the paragraphs of text at the top of this file.
+---construct a class
+---@generic T: fa-class, Base: table
+---@param ... Base
+---@return fun(specs: T): T|Base
 function Class(...)
 
     -- arg = { 
@@ -188,6 +199,14 @@ function Class(...)
             return class
         end
     end
+end
+
+---create a simple class which does not inherit from anything
+---@generic T
+---@param specs T
+---@return T
+function ClassSimple(specs)
+    return Class(specs)
 end
 
 --- Computes the hierarchy chain of a function: determine the path from the current function back to 
@@ -258,6 +277,11 @@ end
 
 --- Constructs a class or state, referring to the paragraphs of text at the top of this file.
 local Seen = { }
+---create a class
+---@generic Base: table, T:table
+---@param bases Base
+---@param specs T
+---@return T
 function ConstructClass(bases, specs)
 
     -- cache as locals for performance
@@ -394,22 +418,22 @@ function ConstructClass(bases, specs)
                 end
             end
         end
+    end
 
-        -- post-process the states to make sure that they're unique and have the correct meta table set
-        for k, v in class do 
-            -- any member that has a meta table set is by definition a state
-            if type(v) == "table" and v.__State then 
+    -- post-process the states to make sure that they're unique and have the correct meta table set
+    for k, v in class do 
+        -- any member that has a meta table set is by definition a state
+        if type(v) == "table" and v.__State then 
 
-                -- copy the content into a new table
-                local d = Deepcopy(v) 
+            -- copy the content into a new table
+            local d = Deepcopy(v) 
 
-                -- set meta table information
-                d.__index = d 
-                setmetatable(d, class)
+            -- set meta table information
+            d.__index = d 
+            setmetatable(d, class)
 
-                -- override previous entry
-                class[k] = d
-            end
+            -- override previous entry
+            class[k] = d
         end
     end
 
