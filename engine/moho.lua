@@ -23,6 +23,12 @@ moho = {
     CollisionManipulator = require('/engine/sim/ccollisionmanipulator.lua'),
     RotateManipulator = require('/engine/sim/crotatemanipulator.lua'),
 
+    -- core (both sim and user)
+
+    sound_methods = require('/engine/core/csound.lua'),
+    EntityCategory = require('/engine/core/entitycategory.lua'),
+    CPrefetchSet = require('/engine/core/cprefetchset.lua'),
+
     -- user
 
     control_methods = require('/engine/user/cmauicontrol.lua'),
