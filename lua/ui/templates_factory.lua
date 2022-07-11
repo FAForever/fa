@@ -16,7 +16,7 @@
 
 
 local Prefs = import('/lua/user/prefs.lua')
----@type table<BuildTemplate>
+---@type BuildTemplate[]
 local templates = Prefs.GetFromCurrentProfile('build_templates_factory') or {}
 local UIUtil = import('/lua/ui/uiutil.lua')
 

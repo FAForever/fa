@@ -1,3 +1,86 @@
+doscript '/lua/system/repr.lua'
+
+-- local blacklist = {
+--     -- these will really eat up the log
+--     categories = true,
+--     __blueprints = true,
+
+--     __factory_objects = true,
+--     __active_mods = true,
+
+--     math = true,
+--     moho = true,
+--     debug = true,
+--     coroutine = true,
+--     serialize = true,
+--     string = true,
+--     table = true,
+--     _G = true,
+--     _VERSION = true,
+--     _LOADED = true,
+--     __pow = true,
+--     assert = true,
+--     collectgarbage = true,
+--     dofile = true,
+--     error = true,
+--     gcinfo = true,
+--     getfenv = true,
+--     getmetatable = true,
+--     import = true,
+--     ipairs = true,
+--     loadfile = true,
+--     loadstring = true,
+--     newproxy = true,
+--     next = true,
+--     pairs = true,
+--     pcall = true,
+--     print = true,
+--     rawequal = true,
+--     rawget = true,
+--     rawset = true,
+--     require = true,
+--     setfenv = true,
+--     setmetatable = true,
+--     tonumber = true,
+--     tostring = true,
+--     type = true,
+--     unpack = true,
+--     -- loaded repr.lua; ignore those functions
+--     repr = true,
+--     reprs = true,
+--     reprsl = true,
+--     repru = true,
+-- }
+-- LOG("INITIALIZING SIM")
+-- local functions = {}
+-- local i = 1
+-- for name, value in _G do
+--     if not blacklist[name] then
+--         -- LOG(string.format("%-50s%s", name, reprs(value, true)))
+--         if type(value) == "cfunction" then
+--             functions[i] = name
+--             i = i + 1
+--         else
+--             LOG(" ! Flag " .. name .. " for review !")
+--         end
+--     end
+-- end
+-- local function lexicographic(name1, name2)
+--     name1 = string.lower(name1)
+--     name2 = string.lower(name2)
+--     for i = 1, math.min(string.len(name1), string.len(name1)) do
+--         local cmp = string.byte(name1, i) - string.byte(name2, i)
+--         if cmp != 0 then
+--             return cmp > 0
+--         end
+--     end
+--     return string.len(name1) > string.len(name1)
+-- end
+-- table.sort(functions)
+-- LOG(table.concat(functions, ', '))
+
+
+
 ---@declare-global
 -- ==========================================================================================
 -- * File       : lua/simInit.lua

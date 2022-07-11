@@ -37,12 +37,12 @@ local glowIntelOver = '10'
 ---@class RangeOverlay
 ---@field key string
 ---@field Label string
----@field Categories EntityCategory
+---@field Categories CategorieType
 ---@field NormalColor string
 ---@field SelectColor string
 ---@field RolloverColor string
----@field Inner table<number>
----@field Outer table<number>
+---@field Inner number[]
+---@field Outer number[]
 ---@field Type number
 ---@field Combo boolean
 ---@field Tooltip string

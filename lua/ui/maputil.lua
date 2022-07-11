@@ -7,7 +7,7 @@
 --*****************************************************************************
 
 ---@class UIScenarioConfiguration
----@field teams {name: string, armies: table<string>}
+---@field teams {name: string, armies: string[]}
 ---@field customprops table<string, string>
 
 ---@class UIScenarioInfo
@@ -61,7 +61,7 @@
 --- Additional map options supplied by the map `options.lua` file, if it exists.
 --- These are the lobby option-factory type of options, not the actual `<key, value>` pairs
 --- that the lobby ends up defining.
----@field options? table<ScenarioOption>
+---@field options? ScenarioOption[]
 --- These are the actual `<key, value>` pairs that the lobby defines, not the option-factory type
 --- objects the lobby uses
 ---@field Options? ScenarioOptions

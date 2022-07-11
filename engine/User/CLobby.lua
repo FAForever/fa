@@ -3,7 +3,7 @@
 local CLobby = {}
 
 ---@class Peer
----@field establishedPeers table<string>
+---@field establishedPeers string[]
 ---@field id string
 ---@field ping number
 ---@field name string
@@ -63,7 +63,7 @@ function CLobby:GetPeer(uid)
 end
 
 ---
----@return table<Peer>
+---@return Peer[]
 function CLobby:GetPeers()
 end
 

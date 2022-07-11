@@ -40,7 +40,7 @@ function UserUnit:GetBuildRate()
 end
 
 --- Return table of commands
----@return table<OrderInfo>
+---@return OrderInfo[]
 function UserUnit:GetCommandQueue()
 end
 
@@ -105,7 +105,7 @@ function UserUnit:GetPosition()
 end
 
 --- Get table of all selection sets unit belongs to
----@return table<string>
+---@return string[]
 function UserUnit:GetSelectionSets()
 end
 
@@ -163,7 +163,7 @@ function UserUnit:IsIdle()
 end
 
 ---
----@param category moho.EntityCategory
+---@param category CategorieType
 ---@return boolean
 function UserUnit:IsInCategory(category)
 end

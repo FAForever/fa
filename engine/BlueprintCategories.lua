@@ -1,10 +1,12 @@
 ---@meta
 ---@declare-global
 
----@type moho.EntityCategory
+--- dummy value just so we have something to assign the categories to
+---@class CategorieType: userdata
+---@type CategorieType
 local categoryValue
 
----@class Categories : table<string, moho.EntityCategory>
+---@class Categories : table<string, CategorieType>
 categories = {
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,

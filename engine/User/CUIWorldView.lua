@@ -27,7 +27,7 @@ end
 
 ---
 ---@param unit Unit
----@return Vector2D | nil
+---@return Vector2 | nil
 function CUIWorldView:GetScreenPos(unit)
 end
 
@@ -63,7 +63,7 @@ end
 
 --- Given a point in world space, project the point to control space
 ---@param position Vector
----@return Vector2D
+---@return Vector2
 function CUIWorldView:Project(position)
 end
 

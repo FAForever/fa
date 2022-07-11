@@ -1,3 +1,6 @@
+---@meta
+
+
 --- No clue what this does
 ---@param entityId number
 ---@param onTime number
@@ -23,7 +26,7 @@ function AddInputCapture(control)
 end
 
 ---
----@param selection table<Unit>
+---@param selection Unit[]
 function AddSelectUnits(selection)
 end
 
@@ -134,22 +137,22 @@ function EngineStartSplashScreens()
 end
 
 --- Return true if a unit category contains this unit
----@param category moho.EntityCategory
+---@param category CategorieType
 ---@param unit Unit
 function EntityCategoryContains(category, unit)
 end
 
 --- Filter a list of units to only those found in the category
----@param category moho.EntityCategory
----@param units table<Unit>
----@return table<Unit>
+---@param category CategorieType
+---@param units Unit[]
+---@return Unit[]
 function EntityCategoryFilterDown(category, units)
 end
 
 --- Filter a list of units to exclude those found in the category
----@param category moho.EntityCategory
----@param units table<Unit>
----@return table<Unit>
+---@param category CategorieType
+---@param units Unit[]
+---@return Unit[]
 function EntityCategoryFilterOut(category, units)
 end
 
@@ -200,18 +203,18 @@ function GetActiveBuildTemplate()
 end
 
 ---
----@return table<number>
+---@return number[]
 function GetAntiAliasingOptions()
 end
 
 ---
 --- Note that this is cached by `/lua/ui/lobbby/override/ArmiesTable.lua`
----@return table<ArmyInfo>
+---@return ArmiesTable
 function GetArmiesTable()
 end
 
 --- Return a table of avatar units for the army
----@return table<Unit>
+---@return Unit[]
 function GetArmyAvatars()
 end
 
@@ -221,14 +224,14 @@ function GetArmyScore(armyIndex)
 end
 
 --- Get a list of units assisting me
----@param units table<Unit>
----@return table<Unit>
+---@param units Unit[]
+---@return Unit[]
 function GetAssistingUnitsList(units)
 end
 
 --- Get a list of units blueprint attached to transports
----@param units table<Unit>
----@return table<Unit>
+---@param units Unit[]
+---@return Unit[]
 function GetAttachedUnitsList(units)
 end
 
@@ -265,7 +268,7 @@ function GetEconomyTotals()
 end
 
 --- Get the right fire state for the units passed in
----@param units table<Unit>
+---@param units Unit[]
 ---@return boolean
 function GetFireState(units)
 end
@@ -303,12 +306,12 @@ function GetGameTimeSeconds()
 end
 
 --- Return a table of idle engineer units for the army
----@return table<Unit>
+---@return Unit[]
 function GetIdleEngineers()
 end
 
 --- Return a table of idle factory units for the army
----@return table<Unit>
+---@return Unit[]
 function GetIdleFactories()
 end
 
@@ -318,19 +321,19 @@ function GetInputCapture()
 end
 
 --- See if anyone in the list is auto building
----@param units table<Unit>
+---@param units Unit[]
 ---@return boolean
 function GetIsAutoMode(units)
 end
 
 --- See if anyone in the list is auto surfacing
----@param units table<Unit>
+---@param units Unit[]
 ---@return boolean
 function GetIsAutoSurfaceMode(units)
 end
 
 --- Is anyone in this list builder paused?
----@param units table<Unit>
+---@param units Unit[]
 ---@return boolean
 function GetIsPaused(units)
 end
@@ -343,7 +346,7 @@ end
 ---| 1 #not submerged
 
 --- Determine if units are submerged
----@param units table<Unit>
+---@param units Unit[]
 ---@return SubmergeStatus
 function GetIsSubmerged(units)
 end
@@ -371,8 +374,9 @@ function GetNumRootFrames()
 end
 
 ---
----@return any
-function GetOptions()
+---@param key string
+---@return string[]
+function GetOptions(key)
 end
 
 ---
@@ -474,9 +478,9 @@ end
 
 --- Given a set of units, get the union of orders and unit categories (for determining builds)
 ---@param unitSet any
----@return table<string> orders
----@return table<OrderInfo> availableToggles
----@return table<moho.EntityCategory> buildableCategories
+---@return string[] orders
+---@return OrderInfo[] availableToggles
+---@return CategorieType[] buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
@@ -487,7 +491,7 @@ function GetUnitCommandFromCommandCap(rule)
 end
 
 --- Return a table of the currently selected units
----@return table<Unit>
+---@return Unit[]
 function GetValidAttackingUnits()
 end
 
@@ -698,7 +702,7 @@ function IssueDockCommand(clear)
 end
 
 ---
----@param unitList table<Unit>
+---@param unitList Unit[]
 ---@param command string
 ---@param string string?
 ---@param clear boolean?
@@ -755,7 +759,7 @@ end
 
 --- Parse a string to generate a new entity category
 ---@param cat string
----@return moho.EntityCategory
+---@return CategorieType
 function ParseEntityCategory(cat)
 end
 
@@ -801,7 +805,7 @@ end
 --- Start a background load with the given map and mods.
 --- If `hipri` is true, this will interrupt any previous loads in progress.
 ---@param mapname string
----@param mods table<ModInfo>
+---@param mods ModInfo[]
 ---@param hipri? boolean
 function PrefetchSession(mapname, mods, hipri)
 end
@@ -866,7 +870,7 @@ function SavePreferences()
 end
 
 --- Select the specified units
----@param units table<Unit>
+---@param units Unit[]
 function SelectUnits(units)
 end
 
@@ -881,7 +885,7 @@ function SessionEndGame()
 end
 
 --- Return a table of command sources
----@return table<string>
+---@return string[]
 function SessionGetCommandSourceNames()
 end
 
@@ -939,7 +943,7 @@ function SessionResume()
 end
 
 ---
----@param client? number | table<number> client or clients
+---@param client? number | number[] client or clients
 ---@param message string
 function SessionSendChatMessage(client, message)
 end
@@ -950,13 +954,13 @@ function SetActiveBuildTemplate(template)
 end
 
 --- Set if anyone in the list is auto building
----@param units table<Unit>
+---@param units Unit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
 end
 
 --- Set if anyone in the list is auto surfacing
----@param units table<Unit>
+---@param units Unit[]
 ---@param mode boolean
 function SetAutoSurfaceMode(units, mode)
 end
@@ -973,7 +977,7 @@ function SetCursor(cursor)
 end
 
 --- Set the specific fire state for the units passed in
----@param units table<Unit>
+---@param units Unit[]
 ---@param fireState FireState
 function SetFireState(units, fireState)
 end
@@ -1001,7 +1005,7 @@ end
 
 ---
 ---@param overlay string
----@param categories moho.EntityCategory
+---@param categories CategorieType
 ---@param normalColor string
 ---@param selectColor string
 ---@param rolloverColor string
@@ -1013,13 +1017,13 @@ function SetOverlayFilter(overlay, categories, normalColor, selectColor, rollove
 end
 
 ---
----@param list table<RangeOverlay>
+---@param list RangeOverlay[]
 ---@see `/lua/ui/game/RangeOverlayParams.lua`
 function SetOverlayFilters(list)
 end
 
 --- Pause builders in this list
----@param selection table<Unit>
+---@param selection Unit[]
 ---@param paused boolean
 function SetPaused(selection, paused)
 end
@@ -1088,13 +1092,13 @@ end
 -- like some of the other functions alude to?
 
 --- Set the right fire state for the units passed in
----@param units table<Unit>
+---@param units Unit[]
 ---@param fireState FireState
 function ToggleFireState(units, fireState)
 end
 
 ---
----@param units table<Unit>
+---@param units Unit[]
 ---@param bit number
 ---@param state boolean
 function ToggleScriptBit(units, bit, state)
@@ -1116,14 +1120,14 @@ function UISelectionByCategory(expression, addToCurSel, inViewFrustum, nearestTo
 end
 
 ---
----@param units table<Unit>
+---@param units Unit[]
 ---@param seconds? number
 function UIZoomTo(units, seconds)
 end
 
 ---
 ---@param self WorldView maybe?
----@param point Vector2D
+---@param point Vector2
 ---@return Vector
 function UnProject(self, point)
 end
@@ -1135,8 +1139,8 @@ function ValidateIPAddress(ipaddr)
 end
 
 --- Validate a list of units
----@param units table<Unit>
----@return table<Unit>
+---@param units Unit[]
+---@return Unit[]
 function ValidateUnitsList(units)
 end
 
@@ -1188,6 +1192,6 @@ end
 ---@param z number
 ---@param radius number
 ---@param type PatchedDepositType
----@return table<PatchedDepositResult>
+---@return PatchedDepositResult[]
 function GetDepositsAroundPoint(x, z, radius, type)
 end

@@ -9,6 +9,18 @@
 ---@alias AIExpansionOptionValue '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
 ---| '99999' unlimited expansions allowed
 
+-- Note, this documentation pulls from `lobby.lua` which is in need of refactoring
+
+---@class GameInfo
+---@field AutoTeams number[]
+---@field ClosedSlots boolean[]
+---@field firstUpdateAvailableSlotsDone boolean
+---@field GameMods ModInfo[] | table<string, true> lobby changes the set of mod UID's into a ModInfo array at launch
+---@field GameOptions ScenarioOptions
+---@field Observers PlayerData[]
+---@field PlayerOptions PlayerData[]
+---@field SpawnMex boolean[]
+
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
 ---@class ScenarioOptions
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
@@ -25,7 +37,7 @@
 ---@field ManualUnitShare 'none' | 'no_builders' | 'all'
 ---@field NoRushOption '1' | '2' | '3' | '4' | '5' | '10' | '15' | '20' | '25' | '30' | '35' | '40' | '45' | '50' | '55' | '60'
 ---@field PrebuiltUnits 'Off' | 'On'
----@field Ranked 'false' | 'true
+---@field Ranked boolean
 ---@field RevealCivilians 'No' | 'Yes'
 ---@field RandomMap 'Off' | 'Official' | 'All'
 ---@field Score 'no' | 'yes'
@@ -33,6 +45,7 @@
 ---@field ShareUnitCap 'none' | 'allies' | 'all'
 ---@field Timeouts '0' | '3'| '-1'
 ---@field UnitCap '125' | '250' | '375' | '500' | '625' | '750' | '875' | '1000' | '1250' | '1500'
+---@field UnRanked 'false' | 'true
 ---@field Victory 'demoralization' | 'domination' | 'eradication' | 'sandbox'
 ---
 ---@field BuildMult AIMultiplierOptionValue
@@ -48,7 +61,7 @@
 ---@field key string
 ---@field label string
 ---@field mponly? boolean
----@field values table<any | ScenarioOptionValue> can only contain arbitrary values if `value_text` and `value_help` are set to fromat them
+---@field values (any | ScenarioOptionValue)[] can only contain arbitrary values if `value_text` and `value_help` are set to fromat them
 ---@field value_text? string if present, will format arbitrary values in `values`
 ---@field value_help? string if present, will format arbitrary values in `values`
 

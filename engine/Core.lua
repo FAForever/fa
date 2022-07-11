@@ -13,7 +13,7 @@
 ---@field [2] number
 ---@field [3] number
 
----@class Vector2D
+---@class Vector2
 ---@field [1] number
 ---@field [2] number
 
@@ -92,7 +92,7 @@ function EntityCategoryEmpty()
 end
 
 --- Get a list of units blueprint names from a category
----@param category moho.EntityCategory
+---@param category CategorieType
 ---@return table<string>
 function EntityCategoryGetUnitList(category)
 end
@@ -362,7 +362,7 @@ end
 
 ---
 --  Create a vector (x,y)
----@return Vector2D
+---@return Vector2
 function Vector2()
 end
 

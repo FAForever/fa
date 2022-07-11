@@ -213,10 +213,10 @@ Mod initialization issues
 ---@field uid string         defaults to `filename`
 ---@field ui_only? boolean
 ---@field enabled? boolean
----@field requires? table<string> UID list of mods that this mod requires to be also present
----@field conflicts? table<string> UID list of mods that the game will refuse to launch with
----@field before? table<string> UID list of mods that this mod will be applied before
----@field after? table<string> UID list of mods this this mod will be applied after; defaults to `requires` if present
+---@field requires? string[] UID list of mods that this mod requires to be also present
+---@field conflicts? string[] UID list of mods that the game will refuse to launch with
+---@field before? string[] UID list of mods that this mod will be applied before
+---@field after? string[] UID list of mods this this mod will be applied after; defaults to `requires` if present
 ---@field requiresNames? table<string, string> Optional UID-to-name map of required mods
 
 
@@ -228,7 +228,7 @@ local _mod_cache = nil
 
 --- Set the list of active mods requested by the user from the mod manager.
 --- `nil` means do nothing (happens when `cancel` is selected from mod manager)
----@param s? table<string, true> set of mod UID's
+---@param s? set<string> set of mod UID's
 function SetSelectedMods(s)
     if s then
         LOG("MOD LIST SET TO:")
@@ -358,7 +358,7 @@ end
 --- topological sort the mods using before/after lists  
 --- log a warning and return `nil` in case of a cycle
 ---@param mods_to_sort table<string, ModInfo> keys are UID's
----@return table<ModInfo> | nil
+---@return ModInfo[] | nil
 local function ModTopSort(mods_to_sort)
     local required_for = {}
     for uid,mod in mods_to_sort do
@@ -424,7 +424,7 @@ end
 --- are from `GetActiveGameMods()`.
 ---@param filter fun(mod: ModInfo): boolean
 ---@param selected? table<string, true> set of mod UID's; defaults to `GetSelectedMods()`
----@return table<ModInfo>
+---@return ModInfo[]
 local function GetActiveModsFiltered(filter, selected)
     if not selected then
         selected = GetSelectedMods()
@@ -452,21 +452,21 @@ end
 
 --- Return a list out of the mods that have `ui_only` set to true
 ---@param mods? table<string, true> set of mod UID's; defaults to `GetSelectedMods()`
----@return table<ModInfo>
+---@return ModInfo[]
 function GetUiMods(mods)
     return GetActiveModsFiltered(function(m) return m.ui_only end, mods)
 end
 
 --- Return a list out of the mods that don't have `ui_only` set to true
 ---@param mods? table<string, true> set of mod UID's; defaults to `GetSelectedMods()`
----@return table<ModInfo>
+---@return ModInfo[]
 function GetGameMods(mods)
     return GetActiveModsFiltered(function(m) return not m.ui_only end, mods)
 end
 
 --- If `scenario` is a campaign type, return only the FAF campaign mod (`6AAFE20A-E851-11DB-B8BE-ECC755D89593`).
 --- Otherwise, return `GetGameMods()`.
----@param scenario ScenarioInfoTable
+---@param scenario UIScenarioInfo
 ---@return table<string, true> #set of mod UID's
 function GetCampaignMods(scenario)
     local r

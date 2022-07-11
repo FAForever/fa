@@ -38,7 +38,7 @@ function CMauiBitmap:SetFrame(frame)
 end
 
 ---
----@param pattern table<number> an array of integers reflecting texture indicies
+---@param pattern number[] an array of integers reflecting texture indicies
 function CMauiBitmap:SetFramePattern(pattern)
 end
 
@@ -52,7 +52,7 @@ function CMauiBitmap:SetLoopPingPongPattern()
 end
 
 ---
----@param filename string | table<string>
+---@param filename string | string[]
 ---@param border? number defaults to 1
 function CMauiBitmap:SetNewTexture(filename, border)
 end

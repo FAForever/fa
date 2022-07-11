@@ -229,6 +229,7 @@ local commands = {
 
 local Strings = LobbyComm.Strings
 
+---@type LobbyComm
 local lobbyComm = false
 local localPlayerName = ""
 local gameName = ""
@@ -2091,6 +2092,24 @@ local function TryLaunch(skipNoObserversCheck)
 
     numberOfPlayers = numPlayers
     local function LaunchGame()
+        for k,v in gameInfo do
+            LOG(k)
+            if type(v)=="table" then
+                for k,v in v do
+                    LOG('   '..k)
+                    if type(v)=="table" then
+                        for k,v in v do
+                            LOG('      '..k)
+                            LOG('         '..repr(v))
+                        end
+                    else
+                        LOG('      '..repr(v))
+                    end
+                end
+            else
+                LOG('   '..repr(v))
+            end
+        end
         -- These two things must happen before the flattening step, mostly for terrible reasons.
         -- This isn't ideal, as it leads to redundant UI repaints :/
         AssignAutoTeams()
@@ -2188,8 +2207,28 @@ local function TryLaunch(skipNoObserversCheck)
 
         SavePresetToName(LAST_GAME_PRESET_NAME)
 
+        for k,v in gameInfo do
+            LOG(k)
+            if type(v)=="table" then
+                for k,v in v do
+                    LOG('   '..k)
+                    if type(v)=="table" then
+                        for k,v in v do
+                            LOG('      '..k)
+                            LOG('         '..repr(v))
+                        end
+                    else
+                        LOG('      '..repr(v))
+                    end
+                end
+            else
+                LOG('   '..repr(v))
+            end
+        end
         -- launch the game
         lobbyComm:LaunchGame(gameInfo)
+
+        
     end
 
     LaunchGame()
