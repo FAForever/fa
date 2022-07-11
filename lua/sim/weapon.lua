@@ -38,6 +38,7 @@ local function ParsePriorities()
 end
 
 ---@class Weapon : moho.weapon_methods
+---@field Blueprint WeaponBlueprint
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit
