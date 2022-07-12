@@ -4274,8 +4274,99 @@ Unit = Class(moho.unit_methods) {
     --- support factories.
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
-    GetUpgradeAnimation = function(self, unitBeingBuilt) 
+    GetUpgradeAnimation = function(self, unitBeingBuilt)
         return self.Blueprint.Display.AnimationUpgrade
+    end,
+
+    --- Called when a missile launched by this unit is intercepted
+    ---@param self Unit
+    ---@param target Unit | Vector Can be a location if the unit was ground firing
+    ---@param defense Unit
+    ---@param position Vector Location where the missile got intercepted
+    OnMissileIntercepted = function(self, target, defense, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileIntercepted'] then
+            for k, callback in self.Callbacks['OnMissileIntercepted'] do
+                local ok, msg = pcall(callback, target, defense, position)
+                if not ok then
+                    WARN("OnMissileIntercepted callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+
+        DrawCircle(self:GetPosition(), 3, 'ffffff')         -- white
+        DrawCircle(defense:GetPosition(), 4, '00ff00')      -- green
+        DrawCircle(target, 5, '0000ff')                     -- blue
+        DrawCircle(position, 6, 'ff0000')                   -- red
+    end,
+
+    --- Called when a missile launched by this unit hits a shield
+    ---@param self Unit
+    ---@param target Unit | Vector Can be a location if the unit was ground firing
+    ---@param shield Unit
+    ---@param position Vector Location where the missile hit the shield
+    OnMissileImpactShield = function(self, target, shield, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileImpactShield'] then
+            for k, callback in self.Callbacks['OnMissileImpactShield'] do
+                local ok, msg = pcall(callback, target, shield, position)
+                if not ok then
+                    WARN("OnMissileImpactShield callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+
+        DrawCircle(self:GetPosition(), 3, 'ffffff')         -- white
+        DrawCircle(shield:GetPosition(), 4, '00ff00')       -- green
+        DrawCircle(target, 5, '0000ff')                     -- blue
+        DrawCircle(position, 6, 'ff0000')                   -- red
+    end,
+
+    --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
+    ---@param self Unit
+    ---@param target Vector Can be a location if the unit was ground firing
+    ---@param position Vector Location where the missile hit the terrain
+    OnMissileImpactTerrain = function(self, target, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileImpactTerrain'] then
+            for k, callback in self.Callbacks['OnMissileImpactTerrain'] do
+                local ok, msg = pcall(callback, target, position)
+                if not ok then
+                    WARN("OnMissileImpactTerrain callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+
+        DrawCircle(self:GetPosition(), 3, 'ffffff')         -- white
+        DrawCircle(target, 4, '0000ff')                     -- blue
+        DrawCircle(position, 5, 'ff0000')                   -- red
+    end,
+
+    --- Add a callback when a missile launched by this unit is intercepted
+    ---@param self Unit
+    ---@param callback function<Vector, Unit, Vector>
+    AddMissileInterceptedCallback = function(self, callback)
+        self.Callbacks['OnMissileIntercepted'] = self.Callbacks['OnMissileIntercepted'] or { }
+        table.insert(self.Callbacks['OnMissileIntercepted'], callback)
+    end,
+
+    --- Add a callback when a missile launched by this unit hits a shield
+    ---@param self Unit
+    ---@param callback function<Vector, Unit, Vector>
+    AddMissileImpactShieldCallback = function(self, callback)
+        self.Callbacks['OnMissileImpactShield'] = self.Callbacks['OnMissileImpactShield'] or { }
+        table.insert(self.Callbacks['OnMissileImpactShield'], callback)
+    end,
+
+    --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
+    ---@param self Unit
+    ---@param callback function<Unit | Vector, Vector>
+    AddMissileImpactTerrainCallback = function(self, callback)
+        self.Callbacks['OnMissileImpactTerrain'] = self.Callbacks['OnMissileImpactTerrain'] or { }
+        table.insert(self.Callbacks['OnMissileImpactTerrain'], callback)
     end,
 
     --- Various callback-like functions
@@ -4309,26 +4400,6 @@ Unit = Class(moho.unit_methods) {
     OnInActive = function(self) end,
     OnSpecialAction = function(self, location) end,
     OnDamageBy = function(self, index) end,
-
-    OnMissileIntercepted = function(self, target, defense, position) 
-        DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
-        DrawCircle(defense:GetPosition(), 5, '00ff00')      -- green
-        DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
-        DrawCircle(position, 5, 'ff0000')                   -- red
-    end,
-
-    OnMissileImpactShield = function(self, target, shield, position)
-        DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
-        DrawCircle(shield:GetPosition(), 5, '00ff00')       -- green
-        DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
-        DrawCircle(position, 5, 'ff0000')                   -- red
-    end,
-
-    OnMissileImpactTerrain = function(self, target, position)
-        DrawCircle(self:GetPosition(), 5, 'ffffff')         -- white
-        DrawCircle(target:GetPosition(), 5, '0000ff')       -- blue
-        DrawCircle(position, 5, 'ff0000')                   -- red
-    end,
 
     --- Deprecated functionality
 

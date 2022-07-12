@@ -396,16 +396,7 @@ Weapon = Class(moho.weapon_methods) {
 
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
-
-        -- get the actual target
-        proj.Target = self:GetCurrentTarget()
-        if proj.Target.GetSource then 
-            proj.Target = proj.Target:GetSource()
-        end
-
         local damageTable = self:GetDamageTable()
-
-
         if proj and not proj:BeenDestroyed() then
             proj:PassMetaDamage(damageTable)
             local bp = self.Blueprint
