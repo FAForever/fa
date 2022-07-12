@@ -216,7 +216,11 @@ Projectile = Class(moho.projectile_methods) {
         -- callbacks for launcher to have an idea what is going on for AIs
         if not IsDestroyed(self.Launcher) then 
             self.Launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
-            self.Launcher:SetStat('KILLS', self.Launcher:GetStat('KILLS', 0).Value + 1)
+
+            -- keep track of the number of intercepted missiles
+            if not IsDestroyed(instigator) then 
+                instigator:SetStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
+            end
         end
 
         self:CreateImpactEffects(self.Army, self.FxOnKilled, self.FxOnKilledScale)

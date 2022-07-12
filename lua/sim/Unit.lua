@@ -4280,8 +4280,8 @@ Unit = Class(moho.unit_methods) {
 
     --- Called when a missile launched by this unit is intercepted
     ---@param self Unit
-    ---@param target Unit | Vector Can be a location if the unit was ground firing
-    ---@param defense Unit
+    ---@param target Vector
+    ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
     ---@param position Vector Location where the missile got intercepted
     OnMissileIntercepted = function(self, target, defense, position)
         -- try and run callbacks
@@ -4303,8 +4303,8 @@ Unit = Class(moho.unit_methods) {
 
     --- Called when a missile launched by this unit hits a shield
     ---@param self Unit
-    ---@param target Unit | Vector Can be a location if the unit was ground firing
-    ---@param shield Unit
+    ---@param target Vector
+    ---@param shield Unit Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
     ---@param position Vector Location where the missile hit the shield
     OnMissileImpactShield = function(self, target, shield, position)
         -- try and run callbacks
@@ -4326,7 +4326,7 @@ Unit = Class(moho.unit_methods) {
 
     --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
     ---@param self Unit
-    ---@param target Vector Can be a location if the unit was ground firing
+    ---@param target Vector 
     ---@param position Vector Location where the missile hit the terrain
     OnMissileImpactTerrain = function(self, target, position)
         -- try and run callbacks
@@ -4361,7 +4361,7 @@ Unit = Class(moho.unit_methods) {
         table.insert(self.Callbacks['OnMissileImpactShield'], callback)
     end,
 
-    --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
+    --- Add a callback when a missile launched by this unit hits the terrain, note that this can be the same location as the target
     ---@param self Unit
     ---@param callback function<Unit | Vector, Vector>
     AddMissileImpactTerrainCallback = function(self, callback)
