@@ -77,7 +77,7 @@ end
 
 ---
 --  Get a list of units blueprint names from a category
-function EntityCategoryGetUnitList(category)
+function EntityCategoryGetUnitList()
 end
 
 ---

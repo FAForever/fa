@@ -3,7 +3,7 @@
 --* Author: Chris Blackwell
 --* Summary: Responds to wld UI events and show appropriate UI
 --*
---* Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--* Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
 -- Functions exposed to lua

@@ -34,7 +34,7 @@ end
 function AddToSessionExtraSelectList(unit)
 end
 
---- Return true if there is anything currently on the capture stack
+--- Return `true` if there is anything currently on the capture stack
 ---@return boolean
 function AnyInputCapture()
 end
@@ -156,7 +156,7 @@ end
 function EntityCategoryFilterOut(category, units)
 end
 
---- Execute some lua code in the sim
+--- Execute some Lua code in the sim
 ---@param func function
 ---@param ... any this may actually be a comma-separated string of args instead of a vararg
 ---@return any
@@ -279,7 +279,7 @@ end
 
 --- Get the right fire state for the units passed in
 ---@param units UserUnit[]
----@return boolean
+---@return FireState
 function GetFireState(units)
 end
 
@@ -399,7 +399,7 @@ end
 function GetResourceSharing()
 end
 
---- Get the rollover information about the 
+--- Get the rollover information about the unit the cursor is currently hovered over
 ---@return RolloverInfo
 function GetRolloverInfo()
 end
@@ -485,7 +485,7 @@ end
 
 ---
 ---@param id string
----@return Unit
+---@return UserUnit
 function GetUnitById(id)
 end
 
@@ -504,7 +504,7 @@ function GetUnitCommandFromCommandCap(rule)
 end
 
 --- Return a table of the currently selected units
----@return Unit[]
+---@return UserUnit[]
 function GetValidAttackingUnits()
 end
 
@@ -534,7 +534,7 @@ function HasLocalizedVO(language)
 end
 
 --- Add a set of key mappings
----@param keyMapTable table
+---@param keyMapTable table<string, string>
 function IN_AddKeyMapTable(keyMapTable)
 end
 
@@ -543,7 +543,7 @@ function IN_ClearKeyMap()
 end
 
 --- Remove the keys from the key map
----@param keyMapTable table
+---@param keyMapTable table<string, string>
 function IN_RemoveKeyMapTable(keyMapTable)
 end
 
@@ -719,7 +719,7 @@ function IssueDockCommand(clear)
 end
 
 ---
----@param unitList Unit[]
+---@param unitList UserUnit[]
 ---@param command string
 ---@param string string?
 ---@param clear boolean?
