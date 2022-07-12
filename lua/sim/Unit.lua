@@ -4294,11 +4294,6 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-
-        DrawCircle(self:GetPosition(), 3, 'ffffff')         -- white
-        DrawCircle(defense:GetPosition(), 4, '00ff00')      -- green
-        DrawCircle(target, 5, '0000ff')                     -- blue
-        DrawCircle(position, 6, 'ff0000')                   -- red
     end,
 
     --- Called when a missile launched by this unit hits a shield
@@ -4317,11 +4312,6 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-
-        DrawCircle(self:GetPosition(), 3, 'ffffff')         -- white
-        DrawCircle(shield:GetPosition(), 4, '00ff00')       -- green
-        DrawCircle(target, 5, '0000ff')                     -- blue
-        DrawCircle(position, 6, 'ff0000')                   -- red
     end,
 
     --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
@@ -4339,10 +4329,6 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-
-        DrawCircle(self:GetPosition(), 3, 'ffffff')         -- white
-        DrawCircle(target, 4, '0000ff')                     -- blue
-        DrawCircle(position, 5, 'ff0000')                   -- red
     end,
 
     --- Add a callback when a missile launched by this unit is intercepted
