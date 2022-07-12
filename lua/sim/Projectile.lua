@@ -147,18 +147,18 @@ Projectile = Class(moho.projectile_methods) {
         local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
 
         -- torpedoes can only be taken down by anti torpedo
-        if self.Blueprint.CategoriesHash['TORPEDO'] then 
-            if other.Blueprint.CategoriesHash["ANTITORPEDO"] then 
-                return alliedCheck 
-            else 
-                return false 
+        if self.Blueprint.CategoriesHash['TORPEDO'] then
+            if other.Blueprint.CategoriesHash["ANTITORPEDO"] then
+                return alliedCheck
+            else
+                return false
             end
         end
 
         -- missiles can only be taken down by anti missiles
-        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
-            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
-                return other.Target == self 
+        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then
+            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then
+                return other.OriginalTarget == self
             end
         end
 
