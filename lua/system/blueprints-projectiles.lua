@@ -45,11 +45,11 @@ local function PostProcessProjectile(projectile)
 
     -- # fix desired shooter cap for missiles
 
-    if projectile.CategoriesHash['MISSILE'] then
+    if projectile.CategoriesHash['MISSILE'] and (not projectile.CategoriesHash['STRATEGIC']) then
         if not projectile.DesiredShooterCap then
             projectile.DesiredShooterCap = projectile.Defense.Health or 1
         else 
-            if projectile.DesiredShooterCap != (projectile.Defense.Health or 1) then 
+            if projectile.DesiredShooterCap != (projectile.Defense.Health or 1) then
                 WARN(string.format("Inconsistent shooter cap defined for projectile %s, it should match its health", projectile.BlueprintId))
             end
         end
