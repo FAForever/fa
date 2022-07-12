@@ -4274,8 +4274,85 @@ Unit = Class(moho.unit_methods) {
     --- support factories.
     ---@param self Unit A reference to the unit itself, automatically set when you use the ':' notation
     ---@param unitBeingBuilt Unit A flag to determine whether our consumption should be active
-    GetUpgradeAnimation = function(self, unitBeingBuilt) 
+    GetUpgradeAnimation = function(self, unitBeingBuilt)
         return self.Blueprint.Display.AnimationUpgrade
+    end,
+
+    --- Called when a missile launched by this unit is intercepted
+    ---@param self Unit
+    ---@param target Vector
+    ---@param defense Unit Requires an `IsDestroyed` check as the defense may have been destroyed when the missile is intercepted
+    ---@param position Vector Location where the missile got intercepted
+    OnMissileIntercepted = function(self, target, defense, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileIntercepted'] then
+            for k, callback in self.Callbacks['OnMissileIntercepted'] do
+                local ok, msg = pcall(callback, target, defense, position)
+                if not ok then
+                    WARN("OnMissileIntercepted callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+    end,
+
+    --- Called when a missile launched by this unit hits a shield
+    ---@param self Unit
+    ---@param target Vector
+    ---@param shield Unit Requires an `IsDestroyed` check when using as the shield may have been destroyed when the missile impacts
+    ---@param position Vector Location where the missile hit the shield
+    OnMissileImpactShield = function(self, target, shield, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileImpactShield'] then
+            for k, callback in self.Callbacks['OnMissileImpactShield'] do
+                local ok, msg = pcall(callback, target, shield, position)
+                if not ok then
+                    WARN("OnMissileImpactShield callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+    end,
+
+    --- Called when a missile launched by this unit hits the terrain, note that this can be the same location as the target
+    ---@param self Unit
+    ---@param target Vector 
+    ---@param position Vector Location where the missile hit the terrain
+    OnMissileImpactTerrain = function(self, target, position)
+        -- try and run callbacks
+        if self.Callbacks['OnMissileImpactTerrain'] then
+            for k, callback in self.Callbacks['OnMissileImpactTerrain'] do
+                local ok, msg = pcall(callback, target, position)
+                if not ok then
+                    WARN("OnMissileImpactTerrain callback triggered an error:")
+                    WARN(msg)
+                end
+            end
+        end
+    end,
+
+    --- Add a callback when a missile launched by this unit is intercepted
+    ---@param self Unit
+    ---@param callback function<Vector, Unit, Vector>
+    AddMissileInterceptedCallback = function(self, callback)
+        self.Callbacks['OnMissileIntercepted'] = self.Callbacks['OnMissileIntercepted'] or { }
+        table.insert(self.Callbacks['OnMissileIntercepted'], callback)
+    end,
+
+    --- Add a callback when a missile launched by this unit hits a shield
+    ---@param self Unit
+    ---@param callback function<Vector, Unit, Vector>
+    AddMissileImpactShieldCallback = function(self, callback)
+        self.Callbacks['OnMissileImpactShield'] = self.Callbacks['OnMissileImpactShield'] or { }
+        table.insert(self.Callbacks['OnMissileImpactShield'], callback)
+    end,
+
+    --- Add a callback when a missile launched by this unit hits the terrain, note that this can be the same location as the target
+    ---@param self Unit
+    ---@param callback function<Vector, Vector>
+    AddMissileImpactTerrainCallback = function(self, callback)
+        self.Callbacks['OnMissileImpactTerrain'] = self.Callbacks['OnMissileImpactTerrain'] or { }
+        table.insert(self.Callbacks['OnMissileImpactTerrain'], callback)
     end,
 
     --- Various callback-like functions

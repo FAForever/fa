@@ -147,20 +147,18 @@ Projectile = Class(moho.projectile_methods) {
         local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
 
         -- torpedoes can only be taken down by anti torpedo
-        if self.Blueprint.CategoriesHash['TORPEDO'] then 
-            if other.Blueprint.CategoriesHash["ANTITORPEDO"] then 
-                return alliedCheck 
-            else 
-                return false 
+        if self.Blueprint.CategoriesHash['TORPEDO'] then
+            if other.Blueprint.CategoriesHash["ANTITORPEDO"] then
+                return alliedCheck
+            else
+                return false
             end
         end
 
         -- missiles can only be taken down by anti missiles
-        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
-            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
-                return alliedCheck 
-            else 
-                return false 
+        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then
+            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then
+                return other.OriginalTarget == self
             end
         end
 
@@ -214,6 +212,17 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile is killed, in other words: intercepted
     OnKilled = function(self, instigator, type, overkillRatio)
+
+        -- callbacks for launcher to have an idea what is going on for AIs
+        if not IsDestroyed(self.Launcher) then 
+            self.Launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
+
+            -- keep track of the number of intercepted missiles
+            if not IsDestroyed(instigator) then 
+                instigator:SetStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
+            end
+        end
+
         self:CreateImpactEffects(self.Army, self.FxOnKilled, self.FxOnKilledScale)
         self:Destroy()
     end,
@@ -222,16 +231,46 @@ Projectile = Class(moho.projectile_methods) {
     -- @param targetType 
     -- @param targetEntity 
     OnImpact = function(self, targetType, targetEntity)
+
+        -- in case the OnImpact crashes it guarantees that it gets destroyed at some point, useful for mods
+        self.Impacts = (self.Impacts or 0) + 1
+        if self.Impacts > 3 then 
+            WARN("Faulty projectile destroyed manually: " .. tostring(self.Blueprint.BlueprintId))
+            self:Destroy()
+            return
+        end
+
+        -- localize information for performance
+        local position = self:GetPosition()
+        local damageData = self.DamageData
+        local radius = damageData.DamageRadius or 0
+        local bp = self.Blueprint
+
+        -- callbacks for launcher to have an idea what is going on for AIs
+        local categoriesHash = self.Blueprint.CategoriesHash
+        if categoriesHash['TACTICAL'] or categoriesHash['STRATEGICAL'] then
+            -- we have a target, but got caught by terrain
+            if targetType == 'Terrain' then
+                if not IsDestroyed(self.Launcher) then
+                    self.Launcher:OnMissileImpactTerrain(self:GetCurrentTargetPosition(), position)
+                end
+
+            -- we have a target, but got caught by an (unexpected) shield
+            elseif targetType == 'Shield' then
+                if not IsDestroyed(self.Launcher) then 
+                    self.Launcher:OnMissileImpactShield(self:GetCurrentTargetPosition(), targetEntity.Owner, position)
+                end
+            end
+        end
+
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
-        local instigator = self.Launcher or self 
+        local instigator = self.Launcher or self
 
         -- localize information for performance
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
-        local damageData = self.DamageData
-        local radius = damageData.DamageRadius or 0
-        local bp = self.Blueprint 
+
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
