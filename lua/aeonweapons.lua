@@ -290,7 +290,7 @@ ADFTractorClaw = Class(Weapon) {
 
         projectile.OnImpact = function(projectile)
             if not IsDestroyed(target) then
-                self:MakeVulnerable(target)
+                -- self:MakeVulnerable(target)
                 if not IsDestroyed(self.unit) then
                     if target.MyShield and target.MyShield:IsOn() then
                         Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
@@ -310,10 +310,6 @@ ADFTractorClaw = Class(Weapon) {
 
             projectile:Destroy()
         end
-
-        -- destroy it anyway after a while
-        WaitSeconds(10.0)
-        trash:Destroy()
     end,
 
     --- Delayed destruction of the trashbag, allows the wreck to copy over the rotators
