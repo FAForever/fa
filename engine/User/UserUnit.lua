@@ -74,7 +74,7 @@ end
 function UserUnit:GetFootPrintSize()
 end
 
----
+--- Return the unit's fuel level, as a decimal between `0` and `1`
 ---@return number
 function UserUnit:GetFuelRatio()
 end
@@ -104,29 +104,32 @@ end
 function UserUnit:GetPosition()
 end
 
---- Get table of all selection sets unit belongs to
+--- Get table of all selection sets the unit belongs to
 ---@return string[]
 function UserUnit:GetSelectionSets()
 end
 
----
+--- Return the unit's shield level, as a decimal between `0` and `1`
 ---@return number
 function UserUnit:GetShieldRatio()
 end
 
+-- TODO was the UserUnit.GetStat method also patched?
+
 ---
+---@generic T
 ---@param name string
----@param defaultVal? any
----@return any
+---@param defaultVal? T
+---@return {Value: T}
 function UserUnit:GetStat(name, defaultVal)
 end
 
----
+--- Return the unit's ID (e.g. "UAL0305")
 ---@return string
 function UserUnit:GetUnitId()
 end
 
----
+--- Get the progress of the unit's current work, as a decimal between `0` and `1`
 ---@return number
 function UserUnit:GetWorkProgress()
 end

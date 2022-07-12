@@ -233,7 +233,7 @@ function DestroyUI()
     worldView.EventRedirect = nil
 end
 
----@class PathDebugger
+---@class PathDebugger : moho.PathDebugger_methods
 PathDebugger = Class(moho.PathDebugger_methods) {
     __init = function(self,spec)
         _c_CreatePathDebugger(self,spec)

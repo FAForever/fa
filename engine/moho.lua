@@ -39,10 +39,6 @@ moho = {
 
     -- user
 
-    UIWorldView = require('/engine/user/cuiworldview.lua'),
-    WldUIProvider_methods = require('/engine/user/cluawlduiprovider.lua'),
-    PathDebugger_methods = require('/engine/user/cpathdebugger.lua'),
-
     bitmap_methods = require('/engine/user/cmauibitmap.lua'),
     border_methods = require('/engine/user/cmauiborder.lua'),
     control_methods = require('/engine/user/cmauicontrol.lua'),
@@ -57,8 +53,11 @@ moho = {
     lobby_methods = require('/engine/user/clobby.lua'),
     mesh_methods = require('/engine/user/cmauimesh.lua'),
     movie_methods = require('/engine/user/cmauimovie.lua'),
+    PathDebugger_methods = require('/engine/user/cpathdebugger.lua'),
     scrollbar_methods = require('/engine/user/cmauiscrollbar.lua'),
     text_methods = require('/engine/user/cmauitext.lua'),
-    userDecal_methods = require('/engine/user/scripteddecal.lua'),
+    UIWorldView = require('/engine/user/cuiworldview.lua'),
+    userDecal_methods = require('/engine/user/cuserdecal.lua'),
+    WldUIProvider_methods = require('/engine/user/cwlduiprovider.lua'),
     world_mesh_methods = require('/engine/user/cuiworldmesh.lua'),
 }

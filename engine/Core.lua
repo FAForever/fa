@@ -2,33 +2,15 @@
 ---Module: Core
 -- @module Core
 
----@class Quaternion
----@field [1] number
----@field [2] number
----@field [3] number
----@field [4] number
-
 ---@class Vector
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
 
----@class Vector2
----@field [1] number
----@field [2] number
-
 ---@class Point
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
-
----@class Rectangle
----@field [1] number x1
----@field [2] number z1
----@field [3] number x2
----@field [4] number z2
-
----@alias Object Entity | Prop | Unit | Weapon
 
 ---
 --  Create a target object
@@ -93,9 +75,8 @@ end
 function EntityCategoryEmpty()
 end
 
---- Get a list of units blueprint names from a category
----@param category CategorieType
----@return table<string>
+---
+--  Get a list of units blueprint names from a category
 function EntityCategoryGetUnitList(category)
 end
 
@@ -364,7 +345,6 @@ end
 
 ---
 --  Create a vector (x,y)
----@return Vector2
 function Vector2()
 end
 

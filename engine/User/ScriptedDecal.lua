@@ -7,20 +7,23 @@ function ScriptedDecal:Destroy()
 end
 
 --- Set the position based on world coords
-function ScriptedDecal:SetPosition()
+---@param pos Vector
+function ScriptedDecal:SetPosition(pos)
 end
 
 --- Set the position based on screen space mouse coords
-function ScriptedDecal:SetPositionByScreen()
+---@param pos Vector2
+function ScriptedDecal:SetPositionByScreen(pos)
 end
 
 --- Scale the text
-function ScriptedDecal:SetScale()
+---@param scale Vector
+function ScriptedDecal:SetScale(scale)
 end
 
----
---  Set the texture and add it to the decal manager
-function ScriptedDecal:SetTexture()
+--- Set the texture and add it to the decal manager
+---@param tex string
+function ScriptedDecal:SetTexture(tex)
 end
 
 return ScriptedDecal

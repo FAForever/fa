@@ -11,7 +11,7 @@ end
 ---
 ---@param meshInfo MeshInfo
 ---@param duration number
-function AddCommandFeedbackBlip(meshInfo,  duration)
+function AddCommandFeedbackBlip(meshInfo, duration)
 end
 
 ---
@@ -25,12 +25,12 @@ function AddInputCapture(control)
 end
 
 ---
----@param selection Unit[]
+---@param selection UserUnit[]
 function AddSelectUnits(selection)
 end
 
 --- Add unit to the session extra select list
----@param unit Unit
+---@param unit UserUnit
 function AddToSessionExtraSelectList(unit)
 end
 
@@ -71,8 +71,9 @@ end
 function ConExecuteSave(command)
 end
 
----comment
+--- Get console commands that `text` can auto-complete to
 ---@param text string
+---@return string[]
 function ConTextMatches(text)
 end
 
@@ -82,13 +83,13 @@ end
 function CopyCurrentReplay(profile, newFilename)
 end
 
---- CreateUnitAtMouse
+--- Create a Unit AtMouse
 ---@param blueprintId string
 ---@param ownerArmyIndex number
 ---@param offsetMouseWorldPosX number
 ---@param offsetMouseWorldPosZ number
 ---@param rotation number
----@return Unit
+---@return UserUnit
 function CreateUnitAtMouse(blueprintId, ownerArmyIndex, offsetMouseWorldPosX, offsetMouseWorldPosZ, rotation)
 end
 
@@ -137,21 +138,21 @@ end
 
 --- Return true if a unit category contains this unit
 ---@param category moho.EntityCategory
----@param unit Unit
+---@param unit UserUnit
 function EntityCategoryContains(category, unit)
 end
 
 --- Filter a list of units to only those found in the category
 ---@param category moho.EntityCategory
----@param units Unit[]
----@return Unit[]
+---@param units UserUnit[]
+---@return UserUnit[]
 function EntityCategoryFilterDown(category, units)
 end
 
 --- Filter a list of units to exclude those found in the category
 ---@param category moho.EntityCategory
----@param units Unit[]
----@return Unit[]
+---@param units UserUnit[]
+---@return UserUnit[]
 function EntityCategoryFilterOut(category, units)
 end
 
@@ -207,41 +208,41 @@ function GetAntiAliasingOptions()
 end
 
 ---
---- Note that this is cached by `/lua/ui/lobbby/override/ArmiesTable.lua`
+--- Note that this is cached by `/lua/ui/override/ArmiesTable.lua`
 ---@return ArmiesTable
 function GetArmiesTable()
 end
 
 --- Return a table of avatar units for the army
----@return Unit[]
+---@return UserUnit[]
 function GetArmyAvatars()
 end
 
---- It is unknown where this number gets pulled from
+--- It is unknown where this result gets pulled from
 ---@param armyIndex number
 ---@return number
 function GetArmyScore(armyIndex)
 end
 
 --- Get a list of units assisting me
----@param units Unit[]
----@return Unit[]
+---@param units UserUnit[]
+---@return UserUnit[]
 function GetAssistingUnitsList(units)
 end
 
 --- Get a list of units blueprint attached to transports
----@param units Unit[]
----@return Unit[]
+---@param units UserUnit[]
+---@return UserUnit[]
 function GetAttachedUnitsList(units)
 end
 
 --- Get the blueprint of an object
----@param obj Entity
----@return nil
----@overload fun(unit: UserUnit): UnitBlueprint
+---@overload fun(effect: moho.IEffect): TrailEmitterBlueprint | BeamBlueprint
+---@overload fun(projectile: Projectile): ProjectileBlueprint
+---@overload fun(prop: Prop): PropBlueprint
+---@overload fun(unit: UserUnit | Unit): UnitBlueprint
 ---@overload fun(weapon: Weapon): WeaponBlueprint
----@overload fun(unit: Prop): PropBlueprint
-function GetBlueprint(obj)
+function GetBlueprint(object)
 end
 
 ---
@@ -250,9 +251,9 @@ end
 function GetCamera(name)
 end
 
---- Gets the following arguments to a commandline option. For example, if `/arg flag key:value`
+--- Gets the following arguments to a commandline option. For example, if `/arg -flag key:value drop`
 --- was passed to the commandline, then `GetCommandLineArg("/arg", 2)` would return
---- `{"flag", "key:value"}`
+--- `{"-flag", "key:value"}`
 ---@see GetCommandLineArgTable(option) for parsing key-values
 ---@param option string
 ---@param maxArgs number
@@ -270,18 +271,19 @@ end
 function GetCursor()
 end
 
----
----@return table
+--- Get the player's economy totals, for things such as resources `reclaimed`
+--- or `income`
+---@return EconomyTotals
 function GetEconomyTotals()
 end
 
 --- Get the right fire state for the units passed in
----@param units Unit[]
+---@param units UserUnit[]
 ---@return boolean
 function GetFireState(units)
 end
 
----
+--- The current army number that the player has focused, or `-1` for none (i.e. observer)
 ---@return number
 function GetFocusArmy()
 end
@@ -314,34 +316,34 @@ function GetGameTimeSeconds()
 end
 
 --- Return a table of idle engineer units for the army
----@return Unit[]
+---@return UserUnit[]
 function GetIdleEngineers()
 end
 
 --- Return a table of idle factory units for the army
----@return Unit[]
+---@return UserUnit[]
 function GetIdleFactories()
 end
 
---- Returns the current capture control, or nil if none
+--- Returns the current capture control, or `nil` if none
 ---@return Control | nil
 function GetInputCapture()
 end
 
 --- See if anyone in the list is auto building
----@param units Unit[]
+---@param units UserUnit[]
 ---@return boolean
 function GetIsAutoMode(units)
 end
 
 --- See if anyone in the list is auto surfacing
----@param units Unit[]
+---@param units UserUnit[]
 ---@return boolean
 function GetIsAutoSurfaceMode(units)
 end
 
 --- Is anyone in this list builder paused?
----@param units Unit[]
+---@param units UserUnit[]
 ---@return boolean
 function GetIsPaused(units)
 end
@@ -349,12 +351,12 @@ end
 -- FIXME it doesn't like negative numbers
 
 ---@alias SubmergeStatus
----| -1 #submerged
----| 0 #unknown
----| 1 #not submerged
+---| -1  # submerged
+---|  0  # unknown
+---|  1  # not submerged
 
 --- Determine if units are submerged
----@param units Unit[]
+---@param units UserUnit[]
 ---@return SubmergeStatus
 function GetIsSubmerged(units)
 end
@@ -397,24 +399,25 @@ end
 function GetResourceSharing()
 end
 
----
+--- Get the rollover information about the 
 ---@return RolloverInfo
 function GetRolloverInfo()
 end
 
 --- Get the state for the script bit
----@param unit Unit
+---@param unit UserUnit
 ---@param bit number
 ---@return boolean
 function GetScriptBit(unit, bit)
 end
 
 --- Return a table of the currently selected units
----@return table
+---@return UserUnit[]
 function GetSelectedUnits()
 end
 
 --- Return a table of the various clients in the current session
+--- Note that this is cached by `/lua/ui/override/SessionClients.lua`
 ---@return table[]
 function GetSessionClients()
 end
@@ -602,7 +605,7 @@ end
 function InternalCreateItemList(itemList, parent)
 end
 
---- For internal use by CreateLobbyComm()
+--- For internal use by `CreateLobbyComm()`
 ---@param lobbyComClass fa-class
 ---@param protocol string
 ---@param localPort number
@@ -809,7 +812,7 @@ function PlayVoice(sound, duck)
 end
 
 --- Make `dragger` the active dragger from a particular frame.
---- You can pass nil to cancel the current dragger.
+--- You can pass `nil` to cancel the current dragger.
 ---@param originFrame Frame
 ---@param keycode string
 ---@param dragger Dragger | nil
@@ -839,7 +842,7 @@ function RemoveConsoleOutputReciever(handler)
 end
 
 --- Remove unit from the session extra select list
----@param unit Unit
+---@param unit UserUnit
 function RemoveFromSessionExtraSelectList(unit)
 end
 
@@ -884,7 +887,7 @@ function SavePreferences()
 end
 
 --- Select the specified units
----@param units Unit[]
+---@param units UserUnit[]
 function SelectUnits(units)
 end
 
@@ -968,19 +971,19 @@ function SetActiveBuildTemplate(template)
 end
 
 --- Set if anyone in the list is auto building
----@param units Unit[]
+---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoMode(units, mode)
 end
 
 --- Set if anyone in the list is auto surfacing
----@param units Unit[]
+---@param units UserUnit[]
 ---@param mode boolean
 function SetAutoSurfaceMode(units, mode)
 end
 
 ---
----@param unit Unit
+---@param unit UserUnit
 ---@return BuildQueue
 function SetCurrentFactoryForQueueDisplay(unit)
 end
@@ -991,7 +994,7 @@ function SetCursor(cursor)
 end
 
 --- Set the specific fire state for the units passed in
----@param units Unit[]
+---@param units UserUnit[]
 ---@param fireState FireState
 function SetFireState(units, fireState)
 end
@@ -1037,7 +1040,7 @@ function SetOverlayFilters(list)
 end
 
 --- Pause builders in this list
----@param selection Unit[]
+---@param selection UserUnit[]
 ---@param paused boolean
 function SetPaused(selection, paused)
 end
@@ -1059,17 +1062,12 @@ end
 function SetVolume(category, volume)
 end
 
---- Performs a callback with the given identifier from `/lua/sim/simcallbacks.lua`.
+--- Performs a callback with the given identifier from `callback.Func` in `/lua/simcallbacks.lua`.
 --- Optionally appends the unit selection to the arguments.
----@param callback {Func: string, Args: table} where Func represents the callback functions and Args additional data
+---@param callback SimCallback where `Func` represents the callback function and `Args` is additional data
 ---@param addUnitSelection? boolean toggles appending the unit selection to the callback
 function SimCallback(callback, addUnitSelection)
 end
-
--- Something got messed up with whatever imported these functions, and not only did it
--- mix up comments and function names, it got them off by one
--- This means that I have no idea what function this goes to:
---       If bool is specified and true, sends the current selection with the command
 
 ---
 ---@param handle moho.sound_methods
@@ -1102,24 +1100,24 @@ end
 function TeamColorMode(mode)
 end
 
--- TODO do these kinds of functions (that duplicate in `Unit.lua`) also accept single units
+-- TODO: do these kinds of functions (that duplicate in `Unit.lua`) also accept single units
 -- like some of the other functions alude to?
 
 --- Set the right fire state for the units passed in
----@param units Unit[]
+---@param units UserUnit[]
 ---@param fireState FireState
 function ToggleFireState(units, fireState)
 end
 
 ---
----@param units Unit[]
+---@param units UserUnit[]
 ---@param bit number
 ---@param state boolean
 function ToggleScriptBit(units, bit, state)
 end
 
 ---
----@param userunit Unit
+---@param userunit UserUnit
 ---@param seconds? number
 function UISelectAndZoomTo(userunit, seconds)
 end
@@ -1134,16 +1132,16 @@ function UISelectionByCategory(expression, addToCurSel, inViewFrustum, nearestTo
 end
 
 ---
----@param units Unit[]
+---@param units UserUnit[]
 ---@param seconds? number
 function UIZoomTo(units, seconds)
 end
 
 ---
----@param self WorldView maybe?
+---@param view WorldView
 ---@param point Vector2
 ---@return Vector
-function UnProject(self, point)
+function UnProject(view, point)
 end
 
 ---
@@ -1153,8 +1151,8 @@ function ValidateIPAddress(ipaddr)
 end
 
 --- Validate a list of units
----@param units Unit[]
----@return Unit[]
+---@param units UserUnit[]
+---@return UserUnit[]
 function ValidateUnitsList(units)
 end
 
@@ -1170,19 +1168,19 @@ end
 
 --- For internal use by `Cursor.__init()`
 ---@param cursor Cursor
----@param spec any
+---@param spec table | nil
 function _c_CreateCursor(cursor, spec)
 end
 
 --- For internal use by `UserDecal.__init()`
 ---@param decal UserDecal
----@param spec any
+---@param spec table | nil
 function _c_CreateDecal(decal, spec)
 end
 
 --- For internal use by `PathDebugger.__init()`
 ---@param pathDebugger PathDebugger
----@param spec any
+---@param spec table
 function _c_CreatePathDebugger(pathDebugger, spec)
 end
 

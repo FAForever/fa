@@ -62,7 +62,7 @@ end
 function CMauiEdit:GetMaxChars()
 end
 
---- Get the advance of a string using the same font as the control
+--- Get the advance of a string using the same font as the text box
 ---@param text string
 function CMauiEdit:GetStringAdvance(text)
 end

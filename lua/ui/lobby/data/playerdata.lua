@@ -51,7 +51,7 @@ local DEFAULT_MAPPING = {
 }
 
 -- Represents player data using the magic of lazy variables.
----@class PlayerData : WatchedValueTable
+---@class WatchedPlayerData : WatchedValueTable
 PlayerData = Class(WatchedValueTable) {
     -- Create a new PlayerData object for the given player name.
     __init = function(self, initialMapping)

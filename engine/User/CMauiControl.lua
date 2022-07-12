@@ -6,7 +6,7 @@ local CMauiControl = {}
 function CMauiControl:AbandonKeyboardFocus()
 end
 
-
+---
 ---@param blocksKeyDown boolean
 function CMauiControl:AcquireKeyboardFocus(blocksKeyDown)
 end
@@ -51,7 +51,7 @@ end
 function CMauiControl:GetName()
 end
 
---- Return the parent of this control, or nil if it doesn't have one
+--- Return the parent of this control, or `nil` if it doesn't have one
 ---@return Control
 function CMauiControl:GetParent()
 end
@@ -76,15 +76,17 @@ function CMauiControl:HitTest(x, y)
 end
 
 --- Determine if the control is hidden
+---@return boolean
 function CMauiControl:IsHidden()
 end
 
 --- Determine if hit testing is disabled
+---@return boolean
 function CMauiControl:IsHitTestDisabled()
 end
 
 ---
---  bool NeedsFrameUpdate()
+---@return boolean
 function CMauiControl:NeedsFrameUpdate()
 end
 
@@ -114,8 +116,9 @@ function CMauiControl:SetParent(newParentControl)
 end
 
 ---
+---@param pass number
 ---@return number
-function CMauiControl:SetRenderPass()
+function CMauiControl:SetRenderPass(pass)
 end
 
 --- Start rendering and hit testing the control

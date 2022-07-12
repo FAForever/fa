@@ -19,11 +19,11 @@ local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
 local selectionOverlay = {
-        key = 'selection',
-        Label = "<LOC map_options_0006>Selection",
-        Pref = 'range_RenderSelected',
-        Type = 3,
-        Tooltip = "overlay_selection",
+    key = 'selection',
+    Label = "<LOC map_options_0006>Selection",
+    Pref = 'range_RenderSelected',
+    Type = 3,
+    Tooltip = "overlay_selection",
 }
 
 ---@param unit UserUnit

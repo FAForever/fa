@@ -125,3 +125,4 @@ end
 function Camera:UseSystemClock()
 end
 
+return Camera
