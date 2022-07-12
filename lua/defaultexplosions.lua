@@ -183,7 +183,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio, circularDebris)
     overKillRatio = overKillRatio or 1
     circularDebris = circularDebris or false
 
-    if unit then
+    if unit and (not IsDestroyed(unit)) then
         if IsUnit(unit) then
 
             -- cache blueprint values

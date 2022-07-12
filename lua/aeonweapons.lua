@@ -248,6 +248,9 @@ ADFTractorClaw = Class(Weapon) {
                     -- create thread to take into account the fall
                     self:ForkThread(self.TargetFallThread, target, trash, muzzle)
                     self:ResetTarget()
+                else 
+                    self:MakeVulnerable(target)
+                    trash:Destroy()
                 end
             else 
                 self:MakeVulnerable(target)
@@ -307,6 +310,10 @@ ADFTractorClaw = Class(Weapon) {
 
             projectile:Destroy()
         end
+
+        -- destroy it anyway after a while
+        WaitSeconds(10.0)
+        trash:Destroy()
     end,
 
     --- Delayed destruction of the trashbag, allows the wreck to copy over the rotators
