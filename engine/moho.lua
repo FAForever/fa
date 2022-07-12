@@ -2,62 +2,64 @@
 --- none of this code is executed, it is for example only
 ---@declare-global
 moho = {
-    -- sim
+    -- Sim
 
-    AimManipulator = require('/engine/sim/caimmanipulator.lua'),
-    AnimationManipulator = require('/engine/sim/canimationmanipulator.lua'),
-    --BoneEntityManipulator
-    BuilderArmManipulator = require('/engine/sim/cbuilderarmmanipulator.lua'),
-    --CDamage
-    --CDecalHandle
-    CollisionBeamEntity = require('/engine/sim/collisionbeamentity.lua'),
-    CollisionManipulator = require('/engine/sim/ccollisionmanipulator.lua'),
-    --EconomyEvent
-    --FootPlantManipulator
-    IEffect = require('/engine/sim/ieffect.lua'),
-    --MotorFallDown
-    RotateManipulator = require('/engine/sim/crotatemanipulator.lua'),
-    --SlaveManipulator
-    SlideManipulator = require('/engine/sim/cslidemanipulator.lua'),
-    --StorageManipulator
-    --ThrustManipulator
+    AimManipulator = require('/engine/Sim/CAimManipulator.lua'),
+    AnimationManipulator = require('/engine/Sim/CAnimationManipulator.lua'),
+    BoneEntityManipulator = require('/engine/Sim/CBoneEntityManipulator.lua'),
+    BuilderArmManipulator = require('/engine/Sim/CBuilderArmManipulator.lua'),
+    CDamage = require('/engine/Sim/CDamage.lua'),
+    CDecalHandle = require('/engine/Sim/CDecalHandle.lua'),
+    CollisionBeamEntity = require('/engine/Sim/CollisionBeamEntity.lua'),
+    CollisionManipulator = require('/engine/Sim/CCollisionManipulator.lua'),
+    EconomyEvent = require('/engine/Sim/CEconomyEvent.lua'),
+    FootPlantManipulator = require('/engine/Sim/CFootPlantManipulator.lua'),
+    IEffect = require('/engine/Sim/IEffect.lua'),
+    MotorFallDown = require('/engine/Sim/MotorFallDown.lua'),
+    RotateManipulator = require('/engine/Sim/CRotateManipulator.lua'),
+    SlaveManipulator = require('/engine/Sim/CSlaveManipulator.lua'),
+    SlideManipulator = require('/engine/Sim/CSlideManipulator.lua'),
+    StorageManipulator = require('/engine/Sim/CStorageManipulator.lua'),
+    ThrustManipulator = require('/engine/Sim/CThrustManipulator.lua'),
 
-    aibrain_methods = require('/engine/sim/caibrain.lua'),
-    --aipersonality_methods
-    --CAiAttackerImpl_methods
-    --blip_methods
-    entity_methods = require('/engine/sim/entity.lua'),
-    manipulator_methods = require('/engine/sim/ianimanipulator.lua'),
-    navigator_methods = require('/engine/sim/cainavigatorimpl.lua'),
-    projectile_methods = require('/engine/sim/projectile.lua'),
-    prop_methods = require('/engine/sim/prop.lua'),
-    --ScriptTask_Methods
-    shield_methods = require('/engine/sim/shield.lua'),
-    unit_methods = require('/engine/sim/unit.lua'),
-    weapon_methods = require('/engine/sim/unitweapon.lua'),
-    platoon_methods = require('/engine/sim/cplatoon.lua'),
+    aibrain_methods = require('/engine/Sim/CAiBrain.lua'),
+    aipersonality_methods = require('/engine/Sim/CAiPersonality.lua'),
+    CAiAttackerImpl_methods = require('/engine/Sim/CAiAttackerImpl.lua'),
+    blip_methods = require('/engine/Sim/ReconBlip.lua'),
+    entity_methods = require('/engine/Sim/Entity.lua'),
+    manipulator_methods = require('/engine/Sim/IAniManipulator.lua'),
+    navigator_methods = require('/engine/Sim/CAiNavigatorImpl.lua'),
+    projectile_methods = require('/engine/Sim/Projectile.lua'),
+    prop_methods = require('/engine/Sim/Prop.lua'),
+    ScriptTask_Methods = require('/engine/Sim/CUnitScriptTask.lua'),
+    shield_methods = require('/engine/Sim/Shield.lua'),
+    unit_methods = require('/engine/Sim/Unit.lua'),
+    weapon_methods = require('/engine/Sim/UnitWeapon.lua'),
+    platoon_methods = require('/engine/Sim/CPlatoon.lua'),
 
-    -- user
+    -- Core
 
-    bitmap_methods = require('/engine/user/cmauibitmap.lua'),
-    border_methods = require('/engine/user/cmauiborder.lua'),
-    control_methods = require('/engine/user/cmauicontrol.lua'),
-    cursor_methods = require('/engine/user/cmauicursor.lua'),
-    discovery_service_methods = require('/engine/user/cdiscoveryservice.lua'),
-    dragger_methods = require('/engine/user/cmauiluadragger.lua'),
-    edit_methods = require('/engine/user/cmauiedit.lua'),
-    frame_methods = require('/engine/user/cmauiframe.lua'),
-    group_methods = require('/engine/user/cmauigroup.lua'),
-    histogram_methods = require('/engine/user/cmauihistogram.lua'),
-    item_list_methods = require('/engine/user/cmauiitemlist.lua'),
-    lobby_methods = require('/engine/user/clobby.lua'),
-    mesh_methods = require('/engine/user/cmauimesh.lua'),
-    movie_methods = require('/engine/user/cmauimovie.lua'),
-    PathDebugger_methods = require('/engine/user/cpathdebugger.lua'),
-    scrollbar_methods = require('/engine/user/cmauiscrollbar.lua'),
-    text_methods = require('/engine/user/cmauitext.lua'),
-    UIWorldView = require('/engine/user/cuiworldview.lua'),
-    userDecal_methods = require('/engine/user/cuserdecal.lua'),
-    WldUIProvider_methods = require('/engine/user/cwlduiprovider.lua'),
-    world_mesh_methods = require('/engine/user/cuiworldmesh.lua'),
+    -- User
+
+    bitmap_methods = require('/engine/User/CMauiBitmap.lua'),
+    border_methods = require('/engine/User/CMauiBorder.lua'),
+    control_methods = require('/engine/User/CMauiControl.lua'),
+    cursor_methods = require('/engine/User/CMauiCursor.lua'),
+    discovery_service_methods = require('/engine/User/CDiscoveryService.lua'),
+    dragger_methods = require('/engine/User/CMauiLuaDragger.lua'),
+    edit_methods = require('/engine/User/CMauiEdit.lua'),
+    frame_methods = require('/engine/User/CMauiFrame.lua'),
+    group_methods = require('/engine/User/CMauiGroup.lua'),
+    histogram_methods = require('/engine/User/CMauiHistogram.lua'),
+    item_list_methods = require('/engine/User/CMauiItemList.lua'),
+    lobby_methods = require('/engine/User/CLobby.lua'),
+    mesh_methods = require('/engine/User/CMauiMesh.lua'),
+    movie_methods = require('/engine/User/CMauiMovie.lua'),
+    PathDebugger_methods = require('/engine/User/CPathDebugger.lua'),
+    scrollbar_methods = require('/engine/User/CMauiScrollbar.lua'),
+    text_methods = require('/engine/User/CMauiText.lua'),
+    UIWorldView = require('/engine/User/CUIWorldView.lua'),
+    userDecal_methods = require('/engine/User/ScriptedDecal.lua'),
+    WldUIProvider_methods = require('/engine/User/CLuaWldUIProvider.lua'),
+    world_mesh_methods = require('/engine/User/CUIWorldMesh.lua'),
 }
