@@ -4349,7 +4349,7 @@ Unit = Class(moho.unit_methods) {
 
     --- Add a callback when a missile launched by this unit hits the terrain, note that this can be the same location as the target
     ---@param self Unit
-    ---@param callback function<Unit | Vector, Vector>
+    ---@param callback function<Vector, Vector>
     AddMissileImpactTerrainCallback = function(self, callback)
         self.Callbacks['OnMissileImpactTerrain'] = self.Callbacks['OnMissileImpactTerrain'] or { }
         table.insert(self.Callbacks['OnMissileImpactTerrain'], callback)
