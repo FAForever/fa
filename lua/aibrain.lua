@@ -49,6 +49,10 @@ local CoroutineYield = coroutine.yield
 ---@alias HqLayer "LAND"|"AIR"|"NAVY"
 ---@alias HqFaction "AEON"|"UEF"|"SERAPHIM"|"CYBRAN"|"NOMADS"
 
+---@class EnergyDependentEntity
+---@field OnEnergyDepleted fun(self: EnergyDependentEntity)
+---@field OnEnergyViable fun(self: EnergyDependentEntity)
+
 ---@class AIBrain: moho.aibrain_methods
 ---@field Trash TrashBag
 ---@field Result AIResult|nil
@@ -541,10 +545,9 @@ AIBrain = Class(moho.aibrain_methods) {
         end
     end,
 
-    ---@alias EnergyDependentEntity {OnEnergyDepleted: fun(self), OnEnergyViable: fun(self)}
-
-    ---Add an entity to the list of entities that receive callbacks when the energy storage is
-    ---depleted or viable. Expects the functions `OnEnergyDepleted` and `OnEnergyViable` on the unit
+    --- Add an entity to the list of entities that receive callbacks when the energy storage is
+    --- depleted or becomes viable.
+    --- Expects the functions `OnEnergyDepleted` and `OnEnergyViable` on the unit.
     ---@param self AIBrain
     ---@param entity EnergyDependentEntity
     AddEnergyDependingEntity = function(self, entity)
@@ -552,10 +555,11 @@ AIBrain = Class(moho.aibrain_methods) {
         self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
     end,
 
-    ---Remove an entity from the list of entities that receive callbacks when the energy storage is
-    ---depleted or viable
+    --- Remove an entity from the list of entities that receive callbacks when the energy storage is
+    --- depleted or becomes viable. Return if the entity was successfully removed.
     ---@param self AIBrain
     ---@param entity EnergyDependentEntity
+    ---@return boolean
     RemoveEnergyDependingEntity = function(self, entity)
         local energyDependingUnits = self.EnergyDependingUnits
         for i = 1, self.EnergyDependingUnitsHead - 1 do

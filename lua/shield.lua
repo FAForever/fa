@@ -130,7 +130,7 @@ for k, bp in __blueprints do
     end
 end
 
----@class Shield : moho.shield_methods, Entity
+---@class Shield : moho.shield_methods, Entity, EnergyDependentEntity
 ---@field Brain AIBrain
 Shield = Class(moho.shield_methods, Entity) {
     __init = function(self, spec, owner)

@@ -150,7 +150,7 @@ local function PopulateBlueprintCache(entity, blueprint)
 end
 
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods, moho.entity_methods
+---@class Unit : moho.unit_methods, EnergyDependentEntity
 ---@field Brain AIBrain
 ---@field Army Army
 ---@field UnitId UnitId
@@ -2673,7 +2673,7 @@ Unit = Class(moho.unit_methods) {
     -- As an optimisation, EnableIntel and DisableIntel are only called when going from one disabler
     -- present to zero, and when going from zero disablers to one.
 
-    ---Add a disabler for an intel field. Return if it's the first one for the intel field
+    --- Add a disabler for an intel field. Return if it's the first one for the intel field.
     ---@param self Unit
     ---@param disabler string
     ---@param intel string
@@ -2693,7 +2693,7 @@ Unit = Class(moho.unit_methods) {
             local bpIntel = self.Blueprint.Intel
             local active = bpIntel.ActiveIntel
             if active and active[intel] then
-                return
+                return false
             end
             self:DisableIntel(intel)
 
@@ -2710,8 +2710,8 @@ Unit = Class(moho.unit_methods) {
         return intDisabled
     end;
 
-    ---Add a disabler to an intel field (or all of them if absent). Call `OnIntelDisabled` if it's the
-    ---first disabler for any of the intel fields
+    --- Add a disabler to an intel field (or all of them if absent). Call `OnIntelDisabled` if it's the
+    --- first disabler for any of the intel fields.
     ---@param self Unit
     ---@param disabler string
     ---@param intel? string
@@ -2732,7 +2732,7 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ---Remove a disabler from an intel field. Return if it was the last one for the intel field
+    --- Remove a disabler from an intel field. Return if it was the last one for the intel field.
     ---@param self Unit
     ---@param disabler string
     ---@param intel string
@@ -2764,8 +2764,8 @@ Unit = Class(moho.unit_methods) {
         return false
     end;
 
-    ---Remove a disabler from an intel field (or all of them if absent). Call `OnIntelEnabled` if it's
-    ---the last disabler for any of the intel fields
+    --- Remove a disabler from an intel field (or all of them if absent). Call `OnIntelEnabled` if it's
+    --- the last disabler for any of the intel fields.
     ---@param self Unit
     ---@param disabler string
     ---@param intel? string
@@ -2852,9 +2852,9 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    ---Stop the intel reactivation thread if it exists, otherwise disable intel. Called when the player
-    ---stops power stalling by the AIBrain.
-    ---This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel
+    --- Stop the intel reactivation thread if it exists; otherwise, disable intel. Called when the player
+    --- stops power stalling by the AIBrain.
+    --- This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel.
     ---@param self Unit
     OnEnergyDepleted = function(self)
         if self.IntelReactivateThread then
@@ -2865,17 +2865,19 @@ Unit = Class(moho.unit_methods) {
         end
     end;
 
-    ---Create the intel reactivation thread, called when the player stops power stalling by the AIBrain.
-    ---This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel
+    --- Create the intel reactivation thread, called when the player stops power stalling by the AIBrain.
+    --- This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel.
     ---@param self Unit
     OnEnergyViable = function(self)
+        -- Not sure how the thread could already be active, since energy can only become viable after
+        -- it's been depleted, and that removes any threads. Good to be safe though.
         if not self.IntelReactivateThread then
             self.IntelReactivateThread = self:ForkThread(self.IntelReactivate)
         end
     end;
 
-    ---Enable unit intel after the reactivation time has passed (`Blueprint.Intel.ReactivateTime` or
-    ---10 seconds)
+    --- Enable unit intel after the reactivation time has passed (`Blueprint.Intel.ReactivateTime` or
+    --- 10 seconds)
     ---@param self Unit
     IntelReactivate = function(self)
         local recharge = self.Blueprint.Intel.ReactivateTime or 10
@@ -3014,7 +3016,7 @@ Unit = Class(moho.unit_methods) {
             for _, remEnh in bp.RemoveEnhancements do
                 RemoveUnitEnhancement(self, remEnh)
             end
-            if self.EnhanceableIntelEnergyDependency == true then
+            if self.EnhanceableIntelEnergyDependency then
                 for _, remEnh in bp.RemoveEnhancements do
                     local maint = self.Blueprint.Enhancements[remEnh].MaintenanceConsumptionPerSecondEnergy
                     if maint and maint > 0 then
@@ -3026,7 +3028,8 @@ Unit = Class(moho.unit_methods) {
             end
         end
         -- check against false because this field will be `nil` when the energy dependency
-        -- doesn't change with enhancements (i.e. the dependency will already exist)
+        -- doesn't change with enhancements (i.e. either the dependency will always exist
+        -- or never exist, regardless of any enhancement)
         if self.EnhanceableIntelEnergyDependency == false or removeEnergyDependency then
             local maint = bp.MaintenanceConsumptionPerSecondEnergy
             if maint and maint > 0 then
