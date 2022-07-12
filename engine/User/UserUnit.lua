@@ -163,7 +163,7 @@ function UserUnit:IsIdle()
 end
 
 ---
----@param category CategorieType
+---@param category moho.EntityCategory
 ---@return boolean
 function UserUnit:IsInCategory(category)
 end

@@ -9,20 +9,8 @@
 ---@alias AIExpansionOptionValue '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
 ---| '99999' unlimited expansions allowed
 
--- Note, this documentation pulls from `lobby.lua` which is in need of refactoring
-
----@class GameInfo
----@field AutoTeams number[]
----@field ClosedSlots boolean[]
----@field firstUpdateAvailableSlotsDone boolean
----@field GameMods ModInfo[] | table<string, true> lobby changes the set of mod UID's into a ModInfo array at launch
----@field GameOptions ScenarioOptions
----@field Observers PlayerData[]
----@field PlayerOptions PlayerData[]
----@field SpawnMex boolean[]
-
 --- Additionally, extra options can be specified by the map in `mapname .. 'options.lua'`
----@class ScenarioOptions
+---@class GameOptions
 ---@field AutoTeams 'none' | 'manual' | 'tvsb' | 'lvsr' | 'pvsi'
 ---@field TeamLock 'locked' | 'unlocked'
 ---@field TeamSpawn 'fixed' | 'random' | 'balanced' | 'balanced_flex' | 'random_reveal' | 'balanced_reveal' | 'balanced_reveal_mirrored' | 'balanced_flex_reveal'
@@ -71,6 +59,7 @@
 ---@field key any
 
 -- options that show up in the team options panel
+---@type ScenarioOption[][]
 teamOptions =
 {
     {
@@ -174,6 +163,7 @@ teamOptions =
     },
 }
 
+---@type ScenarioOption[]
 globalOpts = {
     {
         default = 1,
@@ -573,6 +563,7 @@ globalOpts = {
     },
 }
 
+---@type ScenarioOption[]
 AIOpts = {
    {
         default = 11,

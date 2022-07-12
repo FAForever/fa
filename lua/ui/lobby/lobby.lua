@@ -235,8 +235,10 @@ local localPlayerName = ""
 local gameName = ""
 local hostID = false
 local singlePlayer = false
+---@type Group
 local GUI = false
 local localPlayerID = false
+---@type GameData | WatchedGameData
 local gameInfo = false
 local pmDialog = false
 local lastKickMessage = UTF.UnescapeString(Prefs.GetFromCurrentProfile('lastKickMessage') or "")

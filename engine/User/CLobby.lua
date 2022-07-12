@@ -11,7 +11,7 @@ local CLobby = {}
 ---@field status string
 
 ---
----@param data {Type: string}
+---@param data CommunicationData
 function CLobby:BroadcastData(data)
 end
 
@@ -84,7 +84,7 @@ function CLobby:JoinGame(address, remotePlayerName, remotePlayerUID)
 end
 
 ---
----@param gameConfig GameInfo
+---@param gameConfig GameData
 function CLobby:LaunchGame(gameConfig)
 end
 
@@ -103,7 +103,7 @@ end
 
 ---
 ---@param targetID string
----@param data {Type: string}
+---@param data CommunicationData
 function CLobby:SendData(targetID, data)
 end
 

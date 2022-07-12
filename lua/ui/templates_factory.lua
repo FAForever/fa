@@ -1,13 +1,14 @@
 ---@class BuildTemplateBuilding
 ---@field [1] string unit id
----@field [2] integer build order
----@field [3] integer position x
----@field [4] integer position z
+---@field [2] number build order
+---@field [3] number position x
+---@field [4] number position z
 
 ---@class BuildQueue
 ---@field [1] number
 ---@field [2] number
---@field [3...] BuildTemplateBuilding
+---@field [3] BuildTemplateBuilding
+--@field [...] BuildTemplateBuilding
 
 ---@class BuildTemplate
 ---@field templateData table

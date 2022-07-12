@@ -155,4 +155,39 @@ end
 function CMauiEdit:ShowCaret(show)
 end
 
+---@class KeyEvent
+---@field Control Control
+---@field KeyCode number
+---@field Modifiers {Shift?: true, Alt?: true} only `Shift` and `Alt` are acceptable modifiers
+---@field MouseX number
+---@field MouseY number
+---@field RawKeyCode number
+---@field Type string
+---@field WheelDelta number
+---@field WheelRotation number
+
+--- Called when the text has changed in the text box. Passes in the newly changed text
+--- and the previous text.
+---@type fun(self: Edit, newText: string, oldText: string)
+CMauiEdit.OnTextChanged = nil
+
+--- Called when the user presses the enter key. Passes in the current contents of the text box.
+---@type fun(self: Edit, text: string)
+CMauiEdit.OnEnterPressed = nil
+
+--- Called when non-text keys are pressed. If the key already affected the text, such as with `Backspace`
+--- or `Delete`, then the event has already been handled and won't propagate down.
+---@param keycode number Windows VK keycode
+---@type fun(self: Edit, keycode: number, event: KeyEvent)
+CMauiEdit.OnNonTextKeyPressed = nil
+
+--- Called when a character key is pressed, before it is entered in to the dialog. If the function
+--- returns `true` (indicating the char is handled) then the character is not inserted in the dialog.
+---@type fun(self: Edit, charcode: number): boolean
+CMauiEdit.OnCharPressed = nil
+
+--- Called when the `escape` key is pressed. Return `true` to prevent the text box from clearing.
+---@type fun(self: Edit, text: string): boolean
+CMauiEdit.OnEscPressed = nil
+
 return CMauiEdit

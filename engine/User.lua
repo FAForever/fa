@@ -1,6 +1,5 @@
 ---@meta
 
-
 --- No clue what this does
 ---@param entityId number
 ---@param onTime number
@@ -99,7 +98,7 @@ end
 function CurrentTime()
 end
 
---- Return true if debug facilities are enabled
+--- Return `true` if debug facilities are enabled
 ---@return boolean
 function DebugFacilitiesEnabled()
 end
@@ -137,20 +136,20 @@ function EngineStartSplashScreens()
 end
 
 --- Return true if a unit category contains this unit
----@param category CategorieType
+---@param category moho.EntityCategory
 ---@param unit Unit
 function EntityCategoryContains(category, unit)
 end
 
 --- Filter a list of units to only those found in the category
----@param category CategorieType
+---@param category moho.EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
 function EntityCategoryFilterDown(category, units)
 end
 
 --- Filter a list of units to exclude those found in the category
----@param category CategorieType
+---@param category moho.EntityCategory
 ---@param units Unit[]
 ---@return Unit[]
 function EntityCategoryFilterOut(category, units)
@@ -218,7 +217,8 @@ end
 function GetArmyAvatars()
 end
 
----
+--- It is unknown where this number gets pulled from
+---@param armyIndex number
 ---@return number
 function GetArmyScore(armyIndex)
 end
@@ -235,9 +235,12 @@ end
 function GetAttachedUnitsList(units)
 end
 
----
----@param obj Unit | Prop
----@return UnitBlueprint | PropBlueprint
+--- Get the blueprint of an object
+---@param obj Entity
+---@return nil
+---@overload fun(unit: UserUnit): UnitBlueprint
+---@overload fun(weapon: Weapon): WeaponBlueprint
+---@overload fun(unit: Prop): PropBlueprint
 function GetBlueprint(obj)
 end
 
@@ -247,12 +250,17 @@ end
 function GetCamera(name)
 end
 
----
----@return CommandArgTable
-function GetCommandLineArg(option, number)
+--- Gets the following arguments to a commandline option. For example, if `/arg flag key:value`
+--- was passed to the commandline, then `GetCommandLineArg("/arg", 2)` would return
+--- `{"flag", "key:value"}`
+---@see GetCommandLineArgTable(option) for parsing key-values
+---@param option string
+---@param maxArgs number
+---@return string[]?
+function GetCommandLineArg(option, maxArgs)
 end
 
---- Return 'splash', 'frontend' or 'game' depending on the current state of the ui
+--- Return 'splash', 'frontend', or 'game' depending on the current state of the UI
 ---@return 'splash' | 'frontend' | 'game'
 function GetCurrentUIState()
 end
@@ -351,10 +359,8 @@ end
 function GetIsSubmerged(units)
 end
 
--- TODO these vectors may actually use x,y,z, fields?
-
 ---
----@return Vector
+---@return Vector2
 function GetMouseScreenPos()
 end
 
@@ -397,7 +403,10 @@ function GetRolloverInfo()
 end
 
 --- Get the state for the script bit
-function GetScriptBit()
+---@param unit Unit
+---@param bit number
+---@return boolean
+function GetScriptBit(unit, bit)
 end
 
 --- Return a table of the currently selected units
@@ -406,6 +415,7 @@ function GetSelectedUnits()
 end
 
 --- Return a table of the various clients in the current session
+---@return table[]
 function GetSessionClients()
 end
 
@@ -480,7 +490,7 @@ end
 ---@param unitSet any
 ---@return string[] orders
 ---@return OrderInfo[] availableToggles
----@return CategorieType[] buildableCategories
+---@return moho.EntityCategory[] buildableCategories
 function GetUnitCommandData(unitSet)
 end
 
@@ -521,6 +531,7 @@ function HasLocalizedVO(language)
 end
 
 --- Add a set of key mappings
+---@param keyMapTable table
 function IN_AddKeyMapTable(keyMapTable)
 end
 
@@ -529,6 +540,7 @@ function IN_ClearKeyMap()
 end
 
 --- Remove the keys from the key map
+---@param keyMapTable table
 function IN_RemoveKeyMapTable(keyMapTable)
 end
 
@@ -538,115 +550,116 @@ end
 function IncreaseBuildCountInQueue(queueIndex, count)
 end
 
---- For internal use by CreateBitmap()
----@param luaobj any
+--- For internal use by `Bitmap.__init()`
+---@param bitmap Bitmap
 ---@param parent any
-function InternalCreateBitmap(luaobj, parent)
+function InternalCreateBitmap(bitmap, parent)
 end
 
---- For internal use by CreateBorder()
----@param luaobj any
----@param parent any
-function InternalCreateBorder(luaobj, parent)
+--- For internal use by `Border.__init()`
+---@param border Border
+---@param parent Control
+function InternalCreateBorder(border, parent)
 end
 
----
----@param service Class
----@return Service
-function InternalCreateDiscoveryService(service)
+--- For internal use by `CreateDiscoveryService()`
+---@param serviceClass fa-class
+---@return DiscoveryService
+function InternalCreateDiscoveryService(serviceClass)
 end
 
---- For internal use by CreateDragger()
----@param luaobj any
-function InternalCreateDragger(luaobj)
+--- For internal use by `Dragger.__init()`
+---@param dragger Dragger
+function InternalCreateDragger(dragger)
 end
 
----
----@param luaobj any
----@param parent any
-function InternalCreateEdit(luaobj, parent)
+--- For internal use by `Edit.__init()`
+---@param edit Edit
+---@param parent Control
+function InternalCreateEdit(edit, parent)
 end
 
---- For internal use by CreateFrame()
----@param luaobj any
-function InternalCreateFrame(luaobj)
+--- For internal use by `Frame.__init()`
+---@param frame Frame
+function InternalCreateFrame(frame)
 end
 
---- For internal use by CreateGroup()
----@param luaobj any
----@param parent any
-function InternalCreateGroup(luaobj, parent)
+--- For internal use by `Group.__init()`
+---@param group Group
+---@param parent Control
+function InternalCreateGroup(group, parent)
 end
 
---- For internal use by CreateHistogram()
----@param luaobj any
----@param parent any
-function InternalCreateHistogram(luaobj, parent)
+--- For internal use by `Histogram.__init()`
+---@param histogram Histogram
+---@param parent Control
+function InternalCreateHistogram(histogram, parent)
 end
 
---- For internal use by CreateItemList()
----@param luaobj any
----@param parent any
-function InternalCreateItemList(luaobj, parent)
+--- For internal use by `ItemList.__init()`
+---@param itemList ItemList
+---@param parent Control
+function InternalCreateItemList(itemList, parent)
 end
 
----
----@param class any
+--- For internal use by CreateLobbyComm()
+---@param lobbyComClass fa-class
 ---@param protocol string
 ---@param localPort number
 ---@param maxConnections number
 ---@param playerName string
 ---@param playerUID string
 ---@param natTraversalProvider userdata
-function InternalCreateLobby(class, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
+---@return LobbyComm
+function InternalCreateLobby(lobbyComClass, protocol, localPort, maxConnections, playerName, playerUID, natTraversalProvider)
 end
 
----
----@param luaobj any
----@param parent any
-function InternalCreateMapPreview(luaobj, parent)
+--- For internal use by `MapPreview.__init()`
+---@param mapPreview MapPreview
+---@param parent Control
+function InternalCreateMapPreview(mapPreview, parent)
 end
 
---- For internal use by CreateMesh()
----@param luaobj any
----@param parent any
-function InternalCreateMesh(luaobj, parent)
+--- For internal use by `Mesh.__init()`
+---@param mesh Mesh
+---@param parent Control
+function InternalCreateMesh(mesh, parent)
 end
 
---- For internal use by CreateMovie()
----@param luaobj any
----@param parent any
-function InternalCreateMovie(luaobj, parent)
+--- For internal use by `Movie.__init()`
+---@param movie Movie
+---@param parent Control
+function InternalCreateMovie(movie, parent)
 end
 
---- For internal use by CreateScrollBar()
----@param luaobj any
----@param parent any
+--- For internal use by `ScrollBar.__init()`
+---@param scrollBar Scrollbar
+---@param parent Control
 ---@param axis "Vert"|"Horz" found in `/lua/scrollbar.lua#ScrollAxis`
-function InternalCreateScrollbar(luaobj, parent, axis)
+function InternalCreateScrollbar(scrollBar, parent, axis)
 end
 
----
----@param luaobj any
----@param parent any
-function InternalCreateText(luaobj, parent)
+--- For internal use by `Text.__init()`
+---@param text Text
+---@param parent Control
+function InternalCreateText(text, parent)
 end
 
---- Create the C++ script object
----@param luaobj any
-function InternalCreateWldUIProvider(luaobj)
+--- For internal use by `WldUIProvider.__init()`
+---@param wldUIProvider WldUIProvider
+function InternalCreateWldUIProvider(wldUIProvider)
 end
 
---- For internal use by WorldMesh()
----@param luaobj any
-function InternalCreateWorldMesh(luaobj)
+--- For internal use by `WorldMesh.__init()`
+---@param worldMesh WorldMesh
+function InternalCreateWorldMesh(worldMesh)
 end
 
 --- Save the current session
----@param filename any
----@param friendlyname any
----@param oncompletion any
-function InternalSaveGame(filename,  friendlyname,  oncompletion)
+---@param filename string
+---@param friendlyname string
+---@param oncompletion fun(worked: boolean, errmsg: string)
+function InternalSaveGame(filename, friendlyname, oncompletion)
 end
 
 ---
@@ -677,8 +690,9 @@ function IsNeutral(army1, army2)
 end
 
 ---
+---@param playerId string
 ---@return boolean
-function IsObserver()
+function IsObserver(playerId)
 end
 
 ---
@@ -759,7 +773,7 @@ end
 
 --- Parse a string to generate a new entity category
 ---@param cat string
----@return CategorieType
+---@return moho.EntityCategory
 function ParseEntityCategory(cat)
 end
 
@@ -941,7 +955,7 @@ end
 --- Resume the world simulation
 function SessionResume()
 end
-
+ 
 ---
 ---@param client? number | number[] client or clients
 ---@param message string
@@ -1005,7 +1019,7 @@ end
 
 ---
 ---@param overlay string
----@param categories CategorieType
+---@param categories moho.EntityCategory
 ---@param normalColor string
 ---@param selectColor string
 ---@param rolloverColor string
@@ -1154,20 +1168,22 @@ end
 function WorldIsPlaying()
 end
 
----
----@param luaobj any
+--- For internal use by `Cursor.__init()`
+---@param cursor Cursor
 ---@param spec any
-function _c_CreateCursor(luaobj, spec)
+function _c_CreateCursor(cursor, spec)
 end
 
---- Create a decal in the user layer
-function _c_CreateDecal(luaobj, spec)
+--- For internal use by `UserDecal.__init()`
+---@param decal UserDecal
+---@param spec any
+function _c_CreateDecal(decal, spec)
 end
 
----
----@param luaobj any
+--- For internal use by `PathDebugger.__init()`
+---@param pathDebugger PathDebugger
 ---@param spec any
-function _c_CreatePathDebugger(luaobj, spec)
+function _c_CreatePathDebugger(pathDebugger, spec)
 end
 
 ------

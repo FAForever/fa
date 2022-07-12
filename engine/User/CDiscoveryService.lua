@@ -3,6 +3,7 @@
 local CDiscoveryService = {}
 
 ---
+---@return number
 function CDiscoveryService:GetGameCount()
 end
 

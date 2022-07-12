@@ -3,15 +3,18 @@
 local CMauiHistogram = {}
 
 ---
-function CMauiHistogram:SetData()
+---@param data {color: string, data: number[]}[]
+function CMauiHistogram:SetData(data)
 end
 
----
+--- Set the increment of the X-axis. If the axis needs to resize (e.g. a value comes in that's higher than
+--- the current maximum) then it will do so in increments of this value.
 ---@param inc number
 function CMauiHistogram:SetXIncrement(inc)
 end
 
----
+--- Set the increment of the Y-axis. If the axis needs to resize (e.g. a value comes in that's higher than
+--- the current maximum) then it will do so in increments of this value.
 ---@param inc number
 function CMauiHistogram:SetYIncrement(inc)
 end

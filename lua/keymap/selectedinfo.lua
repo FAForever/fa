@@ -1,27 +1,15 @@
----@class RolloverInfo
+---@class RolloverInfo : EconData, MissileInfo
 ---@field armyIndex number
 ---@field blueprintId string
 ---@field customName? string
----@field energyConsumed number
----@field energyProduced number
----@field energyRequested number
 ---@field entityId string
 ---@field focus? RolloverInfo
 ---@field focusUpgrade? RolloverInfo
 ---@field fuelRatio number
 ---@field health? number
 ---@field kills number
----@field massConsumed number
----@field massProduced number
----@field massRequested number
 ---@field maxHealth? number
----@field nukeSiloBuildCount number
----@field nukeSiloMaxStorageCount number
----@field nukeSiloStorageCount number
 ---@field shieldRatio number
----@field tacticalSiloBuildCount number
----@field tacticalSiloMaxStorageCount number
----@field tacticalSiloStorageCount number
 ---@field teamColor string
 ---@field userUnit? Unit
 ---@field workProgress number
@@ -38,7 +26,7 @@ local selectionOverlay = {
         Tooltip = "overlay_selection",
 }
 
----@param unit Unit
+---@param unit UserUnit
 ---@return RolloverInfo
 function GetUnitRolloverInfo(unit)
     local info = {}

@@ -199,6 +199,8 @@ Mod initialization issues
 '
 -------------------------------------------------------------------------------------------------------------------- ]]
 
+-- we should really stick `optiondir` in here, so it isn't hardcoded to `mapname .. 'options.lua'`
+
 ---@class ModInfo
 ---@field location string    defaults to `Dirname(filename)`
 ---@field name string        defaults to `filename`
@@ -219,6 +221,7 @@ Mod initialization issues
 ---@field after? string[] UID list of mods this this mod will be applied after; defaults to `requires` if present
 ---@field requiresNames? table<string, string> Optional UID-to-name map of required mods
 
+---@alias uidSet table<string, true>
 
 local SetUtils = import('/lua/system/setutils.lua')
 
@@ -228,7 +231,7 @@ local _mod_cache = nil
 
 --- Set the list of active mods requested by the user from the mod manager.
 --- `nil` means do nothing (happens when `cancel` is selected from mod manager)
----@param s? set<string> set of mod UID's
+---@param s? uidSet set of mod UID's
 function SetSelectedMods(s)
     if s then
         LOG("MOD LIST SET TO:")
@@ -242,7 +245,7 @@ function SetSelectedMods(s)
 end
 
 ---
----@return table<string, true> set of mod UID's
+---@return uidSet #set of mod UID's
 function GetLocallyAvailableMods()
     local result = {}
     for k,mod in AllMods() do
@@ -254,7 +257,7 @@ function GetLocallyAvailableMods()
 end
 
 --- Get list of selected mods and check if they still exist
----@return table<string, true> set of mod UID's
+---@return uidSet #set of mod UID's
 function GetSelectedMods()
     local ModsFromGamePrefs = GetPreference('active_mods') or {}
     local ModsFromDisk= {}
@@ -272,7 +275,7 @@ function GetSelectedMods()
 end
 
 --- Return those selected mods with `ui_only` set to true filtered out
----@return table<string, true> set of mod UID's
+---@return uidSet #set of mod UID's
 function GetSelectedSimMods()
     return SetUtils.PredicateFilter(GetSelectedMods(),
         function(uid)
@@ -282,7 +285,7 @@ function GetSelectedSimMods()
 end
 
 --- Return those selected mods with `ui_only` not set to true filtered out
----@return table<string, true> set of mod UID's
+---@return uidSet #set of mod UID's
 function GetSelectedUIMods()
     return SetUtils.PredicateFilter(GetSelectedMods(),
         function(uid)
@@ -423,7 +426,7 @@ end
 --- Only `ui_only` mods are included in the list; mods that affect the sim
 --- are from `GetActiveGameMods()`.
 ---@param filter fun(mod: ModInfo): boolean
----@param selected? table<string, true> set of mod UID's; defaults to `GetSelectedMods()`
+---@param selected? uidSet set of mod UID's; defaults to `GetSelectedMods()`
 ---@return ModInfo[]
 local function GetActiveModsFiltered(filter, selected)
     if not selected then
@@ -451,14 +454,14 @@ local function GetActiveModsFiltered(filter, selected)
 end
 
 --- Return a list out of the mods that have `ui_only` set to true
----@param mods? table<string, true> set of mod UID's; defaults to `GetSelectedMods()`
+---@param mods? uidSet set of mod UID's; defaults to `GetSelectedMods()`
 ---@return ModInfo[]
 function GetUiMods(mods)
     return GetActiveModsFiltered(function(m) return m.ui_only end, mods)
 end
 
 --- Return a list out of the mods that don't have `ui_only` set to true
----@param mods? table<string, true> set of mod UID's; defaults to `GetSelectedMods()`
+---@param mods? uidSet set of mod UID's; defaults to `GetSelectedMods()`
 ---@return ModInfo[]
 function GetGameMods(mods)
     return GetActiveModsFiltered(function(m) return not m.ui_only end, mods)
@@ -467,7 +470,7 @@ end
 --- If `scenario` is a campaign type, return only the FAF campaign mod (`6AAFE20A-E851-11DB-B8BE-ECC755D89593`).
 --- Otherwise, return `GetGameMods()`.
 ---@param scenario UIScenarioInfo
----@return table<string, true> #set of mod UID's
+---@return uidSet #set of mod UID's
 function GetCampaignMods(scenario)
     local r
     if scenario.type == 'campaign' then
@@ -483,7 +486,7 @@ end
 ---  `missing`: set of uids that this mod requires but aren't installed  
 ---  `conflicts`: set of installed uids that this mod conflicts with (or conflict with this mod)
 ---@param uid string
----@return {requires: table<string, true>, missing: table<string, true>, conflicts: table<string, true>}
+---@return {requires: uidSet, missing: uidSet, conflicts: uidSet}
 function GetDependencies(uid)
     local ret = {requires = {}, missing = {}, conflicts = {}}
     local allMods = AllMods()

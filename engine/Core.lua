@@ -28,6 +28,8 @@
 ---@field [3] number x2
 ---@field [4] number z2
 
+---@alias Object Entity | Prop | Unit | Weapon
+
 ---
 --  Create a target object
 function AITarget()
