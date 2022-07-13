@@ -1,13 +1,3 @@
---- Watched version of `GameData` that can easily change with the lobby
----@class WatchedGameData
----@field AutoTeams number[]
----@field ClosedSlots boolean[]
----@field GameMods table<string, true>
----@field GameOptions GameOptions
----@field Observers WatchedValueArray<PlayerData>
----@field PlayerOptions WatchedValueArray<PlayerData>
----@field SpawnMex boolean[]
-
 --- Flattened version of `WatchedGameData` that can interact with the engine
 ---@class GameData
 ---@field AutoTeams number[]
@@ -17,6 +7,12 @@
 ---@field Observers PlayerData[]
 ---@field PlayerOptions PlayerData[]
 ---@field SpawnMex boolean[]
+
+--- Watched version of `GameData` that can easily change with the lobby
+---@class WatchedGameData : GameData
+---@field GameMods table<string, true>
+---@field Observers WatchedValueArray<PlayerData>
+---@field PlayerOptions WatchedValueArray<PlayerData>
 
 local PlayerData = import('/lua/ui/lobby/data/playerdata.lua').PlayerData
 local WatchedValueArray = import('/lua/ui/lobby/data/watchedvalue/watchedvaluearray.lua').WatchedValueArray

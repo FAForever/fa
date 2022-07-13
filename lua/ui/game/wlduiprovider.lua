@@ -8,7 +8,7 @@
 
 -- Functions exposed to lua
 
----@class WldUIProvider
+---@class WldUIProvider : moho.WldUIProvider_methods
 WldUIProvider = Class(moho.WldUIProvider_methods) {
     __init = function(self)
         InternalCreateWldUIProvider(self)
