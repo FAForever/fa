@@ -277,6 +277,11 @@ end
 function GetEconomyTotals()
 end
 
+---@alias FireState
+---| 0 # Return fire
+---| 1 # Hold fire
+---| 2 # Ground fire
+
 --- Get the right fire state for the units passed in
 ---@param units UserUnit[]
 ---@return FireState
