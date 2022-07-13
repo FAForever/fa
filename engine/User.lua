@@ -416,9 +416,9 @@ end
 function GetSelectedUnits()
 end
 
---- Return a table of the various clients in the current session
+--- Return a table of the various clients in the current session.
 --- Note that this is cached by `/lua/ui/override/SessionClients.lua`
----@return table[]
+---@return Client[]
 function GetSessionClients()
 end
 
@@ -1168,19 +1168,19 @@ end
 
 --- For internal use by `Cursor.__init()`
 ---@param cursor Cursor
----@param spec table | nil
+---@param spec fa-class | nil
 function _c_CreateCursor(cursor, spec)
 end
 
 --- For internal use by `UserDecal.__init()`
 ---@param decal UserDecal
----@param spec table | nil
+---@param spec fa-class | nil
 function _c_CreateDecal(decal, spec)
 end
 
 --- For internal use by `PathDebugger.__init()`
 ---@param pathDebugger PathDebugger
----@param spec table
+---@param spec fa-class
 function _c_CreatePathDebugger(pathDebugger, spec)
 end
 

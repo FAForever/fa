@@ -512,9 +512,9 @@ function Unit:SetElevation()
 end
 
 ---@alias FireState
----| 0 #Return fire
----| 1 #Hold fire
----| 2 #Ground fire
+---| 0 # Return fire
+---| 1 # Hold fire
+---| 2 # Ground fire
 
 --- Set a specific fire state for the retaliation state of the unit
 ---@param fireState FireState
