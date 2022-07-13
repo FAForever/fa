@@ -293,7 +293,7 @@ ADFTractorClaw = Class(Weapon) {
 
         projectile.OnImpact = function(projectile)
             if not IsDestroyed(target) then
-                -- self:MakeVulnerable(target)
+                target.CanTakeDamage = true
                 if not IsDestroyed(self.unit) then
                     if target.MyShield and target.MyShield:IsOn() then
                         Damage(self.unit, self.unit:GetPosition(muzzle), target.MyShield, target.MyShield:GetHealth() + 1, 'Disintegrate')
