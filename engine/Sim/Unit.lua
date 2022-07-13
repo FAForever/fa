@@ -511,7 +511,7 @@ end
 function Unit:SetElevation()
 end
 
---- Set a specific fire state for the retaliation state of the unit
+--- Set a specific fire state for the retaliation state of the unit.
 -- @param fireState Return fie - 0, Hold fire - 1 and Ground fire - 2.
 function Unit:SetFireState(fireState)
 end
