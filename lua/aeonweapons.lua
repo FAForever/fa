@@ -207,6 +207,9 @@ ADFTractorClaw = Class(Weapon) {
             target:AttachBoneTo(-1, unit, muzzle)
             self:MakeImmune(target)
 
+            -- make it stop what it was doing
+            IssueClearCommands({target})
+
             local velocity = self.SliderVelocity[target.Blueprint.TechCategory] or 15
 
             -- start pulling back the slider
@@ -323,6 +326,7 @@ ADFTractorClaw = Class(Weapon) {
     MakeImmune = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(true)
+            target.CanTakeDamage = false
             target.DisallowCollisions = true
         end
     end,
@@ -330,6 +334,7 @@ ADFTractorClaw = Class(Weapon) {
     MakeVulnerable = function (self, target)
         if not IsDestroyed(target) then
             target:SetDoNotTarget(false)
+            target.CanTakeDamage = true
             target.DisallowCollisions = false
         end
     end,
