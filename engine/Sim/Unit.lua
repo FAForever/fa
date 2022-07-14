@@ -4,6 +4,11 @@ local Unit = {}
 
 ---@class UnitId: string
 
+---
+---@param category moho.EntityCategory
+function Unit:AddBuildRestriction(category)
+end
+
 ---@return UnitBlueprint
 function Unit:GetBlueprint()
 end

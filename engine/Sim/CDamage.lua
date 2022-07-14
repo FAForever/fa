@@ -3,6 +3,11 @@
 local CDamage = {}
 
 ---
+---@return Entity
+function CDamage:GetInstigator()
+end
+
+---
 --  CDamage:GetTarget()
 function CDamage:GetTarget()
 end

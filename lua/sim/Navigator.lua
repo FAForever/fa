@@ -10,6 +10,7 @@ NAVSTATUS = {
     Steering = 2,
 }
 
+---@class Navigator: moho.navigator_methods
 Navigator = Class(moho.navigator_methods) {
     
     -- NATIVE METHODS 

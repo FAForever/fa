@@ -3,6 +3,11 @@
 local CAimManipulator = {}
 
 ---
+---@return number
+function CAimManipulator:GetHeadingPitch()
+end
+
+---
 --  AimManipulator:OnTarget()
 function CAimManipulator:OnTarget()
 end

@@ -3,6 +3,10 @@
 local CAiPersonality = {}
 
 ---
+function CAiPersonality:AdjustDelay()
+end
+
+---
 --  CAiPersonality:GetAirUnitsEmphasis()
 function CAiPersonality:GetAirUnitsEmphasis()
 end

@@ -3,6 +3,10 @@
 local CNavigator = {}
 
 ---
+function CNavigator:AbortMove()
+end
+
+---
 --
 function CNavigator:AtGoal()
 end

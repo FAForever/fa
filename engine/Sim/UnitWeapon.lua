@@ -2,6 +2,11 @@
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
+---
+---@return boolean
+function UnitWeapon:BeenDestroyed()
+end
+
 ---@return WeaponBlueprint
 function UnitWeapon:GetBlueprint()
 end

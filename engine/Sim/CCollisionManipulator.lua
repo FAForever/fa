@@ -18,10 +18,5 @@ end
 function CCollisionManipulator:WatchBone(bone)
 end
 
----
---  derived from IAniManipulator
-function CCollisionManipulator:base()
-end
-
 return CCollisionManipulator
 
