@@ -17,11 +17,6 @@
 ---@field [1] number
 ---@field [2] number
 
----@class Position
----@field [1] number
----@field [2] number
----@field [3] number
-
 ---@class Rectangle     # A point-to-point based rectangle, where the first point is usually in the top left corner
 ---@field x0 number
 ---@field y0 number
