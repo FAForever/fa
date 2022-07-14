@@ -55,9 +55,9 @@ end
 -- # Quaternion / orientation related functions
 
 --- Converts euler angles to a quaternion
----@param roll number float
----@param pitch number float
----@param yaw number float
+---@param roll number
+---@param pitch number
+---@param yaw number
 ---@return Quaternion
 function EulerToQuaternion(roll, pitch, yaw)
 end
@@ -363,7 +363,7 @@ end
 function EndLoggingStats(exit)
 end
 
---- Rounds a number to the nearest integer
+--- Rounds a number to the nearest integer using the half-round-even rounding (banker's rules)
 ---@param number number
 function MATH_IRound(number)
 end
