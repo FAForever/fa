@@ -2,6 +2,7 @@
 ---@class moho.aibrain_methods
 local CAiBrain = {}
 
+---@alias AllianceType 'Enemy' | 'Ally' | 'Neutral'
 ---@alias BrainArcType 'high' | 'low' | 'none'
 ---@alias BrainThreatType 'Overall' | 'OverallNotAssigned' | 'StructuresNotMex' | 'Structures' | 'Naval' | 'Air' | 'Land' | 'Experimental' | 'Commander' | 'Artillery' | 'AntiAir' | 'AntiSurface' | 'AntiSub' | 'Economy' | 'Unknown'
 
@@ -57,7 +58,7 @@ end
 function CAiBrain:CanBuildStructureAt(blueprintID, location)
 end
 
---- Returns true if the terrain is **not*8 blocking weapon fire from the attack position to the target position
+--- Returns true if the terrain is blocking weapon fire with the given arc from the attack position to the target position
 ---@param attackPosition Position
 ---@param targetPosition Position
 ---@param arcType BrainArcType
@@ -115,7 +116,7 @@ end
 function CAiBrain:FindPlaceToBuild(buildingType, whatToBuild, baseTemplate, relative, closeToBuilder, optIgnoreAlliance, BuildLocationX, BuildLocationZ, optIgnoreThreatUnder)
 end
 --- Returns a unit that matches the categories, if available
----@param category Categories
+---@param category CategorieType
 ---@param needToBeIdle boolean
 ---@return Unit?
 function CAiBrain:FindUnit(category, needToBeIdle)
@@ -169,15 +170,10 @@ end
 function CAiBrain:GetAttackVectors()
 end
 
---- Returns list of factories at location.
--- @param location Table with location, it's not a position but location created by PBMAddBuildLocation function.
--- @param radius Number in game units.
--- @return tblUnits List of factories.
-
 --- Returns a list of factories at a location
----@param location Position
+---@param location table table with location, it's not a position but location created by PBMAddBuildLocation function
 ---@param radius number
----@return FactoryUnit
+---@return FactoryUnit[]
 function CAiBrain:GetAvailableFactories(location, radius)
 end
 
@@ -271,7 +267,7 @@ end
 -- @return tblUnits Table containing units.
 
 --- Returns a list of units that match the categories
----@param category Categories
+---@param category CategorieType
 ---@param needToBeIdle boolean
 ---@param requireBuilt boolean Appears to be not functional
 ---@return Unit[]
@@ -300,10 +296,10 @@ function CAiBrain:GetNumPlatoonsWithAI()
 end
 
 --- Returns the number of units around a position that match the categories
----@param category Categories
+---@param category CategorieType
 ---@param position Position
 ---@param radius number
----@param alliance 'Ally' | 'Enemy'
+---@param alliance 'Ally' | 'Enemy' | 'Neutral'
 ---@return number
 function CAiBrain:GetNumUnitsAroundPoint(category, position, radius, alliance)
 end
@@ -368,10 +364,10 @@ end
 -- @return tblUnits Table containing units.
 
 --- Returns the units around a position that match the categories
----@param category Categories
+---@param category CategorieType
 ---@param position Position
 ---@param radius number
----@param alliance 'Ally' | 'Enemy'
+---@param alliance AllianceType
 function CAiBrain:GetUnitsAroundPoint(category, position, radius, alliance)
 end
 
