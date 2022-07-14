@@ -1,10 +1,12 @@
 ---@meta
 ---@declare-global
 
----@type moho.EntityCategory
+---@class EntityCategory : userdata, moho.EntityCategory
+
+---@type EntityCategory
 local categoryValue
 
----@class Categories : table<string, moho.EntityCategory>
+---@class Categories : table<string, EntityCategory>
 categories = {
     ABILITYBUTTON = categoryValue,
     ADVANCEDCOMBATPRESET = categoryValue,
