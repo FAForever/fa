@@ -727,9 +727,4 @@ end
 function Unit:TransportHasSpaceFor(target)
 end
 
----
---  derived from Entity
-function Unit:base()
-end
-
 return Unit

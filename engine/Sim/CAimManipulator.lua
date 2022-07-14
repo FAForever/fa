@@ -37,10 +37,5 @@ end
 function CAimManipulator:SetResetPoseTime(resetTime)
 end
 
----
---  derived from IAniManipulator
-function CAimManipulator:base()
-end
-
 return CAimManipulator
 

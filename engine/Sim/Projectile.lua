@@ -153,9 +153,4 @@ end
 function Projectile:TrackTarget(onoff)
 end
 
----
---  derived from Entity
-function Projectile:base()
-end
-
 return Projectile
