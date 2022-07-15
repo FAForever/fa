@@ -15,8 +15,9 @@ Class methods:
         }
 --]]
 
+local Control = import('/lua/maui/control.lua').Control
 
-Histogram = Class(moho.hostogram_methods, Control) {
+Histogram = Class(moho.histogram_methods, Control) {
     __init = function(self, parent, debugname)
         InternalCreateHistogram(self, parent)
         if debugname then

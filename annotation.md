@@ -7,7 +7,7 @@ All future contributions should be properly annotated. With it [our Lua extensio
 
 In general the following conventions apply:
 
-- All comments should be in the imperative mood
+- All comments should be in the declarative mood
 - All comments should be as extensive as required, but not needlessly descriptive. They should atleast define the default value (if applicable)
 - All functions should at least be annotated with `@param` for parameters, `@return` for return values, `@see` for similar alternatives (if applicable) and `@deprecated` if a better alternative exists
 - All annotations with `@param` and `@return` require their type to be defined
@@ -25,7 +25,7 @@ And a few specifics:
 In general, all annotated code in the repository is a good example. Some was written before these guidelines were written. Therefore we'll include some good examples for you to look at.
 
 ```lua
----Attach a beam between two entities.
+--- Attaches a beam between two entities.
 ---@param entityA Entity | Unit | Prop
 ---@param boneA number | string
 ---@param entityB Entity | Unit | Prop
@@ -39,7 +39,7 @@ end
 ```
 
 ```lua
----Takes transports from the transports pool and loads units them with units. Once ready a scenario variable can be set. Can wait on another scenario variable. Attempts to land at the location with the least threat and uses the accompanying attack chain for the units that have landed.
+--- Takes transports from the transports pool and loads units them with units. Once ready a scenario variable can be set. Can wait on another scenario variable. Attempts to land at the location with the least threat and uses the accompanying attack chain for the units that have landed.
 --- | Platoon data value | Description |
 --- | ------------------ | ----------- |
 --- | ReadyVariable      | `ScenarioInfo.VarTable[ReadyVariable]` Set when all units are on the transports
