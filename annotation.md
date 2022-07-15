@@ -55,4 +55,52 @@ end
 function LandAssaultWithTransports(platoon)
 ```
 
-Two proper examples. Note that the latter is from `scenarioplatoonai.lua` and that file contains a series of platoon behaviors. Because of its setup, the parameters of the function are send via `platoon.PlatoonData` instead of as separate parameters. We can't change this - but via a markdown table we can still help the user to understand what parameters are there.
+Note that the latter is from `scenarioplatoonai.lua` and that file contains a series of platoon behaviors. Because of its setup, the parameters of the function are send via `platoon.PlatoonData` instead of as separate parameters. We can't change this - but via a markdown table we can still help the user to understand what parameters are there.
+
+```lua
+---@class AIBrain : moho.aibrain_methods
+---@field Status "Defeat" | "Victory" | "InProgress" | "Draw"
+---@field BrainType 'Human' | 'AI'
+---@field EnergyExcessThread thread
+AIBrain = Class(moho.aibrain_methods) {
+
+    -- The state of the brain in the match
+    Status = 'InProgress',
+
+    --- (...)
+
+    --- Human brain functions handled here
+    ---@param self AIBrain
+    ---@param planName string
+    OnCreateHuman = function(self, planName)
+        self:CreateBrainShared(planName)
+        self.BrainType = 'Human'
+
+        -- human-only behavior
+        self.EnergyExcessThread = ForkThread(self.ToggleEnergyExcessUnitsThread, self)
+    end,
+
+    --- (...)
+}
+```
+
+```lua
+---@class BaseManager
+---@field Active boolean
+---@field AIBrain AIBrain
+BaseManager = ClassSimple {
+
+    --- (...)
+
+    Create = function(self)
+        self.Trash = TrashBag()
+        self.Active = false
+        self.AIBrain = false
+    end,
+
+    --- (...)
+
+}
+```
+
+Two examples of annotating a class. Note that fields need to be added manually, specifically those that are populated in the instance of a class.
