@@ -23,7 +23,7 @@
 ---@field x1 number
 ---@field y1 number
 
----@alias Color EnumColor | string # `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
+---@alias Color string # `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 
 --- Constructs a rectangle, usually the first point is in the top-left corner and the second is in the bottom-right corner
 ---@param x0 number
@@ -37,7 +37,7 @@ end
 -- # Entity-related functions
 
 --- Checks for the empty category
----@param categories Categories
+---@param categories Color
 ---@return boolean
 function EntityCategoryEmpty(categories)
 end
