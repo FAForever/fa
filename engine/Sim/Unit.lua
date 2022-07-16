@@ -6,8 +6,10 @@ local Unit = {}
 
 ---@alias LayerName "Air" | "Land" | "Orbital" | "Seabed" | "Sub" | "Water"
 
----@return UnitBlueprint
-function Unit:GetBlueprint()
+
+---
+---@param category moho.EntityCategory
+function Unit:AddBuildRestriction(category)
 end
 
 --- Add a command cap to a unit.
@@ -116,6 +118,11 @@ end
 ---@param army Army
 ---@return Blip
 function Unit:GetBlip(army)
+end
+
+---
+---@return UnitBlueprint
+function Unit:GetBlueprint()
 end
 
 --- Returns the build rate of a unit.
@@ -733,11 +740,6 @@ end
 -- @param target Unit to test.
 -- @return true/false.
 function Unit:TransportHasSpaceFor(target)
-end
-
----
---  derived from Entity
-function Unit:base()
 end
 
 return Unit

@@ -7,6 +7,10 @@ local UnitWeapon = {}
 function UnitWeapon:BeenDestroyed()
 end
 
+---@return WeaponBlueprint
+function UnitWeapon:GetBlueprint()
+end
+
 ---
 ---@return boolean
 function UnitWeapon:CanFire()

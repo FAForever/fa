@@ -6,6 +6,10 @@ local Entity = {}
 ---@alias EntityId number
 
 ---
+function Entity:AddLocalImpulse(Ix, Iy, Iz, Px, Py, Pz)
+end
+
+---
 --  Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
 function Entity:AddManualScroller(scrollSpeed1,  scrollSpeed2)
 end
@@ -323,6 +327,10 @@ end
 ---
 --  Entity:ShakeCamera(radius, max, min, duration)Shake the camera. This is a method of entities rather than a global functionbecause it takes the position of the entity as the epicenter where it shakes more.
 function Entity:ShakeCamera(radius,  max,  min,  duration)
+end
+
+--- Sink into the ground
+function Entity:SinkAway(vy)
 end
 
 return Entity
