@@ -37,6 +37,12 @@ moho = {
     weapon_methods = require('/engine/Sim/UnitWeapon.lua'),
     platoon_methods = require('/engine/Sim/CPlatoon.lua'),
 
+    -- core (both sim and user)
+
+    sound_methods = require('/engine/core/csound.lua'),
+    EntityCategory = require('/engine/core/entitycategory.lua'),
+    CPrefetchSet = require('/engine/core/cprefetchset.lua'),
+
     -- user
 
     control_methods = require('/engine/user/cmauicontrol.lua'),

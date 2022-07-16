@@ -4,13 +4,12 @@ local Unit = {}
 
 ---@class UnitId: string
 
+---@alias LayerName "Air" | "Land" | "Orbital" | "Seabed" | "Sub" | "Water"
+
+
 ---
 ---@param category moho.EntityCategory
 function Unit:AddBuildRestriction(category)
-end
-
----@return UnitBlueprint
-function Unit:GetBlueprint()
 end
 
 --- Add a command cap to a unit.
@@ -63,9 +62,9 @@ end
 function Unit:AddUnitToStorage(unit)
 end
 
---- Changes the unit's armor type.
--- @param damageTypeName String, see lua/armordefinition.lua available types.
--- @param multiplier TODO.
+--- Changes the unit's multiplier to a damage type
+---@param damageTypeName DamageType
+---@param multiplier number
 function Unit:AlterArmor(damageTypeName, multiplier)
 end
 
@@ -104,17 +103,26 @@ end
 function Unit:EnableManipulators(bone, Enable)
 end
 
---- TODO.
+--- Gets the unit's multiplier to a damage type
+---@param damageTypeName DamageType
+---@return number
 function Unit:GetArmorMult(damageTypeName)
 end
 
---- Get the tactical attack manager object of this unit.
+--- Get the tactical attack manager object of this unit
+---@return AttackManager
 function Unit:GetAttacker()
 end
 
 --- Returns a blip (if any) that the given army has for the unit
--- @return blip
-function Unit:GetBlip(armyIndex)
+---@param army Army
+---@return Blip
+function Unit:GetBlip(army)
+end
+
+---
+---@return UnitBlueprint
+function Unit:GetBlueprint()
 end
 
 --- Returns the build rate of a unit.
@@ -144,9 +152,9 @@ function Unit:GetConsumptionPerSecondMass()
 end
 
 --- Return the name of the layer the unit is currently in. This value is cached inside
--- unit.Layer each time a layer changes (when OnLayerChanged is called) and the hierarchy
--- is called accordingly (e.g., ends up in Unit.OnLayerChange).
--- @return layer String, name of the layer, types: 'Air','Land', 'Orbital', 'Seabed', 'Sub', 'Water'.
+--- `Unit.Layer` each time the layer changes (when `OnLayerChanged` is called) and the hierarchy
+--- is called accordingly (e.g. ends up in `Unit.OnLayerChange`).
+---@return LayerName
 function Unit:GetCurrentLayer()
 end
 
@@ -156,8 +164,8 @@ end
 function Unit:GetCurrentMoveLocation()
 end
 
---- Get the fire state for the unit.
--- TODO find out return format.
+--- Get the fire state for the unit
+---@return FireState
 function Unit:GetFireState()
 end
 
@@ -186,7 +194,7 @@ function Unit:GetGuards()
 end
 
 --- Find out current health
--- @return number HP remaining.
+---@return number
 function Unit:GetHealth()
 end
 
@@ -194,8 +202,8 @@ end
 function Unit:GetNavigator()
 end
 
---- Find out number of nuclear missile this unit has available.
--- @return number
+--- Find out number of nuclear missile this unit has available
+---@return number
 function Unit:GetNukeSiloAmmoCount()
 end
 
@@ -229,8 +237,8 @@ end
 function Unit:GetScriptBit()
 end
 
---- Get the shield ratio.
--- @return float Range 0 - 1.
+--- Get the shield ratio, `0.0` - `1.0`
+---@return number
 function Unit:GetShieldRatio()
 end
 
@@ -245,13 +253,13 @@ end
 function Unit:GetStat(statName, defaultVal)
 end
 
---- Find out number of tactical missile this unit has available.
--- @return number
+--- Find out number of tactical missile this unit has available
+---@return number
 function Unit:GetTacticalSiloAmmoCount()
 end
 
---- Return our target unit if we have one.
--- @return entity or nil.
+--- Return our target unit if we have one
+---@return Entity | Unit | nil
 function Unit:GetTargetEntity()
 end
 
@@ -270,15 +278,16 @@ end
 function Unit:GetVelocity()
 end
 
---- return the index'th weapon of this unit.
--- Index must be between 1 and self:GetWeaponCount(), inclusive.
--- @return weapon
+--- Return the index'th weapon of this unit.
+--- Index must be between `1` and `GetWeaponCount()`, inclusive.
+---@return Weapon
 function Unit:GetWeapon(index)
 end
 
 --- Return the number of weapons on this unit.
--- Note that dummy weapons are not included in the count, so this may differ from the number of weapons defined in the unit's blueprint.
--- @return number
+--- Note that dummy weapons are not included in the count, so this may differ from
+--- the number of weapons defined in the unit's blueprint.
+---@return number
 function Unit:GetWeaponCount()
 end
 
@@ -286,17 +295,19 @@ end
 function Unit:GetWorkProgress()
 end
 
---- Give nuclear missile to the unit.
--- @param num Amout of missiles to give.
-function Unit:GiveNukeSiloAmmo(num)
+--- Give nuclear missile to the unit
+---@param amount number
+function Unit:GiveNukeSiloAmmo(amount)
 end
 
---- Give tactical missile to the unit.
--- @param num Amout of missiles to give.
-function Unit:GiveTacticalSiloAmmo(num)
+--- Give tactical missile to the unit
+---@param amount number
+function Unit:GiveTacticalSiloAmmo(amount)
 end
 
---- TODO.
+---
+---@param target Entity | Unit
+---@return boolean
 function Unit:HasMeleeSpaceAroundTarget(target)
 end
 
@@ -371,7 +382,8 @@ end
 function Unit:KillManipulators(bone)
 end
 
---- TODO.
+---
+---@param target Entity | Unit
 function Unit:MeleeWarpAdjacentToTarget(target)
 end
 
@@ -379,7 +391,10 @@ end
 function Unit:PrintCommandQueue()
 end
 
---- TODO.
+--- Applies an impulse to the unit (e.g. weapon recoil), usually for ship-rocking
+---@param x number
+---@param y number
+---@param z number
 function Unit:RecoilImpulse(x, y, z)
 end
 
@@ -394,14 +409,14 @@ end
 function Unit:RemoveCommandCap(capName)
 end
 
---- Remove amout of nuke missiles from the unit. 
--- @param num Amount of nukes to remove.
-function Unit:RemoveNukeSiloAmmo(num)
+--- Remove amount of nuke missiles from the unit
+---@param amount number
+function Unit:RemoveNukeSiloAmmo(amount)
 end
 
---- Remove amout of tactical missiles from the unit. 
--- @param num Amount of tactical missiles to remove.
-function Unit:RemoveTacticalSiloAmmo(num)
+--- Remove amount of tactical missiles from the unit
+---@param amount number
+function Unit:RemoveTacticalSiloAmmo(amount)
 end
 
 --- Remove a toggle cap to a unit.
@@ -430,7 +445,7 @@ end
 function Unit:RevertElevation()
 end
 
---- Restore regen rate of the unit back to blueprint spec.
+--- Restore regen rate of the unit back to blueprint spec
 function Unit:RevertRegenRate()
 end
 
@@ -516,8 +531,8 @@ end
 function Unit:SetElevation()
 end
 
---- Set a specific fire state for the retaliation state of the unit.
--- @param fireState Return fie - 0, Hold fire - 1 and Ground fire - 2.
+--- Set a specific fire state for the unit's retaliation mode
+---@param fireState FireState
 function Unit:SetFireState(fireState)
 end
 
@@ -577,8 +592,8 @@ end
 function Unit:SetReclaimable(flag)
 end
 
---- Set the regen rate of a unit.
--- @param rate Number of HPs regenerated per second.
+--- Set the regen rate of the unit
+---@param rate number
 function Unit:SetRegenRate(rate)
 end
 
@@ -588,8 +603,8 @@ end
 function Unit:SetScriptBit(string, state)
 end
 
---- Set the shield ratio.
--- @param ratio Float, range 0 - 1.
+--- Set the shield ratio, `0.0` - `1.0`
+---@param ratio number
 function Unit:SetShieldRatio(ratio)
 end
 
@@ -688,7 +703,7 @@ end
 function Unit:ShowBone(bone, affectChildren)
 end
 
---- Stops production of a missile.
+--- Stops production of a missile
 function Unit:StopSiloBuild()
 end
 
@@ -702,7 +717,7 @@ end
 function Unit:TestToggleCaps(capName)
 end
 
---- Toggle the fire state for the retaliation state of the unit.
+--- Toggle the fire state for the retaliation state of the unit
 function Unit:ToggleFireState()
 end
 

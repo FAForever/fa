@@ -1669,7 +1669,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateDestructionEffects = function(self, overKillRatio)
-        explosion.CreateScalableUnitExplosion(self, overKillRatio)
+        explosion.CreateScalableUnitExplosion(self)
     end,
 
     DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
