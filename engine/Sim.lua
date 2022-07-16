@@ -307,10 +307,11 @@ end
 
 --- Deals damage to the target unit
 ---@param instigator Unit | nil
+---@param location Vector origin of the damage, used for effects
 ---@param target Unit
 ---@param amount number
 ---@param damageType DamageType
-function Damage(instigator, target, amount, damageType)
+function Damage(instigator, location, target, amount, damageType)
 end
 
 --- Deals damage in an circle
