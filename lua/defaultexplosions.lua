@@ -178,9 +178,9 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 --- Creates the default unit explosion used by almost all units in the game.
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
-function CreateScalableUnitExplosion(unit, overKillRatio, circularDebris)
+function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
 
-    overKillRatio = overKillRatio or 1
+    debrisMultiplier = debrisMultiplier or 1
     circularDebris = circularDebris or false
 
     if unit and (not IsDestroyed(unit)) then
@@ -301,7 +301,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio, circularDebris)
             )
 
             -- determine debris amount
-            local amount = overKillRatio * MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
+            local amount = debrisMultiplier * MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
 
             -- determine debris velocity range
             local velocity = 2 * boundingXYZRadius

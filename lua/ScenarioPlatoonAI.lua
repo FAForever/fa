@@ -220,39 +220,36 @@ function PlatoonAttackLocationList(platoon)
     end
 end
 
-------------------------------------------------------------------------------------------------
---  TransportPool
---      Moves unit to location if specified
---      Assigns units in platoon to TransportPool platoon for other platoons to use
---  PlatoonData -
---      TransportMoveLocation - Location to move transport to before assigning to transport pool
---  function: TransportPool = AddFunction
---      parameter 0: string: platoon = "default_platoon"
-------------------------------------------------------------------------------------------------
+--- Assigns units in platoon to TransportPool platoon for other platoons to use and moves to to specified location if specified.
+--- | Platoon data value    | Description |
+--- | --------------------- | ----------- |
+--  | TransportMoveLocation | Location to move transport to before assigning to transport pool
+--- | MoveRoute    | List of locations to move to
+--- | MoveChain    | Chain of locations to move
+---@param platoon Platoon
 function TransportPool(platoon)
     local aiBrain = platoon:GetBrain()
-    local tPool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
-    local location = false
     local data = platoon.PlatoonData
-    if platoon.PlatoonData then
-        if data.TransportMoveLocation then
-            if type(data.TransportMoveLocation) == 'string' then
-                location = ScenarioUtils.MarkerToPosition(data.TransportMoveLocation)
-            else
-                location = data.TransportMoveLocation
-            end
-        end
-    end
+
+    local tPool = aiBrain:GetPlatoonUniquelyNamed('TransportPool')
     if not tPool then
-        tPool = aiBrain:MakePlatoon('None', 'None')
+        tPool = aiBrain:MakePlatoon('', '')
         tPool:UniquelyNamePlatoon('TransportPool')
     end
-    for _, unit in platoon:GetPlatoonUnits() do
-        aiBrain:AssignUnitsToPlatoon('TransportPool', {unit}, 'Scout', 'GrowthFormation')
-        if location then
-            IssueMove({unit}, location)
+
+    if data.TransportMoveLocation then
+        if type(data.TransportMoveLocation) == 'string' then
+            data.MoveRoute = {ScenarioUtils.MarkerToPosition(data.TransportMoveLocation)}
+        else
+            data.MoveRoute = {data.TransportMoveLocation}
         end
     end
+
+    if data.MoveChain or data.MoveRoute then
+        MoveToThread(platoon)
+    end
+
+    aiBrain:AssignUnitsToPlatoon('TransportPool', platoon:GetPlatoonUnits(), 'Scout', 'GrowthFormation')
 end
 
 --- Grabs a specific number of transports from the transports pool and loads units into the transport. Once ready a scenario variable can be set. Can wait on another scenario variable. Attempts to land at the location with the least threat and uses the accompanying attack chain for the units that have landed.
@@ -398,7 +395,7 @@ end
 --- Platoon moves to a set of locations
 --- | Platoon data value    | Description   |
 --- | --------------------- | ------------- |
---- | MoveToRoute           | List of locations to move to |
+--- | MoveRoute             | List of locations to move to |
 --- | MoveChain             | Chain of locations to move |
 --- | UseTransports         | Boolean, if true, use transports to move |
 function MoveToThread(platoon)
@@ -2330,4 +2327,13 @@ function MoveAlongRoute(platoon, route)
         end
     end
     return true
+end
+
+--- Enables Stealth on platoon's units
+function PlatoonEnableStealth(platoon)
+    for _, unit in platoon:GetPlatoonUnits() do
+        if not unit.Dead and unit:TestToggleCaps('RULEUTC_StealthToggle') then
+            unit:SetScriptBit('RULEUTC_StealthToggle', false)
+        end
+    end
 end

@@ -3,6 +3,11 @@
 local CAnimationManipulator = {}
 
 ---
+---@return number
+function CAnimationManipulator:GetAnimationDuration()
+end
+
+---
 --  fraction = AnimationManipulator:GetAnimationFraction()
 function CAnimationManipulator:GetAnimationFraction()
 end

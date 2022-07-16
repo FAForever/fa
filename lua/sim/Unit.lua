@@ -115,7 +115,7 @@ local function PopulateBlueprintCache(entity, blueprint)
 end
 
 local cUnit = moho.unit_methods
----@class Unit : moho.unit_methods, moho.entity_methods
+---@class Unit : moho.unit_methods
 ---@field Brain AIBrain
 ---@field Buffs {Affects: BlueprintBuff.Affects, buffTable: table<string, table>}
 ---@field Army Army
@@ -1669,7 +1669,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateDestructionEffects = function(self, overKillRatio)
-        explosion.CreateScalableUnitExplosion(self, overKillRatio)
+        explosion.CreateScalableUnitExplosion(self)
     end,
 
     DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
