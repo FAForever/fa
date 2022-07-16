@@ -1037,8 +1037,7 @@ end
 function NotifyUpgrade(from, to)
 end
 
---- Returns if the current command source is authorized to mess with the given army.
---- Or if cheats are enabled.
+--- Returns if the current command source is authorized to mess with the given army, or whether cheats are enabled
 ---@param army Army
 ---@return boolean
 function OkayToMessWithArmy(army)
@@ -1078,14 +1077,14 @@ end
 function SelectedUnit()
 end
 
---- Sets alliance type between 2 armies
+--- Sets alliance type between 2 armies, note that weapons do not reset their target
 ---@param army1 Army
 ---@param army2 Army
 ---@param alliance AllianceType
 function SetAlliance(army1, army2, alliance)
 end
 
---- Sets alliance type from army1 to army2
+--- Sets alliance type from army1 to army2, note that weapons do not reset their target
 ---@param army1 Army
 ---@param army2 Army
 ---@param alliance AllianceType
@@ -1098,7 +1097,8 @@ end
 function SetAlliedVictory(state)
 end
 
----
+--- Unfinished function related to AI, is not used
+---@deprecated
 ---@param army Army
 ---@param personality AIPersonality
 function SetArmyAIPersonality(army, personality)
@@ -1136,7 +1136,8 @@ end
 function SetArmyOutOfGame(army)
 end
 
----
+--- Unfinished function related to AI, is not used
+---@deprecated
 ---@param army Army
 ---@param plans ArmyPlans
 function SetArmyPlans(army, plans)
