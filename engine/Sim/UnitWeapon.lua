@@ -2,157 +2,169 @@
 ---@class moho.weapon_methods
 local UnitWeapon = {}
 
+---
+---@return boolean
+function UnitWeapon:BeenDestroyed()
+end
+
+---
+---@return boolean
+function UnitWeapon:CanFire()
+end
+
+---
+---@param damage number
+function UnitWeapon:ChangeDamage(damage)
+end
+
+---
+---@param radius number
+function UnitWeapon:ChangeDamageRadius(radius)
+end
+
+---
+---@param typeName DamageType
+function UnitWeapon:ChangeDamageType(typeName)
+end
+
+---
+---@param tolerance number
+function UnitWeapon:ChangeFiringTolerance(tolerance)
+end
+
+---
+---@param max number
+function UnitWeapon:ChangeMaxHeightDiff(max)
+end
+
+---
+---@param maxRadius number
+function UnitWeapon:ChangeMaxRadius(maxRadius)
+end
+
+---
+---@param minRadius number
+function UnitWeapon:ChangeMinRadius(minRadius)
+end
+
+--- Changes the projectile blueprint of a weapon
+---@param projBp ProjectileBlueprint
+function UnitWeapon:ChangeProjectileBlueprint(projBp)
+end
+
+---
+---@param value number
+function UnitWeapon:ChangeRateOfFire(value)
+end
+
+---
+---@param muzzlebone Bone
+function UnitWeapon:CreateProjectile(muzzlebone)
+end
+
+---
+---@param bone Bone
+---@param r number
+---@param g number
+---@param b number
+---@param glow number
+---@param width number
+---@param texture string
+---@param lifetime number
+function UnitWeapon:DoInstaHit(bone, r, g, b, glow, width, texture, lifetime)
+end
+
+---
+---@return boolean
+function UnitWeapon:FireWeapon()
+end
+
+---
 ---@return WeaponBlueprint
 function UnitWeapon:GetBlueprint()
 end
 
 ---
---  UnitWeapon:CanFire()
-function UnitWeapon:CanFire()
-end
-
----
---  UnitWeapon:ChangeDamage(value)
-function UnitWeapon:ChangeDamage(value)
-end
-
----
---  UnitWeapon:ChangeDamageRadius(value)
-function UnitWeapon:ChangeDamageRadius(value)
-end
-
----
---  UnitWeapon:ChangeDamageType(typeName)
-function UnitWeapon:ChangeDamageType(typeName)
-end
-
----
---  UnitWeapon:ChangeFiringTolerance(value)
-function UnitWeapon:ChangeFiringTolerance(value)
-end
-
----
---  UnitWeapon:ChangeMaxHeightDiff(value)
-function UnitWeapon:ChangeMaxHeightDiff(value)
-end
-
----
---  UnitWeapon:ChangeMaxRadius(value)
-function UnitWeapon:ChangeMaxRadius(value)
-end
-
----
---  UnitWeapon:ChangeMinRadius(value)
-function UnitWeapon:ChangeMinRadius(value)
-end
-
----
---  Change the projectile blueprint of a weapon
-function UnitWeapon:ChangeProjectileBlueprint()
-end
-
----
---  UnitWeapon:ChangeRateOfFire(value)
-function UnitWeapon:ChangeRateOfFire(value)
-end
-
----
---  UnitWeapon:CreateProjectile(muzzlebone)
-function UnitWeapon:CreateProjectile(muzzlebone)
-end
-
----
---  UnitWeapon:DoInstaHit(bone, r,g,b, glow, width, texture, lifetime)
-function UnitWeapon:DoInstaHit(bone,  r, g, b,  glow,  width,  texture,  lifetime)
-end
-
----
---  bool = UnitWeapon:FireWeapon()
-function UnitWeapon:FireWeapon()
-end
-
----
---  UnitWeapon:GetCurrentTarget()
+---@return Entity | Unit | nil
 function UnitWeapon:GetCurrentTarget()
 end
 
 ---
---  UnitWeapon:GetCurrentTargetPos()
+---@return Vector
 function UnitWeapon:GetCurrentTargetPos()
 end
 
----
---  Get the firing clock percent (0 - 1)
+--- Gets the firing clock percent, `0.0` - `1.0`
+---@return number
 function UnitWeapon:GetFireClockPct()
 end
 
----
---  Get the firing randomness
+--- Gets the firing randomness
+---@return number
 function UnitWeapon:GetFiringRandomness()
 end
 
 ---
---  blueprint = UnitWeapon:GetProjectileBlueprint()
+---@return ProjectileBlueprint
 function UnitWeapon:GetProjectileBlueprint()
 end
 
 ---
---  UnitWeapon:IsFireControl(label)
+---@param label string
+---@return boolean
 function UnitWeapon:IsFireControl(label)
 end
 
 ---
---  UnitWeapon:PlaySound(weapon,ParamTable)
-function UnitWeapon:PlaySound(weapon, ParamTable)
+---@param params BpSoundResult
+function UnitWeapon:PlaySound(params)
 end
 
 ---
---  UnitWeapon:ResetTarget()
 function UnitWeapon:ResetTarget()
 end
 
 ---
---  UnitWeapon:SetEnabled(enabled)
+---@param enabled boolean
 function UnitWeapon:SetEnabled(enabled)
 end
 
 ---
---  UnitWeapon:SetFireControl(label)
+---@param label string
 function UnitWeapon:SetFireControl(label)
 end
 
 ---
---  UnitWeapon:SetFireTargetLayerCaps(mask)
+---@param mask string
 function UnitWeapon:SetFireTargetLayerCaps(mask)
 end
 
 ---
---  Set the firing randomness
-function UnitWeapon:SetFiringRandomness()
+---@param randomness number
+function UnitWeapon:SetFiringRandomness(randomness)
 end
 
 ---
---  UnitWeapon:SetTarget(entity)
-function UnitWeapon:SetTargetEntity()
+---@param entity Entity | Unit
+function UnitWeapon:SetTargetEntity(entity)
 end
 
 ---
---  UnitWeapon:SetTarget(location)
-function UnitWeapon:SetTargetGround()
+---@param location Vector
+function UnitWeapon:SetTargetGround(location)
 end
 
----
---  Set the targeting priorities for the unit
-function UnitWeapon:SetTargetingPriorities()
+--- Sets the targeting priorities for the unit
+---@param priorities EntityCategory[]
+function UnitWeapon:SetTargetingPriorities(priorities)
 end
 
----
---  Transfer target from 1 weapon to another
+--- Transfers target from one weapon to another
 function UnitWeapon:TransferTarget()
 end
 
 ---
---  bool = UnitWeapon:HasTarget()
+---@return boolean
 function UnitWeapon:WeaponHasTarget()
 end
 

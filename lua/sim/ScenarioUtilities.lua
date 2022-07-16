@@ -1517,6 +1517,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'xaa0305'
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xal0305'
+            elseif template[i][1] == 'delk002' then
+                template[i][1] = 'dalk003'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'ua')
             end
@@ -1533,6 +1535,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'url0306'
             elseif template[i][1] == 'del0204' then
                 template[i][1] = 'drl0204'
+            elseif template[i][1] == 'delk002' then
+                template[i][1] = 'drlk001'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'ur')
             end
@@ -1541,6 +1545,8 @@ function FactionConvert(template, factionIndex)
                 template[i][1] = 'xsl0201'
             elseif template[i][1] == 'xel0305' then
                 template[i][1] = 'xsl0305'
+            elseif template[i][1] == 'delk002' then
+                template[i][1] = 'dslk004'
             else
                 template[i][1] = string.gsub(template[i][1], 'ue', 'xs')
             end

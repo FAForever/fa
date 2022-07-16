@@ -31,8 +31,9 @@ function Entity:AddWorldImpulse(self,  Ix,  Iy,  Iz,  Px,  Py,  Pz)
 end
 
 ---
---  Entity:AdjustHealth(instigator, delta)
-function Entity:AdjustHealth(instigator,  delta)
+---@param instigator Unit
+---@param delta number
+function Entity:AdjustHealth(instigator, delta)
 end
 
 ---
@@ -153,7 +154,7 @@ function Entity:GetHeading()
 end
 
 ---
---  Entity:GetHealth()
+---@return number
 function Entity:GetHealth()
 end
 
@@ -163,7 +164,7 @@ function Entity:GetIntelRadius(type)
 end
 
 ---
---  Entity:GetMaxHealth()
+---@return number
 function Entity:GetMaxHealth()
 end
 
@@ -208,8 +209,10 @@ function Entity:IsValidBone(nameOrIndex, allowNil=false)
 end
 
 ---
---  Entity:Kill(instigator,type,excessDamageRatio)
-function Entity:Kill(instigator, type, excessDamageRatio)
+---@param instigator? Unit
+---@param damageType? DamageType
+---@param excessDamageRatio? number
+function Entity:Kill(instigator, damageType, excessDamageRatio)
 end
 
 ---
@@ -268,7 +271,7 @@ function Entity:SetIntelRadius()
 end
 
 ---
---  Entity:SetMaxHealth(maxhealth)
+---@param maxhealth number
 function Entity:SetMaxHealth(maxhealth)
 end
 

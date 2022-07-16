@@ -279,11 +279,11 @@ StructureUnit = Class(Unit) {
 
     CreateDestructionEffects = function(self, overkillRatio)
         if explosion.GetAverageBoundingXZRadius(self) < 1.0 then
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         else
             explosion.CreateTimedStuctureUnitExplosion(self)
             WaitSeconds(0.5)
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         end
     end,
 
