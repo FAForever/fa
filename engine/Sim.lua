@@ -1,13 +1,14 @@
 ---@declare-global
----@diagnostic disable: lowercase-global
+---Module: Sim
+-- @module Sim
 
+-- TODO
+---@class Decal
+
+-- TODO
 ---@class SimCommand
 
---- TODO move to `'/engine/Core.lua'`
----@alias Bone string | number
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
-
----@alias BoneObject Projectile | Prop | Unit
 
 --- Restrict the army from building the unit category, which can be combined using the typical category arithmetics (+ for union, - for subtraction, * for intersection)
 ---@param army number
@@ -90,357 +91,218 @@ end
 --- Creates a bone manipulator for a weapon, allowing it to aim at a target
 ---@param weapon Weapon
 ---@param label string
----@param turretBone Bone
----@param barrelBone Bone
----@param muzzleBone Bone
----@return moho.AimManipulator
+---@param turretBone number | string
+---@param barrelBone number | string
+---@param muzzleBone number | string
+---@return CAimManipulator
 function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
 end
 
---- Creates a bone manipulator for an object, allowing it to be animated
----@param object BoneObject
+--- Creates a bone manipulator for a unit, allowing it to be animated
+---@param unit Unit
 ---@return moho.manipulator_methods
-function CreateAnimator(object)
+function CreateAnimator(unit)
 end
 
----
----@param object BoneObject
----@param bone Bone
----@param army Army
----@param length number
----@param thickness number
----@param beamBlueprint string
----@return moho.IEffect
-function CreateAttachedBeam(object, bone, army, length, thickness, beamBlueprint)
+--- TODO.
+function CreateAttachedBeam(entity, bone, army, length, thickness, texture_filename)
 end
 
----
----@param object BoneObject
----@param bone Bone
----@param army Army
----@param emitterBlueprint string
----@return moho.IEffect
-function CreateAttachedEmitter(object, bone, army, emitterBlueprint)
+--- TODO.
+function CreateAttachedEmitter(entity, bone, army, emitter_blueprint)
 end
 
----
----@param blueprint string
----@param army Army
----@return moho.IEffect
+--- TODO.
 function CreateBeamEmitter(blueprint, army)
 end
 
----
----@param object BoneObject
----@param tobone Bone
----@param army Army
----@param blueprint string
----@return moho.IEffect
-function CreateBeamEmitterOnEntity(object, tobone, army, blueprint)
+--- TODO.
+function CreateBeamEmitterOnEntity(entity, tobone, army, blueprint)
 end
 
----
----@param object BoneObject
----@param bone Bone
----@param other Entity
----@param otherBone Bone
----@param army Army
----@param blueprint string
----@return moho.CollisionBeamEntity
-function CreateBeamEntityToEntity(object, bone, other, otherBone, army, blueprint)
+--- TODO.
+function CreateBeamEntityToEntity(entity, bone, other, bone, army, blueprint)
 end
 
----
----@param object BoneObject
----@param bone Bone
----@param other Entity
----@param otherBone Bone
----@param army Army
----@param thickness number
----@param texture string
----@return moho.CollisionBeamEntity
-function CreateBeamToEntityBone(object, bone, other, otherBone, army, thickness, texture)
+--- TODO.
+function CreateBeamToEntityBone(entity, bone, other, bone, army, thickness, texture_filename)
 end
 
----
----@param unit Unit
----@param turretBone Bone
----@param barrelBone Bone
----@param aimBone Bone
----@return moho.BuilderArmManipulator
-function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
+--- TODO.
+---@param unit any
+---@param turretBone any
+---@param barrelBone any?
+---@param aimBone any?
+function CreateBuilderArmController(unit,turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator
----@param unit Unit
----@return moho.CollisionManipulator
+--- Create a collision detection manipulator
+-- TODO.
 function CreateCollisionDetector(unit)
 end
 
---- Creates a decal with supplied parameters.
---- This decal is visible to all armies.
----@param position Vector
----@param heading Vector
----@param textureName1 string
----@param textureName2 string
----@param type string
----@param sizeX number size on x axis in game units
----@param sizeZ number size on y axis in game units
----@param lodParam number distance in game units before the decals disappear
----@param duration number lifetime of the decal in seconds, 0 for infinite
----@param army Army
----@param fidelity? number
----@return moho.CDecalHandle
+--- Creates a decal with supplied parametrs.
+-- This decal is visible to all armies.
+-- @param position Table with position {x, y, z}.
+-- @param heading Table with orientation {x, y, z}.
+-- @param textureName1 TODO.
+-- @param textureName2 TODO.
+-- @param type TODO.
+-- @param sizeX Size on x axis in game units.
+-- @param sizeZ Size on y axisin game units.
+-- @param lodParam Distance in game units before the decals disappear.
+-- @param duration Life time of the decal in seconds, 0 for infinite.
+-- @param army Owner's army's index.
+-- @param fidelity TODO.
+-- @return The created decal.
 function CreateDecal(position, heading, textureName1, textureName2, type, sizeX, sizeZ, lodParam, duration, army, fidelity)
 end
 
 --- Creates an economy event for the unit that consumes resources over given time.
---- The unit shows the orange build bar for this event.
----@param unit Unit
----@param totalEnergy number
----@param totalMass number
----@param timeInSeconds number
----@return moho.EconomyEvent
-function CreateEconomyEvent(unit, totalEnergy, totalMass, timeInSeconds)
+-- The unit shows the orange build bar for this event.
+-- @param unit Target unit.
+-- @param energy Amount of total energy the event will consume.
+-- @param mass Amount of total energy the event will consume.
+-- @param timeInSeconds How many seconds will the event last.
+-- return event Created economy event.
+function CreateEconomyEvent(unit, energy, mass, timeInSeconds)
 end
 
---- Creates an emitter at an object's bone, but does not attach the emitter to it
----@see CreateEmitterAtEntity() # at-object version
----@see CreateEmitterOnEntity() # on-object version
----@param object BoneObject
----@param army Army
----@param emitterBlueprint string
----@return moho.IEffect
-function CreateEmitterAtBone(object, bone, army, emitterBlueprint)
+--- TODO.
+function CreateEmitterAtBone(entity, bone, army, emitter_blueprint)
 end
 
---- Creates an emitter at an object, but does not attach the emitter to it
----@see CreateEmitterAtBone() # at-bone version
----@see CreateEmitterOnEntity() # on-object version
----@param object BoneObject
----@param army Army
----@param emitterBlueprint string
----@return moho.IEffect
-function CreateEmitterAtEntity(object, army, emitterBlueprint)
+--- TODO.
+function CreateEmitterAtEntity(entity, army, emitter_bp_name)
 end
 
---- Creates an emitter on an object and attaches the emitter to it
----@see CreateEmitterAtBone() # at-bone version
----@see CreateEmitterAtEntity() # at-object version
----@param object BoneObject
----@param army Army
----@param emitterBlueprint string
----@return moho.IEffect
-function CreateEmitterOnEntity(object, army, emitterBlueprint)
+--- TODO.
+function CreateEmitterOnEntity(entity, army, emitter_bp_name)
 end
 
----
----@param unit Unit
----@param footBone Bone
----@param kneeBone Bone
----@param hipBone Bone
----@param straightLegs? boolean
----@param maxFootFall? number
----@return moho.FootPlantManipulator
+--- TODO.
+---@param unit any
+---@param footBone any
+---@param kneeBone any
+---@param hipBone any
+---@param straightLegs any?
+---@param maxFootFall any?
 function CreateFootPlantController(unit, footBone, kneeBone, hipBone, straightLegs, maxFootFall)
 end
 
---- Spawns initial unit for the given army
----@param army Army
----@param unitId string
----@return Unit
-function CreateInitialArmyUnit(army, unitId)
+--- Spawns initial unit for the given army.
+-- @param armyName String, army's name.
+-- @param initialUnitName String, unit blueprint name, example: 'uel0001'.
+-- @return The created unit.
+function CreateInitialArmyUnit(armyName, initialUnitName)
 end
 
----
----@see CreateLightParticleIntel() # intel-giving version
----@param object BoneObject
----@param bone Bone
----@param army Army
----@param size number
----@param lifetime number
----@param texture string
----@param rampName string
-function CreateLightParticle(object, bone, army, size, lifetime, texture, rampName)
+--- TODO.
+function CreateLightParticle(entity, bone, army, size, lifetime, textureName, rampName)
 end
 
----
----@see CreateLightParticle() # non intel-giving version
----@param object BoneObject
----@param bone Bone
----@param army Army
----@param size number
----@param lifetime number
----@param texture string
----@param rampName string
-function CreateLightParticleIntel(object, bone, army, size, lifetime, texture, rampName)
+--- TODO.
+function CreateLightParticleIntel(entity, bone, army, size, lifetime, textureName, rampName)
 end
 
---- Spawns a prop, oriented by its model
----@see CreatePropHPR() # heading-pitch-roll version
----@param location Vector
----@param blueprintId string
----@return Prop
-function CreateProp(location, blueprintId)
+--- Spawns a prop.
+-- Orientation is set by the prop's model.
+-- For more control over the orientation use CreatePropHPR.
+-- @param location Table with position {x, y, z}.
+-- @param prop_blueprint_id Blueprint ID of the prop to spawn, example: 'CrysCrystal01_prop'.
+-- @return The spawned prop.
+function CreateProp(location, prop_blueprint_id)
 end
 
---- Spawns a prop with control over orientation
----@see CreateProp() # simple version
----@param blueprintPath string full path to the prop's blueprint
----@param x number
----@param y number
----@param z number
----@param heading number
----@param pitch number
----@param roll number
----@return Prop
-function CreatePropHPR(blueprintPath, x, y, z, heading, pitch, roll)
+--- Spawns a prop.
+-- Additional control to set orientation of the prop.
+-- @param blueprint Full path to the prop's blueprint.
+-- @param x Position on x axis.
+-- @param y Position on y axis.
+-- @param z Position on z axis.
+-- @param heading TODO.
+-- @param pitch TODO.
+-- @param roll TODO.
+-- @return The spawned prop.
+function CreatePropHPR(blueprint, x, y, z, heading, pitch, roll)
 end
 
---- Spawns Mass and Hydro deposits on the map
----@param type "Mass" | "Hydrocarbon"
----@param x number
----@param y number
----@param z number
----@param size number 1 for Mass, 3 for Hydro
+--- Spawn Mass and Hydro points on the map.
+-- @param type Type of the resource to create, either 'Mass' or 'Hydrocarbon'.
+-- @param x Position on x axis.
+-- @param y Position on y axis.
+-- @param z Position on z axis.
+-- @param size Size in game units, 1 for Mass, 3 for Hydro.
 function CreateResourceDeposit(type, x, y, z, size)
 end
 
---- Creates a manipulator which rotates on a unit's bone
----@param object BoneObject
----@param bone string
----@param axis "x" | "y" | "z
----@param goal? unknown
----@param speed? number
----@param accel? number
----@param goalspeed? number
----@return moho.RotateManipulator
-function CreateRotator(object, bone, axis, goal, speed, accel, goalspeed)
+--- Create a manipulator which rotates unit's bone.
+---@param unit Unit to create the manipulator for.
+---@param bone string name of the bone to rotate.
+---@param axis string 'x', 'Y' or 'z', axis to rotate around.
+---@param goal unknown? TODO.
+---@param speed unknown? TODO.
+---@param accel unknown? TODO.
+---@param goalspeed unknown? TODO.
+-- @return manipulator
+function CreateRotator(unit, bone, axis, goal, speed, accel, goalspeed)
 end
 
---- Creates a manipulator which copies the motion of `srcBone` onto `dstBone`.
---- Order matters! Only manipulators which come before the slave manipulator will be copied.
----@param object BoneObject
----@param destBone Bone
----@param srcBone Bone
----@return moho.SlaveManipulator
-function CreateSlaver(object, destBone, srcBone)
+--- Create a manipulator which copies the motion of src_bone onto dst_bone.
+-- Priority matters! Only manipulators which come before the slave manipulator will be copied.
+-- @param unit Unit to create the manipulator for.
+-- @param dest_bone String, name of the bone to paste the motion to.
+-- @param src_bone String, name of the bone to copy the motion from.
+-- @return manipulator
+function CreateSlaver(unit, dest_bone, src_bone)
 end
 
----
----@param object BoneObject
----@param bone Bone
----@param goalX? number
----@param goalY? number
----@param goalZ? number
----@param speed? number
----@param worldSpace? boolean
----@return moho.SlideManipulator
-function CreateSlider(object, bone, goalX, goalY, goalZ, speed, worldSpace)
+--- TODO.
+-- CreateSlider(unit, bone, [goal_x, goal_y, goal_z, [speed, [world_space]]]).
+function CreateSlider()
 end
 
---- Adds a splat to the game at a position and heading
----@see CreateSplatOnBone() # adds the splat at an entity bone
----@param position Vector
----@param heading Vector
----@param texture string
----@param sizeX number
----@param sizeZ number
----@param lodParam number
----@param duration number
----@param army Army
----@param fidelity? number
-function CreateSplat(position, heading, texture, sizeX, sizeZ, lodParam, duration, army, fidelity)
+--- TODO.
+function CreateSplat(position, heading, textureName, sizeX, sizeZ, lodParam, duration, army, fidelity)
 end
 
---- Adds a splat to the game at an entity bone position and heading
----@see CreateSplatOnBone() # adds the splat at a position
----@param object BoneObject
----@param offset Vector
----@param bone Bone
----@param texture string
----@param sizeX number
----@param sizeZ number
----@param lodParam number
----@param duration number
----@param army Army
-function CreateSplatOnBone(object, offset, bone, texture, sizeX, sizeZ, lodParam, duration, army)
+--- Add a splat to the game at an entity bone position and heading.
+-- TODO.
+function CreateSplatOnBone(boneName, offset, textureName, sizeX, sizeZ, lodParam, duration, army)
 end
 
----
----@param object BoneObject
----@param bone Bone
----@param resource any
----@param minX number
----@param minY number
----@param minZ number
----@param maxX number
----@param maxY number
----@param maxZ number
----@return moho.StorageManipulator
-function CreateStorageManip(object, bone, resource, minX, minY, minZ, maxX, maxY, maxZ)
+--- TODO.
+function CreateStorageManip(unit, bone, resouceName, minX, minY, minZ, maxX, maxY, maxZ)
 end
 
----
----@param unit Unit
----@param label string
----@param thrustBone Bone
----@return moho.ThrustManipulator
+--- TODO.
 function CreateThrustController(unit, label, thrustBone)
 end
 
----
----@param object BoneObject
----@param bone Bone
----@param army Army
----@param trailBlueprint string
----@return moho.IEffect
-function CreateTrail(object, bone, army, trailBlueprint)
+--- TODO.
+function CreateTrail(entity, bone, army, trail_blueprint)
 end
 
---- Creates a unit from a blueprint for an army, at a position with quaternion orientation
----@see CreateUnit2() # simple version
----@see CreateUnitHPR() # heading-pitch-roll version
----@param blueprint string
----@param army Army
----@param x number
----@param y number
----@param z number
----@param qx number
----@param qy number
----@param qz number
----@param qw number
----@param layer? number
----@return Unit
-function CreateUnit(blueprint, army, x, y, z, qx, qy, qz, qw, layer)
+--- TODO.
+---@param blueprint any
+---@param army any
+---@param tx any
+---@param ty any
+---@param tz any
+---@param qx any
+---@param qy any
+---@param qz any
+---@param qw any
+---@param layer any?
+function CreateUnit(blueprint, army, tx, ty, tz, qx, qy, qz, qw, layer)
 end
 
---- Creates a unit from a blueprint for an army, at an X-Z map point with a heading
----@see CreateUnit() # quaternion version
----@see CreateUnitHPR() # heading-pitch-roll version
----@param blueprint string
----@param army Army
----@param layer? number
----@param x number
----@param z number
----@param heading number
----@return Unit
+--- TODO.
 function CreateUnit2(blueprint, army, layer, x, z, heading)
 end
 
---- Creates a unit from a blueprint for an army, at a position with heading, pitch, and roll
----@see CreateUnit() # quaternion version
----@see CreateUnit2() # simple version
----@param blueprint string
----@param army Army
----@param x number
----@param y number
----@param z number
----@param heading number
----@param pitch number
----@param roll number
----@return Unit
-function CreateUnitHPR(blueprint, army, x, y, z, heading, pitch, roll)
+--- TODO.
+function CreateUnitHPR(blueprint, army, x, y, z, pitch, yaw, roll)
 end
 
 --- Deals damage to the target unit.
@@ -1234,13 +1096,13 @@ end
 function Warp(entity, location, orientation)
 end
 
----
----@return Entity
+--- TODO.
+---@diagnostic disable-next-line: lowercase-global
 function _c_CreateEntity(spec)
 end
 
----
----@return Shield
+--- TODO.
+---@diagnostic disable-next-line: lowercase-global
 function _c_CreateShield(spec)
 end
 
