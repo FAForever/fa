@@ -2,12 +2,12 @@
 ---@class moho.projectile_methods : moho.entity_methods
 local Projectile = {}
 
---- Change the detonate above height for the projectile
+--- Change the detonate above height for the projectile, relative to the terrain
 ---@param height number
 function Projectile:ChangeDetonateAboveHeight(height)
 end
 
---- Change the detonate below height for the projectile
+--- Change the detonate below height for the projectile, relative to the terrain
 ---@param height number
 function Projectile:ChangeDetonateBelowHeight(height)
 end
@@ -22,7 +22,7 @@ end
 function Projectile:ChangeZigZagFrequency(freq)
 end
 
---- Internally calls `import` to find the projectile
+--- Creates a child projectile that inherits the speed and orientation of its parent
 ---@param blueprint ProjectileBlueprint
 ---@return Projectile
 function Projectile:CreateChildProjectile(blueprint)
@@ -39,12 +39,12 @@ function Projectile:GetCurrentTargetPosition()
 end
 
 --- Get who launched this projectile
----@return Entity | Unit
+---@return Entity | Unit | nil
 function Projectile:GetLauncher()
 end
 
 ---
----@return Entity | Unit
+---@return Entity | Unit | nil
 function Projectile:GetTrackingTarget()
 end
 
@@ -58,17 +58,17 @@ end
 function Projectile:SetAcceleration(accel)
 end
 
----
+--- 
 ---@param accel number
 function Projectile:SetBallisticAcceleration(accel)
 end
 
----
+--- Whether or not this projecile collides with units and shields, should not be used for dummy projectiles as this is expensive
 ---@param collide boolean
 function Projectile:SetCollideEntity(collide)
 end
 
----
+--- Whether or not this projectile collides with the terrain and water surface
 ---@param collide boolean
 function Projectile:SetCollideSurface(collide)
 end
@@ -78,7 +78,8 @@ end
 function Projectile:SetCollision(collide)
 end
 
---- Change how much damage this projectile will do. Either amount or radius can be nil to leave unchanged.
+--- Unused, damage is passed by the weapon via the damage table
+---@deprecated
 ---@param amount number | nil
 ---@param radius number | nil
 function Projectile:SetDamage(amount, radius)
