@@ -305,35 +305,35 @@ end
 function CreateUnitHPR(blueprint, army, x, y, z, pitch, yaw, roll)
 end
 
---- Deals damage to the target unit.
--- @param instigator Source of the damage (unit) or nil.
--- @param target Unit taking the damage
--- @param amount Number, amount of damage.
--- @param damageType Example: 'Force', 'Normal', 'Nuke', 'Fire', TODO.
+--- Deals damage to the target unit
+---@param instigator Unit | nil
+---@param target Unit
+---@param amount number
+---@param damageType DamageType
 function Damage(instigator, target, amount, damageType)
 end
 
---- Deals damage to the target unit.
----@param instigator Unit Source of the damage (unit) or nil.
----@param location {x:number, y:number, z:number} with position {x, y, z}.
----@param radius number distance from the location to deal the damage.
----@param amount number amount of damage.
----@param damageType string 'Force', 'Normal', 'Nuke', 'Fire', TODO.
----@param damageFriendly boolean if it should damage allied units.
----@param damageSelf boolean? if the unit dealing the damage should take it as well.
-function DamageArea(instigator, location, radius, amount, damageType, damageFriendly, damageSelf)
+--- Deals damage in an circle
+---@param instigator Unit | nil
+---@param location Vector
+---@param radius number
+---@param damage number
+---@param damageType DamageType
+---@param damageFriendly boolean
+---@param damageSelf? boolean
+function DamageArea(instigator, location, radius, damage, damageType, damageFriendly, damageSelf)
 end
 
---- Deals damage to the target unit.
----@param instigator Unit Source of the damage (unit) or nil.
----@param location {x:number, y:number, z:number} with position {x, y, z}.
----@param minRadius number distance from the location to start dealing damage.
----@param maxRadius number distance from the location to stop dealing damage.
----@param amount number amount of damage.
----@param damageType string 'Force', 'Normal', 'Nuke', 'Fire', TODO.
----@param damageFriendly boolean if it should damage allied units.
----@param damageSelf boolean if the unit dealing the damage should take it as well.
-function DamageRing(instigator, location, minRadius, maxRadius, amount, damageType, damageFriendly, damageSelf)
+--- Deals damage in an ring
+---@param instigator Unit | nil
+---@param location Vector
+---@param minRadius number
+---@param maxRadius number
+---@param damage number
+---@param damageType DamageType
+---@param damageFriendly boolean
+---@param damageSelf? boolean
+function DamageRing(instigator, location, minRadius, maxRadius, damage, damageType, damageFriendly, damageSelf)
 end
 
 --- Get DEBUG info for UI selection.
