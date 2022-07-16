@@ -103,7 +103,7 @@ end
 function CreateAnimator(object)
 end
 
----
+--- Creates a beam that is attached to an entity
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -114,7 +114,8 @@ end
 function CreateAttachedBeam(object, bone, army, length, thickness, beamBlueprint)
 end
 
----
+--- Creates an emitter that is attached to an entity
+---@see CreateEmitterAtBone() or CreateEmitterAtEntity() # Alternative functions where the emitter spawns at the entity / bone, but is not attached
 ---@param object BoneObject
 ---@param bone Bone
 ---@param army Army
@@ -123,14 +124,15 @@ end
 function CreateAttachedEmitter(object, bone, army, emitterBlueprint)
 end
 
----
+--- Creates a beam, which then needs to be attached to a bone
+---@see AttachBeamToEntity() # Attaches the beam to a bone
 ---@param blueprint string
 ---@param army Army
 ---@return moho.IEffect
 function CreateBeamEmitter(blueprint, army)
 end
 
----
+--- Creates a beam and attaches it to an entity, usually used for weaponry
 ---@param object BoneObject
 ---@param tobone Bone
 ---@param army Army
@@ -139,7 +141,7 @@ end
 function CreateBeamEmitterOnEntity(object, tobone, army, blueprint)
 end
 
----
+--- Creates a beam between two entities
 ---@param object BoneObject
 ---@param bone Bone
 ---@param other Entity
@@ -150,7 +152,7 @@ end
 function CreateBeamEntityToEntity(object, bone, other, otherBone, army, blueprint)
 end
 
----
+--- ???
 ---@param object BoneObject
 ---@param bone Bone
 ---@param other Entity
@@ -162,7 +164,7 @@ end
 function CreateBeamToEntityBone(object, bone, other, otherBone, army, thickness, texture)
 end
 
----
+--- Creates a builder arm controller that aims for the unit that is being built, repaired or reclaimed. Similar to an aim controller for weapons
 ---@param unit Unit
 ---@param turretBone Bone
 ---@param barrelBone Bone
@@ -171,14 +173,13 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator
+--- Creates a collision detection manipulator, calls the function `self.OnAnimTerrainCollision(self, bone, x, y, z)` when a bone that is being watched collides with the terrain
 ---@param unit Unit
 ---@return moho.CollisionManipulator
 function CreateCollisionDetector(unit)
 end
 
---- Creates a decal with supplied parameters.
---- This decal is visible to all armies.
+--- Creates a decal with supplied parameters, the decal is visible through the fog
 ---@param position Vector
 ---@param heading Vector
 ---@param textureName1 string
@@ -234,7 +235,7 @@ end
 function CreateEmitterOnEntity(object, army, emitterBlueprint)
 end
 
----
+--- Prevents a bone from going through the terrain, useful for units that walk
 ---@param unit Unit
 ---@param footBone Bone
 ---@param kneeBone Bone
@@ -252,7 +253,7 @@ end
 function CreateInitialArmyUnit(army, unitId)
 end
 
----
+--- Creates a light particle that provides vision, is often used in combination with effects
 ---@see CreateLightParticleIntel() # intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
@@ -264,7 +265,7 @@ end
 function CreateLightParticle(object, bone, army, size, lifetime, texture, rampName)
 end
 
----
+--- Creates a light particle, is often used in combination with effects
 ---@see CreateLightParticle() # non intel-giving version
 ---@param object BoneObject
 ---@param bone Bone
@@ -276,7 +277,7 @@ end
 function CreateLightParticleIntel(object, bone, army, size, lifetime, texture, rampName)
 end
 
---- Spawns a prop, oriented by its model
+--- Spawns a prop, using the default orientation
 ---@see CreatePropHPR() # heading-pitch-roll version
 ---@param location Vector
 ---@param blueprintId string
@@ -297,7 +298,7 @@ end
 function CreatePropHPR(blueprintPath, x, y, z, heading, pitch, roll)
 end
 
---- Spawns Mass and Hydro deposits on the map
+--- Spawns mass and hydro deposits on the map
 ---@param type "Mass" | "Hydrocarbon"
 ---@param x number
 ---@param y number
@@ -327,7 +328,7 @@ end
 function CreateSlaver(object, destBone, srcBone)
 end
 
----
+--- Creates a slider similar to those used in robotics. When applied with other manipulators the slider can cause the entire sequence to 'stutter' at one update per tick, usually you should only manipulate a bone with a slider and nothing else
 ---@param object BoneObject
 ---@param bone Bone
 ---@param goalX? number
