@@ -3,39 +3,38 @@
 local CAimManipulator = {}
 
 ---
---  AimManipulator:OnTarget()
 function CAimManipulator:OnTarget()
 end
 
 ---
---  AimManipulator:SetAimHeadingOffset(offset)
+---@param offset Vector
 function CAimManipulator:SetAimHeadingOffset(offset)
 end
 
 ---
---  AimManipulator:SetEnabled(flag)
-function CAimManipulator:SetEnabled(flag)
+---@param enabled boolean
+function CAimManipulator:SetEnabled(enabled)
 end
 
 ---
---  AimManipulator:SetFiringArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
-function CAimManipulator:SetFiringArc(minHeading,  maxHeading,  headingMaxSlew,  minPitch,  maxPitch,  pitchMaxSlew)
+---@param minHeading number
+---@param maxHeading number
+---@param headingMaxSlew number
+---@param minPitch number
+---@param maxPitch number
+---@param pitchMaxSlew number
+function CAimManipulator:SetFiringArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
 end
 
 ---
---  AimManipulator:SetHeadingPitch(heading, pitch)
-function CAimManipulator:SetHeadingPitch(heading,  pitch)
+---@param heading number
+---@param pitch number
+function CAimManipulator:SetHeadingPitch(heading, pitch)
 end
 
 ---
---  AimManipulator:SetResetPoseTime(resetTime)
+---@param resetTime number
 function CAimManipulator:SetResetPoseTime(resetTime)
 end
 
----
---  derived from IAniManipulator
-function CAimManipulator:base()
-end
-
 return CAimManipulator
-
