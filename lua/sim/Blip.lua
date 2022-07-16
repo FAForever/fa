@@ -8,7 +8,7 @@
 --**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
----@class Blip
+---@class Blip : moho.blip_methods
 Blip = Class(moho.blip_methods) {
 
     AddDestroyHook = function(self,hook)

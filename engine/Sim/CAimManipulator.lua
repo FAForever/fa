@@ -3,6 +3,11 @@
 local CAimManipulator = {}
 
 ---
+---@return number
+function CAimManipulator:GetHeadingPitch()
+end
+
+---
 --  AimManipulator:OnTarget()
 function CAimManipulator:OnTarget()
 end
@@ -30,11 +35,6 @@ end
 ---
 --  AimManipulator:SetResetPoseTime(resetTime)
 function CAimManipulator:SetResetPoseTime(resetTime)
-end
-
----
---  derived from IAniManipulator
-function CAimManipulator:base()
 end
 
 return CAimManipulator

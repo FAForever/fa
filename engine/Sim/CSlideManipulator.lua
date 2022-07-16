@@ -3,6 +3,11 @@
 local CSlideManipulator = {}
 
 ---
+---@return boolean
+function CSlideManipulator:BeenDestroyed()
+end
+
+---
 --  CSlideManipulator:SetAcceleration(acc)
 function CSlideManipulator:SetAcceleration(acc)
 end

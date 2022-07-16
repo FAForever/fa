@@ -55,6 +55,7 @@ AIRESULT = {
     Ignored=3,
 }
 
+---@class ScriptTask : moho.ScriptTask_Methods
 ScriptTask = Class(moho.ScriptTask_Methods) {
 
     -- Called immediately when task is created

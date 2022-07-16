@@ -3,6 +3,11 @@
 local CAiAttackerImpl = {}
 
 ---
+---@return boolean
+function CAiAttackerImpl:AttackerWeaponsBusy()
+end
+
+---
 --  Loop through the weapons to see if the target can be attacked
 function CAiAttackerImpl:CanAttackTarget()
 end
