@@ -1235,13 +1235,15 @@ function Warp(entity, location, orientation)
 end
 
 ---
----@return Entity
-function _c_CreateEntity(spec)
+---@param entity Entity
+---@param spec UnitBlueprint
+function _c_CreateEntity(entity, spec)
 end
 
 ---
----@return Shield
-function _c_CreateShield(spec)
+---@param shield Shield
+---@param spec BpDefense.Shield
+function _c_CreateShield(shield, spec)
 end
 
 --- Print a log message
