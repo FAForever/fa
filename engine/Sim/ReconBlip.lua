@@ -7,12 +7,13 @@ local ReconBlip = {}
 function ReconBlip:GetBlueprint()
 end
 
----
+--- Returns the unit, even for blips that are part of jamming / spoofing
 ---@return Unit
 function ReconBlip:GetSource()
 end
 
----
+--- Does not appear to function
+---@deprecated
 ---@return boolean
 function ReconBlip:IsKnownFake()
 end
