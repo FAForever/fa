@@ -292,9 +292,10 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
 
     UIUtil.CreateLobbyVertScrollbar(scrollGroup, 1, 0, 0, 10)
     scrollGroup.top = 1
-
+    
     scrollGroup.GetScrollValues = function(self, axis)
-        return 1, table.getn(controlList), self.top, math.min(self.top + modsPerPage - 1, table.getn(controlList))
+        local controlsCount = table.getsize(self:GetFilteredControls())
+        return 1, controlsCount, self.top, math.min(self.top + modsPerPage - 1, controlsCount)
     end
 
     scrollGroup.ScrollLines = function(self, axis, delta)
@@ -306,9 +307,10 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     end
 
     scrollGroup.ScrollSetTop = function(self, axis, top)
+        local controlsCount = table.getsize(self:GetFilteredControls())
         top = math.floor(top)
         if top == self.top then return end
-        self.top = math.max(math.min(table.getn(controlList) - modsPerPage + 1 , top), 1)
+        self.top = math.max(math.min(controlsCount - modsPerPage + 1 , top), 1)
         self:CalcVisible()
     end
 
@@ -331,6 +333,16 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
                 visibleIndex = visibleIndex + 1
             end
         end
+    end
+
+    scrollGroup.GetFilteredControls = function(self)
+        local filteredControls = {}
+        for index, control in ipairs(controlList) do
+            if not control.filtered then
+                table.insert(filteredControls, control)
+            end
+        end
+        return filteredControls
     end
 
     SaveButton.OnClick = function(self)
