@@ -245,6 +245,13 @@ function UpdateWorldBorderState(skin, isOn)
 
 end
 
+local currentSkinName = 'random'
+--- gets name of current skin that changes when calling SetCurrentSkin()
+--- returns 'random', 'uef', 'cybran', 'aeon', or 'seraphim'
+function GetCurrentSkinName()
+    return currentSkinName
+end
+
 --* skin control, sets the current skin table
 function SetCurrentSkin(skin, overrideTable)
     local skinTable = skins[skin]
@@ -253,6 +260,7 @@ function SetCurrentSkin(skin, overrideTable)
         skinTable = skins[skin]
     end
 
+    currentSkinName = skin -- updating name of current skin
     currentSkin:Set(skin)
 
     tooltipTitleColor:Set(skinTable.tooltipTitleColor)
