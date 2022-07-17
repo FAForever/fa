@@ -164,8 +164,9 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     callback = saveBehaviour
     mods.availableToAll = availableMods
 
-    LoadPreferences() -- loading favorite mods, mods sorting order, mod list expanded/collapsed
-    
+    LoadPreferences() -- loading preference for favorite mods, mods sorting order, mod list expanded/collapsed
+    LoadMods() -- loading mods before creating mod filters so they show correct count of mods
+
     dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(80)
     dialogContent = Group(parent)
     LayoutHelpers.SetWidth(dialogContent, dialogWidth)
