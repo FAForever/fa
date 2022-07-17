@@ -162,13 +162,11 @@ local modsTags = {
 function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     IsHost = isHost
     callback = saveBehaviour
-    
     mods.availableToAll = availableMods
 
     LoadPreferences() -- loading favorite mods, mods sorting order, mod list expanded/collapsed
     
     dialogHeight = GetFrame(0).Height() - LayoutHelpers.ScaleNumber(80)
-
     dialogContent = Group(parent)
     LayoutHelpers.SetWidth(dialogContent, dialogWidth)
     dialogContent.Height:Set(dialogHeight)
@@ -202,7 +200,6 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
     favoriteModsToggle.Fill:SetSolidColor('FF999898')  -- '#FF999898'
     favoriteModsToggle.Icon.Depth:Set(function() return dialogContent.Depth() + 100 end)
     favoriteModsToggle.OnClick = function(self, event)
---        WARN('favoriteModsToggle.HandleEvent: ' .. event.Type)
         if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then 
             if event.Modifiers.Right then
                 mods.favorite = {}
@@ -326,7 +323,6 @@ function CreateDialog(parent, isHost, availableMods, saveBehaviour)
                 visibleIndex = visibleIndex + 1
             else
                 control:Show()
-                --control.Left:Set(self.Left() +5)
                 local i = visibleIndex
                 local c = control
                 control.Top:Set(function() return self.Top() + ((i - top) * (c.Height() +2)) end)
@@ -469,7 +465,6 @@ function CreateFilters()
     modSearch.Input:SetHighlightForegroundColor(UIUtil.highlightColor)
     modSearch.Input:SetHighlightBackgroundColor("880085EF") --#880085EF
     LayoutHelpers.AnchorToRight(modSearch.Input, modSearch.Icon, 5)
---    LayoutHelpers.AtLeftIn(modSearch.Input, modSearch.Group, 5)
     LayoutHelpers.AtRightIn(modSearch.Input, modSearch.Group, 5)
     LayoutHelpers.AtTopIn(modSearch.Input, modSearch.Group, 4)
     LayoutHelpers.AtBottomIn(modSearch.Input, modSearch.Group, 2)
@@ -579,7 +574,6 @@ function CreateFilterButton(parent, tag)
     end
 
     AddTooltip(filterToggle, modsTags[tag].text,  modsTags[tag].body)
-     
     return filterToggle
 end
 
@@ -656,7 +650,6 @@ function AppendMods(modlist, active, enabled, labelParam, labelSet)
         else
             GUI.modListCounter = GUI.modListCounter + 1
             local label = labelParam or LOC(labelSet[k])
-
             local listItem = CreateListElement(scrollGroup, mod, GUI.modListCounter)
             if not enabled then
                 listItem.bg:Disable()
@@ -670,7 +663,6 @@ function AppendMods(modlist, active, enabled, labelParam, labelSet)
                 LOG('ModsManager activated: ' .. GetModNameType(mod.uid))
             end
             listItem.bg:SetCheck(active, true)
-
         end
     end
 end
@@ -868,8 +860,6 @@ function LoadMods()
     for uid, mod in mods.ui.inactive do
         mods.ui.selecatable[uid] = mod
     end
-
-
 end
 
 -- Refreshes the mod list UI.
@@ -888,7 +878,6 @@ function RefreshModsList()
 
     controlList = {}
     controlMap = {}
-     
     LoadMods()
 
     GUI.modListCounter = 0
@@ -931,7 +920,6 @@ function RefreshModsList()
 
     FilterMods()
     SortMods(mods.sortKey)
-
 end
 -- Activates the mod with the given uid
 -- @param isRecursing Indicates this is a recursive call (usually pulling in dependencies), so should not prompt the user for input.
@@ -1109,15 +1097,13 @@ function CreateListElement(parent, mod, index)
     group.favToggle.Bottom:Set(function() return group.Bottom() end)
     group.favToggle.Height:Set(function() return group.Height() end)
     group.favToggle.OnClick = function(self)
-          
-              if mods.favorite[mod.uid] then
-                 mods.favorite[mod.uid] = nil
-              else 
-                 mods.favorite[mod.uid] = true
-              end
-
-              self.isChecked = mods.favorite[mod.uid]
-              self:Update() 
+        if mods.favorite[mod.uid] then
+           mods.favorite[mod.uid] = nil
+        else 
+           mods.favorite[mod.uid] = true
+        end
+        self.isChecked = mods.favorite[mod.uid]
+        self:Update() 
     end
     group.favToggle.isChecked = mods.favorite[mod.uid]
     group.favToggle:Update()
@@ -1205,7 +1191,7 @@ function CreateListElement(parent, mod, index)
         return false 
     end
     LayoutHelpers.SetDimensions(group.type, 30, 24) 
-        
+
     if mod.type == 'GAME' then
         AddTooltip(group.type, mod.status, 'This mod is changing game for all players and it will prevent ranking of the current game', 400, nil, nil, 'right')
     elseif mod.type == 'UI' then
@@ -1216,7 +1202,7 @@ function CreateListElement(parent, mod, index)
 
     group.ui = mod.ui_only
     LayoutHelpers.AtRightTopIn(group.type, group.bg, 10, 6)
-     
+
     -- check if the mod has 2 website links: mod info website and Github website
     if mod.url and mod.github then  
         -- creating a link for opening a website with info about the mod
@@ -1228,7 +1214,7 @@ function CreateListElement(parent, mod, index)
         group.github = CreateLinkButton(group.bg, mod.github, GUI.modSourceIcon, 'Open website with source code for the mod \n' .. mod.url) 
         LayoutHelpers.SetDimensions(group.github, 20, 20)
         LayoutHelpers.LeftOf(group.github, group.website, 5)
-    
+
     -- check if the mod has website URL or Github URL
     elseif mod.url then 
         if Links.repo(mod.url) then  
@@ -1311,7 +1297,6 @@ function CreateLinkButton(parent, url, iconPath, description)
 end
 
 function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
-
     local toggle = Bitmap(parent)
     toggle.isChecked = isChecked
     toggle.isCheckable = true 
@@ -1322,11 +1307,10 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     if UIUtil.GetCurrentSkinName() == 'random' then
        toggle.checkedColor = 'FFFFFF' -- #FFFFFF
     else
-       toggle.checkedColor = UIUtil.factionTextColor -- 'FFF7DE0B' -- '#FFF7DE0B'
+       toggle.checkedColor = UIUtil.factionTextColor
     end
-    
+
     toggle.Icon = Bitmap(parent, GUI.modFavoriteIcon)
---    toggle.Icon.Depth:Set(100)
     toggle.Icon:DisableHitTest()
     LayoutHelpers.SetDimensions(toggle.Icon, iconSize, iconSize)
     LayoutHelpers.AtLeftIn(toggle.Icon, parent, 5)
@@ -1337,7 +1321,7 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     toggle.Fill:SetSolidColor(toggle.uncheckColor)
     toggle.Fill.Depth:Set(function() return toggle.Icon.Depth() - 1 end)
     LayoutHelpers.FillParent(toggle.Fill, toggle.Icon)
-    
+
     if isCentered then
         LayoutHelpers.AtVerticalCenterIn(toggle.Icon, parent)
     else 
@@ -1349,10 +1333,8 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     LayoutHelpers.FillParentFixedBorder(toggle, toggle.Icon, -8)
      
     toggle.HandleEvent = function(self, event)
---        WARN('favToggle.HandleEvent: ' .. event.Type)
         OnButtonHighlight(self.Fill, event)
         if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then 
---            mods.favorite[mod.uid] = not mods.favorite[mod.uid]
             if self.OnClick then
                self:OnClick(event)
             end
@@ -1375,12 +1357,10 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
         end
     end
     toggle:Update()
-    
     return toggle
 end
 
 function CreateSortComboBox()
-
     local sortCombo = Combo(dialogContent, 14, 10, nil, nil, "UI_Tab_Click_01", "UI_Tab_Rollover_01")
     LayoutHelpers.SetWidth(sortCombo, 75) 
     LayoutHelpers.AtTopIn(sortCombo, dialogContent, 20)
@@ -1419,7 +1399,6 @@ function CreateSortComboBox()
 end
 
 function AddTooltip(control, title, description, width, padding, fontSize, position)
-
     if not fontSize then fontSize = 14 end
     if not position then position = 'left' end
     import('/lua/ui/game/tooltip.lua').AddControlTooltipManual(control, title, description, 0, width, 6, fontSize, fontSize, position)
@@ -1428,7 +1407,6 @@ end
 -- saves favorite mods, mods sorting order, mods expanded/collapsed
 function SavePreferences()
     if not mods or not mods.favorite then return end
-    
     SetPreference('mods_expanded', mods.expanded)
     SetPreference('mods_favorite', mods.favorite or {})
 --    SetPreference('mods_sortKey', mods.sortKey or 'status')
