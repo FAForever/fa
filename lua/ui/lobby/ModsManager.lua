@@ -1315,7 +1315,7 @@ function CreateFavoriteButton(parent, iconSize, isCentered, isChecked)
     local toggle = Bitmap(parent)
     toggle.isChecked = isChecked
     toggle.isCheckable = true 
-    toggle.uncheckColor = 'FF999898' -- #FF999898
+    toggle.uncheckColor = 'ff434343' -- #ff434343
     toggle.checkedTooltip = 'Remove this mod from the list of favorite mods'
     toggle.uncheckTooltip = 'Add this mod to the list of favorite mods that you can later activate by clicking on the Star button located in top left corner of this dialog'
     
