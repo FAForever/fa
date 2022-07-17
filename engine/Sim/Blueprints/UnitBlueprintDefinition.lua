@@ -311,7 +311,8 @@
 ---@field ProductionPerSecondEnergy number -- Amount of energy produced per second.
 ---@field ProductionPerSecondMass number -- Amount of mass produced per second.
 ---@field RebuildBonusIds string[] -- You will get bonus if you rebuild this unit over the wreckage of these wreckages. Multible BonusID's could be added.
----@field SacrificeMass number -- Builder will kill self but provide this amount of health to the unit it is helping.
+---@field SacrificeMassMult number -- Builder will kill self but provide this amount of health to the unit it is helping.
+---@field SacrificeEnergyMult number -- Builder will kill self but provide this amount of health to the unit it is helping.
 ---@field StorageEnergy number -- Enery storage capacity provided by this unit; This gets added to the main resource pool and is not stored in the unit itself.
 ---@field StorageMass number -- Mass storage capacity provided by this unit; This gets added to the main resource pool and is not stored in the unit itself.
 ---@field TeleportEnergyMod number -- Multiply by the unit's energy cost to get the energy per tick cost of teleporting.

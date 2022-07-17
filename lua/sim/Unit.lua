@@ -1028,6 +1028,79 @@ Unit = Class(moho.unit_methods) {
         return self.BuildRateOverride
     end,
 
+    --- an extension of https://github.com/Hdt80bro/fa/blob/annotate-engine/user.lua/lua/ui/game/economy.lua#L10-L12
+    ---@class EconomyResourceCosts : EconomyResourceValues
+    ---@field TIME number
+
+    --- Adds up total build costs for the unit blueprint and active enhancements
+    ---@param self Unit
+    ---@return EconomyResourceCosts
+    GetTotalResourceCosts = function(self)
+        local bp = self.Blueprint
+        local economy = bp.Economy
+        local mass = economy.BuildCostMass | 0
+        local energy = economy.BuildCostEnergy | 0
+        local time = economy.BuildTime | 0
+        if bp.Enhancements then
+            local enhancements = SimUnitEnhancements[self.EntityId]
+            if enhancements then
+                for _, enh in enhancements do
+                    mass = mass + (enh.BuildCostMass or 0)
+                    energy = energy + (enh.BuildCostEnergy or 0)
+                    time = time + (enh.BuildTime or 0)
+                end
+                -- subtract enhancement costs built into the unit cost
+                -- but only do that if the enhancement has been double-added from above
+                local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                if presetEnhancements then
+                    for _, name in presetEnhancements do
+                        local enhBp = bp.Enhancements[name]
+                        mass = mass - (enhBp.BuildCostMass or 0)
+                        energy = energy - (enhBp.BuildCostEnergy or 0)
+                        time = time - (enhBp.BuildTime or 0)
+                    end
+                end
+            end
+        end
+        if time == 0 then
+            time = 10   -- common default value, since 0 usually doesn't make sense
+        end
+        return {MASS = mass, ENERGY = energy, TIME = time}
+    end;
+
+    --- Adds up the resource value with all values found in active enhancements
+    ---@param self Unit
+    ---@param resource string a field in BpEconomy
+    ---@return number
+    GetTotalResourceCost = function(self, resource)
+        local bp = self.Blueprint
+        local cost = bp.Economy[resource] | 0
+        if bp.Enhancements then
+            local enhancements = SimUnitEnhancements[self.EntityId]
+            if enhancements then
+                for _, enh in enhancements do
+                    cost = cost + (enh[resource] or 0)
+                end
+                -- subtract enhancement costs built into the unit cost
+                -- but only do that if the enhancement has been double-added from above
+                local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
+                if presetEnhancements then
+                    for _, name in presetEnhancements do
+                        cost = cost - (bp.Enhancements[name][resource] or 0)
+                    end
+                end
+            end
+        end
+        return cost
+    end;
+
+    --- Adds up the total mass cost of this unit, including enhancements
+    ---@param self Unit
+    ---@return number
+    GetTotalMassCost = function(self)
+        return self:GetTotalResourceCost "BuildCostMass"
+    end;
+
     -------------------------------------------------------------------------------------------
     -- DAMAGE
     -------------------------------------------------------------------------------------------
@@ -1258,29 +1331,12 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetVeterancyValue = function(self)
-        local bp = self.Blueprint
-        local mass = bp.Economy.BuildCostMass
         local fractionComplete = self:GetFractionComplete()
-
-        if fractionComplete == 1 then
-            -- Add the value of any enhancements
-            local enhancements = SimUnitEnhancements[self.EntityId]
-            if enhancements then
-                for _, name in enhancements do
-                    mass = mass + bp.Enhancements[name].BuildCostMass or 0
-                end
-            end
-
-            -- Subtract the value of any enhancements from a preset because their value is included in bp.Economy.BuildCostMass
-            if bp.EnhancementPresetAssigned.Enhancements then
-                for _, name in bp.EnhancementPresetAssigned.Enhancements do
-                    mass = mass - bp.Enhancements[name].BuildCostMass or 0
-                end
-            end
-        end
-
-        -- Allow units to count for more or less than their real mass if needed.
-        return mass * fractionComplete * (bp.VeteranImportanceMult or 1) + (self.cargoMass or 0)
+        local unitMass = self:GetTotalMassCost()
+        local vetMult = self.Blueprint.VeteranImportanceMult or 1
+        local cargoMass = self.cargoMass or 0
+        -- Allow units to count for more or less than their real mass if needed
+        return fractionComplete * unitMass * vetMult + cargoMass
     end,
 
     --- Called when this unit kills another. Chiefly responsible for the veterancy system for now.
@@ -2622,15 +2678,48 @@ Unit = Class(moho.unit_methods) {
         end
     end,
 
-    OnStartSacrifice = function(self, target_unit)
-        EffectUtilities.PlaySacrificingEffects(self, target_unit)
+    OnStartSacrifice = function(self, targetUnit)
+        EffectUtilities.PlaySacrificingEffects(self, targetUnit)
     end,
 
-    OnStopSacrifice = function(self, target_unit)
-        EffectUtilities.PlaySacrificeEffects(self, target_unit)
+    OnStopSacrifice = function(self, targetUnit)
+        self:AdjustSacrificeToTotalCost(targetUnit)
+        EffectUtilities.PlaySacrificeEffects(self, targetUnit)
         self:SetDeathWeaponEnabled(false)
         self:Destroy()
     end,
+
+    AdjustSacrificeToTotalCost = function(self, targetUnit)
+        local economy = self.Blueprint.Economy
+        local usedBonus = targetUnit:CalculateSacrificeBonus(self)
+
+        local actualCost = self:GetTotalResourceCosts()
+        local actualMass = actualCost.MASS * economy.SacrificeMassMult
+        local actualEnergy = actualCost.ENERGY * economy.SacrificeEnergyMult
+        local actualBonus = targetUnit:CalculateSacrificeBonus(actualMass, actualEnergy)
+
+        local bonusDif = actualBonus - usedBonus
+        -- do something with this information
+    end;
+
+    --- Gets the change in build progress a unit will have if it sacrifices into this one
+    ---@param self Unit
+    ---@param mass number
+    ---@param energy number
+    ---@return number
+    ---@overload fun(self: Unit, sacrificer: Unit): number
+    CalculateSacrificeBonus = function(self, mass, energy)
+        if type(mass) == "table" then
+            local bp = mass.Blueprint.Economy
+            mass = bp.BuildCostMass * bp.SacrificeMassMult
+            energy = bp.BuildCostEnergy * bp.SacrificeEnergyMult
+        end
+        local economy = self.Blueprint.Economy
+        local buildMass = economy.BuildCostMass
+        local buildEnergy = economy.BuildCostEnergy
+        -- don't know the actual calculation
+        return (mass / buildMass + energy / buildEnergy) / 2
+    end;
 
     -------------------------------------------------------------------------------------------
     -- INTEL
@@ -4670,3 +4759,39 @@ DummyUnit = Class(moho.unit_methods) {
     CheckAssistFocus = function(self) end,
     UpdateAssistersConsumption = function (self) end,
 }
+
+
+
+--[[
+    INFO: Before: 1.3945370912552
+INFO: Guess: 43.738288879395
+INFO: After: 43.733432769775
+INFO: PopupCreateUnitMenu
+INFO: Before: 43.639007568359
+INFO: Guess: 120.0279006958
+INFO: After: 100
+INFO: PopupCreateUnitMenu
+INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
+INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
+INFO: Before: 0.7784823179245
+INFO: Guess: 77.167373657227
+INFO: After: 77.162521362305
+INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
+INFO: Before: 2.2704944610596
+INFO: Guess: 39.470497131348
+INFO: After: 39.469135284424
+INFO: Before: 39.465717315674
+INFO: Guess: 67.665718078613
+INFO: After: 67.664360046387
+INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
+INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
+INFO: Before: 0.063786953687668
+INFO: Guess: 5.4736227989197
+INFO: After: 5.4733214378357
+INFO: Before: 5.4728198051453
+INFO: Guess: 13.403147697449
+INFO: After: 13.40283870697
+INFO: Before: 13.402201652527
+INFO: Guess: 17.336627960205
+INFO: After: 17.336334228516
+]]
