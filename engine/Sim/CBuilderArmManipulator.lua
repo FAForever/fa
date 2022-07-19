@@ -3,6 +3,11 @@
 local CBuilderArmManipulator = {}
 
 ---
+---@return number
+function CBuilderArmManipulator:GetHeadingPitch()
+end
+
+---
 --  BuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
 function CBuilderArmManipulator:SetAimingArc(minHeading,  maxHeading,  headingMaxSlew,  minPitch,  maxPitch,  pitchMaxSlew)
 end

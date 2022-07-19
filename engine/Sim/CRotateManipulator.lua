@@ -3,6 +3,10 @@
 local CRotateManipulator = {}
 
 ---
+function CRotateManipulator:ClearFollowBone()
+end
+
+---
 --  RotateManipulator:ClearGoal()
 function CRotateManipulator:ClearGoal()
 end
