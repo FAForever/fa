@@ -47,10 +47,10 @@ local function SyncCallback(sync)
         local focus = GetFocusArmy()
         local score = sync.Score[focus]
 
-        instance.time:Set(GetGameTime())
+        instance:UpdateTime(GetGameTime())
 
         if score.general.currentunits and score.general.currentcap then 
-            instance.unitData:Set({ Count = score.general.currentunits , Cap = score.general.currentcap })
+            instance:UpdateUnitData(score.general.currentunits, score.general.currentcap)
         end
 
         if sync.NewPlayableArea then 
@@ -91,7 +91,6 @@ local scoreboardUtilities = {
             return string.format("%4dk", 0.1 * math.floor(0.01* number))
         end
     end,
-
 
     --- Used when trying to gift resources to yourself
     ---@param from number
@@ -160,6 +159,12 @@ local ScoreboardArmyLine = Class(Group) {
     __init = function(armyLine, scoreboard, debug, data, index) 
         Group.__init(armyLine, scoreboard, "scoreboard-armyLine-" .. index)
 
+        -- # store information
+
+        armyLine.debug = debug
+        armyLine.armyIndex = index
+        armyLine.armyData = data 
+
         -- # prepare lazy values
 
         armyLine.rating = LazyVar(0)
@@ -174,12 +179,6 @@ local ScoreboardArmyLine = Class(Group) {
             StorageMass = false,
             StorageEnergy = false,
         })
-
-        -- # store information
-
-        armyLine.debug = debug
-        armyLine.armyIndex = index
-        armyLine.armyData = data 
 
         -- # player faction, color, rating and name
 
@@ -627,23 +626,137 @@ local ScoreboardArmyLine = Class(Group) {
     end,
 }
 
+local ScoreboardHeader = Class(Group) {
+
+    __init = function(header, scoreboard, debug)
+        Group.__init(header, scoreboard, "scoreboard-header")
+
+        -- # Setup lazy vars
+
+        header.time = LazyVar(0)
+
+        header.simSpeed = LazyVar(0)
+        header.simSpeedDesired = LazyVar(0)
+    
+        header.unitData = LazyVar({
+            Count = 0, 
+            Cap = 0,
+        })
+
+        -- # Setup UI
+
+        LayoutHelpers.LayoutFor(header)
+            :Left(scoreboard.Left)
+            :Right(scoreboard.Right)
+            :Top(scoreboard.Top)        -- dummy value
+            :Height(20)
+            :End()
+
+        header.debug = LayoutHelpers.LayoutFor(Bitmap(debug))
+            :Fill(header)
+            :Color('44ff0000')
+            :End()
+
+        -- # Setup UI: time
+
+        header.timeIcon = LayoutHelpers.LayoutFor(
+            Bitmap(header))
+            :Texture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
+            :AtLeftIn(header, 2)
+            :AtTopIn(header, 2)
+            :Width(14)
+            :Height(14)
+            :Over(scoreboard, 10)
+            :End()
+
+        header.timeText = LayoutHelpers.LayoutFor(
+            UIUtil.CreateText(header, "",  12, UIUtil.bodyFont)) 
+            :RightOf(header.timeIcon, 2)
+            :AtTopIn(header, 2)
+            :Color('ff00dbff')
+            :Over(scoreboard, 10)
+            :End()
+
+        header.time.OnDirty = function(self)
+            header.timeText:SetText(self())
+        end
+
+        -- # Setup UI: unit statistics
+
+        header.unitIcon = LayoutHelpers.LayoutFor(
+            Bitmap(scoreboard))
+            :Texture(UIUtil.UIFile('/dialogs/score-overlay/tank_bmp.dds'))
+            :AtRightIn(header, 2)
+            :AtTopIn(header, 2)
+            :Width(28)
+            :Height(14)
+            :Over(scoreboard, 10)
+            :End()
+
+        header.unitText = LayoutHelpers.LayoutFor(
+            UIUtil.CreateText(header, "",  12, UIUtil.bodyFont))
+            :LeftOf(header.unitIcon, 2)
+            :AtTopIn(header, 2)
+            :Color('ff00dbff')
+            :Over(scoreboard, 10)
+            :End()
+
+        header.unitData.OnDirty = function(self)
+            local data = self()
+            header.unitText:SetText(string.format("%d/%d", data.Count or 0, data.Cap or 0))
+        end
+
+        -- # initial sane values 
+
+        header.time:Set(GetGameTime())
+        header.simSpeed:Set(0)
+        header.simSpeedDesired:Set(0)
+        header.unitData:Set({
+            Count = 0,
+            Cap = scenario.Options.UnitCap,
+        })
+    end,
+
+    UpdateTime = function(header, value)
+        header.time:Set(value)
+    end,
+
+    UpdateUnitData = function(header, count, cap)
+        local data = header.unitData()
+        data.Count = count 
+        data.Cap = cap 
+        header.unitData:Set(data)
+    end,
+
+}
+
+local ScoreboardBody = Class(Group) {
+
+    __init = function(scoreboard, parent)
+        Group.__init(scoreboard, parent, "scoreboard-header")
+
+    end,
+
+}
+
+local ScoreboardFooter = Class(Group) {
+
+    __init = function(scoreboard, parent)
+        Group.__init(scoreboard, parent, "scoreboard-header")
+
+    end,
+
+}
+
 ---@class Scoreboard
 local Scoreboard = Class(Group) {
 
     __init = function(scoreboard, parent)
         Group.__init(scoreboard, parent, "scoreboard")
 
+        
+        
         -- # prepare lazy values
-
-        scoreboard.time = LazyVar(0)
-
-        scoreboard.simSpeed = LazyVar(0)
-        scoreboard.simSpeedDesired = LazyVar(0)
-    
-        scoreboard.unitData = LazyVar({
-            Count = 0, 
-            Cap = 0,
-        })
     
         scoreboard.gameType = LazyVar({
             Name = "",
@@ -678,6 +791,9 @@ local Scoreboard = Class(Group) {
             :Color('ff000000')
             :End()
 
+        scoreboard.header = ScoreboardHeader(scoreboard, debug)
+        scoreboard.header.Top:Set(scoreboard.Top)
+
         -- # Debug tooling
 
         local checker = LayoutHelpers.LayoutFor(Checkbox(scoreboard))
@@ -701,23 +817,11 @@ local Scoreboard = Class(Group) {
 
         -- # Construction of UI areas
 
-        local header = LayoutHelpers.LayoutFor(Bitmap(scoreboard))
-            :Left(scoreboard.Left)
-            :Right(scoreboard.Right)
-            :Top(scoreboard.Top)
-            :Bottom(function() return scoreboard.Top() + LayoutHelpers.ScaleNumber(20) end)
-            :End()
-
-        LayoutHelpers.LayoutFor(Bitmap(debug))
-            :Fill(header)
-            :Color('44ff0000')
-            :End()
-
         local body = LayoutHelpers.LayoutFor(Bitmap(scoreboard))
             :Left(scoreboard.Left)
             :Right(scoreboard.Right)
-            :Top(header.Bottom)
-            :Bottom(function() return header.Bottom() + 200 end)        -- some dummy value to start with
+            :Top(scoreboard.header.Bottom)
+            :Bottom(function() return scoreboard.header.Bottom() + 200 end)        -- some dummy value to start with
             :End()
 
         LayoutHelpers.LayoutFor(Bitmap(debug))
@@ -739,49 +843,6 @@ local Scoreboard = Class(Group) {
 
         LayoutHelpers.LayoutFor(scoreboard)
             :Bottom(footer.Bottom)
-
-        -- # Populate header
-
-        local timeIcon = LayoutHelpers.LayoutFor(Bitmap(scoreboard))
-            :Texture(UIUtil.UIFile('/game/unit_view_icons/time.dds'))
-            :AtLeftIn(header, 2)
-            :AtTopIn(header, 2)
-            :Width(14)                  -- match font size
-            :Height(14)                 -- match font size
-            :Over(scoreboard, 10)
-            :End()
-
-        local time = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "",  12, UIUtil.bodyFont))
-            :RightOf(timeIcon, 2)
-            :AtTopIn(header, 2)
-            :Color('ff00dbff')
-            :Over(scoreboard, 10)
-            :End()
-
-        scoreboard.time.OnDirty = function(self)
-            time:SetText(self())
-        end
-
-        local unitIcon = LayoutHelpers.LayoutFor(Bitmap(scoreboard))
-            :Texture(UIUtil.UIFile('/dialogs/score-overlay/tank_bmp.dds'))
-            :AtRightIn(header, 2)
-            :AtTopIn(header, 2)
-            :Width(28)
-            :Height(14)
-            :Over(scoreboard, 10)
-            :End()
-
-        local unit = LayoutHelpers.LayoutFor(UIUtil.CreateText(scoreboard, "",  12, UIUtil.bodyFont))
-            :LeftOf(unitIcon, 2)
-            :AtTopIn(header, 2)
-            :Color('ff00dbff')
-            :Over(scoreboard, 10)
-            :End()
-
-        scoreboard.unitData.OnDirty = function(self)
-            local data = self()
-            unit:SetText(string.format("%d/%d", data.Count or 0, data.Cap or 0))
-        end
 
         -- # populate footer
 
@@ -837,7 +898,7 @@ local Scoreboard = Class(Group) {
         -- # Populate body
 
         scoreboard.armyEntries = { }
-        local last = header 
+        local last = scoreboard.header 
         for k, army in armies do 
             if not army.civilian then 
                 local armyLine = LayoutHelpers.LayoutFor(ScoreboardArmyLine(scoreboard, debug, army, k))
@@ -850,14 +911,6 @@ local Scoreboard = Class(Group) {
         end
 
         -- # initial (sane) values
-
-        scoreboard.time:Set(GetGameTime())
-        scoreboard.simSpeed:Set(0)
-        scoreboard.simSpeedDesired:Set(0)
-        scoreboard.unitData:Set({
-            Count = 0,
-            Cap = scenario.Options.UnitCap,
-        })
 
         scoreboard.gameType:Set({
             Name = ShareNameLookup[scenario.Options.Share],
@@ -880,6 +933,14 @@ local Scoreboard = Class(Group) {
         if not showDebugLayout then 
             debug:Hide()
         end
+    end,
+
+    UpdateTime = function(scoreboard, value)
+        scoreboard.header:UpdateTime(value)
+    end,
+
+    UpdateUnitData = function(scoreboard, count, cap)
+        scoreboard.header:UpdateUnitData(count, cap)
     end,
 
 
