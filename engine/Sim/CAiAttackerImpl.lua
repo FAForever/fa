@@ -8,6 +8,7 @@ local CAiAttackerImpl = {}
 --- Returns if the attacker has any weapon that is currently attacking any enemies
 ---@return boolean
 function CAiAttackerImpl:AttackerWeaponsBusy()
+end
 
 --- Loop through the weapons to see if the target can be attacked
 ---@param target AITarget
