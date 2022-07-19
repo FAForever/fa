@@ -197,7 +197,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 600,
             DamageFriendly = false,                    --IceDreamer
-            DamageRadius = 3,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Zealot AA Missile',
             FireTargetLayerCapsTable = {

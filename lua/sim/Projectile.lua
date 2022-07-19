@@ -271,6 +271,12 @@ Projectile = Class(moho.projectile_methods) {
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
 
+        if targetEntity then
+            local vx, vy, vz = targetEntity:GetVelocity()
+            vc[1] = vc[1] + vx
+            vc[2] = vc[2] + vy
+            vc[3] = vc[3] + vz
+        end
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
@@ -525,7 +531,7 @@ Projectile = Class(moho.projectile_methods) {
                         if radius > 0 then
                             DamageArea(
                                 instigator, 
-                                cachedPosition, 
+                                cachedPosition , 
                                 radius, 
                                 initialDmg, 
                                 DamageData.DamageType, 

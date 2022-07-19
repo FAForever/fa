@@ -187,7 +187,7 @@ UnitBlueprint {
             CollideFriendly = false,
             Damage = 300,
             DamageFriendly = false,                    --IceDreamer
-            DamageRadius = 3,
+            DamageRadius = 1.5,
             DamageType = 'Normal',
             DisplayName = 'Nanite Missile System',
             FireTargetLayerCapsTable = {
