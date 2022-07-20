@@ -361,11 +361,12 @@ UnitBlueprint {
             ReTargetOnMiss = true,
             RequireTime = 0,
             TargetPriorities = {
-                'AIR MOBILE EXPERIMENTAL',
                 'AIR MOBILE TECH3 BOMBER',
-                'AIR MOBILE BOMBER',
-                'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE TRANSPORTATION',
+                'AIR MOBILE EXPERIMENTAL',
+                'AIR MOBILE TECH3',
+                'AIR MOBILE TECH2',
+                'AIR MOBILE GROUNDATTACK',
                 'AIR MOBILE',
                 'ALLUNITS'
             },
