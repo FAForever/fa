@@ -601,11 +601,6 @@ function SetupMFDSync(movieTable, text)
         tempData.text = tempText
         LOG("ERROR: Unable to find name in string: " .. text .. " (" .. tempText .. ")")
     end
-    -- local timeSecs = GetGameTimeSeconds()
-    -- local hours = math.floor(timeSecs / 3600)
-    -- local minutes = math.mod(timeSecs, math.floor(timeSecs / 60), 60)
-    -- local seconds = math.mod(timeSecs, 60)
-    -- tempData.time = string.format("%02d:%02d:%02d", hours, minutes, seconds)
     tempData.time = GetGameTime()
     if movieTable[4] == 'UEF' then
         tempData.color = 'ff00c1ff'
