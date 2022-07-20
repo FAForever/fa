@@ -58,14 +58,18 @@ function GetMarker(name)
     return Scenario.MasterChain._MASTERCHAIN_.Markers[name]
 end
 
+---
+---@param chainName string
+---@return Vector[]
 function ChainToPositions(chainName)
     local chain = Scenario.Chains[chainName]
     if not chain then
         error('ERROR: Invalid Chain Named- ' .. chainName, 2)
     end
     local positionTable = {}
-    for num, marker in chain.Markers do
-        table.insert(positionTable, Scenario.MasterChain._MASTERCHAIN_.Markers[marker]['position'])
+    local markers = Scenario.MasterChain._MASTERCHAIN_.Markers
+    for i, marker in chain.Markers do
+        positionTable[i] = markers[marker]['position']
     end
     return positionTable
 end
@@ -92,27 +96,28 @@ function GetMarkerChain(name)
     return chain
 end
 
-----[  MarkerToPosition                                                           ]--
-----[                                                                             ]--
-----[  Converts a marker as specified in *_save.lua file to a position.           ]--
-function MarkerToPosition(strMarker)
-    local marker = GetMarker(strMarker)
-        if not marker then
-            error('ERROR: Invalid marker name- '..strMarker)
-        end
+
+--- Converts a marker as specified in `*_save.lua` file to a position
+---@param markerName string
+---@return Vector
+function MarkerToPosition(markerName)
+    local marker = GetMarker(markerName)
+    if not marker then
+        error('ERROR: Invalid marker name- ' .. markerName)
+    end
     return marker.position
 end
 
-----[  AreaToRect                                                                 ]--
-----[                                                                             ]--
-----[  Converts an area as specified in *_save.lua file to a rectangle.           ]--
-function AreaToRect(strArea)
-    local area = Scenario.Areas[strArea]
+--- Converts an area as specified in `*_save.lua` file to a rectangle
+---@param areaName Area
+---@return Rectangle
+function AreaToRect(areaName)
+    local area = Scenario.Areas[areaName]
     if not area then
         error('ERROR: Invalid area name')
     end
     local rectangle = area.rectangle
-    return Rect(rectangle[1],rectangle[2],rectangle[3],rectangle[4])
+    return Rect(rectangle[1], rectangle[2], rectangle[3], rectangle[4])
 end
 
 function InRect(vectorPos, rect)
