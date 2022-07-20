@@ -329,8 +329,7 @@ UnitBlueprint {
             RateOfFire = 2,
             TargetPriorities = {
                 'TECH3 MOBILE',
-                'MOBILE',
-                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE + (STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -396,9 +395,7 @@ UnitBlueprint {
             RateOfFire = 2,
             TargetPriorities = {
                 'TECH3 MOBILE',
-                'TECH2 MOBILE',
-                'TECH1 MOBILE',
-                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE + (STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
@@ -466,9 +463,7 @@ UnitBlueprint {
             SlavedToBodyArcRange = 175,
             TargetPriorities = {
                 'TECH3 MOBILE',
-                'TECH2 MOBILE',
-                'TECH1 MOBILE',
-                '(STRUCTURE * DEFENSE - ANTIMISSILE)',
+                'MOBILE + (STRUCTURE * DEFENSE - ANTIMISSILE)',
                 'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE',
