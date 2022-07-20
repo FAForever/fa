@@ -41,7 +41,7 @@ function ExitGame()
     Sync.RequestingExit = true
 end
 
---- Call to end an operation
+--- Ends an operation
 ---@param success boolean instructs UI which dialog to show
 ---@param allPrimary boolean
 ---@param allSecondary boolean
@@ -99,7 +99,7 @@ function OnFactionSelect(data)
     end
 end
 
---- Call to end an operation where the data is already provided in table form (just a wrapper for sync)
+--- Ends an operation where the data is already provided in table form (just a wrapper for sync)
 ---@param opData table
 function EndOperationT(opData)
     Sync.OperationComplete = opData
@@ -143,7 +143,8 @@ end
 
 CreateUnitDeathTrigger = TriggerFile.CreateUnitDeathTrigger
 
----
+--- Sets a unit's death to be paused. It is unpaused globally, since this usually only
+--- happens to one unit at a time (e.g. the camera zooms in an ACU before it explodes)
 ---@param unit Unit
 function PauseUnitDeath(unit)
     if unit and not unit.Dead then
@@ -153,7 +154,8 @@ function PauseUnitDeath(unit)
     end
 end
 
----
+--- An override for `Unit.DoTakeDamage` to hold on to the final blow and then release it
+--- on the unit once its death is unpaused
 ---@param self Unit
 ---@param instigator Unit
 ---@param amount number
@@ -190,7 +192,7 @@ function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio
     self:Kill(instigator, damageType, excessDamageRatio)
 end
 
----
+--- An override for `Unit.OnKilled` to make unit death pausing work
 ---@param self Unit
 ---@param instigator Unit
 ---@param type any
@@ -379,7 +381,7 @@ function GetCatUnitsInArea(cat, area, brain)
     return result
 end
 
--- Goes through every unit in `group` and destroys them without explosions
+--- Goes through every unit in `group` and destroys them without explosions
 ---@param units Unit[]
 function DestroyGroup(units)
     for _, unit in units do
@@ -519,7 +521,7 @@ function GroupMoveChain(units, chain)
     end
 end
 
----
+--- Makes `units` to have their work progress start at `0.0` and scale to `1.0` over `time`
 ---@param units Unit[]
 ---@param time number
 function GroupProgressTimer(units, time)

@@ -126,14 +126,14 @@ function AreaTriggerThread(callback, rectangles, category, onceOnly, invert, aiB
             end
         end
         -- Check to see if we have a triggering amount inside in the area.
-        if number and ((amount >= number and not invert) or (amount < number and invert)) then
+        if unitCount and ((amount >= unitCount) ~= invert) then
             triggered = true
         end
         -- TRIGGER IF:
         -- You don't want a specific amount and the correct unit category entered
         -- You don't want a specific amount, there are no longer the category inside and you wanted the test inverted
         -- You want a specific amount and we have enough.
-        if (triggered and not invert and not number) or (not triggered and invert and not number) or (triggered and number) then
+        if (not unitCount and (triggered ~= invert)) or (triggered and unitCount) then
             if name then
                 callback(TriggerManager, name, triggeringEntity)
             else
