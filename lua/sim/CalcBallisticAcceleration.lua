@@ -8,7 +8,7 @@ local ProjectileMethods = moho.projectile_methods
 local ProjectileGetLauncher = ProjectileMethods.GetLauncher
 
 local EntityMethods = moho.entity_methods
-local EntityGetPosition = EntityMethods.GetPosition
+local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 
 local UnitMethods = moho.unit_methods
 local UnitGetVelocity = UnitMethods.GetVelocity
@@ -48,8 +48,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
 
     -- Get projectile position and velocity
     -- velocity needs to multiplied by 10 due to being returned /tick instead of /s
-    local projPos = EntityGetPosition(projectile)
-    local projPosX, projPosY, projPosZ = projPos[1], projPos[2], projPos[3]
+    local projPosX, projPosY, projPosZ = EntityGetPositionXYZ(projectile)
     local projVelX,    _    , projVelZ = UnitGetVelocity(launcher)
 
     local target = UnitGetTargetEntity(launcher)
@@ -59,8 +58,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     local targetVelX, targetVelZ
     if target and IsUnit(target) then
         -- target is a entity
-        targetPos = EntityGetPosition(target)
-        targetPosX, targetPosZ = targetPos[1], targetPos[3]
+        targetPosX, _, targetPosZ = EntityGetPositionXYZ(target)
         targetVelX, _, targetVelZ = UnitGetVelocity(target)
     else
         -- target is something else i.e. attack ground
@@ -69,11 +67,11 @@ CalculateBallisticAcceleration = function(weapon, projectile)
         targetVelX, targetVelZ = 0, 0
     end
 
-    local bp = weapon.Blueprint
     local data = bombData[id]
 
     -- if it's the first time...
     if not data then
+        local bp = weapon.Blueprint
         local muzzleSalvoSize = bp.MuzzleSalvoSize
         -- and there's going to be a second time
         if muzzleSalvoSize > 1 then
@@ -81,11 +79,13 @@ CalculateBallisticAcceleration = function(weapon, projectile)
             data = {
                 remaining = muzzleSalvoSize,
                 lastAccel = 4.75,
-                -- subtract one because we will have already dropped one bomb
+                -- center the spread on the target
+                -- subtract one because we will have already dropped one bomb when we calculate it
                 spreadBegin = 0.5 * muzzleSalvoSize - 0.5,
                 -- adjusted time between bombs, this is multiplied by 0.5 to get the bombs overlapping a bit
                 -- (also pre-convert velocity from per ticks to per seconds by multiplying by 10)
                 adjustedDelay = 5 * bp.MuzzleSalvoDelay,
+                -- store the target position if it was a groundfire
                 targetpos = targetPos, -- we don't use this, but apparently other code does
             }
             local dropShort = bp.DropBombShort
@@ -112,10 +112,10 @@ CalculateBallisticAcceleration = function(weapon, projectile)
                 return 4.75
             end
             local time = distPos / distVel
-            local targetTPosX = targetPosX + time * targetVelX
-            local targetTPosZ = targetPosZ + time * targetVelZ
-            local targetTPosY = GetSurfaceHeight(targetTPosX, targetTPosZ)
-            return 200 * (projPosY - targetTPosY) / (time*time)
+            local targetNewPosX = targetPosX + time * targetVelX
+            local targetNewPosZ = targetPosZ + time * targetVelZ
+            local targetNewPosY = GetSurfaceHeight(targetNewPosX, targetNewPosZ)
+            return 200 * (projPosY - targetNewPosY) / (time*time)
         end
     end
 
@@ -133,7 +133,7 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     end
 
     -- calculate flat (exclude y-axis) distance and velocity between projectile and target
-    -- velocity will need to multiplied by 10 due to being returned per tick instead of per second
+    -- velocity will need to multiplied by 10 due to being per tick instead of per second
     local distVel = VDist2(projVelX, projVelZ, targetVelX, targetVelZ)
     if distVel == 0 then
         return 4.75
@@ -142,7 +142,6 @@ CalculateBallisticAcceleration = function(weapon, projectile)
 
     local dropShort = data.dropShortRatio
     if dropShort then
-        -- deliberately drop bomb short by % ratio, could be useful for torpedo bombers
         distPos = distPos * dropShort
     end
 
@@ -175,10 +174,17 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     -- now we can calculate what acceleration we need to make it hit the target in the y-axis
     -- a = 2 * (1/t)^2 * x
 
-    -- also convert time from per tick to per second (multiply by 10*10)
+    -- also convert time from ticks to seconds (multiply by 10, twice)
     local acc = 200 * (projPosY - targetNewPosY) / (time*time)
 
     -- store last acceleration in case target dies in the middle of carpet bomb run
     data.lastAccel = acc
     return acc
+end
+
+local once = true
+if once then
+    for i, line in debug.listcode(CalculateBallisticAcceleration) do
+        LOG(line)
+    end
 end
