@@ -181,10 +181,3 @@ CalculateBallisticAcceleration = function(weapon, projectile)
     data.lastAccel = acc
     return acc
 end
-
-local once = true
-if once then
-    for i, line in debug.listcode(CalculateBallisticAcceleration) do
-        LOG(line)
-    end
-end
