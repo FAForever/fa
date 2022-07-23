@@ -296,18 +296,16 @@ Projectile = Class(moho.projectile_methods) {
         local dz = OnImpactPreviousZ - vc[3]
         local dsqrt = dx * dx + dz * dz
         local doEffects = Random() < 0.1 or dsqrt > radius
-        
-        -- update last position of known effects
-        if doEffects then 
-            OnImpactPreviousX = vc[1]
-            OnImpactPreviousZ = vc[3]
-        end
 
         -- do splat logic and knock over trees
-        if doEffects and radius > 0 then 
+        if doEffects and radius > 0 then
+
+            -- update last position of known effects
+            OnImpactPreviousX = vc[1]
+            OnImpactPreviousZ = vc[3]
 
             -- knock over trees
-            DamageArea( 
+            DamageArea(
                 self,               -- instigator
                 vc,                 -- position
                 0.75 * radius,      -- radius
@@ -317,12 +315,12 @@ Projectile = Class(moho.projectile_methods) {
             )
 
             -- try and spawn in a splat
-            if 
+            if
                 -- if we flat out hit the terrain
-                targetType == "Terrain" or 
+                targetType == "Terrain" or
 
                 -- if we hit a unit that is on land
-                (targetEntity and targetEntity.Layer == "Land") 
+                (targetEntity and targetEntity.Layer == "Land")
             then 
                 -- choose a splat to spawn
                 local splat = bp.Display.ScorchSplat
@@ -348,7 +346,6 @@ Projectile = Class(moho.projectile_methods) {
                 local rngRadius = altRadius * Random()
 
                 CreateSplat(
-
                     -- position, orientation and the splat
                     vc,                                     -- position
                     6.28 * Random(),                        -- heading
