@@ -271,18 +271,26 @@ Projectile = Class(moho.projectile_methods) {
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
 
+        -- adjust the impact location based on the velocity of the
         if targetEntity then
-            local vx, vy, vz = targetEntity:GetVelocity()
-            vc[1] = vc[1] + vx
-            vc[2] = vc[2] + vy
-            vc[3] = vc[3] + vz
+            if targetType == 'Unit' or targetType == 'UnitAir' then
+                local vx, vy, vz = targetEntity:GetVelocity()
+                vc[1] = vc[1] + vx
+                vc[2] = vc[2] + vy
+                vc[3] = vc[3] + vz
+            elseif targetType == 'Shield' then
+                local vx, vy, vz = targetEntity.Owner:GetVelocity()
+                vc[1] = vc[1] + vx
+                vc[2] = vc[2] + vy
+                vc[3] = vc[3] + vz
+            end
         end
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
 
-        -- compute whether we should spawn additional effects for this 
-        -- projectile, there's always a 10% chance or if we're far away from 
+        -- compute whether we should spawn additional effects for this
+        -- projectile, there's always a 10% chance or if we're far away from
         -- the previous impact
         local dx = OnImpactPreviousX - vc[1]
         local dz = OnImpactPreviousZ - vc[3]
