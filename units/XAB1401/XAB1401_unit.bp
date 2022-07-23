@@ -1,4 +1,11 @@
 UnitBlueprint {
+    AI = {
+        TargetBones ={
+            'Target01',
+            'Target02',
+            'Target03',
+        },
+    },
     Audio = {
         ActiveLoop = Sound {
             Bank = 'XAB',
@@ -116,6 +123,11 @@ UnitBlueprint {
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
+                {
+                    LodCutoff = 1,
+                    ShaderName = 'Aeon',
+                    MeshName = '/units/XAB1401/XAB1401_lod-1.scm',
+                },
                 {
                     LODCutoff = 160,
                     ShaderName = 'Aeon',

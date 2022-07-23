@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Sphere'
+        },
+    },
     Adjacency = 'T2PowerGeneratorAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {

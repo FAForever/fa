@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Target'
+        },
+    },
     Adjacency = 'T1MassStorageAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {
@@ -57,6 +62,11 @@ UnitBlueprint {
         Mesh = {
             IconFadeInZoom = 130,
             LODs = {
+                {
+                    LODCutoff = 1,
+                    ShaderName = 'Aeon',
+                    MeshName = '/units/UAB1106/UAB1106_LOD-1.scm',
+                },
                 {
                     LODCutoff = 120,
                     ShaderName = 'Aeon',

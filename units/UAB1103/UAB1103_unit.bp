@@ -1,9 +1,7 @@
 UnitBlueprint {
     AI = {
         TargetBones = {
-            'Turret01_B02',
-            'Turret02_B02',
-            'Turret03_B02',
+            'Shaft'
         },
     },
     Adjacency = 'T1MassExtractorAdjacencyBuffs',

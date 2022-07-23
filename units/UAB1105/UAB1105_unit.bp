@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Center_Pod'
+        },
+    },
     Adjacency = 'T1EnergyStorageAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {

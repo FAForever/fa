@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Shaft'
+        },
+    },
     Adjacency = 'T2MassExtractorAdjacencyBuffs',
     Audio = {
         ActiveLoop = Sound {
