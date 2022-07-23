@@ -271,8 +271,10 @@ Projectile = Class(moho.projectile_methods) {
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
 
-        -- adjust the impact location based on the velocity of the
-        if targetEntity then
+        -- adjust the impact location based on the velocity of the thing we're hitting, this fixes a bug with damage being applied the tick after the collision
+        -- is registered. As a result, the unit has moved one step ahead already, allowing it to 'miss' the area damage that we're trying to apply. Usually
+        -- air units are affected by this
+        if radius > 0 and targetEntity then
             if targetType == 'Unit' or targetType == 'UnitAir' then
                 local vx, vy, vz = targetEntity:GetVelocity()
                 vc[1] = vc[1] + vx
@@ -298,7 +300,7 @@ Projectile = Class(moho.projectile_methods) {
         local doEffects = Random() < 0.1 or dsqrt > radius
 
         -- do splat logic and knock over trees
-        if doEffects and radius > 0 then
+        if radius > 0 and doEffects then
 
             -- update last position of known effects
             OnImpactPreviousX = vc[1]
