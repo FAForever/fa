@@ -6,7 +6,7 @@ local CMauiMovie = {}
 function CMauiMovie:GetFrameRate()
 end
 
---- Return the number of frames in the movie
+--- Returns the number of frames in the movie
 ---@return number
 function CMauiMovie:GetNumFrames()
 end

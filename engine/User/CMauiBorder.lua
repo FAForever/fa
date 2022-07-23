@@ -2,7 +2,7 @@
 ---@class moho.border_methods : moho.control_methods
 local CMauiBorder = {}
 
---- Set the textures of the border. Will leave the border edge alone if `nil`.
+--- Sets the textures of the border. Will leave the border edge alone if `nil`.
 ---@param vertical   string | nil
 ---@param horizontal string | nil
 ---@param upperLeft  string | nil

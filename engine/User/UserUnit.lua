@@ -24,37 +24,37 @@ local UserUnit = {}
 function UserUnit:CanAttackTarget(target, rangeCheck)
 end
 
---- Return the army index
+--- Returns the army index
 ---@return number
 function UserUnit:GetArmy()
 end
 
 ---
----@retrun UnitBluepritn
+---@return UnitBlueprint
 function UserUnit:GetBlueprint()
 end
 
---- Return current unit build rate
+--- Returns current unit build rate
 ---@return number
 function UserUnit:GetBuildRate()
 end
 
---- Return table of commands
+--- Returns a table of commands
 ---@return OrderInfo[]
 function UserUnit:GetCommandQueue()
 end
 
---- Return the unit's creator, or nil
+--- Returns the unit's creator, or `nil` if none
 ---@return UserUnit | nil
 function UserUnit:GetCreator()
 end
 
---- Get the current custom name, nil if none
+--- Returns the current custom name, `nil` if none
 ---@return string | nil
 function UserUnit:GetCustomName()
 end
 
---- Return a table of economy data
+--- Returns a table of economy data
 ---@return EconData
 function UserUnit:GetEconData()
 end
@@ -64,7 +64,7 @@ end
 function UserUnit:GetEntityId()
 end
 
---- Return the unit this unit is currently focused on, or nil
+--- Returns the unit this unit is currently focused on, or `nil`
 ---@return UserUnit | nil
 function UserUnit:GetFocus()
 end
@@ -74,47 +74,47 @@ end
 function UserUnit:GetFootPrintSize()
 end
 
---- Return the unit's fuel level, as a decimal between `0` and `1`
+--- Returns the unit's fuel level, as a decimal between `0.0` and `1.0`
 ---@return number
 function UserUnit:GetFuelRatio()
 end
 
---- Return the unit's guard target, or nil
+--- Returns the unit's guard target, or nil
 ---@return UserUnit | nil
 function UserUnit:GetGuardedEntity()
 end
 
---- Return current health
+--- Returns current health
 ---@return number
 function UserUnit:GetHealth()
 end
 
---- Return max health
+--- Returns max health
 ---@return number
 function UserUnit:GetMaxHealth()
 end
 
---- Return a table of the missile info for this unit
+--- Returns a table of the missile info for this unit
 ---@return MissileInfo
 function UserUnit:GetMissileInfo()
 end
 
---- Return the current world position of the unit
+--- Returns the current world position of the unit
 ---@return Position
 function UserUnit:GetPosition()
 end
 
---- Get table of all selection sets the unit belongs to
+--- Gets a table of all selection sets the unit belongs to
 ---@return string[]
 function UserUnit:GetSelectionSets()
 end
 
---- Return the unit's shield level, as a decimal between `0` and `1`
+--- Returns the unit's shield level, as a decimal between `0.0` and `1.0`
 ---@return number
 function UserUnit:GetShieldRatio()
 end
 
--- TODO was the UserUnit.GetStat method also patched?
+-- TODO was the UserUnit.GetStat method also binary patched?
 
 ---
 ---@generic T
@@ -124,23 +124,23 @@ end
 function UserUnit:GetStat(name, defaultVal)
 end
 
---- Return the unit's ID (e.g. "UAL0305")
+--- Returns the unit's ID (e.g. `"UAL0305"`)
 ---@return string
 function UserUnit:GetUnitId()
 end
 
---- Get the progress of the unit's current work, as a decimal between `0` and `1`
+--- Gets the progress of the unit's current work, as a decimal between `0.0` and `1.0`
 ---@return number
 function UserUnit:GetWorkProgress()
 end
 
---- See if a unit belongs to a given selection set
+--- Returns if a unit belongs to a given selection set
 ---@param selSet string
 ---@return boolean
 function UserUnit:HasSelectionSet(selSet)
 end
 
---- See if this unit already has an unload from transport queued up
+--- Returns if this unit already has an unload from transport queued up
 ---@return boolean
 function UserUnit:HasUnloadCommandQueuedUp()
 end
@@ -155,12 +155,12 @@ end
 function UserUnit:IsAutoSurfaceMode()
 end
 
---- Return true if the unit has been destroyed
+--- Returns if the unit has been destroyed
 ---@return boolean
 function UserUnit:IsDead()
 end
 
---- Return true if the unit is idle
+--- Returns if the unit is idle
 ---@return boolean
 function UserUnit:IsIdle()
 end
@@ -171,7 +171,7 @@ end
 function UserUnit:IsInCategory(category)
 end
 
---- Return current overcharge paused status
+--- Returns current overcharge paused status
 ---@return boolean
 function UserUnit:IsOverchargePaused()
 end
@@ -192,12 +192,12 @@ end
 function UserUnit:ProcessInfo(command, value)
 end
 
---- Remove a selection set name from a unit
+--- Removes a selection set name from a unit
 ---@param selSet string
 function UserUnit:RemoveSelectionSet(selSet)
 end
 
---- Set a custom name for the unit
+--- Sets a custom name for the unit
 ---@param name string
 function UserUnit:SetCustomName(name)
 end

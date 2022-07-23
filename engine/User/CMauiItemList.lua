@@ -43,7 +43,7 @@ end
 function CMauiItemList:GetSelection()
 end
 
---- Get the advance of a string using the same font as the control
+--- Gets the advance of a string using the same font as the control
 ---@param text string
 ---@return number
 function CMauiItemList:GetStringAdvance(text)
@@ -56,7 +56,7 @@ end
 function CMauiItemList:ModifyItem(index, string)
 end
 
---- Return true if a scrollbar is needed, else, false
+--- Returns if a scrollbar is needed
 ---@return boolean
 function CMauiItemList:NeedsScrollBar()
 end
@@ -77,7 +77,7 @@ end
 function CMauiItemList:SetNewColors(foreground, background, selectedForeground, selectedBackground)
 end
 
---- Set the font to use in this ItemList control
+--- Sets the font to use in this ItemList control
 ---@param family string
 ---@param pointsize number
 function CMauiItemList:SetNewFont(family, pointsize)
@@ -93,12 +93,12 @@ end
 function CMauiItemList:ShowItem(index)
 end
 
---- Enable or disable the showing of the mouseover item
+--- Enables or disables the showing of the mouseover item
 ---@param show boolean
 function CMauiItemList:ShowMouseoverItem(show)
 end
 
---- Enable or disable the highlighting of the selected item
+--- Enables or disables the highlighting of the selected item
 ---@param show boolean
 function CMauiItemList:ShowSelection(show)
 end

@@ -91,27 +91,6 @@ LobbyComm = Class(moho.lobby_methods) {
         LOG('Peer Disconnected : (name=' .. peerName .. ', uid=' .. uid .. ')')
     end,
     LaunchFailed = function(self, reasonKey) end,
-
-    --  native void SendData(self, targetID, data)
-    --  native void BroadcastData(self,data)
-    --  native void Destroy(self)
-    --  native bool IsHost(self)
-    --  native table GetPeers(self)
-    --  native int GetPlayerCount(self)
-    --  native string GetLocalPlayerName(self)
-    --  native void EjectPeer(self, targetID, reason)
-    --  native string MakeValidGameName(self,desiredName)
-    --  native string MakeValidPlayerName(self,uid,desiredName)
-    --  native void HostGame(self)
-    --  native void JoinGame(self, addressStr, string-or-nil remotePlayerName, remotePlayerUIDStr)
-    --  native void LaunchGame(self,gameInfo)
-    --  native void DebugDump(self)
-    --  native string GetLocalPlayerID(self)
-    --  native int-or-nil GetLocalPort(self)
-
-    --  Used by GPGNET
-    --  native void ConnectToPeer(addressStr,port,name,uidStr)
-    --  native void DisconnectFromPeer(uidStr)
 }
 
 function CreateLobbyComm(protocol, localport, localPlayerName, localPlayerUID, natTraversalProvider)

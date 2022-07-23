@@ -28,7 +28,7 @@ end
 function CMauiText:SetDropShadow(shadow)
 end
 
---- Will cause the control to only render as many characters as fit in its width
+--- Causes the control to only render as many characters as fit in its width
 ---@param clip boolean
 function CMauiText:SetNewClipToWidth(clip)
 end

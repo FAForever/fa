@@ -20,7 +20,7 @@ end
 function CMauiScrollbar:SetNewTextures(background, thumbMiddle, thumbTop, thumbBottom)
 end
 
---- Set the scrollable object connected to this scrollbar
+--- Sets the scrollable object connected to this scrollbar
 ---@param scrollable Control
 function CMauiScrollbar:SetScrollable(scrollable)
 end

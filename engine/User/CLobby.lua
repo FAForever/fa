@@ -2,6 +2,8 @@
 ---@class moho.lobby_methods
 local CLobby = {}
 
+---@alias GPGNetAddress string | number
+
 ---@class Peer
 ---@field establishedPeers string[]
 ---@field id string
@@ -16,7 +18,7 @@ function CLobby:BroadcastData(data)
 end
 
 ---
----@param address string | number
+---@param address GPGNetAddress # includes the port
 ---@param name string
 ---@param uid string
 function CLobby:ConnectToPeer(address, name, uid)
@@ -77,7 +79,7 @@ function CLobby:IsHost()
 end
 
 ---
----@param address string | number
+---@param address GPGNetAddress
 ---@param remotePlayerName string | nil
 ---@param remotePlayerUID string
 function CLobby:JoinGame(address, remotePlayerName, remotePlayerUID)

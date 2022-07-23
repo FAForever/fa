@@ -49,7 +49,7 @@
 ---@field key string
 ---@field label string
 ---@field mponly? boolean
----@field values (any | ScenarioOptionValue)[] can only contain arbitrary values if `value_text` and `value_help` are set to fromat them
+---@field values (any | ScenarioOptionValue)[] can only contain arbitrary values if `value_text` and `value_help` are set to format them
 ---@field value_text? string if present, will format arbitrary values in `values`
 ---@field value_help? string if present, will format arbitrary values in `values`
 
@@ -59,7 +59,7 @@
 ---@field key any
 
 -- options that show up in the team options panel
----@type ScenarioOption[][]
+---@type ScenarioOption[]
 teamOptions =
 {
     {

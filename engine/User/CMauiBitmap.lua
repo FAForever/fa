@@ -53,7 +53,7 @@ end
 
 ---
 ---@param filename string | string[]
----@param border? number defaults to 1
+---@param border? number defaults to `1`
 function CMauiBitmap:SetNewTexture(filename, border)
 end
 
@@ -74,7 +74,7 @@ end
 function CMauiBitmap:SetUV(u0, v0, u1, v1)
 end
 
---- Allow two bitmaps to use the same textures
+--- Allows two bitmaps to use the same textures
 ---@param bitmap Bitmap
 function CMauiBitmap:ShareTextures(bitmap)
 end
