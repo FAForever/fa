@@ -6,37 +6,41 @@
 -----------------------------------------------------------------
 
 -- Imports. Localise commonly used subfunctions for speed
-local Entity = import('/lua/sim/Entity.lua').Entity
-local EffectTemplate = import('/lua/EffectTemplates.lua')
-local explosion = import('/lua/defaultexplosions.lua')
-
-local EffectUtilities = import('/lua/EffectUtilities.lua')
-local Game = import('/lua/game.lua')
-local utilities = import('/lua/utilities.lua')
-local Shield = import('/lua/shield.lua').Shield
-local PersonalBubble = import('/lua/shield.lua').PersonalBubble
-local TransportShield = import('/lua/shield.lua').TransportShield
-local PersonalShield = import('/lua/shield.lua').PersonalShield
-local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
-
-local Buff = import('/lua/sim/buff.lua')
 local AIUtils = import('/lua/ai/aiutilities.lua')
-local Wreckage = import('/lua/wreckage.lua')
+local Buff = import('/lua/sim/buff.lua')
+local EffectTemplate = import('/lua/EffectTemplates.lua')
+local EffectUtilities = import('/lua/EffectUtilities.lua')
+local EnhancementCommon = import('/lua/enhancementcommon.lua')
+local Explosion = import('/lua/defaultexplosions.lua')
+local Game = import('/lua/game.lua')
 local Set = import('/lua/system/setutils.lua')
-local Factions = import('/lua/factions.lua').GetFactions(true)
+local SimUtils = import('/lua/SimUtils.lua')
+local utilities = import('/lua/utilities.lua')
+local Wreckage = import('/lua/wreckage.lua')
 
-local DeprecatedWarnings = { }
+local AntiArtilleryShield = import('/lua/shield.lua').AntiArtilleryShield
+local PersonalBubble = import('/lua/shield.lua').PersonalBubble
+local PersonalShield = import('/lua/shield.lua').PersonalShield
+local Shield = import('/lua/shield.lua').Shield
+local TransportShield = import('/lua/shield.lua').TransportShield
+local Weapon = import('/lua/sim/Weapon.lua').Weapon
 
--- allows us to skip ai-specific functionality
-local GameHasAIs = ScenarioInfo.GameHasAIs
+local TrashBag = TrashBag
+local TrashAdd = TrashBag.Add
+local TrashDestroy = TrashBag.Destroy
+local TrashEmpty = TrashBag.Empty
 
--- cached categories for performance
+local armies = ListArmies()
+local AttachBeamEntityToEntity = AttachBeamEntityToEntity
+local CreateEmitterAtBone = CreateEmitterAtBone
+local IsAlly = IsAlly
+local rawget = rawget
+
 local UpdateAssistersConsumptionCats = categories.REPAIR - categories.INSIGNIFICANTUNIT     -- anything that repairs but insignificant things, such as drones
 
--- upvalue for performance
-local rawget = rawget 
-local IsAlly = IsAlly
-local armies = ListArmies()
+
+
+local DeprecatedWarnings = { }
 
 -- Structures that are reused for performance reasons
 -- Maps unit.techCategory to a number so we can do math on it for naval units
@@ -58,13 +62,6 @@ local veterancyRegenBuffs = {
     {25, 50, 75, 100,125}, -- Experimental
 }
 
-local TrashBag = TrashBag
-local TrashAdd = TrashBag.Add
-local TrashDestroy = TrashBag.Destroy
-local TrashEmpty = TrashBag.Empty
-
-local AttachBeamEntityToEntity = AttachBeamEntityToEntity
-local CreateEmitterAtBone = CreateEmitterAtBone
 
 SyncMeta = {
     __index = function(t, key)
@@ -817,7 +814,7 @@ Unit = Class(moho.unit_methods) {
 
             -- Fix captured units not retaining their data
             self:ResetCaptors()
-            local newUnits = import('/lua/SimUtils.lua').TransferUnitsOwnership({self}, captor.Army, true) or {}
+            local newUnits = SimUtils.TransferUnitsOwnership({self}, captor.Army, true) or {}
 
             -- The unit transfer function returns a table of units. Since we transferred 1 unit, the table contains 1 unit (The new unit).
             -- If table would have been nil (Set to {} above), was empty, or contains more than one, kill this sequence
@@ -1028,77 +1025,73 @@ Unit = Class(moho.unit_methods) {
         return self.BuildRateOverride
     end,
 
-    --- an extension of https://github.com/Hdt80bro/fa/blob/annotate-engine/user.lua/lua/ui/game/economy.lua#L10-L12
-    ---@class EconomyResourceCosts : EconomyResourceValues
-    ---@field TIME number
-
     --- Adds up total build costs for the unit blueprint and active enhancements
     ---@param self Unit
-    ---@return EconomyResourceCosts
+    ---@return number mass
+    ---@return number energy
+    ---@return number time
     GetTotalResourceCosts = function(self)
         local bp = self.Blueprint
         local economy = bp.Economy
         local mass = economy.BuildCostMass | 0
         local energy = economy.BuildCostEnergy | 0
         local time = economy.BuildTime | 0
-        if bp.Enhancements then
-            local enhancements = SimUnitEnhancements[self.EntityId]
-            if enhancements then
-                for _, enh in enhancements do
-                    mass = mass + (enh.BuildCostMass or 0)
-                    energy = energy + (enh.BuildCostEnergy or 0)
-                    time = time + (enh.BuildTime or 0)
-                end
-                -- subtract enhancement costs built into the unit cost
-                -- but only do that if the enhancement has been double-added from above
+        local enhancements = bp.Enhancements
+        if enhancements then
+            local activeEnhancements = SimUnitEnhancements[self.EntityId]
+            if activeEnhancements then
                 local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
-                if presetEnhancements then
-                    for _, name in presetEnhancements do
-                        local enhBp = bp.Enhancements[name]
-                        mass = mass - (enhBp.BuildCostMass or 0)
-                        energy = energy - (enhBp.BuildCostEnergy or 0)
-                        time = time - (enhBp.BuildTime or 0)
+                for _, enhName in activeEnhancements do
+                    -- don't add enhancement costs built into the unit cost
+                    if presetEnhancements and presetEnhancements[enhName] then
+                        continue
                     end
+                    -- add up the enhancement AND all of its prerequisites
+                    repeat
+                        local enh = enhancements[enhName]
+                        mass = mass + (enh.BuildCostMass or 0)
+                        energy = energy + (enh.BuildCostEnergy or 0)
+                        time = time + (eng.BuildTime or 0)
+                        enhName = enh.Prerequisite
+                    until not enhName
                 end
             end
         end
         if time == 0 then
-            time = 10   -- common default value, since 0 usually doesn't make sense
+            time = 10
         end
-        return {MASS = mass, ENERGY = energy, TIME = time}
-    end;
-
-    --- Adds up the resource value with all values found in active enhancements
-    ---@param self Unit
-    ---@param resource string a field in BpEconomy
-    ---@return number
-    GetTotalResourceCost = function(self, resource)
-        local bp = self.Blueprint
-        local cost = bp.Economy[resource] | 0
-        if bp.Enhancements then
-            local enhancements = SimUnitEnhancements[self.EntityId]
-            if enhancements then
-                for _, enh in enhancements do
-                    cost = cost + (enh[resource] or 0)
-                end
-                -- subtract enhancement costs built into the unit cost
-                -- but only do that if the enhancement has been double-added from above
-                local presetEnhancements = bp.EnhancementPresetAssigned.Enhancements
-                if presetEnhancements then
-                    for _, name in presetEnhancements do
-                        cost = cost - (bp.Enhancements[name][resource] or 0)
-                    end
-                end
-            end
-        end
-        return cost
+        return mass, energy, time
     end;
 
     --- Adds up the total mass cost of this unit, including enhancements
     ---@param self Unit
     ---@return number
     GetTotalMassCost = function(self)
-        return self:GetTotalResourceCost "BuildCostMass"
+        return (self:GetTotalResourceCosts()) -- adjust to one return value
+    end;
+
+    --- Gets the change in progress a unit will have if it sacrifices into this one
+    ---@overload fun(self: Unit, sacrificer: Unit): number
+    --- Gets the change in progress a unit with `mass` and `energy` build costs will have, presuming
+    --- a `SacrificeMassMult` and `SacrificeEnergyMult` of `1.0`. Premultiply the mass and energy values
+    --- if this is not the case (as it usually is). 
+    ---@param self Unit
+    ---@param mass number
+    ---@param energy number
+    ---@return number
+    CalculateSacrificeBonus = function(self, mass, energy)
+        if type(mass) == "table" then
+            local unit = mass
+            local economy = unit.Blueprint.Economy
+            mass, energy = unit:GetTotalResourceCosts()
+            mass = mass * economy.SacrificeMassMult
+            energy = energy * economy.SacrificeEnergyMult
+        end
+        local economy = self.Blueprint.Economy
+        local buildMass = economy.BuildCostMass
+        local buildEnergy = economy.BuildCostEnergy
+        -- always comes within 5 ulps; probably what the underlying engine uses, with different rounding
+        return math.min(mass / buildMass, energy / buildEnergy)
     end;
 
     -------------------------------------------------------------------------------------------
@@ -1676,7 +1669,7 @@ Unit = Class(moho.unit_methods) {
 
         -- Create some ambient wreckage smoke
         if layer == 'Land' then
-            explosion.CreateWreckageEffects(self, prop)
+            Explosion.CreateWreckageEffects(self, prop)
         end
 
         return prop
@@ -1725,7 +1718,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     CreateDestructionEffects = function(self, overKillRatio)
-        explosion.CreateScalableUnitExplosion(self)
+        Explosion.CreateScalableUnitExplosion(self)
     end,
 
     DeathWeaponDamageThread = function(self, damageRadius, damage, damageType, damageFriendly)
@@ -1758,7 +1751,7 @@ Unit = Class(moho.unit_methods) {
             end
 
             if toSurface < 0 then
-                explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
+                Explosion.CreateDefaultHitExplosionAtBone(self, randBone, scale*1.5)
             else
                 local lifetime = utilities.GetRandomInt(50, 200)
 
@@ -2114,7 +2107,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     SetRotation = function(self, angle)
-        local qx, qy, qz, qw = explosion.QuatFromRotation(angle, 0, 1, 0)
+        local qx, qy, qz, qw = Explosion.QuatFromRotation(angle, 0, 1, 0)
         self:SetOrientation({qx, qy, qz, qw}, true)
     end,
 
@@ -2679,47 +2672,18 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnStartSacrifice = function(self, targetUnit)
+        self:SetUnitState("Sacrificing", true)
         EffectUtilities.PlaySacrificingEffects(self, targetUnit)
+        self.SacrificeThread = self:ForkThread(self.DoSacrificeThread, targetUnit)
+        self.SacrificeTargetUnit = targetUnit
     end,
 
     OnStopSacrifice = function(self, targetUnit)
-        self:AdjustSacrificeToTotalCost(targetUnit)
+        self:SetUnitState("Sacrificing", false)
         EffectUtilities.PlaySacrificeEffects(self, targetUnit)
         self:SetDeathWeaponEnabled(false)
         self:Destroy()
     end,
-
-    AdjustSacrificeToTotalCost = function(self, targetUnit)
-        local economy = self.Blueprint.Economy
-        local usedBonus = targetUnit:CalculateSacrificeBonus(self)
-
-        local actualCost = self:GetTotalResourceCosts()
-        local actualMass = actualCost.MASS * economy.SacrificeMassMult
-        local actualEnergy = actualCost.ENERGY * economy.SacrificeEnergyMult
-        local actualBonus = targetUnit:CalculateSacrificeBonus(actualMass, actualEnergy)
-
-        local bonusDif = actualBonus - usedBonus
-        -- do something with this information
-    end;
-
-    --- Gets the change in build progress a unit will have if it sacrifices into this one
-    ---@param self Unit
-    ---@param mass number
-    ---@param energy number
-    ---@return number
-    ---@overload fun(self: Unit, sacrificer: Unit): number
-    CalculateSacrificeBonus = function(self, mass, energy)
-        if type(mass) == "table" then
-            local bp = mass.Blueprint.Economy
-            mass = bp.BuildCostMass * bp.SacrificeMassMult
-            energy = bp.BuildCostEnergy * bp.SacrificeEnergyMult
-        end
-        local economy = self.Blueprint.Economy
-        local buildMass = economy.BuildCostMass
-        local buildEnergy = economy.BuildCostEnergy
-        -- don't know the actual calculation
-        return (mass / buildMass + energy / buildEnergy) / 2
-    end;
 
     -------------------------------------------------------------------------------------------
     -- INTEL
@@ -3006,14 +2970,13 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnWorkBegin = function(self, work)
-        local enhCommon = import('/lua/enhancementcommon.lua')
-        local restrictions = enhCommon.GetRestricted()
+        local restrictions = EnhancementCommon.GetRestricted()
         if restrictions[work] then
             self:OnWorkFail(work)
             return false
         end
 
-        local unitEnhancements = enhCommon.GetEnhancements(self.EntityId)
+        local unitEnhancements = EnhancementCommon.GetEnhancements(self.EntityId)
         local tempEnhanceBp = self.Blueprint.Enhancements[work]
         --LOG('ACU is ordering enhancement ['..repr(tempEnhanceBp.Name)..'] ' )
         if tempEnhanceBp.Prerequisite then
@@ -3061,6 +3024,105 @@ Unit = Class(moho.unit_methods) {
         self:StopUnitAmbientSound('EnhanceLoop')
         self:CleanupEnhancementEffects()
     end,
+
+    ---@alias DefaultWorkOrder "BeingBuilt" | "Enhancing" | "FactoryBuilding" | "None" | "Repairing" | "Upgrading"
+
+    --- Returns the current default work order, which is something that an assisting unit would be
+    --- able to directly do for the unit without inheriting work: constructing, enhancing, upgrading,
+    --- factory building, repairing, or nothing (in that order).
+    ---@param self Unit
+    ---@return DefaultWorkOrder
+    GetCurrentDefaultWorkOrder = function(self)
+        if self:IsUnitState("BeingBuilt") then
+            return "BeingBuilt"
+        end
+        if self:IsUnitState("Enhancing") then
+            return "Enhancing"
+        end
+        if self:IsUnitState("Upgrading") then
+            return "Upgrading"
+        end
+        if self:IsUnitState("Building") then
+            return "FactoryBuilding"
+        end
+        if self:GetHealth() < self:GetMaxHealth() then
+            return "Repairing"
+        end
+        return "None"
+    end;
+
+    --- Gets the amount of progress left for the current default work item--that is, something
+    --- an assisting unit can directly do for the unit without inheriting work: constructing,
+    --- enhancing, upgrading, factory building, and repairing (in that order).
+    ---@param self Unit
+    ---@return number totalProgressLeft
+    GetCurrentDefaultWorkProgress = function(self)
+        -- constructing
+        local built = self:GetFractionComplete()
+        if built < 1.0 then
+            return built
+        end
+
+        --- enhancing, upgrading, building
+        if self.WorkItem or self:IsUnitState("Upgrading") or self:IsUnitState("Building") then
+            return self:GetWorkProgress()
+        end
+
+        --- default to repairing
+        local health = self:GetHealth()
+        local maxHealth = self:GetMaxHealth()
+        if health == maxHealth then
+            return 1.0
+        end
+        return health / maxHealth
+    end;
+
+    --- Adds progress to the default work order for this unit. A default work order is something that
+    --- an assisting unit can directly do for the unit without inheriting work: constructing it,
+    --- enhancing it, upgrading it, factory building from it, and repairing it (in that order).
+    ---@param self Unit
+    ---@param prog number
+    ---@return number progressLeft
+    AddDefaultWorkProgress = function(self, prog)
+        LOG("adding default work progress: " .. prog)
+        if self:GetFractionComplete() < 1.0 then
+            local before = self:GetFractionComplete()
+            SimUtils.AddConstructionProgress(self, prog)
+            return prog - (self:GetFractionComplete() - before)
+        end
+
+        if self.WorkItem or self:IsUnitState("Upgrading") or self:IsUnitState("Building") then
+            local newProgress = self:GetWorkProgress() + prog
+            if newProgress > 1.0 then
+                prog = newProgress - 1
+            elseif newProgress < 0.0 then
+                prog = newProgress + 1
+            else
+                prog = 0
+            end
+            self:SetWorkProgress(newProgress)
+            return prog
+        end
+
+        --- default to repairing
+        local health = self:GetHealth()
+        local max = self:GetMaxHealth()
+        if prog < 0 then
+            local newhealth = health + prog * max
+            if newhealth <= 0 then
+                self:Destroy()
+                prog = prog + health / max
+            else
+                self:SetHealth(self, newhealth)
+                prog = 0
+            end
+        elseif health < max then
+            local newhealth = math.min(max, health + prog * max)
+            self:SetHealth(self, newhealth)
+            prog = prog - health / max
+        end
+        return prog
+    end;
 
     CreateEnhancement = function(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
@@ -3695,7 +3757,7 @@ Unit = Class(moho.unit_methods) {
     end,
 
     GetWeaponClass = function(self, label)
-        return self.Weapons[label] or import('/lua/sim/Weapon.lua').Weapon
+        return self.Weapons[label] or Weapon
     end,
 
     -- Return the total time in seconds, cost in energy, and cost in mass to build the given target type.
@@ -3959,7 +4021,7 @@ Unit = Class(moho.unit_methods) {
         elseif bt == 'MAXHEALTH' then
             self:SetMaxHealth(self:GetMaxHealth() + (buffTable.Value or 0))
         elseif bt == 'HEALTH' then
-            self:SetHealth(self, self:GetHealth() + (buffTable.Value or 0))
+            self:AdjustHealth(self, buffTable.Value or 0)
         elseif bt == 'SPEEDMULT' then
             self:SetSpeedMult(buffTable.Value or 0)
         elseif bt == 'MAXFUEL' then
@@ -4759,39 +4821,3 @@ DummyUnit = Class(moho.unit_methods) {
     CheckAssistFocus = function(self) end,
     UpdateAssistersConsumption = function (self) end,
 }
-
-
-
---[[
-    INFO: Before: 1.3945370912552
-INFO: Guess: 43.738288879395
-INFO: After: 43.733432769775
-INFO: PopupCreateUnitMenu
-INFO: Before: 43.639007568359
-INFO: Guess: 120.0279006958
-INFO: After: 100
-INFO: PopupCreateUnitMenu
-INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
-INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
-INFO: Before: 0.7784823179245
-INFO: Guess: 77.167373657227
-INFO: After: 77.162521362305
-INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
-INFO: Before: 2.2704944610596
-INFO: Guess: 39.470497131348
-INFO: After: 39.469135284424
-INFO: Before: 39.465717315674
-INFO: Guess: 67.665718078613
-INFO: After: 67.664360046387
-INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
-INFO: UI_Lua import("/lua/ui/game/orders.lua").Stop()
-INFO: Before: 0.063786953687668
-INFO: Guess: 5.4736227989197
-INFO: After: 5.4733214378357
-INFO: Before: 5.4728198051453
-INFO: Guess: 13.403147697449
-INFO: After: 13.40283870697
-INFO: Before: 13.402201652527
-INFO: Guess: 17.336627960205
-INFO: After: 17.336334228516
-]]
