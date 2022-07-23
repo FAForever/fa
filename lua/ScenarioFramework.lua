@@ -2170,7 +2170,7 @@ function AntiOffMapMainThread()
             if units then
                 for _, unit in units do
                     -- This is to make sure that we only do this check for air units
-                    if not unit.OffMapThread and unit.CategoriesHash.AIR then
+                    if not unit.OffMapThread and EntityCategoryContains(categories.AIR, unit) then
                         -- This is to make it so it only impacts player armies, not AI or civilian or mission map armies
                         if IsHumanUnit(unit) then
                             unit.OffMapThread = unit:ForkThread(MoveOnMapThread)
@@ -2205,7 +2205,7 @@ function MoveOnMapThread(unit)
     end
     unit.OffMapTime = 0
     unit.OnMapTime = 0
-    unit.OffmapThread = nil
+    unit.OffMapThread = nil
 end
 
 --- Clears a unit's orders and issues a move order to the closest point on the map
