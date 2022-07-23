@@ -1,6 +1,5 @@
 ---@declare-global
----@class moho.EconomyEvent : moho.manipulator_methods
+---@class moho.FootPlantManipulator : moho.manipulator_methods
 local CFootPlantManipulator = {}
 
 return CFootPlantManipulator
-

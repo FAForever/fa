@@ -17,7 +17,7 @@ UnitBlueprint {
         },
     },
     Categories = {
-        'Cybran',
+        'CYBRAN',
         'STRUCTURE',
         'CIVILIAN',
         'SELECTABLE',
