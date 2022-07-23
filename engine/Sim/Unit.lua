@@ -155,12 +155,12 @@ function Unit:GetArmorMult(damageTypeName)
 end
 
 --- Returns the tactical attack manager object of this unit
----@return AttackManager
+---@return Attacker
 function Unit:GetAttacker()
 end
 
 --- Returns the blip (if any) that the given army has for the unit
----@return Blip
+---@return Blip?
 function Unit:GetBlip(armyIndex)
 end
 

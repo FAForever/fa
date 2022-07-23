@@ -3,14 +3,14 @@
 local IEffect = {}
 
 ---@alias IEffectBeamParameters
---- | 'Length' number
---- | 'Thickness' number
---- | 'Lifetime' number
---- | 'TextureName' string (path to a texture file)
---- | 'UShift' number
---- | 'VShift' number
---- | 'RepeatRate' number
---- | 'LODCutoff' number
+--- | 'Length' # number
+--- | 'Thickness' # number
+--- | 'Lifetime' # number
+--- | 'TextureName' # string (path to a texture file)
+--- | 'UShift' # number
+--- | 'VShift' # number
+--- | 'RepeatRate' # number
+--- | 'LODCutoff' # number
 
 ---@alias iEffectCurveParameters
 --- | 'XDirectionCurve'
@@ -36,26 +36,26 @@ local IEffect = {}
 --- | 'RampSelectionCurve'
 
 ---@alias IEffectParameters
---- | 'Lifetime' number
---- | 'Repeattime' number
---- | 'TextureFramecount' number
---- | 'Blendmode' integer (1, 2, 3 or 4)
---- | 'LocalVelocity' boolean
---- | 'LocalAcceleration' boolean
---- | 'Gravity' boolean
---- | 'AlignRotation' boolean
---- | 'AlignToBone' boolean
---- | 'Flat' boolean
---- | 'LODCutoff' number
---- | 'CatchupEmit' boolean
---- | 'CreateIfVisible' boolean
---- | 'SnapToWaterline' boolean
---- | 'OnlyEmitOnWater' boolean
---- | 'ParticleResistance' boolean
---- | 'InterpolateEmission' boolean
---- | 'SortOrder' number
---- | 'Texture' string (path to a texture file)
---- | 'RampTexture' string (path to a texture file)
+--- | 'Lifetime' # number
+--- | 'RepeatTime' # number
+--- | 'TextureFramecount' # number
+--- | 'Blendmode' # integer (1, 2, 3 or 4)
+--- | 'LocalVelocity' # boolean
+--- | 'LocalAcceleration' # boolean
+--- | 'Gravity' # boolean
+--- | 'AlignRotation' # boolean
+--- | 'AlignToBone' # boolean
+--- | 'Flat' # boolean
+--- | 'LODCutoff' # number
+--- | 'CatchupEmit' # boolean
+--- | 'CreateIfVisible' # boolean
+--- | 'SnapToWaterline' # boolean
+--- | 'OnlyEmitOnWater' # boolean
+--- | 'ParticleResistance' # boolean
+--- | 'InterpolateEmission' # boolean
+--- | 'SortOrder' # number
+--- | 'Texture' # string (path to a texture file)
+--- | 'RampTexture' # string (path to a texture file)
 
 --- Destroy the effect, de-allocating it from memory
 function IEffect:Destroy()
