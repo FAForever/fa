@@ -160,8 +160,6 @@ function CreateSeraphimBuildThread(unitBeingBuilt, builder, effectsBag, scaleFac
         local emitter = CreateAttachedEmitter(unitBeingBuilt, -1, army, effect)
         IEffectScaleEmitter(emitter, scaleFactor)
         IEffectSetEmitterParam(emitter, "LODCutoff", lods[1].LODCutoff)
-        IEffectSetEmitterParam(emitter, "PARTICLERESISTANCE", 10)
-        reprsl(emitter, true)
 
         TrashBagAdd(effectsBag, emitter)
         emitters[emittersHead] = emitter
