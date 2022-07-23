@@ -3077,53 +3077,6 @@ Unit = Class(moho.unit_methods) {
         return health / maxHealth
     end;
 
-    --- Adds progress to the default work order for this unit. A default work order is something that
-    --- an assisting unit can directly do for the unit without inheriting work: constructing it,
-    --- enhancing it, upgrading it, factory building from it, and repairing it (in that order).
-    ---@param self Unit
-    ---@param prog number
-    ---@return number progressLeft
-    AddDefaultWorkProgress = function(self, prog)
-        LOG("adding default work progress: " .. prog)
-        if self:GetFractionComplete() < 1.0 then
-            local before = self:GetFractionComplete()
-            SimUtils.AddConstructionProgress(self, prog)
-            return prog - (self:GetFractionComplete() - before)
-        end
-
-        if self.WorkItem or self:IsUnitState("Upgrading") or self:IsUnitState("Building") then
-            local newProgress = self:GetWorkProgress() + prog
-            if newProgress > 1.0 then
-                prog = newProgress - 1
-            elseif newProgress < 0.0 then
-                prog = newProgress + 1
-            else
-                prog = 0
-            end
-            self:SetWorkProgress(newProgress)
-            return prog
-        end
-
-        --- default to repairing
-        local health = self:GetHealth()
-        local max = self:GetMaxHealth()
-        if prog < 0 then
-            local newhealth = health + prog * max
-            if newhealth <= 0 then
-                self:Destroy()
-                prog = prog + health / max
-            else
-                self:SetHealth(self, newhealth)
-                prog = 0
-            end
-        elseif health < max then
-            local newhealth = math.min(max, health + prog * max)
-            self:SetHealth(self, newhealth)
-            prog = prog - health / max
-        end
-        return prog
-    end;
-
     CreateEnhancement = function(self, enh)
         local bp = self.Blueprint.Enhancements[enh]
         if not bp then

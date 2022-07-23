@@ -321,7 +321,7 @@ local function MomentaryOrderBehavior(self, modifiers)
 end
 
 function Stop(units)
-    units = units or GetSelectedUnits()
+    local units = units or GetSelectedUnits()
 
     if units[1] then
         IssueUnitCommand(units, 'Stop')
