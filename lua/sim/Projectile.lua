@@ -273,7 +273,7 @@ Projectile = Class(moho.projectile_methods) {
 
         -- adjust the impact location based on the velocity of the thing we're hitting, this fixes a bug with damage being applied the tick after the collision
         -- is registered. As a result, the unit has moved one step ahead already, allowing it to 'miss' the area damage that we're trying to apply. Usually
-        -- air units are affected by this
+        -- air units are affected by this, see also the pull request for a visual aid on this issue on Github
         if radius > 0 and targetEntity then
             if targetType == 'Unit' or targetType == 'UnitAir' then
                 local vx, vy, vz = targetEntity:GetVelocity()
