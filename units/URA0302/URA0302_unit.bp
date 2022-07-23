@@ -243,7 +243,7 @@ UnitBlueprint {
     SelectionSizeX = 1.6,
     SelectionSizeZ = 0.7,
     SelectionThickness = 0.26,
-    SizeSphere = 1.6,
+    SizeSphere = 2.7,
     SizeX = 2.3,
     SizeY = 0.25,
     SizeZ = 0.8,

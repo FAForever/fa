@@ -10,7 +10,7 @@ local Entity = {}
 ---@unknown
 ---@param scrollSpeed1 number
 ---@param scrollSpeed2 number
-function Entity:AddManualScroller(scrollSpeed1,  scrollSpeed2)
+function Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
 end
 
 ---
@@ -247,8 +247,10 @@ function Entity:IsValidBone(bone, allowNil)
 end
 
 ---
---  Entity:Kill(instigator,type,excessDamageRatio)
-function Entity:Kill(instigator, type, excessDamageRatio)
+---@param instigator? Unit
+---@param damageType? DamageType
+---@param excessDamageRatio? number
+function Entity:Kill(instigator, damageType, excessDamageRatio)
 end
 
 ---
@@ -313,7 +315,7 @@ function Entity:SetIntelRadius(type, radius)
 end
 
 ---
---  Entity:SetMaxHealth(maxhealth)
+---@param maxhealth number
 function Entity:SetMaxHealth(maxhealth)
 end
 
@@ -376,6 +378,10 @@ end
 ---@param min number
 ---@param duration number
 function Entity:ShakeCamera(radius,  max,  min,  duration)
+end
+
+--- Sink into the ground
+function Entity:SinkAway(vy)
 end
 
 return Entity
