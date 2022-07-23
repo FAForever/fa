@@ -352,6 +352,7 @@ end
 
 --- Create an empty prefetch set
 ---@unknown
+---@return userdata
 function CreatePrefetchSet()
 end
 
