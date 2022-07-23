@@ -5,6 +5,13 @@
 --* Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --*****************************************************************************
 
+---@alias DiplomacyActionType "accept" | "break" | "never" | "offer" | "reject"
+
+---@class DiplomacyAction
+---@field Action DiplomacyActionType
+---@field To number army index
+---@field From number army index
+
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local EffectHelpers = import('/lua/maui/effecthelpers.lua')
