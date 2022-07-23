@@ -25,16 +25,66 @@
 
 ---@alias Color string # `EnumColor` or hexcode like `'RrGgBb'`, or `'AaRrGgBb'` with transparency
 
---- Constructs a rectangle, usually the first point is in the top-left corner and the second is in the bottom-right corner
----@param x0 number
----@param y0 number
----@param x1 number
----@param y1 number
----@return Rectangle
-function Rect(x0, y0, x1, y1)
+---@unknown
+function AITarget()
 end
 
--- # Entity-related functions
+--- Returns the last component of a path
+---@param fullPath string
+---@param stripExtension boolean?
+function Basename(fullPath, stripExtension)
+end
+
+--- Likely used for debugging, but the use is unknown
+---@unknown
+function BeginLoggingStats()
+end
+
+--- Called during blueprint loading to update the loading animation
+function BlueprintLoaderUpdateProgress()
+end
+
+--- Create an empty prefetch set
+---@unknown
+---@return userdata
+function CreatePrefetchSet()
+end
+
+--- Returns the current running thread
+---@return thread?
+function CurrentThread()
+end
+
+--- Returns the directory name
+---@param fullPath any
+---@result string
+function Dirname(fullPath)
+end
+
+--- Returns all files in the directory that matches the pattern
+---@param directory any
+---@param pattern any
+---@return string[]
+function DiskFindFiles(directory,  pattern)
+end
+
+--- Returns a table of information for the given file, or false if the file doesn't exist 
+---@param filename string
+---@return any | boolean
+function DiskGetFileInfo(filename)
+end
+
+--- Converts a system path to a local path (based on the init file directories), returns the path if it is already local
+---@param SysOrLocalPath string
+---@return string
+function DiskToLocal(SysOrLocalPath)
+end
+
+
+---End logging stats and optionally exit app
+---@param exit boolean
+function EndLoggingStats(exit)
+end
 
 --- Checks for the empty category
 ---@param categories Color
@@ -48,13 +98,10 @@ end
 function EntityCategoryGetUnitList(categories)
 end
 
---- Checks if the C-side of an object is destroyed / de-allocated
----@param entity Entity | Unit | Prop | Weapon
----@return boolean
-function IsDestroyed(entity)
+--- Returns an ordered list of named colors available for a `Color` instead of using a hexcode
+---@return EnumColor[]
+function EnumColorNames()
 end
-
--- # Quaternion / orientation related functions
 
 --- Converts euler angles to a quaternion
 ---@param roll number
@@ -62,6 +109,66 @@ end
 ---@param yaw number
 ---@return Quaternion
 function EulerToQuaternion(roll, pitch, yaw)
+end
+
+--- Collapse all intermediate `/./` or `/../` directory names from a path
+---@param fullPath string
+---@return string
+function FileCollapsePath(fullPath)
+end
+
+--- Creates a new thread, passing all additional arguments to the callback
+---@param callback function
+---@vararg any
+---@return thread
+function ForkThread(callback,  ...)
+end
+
+--- Retrieves the cue and bank of a sound table
+---@param sound BpAudio
+---@return string The cue identifier within the bank
+---@return string The bank identifier
+function GetCueBank(sound)
+end
+
+--- Retrieves the movie duration
+---@param localFileName string
+---@return number
+function GetMovieDuration(localFileName)
+end
+
+--- Retrieves the game version, as set by `version.lua`
+---@return string
+function GetVersion()
+end
+
+--- Checks if the C-side of an object is destroyed / de-allocated
+---@param entity Entity | Unit | Prop | Weapon
+---@return boolean
+function IsDestroyed(entity)
+end
+
+--- Destroys the c-side of a thread
+---@param thread thread
+function KillThread(thread)
+end
+
+--- Print a message to the moho logger, this shouldn't be used in production code
+---@param TextOne string
+---@param TextTwo? string
+function LOG(TextOne, TextTwo)
+end
+
+--- Rounds a number to the nearest integer using the half-round-even rounding (banker's rules)
+---@param number number
+function MATH_IRound(number)
+end
+
+--- Applies linear interpolation between two values `a` and `b`
+---@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
+---@param a number
+---@param b number
+function MATH_Lerp(s,  a,  b)
 end
 
 --- Applies linear interpolation between two quaternions `L` and `R`
@@ -84,23 +191,64 @@ end
 function OrientFromDir(vector)
 end
 
--- # Thread-related functions
-
---- Creates a new thread, passing all additional arguments to the callback
----@param callback function
----@vararg any
----@return thread
-function ForkThread(callback,  ...)
+--- Creates a point vector
+---@alternative Not used, better off allocating a separate position and vector
+---@param px number
+---@param py number
+---@param pz number
+---@param vx number
+---@param vy number
+---@param vz number
+function PointVector(px, py, pz, vx, vy, vz)
 end
 
---- Returns the current running thread
----@return thread?
-function CurrentThread()
+--- RPCSound({cue,bank,cutoff}) - Make a sound parameters object
+---@param sound { cue:string, bank:string, cutoff:number }
+function RPCSound(sound)
 end
 
---- Destroys the c-side of a thread
----@param thread thread
-function KillThread(thread)
+--- Constructs a rectangle, usually the first point is in the top-left corner and the second is in the bottom-right corner
+---@param x0 number
+---@param y0 number
+---@param x1 number
+---@param y1 number
+---@return Rectangle
+function Rect(x0, y0, x1, y1)
+end
+
+--- Define a beam effect, only works in `blueprints.lua`
+---@param spec any
+function RegisterBeamBlueprint(spec)
+end
+
+--- Define a particle emitter, only works in `blueprints.lua`
+---@param spec any
+function RegisterEmitterBlueprint(spec)
+end
+
+--- Define mesh properties, only works in `blueprints.lua`
+---@param spec any
+function RegisterMeshBlueprint(spec)
+end
+
+--- Define a projectile, only works in `blueprints.lua`
+---@param spec any
+function RegisterProjectileBlueprint(spec)
+end
+
+--- Define a prop, only works in `blueprints.lua`
+v
+function RegisterPropBlueprint(spec)
+end
+
+--- Defile a poly trail emitter, only works in `blueprints.lua`
+---@param spec any
+function RegisterTrailEmitterBlueprint(spec)
+end
+
+--- Define a unit, only works in `blueprints.lua`
+---@param spec any
+function RegisterUnitBlueprint(spec)
 end
 
 --- Resumes the thread after suspending it, does nothing if the thread wasn't suspended
@@ -109,29 +257,69 @@ end
 function ResumeThread(thread)
 end
 
+--- Print a debug message to the moholog, this shouldn't be used in production code
+---@param TextOne string Debug message
+---@param TextTwo string? Optional text
+-- Output: "DEBUG: TextOne\000TextTwo"
+function SPEW(TextOne,TextTwo)
+end
+
+--- Splits the string on the delimiter, returning several smaller strings
+---@param string string
+---@param delimiter string
+---@return string[]
+function STR_GetTokens(string, delimiter)
+end
+
+--- Returns the number of characters in a UTF-8 string
+---@param string string
+---@return number
+function STR_Utf8Len(string)
+end
+
+--- Returns a substring from start to count
+---@param string string
+---@param start number
+---@param count number
+function STR_Utf8SubString(string,  start,  count)
+end
+
+--- Converts an integer into a hexidecimal string
+---@param int number
+---@return string 
+function STR_itox(int)
+end
+
+---  Converts a hexidecimal string to an integer
+---@param string string
+---@return number
+function STR_xtoi(string)
+end
+
+--- Returns how many seconds in a tick
+---@return number
+function SecondsPerTick()
+end
+
+--- Sound({cue,bank,cutoff}) - Make a sound parameters object
+---@param sound BpSound
+---@return BpSoundResult
+function Sound(sound)
+end
+
+--- Define the footprint types for pathfinding, only works in `blueprints.lua`
+---@param spec any
+function SpecFootprints(spec)
+end
+
 --- Suspends the current thread indefinitely. Only a call to `ResumeThread(thread)` can resume it
 ---@see ResumeThread
 function SuspendCurrentThread()
 end
 
---- Suspends the thread until the manipulator reaches its goal
----@param manipulator moho.manipulator_methods
-function WaitFor(manipulator)
-end
-
--- # Vector-related functions 
-
---- Populates a new table with the corresponding meta table
----@param x number
----@param y number
----@param z number
-function Vector(x, y, z)
-end
-
---- Populates a new table with the corresponding meta table
----@param x number
----@param y number
-function Vector2(x, y)
+--- Turns tracing on / off
+---@param enable boolean
+function Trace(enable)
 end
 
 --- Adds vector `b` to vector `a`
@@ -192,121 +380,17 @@ end
 function VPerpDot(a, b)
 end
 
--- # File-related functions
-
---- Returns the last component of a path
----@param fullPath string
----@param stripExtension boolean?
-function Basename(fullPath, stripExtension)
+--- Populates a new table with the corresponding meta table
+---@param x number
+---@param y number
+---@param z number
+function Vector(x, y, z)
 end
 
---- Returns the directory name
----@param fullPath any
----@result string
-function Dirname(fullPath)
-end
-
---- Returns all files in the directory that matches the pattern
----@param directory any
----@param pattern any
----@return string[]
-function DiskFindFiles(directory,  pattern)
-end
-
---- Returns a table of information for the given file, or false if the file doesn't exist 
----@param filename string
----@return any | boolean
-function DiskGetFileInfo(filename)
-end
-
---- Converts a system path to a local path (based on the init file directories), returns the path if it is already local
----@param SysOrLocalPath string
----@return string
-function DiskToLocal(SysOrLocalPath)
-end
-
---- Collapse all intermediate `/./` or `/../` directory names from a path
----@param fullPath string
----@return string
-function FileCollapsePath(fullPath)
-end
-
----
---  doscript(script, [env]) -- run another script. The environment table, if given, will be used for the script's global variables.
----comment
----@param script string
----@param env table?
----@diagnostic disable-next-line: lowercase-global
-function doscript(script,  env)
-end
-
----
---  exists(name) -> bool -- returns true if the given resource file exists
----@param name string
----@diagnostic disable-next-line: lowercase-global
-function exists(name)
-end
-
--- # Blueprint-related functions
-
---- Called during blueprint loading to update the loading animation
-function BlueprintLoaderUpdateProgress()
-end
-
----
---  BeamBlueprint { spec } - define a beam effect
-function RegisterBeamBlueprint(spec)
-end
-
----
---  EmitterBlueprint { spec } - define a particle emitter
-function RegisterEmitterBlueprint(spec)
-end
-
----
---  MeshBlueprint { spec } - define mesh properties
-function RegisterMeshBlueprint(spec)
-end
-
----
---  ProjectileBlueprint { spec } - define a type of projectile
-function RegisterProjectileBlueprint(spec)
-end
-
----
---  PropBlueprint { spec } - define a type of prop
-function RegisterPropBlueprint(spec)
-end
-
----
---  TrailEmitterBlueprint { spec } - define a polytrail emitter
-function RegisterTrailEmitterBlueprint(spec)
-end
-
----
---  UnitBlueprint { spec } - define a type of unit
-function RegisterUnitBlueprint(spec)
-end
-
----
---  SpecFootprints { spec } -- define the footprint types for pathfinding
-function SpecFootprints(spec)
-end
-
-
--- # All other functions
-
---- Print a message to the moho logger, this shouldn't be used in production code
----@param TextOne string
----@param TextTwo string
-function LOG(TextOne, TextTwo)
-end
-
---- Print a debug message to the moholog, this shouldn't be used in production code
----@param TextOne string Debug message
----@param TextTwo string? Optional text
--- Output: "DEBUG: TextOne\000TextTwo"
-function SPEW(TextOne,TextTwo)
+--- Populates a new table with the corresponding meta table
+---@param x number
+---@param y number
+function Vector2(x, y)
 end
 
 --- Print a warning message to the moholog, this shouldn't be used in production code
@@ -316,124 +400,24 @@ end
 function WARN(TextOne, TextTwo)
 end
 
---- Turns tracing on / off
----@param enable boolean
-function Trace(enable)
+--- Suspends the thread until the manipulator reaches its goal
+---@param manipulator moho.manipulator_methods
+function WaitFor(manipulator)
 end
 
---- RPCSound({cue,bank,cutoff}) - Make a sound parameters object
----@param sound { cue:string, bank:string, cutoff:number }
-function RPCSound(sound)
+--- Run another script. The environment table, if given, will be used for the script's global variables.
+---@param script string
+---@param env? table
+---@diagnostic disable-next-line: lowercase-global
+function doscript(script,  env)
 end
 
---- Sound({cue,bank,cutoff}) - Make a sound parameters object
----@param sound BpSound
----@return BpSoundResult
-function Sound(sound)
+--- Returns if the given resource file exists
+---@param name string
+---@diagnostic disable-next-line: lowercase-global
+function exists(name)
 end
 
---- Retrieves the cue and bank of a sound table
----@param sound BpAudio
----@return string The cue identifier within the bank
----@return string The bank identifier
-function GetCueBank(sound)
-end
-
---- Retrieves the movie duration
----@param localFileName string
----@return number
-function GetMovieDuration(localFileName)
-end
-
---- Retrieves the game version, as set by `version.lua`
----@return string
-function GetVersion()
-end
-
---- Create an empty prefetch set
----@unknown
----@return userdata
-function CreatePrefetchSet()
-end
-
---- Likely used for debugging, but the use is unknown
----@unknown
-function BeginLoggingStats()
-end
-
----End logging stats and optionally exit app
----@param exit boolean
-function EndLoggingStats(exit)
-end
-
---- Rounds a number to the nearest integer using the half-round-even rounding (banker's rules)
----@param number number
-function MATH_IRound(number)
-end
-
---- Applies linear interpolation between two values `a` and `b`
----@param s number Usually between 0 (returns `a`) and 1 (returns `b`)
----@param a number
----@param b number
-function MATH_Lerp(s,  a,  b)
-end
-
----@unknown
-function AITarget()
-end
-
---- Returns an ordered list of named colors available for a `Color` instead of using a hexcode
----@return EnumColor[]
-function EnumColorNames()
-end
-
---- Creates a point vector
----@alternative Not used, better off allocating a separate position and vector
----@param px number
----@param py number
----@param pz number
----@param vx number
----@param vy number
----@param vz number
-function PointVector(px, py, pz, vx, vy, vz)
-end
-
---- Splits the string on the delimiter, returning several smaller strings
----@param string string
----@param delimiter string
----@return string[]
-function STR_GetTokens(string, delimiter)
-end
-
---- Returns the number of characters in a UTF-8 string
----@param string string
----@return number
-function STR_Utf8Len(string)
-end
-
---- Returns a substring from start to count
----@param string string
----@param start number
----@param count number
-function STR_Utf8SubString(string,  start,  count)
-end
-
---- Converts an integer into a hexidecimal string
----@param int number
----@return string 
-function STR_itox(int)
-end
-
----  Converts a hexidecimal string to an integer
----@param string string
----@return number
-function STR_xtoi(string)
-end
-
---- Returns how many seconds in a tick
----@return number
-function SecondsPerTick()
-end
 
 ---@alias EnumColor
 ---| "AliceBlue"            #F7FBFF
