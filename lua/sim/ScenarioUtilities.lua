@@ -117,7 +117,7 @@ function AreaToRect(areaName)
         error('ERROR: Invalid area name')
     end
     local rectangle = area.rectangle
-    return Rect(rectangle[1], rectangle[2], rectangle[3], rectangle[4])
+    return Rect(unpack(rectangle))
 end
 
 function InRect(vectorPos, rect)
