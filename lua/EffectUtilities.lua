@@ -26,7 +26,7 @@ local MathMax = math.max
 local MathMin = math.min
 local MathSin = math.sin
 local MathSqrt = math.sqrt
-local MathTau = 2 * math.pi
+local mathTau = 2 * math.pi
 local TableCopy = table.copy
 local TableEmpty = table.empty
 local TableGetn = table.getn
@@ -265,7 +265,7 @@ function SpawnBuildBots(builder, unitBeingBuilt, buildEffectsBag)
             local angle = 180
             local vecMul = 0.5
 
-            local angleChange = MathTau / numUnits
+            local angleChange = mathTau / numUnits
 
             -- Launch projectiles at semi-random angles away from the sphere, with enough
             -- initial velocity to escape sphere core
@@ -1316,7 +1316,7 @@ function PlayTeleportInEffects(unit, effectsBag)
     local bp = unit.Blueprint
     local faction = bp.General.FactionName
     local offsetY = TeleportGetUnitYOffset(unit)
-    local decalOrient = UtilGetRandomFloat(0, MathTau)
+    local decalOrient = UtilGetRandomFloat(0, mathTau)
     local unitArmy = unit.Army
 
     DoTeleportInDamage(unit)  -- Fire teleport weapon
@@ -1399,7 +1399,7 @@ function PlayTeleportInEffects(unit, effectsBag)
                 CreateLightParticle(unit, -1, unitArmy, 4, 15, 'glow_05', 'ramp_jammer_01')
                 DamageArea(unit, unit:GetPosition(), 9, 1, 'Force', true)
 
-                local decalOrient = UtilGetRandomFloat(0, MathTau)
+                local decalOrient = UtilGetRandomFloat(0, mathTau)
                 CreateDecal(unit:GetPosition(), decalOrient, 'crater01_albedo', '', 'Albedo', 4, 4, 200, 300, unitArmy)
                 CreateDecal(unit:GetPosition(), decalOrient, 'crater01_normals', '', 'Normals', 4, 4, 200, 300, unitArmy)
 
