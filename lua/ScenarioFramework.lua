@@ -23,15 +23,17 @@
 ---@field [3] string cue
 ---@field [4] string faction
 
+-- these need to be global because other files refer to them for some reason
 
-local Cinematics = import('/lua/cinematics.lua')
-local Objectives = import('/lua/SimObjectives.lua')
-local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local SimCamera = import('/lua/SimCamera.lua').SimCamera
-local SimUIVars = import('/lua/sim/SimUIState.lua')
-local TriggerFile = import('/lua/scenariotriggers.lua')
-local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+Cinematics = import('/lua/cinematics.lua')
+Objectives = import('/lua/SimObjectives.lua')
+PingGroups = import('/lua/SimPingGroup.lua') -- we don't we this, but other files do...
+ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
+ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+SimCamera = import('/lua/SimCamera.lua').SimCamera
+SimUIVars = import('/lua/sim/SimUIState.lua')
+TriggerFile = import('/lua/scenariotriggers.lua')
+VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
 
 local PauseUnitDeathActive = false
@@ -399,6 +401,8 @@ CreateUnitToPositionDistanceTrigger = TriggerFile.CreateUnitToPositionDistanceTr
 CreateUnitToMarkerDistanceTrigger = CreateUnitToPositionDistanceTrigger -- got renamed for some reason
 CreateUnitNearTypeTrigger = TriggerFile.CreateUnitNearTypeTrigger
 
+-- platoon functions REQUIRE `squad` to be non-nil when present
+
 -- Orders a platoon to move along a route
 ---@param platoon Platoon
 ---@param route (Marker | Vector)[]
@@ -408,7 +412,11 @@ function PlatoonMoveRoute(platoon, route, squad)
         if type(node) == 'string' then
             node = ScenarioUtils.MarkerToPosition(node)
         end
-        platoon:MoveToLocation(node, false, squad)
+        if squad then
+            platoon:MoveToLocation(node, false, squad)
+        else
+            platoon:MoveToLocation(node, false)
+        end
     end
 end
 
@@ -421,7 +429,11 @@ function PlatoonPatrolRoute(platoon, route, squad)
         if type(node) == 'string' then
             node = ScenarioUtils.MarkerToPosition(node)
         end
-        platoon:Patrol(node, squad)
+        if squad then
+            platoon:Patrol(node, squad)
+        else
+            platoon:Patrol(node)
+        end
     end
 end
 
@@ -434,7 +446,11 @@ function PlatoonAttackRoute(platoon, route, squad)
         if type(node) == 'string' then
             node = ScenarioUtils.MarkerToPosition(node)
         end
-        platoon:AggressiveMoveToLocation(node, squad)
+        if squad then
+            platoon:AggressiveMoveToLocation(node, squad)
+        else
+            platoon:AggressiveMoveToLocation(node)
+        end
     end
 end
 
@@ -444,7 +460,11 @@ end
 ---@param squad? string
 function PlatoonMoveChain(platoon, chain, squad)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        platoon:MoveToLocation(pos, false, squad)
+        if squad then
+            platoon:MoveToLocation(pos, false, squad)
+        else
+            platoon:MoveToLocation(pos, false)
+        end
     end
 end
 
@@ -454,7 +474,11 @@ end
 ---@param squad? string
 function PlatoonPatrolChain(platoon, chain, squad)
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        platoon:Patrol(pos, squad)
+        if squad then
+            platoon:Patrol(pos, squad)
+        else
+            platoon:Patrol(pos)
+        end
     end
 end
 
@@ -466,7 +490,11 @@ end
 function PlatoonAttackChain(platoon, chain, squad)
     local cmd = false
     for _, pos in ScenarioUtils.ChainToPositions(chain) do
-        cmd = platoon:AggressiveMoveToLocation(pos, squad)
+        if squad then
+            cmd = platoon:AggressiveMoveToLocation(pos, squad)
+        else
+            cmd = platoon:AggressiveMoveToLocation(pos)
+        end
     end
 
     return cmd
@@ -601,7 +629,12 @@ function SetupMFDSync(movieTable, text)
         tempData.text = tempText
         LOG("ERROR: Unable to find name in string: " .. text .. " (" .. tempText .. ")")
     end
-    tempData.time = GetGameTime()
+    -- `GetGameTime()` would be the perfect thing to use here--unfortunately, that's sim-side only
+    local time = GetGameTimeSeconds()
+    local hours = math.floor(time / 3600)
+    local minutes = math.mod(time, math.floor(time / 60), 60)
+    local seconds = math.mod(time, 60)
+    tempData.time = string.format("%02d:%02d:%02d", hours, minutes, seconds)
     if movieTable[4] == 'UEF' then
         tempData.color = 'ff00c1ff'
     elseif movieTable[4] == 'Cybran' then
