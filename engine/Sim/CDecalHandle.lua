@@ -6,4 +6,3 @@ function CDecalHandle:Destroy()
 end
 
 return CDecalHandle
-

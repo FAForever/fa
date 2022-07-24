@@ -6,6 +6,7 @@
 --- TODO move to `'/engine/Core.lua'`
 ---@alias Bone string | number
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
+
 ---@alias Faction
 ---| 0 # UEF
 ---| 1 # Aeon
@@ -34,7 +35,7 @@ end
 function ArmyInitializePrebuiltUnits(army)
 end
 
---- Returns dif the indicated army is a civilian army
+--- Returns if the indicated army is a civilian army
 ---@param army Army
 ---@return boolean
 function ArmyIsCivilian(army)
@@ -556,6 +557,7 @@ end
 ---
 ---@param armyName string
 function GenerateArmyStart(armyName)
+function GenerateArmyStart(army)
 end
 
 ---
@@ -563,7 +565,7 @@ end
 function GenerateRandomOrientation()
 end
 
---- Returns an army brain given the brain's name.
+--- Returns an army's brain
 ---@param army Army
 ---@return AIBrain
 function GetArmyBrain(army)
@@ -688,7 +690,8 @@ function HasLocalizedVO(language)
 end
 
 --- Starts the AI on given army
-function InitializeArmyAI(strArmy)
+---@param army string
+function InitializeArmyAI(army)
 end
 
 --- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
@@ -777,7 +780,7 @@ end
 ---@param units Unit[]
 ---@param position Vector
 ---@param blueprintID string
----@param table number # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
+---@param table number[] # A list of alternative build locations, similar to AiBrain.BuildStructure. Doesn't appear to function properly
 ---@return SimCommand
 function IssueBuildMobile(units, position, blueprintID, table)
 end
@@ -952,6 +955,7 @@ end
 ---@param tblUnits Unit[]
 ---@param order Task
 ---@return ScriptTask
+
 function IssueScript(tblUnits, order)
 end
 
@@ -1101,14 +1105,14 @@ end
 function SessionIsReplay()
 end
 
---- Sets alliance type between 2 armies
+--- Sets alliance type between 2 armies, note that weapons do not reset their target
 ---@param army1 Army
 ---@param army2 Army
 ---@param alliance AllianceType
 function SetAlliance(army1, army2, alliance)
 end
 
---- Sets alliance type from army1 to army2
+--- Sets alliance type from army1 to army2, note that weapons do not reset their target
 ---@param army1 Army
 ---@param army2 Army
 ---@param alliance AllianceType
@@ -1121,7 +1125,8 @@ end
 function SetAlliedVictory(state)
 end
 
----
+--- Unfinished function related to AI, is not used
+---@deprecated
 ---@param army Army
 ---@param personality AIPersonality
 function SetArmyAIPersonality(army, personality)
@@ -1159,7 +1164,8 @@ end
 function SetArmyOutOfGame(army)
 end
 
----
+--- Unfinished function related to AI, is not used
+---@deprecated
 ---@param army Army
 ---@param plans ArmyPlans
 function SetArmyPlans(army, plans)
@@ -1207,7 +1213,6 @@ function SetIgnoreArmyUnitCap(army, ignore)
 end
 
 --- Sets army to ignore playable rectangle.
---- Units can move outside of restricted area.
 --- Used in campaign for offmap attacks.
 ---@param army Army
 ---@param ignore boolean
@@ -1278,7 +1283,7 @@ function TryCopyPose(unitFrom, entityTo, copyWorldTransform)
 end
 
 --- Instantly moves an entity to a location
----@param entity Entity
+---@param object Entity | Projectile | Unit
 ---@param location Vector
 ---@param orientation? Vector
 function Warp(entity, location, orientation)

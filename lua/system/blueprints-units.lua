@@ -159,6 +159,37 @@ local function PostProcessUnit(unit)
     if unit.CategoriesHash['FACTORY'] and unit.CategoriesHash['NAVAL'] then 
         unit.Physics.CorrectNavalRollOffPoints = true
     end
+
+    -- # Check size of collision boxes
+
+    if not isDummy then 
+
+        -- find maximum speed
+        local speed = unit.Physics.MaxSpeed
+        if unit.Air and unit.Air.MaxAirspeed then
+            speed = unit.Air.MaxAirspeed
+        end
+
+        -- determine if collision box is fine
+        if speed then
+            if unit.SizeSphere then
+                if unit.SizeSphere < 0.1 * speed then
+                    WARN(string.format("Overriding the size of the collision sphere of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeSphere = 0.1 * speed
+                end
+            else
+                if unit.SizeX < 0.1 * speed then
+                    WARN(string.format("Overriding the x axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeX = 0.1 * speed
+                end
+
+                if unit.SizeZ < 0.1 * speed then
+                    WARN(string.format("Overriding the z axis of collision box of unit ( %s ), it should be atleast 10 percent ( %s ) of the maximum speed ( %s ) to guarantee proper functioning beam weapons", tostring(unit.BlueprintId), tostring(0.1 * speed), tostring(speed)))
+                    unit.SizeZ = 0.1 * speed
+                end
+            end
+        end
+    end
 end
 
 --- Post-processes all units
