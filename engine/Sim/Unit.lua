@@ -89,7 +89,14 @@ local Unit = {}
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
 
---- Adds a command cap to the unit.
+---@alias LayerName "Air" | "Land" | "Orbital" | "Seabed" | "Sub" | "Water"
+
+--- Adds a command cap to the unit
+---@param category moho.EntityCategory
+function Unit:AddBuildRestriction(category)
+end
+
+
 --- Also adds a button to the UI, or enables it, for the unit to use the new command.
 ---@param capName CommandCap
 function Unit:AddCommandCap(capName)
@@ -168,8 +175,12 @@ end
 function Unit:GetBlueprint()
 end
 
+---@return UnitBlueprint
+function Unit:GetBlueprint()
+end
+
 --- Returns the build rate of a unit
---- @return number
+--- @return rate
 function Unit:GetBuildRate()
 end
 
@@ -484,7 +495,7 @@ end
 function Unit:RestoreCommandCaps()
 end
 
---- Restors the toggle caps of the unit back to blueprint spec
+--- Restores the toggle caps of the unit back to blueprint spec
 function Unit:RestoreToggleCaps()
 end
 
@@ -509,11 +520,11 @@ end
 ---@param accelMult number
 function Unit:SetAccMult(accelMult)
 end
+
 --- Sets auto silo build mode to on/off
 ---@param mode boolean
 function Unit:SetAutoMode(mode)
 end
-
 
 ---
 ---@param block boolean
@@ -572,9 +583,9 @@ function Unit:SetCustomName(name)
 end
 
 --- Sets if enemy units won't target this unit.
---- Accidental hits can still damage it, but enemy units won't lock onto it.
----@param flag boolean
-function Unit:SetDoNotTarget(flag)
+--- Accidental hits can still damage it but it enemy units won't lock onto it.
+---@param dontTarget boolean
+function Unit:SetDoNotTarget(dontTarget)
 end
 
 --- Sets the elevation of the unit
@@ -613,13 +624,13 @@ function Unit:SetIsValidTarget(valid)
 end
 
 --- Sets if this unit's overcharge is paused
----@param pause boolean
-function Unit:SetOverchargePaused(pause)
+---@param paused boolean
+function Unit:SetOverchargePaused(paused)
 end
 
 --- Pauses building, upgrading, and other tasks
----@param pause boolean
-function Unit:SetPaused(pause)
+---@param paused boolean
+function Unit:SetPaused(paused)
 end
 
 --- Enables or disables resource production for the unit.
