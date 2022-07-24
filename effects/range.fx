@@ -46,7 +46,7 @@ technique Cast
     StencilZFail = incr;
     StencilPass = keep;
     StencilFunc = notequal;
-    CCW_StencilFail = zero;
+    CCW_StencilFail = keep;
     CCW_StencilZFail = decr;
     CCW_StencilPass = keep;
     CCW_StencilFunc = notequal;
