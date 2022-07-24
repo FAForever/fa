@@ -74,7 +74,7 @@ Tree = Class(Prop) {
             local canFall = not self.Fallen 
             local canBurn = (not self.Burning) and (not self.NoBurn)
 
-            if type == 'Disintegrate' or type == "Reclaimed" then 
+            if type == 'Disintegrate' or type == "Reclaimed" then
                 -- we just got obliterated
                 EntityDestroy(self)
 

@@ -271,29 +271,43 @@ Projectile = Class(moho.projectile_methods) {
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
 
+        -- adjust the impact location based on the velocity of the thing we're hitting, this fixes a bug with damage being applied the tick after the collision
+        -- is registered. As a result, the unit has moved one step ahead already, allowing it to 'miss' the area damage that we're trying to apply. Usually
+        -- air units are affected by this, see also the pull request for a visual aid on this issue on Github
+        if radius > 0 and targetEntity then
+            if targetType == 'Unit' or targetType == 'UnitAir' then
+                local vx, vy, vz = targetEntity:GetVelocity()
+                vc[1] = vc[1] + vx
+                vc[2] = vc[2] + vy
+                vc[3] = vc[3] + vz
+            elseif targetType == 'Shield' then
+                local vx, vy, vz = targetEntity.Owner:GetVelocity()
+                vc[1] = vc[1] + vx
+                vc[2] = vc[2] + vy
+                vc[3] = vc[3] + vz
+            end
+        end
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
 
-        -- compute whether we should spawn additional effects for this 
-        -- projectile, there's always a 10% chance or if we're far away from 
+        -- compute whether we should spawn additional effects for this
+        -- projectile, there's always a 10% chance or if we're far away from
         -- the previous impact
         local dx = OnImpactPreviousX - vc[1]
         local dz = OnImpactPreviousZ - vc[3]
         local dsqrt = dx * dx + dz * dz
         local doEffects = Random() < 0.1 or dsqrt > radius
-        
-        -- update last position of known effects
-        if doEffects then 
-            OnImpactPreviousX = vc[1]
-            OnImpactPreviousZ = vc[3]
-        end
 
         -- do splat logic and knock over trees
-        if doEffects and radius > 0 then 
+        if radius > 0 and doEffects then
+
+            -- update last position of known effects
+            OnImpactPreviousX = vc[1]
+            OnImpactPreviousZ = vc[3]
 
             -- knock over trees
-            DamageArea( 
+            DamageArea(
                 self,               -- instigator
                 vc,                 -- position
                 0.75 * radius,      -- radius
@@ -303,12 +317,12 @@ Projectile = Class(moho.projectile_methods) {
             )
 
             -- try and spawn in a splat
-            if 
+            if
                 -- if we flat out hit the terrain
-                targetType == "Terrain" or 
+                targetType == "Terrain" or
 
                 -- if we hit a unit that is on land
-                (targetEntity and targetEntity.Layer == "Land") 
+                (targetEntity and targetEntity.Layer == "Land")
             then 
                 -- choose a splat to spawn
                 local splat = bp.Display.ScorchSplat
@@ -334,7 +348,6 @@ Projectile = Class(moho.projectile_methods) {
                 local rngRadius = altRadius * Random()
 
                 CreateSplat(
-
                     -- position, orientation and the splat
                     vc,                                     -- position
                     6.28 * Random(),                        -- heading
@@ -525,7 +538,7 @@ Projectile = Class(moho.projectile_methods) {
                         if radius > 0 then
                             DamageArea(
                                 instigator, 
-                                cachedPosition, 
+                                cachedPosition , 
                                 radius, 
                                 initialDmg, 
                                 DamageData.DamageType, 
