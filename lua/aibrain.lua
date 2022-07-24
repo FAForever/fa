@@ -298,6 +298,8 @@ AIBrain = Class(moho.aibrain_methods) {
         self.Jammers = { }
         setmetatable(self.Jammers, { __mode = 'v' })
 
+        self.JammerResetTime = 15
+
         ForkThread(self.JammingToggleThread, self)
 
         -- populate the possible HQs per faction, layer and tech
@@ -695,7 +697,7 @@ AIBrain = Class(moho.aibrain_methods) {
             if not val then
                 local unit = blip:GetSource()
                 if unit.Blueprint.Intel.JammerBlips > 0 then
-                    unit.ResetJammer = 15
+                    unit.ResetJammer = self.JammerResetTime
                 end
             end
         end
