@@ -348,6 +348,13 @@ Unit = Class(moho.unit_methods) {
         end
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
+
+        
+        if self.Blueprint.Intel.JammerBlips > 0 then
+            self.Brain:TrackJammer(self)
+            self.ResetJammer = -1
+        end
+        
     end,
 
     -------------------------------------------------------------------------------------------
@@ -1964,7 +1971,11 @@ Unit = Class(moho.unit_methods) {
         if self.EventCallbacks then
             self.EventCallbacks = nil
         end
-
+        
+        if self.Blueprint.Intel.JammerBlips > 0 then
+            self.Brain:UntrackJammer(self)
+        end
+        
         ChangeState(self, self.DeadState)
     end,
 
