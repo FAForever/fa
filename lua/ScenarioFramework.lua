@@ -23,17 +23,16 @@
 ---@field [3] string cue
 ---@field [4] string faction
 
--- these need to be global because other files refer to them for some reason
+local Cinematics = import('/lua/cinematics.lua')
+local ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local SimCamera = import('/lua/SimCamera.lua').SimCamera
+local SimUIVars = import('/lua/sim/SimUIState.lua')
+local TriggerFile = import('/lua/scenariotriggers.lua')
+local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
-Cinematics = import('/lua/cinematics.lua')
 Objectives = import('/lua/SimObjectives.lua')
-PingGroups = import('/lua/SimPingGroup.lua') -- we don't we this, but other files do...
-ScenarioPlatoonAI = import('/lua/ScenarioPlatoonAI.lua')
-ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-SimCamera = import('/lua/SimCamera.lua').SimCamera
-SimUIVars = import('/lua/sim/SimUIState.lua')
-TriggerFile = import('/lua/scenariotriggers.lua')
-VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
+PingGroups = import('/lua/SimPingGroup.lua')
 
 
 local PauseUnitDeathActive = false
