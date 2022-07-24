@@ -151,7 +151,7 @@ function OnSync()
         local size = SessionGetScenarioInfo().size
         size[1] = area[3] - area[1]
         size[2] = area[4] - area[2]
-        SetPlayableArea(Sync.NewPlayableArea)
+        SetPlayableArea(area)
     end
 
     if Sync.StartPositions then
