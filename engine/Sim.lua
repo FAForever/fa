@@ -7,32 +7,34 @@
 ---@alias Bone string | number
 ---@alias Language "cn" | "cz" | "de" | "es" | "fr" | "it" | "pl" | "ru" | "tw" | "tzm" | "us"
 
+
 ---@alias BoneObject Projectile | Prop | Unit
 
---- Restrict the army from building the unit category, which can be combined using the typical category arithmetics (+ for union, - for subtraction, * for intersection)
----@param army number
----@param category Categories
+--- Restricts the army from building the unit category
+---@param army Army
+---@param category EntityCategory
 function AddBuildRestriction(army, category)
 end
 
----@param army number
----@deprecated It is unknown what this function does and where it gets its value from.
+--- It is unknown what this function does or where it gets its value from
+---@param army Army
+---@deprecated
 function ArmyGetHandicap(army)
 end
 
---- Initialises the prebuilt units of an army via `brain:OnSpawnPreBuiltUnits`
----@param army number
+--- Initialises the prebuilt units of an army via `AiBrain.OnSpawnPreBuiltUnits`
+---@param army Army
 function ArmyInitializePrebuiltUnits(army)
 end
 
---- Return true if the indicated army is a civilian army.
----@param army number
+--- Returns if the indicated army is a civilian army
+---@param army Army
 ---@return boolean
 function ArmyIsCivilian(army)
 end
 
---- Return true if the indicated army has been defeated.
----@param army number | string
+--- Returns if the indicated army has been defeated
+---@param army Army
 function ArmyIsOutOfGame(army)
 end
 
@@ -66,13 +68,9 @@ end
 function AudioSetLanguage(language)
 end
 
---- Change a unit's army, return the new unit.
--- @param unit Unit to be given.
--- @param army Army's index to recieve the unit.
-
---- Changes the army of a unit, returning a new unit.
+--- Changes the army of a unit, returning the unit
 ---@param unit Unit
----@param army number
+---@param army Army
 ---@return Unit
 function ChangeUnitArmy(unit, army)
 end
@@ -552,8 +550,9 @@ end
 function FlushIntelInRect(minX, minZ, maxX, maxZ)
 end
 
---- TODO.
-function GenerateArmyStart(strArmy)
+---
+---@param army Army
+function GenerateArmyStart(army)
 end
 
 --- TODO.
@@ -561,18 +560,22 @@ end
 function GenerateRandomOrientation()
 end
 
---- Returns an army brain given the brain's name.
----@param strArmy any
+--- Returns an army's brain
+---@param army Army
 ---@return AIBrain
-function GetArmyBrain(strArmy)
+function GetArmyBrain(army)
 end
 
---- Returns current army's unit capacity.
-function GetArmyUnitCap(strArmy)
+--- Returns the army's unit cap
+---@param army Army
+---@return number
+function GetArmyUnitCap(army)
 end
 
---- TODO.
-function GetArmyUnitCostTotal(strArmy)
+--- Returns the total unit cap cost of the army
+---@param army Army
+---@return number
+function GetArmyUnitCostTotal(army)
 end
 
 --- Returns entity's blueprint.
@@ -580,8 +583,8 @@ end
 function GetBlueprint(entity)
 end
 
---- Return the (1 based) index of the current command source.
--- TODO.
+---
+---@return Army
 function GetCurrentCommandSource()
 end
 
@@ -595,7 +598,8 @@ end
 function GetEntityById(id)
 end
 
---- Returns the index of local army.
+--- Returns the index of local army
+---@return Army
 function GetFocusArmy()
 end
 
@@ -681,13 +685,12 @@ end
 function HasLocalizedVO(language)
 end
 
---- Starts the AI on given army.
-function InitializeArmyAI(strArmy)
+--- Starts the AI on given army
+---@param army string
+function InitializeArmyAI(army)
 end
 
---- Returns true if army2 is allied with army1.
--- @param army1 Army's index.
--- @param army2 Army's index.
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function IsAlly(army1, army2)
 end
 
@@ -706,9 +709,7 @@ end
 function IsCommandDone(cmd)
 end
 
---- Returns true if army2 is enemy to army1.
--- @param army1 Army's index.
--- @param army2 Army's index.
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function IsEnemy(army1, army2)
 end
 
@@ -721,9 +722,7 @@ end
 function IsGameOver()
 end
 
---- Returns true if army2 is neutral to army1.
--- @param army1 Army's index.
--- @param army2 Army's index.
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
 function IsNeutral(army1, army2)
 end
 
@@ -1024,8 +1023,8 @@ end
 function LUnitMoveNear(self, target, range)
 end
 
---- List all armies in the game.
--- @return Table containing strings of army names.
+--- Lists all armies in the game
+---@return string[]
 function ListArmies()
 end
 
@@ -1038,10 +1037,10 @@ end
 function NotifyUpgrade(from, to)
 end
 
---- Return true if the current command source is authorized to mess with the given army.
--- Or if cheats are enabled.
--- TODO.
-function OkayToMessWithArmy()
+--- Returns if the current command source is authorized to mess with the given army, or whether cheats are enabled
+---@param army Army
+---@return boolean
+function OkayToMessWithArmy(army)
 end
 
 --- Parse a string to generate a new entity category.
@@ -1078,104 +1077,119 @@ end
 function SelectedUnit()
 end
 
---- Set alliances between 2 armies.
--- @param army1 Army's index.
--- @param army2 Army's index.
--- @param alliance Can be 'Neutral', 'Enemy', 'Ally'.
+--- Sets alliance type between 2 armies, note that weapons do not reset their target
+---@param army1 Army
+---@param army2 Army
+---@param alliance AllianceType
 function SetAlliance(army1, army2, alliance)
 end
 
---- Set alliances from army1 to army2.
--- @param army1 Army's index.
--- @param army2 Army's index.
--- @param alliance Can be 'Neutral', 'Enemy', 'Ally'.
+--- Sets alliance type from army1 to army2, note that weapons do not reset their target
+---@param army1 Army
+---@param army2 Army
+---@param alliance AllianceType
 function SetAllianceOneWay(army1, army2, alliance)
 end
 
---- TODO.
-function SetAlliedVictory()
+--- Use `/lua/ui/game/diplomacy.lua#SetAlliedVectory(state)` instead
+---@deprecated
+---@param state boolean
+function SetAlliedVictory(state)
 end
 
---- TODO.
--- @param army Army's index.
--- @param personality TODO.
+--- Unfinished function related to AI, is not used
+---@deprecated
+---@param army Army
+---@param personality AIPersonality
 function SetArmyAIPersonality(army, personality)
 end
 
---- Set army's color using RGB values.
--- @param army Army's index.
--- @param r Number 0-255.
--- @param g Number 0-255.
--- @param b Number 0-255.
+--- Sets army's color using RGB values (0 - 255)
+---@param army Army
+---@param r number
+---@param g number
+---@param b number
 function SetArmyColor(army, r, g, b)
 end
 
---- TODO.
--- @param army Army's index.
-function SetArmyColorIndex(army, index)
+--- Sets the color index of the army
+---@param army Army
+---@param color number
+function SetArmyColorIndex(army, color)
 end
 
---- Gives mass and energy to the army.
--- TODO: Find out if this is in any way special than brain:GiveResource().
--- @param army Army's index.
--- @param mass Amount of mass to give.
--- @param energy Amount of energy to give.
+--- Sets mass and energy of the army
+---@param army Army
+---@param mass number
+---@param energy number
 function SetArmyEconomy(army, mass, energy)
 end
 
---- Sets faction for the given army.
--- 0 - UEF, 1 - Aeon, 2 - Cybran, 3 - Seraphim.
--- @param army Army's index.
--- @param index Faction index.
+--- Sets faction for the given army
+---@param army Army
+---@param index Faction
 function SetArmyFactionIndex(army, index)
 end
 
---- Indicate that the supplied army has been defeated.
--- @param army Army's index.
+--- Indicates that the army has been defeated
+---@param army Army
 function SetArmyOutOfGame(army)
 end
 
---- TODO.
+--- Unfinished function related to AI, is not used
+---@deprecated
+---@param army Army
+---@param plans ArmyPlans
 function SetArmyPlans(army, plans)
 end
 
---- Determines if the user should be able to see the army score.
--- @param army Army's index.
--- @param bool true/false.
-function SetArmyShowScore(army, bool)
+--- Determines if the user should be able to see the army score
+---@param army Army
+---@param show boolean
+function SetArmyShowScore(army, show)
 end
 
---- Set the arty starting position.
--- Position where the initial unit will be spawned.
--- @param army Army's index.
--- @param x Position on the map on X axis.
--- @param x Position on the map on Z axis.
+--- Sets the arty starting position.
+--- Position where the initial unit will be spawned.
+---@param army Army
+---@param x number
+---@param z number
 function SetArmyStart(army, x, z)
 end
 
---- Set the army index for which to sync army stats (-1 for none) .
--- TODO
-function SetArmyStatsSyncArmy()
+--- Sets the army index for which to sync army stats
+---@param army Army
+function SetArmyStatsSyncArmy(army)
 end
 
---- Sets maximum number of units army can build.
--- @param army Army's index.
--- @param unitCap Number, the new unit cap.
+--- Sets the unit cap for the army
+---@param army Army
+---@param unitCap number
 function SetArmyUnitCap(army, unitCap)
 end
 
---- Sets army to ignore max unit capacity.
--- @param army Army's index.
--- @param flag true/false.
-function SetIgnoreArmyUnitCap(army, flag)
+--- Allows set the rights to the army
+---@param targetArmyIndex Army
+---@param sourceHumanIndex Army
+---@param enable boolean
+function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
 end
 
---- Sets army to ignore playable reclangle.
--- Units can move outside of restricted area.
--- Used in campaign for offmap attacks.
--- @param army Army's index.
--- @param flag true/false
-function SetIgnorePlayableRect(army, flag)
+--- TODO merge from `'/engine/User.lua'` into `'/engine/Core.lua'`
+function SetFocusArmy(armyIndex)
+end
+
+--- Sets army to ignore unit cap
+---@param army Army
+---@param ignore boolean
+function SetIgnoreArmyUnitCap(army, ignore)
+end
+
+--- Sets army to ignore playable rectangle so that units can move outside of restricted area.
+--- Used in campaign for offmap attacks.
+---@param army Army
+---@param ignore boolean
+function SetIgnorePlayableRect(army, ignore)
 end
 
 --- Set playable rectangle.
@@ -1195,7 +1209,8 @@ end
 function SetTerrainTypeRect(rect, type)
 end
 
---- TODO.
+---
+---@return boolean createInitial
 function ShouldCreateInitialArmyUnits()
 end
 
@@ -1279,19 +1294,4 @@ end
 -- Returns true if the active session is a replay
 -- Same as user SessionIsReplay.
 function SessionIsReplay()
-end
-
--- Allows set the rights to the army
--- targetArmyIndex, sourceHumanIndex is 0 based index
--- Nothing returns
----@param targetArmyIndex any
----@param sourceHumanIndex any
----@param enable boolean
-function SetCommandSource(targetArmyIndex, sourceHumanIndex, enable)
-end
-
--- Sets the focus without checking rights
----@param armyIndex number is 0 based index or -1
--- Nothing returns
-function SetFocusArmy(armyIndex)
 end

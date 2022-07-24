@@ -2,7 +2,7 @@
 ---@class moho.entity_methods
 local Entity = {}
 
----@alias Army number
+---@alias Army number | string
 ---@alias EntityId number
 ---@alias EntityVisionType 'Intel' | 'Never' | 'Always' | 'Vision'
 
