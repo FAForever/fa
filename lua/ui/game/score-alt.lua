@@ -43,7 +43,6 @@ ShareDescriptionLookup["TransferToKiller"] = "<LOC lobui_0763>"
 ShareDescriptionLookup["Defectors"] = "<LOC lobui_0767>"
 ShareDescriptionLookup["CivilianDeserter"] = "<LOC lobui_0765>"
 
-
 local function SyncCallback(sync)
     if instance then 
         local focus = GetFocusArmy()
@@ -54,8 +53,8 @@ local function SyncCallback(sync)
         if score.general.currentunits and score.general.currentcap then 
             instance.UnitData:Set({ Count = score.general.currentunits , Cap = score.general.currentcap })
         end
-        
-        if sync.NewPlayableArea then
+
+        if sync.NewPlayableArea then 
             local width = sync.NewPlayableArea[3] - sync.NewPlayableArea[1]
             local height = sync.NewPlayableArea[4] - sync.NewPlayableArea[2]
 
