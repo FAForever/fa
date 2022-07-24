@@ -178,8 +178,12 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 --- Creates the default unit explosion used by almost all units in the game.
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
-function CreateScalableUnitExplosion(unit, overKillRatio)
-    if unit then
+function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
+
+    debrisMultiplier = debrisMultiplier or 1
+    circularDebris = circularDebris or false
+
+    if unit and (not IsDestroyed(unit)) then
         if IsUnit(unit) then
 
             -- cache blueprint values
@@ -297,7 +301,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             )
 
             -- determine debris amount
-            local amount = MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
+            local amount = debrisMultiplier * MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
 
             -- determine debris velocity range
             local velocity = 2 * boundingXYZRadius
@@ -325,9 +329,16 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 local zpos = r3 * sz - (sz * 0.5)
 
                 -- launch them into space
-                local xdir = velocity * r1 - (hVelocity)
-                local ydir = boundingXYZRadius + velocity * r2
-                local zdir = velocity * r3 - (hVelocity)
+                local xdir, ydir, zdir 
+                if circularDebris then 
+                    xdir = velocity * r1 - (hVelocity)
+                    ydir = velocity * r2 - (hVelocity)
+                    zdir = velocity * r3 - (hVelocity)
+                else 
+                    xdir = velocity * r1 - (hVelocity)
+                    ydir = boundingXYZRadius + velocity * r2
+                    zdir = velocity * r3 - (hVelocity)
+                end
 
                 -- choose a random blueprint
                 local bp = ProjectileDebrisBps[MathMin(ProjectileDebrisBpsN, Random(1, i))]

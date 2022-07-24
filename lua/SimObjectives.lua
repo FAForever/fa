@@ -1317,7 +1317,11 @@ function Protect(Type, Complete, Title, Description, Target)
     end
 
     for _, unit in Target.Units do
-        CreateTriggers(unit, objective, true)
+        if not unit.Dead then
+            CreateTriggers(unit, objective, true)
+        else
+            objective.OnUnitKilled(unit)
+        end
     end
 
     if Target.ShowProgress then

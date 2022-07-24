@@ -21,7 +21,7 @@
 --- Post-processes the provided projectile blueprint
 local function PostProcessProjectile(projectile)
 
-    -- -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     projectile.CategoriesCount = 0
     projectile.CategoriesHash = { }
@@ -32,7 +32,7 @@ local function PostProcessProjectile(projectile)
         end
     end
 
-    -- -- create hash tables for quick lookup
+    -- # create hash tables for quick lookup
 
     projectile.DoNotCollideListCount = 0 
     projectile.DoNotCollideListHash = { }
@@ -40,6 +40,18 @@ local function PostProcessProjectile(projectile)
         projectile.DoNotCollideListCount = table.getn(projectile.DoNotCollideList)
         for k, category in projectile.DoNotCollideList do 
             projectile.DoNotCollideListHash[category] = true 
+        end
+    end
+
+    -- # fix desired shooter cap for missiles
+
+    if projectile.CategoriesHash['MISSILE'] and (not projectile.CategoriesHash['STRATEGIC']) then
+        if not projectile.DesiredShooterCap then
+            projectile.DesiredShooterCap = projectile.Defense.Health or 1
+        else 
+            if projectile.DesiredShooterCap != (projectile.Defense.Health or 1) then
+                WARN(string.format("Inconsistent shooter cap defined for projectile %s, it should match its health", projectile.BlueprintId))
+            end
         end
     end
 end
