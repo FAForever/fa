@@ -7,16 +7,16 @@
 
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
----@alias TriggerCallback
----| fun()
----| fun(manager: TriggerManager, name: string)
----@alias UnitTriggerCallback
----| fun(trigger: Unit)
----| fun(manager: TriggerManager, name: string, trigger: Unit)
----@alias UnitInstigatorTriggerCallback
----| fun(unit: Unit, inst: Unit)
----| fun(manager: TriggerManager, name: string, unit: Unit, inst: Unit)
----@alias OnDamagedCallback fun(unit: Unit, instigator: Unit)
+---@alias NamedTriggerCallback            fun(manager: TriggerManager, name: string)
+---@alias NamedUnitTriggerCallback        fun(manager: TriggerManager, name: string, trigger: Unit)
+---@alias NamedGroupTriggerCallback       fun(manager: TriggerManager, name: string, group: Unit[])
+---@alias NamedAreaTriggerCallback        fun(manager: TriggerManager, name: string, group: Unit | Unit[])
+---@alias NamedInstigatorTriggerCallback  fun(manager: TriggerManager, name: string, unit: Unit, instigator: Unit)
+---@alias TriggerCallback            fun()
+---@alias UnitTriggerCallback        fun(trigger: Unit)
+---@alias GroupTriggerCallback       fun(group: Unit[])
+---@alias AreaTriggerCallback        fun(group: Unit | Unit[])
+---@alias InstigatorTriggerCallback  fun(unit: Unit, instigator: Unit)
 
 ---@alias ArmyStateCompareType "GreaterThan" | "GreaterThanOrEqual" | "LessThan" | "LessThanOrEqual"
 
@@ -50,94 +50,67 @@ local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 
 
 
---- This will create an area trigger around `rectangle`. It will fire when `category` is met of `aiBrain`.
----@param callback UnitTriggerCallback
----@param rectangle Rectangle
+--- Creates an area trigger around `area` that fires `callback` when there are `unitCount`
+--- units of type `category` (optionally belonging to `aiBrain`) in it. The triggering units
+--- are passed as an argument to the callback.
+--- If it `unitCount` is absent, then the callback will receive only the first triggering unit
+--- (or `nil` if none, due to `lessThan`).
+--- If `name` is supplied, then the callback is called with TriggerManager and the name as arguments
+--- before the triggering unit / group.
+---@see CreateMutlipleAreaTrigger() to pass in multiple areas
+---@param callback NamedAreaTriggerCallback | AreaTriggerCallback
+---@param area Area | Rectangle
 ---@param category EntityCategory
----@param onceOnly boolean means it will not continue to run after the first time it fires
----@param invert boolean means it will fire when there are less than `unitCount` units in the area. Useful for testing if someone has defeated a base.
----@param aiBrain AIBrain
----@param unitCount number number of units it will take to fire
----@param requireBuilt boolean
+---@param onceOnly? boolean
+---@param lessThan? boolean
+---@param aiBrain? AIBrain
+---@param unitCount? number defaults to any (or none with `lessThan` set)
+---@param requireBuilt? boolean
+---@param name? string
 ---@return thread
-function CreateAreaTrigger(callback, rectangle, category, onceOnly, invert, aiBrain, unitCount, requireBuilt)
-    return ForkThread(AreaTriggerThread, callback, {rectangle}, category, onceOnly, invert, aiBrain, unitCount, requireBuilt)
+function CreateAreaTrigger(callback, area, category, onceOnly, lessThan, aiBrain, unitCount, requireBuilt, name)
+    return ForkThread(AreaTriggerThread, callback, {area}, category, onceOnly, lessThan, aiBrain, unitCount, requireBuilt, name)
 end
 
---- Same as `CreateAreaTrigger` except you can supply the function with a table of Rectangles for if
---- you have an odd shaped area for an area trigger
----@param callback UnitTriggerCallback
----@param rectangles Rectangle[]
+--- Same as `CreateAreaTrigger` except you supply the function with a table of areas for if
+--- you have an odd shaped area as an area trigger
+---@see CreateAreaTrigger() to pass in a single area and information regarding arguments
+---@param callback NamedAreaTriggerCallback | AreaTriggerCallback
+---@param areas (Area | Rectangle)[]
 ---@param category EntityCategory
----@param onceOnly boolean
----@param invert boolean
----@param aiBrain AIBrain
----@param unitCount number
----@param requireBuilt boolean
+---@param onceOnly? boolean
+---@param lessThan? boolean
+---@param aiBrain? AIBrain
+---@param unitCount? number defaults to any (or none with `lessThan` set)
+---@param requireBuilt? boolean
+---@param name? string
 ---@return thread
-function CreateMultipleAreaTrigger(callback, rectangles, category, onceOnly, invert, aiBrain, unitCount, requireBuilt)
-    return ForkThread(AreaTriggerThread, callback, rectangles, category, onceOnly, invert, aiBrain, unitCount, requireBuilt)
+function CreateMultipleAreaTrigger(callback, areas, category, onceOnly, lessThan, aiBrain, unitCount, requireBuilt, name)
+    return ForkThread(AreaTriggerThread, callback, areas, category, onceOnly, lessThan, aiBrain, unitCount, requireBuilt, name)
 end
 
-function AreaTriggerThread(callback, rectangles, category, onceOnly, invert, aiBrain, unitCount, requireBuilt, name)
-    local recTable = {}
-    for i, rect in rectangles do
-        if type(rect) == 'string' then
-            recTable[i] = ScenarioUtils.AreaToRect(rect)
-        else
-            recTable[i] = rect
-        end
-    end
-
+function AreaTriggerThread(callback, areas, category, onceOnly, lessThan, aiBrain, unitCount, requireBuilt, name)
+    local recTable = ScenarioUtils.MultiAreaToMultiRect(areas)
     while true do
-        local amount = 0
-        local totalEntities = {}
-        local totalEntityCount = 0
-        for _, rect in recTable do
-            local entities = GetUnitsInRect(rect)
-            if entities then
-                for _, entity in entities do
-                    totalEntityCount = totalEntityCount + 1
-                    totalEntities[totalEntityCount] = entity
-                end
+        local triggered = lessThan
+        local trigger
+        if unitCount then
+            local amount
+            trigger, amount = ScenarioUtils.GetUnitsInArea(recTable, category, aiBrain, requireBuilt)
+            if unitCount >= amount then
+                triggered = not triggered
+            end
+        else
+            trigger = ScenarioUtils.FindUnitInArea(recTable, category, aiBrain, requireBuilt)
+            if trigger then
+                triggered = not triggered
             end
         end
-        local triggered = false
-        local triggeringEntity
-        if totalEntityCount > 0 then
-            for _, entity in totalEntities do
-                local contains = EntityCategoryContains(category, entity)
-                if contains and (aiBrain and entity:GetAIBrain() == aiBrain) and (not requireBuilt or (requireBuilt and not entity:IsBeingBuilt())) then
-                    amount = amount + 1
-                    -- If we want to trigger as soon as one of a type is in there, kick out immediately.
-                    if not unitCount then
-                        triggeringEntity = entity
-                        triggered = true
-                        break
-                    -- If we want to trigger on an amount, then add the entity into the triggeringEntity table
-                    -- so we can pass that table back to the callback function.
-                    else
-                        if not triggeringEntity then
-                            triggeringEntity = {}
-                        end
-                        table.insert(triggeringEntity, entity)
-                    end
-                end
-            end
-        end
-        -- Check to see if we have a triggering amount inside in the area.
-        if unitCount and ((amount >= unitCount) ~= invert) then
-            triggered = true
-        end
-        -- TRIGGER IF:
-        -- You don't want a specific amount and the correct unit category entered
-        -- You don't want a specific amount, there are no longer the category inside and you wanted the test inverted
-        -- You want a specific amount and we have enough.
-        if (not unitCount and (triggered ~= invert)) or (triggered and unitCount) then
+        if triggered then
             if name then
-                callback(TriggerManager, name, triggeringEntity)
+                callback(TriggerManager, name, trigger)
             else
-                callback(triggeringEntity)
+                callback(trigger)
             end
             if onceOnly then
                 return
@@ -147,14 +120,16 @@ function AreaTriggerThread(callback, rectangles, category, onceOnly, invert, aiB
     end
 end
 
----
----@param callback TriggerCallback
+--- Creates a threat trigger that fires `callback` when the threat level to an `aiBrain` around
+--- a `unit` exceeds or falls below `value`, depending on `greater` (but it always fires when equal).
+--- If `name` is supplied, the callback is called with TriggerManager and the name as arguments.
+---@param callback TriggerCallback | NamedTriggerCallback
 ---@param aiBrain AIBrain
 ---@param unit Unit
 ---@param rings boolean
 ---@param onceOnly boolean
 ---@param value number
----@param greater boolean
+---@param greater? boolean
 ---@param name? string
 ---@return thread
 function CreateThreatTriggerAroundUnit(callback, aiBrain, unit, rings, onceOnly, value, greater, name)
@@ -177,14 +152,16 @@ function ThreatTriggerAroundUnitThread(callback, aiBrain, unit, rings, onceOnly,
     end
 end
 
----
----@param callback TriggerCallback
+--- Creates a threat trigger that fires `callback` when the threat level to an `aiBrain` at a `pos`
+--- exceeds or falls below `value`, depending on `greater` (but it always fires when equal).
+--- If `name` is supplied, the callback is called with TriggerManager and the name as arguments.
+---@param callback TriggerCallback | NamedTriggerCallback
 ---@param aiBrain AIBrain
 ---@param pos Marker | Vector
 ---@param rings boolean
 ---@param onceOnly boolean
 ---@param value number
----@param greater boolean
+---@param greater? boolean
 ---@param name? string
 ---@return thread
 function CreateThreatTriggerAroundPosition(callback, aiBrain, pos, rings, onceOnly, value, greater, name)
@@ -210,27 +187,27 @@ function ThreatTriggerAroundPositionThread(callback, aiBrain, pos, rings, onceOn
     end
 end
 
---- Fires the `callback` function after `seconds`.
---- You can have the function repeat `repeatNum` times which will fire every `seconds`.
----@param callback function
+--- Creates a timer that fires `callback` after `seconds` have passed, calling `onTickSecond` with
+--- the current number of seconds left on the timer if `doOnTickSecond` is set. This includes the
+--- starting duration, but also 0--note that this adds an extra second.
+--- If `name` is supplied, the callback is called with TriggerManager and the name as arguments.
+---@param callback TriggerCallback | NamedTriggerCallback
 ---@param seconds number
 ---@param name? string
----@param display? boolean
----@param onTickSecond? fun(seconds: number) display needs to be `true` to be called
+---@param doOnTickSecond? boolean
+---@param onTickSecond? fun(seconds: number)
 ---@return thread
-function CreateTimerTrigger(callback, seconds, name, display, onTickSecond)
-    return ForkThread(TimerTriggerThread, callback, seconds, name, display, onTickSecond)
+function CreateTimerTrigger(callback, seconds, name, doOnTickSecond, onTickSecond)
+    return ForkThread(TimerTriggerThread, callback, seconds, name, doOnTickSecond, onTickSecond)
 end
-function TimerTriggerThread(callback, seconds, name, display, onTickSecond)
-    if display then
-        local targetTime = math.floor(GetGameTimeSeconds()) + seconds
-        onTickSecond(seconds)
-
+function TimerTriggerThread(callback, seconds, name, doOnTickSecond, onTickSecond)
+    if doOnTickSecond then
         while true do
+            onTickSecond(seconds)
+            -- we should break here instead to not add an extra second...
             WaitSeconds(1)
-            local time = targetTime - math.floor(GetGameTimeSeconds())
-            onTickSecond(time)
-            if time < 0 then
+            seconds = seconds - 1
+            if seconds < 0 then
                 break
             end
         end
@@ -245,8 +222,9 @@ function TimerTriggerThread(callback, seconds, name, display, onTickSecond)
     end
 end
 
----
----@param callback TriggerCallback
+--- Creates a trigger that fires `callback` when all `units` are dead.
+--- If `name` is supplied, then the callback is called with TriggerManager and the name as arguments.
+---@param callback TriggerCallback | NamedTriggerCallback
 ---@param units Unit[]
 ---@param name? string
 ---@return thread
@@ -274,14 +252,15 @@ function GroupDeathTriggerThread(callback, units, name)
     end
 end
 
----
----@param callback TriggerCallback
+--- Creates a trigger that fires `callback` when there are `deadCount` units dead.
+--- If `name` is supplied, then the callback is called with TriggerManager and the name as arguments.
+---@param callback TriggerCallback | NamedTriggerCallback
 ---@param units Unit[]
----@param num number
+---@param deadCount number
 ---@param name? string
 ---@return thread
-function CreateSubGroupDeathTrigger(callback, units, num, name)
-    return ForkThread(SubGroupDeathTriggerThread, callback, units, num, name)
+function CreateSubGroupDeathTrigger(callback, units, deadCount, name)
+    return ForkThread(SubGroupDeathTriggerThread, callback, units, deadCount, name)
 end
 function SubGroupDeathTriggerThread(callback, units, num, name)
     local numDead = 0
@@ -368,8 +347,8 @@ function CreateArmyUnitCategoryVeterancyTrigger(callback, aiBrain, category, lev
     aiBrain:SetupBrainVeterancyTrigger(spec)
 end
 
----
----@param callback fun()
+--- Creates a trigger that fires `callback` when the two units are farther apart than `distance`
+---@param callback TriggerCallback
 ---@param unitOne Unit
 ---@param unitTwo Unit
 ---@param distance number
@@ -384,8 +363,10 @@ function UnitDistanceTriggerThread(callback, unitOne, unitTwo, distance)
     callback()
 end
 
----
----@param callback UnitTriggerCallback
+--- Creates a unit trigger that fires `callback` with the unit it's closer than `distance` to a `marker`.
+--- If `name` is supplied, then the callback is called with TriggerManager and the name as arguments
+--- before the unit.
+---@param callback UnitTriggerCallback | NamedUnitTriggerCallback
 ---@param unit Unit
 ---@param marker Marker
 ---@param distance number
@@ -417,8 +398,11 @@ function UnitToPositionDistanceTriggerThread(callback, unit, marker, distance, n
     end
 end
 
----
----@param callback UnitInstigatorTriggerCallback
+--- Creates a trigger that fires `callback` when a unit of type `category` is closer than `distance`
+--- to `unit`. The callback function recieves the original unit and trigger unit as arguments.
+--- If `name` is supplied, then the callback is called with TriggerManager and the name as arguments
+--- before the original and trigger unit.
+---@param callback InstigatorTriggerCallback | NamedInstigatorTriggerCallback
 ---@param unit Unit
 ---@param brain AIBrain
 ---@param category EntityCategory
@@ -434,12 +418,12 @@ function CreateUnitNearTypeTriggerThread(callback, unit, brain, category, distan
             return
         else
             local position = unit:GetPosition()
-            for _, catUnit in brain:GetListOfUnits(category, false) do
-                if VDist3(position, catUnit:GetPosition()) < distance and not catUnit:IsBeingBuilt() then
+            for _, triggerUnit in brain:GetListOfUnits(category, false) do
+                if VDist3(position, catUnit:GetPosition()) < distance and not triggerUnit:IsBeingBuilt() then
                     if name then
-                        callback(TriggerManager, name, unit, catUnit)
+                        callback(TriggerManager, name, unit, triggerUnit)
                     else
-                        callback(unit, catUnit)
+                        callback(unit, triggerUnit)
                     end
                     return
                 end
@@ -459,7 +443,7 @@ function CreateOnFailedToBuildTrigger(callback, unit)
 end
 
 ---
----@param callback fun(self: Unit, builder: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 ---@param category EntityCategory
 function CreateUnitBuiltTrigger(callback, unit, category)
@@ -467,16 +451,16 @@ function CreateUnitBuiltTrigger(callback, unit, category)
 end
 
 ---
----@param callback OnDamagedCallback
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
----@param amount? number defaults to -1
----@param repeatNum? number defaults to 1
+---@param amount? number defaults to `-1`
+---@param repeatNum? number defaults to `1`
 function CreateUnitDamagedTrigger(callback, unit, amount, repeatNum)
     unit:AddOnDamagedCallback(callback, amount, repeatNum)
 end
 
 ---
----@param callback fun(self: Unit)
+---@param callback UnitTriggerCallback
 ---@param unit Unit
 function CreateUnitDeathTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnKilled')
@@ -492,7 +476,7 @@ function CreateUnitPercentageBuiltTrigger(callback, aiBrain, category, percent)
     aiBrain:AddUnitBuiltPercentageCallback(callback, category, percent)
 end
 
----@param callback fun(self: Unit)
+---@param callback UnitTriggerCallback
 ---@param unit Unit
 function CreateUnitVeterancyTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnVeteran')
@@ -503,71 +487,71 @@ function RemoveUnitTrigger(unit, callback)
 end
 
 ---
----@param callback fun(self: Unit, source: Entity)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitReclaimedTrigger(callback, unit)
    unit:AddUnitCallback(callback, 'OnReclaimed')
 end
 
 ---
----@param callback fun(self: Unit, target: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitStartReclaimTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnStartReclaim')
 end
 
 ---
----@param callback fun(self: Unit, target: Entity)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitStopReclaimTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnStopReclaim')
 end
 
 ---
----@param cbOldUnit fun(oldUnit: Unit, captor: Unit) | nil
----@param cbNewUnit fun(newUnit: Unit, captor: Unit) | nil
+---@param cbOldUnit InstigatorTriggerCallback | nil
+---@param cbNewUnit InstigatorTriggerCallback | nil
 ---@param unit Unit
 function CreateUnitCapturedTrigger(cbOldUnit, cbNewUnit, unit)
     unit:AddOnCapturedCallback(cbOldUnit, cbNewUnit)
 end
 
 ---
----@param callback fun(self: Unit, target: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitStartCaptureTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnStartCapture')
 end
 
 ---
----@param callback fun(self: Unit, target: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitStopCaptureTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnStopCapture')
 end
 
 ---
----@param callback fun(self: Unit, captor: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitStartBeingCapturedTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnStartBeingCaptured')
 end
 
 ---
----@param callback fun(self: Unit, captor: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitStopBeingCapturedTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnStopBeingCaptured')
 end
 
 ---
----@param callback fun(self: Unit, captor: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitFailedBeingCapturedTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnFailedBeingCaptured')
 end
 
 ---
----@param callback fun(self: Unit, target: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitFailedCaptureTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnFailedCapture')
@@ -578,7 +562,7 @@ function CreateUnitStopBeingBuiltTrigger(callback, unit)
 end
 
 ---
----@param callback fun(self: Unit, newUnit: Unit)
+---@param callback InstigatorTriggerCallback
 ---@param unit Unit
 function CreateUnitGivenTrigger(callback, unit)
     unit:AddUnitCallback(callback, 'OnGiven')

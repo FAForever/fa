@@ -111,20 +111,22 @@ CreateAreaTrigger = TriggerFile.CreateAreaTrigger
 CreateMultipleAreaTrigger = TriggerFile.CreateMultipleAreaTrigger
 
 local timerThread = nil
---- Creates a UI timer that fires `callback` after `seconds`.
---- You can have the function repeat `repeatNum` times which will fire every `seconds`.
+--- Creates a timer that runs `callback` after `seconds` have passed, calling `onTickSecond` with
+--- the current number of seconds left on the timer if `doOnTickSecond` is set. This includes the
+--- starting duration, but also 0--note that this adds an extra second.
+--- If `name` is supplied, the callback is called with TriggerManager and the name as arguments.
 ---@param callback function
 ---@param seconds number
----@param name string
----@param display boolean
----@param onTickSecond fun(seconds: number)
+---@param name? string
+---@param doOnTickSecond? boolean
+---@param onTickSecond? fun(seconds: number)
 ---@return thread
-function CreateTimerTrigger(callback, seconds, name, display, onTickSecond)
-    timerThread = TriggerFile.CreateTimerTrigger(callback, seconds, name, display, onTickSecond)
+function CreateTimerTrigger(callback, seconds, name, doOnTickSecond, onTickSecond)
+    timerThread = TriggerFile.CreateTimerTrigger(callback, seconds, name, doOnTickSecond, onTickSecond)
     return timerThread
 end
 
---- Stops the timer set by `CreateTimerTrigger`
+--- Stops the last timer set by `CreateTimerTrigger` and resets the objective timer
 function ResetUITimer()
     if timerThread then
         Sync.ObjectiveTimer = 0
@@ -184,7 +186,6 @@ function OverrideDoDamage(self, instigator, amount, vector, damageType)
         end
     end
 end
-
 function UnlockAndKillUnitThread(self, instigator, damageType, excessDamageRatio)
     self:DoUnitCallbacks('OnKilled')
     while PauseUnitDeathActive do
@@ -317,11 +318,11 @@ CreateSubGroupDeathTrigger = TriggerFile.CreateSubGroupDeathTrigger
 ---@param cat EntityCategory
 ---@param area Area | Rectangle
 ---@return boolean
-function UnitsInAreaCheck(cat, rectangle)
-    if type(rectangle) == 'string' then
-        rectangle = ScenarioUtils.AreaToRect(rectangle)
+function UnitsInAreaCheck(cat, area)
+    if type(area) == 'string' then
+        area = ScenarioUtils.AreaToRect(area)
     end
-    local entities = GetUnitsInRect(rectangle)
+    local entities = GetUnitsInRect(area)
     if not entities then
         return false
     end
@@ -815,7 +816,7 @@ function GroupDeathCheck(units)
 end
 
 --- Returns if the list is entirely truthy
----@param list boolean[]
+---@param list unknown
 ---@return boolean
 function CheckObjectives(list)
     for _, val in list do
