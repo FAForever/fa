@@ -40,7 +40,7 @@ end
 function ArmyIsCivilian(army)
 end
 
---- Returns if the indicated army has been defeated
+--- Returns true if the indicated army has been defeated
 ---@param army Army
 function ArmyIsOutOfGame(army)
 end
@@ -76,7 +76,7 @@ end
 function ChangeUnitArmy(unit, army)
 end
 
---- Returns if cheats are enabled, logs the cheat attempt no matter what
+--- Returns true if cheats are enabled, logs the cheat attempt no matter what
 ---@return boolean
 function CheatsEnabled()
 end
@@ -163,7 +163,8 @@ end
 function CreateBeamToEntityBone(object, bone, other, otherBone, army, thickness, texture)
 end
 
---- Creates a builder arm controller that aims for the unit that is being built, repaired or reclaimed. Similar to an aim controller for weapons
+--- Creates a builder arm controller that aims for the unit that is being built, repaired or reclaimed.
+--- Similar to an aim controller for weapons.
 ---@param unit Unit
 ---@param turretBone Bone
 ---@param barrelBone Bone
@@ -172,7 +173,8 @@ end
 function CreateBuilderArmController(unit, turretBone, barrelBone, aimBone)
 end
 
---- Creates a collision detection manipulator
+--- Creates a collision detection manipulator, calls the function `self.OnAnimTerrainCollision(self, bone, x, y, z)`
+--- when a bone that is being watched collides with the terrain
 ---@param unit Unit
 ---@return moho.CollisionManipulator
 function CreateCollisionDetector(unit)
@@ -327,7 +329,9 @@ end
 function CreateSlaver(object, destBone, srcBone)
 end
 
---- Creates a slider similar to those used in robotics. When applied with other manipulators the slider can cause the entire sequence to 'stutter' at one update per tick, usually you should only manipulate a bone with a slider and nothing else
+--- Creates a slider similar to those used in robotics. When applied with other manipulators the
+--- slider can cause the entire sequence to 'stutter' at one update per tick, usually you should
+--- only manipulate a bone with a slider and nothing else
 ---@param object BoneObject
 ---@param bone Bone
 ---@param goalX? number
@@ -475,7 +479,8 @@ end
 function DamageRing(instigator, location, minRadius, maxRadius, damage, damageType, damageFriendly, damageSelf)
 end
 
---- Gets DEBUG selection
+--- Gets the selected units for debug purposes. Note that the selection depends on the player,
+--- so it should not be used in synchronous code.
 ---@return Unit[]
 function DebugGetSelection()
 end
@@ -501,7 +506,7 @@ end
 function DrawLinePop(start, finish, color)
 end
 
---- Returns if the economy event is finished
+--- Returns true if the economy event is finished
 ---@param event moho.EconomyEvent
 ---@return boolean
 function EconomyEventIsDone(event)
@@ -544,8 +549,7 @@ end
 function FlattenMapRect(x, z, sizeX, sizeZ, elevation)
 end
 
---- Deletes scouted icons from the target area.
---- If the area is in a radar range, it will switch back to default unscouted icons.
+--- Removes all recon blips from the target area, if the area is in radar range it generates unseen recon blips
 ---@param minX number
 ---@param minZ number
 ---@param maxX number
@@ -590,7 +594,7 @@ end
 function GetCurrentCommandSource()
 end
 
---- Return the enitities inside the given rectangle
+--- Returns the entities inside the given rectangle
 ---@param rectangle Rectangle
 function GetEntitiesInRect(rectangle)
 end
@@ -676,7 +680,8 @@ end
 function GetUnitById(id)
 end
 
---- Retrieves all units in a rectangle, excludes insignificant units (such as the Cybran build bot) by default
+--- Retrieves all units in a rectangle, excludes insignificant units (such as the Cybran build bot)
+--- by default
 ---@param rectangle Rectangle
 ---@return Unit[] | nil
 ---@overload fun(x0: number, z0: number, x1: number, z1: number): Unit[] | nil
@@ -707,7 +712,7 @@ end
 function IsCollisionBeam(object)
 end
 
---- Returns if the given command is finished
+--- Returns true if the given command is finished
 ---@param cmd SimCommand
 ---@return boolean
 function IsCommandDone(cmd)
@@ -717,13 +722,13 @@ end
 function IsEnemy(army1, army2)
 end
 
---- Returns if the given object is a Entity
+--- Returns true if the given object is an Entity
 ---@param object Object
 ---@return boolean
 function IsEntity(object)
 end
 
---- Returns if the game is over
+--- Returns true if the game is over
 ---@return boolean
 function IsGameOver()
 end
@@ -732,19 +737,19 @@ end
 function IsNeutral(army1, army2)
 end
 
---- Returns if the target entity is a projectile
+--- Returns true if the target entity is a projectile
 ---@param object Object
 ---@return boolean
 function IsProjectile(object)
 end
 
---- Returns if the target entity is a prop
+--- Returns true if the target entity is a prop
 ---@param object Object
 ---@return boolean
 function IsProp(object)
 end
 
---- Returns if the target entity is a unit
+--- Returns true if the target entity is a unit
 ---@param object Object
 ---@return boolean
 function IsUnit(object)
@@ -948,7 +953,8 @@ end
 function IssueSacrifice(tblUnits, target)
 end
 
---- Orders a group of units to run a script sequence, as an example: { TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }
+--- Orders a group of units to run a script sequence, as an example:
+--- `{ TaskName = "EnhanceTask", Enhancement = "AdvancedEngineering" }`
 ---@param tblUnits Unit[]
 ---@param order Task
 ---@return ScriptTask
@@ -1059,7 +1065,7 @@ end
 function NotifyUpgrade(from, to)
 end
 
---- Returns if the current command source is authorized to mess with the given army, or if cheats are enabled.
+--- Returns true if the current command source is authorized to mess with the given army, or if cheats are enabled
 ---@param army Army
 ---@return boolean
 function OkayToMessWithArmy(army)
@@ -1092,7 +1098,7 @@ end
 function RemoveEconomyEvent(unit, event)
 end
 
---- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit.
+--- Returns the currently selected unit. For use at the lua console, so you can call Lua methods on a unit
 ---@return Unit
 function SelectedUnit()
 end
