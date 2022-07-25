@@ -1,13 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UEB5102',
-        TargetBones = {
-            'FrontRight_Engine',
-            'FrontLeft_Engine',
-            'BackRight_Engine',
-            'BackLeft_Engine',
-            'XEA0306',
-        },
     },
     Air = {
         AutoLandTime = 1,
