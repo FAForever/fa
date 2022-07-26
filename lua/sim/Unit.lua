@@ -4202,6 +4202,7 @@ Unit = Class(moho.unit_methods) {
             self:DisableDefaultToggleCaps()
 
         end
+        self.DisallowCollisions = true
         self:DoUnitCallbacks('OnAttachedToTransport', transport, bone)
     end,
 
@@ -4210,6 +4211,7 @@ Unit = Class(moho.unit_methods) {
         self:EnableShield()
         self:EnableDefaultToggleCaps()
         self:TransportAnimation(-1)
+        self.DisallowCollisions = false
         self:DoUnitCallbacks('OnDetachedFromTransport', transport, bone)
     end,
 
