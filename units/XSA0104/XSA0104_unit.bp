@@ -115,7 +115,7 @@ UnitBlueprint {
         'SNIPEMODE',
     },
     CollisionOffsetX = 0,
-    CollisionOffsetY = -1.5,
+    CollisionOffsetY = -0.2,
     CollisionOffsetZ = 1.5,
     Defense = {
         AirThreatLevel = 1.5,
@@ -264,7 +264,7 @@ UnitBlueprint {
     SelectionSizeZ = 4.5,
     SelectionThickness = 0.23,
     SizeX = 4.5,
-    SizeY = 2.8,
+    SizeY = 1.3,
     SizeZ = 7,
     StrategicIconName = 'icon_gunship2_transport',
     StrategicIconSortPriority = 65,
