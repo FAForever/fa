@@ -2,7 +2,7 @@ UnitBlueprint {
     ResolvePath = true,
     AI = {
         TargetBones = { 
-            'Turret'
+            'Torso'
         },
         NeedUnpack = true,
     },
@@ -216,7 +216,7 @@ UnitBlueprint {
     SelectionSizeZ = 1,
     SelectionThickness = 0.43,
     SizeX = 0.7,
-    SizeY = 0.7,
+    SizeY = 0.6,
     SizeZ = 1.0,
     StrategicIconName = 'icon_land3_artillery',
     StrategicIconSortPriority = 115,
