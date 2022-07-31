@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'AttachPoint'
+        },
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
