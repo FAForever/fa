@@ -63,6 +63,7 @@ UnitBlueprint {
         'TANK',
         'OVERLAYDIRECTFIRE',
     },
+    CollisionOffsetX = 0.15,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -263,9 +264,9 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.5,
-    SizeX = 0.9,
-    SizeY = 0.5,
-    SizeZ = 1.2,
+    SizeX = 0.6,
+    SizeY = 0.6,
+    SizeZ = 1.05,
     StrategicIconName = 'icon_land2_directfire',
     StrategicIconSortPriority = 125,
     Transport = {

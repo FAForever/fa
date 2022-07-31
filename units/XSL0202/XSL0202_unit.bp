@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Torso'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -238,9 +243,9 @@ UnitBlueprint {
     SelectionSizeX = 0.55,
     SelectionSizeZ = 0.5,
     SelectionThickness = 0.7,
-    SizeX = 1.0,
+    SizeX = 1,
     SizeY = 1.1,
-    SizeZ = 1.0,
+    SizeZ = 0.9,
     StrategicIconName = 'icon_bot2_directfire', -- used wrong icon [138]
     StrategicIconSortPriority = 125,
     Transport = {
