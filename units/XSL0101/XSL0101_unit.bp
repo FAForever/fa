@@ -1,6 +1,9 @@
 UnitBlueprint {
     ResolvePath = true,
     AI = {
+        TargetBones = {
+            'AttachPoint'
+        },
         GuardScanRadius = 26, -- Same as other T1 scouts (UEF & Cybran), this scout will suicide into T1 tanks because it's weapon range is too small and changing it would have too big of an impact on the gameplay
     },
     Audio = {
@@ -224,9 +227,9 @@ UnitBlueprint {
     SelectionSizeX = 0.3,
     SelectionSizeZ = 0.3,
     SelectionThickness = 1.2,
-    SizeX = 0.6,
-    SizeY = 0.7,
-    SizeZ = 0.7,
+    SizeX = 0.75,
+    SizeY = 0.75,
+    SizeZ = 0.75,
     StrategicIconName = 'icon_bot1_intel',
     StrategicIconSortPriority = 135,
     Transport = {
