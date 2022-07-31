@@ -48,7 +48,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'DUMMYGSRWEAPON',
     },
-    CollisionOffsetY = 0.1,
+    CollisionOffsetY =0.1,
     Defense = {
         AirThreatLevel = 3,
         ArmorType = 'Normal',
