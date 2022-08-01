@@ -329,7 +329,9 @@ function Unit:GetUnitId()
 end
 
 ---
----@return Vector
+---@return number x
+---@return number y
+---@return number z
 function Unit:GetVelocity()
 end
 
