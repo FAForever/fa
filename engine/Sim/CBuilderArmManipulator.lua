@@ -13,8 +13,19 @@ function CBuilderArmManipulator:SetAimingArc(minHeading,  maxHeading,  headingMa
 end
 
 ---
---  CBuilderArmManipulator:SetHeadingPitch(heading, pitch)
-function CBuilderArmManipulator:SetHeadingPitch(heading,  pitch)
+---@param minHeading number
+---@param maxHeading number
+---@param headingMaxSlew number
+---@param minPitch number
+---@param maxPitch number
+---@param pitchMaxSlew number
+function CBuilderArmManipulator:SetAimingArc(minHeading, maxHeading, headingMaxSlew, minPitch, maxPitch, pitchMaxSlew)
+end
+
+---
+---@param heading number
+---@param pitch number
+function CBuilderArmManipulator:SetHeadingPitch(heading, pitch)
 end
 
 return CBuilderArmManipulator

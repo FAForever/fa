@@ -10,7 +10,7 @@ EmitterBlueprint {
 	AlignRotation = true,
 	AlignToBone = false,
 	Flat = false,
-	LODCutoff = 250.00,
+	LODCutoff = 350.00,
 	EmitIfVisible = true,
 	CatchupEmit = true,
 	CreateIfVisible = false,
