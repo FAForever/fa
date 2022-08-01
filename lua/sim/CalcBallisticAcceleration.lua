@@ -282,7 +282,11 @@ CalculateBallisticAccelerationOld = function(weapon, projectile)
 end
 
 CalculateBallisticAcceleration = function(weapon, projectile)
-    LOG(string.format('Old result: %d', CalculateBallisticAccelerationOld(weapon, projectile)))
-    LOG(string.format('New result: %d', CalculateBallisticAccelerationNew(weapon, projectile)))
-    return CalculateBallisticAccelerationNew(weapon, projectile)
+    -- local acc = CalculateBallisticAccelerationOld(weapon, projectile)
+    -- LOG(string.format('Old result: %f', acc))
+
+    local acc = CalculateBallisticAccelerationNew(weapon, projectile)
+    LOG(string.format('New result: %f', acc))
+
+    return acc
 end
