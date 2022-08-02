@@ -8,13 +8,13 @@
 ---@field Adjacency BpAdjacency|string
 ---@field Audio BpAudio
 ---@field AverageDensity number -- Unit average density in tons / m^3 (Default is 0.49).
----@field Buffs BpBuffs
+---@field Buffs BpBuff[]
 ---@field BuildIconSortPriority integer -- set to an integer that describes the unit's position in the list of build icons.
 ---@field Categories CategoryName[] -- a list of capitalized strings that describe categories to which the unit belongs. Many other parts of the game refer to these categories to affect how units interact.
 ---@field CollisionOffsetX number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
 ---@field CollisionOffsetY number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
 ---@field CollisionOffsetZ number -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
----@field CollisionShape "None"|"Box" -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
+---@field CollisionShape CollisionShape -- collision offset ones are to move the collision box away from the center of the unit. It's used to extend the collision box of floating units (like engineers) below the water to allow torpedoes to hit them.
 ---@field Defense BpDefense -- Defense information for the unit.
 ---@field Description string -- description of the unit. For example the description for the UEF tech 1 Tank MA12 Striker is '<LOC uel0201_desc>Medium Tank'. <LOC xxx_desc> is used for localisation which is defined in the strings_db.lua (in the file loc_XX.scd in the subdirectory \loc\XX; XX is the shortcut for the localised language). If the localisation part is not set, the description in tags will be used for any language, which would be "Medium Tank" for this example.
 ---@field Display BpDisplay
@@ -44,7 +44,7 @@
 ---@field Transport BpTransport
 ---@field UseOOBTestZoom number -- Use OOB hit test for this unit when camera is below this zoom level. Usually we use screen space to do unit selection, but occasionally we want to use the unit's oriented bounding box (OBB) instead. So we have UseOOBTestZoom.
 ---@field Veteran BpVeteran
----@field Weapon BpWeapon[] -- See https://wiki.faforever.com/en/Blueprints/Weapon
+---@field Weapon WeaponBlueprint[] -- See https://wiki.faforever.com/en/Blueprints/Weapon
 ---@field Wreckage BpWreckage
 
 ---@class BpAI
@@ -193,12 +193,21 @@
 ---@field Cue string
 ---@field LodCutoff string
 
+---@alias UnparsedCategory string
+
 --- TODO bp sound result?
 ---@class BpSoundResult
 
----@alias BpBuffs {Regen: {Level1: number, Level2: number, Level3: number, Level4: number, Level5: number}}
+---@class BpBuff {Regen: {Level1: number, Level2: number, Level3: number, Level4: number, Level5: number}}
+---@field Add  { OnImpact: boolean }
+---@field AppliedToTarget boolean
+---@field BuffType BuffType
+---@field Duration number
+---@field TargetAllow UnparsedCategory
+---@field TargetDisallow UnparsedCategory
+
 ---@class BpDefense
----@field ArmorType "Light"|"Normal"|"Commander"|"Structure" -- The armor type name.
+---@field ArmorType ArmorType -- The armor type name.
 ---@field Health number -- Starting health value for the unit.
 ---@field MaxHealth number -- Max health value for the unit. (It just could get higher through veteran buff or an enhancement)
 ---@field RegenRate number -- Amount of health to regenerate per second.
@@ -257,7 +266,7 @@
 
 ---@class BpDisplay.Effect
 ---@field Bones string[] -- Names of bones to which the effect will be attached.
----@field Offset {[1]:number, [2]:number, [3]:number} -- Controls position of the effect relatively to the bone it's attached to. n1, n2 and n3 are respectively x, y and z coordinates (0, 0, 0 by default).
+---@field Offset Vector -- Controls position of the effect relatively to the bone it's attached to. n1, n2 and n3 are respectively x, y and z coordinates (0, 0, 0 by default).
 ---@field Scale number -- Controls scale of the effect (1 by default).
 ---@field Type string -- Defines what effect will be used.
 
@@ -336,7 +345,8 @@
 ---@field UpgradesFrom string -- What unit, if any, was this unit upgrade from.
 ---@field UpgradesTo string -- What unit, if any, does this unit upgrade to.
 
----@class BpGeneral.CommandCaps
+---@alias BpGeneral.CommandCaps table<CommandCap, boolean>
+
 ---@field RULEUCC_Attack boolean -- Whether the unit has an attack command.
 ---@field RULEUCC_CallTransport boolean -- Whether the unit can ask to be transported by a transport unit.
 ---@field RULEUCC_Capture boolean -- Whether the unit has a capture command.
@@ -397,7 +407,7 @@
 ---@field BackUpDistance number -- Distance that the unit will just back up if it is easier to do so.
 ---@field BankingSlope number -- How much the unit banks in corners (negative to lean outwards).
 ---@field BuildOnLayerCaps BpPhysics.BuildOnLayerCaps -- Unit may be built on these layers (only applies to structures); Subcategories are:
----@field BuildRestriction string -- Special build restrictions (mass deposit, thermal vent, etc).
+---@field BuildRestriction UnitBuildRestriction -- Special build restrictions (mass deposit, thermal vent, etc).
 ---@field CatchUpAcc number, -- Acceleration to allow unit to catch up to the target when it starts to drift.
 ---@field DragCoefficient number
 ---@field Elevation number -- Prefferred height above (-below) land or water surface.
@@ -467,9 +477,6 @@
 ---@field Level3 integer -- Define how much kills are required for reaching veteran level 3
 ---@field Level4 integer -- Define how much kills are required for reaching veteran level 4
 ---@field Level5 integer -- Define how much kills are required for reaching veteran level 5
-
---- TODO, possibly in seperate file, more info here https://wiki.faforever.com/en/Blueprints/Weapon
----@class BpWeapon
 
 ---@class BpWreckage
 ---@field Blueprint string
