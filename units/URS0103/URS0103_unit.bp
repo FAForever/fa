@@ -43,7 +43,6 @@ UnitBlueprint {
         'MOBILE',
         'NAVAL',
         'TECH1',
-        'ANTIAIR',
         'DIRECTFIRE',
         'INTELLIGENCE',
         'RADAR',

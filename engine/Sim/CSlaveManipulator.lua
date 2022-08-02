@@ -3,11 +3,6 @@
 local CSlaveManipulator = {}
 
 ---
---  derived from IAniManipulator
-function CSlaveManipulator:base()
-end
-
----
 --
 function CSlaveManipulator:SetMaxRate()
 end

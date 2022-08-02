@@ -19,10 +19,10 @@ function CallEndGame()
 end
 
 --- Finds and collectors the brains that are defeated
----@param aliveBrains AIBrain[] # Table of brains that are relevant to check for defeat
----@param condition Categories  # Categories to check for units that are required to remain in the game
----@param delay number          # Delay between each brain to spread the load over various ticks
----@return AIBrain[]            # Table of brains that are considered defeated, can be empty
+---@param aliveBrains AIBrain[]         # Table of brains that are relevant to check for defeat
+---@param condition EntityCategory # Categories to check for units that are required to remain in the game
+---@param delay number                  # Delay between each brain to spread the load over various ticks
+---@return AIBrain[]                    # Table of brains that are considered defeated, can be empty
 local function CollectDefeatedBrains(aliveBrains, condition, delay)
     local defeatedBrains = { }
     for k, brain in aliveBrains do
@@ -83,8 +83,12 @@ local function MatchStateThread()
 
     -- determine game conditions
     local condition = Conditions[ScenarioInfo.Options.Victory]
-    if not condition and not (ScenarioInfo.Options.Victory == 'sandbox') then
-        SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
+    
+    if not condition then
+        if ScenarioInfo.Options.Victory ~= 'sandbox' then
+            SPEW("Unknown victory condition supplied: " .. ScenarioInfo.Options.Victory .. ", victory condition defaults to sandbox.")
+        end
+        
         return
     end
 
@@ -165,13 +169,11 @@ local function MatchStateThread()
 
             -- check for win
             local win = true 
-            for _, brain in aliveBrains do
-                win = win and brain.RequestingAlliedVictory
-            end
-
-            for k, _ in aliveBrains do
+            for k, brain in aliveBrains do
                 for l, _ in aliveBrains do
-                    win = win and IsAlly(k, l)
+                    if k ~= l then
+                        win = win and IsAlly(k, l) and brain.RequestingAlliedVictory
+                    end
                 end
             end
 

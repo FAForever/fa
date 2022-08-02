@@ -38,6 +38,7 @@ local function ParsePriorities()
 end
 
 ---@class Weapon : moho.weapon_methods
+---@field Blueprint WeaponBlueprint
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit
@@ -395,8 +396,14 @@ Weapon = Class(moho.weapon_methods) {
 
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
 
+        -- store the original target, can be nil if ground firing
+        proj.OriginalTarget = self:GetCurrentTarget()
+        if proj.OriginalTarget.GetSource then 
+            proj.OriginalTarget = proj.OriginalTarget:GetSource()
+        end
+
+        local damageTable = self:GetDamageTable()
         if proj and not proj:BeenDestroyed() then
             proj:PassMetaDamage(damageTable)
             local bp = self.Blueprint

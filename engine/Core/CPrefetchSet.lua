@@ -2,8 +2,8 @@
 ---@class moho.CPrefetchSet
 local CPrefetchSet = {}
 
----
-function CPrefetchSet:Update({d3d_textures=...,  batch_textures=...,  models=...,  anims=...})
+---@param data {d3d_textures: string[], batch_textures: string[], models: string[], anims: string[]}
+function CPrefetchSet:Update(data)
 end
 
 ---

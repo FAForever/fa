@@ -1930,9 +1930,6 @@ function OperationNISCameraThread(unitInfo, camInfo)
             Sync.NISMode = 'off'
 
             ScenarioInfo.NIS = false
-        -- Otherwise just unlock input, allowing them to click on the "Ok" button on the "Operation ended" box
-        else
-            UnlockInput()
         end
 
         -- cleanup

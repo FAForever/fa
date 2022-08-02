@@ -94,7 +94,6 @@ UnitBlueprint {
         'MOBILE',
         'AIR',
         'DIRECTFIRE',
-        'ANTINAVY',
         'ANTIAIR',
         'HIGHALTAIR',
         'EXPERIMENTAL',
