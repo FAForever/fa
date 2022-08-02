@@ -33,14 +33,18 @@ function GetUnitRolloverInfo(unit, skipFocus)
 
     local focus = unit:GetFocus()
     if focus and not skipFocus then
-        _visited = { [unit:GetEntityId()] = true }
+        local visited = { [unit:GetEntityId()] = true }
+        local focusingInfo = info
         while focus do
-            if _visited[focus:GetEntityId()] then
-                info.focus = GetUnitRolloverInfo(unit:GetFocus(), true)
+            local id = focus:GetEntityId()
+            if visited[id] then
+                info.focus.focus = nil
                 break
             end
-            _visited[focus:GetEntityId()] = true
-            info.focus = focus
+            visited[id] = true
+            local focusInfo = GetUnitRolloverInfo(focus, true)
+            focusingInfo.focus = focusInfo
+            focusingInfo = focusInfo
             focus = focus:GetFocus()
         end
     end
