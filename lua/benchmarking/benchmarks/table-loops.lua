@@ -10,6 +10,16 @@
 -- looping structure. However, when typical hashes are involved this cheaper
 -- version will not reach all the elements of the table.
 
+FileDisplayName = "Table Loops"
+BenchmarkData = {
+    ForGetn = "For table.getn",
+    ForPairs = "For pairs",
+    ForiPairs = "For ipairs",
+    Foreach = "For each",
+    WhileGetn = "While table.getn",
+    WhileGetnCached = "While cache table.getn",
+}
+
 local outerLoop = 100000
 
 -- prepare data

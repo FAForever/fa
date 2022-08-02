@@ -7,11 +7,10 @@
 -- Highly recommending to upvalue the categories computation in both class 
 -- and table based files.
 
+FileDisplayName = "Categories"
 BenchmarkData = {
     Cached = "Cached function",
-    Inline = {
-        name = "Inline function"
-    },
+    Inline = "Inline function",
 }
 
 local outerLoop = 1000

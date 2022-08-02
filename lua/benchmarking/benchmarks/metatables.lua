@@ -23,6 +23,21 @@
 -- only be done for values that are accessed often as caching involves cycles too. As an example: values that are only used once
 -- are not worth caching. Instead, you may want to reduce the hierarchy.
 
+FileDisplayName = "Metatables"
+BenchmarkData = {
+    Depth1 = "Depth 1",
+    Depth2 = "Depth 2",
+    Depth3 = "Depth 3",
+    Depth4 = "Depth 4",
+    Depth5 = "Depth 5",
+    Depth6 = "Depth 6",
+    Depth6Functions = "Depth 6 Functions",
+    PracticalTestArmyMeta = "Army from Meta",
+    PracticalTestArmyCached = "Army from Field",
+    PracticalTestWeaponsMeta = "ForkThread from Meta",
+    PracticalTestWeaponsCached = "ForkThread from Field",
+}
+
 local loops = 2000 * 2000
 
 local n1 = { }

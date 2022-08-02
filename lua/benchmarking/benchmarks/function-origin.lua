@@ -6,7 +6,12 @@
 -- Performing engine calls are expensive and should be prevented in critical code. Calling getters
 -- or setters should also be prevented - it is better to just get the member variable directly instead.
 
-CategoryDisplayName = "Function Origin"
+FileDisplayName = "Function Origins"
+BenchmarkData = {
+    EngineCall = "Engine Call",
+    LuaCall = "Lua Call",
+    CachedCall = "Cached Call",
+}
 
 local outerLoop = 1000000
 

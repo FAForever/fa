@@ -6,6 +6,17 @@
 
 -- Conclusion: there is no difference.
 
+
+FileDisplayName = "Table Access"
+BenchmarkData = {
+    EntriesBracketShort = "Entry using bracket (short)",
+    EntriesBracketLong = "Entry using bracket (long)",
+    EntriesDotShort = "Entry using dot (short)",
+    EntriesDotLong = "Entry using dot (long)",
+    TableTest1 = "Chained entries",
+    TableTest2 = "Localized entries",
+}
+
 function EntriesBracketShort()
 
     local data = { a = 1 }

@@ -1,4 +1,11 @@
 
+
+FileDisplayName = "Strings"
+BenchmarkData = {
+    EachIterationNothing = "NOP",
+    EachIterationString = "String concat",
+}
+
 function EachIterationNothing()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()

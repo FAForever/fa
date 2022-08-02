@@ -20,6 +20,16 @@
 -- That is what happens when we first add and then use the value, instead of using 
 -- the value and then adding to it.
 
+
+FileDisplayName = "Table Insert"
+BenchmarkData = {
+    AddInsertGlobal = "Global table.insert",
+    AddInsertLocal = "Local table.insert",
+    AddIndex = "Table index assignment",
+    AddCount = "Assign from Count",
+    AddCountAlt = "Assign from Head",
+}
+
 function AddInsertGlobal()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()

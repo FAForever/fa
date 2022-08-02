@@ -17,6 +17,24 @@
 -- Conclusion: these functions are very cheap to use and are likely a lookup table
 -- on the C-side.
 
+
+FileDisplayName = "Math Trigonometry"
+BenchmarkData = {
+    SinGlobal = "Global math.sin",
+    SinUpvalue = "Upvalued math.sin",
+    SinLocal = "Local math.sin",
+    SinLocalPerIteration = "Local math.sin per iteration",
+    CosGlobal = "Global math.cos",
+    CosUpvalue = "Upvalued math.cos",
+    CosLocal = "Local math.cos",
+    CosLocalPerIteration = "Local math.cos per iteration",
+    TanGlobal = "Global math.tan",
+    TanUpvalue = "Upvalued math.tan",
+    TanLocal = "Local math.tan",
+    TanLocalPerIteration = "Local math.tan per iteration",
+}
+
+
 function SinGlobal()
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 

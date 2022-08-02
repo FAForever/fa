@@ -4,6 +4,13 @@
 
 -- Conclusion: preventing table operations (the '.') is quite the benefit in practice.
 
+FileDisplayName = "Table Subscript"
+BenchmarkData = {
+    BlueprintSubTables2 = "Chained access",
+    BlueprintSubTables1 = "Localized Access",
+}
+
+
 function BlueprintSubTables2()
 
     -- create a dummy unit

@@ -1,4 +1,12 @@
 
+
+FileDisplayName = "Table Sequence"
+BenchmarkData = {
+    TableTest1 = "Chained access",
+    TableTest2 = "Localized Access",
+}
+
+
 -- 0.071
 -- 0.070
 -- 0.071

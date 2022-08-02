@@ -5,6 +5,12 @@
 -- Creation closures on the go is expensive, but not as time consuming 
 -- as it appears to be within the Supreme Commander context.
 
+FileDisplayName = "Function Closures"
+BenchmarkData = {
+    ClosureA = "Closure A",
+    ClosureB = "Closure B",
+}
+
 local outerLoop = 1000000
 
 function ClosureA()

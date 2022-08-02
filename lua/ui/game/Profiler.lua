@@ -630,10 +630,10 @@ ProfilerWindow = Class(Window) {
                 end
                 keys[k] = categoryName
             end
-            local i = State.Tabs.Benchmarks.SelectedFile
+            table.sort(keys)
             State.Tabs.Benchmarks.FileComboKeys = keys
             filePicker:ClearItems()
-            filePicker:AddItems(keys, i, i)
+            filePicker:AddItems(keys)
         end
 
         local function SetData(info)
@@ -656,7 +656,7 @@ ProfilerWindow = Class(Window) {
                 bytecode:AddItem(benchmarks.desc)
             else
                 local keys = {}
-                for k, element in benchmarks.benchmarks do
+                for k, element in ipairs(benchmarks.benchmarks) do
                     keys[k] = element
                     local name = element.title
                     if name == "" then

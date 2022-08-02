@@ -11,6 +11,19 @@
 
 -- Conclusion: we should uplift these functions whenever possible.
 
+
+FileDisplayName = "Generic math"
+BenchmarkData = {
+    AbsGlobal = "Global math.abs",
+    AbsUpvalue = "Upvalued math.abs",
+    AbsLocal = "Local math.abs",
+    AbsLocalPerIteration = "Local math.abs per iteration",
+    CeilGlobal = "Global math.ceil",
+    CeilUpvalue = "Upvalued math.ceil",
+    CeilLocal = "Local math.ceil",
+    CeilLocalPerIteration = "Local math.ceil per iteration",
+}
+
 local outerLoop = 10000000
 
 function AbsGlobal()

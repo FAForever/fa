@@ -161,15 +161,29 @@ function FindBenchmarks(army)
             local localExclude = {}
             local benchmarkTitles = {}
             local benchmarkDescs = {}
+            local sortOrder = {}
+            local nameSorter = function(a, b)
+                local aname = a.name
+                local bname = b.name
+                local asort = sortOrder[aname]
+                local bsort = sortOrder[bname]
+                if asort then
+                    return bsort and asort < bsort
+                end
+                if bsort then
+                    return false
+                end
+                return aname < bname
+            end
             -- can't just pull these values because it'll throw an error if they don't exist
             for k, val in category do
-                if k == "CategoryDisplayName" then
+                if k == "FileDisplayName" then
                     if type(val) == "string" then
                         catName = val
                     end
                     continue
                 end
-                if k == "CategoryDescription" then
+                if k == "FileDescription" then
                     if type(val) == "string" then
                         catDesc = val
                     end
@@ -193,6 +207,14 @@ function FindBenchmarks(army)
                             local funDesc = funData.desc
                             if funDesc and type(funDesc) == "string" then
                                 benchmarkDescs[funName] = funDesc
+                            end
+                            local funExc = funData.exclude
+                            if funExc and type(funExc) == "boolean" then
+                                localExclude[funName] = true
+                            end
+                            local funSort = funData.sort
+                            if funSort and type(funSort) == "number" then
+                                sortOrder[funName] = funSort
                             end
                         end
                     end
@@ -227,6 +249,8 @@ function FindBenchmarks(army)
                     functions[benchmarkCount] = benchmark
                 end
             end
+
+            table.sort(benchmarks, nameSorter)
 
             -- add correct category
             categories[categoryCount] = {

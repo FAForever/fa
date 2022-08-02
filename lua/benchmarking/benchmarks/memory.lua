@@ -6,6 +6,16 @@
 -- AllocateVectorGetPosition:       700 ms
 -- AllocateVectorGetPositionXYZ:    680 ms
 
+FileDisplayName = "Memory"
+BenchmarkData = {
+    AllocateVectorGlobal = "Global Vector",
+    AllocateVectorUpvalue = "Upvalued Vector",
+    AllocateVectorLocal = "Local Vector",
+    AllocateVectorCached = "Cached Vector",
+    AllocateVectorGetPosition = "GetPosition Vector",
+    AllocateVectorGetPositionCached = "GetPositionXYZ Cached Vector",
+}
+
 local loops = 2000
 
 -- easily ramps up 160mb in small blocks

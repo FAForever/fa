@@ -38,6 +38,34 @@
 -- that may have been optmized. This may be just the cacheline of the CPU, but we see a similar 
 -- behavior with the array part of a table.
 
+
+FileDisplayName = "Table Hash"
+BenchmarkData = {
+    Hash01 = "Hash - 1",
+    Hash02 = "Hash - 2",
+    Hash04 = "Hash - 4",
+    Hash08 = "Hash - 8",
+    Hash16 = "Hash - 16",
+    HashCached01 = "Hash Cached - 1",
+    HashCached02 = "Hash Cached - 2",
+    HashCached04 = "Hash Cached - 4",
+    HashCached08 = "Hash Cached - 8",
+    HashCached16 = "Hash Cached - 16",
+    HashCross1 = "Hash Cross - 1",
+    HashCross2 = "Hash Cross - 2",
+    HashCross4 = "Hash Cross - 4",
+    HashCrossCached1 = "Hash Cross Cached - 1",
+    HashCrossCached2 = "Hash Cross Cached - 2",
+    HashCrossCached4 = "Hash Cross Cached - 4",
+    HashDot1 = "Hash Dot - 1",
+    HashDot2 = "Hash Dot - 2",
+    HashDot4 = "Hash Dot - 4",
+    HashDotCached1 = "Hash Dot Cached - 1",
+    HashDotCached2 = "Hash Dot Cached - 2",
+    HashDotCached4 = "Hash Dot Cached - 4",
+}
+
+
 function Hash01()
 
     local element = { x = 1, y = 2, z = 3, w = 4 }

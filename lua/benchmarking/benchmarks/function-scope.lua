@@ -30,6 +30,27 @@
 -- this is because of the table operation that is hidden. Having GETUPVAL is cheaper than GETTABLE
 -- as an instruction, which is cheaper than SELF.
 
+
+FileDisplayName = "Function Scopes"
+BenchmarkData = {
+    GetPositionLocal01 = "GetPosition local - 1",
+    GetPositionLocal02 = "GetPosition local - 2",
+    GetPositionLocal04 = "GetPosition local - 4",
+    GetPositionLocal08 = "GetPosition local - 8",
+    GetPositionLocal16 = "GetPosition local - 16",
+    GetPositionUpvalue01 = "GetPosition upvalue - 1",
+    GetPositionUpvalue02 = "GetPosition upvalue - 2",
+    GetPositionUpvalue04 = "GetPosition upvalue - 4",
+    GetPositionUpvalue08 = "GetPosition upvalue - 8",
+    GetPositionUpvalue16 = "GetPosition upvalue - 16",
+    GetPositionSelfManual01 = "GetPosition self - 1",
+    GetPositionSelfManual02 = "GetPosition self - 2",
+    GetPositionSelfManual04 = "GetPosition self - 4",
+    GetPositionSelfManual08 = "GetPosition self - 8",
+    GetPositionSelfManual16 = "GetPosition self - 16",
+}
+
+
 function GetPositionLocal01()
 
     -- create a dummy unit

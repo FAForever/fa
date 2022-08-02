@@ -35,6 +35,18 @@
 ---@field main table<string, number>
 ---@field unknown table<string, number>
 
+---@class BenchmarkFileMetadata
+---@field BenchmarkData? table<string, BenchmarkMetadata | string>
+---@field Exclude? table<string, boolean>
+---@field FileDescription? string
+---@field FileDisplayName? string
+
+---@class BenchmarkMetadata
+---@field desc? string
+---@field exclude? boolean
+---@field name? string
+---@field sort? number
+
 
 --- Constructs an empty table that the profiler can populate
 ---@return ProfilerData

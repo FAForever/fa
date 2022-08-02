@@ -20,6 +20,22 @@
 -- elements in succession. This may be just the cacheline of the CPU, but we see a similar 
 -- behavior with the hashed part of a table.
 
+
+FileDisplayName = "Table Array"
+BenchmarkData = {
+    Array01 = "Array - 1",
+    Array02 = "Array - 2",
+    Array04 = "Array - 4",
+    Array08 = "Array - 8",
+    Array16 = "Array - 16",
+    ArrayCached01 = "Array Cached - 1",
+    ArrayCached02 = "Array Cached - 2",
+    ArrayCached04 = "Array Cached - 4",
+    ArrayCached08 = "Array Cached - 8",
+    ArrayCached16 = "Array Cached - 16",
+}
+
+
 local loopCount = 1000000
 
 function Array01()
