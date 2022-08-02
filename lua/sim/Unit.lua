@@ -348,6 +348,13 @@ Unit = Class(moho.unit_methods) {
         end
         -- Flags for scripts
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
+
+        
+        if self.Blueprint.Intel.JammerBlips > 0 then
+            self.Brain:TrackJammer(self)
+            self.ResetJammer = -1
+        end
+        
     end,
 
     -------------------------------------------------------------------------------------------
@@ -1481,20 +1488,20 @@ Unit = Class(moho.unit_methods) {
         end
 
         -- check for exclusions from projectile perspective
-        for k = 1, other.Blueprint.DoNotCollideListCount do 
-            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then 
+        for k = 1, other.Blueprint.DoNotCollideListCount do
+            if self.Cache.HashedCats[other.Blueprint.DoNotCollideList[k]] then
                 return false 
             end
         end
 
         -- check for exclusions from unit perspective
         for k = 1, self.Cache.DoNotCollideCatsCount do 
-            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then 
-                return false 
+            if other.Blueprint.CategoriesHash[self.Cache.DoNotCollideCats[k]] then
+                return false
             end
         end
 
-        return true 
+        return true
     end,
 
     --- Called when a unit collides with a collision beam to check if the collision is valid
@@ -1964,7 +1971,11 @@ Unit = Class(moho.unit_methods) {
         if self.EventCallbacks then
             self.EventCallbacks = nil
         end
-
+        
+        if self.Blueprint.Intel.JammerBlips > 0 then
+            self.Brain:UntrackJammer(self)
+        end
+        
         ChangeState(self, self.DeadState)
     end,
 

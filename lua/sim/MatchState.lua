@@ -169,13 +169,11 @@ local function MatchStateThread()
 
             -- check for win
             local win = true 
-            for _, brain in aliveBrains do
-                win = win and brain.RequestingAlliedVictory
-            end
-
-            for k, _ in aliveBrains do
+            for k, brain in aliveBrains do
                 for l, _ in aliveBrains do
-                    win = win and IsAlly(k, l)
+                    if k ~= l then
+                        win = win and IsAlly(k, l) and brain.RequestingAlliedVictory
+                    end
                 end
             end
 
