@@ -258,7 +258,7 @@ UnitBlueprint {
     SelectionSizeZ = 5,
     SelectionThickness = 0.19,
     SizeX = 2,
-    SizeY = 1,
+    SizeY = 1.4,
     SizeZ = 7,
     StrategicIconName = 'icon_gunship2_transport',
     StrategicIconSortPriority = 65,
