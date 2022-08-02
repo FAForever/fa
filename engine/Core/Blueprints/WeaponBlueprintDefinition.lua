@@ -8,7 +8,7 @@
 ---@class WeaponBlueprint: BlueprintBase
 ---@field Audio BpSound -- Informations about the audio files used by the weapon
 ---@field AutoInitiateAttackCommand boolean -- If the unit has no issued commands and has a weapon that has AutoInitiateAttackCommand set, then if it finds a suitable target it will issue an attack command to go after the target.
----@field BallisticArc BallisticArcType -- Ballistic arcs that should be used on the projectile
+---@field BallisticArc WeaponBallisticArc -- Ballistic arcs that should be used on the projectile
 ---@field BeamCollisionDelay number -- Every X +.1 seconds, this beam will collide and do damage - use 0 so that beams will cause their damage every .1 second
 ---@field BeamLifetime number -- The amount of time the beam exists
 ---@field Buffs BpBuff[] -- Information about the bonuses added to the unit's weapon when it reaches a specific veteran level.

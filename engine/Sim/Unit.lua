@@ -51,7 +51,7 @@ local Unit = {}
 ---| "HoldingPattern"
 ---| "SiloBuildingAmmo"
 
----@alias LayerName "Air" | "Land" | "Orbital" | "Seabed" | "Sub" | "Water"
+---@alias LayerName "Land" | "Seabed" | "Sub" | "Water" | "Air" | "Orbital"
 
 --- Adds a command cap to the unit
 ---@param category moho.EntityCategory

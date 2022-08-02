@@ -1,5 +1,4 @@
 
----
 ---@alias CommandCap
 ---| "RULEUCC_Move"
 ---| "RULEUCC_Stop"
@@ -27,7 +26,6 @@
 ---| "RULEUCC_Script"
 ---| "RULEUCC_Invalid"
 
-
 ---@alias ToggleCap
 ---| "RULEUTC_ShieldToggle"
 ---| "RULEUTC_WeaponToggle"
@@ -39,7 +37,7 @@
 ---| "RULEUTC_SpecialToggle"
 ---| "RULEUTC_CloakToggle"
 
----@alias UnitMovementType
+---@alias UnitMotionType
 ---| "RULEUMT_None"
 ---| "RULEUMT_Land"
 ---| "RULEUMT_Air"
@@ -51,6 +49,42 @@
 ---| "RULEUMT_AmphibiousFloating"
 ---| "RULEUMT_Special"
 
----@alias UnitBuildRestriction "RULEUBR_Bridge" | "RULEUBR_None" | "RULEUBR_OnMassDeposit" | "RULEUBR_OnHydrocarbonDeposit"
----@alias UnitBallisticArc "RULEUBA_None" | "RULEUBA_LowArc" | "RULEUBA_HighArc"
----@alias WeaponTargetType "RULEWTT_Projectile" | "RULEWTT_Prop" | "RULEWTT_Unit"
+---@alias UnitBuildRestriction
+---| "RULEUBR_None"
+---| "RULEUBR_Bridge"
+---| "RULEUBR_OnMassDeposit"
+---| "RULEUBR_OnHydrocarbonDeposit"
+
+---@alias WeaponBallisticArc
+---| "RULEUBA_None"
+---| "RULEUBA_LowArc"
+---| "RULEUBA_HighArc"
+
+---@alias WeaponTargetType
+---| "RULEWTT_Unit"
+---| "RULEWTT_Projectile"
+---| "RULEWTT_Prop"
+
+--- the rest are not hardcoded into the engine
+
+---@alias UnitClassification
+---| 'RULEUC_Commander'
+---| 'RULEUC_CounterMeasure'
+---| 'RULEUC_Engineer'
+---| 'RULEUC_Factory
+---| 'RULEUC_MilitaryAircraft'
+---| 'RULEUC_MilitaryShip'
+---| 'RULEUC_MilitarySub'
+---| 'RULEUC_MilitaryVehicle'
+---| 'RULEUC_MiscSupport'
+---| 'RULEUC_Resource'
+---| 'RULEUC_Sensor'
+---| 'RULEUC_Weapon'
+
+---@alias UnitTechLevel
+---| 'RULEUTL_Basic'
+---| 'RULEUTL_Advanced'
+---| 'RULEUTL_Secret'
+---| 'RULEUTL_Experimental'
+-- never implemented
+---| 'RULEUTL_Munition'

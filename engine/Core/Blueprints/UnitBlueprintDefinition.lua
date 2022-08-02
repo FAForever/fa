@@ -339,7 +339,7 @@
 ---@field QuickSelectPriority integer -- Indicates unit has it's own avatar button in the quick select interface, and it's sorting priority.
 ---@field TarmacDecal unknown
 ---@field TarmacGlowDecal unknown
----@field TechLevel string -- This define the tech level. 'RULEUTL_Basic' for tech 1, 'RULEUTL_Advanced' for tech 2, 'RULEUTL_Secret' for tech 3 and 'RULEUTL_Experimental' for experimental.
+---@field TechLevel UnitTechLevel -- This define the tech level. 'RULEUTL_Basic' for tech 1, 'RULEUTL_Advanced' for tech 2, 'RULEUTL_Secret' for tech 3 and 'RULEUTL_Experimental' for experimental.
 ---@field UnitName string -- The name of the unit.
 ---@field UnitWeight number
 ---@field UpgradesFrom string -- What unit, if any, was this unit upgrade from.
