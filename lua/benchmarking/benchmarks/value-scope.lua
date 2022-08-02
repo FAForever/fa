@@ -9,12 +9,16 @@
 -- CircleLocalPreCompute:   1985.35 ms
 -- CircleOptimal:           1288.08 ms
 
+Exclude = {
+    ComputePoint = true,
+}
+
 local outerLoop = 10000000
 
 ProfilerA = 10
 ProfilerB = 20
 ProfilerC = 0
-
+balargs
 function AddGlobal()
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()

@@ -3,234 +3,241 @@
 -- - https://www.lua.org/pil/23.1.html
 
 local Statistics = import("/lua/shared/statistics.lua")
+local CollapseDebugInfo = import("/lua/shared/Profiler.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
+local DebugFunction = import("/lua/shared/Profiler.lua").DebugFunction
+local PlayerIsDev = import("/lua/shared/Profiler.lua").PlayerIsDev
 
 -- upvalue for performance
-local SPEW = SPEW
 local sethook = debug.sethook
 local getinfo = debug.getinfo
 
+local SPEW = SPEW
+local WaitTicks = WaitTicks
+
 --- Keeps track of whether profiling has been toggled or not
 local isProfiling = false
-
 --- Thread to keep the simulation synced with the UI
-local thread = false 
-
+local profilingThread
+local benchmarkThread = false
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
+--- How many times each benchmark is run
+local benchmarkRuns = 30
+local tests = {}
+
+local benchmarkExcludeFunctions = {
+    import = true,
+    __moduleinfo = true,
+}
+
+local function CanUseProfiler()
+    if ScenarioInfo.GameHasAIs then
+        SPEW("Profiler can be toggled: game has AIs")
+        return true
+    end
+    if CheatsEnabled() then
+        SPEW("Profiler can be toggled: game has cheats enabled")
+        return true
+    end
+    if SessionIsReplay() then
+        SPEW("Profiler can be toggled: session is a replay")
+        return true
+    end
+
+    -- exception to allow toggling the profiler
+    for _, brain in ArmyBrains do
+        if PlayerIsDev(brain) then
+            SPEW("Profiler can be toggled: a game developer is in the game")
+            return true
+        end
+    end
+    return false
+end
 
 --- Toggles the profiler on / off
 function ToggleProfiler(army, forceEnable)
-
-    -- basic checks for toggling the profiler
-    local gameHasAIs = ScenarioInfo.GameHasAIs
-    local cheatsEnabled = CheatsEnabled()
-    local isReplay = SessionIsReplay()
-
-    -- exception to allow toggling the profiler
-    local gameHasJip = false 
-    for k, brain in ArmyBrains do 
-        gameHasJip = gameHasJip or string.lower(brain.Nickname) == "jip"
-    end 
-
-    -- return if conditions are not met
-    if not (gameHasAIs or cheatsEnabled or gameHasJip or isReplay) then 
+    if  not CanUseProfiler() or       -- game currently isn't in a state that would use the profiler
+        GetFocusArmy() ~= army or     -- if we're not the ones that initiated this call, get out
+        (forceEnable and isProfiling) -- let the profiler be on if we are trying to force it on 
+    then
         return
     end
 
-    -- inform us why profiler can be toggled
-    if gameHasAIs then 
-        SPEW("Profiler can be toggled: game has AIs")
-    end
-
-    if cheatsEnabled then 
-        SPEW("Profiler can be toggled: game has cheats enabled")
-    end
-
-    if gameHasJip then 
-        SPEW("Profiler can be toggled: a game developer is in the game")
-    end
-
-    if isReplay then 
-        SPEW("Profiler can be toggled: session is a replay")
-    end
-
-    -- Inform us in case of abuse
-    SPEW("Profiler has been toggled on by army: " .. tostring(army))
-
-    -- if we're not the ones that initiated this call, get out
-    if GetFocusArmy() ~= army then 
-        return 
-    end
-
-    -- allows us to remain enabled
-    if forceEnable and isProfiling then 
-        return 
-    end
-
-    if not isProfiling then 
-
-        isProfiling = true 
+    if not isProfiling then
+        -- Inform us in case of abuse
+        SPEW("Profiler has been toggled on by army: " .. tostring(army))
+        isProfiling = true
 
         -- Thread to sync information gathered to the UI
-        if not thread then 
-            thread = ForkThread(SyncThread)
+        if not profilingThread then
+            profilingThread = ForkThread(SyncThread)
         end
 
         -- Add a function to track
-        sethook(function(event)
-
-                -- quite expensive, returns a table
-                local i = getinfo(2, "Sn")
-
-                -- because of "n"
-                -- i.name           = A reasonable name for the function
-                -- i.namewhat       = What the previous field means. This field may be "global", "local", "method", "field", or "" (the empty string). The empty string means that Lua did not find a name for the function
-
-                -- because of "S"
-                -- i.source         = Where the function was defined. If the function was defined in a string (through loadstring), source is that string. If the function was defined in a file, source is the file name prefixed with a `@´
-                -- i.short_src      = A short version of source (up to 60 characters), useful for error messages
-                -- i.what           = What this function is. Options are "Lua" if foo is a regular Lua function, "C" if it is a C function, or "main" if it is the main part of a Lua chunk
-                -- i.linedefined    = The line of the source where the function was defined
-
-                -- count the function call
-                local source = i.what or "unknown"
-                local scope = i.namewhat or "other"
-                local name = i.name or "lambda"
-
-                -- prevent an empty scope
-                if scope == "" then 
-                    scope = "other"
-                end
-
-                -- if name == "lambda" then 
-                --     local trace = repr(debug.traceback())
-                --     if not traces[trace] or traces[trace] == 500 then
-                --         traces[trace] = traces[trace] or 0  
-                --         LOG(tostring(traces[trace]) .. ": " .. trace)
-                --     end
-                    
-                --     traces[trace] = traces[trace] + 1
-                -- end
-
-                -- keep track 
-                local count = data[source][scope][name]
-                if not count then 
-                    data[source][scope][name] = 1
-                else 
-                    data[source][scope][name] = count + 1
-                end
-
-            end
-            -- only track on function calls
-            , "c")
-
-    else 
+        sethook(FunctionHook, "c") -- only track on function calls
+    else
         isProfiling = false
+        if profilingThread then
+            profilingThread = KillThread(profilingThread)
+        end
 
         -- Inform us in case of abuse
         SPEW("Profiler has been toggled off by army: " .. tostring(army))
 
-        -- nil removes tracking
-        sethook(nil)
+        sethook(nil) -- remove tracking
     end
 end
 
-local yield = coroutine.yield
+function FunctionHook(event)
+    -- quite expensive, returns a table
+    local info = getinfo(2, "Sn")
+    -- because of "n"
+    -- i.name           = A reasonable name for the function
+    -- i.namewhat       = What the previous field means. This field may be "global", "local", "method", "field", or "" (the empty string). The empty string means that Lua did not find a name for the function
+
+    -- because of "S"
+    -- i.source         = Where the function was defined. If the function was defined in a string (through loadstring), source is that string. If the function was defined in a file, source is the file name prefixed with a `@´
+    -- i.short_src      = A short version of source (up to 60 characters), useful for error messages
+    -- i.what           = What this function is. Options are "Lua" if foo is a regular Lua function, "C" if it is a C function, or "main" if it is the main part of a Lua chunk
+    -- i.linedefined    = The line of the source where the function was defined
+
+    local source, scope, name = CollapseDebugInfo(info)
+
+    -- keep track 
+    scopeData = data[source][scope]
+    local count = scopeData[name]
+    if not count then
+        scopeData[name] = 1
+    else
+        scopeData[name] = count + 1
+    end
+end
 
 function SyncThread()
-    while true do 
+    while true do
+        -- pass along the profiler information
+        Sync.ProfilerData = data
 
-        if isProfiling then 
-            -- pass along the profiler information
-            Sync.ProfilerData = data
-
-            -- reset data collection
-            data = CreateEmptyProfilerTable()
-        end
+        -- reset data collection
+        data = CreateEmptyProfilerTable()
 
         -- hold up a frame
-        yield(1)
+        WaitTicks(1)
     end
 end
 
-local FunctionsToExclude = {
-    ["import"] = true,
-    ["__moduleinfo"] = true
-}
-
 function FindBenchmarks(army)
-
     SPEW("Benchmarks have been searched for by army: " .. tostring(army))
 
-    local categories = { }
-    local head = 1
+    local categories = {}
+    local categoryCount = 0
 
     local function AddBenchmarksFromFolder(path)
         local files = DiskFindFiles(path, "*.lua")
 
-        for k, file in files do 
-
+        for _, file in files do
             -- retrieve category file
-            local category
-            local ok, msg = pcall(
-                function()
-                    category = import(file)
-                end
-            )
+            local category = import(file)
 
-            if ok then 
-
-                -- retrieve benchmarks in category file
-                local benchmarks = { }
-                local bHead = 1
-
-                for k, benchmark in category do 
-
-                        -- exclude these functions
-                        if FunctionsToExclude[k] then 
-                            continue 
-                        end
-
-                    -- only look at functions
-                    if type(benchmark) == "function" then 
-
-                        local code = debug.listcode(benchmark)
-                        local maxstack = code.maxstack
-
-                        -- add correct entry
-                        benchmarks[bHead] = {
-                                name = k
-                            , code = code 
-                            , maxstack = maxstack
-                            , faulty = false 
-                            , message = ""
-                        }
-
-                        bHead = bHead + 1
-                    else 
-
-                        -- add faulty entry
-                        benchmarks[bHead] = {
-                            name = k
-                            , code = false 
-                            , maxstack = false
-                            , faulty = true
-                            , message = "Not a Lua function"
-                        }
-
-                        bHead = bHead + 1
-                    end
-                end
-
-                -- add correct category
-                categories[head] = { folder = path, file = file, benchmarks = benchmarks, faulty = false, message = "" }
-                head = head + 1
-            else 
+            categoryCount = categoryCount + 1
+            if table.empty(category) then
                 -- add faulty category
-                categories[head] = { folder = path, file = file, benchmarks = { }, faulty = true, message = msg }
-                head = head + 1
+                categories[categoryCount] = {
+                    folder = path,
+                    file = file,
+                    benchmarks = {},
+                    faulty = true,
+                    name = "",
+                    desc = "Error opening file",
+                }
+                continue
             end
+            -- retrieve benchmarks in category file
+            local benchmarks = {}
+            local benchmarkCount = 0
+            local catName = ""
+            local catDesc = ""
+            local localExclude = {}
+            local benchmarkTitles = {}
+            local benchmarkDescs = {}
+            -- can't just pull these values because it'll throw an error if they don't exist
+            for k, val in category do
+                if k == "CategoryDisplayName" then
+                    if type(val) == "string" then
+                        catName = val
+                    end
+                    continue
+                end
+                if k == "CategoryDescription" then
+                    if type(val) == "string" then
+                        catDesc = val
+                    end
+                    continue
+                end
+                if type(val) ~= "table" then
+                    continue
+                end
+                if k == "BenchmarkData" then
+                    for funName, funData in val do
+                        if type(funName) ~= "string" then
+                            continue
+                        end
+                        if type(funData) == "string" then
+                            benchmarkTitles[funName] = funData
+                        elseif type(funData) == "table" then
+                            local funTitle = funData.name
+                            if funTitle and type(funTitle) == "string" then
+                                benchmarkTitles[funName] = funTitle
+                            end
+                            local funDesc = funData.desc
+                            if funDesc and type(funDesc) == "string" then
+                                benchmarkDescs[funName] = funDesc
+                            end
+                        end
+                    end
+                    continue
+                end
+                if k == "Exclude" then
+                    for excludeName, doExclude in val do
+                        if type(excludeName) == "string" and doExclude then
+                            localExclude[excludeName] = true
+                        end
+                    end
+                    continue
+                end
+            end
+
+            local functions = {}
+            for funName, benchmark in category do
+                -- exclude these functions
+                if benchmarkExcludeFunctions[funName] or localExclude[funName] then
+                    continue
+                end
+
+                -- only look at functions
+                if type(benchmark) == "function" then
+                    -- add correct entry
+                    benchmarkCount = benchmarkCount + 1
+                    benchmarks[benchmarkCount] = {
+                        name = funName,
+                        title = benchmarkTitles[funName] or "",
+                        desc = benchmarkDescs[funName] or "",
+                    }
+                    functions[benchmarkCount] = benchmark
+                end
+            end
+
+            -- add correct category
+            categories[categoryCount] = {
+                folder = path,
+                file = file,
+                benchmarks = benchmarks,
+                faulty = false,
+                name = catName,
+                desc = catDesc,
+            }
+            tests[categoryCount] = functions
         end
     end
 
@@ -243,48 +250,40 @@ function FindBenchmarks(army)
 
     -- sync it over
     Sync.Benchmarks = categories
+    benchmarkThread = false
 end
 
-local benchmarkOutput = { }
-local benchmarkRuns = 30
-
-function RunBenchmarks(info)
-
-    -- localize for performance
-    local abs = math.abs
-
-    -- keep track of all output
-    local output = { }
-
-    for k, element in info do 
-
-        -- import the benchmark
-        local benchmark = import(element.file)[element.benchmark]
-
-        -- run benchmark multiple times
-        for k = 1, benchmarkRuns do 
-            benchmarkOutput[k] = benchmark()
-        end
-
-        -- compute deviation and filter outliers
-        -- outliers are created by the garbage collector kicking in
-        local mean = Statistics.Mean(benchmarkOutput, 30)
-        local deviation = Statistics.Deviation(benchmarkOutput, 30, mean)
-
-        local o = { }
-        local c = 1 
-        for k = 1, benchmarkRuns do 
-            if abs(benchmarkOutput[k] - mean) < 2 * devation then 
-                o[c] = benchmarkOutput[k]
-                c = c + 1
-            end
-        end
-
-        -- store it
-        output[element.file] = output[element.file] or { }
-        output[element.file][element.benchmark] = { samples = c, data = o }
+function RunBenchmark(fileIndex, benchmarkIndex)
+    if not benchmarkThread then
+        benchmarkThread = ForkThread(RunBenchmarkThread, fileIndex, benchmarkIndex)
+    else
+        SPEW("Already running benchmark")
     end
+end
+
+function RunBenchmarkThread(fileIndex, benchmarkIndex)
+    -- keep track of all output
+    local output = {}
+    local test = tests[fileIndex][benchmarkIndex]
+
+    if test == nil then
+        WARN("Can't run benchmark " .. fileIndex .. "," .. benchmarkIndex)
+        Sync.BenchmarkOutput = {success = false}
+        return
+    end
+
+    -- run benchmark multiple times
+    for k = 1, benchmarkRuns do
+        output[k] = test()
+    end
+
+    -- outliers are created by the garbage collector kicking in
+    local trimmed, size = Statistics.StatObject(output, benchmarkRuns):RemoveOutliers()
+
+    output = { samples = size, data = trimmed, success = true }
 
     -- sync to UI
     Sync.BenchmarkOutput = output
+    benchmarkThread = false
+    SPEW("Done with benchmark")
 end

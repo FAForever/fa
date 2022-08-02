@@ -600,8 +600,8 @@ Callbacks.FindBenchmarks = function (data)
 end
 
 -- Allows a benchmark to be run in the sim
-Callbacks.RunBenchmarks = function (data)
-    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+Callbacks.RunBenchmark = function (data)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.File, data.Benchmark)
 end
 
 do

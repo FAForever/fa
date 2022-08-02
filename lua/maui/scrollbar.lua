@@ -18,6 +18,7 @@ Scrollbar = Class(moho.scrollbar_methods, Control) {
         if debugname then
             self:SetName(debugname)
         end
+        self.Axis = axis
 
         local LazyVar = import('/lua/lazyvar.lua')
 
@@ -54,15 +55,19 @@ Scrollbar = Class(moho.scrollbar_methods, Control) {
         self._tb = nil
     end,
 
-    AddButtons = function(self, upButton, downButton)
-        self.UpButton = upButton
-        upButton.OnClick = function(upButton)
-            self:DoScrollLines(-1)
+    AddButtons = function(self, button1, button2)
+        if self.Axis == ScrollAxis.Vert then
+            self.UpButton = button1
+            self.DownButton = button2
+        else
+            self.RightButton = button1
+            self.LeftButton = button2
         end
-
-        self.DownButton = downButton
-        downButton.OnClick = function(downButton)
+        button1.OnClick = function(bt)
             self:DoScrollLines(1)
+        end
+        button2.OnClick = function(bt)
+            self:DoScrollLines(-1)
         end
     end,
 

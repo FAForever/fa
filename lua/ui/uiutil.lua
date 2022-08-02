@@ -26,6 +26,7 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
+local ScrollAxis = import('/lua/maui/scrollbar.lua').ScrollAxis
 
 
 --* Handy global variables to assist skinning
@@ -739,7 +740,7 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
         scrollbartop = textureName..'bar-top_scr_up.dds'
         scrollbarbot = textureName..'bar-bot_scr_up.dds'
     end
-    local scrollbar = Scrollbar(attachto, import('/lua/maui/scrollbar.lua').ScrollAxis.Vert)
+    local scrollbar = Scrollbar(attachto, ScrollAxis.Vert)
     scrollbar:SetTextures(   SkinnableFile(scrollbg)
                             ,SkinnableFile(scrollbarmid)
                             ,SkinnableFile(scrollbartop)
@@ -777,8 +778,75 @@ function CreateVertScrollbarFor(attachto, offset_right, filename, offset_bottom,
     return scrollbar
 end
 
-function CreateLobbyVertScrollbar(attachto, offset_right, offset_bottom, offset_top)
-    return CreateVertScrollbarFor(attachto, offset_right, "/SCROLLBAR_VERT/", offset_bottom, offset_top)
+
+function CreateHorzScrollbarFor(attachto, offsetBottom, filename, offsetLeft, offsetRight)
+    offsetBottom = offsetBottom or 0
+    offsetLeft = offsetLeft or 0
+    offsetRight = offsetRight or 0
+    local textureName = filename or '/small-horz_scroll/'
+    local scrollbg = textureName..'back_scr_mid.dds'
+    local scrollbarmid = textureName..'bar-mid_scr_over.dds'
+    local scrollbarleft = textureName..'bar-left_scr_up.dds'
+    local scrollbarright = textureName..'bar-right_scr_up.dds'
+    if filename then
+        scrollbg = textureName..'back_scr_mid.dds'
+        scrollbarmid = textureName..'bar-mid_scr_up.dds'
+        scrollbarleft = textureName..'bar-left_scr_up.dds'
+        scrollbarright = textureName..'bar-right_scr_up.dds'
+    end
+    local scrollbar = Scrollbar(attachto, ScrollAxis.Horz)
+    scrollbar:SetTextures(
+        SkinnableFile(scrollbg),
+        SkinnableFile(scrollbarmid),
+        SkinnableFile(scrollbarleft),
+        SkinnableFile(scrollbarright)
+    )
+
+    local scrollLeftButton = Button(scrollbar,
+        SkinnableFile(textureName..'arrow-left_scr_up.dds'),
+        SkinnableFile(textureName..'arrow-left_scr_down.dds'),
+        SkinnableFile(textureName..'arrow-left_scr_over.dds'),
+        SkinnableFile(textureName..'arrow-left_scr_dis.dds'),
+        "UI_Arrow_Click"
+    )
+
+    local scrollRightButton = Button(scrollbar,
+        SkinnableFile(textureName..'arrow-right_scr_up.dds'),
+        SkinnableFile(textureName..'arrow-right_scr_down.dds'),
+        SkinnableFile(textureName..'arrow-right_scr_over.dds'),
+        SkinnableFile(textureName..'arrow-right_scr_dis.dds'),
+        "UI_Arrow_Click"
+    )
+
+    LayoutHelpers.AnchorToBottom(scrollbar, attachto, offsetBottom)
+    scrollbar.Left:Set(scrollLeftButton.Right)
+    scrollbar.Right:Set(scrollRightButton.Left)
+
+    scrollLeftButton.Top:Set(scrollbar.Top)
+    LayoutHelpers.AtLeftIn(scrollLeftButton, attachto, offsetLeft)
+
+    scrollRightButton.Top:Set(scrollbar.Top)
+    LayoutHelpers.AtRightIn(scrollRightButton, attachto, offsetRight)
+
+    scrollbar.Bottom:Set(scrollLeftButton.Bottom)
+
+    scrollbar:AddButtons(scrollRightButton, scrollLeftButton)
+    -- horizontal scrolling doesn't work
+    local phantomWidth = LayoutHelpers.ReusedLayoutFor(Group(attachto))
+        :Fill(attachto)
+        :Height(function() return attachto.Width() end)
+        :End()
+    scrollbar:SetScrollable(phantomWidth)
+
+    return scrollbar
+end
+
+function CreateLobbyVertScrollbar(attachto, offsetRight, offsetBottom, offsetTop)
+    return CreateVertScrollbarFor(attachto, offsetRight, "/scrollbar_vert/", offsetBottom, offsetTop)
+end
+
+function CreateLobbyHorzScrollbar(attachto, offsetBottom, offsetLeft, offsetRight)
+    return CreateHorzScrollbarFor(attachto, offsetBottom, "/scrollbar_horz/", offsetLeft, offsetRight)
 end
 
 -- cause a dialog to get input focus, optional functions to perform when the user hits enter or escape
@@ -1209,4 +1277,59 @@ function CreateAnnouncementStd(primary, secondary, control)
         control,
         secondary 
     )
+end
+
+
+---@param parent Control
+---@param percentage number
+---@param sep? number
+---@return Group top
+---@return Group bottom
+function CreateVertSplitGroups(parent, percentage, sep)
+    local top = LayoutHelpers.ReusedLayoutFor(Group(parent))
+        :Top(parent.Top)
+        :Left(parent.Left)
+        :Right(parent.Right)
+        :Bottom(function()
+            return parent.Top() + percentage * parent.Height() - sep
+        end)
+        :End()
+
+    local bottom = LayoutHelpers.ReusedLayoutFor(Group(parent))
+        :Top(function()
+            return parent.Top() + percentage * parent.Height() + sep
+        end)
+        :Left(parent.Left)
+        :Right(parent.Right)
+        :Bottom(parent.Bottom)
+        :End()
+
+    return top, bottom
+end
+
+---@param parent Control
+---@param percentage number
+---@param sep? number
+---@return Group left
+---@return Group right
+function CreateHorzSplitGroups(parent, percentage, sep)
+    local left = LayoutHelpers.ReusedLayoutFor(Group(parent))
+        :Top(parent.Top)
+        :Left(parent.Left)
+        :Right(function()
+            return parent.Left() + percentage * parent.Width() - sep
+        end)
+        :Bottom(parent.Bottom)
+        :End()
+
+    local right = LayoutHelpers.ReusedLayoutFor(Group(parent))
+        :Top(parent.Top)
+        :Left(function()
+            return parent.Left() + percentage * parent.Width() + sep
+        end)
+        :Right(parent.Right)
+        :Bottom(parent.Bottom)
+        :End()
+
+    return left, right
 end

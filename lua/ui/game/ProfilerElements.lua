@@ -146,9 +146,9 @@ ProfilerScrollArea = Class(Group) {
         end
 
         UIUtil.CreateLobbyVertScrollbar(self, -- calls functions on this
-        0, -- offset right
-        0, -- offset bottom
-        0 -- offset top
+            0, -- offset right
+            0, -- offset bottom
+            0 -- offset top
         )
 
         -- populate it a bit
@@ -222,6 +222,5 @@ ProfilerScrollArea = Class(Group) {
                 self:ScrollLines(nil, 1)
             end
         end
-    end
-
+    end,
 }
