@@ -816,7 +816,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- remove the shield and the shield bar
             self:RemoveShield()
-            self:UpdateShieldRatio(-1)
+            self:UpdateShieldRatio(0)
 
             -- inform the owner that the shield is disabled
             self.Owner:OnShieldDisabled()

@@ -35,12 +35,6 @@ local BrainGetUnitsAroundPoint = moho.aibrain_methods.GetUnitsAroundPoint
 local BrainGetListOfUnits = moho.aibrain_methods.GetListOfUnits
 local CategoriesDummyUnit = categories.DUMMYUNIT
 
-local observer = false
-local Points = {
-    defeat = -10,
-    draw = 0,
-    victory = 10
-}
 
 local CoroutineYield = coroutine.yield
 
@@ -48,6 +42,7 @@ local CoroutineYield = coroutine.yield
 ---@alias HqTech "TECH2"|"TECH3"
 ---@alias HqLayer "LAND"|"AIR"|"NAVY"
 ---@alias HqFaction "AEON"|"UEF"|"SERAPHIM"|"CYBRAN"|"NOMADS"
+---@alias BrainState "Defeat" | "Victory" | "InProgress" | "Draw"
 
 ---@class EnergyDependentEntity
 ---@field OnEnergyDepleted fun(self: EnergyDependentEntity)
@@ -95,7 +90,11 @@ local CoroutineYield = coroutine.yield
 ---@field EnergyExcessThread thread
 ---@field IntelData table<string, number>|nil
 ---@field targetoveride boolean
+---@field Status BrainState
 AIBrain = Class(moho.aibrain_methods) {
+
+    -- The state of the brain in the match
+    Status = 'InProgress',
 
     --- HUMAN BRAIN FUNCTIONS HANDLED HERE
     ---@param self AIBrain
@@ -299,6 +298,13 @@ AIBrain = Class(moho.aibrain_methods) {
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
+    
+        self.Jammers = { }
+        setmetatable(self.Jammers, { __mode = 'v' })
+
+        self.JammerResetTime = 15
+
+        ForkThread(self.JammingToggleThread, self)
 
         -- populate the possible HQs per faction, layer and tech
         self.HQs = { }
@@ -389,6 +395,52 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    -- Jamming Switch Logic
+
+    --- Adds a unit to a list of all units with jammers
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer unit
+    TrackJammer = function(self, unit)
+        self.Jammers[unit.EntityId] = unit
+    end,
+
+    --- Removes a unit to a list of all units with jammers
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer unit
+    UntrackJammer = function(self, unit)
+        self.Jammers[unit.EntityId] = nil
+    end,
+
+    --- Creates a thread that interates over all jammer units to reset them when vision is lost on them
+    ---@param self AIBrain 
+    JammingToggleThread = function(self)
+        while true do
+            for i, jammer in self.Jammers do
+                if jammer.ResetJammer == 0 then
+                    self:ForkThread(self.JammingFollowUpThread, jammer)
+                    jammer.ResetJammer = -1
+                else
+                    if jammer.ResetJammer > 0 then
+                        jammer.ResetJammer = jammer.ResetJammer - 1
+                    end
+                end
+            end
+            WaitSeconds(1)
+        end
+    end,
+
+    --- Toggles a given unit's jammer
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer to be toggled
+    JammingFollowUpThread = function(self, unit)
+        unit:DisableUnitIntel('AutoToggle', 'Jammer')
+        WaitSeconds(1)
+        if not unit:BeenDestroyed() then
+            unit:EnableUnitIntel('AutoToggle', 'Jammer')
+            unit.ResetJammer = -1
+        end
     end,
 
     -- Energy storage callbacks
@@ -664,6 +716,15 @@ AIBrain = Class(moho.aibrain_methods) {
     -- calls callback function with blip it saw.
     ---@param self AIBrain
     OnIntelChange = function(self, blip, reconType, val)
+        if reconType == 'LOSNow' or reconType == 'Omni' then
+            if not val then
+                local unit = blip:GetSource()
+                if unit.Blueprint.Intel.JammerBlips > 0 then
+                    unit.ResetJammer = self.JammerResetTime
+                end
+            end
+        end
+
         if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
                 if EntityCategoryContains(v.Category, blip:GetBlueprint().BlueprintId)
@@ -759,30 +820,19 @@ AIBrain = Class(moho.aibrain_methods) {
     end,
 
     ---@param self AIBrain
+    ---@deprecated 
     ReportScore = function(self)
-        local kills = self:GetArmyStat('Enemies_Commanders_Destroyed', 0).Value
-        local score = Points[self.Result] or 0 + kills
-        table.insert(Sync.GameResult, {self:GetArmyIndex(), string.format("%s %i", self.Result or 'score', score)})
     end,
 
     ---@param self AIBrain
     ---@param result AIResult
+    ---@deprecated
     SetResult = function(self, result)
-        if self.Result then return end
-        if not Points[result] then
-            WARN("brain:SetResult() " .. result .. " not a valid result")
-            return
-        end
-
-        self.Result = result
-        self:ReportScore()
     end,
 
     ---@param self AIBrain
     OnDefeat = function(self)
-        self:SetResult("defeat")
-
-        SetArmyOutOfGame(self:GetArmyIndex())
+        self.Status = 'Defeat'
 
         import('/lua/SimUtils.lua').UpdateUnitCap(self:GetArmyIndex())
         import('/lua/SimPing.lua').OnArmyDefeat(self:GetArmyIndex())
@@ -1032,17 +1082,17 @@ AIBrain = Class(moho.aibrain_methods) {
 
     ---@param self AIBrain
     OnVictory = function(self)
-        self:SetResult("victory")
+        self.Status = 'Victory'
     end,
 
     ---@param self AIBrain
     OnDraw = function(self)
-        self:SetResult("draw")
+        self.Status = 'Draw'
     end,
 
     ---@param self AIBrain
     IsDefeated = function(self)
-        return self.Result == "defeat"
+        return self.Status == "Defeat"
     end,
 
     ---@param self AIBrain
@@ -2034,8 +2084,8 @@ AIBrain = Class(moho.aibrain_methods) {
                 if not v.PrimaryFactories.Air or v.PrimaryFactories.Air.Dead
                     or v.PrimaryFactories.Air:IsUnitState('Upgrading')
                     or self:PBMCheckHighestTechFactory(airFactories, v.PrimaryFactories.Air) then
-                        fac = self:PBMGetPrimaryFactory(airFactories)
-                        v.PrimaryFactories.Air = fac
+                        afac = self:PBMGetPrimaryFactory(airFactories)
+                        v.PrimaryFactories.Air = afac
                 end
                 self:PBMAssistGivenFactory(airFactories, v.PrimaryFactories.Air)
             end

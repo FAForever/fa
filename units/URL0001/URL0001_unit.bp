@@ -120,6 +120,7 @@ UnitBlueprint {
         'SELECTABLE',
         'CYBRAN',
         'MOBILE',
+        'AMPHIBIOUS',
         'ECONOMIC',
         'COMMAND',
         'MASSPRODUCTION',

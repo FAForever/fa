@@ -9,6 +9,7 @@
 
 local Entity = import('/lua/sim/Entity.lua').Entity
 
+---@class VizMarker
 VizMarker = Class(Entity) {
     __init = function(self, spec)
         --LOG('__VizMarker')

@@ -1,8 +1,9 @@
---- Class CMauiLuaDragger
--- @classmod User.CMauiLuaDragger
+---@declare-global
+---@class moho.dragger_methods
+local CMauiLuaDragger = {}
 
 ---
---
-function CMauiLuaDragger:moho.dragger_methods()
+function CMauiLuaDragger:Destroy()
 end
 
+return  CMauiLuaDragger

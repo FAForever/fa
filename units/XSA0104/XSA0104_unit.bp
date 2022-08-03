@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'XSB5102',
-        TargetBones = {
-            'XSA0104',
-        },
     },
     Air = {
         AutoLandTime = 1,

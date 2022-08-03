@@ -21,7 +21,7 @@ XEB2306 = Class(TStructureUnit) {
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(0)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Exhaust', self.unit.Army, Effects.WeaponSteam01)
+				EffectUtils.CreateBoneEffectsOpti(self.unit, 'Exhaust', self.unit.Army, Effects.WeaponSteam01)
                 TDFHeavyPlasmaCannonWeapon.PlayFxWeaponPackSequence(self)
             end,
 
@@ -41,7 +41,7 @@ XEB2306 = Class(TStructureUnit) {
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Exhaust', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Exhaust', self.unit.Army, Effects.WeaponSteam01)
                 TDFHeavyPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,    
         }
