@@ -88,7 +88,7 @@ function CreateEmptyProfilerTable()
 end
 
 -- the profiler benchmarks must be guarded so that players can't maliciously send requests
-local devs = {"jip"}
+local devs = {"jip", "hdt80bro"}
 ---@param player Army | AIBrain | string
 ---@return boolean
 function PlayerIsDev(player)

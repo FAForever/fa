@@ -246,7 +246,10 @@ function FindBenchmarks(army)
                         title = benchmarkTitles[funName] or "",
                         desc = benchmarkDescs[funName] or "",
                     }
-                    functions[benchmarkCount] = benchmark
+                    functions[benchmarkCount] = {
+                        name = funName,
+                        func = benchmark,
+                    }
                 end
             end
 
@@ -261,7 +264,10 @@ function FindBenchmarks(army)
                 name = catName,
                 desc = catDesc,
             }
-            tests[categoryCount] = functions
+            tests[categoryCount] = {
+                file = file,
+                benchmarks = functions,
+            }
         end
     end
 
@@ -279,6 +285,8 @@ end
 
 function RunBenchmark(fileIndex, benchmarkIndex)
     if not benchmarkThread then
+        local category = tests[fileIndex]
+        LOG("Running benchmark " .. category.benchmarks[benchmarkIndex].name .. " in file " .. category.file)
         benchmarkThread = ForkThread(RunBenchmarkThread, fileIndex, benchmarkIndex)
     else
         SPEW("Already running benchmark")
@@ -288,7 +296,7 @@ end
 function RunBenchmarkThread(fileIndex, benchmarkIndex)
     -- keep track of all output
     local output = {}
-    local test = tests[fileIndex][benchmarkIndex]
+    local test = tests[fileIndex].benchmarks[benchmarkIndex].func
 
     if test == nil then
         WARN("Can't run benchmark " .. fileIndex .. "," .. benchmarkIndex)
