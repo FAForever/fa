@@ -1033,9 +1033,9 @@ Unit = Class(moho.unit_methods) {
     GetTotalResourceCosts = function(self)
         local bp = self.Blueprint
         local economy = bp.Economy
-        local mass = economy.BuildCostMass | 0
-        local energy = economy.BuildCostEnergy | 0
-        local time = economy.BuildTime | 0
+        local mass = economy.BuildCostMass or 0
+        local energy = economy.BuildCostEnergy or 0
+        local time = economy.BuildTime or 0
         local enhancements = bp.Enhancements
         if enhancements then
             local activeEnhancements = SimUnitEnhancements[self.EntityId]
