@@ -1,6 +1,21 @@
+---@class ArmiesTable
+---@field armiesTable ArmyInfo[]
+---@field numArmies number
+---@field focusArmy number
+
+---@class ArmyInfo
+---@field armyIndex number
+---@field civilian boolean
+---@field color string
+---@field faction number
+---@field human boolean
+---@field name string
+---@field nickname string
+---@field outOfGame boolean
+---@field showScore boolean
 
 -- keep a reference to the actual function
-local GlobalGetArmiesTable = _G.GetArmiesTable
+local GlobalGetArmiesTable = GetArmiesTable
 
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 local Cached = GlobalGetArmiesTable()
@@ -44,7 +59,7 @@ function Setup()
 end
 
 --- Override global function to return our cache
-_G.GetArmiesTable = function()
+GetArmiesTable = function()
     return Cached
 end
 

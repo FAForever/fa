@@ -1,14 +1,33 @@
+---@class RolloverInfo : EconData, MissileInfo
+---@field armyIndex number
+---@field blueprintId string
+---@field customName? string
+---@field entityId string
+---@field focus? RolloverInfo
+---@field focusUpgrade? RolloverInfo
+---@field fuelRatio number
+---@field health? number
+---@field kills number
+---@field maxHealth? number
+---@field shieldRatio number
+---@field teamColor string
+---@field userUnit? Unit
+---@field workProgress number
+
+
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 
 local selectionOverlay = {
-        key = 'selection',
-        Label = "<LOC map_options_0006>Selection",
-        Pref = 'range_RenderSelected',
-        Type = 3,
-        Tooltip = "overlay_selection",
+    key = 'selection',
+    Label = "<LOC map_options_0006>Selection",
+    Pref = 'range_RenderSelected',
+    Type = 3,
+    Tooltip = "overlay_selection",
 }
 
+---@param unit UserUnit
+---@return RolloverInfo
 function GetUnitRolloverInfo(unit)
     local info = {}
 
