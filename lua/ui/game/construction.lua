@@ -195,6 +195,7 @@ function IssueUpgradeOrders(units, bpid)
 end
 
 function ResetOrderQueue(factory)
+    LOG("ResetOrderQueue")
     local queue = SetCurrentFactoryForQueueDisplay(factory)
     if queue then
         SelectUnits({factory})
@@ -1290,6 +1291,10 @@ function OrderEnhancement(item, clean, destroy)
 end
 
 function OnClickHandler(button, modifiers)
+    LOG("OnClickHandler")
+    reprsl(button)
+    reprsl(modifiers)
+
     PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
     local item = button.Data
 
@@ -1411,11 +1416,16 @@ function OnClickHandler(button, modifiers)
             else
                 if itembp.Physics.MotionType == 'RULEUMT_None' or EntityCategoryContains(categories.NEEDMOBILEBUILD, item.id) then
                     -- Stationary means it needs to be placed, so go in to build mobile mode
+                    LOG("Started command mode!")
                     import('/lua/ui/game/commandmode.lua').StartCommandMode(buildCmd, {name = item.id})
                 else
                     -- If the item to build can move, it must be built by a factory
                     -- TODO - what about mobile factories?
+                    LOG("IssueBlueprintCommand!")
+                    local units = GetSelectedUnits()
+                    SelectUnits({})
                     IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item.id, count)
+                    SelectUnits(units)
                 end
             end
         else
