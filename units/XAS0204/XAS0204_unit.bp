@@ -280,7 +280,7 @@ UnitBlueprint {
     SelectionSizeX = 0.6,
     SelectionSizeZ = 1.8,
     SelectionThickness = 0.37,
-    SizeX = 0.65,
+    SizeX = 0.7,
     SizeY = 0.5,
     SizeZ = 2.8,
     StrategicIconName = 'icon_sub2_antinavy',

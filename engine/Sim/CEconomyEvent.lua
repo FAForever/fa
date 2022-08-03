@@ -3,4 +3,3 @@
 local CEconomyEvent = {}
 
 return CEconomyEvent
-

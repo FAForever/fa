@@ -1,9 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UAB5102',
-        TargetBones = {
-            'UAA0107',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -109,7 +106,7 @@ UnitBlueprint {
         'TRANSPORTFOCUS',
         'CANNOTUSEAIRSTAGING',
     },
-    CollisionOffsetY = -2,
+    CollisionOffsetY = -0.1,
     CollisionOffsetZ = 0,
     Defense = {
         AirThreatLevel = 4,
@@ -233,9 +230,9 @@ UnitBlueprint {
     SelectionSizeX = 0.9,
     SelectionSizeZ = 0.9,
     SelectionThickness = 0.43,
-    SizeX = 3,
-    SizeY = 2.5,
-    SizeZ = 3,
+    SizeX = 1.8,
+    SizeY = 0.9,
+    SizeZ = 1.8,
     StrategicIconName = 'icon_gunship1_transport',
     StrategicIconSortPriority = 65,
     Transport = {

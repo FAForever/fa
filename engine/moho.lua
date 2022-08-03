@@ -43,15 +43,28 @@ moho = {
     EntityCategory = require('/engine/core/entitycategory.lua'),
     CPrefetchSet = require('/engine/core/cprefetchset.lua'),
 
+
     -- user
 
-    control_methods = require('/engine/user/cmauicontrol.lua'),
-    edit_methods = require('/engine/user/cmauiedit.lua'),
-    frame_methods = require('/engine/user/cmauiframe.lua'),
-    text_methods = require('/engine/user/cmauitext.lua'),
-    item_list_methods = require('/engine/user/cmauiitemlist.lua'),
-    bitmap_methods = require('/engine/user/cmauibitmap.lua'),
-    cursor_methods = require('/engine/user/cmauicursor.lua'),
-    UIWorldView = require('/engine/user/cuiworldview.lua'),
-    lobby_methods = require('/engine/user/clobby.lua')
+    bitmap_methods = require('/engine/User/CMauiBitmap.lua'),
+    border_methods = require('/engine/User/CMauiBorder.lua'),
+    control_methods = require('/engine/User/CMauiControl.lua'),
+    cursor_methods = require('/engine/User/CMauiCursor.lua'),
+    discovery_service_methods = require('/engine/User/CDiscoveryService.lua'),
+    dragger_methods = require('/engine/User/CMauiLuaDragger.lua'),
+    edit_methods = require('/engine/User/CMauiEdit.lua'),
+    frame_methods = require('/engine/User/CMauiFrame.lua'),
+    group_methods = require('/engine/User/CMauiGroup.lua'),
+    histogram_methods = require('/engine/User/CMauiHistogram.lua'),
+    item_list_methods = require('/engine/User/CMauiItemList.lua'),
+    lobby_methods = require('/engine/User/CLobby.lua'),
+    mesh_methods = require('/engine/User/CMauiMesh.lua'),
+    movie_methods = require('/engine/User/CMauiMovie.lua'),
+    PathDebugger_methods = require('/engine/User/CPathDebugger.lua'),
+    scrollbar_methods = require('/engine/User/CMauiScrollbar.lua'),
+    text_methods = require('/engine/User/CMauiText.lua'),
+    UIWorldView = require('/engine/User/CUIWorldView.lua'),
+    userDecal_methods = require('/engine/User/ScriptedDecal.lua'),
+    WldUIProvider_methods = require('/engine/User/CLuaWldUIProvider.lua'),
+    world_mesh_methods = require('/engine/User/CUIWorldMesh.lua'),
 }
