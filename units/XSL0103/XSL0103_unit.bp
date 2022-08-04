@@ -259,7 +259,7 @@ UnitBlueprint {
     SelectionThickness = 0.75,
     SizeX = 0.65,
     SizeY = 0.40,
-    SizeZ = 0.8,
+    SizeZ = 0.90,
     StrategicIconName = 'icon_land1_artillery',
     StrategicIconSortPriority = 135,
     Veteran = {
