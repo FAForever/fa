@@ -243,7 +243,7 @@ UnitBlueprint {
     SelectionThickness = 0.47,
     SizeX = 0.45,
     SizeY = 0.7,
-    SizeZ = 0.9,
+    SizeZ = 1.2,
     StrategicIconName = 'icon_bot3_sniper',
     StrategicIconSortPriority = 115,
     Transport = {
