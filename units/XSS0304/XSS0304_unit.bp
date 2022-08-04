@@ -287,6 +287,9 @@ UnitBlueprint {
     },
     Weapon = {
         {
+            -- sim-performance related values
+            TargetCheckInterval = 0.5,
+
             Audio = {
                 Fire = Sound {
                     Bank = 'XSS_Weapon',

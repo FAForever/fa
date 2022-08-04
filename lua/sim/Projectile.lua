@@ -485,11 +485,54 @@ Projectile = Class(moho.projectile_methods) {
     OnLostTarget = function(self)
         local bp = self.Blueprint.Physics
         if bp.TrackTarget and bp.TrackTarget == true then
-            if bp.OnLostTargetLifetime then
-                self:SetLifetime(bp.OnLostTargetLifetime)
-            else
-                self:SetLifetime(0.5)
+
+            if bp.Retarget then
+                self:ForkThread(self.RetargetThread)
+            else    
+                if bp.OnLostTargetLifetime then
+                    self:SetLifetime(bp.OnLostTargetLifetime)
+                else
+                    self:SetLifetime(0.5)
+                end
             end
+        end
+    end,
+
+    ---comment
+    ---@param self any
+    RetargetThread = function (self)
+
+        -- try and find a new target
+        local attempts = 5 
+        while attempts > 0 do 
+
+            WaitSeconds(0.2)
+
+            if IsDestroyed(self) then
+                return
+            end
+
+            if IsDestroyed(self.LaunchedFromWeapon) then
+                break
+            end
+
+            local target = self.LaunchedFromWeapon:GetCurrentTarget()
+
+            if target then
+                self:SetNewTarget(target)
+                self:TrackTarget(true)
+                return
+            end
+
+            attempts = attempts - 1
+        end
+
+        -- we couldn't find a new target, take us out
+        local bp = self.Blueprint.Physics
+        if bp.OnLostTargetLifetime then
+            self:SetLifetime(bp.OnLostTargetLifetime)
+        else
+            self:SetLifetime(0.5)
         end
     end,
 

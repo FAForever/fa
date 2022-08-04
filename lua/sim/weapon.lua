@@ -396,6 +396,7 @@ Weapon = Class(moho.weapon_methods) {
 
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
+        proj.LaunchedFromWeapon = self
 
         -- store the original target, can be nil if ground firing
         proj.OriginalTarget = self:GetCurrentTarget()

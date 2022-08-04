@@ -56,6 +56,7 @@ ProjectileBlueprint {
         RotationalVelocity = 800,
         StayUnderwater = true,
         TrackTarget = true,
+        Retarget = true,
         TurnRate = 230,
         UseGravity = false,
         VelocityAlign = true,
