@@ -48,7 +48,7 @@ UnitBlueprint {
         'OVERLAYANTIAIR',
         'DUMMYGSRWEAPON',
     },
-    CollisionOffsetZ = 0,
+    CollisionOffsetY = 0.1,
     Defense = {
         AirThreatLevel = 3,
         ArmorType = 'Normal',
@@ -260,9 +260,9 @@ UnitBlueprint {
     SelectionSizeX = 0.5,
     SelectionSizeZ = 0.8,
     SelectionThickness = 0.5,
-    SizeX = 0.9,
-    SizeY = 0.7,
-    SizeZ = 0.9,
+    SizeX = 0.8,
+    SizeY = 0.75,
+    SizeZ = 1.0,
     StrategicIconName = 'icon_land2_antiair',
     StrategicIconSortPriority = 125,
     Transport = {
