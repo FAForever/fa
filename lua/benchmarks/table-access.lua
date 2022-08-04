@@ -7,7 +7,7 @@
 -- Conclusion: there is no difference.
 
 
-FileDisplayName = "Table Access"
+ModuleName = "Table Access"
 BenchmarkData = {
     EntriesBracketShort = "Entry using bracket (short)",
     EntriesBracketLong = "Entry using bracket (long)",

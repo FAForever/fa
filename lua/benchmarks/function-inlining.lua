@@ -11,7 +11,7 @@
 -- that is performed in the function is small. Call1 / Inline1 are from /lua/defaultexplosions.lua and
 -- call3 / inline3 are from /lua/utilities.lua.
 
-FileDisplayName = "Function Inlining"
+ModuleName = "Function Inlining"
 BenchmarkData = {
     Call1 = "Call 1",
     Call2 = "Call 2",

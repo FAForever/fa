@@ -22,12 +22,43 @@ function ObservableMeta:Set(value)
     end
 end
 
+
+
+-- setup for a basic meta table
+local ClassObservableMeta = {}
+ClassObservableMeta.__index = ClassObservableMeta
+
+--- Adds an observer that is updated when the value is subject is set
+---@param methodName string name of method that receives the value
+function ClassObservableMeta:AddObserver(methodName)
+    TableInsert(self.Methods, methodName)
+end
+
+--- Sets the value of the subject and notifies all observer methods with the updated value
+function ClassObservableMeta:Set(value)
+    local object = self.Object
+    for _, methodName in self.Methods do
+        object[methodName](object, value)
+    end
+end
+
+
 --- Constructs an observable as described by the observable pattern
-function Create()
-    local observable = {}
-    setmetatable(observable, ObservableMeta)
+function Create(obj)
+    if obj then
+        local observable = {
+            Methods = {},
+            Object = obj,
+        }
+        setmetatable(observable, ClassObservableMeta)
 
-    observable.Listeners = { }
+        return observable
+    else
+        local observable = {
+            Listeners = {},
+        }
+        setmetatable(observable, ObservableMeta)
 
-    return observable
+        return observable
+    end
 end

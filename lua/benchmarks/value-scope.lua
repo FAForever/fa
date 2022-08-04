@@ -9,7 +9,7 @@
 -- CircleLocalPreCompute:   1985.35 ms
 -- CircleOptimal:           1288.08 ms
 
-FileDisplayName = "Value Scope"
+ModuleName = "Value Scope"
 BenchmarkData = {
     AddGlobal = "Add Globals",
     AddUpval = "Add Upvalues",

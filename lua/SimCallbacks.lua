@@ -601,7 +601,11 @@ end
 
 -- Allows a benchmark to be run in the sim
 Callbacks.RunBenchmark = function (data)
-    import("/lua/sim/profiler.lua").RunBenchmark(data.File, data.Benchmark)
+    import("/lua/sim/profiler.lua").RunBenchmark(data.Module, data.Benchmark)
+end
+-- Allows a benchmark to be run in the sim
+Callbacks.StopBenchmark = function (data)
+    import("/lua/sim/profiler.lua").StopBenchmark()
 end
 
 do

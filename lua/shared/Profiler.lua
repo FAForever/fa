@@ -35,17 +35,19 @@
 ---@field main table<string, number>
 ---@field unknown table<string, number>
 
----@class BenchmarkFileMetadata
----@field BenchmarkData? table<string, BenchmarkMetadata | string>
+---@class BenchmarkModuleMetadataFormat
+---@field BenchmarkData? table<string, BenchmarkMetadataFormat | string>
 ---@field Exclude? table<string, boolean>
----@field FileDescription? string
----@field FileDisplayName? string
+---@field ModuleDescription? string
+---@field ModuleName? string defaults to the file name
+---@field NotBenchmarkModule? boolean
 
----@class BenchmarkMetadata
+---@class BenchmarkMetadataFormat
 ---@field desc? string
 ---@field exclude? boolean
----@field name? string
----@field sort? number
+---@field name? string defaults to the function name
+---@field runs? number defaults to `/lua/sim/Profiler.lua#defaultBenchmarkRuns`
+---@field sort? number defaults to `0`
 
 
 --- Constructs an empty table that the profiler can populate
@@ -94,9 +96,9 @@ local devs = {"jip", "hdt80bro"}
 function PlayerIsDev(player)
     local t = type(player)
     if t == "number" then -- army
-        player = string.lower(ArmyBrains[player].Nickname)
+        player = ArmyBrains[player].Nickname:lower()
     elseif t ~= "string" then -- AIBrain
-        player = string.lower(player.Nickname)
+        player = player.Nickname:lower()
     end
     for _, dev in devs do
         if player == dev then
@@ -139,7 +141,8 @@ local MAXUPVALUE = 32
 local FIELDS_PER_FLUSH = 32
 
 local hexWidth = math.ceil(Bx_SIZE / 4)
-local offsetPattern = "%0#" .. (hexWidth + 2) .. "x"
+local addressPattern = "%0#" .. (hexWidth + 2) .. "x"
+local addressZero = "0x" .. string.rep("0", hexWidth)
 
 ---@alias DebugOpArgKind "const" | "double" | "global" | "offset" | "prototype" | "register" | "register|const" | "upvalue" | "value"
 ---@alias DebugOpControlFlow "call" | "jump" | "return" | "skip" | "tailcall"
@@ -244,13 +247,13 @@ DebugOpcode = Class() {
         elseif type == "prototype" then
             return "P(" .. value .. ")"
         elseif type == "offset" then
-            -- adjust address offsets to absolute addresses 
+            -- adjust address offsets to absolute addresses
             value = instr:ResolveAbsoluteAddress(value)
             if value == 0 then
                 -- the formatter just returns "00000" for 0
-                return "0x" .. string.rep("0", hexWidth)
+                return addressZero
             end
-            return string.format(offsetPattern, value)
+            return addressPattern:format(value)
         elseif type == "upvalue" then
             if fn then
                 return FormatToString(fn:GetUpvalueName(value + 1))
@@ -259,22 +262,6 @@ DebugOpcode = Class() {
         else -- value or double
             return tostring(value)
         end
-    end;
-
-    InstructionToString = function(self, instr, fn)
-        local string = instr:GetName()
-        for arg = 1, self.args do
-            local str = instr:ArgToString(arg, fn)
-            if str then
-                string = string .. " " .. str
-            end
-        end
-        local pos = instr.pos
-        if pos == 0 then
-            -- the formatter just returns "00000" for 0
-            return "0x" .. string.rep("0", hexWidth) .. "  " .. string
-        end
-        return string.format(offsetPattern, pos) .. "  " .. string
     end;
 }
 
@@ -393,23 +380,42 @@ end
 ---@field B? number
 ---@field C? number
 ---@field opcode DebugOpcode
----@field pos number
+---@field address number
 DebugInstruction = Class() {
-    GetSize = function(self)
-        return self.opcode.size / 8
-    end;
     GetName = function(self)
         return self.opcode:InstructionName(self)
     end;
     ArgToString = function(self, arg, fn)
         return self.opcode:InstructionArgToString(self, arg, fn)
     end;
-    ToString = function(self, fn)
-        return self.opcode:InstructionToString(self, fn)
-    end;
 
     ResolveAbsoluteAddress = function(self, relAddr)
-        return self.pos + relAddr + 1 -- add one because the PC automatically increments
+        return self.address + relAddr + 1 -- add one because the PC automatically increments
+    end;
+
+    AddressToString = function(self, address)
+        address = address or self.address
+        if address == 0 then
+            -- the formatter just returns "00000" for 0
+            return addressZero
+        else
+            return addressPattern:format(address)
+        end
+    end;
+
+    OperationToString = function(self, fn)
+        local str = self:GetName()
+        for i = 1, self.opcode.args do
+            local arg = self:ArgToString(i, fn)
+            if arg then
+                str = str .. " " .. arg
+            end
+        end
+        return str
+    end;
+
+    InstructionToString = function(self, fn)
+        return self:AddressToString() .. "  " .. self:OperationToString(fn)
     end;
 }
 
@@ -460,10 +466,6 @@ DebugFunction = Class() {
             self.currentline = currentline
         end
 
-        -- they really took way all our options here...
-        -- local sourceLines = {}
-        -- for i = 1,1 do end
-
         local upvalues = {}
         for i = 1, self.nups do
             -- also returns the current value, but we don't care about that right now
@@ -502,7 +504,7 @@ DebugFunction = Class() {
             local instr = DebugInstruction()
             instr.A = argA
             instr.opcode = OPCODE[opcode]
-            instr.pos = tonumber(pos)
+            instr.address = tonumber(pos)
             if argB then
                 instr.B = tonumber(argB)
                 local argC = chunker()
@@ -609,7 +611,7 @@ DebugFunction = Class() {
         for i = 1, self.instructionCount do
             local instr = instructions[i]
             if instr.opcode.B == "offset" then
-                local loc = instr:ResolveAbsoluteAddress(instr.B)
+                local loc = instr:ResolveAbsoluteAddress(instr.B) + 1
                 local jump = jumps[loc]
                 if not jump then
                     jump = {}
@@ -619,5 +621,42 @@ DebugFunction = Class() {
             end
         end
         return jumps
-    end
+    end;
+
+    PrettyPrint = function(self)
+        local lines = {}
+        local lineLocalizer = LOC("<LOC profiler_0001>Line %d:")
+        local jumps = self:ResolveJumps()
+        local instructionCount = 0
+        local lineCount = 0
+        for _, line in self.lines do
+            lineCount = lineCount + 1
+            lines[lineCount] = lineLocalizer:format(line.lineNumber)
+            local prepend
+            for i = 1, line.instructionCount do
+                local instr = line[i]
+                -- insert jump indicator if the instruction is jumped to by another instruction
+                local str = instr:OperationToString(self)
+                instructionCount = instructionCount + 1
+                if jumps[instructionCount] then
+                    str = '>' .. str
+                end
+                str = instr:AddressToString() .. "  " .. str
+
+                local controlFlow = instr.opcode.controlFlow
+                if prepend then
+                    str = prepend .. str
+                    prepend = nil
+                else
+                    str = "    " .. str
+                end
+                if controlFlow == "skip" then
+                    prepend = "        "
+                end
+                lineCount = lineCount + 1
+                lines[lineCount] = str
+            end
+        end
+        return lines
+    end;
 }

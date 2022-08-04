@@ -1,6 +1,6 @@
 
 
-FileDisplayName = "Table Sequence"
+ModuleName = "Table Sequence"
 BenchmarkData = {
     TableTest1 = "Chained access",
     TableTest2 = "Localized Access",

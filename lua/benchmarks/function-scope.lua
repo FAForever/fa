@@ -31,7 +31,7 @@
 -- as an instruction, which is cheaper than SELF.
 
 
-FileDisplayName = "Function Scopes"
+ModuleName = "Function Scopes"
 BenchmarkData = {
     GetPositionLocal01 = "GetPosition local - 1",
     GetPositionLocal02 = "GetPosition local - 2",

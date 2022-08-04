@@ -37,9 +37,11 @@ local StringSub = string.sub
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
+---@class Module
+
 --- The global import function used to keep track of modules.
 ---@param name string The path to the module to load.
----@return table
+---@return Module
 function import(name)
 
     -- attempt to find the module without lowering the string
@@ -86,6 +88,7 @@ function import(name)
 
     -- try to add content to the environment
     local ok, msg = pcall(doscript, name, env)
+    -- note: doscript never fails, so we only catch any errors the file throws itself
     if not ok then
         -- we failed: report back
         upModules[name] = nil

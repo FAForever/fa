@@ -12,7 +12,7 @@
 -- doing work should be done before we initialize the thread, instead of at the start of it. This is 
 -- commonly done in unit.lua and we can optimize that for sure.
 
-FileDisplayName = "Function Threads"
+ModuleName = "Function Threads"
 BenchmarkData = {
     FunctionCall = "Function Call",
     ThreadCall = "Thread Call",

@@ -7,7 +7,7 @@
 -- Highly recommending to upvalue the categories computation in both class 
 -- and table based files.
 
-FileDisplayName = "Categories"
+ModuleName = "Categories"
 BenchmarkData = {
     Cached = "Cached function",
     Inline = "Inline function",

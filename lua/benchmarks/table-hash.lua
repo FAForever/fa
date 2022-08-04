@@ -38,8 +38,7 @@
 -- that may have been optmized. This may be just the cacheline of the CPU, but we see a similar 
 -- behavior with the array part of a table.
 
-
-FileDisplayName = "Table Hash"
+ModuleName = "Table Hash"
 BenchmarkData = {
     Hash01 = "Hash - 1",
     Hash02 = "Hash - 2",
@@ -64,7 +63,6 @@ BenchmarkData = {
     HashDotCached2 = "Hash Dot Cached - 2",
     HashDotCached4 = "Hash Dot Cached - 4",
 }
-
 
 function Hash01()
 

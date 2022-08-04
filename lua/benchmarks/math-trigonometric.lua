@@ -18,7 +18,7 @@
 -- on the C-side.
 
 
-FileDisplayName = "Math Trigonometry"
+ModuleName = "Math Trigonometry"
 BenchmarkData = {
     SinGlobal = "Global math.sin",
     SinUpvalue = "Upvalued math.sin",

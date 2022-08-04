@@ -21,7 +21,7 @@
 -- behavior with the hashed part of a table.
 
 
-FileDisplayName = "Table Array"
+ModuleName = "Table Array"
 BenchmarkData = {
     Array01 = "Array - 1",
     Array02 = "Array - 2",

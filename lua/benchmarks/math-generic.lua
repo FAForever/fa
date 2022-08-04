@@ -12,7 +12,7 @@
 -- Conclusion: we should uplift these functions whenever possible.
 
 
-FileDisplayName = "Generic math"
+ModuleName = "Generic math"
 BenchmarkData = {
     AbsGlobal = "Global math.abs",
     AbsUpvalue = "Upvalued math.abs",

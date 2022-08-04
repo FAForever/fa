@@ -5,7 +5,6 @@
 local Statistics = import("/lua/shared/statistics.lua")
 local CollapseDebugInfo = import("/lua/shared/Profiler.lua").CollapseDebugInfo
 local CreateEmptyProfilerTable = import("/lua/shared/Profiler.lua").CreateEmptyProfilerTable
-local DebugFunction = import("/lua/shared/Profiler.lua").DebugFunction
 local PlayerIsDev = import("/lua/shared/Profiler.lua").PlayerIsDev
 
 -- upvalue for performance
@@ -19,12 +18,13 @@ local WaitTicks = WaitTicks
 local isProfiling = false
 --- Thread to keep the simulation synced with the UI
 local profilingThread
-local benchmarkThread = false
+local benchmarkThread
 --- Data that we send over to the UI
 local data = CreateEmptyProfilerTable()
---- How many times each benchmark is run
-local benchmarkRuns = 30
-local tests = {}
+--- How many times each benchmark is run by default
+local defaultBenchmarkRuns = 30
+local benchmarkPath = "/lua/benchmarks"
+local benchmarkModules
 
 local benchmarkExcludeFunctions = {
     import = true,
@@ -127,111 +127,192 @@ function SyncThread()
     end
 end
 
+---@class BenchmarkModuleMetadata
+---@field moduleName string
+---@field moduleDesc string
+---@field titles table<string, string>
+---@field descs table<string, string>
+---@field runs table<string, number>
+---@field excludes table<string, true>
+---@field sort table<string, number>
+
+---@param module Module
+---@return BenchmarkModuleMetadata?
+function PullBenchmarkModuleMetadata(module)
+    local moduleName = ""
+    local moduleDesc = ""
+    local benchmarkTitles = {}
+    local benchmarkDescs = {}
+    local benchmarkRuns = {}
+    local localExclude = {}
+    local sortOrder = {}
+    -- can't just pull these values because it'll throw an error if they don't exist
+    -- so we get to iterate over everything!
+    for k, val in module do
+        if k == "NotBenchmarkModule" then
+            if val and type(val) == "boolean" then
+                -- indicate that this module, inside of the `/benchmarks/` folder, isn't for benchmarking
+                SPEW("Module " .. module.__moduleinfo.name .. " excluded from benchmarking list")
+                return nil
+            end
+        end
+        if k == "ModuleName" then
+            if type(val) == "string" then
+                moduleName = val
+            end
+            continue
+        end
+        if k == "ModuleDescription" then
+            if type(val) == "string" then
+                moduleDesc = val
+            end
+            continue
+        end
+        if type(val) ~= "table" then
+            continue
+        end
+        if k == "BenchmarkData" then
+            for funName, funData in val do
+                if type(funName) ~= "string" then
+                    continue
+                end
+                -- a string indicates the benchmarks display name
+                if type(funData) == "string" then
+                    benchmarkTitles[funName] = funData
+                -- otherwise, it's a table of metdata on the benchmark 
+                elseif type(funData) == "table" then
+                    local funTitle = funData.name
+                    if funTitle and type(funTitle) == "string" then
+                        benchmarkTitles[funName] = funTitle
+                    end
+                    local funDesc = funData.desc
+                    if funDesc and type(funDesc) == "string" then
+                        benchmarkDescs[funName] = funDesc
+                    end
+                    local funRuns = funData.runs
+                    if funRuns and type(funRuns) == "number" then
+                        benchmarkRuns[funName] = funRuns
+                    end
+                    local funExc = funData.exclude
+                    if funExc and type(funExc) == "boolean" then
+                        localExclude[funName] = true
+                    end
+                    local funSort = funData.sort
+                    if funSort and type(funSort) == "number" then
+                        sortOrder[funName] = funSort
+                    end
+                end
+            end
+            continue
+        end
+        if k == "Exclude" then
+            -- yes, it's possible to use the `BenchmarkData[x].exclude` field, but can be unwieldly in
+            -- some applications, so a separate `Exclude` table is also supported
+            for excludeName, doExclude in val do
+                if type(excludeName) == "string" and doExclude then
+                    localExclude[excludeName] = true
+                end
+            end
+            continue
+        end
+    end
+    return {
+        moduleName = moduleName,
+        moduleDesc = moduleDesc,
+        titles = benchmarkTitles,
+        descs = benchmarkDescs,
+        runs = benchmarkRuns,
+        excludes = localExclude,
+        sort = sortOrder,
+    }
+end
+
+---@param name string
+---@return Module? module
+---@return BenchmarkModuleMetadata? metadata
+---@return string? error
+function LoadBenchmarkModule(name)
+    -- **le sigh**   this doesn't catch any errors inside `doscript`, only explicit Lua errors
+    local ok, obj = pcall(import, name)
+    if ok then
+        -- we can still check to see if the module is empty, which only probably means that it failed
+        local notEmpty = table.getsize(obj) > table.getsize(benchmarkExcludeFunctions)
+        if notEmpty or true then
+            return obj, PullBenchmarkModuleMetadata(obj)
+        end
+        WARN("Skipping empty benchmark module \"" .. name .. "\"; there's likely a 'WARNING: SCR_LuaDoFileConcat' right above me'")
+        return obj, nil
+    end
+    WARN("Couldn't load benchmark module \"" .. name .. "\": " .. obj)
+    return nil, {}, obj
+end
+
 function FindBenchmarks(army)
     SPEW("Benchmarks have been searched for by army: " .. tostring(army))
 
-    local categories = {}
-    local categoryCount = 0
+    local modulesUser = {}
+    local modulesSim = {}
+    local moduleCount = 0
+    local sortOrder
 
-    local function AddBenchmarksFromFolder(path)
+    -- sorts by the `name` field, but first it groups by the `sort` field
+    -- (1) Positive sorts (closer to zero first)
+    -- (2) Zero sorts (the default)
+    -- (3) Negative sorts (closer to zero first)
+    local function BenchmarkSorter(a, b)
+        local aname = a.name
+        local bname = b.name
+        local asort = sortOrder[aname] or 0
+        local bsort = sortOrder[bname] or 0
+        if asort ~= bsort then
+            if asort > 0 then
+                return bsort <= 0 or asort < bsort
+            else
+                return bsort < 0 and asort > bsort
+            end
+        end
+        return a.name:lower() < b.name:lower()
+    end
+
+    local function AddBenchmarkModulesFromFolder(path)
         local files = DiskFindFiles(path, "*.lua")
+        local TableSort = table.sort
 
         for _, file in files do
-            -- retrieve category file
-            local category = import(file)
+            -- retrieve benchmark module
+            local module, metadata, error = LoadBenchmarkModule(file)
+            if not metadata then
+                continue -- the file isn't a benchmark
+            end
 
-            categoryCount = categoryCount + 1
-            if table.empty(category) then
+            moduleCount = moduleCount + 1
+            if error then
                 -- add faulty category
-                categories[categoryCount] = {
+                modulesUser[moduleCount] = {
                     folder = path,
                     file = file,
                     benchmarks = {},
                     faulty = true,
-                    name = "",
-                    desc = "Error opening file",
+                    name = metadata.moduleName,
+                    desc = error,
+                }
+                modulesSim[moduleCount] = {
+                    file = file,
+                    benchmarks = {},
                 }
                 continue
             end
-            -- retrieve benchmarks in category file
-            local benchmarks = {}
-            local benchmarkCount = 0
-            local catName = ""
-            local catDesc = ""
-            local localExclude = {}
-            local benchmarkTitles = {}
-            local benchmarkDescs = {}
-            local sortOrder = {}
-            local nameSorter = function(a, b)
-                local aname = a.name
-                local bname = b.name
-                local asort = sortOrder[aname]
-                local bsort = sortOrder[bname]
-                if asort then
-                    return bsort and asort < bsort
-                end
-                if bsort then
-                    return false
-                end
-                return aname < bname
-            end
-            -- can't just pull these values because it'll throw an error if they don't exist
-            for k, val in category do
-                if k == "FileDisplayName" then
-                    if type(val) == "string" then
-                        catName = val
-                    end
-                    continue
-                end
-                if k == "FileDescription" then
-                    if type(val) == "string" then
-                        catDesc = val
-                    end
-                    continue
-                end
-                if type(val) ~= "table" then
-                    continue
-                end
-                if k == "BenchmarkData" then
-                    for funName, funData in val do
-                        if type(funName) ~= "string" then
-                            continue
-                        end
-                        if type(funData) == "string" then
-                            benchmarkTitles[funName] = funData
-                        elseif type(funData) == "table" then
-                            local funTitle = funData.name
-                            if funTitle and type(funTitle) == "string" then
-                                benchmarkTitles[funName] = funTitle
-                            end
-                            local funDesc = funData.desc
-                            if funDesc and type(funDesc) == "string" then
-                                benchmarkDescs[funName] = funDesc
-                            end
-                            local funExc = funData.exclude
-                            if funExc and type(funExc) == "boolean" then
-                                localExclude[funName] = true
-                            end
-                            local funSort = funData.sort
-                            if funSort and type(funSort) == "number" then
-                                sortOrder[funName] = funSort
-                            end
-                        end
-                    end
-                    continue
-                end
-                if k == "Exclude" then
-                    for excludeName, doExclude in val do
-                        if type(excludeName) == "string" and doExclude then
-                            localExclude[excludeName] = true
-                        end
-                    end
-                    continue
-                end
-            end
+            local benchmarkTitles = metadata.titles
+            local benchmarkDescs = metadata.descs
+            local benchmarkRuns = metadata.runs
+            local localExclude = metadata.excludes
+            sortOrder = metadata.sort -- upvalue into the sorter
 
-            local functions = {}
-            for funName, benchmark in category do
+            local userBenchmarkData = {}
+            local simBenchmarkData = {}
+            local benchmarkCount = 0
+
+            for funName, benchmark in module do
                 -- exclude these functions
                 if benchmarkExcludeFunctions[funName] or localExclude[funName] then
                     continue
@@ -241,81 +322,96 @@ function FindBenchmarks(army)
                 if type(benchmark) == "function" then
                     -- add correct entry
                     benchmarkCount = benchmarkCount + 1
-                    benchmarks[benchmarkCount] = {
+                    userBenchmarkData[benchmarkCount] = {
                         name = funName,
                         title = benchmarkTitles[funName] or "",
                         desc = benchmarkDescs[funName] or "",
                     }
-                    functions[benchmarkCount] = {
+                    simBenchmarkData[benchmarkCount] = {
                         name = funName,
                         func = benchmark,
+                        runs = benchmarkRuns[funName] or defaultBenchmarkRuns,
                     }
                 end
             end
 
-            table.sort(benchmarks, nameSorter)
+            TableSort(userBenchmarkData, BenchmarkSorter)
+            TableSort(simBenchmarkData, BenchmarkSorter)
 
             -- add correct category
-            categories[categoryCount] = {
+            modulesUser[moduleCount] = {
                 folder = path,
                 file = file,
-                benchmarks = benchmarks,
+                benchmarks = userBenchmarkData,
                 faulty = false,
-                name = catName,
-                desc = catDesc,
+                name = metadata.moduleName,
+                desc = metadata.moduleDesc,
             }
-            tests[categoryCount] = {
+            modulesSim[moduleCount] = {
                 file = file,
-                benchmarks = functions,
+                benchmarks = simBenchmarkData,
             }
         end
     end
 
     -- add benchmarks from base game
-    AddBenchmarksFromFolder("/lua/benchmarking/benchmarks")
+    AddBenchmarkModulesFromFolder(benchmarkPath)
 
-    -- TODO: add mod support
-    -- - scan active mods for a 'benchmarks' folder
-    -- - add benchmarks from that folder
+    -- add benchmarks from mods
+    for _, mod in __active_mods do
+        AddBenchmarkModulesFromFolder(mod.location .. benchmarkPath)
+    end
 
     -- sync it over
-    Sync.Benchmarks = categories
-    benchmarkThread = false
+    Sync.Benchmarks = modulesUser
+    benchmarkModules = modulesSim
 end
 
 function RunBenchmark(fileIndex, benchmarkIndex)
     if not benchmarkThread then
-        local category = tests[fileIndex]
-        LOG("Running benchmark " .. category.benchmarks[benchmarkIndex].name .. " in file " .. category.file)
+        local moduleData = benchmarkModules[fileIndex]
+        LOG("Running benchmark \"" .. tostring(moduleData.benchmarks[benchmarkIndex].name) .. "\" in file " .. tostring(moduleData.file))
         benchmarkThread = ForkThread(RunBenchmarkThread, fileIndex, benchmarkIndex)
     else
         SPEW("Already running benchmark")
     end
 end
 
+function StopBenchmark()
+    SPEW("Stopping benchmark")
+    benchmarkThread = false
+end
+
 function RunBenchmarkThread(fileIndex, benchmarkIndex)
     -- keep track of all output
     local output = {}
-    local test = tests[fileIndex].benchmarks[benchmarkIndex].func
-
-    if test == nil then
-        WARN("Can't run benchmark " .. fileIndex .. "," .. benchmarkIndex)
+    local benchmark = benchmarkModules[fileIndex].benchmarks[benchmarkIndex]
+    if benchmark == nil then
+        WARN("Can't run benchmark " .. tostring(fileIndex) .. "," .. tostring(benchmarkIndex))
         Sync.BenchmarkOutput = {success = false}
         return
     end
 
+    local test = benchmark.func
+    local runs = benchmark.runs
+    Sync.BenchmarkProgress = {runs = runs}
+    WaitTicks(1)
+
     -- run benchmark multiple times
-    for k = 1, benchmarkRuns do
+    for k = 1, runs do
         output[k] = test()
+        Sync.BenchmarkProgress = {complete = k}
+        WaitTicks(1)
+        if not benchmarkThread then
+            break
+        end
     end
 
     -- outliers are created by the garbage collector kicking in
-    local trimmed, size = Statistics.StatObject(output, benchmarkRuns):RemoveOutliers()
-
-    output = { samples = size, data = trimmed, success = true }
+    local trimmed, size = Statistics.StatObject(output):RemoveOutliers()
 
     -- sync to UI
-    Sync.BenchmarkOutput = output
+    Sync.BenchmarkOutput = { samples = size, data = trimmed, success = true }
     benchmarkThread = false
     SPEW("Done with benchmark")
 end

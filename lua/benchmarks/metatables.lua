@@ -23,7 +23,7 @@
 -- only be done for values that are accessed often as caching involves cycles too. As an example: values that are only used once
 -- are not worth caching. Instead, you may want to reduce the hierarchy.
 
-FileDisplayName = "Metatables"
+ModuleName = "Metatables"
 BenchmarkData = {
     Depth1 = "Depth 1",
     Depth2 = "Depth 2",

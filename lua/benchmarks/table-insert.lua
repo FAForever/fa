@@ -21,7 +21,7 @@
 -- the value and then adding to it.
 
 
-FileDisplayName = "Table Insert"
+ModuleName = "Table Insert"
 BenchmarkData = {
     AddInsertGlobal = "Global table.insert",
     AddInsertLocal = "Local table.insert",

@@ -6,7 +6,7 @@
 -- AllocateVectorGetPosition:       700 ms
 -- AllocateVectorGetPositionXYZ:    680 ms
 
-FileDisplayName = "Memory"
+ModuleName = "Memory"
 BenchmarkData = {
     AllocateVectorGlobal = "Global Vector",
     AllocateVectorUpvalue = "Upvalued Vector",

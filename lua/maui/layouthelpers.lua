@@ -1028,6 +1028,42 @@ function LayouterMetaTable:AtBottomIn(parent, bottomOffset)
     return self
 end
 
+--- Places the control's left edge at a percentage along the width of a parent,
+--- with 0.00 at the parent's left edge
+---@param parent Control
+---@param leftPercent? number defaults to 0.00 (all the way to left)
+function LayouterMetaTable:FromLeftIn(parent, leftPercent)
+    FromLeftIn(self.c, parent, leftPercent)
+    return self
+end
+
+--- Places the control's top edge at a percentage along the height of a parent,
+--- with 0.00 at the parent's top edge
+---@param parent Control
+---@param topPercent? number defaults to 0.00 (all the way at the top)
+function LayouterMetaTable:FromTopIn(parent, topPercent)
+    FromTopIn(self.c, parent, topPercent)
+    return self
+end
+
+--- Places the control's right edge at a percentage along the width of a parent,
+--- with 0.00 at the parent's right edge
+---@param parent Control
+---@param rightPercent? number defaults to 0.00 (all the way right)
+function LayouterMetaTable:FromRightIn(parent, rightPercent)
+    FromRightIn(self.c, parent, rightPercent)
+    return self
+end
+
+--- Places the control's bottom edge at a percentage along the height of a parent,
+--- with 0.00 at the parent's bottom edge
+---@param parent Control
+---@param bottomPercent? number defaults to 0.00 (all the way at the bottom)
+function LayouterMetaTable:FromBottomIn(parent, bottomPercent)
+    FromBottomIn(self.c, parent, bottomPercent)
+    return self
+end
+
 -- Resets
 
 --- Resets the control's left edge to be calculated from its right edge and width.  
@@ -1266,6 +1302,17 @@ end
 function LayouterMetaTable:Below(parent, padding)
     Below(self.c, parent, padding)
     return self
+end
+
+--- Sets all edges of the control to be a certain percentage inside of a parent.
+--- Percentages are optional.
+---@param parent Control
+---@param left? number
+---@param top? number
+---@param right? number
+---@param bottom? number
+function LayouterMetaTable:PercentIn(parent, left, top, right, bottom)
+    PercentIn(self.c, parent, left, top, right, bottom)
 end
 
 -- Fill parent

@@ -6,7 +6,7 @@
 -- Performing engine calls are expensive and should be prevented in critical code. Calling getters
 -- or setters should also be prevented - it is better to just get the member variable directly instead.
 
-FileDisplayName = "Function Origins"
+ModuleName = "Function Origins"
 BenchmarkData = {
     EngineCall = "Engine Call",
     LuaCall = "Lua Call",
