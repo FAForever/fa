@@ -503,8 +503,8 @@ Projectile = Class(moho.projectile_methods) {
     RetargetThread = function (self)
 
         -- try and find a new target
-        local attempts = 5 
-        while attempts > 0 do 
+        local attempts = 5
+        while attempts > 0 do
 
             WaitSeconds(0.2)
 

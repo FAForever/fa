@@ -1047,6 +1047,21 @@ Unit = Class(moho.unit_methods) {
         end
 
         if self.CanTakeDamage then
+
+            if not (self.Layer == 'Land' or self.Layer == 'Air') then 
+                -- make submerged units immune to surface damage
+                local px, py, pz = self:GetPositionXYZ()
+                py = py + self.Blueprint.SizeY
+
+
+                local ex, ey, ez = px - vector[1], py - vector[2], pz - vector[3]
+                local surface = GetSurfaceHeight(ex, ez)
+
+                if ey > surface - 0.005 then
+                    amount = 0.5 * amount
+                end
+            end
+
             self:DoOnDamagedCallbacks(instigator)
 
             -- Pass damage to an active personal shield, as personal shields no longer have collisions
@@ -3065,6 +3080,8 @@ Unit = Class(moho.unit_methods) {
     -- LAYER EVENTS
     -------------------------------------------------------------------------------------------
     OnLayerChange = function(self, new, old)
+
+        LOG("Layer: "  .. new)
 
         -- this function is called _before_ OnCreate is called. 
         -- You can identify this original call by checking whether 'old' is set to 'None'.
