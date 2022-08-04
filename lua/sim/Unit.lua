@@ -2674,7 +2674,6 @@ Unit = Class(moho.unit_methods) {
     OnStartSacrifice = function(self, targetUnit)
         self:SetUnitState("Sacrificing", true)
         EffectUtilities.PlaySacrificingEffects(self, targetUnit)
-        self.SacrificeThread = self:ForkThread(self.DoSacrificeThread, targetUnit)
         self.SacrificeTargetUnit = targetUnit
     end,
 
