@@ -5,6 +5,7 @@ UnitBlueprint {
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
+        GuardReturnRadius = 15,
         TargetBones = {
             'URS0303',
             'Back_Wake',
