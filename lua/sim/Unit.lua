@@ -1048,17 +1048,23 @@ Unit = Class(moho.unit_methods) {
 
         if self.CanTakeDamage then
 
-            if not (self.Layer == 'Land' or self.Layer == 'Air') then 
-                -- make submerged units immune to surface damage
+            -- adjust damage based on water depth
+            LOG(self.Layer)
+            if not (self.Layer == 'Land' or self.Layer == 'Air' or self.Layer == 'Water') then
+                -- determine how deep we are
                 local px, py, pz = self:GetPositionXYZ()
-                py = py + self.Blueprint.SizeY
+                py = py + self.Blueprint.SizeY + self.Blueprint.CollisionOffsetY
+                local ps = GetSurfaceHeight(px, pz)
+                local depth = ps - py
+                LOG(depth)
 
+                if depth > 0 then
+                    local multiplier = depth / 3
+                    if multiplier > 0.5 then
+                        multiplier = 0.5
+                    end
 
-                local ex, ey, ez = px - vector[1], py - vector[2], pz - vector[3]
-                local surface = GetSurfaceHeight(ex, ez)
-
-                if ey > surface - 0.005 then
-                    amount = 0.5 * amount
+                    amount = multiplier * amount
                 end
             end
 

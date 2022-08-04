@@ -228,6 +228,7 @@ TDFBigShipGaussCannonProjectile = Class(TDFGeneralGaussCannonProjectile) { -- UE
     FxImpactUnit = EffectTemplate.TShipGaussCannonHitUnit01,
     FxImpactProp = EffectTemplate.TShipGaussCannonHit01,
     FxImpactLand = EffectTemplate.TShipGaussCannonHit01,
+    FxImpactWater = EffectTemplate.TShipGaussCannonHit01,
     OnImpact = function(self, targetType, targetEntity)
         MultiPolyTrailProjectile.OnImpact(self, targetType, targetEntity)
 
