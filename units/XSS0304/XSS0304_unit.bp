@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 15,
         TargetBones = {
             'Front_Turret_Barrel01',
         },
