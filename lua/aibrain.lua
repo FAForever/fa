@@ -852,19 +852,29 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             -- Transfer our units to other brains. Wait in between stops transfer of the same units to multiple armies.
-            local function TransferUnitsToBrain(brains)
+            -- Optional Categories input (defaults to all units except wall and command)
+            local function TransferUnitsToBrain(brains, Categories)
                 if not table.empty(brains) then
+                    local units
                     if shareOption == 'FullShare' then
                         local indexes = {}
                         for _, brain in brains do
                             table.insert(indexes, brain.index)
                         end
-                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                        TransferUnfinishedUnitsAfterDeath(units, indexes)
+                        if Categories then
+                            units = self:GetListOfUnits(Categories, false)
+                        else
+                            units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        end
+                            TransferUnfinishedUnitsAfterDeath(units, indexes)
                     end
 
                     for k, brain in brains do
-                        local units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        if Categories then
+                            units = self:GetListOfUnits(Categories, false)
+                        else
+                            units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        end
                         if units and not table.empty(units) then
                             local givenUnitCount = table.getn(TransferUnitsOwnership(units, brain.index))
 
@@ -880,7 +890,8 @@ AIBrain = Class(moho.aibrain_methods) {
             end
 
             -- Sort the destiniation brains (armies/players) by rating (and if rating does not exist (such as with regular AI's), by score, after players with positive rating)
-            local function TransferUnitsToHighestBrain(brains)
+            -- optional category input (default of everything but walls and command)
+            local function TransferUnitsToHighestBrain(brains, categories)
                 if not table.empty(brains) then
                     local ratings = ScenarioInfo.Options.Ratings
                     for i, brain in brains do 
@@ -893,7 +904,7 @@ AIBrain = Class(moho.aibrain_methods) {
                     end
                     -- sort brains by rating
                     table.sort(brains, function(a, b) return a.rating > b.rating end)
-                    TransferUnitsToBrain(brains)
+                    TransferUnitsToBrain(brains, categories)
                 end
             end
 
@@ -952,6 +963,20 @@ AIBrain = Class(moho.aibrain_methods) {
                 TransferUnitsOwnership(given, selfIndex)
             end
 
+            -- Kill units in category that I gave away
+            local function KillSharedUnitsInCategories(owner, brains, categories)
+                for index, brain in brains do
+                    local units = brain:GetListOfUnits(categories, false)
+                    if units and not table.empty(units) then
+                        for _, unit in units do
+                            if unit.oldowner == owner then -- The unit was built by me
+                                unit:Kill()
+                            end
+                        end
+                    end
+                end
+            end
+
             -- Sort brains out into mutually exclusive categories
             for index, brain in ArmyBrains do
                 brain.index = index
@@ -976,6 +1001,11 @@ AIBrain = Class(moho.aibrain_methods) {
                 ReturnBorrowedUnits() -- Give back things I was given by others
             elseif shareOption == 'FullShare' then
                 TransferUnitsToHighestBrain(BrainCategories.Allies) -- Transfer things to allies, highest score first
+                TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
+            elseif shareOption == 'PartialShare' then
+                KillSharedUnitsInCategories(self:GetArmyIndex(), BrainCategories.Allies, categories.ALLUNITS - categories.STRUCTURE - categories.ENGINEER) -- Kill some things I gave away
+                ReturnBorrowedUnits() -- Give back things I was given by others
+                TransferUnitsToHighestBrain(BrainCategories.Allies, categories.STRUCTURE + categories.ENGINEER) -- Transfer some things to allies, highest rating first
                 TransferOwnershipOfBorrowedUnits(BrainCategories.Allies) -- Give stuff away permanently
             else
                 GetBackUnits(BrainCategories.Allies) -- Get back units I gave away
