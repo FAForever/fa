@@ -89,8 +89,11 @@ UAL0307 = Class(AShieldHoverLandUnit) {
     OnLayerChange = function(self, new, old)
         AShieldHoverLandUnit.OnLayerChange(self, new, old)
         
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self) then
+            if self.PointerEnabled == false then
+                -- since its reset on layer change we need to do this, unfortunate
+                self.TargetPointer:SetFireTargetLayerCaps('None') 
+            end
         end
     end,
 }
