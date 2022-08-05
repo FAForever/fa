@@ -98,18 +98,21 @@ end
 function CreateUnitAtMouse(blueprintId, ownerArmyIndex, offsetMouseWorldPosX, offsetMouseWorldPosZ, rotation)
 end
 
----
---  Get the current time in seconds, counting from 0 at application start. This is wall-clock time and is unaffected by gameplay.
+
+---Get the current time in seconds, counting from 0 at application start. This is wall-clock time and is unaffected by gameplay.
+---@return number
 function CurrentTime()
 end
 
 ---
---  bool DebugFacilitiesEnabled() - returns true if debug facilities are enabled.
+---returns true if debug facilities are enabled.
+---@return boolean
 function DebugFacilitiesEnabled()
 end
 
----
---  DecreaseBuildCountInQueue(queueIndex, count)
+---Decreases build count in queue of displated factory
+---@param queueIndex integer
+---@param count integer
 function DecreaseBuildCountInQueue(queueIndex,  count)
 end
 
@@ -144,24 +147,33 @@ end
 function EngineStartSplashScreens()
 end
 
----
---  See if a unit category contains this unit
-function EntityCategoryContains()
+
+---See if a unit contains these categories
+---@param categories Categories
+---@param unit Unit
+---@return boolean
+function EntityCategoryContains(categories, unit)
 end
 
----
---  Filter a list of units to only those found in the category
-function EntityCategoryFilterDown()
+---filters only units that contain given categories
+---@param categories Categories
+---@param units Unit[]
+---@return Unit[]
+function EntityCategoryFilterDown(categories, units)
 end
 
----
---  Filter a list of units to exclude those found in the category
-function EntityCategoryFilterOut()
+---filters only units that dont contain given categories
+---@param categories Categories
+---@param units Unit[]
+---@return Unit[]
+function EntityCategoryFilterOut(categories, units)
 end
 
----
---  Execute some lua code in the sim
-function ExecLuaInSim()
+
+---Execute some lua code in the sim
+---@param funcname string
+---@param ... any
+function ExecLuaInSim(funcname, ...)
 end
 
 ---
@@ -180,17 +192,21 @@ function FlushEvents()
 end
 
 ---
---  string FormatTime(seconds) - format a string displaying the time specified in seconds
+---Formats time given in seconds
+---@param seconds number
+---@return string
 function FormatTime(seconds)
 end
 
----
---  Get the current game time in ticks. The game time is the simulation time, that stops when the game is paused.
+
+---Get the current game time in ticks. The game time is the simulation time, that stops when the game is paused.
+---@return integer
 function GameTick()
 end
 
----
---  Get the current game time in seconds. The game time is the simulation time, that stops when the game is paused.
+
+---Get the current game time in seconds. The game time is the simulation time, that stops when the game is paused.
+---@return number
 function GameTime()
 end
 
@@ -210,7 +226,8 @@ function GetAntiAliasingOptions()
 end
 
 ---
---  armyInfo GetArmiesTable()
+---returns info about armies of current game session
+---@return 
 function GetArmiesTable()
 end
 
@@ -239,13 +256,17 @@ end
 function GetBlueprint()
 end
 
----
---  GetCamera(name)
+
+---get camera by name
+---@param name string
+---@return Camera
 function GetCamera(name)
 end
 
 ---
---  CommandArgTable GetCommandLineArg(option, number)
+---returns line arg for given option
+---@param option string
+---@param number number
 function GetCommandLineArg(option,  number)
 end
 
@@ -254,8 +275,8 @@ end
 function GetCurrentUIState()
 end
 
----
---  GetCursor()
+---returns cursor
+---@return Cursor
 function GetCursor()
 end
 
@@ -269,13 +290,13 @@ end
 function GetFireState()
 end
 
----
---  GetFocusArmy()
+---returns id of focus army
+---@return integer
 function GetFocusArmy()
 end
 
 ---
---  frame GetFrame(int head) - return the root UI frame for a given head
+---return the root UI frame for a given head
 ---@param head number int
 function GetFrame(head)
 end
@@ -287,26 +308,31 @@ end
 
 ---
 --  Return the current game speed
+---@return integer
 function GetGameSpeed()
 end
 
 ---
---  string GetGameTime() - returns a formatted string displaying the time the game has been played
+---returns a formatted string displaying the time the game has been played
+---@return string
 function GetGameTime()
 end
 
 ---
---  float GetGameTimeSeconds() - returns game time in seconds
+---returns game time in seconds
+---@return number
 function GetGameTimeSeconds()
 end
 
 ---
---  table GetIdleEngineers() - return a table of idle engineer units for the army
+---return a table of idle engineer units for the army
+---@return UserUnit[]
 function GetIdleEngineers()
 end
 
 ---
---  table GetIdleFactories() - return a table of idle factory units for the army
+---return a table of idle factory units for the army
+---@return UserUnit[]
 function GetIdleFactories()
 end
 
@@ -452,8 +478,10 @@ end
 function GetUIControlsAlpha()
 end
 
----
---  GetUnitById(id)
+
+---userunit by its id
+---@param id any
+---@return UserUnit
 function GetUnitById(id)
 end
 
