@@ -26,9 +26,7 @@ local selectionOverlay = {
     Tooltip = "overlay_selection",
 }
 
----@param unit UserUnit
----@return RolloverInfo
-function GetUnitRolloverInfo(unit)
+function GetUnitRolloverInfo(unit, skipFocus)
     local info = {}
 
     info.blueprintId = unit:GetBlueprint().BlueprintId
@@ -50,8 +48,22 @@ function GetUnitRolloverInfo(unit)
     info.shieldRatio = unit:GetShieldRatio()
     info.workProgress = unit:GetWorkProgress()
 
-    if unit:GetFocus() then
-        info.focus = GetUnitRolloverInfo(unit:GetFocus())
+    local focus = unit:GetFocus()
+    if focus and not skipFocus then
+        local visited = { [unit:GetEntityId()] = true }
+        local focusingInfo = info
+        while focus do
+            local id = focus:GetEntityId()
+            if visited[id] then
+                info.focus.focus = nil
+                break
+            end
+            visited[id] = true
+            local focusInfo = GetUnitRolloverInfo(focus, true)
+            focusingInfo.focus = focusInfo
+            focusingInfo = focusInfo
+            focus = focus:GetFocus()
+        end
     end
 
     local killStat = unit:GetStat('KILLS')
@@ -71,4 +83,3 @@ function GetUnitRolloverInfo(unit)
 
     return info
 end
-
