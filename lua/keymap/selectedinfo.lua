@@ -1,3 +1,20 @@
+---@class RolloverInfo : EconData, MissileInfo
+---@field armyIndex number
+---@field blueprintId string
+---@field customName? string
+---@field entityId string
+---@field focus? RolloverInfo
+---@field focusUpgrade? RolloverInfo
+---@field fuelRatio number
+---@field health? number
+---@field kills number
+---@field maxHealth? number
+---@field shieldRatio number
+---@field teamColor string
+---@field userUnit? Unit
+---@field workProgress number
+
+
 local Prefs = import('/lua/user/prefs.lua')
 local options = Prefs.GetFromCurrentProfile('options')
 

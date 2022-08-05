@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardReturnRadius = 0,
         InitialAutoMode = false,
         TargetBones = {
             'Tower_Target',

@@ -3,6 +3,7 @@
 
 local Control = import('control.lua').Control
 
+---@class Mesh : moho.mesh_methods, Control
 Mesh = Class(moho.mesh_methods, Control) {
     __init = function(self, parent, debugname)
         InternalCreateMesh(self, parent)

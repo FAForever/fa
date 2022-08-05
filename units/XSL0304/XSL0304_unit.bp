@@ -1,6 +1,9 @@
 UnitBlueprint {
     ResolvePath = true,
     AI = {
+        TargetBones = { 
+            'Torso'
+        },
         NeedUnpack = true,
     },
     Audio = {
@@ -58,7 +61,6 @@ UnitBlueprint {
         'OVERLAYINDIRECTFIRE',
         'SNIPEMODE',
     },
-    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -214,8 +216,8 @@ UnitBlueprint {
     SelectionSizeZ = 1,
     SelectionThickness = 0.43,
     SizeX = 0.7,
-    SizeY = 0.8,
-    SizeZ = 0.9,
+    SizeY = 0.6,
+    SizeZ = 1.0,
     StrategicIconName = 'icon_land3_artillery',
     StrategicIconSortPriority = 115,
     Transport = {
