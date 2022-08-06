@@ -1,6 +1,7 @@
 -- This file contains key bindable actions that don't fit elsewhere
 
 local Prefs = import('/lua/user/prefs.lua')
+local targeting = import('/lua/keymap/targeting.lua').targetingMap
 
 local lockZoomEnable = false
 function lockZoom()
@@ -388,6 +389,29 @@ function SetWeaponPriorities(prioritiesString, name, exclusive)
     end
 
     SimCallback({Func = 'WeaponPriorities', Args = {SelectedUnits = unitIds, prioritiesTable = priotable, name = name, exclusive = exclusive or false }})
+end
+
+function SetWeaponPrioritiesSpecific()
+    local info = GetRolloverInfo()
+    if info and info.blueprintId ~= "unknown" then
+
+        local bpId = info.blueprintId
+        local text = LOC(__blueprints[bpId].General.UnitName)     
+        if text then
+            text = "\n" .. text .. " — " .. LOC(__blueprints[bpId].Interface.HelpText)
+        else
+            text = "\n" .. LOC(__blueprints[bpId].Interface.HelpText)
+        end
+
+        local target = targeting[string.upper(bpId)]
+
+        if target then
+            SetWeaponPriorities(target, text, false)
+        else
+            SetWeaponPriorities("{categories." .. bpId .. "}", text, false)
+        end 
+        SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
+    end
 end
 
 function RecheckTargetsOfWeapons()
