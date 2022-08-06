@@ -103,9 +103,6 @@ local function MatchStateThread()
 
     -- keep scanning the gamestate for changes in alliances and brain state
     while true do
-        
-        LOG(GetGameTick())
-
         -- check for defeat
         local defeatedBrains = CollectDefeatedBrains(aliveBrains, condition, 4)
         local defeatedBrainsCount = table.getsize(defeatedBrains)
@@ -113,10 +110,9 @@ local function MatchStateThread()
 
             -- take into account cascading effects
             local lastDefeatedBrainsCount
-            repeat
+            repeat 
                 WaitTicks(4)
-                LOG("Recheck for defeated brains!")
-
+                
                 lastDefeatedBrainsCount = defeatedBrainsCount
 
                 -- re-compute the defeated brains until it no longer increases
@@ -126,7 +122,6 @@ local function MatchStateThread()
 
             -- call them out as being defeated and exclude them
             for k, brain in defeatedBrains do
-                LOG("Brain defeated: " .. brain.Nickname)
                 -- take the army out of the game, adjust command sources
                 SetArmyOutOfGame(k)
                 ObserverAfterDeath(k)
@@ -144,7 +139,7 @@ local function MatchStateThread()
 
         -- loop through the brains that are still alive to check for alliance differences
 
-        if table.getsize(aliveBrains) > 0 then
+        if table.getsize(aliveBrains) > 0 then 
 
             -- check for draw
             local draw = true
@@ -173,16 +168,13 @@ local function MatchStateThread()
             end
 
             -- check for win
-            LOG("Checking for a win")
             local win = true 
             for k, brain in aliveBrains do
-                reprsl(brain.Nickname)
                 for l, _ in aliveBrains do
                     if k ~= l then
                         win = win and IsAlly(k, l) and brain.RequestingAlliedVictory
                     end
                 end
-                LOG(string.format('Status quo of win: %s', tostring(win)))
             end
 
             if win then 
