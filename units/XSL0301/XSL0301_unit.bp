@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         InitialAutoMode = true,
+        
         GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'Back_Upgrade',
