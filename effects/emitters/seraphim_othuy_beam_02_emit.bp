@@ -8,5 +8,5 @@ BeamBlueprint {
     UShift = 0.0,
     VShift = 0.4,
     RepeatRate= 0.1,
-    LOD= 200,
+    LODCutoff= 200,
 }
