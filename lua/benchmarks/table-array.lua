@@ -35,495 +35,251 @@ BenchmarkData = {
     ArrayCached16 = "Array Cached - 16",
 }
 
+function Array01(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-local loopCount = 1000000
+    local element = { 1, 1, 1, 1 }
 
-function Array01()
+    local a
+    local start = timer()
 
-    local element = { 1, 2, 3, 4 }
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local sum = 0
-    for k = 1, loopCount do 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+    for _ = 1, loop do
+        a = 0 + element[1] + element[2] + element[3] + element[4]
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function Array02()
+function Array02(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local element = { 1, 2, 3, 4 }
+    local element = { 1, 1, 1, 1 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, loopCount do 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+    for _ = 1, loop do
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function Array04()
+function Array04(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local element = { 1, 2, 3, 4 }
+    local element = { 1, 1, 1, 1 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, loopCount do 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+    for _ = 1, loop do
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function Array08()
+function Array08(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local element = { 1, 2, 3, 4 }
+    local element = { 1, 1, 1, 1 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, loopCount do 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+    for _ = 1, loop do
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-        
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-        
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function Array16()
+function Array16(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local element = { 1, 2, 3, 4 }
+    local element = { 1, 1, 1, 1 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, loopCount do 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+    for _ = 1, loop do
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-        
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
 
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-        
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-        
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-        
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
-
-        sum = sum + element[1]
-        sum = sum + element[2]
-        sum = sum + element[3]
-        sum = sum + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
+        a = 0 + element[1] + element[2] + element[3] + element[4]
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function ArrayCached01()
+function ArrayCached01(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local element = { 1, 2, 3, 4 }
+    local element = { 1, 1, 1, 1 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, loopCount do 
-
+    for _ = 1, loop do
         local el1 = element[1]
         local el2 = element[2]
         local el3 = element[3]
         local el4 = element[4]
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function ArrayCached02()
 
-    local element = { 1, 2, 3, 4 }
+function ArrayCached02(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local element = { 1, 1, 1, 1 }
 
-    local sum = 0
-    for k = 1, loopCount do 
+    local a
+    local start = timer()
 
+    for _ = 1, loop do
         local el1 = element[1]
         local el2 = element[2]
         local el3 = element[3]
         local el4 = element[4]
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function ArrayCached04()
 
-    local element = { 1, 2, 3, 4 }
+function ArrayCached04(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local element = { 1, 1, 1, 1 }
 
-    local sum = 0
-    for k = 1, loopCount do 
+    local a
+    local start = timer()
 
+    for _ = 1, loop do
         local el1 = element[1]
         local el2 = element[2]
         local el3 = element[3]
         local el4 = element[4]
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function ArrayCached08()
 
-    local element = { 1, 2, 3, 4 }
+function ArrayCached08(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local element = { 1, 1, 1, 1 }
 
-    local sum = 0
-    for k = 1, loopCount do 
+    local a
+    local start = timer()
 
+    for _ = 1, loop do
         local el1 = element[1]
         local el2 = element[2]
         local el3 = element[3]
         local el4 = element[4]
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function ArrayCached16()
 
-    local element = { 1, 2, 3, 4 }
+function ArrayCached16(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local element = { 1, 1, 1, 1 }
 
-    local sum = 0
-    for k = 1, loopCount do 
+    local a
+    local start = timer()
 
+    for _ = 1, loop do
         local el1 = element[1]
         local el2 = element[2]
         local el3 = element[3]
         local el4 = element[4]
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
 
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
-
-        sum = sum + el1
-        sum = sum + el2
-        sum = sum + el3
-        sum = sum + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
+        a = 0 + el1 + el2 + el3 + el4
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end

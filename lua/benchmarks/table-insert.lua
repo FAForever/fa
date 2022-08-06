@@ -30,46 +30,68 @@ BenchmarkData = {
     AddCountAlt = "Assign from Head",
 }
 
-function AddInsertGlobal()
+function AddInsertGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local tbl = {}
 
-    local a = { }
-    for k = 1, 100000 do
-        table.insert(a, k)
+    local a = 1
+    local start = timer()
+
+    for _ = 1, loop do
+        table.insert(tbl, a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 
-function AddInsertLocal()
+function AddInsertLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a = {}
+
+    local start = timer()
 
     -- to local scope
     local TableInsert = table.insert
-
-    local a = { }
-    for k = 1, 100000 do
+    for k = 1, loop do
         TableInsert(a, k)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function AddIndex()
+function AddIndexReused(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local tbl = {}
 
-    local a = { }
-    for k = 1, 100000 do
-        a[k] = k 
+    local a = 1
+    local start = timer()
+
+    for k = 1, loop do
+        tbl[k] = a
+    end
+
+    local final = timer()
+    return final - start
+end
+
+function AddIndexSize(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+    local tbl = {}
+
+    local a = 1
+    local start = timer()
+
+    local tblSize = 0
+    for _ = 1, loop do
+        tblSize = tblSize + 1
+        tbl[tblSize] = a
     end
 
     local final = GetSystemTimeSecondsOnlyForProfileUse()
@@ -78,72 +100,20 @@ function AddIndex()
 
 end
 
--- function AddGetnLocal()
+function AddIndexHead(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
---     local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local tbl = {}
 
---     local TableGetn = table.getn
+    local a = 1
+    local start = timer()
 
---     local a = { }
---     for k = 1, 100000 do
---         a[TableGetn(a) + 1] = k
---     end
-
---     local final = GetSystemTimeSecondsOnlyForProfileUse()
-
---     return final - start
-
--- end
-
--- function AddGetnGlobal()
-
---     local start = GetSystemTimeSecondsOnlyForProfileUse()
-
---     local TableGetn = table.getn
-
---     local a = { }
---     for k = 1, 100000 do
---         a[table.getn(a) + 1] = k 
---     end
-
---     local final = GetSystemTimeSecondsOnlyForProfileUse()
-
---     return final - start
-
--- end
-
-function AddCount()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local count = 0
-
-    local a = { }
-    for k = 1, 100000 do
-        count = count + 1
-        a[count] = k 
+    local tblHead = 1
+    for _ = 1, loop do
+        tbl[tblHead] = a
+        tblHead = tblHead + 1
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
-end
-
-function AddCountAlt()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local count = 1
-
-    local a = { }
-    for k = 1, 100000 do
-        a[count] = k 
-        count = count + 1
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    return final - start
-
 end

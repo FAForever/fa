@@ -40,13 +40,13 @@
 ---@field Exclude? table<string, boolean>
 ---@field ModuleDescription? string
 ---@field ModuleName? string defaults to the file name
+---@field ModuleSort? number defualts to `0`
 ---@field NotBenchmarkModule? boolean
 
 ---@class BenchmarkMetadataFormat
 ---@field desc? string
 ---@field exclude? boolean
 ---@field name? string defaults to the function name
----@field runs? number defaults to `/lua/sim/Profiler.lua#defaultBenchmarkRuns`
 ---@field sort? number defaults to `0`
 
 

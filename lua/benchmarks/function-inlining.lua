@@ -21,15 +21,13 @@ BenchmarkData = {
     Inline3 = "Inline 3",
 }
 
-local outerLoop = 1000000
-
-function Call1()
+function Call1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local function GetUnitSizes(unit)
         local bp = unit:GetBlueprint()
         return bp.SizeX or 0, bp.SizeY or 0, bp.SizeZ or 0
     end
-    
     local function GetUnitVolume(unit)
         local x, y, z = GetUnitSizes(unit)
         return x * y * z
@@ -37,110 +35,100 @@ function Call1()
 
     -- create a dummy unit
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local size
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local size = 0
-    for k = 1, outerLoop do 
+    for _ = 1, loop do
         size = GetUnitVolume(unit)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     -- remove dummy unit
     unit:Destroy()
-
     return final - start
 end
 
-function Inline1()
-
+function Inline1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     -- create a dummy unit
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local size
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local size = false
-    for k = 1, outerLoop do 
+    for _ = 1, loop do
         local blueprint = unit:GetBlueprint()
         local sx, sy, sz = blueprint.SizeX or 0, blueprint.SizeY or 0, blueprint.SizeZ or 0
         size = sx * sy * sz
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     -- remove dummy unit
     unit:Destroy()
-
     return final - start
 end
 
-function Call2()
+function Call2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local function Square(a)
         return a * a
     end
-    
     local function AddOneThenSquare(a)
         return Square(a + 1)
     end
 
+    local size
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    local size = 0
-    for k = 1, outerLoop do 
+    for k = 1, loop do
         size = AddOneThenSquare(k)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function Inline2()
+function Inline2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local size
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local size = false
-    for k = 1, outerLoop do 
+    for k = 1, loop do
         size = (k + 1) * (k + 1)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 
-function Call3()
-
+function Call3(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local function GetRandomFloat(nmin, nmax)
         return Random() * (nmax - nmin) + nmin
     end
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local size
+    local start = timer()
 
-    local size = 0
-    for k = 1, outerLoop do 
+    for k = 1, loop do
         size = GetRandomFloat(10, k + 20)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function Inline3()
+function Inline3(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local size
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local size = false
-    for k = 1, outerLoop do 
+    for k = 1, loop do
         size = Random() * (k + 20 - 10) + 10
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end

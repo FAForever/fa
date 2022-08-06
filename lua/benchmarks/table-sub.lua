@@ -11,41 +11,39 @@ BenchmarkData = {
 }
 
 
-function BlueprintSubTables2()
-
-    -- create a dummy unit
+function BlueprintSubTables2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+
     local blueprint = unit:GetBlueprint()
+
     unit:Destroy()
+    local a
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local sum = 1
-    for k = 1, 100000 do 
-        sum = sum + blueprint.Defense.MaxHealth
+    for _ = 1, loop do
+        a = blueprint.Defense.MaxHealth
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function BlueprintSubTables1()
-
-    -- create a dummy unit
+function BlueprintSubTables1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+
     local blueprint = unit:GetBlueprint()
-    local test = { DefenseMaxHealth = blueprint.Defense.MaxHealth }
+
     unit:Destroy()
+    local a
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local sum = 1
-    for k = 1, 100000 do 
-        sum = sum + test.DefenseMaxHealth
+    local Defense = blueprint.Defense
+    for _ = 1, loop do
+        a = Defense.MaxHealth
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end

@@ -168,6 +168,10 @@ QuartileFunctions = {
     end,
     -- Moore and McCabe: quartiles are medians of the resulting sets with the median excluded
     [2] = function(sorted, n)
+        if n == 1 then
+            local val = sorted[1]
+            return val, val, val
+        end
         local rawHalf = n * 0.5
         local quart2 = MathCeil(rawHalf)
 
@@ -754,7 +758,7 @@ StatObject = {
         normalExcessKurtosis = "excessKurtosis",
         sampSkewness = "skewness",
 
-        -- center populates with "mean" | "median" | avg("mode"), depending on the first to the cache (defaulting to mean)
+        -- `center` populates with "mean" | "median" | avg("mode"), depending on the first to the cache (defaulting to mean)
     }
 }
 
@@ -826,7 +830,7 @@ function StatObject:RemoveOutliers(mult)
     local data = self.data
     for i = 1, self.n do
         local val = data[i]
-        if lower < val and val < upper then
+        if lower <= val and val <= upper then
             size = size + 1
             trimmed[size] = val
         end

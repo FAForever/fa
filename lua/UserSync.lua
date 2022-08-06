@@ -38,15 +38,15 @@ function OnSync()
         end
     end
 
-    if Sync.ProfilerData then 
+    if Sync.ProfilerData then
         import("/lua/ui/game/Profiler.lua").ReceiveData(Sync.ProfilerData)
     end
 
-    if Sync.Benchmarks then 
-        import("/lua/ui/game/Profiler.lua").ReceiveBenchmarks(Sync.Benchmarks)
+    if Sync.BenchmarkModules then
+        import("/lua/ui/game/Profiler.lua").ReceiveBenchmarkModules(Sync.BenchmarkModules)
     end
 
-    if Sync.BenchmarkOutput then 
+    if Sync.BenchmarkOutput then
         import("/lua/ui/game/Profiler.lua").ReceiveBenchmarkOutput(Sync.BenchmarkOutput)
     end
 

@@ -17,87 +17,82 @@ BenchmarkData = {
     TableTest2 = "Localized entries",
 }
 
-function EntriesBracketShort()
+function EntriesBracketShort(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local data = { a = 1 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + data["a"]
+    for _ = 1, loop do
+        a = data["a"]
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function EntriesBracketLong()
+function EntriesBracketLong(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local data = { ThisIsASuperLongEntryAndDoesThatMatterOrNotBecauseManThisStuffIsLong = 1}
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + data["ThisIsASuperLongEntryAndDoesThatMatterOrNotBecauseManThisStuffIsLong"] 
+    for _ = 1, loop do
+        a = data["ThisIsASuperLongEntryAndDoesThatMatterOrNotBecauseManThisStuffIsLong"]
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function EntriesDotShort()
+function EntriesDotShort(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local data = { a = 1 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + data.a
+    for _ = 1, loop do
+        a = data.a
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function EntriesDotLong()
+function EntriesDotLong(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local data = { ThisIsASuperLongEntryAndDoesThatMatterOrNotBecauseManThisStuffIsLong = 1}
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + data.ThisIsASuperLongEntryAndDoesThatMatterOrNotBecauseManThisStuffIsLong
+    for _ = 1, loop do
+        a = data.ThisIsASuperLongEntryAndDoesThatMatterOrNotBecauseManThisStuffIsLong
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
--- 0.071
--- 0.070
--- 0.071
-function TableTest2()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local t = { 
+function TableTest2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local t = {
         unit1 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0),
-        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0) 
+        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0),
     }
+    local start = timer()
 
-    local sum = 1
-    for k = 1, 100000 do 
+    for _ = 1, loop do
         local unit1 = t.unit1
         local unit2 = t.unit2
-        if unit1 and unit2 then 
+        if unit1 and unit2 then
             unit1:GetPosition()
             unit2:GetPosition()
             unit1:GetPositionXYZ()
@@ -105,29 +100,22 @@ function TableTest2()
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     t.unit1:Destroy()
     t.unit2:Destroy()
-
     return final - start
 end
 
--- 0.078
--- 0.073
--- 0.074
-function TableTest1()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local t = { 
+function TableTest1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local t = {
         unit1 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0),
-        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0) 
+        unit2 = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
     }
+    local start = timer()
 
-    local sum = 1
-    for k = 1, 100000 do 
-        if t.unit1 and t.unit2 then 
+    for _ = 1, loop do
+        if t.unit1 and t.unit2 then
            t.unit1:GetPosition()
            t.unit2:GetPosition()
            t.unit1:GetPositionXYZ()
@@ -135,10 +123,8 @@ function TableTest1()
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     t.unit1:Destroy()
     t.unit2:Destroy()
-
     return final - start
 end

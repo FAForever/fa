@@ -2135,4 +2135,9 @@ Tooltips = {
         title = '<LOC OPTIONS_0236>Zoom Pop Distance',
         description = '<LOC OPTIONS_0272>Adjusts distance to which Zoom Pop zooms to.',
     },
+
+    profiler_print_to_log = {
+        title = "<LOC profiler_0100>Log",
+        description = "<LOC profiler_0101>Print bytecode to log file",
+    },
 }

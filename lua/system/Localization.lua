@@ -138,6 +138,8 @@ end
 --
 -- Note - we use [[foo]] string syntax here instead of "foo", so the localizing
 -- script won't try to mess with *our* strings.
+---@param s string
+---@return string
 function LOC(s)
     if s == nil then
         return s

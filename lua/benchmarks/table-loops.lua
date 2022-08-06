@@ -20,69 +20,58 @@ BenchmarkData = {
     WhileGetnCached = "While cache table.getn",
 }
 
-local outerLoop = 100000
-
 -- prepare data
-local data = { }
+local data = {}
 
-for k = 1, 20 do 
-    data[k] = k
+for k = 1, 20 do
+    data[k] = 1
 end
 
-function ForGetn()
+function ForGetn(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    for k = 1, outerLoop do 
-        local x = 0
-        for k = 1, table.getn(data) do 
-            x = x + data[k]
+    for _ = 1, loop do
+        for k = 1, table.getn(data) do
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function ForPairs()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function ForPairs(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local start = timer()
 
-    for k = 1, outerLoop do 
-        local x = 0
-        for k, v in pairs(data) do 
-            x = x + v
+    for _ = 1, loop do
+        for k, v in pairs(data) do
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function ForiPairs()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function ForiPairs(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local start = timer()
 
-    for k = 1, outerLoop do 
-        local x = 0
-        for k, v in ipairs(data) do 
-            x = x + v
+    for _ = 1, loop do
+        for k, v in ipairs(data) do
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function Foreach()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function Foreach(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local start = timer()
 
-    for k = 1, outerLoop do 
-        local x = 0
-        for k, v in data do 
-            x = x + v
+    for _ = 1, loop do
+        for k, v in data do
         end
     end
 
@@ -91,39 +80,33 @@ function Foreach()
     return final - start
 end
 
-function WhileGetn()
+function WhileGetn(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    for k = 1, outerLoop do 
+    for _ = 1, loop do
         local k = 1
-        local x = 0
-        while k < table.getn(data) do 
-            x = x + data[k]
+        while k < table.getn(data) do
             k = k + 1
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function WhileGetnCached()
+function WhileGetnCached(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    for k = 1, outerLoop do 
+    for _ = 1, loop do
         local k = 1
-        local x = 0
         local n = table.getn(data)
-        while k < n do 
-            x = x + data[k]
+        while k < n do
             k = k + 1
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end

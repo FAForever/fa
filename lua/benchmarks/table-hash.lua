@@ -64,494 +64,241 @@ BenchmarkData = {
     HashDotCached4 = "Hash Dot Cached - 4",
 }
 
-function Hash01()
+function Hash01(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + element.x -- GETABLE, ADD
-        sum = sum + element.y -- GETABLE, ADD
-        sum = sum + element.z -- GETABLE, ADD
-        sum = sum + element.w -- GETABLE, ADD
+    for _ = 1, loop do
+        a = 0 + element.x + element.y + element.z + element.w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
-
-function Hash02()
+function Hash02(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+    for _ = 1, loop do
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
-
-function Hash04()
+function Hash04(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+    for _ = 1, loop do
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
-
-function Hash08()
+function Hash08(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+    for _ = 1, loop do
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
-
-function Hash16()
+function Hash16(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+    for _ = 1, loop do
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
 
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
-
-        sum = sum + element.x
-        sum = sum + element.y
-        sum = sum + element.z
-        sum = sum + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
+        a = 0 + element.x + element.y + element.z + element.w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function HashCached01()
+function HashCached01(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-
-        local x = element.x 
-        local y = element.y 
+    for _ = 1, loop do
+        local x = element.x
+        local y = element.y
         local z = element.z
         local w = element.w
 
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
+        a = 0 + x + y + z + w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
-
-function HashCached02()
+function HashCached02(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-
-        local x = element.x -- GETTABLE
-        local y = element.y -- GETTABLE
-        local z = element.z -- GETTABLE
-        local w = element.w -- GETTABLE
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    return final - start
-
-end
-
-function HashCached04()
-
-    local element = { x = 1, y = 2, z = 3, w = 4 }
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local sum = 0
-    for k = 1, 100000 do 
-
-        local x = element.x 
-        local y = element.y 
+    for _ = 1, loop do
+        local x = element.x
+        local y = element.y
         local z = element.z
         local w = element.w
 
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
-
-function HashCached08()
+function HashCached04(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-
-        local x = element.x 
-        local y = element.y 
+    for _ = 1, loop do
+        local x = element.x
+        local y = element.y
         local z = element.z
         local w = element.w
 
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
-
-function HashCached16()
+function HashCached08(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     local element = { x = 1, y = 2, z = 3, w = 4 }
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local sum = 0
-    for k = 1, 100000 do 
-
-        local x = element.x 
-        local y = element.y 
+    for _ = 1, loop do
+        local x = element.x
+        local y = element.y
         local z = element.z
         local w = element.w
 
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
 
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
-
-        sum = sum + x
-        sum = sum + y
-        sum = sum + z
-        sum = sum + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
+end
+function HashCached16(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
+    local element = { x = 1, y = 2, z = 3, w = 4 }
+
+    local a
+    local start = timer()
+
+    for _ = 1, loop do
+        local x = element.x
+        local y = element.y
+        local z = element.z
+        local w = element.w
+
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+        a = 0 + x + y + z + w
+    end
+
+    local final = timer()
+    return final - start
 end
 
 -- The following benchmarks represent the following function from /lua/utilities.lua:
@@ -560,162 +307,134 @@ end
 --     return Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
 -- end
 
-function HashCross1()
+function HashCross1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a, b, c
+    local start = timer()
 
-    local cross = 0
-    for k = 1, 100000 do 
-        -- do the cross product
-        cross = Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
+    for _ = 1, loop do
+        a, b, c = v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y - v2.x
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashCross2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashCross2()
-
-    -- initialize two vectors
-    local v1 = Vector(1, 0, 1)
-    local v2 = Vector(0, 1, 1)
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local cross = 0
-    for k = 1, 100000 do 
-        -- do the cross product
-        cross = Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
-        cross = Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    return final - start
-
-end
-
-function HashCross4()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a, b, c
+    local start = timer()
 
-    local cross = 0
-    for k = 1, 100000 do 
-        -- do the cross product
-        cross = Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
-        cross = Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
-        cross = Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
-        cross = Vector((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y - v2.x))
+    for _ = 1, loop do
+        a, b, c = v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y - v2.x
+        a, b, c = v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y - v2.x
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashCross4(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashCrossCached1()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-    
-    local cross = 0
-    for k = 1, 100000 do 
+    local a, b, c
+    local start = timer()
 
-        -- cache it
-        local v1x = v1.x 
+    for _ = 1, loop do
+        a, b, c = v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y - v2.x
+        a, b, c = v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y - v2.x
+        a, b, c = v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y - v2.x
+        a, b, c = v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y - v2.x
+    end
+
+    local final = timer()
+    return final - start
+end
+
+function HashCrossCached1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+    local v1 = Vector(1, 1, 1)
+    local v2 = Vector(2, 1, 1)
+
+    local a, b, c
+    local start = timer()
+
+    for _ = 1, loop do
+        local v1x = v1.x
         local v1y = v1.y
-        local v1z = v1.z 
+        local v1z = v1.z
 
-        local v2x = v2.x 
-        local v2y = v2.y 
-        local v2z = v2.z 
+        local v2x = v2.x
+        local v2y = v2.y
+        local v2z = v2.z
 
-        -- do the cross product
-        cross = Vector((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z), (v1x * v2y) - (v1y - v2x))
+        a, b, c = v1y * v2z - v1z * v2y, v1z * v2x - v1x * v2z, v1x * v2y - v1y - v2x
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashCrossCached2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashCrossCached2()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-    
-    local cross = 0
-    for k = 1, 100000 do 
+    local a, b, c
+    local start = timer()
 
-        -- cache it
-        local v1x = v1.x 
+    for _ = 1, loop do
+        local v1x = v1.x
         local v1y = v1.y
-        local v1z = v1.z 
+        local v1z = v1.z
 
-        local v2x = v2.x 
-        local v2y = v2.y 
-        local v2z = v2.z 
+        local v2x = v2.x
+        local v2y = v2.y
+        local v2z = v2.z
 
-        -- do the cross product
-        cross = Vector((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z), (v1x * v2y) - (v1y - v2x))
-        cross = Vector((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z), (v1x * v2y) - (v1y - v2x))
+        a, b, c = v1y * v2z - v1z * v2y, v1z * v2x - v1x * v2z, v1x * v2y - v1y - v2x
+        a, b, c = v1y * v2z - v1z * v2y, v1z * v2x - v1x * v2z, v1x * v2y - v1y - v2x
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashCrossCached4(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashCrossCached4()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-    
-    local cross = 0
-    for k = 1, 100000 do 
+    local a, b, c
+    local start = timer()
 
-        -- cache it
-        local v1x = v1.x 
+    for _ = 1, loop do
+        local v1x = v1.x
         local v1y = v1.y
-        local v1z = v1.z 
+        local v1z = v1.z
 
-        local v2x = v2.x 
-        local v2y = v2.y 
-        local v2z = v2.z 
+        local v2x = v2.x
+        local v2y = v2.y
+        local v2z = v2.z
 
-        -- do the cross product
-        cross = Vector((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z), (v1x * v2y) - (v1y - v2x))
-        cross = Vector((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z), (v1x * v2y) - (v1y - v2x))
-        cross = Vector((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z), (v1x * v2y) - (v1y - v2x))
-        cross = Vector((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z), (v1x * v2y) - (v1y - v2x))
+        a, b, c = v1y * v2z - v1z * v2y, v1z * v2x - v1x * v2z, v1x * v2y - v1y - v2x
+        a, b, c = v1y * v2z - v1z * v2y, v1z * v2x - v1x * v2z, v1x * v2y - v1y - v2x
+        a, b, c = v1y * v2z - v1z * v2y, v1z * v2x - v1x * v2z, v1x * v2y - v1y - v2x
+        a, b, c = v1y * v2z - v1z * v2y, v1z * v2x - v1x * v2z, v1x * v2y - v1y - v2x
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
 -- The following benchmarks represent the following function from /lua/utilities.lua:
@@ -724,157 +443,132 @@ end
 --     return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
 -- end
 
-function HashDot1()
+function HashDot1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local dot = 0
-    for k = 1, 100000 do 
-        -- do the dot product
-        dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z))
+    for _ = 1, loop do
+        a = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashDot2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashDot2()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local dot = 0
-    for k = 1, 100000 do 
-        -- do the dot product
-        dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z))
-        dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z))
+    for _ = 1, loop do
+        a = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+        a = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashDot4(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashDot4()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local dot = 0
-    for k = 1, 100000 do 
-        -- do the dot product
-        dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z))
-        dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z))
-        dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z))
-        dot = ((v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z))
+    for _ = 1, loop do
+        a = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+        a = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+        a = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+        a = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function HashDotCached1()
+function HashDotCached1(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local dot = 0
-    for k = 1, 100000 do 
-
-        local v1x = v1.x 
+    for _ = 1, loop do
+        local v1x = v1.x
         local v1y = v1.y
-        local v1z = v1.z 
+        local v1z = v1.z
 
-        local v2x = v2.x 
-        local v2y = v2.y 
-        local v2z = v2.z 
+        local v2x = v2.x
+        local v2y = v2.y
+        local v2z = v2.z
 
-        -- do the dot product
-        dot = ((v1x * v2x) + (v1y * v2y) + (v1z * v2z))
+        a = v1x * v2x + v1y * v2y + v1z * v2z
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashDotCached2(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashDotCached2()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local dot = 0
-    for k = 1, 100000 do 
-
-        local v1x = v1.x 
+    for _ = 1, loop do
+        local v1x = v1.x
         local v1y = v1.y
-        local v1z = v1.z 
+        local v1z = v1.z
 
-        local v2x = v2.x 
-        local v2y = v2.y 
-        local v2z = v2.z 
+        local v2x = v2.x
+        local v2y = v2.y
+        local v2z = v2.z
 
-        -- do the dot product
-        dot = ((v1x * v2x) + (v1y * v2y) + (v1z * v2z))
-        dot = ((v1x * v2x) + (v1y * v2y) + (v1z * v2z))
+        a = v1x * v2x + v1y * v2y + v1z * v2z
+        a = v1x * v2x + v1y * v2y + v1z * v2z
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
+function HashDotCached4(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-function HashDotCached4()
-
-    -- initialize two vectors
     local v1 = Vector(1, 1, 1)
     local v2 = Vector(2, 1, 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local a
+    local start = timer()
 
-    local dot = 0
-    for k = 1, 100000 do 
-
-        local v1x = v1.x 
+    for _ = 1, loop do
+        local v1x = v1.x
         local v1y = v1.y
-        local v1z = v1.z 
+        local v1z = v1.z
 
-        local v2x = v2.x 
-        local v2y = v2.y 
-        local v2z = v2.z 
+        local v2x = v2.x
+        local v2y = v2.y
+        local v2z = v2.z
 
-        -- do the dot product
-        dot = ((v1x * v2x) + (v1y * v2y) + (v1z * v2z))
-        dot = ((v1x * v2x) + (v1y * v2y) + (v1z * v2z))
-        dot = ((v1x * v2x) + (v1y * v2y) + (v1z * v2z))
-        dot = ((v1x * v2x) + (v1y * v2y) + (v1z * v2z))
+        a = v1x * v2x + v1y * v2y + v1z * v2z
+        a = v1x * v2x + v1y * v2y + v1z * v2z
+        a = v1x * v2x + v1y * v2y + v1z * v2z
+        a = v1x * v2x + v1y * v2y + v1z * v2z
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end

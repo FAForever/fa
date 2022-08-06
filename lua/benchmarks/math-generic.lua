@@ -24,71 +24,69 @@ BenchmarkData = {
     CeilLocalPerIteration = "Local math.ceil per iteration",
 }
 
-local outerLoop = 10000000
+function AbsGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-function AbsGlobal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local a = 1.1
-    for k = 1, outerLoop do
-        a = math.abs(a)
+    for _ = 1, loop do
+        math.abs(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 local MathAbs = math.abs
 
-function AbsUpvalue()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function AbsUpvalue(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, outerLoop do
-        a = MathAbs(a)
+    for _ = 1, loop do
+        MathAbs(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function AbsLocal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function AbsLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
     local MathAbs = math.abs
-
-    local a = 1.1
-    for k = 1, outerLoop do
-        a = MathAbs(a)
+    for _ = 1, loop do
+        MathAbs(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function AbsLocalPerIteration()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function AbsLocalPerIteration(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, outerLoop do
+    for _ = 1, loop do
         local MathAbs = math.abs
-        a = MathAbs(a)
+        MathAbs(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function CeilGlobal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CeilGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, outerLoop do
-        a = math.ceil(a)
+    for _ = 1, loop do
+        math.ceil(a)
     end
 
     local final = GetSystemTimeSecondsOnlyForProfileUse()
@@ -98,44 +96,43 @@ end
 
 local MathCeil = math.ceil
 
-function CeilUpvalue()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CeilUpvalue(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, outerLoop do
-        a = MathCeil(a)
+    for _ = 1, loop do
+        MathCeil(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function CeilLocal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CeilLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
     local MathCeil = math.ceil
-
-    local a = 1.1
-    for k = 1, outerLoop do
-        a = MathCeil(a)
+    for _ = 1, loop do
+        MathCeil(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function CeilLocalPerIteration()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CeilLocalPerIteration(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, outerLoop do
+    for _ = 1, loop do
         local MathCeil = math.ceil
-        a = MathCeil(a)
+        MathCeil(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end

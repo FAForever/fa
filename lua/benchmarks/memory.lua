@@ -16,124 +16,98 @@ BenchmarkData = {
     AllocateVectorGetPositionCached = "GetPositionXYZ Cached Vector",
 }
 
-local loops = 2000
-
 -- easily ramps up 160mb in small blocks
-function AllocateVectorGlobal()
+function AllocateVectorGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a, b, c = 1, 1, 1
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local vector = false
-    for y = 1, loops do 
-        for x = 1, loops do
-            vector = Vector(x, y, 1)
-        end
+    for _ = 1, loop do
+        Vector(a, b, c)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 local VectorUpvalue = Vector
 
 -- easily ramps up 160mb in small blocks
-function AllocateVectorUpvalue()
+function AllocateVectorUpvalue(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a, b, c = 1, 1, 1
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local vector = false
-    for y = 1, loops do 
-        for x = 1, loops do
-            vector = VectorUpvalue(x, y, 1)
-        end
+    for _ = 1, loop do
+        VectorUpvalue(a, b, c)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 -- easily ramps up 160mb in small blocks
-function AllocateVectorLocal()
+function AllocateVectorLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a, b, c = 1, 1, 1
+    local start = timer()
 
     local Vector = Vector
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local vector = false
-    for y = 1, loops do 
-        for x = 1, loops do
-            vector = Vector(x, y, 1)
-        end
+    for _ = 1, loop do
+        Vector(a, b, c)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 -- doesn't use anything
-function AllocateVectorCached()
-
-    local VectorCached = Vector(0, 0, 0)
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local vector = VectorCached
-    for y = 1, loops do 
-        for x = 1, loops do
-            vector[1] = x
-            vector[2] = y 
-            vector[3] = 1
-        end
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    return final - start
-end
-
--- doesn't use anything
-function AllocateVectorGetPosition()
-
-    -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    local vector = false
-    for y = 1, loops do 
-        for x = 1, loops do
-            vector = unit:GetPosition()
-        end
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    unit:Destroy()
-
-    return final - start
-end
-
--- doesn't use anything
-function AllocateVectorGetPositionCached()
-
-    -- create a dummy unit
-    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
+function AllocateVectorCached(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local vector = Vector(0, 0, 0)
-    for y = 1, loops do 
-        for x = 1, loops do
-            vector[1], vector[2], vector[3] = unit:GetPositionXYZ()
-        end
+    local a, b, c = 1, 1, 1
+    local start = timer()
+
+    for _ = 1, loop do
+        vector[1] = a
+        vector[2] = b
+        vector[3] = c
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
+    local final = timer()
+    return final - start
+end
 
+-- doesn't use anything
+function AllocateVectorGetPosition(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    -- create a dummy unit
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local vector
+    local start = timer()
+
+    for _ = 1, loop do
+        vector = unit:GetPosition()
+    end
+
+    local final = timer()
     unit:Destroy()
+    return final - start
+end
 
+-- doesn't use anything
+function AllocateVectorGetPositionCached(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    -- create a dummy unit
+    local unit = CreateUnit("uaa0303", 1, 0, 0, 0, 0, 0, 0, 0)
+    local vector = Vector(0, 0, 0)
+    local start = timer()
+
+    for _ = 1, loop do
+        vector[1], vector[2], vector[3] = unit:GetPositionXYZ()
+    end
+
+    local final = timer()
+    unit:Destroy()
     return final - start
 end

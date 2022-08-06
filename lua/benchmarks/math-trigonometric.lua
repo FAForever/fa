@@ -35,141 +35,140 @@ BenchmarkData = {
 }
 
 
-function SinGlobal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function SinGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
-        a = math.sin(k)
+    for _ = 1, loop do
+        math.sin(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 local MathSin = math.sin
 
-function SinUpvalue()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function SinUpvalue(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
-        a = MathSin(k)
+    for _ = 1, loop do
+        MathSin(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function SinLocal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function SinLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
     local MathSin = math.sin
-
-    local a = 1.1
-    for k = 1, 100000 do
-        a = MathSin(k)
+    for _ = 1, loop do
+        MathSin(_)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function SinLocalPerIteration()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function SinLocalPerIteration(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
+    for _ = 1, loop do
         local MathSin = math.sin
-        a = MathSin(k)
+        MathSin(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function CosGlobal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CosGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
-        a = math.cos(k)
+    for _ = 1, loop do
+        math.cos(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 local MathCos = math.cos
 
-function CosUpvalue()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CosUpvalue(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
-        a = MathCos(k)
+    for _ = 1, loop do
+        MathCos(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function CosLocal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CosLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
     local MathCos = math.cos
-
-    local a = 1.1
-    for k = 1, 100000 do
-        a = MathCos(k)
+    for _ = 1, loop do
+        MathCos(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function CosLocalPerIteration()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function CosLocalPerIteration(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
+    for k = 1, loop do
         local MathCos = math.cos
-        a = MathCos(k)
+        MathCos(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function TanGlobal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function TanGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
-        a = math.tan(k)
+    for _ = 1, loop do
+        math.tan(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 local MathTan = math.tan
 
-function TanUpvalue()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function TanUpvalue(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
-        a = MathTan(k)
+    for _ = 1, loop do
+        MathTan(a)
     end
 
     local final = GetSystemTimeSecondsOnlyForProfileUse()
@@ -177,31 +176,30 @@ function TanUpvalue()
     return final - start
 end
 
-function TanLocal()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function TanLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
     local MathTan = math.tan
-
-    local a = 1.1
-    for k = 1, 100000 do
-        a = MathTan(k)
+    for _ = 1, loop do
+        MathTan(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function TanLocalPerIteration()
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+function TanLocalPerIteration(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local a = 1
+    local start = timer()
 
-    local a = 1.1
-    for k = 1, 100000 do
+    for _ = 1, loop do
         local MathTan = math.tan
-        a = MathTan(k)
+        MathTan(a)
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end

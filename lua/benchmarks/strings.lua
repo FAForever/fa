@@ -1,112 +1,68 @@
 
-
 ModuleName = "Strings"
 BenchmarkData = {
-    EachIterationNothing = "NOP",
     EachIterationString = "String concat",
+    CallColon = "Call Colon",
+    CallGlobal = "Call Global",
+    CallLocal = "Call Local",
 }
 
-function EachIterationNothing()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    for k = 1, 100000 do
-
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    return final - start
-
-end
-
-function EachIterationString()
-
-    local function ToCall()
-    end
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
+function EachIterationString(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+    local test
     local string = "to-test-this-long-string"
-    for k = 1, 100000 do
-        local test = string .. k 
+    local start = timer()
+
+    for k = 1, loop do
+        test = string .. k
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function CallColon()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
+function CallColon(innerLoop, outerLoop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local str = "str"
-    for k = 1, 10000 do
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
-        local test = str:len()
+    local start = timer()
+
+    for _ = 1, outerLoop do
+        for _ = 1, innerLoop do
+            str:len()
+        end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function CallGlobal()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
+function CallGlobal(outerLoop, innerLoop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local str = "str"
-    for k = 1, 10000 do
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
-        local test = string.len(str)
+    local start = timer()
+
+    for _ = 1, outerLoop do
+        for _ = 1, innerLoop do
+            string.len(str)
+        end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end
 
-function CallLocal()
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
+function CallLocal(outerLoop, innerLoop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
     local str = "str"
-    for k = 1, 10000 do
+    local start = timer()
+
+    for _ = 1, outerLoop do
         local StringLen = string.len
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
-        local test = StringLen(str)
+        for _ = 1, innerLoop do
+            StringLen(str)
+        end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
-
 end

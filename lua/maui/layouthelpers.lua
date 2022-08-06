@@ -183,11 +183,11 @@ end
 function AtHorizontalCenterIn(control, parent, leftOffset)
     if leftOffset then
         control.Left:SetFunction(function()
-            return MathFloor(parent.Left() + (parent.Width() - control.Width()) / 2 + leftOffset * pixelScaleFactor)
+            return MathFloor(parent.Left() + (parent.Width() - control.Width()) * 0.5 + leftOffset * pixelScaleFactor)
         end)
     else
         control.Left:SetFunction(function()
-            return MathFloor(parent.Left() + (parent.Width() - control.Width()) / 2)
+            return MathFloor(parent.Left() + (parent.Width() - control.Width()) * 0.5)
         end)
     end
 end
@@ -200,11 +200,11 @@ end
 function AtVerticalCenterIn(control, parent, topOffset)
     if topOffset then
         control.Top:SetFunction(function()
-            return MathFloor(parent.Top() + (parent.Height() - control.Height()) / 2 + topOffset * pixelScaleFactor)
+            return MathFloor(parent.Top() + (parent.Height() - control.Height()) * 0.5 + topOffset * pixelScaleFactor)
         end)
     else
         control.Top:SetFunction(function()
-            return MathFloor(parent.Top() + (parent.Height() - control.Height()) / 2)
+            return MathFloor(parent.Top() + (parent.Height() - control.Height()) * 0.5)
         end)
     end
 end
@@ -514,6 +514,47 @@ function OffsetIn(control, parent, left, top, right, bottom)
     AtBottomIn(control, parent, bottom)
 end
 
+
+--- Places the control a percentage along the width of a parent (updating its left and right edges),
+--- with 0.00 at the parent's left edge
+---@param control Control
+---@param parent Control
+---@param leftPercent number
+function FromHorizontalCenterIn(control, parent, leftPercent)
+    if leftPercent and leftPercent ~= 0 then
+        control.Left:SetFunction(function()
+            return MathFloor(parent.Left() + leftPercent * (parent.Width() - control.Width()))
+        end)
+        control.Right:SetFunction(function()
+            local width = control.Width()
+            return MathFloor(parent.Left() + leftPercent * (parent.Width() - width) + width)
+        end)
+    else
+        control.Left:SetFunction(function() return parent.Left() end)
+        control.Right:SetFunction(function() return parent.Left() + control.Width() end)
+    end
+end
+
+--- Places the control a percentage along the height of a parent (updating its top and bottom edges),
+--- with 0.00 at the parent's top edge
+---@param control Control
+---@param parent Control
+---@param topPercent number
+function FromVerticalCenterIn(control, parent, topPercent)
+    if topPercent and topPercent ~= 0 then
+        control.Top:SetFunction(function()
+            return MathFloor(parent.Top() + topPercent * (parent.Height() - control.Height()))
+        end)
+        control.Bottom:SetFunction(function()
+            local height = control.Height()
+            return MathFloor(parent.Top() + topPercent * (parent.Height() - height) + height)
+        end)
+    else
+        control.Top:SetFunction(function() return parent.Top() end)
+        control.Bottom:SetFunction(function() return parent.Top() + control.Height() end)
+    end
+end
+
 --- Sets all edges of a control to be a certain percentage inside of a parent.
 --- Percentages are optional.
 ---@param control Control
@@ -571,16 +612,16 @@ function FillParentPreserveAspectRatio(control, parent)
     end
 
     control.Top:SetFunction(function()
-        return MathFloor(parent.Top() + (parent.Height() - control.Height() * GetRatio(control, parent)) / 2)
+        return MathFloor(parent.Top() + (parent.Height() - control.Height() * GetRatio(control, parent)) * 0.5)
     end)
     control.Bottom:SetFunction(function()
-        return MathFloor(parent.Bottom() - (parent.Height() - control.Height() * GetRatio(control, parent)) / 2)
+        return MathFloor(parent.Bottom() - (parent.Height() - control.Height() * GetRatio(control, parent)) * 0.5)
     end)
     control.Left:SetFunction(function()
-        return MathFloor(parent.Left() + (parent.Width() - control.Width() * GetRatio(control, parent)) / 2)
+        return MathFloor(parent.Left() + (parent.Width() - control.Width() * GetRatio(control, parent)) * 0.5)
     end)
     control.Right:SetFunction(function()
-        return MathFloor(parent.Right() - (parent.Width() - control.Width() * GetRatio(control, parent)) / 2)
+        return MathFloor(parent.Right() - (parent.Width() - control.Width() * GetRatio(control, parent)) * 0.5)
     end)
 end
 
@@ -1304,6 +1345,38 @@ function LayouterMetaTable:Below(parent, padding)
     return self
 end
 
+--- Sets all edges of a control to be a certain amount inside of a parent.
+--- Offsets are optional and scaled by the pixel scale factor.
+---@param parent Control
+---@param left? number
+---@param top? number
+---@param right? number
+---@param bottom? number
+function LayouterMetaTable:OffsetIn(parent, left, top, right, bottom)
+    OffsetIn(self.c, parent, left, top, right, bottom)
+    return self
+end
+
+--- Places the control a percentage along the width of a parent (updating its left and right edges),
+--- with 0.00 at the parent's left edge
+---@param parent Control
+---@param leftPercent number
+---@return Layouter
+function LayouterMetaTable:FromHorizontalCenterIn(parent, leftPercent)
+    FromHorizontalCenterIn(self.c, parent, leftPercent)
+    return self
+end
+
+--- Places the control a percentage along the height of a parent (updating its top and bottom edges),
+--- with 0.00 at the parent's top edge
+---@param parent Control
+---@param topPercent number
+---@return Layouter
+function LayouterMetaTable:FromVerticalCenterIn(parent, topPercent)
+    FromVerticalCenterIn(self.c, parent, topPercent)
+    return self
+end
+
 --- Sets all edges of the control to be a certain percentage inside of a parent.
 --- Percentages are optional.
 ---@param parent Control
@@ -1311,8 +1384,10 @@ end
 ---@param top? number
 ---@param right? number
 ---@param bottom? number
+---@return Layouter
 function LayouterMetaTable:PercentIn(parent, left, top, right, bottom)
     PercentIn(self.c, parent, left, top, right, bottom)
+    return self
 end
 
 -- Fill parent

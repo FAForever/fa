@@ -14,6 +14,7 @@ BenchmarkData = {
     AddGlobal = "Add Globals",
     AddUpval = "Add Upvalues",
     AddLocal = "Add Locals",
+    AddConst = "Add Constants",
     CircleGlobal = "Circle Global",
     CircleUpval = "Circle Upvalued",
     CircleLocal = "Circle Local",
@@ -25,56 +26,78 @@ Exclude = {
     ComputePoint = true,
 }
 
-local outerLoop = 10000000
-
 ProfilerA = 10
 ProfilerB = 20
 ProfilerC = 0
-function AddGlobal()
+function AddGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    ProfilerA = 10
+    ProfilerB = 20
+    ProfilerC = 0
 
-    for k = 1, outerLoop do 
+    local start = timer()
+
+    for _ = 1, loop do
         ProfilerC = ProfilerA + ProfilerB
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 
 end
 
-local ProfilerA = ProfilerA
-local ProfilerB = ProfilerB
-local ProfilerC = ProfilerC
+local ProfilerA = 10
+local ProfilerB = 20
+local ProfilerC = 0
 
-function AddUpval()
+function AddUpval(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    ProfilerA = 10
+    ProfilerB = 20
+    ProfilerC = 0
 
-    for k = 1, outerLoop do 
+    local start = timer()
+
+    for _ = 1, loop do
         ProfilerC = ProfilerA + ProfilerB
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
+    local final = timer()
+    return final - start
+end
 
+function AddLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+    local ProfilerA = 10
+    local ProfilerB = 20
+    local ProfilerC = 0
+
+    local start = GetSystemTimeSecondsOnlyForProfileUse()
+
+    for _ = 1, loop do
+        ProfilerC = ProfilerA + ProfilerB
+    end
+
+    local final = timer()
     return final - start
 end
 
 
-function AddLocal()
+function AddConst(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+    local ProfilerC = 0
 
     local start = GetSystemTimeSecondsOnlyForProfileUse()
 
-    for k = 1, outerLoop do 
-        local ProfilerA = ProfilerA 
-        local ProfilerB = ProfilerB
-        local ProfilerC = ProfilerC
-        ProfilerC = ProfilerA + ProfilerB
+    for _ = 1, loop do
+        ProfilerC = 10 + 20
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
@@ -82,24 +105,24 @@ end
 function ComputePoint(center, radius, radians)
     return {
         center[1] + radius * math.cos(radians),
-        center[2] + 0,
+        center[2],
         center[3] + radius * math.sin(radians),
     }
 end
 
-function CircleGlobal()
+function CircleGlobal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     -- parameters
-    local center = { 100, 0, 100}
+    local center = {100, 0, 100}
     local radius = 15
     local radianOffset = 1
     local numberOfPieces = 30
 
+    local start = timer()
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    for k = 1, 100000 do 
-        local points = { }
+    for _ = 1, loop do
+        local points = {}
         for k = 1, numberOfPieces do
             local radians = (k - 1) / (numberOfPieces - 1) * 3.14 * 2.0
             local point = ComputePoint(center, radius, radians + radianOffset)
@@ -108,8 +131,7 @@ function CircleGlobal()
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
@@ -121,23 +143,24 @@ local MathSin = math.sin
 local function ComputePoint(center, radius, radians)
     return {
         center[1] + radius * MathCos(radians),
-        center[2] + 0,
+        center[2],
         center[3] + radius * MathSin(radians),
     }
 end
 
-function CircleUpval()
+function CircleUpval(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     -- parameters
-    local center = { 100, 0, 100}
+    local center = {100, 0, 100}
     local radius = 15
     local radianOffset = 1
     local numberOfPieces = 30
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    local start = timer()
 
-    for k = 1, 100000 do 
-        local points = { }
+    for _ = 1, loop do
+        local points = {}
         for k = 1, numberOfPieces do
             local radians = (k - 1) / (numberOfPieces - 1) * 3.14 * 2.0
             local point = ComputePoint(center, radius, radians + radianOffset)
@@ -146,132 +169,114 @@ function CircleUpval()
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 
 end
 
-function CircleLocal()
+function CircleLocal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     -- parameters
-    local center = { 100, 0, 100}
+    local center = {100, 0, 100}
     local radius = 15
     local radianOffset = 1
     local numberOfPieces = 30
 
+    local start = timer()
+
     -- in local scope
     local GetSurfaceHeight = GetSurfaceHeight
     local TableInsert = table.insert
-    local MathCos = math.cos 
+    local MathCos = math.cos
     local MathSin = math.sin
-    
-    local function ComputePoint(center, radius, radians)
-        return {
-            center[1] + radius * MathCos(radians),
-            center[2] + 0,
-            center[3] + radius * MathSin(radians),
-        }
-    end
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    for k = 1, 100000 do 
-        local points = { }
+    for _ = 1, loop do
+        local points = {}
         for k = 1, numberOfPieces do
-            local radians = (k - 1) / (numberOfPieces - 1) * 3.14 * 2.0
-            local point = ComputePoint(center, radius, radians + radianOffset)
-            point[2] = GetSurfaceHeight(point[1], point[3])
-            TableInsert(points, point)
-        end
-    end
-
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
-    return final - start
-end
-
-function CircleLocalPreCompute()
-
-    -- parameters
-    local center = { 100, 0, 100}
-    local radius = 15
-    local radianOffset = 1
-    local numberOfPieces = 30
-
-    -- in local scope
-    local GetSurfaceHeight = GetSurfaceHeight
-    local TableInsert = table.insert
-    local MathCos = math.cos 
-    local MathSin = math.sin
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
-    -- pre-compute
-    local twoPi = 3.14 * 2.0
-    local n = numberOfPieces - 1
-    local inv = 1 / n 
-    local combined = twoPi * inv 
-
-    for k = 1, 100000 do 
-        local points = { }
-        for k = 0, numberOfPieces do
-            local radians = radianOffset + combined * k
+            local radians = (k - 1) / (numberOfPieces - 1) * 3.14 * 2.0 + radianOffset
             local point = {
                 center[1] + radius * MathCos(radians),
-                0,
+                center[2],
                 center[3] + radius * MathSin(radians),
             }
-
             point[2] = GetSurfaceHeight(point[1], point[3])
             TableInsert(points, point)
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
-function CircleOptimal()
+function CircleLocalPreCompute(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     -- parameters
-    local center = { 100, 0, 100}
+    local center = {100, 0, 100}
     local radius = 15
     local radianOffset = 1
     local numberOfPieces = 30
 
+    local start = timer()
+
     -- in local scope
     local GetSurfaceHeight = GetSurfaceHeight
-    local MathCos = math.cos 
+    local TableInsert = table.insert
+    local MathCos = math.cos
     local MathSin = math.sin
+    -- pre-compute
+    local precomputed = 6.28 / (numberOfPieces - 1)
 
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
+    for _ = 1, loop do
+        local points = {}
+        for k = 0, numberOfPieces do
+            local radians = radianOffset + precomputed * k
+            local point = {
+                center[1] + radius * MathCos(radians),
+                center[2],
+                center[3] + radius * MathSin(radians),
+            }
+            point[2] = GetSurfaceHeight(point[1], point[3])
+            TableInsert(points, point)
+        end
+    end
+
+    local final = timer()
+    return final - start
+end
+
+function CircleOptimal(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
+
+    -- parameters
+    local center = {100, 0, 100}
+    local radius = 15
+    local radianOffset = 1
+    local numberOfPieces = 30
+
+    local start = timer()
 
     -- pre-compute
-    local twoPi = 3.14 * 2.0
-    local n = numberOfPieces - 1
-    local inv = 1 / n 
-    local combined = twoPi * inv 
+    local combined = 6.28 / (numberOfPieces - 1)
+    -- in local scope
+    local GetSurfaceHeight = GetSurfaceHeight
+    local MathCos = math.cos
+    local MathSin = math.sin
 
-    -- re-use table - we can do this because we keep a separate count
-    -- local count = 0
-    local points = { }
-
-    for k = 1, 100000 do 
-
+    for _ = 1, loop do
         -- insert elements manually
+        local points = {}
         local count = 0
 
         for k = 0, numberOfPieces do
-
             -- compute radians for this piece
             local radians = radianOffset + combined * k
 
             -- replace function call all together (0.1 seconds)
             local point = {
                 center[1] + radius * MathCos(radians),
-                0,
+                center[2],
                 center[3] + radius * MathSin(radians),
             }
 
@@ -283,13 +288,13 @@ function CircleOptimal()
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
 
 
-function CircleChebyshev()
+function CircleChebyshev(loop)
+    local timer = GetSystemTimeSecondsOnlyForProfileUse
 
     -- parameters
     local center = {100, 0, 100}
@@ -297,26 +302,18 @@ function CircleChebyshev()
     local radianOffset = 1
     local numberOfPieces = 30
 
+    local start = timer()
+
     -- in local scope
     local GetSurfaceHeight = GetSurfaceHeight
     local MathCos = math.cos
     local MathSqrt = math.sqrt
-
-    local start = GetSystemTimeSecondsOnlyForProfileUse()
-
     -- pre-compute
-    local twoPi = 3.14 * 2.0
-    local n = numberOfPieces - 1
-    local inv = 1 / n
-    local combined = twoPi * inv
+    local combined = 6.28 / (numberOfPieces - 1)
 
-    -- re-use table - we can do this because we keep a separate count
-    -- local count = 0
-    local points = {}
-
-    for k = 1, 100000 do
-
+    for _ = 1, loop do
         -- insert elements manually
+        local points = {}
         local count = 0
 
         local cosAng = MathCos(combined)
@@ -333,6 +330,7 @@ function CircleChebyshev()
         local cosNm1 = cosInit * cosAng + sinInit * sinAng
         local sinNm1 = sinInit * cosAng - cosInit * sinAng
 
+        -- replace trig functions
         for k = 0, numberOfPieces do
             -- cos(init + n ang) = 2 cos(ang) cos(init + (n-1) ang) - cos(init + (n-2) ang)
             -- sin(init + n ang) = 2 cos(ang) sin(init + (n-1) ang) - sin(init + (n-2) ang)
@@ -344,7 +342,7 @@ function CircleChebyshev()
             -- replace function call all together (0.1 seconds)
             local point = {
                 center[1] + cosN,
-                0,
+                center[2],
                 center[3] + sinN,
             }
 
@@ -356,7 +354,6 @@ function CircleChebyshev()
         end
     end
 
-    local final = GetSystemTimeSecondsOnlyForProfileUse()
-
+    local final = timer()
     return final - start
 end
