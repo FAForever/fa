@@ -417,11 +417,6 @@ function ConstructClass(bases, specs)
 
     class.__index = class
 
-    local staticInit = class.__static_init
-    if staticInit then
-        staticInit(class)
-    end
-
     return class
 end
 
