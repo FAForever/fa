@@ -6,6 +6,7 @@ UnitBlueprint {
             'Torso',
             'AttachPoint',
         },
+        InitialAutoMode = true,
     },
     Audio = {
         CaptureLoop = Sound {
