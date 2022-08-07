@@ -304,7 +304,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 60,
+            MuzzleVelocity = 120,
             ProjectileId = '/projectiles/TAARailgun03/TAARailgun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
@@ -382,7 +382,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 60,
+            MuzzleVelocity = 120,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TAARailgun03/TAARailgun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
@@ -456,7 +456,7 @@ UnitBlueprint {
             InitialDamage = 20, -- Total impact damage = 400. Total overall damage = 1600
             Label = 'Bomb',
             MaxRadius = 60,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 20,
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
