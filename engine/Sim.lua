@@ -91,8 +91,8 @@ end
 ---@param weapon Weapon
 ---@param label string
 ---@param turretBone Bone
----@param barrelBone Bone
----@param muzzleBone Bone
+---@param barrelBone? Bone
+---@param muzzleBone? Bone
 ---@return moho.AimManipulator
 function CreateAimController(weapon, label, turretBone, barrelBone, muzzleBone)
 end

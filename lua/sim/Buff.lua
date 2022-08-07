@@ -27,6 +27,67 @@
 ----        }
 ----    }
 
+---@alias BuffType
+---| AdjacencyBuffType
+---| CheatBuffType
+---| CommonBuffType
+---| OpBuffType
+---| UniqueBuffType
+---| VeterancyBuffType
+
+---@alias CommonBuffType
+---| 'BuildRate'
+---| 'Damage'
+---| 'DamageRadius'
+---| 'EnergyActive'
+---| 'EnergyWeapon'
+---| 'EnergyMaintenance'
+---| 'EnergyProduction'
+---| 'Health'
+---| 'MassActive'
+---| 'MassMaintenance'
+---| 'MaxHealth'
+---| 'MaxRadius'
+---| 'MoveMult'
+---| 'MassProduction'
+---| 'OmniRadius'
+---| 'RadarRadius'
+---| 'RateOfFire'
+---| 'Regen'
+---| 'Stun'
+---| 'StunAlt'
+---| 'VisionRadius'
+---| 'WeaponsEnable'
+
+-- These are only created when needed
+---@alias UniqueBuffType
+---| 'AeonACUChronoDampener'
+---| 'AeonACUT2BuildRate'
+---| 'AeonACUT3BuildRate'
+---| 'AeonSCUBuildRate'
+---| 'AeonSCURegenRate'
+---| 'CybranACUCloakBonus'
+---| 'CybranACUStealthBonus'
+---| 'CybranACUT2BuildRate'
+---| 'CybranACUT3BuildRate'
+---| 'CybranSCUBuildRate'
+---| 'CybranSCUCloakBonus'
+---| 'CybranSCURegenerateBonus'
+---| 'UEFACUDamageStabilization'
+---| 'UEFACUT2BuildRate'
+---| 'UEFACUT3BuildRate'
+---| 'SelenCloakVisionDebuff'
+---| 'SeraphimACUDamageStabilization'
+---| 'SeraphimACUDamageStabilizationAdv'
+---| 'SeraphimACUAdvancedRegenAura'
+---| 'SeraphimACUAdvancedRegenAuraSelfBuff'
+---| 'SeraphimACURegenAura'
+---| 'SeraphimACURegenAuraSelfBuff'
+---| 'SeraphimACUT2BuildRate'
+---| 'SeraphimACUT3BuildRate'
+---| 'SeraphimSCUDamageStabilization'
+---| 'SeraphimSCUBuildRate'
+
 --Function to apply a buff to a unit.
 --This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
 ---@param unit Unit
@@ -469,7 +530,7 @@ end
 -- A key -> function table for buffs, uses the buffName parameter
 local UniqueBuffs = { }
 UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
-UniqueBuffs['SeraphimAdvancedACURegenAura'] = BuffRegenFieldCalculate
+UniqueBuffs['SeraphimACUAdvancedRegenAura'] = BuffRegenFieldCalculate
 
 --- Calculates the buff from all the buffs of the same time the unit has.
 ---@param unit Unit
