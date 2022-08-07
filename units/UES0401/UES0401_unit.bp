@@ -5,6 +5,7 @@ UnitBlueprint {
         RepairConsumeEnergy = 30,
         RepairConsumeMass = 0,
         StagingPlatformScanRadius = 300,
+        GuardReturnRadius = 0,
         TargetBones = {
             'Front_Left_Projectile02',
             'Front_Right_Projectile02',

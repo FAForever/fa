@@ -119,8 +119,10 @@ UEL0307 = Class(TShieldLandUnit) {
     OnLayerChange = function(self, new, old)
         TShieldLandUnit.OnLayerChange(self, new, old)
         
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self) then 
+            if self.PointerEnabled == false then
+                self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+            end
         end
     end,
 }
