@@ -2952,8 +2952,15 @@ Unit = Class(moho.unit_methods) {
     --- 10 seconds)
     ---@param self Unit
     IntelReactivate = function(self)
-        local recharge = self.Blueprint.Intel.ReactivateTime or 10
-        WaitSeconds(recharge)
+        local recharge = 0.1 * self.Blueprint.Intel.ReactivateTime or 10
+
+        for k = 1, 10 do
+            WaitSeconds(recharge)
+            self:SetWorkProgress(0.1 * k)
+        end
+
+        self:SetWorkProgress(-1)
+
         self:EnableUnitIntel('Energy')
         self.IntelReactivateThread = nil
     end;
