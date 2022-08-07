@@ -92,8 +92,6 @@ XRL0403 = Class(CWalkingLandUnit) {
     OnLayerChange = function(self, new, old)
         CWalkingLandUnit.OnLayerChange(self, new, old)
 
-        --LOG("Mega Layerchange from ", old, " to ", new)
-
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')
             -- Set movement speed to default
