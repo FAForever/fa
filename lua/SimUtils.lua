@@ -56,6 +56,26 @@ function KillSharedUnits(owner)
     end
 end
 
+local function TransferUnitsOwnershipComparator (a, b) 
+    a = a.Blueprint or a:GetBlueprint()
+    b = b.Blueprint or b:GetBlueprint()
+    return a.Economy.BuildCostMass > b.Economy.BuildCostMass 
+end
+
+local function TransferUnitsOwnershipDelayedWeapons (weapon)
+    if not weapon:BeenDestroyed() then 
+        -- compute delay
+        local bp = weapon:GetBlueprint()
+        local delay = 1 / bp.RateOfFire
+        WaitSeconds(delay)
+
+        -- enable the weapon again if it still exists
+        if not weapon:BeenDestroyed() then 
+            weapon:SetEnabled(true)
+        end
+    end
+end
+
 function TransferUnitsOwnership(units, ToArmyIndex, captured)
     local toBrain = GetArmyBrain(ToArmyIndex)
     if not toBrain or toBrain:IsDefeated() or not units or table.empty(units) then
@@ -72,7 +92,7 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
     units = EntityCategoryFilterDown(categories.ALLUNITS - categories.INSIGNIFICANTUNIT, units)
 
     -- gift most valuable units first
-    table.sort(units, function (a, b) return a:GetBlueprint().Economy.BuildCostMass > b:GetBlueprint().Economy.BuildCostMass end)
+    table.sort(units, TransferUnitsOwnershipComparator)
 
     local newUnits = {}
     local upUnits = {}
@@ -249,6 +269,17 @@ function TransferUnitsOwnership(units, ToArmyIndex, captured)
 
         if upgradeKennels[1] then
             ForkThread(UpgradeTransferredKennels, upgradeKennels)
+        end
+    end
+
+    -- add delay on turning on each weapon 
+    for k, unit in newUnits do 
+        
+        -- disable all weapons, enable with a delay
+        for k = 1, unit.WeaponCount do 
+            local weapon = unit:GetWeapon(k)
+            weapon:SetEnabled(false)
+            weapon:ForkThread(TransferUnitsOwnershipDelayedWeapons)
         end
     end
 
@@ -529,9 +560,23 @@ function TransferUnfinishedUnitsAfterDeath(units, armies)
 end
 
 function GiveUnitsToPlayer(data, units)
+    local manualShare = ScenarioInfo.Options.ManualUnitShare
+    if manualShare == 'none' then return end
+
     if units then
         local owner = units[1].Army
         if OkayToMessWithArmy(owner) and IsAlly(owner,data.To) then
+            if manualShare == 'no_builders' then
+                local unitsBefore = table.getsize(units)
+                units = EntityCategoryFilterDown(categories.ALLUNITS - categories.CONSTRUCTION - categories.ENGINEER, units)
+                local unitsAfter = table.getsize(units)
+
+                if unitsAfter ~= unitsBefore then
+                    -- Maybe spawn an UI dialog instead?
+                    print((unitsBefore - unitsAfter) .. " engineers/factories could not be transferred due to manual share rules")
+                end
+            end
+            
             TransferUnitsOwnership(units, data.To)
         end
     end

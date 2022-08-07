@@ -1,0 +1,10 @@
+BeamBlueprint {
+    Lifetime = 10,
+    TextureName = '/textures/particles/beam_zapper_01.dds',
+    Thickness = 0.3,
+    StartColor = {x=0.6,y=0.6,z=0.6,w=0.04}, -- R,G,B,A
+    EndColor = {x=0.6,y=0.6,z=0.6,w=0.04}, -- R,G,B,A
+    Length = 2000,
+    UShift = 0.0,
+    VShift = -0.20,
+}

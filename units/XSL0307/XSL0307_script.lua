@@ -4,7 +4,7 @@
 --**
 --**  Summary  :  Seraphim Mobile Shield Generator Script
 --**
---**  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+--**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
 
 local SShieldHoverLandUnit = import('/lua/seraphimunits.lua').SShieldHoverLandUnit
@@ -79,8 +79,10 @@ XSL0307 = Class(SShieldHoverLandUnit) {
     OnLayerChange = function(self, new, old)
         SShieldHoverLandUnit.OnLayerChange(self, new, old)
         
-        if self.PointerEnabled == false then
-            self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+        if not IsDestroyed(self) then 
+            if self.PointerEnabled == false then
+                self.TargetPointer:SetFireTargetLayerCaps('None') --since its reset on layer change we need to do this. unfortunate.
+            end
         end
     end,
 }

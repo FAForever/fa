@@ -43,13 +43,10 @@ Blacklist = {
     ['98785b7a-9e9e-4863-abb3-46aaf1caef80'] = INTEGRATED,
 
     -- GAZ_UI (already merged)
-    ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = INTEGRATED,
+    -- ['4f8b5ac3-346c-4d25-ac34-7b8ccc14eb0a'] = INTEGRATED,
     ['CC5A5288-18E3-11DD-BF33-005055D89593'] = INTEGRATED,
     ['e9bb4b11-2952-4b19-bf4e-11fb6e5fcbe9'] = INTEGRATED,
-    ['CC5A5288-18E3-11DD-BF33-005055D89593'] = INTEGRATED,
-    ['e9bb4b11-2952-4b19-bf4e-11fe6e5fcbe9'] = INTEGRATED,
-    ['CC5A5288-18E3-11DD-BF33-005055D89593'] = INTEGRATED,
-    ['e9bb4b11-2952-4b19-bf4e-11fb6e5fcbe9'] = INTEGRATED,
+
 
     -- MoreUnitInfo
     ['CC51528A-1823-113D-BF33-044655D89593'] = INTEGRATED,
@@ -192,10 +189,6 @@ Blacklist = {
     ['fff6f6c8-248a-11de-8c30-362b9e100009'] = HARMFUL,
     
     -- cheat mods
-    ['086060ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v3
-    ['086061ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v4
-
-    -- cheat mod
     ['086060ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v3
     ['086061ea-6452-466d-b576-f756f9c913ef'] = HARMFUL, --Quality of Performance v4
 }

@@ -2,6 +2,7 @@ local DefaultProjectileFile = import('/lua/sim/defaultprojectiles.lua')
 local MultiPolyTrailProjectile = DefaultProjectileFile.MultiPolyTrailProjectile
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
+---@class TShellPhalanxProjectile : MultiPolyTrailProjectile
 TShellPhalanxProjectile = Class(MultiPolyTrailProjectile) {
     PolyTrails = EffectTemplate.TPhalanxGunPolyTrails,
     PolyTrailOffset = EffectTemplate.TPhalanxGunPolyTrailsOffsets,

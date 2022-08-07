@@ -1,0 +1,14 @@
+-- used by xsb2302
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_rifter_mobileartillery_polytrail_01',
+	Lifetime = -1.00,
+    TrailLength = 2.5,
+    Size = 0.08,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = -1.00, -- t3 / t4 artillery
+	RepeatTexture = '/textures/particles/trail_white_01.dds',
+	RampTexture = '/textures/particles/ramp_orange_03.dds',
+}
+

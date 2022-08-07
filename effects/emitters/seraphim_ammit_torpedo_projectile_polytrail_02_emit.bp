@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_ammit_torpedo_projectile_polytrail_02',
+	Lifetime = -1.00,
+    TrailLength = 4.0,
+    Size = 0.015,
+    SortOrder = -103,
+    BlendMode = 1,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_02.dds',
+	RampTexture = '/textures/particles/ramp_trail_17.dds',
+}
+

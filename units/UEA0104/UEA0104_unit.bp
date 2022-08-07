@@ -1,12 +1,6 @@
 UnitBlueprint {
     AI = {
         BeaconName = 'UEB5102',
-        TargetBones = {
-            'Char01',
-            'Char02',
-            'Char03',
-            'Char04',
-        },
     },
     Air = {
         AutoLandTime = 1,
@@ -95,15 +89,6 @@ UnitBlueprint {
         },
     },
     AverageDensity = 1,
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
-        },
-    },
     BuildIconSortPriority = 40,
     Categories = {
         'PRODUCTSC1',
@@ -124,7 +109,7 @@ UnitBlueprint {
         'CANNOTUSEAIRSTAGING',
         'SNIPEMODE',
     },
-    CollisionOffsetY = -1,
+    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 1.5,
         ArmorType = 'Light',
@@ -214,7 +199,7 @@ UnitBlueprint {
     },
     Footprint = {
         MaxSlope = 0.25,
-        SizeX = 1,
+        SizeX = 2,
         SizeZ = 6,
     },
     General = {
@@ -273,7 +258,7 @@ UnitBlueprint {
     SelectionSizeZ = 5,
     SelectionThickness = 0.19,
     SizeX = 2,
-    SizeY = 2,
+    SizeY = 1.4,
     SizeZ = 7,
     StrategicIconName = 'icon_gunship2_transport',
     StrategicIconSortPriority = 65,
@@ -339,12 +324,10 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Front_Down_Muzzle',
             TurretBonePitch = 'Front_Down_Barrel',
             TurretBoneYaw = 'Front_Down_Turret',
@@ -405,12 +388,10 @@ UnitBlueprint {
             RackSlavedToTurret = true,
             RangeCategory = 'UWRC_DirectFire',
             RateOfFire = 3,
-            TargetCheckInterval = 0.3,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'HIGHALTAIR, UNTARGETABLE',
-            TrackingRadius = 1.15,
             TurretBoneMuzzle = 'Back_Down_Muzzle',
             TurretBonePitch = 'Back_Down_Barrel',
             TurretBoneYaw = 'Back_Down_Turret',
@@ -475,13 +456,11 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Front_Up_Muzzle01',
             TurretBonePitch = 'Front_Up_Turret_Barrel01',
             TurretBoneYaw = 'Front_Up_Turret',
@@ -549,13 +528,11 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_AntiAir',
             RateOfFire = 1,
-            TargetCheckInterval = 0.5,
             TargetPriorities = {
-                '(ALLUNITS - SPECIALLOWPRI)',
+                'ALLUNITS',
             },
             TargetRestrictDisallow = 'UNTARGETABLE,LAND,STRUCTURE,NAVAL',
             TargetRestrictOnlyAllow = 'AIR',
-            TrackingRadius = 1.4,
             TurretBoneMuzzle = 'Back_Up_Muzzle01',
             TurretBonePitch = 'Back_Up_Turret_Barrel01',
             TurretBoneYaw = 'Back_Up_Turret',

@@ -10,6 +10,7 @@ local Game = import('/lua/game.lua')
 local CalculateBallisticAcceleration = import('/lua/sim/CalcBallisticAcceleration.lua').CalculateBallisticAcceleration
 
 -- Most weapons derive from this class, including beam weapons later in this file
+---@class DefaultProjectileWeapon: Weapon
 DefaultProjectileWeapon = Class(Weapon) {
 
     FxRackChargeMuzzleFlash = {},
@@ -285,7 +286,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.UnpackAnimator = CreateAnimator(self.unit)
             self.UnpackAnimator:PlayAnim(bp.WeaponUnpackAnimation):SetRate(0)
             self.UnpackAnimator:SetPrecedence(bp.WeaponUnpackAnimatorPrecedence or 0)
-            self.Trash:Add(self.UnpackAnimator)
+            self.TrashManipulators:Add(self.UnpackAnimator)
         end
         if self.UnpackAnimator then
             self.UnpackAnimator:SetRate(bp.WeaponUnpackAnimationRate)
@@ -318,14 +319,14 @@ DefaultProjectileWeapon = Class(Weapon) {
             tmpSldr:SetPrecedence(11)
             tmpSldr:SetGoal(0, 0, bp.RackRecoilDistance)
             tmpSldr:SetSpeed(-1)
-            self.Trash:Add(tmpSldr)
+            self.TrashManipulators:Add(tmpSldr)
             if v.TelescopeBone then
                 tmpSldr = CreateSlider(self.unit, v.TelescopeBone)
                 table.insert(self.RecoilManipulators, tmpSldr)
                 tmpSldr:SetPrecedence(11)
                 tmpSldr:SetGoal(0, 0, v.TelescopeRecoilDistance or bp.RackRecoilDistance)
                 tmpSldr:SetSpeed(-1)
-                self.Trash:Add(tmpSldr)
+                self.TrashManipulators:Add(tmpSldr)
             end
         end
         self:ForkThread(self.PlayRackRecoilReturn, rackList)
@@ -869,6 +870,7 @@ DefaultProjectileWeapon = Class(Weapon) {
     },
 }
 
+---@class KamikazeWeapon : Weapon
 KamikazeWeapon = Class(Weapon) {
     OnFire = function(self)
         local myBlueprint = self.Blueprint
@@ -878,6 +880,7 @@ KamikazeWeapon = Class(Weapon) {
     end,
 }
 
+---@class BareBonesWeapon : Weapon
 BareBonesWeapon = Class(Weapon) {
     Data = {},
 
@@ -890,6 +893,7 @@ BareBonesWeapon = Class(Weapon) {
     end,
 }
 
+---@class OverchargeWeapon : DefaultProjectileWeapon
 OverchargeWeapon = Class(DefaultProjectileWeapon) {
     NeedsUpgrade = false,
     AutoMode = false,
@@ -1063,6 +1067,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
     }
 }
 
+---@class DefaultBeamWeapon : DefaultProjectileWeapon
 DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
     BeamType = CollisionBeam,
 
@@ -1096,7 +1101,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
                 }
                 local beamTable = {Beam = beam, Muzzle = mv, Destroyables = {}}
                 table.insert(self.Beams, beamTable)
-                self.Trash:Add(beam)
+                self.TrashProjectiles:Add(beam)
                 beam:SetParentWeapon(self)
                 beam:Disable()
             end
@@ -1143,7 +1148,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 
         if beam:IsEnabled() then return end
         beam:Enable()
-        self.Trash:Add(beam)
+        self.TrashProjectiles:Add(beam)
 
         -- Deal with continuous and non-continuous beams
         if bp.BeamLifetime > 0 then
@@ -1287,6 +1292,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
 }
 
 local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
+---@class DeathNukeWeapon : BareBonesWeapon
 DeathNukeWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,
@@ -1319,6 +1325,7 @@ DeathNukeWeapon = Class(BareBonesWeapon) {
     end,
 }
 
+---@class SCUDeathWeapon : BareBonesWeapon
 SCUDeathWeapon = Class(BareBonesWeapon) {
     OnFire = function(self)
     end,

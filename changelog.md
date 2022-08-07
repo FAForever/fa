@@ -1,3 +1,780 @@
+
+Some sections of the changelog are available in other languages such as [French](changelog-fr.md) or [Russian](changelog-ru.md)
+
+Game version 3740 (23th of June, 2022)
+======================================
+
+## Bug fixes
+
+(#3987) Align the stun radius of a Medusa with its damage radius
+
+(#3988) Fix the initialisation of a state as part of a simple class
+
+(#3990) Fix various issues with transports for AIs
+    Specifically allows the AIs to properly understand the number of units that can be attached to a transport 
+
+## Features
+
+(#3979) Improve campaign AI behavior
+    Includes various fixes for campaign behavior, specifically to their use of transports
+
+(#3989, #3993) Allow all direct fire weapons to retarget as usual
+    Prevents units from 'being stuck' attacking a factory while an engineer is next to it. This type of issue
+    shows up a lot more often in matchmaking. Change made with thanks to a conversation on the forums.
+
+    I'd also like to use this opportunity to note that we're making the game better for the community. If a change 
+    appears to be the reverse of that then we're always open to discuss why you think that is the case. 
+
+## Other changes
+
+(#3962) Add annotation to campaign related files
+
+(#3983) Fix the Russian translation to 'Depth charges'
+
+(#3991) Prevent loading of the mod `Quality of Performance 2022`
+    It was damaging some of the optimalisations that were introduced the past few months. At the same time it
+    introduces a unit that is free and produces a lot of resources, but it is only available to the Cybran faction
+
+(#3992) Adjust the spacing of tech 1 / tech 2 bombers / gunships
+
+## Contributors
+
+Jip (#3962, #3988, #3992, #3991, #3993, #3990)
+Uveso (#3983)
+Fluffy (#3987)
+speed2 (#3979, #3990)
+
+Game version 3739 (20th of June, 2022)
+======================================
+
+## Bug fixes
+
+- (#3978) Fix tactical missile enhancements of (S)ACUs
+
+## Contributors
+
+- Jip (#3978)
+
+Game version 3738 (19th of June, 2022)
+======================================
+
+The past month has been exciting - there is no other word that we can use.
+
+From a development perspective we're on the verge of being able to provide a modern, interactive development environment to our community. With the work of Eluvatar a Visual Studio Code (VSC) extension is close to release that provides intellisense support for map scripters, mod makers and game developers. And with the work of Ejsstiil the Lua debugger that ships with the game is fully functional again when you work from your development environment. Programmers understand how critical these features are for the development of essentially anything.
+
+And from a user perspective the game has never been more performing. Specifically the infamously slow ASF battles has been tackled. For the majority of matches the game no longer slows down, with the assumption that there is no potato processor participating in the match.
+
+All of that shadows all of the other critical work that has been done the past month with thanks to all the remaining contributors, including SpikeyNoob, Hdt80bro and LilJoe7k4 who made their first contributions to the game repository.
+
+A great deal of appreciation towards everyone that made this patch possible.
+
+I hope you all enjoy the lack of APM during a late Seton's Clutch game,
+
+With kind regards,
+
+Jip
+
+## Bug fixes
+
+- (#3896, #3899, #3901) Fix UI elements ignoring the console command UI_ToggleGamePanels
+
+- (#3909) Fix enhancements ETAs leaking to the other screen when using split screen
+
+- (#3876) Sanitize weapon target priorities of Point Defenses
+    This fixes the issue that point defenses are not firing while a target is in range
+
+- (#3923, #3924) Fix an economy related glitch that allows you to gain resources free of charge
+    For all intends and purposes we will not dive into the details ;)
+
+- (#3946) Fix damage of child projectiles, such as Cybran tactical missiles after they split
+
+- (#3961) Fix issue with the attachment bones of the tech 2 Aeon Transport
+    As a consequence the tech 2 Aeon transport can now carry up to 3 tech 3 units, instead of 2
+
+- (#3966) Fix roll off points for various factories
+    The roll off points were not properly aligned, as a consequence ships had trouble leaving the dock. This was especially noticeable on the naval factories of the Cybran faction
+
+## Features
+
+- (#3887, #3968) Introduce Intellisense support for the FA Visual Studio Code (VSC) extension
+    As map scripters, mod makers and game developers we have been living in a cave. But no more - thanks to the work on the extension and the work in this pull request we are slowly introducing annotation across the repository.
+
+    For those with programming experience: it is like the introduction of Typescript, after working for years on ends in Javascript.
+
+    This also works when you have no development environment for the FA repository on your system, see the readme on the Github page of the FA repository for more information.
+
+- (#3938) Revive the FA Lua debugger
+    Revives the FA Lua debugger when you are working from your development environment. Allows you to set breakpoints and inspect the stack, locals and globals. Extremely useful when you are debugging your maps, mods and when you're working on game development in general.
+
+    Requires a development environment in order to work. You can set this up in half an hour, see the readme on the Github page of the FA repository for more information.
+
+- (#3883) Introduce a UI to keep track of the mass fabricator behavior
+    The UI element is to the right of the economy panel. It can be dragged horizontally by using the middle mouse button.
+
+- (#3889, #3906) Improve in-game chat settings panel
+    Fixes various small issues with the chat panel and allows you to view and inspect the changes in the settings live by using the apply button.
+
+- (#3863) Pimp the Aeon Quantum Optics Facility
+    The unit was unfinished in every regard - as part of a live programming session we improved the feeling and aesthetics.
+
+- (#3905) Add guidelines for a development environment for FA for Linux-based operating systems
+    For more information, see the work instructions of the github page.
+
+- (#3933) Use playable area instead of map size on the default scoreboard
+
+- (#3835) Introduce a builder pattern to create UI elements
+    An alternative, more modern approach to creating, positioning and checking of UI elements.
+
+- (#3972) Add the ability to manually recheck weapon targets of the selected units via a hotkey
+    As per #3857 the weapons of the majority of units do not recheck their targets. Usually this is not required, but it does cause a big hit on performance. This new hotkey is introduced to allow you to let your units retarget on command for those situations where that is required
+
+    You can find the hotkey by searching for 'recheck' in the hotkeys menu
+
+### For map, mod and AI developers
+
+- (#3884) Add support for a unit.IsCivilian flag
+    Introduces an easy to use flag to indicate whether a unit belongs to a civilian army
+
+- (#3894) Add support for a unit.ImmuneToStun flag
+    Introduces an easy to use flag to make a unit immune to stuns
+
+- (#3894) Add support for a shield.SkipAttachment flag
+    Introduces an easy to use flag to allow shields to function when attached
+
+- (#3944) Add support for multiple upgrade animations via the function unit.GetUpgradeAnimation
+
+## Performance
+
+- (#3845) Reduce table allocations when defining weapon target priorities
+
+- (#3875, #3945) Reduce memory impact of units, weapons and props
+
+- (#3891, 6fefe78) Sanitize guard scan radius of units
+    The guard scan radius is used by units on attack move or patrol to find and engage hostile units in their surrounding. The value was all over the place and could cause serious slowdowns, especially during the late game.
+
+- (#3892, #3903) Sanitize footprints of air units
+    All non-experimental air units had a footprint size of 1 - the size of a wall. Because of that there were two issues: due to their proximity it introduced mesh intersections that break the immersion of the game. And due to their density it causes performance issues. From now on all bombers have a footprint size of 4, all gunships have a footprint size of 3 and all interceptors have a footprint size of 2.
+
+- (#3930) Remove dependency on the schook folder
+    Improves code maintainability and reduces the amount of hooks that ships with the game.
+
+- (#3857, #3931, #3950) Sanitize weapon parameters
+    There are three crucial parameters that determine the behavior and performance of weaponary: the weapon target check interval, the weapon tracking radius and the retargeting behavior of weaponry. The weapon target check interval is now based on the rate of fire of the weapon. The weapon tracking radius is reduced to 7% for non-anti air weaponry units and 15% for anti air weaponry. The retargeting is disabled unless the weapon is considered artillery or anti air.
+
+    This slightly changes the behavior of units, by standardizing their weapon parameters. In return, the game performs a lot better and units respond more consistent based on their weapon statistics.
+
+- (#3949) Reduce impact of props on FPS
+    Aligns the rendering distance of props with the base game
+
+- (#3943, #3951) Reduce impact of mesh entities on FPS
+    Aligns the rendering of various mesh-based entities with their respective size. As an example, the adjancency node was rendered up to the same distance as that of shields.
+
+- (#3967, #3965) reduce impact of projectiles on FPS
+    Sanitizes the LODCutoff of projectiles that have a mesh. The average projectile is emitter based, but some use a mesh. These meshes were visible at extreme ranges, causing them to be rendered even though they were completely hidden behind the strategical overlay of projectiles (dots)
+
+## Other changes
+
+- (#3885) Fix argumentations for the Hunter AI
+
+- (#3879) Fix minor issue with lobby
+
+- (#3881) Refactor effect files of the Lighting Tank
+    As told to us by Rowey - we'd be lost without him.
+
+- (#3895) Fix minor issues with the initialisation files
+
+- (#3907, #3926) Improve the /nomovie command line switch
+
+- (#3908) Introduce a /nomusic command line switch
+
+- (#3904) Fix game options menu not being scrollable by mousewheel
+
+- (#3913) Fix issues with the .gitignore of the repository
+
+- (#3921) Add tooltip to patchnotes button in the lobby
+    The mighty Rowey - at work again.
+
+- (#3882) Fix bone names of the upgraded Hives
+
+- (#3925) Fix the width, padding and layouts of various UI elements
+
+- (#3912, #3724) Add in remaining base game blueprint and script files
+    Greatly improves code maintainability of working on the game as a whole.
+
+- (#3947) Fix UEF engineers not applying their water animation
+
+- (#3948) Fix a rare issue where the speed adjustment of (slow) hover units caused an error
+
+- (#3941) Fix categories missmatch for the Atlantis
+
+- (#3969) Fix the Flayer (AA) missiles of the tech 2 UEF Cruiser
+    The missiles were using a torpedo mesh, instead of the typical UEF AA Flayer mesh used by sams
+
+## Contributors
+
+- LilJoe7k4: (#3845)
+- speed2: (#3885)
+- 4z0t: (#3879, #3883, #3835)
+- Jip: (#3895, #3894, #3884, #3875, #3863, #3891, #3892, #3903, #3923, #3913, #3924, #3857, #3931, #3912, #3724, #3944, #3947, #3946, #3945, #3948, #3950, #3972)
+- Ejsstiil: (#3896, #3889, #3899, #3907, #3908, #3909, #3904, #3906, #3901, #3926, #3925, #3937)
+- Madmax: (#3863, #3951, #3943, #3961)
+- SpikeyNoob: (#3905)
+- Tagada: (#3876)
+- Rowey: (#3921, #3881, #3882)
+- Hdt80bro: (#3933)
+- Eluvatar: (#3887, #3968)
+- Uveso: (#3941)
+- M0rph3us (#3969, #3967, #3965)
+- KionX (6fefe78)
+
+## Translators
+
+- 4z0t (Russian)
+- M0rph3us (French)
+- Unknow (French)
+- Carchagassky (French)
+
+
+Game version 3737 (15th of May, 2022)
+===================================
+
+### Features
+
+ - (Engine patch) Introduction of alternative profiling function for better accuracy (ff630c8)
+
+ - (Engine patch) Maximum game speed is set to +50 (adc06ef5)
+    Note that the interface (for replays, for example) has not been adjusted yet. Usually anything
+    above +10 is only applicable in the first few minutes of the game.
+
+ - Add button to lobby to access patch notes (#3842)
+    Another contribution of Rowey: introduces a button in the lobby to access the patch notes.
+
+ - Add Cloak Enhancement restriction option (#3844)
+    Allows the host to restrict the cloak enhancement of the Cybran ACU / SACU.
+
+ - Add proper recursive logging (#3861, #3869) 
+    Introduces the functions 'reprs' and 'reprsl'. They are abbreviations for 'Recursive printing safe' and
+    'Recursive printing safe to log'. It introduces an alternative to 'repr' which can get stuck in a recursive
+    loop when trying to stringify units, projectiles, weapons and / or props. The old repr functions is available
+    as 'repru', which is an abbreviation for 'Recursive printing unsafe'. The function 'repr' refers to 'reprs'.
+
+### Bug fixes
+
+ - (Engine patch) Disable mesh rendering for minimap (#7)
+
+ - (Engine patch) Fix a crash when restarting a map with a Salem (#6)
+
+ - (Engine patch) Fix a crash when air units have a collision of 'None' (1b17fe7)
+
+ - (Engine patch) Excludes negative income and problems from this (1b17fe7)
+    The problem in question is complicated and happens in every game, but it noticeable when it
+    happens to a commander. The negative income causes the commander to not be 'fully built', and that causes
+    a player to lose the game. This could happen when the commander was being repaired.
+
+ - (Engine patch) Fix a crash when the mouse is pointing towards the sky, away from the terrain (3bf0ba5)
+
+ - Fix mass fabricator behavior for multiplayer (#3852)
+    Fixes an issue where the new fabricators could seriously hamper the performance of the game
+
+ - Fix reclaim effects (#3865) 
+    Fixes an issue where the beam glitches out when reclaiming a unit
+
+ - Fix destruction sound of units being played twice (#3868)
+    Was especially noticeable on the Spiderbot
+
+### Performance
+
+ - (Engine patch) Improve performance of common table operations (ff630c8, da692d3)
+
+ - Optimize abstract projectile classes (#3847, #3855, #3866, #3867)
+    Further reduces the load on the CPU when projectiles are taking part in the simulation
+
+ - Clean up defaultunits.lua (#3806) 
+    Improves documentation, while removing engine calls, empty functions and duplicated code
+
+### Other 
+
+ - Fix coloring of lobby buttons (#3846) 
+    Rowey has keen eyes - fixes a few textures having the wrong colors when in the lobby when
+    you select the UEF faction
+
+ - Minor autobalance-related improvements (#3849)
+    Prevents a no-op swap where a player is switched with him / herself
+
+ - Fix two UI layout functions (#3848)
+    Fixes the UI functions 'OffsetIn' and 'PercentIn' of LayoutHelpers.lua
+
+ - Announce game full on slot closure (#3862)
+    Enables the game full announcement to happen when you close slots
+
+### Contributors
+
+ - Strogo (#7, #6)
+ - KionX (1b17fe7, ff630c8, 3bf0ba5, 564ff89, adc06ef5)
+ - Rowey (#3842, #3846, #3844)
+ - Jip (#3847, #3855, #3866, #3867, #3865,
+        #3868, #3861, #3869)
+ - 4z0t (#3852, #3848)
+ - Penguin (#3849, #3862)
+
+Game version 3736 (6th of May, 2022)
+===================================
+
+### Features
+
+ - Introduction of automated fabricator behavior (#3813, #3814, #3822, #3838, #3840)
+    Automates the fabricators depending on your energy storage and energy trend:
+     - Less than 90% storage: fabricators are turned off, one by one until the storage is full again.
+     - Full storage and more than 100 energy income: fabricators are turned on, as long as the conditions are met
+
+    There is no particular order in enabling and disabling the fabricators. Only one fabricator is enabled or disabled 
+    at any moment. This is an intended limitation to encourage the construction of one tech 3 fabricator over 
+    16 tech 2 fabricators.
+
+    The fabricators production toggle enables or disables the automated behavior of fabricators. When toggled off both 
+    the behavior and the production is removed. When toggled on the behavior is enabled again but does not follow suite: 
+    the fabricator will be enabled over time assuming that you meet its conditions: full storage and  more than 
+    100 energy income.
+
+    This feature is experimental and may be removed again in the future. Please use the Discord channels and the forums to 
+    provide feedback on this feature. Note that the feature is not intended to play the game for you - it should therefore 
+    not always make an optimal choice. As an example, if you want certain fabricators enabled but they remain off then you 
+    should build more power to sustain all fabricators or disable other fabricators manually.
+
+ - Allow the cheat window to spawn multiple units at once (#3825)
+
+ - Re-implement the changelog dialog (#3833)
+    Adapts the changelog into one that is more versatile. It puts an emphasis on the amount of work that has been done in 
+    the past, can be dismissed by pressing escape, highlights the lines that you're hovering over and has a button with a 
+    link to the more user-friendly version of balance patches.
+
+### Bug fixes
+
+ - Fix UI issue with some co-op maps (#3816)
+    Fixes the playable area not being set for various co-op maps
+
+ - Fix invulnerable Continentals (#3830)
+    Continentals could end up being invulnerable, making the ideal ghetto gunship. This was damaging to the game balance 
+    and therefore corrected.
+
+ - Fix rendering issues with the minimap (#3834)
+
+ - Fix behavior when kicking observers (#3836)
+    Removes the 'offset' that was introduced by 3732 and a host can no longer eject him/herself.
+
+### Performance
+
+ - Improve performance of entity allocations (#3824)
+
+ - Re-introduce input delay when there is one or fewer players (#3837)
+    Six years ago the input delay was removed when a single player game was detected. This would allow your units to respond 
+    immediately. This brought in some serious side effects such as a (massive) loss of performance over the duration of a 
+    game. Particular players playing against AI may notice a significant speed up and more stable performance.
+
+### Other 
+
+ - Remove deprecation warnings (#3827)
+    The deprecation warnings ended up being confusion to map and mod makers alike. They are removed until a better 
+    alternative is available.
+
+ - Update description of fabricators (#3817)
+    We have been rewarded by another contribution from Rowey - an event unlike any other. We're blessed to have him with us.
+
+### Contributors
+
+ - 4z0t (#3816)
+ - Rowey (#3817)
+ - Strogo (#3834)
+ - Penguin (#3836)
+ - Jip  (#3813, #3814, #3822, #3838, #3840,
+        (#3825, #3827, #3824, #3826, #3822,
+         #3833, #3830)
+
+With thanks to speed2 for reporting some of the issues through Github.
+
+Game version 3735 (24th of April, 2022)
+===================================
+
+### Bug fixes
+
+ - Remove remainder of old decal / tree knocking code (#3803)
+    Fixes issues with the missiles of the Cybran 'Plan B' submarine
+
+ - Fix consumption issue with extractors when production is paused (#3804)
+    Extractors no longer produce mass for free when their production is paused :)
+
+ - Allow for ambiguous states in classes (#3805)
+    This fixes an issue with the mod RKs explosions that immediately 
+    broke the simulation upon launch
+
+ - Fix wreckage not taking damage (#3807)
+
+ - Fix inconsistent lods (#3808)
+    This was particularly noticeable between trees and tree groups.
+
+ - Fix Aeon structures shader after construction (#3809)
+
+### Performance
+
+ - Prevent extractors from looking through all markers upon creation (#3804)
+
+### Contributors
+
+ - Jip (#3803, #3804, #3805, #3807, #3808, #3809)
+
+With thanks to Archsimkat, AlfaViTe and Cyrris for taking the time to report various issues.
+
+Game version 3734 (22nd of April, 2022)
+===================================
+
+### Bug fixes
+
+ - Fix (another) missing parameter in matchmaking (#3801) 
+
+### Contributors
+
+ - Jip (#3801)
+
+Game version 3733 (22nd of April, 2022)
+===================================
+
+### Bug fixes
+
+ - Fix missing parameter in matchmaking (#3800) 
+
+### Contributors
+
+ - Jip (#3800)
+
+Game version 3732 (22nd of April, 2022)
+===================================
+
+### Features
+ - In-lobby auto balancing (#3750, #3764, #3768) 
+    Introduction of in-lobby balancing for the typical two-team setup. Similar results
+    to optimal balance but allows the host to manually tweak the starting positions
+    and take into account parties before launching the game.
+
+ - Introduction of experimental graphics (#3775)
+    Allows you to increase the LOD of entities and the LOD and resolution of 
+    shadows. This can be enabled separetely in the graphics options of the game. Is
+    applied after restarting the game.
+
+    Please read the tooltip carefully.
+
+ - Introduction of lobby option to determine sharing behavior of units (#3741)
+    Allows the host to enable the sharing of all units, only allow the sharing of
+    non-construction units or disable the sharing of units all together. By default
+    sharing of all units is enabled.
+
+ - Dynamic AI threat calculations (#3660) 
+    The AI threat values have not been updated over the years - they are now 
+    computed based on unit statistics during the blueprint loading phase. 
+    Introduces a utilities window that allows you to inspect AI-related blueprint 
+    values of a unit. You need to set a hotkey for that window. You can find it 
+    in the hotkeys dialogue (F1) by searching for 'information'. Cheats need to 
+    be enabled in order for the window to show.
+
+ - Allow Hives to start upgrading immediately (#3675)
+    Part of the Small Suggestions topic on the forum - suggested by Tagada.
+
+ - Introduce connection status during matchmaking
+    Adds a UI component that informs you how many players are connected while waiting for
+    the people to connect for ladder / matchmaking.
+
+ - Introduction of the (performance) profiler (#3674, #3700)
+    Allows us to diagnose where the performance is being used during a game. Revolutionary 
+    in terms of our capabilities of understanding where all those cycles are going.
+
+    Requires you to set a hotkey to enable it. Abuse is bannable.
+
+ - Introduce toggle for mesh rendering on the minimap (#3667)
+    All meshes would be culled (or rendered) accordingly on the minimap even though
+    they are, typically, never visible. Introduces a toggle to disable mesh rendering
+    in the minimap.
+
+    This is not functional until the next release of the executable.
+
+ - Adjust dynamic threat computations (#3680, #3673)
+    Armored command units no longer have inflated threat values. Introduces a flag to skip 
+    the dynamic threat computation all together, defaulting back to what was set in the 
+    blueprint. Weapons by default produce direct fire threat, unless they are flagged to be 
+    blockable by an anti-artillery shield. In that case they only produce economic threat.
+
+    This only impacts AI-related games. With thanks to Relent0r (creator of RNGAI) for his time.
+
+ - Temporarily disables weapons of a unit upon gifting (#3696)
+    Prevents the cheat where gifted units can immediately fire again. This was particularly
+    relevant to bombers.
+
+ - Map utilities window (#3677, #3713) 
+    Introduces a window to help analyse a map. Can be used to visualize the threat values of an AI, 
+    check the buildability of extractors, along with ringed storages and fabricators. Can visualize
+    all markers on a map.
+
+    Requires you to set a hotkey to enable it. 
+
+ - Display team ratings in the observer window of the lobby (#3721, #3728, #3742)
+
+ - Introduction of an announcement when you receive units due to full share (#3712) 
+
+ - Introduction of click-on-name-to-whisper feature while in the lobby (#3747)
+    
+### Bug fixes
+
+ - Remove new lines when you set a lobby title (#3644) 
+    Prevents having lobbies in the client that occupy multiple lines, 
+    allowing them to overlap with other lobbies.
+
+ - Preserve weapon bone orientation upon destruction (#3668)
+    There was a bug introduced last patch that causes weapons to reset
+    their orientation right before the unit was destroyed. 
+
+ - Fix trampling damage (#3669)
+    There was a bug introduced last patch that reduced all trampling
+    damage to zero. Surprising how little people reported about it :)
+ 
+ - Fix inconsistencies with cheat menu (#3656)
+    The mouse click is now always registered. Prevents selected units from 
+    interfering with the cheat progress by deselecting them while spawning 
+    units and reselecting them when you are finished. Fixes veterancy issues: 
+    both for the spawn menu and all campaign missions.
+
+ - Proper UI scaling of Window class (#3679, #3795)
+
+ - Fix display name of Ythotha death weapon (#3689)
+    The yearly contribution of Rowey - can't wait what next year will bring us!
+
+ - Add missing build mode entries (#3690)
+
+ - Fix Cerberus turrets over extending their range (#3693)
+
+ - Fix encoding issues with unicode characters in the preference file (#3711, #3737) 
+
+ - Fix issues with the color picker of the lobby (#3705, #3715, #3751, #3765, #3706, #3799)
+
+ - Fix various issues that people found while playing on FAF Develop 
+   - (#3729, #3731, #3732, #3748, #3771, #3774, #3780, #3782, #3784,
+      #3788, #3794, #3793, #3796) 
+
+    With thanks to: Yudi, Archsimkat, Snagglefox, Master-Chief, Moosemax, Phong and all the other
+    people that hosted games on FAF Develop and / or reported issues to the game team.
+
+### Other
+ - Improve readme of repository (#3647, #3663, #3670)
+    Introduces a modern readme and accurate installation instructions of the 
+    development environment. With thanks to everyone involved, including but not 
+    limited to BlackYps, Sheikah, Balthazar, Emperor, Ftx. And thanks to 4z0t there is 
+    a complete Russian translation of the readme and the installation instructions.
+
+ - Adjust map preview button (#3646)
+    The button to show the map preview is enlarged and remains enabled when 
+    you are ready as a player.
+
+    Part of the Small Suggestions topic on the forum - suggested by Scout_More_Often.
+
+ - Add enabled mods to tooltip (#3649) 
+    Adds the enabled ui or sim mods to the tooltip in the lobby, allowing you to preview 
+    the enabled mods without entering the mod manager. A small quality of life feature.
+
+    Part of the Small Suggestions topic on the forum - suggested by Emperor_Penguin.
+
+ - Chat ally option (#3651)
+    Adds a chat option to send to allies by default instead of to all. Chat options 
+    can be found by clicking the wrench icon on the chat dialogue when you are in-game.
+
+    Part of the Small Suggestions topic on the forum - suggested by CheeseBerry.
+
+ - Add map version to tooltip in scoreboard (#3648) 
+    Improves the default scoreboard by introducing the map description and version
+    when hovering over the map.
+
+    Part of the Small Suggestions topic on the forum - suggested by Emperor_Penguin.
+
+ - Change default army color order of lobby (#3642)
+    Changes the default army colors to be more intuitive, as an example: when the game is 
+    2 vs 2 then it is two shades of red versus two shades of blue.
+
+ - Improve compatibility with Lua 5.1 (#3676) 
+
+ - Improve compatibility for LuaJIT (#3682) 
+    Sadly - LuaJit itself has been cancelled due to the insignificant improvements to the simulation
+    in comparison to the amount of work.
+
+ - Enable `wld_RunWithTheWind` from the command line (#3653)
+    Useful when you have Ai vs Ai games
+
+ - Allow Galacitic Colossus to retarget if the current target is unreachable (#3695)
+
+ - Fix some styling issues with the lobby (#3777)
+
+ - Attempts to fix the self-awareness of the ready button in the lobby (#3791, #3792)
+    Reduces the occurences of the ready button not being in sync with the
+    host and other users in the lobby.
+
+### Performance
+ - Fix LODs of effects (#3720, #3798)
+
+    Fixes inconsistent Level of Detail (LOD) cutoffs for effects. The cutoff is used to 
+    prevent the creation and rendering of particles when they barely contribute to the final 
+    image. A lot of effects had an infinite cutoff. These particles were always created and 
+    rendered. The creation of particles has a significant impact on the sim, the rendering 
+    has an impact on your fps. We introduce a sane LOD cutoff value with which we improve 
+    the performance of the sim and your fps at the same time.
+
+    With thanks to Madmax (creator of various maps and mods) for all his effort to
+    look at more than individual 300 effect files.
+
+    This was a well-described starters issue - you can find more of these issues on the repository.
+
+ - Dynamic LOD settings (#3662) 
+    Computes the LOD cut off values of props based on its blueprint properties. A 
+    prop that occupies less screen space will have a lower cut off value - allowing 
+    it to be culled sooner. This improves the framerate of the game in general, 
+    while having a minor impact on visual fidelity. 
+    
+    Technical detail: The LOD values of props in the blueprint are now ignored.
+
+ - Improve performance of markers (#3387) 
+    Allows AI developers / map scripters to work with markers without having to worry 
+    about underlying performance issues. As an example, retrieving the mass markers
+    on a map is a common operation for AIs. If done through the base game code it would 
+    re-allocate a new table of markers each time an AI condition manager starts 
+    checking the state of the game. That is quite wasteful. This file keeps
+    track of previous calls, caching the result. Supports adaptive and crazy rush-like maps.
+
+    Introduces a UI that allows you to inspect the cached markers. The window is toggled with 
+    'K' by default and can be adjusted as usual. Requires cheats to be enabled.
+
+    Technical detail: this has no impact on regular games, only on games with AI once they've
+    implemented these new routines.
+
+ - Improve performance of various UI-related functions (#3659) 
+    Replaces the global function to use a cached result. A call to `GetSessionClients` or 
+    `GetArmiesTable` created a unique table that the garbage collector can pick up two 
+    lines later. These functions are called each frame or each tick. With this caching 
+    behavior they get replenished every two seconds, or every 0.025 seconds if a fast
+    interval is set.
+
+ - Improve performance of reclaim effects (#3672)
+    Reduces the amount of garbage generated when an engineer is reclaiming a prop, such
+    as a tree or a wreck.
+
+ - Improve performance of shield interactions (#3681, #3699)
+    Significantly improves the performance when a lot of shield interactions are happening
+    simultaniously. This is the case when shields get tickled to death, such as by a Mantis
+    or by a bomber. 
+
+    One particular use case that is significantly faster is when you have fire at Janus fly over
+    30 mobile shields. This took about 60% of the total budget per tick, but now only takes 10%.
+
+ - Improve performance of damage over time (DOT) (#3683)
+    Reduction of table allocations. 
+
+ - Improve performance of projectile collisions (#3685) 
+    Reduction of table allocations and engine calls.
+
+ - Improve performance of unit sound interactions (#3686) 
+    According to commit dfb363d the sound of submarine units do not work. The solution introduced 
+    is applied to all units and allocates a handful of entities per unit. These allocations are 
+    expensive! By default, units try to play the sound themselves. For submarine units we 
+    introduce one entity that plays all the sounds of the submarine. 
+
+ - Improve performance of utility functions of the Unit class (#3678, #3691)
+    Reduction of table allocations and engine calls.
+
+ - Removal of the blinking lights (#3698)
+
+ - Improve performance of UI related classes 
+   - (#3704, #3703, #3709, #3725, #3766, #3767, #3521, #3781, #3785)
+
+ - Improve performance of all props, including wrecks (#3714)
+    Significantly reduces the number of tables allocated per prop. Simplifies some 
+    of the logic in favor of performance. Completely removes the state machine. Improves
+    the visual fidelity of forest fires.
+
+ - Improve performance of all projectiles (#3718)
+    Reduction of table allocations, engine calls and various logic across the projectile
+    class hierarchy.
+
+    Part of a session available on Youtube. See the videos about improving the 
+    performance of projectiles in the playlist Game Development on the FAForever Youtube 
+    channel.
+
+ - Improve performance of tree-knocking and decal creation of projectiles (#3719)
+    Introduces a generic approach that is highly optimized. Supports units from
+    mod packs accordingly.
+ 
+ - Improve performance of the UEF build effects (#3702, #3736, #3738)
+    Significant reduction of table allocations, engine calls and a significant reduction in
+    the amount of Lua instructions related to these functions.
+
+    Part of a session available on Youtube. See the videos about improving the 
+    performance of UEF build effects in the playlist Game Development on the FAForever  
+    Youtube channel.
+
+ - Improve performance of the Seraphim build effects (#3740, #3753)
+    Corrects the scope of some values and improves the consistency of the Seraphim build effect.
+
+ - Improve performance of the Lua class hierarchy (#3710) 
+    Re-implements the class hierarchy used on the Lua side of the game from scratch. It simplifies
+    the implementation to improve the performance while retaining the same functionality. Reduces
+    the amount of tables allocated and the amount of table-related Lua instructions. Supports  
+    automated class culling and adjust the implementation of states to reduce the memory footprint 
+    of the game. 
+
+ - Improve performance of exhaus effects (#3743)
+    Significant reduction of table allocations.
+    
+    This was a well-described starters issue - you can find more of these issues on the repository.
+
+ - Improve performance of veterancy buff creation (#3720)
+    Reduction of table allocations.
+
+    This was a well-described starters issue - you can find more of these issues on the repository.
+
+ - Improve performance of OnMotionHorzEventChange (#3717) 
+    Reduction of function calls and removes the 'OnMotionHorzStart' callback.
+
+### Contributors
+
+ - Sheikah (#3647)
+ - FtxCommando (#3647)
+ - BlackYps (#3647, #3642, #3759)
+ - Penguin  (#3647, #3705, #3715, #3721,
+             #3728, #3712, #3742, #3751,
+             #3764, #3750, #3768, #3765,
+             #3782, #3706, #3792, #3799) 
+ - Askaholic (#3647, #3759)
+ - Sheeo (#3647)
+ - Balthazar (#3660, #3647, #3676)
+ - 4z0t (#3651, #3647, #3704, #3703, #3709,
+         #3725, #3737, #3747, #3766, #3767,
+         #3777, #3787, #3785, #3795)
+ - Jip (#3660, #3647, #3663, #3656, #3387, 
+        #3659, #3648, #3646, #3649, #3672,
+        #3668, #3669, #3670, #3675, #3679,
+        #3681, #3683, #3685, #3673, #3653,
+        #3693, #3691, #3696, #3698, #3718,
+        #3714, #3719, #3702, #3729, #3710,
+        #3712, #3736, #3740, #3753, #3720,
+        #3774, #3775, #3780, #3521, #3781,
+        #3788, #3791, #3793, #3794, #3796,
+        #3759)
+ - Tagada (#3675, #3678)
+ - Strogo (#3667)
+ - Rowey (#3689)
+ - Unbring (#3690)
+ - KionX (#3682)
+ - Relent0r (#3673)
+ - Brokerjoe (#3738, #3740)
+ - SkepticSpecter (#3743)
+ - Madmax (#3720, #3798)
+ - Healther (#3722, #3717)
+ - Crotalus (#3741)
+ - speed2 (#3759)
+
+
 Game version 3731 (30th of December, 2021)
 ===================================
 

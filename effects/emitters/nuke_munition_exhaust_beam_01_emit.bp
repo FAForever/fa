@@ -1,0 +1,8 @@
+BeamBlueprint {
+    Lifetime = 3.0,
+    TextureName = '/textures/particles/beam_missile_exhaust_01.dds',
+    Length = -1,
+    Thickness = 0.06,
+    StartColor = {x=1,y=1,z=0.75,w=0}, -- R,G,B,A
+    EndColor = {x=1,y=1,z=0.75,w=0}, -- R,G,B,A
+}

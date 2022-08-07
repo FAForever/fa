@@ -1,28 +1,31 @@
---- Class CMauiCursor
--- @classmod User.CMauiCursor
+---@declare-global
+---@class moho.cursor_methods
+local CMauiCursor = {}
 
 ---
---  Cursor:ResetToDefault()
 function CMauiCursor:ResetToDefault()
 end
 
 ---
---  Cursor:SetDefaultTexture(filename, hotspotX, hotspotY)
-function CMauiCursor:SetDefaultTexture(filename,  hotspotX,  hotspotY)
+---@param filename string
+---@param hotspotX number
+---@param hotspotY number
+function CMauiCursor:SetDefaultTexture(filename, hotspotX, hotspotY)
 end
 
 ---
---  Cursor:SetTexture(filename, hotspotX, hotspotY)
-function CMauiCursor:SetNewTexture()
+---@param filename string
+---@param hotspotX number
+---@param hotspotY number
+function CMauiCursor:SetNewTexture(filename, hotspotX, hotspotY)
 end
 
 ---
---  Cursor:Show()
 function CMauiCursor:Show()
 end
 
 ---
---
-function CMauiCursor:moho.cursor_methods()
+function CMauiCursor:Hide()
 end
 
+return CMauiCursor

@@ -1,0 +1,13 @@
+BeamBlueprint {
+    Lifetime = 10,
+	TextureName = '/textures/particles/ser_experimental_beam_02.dds',
+    Thickness = 0.50,
+    StartColor = {x=1,y=1,z=1,w=0.0}, -- R,G,B,A
+    EndColor = {x=0.7,y=0.7,z=1,w=0.0}, -- R,G,B,A
+    Blendmode = 3.0,
+    RepeatRate = 0.05,
+    Length = 2000,
+    UShift = 0.0,
+    VShift = -0.4,
+    LODCutoff = 400,
+}

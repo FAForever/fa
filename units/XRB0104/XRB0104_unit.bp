@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardScanRadius = 15,
+        GuardScanRadius = 15, 
         InitialAutoMode = true,
         ShowAssistRangeOnSelect = true,
         StagingPlatformScanRadius = 15,

@@ -5,7 +5,7 @@
 -- **
 -- **  Summary  : The base weapon class for all weapons in the game.
 -- **
--- **  Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- **  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 -- ****************************************************************************
 
 local Entity = import('/lua/sim/Entity.lua').Entity
@@ -13,6 +13,7 @@ local NukeDamage = import('/lua/sim/NukeDamage.lua').NukeAOE
 local Set = import('/lua/system/setutils.lua')
 local ParseEntityCategoryProperly = import('/lua/sim/CategoryUtils.lua').ParseEntityCategoryProperly
 local cachedPriorities = false
+local RecycledPriTable = {}
 
 local function ParsePriorities()
     local idlist = EntityCategoryGetUnitList(categories.ALLUNITS)
@@ -36,29 +37,8 @@ local function ParsePriorities()
     return finalPriorities
 end
 
---- A collection of functions that are most often called. Is not in any specific order.
--- These functions should be cached during OnCreate to improve the access pattern. See also
--- the benchmark about metatables.
--- local FunctionsToCache = { 
---     "GetDamageTable"
-
---   , "OnStartTracking"
---   , "OnStopTracking"
---   , "OnGotTarget"
---   , "OnLostTarget"
-
---   , "PlayWeaponSound"
---   , "PlayWeaponAmbientSound"
---   , "StopWeaponAmbientSound"
-
---   , "ForkThread"
-
---   , "OnMotionHorzEventChange"
-
---   , "DoOnFireBuffs"
---   , "CreateProjectileForWeapon"
--- }
-
+---@class Weapon : moho.weapon_methods
+---@field Blueprint WeaponBlueprint
 Weapon = Class(moho.weapon_methods) {
     __init = function(self, unit)
         self.unit = unit
@@ -82,7 +62,10 @@ Weapon = Class(moho.weapon_methods) {
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
         -- cache information of unit, weapons get created before unit.OnCreate is called
-        self.Trash = TrashBag();
+        self.Trash = TrashBag()
+        self.TrashProjectiles = TrashBag()
+        self.TrashManipulators = TrashBag()
+
         self.Brain = self.unit:GetAIBrain()
         self.Army = self.unit:GetArmy()
 
@@ -161,22 +144,22 @@ Weapon = Class(moho.weapon_methods) {
                     self.AimControl:SetResetPoseTime(9999999)
                 end
                 self:SetFireControl('Right')
-                self.Trash:Add(self.AimControl)
-                self.Trash:Add(self.AimRight)
-                self.Trash:Add(self.AimLeft)
+                self.TrashManipulators:Add(self.AimControl)
+                self.TrashManipulators:Add(self.AimRight)
+                self.TrashManipulators:Add(self.AimLeft)
             else
                 self.AimControl = CreateAimController(self, 'Default', yawBone, pitchBone, muzzleBone)
                 if EntityCategoryContains(categories.STRUCTURE, self.unit) then
                     self.AimControl:SetResetPoseTime(9999999)
                 end
-                self.Trash:Add(self.AimControl)
+                self.TrashManipulators:Add(self.AimControl)
                 self.AimControl:SetPrecedence(precedence)
                 if bp.RackSlavedToTurret and not table.empty(bp.RackBones) then
                     for k, v in bp.RackBones do
                         if v.RackBone ~= pitchBone then
                             local slaver = CreateSlaver(self.unit, v.RackBone, pitchBone)
                             slaver:SetPrecedence(precedence-1)
-                            self.Trash:Add(slaver)
+                            self.TrashManipulators:Add(slaver)
                         end
                     end
                 end
@@ -400,6 +383,8 @@ Weapon = Class(moho.weapon_methods) {
             end
         end
 
+        damageTable.__index = damageTable
+
         return damageTable
     end,
 
@@ -411,10 +396,16 @@ Weapon = Class(moho.weapon_methods) {
 
     CreateProjectileForWeapon = function(self, bone)
         local proj = self:CreateProjectile(bone)
-        local damageTable = self:GetDamageTable()
 
+        -- store the original target, can be nil if ground firing
+        proj.OriginalTarget = self:GetCurrentTarget()
+        if proj.OriginalTarget.GetSource then 
+            proj.OriginalTarget = proj.OriginalTarget:GetSource()
+        end
+
+        local damageTable = self:GetDamageTable()
         if proj and not proj:BeenDestroyed() then
-            proj:PassDamageData(damageTable)
+            proj:PassMetaDamage(damageTable)
             local bp = self.Blueprint
 
             if bp.NukeOuterRingDamage and bp.NukeOuterRingRadius and bp.NukeOuterRingTicks and bp.NukeOuterRingTotalTime and
@@ -447,7 +438,18 @@ Weapon = Class(moho.weapon_methods) {
         end
     end,
 
+
     OnDestroy = function(self)
+    end,
+
+    --- Clears out the trash of projectiles, such as beams. Called by the owning unit
+    ClearProjectileTrash = function(self)
+        self.TrashProjectiles:Destroy()
+    end,
+
+    --- Clears out the manipulators. Called by the owning unit
+    ClearManipulatorTrash = function(self)
+        self.TrashManipulators:Destroy()
     end,
 
     SetWeaponPriorities = function(self, priTable)
@@ -459,29 +461,39 @@ Weapon = Class(moho.weapon_methods) {
         if not priTable then
             local bp = self.Blueprint.TargetPriorities
             if bp then
-                local priorityTable = {}
+                local count = 1
+                local priorityTable = RecycledPriTable
                 for k, v in bp do
                     if cachedPriorities[v] then
-                        table.insert(priorityTable, cachedPriorities[v])
+                        priorityTable[count] = cachedPriorities[v]
                     else
                         if string.find(v, '%(') then
                             cachedPriorities[v] = ParseEntityCategoryProperly(v)
-                            table.insert(priorityTable, cachedPriorities[v])
+                            priorityTable[count] = cachedPriorities[v]
                         else
                             cachedPriorities[v] = ParseEntityCategory(v)
-                            table.insert(priorityTable, cachedPriorities[v])
+                            priorityTable[count] = cachedPriorities[v]
                         end
                     end
+                    count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
+                for i = 1, count - 1 do
+                    priorityTable[i] = nil
+                end
             end
         else
             if type(priTable[1]) == 'string' then
-                local priorityTable = {}
+                local count = 1
+                local priorityTable = RecycledPriTable
                 for k, v in priTable do
-                    table.insert(priorityTable, ParseEntityCategory(v))
+                    priorityTable[count] = ParseEntityCategory(v)
+                    count = count + 1
                 end
                 self:SetTargetingPriorities(priorityTable)
+                for i = 1, count - 1 do
+                    priorityTable[i] = nil
+                end
             else
                 self:SetTargetingPriorities(priTable)
             end

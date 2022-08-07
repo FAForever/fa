@@ -64,6 +64,8 @@ LobbyOptions = false
 -- The focus army as set at the start of the game. Allows us to detect whether someone was originally an observer or a player
 OriginalFocusArmy = -1
 
+GameHasAIs = false
+
 function KillWaitingDialog()
     if waitingDialog then
         waitingDialog:Destroy()
@@ -143,6 +145,10 @@ end
 
 function CreateUI(isReplay)
 
+    -- override some UI globals
+    import("/lua/ui/override/ArmiesTable.lua").Setup()
+    import("/lua/ui/override/SessionClients.lua").Setup()
+
     -- ensure logger is turned off for the average user
     if not GetPreference('debug.enable_debug_facilities') then
         SetPreference('Options.Log', {
@@ -157,11 +163,35 @@ function CreateUI(isReplay)
     -- prevents the nvidia stuttering bug with their more recent drivers
     ConExecute('d3d_WindowsCursor on')  
 
+    -- enable experimental graphics
+    if      Prefs.GetFromCurrentProfile('options.fidelity') >= 2 
+        and Prefs.GetFromCurrentProfile('options.experimental_graphics') == 1 then 
+
+        ForkThread(
+            function() 
+
+                WaitSeconds(1.0)
+
+                LOG("Experimental graphics enabled, use at your own risk: ")
+
+                if Prefs.GetFromCurrentProfile('options.level_of_detail') == 2 then 
+                    -- allow meshes and effects to be seen from further away
+                    ConExecute("cam_SetLOD WorldCamera 0.65")
+                end
+
+                if Prefs.GetFromCurrentProfile('options.shadow_quality') == 3 then 
+
+                    -- improve shadow LOD and resolution
+                    ConExecute("ren_ShadowLOD 1024")
+                    ConExecute("ren_ShadowSize 2048")
+                end
+            end
+        )
+    end
+
     -- keep track of the original focus army
     import("/lua/ui/game/ping.lua").OriginalFocusArmy = GetFocusArmy()
     OriginalFocusArmy = GetFocusArmy()
-
-
 
     ConExecute("Cam_Free off")
     local prefetchTable = { models = {}, anims = {}, d3d_textures = {}, batch_textures = {} }
@@ -201,6 +231,8 @@ function CreateUI(isReplay)
 
     mfdControl = import('/lua/ui/game/multifunction.lua').Create(controlClusterGroup)
     controls.mfd = mfdControl
+
+    controls.mfp = import('/lua/ui/game/massfabs.lua').Create(statusClusterGroup)
 
     if not isReplay then
         ordersControl = import('/lua/ui/game/orders.lua').SetupOrdersControl(controlClusterGroup, mfdControl)
@@ -257,12 +289,6 @@ function CreateUI(isReplay)
         import('/lua/ui/game/economy.lua').ToggleEconPanel(false)
         import('/lua/ui/game/avatars.lua').ToggleAvatars(false)
         AddBeatFunction(UiBeat)
-    else
-        local clients = GetSessionClients()
-        if table.getsize(clients) <= 1 then
-            -- No need for unnecessary lag when playing alone
-            ConExecute('net_lag 0')
-        end
     end
 
     if options.gui_render_enemy_lifebars == 1 or options.gui_render_custom_names == 0 then
@@ -500,6 +526,17 @@ function DeselectSelens(selection)
     return otherUnits, true
 end
 
+--- A cache used with ObserveSelection to prevent continious table allocations
+local cachedSelection = {
+    oldSelection = { },
+    newSelection = { },
+    added = { },
+    removed = { },
+}
+
+--- Observable to allow mods to do something with a new selection
+ObserveSelection = import("/lua/shared/observable.lua").Create()
+
 -- This function is called whenever the set of currently selected units changes
 -- See /lua/unit.lua for more information on the lua unit object
 -- @param oldSelection: What the selection was before
@@ -516,6 +553,13 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
     if import('/lua/ui/game/selection.lua').IsHidden() then
         return
     end
+
+    -- populate observable and send out a notification
+    cachedSelection.oldSelection = oldSelection
+    cachedSelection.newSelection = newSelection
+    cachedSelection.added = added
+    cachedSelection.removed = removed
+    ObserveSelection:Set(cachedSelection)
 
     if not hotkeyLabelsOnSelectionChanged then
         hotkeyLabelsOnSelectionChanged = import('/lua/keymap/hotkeylabels.lua').onSelectionChanged

@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_mortar02_polytrail_02',
+	Lifetime = -1.00,
+    TrailLength = 7,
+    Size = 0.01,
+    SortOrder = 0,
+    BlendMode = 3.0,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/ramp_white_01.dds',
+	RampTexture = '/textures/particles/ramp_trail_08.dds',
+}

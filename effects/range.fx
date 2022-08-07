@@ -26,9 +26,9 @@ Vertex vertexShader( float3 vertex : POSITION0, float2 coeff : TEXCOORD0, float2
 
 technique Cast
 {
-  pass FrontFace
+  pass P0
   {
-    CullMode = CCW;
+    CullMode = none;
 
     ColorWriteEnable = 0x00;
 
@@ -37,38 +37,19 @@ technique Cast
     ZFunc = less;
 
     StencilEnable = true;
-    StencilFunc = notequal;
+    StencilWriteMask = 0x7F;
     StencilRef = 0xFF;
     StencilMask = 0x80;
 
-    StencilWriteMask = 0x7F;
+    TwoSidedStencilMode = true;
     StencilFail = zero;
-    StencilPass = keep;
-
     StencilZFail = incr;
-
-    VertexShader = compile vs_2_0 vertexShader();
-  }
-  pass BackFace
-  {
-    CullMode = CW;
-
-    ColorWriteEnable = 0x00;
-
-    ZWriteEnable = false;
-    ZEnable = true;
-    ZFunc = less;
-
-    StencilEnable = true;
-    StencilFunc = notequal;
-    StencilRef = 0xFF;
-    StencilMask = 0x80;
-
-    StencilWriteMask = 0x7F;
-    StencilFail = zero;
     StencilPass = keep;
-
-    StencilZFail = decr;
+    StencilFunc = notequal;
+    CCW_StencilFail = keep;
+    CCW_StencilZFail = decr;
+    CCW_StencilPass = keep;
+    CCW_StencilFunc = notequal;
 
     VertexShader = compile vs_2_0 vertexShader();
   }

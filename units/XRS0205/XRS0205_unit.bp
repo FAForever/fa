@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardReturnRadius = 30,
         TargetBones = {
             'point_midhigh',
             'point_midlow',
@@ -53,8 +54,6 @@ UnitBlueprint {
         'OVERLAYRADAR',
         'OVERLAYSONAR',
     },
-    CollisionOffsetY = -0.15,
-    CollisionOffsetZ = 0.1,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -221,6 +220,7 @@ UnitBlueprint {
     SizeY = 1.5,
     SizeZ = 3.6,
     CollisionOffsetY = -0.4,
+    CollisionOffsetZ = 0.1,
     StrategicIconName = 'icon_ship2_counterintel',
     StrategicIconSortPriority = 165,
     Weapon = {
@@ -270,11 +270,9 @@ UnitBlueprint {
             RackSlavedToTurret = false,
             RangeCategory = 'UWRC_Countermeasure',
             RateOfFire = 0.26,
-            TargetCheckInterval = 0.5,
             TargetRestrictDisallow = 'UNTARGETABLE',
             TargetRestrictOnlyAllow = 'TORPEDO',
             TargetType = 'RULEWTT_Projectile',
-            TrackingRadius = 1.5,
             TurretDualManipulators = false,
             TurretPitch = 0,
             TurretPitchRange = 0,

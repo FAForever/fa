@@ -2,6 +2,7 @@ local Bitmap = import('bitmap.lua').Bitmap
 local Dragger = import('dragger.lua').Dragger
 local UIUtil = import('/lua/ui/uiutil.lua')
 
+---@class Button : Bitmap
 Button = Class(Bitmap) {
 
     __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
@@ -116,6 +117,7 @@ Button = Class(Bitmap) {
 --- A button that can optionally have its textures "fixed" to some value. This is special-snowflaking
 -- for the retarded construction UI, and can probably be got rid of when we think of a better way of
 -- doing this. For now this at least gets this bollocks out of the Button class.
+---@class FixableButton : Button
 FixableButton = Class(Button) {
     __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)
         Button.__init(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, frameRate)

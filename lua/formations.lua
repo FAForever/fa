@@ -10,6 +10,8 @@
 --
 -- Basic create formation scripts
 
+---@alias UnitFormations 'AttackFormation' | 'GrowthFormation'
+
 
 SurfaceFormations = {
     'AttackFormation',
@@ -834,7 +836,7 @@ function GuardFormation(formationUnits)
             remainingShields = remainingShields + 1
         end
 
-        local fs = u:GetFootPrintSize()
+        local fs = u.FootPrintSize
         footprintCounts[fs] = (footprintCounts[fs] or 0) + 1
     end
 

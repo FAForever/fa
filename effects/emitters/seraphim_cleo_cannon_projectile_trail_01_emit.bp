@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_cleo_cannon_projectile_trail_01',
+	Lifetime = -1.00,
+    TrailLength = 0.75,
+    Size = 0.035,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_white_02.dds',
+	RampTexture = '/textures/particles/ramp_yellow_purple_01.dds',
+}
+

@@ -219,6 +219,11 @@ keyDescriptions = {
     ['spreadattack'] = '<LOC key_desc_0182>Spread attack',
     ['shift_spreadattack'] = '<LOC key_desc_0183>Spread attack',
     ['show_objective_screen'] = '<LOC key_desc_0184>Show Scenario Options/Objectives Window',
+    ['toggle_ai_screen'] = 'Toggle AI blueprint information window, requires cheats to be enabled',
+    ['toggle_markers_screen'] = 'Toggle marker information window, requires cheats to be enabled',
+    ['toggle_map_utilities_window'] = 'Toggle map utilities window, requires cheats to be enabled',
+    ['toggle_profiler'] = 'Toggles the profiler. This is a debug tool, abuse is bannable',
+    ['toggle_profiler_window'] = 'Toggles the profiler window. This is a debug tool, abuse is bannable',
 
     -- GAZUI
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',
@@ -448,4 +453,6 @@ keyDescriptions = {
     ['t3_support_land_factory'] = '<LOC key_desc_0385>build T3 Support Land Factory',
     ['t3_support_air_factory'] = '<LOC key_desc_0386>build T3 Support Air Factory',
     ['t3_support_naval_factory'] = '<LOC key_desc_0387>build T3 Support Naval Factory',
+
+    ['recheck_targets_of_weapons'] = 'Recheck targets of weapons of selected units',
 }

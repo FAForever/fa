@@ -46,11 +46,6 @@ Tooltips = {
         description = "<LOC tooltipui0300>Units will not engage enemies",
         keyID = "mode",
     },
-    mode_aggressive = {
-        title = "<LOC tooltipui0301>Ground Fire",
-        description = "<LOC tooltipui0302>Units will attack targeted positions rather attack-move",
-        keyID = "mode",
-    },
     mode_return_fire = {
         title = "<LOC tooltipui0303>Return Fire",
         description = "<LOC tooltipui0304>Units will move and engage normally",
@@ -551,6 +546,31 @@ Tooltips = {
         title = "<LOC tooltipui0129>Build Efficiency",
         description = "<LOC tooltipui0130>Your overall Economic Efficiency",
     },
+    -- **********************
+    -- ** Mass Fabs panel Strings
+    -- **********************
+    mf_mass_income_display = {
+        title = "<LOC tooltipui1000>Mass Income",
+        description = "<LOC tooltipui1001>Mass being generated with mass fabricators per second",
+    },
+    mf_energy_expense_display = {
+        title = "<LOC tooltipui1002>Energy Expense",
+        description = "<LOC tooltipui1003>Energy being spent with mass fabricators per second",
+    },
+    mf_active_amount = {
+        title = "<LOC tooltipui1004>Active mass fabricators",
+        description = "<LOC tooltipui1005>Amount of active mass fabricators",
+    },
+    mf_inactive_amount = {
+        title = "<LOC tooltipui1006>Inactive mass fabricators",
+        description = "<LOC tooltipui1007>Amount of inactive mass fabricators",
+    },
+    mf_energy_required = {
+        title = "<LOC tooltipui1008>Energy Required",
+        description = "<LOC tooltipui1009>Amount of required energy for mass fabricators to work",
+    },
+
+
 
 
     -- **********************
@@ -798,6 +818,10 @@ Tooltips = {
         title = "<LOC OPTIONS_0184>Bloom Render",
         description = "<LOC OPTIONS_0185>Toggles a glow type effect that is used on many weapon effects and some UI elements (off = fastest)",
     },
+    options_experimental_graphics = {
+        title = "<LOC OPTIONS_EXP_GRAPHICS_01>Experimental graphics",
+        description = "<LOC OPTIONS_EXP_GRAPHICS_02>Requires fidelity set to 'High'. \r\n\r\nIntroduces experimental graphics that high-end hardware should be able to support. \r\n\r\nThis feature may be unstable - use at your own risk.",
+    },
     options_use_mydocuments = {
         title = "<LOC OPTIONS_0186>Save Games and Replays in My Documents",
         description = "<LOC OPTIONS_0187>When on, changes the location where save games and replays get stored (My Documents\\My Games\\Supreme Commander Forged Alliance\\). Note that you will only see save games and replays in the active directory. Also, files saved to the alternate location will not be removed when the game is uninstalled.",
@@ -864,6 +888,10 @@ Tooltips = {
     Lobby_Mod_Option = {
         title = "<LOC tooltipui0668>Mods Enabled",
         description = "<LOC tooltipui0669>The host has enabled mods. Be sure to check the mod manager.",
+    },
+    Lobby_patchnotes = {
+        title = "<LOC tooltipui2000>Patchnotes",
+        description = "<LOC tooltipui2001>Access to all previous patch notes made by and for the community",
     },
     Lobby_Load = {
         title = "<LOC tooltipui0171>Load",
@@ -1335,18 +1363,6 @@ Tooltips = {
     PostScore_score = {
         title = "<LOC tooltipui0219>Score",
         description = "<LOC tooltipui0220>Sort by Overall Performance",
-    },
-    PostScore_kills = {
-        title = "<LOC tooltipui0221>Kills",
-        description = "<LOC tooltipui0222>Sort by Units Destroyed",
-    },
-    PostScore_built = {
-        title = "<LOC tooltipui0223>Built",
-        description = "<LOC tooltipui0224>Sort by Structures Built",
-    },
-    PostScore_lost = {
-        title = "<LOC tooltipui0225>Losses",
-        description = "<LOC tooltipui0226>Sort by Units Lost",
     },
     PostScore_cdr = {
         title = "<LOC tooltipui0231>Command Units",
@@ -2031,10 +2047,6 @@ Tooltips = {
     -- **********************
     -- ** Misc
     -- **********************
-    minimap_reset = {
-        title = "<LOC tooltipui0625>Reset Minimap",
-        description = "<LOC tooltipui0626>Sets the minimap to its default position and size",
-    },
     no_rush_clock = {
         title = "<LOC tooltipui0627>No Rush Clock",
         description = "<LOC tooltipui0628>Displays time remaining in the no rush clock",
@@ -2042,6 +2054,9 @@ Tooltips = {
     save_template = {
         title = "<LOC tooltipui0629>Save Template",
         description = "<LOC tooltipui0630>Creates construction template by saving units/structures and their position",
+    },
+    minimap_mesh = {
+        description = "<LOC tooltipui0720>Disables the rendering of meshes of units and props on the minimap to reduce the burden on the rendering thread. Can potentially improve your framerate.",
     },
 
     -- **********************

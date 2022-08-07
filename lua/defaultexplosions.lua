@@ -18,13 +18,10 @@ local GetRandomOffset2 = util.GetRandomOffset2
 
 -- upvalue for performance
 local EfctUtil = import('EffectUtilities.lua')
-local CreateEffects = EfctUtil.CreateEffects
-local CreateEffectsWithOffset = EfctUtil.CreateEffectsWithOffset
-local CreateEffectsWithRandomOffset = EfctUtil.CreateEffectsWithRandomOffset
-local CreateBoneEffects = EfctUtil.CreateBoneEffects
-local CreateBoneEffectsOffset = EfctUtil.CreateBoneEffectsOffset
-local CreateRandomEffects = EfctUtil.CreateRandomEffects
-local ScaleEmittersParam = EfctUtil.ScaleEmittersParam
+local ApplyWindDirection = EfctUtil.ApplyWindDirection
+local CreateEffectsOpti = EfctUtil.CreateEffectsOpti
+local CreateBoneEffectsOpti = EfctUtil.CreateBoneEffectsOpti
+local CreateBoneEffectsOffsetOpti = EfctUtil.CreateBoneEffectsOffsetOpti
 
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local ExplosionSmall = EffectTemplate.ExplosionSmall
@@ -181,8 +178,12 @@ local ProjectileDebrisBpsN = TableGetn(ProjectileDebrisBps)
 --- Creates the default unit explosion used by almost all units in the game.
 -- @unit The Unit to create the explosion for.
 -- @overKillRatio Has an impact on how strong the explosion is.
-function CreateScalableUnitExplosion(unit, overKillRatio)
-    if unit then
+function CreateScalableUnitExplosion(unit, debrisMultiplier, circularDebris)
+
+    debrisMultiplier = debrisMultiplier or 1
+    circularDebris = circularDebris or false
+
+    if unit and (not IsDestroyed(unit)) then
         if IsUnit(unit) then
 
             -- cache blueprint values
@@ -281,11 +282,11 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
 
             -- create the emitters  
             if baseEffects then 
-                CreateEffects(unit, army, baseEffects)
+                CreateEffectsOpti(unit, army, baseEffects)
             end
 
             if environmentEffects then 
-                CreateEffects(unit, army, environmentEffects)       
+                CreateEffectsOpti(unit, army, environmentEffects)       
             end    
 
             -- create the flash
@@ -300,7 +301,7 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
             )
 
             -- determine debris amount
-            local amount = MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
+            local amount = debrisMultiplier * MathMin(Random(1 + (boundingXYZRadius * 6), (boundingXYZRadius * 15)) , 100)
 
             -- determine debris velocity range
             local velocity = 2 * boundingXYZRadius
@@ -328,9 +329,16 @@ function CreateScalableUnitExplosion(unit, overKillRatio)
                 local zpos = r3 * sz - (sz * 0.5)
 
                 -- launch them into space
-                local xdir = velocity * r1 - (hVelocity)
-                local ydir = boundingXYZRadius + velocity * r2
-                local zdir = velocity * r3 - (hVelocity)
+                local xdir, ydir, zdir 
+                if circularDebris then 
+                    xdir = velocity * r1 - (hVelocity)
+                    ydir = velocity * r2 - (hVelocity)
+                    zdir = velocity * r3 - (hVelocity)
+                else 
+                    xdir = velocity * r1 - (hVelocity)
+                    ydir = boundingXYZRadius + velocity * r2
+                    zdir = velocity * r3 - (hVelocity)
+                end
 
                 -- choose a random blueprint
                 local bp = ProjectileDebrisBps[MathMin(ProjectileDebrisBpsN, Random(1, i))]
@@ -373,7 +381,7 @@ function CreateDefaultHitExplosion(obj, scale)
         )
         
         -- create the fire cloud
-        CreateEffects(obj, army, FireCloudMed01)
+        CreateEffectsOpti(obj, army, FireCloudMed01)
     end
 end
 
@@ -389,7 +397,7 @@ function CreateDefaultHitExplosionOffset(obj, scale, xOffset, yOffset, zOffset)
         return
     end
 
-    CreateBoneEffectsOffset(obj, -1, obj.Army, DefaultHitExplosion01, xOffset, yOffset, zOffset)
+    CreateBoneEffectsOffsetOpti(obj, -1, obj.Army, DefaultHitExplosion01, xOffset, yOffset, zOffset)
 end
 
 
@@ -400,7 +408,7 @@ end
 function CreateDefaultHitExplosionAtBone(obj, boneName, scale)
     local army = obj.Army
     CreateFlash(obj, boneName, scale * 0.5, army)
-    CreateBoneEffects(obj, boneName, army, FireCloudMed01)
+    CreateBoneEffectsOpti(obj, boneName, army, FireCloudMed01)
 end
 
 function CreateTimedStuctureUnitExplosion(obj)
@@ -496,7 +504,7 @@ function _CreateScalableUnitExplosion(obj)
     end
 
     -- Create Generic emitter effects
-    CreateEffects(obj, army, EffectTable)
+    CreateEffectsOpti(obj, army, EffectTable)
 
     -- Create Light particle flash
     CreateFlash(obj, -1, scale, army)
@@ -588,27 +596,56 @@ end
 -- WRECKAGE EFFECTS --
 ----------------------
 
-function CreateWreckageEffects(obj, prop)
-    if IsUnit(obj) then
-        local scale = GetAverageBoundingXYZRadius(obj)
-        local emitters = {}
-        local layer = obj.Layer
+local MathFloor = math.floor
 
-        if scale < 0.5 then -- SMALL UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsSml01, 1)
-        elseif scale > 1.5 then -- LARGE UNITS
-            local x,y,z = GetUnitSizes(obj)
-            emitters = CreateEffectsWithRandomOffset(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsLrg01, x, 0, z)
-        else -- MEDIUM UNITS
-            emitters = CreateRandomEffects(prop, obj.Army, EffectTemplate.DefaultWreckageEffectsMed01, 2)
-        end
+-- upvalue for performance
+local IEffectSetEmitterParam = _G.moho.IEffect.SetEmitterParam
+local IEffectScaleEmitter = _G.moho.IEffect.ScaleEmitter
+local IEffectOffsetEmitter = _G.moho.IEffect.OffsetEmitter
+local IEffectSetEmitterCurveParam = _G.moho.IEffect.SetEmitterCurveParam
 
-        -- Give the emitters created some random lifetimes
-        ScaleEmittersParam(emitters, 'LIFETIME', 100, 1000)
+-- direct access for performance
+local DefaultWreckageEffects = EffectTemplate.DefaultWreckageEffectsLrg01
+local DefaultWreckageEffectsCount = EffectTemplate.DefaultWreckageEffectsLrg01Count
 
-        for k, v in emitters do
-            v:ScaleEmitter(GetRandomFloat(0.25, 1))
-        end
+-- remove all wreckage effects, but keep for compatibility
+function CreateWreckageEffects(unit, prop)
+
+    -- determine number of effects
+    local blueprint = unit.Blueprint or EntityGetBlueprint(unit)
+
+    -- we can't make an animation for these based on bones: they spawn at the unanimated locations
+    if blueprint.Display.AnimationDeath then 
+        return 
+    end
+
+    -- determine number of effects
+    local bones = unit:GetBoneCount()
+    local size = MathFloor(0.2 * (blueprint.SizeX + blueprint.SizeY + blueprint.SizeZ)) + 1
+    if size > bones - 1 then 
+        size = bones - 1
+    end
+
+    -- localize for performance
+    local Random = Random 
+    local bone, effect, emitter, r1
+
+    -- spawn the effects
+    for k = 1, size do 
+        -- create an emitter at a bone
+        bone = Random(1, bones - 1) - 1
+        effect = Random(1, DefaultWreckageEffectsCount)
+        emitter = CreateEmitterAtBone(prop, bone, unit.Army, DefaultWreckageEffects[effect])
+
+        -- larger smoke tends to live longer
+        r1 = Random()
+        IEffectScaleEmitter(emitter, 0.5 + 0.75 * r1)
+        IEffectSetEmitterParam(emitter, 'LIFETIME', 40 + 75 * r1)
+
+        -- apply wind direction
+        ApplyWindDirection(emitter, 1.0)
+
+        prop.Trash:Add(emitter)
     end
 end
 

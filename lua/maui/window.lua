@@ -1,63 +1,9 @@
---#################################################
---#   Generic Window Class
---#################################################
---#  In order for this class to work, you MUST hook in a styles table in your product.
---#  Here is an example:
---#local styles = {
---#    backgrounds = {
---#        notitle = {
---#            tl = '/game/mini-map-brd01/mini-map_brd_ul.dds',
---#            tr = '/game/mini-map-brd01/mini-map_brd_ur.dds',
---#            tm = '/game/mini-map-brd01/mini-map_brd_horz_um.dds',
---#            ml = '/game/mini-map-brd01/mini-map_brd_vert_l.dds',
---#            m = '/game/mini-map-brd01/mini-map_brd_m.dds',
---#            mr = '/game/mini-map-brd01/mini-map_brd_vert_r.dds',
---#            bl = '/game/mini-map-brd01/mini-map_brd_ll.dds',
---#            bm = '/game/mini-map-brd01/mini-map_brd_lm.dds',
---#            br = '/game/mini-map-brd01/mini-map_brd_lr.dds',
---#            borderColor = 'ff415055',
---#        },
---#        title = {
---#            tl = '/game/options_brd/options_brd_ul.dds',
---#            tr = '/game/options_brd/options_brd_ur.dds',
---#            tm = '/game/options_brd/options_brd_horz_um.dds',
---#            ml = '/game/options_brd/options_brd_vert_l.dds',
---#            m = '/game/options_brd/options_brd_m.dds',
---#            mr = '/game/options_brd/options_brd_vert_r.dds',
---#            bl = '/game/options_brd/options_brd_ll.dds',
---#            bm = '/game/options_brd/options_brd_lm.dds',
---#            br = '/game/options_brd/options_brd_lr.dds',
---#            borderColor = 'ff415055',
---#        },
---#    },
---#    closeButton = {
---#        up = '/dialogs/close_btn/close_btn_up.dds',
---#        down = '/dialogs/close_btn/close_btn_down.dds',
---#        over = '/dialogs/close_btn/close_btn_over.dds',
---#        dis = '/dialogs/close_btn/close_btn_dis.dds',
---#    },
---#    pinButton = {
---#        up = '/dialogs/pin/pin_up.dds',
---#        upSel = '/dialogs/pin/pinned_up.dds',
---#        over = '/dialogs/pin/pin_over.dds',
---#        overSel = '/dialogs/pin/pinned_over.dds',
---#        dis = '/dialogs/pin/pin_dis.dds',
---#        disSel = '/dialogs/pin/pinned_dis.dds',
---#    },
---#    configButton = {
---#        up = '/dialogs/config_btn/config_btn_up.dds',
---#        down = '/dialogs/config_btn/config_btn_down.dds',
---#        over = '/dialogs/config_btn/config_btn_over.dds',
---#        dis = '/dialogs/config_btn/config_btn_dis.dds',
---#    },
---#    title = {
---#        font = UIUtil.titleFont,
---#        color = UIUtil.fontColor,
---#        size = 14,
---#    },
---#    cursorFunc = UIUtil.GetCursor,
---#}
---#################################################
+----------------------------------------------------------------------------------------------------
+----   Generic Window Class
+----------------------------------------------------------------------------------------------------
+
+
+local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import('/lua/maui/text.lua').Text
@@ -67,15 +13,70 @@ local Checkbox = import('/lua/maui/checkbox.lua').Checkbox
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Prefs = import('/lua/user/prefs.lua')
 
-styles = {}
+-- default style set
+styles = {
+    backgrounds = {
+        notitle = {
+            tl = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ul.dds'),
+            tr = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ur.dds'),
+            tm = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_horz_um.dds'),
+            ml = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_vert_l.dds'),
+            m = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_m.dds'),
+            mr = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_vert_r.dds'),
+            bl = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_ll.dds'),
+            bm = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_lm.dds'),
+            br = UIUtil.UIFile('/game/mini-map-brd01/mini-map_brd_lr.dds'),
+            borderColor = 'ff415055',
+        },
+        title = {
+            tl = UIUtil.UIFile('/game/options_brd/options_brd_ul.dds'),
+            tr = UIUtil.UIFile('/game/options_brd/options_brd_ur.dds'),
+            tm = UIUtil.UIFile('/game/options_brd/options_brd_horz_um.dds'),
+            ml = UIUtil.UIFile('/game/options_brd/options_brd_vert_l.dds'),
+            m = UIUtil.UIFile('/game/options_brd/options_brd_m.dds'),
+            mr = UIUtil.UIFile('/game/options_brd/options_brd_vert_r.dds'),
+            bl = UIUtil.UIFile('/game/options_brd/options_brd_ll.dds'),
+            bm = UIUtil.UIFile('/game/options_brd/options_brd_lm.dds'),
+            br = UIUtil.UIFile('/game/options_brd/options_brd_lr.dds'),
+            borderColor = 'ff415055',
+        },
+    },
+    closeButton = {
+        up = UIUtil.SkinnableFile('/game/menu-btns/close_btn_up.dds'),
+        down = UIUtil.SkinnableFile('/game/menu-btns/close_btn_down.dds'),
+        over = UIUtil.SkinnableFile('/game/menu-btns/close_btn_over.dds'),
+        dis = UIUtil.SkinnableFile('/game/menu-btns/close_btn_dis.dds'),
+    },
+    pinButton = {
+        up = UIUtil.SkinnableFile('/game/menu-btns/pin_btn_up.dds'),
+        upSel = UIUtil.SkinnableFile('/game/menu-btns/pinned_btn_up.dds'),
+        over = UIUtil.SkinnableFile('/game/menu-btns/pin_btn_over.dds'),
+        overSel = UIUtil.SkinnableFile('/game/menu-btns/pinned_btn_over.dds'),
+        dis = UIUtil.SkinnableFile('/game/menu-btns/pin_btn_dis.dds'),
+        disSel = UIUtil.SkinnableFile('/game/menu-btns/pinned_btn_dis.dds'),
+    },
+    configButton = {
+        up = UIUtil.SkinnableFile('/game/menu-btns/config_btn_up.dds'),
+        down = UIUtil.SkinnableFile('/game/menu-btns/config_btn_down.dds'),
+        over = UIUtil.SkinnableFile('/game/menu-btns/config_btn_over.dds'),
+        dis = UIUtil.SkinnableFile('/game/menu-btns/config_btn_dis.dds'),
+    },
+    title = {
+        font = UIUtil.titleFont,
+        color = UIUtil.fontColor,
+        size = 14,
+    },
+    cursorFunc = UIUtil.GetCursor,
+}
 
+---@class Window : Group
 Window = Class(Group) {
     __init = function(self, parent, title, icon, pin, config, lockSize, lockPosition, prefID, defaultPosition, textureTable)
-        Group.__init(self, parent, 'window')
+        Group.__init(self, parent, tostring(title) .. "-window")
 
         self:DisableHitTest()
 
-        self._resizeGroup = Group(parent, 'window resize group')
+        self._resizeGroup = Group(self, 'window resize group')
         LayoutHelpers.FillParent(self._resizeGroup, self)
         self._resizeGroup.Depth:Set(function() return self.Depth() + 100 end)
         self._resizeGroup:DisableHitTest()
@@ -279,13 +280,14 @@ Window = Class(Group) {
         end
 
         self.ClientGroup = Group(self, 'window client group')
-        self.ClientGroup.Top:Set(self.TitleGroup.Bottom)
-        self.ClientGroup.Left:Set(self.ml.Right)
-        self.ClientGroup.Height:Set(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
-        self.ClientGroup.Width:Set(function() return self.mr.Left() - self.ml.Right() end)
-        self.ClientGroup.Right:Set(self.mr.Left)
-        self.ClientGroup.Bottom:Set(self.bm.Top)
-        self.ClientGroup.Depth:Set(function() return self.window_m.Depth() + 1 end)
+        LayoutHelpers.ReusedLayoutFor(self.ClientGroup)
+            :Top(self.TitleGroup.Bottom)
+            :Left(self.ml.Right)
+            :Height(function() return self.bm.Top() - self.TitleGroup.Bottom() end)
+            :Width(function() return self.mr.Left() - self.ml.Right() end)
+            :Right(self.mr.Left)
+            :Bottom(self.bm.Top)
+            :Over(self.window_m)
 
         self.StartSizing = function(event, xControl, yControl)
             local drag = Dragger()
@@ -453,19 +455,37 @@ Window = Class(Group) {
             self:SaveWindowLocation()
         end
 
+        -- attempt to retrieve location of window in preference file
         local location = Prefs.GetFromCurrentProfile(prefID)
         if location then
-            local oldHeight = location.bottom - location.top
-            local oldWidth = location.right - location.left
-            self.Top:Set(math.max(location.top, parent.Top()))
-            self.Left:Set(math.max(location.left, parent.Left()))
-            self.Right:Set(math.min(location.right, parent.Right()))
-            self.Bottom:Set(math.min(location.bottom, parent.Bottom()))
-            if self.Bottom() - self.Top() ~= oldHeight then
-                self.Top:Set(math.max(math.min(location.bottom, parent.Bottom()) - oldHeight), parent.Top())
-            end
-            if self.Right() - self.Left() ~= oldWidth then
-                self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
+
+            -- old version in preference file that doesn't support UI scaling
+            if not (location.width and location.height) then 
+                local oldHeight = location.bottom - location.top
+                local oldWidth = location.right - location.left
+                self.Top:Set(math.max(location.top, parent.Top()))
+                self.Left:Set(math.max(location.left, parent.Left()))
+                self.Right:Set(math.min(location.right, parent.Right()))
+                self.Bottom:Set(math.min(location.bottom, parent.Bottom()))
+                if self.Bottom() - self.Top() ~= oldHeight then
+                    self.Top:Set(math.max(math.min(location.bottom, parent.Bottom()) - oldHeight), parent.Top())
+                end
+                if self.Right() - self.Left() ~= oldWidth then
+                    self.Left:Set(math.max(math.min(location.right, parent.Right()) - oldWidth), parent.Left())
+                end
+            -- new version in preference file that does support UI scaling
+            else 
+                local top = location.top 
+                local left = location.left 
+                local width = location.width 
+                local height = location.height 
+
+                self.Left:Set(left)
+                self.Top:Set(top)
+
+                -- we can scale these accordingly as we applied the inverse on saving
+                self.Right:Set(LayoutHelpers.ScaleNumber(width) + left)
+                self.Bottom:Set(LayoutHelpers.ScaleNumber(height) + top)
             end
         elseif defaultPosition then
             -- Scale only if it's a number, else it's already scaled lazyvar
@@ -485,7 +505,21 @@ Window = Class(Group) {
 
     SaveWindowLocation = function(self)
         if self._pref then
-            Prefs.SetToCurrentProfile(self._pref, {top = self.Top(), left = self.Left(), right = self.Right(), bottom = self.Bottom()})
+            Prefs.SetToCurrentProfile(
+                self._pref, 
+                {
+                    top = self.Top(), 
+                    left = self.Left(), 
+
+                    -- backwards compatibility with the FAF branch
+                    right = self.Right(),
+                    bottom = self.Bottom(),
+
+                    -- invert the scale on these numbers, that allows us to apply the scale again when we read it from the preference file
+                    width = LayoutHelpers.InvScaleNumber(self.Width()), 
+                    height = LayoutHelpers.InvScaleNumber(self.Height())
+                }
+            )
         end
     end,
 

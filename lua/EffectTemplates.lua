@@ -84,9 +84,15 @@ SmokePlumeMedDensitySml03 = { EmtBpPath .. 'destruction_explosion_smoke_11_emit.
 -- ---------------------------------------------------------------
 -- Wreckage Smoke Effects
 -- ---------------------------------------------------------------
+
 DefaultWreckageEffectsSml01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsSml01Count = table.getn(DefaultWreckageEffectsSml01)
+
 DefaultWreckageEffectsMed01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsMed01Count = table.getn(DefaultWreckageEffectsMed01)
+
 DefaultWreckageEffectsLrg01 = table.concatenate(SmokePlumeLightDensityMed01, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml01, SmokePlumeMedDensitySml02, SmokePlumeMedDensitySml03)
+DefaultWreckageEffectsLrg01Count = table.getn(DefaultWreckageEffectsLrg01)
 
 
 -- ---------------------------------------------------------------
@@ -275,8 +281,12 @@ DamageStructureFireSmoke01 = table.concatenate(DamageStructureSmoke01, DamageStr
 -- ---------------------------------------------------------------
 -- Ambient effects
 -- ---------------------------------------------------------------
-TreeBurning01 = table.concatenate(DamageFire01 ,{EmtBpPath .. 'forest_fire_smoke_01_emit.bp'})
 
+TreeBurning01 = {
+    EmtBpPath .. 'forest_fire_01.bp',
+    EmtBpPath .. 'forest_distortion_01.bp',
+    EmtBpPath .. 'forest_smoke_01.bp',
+}
 
 -- ---------------------------------------------------------------
 -- Shield Impact effects
@@ -650,6 +660,13 @@ AQuantumGateAmbient = {
     EmtBpPath .. 'aeon_gate_02_emit.bp',
     EmtBpPath .. 'aeon_gate_03_emit.bp',
 }
+
+ATractorAmbient = {
+    EmtBpPath .. 'tractor_01_emit.bp',
+    EmtBpPath .. 'tractor_02_emit.bp',
+    EmtBpPath .. 'tractor_03_emit.bp',
+}
+
 
 AResourceGenAmbient = {
     EmtBpPath .. 'aeon_rgen_ambient_01_emit.bp',

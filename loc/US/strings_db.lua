@@ -1540,7 +1540,7 @@ Unit_Description_0094="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0095="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0096="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0097="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0098="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0098="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 
 -- UEF -- Engineers
 Unit_Description_0076="Tech 1 amphibious construction, repair, capture and reclamation unit."
@@ -1703,7 +1703,7 @@ Unit_Description_0211="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0212="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0213="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0214="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0215="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0215="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 
 -- CYBRAN -- Engineers
 Unit_Description_0193="Tech 1 amphibious construction, repair, capture and reclamation unit."
@@ -1860,7 +1860,7 @@ Unit_Description_0291="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0292="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0293="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0294="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0295="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0295="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 Unit_Description_0336="Generates an adaptive economy of up to 10000 mass per second and 1000000 energy per second. When killed the reactor core destabilizes in a fully-fledged nuclear explosion."
 
 -- AEON -- Engineers
@@ -2004,7 +2004,7 @@ Unit_Description_0406="Generates 500 Energy per second. Construct next to other 
 Unit_Description_0407="Extracts 6 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus. Can be upgraded."
 Unit_Description_0408="Generates 2500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
 Unit_Description_0409="Generates 18 mass per second. Must be constructed on mass deposits. Construct structures next to mass extractor for adjacency bonus."
-Unit_Description_0410="Creates 16 mass per second using 1500 energy per second. Construct next to other energy consuming structures for adjacency bonus."
+Unit_Description_0410="Creates 16 mass per second using 1500 energy per second. Construct next to other energy generating structures for adjacency bonus."
 
 -- SERAPHIM -- Engineers
 Unit_Description_0387="Tech 1 amphibious construction, Repair, Capture and Reclamation unit."
@@ -4673,7 +4673,14 @@ lobui_0398="An arbitrary option has been selected for now: check the game option
 lobui_0399="The selected map does not exist."
 lobui_0700=" kicked because he does not have this mod: "
 lobui_0701="The last player is kicked because he does not have this mod: "
+lobui_0702="Team Ratings:"
+lobui_0703="Team %d: %d (%d+/-%d)"
 
+AutoLobbyHeaderText="Connection status"
+AutoLobbyConnectionsTextSingular="%s / %s players are connected"
+AutoLobbyConnectionsTextPlural="%s / %s players are connected"
+AutoLobbyConnectionsTextSingularNoTotal="%s player is connected"
+AutoLobbyConnectionsTextPluralNoTotal="%s players are connected"
 --Lobby options panel
 lobui_0400="Stretch Background"
 lobui_0401="Stretch background to fill screen."
@@ -7415,6 +7422,7 @@ lobui_0611="Lobby Settings"
 lobui_0612="Change your lobby background or chat font size."
 lobui_0618="Large Preview"
 lobui_0619="Click to show a large map preview showing all the mass and hydrocarbon spots"
+lobui_0626="Finished autobalancing"
 tooltipui0547 = "Energy being generated and spent per second"
 tooltipui0104 = "Mass being generated and spent per second"
 tooltipui0700 = "Mass Reclaimed"
@@ -7551,6 +7559,18 @@ tooltipui0640 = "Removes units which hover"
 tooltipui0696 = "Rehost"
 tooltipui0800 = "Pin Minimap Window"
 tooltipui0801 = "Locks the position and layout of the minimap window"
+
+tooltipui1000="Mass Income"
+tooltipui1001="Mass being generated with mass fabricators per second"
+tooltipui1002="Energy Expense"
+tooltipui1003="Energy being spent with mass fabricators per second"
+tooltipui1004="Active mass fabricators"
+tooltipui1005="Amount of active mass fabricators"
+tooltipui1006="Inactive mass fabricators"
+tooltipui1007="Amount of inactive mass fabricators"
+tooltipui1008="Energy Required"
+tooltipui1009="Amount of required energy for mass fabricators to work"
+
 LOADING = "Loading..."
 lobui_0427 = "FAF Game Lobby"
 lobui_0428 = "Kick Player"
@@ -7559,6 +7579,7 @@ lobui_0430="Country not found. Please contact the development team on the forums
 lobui_0431="Close - spawn mex"
 lobui_0432="Closed - spawn mex"
 lobui_0433="Curated Maps"
+lobui_1000="Patchnotes"
 tooltipui0360 = "Set how quickly the Game runs"
 
 sorian_0001="AI: Sorian"
@@ -7607,6 +7628,9 @@ lobui_0440="All"
 lobui_0441="Share unitcap with all players"
 lobui_0442="From %s"
 lobui_0443="To %s"
+lobui_0444 = "Autobalance"
+lobui_0445 = "Automatically balance players into 2 equally sized teams"
+lobui_0446 = "Enabled fixed spawn locations"
 
 lobui_0450="CPU"
 lobui_0451="Ping"
@@ -7665,6 +7689,13 @@ lobui_0780="Flexible balance (Revealed)"
 lobui_0781="Teams will be balanced with up to 5%% tolerance of best setup to make it a bit unpredictable, labeled random start locations"
 lobui_0782="Optimal balance (Mirrored)"
 lobui_0783="Teams will be optimally balanced, mirrored start locations"
+
+lobui_0790="Manual Unit Sharing"
+lobui_0791="Are players allowed to manually give units?"
+lobui_0792="Manual unit sharing are allowed"
+lobui_0793="Yes except builders"
+lobui_0794="No manual sharing of builder/factory"
+lobui_0795="No manual sharing of units"
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."
@@ -8078,3 +8109,5 @@ lobui_0807="This game will not be rated."
 
 replay_id="Replay id"
 map_version="Map version"
+
+ChangelogDescriptionIdentifier="description"

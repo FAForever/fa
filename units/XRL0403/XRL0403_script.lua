@@ -53,7 +53,7 @@ XRL0403 = Class(CWalkingLandUnit) {
         self:SetWeaponEnabledByLabel('HackPegLauncher', true)   -- -- -- Enable and show hack-peg launcher.
     end,
 
-    OnCreate= function(self)
+    OnCreate = function(self)
         CWalkingLandUnit.OnCreate(self)
         self:SetWeaponEnabledByLabel('HackPegLauncher', false)
         if self:IsValidBone('Missile_Turret') then
@@ -67,11 +67,34 @@ XRL0403 = Class(CWalkingLandUnit) {
             self.AnimationManipulator = CreateAnimator(self)
             self.Trash:Add(self.AnimationManipulator)
         end
+
         self.AnimationManipulator:PlayAnim(self:GetBlueprint().Display.AnimationActivate, false):SetRate(0)
+
+        -- adjust collision box due to build animation
+        self:SetCollisionShape(
+            'Box', 
+            self.Blueprint.CollisionOffsetX,
+            self.Blueprint.CollisionOffsetY,
+            self.Blueprint.CollisionOffsetZ,
+            0.5 * self.Blueprint.SizeX,
+            0.5 * self.Blueprint.SizeY,
+            0.5 * self.Blueprint.SizeZ
+        )
+
     end,
 
     OnStopBeingBuilt = function(self,builder,layer)
         CWalkingLandUnit.OnStopBeingBuilt(self,builder,layer)
+
+        -- adjust collision box due to build animation
+        self:SetCollisionShape('Box',
+            2 * self.Blueprint.CollisionOffsetX,
+            2 * self.Blueprint.CollisionOffsetY,
+            2 * self.Blueprint.CollisionOffsetZ,
+            0.5 * self.Blueprint.SizeX,
+            0.5 * self.Blueprint.SizeY,
+            0.5 * self.Blueprint.SizeZ
+        )
 
         if self:IsValidBone('Missile_Turret') then
             self:HideBone('Missile_Turret', true)
@@ -91,8 +114,6 @@ XRL0403 = Class(CWalkingLandUnit) {
 
     OnLayerChange = function(self, new, old)
         CWalkingLandUnit.OnLayerChange(self, new, old)
-
-        --LOG("Mega Layerchange from ", old, " to ", new)
 
         if new == 'Land' then
             self:DisableUnitIntel('Layer', 'Sonar')

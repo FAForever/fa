@@ -8,6 +8,10 @@
 ---- We store the callbacks in a sub-table (instead of directly in the
 ---- module) so that we don't include any
 
+---@class SimCallback
+---@field Func string
+---@field Args table
+
 local SimUtils = import('/lua/SimUtils.lua')
 local SimPing = import('/lua/SimPing.lua')
 local SimTriggers = import('/lua/scenariotriggers.lua')
@@ -45,6 +49,7 @@ local CategoriesEngineer = categories.ENGINEER - categories.INSIGNIFICANTUNIT
 local Warnings = { }
 
 --- List of callbacks that is being populated throughout this file
+---@type table<string, function>
 local Callbacks = {}
 
 function DoCallback(name, data, units)
@@ -162,8 +167,8 @@ local skirtSizes = {
 }
 
 --- Computes the n'th layer of a previous layer.
--- @param skirtSize The skirt size of the unit.
--- @param layers The nth layer we'd like to have for this unit.
+---@param skirtSize number skirt size of the unit
+---@param nthLayer number nth layer we'd like to have for this unit
 local function RetrieveNthStructureLayer (skirtSize, nthLayer)
 
     -- attempt to retrieve the right set of layers for this skirtSize
@@ -404,10 +409,10 @@ Callbacks.BoxFormationSpawn = function(data)
         or math.floor(val) + (math.mod(FootprintSize(axe),2) == 1 and 0.5 or 0)
     end
 
-    local posX = math.floor(data.pos[1])
-    local posZ = math.floor(data.pos[3])
-    local offsetX = unitbp.SizeX or 1
-    local offsetZ = unitbp.SizeZ or 1
+    local posX = (data.pos[1])
+    local posZ = (data.pos[3])
+    local offsetX = 1.2 * (unitbp.Footprint.SizeX or 1)
+    local offsetZ = 1.2 * (unitbp.Footprint.SizeZ or 1)
 
     if unitbp.Physics.MotionType == 'RULEUMT_None' then
         offsetX = math.ceil(unitbp.Physics.SkirtSizeX or FootprintSize('x'))
@@ -580,3 +585,156 @@ Callbacks.FlagShield = function(data, units)
 end
 
 Callbacks.WeaponPriorities = import('/lua/WeaponPriorities.lua').SetWeaponPriorities
+
+Callbacks.ToggleDebugChainByName = function (data, units)
+    LOG("ToggleDebugChainByName")
+end
+
+Callbacks.ToggleDebugMarkersByType = function (data, units)
+    import("/lua/sim/markerutilities.lua").ToggleDebugMarkersByType(data.Type)
+end
+
+--- Toggles the profiler on / off
+Callbacks.ToggleProfiler = function (data)
+    import("/lua/sim/profiler.lua").ToggleProfiler(data.Army, data.ForceEnable or false )
+end
+
+-- Allows searching for benchmarks
+Callbacks.FindBenchmarks = function (data)
+    import("/lua/sim/profiler.lua").FindBenchmarks(data.Army)
+end
+
+-- Allows a benchmark to be run in the sim
+Callbacks.RunBenchmarks = function (data)
+    import("/lua/sim/profiler.lua").RunBenchmarks(data.Info)
+end
+
+do
+    -- upvalue for performance
+    local EntityCategoryFilterDown = EntityCategoryFilterDown
+    local IssueClearCommands = IssueClearCommands
+    local IssueUpgrade = IssueUpgrade
+
+    local cxrb0104 = categories.xrb0104
+    local cxrb0204 = categories.xrb0204
+
+    --- Forces hives in the selection to upgrade immediately
+    ---@param data {UpgradeTo: string} what we want to upgrade to, should be 'xrb0204' or 'xrb0304'
+    ---@param units Unit[] selected units
+    Callbacks.ImmediateHiveUpgrade = function(data, units)
+
+        -- make sure we have valid units
+        units = SecureUnits(units)
+
+        -- find t1 / t2 hives
+        local xrb0104 = EntityCategoryFilterDown(cxrb0104, units)
+        local xrb0204 = EntityCategoryFilterDown(cxrb0204, units)
+
+        -- upgrade tech 1 hives
+        if xrb0104[1] then 
+
+            -- oof for performance, but this doesn't get run that often
+            local notUpgradingh = 1
+            local notUpgrading = { }
+            
+            local upgradingh = 1 
+            local upgrading = { }
+
+            -- split between upgrading / and not upgrading hives for different behavior
+            for k, unit in xrb0104 do 
+                if not unit:IsUnitState('Upgrading') then 
+                    notUpgrading[notUpgradingh] = unit 
+                    notUpgradingh = notUpgradingh + 1
+                else 
+                    upgrading[upgradingh] = unit 
+                    upgradingh = upgradingh + 1
+                end
+            end
+
+            -- always clear things out
+            IssueClearCommands(notUpgrading)
+
+            -- upgrading to t2 from t1
+            if data.UpgradeTo == "xrb0204" then 
+                IssueUpgrade( notUpgrading, "xrb0204")
+            
+            -- upgrading to t3 from t1
+            elseif data.UpgradeTo == "xrb0304" then 
+                IssueUpgrade( notUpgrading, "xrb0204")
+                IssueUpgrade( xrb0104, "xrb0304")
+            end
+        end
+
+        -- upgrade tech 2 hives
+        if xrb0204[1] then 
+
+            -- always clear things out
+            if data.ClearCommands then 
+                IssueClearCommands(xrb0204)
+            end
+
+            -- upgrading to t3 form t1
+            if data.UpgradeTo == "xrb0304" then 
+                IssueUpgrade( xrb0204, "xrb0304")
+            end
+        end
+    end
+end
+
+do
+    --- Allows the player to force a target recheck on the selected units
+    ---@param data table   an empty table
+    ---@param units Unit[] table of units
+    Callbacks.RecheckTargetsOfWeapons = function(data, units)
+
+        -- make sure we have valid units with the correct command source
+        units = SecureUnits(units)
+        local tick = GetGameTick()
+        local rechecks = 0 
+
+        -- reset their weapons
+        for k, unit in units do
+            if
+                -- unit should still exist
+                not unit:BeenDestroyed() and
+                (   -- do not allow players to spam this
+                    not unit.RecheckTargetsOfWeaponsTick or
+                    (tick - unit.RecheckTargetsOfWeaponsTick > 10)
+                ) 
+            then
+                rechecks = rechecks + 1
+                unit.RecheckTargetsOfWeaponsTick = tick
+                for l = 1, unit.WeaponCount do
+                    unit:GetWeapon(l):ResetTarget()
+                end
+            end
+        end
+
+        -- user feedback
+        if rechecks > 0 then 
+            if units[1].Army == GetFocusArmy() then
+                if rechecks == 1 then 
+                    print("1 weapon target recheck")
+                else 
+                    print(string.format("%d weapon target rechecks", rechecks))
+                end
+            end
+        end
+    end
+end
+
+Callbacks.MapResoureCheck = function(data)
+    import("/lua/sim/MapUtilities.lua").MapResourceCheck()
+end
+
+Callbacks.iMapSwitchPerspective = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapSwitchPerspective(data.Army)
+end
+
+Callbacks.iMapToggleRendering = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapToggleRendering()
+end
+
+Callbacks.iMapToggleThreat = function(data)
+    import("/lua/sim/MapUtilities.lua").iMapToggleThreat(data.Identifier)
+end

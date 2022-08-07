@@ -1,9 +1,16 @@
---- Class Entity
--- @classmod Sim.Entity
+---@declare-global
+---@class moho.entity_methods
+local Entity = {}
 
----
---  Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
-function Entity:AddManualScroller(scrollSpeed1,  scrollSpeed2)
+---@alias Army number | string
+---@alias EntityId number
+---@alias EntityVisionType 'Intel' | 'Never' | 'Always' | 'Vision'
+
+--- Does not appear to be used
+---@unknown
+---@param scrollSpeed1 number
+---@param scrollSpeed2 number
+function Entity:AddManualScroller(scrollSpeed1, scrollSpeed2)
 end
 
 ---
@@ -11,13 +18,15 @@ end
 function Entity:AddPingPongScroller(ping1,  pingSpeed1,  pong1,  pongSpeed1,  ping2,  pingSpeed2,  pong2,  pongSpeed2)
 end
 
----
---  AddShooter(shooter)
+--- Does not appear to be used
+---@unknown
+---@param shooter any
 function Entity:AddShooter(shooter)
 end
 
----
---  Entity:AddThreadScroller(sideDist, scrollMult)
+--- Attaches a thread scroller to an entity, animating the bottom section of their textures / UVs
+---@param sideDist number
+---@param scrollMult number
 function Entity:AddThreadScroller(sideDist,  scrollMult)
 end
 
@@ -26,19 +35,22 @@ end
 function Entity:AddWorldImpulse(self,  Ix,  Iy,  Iz,  Px,  Py,  Pz)
 end
 
----
---  Entity:AdjustHealth(instigator, delta)
+--- Adjusts the health of the entity, with credits to the instigator
+---@param instigator Unit
+---@param delta number
 function Entity:AdjustHealth(instigator,  delta)
 end
 
----
---  Entity:AttachBoneTo(selfbone, entity, bone)
+--- Attaches this entity to another entity, matching the bone position of `selfBone` and `bone` accordingly
+---@param selfbone number | string
+---@param entity Entity
+---@param bone number | string
 function Entity:AttachBoneTo(selfbone,  entity,  bone)
 end
 
 ---
 --  Attach a unit bone position to an entity bone position
-function Entity:AttachBoneToEntityBone()
+function Entity:AttachBoneToEntityBone(selfBone, other, otherBone, flag)
 end
 
 ---
@@ -46,39 +58,51 @@ end
 function Entity:AttachTo(entity,  bone)
 end
 
----
---  Entity:BeenDestroyed()
+
+--- Returns whether the C-side of this entity has been destroyed
+---@see # As an alternative: `IsDestroyed(entity)`
 function Entity:BeenDestroyed()
 end
 
----
---  Entity:CreateProjectile(proj_bp, [ox, oy, oz], [dx, dy, dz]
-function Entity:CreateProjectile()
+--- Creates a projectile at the position of the entity such that `projectile:GetLauncher()` returns the entity
+---@param projectileid string
+---@param ox number? X coordinate of the offset
+---@param oy number? Y coordinate of the offset
+---@param oz number? Z coordinate of the offset
+---@param dx number? X direction of the projectile
+---@param dy number? Y direction of the projectile
+---@param dz number? Z direction of the projectile
+---@return Projectile
+function Entity:CreateProjectile(projectileid, ox, oy, oz, dx, dy, dz)
 end
 
----
---  Entity:CreateProjectileAtBone(projectile_blueprint, bone)
+--- Creates a projectile at a bone matching the orientation of the bone such that `projectile:GetLauncher()` returns the entity
+---@param projectile string
+---@param bone number | string
+---@return Projectile
 function Entity:CreateProjectileAtBone(projectile_blueprint,  bone)
 end
 
----
---  Entity:CreatePropAtBone(boneindex,prop_blueprint_id)
-function Entity:CreatePropAtBone(boneindex, prop_blueprint_id)
+--- Creates a prop at a bone matching the orientation of the bone, used by tree groups when they break
+---@param bone number | string
+---@param propid string
+---@return Prop
+function Entity:CreatePropAtBone(bone, propid)
 end
 
----
---  Entity:Destroy()
+--- Destroys the entity, de-allocating the c-side
 function Entity:Destroy()
 end
 
----
---  Entity:DetachAll(bone,[skipBallistic])
-function Entity:DetachAll(bone, [skipBallistic])
+--- Detaches all entities attached to the given bone
+---@param bone number | string
+---@param skipBallistic? boolean
+function Entity:DetachAll(bone, skipBallistic)
 end
 
----
---  Entity:DetachFrom([skipBallistic])
-function Entity:DetachFrom([skipBallistic])
+--- Detaches all entities attached to this entity
+---@param skipBallistic? boolean
+function Entity:DetachFrom(skipBallistic)
 end
 
 ---
@@ -91,19 +115,23 @@ end
 function Entity:EnableIntel(type)
 end
 
----
---  Entity:FallDown(dx,dy,dz,force) -- start falling down
+
+---@param dx any
+---@param dy any
+---@param dz any
+---@param force any
+---@return moho.MotorFallDown
 function Entity:FallDown(dx, dy, dz, force)
 end
 
 ---
 --  GetAIBrain(self)
-function Entity:GetAIBrain(self)
+function Entity:GetAIBrain()
 end
 
----
---  GetArmy(self)
-function Entity:GetArmy(self)
+--- Returns the army that is associated with this entity, as set by the value `Army` in its specification
+---@return Army
+function Entity:GetArmy()
 end
 
 ---
@@ -111,18 +139,22 @@ end
 function Entity:GetBlueprint()
 end
 
----
---  Entity:GetBoneCount() -- returns number of bones in this entity's skeleton
+--- Returns the total number of bones, excluding -2 and -1.
+---@return number
 function Entity:GetBoneCount()
 end
 
----
---  Entity:GetBoneDirection(bone_name)
-function Entity:GetBoneDirection(bone_name)
+--- Returns separate three numbers representing the roll, pitch, yaw of the bone
+---@see EulerToQuaternion if you need a Quaternion instead
+---@param bone number | string
+---@return number
+---@return number
+---@return number
+function Entity:GetBoneDirection(bone)
 end
-
----
---  Entity:GetBoneName(i) -- return the name of the i'th bone of this entity (counting from 0)
+--- Converts the bone index to the bone name, as set in the mesh
+---@param i any
+---@return string
 function Entity:GetBoneName(i)
 end
 
@@ -131,23 +163,24 @@ end
 function Entity:GetCollisionExtents()
 end
 
----
---  Entity:GetEntityId()
+--- Returns the unique entity id as set by the engine, note that these are recycled as the game progresses
+---@return EntityId
 function Entity:GetEntityId()
 end
 
----
---  Entity:GetFractionComplete()
+--- Returns a number between 0 and 1, where 0 is unbuilt and 1 is completely built
+---@return number
 function Entity:GetFractionComplete()
 end
 
----
---  Entity:GetHeading()
+--- Returns the heading on the XZ plane, where south is 0 and moving counter clock wise (just like the unit circle)
+---@return number
 function Entity:GetHeading()
 end
 
----
---  Entity:GetHealth()
+--- Returns the amount of health this entity has
+---@see For the maximum possible health, use `entity:GetMaxHealth()` instead
+---@return number
 function Entity:GetHealth()
 end
 
@@ -156,13 +189,14 @@ end
 function Entity:GetIntelRadius(type)
 end
 
----
---  Entity:GetMaxHealth()
+--- Returns the maximum amount of health this entity can have
+---@see For the current amount of health, use `entity:GetHealth()` instead
+---@return number
 function Entity:GetMaxHealth()
 end
 
----
---  Entity:GetOrientation()
+--- Returns the orientation of this entity as a quaternion
+---@return Quaternion
 function Entity:GetOrientation()
 end
 
@@ -171,24 +205,30 @@ end
 function Entity:GetParent()
 end
 
----
---  Entity:GetPosition([bone_name])
-function Entity:GetPosition([bone_name])
+--- Returns the position of the entity at a given bone (or its center bone if absent) as a table that is re-used on each call
+---@param bone? string | number
+---@return Vector
+function Entity:GetPosition(bone)
 end
 
----
---  Entity:GetPositionXYZ([bone_name])
-function Entity:GetPositionXYZ([bone_name])
+--- Returns the position of the entity at a given bone (or its center bone if absent) as three separate numbers
+---@param bone? string | number
+---@return number X
+---@return number Y
+---@return number Z
+function Entity:GetPositionXYZ(bone)
 end
 
----
---  Entity:GetScale() -> sx,sy,sz -- return current draw scale of this entity
-function Entity:GetScale()
+--- Returns the draw scale of the mesh of the entity, note that this functionality does not work on units
+---@param sx number
+---@param sy number
+---@param sz number
+function Entity:GetScale(sx, sy, sz)
 end
 
 ---
 --  InitIntel(army,type,<radius>)
-function Entity:InitIntel(army, type, <radius>)
+function Entity:InitIntel(army, type, radius)
 end
 
 ---
@@ -198,12 +238,19 @@ end
 
 ---
 --  Entity:IsValidBone(nameOrIndex,allowNil=false)
-function Entity:IsValidBone(nameOrIndex, allowNil=false)
+
+--- Returns whether the bone is a valid bone for the entity
+---@param bone number | string
+---@param allowNil boolean Flag that to consider nil a valid bone, defaults to false
+---@return boolean
+function Entity:IsValidBone(bone, allowNil)
 end
 
 ---
---  Entity:Kill(instigator,type,excessDamageRatio)
-function Entity:Kill(instigator, type, excessDamageRatio)
+---@param instigator? Unit
+---@param damageType? DamageType
+---@param excessDamageRatio? number
+function Entity:Kill(instigator, damageType, excessDamageRatio)
 end
 
 ---
@@ -243,7 +290,14 @@ end
 
 ---
 --  Entity:SetCollisionShape(['Box'|'Sphere'|'None'], centerX, Y, Z, size) -- size is radius for sphere, x,y,z extent for box
-function Entity:SetCollisionShape(['Box'|'Sphere'|'None'],  centerX,  Y,  Z,  size)
+
+--- Defines the collision shape of the entity. Should not be used excessively due to its performance impact
+---@param type 'Box' | 'Sphere' | 'None'
+---@param centerX number
+---@param Y number
+---@param Z number
+---@param size number
+function Entity:SetCollisionShape(type,  centerX,  Y,  Z,  size)
 end
 
 ---
@@ -256,23 +310,27 @@ end
 function Entity:SetHealth(instigator, health)
 end
 
----
---  SetRadius(type,radius)
-function Entity:SetIntelRadius()
+
+function Entity:SetIntelRadius(type, radius)
 end
 
 ---
---  Entity:SetMaxHealth(maxhealth)
+---@param maxhealth number
 function Entity:SetMaxHealth(maxhealth)
 end
 
----
---  Entity:SetMesh(meshBp, bool keepActor): Change mesh on the fly
-function Entity:SetMesh(meshBp,  bool keepActor)
+--
+
+--- Change the mesh of the entity
+---@param meshBp string
+---@param keepActor boolean if set, keep all manipulators attached
+function Entity:SetMesh(meshBp,  keepActor)
 end
 
----
---  Entity:SetOrientation(orientation, immediately)
+--- Defines the orientation of the entity
+---@see `entity:SetPosition` for the position of the entity
+---@param orientation Quaternion
+---@param immediately boolean defaults to false
 function Entity:SetOrientation(orientation,  immediately)
 end
 
@@ -281,38 +339,49 @@ end
 function Entity:SetParentOffset(vector)
 end
 
----
---  Entity:SetPosition(vector,[immediate])
-function Entity:SetPosition(vector, [immediate])
+---@see `entity:SetOrientation` for the orientation of the entity
+---@param vector Vector
+---@param immediate boolean defaults to false
+function Entity:SetPosition(vector, immediate)
 end
 
----
---  Entity:SetScale(s) or Entity:SetScale(sx,sy,sz)
-function Entity:SetScale(s)
+--- Defines the draw scale of the mesh of the entity, note that this functionality does not work on units
+---@param sx number
+---@param sy number
+---@param sz number
+function Entity:SetScale(sx, sy, sz)
 end
 
----
---  SetVizToAllies(type)
+--- Defines when allied armies to this entity gain vision of (the mesh of) this entity
+---@param type EntityVisionType
 function Entity:SetVizToAllies(type)
 end
 
----
---  SetVizToEnemies(type)
+--- Defines when hostile armies to this entity gain vision of (the mesh of) this entity
+---@param type EntityVisionType
 function Entity:SetVizToEnemies(type)
 end
 
----
---  SetVizToFocusPlayer(type)
+--- Defines when the focus army of this entity gaisn vision of (the mesh of) this entity
+---@param type EntityVisionType
 function Entity:SetVizToFocusPlayer(type)
 end
 
----
---  SetVizToNeutrals(type)
+--- Defines when neutral armies to this entity gain vision of (the mesh of) this entity
+---@param type EntityVisionType
 function Entity:SetVizToNeutrals(type)
 end
 
----
---  Entity:ShakeCamera(radius, max, min, duration)Shake the camera. This is a method of entities rather than a global functionbecause it takes the position of the entity as the epicenter where it shakes more.
+--- Shakes the camera, depending on its distance to the entity
+---@param radius number
+---@param max number
+---@param min number
+---@param duration number
 function Entity:ShakeCamera(radius,  max,  min,  duration)
 end
 
+--- Sink into the ground
+function Entity:SinkAway(vy)
+end
+
+return Entity

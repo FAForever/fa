@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'aeon_missile_trail_01',
+	Lifetime = -1.00,
+    TrailLength = 7.45,
+    Size = 0.025,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_green_05.dds',
+}
+

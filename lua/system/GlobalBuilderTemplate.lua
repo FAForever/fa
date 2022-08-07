@@ -1,10 +1,11 @@
+---@declare-global
 ----------------------------------------------------------------------------
 --
 --  File     :  /lua/system/GlobalBuilderTemplate.lua
 --
 --  Summary  :  Global builder table and template methods
 --
---  Copyright © 2007 Gas Powered Games, Inc.  All rights reserved.
+--  Copyright ï¿½ 2007 Gas Powered Games, Inc.  All rights reserved.
 ----------------------------------------------------------------------------
 
 -- Global list of all buffs found in the system.

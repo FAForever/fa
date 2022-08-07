@@ -1,0 +1,158 @@
+-- used by SIFExperimentalStrategicMissile01, xsb2401
+EmitterBlueprint {
+	BlueprintId = 'seraphim_expnuke_launch_09',
+	Lifetime = 60.00,
+	Repeattime = 60.00,
+	TextureFramecount = 1.00,
+	Blendmode = 3.00,
+	LocalVelocity = true,
+	LocalAcceleration = true,
+	Gravity = false,
+	AlignRotation = true,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = -1.00, -- nuke
+	EmitIfVisible = true,
+	CatchupEmit = true,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = false,
+	ParticleResistance = false,
+	InterpolateEmission = true,
+	TextureStripcount = 4.00,
+	SortOrder = 0.00,
+	LowFidelity = true,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = '/textures/particles/line_white_add_11.dds',
+	RampTexture = '/textures/particles/ramp_blue_28.dds',
+	XDirectionCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=15.600,y=0.000,z=0.000 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=0.000,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=14.220,y=1.000,z=0.500 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=9.000,y=0.000,z=0.000 },
+			{ x=18.000,y=2.000,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=15.180,y=30.000,z=0.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=12.480,y=0.050,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=0.000,z=0.000 },
+		},
+	},
+	ResistanceCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=13.860,y=2.500,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=0.000,z=0.000 },
+		},
+	},
+	YPosCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=13.140,y=0.000,z=0.000 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=-2.000,z=3.000 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=15.420,y=0.000,z=0.000 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=18.540,y=2.500,z=1.000 },
+			{ x=60.000,y=1.500,z=0.500 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=16.140,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=30.000,y=1.000,z=0.077 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=17.414,y=2.000,z=4.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 60.00,
+		Keys = {
+			{ x=10.620,y=0.633,z=0.000 },
+		},
+	},
+}
+

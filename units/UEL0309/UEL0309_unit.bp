@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardScanRadius = 26, -- allows for factory reclaim bug 
         TargetBones = {
             'Turret',
         },
@@ -73,6 +74,7 @@ UnitBlueprint {
         'BUILTBYTIER3FACTORY',
         'UEF',
         'MOBILE',
+        'AMPHIBIOUS',
         'LAND',
         'TECH3',
         'CONSTRUCTION',

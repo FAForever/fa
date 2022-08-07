@@ -78,27 +78,6 @@ UnitBlueprint {
             '<LOC ability_upgradable>Upgradeable',
         },
         AnimationUpgrade = '/units/urb0203/urb0203_aupgrade.sca',
-        BlinkingLights = {
-            {
-                BLBone = 'B03',
-                BLOffsetX = -0.7,
-                BLOffsetY = 0.2,
-                BLOffsetZ = 0.08,
-                BLScale = 2,
-            },
-            {
-                BLBone = 'B03',
-                BLOffsetX = 0.65,
-                BLOffsetY = 0.2,
-                BLOffsetZ = 0.04,
-                BLScale = 2,
-            },
-        },
-        BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
-        },
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {
             Water = {
@@ -210,16 +189,17 @@ UnitBlueprint {
         MaxSteerForce = 0,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
+        ComputeRollOffPoint = true,
         RollOffPoints = {
             {
                 UnitSpin = 180,
-                X = -2,
+                X = -3,
                 Y = 0,
                 Z = -8,
             },
             {
                 UnitSpin = 0,
-                X = -2,
+                X = -3,
                 Y = 0,
                 Z = 8,
             },
@@ -235,7 +215,7 @@ UnitBlueprint {
     SelectionSizeZ = 8.1,
     SelectionThickness = 0.21,
     SizeX = 4,
-    SizeY = 3, #from 2, for beam weapons
+    SizeY = 3, --from 2, for beam weapons
     SizeZ = 10,
     StrategicIconName = 'icon_factoryhq2_naval',
     StrategicIconSortPriority = 215,

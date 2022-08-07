@@ -1,0 +1,149 @@
+-- used by trees
+EmitterBlueprint {
+	BlueprintId = 'forest_fire_smoke_01',
+	Lifetime = -1,
+	Repeattime = 150.00,
+	TextureFramecount = 1.00,
+	Blendmode = 0.00,
+	LocalVelocity = false,
+	LocalAcceleration = false,
+	Gravity = false,
+	AlignRotation = false,
+	AlignToBone = false,
+	Flat = false,
+	LODCutoff = 300.00,
+	EmitIfVisible = true,
+	CatchupEmit = false,
+	CreateIfVisible = false,
+	SnapToWaterline = true,
+	OnlyEmitOnWater = false,
+	InterpolateEmission = true,
+	TextureStripcount = 1.00,
+	SortOrder = 10.00,
+	LowFidelity = false,
+	MedFidelity = true,
+	HighFidelity = true,
+	Texture = '/textures/particles/cloud_smoke_alpha_10.dds',
+	RampTexture = '/textures/particles/ramp_fire_smoke_03.dds',
+	XDirectionCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=-0.005,z=0.003 },
+		},
+	},
+	YDirectionCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=79.947,y=0.015,z=0.000 },
+		},
+	},
+	ZDirectionCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.010 },
+		},
+	},
+	EmitRateCurve = {
+		XRange = 40.00,
+		Keys = {
+			{ x=0.210,y=0.250,z=0.000 },
+			{ x=150.000,y=0.500,z=0.000 },
+		},
+	},
+	LifetimeCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=0.000,y=142.000,z=0.000 },
+		},
+	},
+	VelocityCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.390,y=0.830,z=0.000 },
+		},
+	},
+	XAccelCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.000 },
+		},
+	},
+	YAccelCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.000 },
+		},
+	},
+	ZAccelCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.000 },
+		},
+	},
+	SizeCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=61.140,y=0.000,z=0.000 },
+		},
+	},
+	XPosCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.200 },
+		},
+	},
+	YPosCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.200,z=0.400 },
+		},
+	},
+	ZPosCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.400 },
+		},
+	},
+	StartSizeCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=80.343,y=0.100,z=0.100 },
+		},
+	},
+	EndSizeCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=73.800,y=0.300,z=0.200 },
+		},
+	},
+	InitialRotationCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=68.280,y=180.000,z=360.000 },
+		},
+	},
+	RotationRateCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.000 },
+		},
+	},
+	FrameRateCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=1.000,z=0.000 },
+		},
+	},
+	TextureSelectionCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=75.000,y=0.000,z=0.000 },
+		},
+	},
+	RampSelectionCurve = {
+		XRange = 150.00,
+		Keys = {
+			{ x=73.950,y=0.500,z=1.000 },
+		},
+	},
+}

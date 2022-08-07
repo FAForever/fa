@@ -1,0 +1,13 @@
+MeshBlueprint {
+    IconFadeInZoom = 130,
+    LODs = {
+        {
+            MeshName = '/units/uec1301/uec1301_lod0.scm',
+            AlbedoName = '/units/uec1301_Tundra/uec1301_Tundra_Albedo.dds',
+            NormalsName = '/units/uec1301_Tundra/uec1301_Tundra_normalsTS.dds',
+            SpecularName = '/units/uec1301_Tundra/uec1301_Tundra_SpecTeam.dds',
+            Shader = 'TMeshAlpha',
+            LODCutoff = 195,
+        },
+    },
+}

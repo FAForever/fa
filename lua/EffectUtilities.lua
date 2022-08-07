@@ -10,8 +10,16 @@ local Entity = import('/lua/sim/Entity.lua').Entity
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local RandomFloat = import('/lua/utilities.lua').GetRandomFloat
 
-local DeprecatedWarnings = { }
+-- local DeprecatedWarnings = { }
 
+---@alias Position {[1]: number, [2]: number, [3]: number} table of {x, y, z}
+---@alias AdjacencyBeam {Unit: Unit, Trash: TrashBag}
+
+--- Creates all effects in a table at an entity
+---@param obj Entity
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
+---@return moho.IEffect[] emitters
 function CreateEffects(obj, army, EffectTable)
     local emitters = {}
     for _, v in EffectTable do
@@ -20,6 +28,14 @@ function CreateEffects(obj, army, EffectTable)
     return emitters
 end
 
+--- Creates all effects in a table, with an offset from an entity
+---@param obj Entity | Unit
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
+---@param x number
+---@param y number
+---@param z number
+---@return moho.IEffect[] emitters
 function CreateEffectsWithOffset(obj, army, EffectTable, x, y, z)
     local emitters = {}
     for _, v in EffectTable  do
@@ -28,6 +44,14 @@ function CreateEffectsWithOffset(obj, army, EffectTable, x, y, z)
     return emitters
 end
 
+--- Creates all effects in a table, with random offsets from an entity
+---@param obj Entity | Unit
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
+---@param xRange number
+---@param yRange number
+---@param zRange number
+---@return moho.IEffect[] emitters
 function CreateEffectsWithRandomOffset(obj, army, EffectTable, xRange, yRange, zRange)
     local emitters = {}
     for _, v in EffectTable do
@@ -36,6 +60,12 @@ function CreateEffectsWithRandomOffset(obj, army, EffectTable, xRange, yRange, z
     return emitters
 end
 
+--- Creates all effects in a table at an entity's bone
+---@param obj Entity | Unit
+---@param bone string | number
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
+---@return moho.IEffect[] emitters
 function CreateBoneEffects(obj, bone, army, EffectTable)
     local emitters = {}
     for _, v in EffectTable do
@@ -44,6 +74,15 @@ function CreateBoneEffects(obj, bone, army, EffectTable)
     return emitters
 end
 
+--- Creates all effects in a table at an entity's bone, with offset
+---@param obj Entity | Unit
+---@param bone string | number
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
+---@param x number
+---@param y number
+---@param z number
+---@return moho.IEffect[] emitters
 function CreateBoneEffectsOffset(obj, bone, army, EffectTable, x, y, z)
     local emitters = {}
     for _, v in EffectTable do
@@ -52,6 +91,11 @@ function CreateBoneEffectsOffset(obj, bone, army, EffectTable, x, y, z)
     return emitters
 end
 
+--- Creates all effects in a table at each bone in a table for an entity
+---@param obj Entity | Unit
+---@param BoneTable string[]
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
 function CreateBoneTableEffects(obj, BoneTable, army, EffectTable)
     for _, vBone in BoneTable do
         for _, vEffect in EffectTable do
@@ -60,6 +104,13 @@ function CreateBoneTableEffects(obj, BoneTable, army, EffectTable)
     end
 end
 
+--- Creates all effects in a table at each bone in a table for an entity
+---@param obj Entity | Unit
+---@param BoneTable string[] | number[]
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
+---@param ScaleMin number
+---@param ScaleMax number
 function CreateBoneTableRangedScaleEffects(obj, BoneTable, EffectTable, army, ScaleMin, ScaleMax)
     for _, vBone in BoneTable do
         for _, vEffect in EffectTable do
@@ -68,6 +119,12 @@ function CreateBoneTableRangedScaleEffects(obj, BoneTable, EffectTable, army, Sc
     end
 end
 
+--- Creates a number of random effects out of a table at an entity
+---@param obj Entity | Unit
+---@param army number
+---@param EffectTable string[] Emitter blueprint names
+---@param NumEffects integer
+---@return moho.IEffect[] emitters
 function CreateRandomEffects(obj, army, EffectTable, NumEffects)
     local NumTableEntries = table.getn(EffectTable)
     local emitters = {}
@@ -77,271 +134,24 @@ function CreateRandomEffects(obj, army, EffectTable, NumEffects)
     return emitters
 end
 
+--- Sets the param of each effect to a random ranged float
+---@param Emitters moho.IEffect[]
+---@param param string
+---@param minRange number
+---@param maxRange number
 function ScaleEmittersParam(Emitters, param, minRange, maxRange)
     for _, v in Emitters do
         v:SetEmitterParam(param, util.GetRandomFloat(minRange, maxRange))
     end
 end
 
-function CreateBuildCubeThread(unitBeingBuilt, builder, OnBeingBuiltEffectsBag)
-    unitBeingBuilt.BuildingCube = true
-    local bp = unitBeingBuilt:GetBlueprint()
-    local mul = 1.15
-    local xPos, yPos, zPos = unpack(unitBeingBuilt:GetPosition())
-    local proj = nil
-    yPos = yPos + (bp.Physics.MeshExtentsOffsetY or 0)
-
-    local x = bp.Physics.MeshExtentsX or (bp.Footprint.SizeX * mul)
-    local z = bp.Physics.MeshExtentsZ or (bp.Footprint.SizeZ * mul)
-    local y = bp.Physics.MeshExtentsY or (0.5 + (x + z) * 0.1)
-
-    -- Create a quick glow effect at location where unit is goig to be built
-    proj = unitBeingBuilt:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', 0, 0, 0, nil, nil, nil)
-    proj:SetScale(x * 1.05, y * 0.2, z * 1.05)
-    WaitSeconds(0.1)
-
-    if unitBeingBuilt.Dead then
-        return
-    end
-
-    local BuildBaseEffect = unitBeingBuilt:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect03_proj.bp', 0, 0, 0, nil, nil, nil)
-    OnBeingBuiltEffectsBag:Add(BuildBaseEffect)
-    unitBeingBuilt.Trash:Add(BuildBaseEffect)
-    Warp(BuildBaseEffect, Vector(xPos, yPos - y, zPos))
-    BuildBaseEffect:SetScale(x, y, z)
-    BuildBaseEffect:SetVelocity(0, 1.4 * y, 0)
-    WaitSeconds(0.7)
-
-    if unitBeingBuilt.Dead then
-        return
-    end
-
-    if not BuildBaseEffect:BeenDestroyed() then
-        BuildBaseEffect:SetVelocity(0)
-    end
-
-    unitBeingBuilt:ShowBone(0, true)
-    unitBeingBuilt:HideLandBones()
-    unitBeingBuilt.BeingBuiltShowBoneTriggered = true
-
-    local lComplete = unitBeingBuilt:GetFractionComplete()
-    WaitSeconds(0.2)
-
-    if unitBeingBuilt.Dead then
-        return
-    end
-
-    -- Create glow slice cuts and resize base cube
-    local slice = nil
-    local SlicePeriod = 1.1
-    local cComplete = unitBeingBuilt:GetFractionComplete()
-    while not unitBeingBuilt.Dead and  cComplete < 1.0 do
-        if lComplete < cComplete and not BuildBaseEffect:BeenDestroyed() then
-            proj = BuildBaseEffect:CreateProjectile('/effects/Entities/UEFBuildEffect/UEFBuildEffect02_proj.bp', 0, y * (1 - cComplete), 0, nil, nil, nil)
-            OnBeingBuiltEffectsBag:Add(proj)
-            slice = math.abs(lComplete - cComplete)
-            proj:SetScale(x, y * slice, z)
-            BuildBaseEffect:SetScale(x, y * (1 - cComplete), z)
-        end
-        WaitSeconds(SlicePeriod)
-
-        if unitBeingBuilt.Dead then
-            break
-        end
-        lComplete = cComplete
-        cComplete = unitBeingBuilt:GetFractionComplete()
-    end
-    unitBeingBuilt.BuildingCube = nil
-end
-
-function CreateUEFUnitBeingBuiltEffects(builder, unitBeingBuilt, BuildEffectsBag)
-    local buildAttachBone = builder:GetBlueprint().Display.BuildAttachBone
-    BuildEffectsBag:Add(CreateAttachedEmitter(builder, buildAttachBone, builder.Army, '/effects/emitters/uef_mobile_unit_build_01_emit.bp'))
-end
-
-function CreateUEFBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
-    local buildbp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)
-
-    -- Create a projectile for the end of build effect and warp it to the unit
-    local BeamEndEntity = unitBeingBuilt:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
-    BuildEffectsBag:Add(BeamEndEntity)
-
-    -- Create build beams
-    if BuildEffectBones ~= nil then
-        local beamEffect = nil
-        for i, BuildBone in BuildEffectBones do
-            BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, BeamBuildEmtBp))
-            BuildEffectsBag:Add(CreateAttachedEmitter(builder, BuildBone, builder.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-        end
-    end
-
-    -- Determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
-    local mul = 1.15
-    local ox = buildbp.Physics.MeshExtentsX or (buildbp.Footprint.SizeX * mul)
-    local oz = buildbp.Physics.MeshExtentsZ or (buildbp.Footprint.SizeZ * mul)
-    local oy = (buildbp.Physics.MeshExtentsY or (0.5 + (ox + oz) * 0.1))
-
-    ox = ox * 0.5
-    oz = oz * 0.5
-
-    -- Determine the the 2 closest edges of the build cube and use those for the location of our laser
-    local VectorExtentsList = { Vector(x + ox, y + oy, z + oz), Vector(x + ox, y + oy, z - oz), Vector(x - ox, y + oy, z + oz), Vector(x - ox, y + oy, z - oz) }
-    local endVec1 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-
-    for k, v in VectorExtentsList do
-        if v == endVec1 then
-            table.remove(VectorExtentsList, k)
-        end
-    end
-
-    local endVec2 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-    local cx1, cy1, cz1 = unpack(endVec1)
-    local cx2, cy2, cz2 = unpack(endVec2)
-
-    -- Determine a the velocity of our projectile, used for the scaning effect
-    local velX = 2 * (endVec2.x - endVec1.x)
-    local velY = 2 * (endVec2.y - endVec1.y)
-    local velZ = 2 * (endVec2.z - endVec1.z)
-
-    if unitBeingBuilt:GetFractionComplete() == 0 then
-        Warp(BeamEndEntity, Vector((cx1 + cx2) * 0.5, ((cy1 + cy2) * 0.5) - oy, (cz1 + cz2) * 0.5))
-        WaitSeconds(0.7)
-    end
-
-    local flipDirection = true
-
-    -- Warp our projectile back to the initial corner and lower based on build completeness
-    while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
-        if flipDirection then
-            Warp(BeamEndEntity, Vector(cx1, (cy1 - (oy * unitBeingBuilt:GetFractionComplete())), cz1))
-            BeamEndEntity:SetVelocity(velX, velY, velZ)
-            flipDirection = false
-        else
-            Warp(BeamEndEntity, Vector(cx2, (cy2 - (oy * unitBeingBuilt:GetFractionComplete())), cz2))
-            BeamEndEntity:SetVelocity(-velX, -velY, -velZ)
-            flipDirection = true
-        end
-        WaitSeconds(0.5)
-    end
-end
-
-function CreateUEFCommanderBuildSliceBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
-    local buildbp = unitBeingBuilt:GetBlueprint()
-    local x, y, z = unpack(unitBeingBuilt:GetPosition())
-    y = y + (buildbp.Physics.MeshExtentsOffsetY or 0)
-
-    -- Create a projectile for the end of build effect and warp it to the unit
-    local BeamEndEntity = unitBeingBuilt:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
-    local BeamEndEntity2 = unitBeingBuilt:CreateProjectile('/effects/entities/UEFBuild/UEFBuild01_proj.bp', 0, 0, 0, nil, nil, nil)
-    BuildEffectsBag:Add(BeamEndEntity)
-    BuildEffectsBag:Add(BeamEndEntity2)
-
-    -- Create build beams
-    if BuildEffectBones ~= nil then
-        local beamEffect = nil
-        for i, BuildBone in BuildEffectBones do
-            BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, BeamBuildEmtBp))
-            BuildEffectsBag:Add(AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity2, -1, builder.Army, BeamBuildEmtBp))
-            BuildEffectsBag:Add(CreateAttachedEmitter(builder, BuildBone, builder.Army, '/effects/emitters/flashing_blue_glow_01_emit.bp'))
-        end
-    end
-
-    -- Determine beam positioning on build cube, this should match sizes of CreateBuildCubeThread
-    local mul = 1.15
-    local ox = buildbp.Physics.MeshExtentsX or (buildbp.Footprint.SizeX * mul)
-    local oz = buildbp.Physics.MeshExtentsZ or (buildbp.Footprint.SizeZ * mul)
-    local oy = (buildbp.Physics.MeshExtentsY or (0.5 + (ox + oz) * 0.1))
-
-    ox = ox * 0.5
-    oz = oz * 0.5
-
-    -- Determine the the 2 closest edges of the build cube and use those for the location of our laser
-    local VectorExtentsList = { Vector(x + ox, y + oy, z + oz), Vector(x + ox, y + oy, z - oz), Vector(x - ox, y + oy, z + oz), Vector(x - ox, y + oy, z - oz) }
-    local endVec1 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-
-    for k, v in VectorExtentsList do
-        if v == endVec1 then
-            table.remove(VectorExtentsList, k)
-        end
-    end
-
-    local endVec2 = util.GetClosestVector(builder:GetPosition(), VectorExtentsList)
-    local cx1, cy1, cz1 = unpack(endVec1)
-    local cx2, cy2, cz2 = unpack(endVec2)
-
-    -- Determine a the velocity of our projectile, used for the scaning effect
-    local velX = 2 * (endVec2.x - endVec1.x)
-    local velY = 2 * (endVec2.y - endVec1.y)
-    local velZ = 2 * (endVec2.z - endVec1.z)
-
-    if unitBeingBuilt:GetFractionComplete() == 0 then
-        Warp(BeamEndEntity, Vector(cx1, cy1 - oy, cz1))
-        Warp(BeamEndEntity2, Vector(cx2, cy2 - oy, cz2))
-        WaitSeconds(0.7)
-    end
-
-    local flipDirection = true
-
-    -- Warp our projectile back to the initial corner and lower based on build completeness
-    while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
-        if flipDirection then
-            Warp(BeamEndEntity, Vector(cx1, (cy1 - (oy * unitBeingBuilt:GetFractionComplete())), cz1))
-            BeamEndEntity:SetVelocity(velX, velY, velZ)
-            Warp(BeamEndEntity2, Vector(cx2, (cy2 - (oy * unitBeingBuilt:GetFractionComplete())), cz2))
-            BeamEndEntity2:SetVelocity(-velX, -velY, -velZ)
-            flipDirection = false
-        else
-            Warp(BeamEndEntity, Vector(cx2, (cy2 - (oy * unitBeingBuilt:GetFractionComplete())), cz2))
-            BeamEndEntity:SetVelocity(-velX, -velY, -velZ)
-            Warp(BeamEndEntity2, Vector(cx1, (cy1 - (oy * unitBeingBuilt:GetFractionComplete())), cz1))
-            BeamEndEntity2:SetVelocity(velX, velY, velZ)
-            flipDirection = true
-        end
-        WaitSeconds(0.5)
-    end
-end
-
-function CreateDefaultBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-    local BeamBuildEmtBp = '/effects/emitters/build_beam_01_emit.bp'
-    local ox, oy, oz = unpack(unitBeingBuilt:GetPosition())
-    local BeamEndEntity = Entity()
-    BuildEffectsBag:Add(BeamEndEntity)
-    Warp(BeamEndEntity, Vector(ox, oy, oz))
-
-    local BuildBeams = {}
-
-    -- Create build beams
-    if BuildEffectBones ~= nil then
-        local beamEffect = nil
-        for i, BuildBone in BuildEffectBones do
-            local beamEffect = AttachBeamEntityToEntity(builder, BuildBone, BeamEndEntity, -1, builder.Army, BeamBuildEmtBp)
-            table.insert(BuildBeams, beamEffect)
-            BuildEffectsBag:Add(beamEffect)
-        end
-    end
-
-    CreateEmitterOnEntity(BeamEndEntity, builder.Army, '/effects/emitters/sparks_08_emit.bp')
-    local waitTime = util.GetRandomFloat(0.3, 1.5)
-
-    while not builder:BeenDestroyed() and not unitBeingBuilt:BeenDestroyed() do
-        local x, y, z = builder.GetRandomOffset(unitBeingBuilt, 1)
-        Warp(BeamEndEntity, Vector(ox + x, oy + y, oz + z))
-        WaitSeconds(waitTime)
-    end
-end
-
+---@deprecated
+--- You can use CreateCybranBuildBeamsOpti instead
+---@param builder Unit
+---@param unitBeingBuilt Unit
+---@param BuildEffectBones string[]
+---@param BuildEffectsBag TrashBag
 function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, BuildEffectsBag)
-
-    -- deprecation warning for more effcient alternative
-    if not DeprecatedWarnings.CreateCybranBuildBeams then 
-        DeprecatedWarnings.CreateCybranBuildBeams = true 
-        WARN("CreateCybranBuildBeams is deprecated: use CreateCybranBuildBeamsOpti instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-    end
 
     WaitSeconds(0.2)
     local BeamBuildEmtBp = '/effects/emitters/build_beam_02_emit.bp'
@@ -372,14 +182,13 @@ function CreateCybranBuildBeams(builder, unitBeingBuilt, BuildEffectBones, Build
     end
 end
 
+---@deprecated
+--- You can use SpawnBuildBotsOpti instead
+---@param builder Unit
+---@param unitBeingBuilt Unit
+---@param BuildEffectsBag any unused
+---@return Unit[]?
 function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
-
-    -- deprecation warning for more effcient alternative
-    if not DeprecatedWarnings.SpawnBuildBots then 
-        DeprecatedWarnings.SpawnBuildBots = true 
-        WARN("SpawnBuildBots is deprecated: use SpawnBuildBotsOpti instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-    end
 
     -- Buildbots are scaled: ~ 1 pr 15 units of BP
     -- clamped to a max of 10 to avoid insane FPS drop
@@ -421,8 +230,8 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
                 local bot = CreateUnit('ura0001', builder.Army, x + xVec, y + yVec, z + zVec, qx, qy, qz, qw, 'Air')
 
                 -- Make build bots unkillable
-                bot:SetCanTakeDamage(false)
-                bot:SetCanBeKilled(false)
+                bot.CanTakeDamage = false
+                bot.CanBeKilled = false
                 bot.spawnedBy = builder
 
                 table.insert(builder.buildBots, bot)
@@ -437,14 +246,13 @@ function SpawnBuildBots(builder, unitBeingBuilt, BuildEffectsBag)
     end
 end
 
+---@deprecated
+--- You can use CreateCybranEngineerBuildEffectsOpti instead
+---@param builder Unit
+---@param BuildBones string[]
+---@param BuildBots Unit[]
+---@param BuildEffectsBag TrashBag
 function CreateCybranEngineerBuildEffects(builder, BuildBones, BuildBots, BuildEffectsBag)
-
-    -- deprecation warning for more effcient alternative
-    if not DeprecatedWarnings.CreateCybranEngineerBuildEffects then 
-        DeprecatedWarnings.CreateCybranEngineerBuildEffects = true 
-        WARN("CreateCybranEngineerBuildEffects is deprecated: use CreateCybranEngineerBuildEffectsOpti instead.")
-        WARN("Source: " .. repr(debug.getinfo(2)))
-    end
 
     -- Create build constant build effect for each build effect bone defined
     if BuildBones and BuildBots then
@@ -480,9 +288,13 @@ local UnitBuildEffects = {
     '/effects/emitters/build_sparks_blue_02_emit.bp',
 }
 
+--- Creates the Cybran factor build effects
+---@param builder Unit
+---@param unitBeingBuilt Unit
+---@param BuildBones string[]
+---@param BuildEffectsBag TrashBag
 function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, BuildEffectsBag)
-
-    CreateCybranBuildBeams(builder, unitBeingBuilt, BuildBones.BuildEffectBones, BuildEffectsBag)
+    CreateCybranBuildBeamsOpti(builder, nil, unitBeingBuilt, BuildEffectsBag, false)
 
     for _, vB in BuildBones.BuildEffectBones do
         for _, vE in BuildEffects do
@@ -503,40 +315,17 @@ function CreateCybranFactoryBuildEffects(builder, unitBeingBuilt, BuildBones, Bu
     end
 end
 
---- Creates the seraphim factory building beam effects.
--- @param builder The factory that is building the unit.
--- @param unitBeingBuilt the unit that is being built by the factory.
--- @param effectBones The bones of the factory to spawn effects for.
--- @param effectsBag The trashbag for effects.
+
 CreateSeraphimUnitEngineerBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimUnitEngineerBuildingEffects
-
---- Creates the seraphim factory building effects.
--- @param builder The factory that is building the unit.
--- @param unitBeingBuilt the unit that is being built by the factory.
--- @param effectBones The bones of the factory to spawn effects for.
--- @param locationBone The main build bone where the unit spawns on top of.
--- @param effectsBag The trashbag for effects.
 CreateSeraphimFactoryBuildingEffects = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimFactoryBuildingEffects
-
---- Creates the seraphim build cube effect.
--- @param unitBeingBuilt the unit that is being built by the factory.
--- @param builder The factory that is building the unit.
--- @param effectsBag The trashbag for effects.
--- @param scaleFactor A scale factor for the effects.
 CreateSeraphimBuildThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildThread
-
---- Creates the seraphim build cube effect.
--- @param unitBeingBuilt the unit that is being built by the factory.
--- @param builder The factory that is building the unit.
--- @param effectsBag The trashbag for effects.
 CreateSeraphimBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimBuildBaseThread
-
---- Creates the seraphim build cube effect.
--- @param unitBeingBuilt the unit that is being built by the factory.
--- @param builder The factory that is building the unit.
--- @param effectsBag The trashbag for effects.
 CreateSeraphimExperimentalBuildBaseThread = import("/lua/EffectUtilitiesSeraphim.lua").CreateSeraphimExperimentalBuildBaseThread
 
+--- Creates the adjacency beams between structures
+---@param unit Unit
+---@param adjacentUnit Unit
+---@param AdjacencyBeamsBag AdjacencyBeam[]
 function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
     local info = {
         Unit = adjacentUnit,
@@ -893,7 +682,10 @@ function CreateAdjacencyBeams(unit, adjacentUnit, AdjacencyBeamsBag)
     end
 end
 
-function PlaySacrificingEffects(unit, target_unit)
+--- Creates the sacrificing effects on the unit
+---@param unit Unit
+---@param targetUnit Unit unused
+function PlaySacrificingEffects(unit, targetUnit)
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
 
@@ -904,49 +696,26 @@ function PlaySacrificingEffects(unit, target_unit)
     end
 end
 
-function PlaySacrificeEffects(unit, target_unit)
+--- Creates the sacrifice effects on the target unit
+---@param unit Unit
+---@param targetUnit Unit
+function PlaySacrificeEffects(unit, targetUnit)
     local bp = unit:GetBlueprint()
     local faction = bp.General.FactionName
 
     if faction == 'Aeon' then
         for _, v in EffectTemplate.ASacrificeOfTheAeon02 do
-            CreateEmitterAtEntity(target_unit, unit.Army, v)
+            CreateEmitterAtEntity(targetUnit, unit.Army, v)
         end
     end
 end
 
-function PlayReclaimEffects(reclaimer, reclaimed, BuildEffectBones, EffectsBag)
-    local pos = reclaimed:GetPosition()
-    pos[2] = GetTerrainHeight(pos[1], pos[3])
 
-    local beamEnd = Entity()
-    EffectsBag:Add(beamEnd)
-    Warp(beamEnd, pos)
-
-    for _, vBone in BuildEffectBones do
-        for _, vEmit in EffectTemplate.ReclaimBeams do
-            local beamEffect = AttachBeamEntityToEntity(reclaimer, vBone, beamEnd, -1, reclaimer.Army, vEmit)
-            EffectsBag:Add(beamEffect)
-        end
-    end
-
-    for _, v in EffectTemplate.ReclaimObjectAOE do
-        EffectsBag:Add(CreateEmitterOnEntity(reclaimed, reclaimer.Army, v))
-    end
-end
-
-function PlayReclaimEndEffects(reclaimer, reclaimed)
-    local army = -1
-    if reclaimer then
-        army = reclaimer.Army
-    end
-    for _, v in EffectTemplate.ReclaimObjectEnd do
-        CreateEmitterAtEntity(reclaimed, army, v)
-    end
-
-    CreateLightParticleIntel(reclaimed, -1, army, 4, 6, 'glow_02', 'ramp_flare_02')
-end
-
+--- Creates capturing effects on the capturing unit
+---@param capturer Unit
+---@param captive Unit
+---@param BuildEffectBones string[]
+---@param EffectsBag TrashBag
 function PlayCaptureEffects(capturer, captive, BuildEffectBones, EffectsBag)
     for _, vBone in BuildEffectBones do
         for _, vEmit in EffectTemplate.CaptureBeams do
@@ -956,6 +725,12 @@ function PlayCaptureEffects(capturer, captive, BuildEffectBones, EffectsBag)
     end
 end
 
+--- Creates the ping-ponging quantum effect for the Summoner
+---@param unit Unit
+---@param bone1 string
+---@param bone2 string
+---@param TrashBag TrashBag
+---@param startwaitSeed number
 function CreateCybranQuantumGateEffect(unit, bone1, bone2, TrashBag, startwaitSeed)
     -- Adding a quick wait here so that unit bone positions are correct
     WaitSeconds(startwaitSeed)
@@ -1000,25 +775,51 @@ function CreateCybranQuantumGateEffect(unit, bone1, bone2, TrashBag, startwaitSe
     end
 end
 
+--- Creates an enhancement effect at an unit's bone
+---@param unit Unit
+---@param bone string | number
+---@param TrashBag TrashBag
 function CreateEnhancementEffectAtBone(unit, bone, TrashBag)
     for _, vEffect in EffectTemplate.UpgradeBoneAmbient do
         TrashBag:Add(CreateAttachedEmitter(unit, bone, unit.Army, vEffect))
     end
 end
 
+--- Creates an enhancement ambient at an unit
+---@param unit Unit
+---@param bone string | number
+---@param TrashBag TrashBag
 function CreateEnhancementUnitAmbient(unit, bone, TrashBag)
     for _, vEffect in EffectTemplate.UpgradeUnitAmbient do
         TrashBag:Add(CreateAttachedEmitter(unit, bone, unit.Army, vEffect))
     end
 end
 
-function CleanupEffectBag(self, EffectBag)
-    for _, v in self[EffectBag] do
-        v:Destroy()
-    end
-    self[EffectBag] = {}
-end
+local TableEmpty = table.empty 
+--- Cleans up a trash bag (whether an old-style table or new-style TrashBag)
+---@param self Entity
+---@param identifier string
+function CleanupEffectBag(self, identifier)
 
+    local bag = self[identifier]
+
+    -- old 'bag' where it is just a table
+    if TableEmpty(getmetatable(bag)) then 
+        for k, v in bag do 
+            if v.Destroy then 
+                v:Destroy()
+            end
+            
+            bag[k] = nil 
+        end
+
+    -- new 'bag' that is a trashbag
+    else 
+        bag:Destroy()
+    end
+end
+--- Creates a small Seraphim rift-in effect
+---@param unit Unit
 function SeraphimRiftIn(unit)
     unit:HideBone(0, true)
 
@@ -1037,7 +838,8 @@ function SeraphimRiftIn(unit)
         CreateAttachedEmitter (unit, -1, unit.Army, v)
     end
 end
-
+--- Creates a large Seraphim rift-in effect
+---@param unit Unit
 function SeraphimRiftInLarge(unit)
     unit:HideBone(0, true)
 
@@ -1057,18 +859,24 @@ function SeraphimRiftInLarge(unit)
     end
 end
 
+--- Creates a Cybran building infection effect
+---@param unit Unit
 function CybranBuildingInfection(unit)
     for _, v in EffectTemplate.CCivilianBuildingInfectionAmbient do
         CreateAttachedEmitter (unit, -1, unit.Army, v)
     end
 end
 
+--- Creates a QAI shutdown effect
+---@param unit Unit
 function CybranQaiShutdown(unit)
     for _, v in EffectTemplate.CQaiShutdown do
         CreateAttachedEmitter (unit, -1, unit.Army, v)
     end
 end
 
+--- Creates Aeon ACU hack effects
+---@param unit Unit
 function AeonHackACU(unit)
     for _, v in EffectTemplate.AeonOpHackACU do
         CreateAttachedEmitter (unit, -1, unit.Army, v)
@@ -1076,6 +884,8 @@ function AeonHackACU(unit)
 end
 
 -- New function for insta capture fix
+---@param self Unit
+---@return boolean
 function IsHumanUnit(self)
     for _, Army in ScenarioInfo.ArmySetup do
         if Army.ArmyIndex == self.Army then
@@ -1088,6 +898,11 @@ function IsHumanUnit(self)
     end
 end
 
+--- Creates the teleport charging effects
+---@param unit Unit
+---@param TeleportDestination Position
+---@param EffectsBag TrashBag
+---@param teleDelay number
 function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, teleDelay)
     -- Plays teleport effects for the given unit
     if not unit then
@@ -1214,12 +1029,23 @@ function PlayTeleportChargingEffects(unit, TeleportDestination, EffectsBag, tele
     end
 end
 
+--- Gets a unit's teleport effect y-offset, so it appears centered
+---@param unit Unit
+---@return number
 function TeleportGetUnitYOffset(unit)
     -- Returns how high to create effects to make the effects appear in the center of the unit
     local bp = unit:GetBlueprint()
     return bp.Display.TeleportEffects.FxChargeAtDestOffsetY or ((bp.Physics.MeshExtentsY or bp.SizeY or 2) / 2)
 end
 
+--- Gets the teleport sizes of a unit
+---@param unit Unit
+---@return integer sizeX
+---@return integer sizeY
+---@return integer sizeZ
+---@return integer offsetX
+---@return integer offsetY
+---@return integer offsetZ
 function TeleportGetUnitSizes(unit)
     -- Returns the sizes of the unit, to be used for teleportation effects
     local bp = unit:GetBlueprint()
@@ -1231,6 +1057,9 @@ function TeleportGetUnitSizes(unit)
            (bp.Display.TeleportEffects.FxOffsetZ or bp.CollisionOffsetZ or 0)
 end
 
+--- Gets the teleport location, based on the terrain height and terrain type offset
+---@param loc Position
+---@return Position
 function TeleportLocationToSurface(loc)
     -- Takes the given location, adjust the Y value to the surface height on that location
     local pos = table.copy(loc)
@@ -1238,6 +1067,11 @@ function TeleportLocationToSurface(loc)
     return pos
 end
 
+--- Creates the teleport charge-up effects at a unit
+---@param unit Unit
+---@param effectTemplate string[]
+---@param EffectsBag TrashBag
+---@return TrashBag
 function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
     -- Creates charge up effects at the unit
     local bp = unit:GetBlueprint()
@@ -1259,6 +1093,11 @@ function TeleportShowChargeUpFxAtUnit(unit, effectTemplate, EffectsBag)
     return emitters
 end
 
+--- Creates the Cybran teleport effect
+---@param unit Unit
+---@param location Position
+---@param initialScale number
+---@return Entity sphere
 function TeleportCreateCybranSphere(unit, location, initialScale)
     -- Creates the sphere used by Cybran teleportation effects
     local bp = unit:GetBlueprint()
@@ -1283,6 +1122,9 @@ function TeleportCreateCybranSphere(unit, location, initialScale)
     return sphere
 end
 
+--- Sets a unit's teleport effect parameters based on the charging progress
+---@param unit Unit
+---@param fraction number
 function TeleportChargingProgress(unit, fraction)
     local bp = unit:GetBlueprint()
 
@@ -1327,6 +1169,9 @@ function TeleportChargingProgress(unit, fraction)
     end
 end
 
+--- Creates the final teleport out effects
+---@param unit Unit
+---@param EffectsBag TrashBag
 function PlayTeleportOutEffects(unit, EffectsBag)
     -- Fired when the unit is being teleported, just before the unit is taken from its original location
     local bp = unit:GetBlueprint()
@@ -1368,6 +1213,8 @@ function PlayTeleportOutEffects(unit, EffectsBag)
     end
 end
 
+--- Applies the teleport area damage and creates their effects
+---@param unit Unit
 function DoTeleportInDamage(unit)
     -- Check for teleport dummy weapon and deal the specified damage. Also show fx.
     local bp = unit:GetBlueprint()
@@ -1413,6 +1260,8 @@ function DoTeleportInDamage(unit)
     end
 end
 
+--- Creates the lingering teleport steam effects
+---@param unit Unit
 function CreateTeleSteamFX(unit)
     local totalBones = unit:GetBoneCount() - 1
     for _, v in EffectTemplate.UnitTeleportSteam01 do
@@ -1422,6 +1271,9 @@ function CreateTeleSteamFX(unit)
     end
 end
 
+--- Creates the teleport-in effects
+---@param unit Unit
+---@param EffectsBag TrashBag unused
 function PlayTeleportInEffects(unit, EffectsBag)
     -- Fired when the unit is being teleported, just after the unit is taken from its original location
     local bp = unit:GetBlueprint()
@@ -1550,6 +1402,9 @@ function PlayTeleportInEffects(unit, EffectsBag)
     end
 end
 
+--- Destroys teleport charge-up effects
+---@param unit Unit
+---@param EffectsBag TrashBag
 function DestroyTeleportChargingEffects(unit, EffectsBag)
     -- Called when charging up is done because successful or cancelled
     if unit.TeleportChargeBag then
@@ -1579,6 +1434,9 @@ function DestroyTeleportChargingEffects(unit, EffectsBag)
     unit:StopUnitAmbientSound('TeleportChargingAtDestination')
 end
 
+--- Destroys the remaining teleport charge-up effects
+---@param unit Unit
+---@param EffectsBag TrashBag unused
 function DestroyRemainingTeleportChargingEffects(unit, EffectsBag)
     -- Called when we're done teleporting (because succesfull or cancelled)
     if unit.TeleportCybranSphere then
@@ -1589,75 +1447,41 @@ end
 --- Optimized functions --
 
 local EffectUtilitiesOpti = import('/lua/EffectUtilitiesOpti.lua')
+local EffectUtilitiesUEF = import('/lua/EffectUtilitiesUEF.lua')
+local EffectUtilitiesGeneric = import('/lua/EffectUtilitiesGeneric.lua')
+local EffectUtilitiesAeon = import('/lua/EffectUtilitiesAeon.lua')
 
---- Creates tracker beams between the builder and its build bots. The
--- bots keep the tracker in their trashbag.
--- @param builder The builder / tracking entity of the build bots.
--- @param buildBones The bones to use as the origin of the beams.
--- @param buildBots The build bots that we're tracking.
--- @param total The number of build bots / bones. The 1st bone will track the 1st bot, etc.
 CreateCybranEngineerBuildEffectsOpti = EffectUtilitiesOpti.CreateCybranEngineerBuildEffects
--- original: CreateCybranEngineerBuildEffects
-
---- Creates the beams and welding points of the builder and its bots. The
--- bots share the welding point which each other, as does the builder with
--- itself.
--- @param builder A builder with builder.BuildEffectBones set. 
--- @param bots The bots of the builder.
--- @param unitBeingBuilt The unit that we're building.
--- @param buildEffectsBag The bag that we use to store / trash all effects.
--- @param stationary Whether or not the builder is a building.
 CreateCybranBuildBeamsOpti = EffectUtilitiesOpti.CreateCybranBuildBeams
--- original: CreateCybranBuildBeams
-
---- Creates the build drones for the (cybran) builder in question. Expects  
--- the builder.BuildBotTotal value to be set.
--- @param builder A cybran builder such as an engineer, hive or commander.
--- @param botBlueprint The blueprint to use for the bot.
 SpawnBuildBotsOpti = EffectUtilitiesOpti.SpawnBuildBots
--- original: SpawnBuildBots
 
---- The build animation for Aeon buildings in general.
--- @param unitBeingBuilt The unit we're trying to build.
--- @param effectsBag The build effects bag containing the pool and emitters.
-CreateAeonBuildBaseThread = import("/lua/EffectUtilitiesAeon.lua").CreateAeonBuildBaseThread
+CreateAeonBuildBaseThread = EffectUtilitiesAeon.CreateAeonBuildBaseThread
+CreateAeonConstructionUnitBuildingEffects = EffectUtilitiesAeon.CreateAeonConstructionUnitBuildingEffects
+CreateAeonCommanderBuildingEffects = EffectUtilitiesAeon.CreateAeonCommanderBuildingEffects
+CreateAeonFactoryBuildingEffects = EffectUtilitiesAeon.CreateAeonFactoryBuildingEffects
+CreateAeonColossusBuildingEffects = EffectUtilitiesAeon.CreateAeonColossusBuildingEffects
+CreateAeonCZARBuildingEffects = EffectUtilitiesAeon.CreateAeonCZARBuildingEffects
+CreateAeonTempestBuildingEffects = EffectUtilitiesAeon.CreateAeonTempestBuildingEffects
+CreateAeonParagonBuildingEffects = EffectUtilitiesAeon.CreateAeonParagonBuildingEffects
 
---- The build animation of an engineer.
--- @param builder The engineer in question.
--- @param unitBeingBuilt The unit we're building.
--- @param buildEffectsBag The trash bag for the build effects.
-CreateAeonConstructionUnitBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonConstructionUnitBuildingEffects
--- original: CreateAeonConstructionUnitBuildingEffects
+CreateEffectsOpti = EffectUtilitiesGeneric.CreateEffectsOpti
+CreateEffectsInTrashbag = EffectUtilitiesGeneric.CreateEffectsInTrashbag
+CreateEffectsWithOffsetOpti = EffectUtilitiesGeneric.CreateEffectsWithOffsetOpti
+CreateEffectsWithOffsetInTrashbag = EffectUtilitiesGeneric.CreateEffectsWithOffsetInTrashbag
+CreateEffectsWithRandomOffsetOpti = EffectUtilitiesGeneric.CreateEffectsWithRandomOffsetOpti
+CreateEffectsWithRandomOffsetInTrashbag = EffectUtilitiesGeneric.CreateEffectsWithRandomOffsetInTrashbag
+CreateBoneEffectsOpti = EffectUtilitiesGeneric.CreateBoneEffectsOpti
+CreateBoneEffectsInTrashbag = EffectUtilitiesGeneric.CreateBoneEffectsInTrashbag
+CreateBoneEffectsOffsetOpti = EffectUtilitiesGeneric.CreateBoneEffectsOffsetOpti
+CreateBoneEffectsOffsetInTrashbag = EffectUtilitiesGeneric.CreateBoneEffectsOffsetInTrashbag
+CreateRandomEffectsOpti = EffectUtilitiesGeneric.CreateRandomEffectsOpti
+CreateRandomEffectsInTrashbag = EffectUtilitiesGeneric.CreateRandomEffectsInTrashbag
+PlayReclaimEffects = EffectUtilitiesGeneric.PlayReclaimEffects
+PlayReclaimEndEffects = EffectUtilitiesGeneric.PlayReclaimEndEffects
+ApplyWindDirection = EffectUtilitiesGeneric.ApplyWindDirection
 
---- The build animation of the commander.
--- @param builder The commander in question.
--- @param unitBeingBuilt The unit we're building.
--- @param buildEffectBones The bone(s) of the commander where the effect starts.
--- @param buildEffectsBag The trash bag for the build effects.
-CreateAeonCommanderBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonCommanderBuildingEffects
--- original: CreateAeonCommanderBuildingEffects
-
---- The build animation for Aeon factories, including the pool and dummy unit.
--- @param builder The factory that is building the unit.
--- @param unitBeingBuilt The unit we're trying to build.
--- @param buildEffectBones The arms of the factory where the build beams come from.
--- @param buildBone The location where the unit is beint built.
--- @param effectsBag The build effects bag.
-CreateAeonFactoryBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonFactoryBuildingEffects
--- original: CreateAeonFactoryBuildingEffects
-
---- Creates the Aeon Tempest build effects, including particles and an animation.
--- @param unitBeingBuilt The Colossus that is being built.
-CreateAeonColossusBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonColossusBuildingEffects
-
---- Creates the Aeon CZAR build effects, including particles.
--- @param unitBeingBuilt The CZAR that is being built.
-CreateAeonCZARBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonCZARBuildingEffects
-
---- Creates the Aeon Tempest build effects, including particles and an animation.
--- @param unitBeingBuilt The tempest that is being built.
-CreateAeonTempestBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonTempestBuildingEffects
-
---- Creates the Aeon Paragon build effects, including particles and an animation.
--- @param unitBeingBuilt The tempest that is being built.
-CreateAeonParagonBuildingEffects = import("/lua/EffectUtilitiesAeon.lua").CreateAeonParagonBuildingEffects
+CreateDefaultBuildBeams = EffectUtilitiesUEF.CreateDefaultBuildBeams
+CreateUEFBuildSliceBeams = EffectUtilitiesUEF.CreateUEFBuildSliceBeams
+CreateUEFUnitBeingBuiltEffects = EffectUtilitiesUEF.CreateUEFUnitBeingBuiltEffects
+CreateUEFCommanderBuildSliceBeams = EffectUtilitiesUEF.CreateUEFCommanderBuildSliceBeams
+CreateBuildCubeThread = EffectUtilitiesUEF.CreateBuildCubeThread

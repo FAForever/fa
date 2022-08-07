@@ -20,7 +20,7 @@ local LobbyComm = import('/lua/ui/lobby/lobbyComm.lua')
 local gameColors = import('/lua/gameColors.lua').GameColors
 local utils = import('/lua/system/utils.lua')
 
-
+local ConnectionStatus = import("/lua/ui/lobby/autolobby-classes.lua").ConnectionStatus
 
 
 
@@ -29,6 +29,7 @@ local localPlayerName = false
 local requiredPlayers = false
 
 local currentDialog = false
+local connectionStatusGUI = false 
 
 local localPlayerID = false
 
@@ -141,7 +142,7 @@ local function HostAddPlayer(senderId, playerInfo)
 
     playerInfo.PlayerName = lobbyComm:MakeValidPlayerName(playerInfo.OwnerID,playerInfo.PlayerName)
     -- TODO: Should colors be based on teams?
-    playerInfo.PlayerColor = slot
+    playerInfo.PlayerColor = gameColors.TMMColorOrder[slot]
 
     gameInfo.PlayerOptions[slot] = playerInfo
 end
@@ -248,6 +249,11 @@ local function CreateUI()
     local background = MenuCommon.SetupBackground(GetFrame(0))
 
     SetDialog(parent, "<LOC lobui_0201>Setting up automatch...", "<LOC _Cancel>", ExitApplication)
+
+    -- construct the connection status GUI and position it right below the dialog
+    connectionStatusGUI = ConnectionStatus(GetFrame(0))
+    LayoutHelpers.CenteredBelow(connectionStatusGUI, currentDialog, 20)
+    LayoutHelpers.DepthOverParent(connectionStatusGUI, background, 1)
 end
 
 
@@ -355,6 +361,10 @@ local function InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayer
         if not wasConnected(uid) then
             table.insert(connectedTo, uid)
         end
+
+        -- update ui to inform players
+        connectionStatusGUI:SetPlayersConnectedCount(table.getn(connectedTo))
+
         if self:IsHost() then
             CheckForLaunch()
         end
@@ -384,6 +394,8 @@ function CreateLobby(protocol, localPort, desiredPlayerName, localPlayerUID, nat
         parent = false
         ExitApplication()
     end
+
+    -- construct the initial dialog
     SetDialog(parent, Strings.TryingToConnect, Strings.AbortConnect, OnAbort)
 
     InitLobbyComm(protocol, localPort, desiredPlayerName, localPlayerUID, natTraversalProvider)
@@ -405,6 +417,9 @@ function HostGame(gameName, scenarioFileName, singlePlayer)
 
     SetGameOptionsFromCommandLine()
 
+    -- update the connection status GUI
+    connectionStatusGUI:SetTotalPlayersCount(requiredPlayers)
+
     -- The guys at GPG were unable to make a standard for map. We dirty-solve it.
     lobbyComm.desiredScenario = string.gsub(scenarioFileName, ".v%d%d%d%d_scenario.lua", "_scenario.lua")
 
@@ -416,7 +431,18 @@ function JoinGame(address, asObserver, playerName, uid)
     LOG("Joingame (name=" .. playerName .. ", uid=" .. uid .. ", address=" .. address ..")")
     CreateUI()
 
+    -- TODO: I'm not sure if this argument is passed along when you are joining a lobby
+    requiredPlayers = 2
+    local args = GetCommandLineArg("/players", 1)
+    if args then
+        requiredPlayers = tonumber(args[1])
+        LOG("requiredPlayers was set to: "..requiredPlayers)
+    end
+
     SetGameOptionsFromCommandLine()
+
+    -- update the connection status GUI
+    connectionStatusGUI:SetTotalPlayersCount(requiredPlayers)
 
     lobbyComm:JoinGame(address, playerName, uid)
 end
@@ -425,18 +451,28 @@ function ConnectToPeer(addressAndPort,name,uid)
     if not string.find(addressAndPort, '127.0.0.1') then
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..")")
     else
-        DisconnectFromPeer(uid)
+        DisconnectFromPeer(uid, true)
         LOG("ConnectToPeer (name=" .. name .. ", uid=" .. uid .. ", address=" .. addressAndPort ..", USE PROXY)")
     end
+
+    -- update ui to inform players
+    connectionStatusGUI:AddConnectedPlayer()
+
     lobbyComm:ConnectToPeer(addressAndPort,name,uid)
 end
 
-function DisconnectFromPeer(uid)
+function DisconnectFromPeer(uid, doNotUpdateView)
     LOG("DisconnectFromPeer (uid=" .. uid ..")")
     if wasConnected(uid) then
         table.remove(connectedTo, uid)
     end
     GpgNetSend('Disconnected', string.format("%d", uid))
+
+    -- sometimes we disconnect immediately, but secretly connect through a proxy
+    if not doNotUpdateView then 
+        connectionStatusGUI:RemoveConnectedPlayer()
+    end
+
     lobbyComm:DisconnectFromPeer(uid)
 end
 

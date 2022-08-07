@@ -1,8 +1,10 @@
---- Class MotorFallDown
--- @classmod Sim.MotorFallDown
+---@declare-global
+---@class moho.MotorFallDown
+local CMotorFallDown = {}
 
 ---
 --
-function MotorFallDown:moho.MotorFallDown()
+function CMotorFallDown:Whack(x, y, z, depth, flag)
 end
 
+return CMotorFallDown

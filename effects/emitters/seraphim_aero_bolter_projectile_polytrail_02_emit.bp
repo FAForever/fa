@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_aero_bolter_projectile_polytrail_02',
+	Lifetime = -1.00,
+    TrailLength = 4.75,
+    Size = 0.02,
+    SortOrder = 0,
+    BlendMode = 3,
+    TextureRepeatRate = 1,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/railgun_trail_01.dds',
+	RampTexture = '/textures/particles/ramp_white_12.dds',
+}

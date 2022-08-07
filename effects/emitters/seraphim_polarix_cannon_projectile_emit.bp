@@ -1,0 +1,12 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'seraphim_polarix_cannon_projectile_02',
+	Lifetime = -1.00,
+    TrailLength = 2.5,
+    Size = 0.275,
+    SortOrder = 10,
+    BlendMode = 1,
+    TextureRepeatRate = 0.15,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/trail_ser_02.dds',
+	RampTexture = '/textures/particles/ramp_trail_18.dds',
+}

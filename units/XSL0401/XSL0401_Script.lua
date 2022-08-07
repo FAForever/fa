@@ -11,8 +11,7 @@ local SDFExperimentalPhasonProj = WeaponsFile.SDFExperimentalPhasonProj
 local SDFAireauWeapon = WeaponsFile.SDFAireauWeapon
 local SDFSinnuntheWeapon = WeaponsFile.SDFSinnuntheWeapon
 local SAAOlarisCannonWeapon = WeaponsFile.SAAOlarisCannonWeapon
-local utilities = import('/lua/utilities.lua')
-local EffectUtil = import('/lua/EffectUtilities.lua')
+local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
 local explosion = import('/lua/defaultexplosions.lua')
 
 XSL0401 = Class(SWalkingLandUnit) {
@@ -76,19 +75,20 @@ XSL0401 = Class(SWalkingLandUnit) {
 
     StartBeingBuiltEffects = function(self, builder, layer)
         SWalkingLandUnit.StartBeingBuiltEffects(self, builder, layer)
-        self:ForkThread(EffectUtil.CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag)
+        self:ForkThread( CreateSeraphimExperimentalBuildBaseThread, builder, self.OnBeingBuiltEffectsBag, 2 )
     end,
 
     DeathThread = function(self, overkillRatio , instigator)
+        local size = self.Size
         local bigExplosionBones = {'Torso', 'Head', 'pelvis'}
         local explosionBones = {'Right_Arm_B07', 'Right_Arm_B03',
                                 'Left_Arm_B10', 'Left_Arm_B07',
                                 'Chest_B01', 'Chest_B03',
                                 'Right_Leg_B01', 'Right_Leg_B02', 'Right_Leg_B03',
                                 'Left_Leg_B17', 'Left_Leg_B14', 'Left_Leg_B15'}
-
+        
         explosion.CreateDefaultHitExplosionAtBone(self, bigExplosionBones[Random(1, 3)], 4.0)
-        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {self:GetUnitSizes()})
+        explosion.CreateDebrisProjectiles(self, explosion.GetAverageBoundingXYZRadius(self), {size.SizeX, size.SizeY, size.SizeZ})
         WaitSeconds(2)
 
         local RandBoneIter = RandomIter(explosionBones)
@@ -97,7 +97,6 @@ XSL0401 = Class(SWalkingLandUnit) {
             explosion.CreateDefaultHitExplosionAtBone(self, bone, 1.0)
             WaitTicks(Random(1, 4))
         end
-
 
         WaitSeconds(3.5)
         explosion.CreateDefaultHitExplosionAtBone(self, 'Torso', 5.0)
@@ -126,10 +125,9 @@ XSL0401 = Class(SWalkingLandUnit) {
         end
 
         -- only apply death damage when the unit is sufficiently build
-        local bp = self:GetBlueprint()
+        local bp = self.Blueprint
         local FractionThreshold = bp.General.FractionThreshold or 0.5
         if self:GetFractionComplete() >= FractionThreshold then 
-            local bp = self:GetBlueprint()
             for i, numWeapons in bp.Weapon do
                 if bp.Weapon[i].Label == 'CollossusDeath' then
                     DamageArea(self, self:GetPosition(), bp.Weapon[i].DamageRadius, bp.Weapon[i].Damage, bp.Weapon[i].DamageType, bp.Weapon[i].DamageFriendly)
@@ -137,8 +135,6 @@ XSL0401 = Class(SWalkingLandUnit) {
                 end
             end
         end
-
-
 
         -- only spawn storm and do damage when the unit is finished building
         if self:GetFractionComplete() == 1 then

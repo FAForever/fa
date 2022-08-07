@@ -1,98 +1,91 @@
---- Class CMauiBitmap
--- @classmod User.CMauiBitmap
+---@declare-global
+---@class moho.bitmap_methods : moho.control_methods
+local CMauiBitmap = {}
 
 ---
---  GetNumFrames()
 function CMauiBitmap:GetNumFrames()
 end
 
 ---
---  Bitmap:InternalSetSolidColor(color)
+function CMauiBitmap:GetFrame()
+end
+
+---
+---@param color string
 function CMauiBitmap:InternalSetSolidColor(color)
 end
 
 ---
---  Loop(bool)
-function CMauiBitmap:Loop(bool)
+---@param loop boolean
+function CMauiBitmap:Loop(loop)
 end
 
 ---
---  Play()
 function CMauiBitmap:Play()
 end
 
 ---
---  SetBackwardPattern()
 function CMauiBitmap:SetBackwardPattern()
 end
 
 ---
---  SetForwardPattern()
 function CMauiBitmap:SetForwardPattern()
 end
 
 ---
---  SetFrame(int)
-function CMauiBitmap:SetFrame(int)
+---@param frame number
+function CMauiBitmap:SetFrame(frame)
 end
 
 ---
---  SetFramePattern(pattern)
+---@param pattern number[] an array of integers reflecting texture indicies
 function CMauiBitmap:SetFramePattern(pattern)
 end
 
 ---
---  SetFrameRate(float)
-function CMauiBitmap:SetFrameRate(float)
+---@param frameRate number
+function CMauiBitmap:SetFrameRate(frameRate)
 end
 
 ---
---  SetLoopPingPongPattern()
 function CMauiBitmap:SetLoopPingPongPattern()
 end
 
 ---
---  Bitmap:SetNewTexture(filename(s), border=1)
-function CMauiBitmap:SetNewTexture(filename(s)
+---@param filename string | string[]
+---@param border? number defaults to `1`
+function CMauiBitmap:SetNewTexture(filename, border)
 end
 
 ---
---  SetPingPongPattern()
 function CMauiBitmap:SetPingPongPattern()
 end
 
 ---
---  SetTiled(bool)
-function CMauiBitmap:SetTiled(bool)
+---@param tiled boolean
+function CMauiBitmap:SetTiled(tiled)
 end
 
 ---
---  Bitmap:SetUV(float u0, float v0, float u1, float v1)
-function CMauiBitmap:SetUV(float u0,  float v0,  float u1,  float v1)
+---@param u0 number
+---@param v0 number
+---@param u1 number
+---@param v1 number
+function CMauiBitmap:SetUV(u0, v0, u1, v1)
 end
 
----
---  ShareTextures(bitmap) - allows two bitmaps to use the same textures
+--- Allows two bitmaps to use the same textures
+---@param bitmap Bitmap
 function CMauiBitmap:ShareTextures(bitmap)
 end
 
 ---
---  Stop()
 function CMauiBitmap:Stop()
 end
 
 ---
---  UseAlphaHitTest(bool)
-function CMauiBitmap:UseAlphaHitTest(bool)
+---@param doHit boolean
+function CMauiBitmap:UseAlphaHitTest(doHit)
 end
 
----
---  derived from CMauiControl
-function CMauiBitmap:base()
-end
-
----
---
-function CMauiBitmap:moho.bitmap_methods()
-end
-
+return CMauiBitmap

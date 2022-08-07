@@ -1,0 +1,13 @@
+TrailEmitterBlueprint {
+	BlueprintId = 'sonic_pulse_munition_polytrail_02',
+	Lifetime = -1.00,
+    TrailLength = 0.9,
+    Size = 0.035,
+    SortOrder = 0,
+    BlendMode = 4,
+    TextureRepeatRate = 0.05,
+    LODCutoff = 160,
+	RepeatTexture = '/textures/particles/sonic_pulse_01.dds',
+	RampTexture = '/textures/particles/ramp_sonic_pulse_01.dds',
+}
+

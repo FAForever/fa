@@ -1,4 +1,5 @@
--- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
+-- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
+---@declare-global
 --
 -- Implement import()
 
@@ -36,20 +37,20 @@ local StringSub = string.sub
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
--- local once = true
-
 --- The global import function used to keep track of modules.
--- @param name The path to the module to load.
+---@param name string The path to the module to load.
+---@return table
 function import(name)
 
-    -- if once then 
-    --     once = false
-    --     LOG(repr(debug.listcode(import)))
-    -- end
-
-    -- caching: if it exists then we return the previous version
-    name = StringLower(name)
+    -- attempt to find the module without lowering the string
     local existing = upModules[name]
+    if existing then
+        return existing
+    end
+
+    -- try again after lowering the string
+    name = StringLower(name)
+    existing = upModules[name]
     if existing then
         return existing
     end

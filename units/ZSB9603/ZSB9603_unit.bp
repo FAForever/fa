@@ -75,34 +75,6 @@ UnitBlueprint {
                 Weight = 100,
             },
         },
-        BlinkingLights = {
-            {
-                BLBone = 0,
-                BLOffsetX = 0,
-                BLOffsetY = 1,
-                BLOffsetZ = 2.75,
-                BLScale = 2,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = 1.25,
-                BLOffsetY = 0.5,
-                BLOffsetZ = 2.25,
-                BLScale = 2,
-            },
-            {
-                BLBone = 0,
-                BLOffsetX = -1,
-                BLOffsetY = 0.75,
-                BLOffsetZ = 2.25,
-                BLScale = 2,
-            },
-        },
-        BlinkingLightsFx = {
-            Green = '/effects/emitters/light_green_03_emit.bp',
-            Red = '/effects/emitters/light_red_03_emit.bp',
-            Yellow = '/effects/emitters/light_yellow_02_emit.bp',
-        },
         BuildAttachBone = 'Attachpoint',
         IdleEffects = {
             Water = {
@@ -220,18 +192,19 @@ UnitBlueprint {
         MeshExtentsZ = 14,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
+        ComputeRollOffPoint = true,
         RollOffPoints = {
             {
                 UnitSpin = 180,
                 X = 4,
                 Y = 0,
-                Z = -10,
+                Z = -8,
             },
             {
                 UnitSpin = 0,
                 X = 4,
                 Y = 0,
-                Z = 10,
+                Z = 8,
             },
         },
         SkirtOffsetX = -2,
@@ -246,7 +219,7 @@ UnitBlueprint {
     SelectionSizeZ = 8,
     SelectionThickness = 0.21,
     SizeX = 4,
-    SizeY = 3, #from 2, for beam weapons
+    SizeY = 3, --from 2, for beam weapons
     SizeZ = 10,
     StrategicIconName = 'icon_factory3_naval',
     StrategicIconSortPriority = 210,

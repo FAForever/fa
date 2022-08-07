@@ -27,32 +27,33 @@ local NinePatch = import('/lua/ui/controls/ninepatch.lua').NinePatch
 local InputDialog = import('/lua/ui/controls/popups/inputdialog.lua').InputDialog
 local skins = import('/lua/skins/skins.lua').skins
 
+
 --* Handy global variables to assist skinning
-buttonFont = import('/lua/lazyvar.lua').Create()            -- default font used for button faces
-factionFont = import('/lua/lazyvar.lua').Create()      -- default font used for dialog button faces
-dialogButtonFont = import('/lua/lazyvar.lua').Create()      -- default font used for dialog button faces
-bodyFont = import('/lua/lazyvar.lua').Create()              -- font used for all other text
-fixedFont = import('/lua/lazyvar.lua').Create()             -- font used for fixed width characters
-titleFont = import('/lua/lazyvar.lua').Create()             -- font used for titles and labels
-fontColor = import('/lua/lazyvar.lua').Create()             -- common font color
-fontOverColor = import('/lua/lazyvar.lua').Create()             -- common font color
-fontDownColor = import('/lua/lazyvar.lua').Create()             -- common font color
-tooltipTitleColor = import('/lua/lazyvar.lua').Create()             -- common font color
-tooltipBorderColor = import('/lua/lazyvar.lua').Create()             -- common font color
-bodyColor = import('/lua/lazyvar.lua').Create()             -- common color for dialog body text
-dialogCaptionColor = import('/lua/lazyvar.lua').Create()    -- common color for dialog titles
-dialogColumnColor = import('/lua/lazyvar.lua').Create()     -- common color for column headers in a dialog
-dialogButtonColor = import('/lua/lazyvar.lua').Create()     -- common color for buttons in a dialog
-highlightColor = import('/lua/lazyvar.lua').Create()        -- text highlight color
-disabledColor = import('/lua/lazyvar.lua').Create()         -- text disabled color
-panelColor = import('/lua/lazyvar.lua').Create()            -- default color when drawing a panel
-transparentPanelColor = import('/lua/lazyvar.lua').Create() -- default color when drawing a transparent panel
-consoleBGColor = import('/lua/lazyvar.lua').Create()        -- console background color
-consoleFGColor = import('/lua/lazyvar.lua').Create()        -- console foreground color (text)
-consoleTextBGColor = import('/lua/lazyvar.lua').Create()    -- console text background color
-menuFontSize = import('/lua/lazyvar.lua').Create()          -- font size used on main in game escape menu
-factionTextColor = import('/lua/lazyvar.lua').Create()      -- faction color for text foreground
-factionBackColor = import('/lua/lazyvar.lua').Create()      -- faction color for text background
+buttonFont = LazyVar.Create()            -- default font used for button faces
+factionFont = LazyVar.Create()      -- default font used for dialog button faces
+dialogButtonFont = LazyVar.Create()      -- default font used for dialog button faces
+bodyFont = LazyVar.Create()              -- font used for all other text
+fixedFont = LazyVar.Create()             -- font used for fixed width characters
+titleFont = LazyVar.Create()             -- font used for titles and labels
+fontColor = LazyVar.Create()             -- common font color
+fontOverColor = LazyVar.Create()             -- common font color
+fontDownColor = LazyVar.Create()             -- common font color
+tooltipTitleColor = LazyVar.Create()             -- common font color
+tooltipBorderColor = LazyVar.Create()             -- common font color
+bodyColor = LazyVar.Create()             -- common color for dialog body text
+dialogCaptionColor = LazyVar.Create()    -- common color for dialog titles
+dialogColumnColor = LazyVar.Create()     -- common color for column headers in a dialog
+dialogButtonColor = LazyVar.Create()     -- common color for buttons in a dialog
+highlightColor = LazyVar.Create()        -- text highlight color
+disabledColor = LazyVar.Create()         -- text disabled color
+panelColor = LazyVar.Create()            -- default color when drawing a panel
+transparentPanelColor = LazyVar.Create() -- default color when drawing a transparent panel
+consoleBGColor = LazyVar.Create()        -- console background color
+consoleFGColor = LazyVar.Create()        -- console foreground color (text)
+consoleTextBGColor = LazyVar.Create()    -- console text background color
+menuFontSize = LazyVar.Create()          -- font size used on main in game escape menu
+factionTextColor = LazyVar.Create()      -- faction color for text foreground
+factionBackColor = LazyVar.Create()      -- faction color for text background
 
 -- table of layouts supported by this skin, not a lazy var as we don't need updates
 layouts = nil
@@ -60,7 +61,7 @@ layouts = nil
 --* other handy variables!
 consoleDepth = false  -- in order to get the console to always be on top, assign this number and never go over
 
-networkBool = import('/lua/lazyvar.lua').Create()    -- boolean whether the game is local or networked
+networkBool = LazyVar.Create()    -- boolean whether the game is local or networked
 
 -- Default scenario for skirmishes / MP Lobby
 defaultScenario = '/maps/scmp_039/scmp_039_scenario.lua'
@@ -89,7 +90,7 @@ VK_UP = 38
 VK_DOWN = 40
 VK_PAUSE = 310
 
-local currentSkin = import('/lua/lazyvar.lua').Create()
+local currentSkin = LazyVar.Create()
 
 currentLayout = false
 changeLayoutFunction = false    -- set this function to get called with the new layout name when layout changes
@@ -244,6 +245,13 @@ function UpdateWorldBorderState(skin, isOn)
 
 end
 
+local currentSkinName = 'random'
+--- gets name of current skin that changes when calling SetCurrentSkin()
+--- returns 'random', 'uef', 'cybran', 'aeon', or 'seraphim'
+function GetCurrentSkinName()
+    return currentSkinName
+end
+
 --* skin control, sets the current skin table
 function SetCurrentSkin(skin, overrideTable)
     local skinTable = skins[skin]
@@ -252,6 +260,7 @@ function SetCurrentSkin(skin, overrideTable)
         skinTable = skins[skin]
     end
 
+    currentSkinName = skin -- updating name of current skin
     currentSkin:Set(skin)
 
     tooltipTitleColor:Set(skinTable.tooltipTitleColor)
@@ -1091,7 +1100,7 @@ function GetReplayId()
         id = GetFrontEndData('syncreplayid')
     elseif HasCommandLineArg("/savereplay") then
         -- /savereplay format is gpgnet://local_ip:port/replay_id/USERNAME.SCFAreplay
-        -- see https://github.com/FAForever/downlords-faf-client/blob/b819997b2c4964ae6e6801d5d2eecd232bca5688/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java#L192
+        -- see https://github.com/FAForever/downlords-faf-client/blob/b819997b2c4964ae6e6801d5d2eecd232bca5688/src/main/java/com/faforever/client/fa/LaunchCommandBuilder.java--L192
         local url = GetCommandLineArg("/savereplay", 1)[1]
         local fistpos = string.find(url, "/", 10) + 1
         local lastpos = string.find(url, "/", fistpos) - 1
@@ -1125,4 +1134,79 @@ function SetTextBoxText(textBox, text)
     for i, line in wrapped do
         textBox:AddItem(line)
     end
+end
+
+local Window = import('/lua/maui/window.lua').Window
+local windowTextures = {
+    tl = UIFile('/game/mini-map-brd/mini-map_brd_ul.dds'),
+    tr = UIFile('/game/mini-map-brd/mini-map_brd_ur.dds'),
+    tm = UIFile('/game/mini-map-brd/mini-map_brd_horz_um.dds'),
+    ml = UIFile('/game/mini-map-brd/mini-map_brd_vert_l.dds'),
+    m =  UIFile('/game/mini-map-brd/mini-map_brd_m.dds'),
+    mr = UIFile('/game/mini-map-brd/mini-map_brd_vert_r.dds'),
+    bl = UIFile('/game/mini-map-brd/mini-map_brd_ll.dds'),
+    bm = UIFile('/game/mini-map-brd/mini-map_brd_lm.dds'),
+    br = UIFile('/game/mini-map-brd/mini-map_brd_lr.dds'),
+    borderColor = 'ff415055',
+}
+
+--- Constructs a default window.
+-- @param parent Parent of the window, defaults to GetFrame(0)
+-- @param title Title of the window
+-- @param icon Path to the icon to use for the window, defaults to false (in other words: no icon) 
+-- @param pin Toggle for the pin button, override window.OnPinCheck(self, checked) to set the behavior
+-- @param config Toggle for configuration button, override window.OnConfigClick(self) to set the behavior
+-- @Param lockSize Toggle to allow the user to adjust the size of the window.
+-- @param lockPosition Toggle to allow the user to adjust the position of the window.
+-- @param preferenceID Identifier used in the preference file to remember where this window was located last
+-- @param defaultLeft The default left boundary of the window, defaults to 10
+-- @param defaultTop The default top boundary of the window, defaults to 300
+-- @param defaultBottom The default bottom boundary of the window, defaults to 600
+-- @param defaultRight The default right boundary of the window, defaults to 210
+function CreateWindowStd(parent, title, icon, pin, config, lockSize, lockPosition, preferenceID, defaultLeft, defaultTop, defaultBottom, defaultRight)
+
+    -- allow for optionals
+    parent = parent or GetFrame(0)
+
+    defaultLeft = defaultLeft or 10
+    defaultTop = defaultTop or 300
+    defaultBottom = defaultBottom or 600
+    defaultRight = defaultRight or 210
+
+    -- setup data
+    local defaults = { Left = defaultLeft, Top = defaultTop, Bottom = defaultBottom, Right = defaultRight }
+
+    -- create and return window
+    return Window(
+        parent,          -- parent
+        title,           -- title
+        icon,            -- icon
+        pin,             -- pin
+        config,          -- config
+        lockSize,        -- lockSize
+        lockPosition,    -- lockPosition
+        preferenceID,    -- prefID
+        defaults,        -- default position
+        windowTextures   -- textureTable
+    )
+end
+
+function CreateAnnouncementStd(primary, secondary, control)
+
+    -- make it originate from the top
+    if not control then 
+        local frame = GetFrame(0)
+        control = Group(frame)
+        control.Left = function() return frame.Left() + 0.49 * frame.Right() end 
+        control.Right = function() return frame.Left() + 0.51 * frame.Right() end 
+        control.Top = frame.Top 
+        control.Bottom = frame.Top 
+    end
+
+    -- create the announcement accordingly
+    import('/lua/ui/game/announcement.lua').CreateAnnouncement(
+        primary,
+        control,
+        secondary 
+    )
 end
