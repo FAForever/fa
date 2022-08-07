@@ -84,26 +84,42 @@ local veterancyRegenBuffs = {
     {25, 50, 75, 100,125}, -- Experimental
 }
 
+local function IntelBooleanCheck(value)
+    return value
+end
+
+local function IntelTableCheck(value)
+    return (value.Max > 0) and (value.Min > 0)
+end
+
+local function IntelRadiusCheck(value)
+    return value > 0
+end
+
+local function IntelNoCheck()
+    return true
+end
+
 -- The keys in this table are what shows up in `Blueprint.Intel` and the values
 -- are the corresponding intel fields inside `Unit.IntelDisables`
 local IntelMap = {
-    Cloak = 'Cloak',
-    CloakField = 'CloakField',
-    CloakFieldRadius = 'CloakField',
-    JamRadius = 'Spoof',
-    SpoofRadius = 'Spoof',
+    -- intel types, alphebetical order
+    Cloak = { Name = 'Cloak', IsUsed = IntelBooleanCheck },
+    CloakFieldRadius = { Name = 'CloakField', IsUsed = IntelRadiusCheck },
+    JamRadius = { Name = 'Spoof', IsUsed = IntelTableCheck },
+    OmniRadius = { Name = 'Omni', IsUsed = IntelRadiusCheck },
+    RadarRadius = { Name = 'Radar', IsUsed = IntelRadiusCheck },
+    RadarStealth = { Name = 'RadarStealth', IsUsed = IntelBooleanCheck },
+    RadarStealthFieldRadius = { Name = 'RadarStealthField', IsUsed = IntelRadiusCheck },
+    SonarRadius = { Name = 'Sonar', IsUsed = IntelRadiusCheck },
+    SonarStealth = { Name = 'SonarStealth', IsUsed = IntelBooleanCheck },
+    SonarStealthFieldRadius = { Name = 'SonarStealthField', IsUsed = IntelRadiusCheck },
+    SpoofRadius = { Name = 'Spoof', IsUsed = IntelTableCheck },
 
-    RadarRadius = 'Radar',
-    RadarStealth = 'RadarStealth',
-    RadarStealthField = 'RadarStealthField',
-    RadarStealthFieldRadius = 'RadarStealthField',
-
-    Sonar = 'Sonar',
-    SonarRadius = 'Sonar',
-    SonarStealth = 'SonarStealth',
-    SonarStealthFieldRadius = 'SonarStealthField',
-
-    OmniRadius = 'Omni',
+    -- these do not exist on the blueprint
+    Sonar = { Name = 'Sonar', IsUsed = IntelNoCheck },
+    CloakField = { Name = 'CloakField', IsUsed = IntelNoCheck },
+    RadarStealthField = { Name = 'RadarStealthField', IsUsed = IntelNoCheck },
 }
 
 SyncMeta = {
@@ -378,10 +394,10 @@ Unit = Class(moho.unit_methods) {
         if bpInt then
             -- only make the table when needed, and only add the intel used by the unit
             self.IntelDisables = {}
-            for intel, _ in bpInt do
-                local field = IntelMap[intel]
-                if field then
-                    self.IntelDisables[field] = {Construction = true}
+            for intel, value in bpInt do
+                local info = IntelMap[intel]
+                if info and info.IsUsed(value) then
+                    self.IntelDisables[info.Name] = {Construction = true}
                 end
             end
             -- manage the loss of intel when energy is depleted
@@ -396,7 +412,6 @@ Unit = Class(moho.unit_methods) {
                 end
             end
         end
-
         
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
@@ -2814,8 +2829,6 @@ Unit = Class(moho.unit_methods) {
     ---@return boolean
     ---@see EnableUnitIntel
     EnableOneIntel = function(self, disabler, intel)
-
-        reprsl(debug.traceback())
         LOG(string.format("EnableOneIntel - type: %s, disabler: %s", intel, disabler))
 
         if not self.IntelDisables then

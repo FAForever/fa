@@ -745,6 +745,7 @@ end
 Callbacks.DebugIntel = function(data, units)
     if CheatsEnabled() then
         for k, unit in units do
+            LOG(string.format("Printing intel for: %s", unit.Blueprint.BlueprintId))
             reprsl(unit.IntelDisables)
         end
     end
