@@ -2959,9 +2959,12 @@ Unit = Class(moho.unit_methods) {
             self:SetWorkProgress(0.1 * k)
         end
 
+        self:EnableUnitIntel('Energy')
+
+        WaitSeconds(recharge)
         self:SetWorkProgress(-1)
 
-        self:EnableUnitIntel('Energy')
+
         self.IntelReactivateThread = nil
     end;
 

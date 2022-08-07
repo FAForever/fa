@@ -295,6 +295,8 @@ keyActions = {
         category = 'ui', order = 24},
     ['toggle_profiler'] = {action = 'UI_Lua import("/lua/ui/game/Profiler.lua").ToggleProfiler()',
         category = 'debug', order = 24},
+    ['debug_intel_state'] = {action = 'UI_Lua import("/lua/ui/debug.lua").DebugIntelStateOfSelection()',
+        category = 'debug', order = 24},
     ['toggle_profiler_window'] = {action = 'UI_Lua import("/lua/ui/game/Profiler.lua").OpenWindow()',
         category = 'debug', order = 24},
     ['toggle_repeat_build'] = {action = 'UI_Lua import("/lua/keymap/misckeyactions.lua").ToggleRepeatBuild()',

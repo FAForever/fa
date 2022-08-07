@@ -224,6 +224,7 @@ keyDescriptions = {
     ['toggle_map_utilities_window'] = 'Toggle map utilities window, requires cheats to be enabled',
     ['toggle_profiler'] = 'Toggles the profiler. This is a debug tool, abuse is bannable',
     ['toggle_profiler_window'] = 'Toggles the profiler window. This is a debug tool, abuse is bannable',
+    ['debug_intel_state'] = 'Logs the state of intel of the selected units to the console',
 
     -- GAZUI
     ['toggle_repeat_build'] = '<LOC key_desc_0185>Toggle factory repeat build',

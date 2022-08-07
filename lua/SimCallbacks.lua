@@ -738,3 +738,14 @@ end
 Callbacks.iMapToggleThreat = function(data)
     import("/lua/sim/MapUtilities.lua").iMapToggleThreat(data.Identifier)
 end
+
+--- Logs the state of intel of the selected units to the console
+---@param data table
+---@param units Unit[]
+Callbacks.DebugIntel = function(data, units)
+    if CheatsEnabled() then
+        for k, unit in units do
+            reprsl(unit.IntelDisables)
+        end
+    end
+end
