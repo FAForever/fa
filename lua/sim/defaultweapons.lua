@@ -51,17 +51,17 @@ DefaultProjectileWeapon = Class(Weapon) {
 
         -- Make certain the weapon has essential aspects defined
         if not rackBones then
-           local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
+           local strg = '*ERROR: No RackBones table specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
            error(strg, 2)
            return
         end
         if not muzzleSalvoSize then
-           local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
+           local strg = '*ERROR: No MuzzleSalvoSize specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
            error(strg, 2)
            return
         end
         if not muzzleSalvoDelay then
-           local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
+           local strg = '*ERROR: No MuzzleSalvoDelay specified, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
            error(strg, 2)
            return
         end
@@ -80,7 +80,7 @@ DefaultProjectileWeapon = Class(Weapon) {
             self.RackRecoilReturnSpeed = bp.RackRecoilReturnSpeed or math.abs(dist / ((1 / rof) - (bp.MuzzleChargeDelay or 0))) * 1.25
         end
         if rackRecoilDist ~= 0 and muzzleSalvoDelay ~= 0 then
-            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
+            local strg = '*ERROR: You can not have a RackRecoilDistance with a MuzzleSalvoDelay not equal to 0, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return false
         end
@@ -96,7 +96,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         self.NumRackBones = numRackBones
         local totalMuzzleFiringTime = (self.NumMuzzles - 1) * muzzleSalvoDelay
         if totalMuzzleFiringTime > (1 / rof) then
-            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit.UnitId
+            local strg = '*ERROR: The total time to fire muzzles is longer than the RateOfFire allows, aborting weapon setup.  Weapon: ' .. bp.DisplayName .. ' on Unit: ' .. self.unit:GetUnitId()
             error(strg, 2)
             return false
         end
@@ -167,13 +167,6 @@ DefaultProjectileWeapon = Class(Weapon) {
     end,
 
     CalculateBallisticAcceleration = function(self, projectile)
-        local accOld = self:CalculateBallisticAccelerationOld(projectile)
-        local accNew = self:CalculateBallisticAccelerationNew(projectile)
-        LOG(string.format('Bomb results: %f - %f', accOld, accNew))
-        return accNew
-    end;
-
-    CalculateBallisticAccelerationNew = function(self, projectile)
         local launcher = projectile:GetLauncher()
         if not launcher then -- fail-fast
             return 4.75
@@ -289,118 +282,7 @@ DefaultProjectileWeapon = Class(Weapon) {
         -- store last acceleration in case target dies in the middle of carpet bomb run
         data.lastAccel = acc
         return acc
-    end;
-
-    CalculateBallisticAccelerationOld = function(self, projectile)
-        local bp = self:GetBlueprint()
-        local MuzzleSalvoSize = bp.MuzzleSalvoSize
-        local MuzzleSalvoDelay = bp.MuzzleSalvoDelay
-        local acc = 4.75
-        local launcher = projectile:GetLauncher()
-        if not launcher then return acc end
-
-        -- Get projectile position and velocity
-        -- velocity needs to multiplied by 10 due to being returned /tick instead of /s
-        local proj = {
-            pos = projectile:GetPosition(),
-            vel = VMult(Vector(launcher:GetVelocity()), 10)
-        }
-        local entity = launcher:GetTargetEntity()
-
-        local target
-        if entity and IsUnit(entity) then
-            -- target is a entity
-            target = {
-                pos = entity:GetPosition(),
-                vel = VMult(Vector(entity:GetVelocity()), 10)
-            }
-        else
-            -- target is something else i.e. attack ground
-            target = {
-                pos = self:GetCurrentTargetPos(),
-                vel = Vector(0, 0, 0)
-            }
-        end
-
-        if MuzzleSalvoSize > 1 and self.CurrentSalvoDataOld == nil then
-            self.CurrentSalvoDataOld = {
-                acc = 4.75,
-                n_left = MuzzleSalvoSize,
-                targetpos = target.pos
-            }
-        end
-
-        local mydata = self.CurrentSalvoDataOld
-
-        if not target.pos or mydata.usestore then
-            if mydata then
-                -- use same acceleration as last bomb
-                acc = mydata.acc
-                mydata.n_left = mydata.n_left - 1
-                mydata.usestore = true -- Signal that we've lost our target to lock in these settings
-
-                if mydata.n_left < 1 then
-                    self.CurrentSalvoDataOld = nil
-                end
-            end
-
-            return acc
-        end
-
-        -- calculate flat(exclude y-axis) distance and velocity between projectile and target
-        local dist = {
-            pos = XZDist(proj.pos, target.pos),
-            vel = XZDist(proj.vel, target.vel)
-        }
-        if dist.vel == 0 then return acc end
-
-        if bp.DropBombShort then
-            -- deliberately drop bomb short by % ratio, could be useful for torpedo bombers
-            dist.pos = dist.pos * math.clamp(1 - bp.DropBombShort, 0, 1)
-        end
-
-        if self.CurrentSalvoDataOld ~= nil then -- bomber will drop several bombs
-            -- calculate space between bombs, this is multiplied by 0.5
-            -- to get the bombs overlapping a bit
-            local len = MuzzleSalvoDelay * dist.vel * 0.5
-            local current_bomb = MuzzleSalvoSize - self.CurrentSalvoDataOld.n_left
-
-            -- calculate the position for this particular bomb
-            dist.pos = dist.pos - (len * (MuzzleSalvoSize - 1)) / 2 + len * current_bomb
-            self.CurrentSalvoDataOld.n_left = self.CurrentSalvoDataOld.n_left - 1
-            if self.CurrentSalvoDataOld.n_left < 1 then
-                self.CurrentSalvoDataOld = nil
-            end
-        end
-
-        -- how many seconds until the bomb hits the target in xz-space
-        local time = dist.pos / dist.vel
-        if time == 0 then return acc end
-
-        -- find out where the target will be at that point in time (it could be moving)
-        target.tpos = {
-            target.pos[1] + time * target.vel[1],
-            0,
-            target.pos[3] + time * target.vel[3]
-        }
-        -- what is the height at that future position
-        target.tpos[2] = GetSurfaceHeight(target.tpos[1], target.tpos[3])
-
-        -- The basic formula for displacement over time is x = v0*t + 0.5*a*t^2
-        -- x: displacement, v0: initial velocity, a: acceleration, t: time
-        -- v0 is zero due to projectiles not inheriting y-speed of bomber
-        -- now we can calculate what acceleration we need to make it hit the target in the y-axis
-        -- a = 2 * (1/t)^2 * x
-
-        acc = 2 * math.pow(1 / time , 2) * (proj.pos[2] - target.tpos[2])
-
-        if self.CurrentSalvoDataOld then
-            -- store last acceleration in case target dies in the middle of carpet bomb run
-            self.CurrentSalvoDataOld.acc = acc
-        end
-
-        return acc
-    end;
+    end,
 
     -- Triggers when the weapon is moved horizontally, usually by owner's motion
     OnMotionHorzEventChange = function(self, new, old)
