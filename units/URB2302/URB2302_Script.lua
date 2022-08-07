@@ -12,6 +12,7 @@ local CStructureUnit = import('/lua/cybranunits.lua').CStructureUnit
 local CIFArtilleryWeapon = import('/lua/cybranweapons.lua').CIFArtilleryWeapon
 local DefaultProjectileWeapon = import('/lua/sim/DefaultWeapons.lua').DefaultProjectileWeapon
 
+---@class URB2302 : CStructureUnit
 URB2302 = Class(CStructureUnit) {
     Weapons = {
         MainGun = Class(CIFArtilleryWeapon) {

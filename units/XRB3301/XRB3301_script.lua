@@ -11,6 +11,7 @@ local CRadarUnit = import('/lua/cybranunits.lua').CRadarUnit
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 local CSoothSayerAmbient = import('/lua/EffectTemplates.lua').CSoothSayerAmbient
 
+---@class XRB3301 : CRadarUnit
 XRB3301 = Class(CRadarUnit) {
     IntelEffects = {
         {

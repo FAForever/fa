@@ -11,6 +11,7 @@ local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
 local AAASonicPulseBatteryWeapon = import('/lua/aeonweapons.lua').AAASonicPulseBatteryWeapon
 
 
+---@class UAL0104 : AHoverLandUnit
 UAL0104 = Class(AHoverLandUnit) {
 
     Weapons = {

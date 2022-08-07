@@ -12,6 +12,7 @@ local CAANanoDartWeapon = CybranWeaponsFile.CAANanoDartWeapon
 local CAMZapperWeapon03 = CybranWeaponsFile.CAMZapperWeapon03
 local TargetingLaser = import('/lua/kirvesweapons.lua').TargetingLaserInvisible
 
+---@class URS0202 : CSeaUnit
 URS0202 = Class(CSeaUnit) {
     Weapons = {
         TargetPainter = Class(TargetingLaser) {

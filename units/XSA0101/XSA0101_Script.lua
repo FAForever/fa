@@ -10,6 +10,7 @@
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
+---@class XSA0101 : SAirUnit
 XSA0101 = Class(SAirUnit) {
     OnImpact = function(self, with, other)
         SAirUnit.OnImpact(self, with, other)

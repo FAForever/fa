@@ -9,6 +9,7 @@
 --****************************************************************************
 local TRadarUnit = import('/lua/terranunits.lua').TRadarUnit
 
+---@class UEB3201 : TRadarUnit
 UEB3201 = Class(TRadarUnit) {
 
     OnIntelDisabled = function(self)

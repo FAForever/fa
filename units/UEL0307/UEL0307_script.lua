@@ -11,6 +11,7 @@
 local TShieldLandUnit = import('/lua/terranunits.lua').TShieldLandUnit
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
+---@class UEL0307 : TShieldLandUnit
 UEL0307 = Class(TShieldLandUnit) {
 
     Weapons = {        

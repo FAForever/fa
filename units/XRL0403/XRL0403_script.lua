@@ -25,6 +25,7 @@ local CIFSmartCharge = CybranWeaponsFile.CIFSmartCharge
 local CAABurstCloudFlakArtilleryWeapon = CybranWeaponsFile.CAABurstCloudFlakArtilleryWeapon
 local CDFBrackmanCrabHackPegLauncherWeapon = CybranWeaponsFile.CDFBrackmanCrabHackPegLauncherWeapon
 
+---@class XRL0403 : CWalkingLandUnit
 XRL0403 = Class(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 

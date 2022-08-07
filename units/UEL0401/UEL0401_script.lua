@@ -15,6 +15,7 @@ local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local CreateUEFBuildSliceBeams = EffectUtil.CreateUEFBuildSliceBeams
 
+---@class UEL0401 : TMobileFactoryUnit
 UEL0401 = Class(TMobileFactoryUnit) {
     FxDamageScale = 2.5,
     PrepareToBuildAnimRate = 5,

@@ -11,6 +11,7 @@
 local SAirUnit = import('/lua/seraphimunits.lua').SAirUnit
 local SAALosaareAutoCannonWeapon = import('/lua/seraphimweapons.lua').SAALosaareAutoCannonWeaponAirUnit
 
+---@class XSA0303 : SAirUnit
 XSA0303 = Class(SAirUnit) {
     Weapons = {
         AutoCannon1 = Class(SAALosaareAutoCannonWeapon) {},
