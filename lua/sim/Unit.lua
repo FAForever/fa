@@ -2752,6 +2752,9 @@ Unit = Class(moho.unit_methods) {
     ---@return boolean
     ---@see DisableUnitIntel
     DisableOneIntel = function(self, disabler, intel)
+
+        LOG("DisableOneIntel")
+
         if not self.IntelDisables then
             self.IntelDisables = {}
         end
@@ -2811,6 +2814,10 @@ Unit = Class(moho.unit_methods) {
     ---@return boolean
     ---@see EnableUnitIntel
     EnableOneIntel = function(self, disabler, intel)
+
+        reprsl(debug.traceback())
+        LOG(string.format("EnableOneIntel - type: %s, disabler: %s", intel, disabler))
+
         if not self.IntelDisables then
             self.IntelDisables = {}
         end
