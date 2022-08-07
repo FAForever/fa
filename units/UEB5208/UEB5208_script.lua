@@ -10,6 +10,7 @@
 
 local Unit = import('/lua/sim/Unit.lua').Unit
 
+---@class UEB5208 : Unit
 UEB5208 = Class(Unit) {
 
     OnCreate = function(self)

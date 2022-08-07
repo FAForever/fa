@@ -15,6 +15,7 @@ local TDFOverchargeWeapon = TerranWeaponFile.TDFOverchargeWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
+---@class UEL0001 : ACUUnit
 UEL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},

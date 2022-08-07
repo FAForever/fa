@@ -10,6 +10,7 @@
 
 local TAirStagingPlatformUnit = import('/lua/terranunits.lua').TAirStagingPlatformUnit
 
+---@class UEB5202 : TAirStagingPlatformUnit
 UEB5202 = Class(TAirStagingPlatformUnit) {
 }
 

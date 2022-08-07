@@ -15,6 +15,7 @@ local SB0OhwalliExperimentalStrategicBombWeapon = SeraphimWeapons.SB0OhwalliExpe
 local CreateSeraphimExperimentalBuildBaseThread = import('/lua/EffectUtilitiesSeraphim.lua').CreateSeraphimExperimentalBuildBaseThread
 local explosion = import('/lua/defaultexplosions.lua')
 
+---@class XSA0402 : SAirUnit
 XSA0402 = Class(SAirUnit) {
     DestroyNoFallRandomChance = 1.1,
     

@@ -16,6 +16,7 @@ local barrelBones = { 'Turret_Barrel_F_B01', 'Turret_Barrel_E_B01', 'Turret_Barr
 local recoilBones = { 'Turret_Barrel_F_B02', 'Turret_Barrel_E_B02', 'Turret_Barrel_D_B02', 'Turret_Barrel_C_B02', 'Turret_Barrel_B_B02', 'Turret_Barrel_A_B02' }
 local muzzleBones = { 'Turret_Barrel_F_B03', 'Turret_Barrel_E_B03', 'Turret_Barrel_D_B03', 'Turret_Barrel_C_B03', 'Turret_Barrel_B_B03', 'Turret_Barrel_A_B03' }
 
+---@class URL0401 : CLandUnit
 URL0401 = Class(CLandUnit) {
    
     Weapons = {

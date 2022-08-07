@@ -9,6 +9,7 @@
 ----****************************************************************************
 local CSeaUnit = import('/lua/cybranunits.lua').CSeaUnit
 
+---@class URB3302 : CSeaUnit
 URB3302 = Class(CSeaUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         CSeaUnit.OnStopBeingBuilt(self, builder, layer)

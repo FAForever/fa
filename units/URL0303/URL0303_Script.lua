@@ -25,6 +25,7 @@ local EMPDeathWeapon = Class(Weapon) {
     end,
 }
 
+---@class URL0303 : CWalkingLandUnit
 URL0303 = Class(CWalkingLandUnit) {
     PlayEndAnimDestructionEffects = false,
 

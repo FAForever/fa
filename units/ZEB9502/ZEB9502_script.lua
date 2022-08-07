@@ -11,6 +11,7 @@
 local TAirFactoryUnit = import('/lua/terranunits.lua').TAirFactoryUnit
 
 
+---@class ZEB9502 : TAirFactoryUnit
 ZEB9502 = Class(TAirFactoryUnit) {
 
     StartArmsMoving = function(self)

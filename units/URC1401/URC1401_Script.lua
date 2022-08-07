@@ -9,6 +9,7 @@
 --****************************************************************************
 local CCivilianStructureUnit = import('/lua/cybranunits.lua').CCivilianStructureUnit
 
+---@class URC1401 : CCivilianStructureUnit
 URC1401 = Class(CCivilianStructureUnit) {
 	OnCreate = function(self)
 		CCivilianStructureUnit.OnCreate(self)

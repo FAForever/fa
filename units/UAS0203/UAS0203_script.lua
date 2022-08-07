@@ -11,6 +11,7 @@
 local ASubUnit = import('/lua/aeonunits.lua').ASubUnit
 local AANChronoTorpedoWeapon = import('/lua/aeonweapons.lua').AANChronoTorpedoWeapon
 
+---@class UAS0203 : ASubUnit
 UAS0203 = Class(ASubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {

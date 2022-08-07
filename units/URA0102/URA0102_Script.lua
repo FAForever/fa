@@ -13,6 +13,7 @@
 local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CAAAutocannon = import('/lua/cybranweapons.lua').CAAAutocannon
 
+---@class URA0102 : CAirUnit
 URA0102 = Class(CAirUnit) {
     Weapons = {
         AutoCannon = Class(CAAAutocannon) {},

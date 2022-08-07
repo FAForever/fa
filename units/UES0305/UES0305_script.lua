@@ -11,6 +11,7 @@ local TSeaUnit = import('/lua/terranunits.lua').TSeaUnit
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 local CreateBuildCubeThread = import('/lua/EffectUtilities.lua').CreateBuildCubeThread
 
+---@class UES0305 : TSeaUnit
 UES0305 = Class(TSeaUnit) {
     Weapons = {
         Torpedo01 = Class(TANTorpedoAngler) {},
