@@ -605,6 +605,10 @@ AIBrain = Class(moho.aibrain_methods) {
     AddEnergyDependingEntity = function(self, entity)
         self.EnergyDependingUnits[self.EnergyDependingUnitsHead] = entity
         self.EnergyDependingUnitsHead = self.EnergyDependingUnitsHead + 1
+
+        if self.EnergyDepleted then
+            entity:OnEnergyDepleted()
+        end
     end,
 
     --- Remove an entity from the list of entities that receive callbacks when the energy storage is

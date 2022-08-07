@@ -2879,9 +2879,11 @@ Unit = Class(moho.unit_methods) {
     end,
 
     OnIntelEnabled = function(self)
+        LOG("OnIntelEnabled")
     end,
 
     OnIntelDisabled = function(self)
+        LOG("OnIntelDisabled")
     end,
 
     UpdateCloakEffect = function(self, cloaked, intel)
