@@ -573,6 +573,10 @@ Shield = Class(moho.shield_methods, Entity) {
 
     CreateImpactEffect = function(self, vector)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -1202,6 +1206,10 @@ PersonalShield = Class(Shield){
 
     CreateImpactEffect = function(self, vector)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -1318,6 +1326,10 @@ CzarShield = Class(PersonalShield) {
 
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
