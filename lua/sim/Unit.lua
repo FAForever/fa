@@ -2834,6 +2834,15 @@ Unit = Class(moho.unit_methods) {
 
         if not self.IntelDisables then
             self.IntelDisables = {}
+            local bp = self.Blueprint
+            if not bp.Intel.FreeIntel then
+                local maint = bp.Economy.MaintenanceConsumptionPerSecondEnergy
+                if maint and maint > 0 then
+                    self.Brain:AddEnergyDependingEntity(self)
+                else
+                    self.EnhanceableIntelEnergyDependency = false
+                end
+            end
         end
         local intelDisables = self.IntelDisables[intel]
         if not intelDisables then
