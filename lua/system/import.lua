@@ -40,6 +40,12 @@ local informDevOfLoad = false
 ---@return table
 function import(name)
 
+    -- attempt to find the module without lowering the string
+    local existing = __modules[name]
+    if existing then
+        return existing
+    end
+
     -- caching: if it exists then we return the previous version
     name = StringLower(name)
     local existing = __modules[name]
