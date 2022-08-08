@@ -2812,8 +2812,10 @@ Unit = Class(moho.unit_methods) {
         if intel then
             intDisabled = self:DisableOneIntel(disabler, intel)
         else
+            local intelDisables = self.IntelDisables
+            if not intelDisables then return end
             -- Loop over all intels and add disabler
-            for intel, _ in self.IntelDisables do
+            for intel, _ in intelDisables do
                 intDisabled = self:DisableOneIntel(disabler, intel) or intDisabled -- Beware of short-circuiting
             end
         end
@@ -2877,8 +2879,10 @@ Unit = Class(moho.unit_methods) {
         if intel then
             intEnabled = self:EnableOneIntel(disabler, intel)
         else
+            local intelDisables = self.IntelDisables
+            if not intelDisables then return end
             -- Loop over all intels and remove disabler
-            for intel, _ in self.IntelDisables do
+            for intel, _ in intelDisables do
                 intEnabled = self:EnableOneIntel(disabler, intel) or intEnabled -- Beware of short-circuiting
             end
         end
