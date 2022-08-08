@@ -393,31 +393,33 @@ Unit = Class(moho.unit_methods) {
         self:SetIntelRadius('Vision', bpInt.VisionRadius or 0)
         if bpInt then
             -- only make the table when needed, and only add the intel used by the unit
-            self.IntelDisables = {}
+            local intelDisables = {}
             for intel, value in bpInt do
                 local info = IntelMap[intel]
                 if info and info.IsUsed(value) then
-                    self.IntelDisables[info.Name] = {Construction = true}
+                    intelDisables[info.Name] = {Construction = true}
                 end
             end
-            -- manage the loss of intel when energy is depleted
-            if not bpInt.FreeIntel then
-                local maint = bp.Economy.MaintenanceConsumptionPerSecondEnergy
-                if maint and maint > 0 then
-                    self.Brain:AddEnergyDependingEntity(self)
-                else
-                    -- we don't currently have a maintenance cost, so it must come from an enhancement
-                    -- use this field to keep track of whether we've set the dependency
-                    self.EnhanceableIntelEnergyDependency = false
+            if not table.empty(intelDisables) then
+                self.IntelDisables = intelDisables
+                -- manage the loss of intel when energy is depleted
+                if not bpInt.FreeIntel then
+                    local maint = bp.Economy.MaintenanceConsumptionPerSecondEnergy
+                    if maint and maint > 0 then
+                        self.Brain:AddEnergyDependingEntity(self)
+                    else
+                        -- we don't currently have a maintenance cost, so it must come from an enhancement
+                        -- use this field to keep track of whether we've set the dependency
+                        self.EnhanceableIntelEnergyDependency = false
+                    end
                 end
             end
         end
-        
+
         if self.Blueprint.Intel.JammerBlips > 0 then
             self.Brain:TrackJammer(self)
             self.ResetJammer = -1
         end
-        
     end,
 
     -------------------------------------------------------------------------------------------
@@ -2771,12 +2773,11 @@ Unit = Class(moho.unit_methods) {
         LOG("DisableOneIntel")
 
         if not self.IntelDisables then
-            self.IntelDisables = {}
+            return false
         end
         local intelDisables = self.IntelDisables[intel]
         if not intelDisables then
-            intelDisables = {}
-            self.IntelDisables[intel] = intelDisables
+            return false
         end
         local intDisabled = false
         if Set.Empty(intelDisables) then
