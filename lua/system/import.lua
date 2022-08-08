@@ -48,7 +48,7 @@ function import(name)
 
     -- caching: if it exists then we return the previous version
     name = StringLower(name)
-    local existing = __modules[name]
+    existing = __modules[name]
     if existing then
         return existing
     end
