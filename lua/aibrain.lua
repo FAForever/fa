@@ -861,12 +861,8 @@ AIBrain = Class(moho.aibrain_methods) {
                         for _, brain in brains do
                             table.insert(indexes, brain.index)
                         end
-                        if Categories then
-                            units = self:GetListOfUnits(Categories, false)
-                        else
-                            units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
-                        end
-                            TransferUnfinishedUnitsAfterDeath(units, indexes)
+                        units = self:GetListOfUnits(categories.ALLUNITS - categories.WALL - categories.COMMAND, false)
+                        TransferUnfinishedUnitsAfterDeath(units, indexes)
                     end
 
                     for k, brain in brains do
