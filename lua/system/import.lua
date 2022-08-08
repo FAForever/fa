@@ -36,13 +36,9 @@ local informDevOfLoad = false
 -- local once = true
 
 --- The global import function used to keep track of modules.
--- @param name The path to the module to load.
+---@param name string The path to the module to load.
+---@return table
 function import(name)
-
-    -- if once then 
-    --     once = false
-    --     LOG(repr(debug.listcode(import)))
-    -- end
 
     -- caching: if it exists then we return the previous version
     name = StringLower(name)
