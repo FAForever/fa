@@ -2963,8 +2963,7 @@ Unit = Class(moho.unit_methods) {
     --- This unit only gets added as an energy dependent entity to the AIBrain when the unit has intel.
     ---@param self Unit
     OnEnergyViable = function(self)
-        -- Not sure how the thread could already be active, since energy can only become viable after
-        -- it's been depleted, and that removes any threads. Good to be safe though.
+        -- Guard against the thread already being active for mods
         if not self.IntelReactivateThread then
             self.IntelReactivateThread = self:ForkThread(self.IntelReactivate)
         end
@@ -2974,18 +2973,16 @@ Unit = Class(moho.unit_methods) {
     --- 10 seconds)
     ---@param self Unit
     IntelReactivate = function(self)
-        local recharge = 0.1 * self.Blueprint.Intel.ReactivateTime or 10
+        local recharge = 10 * (self.Blueprint.Intel.ReactivateTime or 10)
+        local rechargeFrac = 1 / recharge
 
-        for k = 1, 10 do
-            WaitSeconds(recharge)
-            self:SetWorkProgress(0.1 * k)
+        for k = 0, recharge - 1 do
+            self:SetWorkProgress(k * rechargeFrac)
+            WaitTicks(1)
         end
 
         self:EnableUnitIntel('Energy')
-
-        WaitSeconds(recharge)
         self:SetWorkProgress(-1)
-
 
         self.IntelReactivateThread = nil
     end;
