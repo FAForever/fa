@@ -1,13 +1,9 @@
--- Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
----@declare-global
+-- Copyright � 2005 Gas Powered Games, Inc.  All rights reserved.
 --
 -- Implement import()
 
 --- Table of all loaded modules, indexed by name.
 __modules = {}
-
---- Upvalued version of all loaded modules for performance
--- local upModules = __modules
 
 --- Common metatable used by all modules, which forwards global references to _G
 __module_metatable = {
@@ -17,8 +13,8 @@ __module_metatable = {
 -- upvalue for performance: changes the calls to access these
 -- tables from GETGLOBAL to GETUPVALUE. This change can be inspected by calling
 -- LOG(repr(debug.listcode(import))).
-local upModules = __modules
-local upModuleMetatable = __module_metatable
+-- local upModules = __modules
+-- local upModuleMetatable = __module_metatable
 
 -- upvalue globals for performance
 -- local LOG = LOG
@@ -37,20 +33,20 @@ local StringSub = string.sub
 -- these values can be adjusted by hooking into this file
 local informDevOfLoad = false
 
+-- local once = true
+
 --- The global import function used to keep track of modules.
----@param name string The path to the module to load.
----@return table
+-- @param name The path to the module to load.
 function import(name)
 
-    -- attempt to find the module without lowering the string
-    local existing = upModules[name]
-    if existing then
-        return existing
-    end
+    -- if once then 
+    --     once = false
+    --     LOG(repr(debug.listcode(import)))
+    -- end
 
-    -- try again after lowering the string
+    -- caching: if it exists then we return the previous version
     name = StringLower(name)
-    existing = upModules[name]
+    local existing = __modules[name]
     if existing then
         return existing
     end
@@ -79,16 +75,16 @@ function import(name)
     }
 
     -- set the meta table so that if it can't find an index it searches in _G
-    setmetatable(env, upModuleMetatable)
+    setmetatable(env, __module_metatable)
 
     -- add ourselves to prevent loops
-    upModules[name] = env
+    __modules[name] = env
 
     -- try to add content to the environment
     local ok, msg = pcall(doscript, name, env)
     if not ok then
         -- we failed: report back
-        upModules[name] = nil
+        __modules[name] = nil
         WARN(msg)
         error("Error importing '" .. name .. "'", 2)
     end
@@ -104,11 +100,11 @@ end
 -- Clear out a module from the table of loaded modules, so that on the next import attempt it will
 -- get reloaded from scratch.
 function dirty_module(name, why)
-    local m = upModules[name]
+    local m = __modules[name]
     if m then
         if why then LOG("Module '", name, "' changed on disk") end
         LOG("  marking '",name,"' for reload")
-        upModules[name] = nil
+        __modules[name] = nil
         local deps = m.__moduleinfo.used_by
         if deps then
             for k,_ in deps do
