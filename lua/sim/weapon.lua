@@ -40,16 +40,16 @@ end
 ---@class Weapon : moho.weapon_methods
 ---@field Blueprint WeaponBlueprint
 Weapon = Class(moho.weapon_methods) {
+
+    -- stored here for mods compatibility, overridden in the inner table when written to
+    DamageMod = 0,
+    DamageRadiusMod = 0,
+
     __init = function(self, unit)
         self.unit = unit
     end,
 
     OnCreate = function(self)
-
-        -- -- Cache access patterns, see benchmark on metatables
-        -- for k, identifier in FunctionsToCache do 
-        --     self[identifier] = self[identifier]
-        -- end
 
         -- Store blueprint for improved access pattern, see benchmark on blueprints
         self.Blueprint = self:GetBlueprint()
@@ -57,7 +57,6 @@ Weapon = Class(moho.weapon_methods) {
 
         -- Legacy information stored for backwards compatibility
         self.Label = bp.Label
-        self.bpRateOfFire = bp.RateOfFire
         self.EnergyRequired = bp.EnergyRequired
         self.EnergyDrainPerSecond = bp.EnergyDrainPerSecond
 
@@ -77,9 +76,6 @@ Weapon = Class(moho.weapon_methods) {
 
         self:SetWeaponPriorities()
         self.DisabledBuffs = {}
-        self.DamageMod = 0
-        self.DamageRadiusMod = 0
-        self.NumTargets = 0
         local initStore = bp.InitialProjectileStorage
         if initStore and initStore > 0 then
             if bp.MaxProjectileStorage and bp.MaxProjectileStorage < initStore then
@@ -296,7 +292,6 @@ Weapon = Class(moho.weapon_methods) {
                 self.unit.Animator:SetBoneEnabled(value, false)
             end
         end
-        self.NumTargets = self.NumTargets + 1
     end,
 
     OnLostTarget = function(self)
@@ -304,11 +299,6 @@ Weapon = Class(moho.weapon_methods) {
             for key, value in self.DisabledFiringBones do
                 self.unit.Animator:SetBoneEnabled(value, true)
             end
-        end
-
-        self.NumTargets = self.NumTargets - 1
-        if self.NumTargets < 0 then
-            self.NumTargets = 0
         end
     end,
 

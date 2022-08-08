@@ -928,7 +928,7 @@ OverchargeWeapon = Class(DefaultProjectileWeapon) {
         if not self.unit:IsOverchargePaused() then
             self.unit:SetOverchargePaused(true)
             self:OnDisableWeapon()
-            WaitSeconds(1 / self.bpRateOfFire)
+            WaitSeconds(1 / self.Blueprint.RateOfFire)
             self.unit:SetOverchargePaused(false)
             if self.AutoMode then
                 self.AutoThread = self:ForkThread(self.AutoEnable)
@@ -1173,7 +1173,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         while true do
             WaitSeconds(1)
             --if we're at hold fire, stop beam
-            if self.unit and (self.unit:GetFireState() == 1 or self.NumTargets == 0) then
+            if self.unit and (self.unit:GetFireState() == 1 or (not self:GetCurrentTarget())) then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end
