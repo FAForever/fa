@@ -10,6 +10,7 @@
 local SShieldHoverLandUnit = import('/lua/seraphimunits.lua').SShieldHoverLandUnit
 local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultProjectileWeapon --import a default weapon so our pointer doesnt explode
 
+---@class XSL0307 : SShieldHoverLandUnit
 XSL0307 = Class(SShieldHoverLandUnit) {
     
     Weapons = {        

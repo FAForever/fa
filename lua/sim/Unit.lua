@@ -1058,7 +1058,7 @@ Unit = Class(moho.unit_methods) {
                         local enh = enhancements[enhName]
                         mass = mass + (enh.BuildCostMass or 0)
                         energy = energy + (enh.BuildCostEnergy or 0)
-                        time = time + (eng.BuildTime or 0)
+                        time = time + (enh.BuildTime or 0)
                         enhName = enh.Prerequisite
                     until not enhName
                 end

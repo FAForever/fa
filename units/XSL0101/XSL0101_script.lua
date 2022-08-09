@@ -8,6 +8,7 @@ local SWalkingLandUnit = import('/lua/seraphimunits.lua').SWalkingLandUnit
 local SDFPhasicAutoGunWeapon = import('/lua/seraphimweapons.lua').SDFPhasicAutoGunWeapon
 local Buff = import('/lua/sim/Buff.lua')
 
+---@class XSL0101 : SWalkingLandUnit
 XSL0101 = Class(SWalkingLandUnit) {
     Weapons = {
         LaserTurret = Class(SDFPhasicAutoGunWeapon) {

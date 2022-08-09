@@ -10,6 +10,7 @@
 
 local TSeaFactoryUnit = import('/lua/terranunits.lua').TSeaFactoryUnit
 
+---@class ZEB9503 : TSeaFactoryUnit
 ZEB9503 = Class(TSeaFactoryUnit) {
     OnCreate = function(self)
         TSeaFactoryUnit.OnCreate(self)

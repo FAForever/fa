@@ -15,6 +15,7 @@ local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 local EffectUtils = import('/lua/effectutilities.lua')
 local Effects = import('/lua/effecttemplates.lua')
 
+---@class DEL0204 : TWalkingLandUnit
 DEL0204 = Class(TWalkingLandUnit) 
 {
     Weapons = {

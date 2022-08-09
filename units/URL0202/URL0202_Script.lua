@@ -11,6 +11,7 @@
 local CLandUnit = import('/lua/cybranunits.lua').CLandUnit
 local CDFLaserHeavyWeapon = import('/lua/cybranweapons.lua').CDFLaserHeavyWeapon
 
+---@class URL0202 : CLandUnit
 URL0202 = Class(CLandUnit) {
     Weapons = {
         MainGun = Class(CDFLaserHeavyWeapon) {},

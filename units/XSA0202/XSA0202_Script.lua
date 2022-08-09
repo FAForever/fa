@@ -12,6 +12,7 @@ local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SAAShleoCannonWeapon = SeraphimWeapons.SAAShleoCannonWeapon
 local SDFBombOtheWeapon = SeraphimWeapons.SDFBombOtheWeapon
 
+---@class XSA0202 : SAirUnit
 XSA0202 = Class(SAirUnit) {
     Weapons = {
         ShleoAAGun01 = Class(SAAShleoCannonWeapon) {

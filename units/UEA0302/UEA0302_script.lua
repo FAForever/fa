@@ -14,6 +14,7 @@ local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 -- Once we get proper "alt abilities", we can switch the buoy creation to use that system.
 local TANTorpedoAngler = import('/lua/terranweapons.lua').TANTorpedoAngler
 
+---@class UEA0302 : TAirUnit
 UEA0302 = Class(TAirUnit) {
 -- Disabling for now, while Design decides whether they want this functionality
 --    Weapons = {

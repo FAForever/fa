@@ -12,6 +12,7 @@ local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 local EffectUtil = import('/lua/EffectUtilities.lua')
 local Buff = import('/lua/sim/Buff.lua')
 
+---@class UAL0301 : CommandUnit
 UAL0301 = Class(CommandUnit) {
     Weapons = {
         RightReactonCannon = Class(ADFReactonCannon) {},
