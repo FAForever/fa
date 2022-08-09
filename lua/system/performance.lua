@@ -574,46 +574,52 @@ local function StoreSamples(exitType)
 
     LOG("Storing samples!")
 
-    mapName = session.name
-    mapVersion = session.map_version or 1
-
     -- get / store the preference table
-    local identifier = string.format("%s - %s", tostring(mapName), tostring(mapVersion))
-    local data = GetPreference('PerformanceTrackingV1') or { }
 
+    -- determine game flags
+    local isSkirmish = session.type == 'skirmish'
+    local hasAI = false
+    for k, army in armies do 
+        if (not army.civilian) and (not army.human) then
+            hasAI = true
+            break
+        end
+    end
+
+    -- determine identifier based on game flags
+    local identifier = 'campaign'
+    if isSkirmish then 
+        if hasAI then 
+            identifier = 'skirmish-ai'
+        else 
+            identifier = 'skirmish'
+        end
+    end
+
+    -- retrieve and update data
+    local data = GetPreference('PerformanceTrackingV1') or { }
     local mapData = data[identifier]
     if mapData then 
         for k = 1, 21 do
             
             if samples[k].Samples > 0 then
                 if mapData[k].Samples > 0 then
-                    
                     -- combine them
                     mapData[k].UnitCount.Min = math.min(samples[k].UnitCount.Min, mapData[k].UnitCount.Min)
                     mapData[k].UnitCount.Max = math.max(samples[k].UnitCount.Max, mapData[k].UnitCount.Max)
-                    mapData[k].EntityCount.Min = math.min(samples[k].EntityCount.Min, mapData[k].EntityCount.Min)
-                    mapData[k].EntityCount.Max = math.max(samples[k].EntityCount.Max, mapData[k].EntityCount.Max)
 
                     -- slowly converge to exclude outliers over time
                     local avgUnitCount = 0.5 * (mapData[k].UnitCount.Min + mapData[k].UnitCount.Max)
-                    local avgEntityCount = 0.5 * (mapData[k].EntityCount.Min + mapData[k].EntityCount.Max)
 
                     -- linear interpolation
                     mapData[k].UnitCount.Min = 0.9 * mapData[k].UnitCount.Min + 0.1 * avgUnitCount
                     mapData[k].UnitCount.Max = 0.9 * mapData[k].UnitCount.Max + 0.1 * avgUnitCount
-                    mapData[k].EntityCount.Min = 0.9 * mapData[k].EntityCount.Min + 0.1 * avgEntityCount
-                    mapData[k].EntityCount.Max = 0.9 * mapData[k].EntityCount.Max + 0.1 * avgEntityCount
-
                     mapData[k].Samples = mapData[k].Samples + samples[k].Samples
                 else
                     -- first time at this rate, just take them as ground truth
                     mapData[k].UnitCount = { }
-                    mapData[k].EntityCount = { }
-
                     mapData[k].UnitCount.Min = samples[k].UnitCount.Min
                     mapData[k].UnitCount.Max = samples[k].UnitCount.Max
-                    mapData[k].EntityCount.Min = samples[k].EntityCount.Min
-                    mapData[k].EntityCount.Max = samples[k].EntityCount.Max
                     mapData[k].Samples = samples[k].Samples
                 end
             end
@@ -626,6 +632,7 @@ local function StoreSamples(exitType)
         data[identifier].Samples = 1
     end
 
+    -- store data
     SetPreference('PerformanceTrackingV1', data)
 end
 
@@ -693,15 +700,10 @@ local function PerformanceTrackingThread()
         if sample.Samples > 0 then 
             sample.UnitCount.Min = math.min(sample.UnitCount.Min, unitCount)
             sample.UnitCount.Max = math.max(sample.UnitCount.Max, unitCount)
-            sample.EntityCount.Min = math.min(sample.EntityCount.Min, entityCount)
-            sample.EntityCount.Max = math.max(sample.EntityCount.Max, entityCount)
         else 
             sample.UnitCount = { }
-            sample.EntityCount = { }
             sample.UnitCount.Min = unitCount
             sample.UnitCount.Max = unitCount
-            sample.EntityCount.Min = entityCount
-            sample.EntityCount.Max = entityCount
         end
 
         sample.Samples = sample.Samples + 1
