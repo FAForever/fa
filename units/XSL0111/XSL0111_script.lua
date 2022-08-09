@@ -10,6 +10,7 @@
 local SLandUnit = import('/lua/seraphimunits.lua').SLandUnit
 local SLaanseMissileWeapon = import('/lua/seraphimweapons.lua').SLaanseMissileWeapon
 
+---@class XSL0111 : SLandUnit
 XSL0111 = Class(SLandUnit) {
     Weapons = {
         MissileRack = Class(SLaanseMissileWeapon) {

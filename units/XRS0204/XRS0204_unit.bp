@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
         TargetBones = {
             'XRS0204',
         },
@@ -289,7 +289,7 @@ UnitBlueprint {
     SelectionSizeX = 0.6,
     SelectionSizeZ = 1.8,
     SelectionThickness = 0.37,
-    SizeX = 0.6,
+    SizeX = 0.66,
     SizeY = 0.5,
     SizeZ = 3,
     StrategicIconName = 'icon_sub2_antinavy',

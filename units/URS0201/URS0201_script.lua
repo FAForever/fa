@@ -13,6 +13,7 @@ local CDFProtonCannonWeapon = CybranWeapons.CDFProtonCannonWeapon
 local CANNaniteTorpedoWeapon = import('/lua/cybranweapons.lua').CANNaniteTorpedoWeapon
 local CIFSmartCharge = import('/lua/cybranweapons.lua').CIFSmartCharge
 
+---@class URS0201 : CSeaUnit
 URS0201 = Class(CSeaUnit) {
     SwitchAnims = true,
     Walking = false,

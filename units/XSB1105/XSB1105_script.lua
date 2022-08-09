@@ -9,6 +9,7 @@
 --****************************************************************************
 local SEnergyStorageUnit = import('/lua/seraphimunits.lua').SEnergyStorageUnit
 
+---@class XSB1105 : SEnergyStorageUnit
 XSB1105 = Class(SEnergyStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

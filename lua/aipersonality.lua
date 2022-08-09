@@ -11,6 +11,7 @@
 -- AIPersonality Lua Module              --
 ----------------------------------------------------------------------------------
 
+---@class AIPpersonality : moho.aipersonality_methods
 AIPersonality = Class(moho.aipersonality_methods) {}
 
 AIPersonalityTemplate = {

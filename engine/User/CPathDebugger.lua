@@ -1,8 +1,9 @@
---- Class CPathDebugger
--- @classmod User.CPathDebugger
+---@declare-global
+---@class moho.PathDebugger_methods
+local CPathDebugger = {}
 
 ---
---
-function CPathDebugger:moho.PathDebugger_methods()
+function CPathDebugger:Destroy()
 end
 
+return CPathDebugger

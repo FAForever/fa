@@ -97,7 +97,7 @@ local function _FormatTable(t)
     elseif IsProjectile(t) then 
         return format("(Projectile of type: %s, with entity id: %s)", tostring(t.Blueprint.BlueprintId), tostring(t.EntityId))
     elseif IsBrain(t) then 
-        return format("(Brain of army: %s)", tostring(t:GetArmyIndex()))
+        return format("(Brain of army: %s)", tostring(t.Army))
     elseif IsWeapon(t) then 
         return format("(Weapon)")
     elseif IsTrashbag(t) then 
@@ -243,7 +243,6 @@ end
 -- @param t value to print
 -- @param extensive include printer of metatable, if applicable
 function reprs(t, extensive)
-
     if type(t) == 'table' then 
         if extensive then 
             return _reprsExt(t, " - ")

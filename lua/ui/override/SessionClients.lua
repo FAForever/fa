@@ -1,6 +1,17 @@
 
+---@class Client
+---@field authorizedCommandSources number[]
+---@field connected boolean
+---@field ejectedBy number[]
+---@field local boolean
+---@field name string
+---@field ping number
+---@field quiet number
+---@field uid string
+
+
 -- keep a reference to the actual function
-local GlobalGetSessionClients = _G.GetSessionClients
+local GlobalGetSessionClients = GetSessionClients
 
 --- Allows UI elements to be updated when the cache is updated by adding a callback via Observable:AddObserver()
 local Cached = GlobalGetSessionClients()
@@ -31,7 +42,8 @@ local function TickThread()
 end
 
 --- Override global function to return our cache
-_G.GetSessionClients = function()
+---@return Client[]
+GetSessionClients = function()
     return Cached
 end
 

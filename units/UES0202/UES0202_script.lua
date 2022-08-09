@@ -15,6 +15,7 @@ local TDFGaussCannonWeapon = WeaponFile.TDFGaussCannonWeapon
 local TAMPhalanxWeapon = WeaponFile.TAMPhalanxWeapon
 local TIFCruiseMissileLauncher = WeaponFile.TIFCruiseMissileLauncher
 
+---@class UES0202 : TSeaUnit
 UES0202 = Class(TSeaUnit) {
     DestructionTicks = 200,
 

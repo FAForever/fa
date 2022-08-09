@@ -1,6 +1,11 @@
 ---@declare-global
----@class moho.AnimationManipulator
+---@class moho.AnimationManipulator : moho.manipulator_methods
 local CAnimationManipulator = {}
+
+---
+---@return number
+function CAnimationManipulator:GetAnimationDuration()
+end
 
 ---
 --  fraction = AnimationManipulator:GetAnimationFraction()
@@ -19,7 +24,7 @@ end
 
 ---
 --  AnimManipulator:PlayAnim(entity, animName, looping=false)
-function CAnimationManipulator:PlayAnim(entity,  animName,  looping=false)
+function CAnimationManipulator:PlayAnim(entity,  animName,  looping)
 end
 
 ---
@@ -34,7 +39,7 @@ end
 
 ---
 --  AnimationManipulator:SetBoneEnabled(bone, value, include_decscendants=true)
-function CAnimationManipulator:SetBoneEnabled(bone,  value,  include_decscendants=true)
+function CAnimationManipulator:SetBoneEnabled(bone,  value,  include_decscendants)
 end
 
 ---
@@ -55,11 +60,6 @@ end
 ---
 --  AnimationManipulator:SetRate(rate)Set the relative rate at which this anim plays; 1.0 is normal speed.Rate can be negative to play backwards or 0 to pause.
 function CAnimationManipulator:SetRate(rate)
-end
-
----
---  derived from IAniManipulator
-function CAnimationManipulator:base()
 end
 
 return CAnimationManipulator

@@ -15,6 +15,7 @@ local TIFFragLauncherWeapon = TWeapons.TDFFragmentationGrenadeLauncherWeapon
 local EffectUtils = import('/lua/effectutilities.lua')
 local Effects = import('/lua/effecttemplates.lua')
 
+---@class DEL0204 : TWalkingLandUnit
 DEL0204 = Class(TWalkingLandUnit) 
 {
     Weapons = {
@@ -24,7 +25,7 @@ DEL0204 = Class(TWalkingLandUnit)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(0)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxWeaponPackSequence(self)
             end,
 
@@ -44,7 +45,7 @@ DEL0204 = Class(TWalkingLandUnit)
                 if self.SpinManip then
                     self.SpinManip:SetTargetSpeed(200)
                 end
-                self.ExhaustEffects = EffectUtils.CreateBoneEffects(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
+                self.ExhaustEffects = EffectUtils.CreateBoneEffectsOpti(self.unit, 'Left_Arm_Barrel_Muzzle', self.unit.Army, Effects.WeaponSteam01)
                 TDFPlasmaCannonWeapon.PlayFxRackSalvoChargeSequence(self)
             end,
         },

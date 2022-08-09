@@ -9,6 +9,7 @@
 --****************************************************************************
 local SEnergyCreationUnit = import('/lua/seraphimunits.lua').SEnergyCreationUnit
 
+---@class XSB1301 : SEnergyCreationUnit
 XSB1301 = Class(SEnergyCreationUnit) {
     AmbientEffects = 'ST3PowerAmbient',
     

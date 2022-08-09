@@ -10,6 +10,7 @@ local CKrilTorpedoLauncherWeapon = import('/lua/cybranweapons.lua').CKrilTorpedo
 local utilities = import('/lua/utilities.lua')
 local VizMarker = import('/lua/sim/VizMarker.lua').VizMarker
 
+---@class XRB2309 : CStructureUnit
 XRB2309 = Class(CStructureUnit) {
     Weapons = {
         Turret01 = Class(CKrilTorpedoLauncherWeapon) {},

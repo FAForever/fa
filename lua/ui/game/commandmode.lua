@@ -37,6 +37,15 @@ local MathPi = math.pi
 local MathAtan = math.atan
 
 
+
+---@class MeshInfo
+---@field Position Vector
+---@field Blueprint string
+---@field TextureName string
+---@field ShaderName string
+---@field UniformScale number
+
+
 -- When this file is reloaded (using /EnableDiskWatch) the cursor no longer changes
 -- during command mode (e.g., when you do a move order it turns your cursor into
 -- the blue move marker). This is fixed by reloading the game.

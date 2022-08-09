@@ -12,6 +12,7 @@ local DefaultProjectileWeapon = import('/lua/sim/defaultweapons.lua').DefaultPro
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local EffectUtils = import('/lua/effectutilities.lua')
 
+---@class DAA0206 : AAirUnit
 DAA0206 = Class(AAirUnit) {
     Weapons = {
         Suicide = Class(DefaultProjectileWeapon) {}

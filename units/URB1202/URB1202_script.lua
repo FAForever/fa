@@ -10,6 +10,7 @@
 
 local CMassCollectionUnit = import('/lua/cybranunits.lua').CMassCollectionUnit
 
+---@class URB1202 : CMassCollectionUnit
 URB1202 = Class(CMassCollectionUnit) {
     OnStartBuild = function(self, unitBeingBuilt, order)
         CMassCollectionUnit.OnStartBuild(self, unitBeingBuilt, order)

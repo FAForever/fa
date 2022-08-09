@@ -11,6 +11,7 @@
 local AStructureUnit = import('/lua/aeonunits.lua').AStructureUnit
 local AANChronoTorpedoWeapon = import('/lua/aeonweapons.lua').AANChronoTorpedoWeapon
 
+---@class UAB2109 : AStructureUnit
 UAB2109 = Class(AStructureUnit) {
     Weapons = {
         Turret01 = Class(AANChronoTorpedoWeapon) {},

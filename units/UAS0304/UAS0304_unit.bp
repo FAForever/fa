@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         InitialAutoMode = false,
+        GuardReturnRadius = 0,
         TargetBones = {
             'Muzzle_04',
             'Muzzle_05',

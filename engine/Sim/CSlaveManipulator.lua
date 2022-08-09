@@ -1,13 +1,13 @@
---- Class CSlaveManipulator
--- @classmod Sim.CSlaveManipulator
-
----
---  derived from IAniManipulator
-function CSlaveManipulator:base()
-end
+---@declare-global
+---@class moho.SlaveManipulator : moho.manipulator_methods
+local CSlaveManipulator = {}
 
 ---
 --
-function CSlaveManipulator:moho.SlaveManipulator()
+function CSlaveManipulator:SetMaxRate()
 end
+
+return CSlaveManipulator
+
+
 

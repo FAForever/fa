@@ -10,6 +10,7 @@
 
 local AAirUnit = import('/lua/aeonunits.lua').AAirUnit
 
+---@class UAA0101 : AAirUnit
 UAA0101 = Class(AAirUnit) {
 }
 

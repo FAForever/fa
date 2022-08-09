@@ -9,6 +9,7 @@
 --****************************************************************************
 local AEnergyStorageUnit = import('/lua/aeonunits.lua').AEnergyStorageUnit
 
+---@class UAB1105 : AEnergyStorageUnit
 UAB1105 = Class(AEnergyStorageUnit) {
 
     OnStopBeingBuilt = function(self,builder,layer)

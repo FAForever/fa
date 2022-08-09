@@ -10,6 +10,7 @@
 
 local SMassFabricationUnit = import('/lua/seraphimunits.lua').SMassFabricationUnit
 
+---@class XSB1104 : SMassFabricationUnit
 XSB1104 = Class(SMassFabricationUnit) {
 
     OnCreate = function(self)

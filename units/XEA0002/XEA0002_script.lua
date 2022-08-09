@@ -8,6 +8,7 @@
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TOrbitalDeathLaserBeamWeapon = import('/lua/terranweapons.lua').TOrbitalDeathLaserBeamWeapon
 
+---@class XEA0002 : TAirUnit
 XEA0002 = Class(TAirUnit) {
     DestroyNoFallRandomChance = 1.1,
 

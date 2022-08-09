@@ -11,6 +11,7 @@ local SAirStagingPlatformUnit = import('/lua/seraphimunits.lua').SAirStagingPlat
 local SeraphimAirStagePlat02 = import('/lua/EffectTemplates.lua').SeraphimAirStagePlat02
 local SeraphimAirStagePlat01 = import('/lua/EffectTemplates.lua').SeraphimAirStagePlat01
 
+---@class XSB5202 : SAirStagingPlatformUnit
 XSB5202 = Class(SAirStagingPlatformUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         for k, v in SeraphimAirStagePlat02 do

@@ -11,6 +11,7 @@
 local AHoverLandUnit = import('/lua/aeonunits.lua').AHoverLandUnit
 local AIFMortarWeapon = import('/lua/aeonweapons.lua').AIFMortarWeapon
 
+---@class UAL0103 : AHoverLandUnit
 UAL0103 = Class(AHoverLandUnit) {
     Weapons = {
         MainGun = Class(AIFMortarWeapon) {

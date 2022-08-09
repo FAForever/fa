@@ -11,6 +11,7 @@
 local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TAAGinsuRapidPulseWeapon = import('/lua/terranweapons.lua').TAAGinsuRapidPulseWeapon
 
+---@class UEA0303 : TAirUnit
 UEA0303 = Class(TAirUnit) {
     Weapons = {
         RightBeam = Class(TAAGinsuRapidPulseWeapon) {},

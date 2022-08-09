@@ -661,6 +661,13 @@ AQuantumGateAmbient = {
     EmtBpPath .. 'aeon_gate_03_emit.bp',
 }
 
+ATractorAmbient = {
+    EmtBpPath .. 'tractor_01_emit.bp',
+    EmtBpPath .. 'tractor_02_emit.bp',
+    EmtBpPath .. 'tractor_03_emit.bp',
+}
+
+
 AResourceGenAmbient = {
     EmtBpPath .. 'aeon_rgen_ambient_01_emit.bp',
     EmtBpPath .. 'aeon_rgen_ambient_02_emit.bp',
