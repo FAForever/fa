@@ -10,6 +10,7 @@ local GetSurfaceHeight = GetSurfaceHeight
 local VDist2 = VDist2
 
 local EntityMethods = moho.entity_methods
+local EntityGetPosition = EntityMethods.GetPosition
 local EntityGetPositionXYZ = EntityMethods.GetPositionXYZ
 
 local UnitMethods = moho.unit_methods
@@ -180,18 +181,17 @@ DefaultProjectileWeapon = Class(Weapon) {
         local target = UnitGetTargetEntity(launcher)
 
         local targetPos
-        local targetPosX, targetPosZ
         local targetVelX, targetVelZ
         if target and IsUnit(target) then
             -- target is a unit / prop
-            targetPosX, _, targetPosZ = EntityGetPositionXYZ(target)
+            targetPos = EntityGetPosition(target)
             targetVelX, _, targetVelZ = UnitGetVelocity(target)
         else
             -- target is a position i.e. attack ground
             targetPos = self:GetCurrentTargetPos()
-            targetPosX, targetPosZ = targetPos[1], targetPos[3]
             targetVelX, targetVelZ = 0, 0
         end
+        local targetPosX, targetPosZ = targetPos[1], targetPos[3]
 
         local data = self.CurrentSalvoData
 
@@ -203,8 +203,6 @@ DefaultProjectileWeapon = Class(Weapon) {
                 -- calculate & cache a couple things only the first time
                 data = {
                     lastAccel = 4.75,
-                    -- store the target position if it was a groundfire
-                    targetpos = targetPos, -- we don't use this, but apparently other code does
                 }
                 self.CurrentSalvoData = data
             else
@@ -231,6 +229,7 @@ DefaultProjectileWeapon = Class(Weapon) {
                 return 200 * (projPosY - targetNewPosY) / (time*time)
             end
         end
+        data.targetpos = targetPos
 
         -- check if we lost the target (or if we previously did; regaining a target mid-run shouldn't
         -- suddenly divert some of the bombs)
