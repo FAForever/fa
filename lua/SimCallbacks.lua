@@ -565,6 +565,7 @@ end
 
 Callbacks.AttackMove = function(data, units)
     if data.Clear then
+        -- filtering down to mobile units is to avoid clearing building queues by mistake
         IssueClearCommands(EntityCategoryFilterDown(categories.MOBILE, units))
     end
     IssueAggressiveMove(units, data.Target)
