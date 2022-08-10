@@ -63,11 +63,11 @@ Prop = Class(moho.prop_methods) {
         -- -- Reclaim values
 
         -- used by typical props, wrecks have their own mechanism to set its value
-        if not self.Blueprint.UnitWreckage then 
+        if not self.Blueprint.UnitWreckage then
             local economy = self.Blueprint.Economy
 
             -- set by some adaptive maps to influence how much a prop is worth
-            local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1 
+            local modifier = ScenarioInfo.Options.naturalReclaimModifier or 1
 
             self.SetMaxReclaimValues(self,
                 economy.ReclaimTimeMultiplier or economy.ReclaimMassTimeMultiplier or economy.ReclaimEnergyTimeMultiplier or 1,
@@ -80,18 +80,18 @@ Prop = Class(moho.prop_methods) {
 
         -- Find props that, for some reason, are below ground at their central bone
         local terrainAltitude = GetTerrainHeight(self.CachePosition[1], self.CachePosition[3])
-        if self.CachePosition[2] < terrainAltitude then 
+        if self.CachePosition[2] < terrainAltitude then
             self.CachePosition[2] = terrainAltitude
 
             -- Warp the prop to the surface. We never want things hiding underground!
-            Warp(self, self.CachePosition) 
+            Warp(self, self.CachePosition)
         end
 
         -- -- Set health and status
 
-        local maxHealth = self.Blueprint.Defense.MaxHealth 
-        if maxHealth < 50 then 
-            maxHealth = 50 
+        local maxHealth = self.Blueprint.Defense.MaxHealth
+        if maxHealth < 50 then
+            maxHealth = 50
         end
 
         EntitySetMaxHealth(self, maxHealth)
@@ -158,6 +158,7 @@ Prop = Class(moho.prop_methods) {
     --- Called by the engine when the prop is reclaimed.
     -- @param entity The entity that reclaimed the prop.
     OnReclaimed = function(self, entity)
+        LOG("OnReclaimed (", GetGameTick(), ")")
         self.DoPropCallbacks(self, 'OnReclaimed', entity)
         self.CreateReclaimEndEffects(self, entity)
         EntityDestroy(self)
@@ -220,13 +221,13 @@ Prop = Class(moho.prop_methods) {
     OnDamage = function(self, instigator, amount, direction, damageType)
 
         -- only applies to trees
-        if damageType == "TreeForce" or damageType == "TreeFire" then 
-            return 
+        if damageType == "TreeForce" or damageType == "TreeFire" then
+            return
         end
 
         -- if we're immune then we're good
-        if not self.CanTakeDamage then 
-            return 
+        if not self.CanTakeDamage then
+            return
         end
 
         -- adjust our health
@@ -323,7 +324,7 @@ Prop = Class(moho.prop_methods) {
     -- @return The time it takes and the amount of energy and mass reclaim.
     GetReclaimCosts = function(self, reclaimer)
         local maxValue = self.MaxMassReclaim
-        if self.MaxEnergyReclaim > maxValue then 
+        if self.MaxEnergyReclaim > maxValue then
             maxValue = self.MaxEnergyReclaim
         end
 
@@ -331,8 +332,8 @@ Prop = Class(moho.prop_methods) {
         time = time / 10
 
         -- prevent division by 0 when the prop has no value
-        if time < 0 then 
-            time = 0.0001 
+        if time < 0 then
+            time = 0.0001
         end
         
         return time, self.MaxEnergyReclaim, self.MaxMassReclaim

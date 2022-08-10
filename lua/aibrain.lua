@@ -412,6 +412,9 @@ AIBrain = Class(moho.aibrain_methods) {
     ---@param unit any
     ---@param target any
     UntrackReclaimer = function(self, unit, target)
+
+
+
         if target.IsProp then
             self.Reclaimers[unit] = nil
             self.ReclaimersToBe[unit] = nil
@@ -424,12 +427,12 @@ AIBrain = Class(moho.aibrain_methods) {
 
         while true do 
 
-            CoroutineYield(2)
+            CoroutineYield(1)
 
             -- for each reclaimer, check if it still exists
             for reclaimer, target in self.Reclaimers do
 
-                if IsDestroyed(reclaimer) or IsDestroyed(target) then
+                if IsDestroyed(reclaimer) or IsDestroyed(target) or (not reclaimer:IsUnitState('Reclaiming')) then
                     break
                 end
 
@@ -440,8 +443,8 @@ AIBrain = Class(moho.aibrain_methods) {
                     multiplier = time / 0.1
                 end
 
-                local massChange = 2 * mass / (time * 10) * multiplier
-                local energyChange = 2 * energy / (time * 10) * multiplier
+                local massChange = 1 * mass / (time * 10) * multiplier
+                local energyChange = 1 * energy / (time * 10) * multiplier
 
                 if massChange > 0 then 
                     reclaimer.ReclaimedMass = reclaimer.ReclaimedMass + massChange
@@ -449,15 +452,15 @@ AIBrain = Class(moho.aibrain_methods) {
                 end
 
                 if energyChange > 0 then 
-                    reclaimer.ReclaimedEnergy = reclaimer.ReclaimedEnergy + energyChange 
+                    reclaimer.ReclaimedEnergy = reclaimer.ReclaimedEnergy + energyChange
                     reclaimer:SetStat('ReclaimedEnergy', reclaimer.ReclaimedEnergy)
                 end
             end
 
             CoroutineYield(1)
 
-            for reclaimer, target in self.ReclaimersToBe do 
-                self.Reclaimers[reclaimer] = target 
+            for reclaimer, target in self.ReclaimersToBe do
+                self.Reclaimers[reclaimer] = target
                 self.ReclaimersToBe[reclaimer] = nil
             end
         end
