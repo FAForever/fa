@@ -45,14 +45,24 @@ function OnAllianceResult(resultData)
 end
 import('/lua/SimPlayerQuery.lua').AddResultListener("OfferAlliance", OnAllianceResult)
 
-function KillSharedUnits(owner)
+-- categoriesToKill is an optional input (it defaults to all categories)
+function KillSharedUnits(owner, categoriesToKill)
     if sharedUnits[owner] and not table.empty(sharedUnits[owner]) then
-        for index,unit in sharedUnits[owner] do
+        for index, unit in sharedUnits[owner] do
             if not unit.Dead and unit.oldowner == owner then
-                unit:Kill()
+                if categoriesToKill then
+                    if ContainsCategory(unit, categoriesToKill) then
+                        table.remove(sharedUnits[owner], unit)
+                        unit:Kill()
+                    end
+                else
+                    unit:Kill()
+                end
             end
         end
-        sharedUnits[owner] = {}
+        if not categoriesToKill then
+            sharedUnits[owner] = {}
+        end
     end
 end
 

@@ -7697,7 +7697,7 @@ lobui_0793="Yes except builders"
 lobui_0794="No manual sharing of builder/factory"
 lobui_0795="No manual sharing of units"
 lobui_0796="Partial Share"
-lobui_0797="Your buildings and engineers will be transferred to your highest ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy."
+lobui_0797="Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy."
 
 aisettings_0001="AIx Cheat Multiplier"
 aisettings_0002="Set the cheat multiplier for the cheating AIs."

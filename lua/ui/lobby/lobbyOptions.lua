@@ -505,7 +505,7 @@ globalOpts = {
             },
             {
                 text = "<LOC lobui_0796>Partial Share",
-                help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy.",
+                help = "<LOC lobui_0797>Your buildings and engineers will be transferred to your highest rated ally when you die.  Your other units will be destroyed when you die, except those captured by the enemy.",
                 key = 'PartialShare',
             },
             {
