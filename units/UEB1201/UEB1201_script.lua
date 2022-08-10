@@ -10,6 +10,7 @@
 
 local TEnergyCreationUnit = import('/lua/terranunits.lua').TEnergyCreationUnit
 
+---@class UEB1201 : TEnergyCreationUnit
 UEB1201 = Class(TEnergyCreationUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         TEnergyCreationUnit.OnStopBeingBuilt(self,builder,layer)

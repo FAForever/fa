@@ -354,7 +354,7 @@ function BeginSession()
     import('/lua/sim/score.lua').init()
 
     --start watching for victory conditions
-    ForkThread(import('/lua/victory.lua').CheckVictory, ScenarioInfo)
+    import('/lua/sim/matchstate.lua')
 end
 
 function GameTimeLogger()

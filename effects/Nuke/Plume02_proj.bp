@@ -1,5 +1,4 @@
 ProjectileBlueprint {
-    DevStatus = 'STABLE',
     Display = {
         MeshBlueprint = 'Plume02_mesh.bp',
         UniformScale = 0.229,

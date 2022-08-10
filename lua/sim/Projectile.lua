@@ -147,20 +147,18 @@ Projectile = Class(moho.projectile_methods) {
         local alliedCheck = not (self.CollideFriendly and IsAlly(self.Army, other.Army))
 
         -- torpedoes can only be taken down by anti torpedo
-        if self.Blueprint.CategoriesHash['TORPEDO'] then 
-            if other.Blueprint.CategoriesHash["ANTITORPEDO"] then 
-                return alliedCheck 
-            else 
-                return false 
+        if self.Blueprint.CategoriesHash['TORPEDO'] then
+            if other.Blueprint.CategoriesHash["ANTITORPEDO"] then
+                return alliedCheck
+            else
+                return false
             end
         end
 
         -- missiles can only be taken down by anti missiles
-        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then 
-            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then 
-                return alliedCheck 
-            else 
-                return false 
+        if self.Blueprint.CategoriesHash["TACTICAL"] or self.Blueprint.CategoriesHash["STRATEGIC"] then
+            if other.Blueprint.CategoriesHash["ANTIMISSILE"] then
+                return other.OriginalTarget == self
             end
         end
 
@@ -214,6 +212,17 @@ Projectile = Class(moho.projectile_methods) {
 
     --- Called by the engine when the projectile is killed, in other words: intercepted
     OnKilled = function(self, instigator, type, overkillRatio)
+
+        -- callbacks for launcher to have an idea what is going on for AIs
+        if not IsDestroyed(self.Launcher) then 
+            self.Launcher:OnMissileIntercepted(self:GetCurrentTargetPosition(), instigator, self:GetPosition())
+
+            -- keep track of the number of intercepted missiles
+            -- if not IsDestroyed(instigator) then 
+            --     instigator:SetStat('KILLS', instigator:GetStat('KILLS', 0).Value + 1)
+            -- end
+        end
+
         self:CreateImpactEffects(self.Army, self.FxOnKilled, self.FxOnKilledScale)
         self:Destroy()
     end,
@@ -222,39 +231,83 @@ Projectile = Class(moho.projectile_methods) {
     -- @param targetType 
     -- @param targetEntity 
     OnImpact = function(self, targetType, targetEntity)
+
+        -- in case the OnImpact crashes it guarantees that it gets destroyed at some point, useful for mods
+        self.Impacts = (self.Impacts or 0) + 1
+        if self.Impacts > 3 then 
+            WARN("Faulty projectile destroyed manually: " .. tostring(self.Blueprint.BlueprintId))
+            self:Destroy()
+            return
+        end
+
+        -- localize information for performance
+        local position = self:GetPosition()
+        local damageData = self.DamageData
+        local radius = damageData.DamageRadius or 0
+        local bp = self.Blueprint
+
+        -- callbacks for launcher to have an idea what is going on for AIs
+        local categoriesHash = self.Blueprint.CategoriesHash
+        if categoriesHash['TACTICAL'] or categoriesHash['STRATEGICAL'] then
+            -- we have a target, but got caught by terrain
+            if targetType == 'Terrain' then
+                if not IsDestroyed(self.Launcher) then
+                    self.Launcher:OnMissileImpactTerrain(self:GetCurrentTargetPosition(), position)
+                end
+
+            -- we have a target, but got caught by an (unexpected) shield
+            elseif targetType == 'Shield' then
+                if not IsDestroyed(self.Launcher) then 
+                    self.Launcher:OnMissileImpactShield(self:GetCurrentTargetPosition(), targetEntity.Owner, position)
+                end
+            end
+        end
+
         -- Try to use the launcher as instigator first. If its been deleted, use ourselves (this
         -- projectile is still associated with an army)
-        local instigator = self.Launcher or self 
+        local instigator = self.Launcher or self
 
         -- localize information for performance
         local vc = VectorCached 
         vc[1], vc[2], vc[3] = EntityGetPositionXYZ(self)
-        local damageData = self.DamageData
-        local radius = damageData.DamageRadius or 0
-        local bp = self.Blueprint 
+
+        -- adjust the impact location based on the velocity of the thing we're hitting, this fixes a bug with damage being applied the tick after the collision
+        -- is registered. As a result, the unit has moved one step ahead already, allowing it to 'miss' the area damage that we're trying to apply. Usually
+        -- air units are affected by this, see also the pull request for a visual aid on this issue on Github
+        if radius > 0 and targetEntity then
+            if targetType == 'Unit' or targetType == 'UnitAir' then
+                local vx, vy, vz = targetEntity:GetVelocity()
+                vc[1] = vc[1] + vx
+                vc[2] = vc[2] + vy
+                vc[3] = vc[3] + vz
+            elseif targetType == 'Shield' then
+                local vx, vy, vz = targetEntity.Owner:GetVelocity()
+                vc[1] = vc[1] + vx
+                vc[2] = vc[2] + vy
+                vc[3] = vc[3] + vz
+            end
+        end
 
         -- do the projectile damage
         self:DoDamage(instigator, damageData, targetEntity, vc)
 
-        -- compute whether we should spawn additional effects for this 
-        -- projectile, there's always a 10% chance or if we're far away from 
+        -- compute whether we should spawn additional effects for this
+        -- projectile, there's always a 10% chance or if we're far away from
         -- the previous impact
         local dx = OnImpactPreviousX - vc[1]
         local dz = OnImpactPreviousZ - vc[3]
         local dsqrt = dx * dx + dz * dz
         local doEffects = Random() < 0.1 or dsqrt > radius
-        
-        -- update last position of known effects
-        if doEffects then 
-            OnImpactPreviousX = vc[1]
-            OnImpactPreviousZ = vc[3]
-        end
 
         -- do splat logic and knock over trees
-        if doEffects and radius > 0 then 
+        if radius > 0 and doEffects then
+
+            -- update last position of known effects
+            OnImpactPreviousX = vc[1]
+            OnImpactPreviousZ = vc[3]
 
             -- knock over trees
-            DamageArea( 
+            DamageArea(
                 self,               -- instigator
                 vc,                 -- position
                 0.75 * radius,      -- radius
@@ -264,12 +317,12 @@ Projectile = Class(moho.projectile_methods) {
             )
 
             -- try and spawn in a splat
-            if 
+            if
                 -- if we flat out hit the terrain
-                targetType == "Terrain" or 
+                targetType == "Terrain" or
 
                 -- if we hit a unit that is on land
-                (targetEntity and targetEntity.Layer == "Land") 
+                (targetEntity and targetEntity.Layer == "Land")
             then 
                 -- choose a splat to spawn
                 local splat = bp.Display.ScorchSplat
@@ -295,7 +348,6 @@ Projectile = Class(moho.projectile_methods) {
                 local rngRadius = altRadius * Random()
 
                 CreateSplat(
-
                     -- position, orientation and the splat
                     vc,                                     -- position
                     6.28 * Random(),                        -- heading
@@ -486,7 +538,7 @@ Projectile = Class(moho.projectile_methods) {
                         if radius > 0 then
                             DamageArea(
                                 instigator, 
-                                cachedPosition, 
+                                cachedPosition , 
                                 radius, 
                                 initialDmg, 
                                 DamageData.DamageType, 

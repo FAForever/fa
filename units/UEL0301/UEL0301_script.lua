@@ -12,6 +12,7 @@ local TWeapons = import('/lua/terranweapons.lua')
 local TDFHeavyPlasmaCannonWeapon = TWeapons.TDFHeavyPlasmaCannonWeapon
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
+---@class UEL0301 : CommandUnit
 UEL0301 = Class(CommandUnit) {
     IntelEffects = {
         {

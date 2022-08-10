@@ -75,7 +75,6 @@ UnitTeleportEffect01 = Class(NullShell) {
         
         -- light some trees on fire
         DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
-        DamageRing(self, pos, 1, 16, 1, 'TreeFire', false, false)
 
 		-- knockdown trees
         for k = 1, 2 do 

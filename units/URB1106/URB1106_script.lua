@@ -10,6 +10,7 @@
 
 local CMassStorageUnit = import('/lua/cybranunits.lua').CMassStorageUnit
 
+---@class URB1106 : CMassStorageUnit
 URB1106 = Class(CMassStorageUnit) {
     OnStopBeingBuilt = function(self,builder,layer)
         CMassStorageUnit.OnStopBeingBuilt(self,builder,layer)

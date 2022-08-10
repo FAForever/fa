@@ -17,6 +17,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local SIFLaanseTacticalMissileLauncher = SWeapons.SIFLaanseTacticalMissileLauncher
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
+---@class XSL0001 : ACUUnit
 XSL0001 = Class(ACUUnit) {
     Weapons = {
         DeathWeapon = Class(DeathNukeWeapon) {},

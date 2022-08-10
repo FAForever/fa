@@ -105,28 +105,6 @@ function Expand()
     controls.bg:Show()
 end
 
---INFO:   blueprintId="uel0001",
---INFO:   energyConsumed=0,
---INFO:   energyProduced=10,
---INFO:   energyRequested=0,
---INFO:   entityId="0",
---INFO:   fuelRatio=-1,
---INFO:   health=12000,
---INFO:   kills=0,
---INFO:   massConsumed=0,
---INFO:   massProduced=1,
---INFO:   massRequested=0,
---INFO:   maxHealth=12000,
---INFO:   nukeSiloBuildCount=0,
---INFO:   nukeSiloMaxStorageCount=1,
---INFO:   nukeSiloStorageCount=0,
---INFO:   shieldRatio=0,
---INFO:   tacticalSiloBuildCount=0,
---INFO:   tacticalSiloMaxStorageCount=1,
---INFO:   tacticalSiloStorageCount=0,
---INFO:   teamColor="ffe80a0a",
---INFO:   workProgress=0
-
 local queueTextures = {
     Move = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},
     FormMove = {texture = UIUtil.UIFile('/game/orders/move_btn_up.dds'), text = '<LOC order_0000>Moving'},

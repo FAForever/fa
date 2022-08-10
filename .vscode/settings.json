@@ -18,9 +18,13 @@
     "Lua.workspace.ignoreDir": [
         ".vscode",
         "loc",
+        "*.bp"
     ],
     "[lua]": {
         "editor.wordBasedSuggestions": false,
+    },
+    "files.associations": {
+        "*.bp": "lua"
     },
     "Lua.completion.requireSeparator": "/",
     "Lua.diagnostics.enable": true,
@@ -31,3 +35,4 @@
         "ScenarioInfo"
     ],
 }
+

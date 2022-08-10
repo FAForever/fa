@@ -15,6 +15,7 @@ local TDFGaussCannonWeapon = WeaponFile.TDFGaussCannonWeapon
 local TANTorpedoAngler = WeaponFile.TANTorpedoAngler
 local TIFSmartCharge = WeaponFile.TIFSmartCharge
 
+---@class UES0201 : TSeaUnit
 UES0201 = Class(TSeaUnit) {
     DestructionTicks = 200,
 

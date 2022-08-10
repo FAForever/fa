@@ -1,3 +1,4 @@
+---@declare-global
 ----****************************************************************************
 ----**
 ----**  File     :  /lua/sim/buff.lua
@@ -26,8 +27,72 @@
 ----        }
 ----    }
 
+---@alias BuffType
+---| AdjacencyBuffType
+---| CheatBuffType
+---| CommonBuffType
+---| OpBuffType
+---| UniqueBuffType
+---| VeterancyBuffType
+
+---@alias CommonBuffType
+---| 'BuildRate'
+---| 'Damage'
+---| 'DamageRadius'
+---| 'EnergyActive'
+---| 'EnergyWeapon'
+---| 'EnergyMaintenance'
+---| 'EnergyProduction'
+---| 'Health'
+---| 'MassActive'
+---| 'MassMaintenance'
+---| 'MaxHealth'
+---| 'MaxRadius'
+---| 'MoveMult'
+---| 'MassProduction'
+---| 'OmniRadius'
+---| 'RadarRadius'
+---| 'RateOfFire'
+---| 'Regen'
+---| 'Stun'
+---| 'StunAlt'
+---| 'VisionRadius'
+---| 'WeaponsEnable'
+
+-- These are only created when needed
+---@alias UniqueBuffType
+---| 'AeonACUChronoDampener'
+---| 'AeonACUT2BuildRate'
+---| 'AeonACUT3BuildRate'
+---| 'AeonSCUBuildRate'
+---| 'AeonSCURegenRate'
+---| 'CybranACUCloakBonus'
+---| 'CybranACUStealthBonus'
+---| 'CybranACUT2BuildRate'
+---| 'CybranACUT3BuildRate'
+---| 'CybranSCUBuildRate'
+---| 'CybranSCUCloakBonus'
+---| 'CybranSCURegenerateBonus'
+---| 'UEFACUDamageStabilization'
+---| 'UEFACUT2BuildRate'
+---| 'UEFACUT3BuildRate'
+---| 'SelenCloakVisionDebuff'
+---| 'SeraphimACUDamageStabilization'
+---| 'SeraphimACUDamageStabilizationAdv'
+---| 'SeraphimACUAdvancedRegenAura'
+---| 'SeraphimACUAdvancedRegenAuraSelfBuff'
+---| 'SeraphimACURegenAura'
+---| 'SeraphimACURegenAuraSelfBuff'
+---| 'SeraphimACUT2BuildRate'
+---| 'SeraphimACUT3BuildRate'
+---| 'SeraphimSCUDamageStabilization'
+---| 'SeraphimSCUBuildRate'
+
 --Function to apply a buff to a unit.
 --This function is a fire-and-forget.  Apply this and it'll be applied over time if there is a duration.
+---@param unit Unit
+---@param buffName string
+---@param instigator Unit
 function ApplyBuff(unit, buffName, instigator)
 
     -- do not buff dead units
@@ -177,6 +242,10 @@ end
 --afterRemove is a bool that defines if this buff is affecting after the removal of a buff.
 --We reaffect the unit to make sure that buff type is recalculated accurately without the buff that was on the unit.
 --However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
+---@param unit Unit
+---@param buffName string
+---@param instigator Unit
+---@param afterRemove boolean
 function BuffAffectUnit(unit, buffName, instigator, afterRemove)
     local buffDef = Buffs[buffName]
 
@@ -461,9 +530,15 @@ end
 -- A key -> function table for buffs, uses the buffName parameter
 local UniqueBuffs = { }
 UniqueBuffs['SeraphimACURegenAura'] = BuffRegenFieldCalculate
-UniqueBuffs['SeraphimAdvancedACURegenAura'] = BuffRegenFieldCalculate
+UniqueBuffs['SeraphimACUAdvancedRegenAura'] = BuffRegenFieldCalculate
 
--- Calculates the buff from all the buffs of the same time the unit has.
+--- Calculates the buff from all the buffs of the same time the unit has.
+---@param unit Unit
+---@param buffName string
+---@param affectType string
+---@param initialVal number
+---@param initialBool? boolean
+---@return number, boolean
 function BuffCalculate(unit, buffName, affectType, initialVal, initialBool)
 
     -- Check if we have a separate buff calculation system

@@ -65,6 +65,7 @@ integratedMods = LowerHashTable(integratedMods)
 -- mods that are deprecated, based on folder name
 local deprecatedMods = { }
 deprecatedMods["simspeed++"] = true
+deprecatedMods["#quality of performance 2022"] = true
 deprecatedMods = LowerHashTable(deprecatedMods)
 
 -- typical FA packages

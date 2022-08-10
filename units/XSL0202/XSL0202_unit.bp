@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Torso'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -24,15 +29,6 @@ UnitBlueprint {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Bot',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 2,
-            Level2 = 4,
-            Level3 = 6,
-            Level4 = 8,
-            Level5 = 10,
         },
     },
     BuildIconSortPriority = 20,

@@ -9,6 +9,7 @@
 --****************************************************************************
 
 local ASeaFactoryUnit = import('/lua/aeonunits.lua').ASeaFactoryUnit
+---@class ZAB9603 : ASeaFactoryUnit
 ZAB9603 = Class(ASeaFactoryUnit) {
     OnCreate = function(self)
         ASeaFactoryUnit.OnCreate(self)

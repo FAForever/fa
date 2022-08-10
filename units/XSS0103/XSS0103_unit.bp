@@ -1,4 +1,7 @@
 UnitBlueprint {
+    AI = {
+        GuardReturnRadius = 40,
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSS',
@@ -24,15 +27,6 @@ UnitBlueprint {
             Bank = 'SeraphimSelect',
             Cue = 'Seraphim_Select_Naval',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 1,
-            Level2 = 2,
-            Level3 = 3,
-            Level4 = 4,
-            Level5 = 5,
         },
     },
     BuildIconSortPriority = 40,

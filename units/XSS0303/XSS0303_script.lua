@@ -13,6 +13,7 @@ local SeraphimWeapons = import('/lua/seraphimweapons.lua')
 local SAALosaareAutoCannonWeapon = SeraphimWeapons.SAALosaareAutoCannonWeaponSeaUnit
 local SLaanseMissileWeapon = SeraphimWeapons.SLaanseMissileWeapon
 
+---@class XSS0303 : AircraftCarrier
 XSS0303 = Class(AircraftCarrier) {
 
     Weapons = {

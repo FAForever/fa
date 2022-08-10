@@ -1,8 +1,9 @@
---- Class CLuaWldUIProvider
--- @classmod User.CLuaWldUIProvider
+---@declare-global
+---@class moho.WldUIProvider_methods
+local CLuaWldUIProvider = {}
 
 ---
---
-function CLuaWldUIProvider:moho.WldUIProvider_methods()
+function CLuaWldUIProvider:Destroy()
 end
 
+return CLuaWldUIProvider

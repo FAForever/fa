@@ -1,6 +1,7 @@
 UnitBlueprint {
     AI = {
         InitialAutoMode = false,
+        GuardReturnRadius = 0,
         TargetBones = {
             'Muzzle_04',
             'Muzzle_05',
@@ -60,15 +61,6 @@ UnitBlueprint {
             Bank = 'Interface',
             Cue = 'Aeon_Select_Sub',
             LodCutoff = 'UnitMove_LodCutoff',
-        },
-    },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
         },
     },
     BuildIconSortPriority = 15,

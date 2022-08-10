@@ -7,6 +7,7 @@
 --****************************************************************************
 local ACivilianStructureUnit = import('/lua/aeonunits.lua').ACivilianStructureUnit
 
+---@class XAC2101 : ACivilianStructureUnit
 XAC2101 = Class(ACivilianStructureUnit) {
 }
 TypeClass = XAC2101

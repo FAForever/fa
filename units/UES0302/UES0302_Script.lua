@@ -14,6 +14,7 @@ local TAALinkedRailgun = WeaponsFile.TAALinkedRailgun
 local TAMPhalanxWeapon = WeaponsFile.TAMPhalanxWeapon
 local TDFGaussCannonWeapon = WeaponsFile.TDFShipGaussCannonWeapon
 
+---@class UES0302 : TSeaUnit
 UES0302 = Class(TSeaUnit) {
 
 

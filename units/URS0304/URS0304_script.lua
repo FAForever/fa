@@ -11,6 +11,7 @@ local CIFMissileLoaWeapon = CybranWeapons.CIFMissileLoaWeapon
 local CIFMissileStrategicWeapon = CybranWeapons.CIFMissileStrategicWeapon
 local CANTorpedoLauncherWeapon = CybranWeapons.CANTorpedoLauncherWeapon
 
+---@class URS0304 : CSubUnit
 URS0304 = Class(CSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {

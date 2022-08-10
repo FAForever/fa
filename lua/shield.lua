@@ -573,6 +573,10 @@ Shield = Class(moho.shield_methods, Entity) {
 
     CreateImpactEffect = function(self, vector)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -816,7 +820,7 @@ Shield = Class(moho.shield_methods, Entity) {
 
             -- remove the shield and the shield bar
             self:RemoveShield()
-            self:UpdateShieldRatio(-1)
+            self:UpdateShieldRatio(0)
 
             -- inform the owner that the shield is disabled
             self.Owner:OnShieldDisabled()
@@ -1202,6 +1206,10 @@ PersonalShield = Class(Shield){
 
     CreateImpactEffect = function(self, vector)
 
+        if IsDestroyed(self) then
+            return
+        end
+
         -- keep track of this entity
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 
@@ -1318,6 +1326,10 @@ CzarShield = Class(PersonalShield) {
 
 
     CreateImpactEffect = function(self, vector)
+
+        if IsDestroyed(self) then
+            return
+        end
 
         self.LiveImpactEntities = self.LiveImpactEntities + 1
 

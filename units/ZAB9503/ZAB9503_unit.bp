@@ -189,18 +189,19 @@ UnitBlueprint {
         MeshExtentsZ = 10,
         MinSpeedPercent = 0,
         MotionType = 'RULEUMT_None',
+        ComputeRollOffPoint = true,
         RollOffPoints = {
             {
                 UnitSpin = 180,
-                X = -4,
+                X = -6,
                 Y = 0,
-                Z = -10,
+                Z = -8,
             },
             {
                 UnitSpin = 0,
-                X = -4,
+                X = -6,
                 Y = 0,
-                Z = 10,
+                Z = 8,
             },
         },
         SkirtOffsetX = -6,

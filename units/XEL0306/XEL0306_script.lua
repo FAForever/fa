@@ -11,6 +11,7 @@
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TIFCruiseMissileUnpackingLauncher = import('/lua/terranweapons.lua').TIFCruiseMissileUnpackingLauncher
 
+---@class XEL0306 : TLandUnit
 XEL0306 = Class(TLandUnit) {
     Weapons = {
         MissileWeapon = Class(TIFCruiseMissileUnpackingLauncher) 
