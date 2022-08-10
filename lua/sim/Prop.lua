@@ -158,7 +158,6 @@ Prop = Class(moho.prop_methods) {
     --- Called by the engine when the prop is reclaimed.
     -- @param entity The entity that reclaimed the prop.
     OnReclaimed = function(self, entity)
-        LOG("OnReclaimed (", GetGameTick(), ")")
         self.DoPropCallbacks(self, 'OnReclaimed', entity)
         self.CreateReclaimEndEffects(self, entity)
         EntityDestroy(self)
