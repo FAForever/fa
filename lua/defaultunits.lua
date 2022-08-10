@@ -279,11 +279,11 @@ StructureUnit = Class(Unit) {
 
     CreateDestructionEffects = function(self, overkillRatio)
         if explosion.GetAverageBoundingXZRadius(self) < 1.0 then
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         else
             explosion.CreateTimedStuctureUnitExplosion(self)
             WaitSeconds(0.5)
-            explosion.CreateScalableUnitExplosion(self, overkillRatio)
+            explosion.CreateScalableUnitExplosion(self)
         end
     end,
 
@@ -314,8 +314,26 @@ StructureUnit = Class(Unit) {
 
         if performUpgrade and order == 'Upgrade' then
             ChangeState(self, self.UpgradingState)
+
+            -- Fix an oddly specific bug to structures with damaged shields:
+            -- 1) let an engineer to assist the structure, repairing the damaged shield
+            -- 2) upgrade the structure while the shield is being healed
+            -- 3) engineer changes consumption target, but is in limbo - it consumes resources, but it doesn't repair the shield or help upgrade the structure
+
+            -- Luckily, engineers do not heal damaged shields on their own. It usually only happens when an engineer was specifically told to assist the shield,
+            -- therefore we add a check when we upgrade a structure that has a shield. For each guarding unit, check if this is the only command. If so,
+            -- re-issue the guard command
+            if self.MyShield then
+                local guards = self:GetGuards()
+                for k, guard in guards do
+                    if table.getn(guard:GetCommandQueue()) == 1 then
+                        IssueClearCommands({guard})
+                        IssueGuard({guard}, self)
+                    end
+                end
+            end
         end
-     end,
+    end,
 
     IdleState = State {
         Main = function(self)
@@ -324,17 +342,19 @@ StructureUnit = Class(Unit) {
 
     UpgradingState = State {
         Main = function(self)
-            local bp = self.Blueprint.Display
             self:DestroyTarmac()
             self:PlayUnitSound('UpgradeStart')
             self:DisableDefaultToggleCaps()
-            if bp.AnimationUpgrade then
+
+            local animation = self:GetUpgradeAnimation(self.UnitBeingBuilt)
+            if animation then
+
                 local unitBuilding = self.UnitBeingBuilt
                 self.AnimatorUpgradeManip = CreateAnimator(self)
                 self.Trash:Add(self.AnimatorUpgradeManip)
                 local fractionOfComplete = 0
                 self:StartUpgradeEffects(unitBuilding)
-                self.AnimatorUpgradeManip:PlayAnim(bp.AnimationUpgrade, false):SetRate(0)
+                self.AnimatorUpgradeManip:PlayAnim(animation, false):SetRate(0)
 
                 while fractionOfComplete < 1 and not self.Dead do
                     fractionOfComplete = unitBuilding:GetFractionComplete()
@@ -1377,6 +1397,65 @@ SeaFactoryUnit = Class(FactoryUnit) {
             self.UnitBeingBuilt:Destroy()
         end
     end,
+
+    CalculateRollOffPoint = function(self)
+
+        -- backwards compatible, don't try and fix mods that rely on the old logic
+        if not self.Blueprint.Physics.ComputeRollOffPoint then
+            return FactoryUnit.CalculateRollOffPoint(self)
+        end
+
+        -- retrieve our position
+        local px, py, pz = self:GetPositionXYZ()
+
+        -- retrieve roll off points
+        local bp = self.Blueprint.Physics.RollOffPoints
+        if not bp then 
+            return 0, px, py, pz 
+        end
+
+        -- retrieve rally point
+        local rallyPoint = self:GetRallyPoint()
+        if not rallyPoint then 
+            return 0, px, py, pz
+        end
+
+        -- find the attachpoint for the build location
+        local bone = (self:IsValidBone('Attachpoint') and 'Attachpoint') or (self:IsValidBone('Attachpoint01') and 'Attachpoint01')
+        local bx, by, bz = self:GetPositionXYZ(bone)
+        local ropx = bx - px
+        local modz = 1.0 + 0.1 * self.UnitBeingBuilt.Blueprint.SizeZ
+
+        -- find the nearest roll off point
+        local bpKey = 1
+        local distance, lowest = nil
+        for k, rolloffPoint in bp do
+
+            local ropz = modz * rolloffPoint.Z
+            distance = VDist2(rallyPoint[1], rallyPoint[3], ropx + px, ropz + pz)
+            if not lowest or distance < lowest then
+                bpKey = k
+                lowest = distance
+            end
+        end
+
+        -- finalize the computation
+        local fx, fy, fz, spin
+        local bpP = bp[bpKey]
+        local unitBP = self.UnitBeingBuilt.Blueprint.Display.ForcedBuildSpin
+        if unitBP then
+            spin = unitBP
+        else
+            spin = bpP.UnitSpin
+        end
+
+        fx = ropx + px
+        fy = bpP.Y + py
+        fz = modz * bpP.Z + pz
+
+        return spin, fx, fy, fz
+    end,
+
 }
 
 -- SHIELD STRCUTURE UNITS
@@ -1643,7 +1722,7 @@ AirUnit = Class(MobileUnit) {
 
         if with == 'Water' then
             self:PlayUnitSound('AirUnitWaterImpact')
-            EffectUtil.CreateEffects(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
+            EffectUtil.CreateEffectsOpti(self, self.Army, EffectTemplate.DefaultProjectileWaterImpact)
             self.shallSink = true
             self.colliderProj:Destroy()
             self.colliderProj = nil
@@ -2063,7 +2142,7 @@ SlowHoverLandUnit = Class(HoverLandUnit) {
         -- The mult is applied twice thanks to an engine bug, so careful when adjusting it
         -- Newspeed = oldspeed * mult * mult
 
-        local mult = self.Blueprint.Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Water' then
             self:SetSpeedMult(mult)
         else
@@ -2083,7 +2162,7 @@ SlowAmphibiousLandUnit = Class(AmphibiousLandUnit) {
         -- call base class to make sure self.layer is set
         HoverLandUnit.OnLayerChange(self, new, old)
 
-        local mult = self.Blueprint.Physics.WaterSpeedMultiplier
+        local mult = (self.Blueprint or self:GetBlueprint()).Physics.WaterSpeedMultiplier
         if new == 'Seabed'  then
             self:SetSpeedMult(mult)
         else
@@ -2416,10 +2495,6 @@ ACUUnit = Class(CommandUnit) {
             if IsAlly(self.Army, instigator.Army) and not ((type == 'DeathExplosion' or type == 'Nuke' or type == 'Deathnuke') and not instigator.SelfDestructed) then
                 WARN('Teamkill detected')
                 Sync.Teamkill = {killTime = GetGameTimeSeconds(), instigator = instigator.Army, victim = self.Army}
-            else
-                ForkThread(function()
-                    instigatorBrain:ReportScore()
-                end)
             end
         end
         ArmyBrains[self.Army].CommanderKilledBy = (instigator or self).Army

@@ -496,10 +496,18 @@ OverchargeProjectile = Class() {
         self.DamageData.DamageAmount = 0
 
         local launcher = self:GetLauncher()
-        if not launcher then return end
+        if not launcher then 
+            return 
+        end
 
         local wep = launcher:GetWeaponByLabel('OverCharge')
-        if not wep then return end
+        if not wep then
+             return 
+            end
+
+        if IsDestroyed(wep) then
+            return
+        end
 
         --  Table layout for Overcharge data section
         --  Overcharge = {

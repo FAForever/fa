@@ -1,5 +1,4 @@
 ProjectileBlueprint {
-    DevStatus = 'STABLE',
     Display = {
         MeshBlueprint = '/effects/Nuke/Plume01_mesh.bp',
         UniformScale = 0.229,

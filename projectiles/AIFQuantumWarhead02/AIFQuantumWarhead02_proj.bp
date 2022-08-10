@@ -1,0 +1,37 @@
+ProjectileBlueprint {
+    Audio = {
+        ImpactTerrain = Sound {
+            Bank = 'Explosions',
+            Cue = 'Aeon_Nuke_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        ImpactWater = Sound {
+            Bank = 'Explosions',
+            Cue = 'Aeon_Nuke_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+        NukeExplosion = Sound {
+            Bank = 'Explosions',
+            Cue = 'Aeon_Nuke_Impact',
+            LodCutoff = 'Weapon_LodCutoff',
+        },
+    },
+    Physics = {
+        CollideEntity = false,
+        CollideSurface = false,
+        DestroyOnWater = false,
+        DirectionX = 0,
+        DirectionXRange = 0,
+        DirectionY = 1,
+        DirectionYRange = 0,
+        DirectionZ = 0,
+        DirectionZRange = 0,
+        InitialSpeed = 0.1,
+        InitialSpeedRange = 0,
+        Lifetime = 100,
+        RotationalVelocity = 0,
+        RotationalVelocityRange = 0,
+        UseGravity = false,
+        VelocityAlign = true,
+    },
+}

@@ -14,6 +14,7 @@ local TAirUnit = import('/lua/terranunits.lua').TAirUnit
 local TIFCarpetBombWeapon = import('/lua/terranweapons.lua').TIFCarpetBombWeapon
 
 
+---@class UEA0103 : TAirUnit
 UEA0103 = Class(TAirUnit) {
     Weapons = {
         Bomb = Class(TIFCarpetBombWeapon) {

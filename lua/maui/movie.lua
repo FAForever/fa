@@ -8,6 +8,7 @@
 
 local Control = import('control.lua').Control
 
+---@class Movie : moho.movie_methods, Control
 Movie = Class(moho.movie_methods, Control) {
 
     __init = function(self, parent, filename, sound, voice)

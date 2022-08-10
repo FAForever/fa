@@ -14,6 +14,7 @@ local CAAAutocannon = CybranWeaponsFile.CAAAutocannon
 local CAMZapperWeapon = CybranWeaponsFile.CAMZapperWeapon
 local loading = false
 
+---@class URS0303 : AircraftCarrier
 URS0303 = Class(AircraftCarrier) {
 
     Weapons = {

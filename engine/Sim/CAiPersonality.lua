@@ -1,5 +1,10 @@
---- Class CAiPersonality
--- @classmod Sim.CAiPersonality
+---@declare-global
+---@class moho.aipersonality_methods
+local CAiPersonality = {}
+
+---
+function CAiPersonality:AdjustDelay()
+end
 
 ---
 --  CAiPersonality:GetAirUnitsEmphasis()
@@ -171,8 +176,4 @@ end
 function CAiPersonality:GetUpgradesDriven()
 end
 
----
---
-function CAiPersonality:moho.aipersonality_methods()
-end
-
+return CAiPersonality

@@ -9,6 +9,7 @@
 --****************************************************************************
 local SWallStructureUnit = import('/lua/seraphimunits.lua').SWallStructureUnit
 
+---@class XSB5101 : SWallStructureUnit
 XSB5101 = Class(SWallStructureUnit) {}
 
 TypeClass = XSB5101

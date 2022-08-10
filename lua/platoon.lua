@@ -24,6 +24,7 @@ local SPAI = import('/lua/ScenarioPlatoonAI.lua')
 local SUtils = import('/lua/AI/sorianutilities.lua')
 
 ---@class Platoon : moho.platoon_methods
+---@field PlatoonData table
 Platoon = Class(moho.platoon_methods) {
     NeedCoolDown = false,
     LastAttackDestination = {},
@@ -3575,10 +3576,9 @@ Platoon = Class(moho.platoon_methods) {
             return
         end
         local aiBrain = eng.PlatoonHandle:GetBrain()
-
         if not aiBrain or eng.Dead or not eng.EngineerBuildQueue or table.empty(eng.EngineerBuildQueue) then
             if aiBrain:PlatoonExists(eng.PlatoonHandle) then
-                if not eng.AssistSet and not eng.AssistPlatoon and not eng.UnitBeingAssist then
+                if not eng.AssistSet and not eng.AssistPlatoon and not eng.UnitBeingAssist and not eng.UnitBeingBuiltBehavior then
                     eng.PlatoonHandle:PlatoonDisband()
                 end
             end
@@ -3595,9 +3595,12 @@ Platoon = Class(moho.platoon_methods) {
         IssueClearCommands({eng})
         local commandDone = false
         local PlatoonPos
+        local whatToBuild
+        local buildLocation
+        local buildRelative
         while not eng.Dead and not commandDone and not table.empty(eng.EngineerBuildQueue)  do
-            local whatToBuild = eng.EngineerBuildQueue[1][1]
-            local buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
+            whatToBuild = eng.EngineerBuildQueue[1][1]
+            buildLocation = {eng.EngineerBuildQueue[1][2][1], 0, eng.EngineerBuildQueue[1][2][2]}
             if GetTerrainHeight(buildLocation[1], buildLocation[3]) > GetSurfaceHeight(buildLocation[1], buildLocation[3]) then
                 --land
                 buildLocation[2] = GetTerrainHeight(buildLocation[1], buildLocation[3])
@@ -3605,7 +3608,7 @@ Platoon = Class(moho.platoon_methods) {
                 --water
                 buildLocation[2] = GetSurfaceHeight(buildLocation[1], buildLocation[3])
             end
-            local buildRelative = eng.EngineerBuildQueue[1][3]
+            buildRelative = eng.EngineerBuildQueue[1][3]
             if not eng.NotBuildingThread then
                 eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
             end
@@ -3614,28 +3617,40 @@ Platoon = Class(moho.platoon_methods) {
                 if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                     return
                 end
-                -- issue buildcommand to block other engineers from caping mex/hydros or to reserve the buildplace
-                aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
-                -- wait until we are close to the buildplace so we have intel
-                while not eng.Dead do
-                    PlatoonPos = eng:GetPosition()
-                    if VDist2(PlatoonPos[1] or 0, PlatoonPos[3] or 0, buildLocation[1] or 0, buildLocation[3] or 0) < 12 then
-                        break
+                PlatoonPos = eng:GetPosition()
+                if VDist2(PlatoonPos[1] or 0, PlatoonPos[3] or 0, buildLocation[1] or 0, buildLocation[3] or 0) >= 30 then
+                    -- issue buildcommand to block other engineers from caping mex/hydros or to reserve the buildplace
+                    aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
+                    coroutine.yield(3)
+                    -- wait until we are close to the buildplace so we have intel
+                    while not eng.Dead do
+                        PlatoonPos = eng:GetPosition()
+                        if VDist2(PlatoonPos[1] or 0, PlatoonPos[3] or 0, buildLocation[1] or 0, buildLocation[3] or 0) < 12 then
+                            break
+                        end
+                        -- check if we are already building in close range
+                        -- (ACU can build at higher range than engineers)
+                        if eng:IsUnitState("Building") then
+                            break
+                        end
+                        coroutine.yield(1)
                     end
-                    coroutine.yield(1)
                 end
                 if not eng or eng.Dead or not eng.PlatoonHandle or not aiBrain:PlatoonExists(eng.PlatoonHandle) then
                     if eng then eng.ProcessBuild = nil end
                     return
                 end
-                -- cancel all commands, also the buildcommand for blocking mex to check for reclaim or capture
-                eng.PlatoonHandle:Stop()
-                -- check to see if we need to reclaim or capture...
-                AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation)
-                -- check to see if we can repair
-                AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation)
-                -- otherwise, go ahead and build the next structure there
-                aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
+                -- if we are already building then we don't need to reclaim, repair or issue the BuildStructure again
+                if not eng:IsUnitState("Building") then
+                    -- cancel all commands, also the buildcommand for blocking mex to check for reclaim or capture
+                    eng.PlatoonHandle:Stop()
+                    -- check to see if we need to reclaim or capture...
+                    AIUtils.EngineerTryReclaimCaptureArea(aiBrain, eng, buildLocation)
+                    -- check to see if we can repair
+                    AIUtils.EngineerTryRepair(aiBrain, eng, whatToBuild, buildLocation)
+                    -- otherwise, go ahead and build the next structure there
+                    aiBrain:BuildStructure(eng, whatToBuild, {buildLocation[1], buildLocation[3], 0}, buildRelative)
+                end
                 if not eng.NotBuildingThread then
                     eng.NotBuildingThread = eng:ForkThread(eng.PlatoonHandle.WatchForNotBuilding)
                 end
@@ -3653,7 +3668,7 @@ Platoon = Class(moho.platoon_methods) {
             end
         end
         if eng then eng.ProcessBuild = nil end
-    end,
+    end,    
 
     --DUNCAN - added
     EngineerDropAI = function(self)

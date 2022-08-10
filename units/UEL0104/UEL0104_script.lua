@@ -10,6 +10,7 @@
 local TLandUnit = import('/lua/terranunits.lua').TLandUnit
 local TAALinkedRailgun = import('/lua/terranweapons.lua').TAALinkedRailgun
 
+---@class UEL0104 : TLandUnit
 UEL0104 = Class(TLandUnit) {
     Weapons = {
         AAGun = Class(TAALinkedRailgun) {

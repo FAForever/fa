@@ -61,6 +61,24 @@ function GreaterThanEconStorageCurrent(aiBrain, mStorage, eStorage)
     return false
 end
 
+-- Returns true if energy in storage of <aiBrain> is greater than <eStorage>
+function GreaterThanEnergyStorageCurrent(aiBrain, eStorage)
+    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
+    if econ.EnergyStorage > eStorage then
+        return true
+    end
+    return false
+end
+
+-- Returns true if mass in storage of <aiBrain> is greater than <mStorage>
+function GreaterThanMassStorageCurrent(aiBrain, mStorage)
+    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
+    if econ.MassStorage > mStorage then
+        return true
+    end
+    return false
+end
+
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- function: LessThanEconTrend = BuildCondition	doc = "Please work function docs."
 --
@@ -126,6 +144,23 @@ function LessEconStorageCurrent(aiBrain, mStorage, eStorage)
     return false
 end
 
+-- Returns true if energy in storage of <aiBrain> is less than <eStorage>
+function LessThanEnergyStorageCurrent(aiBrain, eStorage)
+    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
+    if econ.EnergyStorage < eStorage then
+        return true
+    end
+    return false
+end
+
+-- Returns true if mass in storage of <aiBrain> is less than <mStorage>
+function LessThanMassStorageCurrent(aiBrain, mStorage)
+    local econ = AIUtils.AIGetEconomyNumbers(aiBrain)
+    if econ.MassStorage < mStorage then
+        return true
+    end
+    return false
+end
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- function: GreaterThanEconTrend = BuildCondition	doc = "Please work function docs."

@@ -1,4 +1,9 @@
 UnitBlueprint {
+    AI = {
+        TargetBones = {
+            'Turret'
+        }
+    },
     Audio = {
         AmbientMove = Sound {
             Bank = 'XSL',
@@ -26,15 +31,6 @@ UnitBlueprint {
             LodCutoff = 'UnitMove_LodCutoff',
         },
     },
-    Buffs = {
-        Regen = {
-            Level1 = 3,
-            Level2 = 6,
-            Level3 = 9,
-            Level4 = 12,
-            Level5 = 15,
-        },
-    },
     BuildIconSortPriority = 20,
     Categories = {
         'PRODUCTFA',
@@ -54,7 +50,6 @@ UnitBlueprint {
         'OVERLAYDIRECTFIRE',
         'OVERLAYINDIRECTFIRE',
     },
-    CollisionOffsetY = 0,
     Defense = {
         AirThreatLevel = 0,
         ArmorType = 'Normal',
@@ -265,7 +260,7 @@ UnitBlueprint {
     SelectionSizeZ = 1.4,
     SelectionThickness = 0.3,
     SizeX = 0.8,
-    SizeY = 0.65,
+    SizeY = 0.60,
     SizeZ = 2.3,
     StrategicIconName = 'icon_land3_directfire',
     StrategicIconSortPriority = 115,

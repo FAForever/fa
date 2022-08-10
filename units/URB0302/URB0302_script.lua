@@ -9,6 +9,7 @@
 --****************************************************************************
 local CAirFactoryUnit = import('/lua/cybranunits.lua').CAirFactoryUnit
 
+---@class URB0302 : CAirFactoryUnit
 URB0302 = Class(CAirFactoryUnit) {
     PlatformBone = 'B01',
 

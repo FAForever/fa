@@ -10,6 +10,7 @@
 local SQuantumGateUnit = import('/lua/seraphimunits.lua').SQuantumGateUnit
 local EffectTemplates = import('/lua/EffectTemplates.lua')
 
+---@class XSB0304 : SQuantumGateUnit
 XSB0304 = Class(SQuantumGateUnit) {
     OnStopBeingBuilt = function(self, builder, layer)
         -- Place emitters at the center of the gateway.

@@ -386,7 +386,6 @@ CConstructionUnit = Class(ConstructionUnit, CConstructionTemplate){
 
     OnStopBeingBuilt = function(self, builder, layer)
         ConstructionUnit.OnStopBeingBuilt(self, builder, layer)
-        -- If created with F2 on land, then play the transform anim.
         if self.Layer == 'Water' then
             self.TerrainLayerTransitionThread = self:ForkThread(self.TransformThread, true)
         end
@@ -530,7 +529,7 @@ CSonarUnit = Class(DefaultUnitsFile.SonarUnit) {}
 CSeaFactoryUnit = Class(SeaFactoryUnit) {
 
     StartBuildingEffects = function(self, unitBeingBuilt)
-        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeams, unitBeingBuilt, self.BuildEffectBones, self.BuildEffectsBag)
+        local thread = self:ForkThread(EffectUtil.CreateCybranBuildBeamsOpti, nil, unitBeingBuilt, self.BuildEffectsBag, false)
         unitBeingBuilt.Trash:Add(thread)
     end,
 

@@ -11,6 +11,7 @@
 local TStructureUnit = import('/lua/terranunits.lua').TStructureUnit
 local TIFArtilleryWeapon = import('/lua/terranweapons.lua').TIFArtilleryWeapon
 
+---@class UEB2302 : TStructureUnit
 UEB2302 = Class(TStructureUnit) {
     Weapons = {
         MainGun = Class(TIFArtilleryWeapon) {
