@@ -565,7 +565,7 @@ end
 
 Callbacks.AttackMove = function(data, units)
     if data.Clear then
-        IssueClearCommands(units)
+        IssueClearCommands(EntityCategoryFilterDown(categories.MOBILE, units))
     end
     IssueAggressiveMove(units, data.Target)
 end

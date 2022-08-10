@@ -393,3 +393,8 @@ end
 function RecheckTargetsOfWeapons()
     SimCallback({Func = 'RecheckTargetsOfWeapons', Args = { }}, true)
 end
+
+function AttackMoveSelectedToCurrentMousePosition(nonShiftVersion)
+    local cb = {Func = 'AttackMove', Args = {Target = GetMouseWorldPos(), Clear = nonShiftVersion}}
+    SimCallback(cb, true)
+end
