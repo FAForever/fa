@@ -588,16 +588,18 @@ local function StoreSamples(exitType)
 
     -- determine identifier based on game flags
     local identifier = 'campaign'
-    if isSkirmish then 
-        if hasAI then 
+    if isSkirmish then
+        if hasAI then
             identifier = 'skirmish-ai'
         else 
             identifier = 'skirmish'
         end
     end
 
+    LOG("Keeping track for: ", identifier)
+
     -- retrieve and update data
-    local data = GetPreference('PerformanceTrackingV1') or { }
+    local data = GetPreference('PerformanceTrackingV2') or { }
     local mapData = data[identifier]
     if mapData then 
         for k = 1, 21 do
@@ -633,7 +635,7 @@ local function StoreSamples(exitType)
     end
 
     -- store data
-    SetPreference('PerformanceTrackingV1', data)
+    SetPreference('PerformanceTrackingV2', data)
 end
 
 local function PerformanceTrackingThread()
