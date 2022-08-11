@@ -5,7 +5,7 @@
 --#**
 --#**  Summary  : AIBrain Strategic Plans Definitions
 --#**
---#**  Copyright � 2006 Gas Powered Games, Inc.  All rights reserved.
+--#**  Copyright © 2006 Gas Powered Games, Inc.  All rights reserved.
 --#****************************************************************************
 
 AIPlansList =
