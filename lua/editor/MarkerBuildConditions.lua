@@ -11,7 +11,7 @@
 
 local AIUtils = import('/lua/ai/aiutilities.lua')
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param markerType string
 ---@param distance number
 ---@param threatMin number
@@ -37,7 +37,7 @@ function MarkerGreaterThanDistance(aiBrain, markerType, distance, threatMin, thr
     return false
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param markerType string
 ---@param distance number
 ---@param threatMin number
@@ -65,7 +65,7 @@ function MarkerLessThanDistance(aiBrain, markerType, distance, threatMin, threat
     return false
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param locationType string
 ---@param distance number
 ---@param threatMin number
@@ -89,7 +89,7 @@ function CanBuildOnMassLessThanDistance(aiBrain, locationType, distance, threatM
 end
 
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param locationType string
 ---@param radius number
 ---@param markerType string

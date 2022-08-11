@@ -5,10 +5,6 @@
 --**
 --**  Copyright © 2005 Gas Powered Games, Inc.  All rights reserved.
 --****************************************************************************
-local AIUtils = import('/lua/ai/aiutilities.lua')
-local ScenarioFramework = import('/lua/scenarioframework.lua')
-local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
-local Utils = import('/lua/utilities.lua')
 
 ---@param aiBrain AIBrain
 ---@return boolean
@@ -101,3 +97,9 @@ function BrainNotLowMassMode(aiBrain)
     end
     return false
 end
+
+-- Moved Unused Imports to bottom for mod support
+local AIUtils = import('/lua/ai/aiutilities.lua')
+local ScenarioFramework = import('/lua/scenarioframework.lua')
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
+local Utils = import('/lua/utilities.lua')
