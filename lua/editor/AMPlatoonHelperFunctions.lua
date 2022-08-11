@@ -10,7 +10,7 @@
 local ScenarioFramework = import('/lua/scenarioframework.lua')
 
 ---AMLockPlatoon = AddFunction
----@param platoon string
+---@param platoon Platoon
 function AMLockPlatoon(platoon)
     if not ScenarioInfo.AMLockTable then
         ScenarioInfo.AMLockTable = {}
@@ -19,7 +19,7 @@ function AMLockPlatoon(platoon)
 end
 
 ---PBMLockAndUnlock = AddFunction
----@param platoon string
+---@param platoon Platoon
 function PBMLockAndUnlock(platoon)
     if not ScenarioInfo.AMLockTable then
         ScenarioInfo.AMLockTable = {}
@@ -29,8 +29,8 @@ function PBMLockAndUnlock(platoon)
 end
 
 ---AMUnlockPlatoon = BuildCallback
----@param brain string
----@param platoon string
+---@param brain AIBrain
+---@param platoon Platoon
 function AMUnlockPlatoon(brain, platoon)
     if ScenarioInfo.AMLockTable and ScenarioInfo.AMLockTable[platoon.PlatoonData.PlatoonName] then
         if platoon.PlatoonData['DiffLockTimerD'..ScenarioInfo.Options.Difficulty] then
@@ -44,8 +44,8 @@ function AMUnlockPlatoon(brain, platoon)
 end
 
 --- AMUnlockPlatoonTimer = BuildCallback
----@param brain string
----@param platoon string
+---@param brain AIBrain
+---@param platoon Platoon
 ---@param duration integer
 function AMUnlockPlatoonTimer(brain, platoon, duration)
     local callback = function()
@@ -57,7 +57,7 @@ function AMUnlockPlatoonTimer(brain, platoon, duration)
 end
 
 ---AMCheckPlatoonLock = BuildCondition
----@param brain string
+---@param brain AIBrain
 ---@param AMPlatoonName string
 ---@return boolean
 function AMCheckPlatoonLock(brain, AMPlatoonName)
@@ -68,7 +68,7 @@ function AMCheckPlatoonLock(brain, AMPlatoonName)
 end
 
 --- ChildCountDifficulty = BuildCondition
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param master string
 ---@return boolean
 function ChildCountDifficulty(aiBrain, master)
@@ -88,7 +88,7 @@ function ChildCountDifficulty(aiBrain, master)
 end
 
 --- MasterCountDifficulty = BuildCondition
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param master string
 ---@return boolean
 function MasterCountDifficulty(aiBrain, master)
@@ -116,8 +116,8 @@ function UnlockTimer(time, name)
     ScenarioInfo.AMLockTable[name] = false
 end
 
----@param brain string
----@param platoon string
+---@param brain AIBrain
+---@param platoon Platoon
 function PlatoonDeathUnlockTimer( brain, platoon )
     local time = platoon.PlatoonData['DiffLockTimerD'..ScenarioInfo.Options.Difficulty] or platoon.PlatoonData.LockTimer or 0
     ForkThread(PlatoonDeathUnlockThread, platoon.PlatoonData.BuilderName, time )

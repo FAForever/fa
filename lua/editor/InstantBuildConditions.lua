@@ -10,7 +10,7 @@ local ScenarioFramework = import('/lua/scenarioframework.lua')
 local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local Utils = import('/lua/utilities.lua')
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@return boolean
 function PreBuiltBase(aiBrain)
     if aiBrain.PreBuilt then
@@ -20,7 +20,7 @@ function PreBuiltBase(aiBrain)
     end
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@return boolean
 function NotPreBuilt(aiBrain)
     if not aiBrain.PreBuilt then
@@ -30,7 +30,7 @@ function NotPreBuilt(aiBrain)
     end
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param numReq integer
 ---@param category EntityCategory
 ---@param idleReq boolean
@@ -48,7 +48,7 @@ function HaveEqualToUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param numReq integer
 ---@param category EntityCategory
 ---@param idleReq EntityCategory
@@ -66,7 +66,7 @@ function HaveGreaterThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param numReq integer
 ---@param category EntityCategory
 ---@param idleReq EntityCategory
@@ -84,7 +84,7 @@ function HaveLessThanUnitsWithCategory(aiBrain, numReq, category, idleReq)
     return false
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@return boolean
 function BrainNotLowPowerMode(aiBrain)
     if not aiBrain.LowEnergyMode then
@@ -93,7 +93,7 @@ function BrainNotLowPowerMode(aiBrain)
     return false
 end
 
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@return boolean
 function BrainNotLowMassMode(aiBrain)
     if not aiBrain.LowMassMode then

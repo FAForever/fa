@@ -164,7 +164,7 @@ function GreaterThanEconTrend(aiBrain, MassTrend, EnergyTrend)
 end
 
 ---GreaterThanEconIncome = BuildCondition
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param MassIncome integer
 ---@param EnergyIncome integer
 ---@return boolean
@@ -181,7 +181,7 @@ function GreaterThanEconIncome(aiBrain, MassIncome, EnergyIncome)
 end
 
 ---LessThanEconIncome = BuildCondition
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param MassIncome integer
 ---@param EnergyIncome integer
 ---@return boolean
@@ -198,7 +198,7 @@ function LessThanEconIncome(aiBrain, MassIncome, EnergyIncome)
 end
 
 ---LessThanEconEfficiency = BuildCondition
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param MassEfficiency integer
 ---@param EnergyEfficiency integer
 ---@return boolean
@@ -215,7 +215,7 @@ function GreaterThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
 end
 
 ---comment
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param MassEfficiency integer
 ---@param EnergyEfficiency integer
 ---@return boolean
@@ -232,7 +232,7 @@ function LessThanEconEfficiency(aiBrain, MassEfficiency, EnergyEfficiency)
 end
 
 ---LessThanEconEfficiencyOverTime = BuildCondition
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param MassEfficiency integer
 ---@param EnergyEfficiency integer
 ---@return boolean
@@ -249,7 +249,7 @@ function GreaterThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEffici
 end
 
 ---comment
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param MassEfficiency integer
 ---@param EnergyEfficiency integer
 ---@return boolean
@@ -266,10 +266,10 @@ function LessThanEconEfficiencyOverTime(aiBrain, MassEfficiency, EnergyEfficienc
 end
 
 ---comment
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param ratio number
 ---@param compareType string
----@param unitCategory string
+---@param unitCategory EntityCategory
 ---@return boolean
 function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
     local econTime = aiBrain:GetEconomyOverTime()
@@ -289,7 +289,7 @@ function MassIncomeToUnitRatio(aiBrain, ratio, compareType, unitCategory)
 end
 
 ---comment
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param t1Drain integer
 ---@param t2Drain integer
 ---@param t3Drain integer
@@ -325,7 +325,7 @@ function GreaterThanMassIncomeToFactory(aiBrain, t1Drain, t2Drain, t3Drain)
 end
 
 ---comment
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param locationType string
 ---@return boolean
 function MassToFactoryRatioBaseCheck(aiBrain, locationType)
@@ -372,7 +372,7 @@ function CompareBody(numOne, numTwo, compareType)
 end
 
 ---comment
----@param aiBrain string
+---@param aiBrain AIBrain
 ---@param numReq number
 ---@param category EntityCategory
 ---@param idleReq boolean
