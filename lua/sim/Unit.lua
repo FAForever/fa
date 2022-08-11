@@ -347,12 +347,11 @@ Unit = Class(moho.unit_methods) {
         self.IsCivilian = armies[self.Army] == "NEUTRAL_CIVILIAN" or nil 
 
         -- add support for keeping track of reclaim statistics
-        if self.Blueprint.CategoriesHash['ENGINEER'] then 
-            self:GetStat('ReclaimedMass', 0)
-            self:GetStat('ReclaimedEnergy', 0)
-
+        if utilities.SelectBit(bp.General.CommandCaps, 20) then -- RULEUCC_Reclaim
             self.ReclaimedMass = 0
             self.ReclaimedEnergy = 0
+            self:GetStat("ReclaimedMass", 0)
+            self:GetStat("ReclaimedEnergy", 0)
         end
 
         if self.Blueprint.Intel.JammerBlips > 0 then

@@ -89,7 +89,7 @@ function SetLayout()
     controls.vetBar._bar:SetTexture(UIUtil.UIFile('/game/unit-build-over-panel/fuelbar.dds'))
 
     LayoutHelpers.AtLeftTopIn(controls.ReclaimGroup, controls.bg, 192, 68)
-    LayoutHelpers.SetDimensions(controls.ReclaimGroup, 200, 200)
+    LayoutHelpers.SetDimensions(controls.ReclaimGroup, 150, 200)
     LayoutHelpers.FillParent(controls.ReclaimGroup.MassIcon, controls.ReclaimGroup)
     controls.ReclaimGroup.MassIcon:SetSolidColor('ffffffff')
     LOG("Set!")

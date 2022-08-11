@@ -383,7 +383,6 @@ function UpdateWindow(info)
             end
         end
 
-        controls.shieldBar:Hide()
         controls.fuelBar:Hide()
         controls.vetBar:Hide()
         controls.ReclaimGroup:Hide()
@@ -391,6 +390,21 @@ function UpdateWindow(info)
         if info.shieldRatio > 0 then
             controls.shieldBar:Show()
             controls.shieldBar:SetValue(info.shieldRatio)
+        else
+            controls.shieldBar:Hide()
+            if info.entityId then
+                local reclaimedMass, reclaimedEnergy
+                local unit = GetUnitById(info.entityId)
+                if unit then
+                    reclaimedMass = unit:GetStat('ReclaimedMass').Value
+                    reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value
+                end
+                if reclaimedMass or reclaimedEnergy then
+                    controls.ReclaimGroup:Show()
+                    controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass or 0))
+                    controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy or 0))
+                end
+            end
         end
 
         if info.fuelRatio > 0 then
@@ -502,20 +516,6 @@ function UpdateWindow(info)
                 else
                     controls.vetBar:Hide()
                 end
-            end
-        else 
-
-            if info.entityId then 
-                local reclaimedMass, reclaimedEnergy
-                local unit = GetUnitById(info.entityId)
-                if unit then 
-                    reclaimedMass = unit:GetStat('ReclaimedMass').Value or 0
-                    reclaimedEnergy = unit:GetStat('ReclaimedEnergy').Value or 0
-                end
-
-                controls.ReclaimGroup:Show()
-                controls.ReclaimGroup.MassText:SetText(tostring(reclaimedMass))
-                controls.ReclaimGroup.EnergyText:SetText(tostring(reclaimedEnergy))
             end
         end
 
