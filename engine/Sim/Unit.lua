@@ -137,10 +137,6 @@ end
 function Unit:GetBlueprint()
 end
 
----@return UnitBlueprint
-function Unit:GetBlueprint()
-end
-
 --- Returns the build rate of a unit
 --- @return rate
 function Unit:GetBuildRate()
