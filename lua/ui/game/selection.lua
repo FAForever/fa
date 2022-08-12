@@ -2,7 +2,7 @@
 ---@alias SelectionSetDoubleTapBehavior
 --- | 'none'                        # When you double tap it will have no effect
 --- | 'translate-zoom'              # When you double tap the camera translates and zooms to the units, default behavior
---- | 'translate-zoom-if-lower'     # When you double tap the camera translates and zooms to the units, but it won't zoom in
+--- | 'translate-zoom-out-only'     # When you double tap the camera translates and zooms to the units, but it won't zoom in
 --- | 'translate'                   # When you double tap the camera only translates
 
 ---@alias SelectionSetAppendBehavior
@@ -26,7 +26,7 @@ local stealFromOtherSelectionSets = true                -- adjustable via option
 local addProducedUnitToSelectionSet = true              -- adjustable via options -> interface
 
 ---@type SelectionSetDoubleTapBehavior
-local doubleTapbehavior = 'translate-zoom-if-lower'     -- adjustable via options -> interface
+local doubleTapbehavior = 'translate-zoom-out-only'     -- adjustable via options -> interface
 
 ---@type SelectionSetAppendBehavior
 local appendBehavior = 'add-selection-set-to-selection' -- adjustable via options -> interface
@@ -155,7 +155,7 @@ local function DoubleTapBehavior(name, units)
         UIZoomTo(units)
 
         -- only zoom out, but not in
-        if doubleTapbehavior == 'translate-zoom-if-lower' then
+        if doubleTapbehavior == 'translate-zoom-out-only' then
             local zoom = cam:GetZoom()
             if zoom < settings.Zoom then 
                 cam:SetZoom(settings.Zoom, 0)
