@@ -522,10 +522,6 @@ Callbacks.OnControlGroupAssign = function(units)
     end
 end
 
-Callbacks.OnControlGroupApply = function(units)
-    --LOG(repr(units))
-end
-
 local SimCamera = import('/lua/SimCamera.lua')
 
 Callbacks.OnCameraFinish = SimCamera.OnCameraFinish
