@@ -871,6 +871,10 @@ options = {
             {
                 title = 'Control groups',
                 type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
             },
 
             {
@@ -890,18 +894,18 @@ options = {
                 title = "<LOC selectionsets0001>Production behavior",
                 key = 'selection-sets-production-behavior',
                 type = 'toggle',
-                default = false,
+                default = true,
                 custom = {
                     states = {
-                        {text = "<LOC selectionsets0002>Add to control group of factory", key = false },
-                        {text = "<LOC selectionsets0003>Do nothing", key = true },
+                        {text = "<LOC selectionsets0002>Add to control group of factory", key = true },
+                        {text = "<LOC selectionsets0003>Do nothing", key = false },
                     },
                 },
             },
 
             {
                 title = "<LOC selectionsets0001>Double tap behavior",
-                key = 'selection-sets-production-behavior',
+                key = 'selection-sets-double-tap-behavior',
                 type = 'toggle',
                 default = 'translate-zoom',
                 custom = {
@@ -928,9 +932,9 @@ options = {
 
             {
                 title = "<LOC selectionsets0001>Append behavior",
-                key = 'selection-sets-production-behavior',
+                key = 'selection-sets-append-behavior',
                 type = 'toggle',
-                default = 0,
+                default = 'add-selection-to-selection-set',
                 custom = {
                     states = {
                         {text = "<LOC selectionsets0002>Append selection to selection set" , key = 'add-selection-set-to-selection' },
@@ -943,6 +947,10 @@ options = {
             {
                 title = 'Spawn menu',
                 type = 'header',
+
+                -- these are expected everywhere
+                default = '',
+                key = '',
             },
 
             {

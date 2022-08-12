@@ -1,4 +1,12 @@
 
+local Prefs = import('/lua/user/prefs.lua')
+
+-- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-append-behavior'))
+-- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-decay'))
+-- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-behavior'))
+-- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-production-behavior'))
+-- reprsl(Prefs.GetFromCurrentProfile('options.selection-sets-add-behavior'))
+
 ---@alias SelectionSetDoubleTapBehavior
 --- | 'none'                        # When you double tap it will have no effect
 --- | 'translate-zoom'              # When you double tap the camera translates and zooms to the units, default behavior
@@ -19,17 +27,6 @@ selectionSets = {}
 local selectionSetCallbacks = {}
 local lastSelectionName = nil
 local lastSelectionTime = 0
-local lastSelectionDecay = 0.2                          -- adjustable via options -> interface
-
--- allows you to tweak functionality
-local stealFromOtherSelectionSets = true                -- adjustable via options -> interface
-local addProducedUnitToSelectionSet = true              -- adjustable via options -> interface
-
----@type SelectionSetDoubleTapBehavior
-local doubleTapbehavior = 'translate-zoom-out-only'     -- adjustable via options -> interface
-
----@type SelectionSetAppendBehavior
-local appendBehavior = 'add-selection-set-to-selection' -- adjustable via options -> interface
 
 local playSelectionSound = true
 
@@ -132,6 +129,9 @@ end
 ---@param units any
 local function DoubleTapBehavior(name, units)
 
+    ---@type SelectionSetDoubleTapBehavior
+    local doubleTapbehavior = Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-behavior')
+
     -- don't do anything
     if doubleTapbehavior == 'none' then
         return
@@ -140,7 +140,7 @@ local function DoubleTapBehavior(name, units)
     -- time window in which we consider it to be a double tab
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastSelectionTime
-    if diffTime > lastSelectionDecay then
+    if diffTime > 0.001 * Prefs.GetFromCurrentProfile('options.selection-sets-double-tap-decay') then
         lastSelectionName = nil
     end
     lastSelectionTime = curTime
@@ -148,26 +148,26 @@ local function DoubleTapBehavior(name, units)
     -- move camera to the selection in the case of a double tab
     if name == lastSelectionName then
 
-        -- retrieve camera and its settings
-        local cam = GetCamera('WorldCamera')
-        local settings = cam:SaveSettings()
+        if next(units) then
 
-        UIZoomTo(units)
+            -- retrieve camera and its settings
+            local cam = GetCamera('WorldCamera')
+            local settings = cam:SaveSettings()
 
-        -- only zoom out, but not in
-        if doubleTapbehavior == 'translate-zoom-out-only' then
-            local zoom = cam:GetZoom()
-            if zoom < settings.Zoom then 
+            UIZoomTo(units)
+
+            -- only zoom out, but not in
+            if doubleTapbehavior == 'translate-zoom-out-only' then
+                local zoom = cam:GetZoom()
+                if zoom < settings.Zoom then
+                    cam:SetZoom(settings.Zoom, 0)
+                end
+
+            -- do not adjust the zoom
+            elseif doubleTapbehavior == 'translate' then
                 cam:SetZoom(settings.Zoom, 0)
             end
-
-        -- do not adjust the zoom
-        elseif doubleTapbehavior == 'translate' then
-            cam:SetZoom(settings.Zoom, 0)
         end
-
-        -- always revert to the default rotation
-        -- cam:RevertRotation()
 
         lastSelectionName = nil
     else
@@ -176,30 +176,39 @@ local function DoubleTapBehavior(name, units)
 end
 
 local function ProcessSelectionSet(name)
-   -- clear out the cache
-   EmptyArray(cache)
-   local aUnits = ToArray(selectionSets[name], cache)
 
-   -- validate units
-   return ValidateUnitsList(aUnits)
+    -- guarantee one exists
+    selectionSets[name] = selectionSets[name] or { }
+
+    -- clear out the cache
+    EmptyArray(cache)
+    local aUnits = ToArray(selectionSets[name], cache)
+
+    -- validate units
+    return ValidateUnitsList(aUnits)
 end
 
 --- Add a unit to an existing selection set, called by the engine to add units that are being built to the selection group of the factory. The function userunit:AddSelectionSet(name) has already been applied at this point
 ---@param name string
 ---@param unit UserUnit
 function AddUnitToSelectionSet(name, unit)
-    if addProducedUnitToSelectionSet then
+    if Prefs.GetFromCurrentProfile('options.selection-sets-production-behavior') then
+
         -- remove it from existing selection sets
-        if stealFromOtherSelectionSets then
+        if Prefs.GetFromCurrentProfile('options.selection-sets-add-behavior') then
             local others = unit:GetSelectionSets()
             for k, other in others do
-                selectionSets[name][unit] = nil
+                if selectionSets[other] then
+                    selectionSets[other][unit] = nil
+                end
             end
         end
 
         -- guarantee that a table exists
         selectionSets[name] = selectionSets[name] or { }
         selectionSets[name][unit] = true
+    else 
+        unit:RemoveSelectionSet(name)
     end
 end
 
@@ -222,10 +231,9 @@ function AddSelectionSet(name, unitArray)
         for _, unit in unitArray do
 
             -- remove it from existing selection sets
-            if stealFromOtherSelectionSets then
+            if Prefs.GetFromCurrentProfile('options.selection-sets-add-behavior') then
                 local others = unit:GetSelectionSets()
-                reprsl(others)
-                for k, other in others do 
+                for k, other in others do
                     selectionSets[other][unit] = nil
                 end
             end
@@ -250,11 +258,7 @@ end
 --- Selects the selection set provided
 ---@param name string
 function ApplySelectionSet(name)
-    -- get a filtered list of only valid units back from the function
-    if not selectionSets[name] then
-        return
-    end
-
+    
     -- validate units, remove the ones that got transformed into wrecks
     local aValidUnits = ProcessSelectionSet(name)
     local aSelection = EntityCategoryFilterDown(categories.ALLUNITS - (categories.FACTORY - categories.MOBILE) , aValidUnits)
@@ -298,62 +302,71 @@ end
 ---@param name any
 function AppendSetToSelection(name)
 
+    -- engine bug
+    name = tostring(name)
+
     -- retrieve the two groups of units
     local aValidUnits = ProcessSelectionSet(name)
     local aSelectedUnits = GetSelectedUnits()
 
-    if appendBehavior == 'add-selection-set-to-selection' then
+    if aSelectedUnits then 
 
-        -- remove factories, unless we only have factories
-        local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
-        if not next(aSelectionSetUnits) then 
-            aSelectionSetUnits = aValidUnits
+        ---@type SelectionSetAppendBehavior
+        local appendBehavior = Prefs.GetFromCurrentProfile('options.selection-sets-append-behavior')
+
+        if appendBehavior == 'add-selection-set-to-selection' then
+
+            -- remove factories, unless we only have factories
+            local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
+            if not next(aSelectionSetUnits) then
+                aSelectionSetUnits = aValidUnits
+            end
+
+            -- append the selection set
+            for k, unit in aSelectionSetUnits do
+                table.insert(aSelectedUnits, unit)
+            end
+
+            -- select them together
+            SelectUnits(aSelectedUnits)
+            DoubleTapBehavior(aSelectedUnits)
+
+        elseif appendBehavior == 'add-selection-to-selection-set' then
+
+            -- remove factories, unless we only have factories
+            local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
+            if not next(aSelectionSetUnits) then
+                aSelectionSetUnits = aValidUnits
+            end
+
+            -- append the selection set
+            for k, unit in aSelectionSetUnits do
+                table.insert(aSelectedUnits, unit)
+            end
+
+            -- turn that into the new selection set
+            AddSelectionSet(name, aSelectedUnits)
+            DoubleTapBehavior(aSelectedUnits)
+
+        elseif appendBehavior == 'combine-and-select-with-selection-set' then
+
+            -- remove factories, unless we only have factories
+            local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
+            if not next(aSelectionSetUnits) then
+                aSelectionSetUnits = aValidUnits
+            end
+
+            -- append the selection set
+            for k, unit in aSelectionSetUnits do
+                table.insert(aSelectedUnits, unit)
+            end
+
+            -- turn that into the new selection set and select it
+            AddSelectionSet(name, aSelectedUnits)
+            SelectUnits(aSelectedUnits)
+            DoubleTapBehavior(aSelectedUnits)
+
         end
-
-        -- append the selection set
-        for k, unit in aSelectionSetUnits do 
-            table.insert(aSelectedUnits, unit)
-        end
-
-        -- select them together
-        SelectUnits(aSelectedUnits)
-
-        DoubleTapBehavior(aSelectedUnits)
-    elseif appendBehavior == 'add-selection-to-selection-set' then
-
-        -- remove factories, unless we only have factories
-        local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
-        if not next(aSelectionSetUnits) then
-            aSelectionSetUnits = aValidUnits
-        end
-
-        -- append the selection set
-        for k, unit in aSelectionSetUnits do
-            table.insert(aSelectedUnits, unit)
-        end
-
-        -- turn that into the new selection set
-        AddSelectionSet(name, aSelectedUnits)
-
-        DoubleTapBehavior(aSelectedUnits)
-    elseif appendBehavior == 'combine-and-select-with-selection-set' then
-
-        -- remove factories, unless we only have factories
-        local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
-        if not next(aSelectionSetUnits) then
-            aSelectionSetUnits = aValidUnits
-        end
-
-        -- append the selection set
-        for k, unit in aSelectionSetUnits do
-            table.insert(aSelectedUnits, unit)
-        end
-
-        -- turn that into the new selection set and select it
-        AddSelectionSet(name, aSelectedUnits)
-        SelectUnits(aSelectedUnits)
-        
-        DoubleTapBehavior(aSelectedUnits)
     end
 end
 

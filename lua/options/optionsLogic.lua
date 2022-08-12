@@ -17,7 +17,9 @@ function GetOptionsData()
         optionItemMap = {}
         for section, secInfo in options do
             for index, item in secInfo.items do
-                optionItemMap[item.key] = item
+                if item.key then 
+                    optionItemMap[item.key] = item
+                end
             end
         end
         
