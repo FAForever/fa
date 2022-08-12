@@ -5,9 +5,9 @@ local techCats = {
     [4] = "EXPERIMENTAL",
 }
 
+-- TODO: refactor this for better performance :)))
 function insertIntoTableLowestTechFirst(units, t, isLowFuel, isIdleCon)
 
-    LOG("insertIntoTableLowestTechFirst")
 
     local didInsert = false
     local isPut = false
