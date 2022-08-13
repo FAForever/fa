@@ -1074,7 +1074,6 @@ function StratIconReplacement(control)
 end
 
 function OnRolloverHandler(button, state)
-    LOG("OnRolloverHandler")
     local item = button.Data
 
     if options.gui_draggable_queue ~= 0 and item.type == 'queuestack' and prevSelection and EntityCategoryContains(categories.FACTORY, prevSelection[1]) then
