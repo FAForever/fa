@@ -178,6 +178,9 @@ local function DoubleTapBehavior(name, units)
     end
 end
 
+--- Processes the selection set from its hash-based layout to an index-based layout
+---@param name string
+---@return UserUnit[]
 local function ProcessSelectionSet(name)
 
     -- guarantee one exists
@@ -188,11 +191,17 @@ local function ProcessSelectionSet(name)
     local aUnits = ToArray(selectionSets[name], cache)
 
     -- validate units
-    return ValidateUnitsList(aUnits)
+    local aValidUnits = ValidateUnitsList(aUnits)
+
+    -- clean up the cache
+    EmptyHash(selectionSets[name])
+    ToHash(aValidUnits, selectionSets[name])
+
+    return aValidUnits
 end
 
 --- Add a unit to an existing selection set, called by the engine to add units that are being built to the selection group of the factory. The function userunit:AddSelectionSet(name) has already been applied at this point
----@param name string
+---@param name string | number
 ---@param unit UserUnit
 function AddUnitToSelectionSet(name, unit)
 
@@ -222,7 +231,7 @@ function AddUnitToSelectionSet(name, unit)
 end
 
 --- Replaces the selection set with the provided units
----@param name string
+---@param name string | number
 ---@param unitArray UserUnit[]
 function AddSelectionSet(name, unitArray)
 
@@ -263,13 +272,13 @@ function AddSelectionSet(name, unitArray)
 end
 
 --- Adds the current selection to the selection set
----@param name string
+---@param name string | number
 function AddCurrentSelectionSet(name)
     AddSelectionSet(name, GetSelectedUnits())
 end
 
 --- Selects the selection set provided
----@param name string
+---@param name string | number
 function ApplySelectionSet(name)
     
     -- bug where name is an index, not a key
@@ -286,10 +295,6 @@ function ApplySelectionSet(name)
         end
     end
 
-    -- clean up the cache
-    EmptyHash(selectionSets[name])
-    ToHash(aValidUnits, selectionSets[name])
-
     SelectUnits(aSelection)
     DoubleTapBehavior(name, aSelection)
 
@@ -300,7 +305,7 @@ function ApplySelectionSet(name)
 end
 
 --- Attempts to select the factories of the selection set
----@param name any
+---@param name string | number
 function FactorySelection(name)
 
     -- bug where name is an index, not a key
@@ -310,15 +315,11 @@ function FactorySelection(name)
     local aValidUnits = ProcessSelectionSet(name)
     local aSelection = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
 
-    -- clean up the cache
-    EmptyHash(selectionSets[name])
-    ToHash(aValidUnits, selectionSets[name])
-
     SelectUnits(aSelection)
 end
 
 ---Adds the current selected units to the selection set
----@param name any
+---@param name string | number
 function AppendSetToSelection(name)
 
     -- bug where name is an index, not a key
@@ -335,14 +336,8 @@ function AppendSetToSelection(name)
 
         if appendBehavior == 'add-selection-set-to-selection' then
 
-            -- remove factories, unless we only have factories
-            local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
-            if not next(aSelectionSetUnits) then
-                aSelectionSetUnits = aValidUnits
-            end
-
             -- append the selection set
-            for k, unit in aSelectionSetUnits do
+            for k, unit in aValidUnits do
                 table.insert(aSelectedUnits, unit)
             end
 
@@ -352,14 +347,8 @@ function AppendSetToSelection(name)
 
         elseif appendBehavior == 'add-selection-to-selection-set' then
 
-            -- remove factories, unless we only have factories
-            local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
-            if not next(aSelectionSetUnits) then
-                aSelectionSetUnits = aValidUnits
-            end
-
             -- append the selection set
-            for k, unit in aSelectionSetUnits do
+            for k, unit in aValidUnits do
                 table.insert(aSelectedUnits, unit)
             end
 
@@ -369,14 +358,8 @@ function AppendSetToSelection(name)
 
         elseif appendBehavior == 'combine-and-select-with-selection-set' then
 
-            -- remove factories, unless we only have factories
-            local aSelectionSetUnits = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
-            if not next(aSelectionSetUnits) then
-                aSelectionSetUnits = aValidUnits
-            end
-
             -- append the selection set
-            for k, unit in aSelectionSetUnits do
+            for k, unit in aValidUnits do
                 table.insert(aSelectedUnits, unit)
             end
 
