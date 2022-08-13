@@ -192,6 +192,10 @@ end
 ---@param name string
 ---@param unit UserUnit
 function AddUnitToSelectionSet(name, unit)
+
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
     if Prefs.GetFromCurrentProfile('options.selection-sets-production-behavior') then
 
         -- remove it from existing selection sets
@@ -199,6 +203,7 @@ function AddUnitToSelectionSet(name, unit)
             local others = unit:GetSelectionSets()
             for k, other in others do
                 if selectionSets[other] then
+                    unit:RemoveSelectionSet(other)
                     selectionSets[other][unit] = nil
                 end
             end
@@ -217,6 +222,9 @@ end
 ---@param unitArray UserUnit[]
 function AddSelectionSet(name, unitArray)
 
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
     -- guarantee that a table exists
     selectionSets[name] = selectionSets[name] or { }
 
@@ -234,6 +242,7 @@ function AddSelectionSet(name, unitArray)
             if Prefs.GetFromCurrentProfile('options.selection-sets-add-behavior') then
                 local others = unit:GetSelectionSets()
                 for k, other in others do
+                    unit:RemoveSelectionSet(other)
                     selectionSets[other][unit] = nil
                 end
             end
@@ -242,6 +251,8 @@ function AddSelectionSet(name, unitArray)
             selectionSets[name][unit] = true
         end
     end
+
+    reprsl(selectionSets[name])
 
     -- peform selection set callbacks
     for i, v in selectionSetCallbacks do
@@ -259,6 +270,9 @@ end
 ---@param name string
 function ApplySelectionSet(name)
     
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
     -- validate units, remove the ones that got transformed into wrecks
     local aValidUnits = ProcessSelectionSet(name)
     local aSelection = EntityCategoryFilterDown(categories.ALLUNITS - (categories.FACTORY - categories.MOBILE) , aValidUnits)
@@ -287,13 +301,16 @@ end
 ---@param name any
 function FactorySelection(name)
 
+    -- bug where name is an index, not a key
+    name = tostring(name)
+
     -- validate units, remove the ones that got transformed into wrecks
     local aValidUnits = ProcessSelectionSet(name)
     local aSelection = EntityCategoryFilterDown(categories.FACTORY, aValidUnits)
 
     -- clean up the cache
     EmptyHash(selectionSets[name])
-    ToHash(aSelection, selectionSets[name])
+    ToHash(aValidUnits, selectionSets[name])
 
     SelectUnits(aSelection)
 end
@@ -302,7 +319,7 @@ end
 ---@param name any
 function AppendSetToSelection(name)
 
-    -- engine bug
+    -- bug where name is an index, not a key
     name = tostring(name)
 
     -- retrieve the two groups of units
