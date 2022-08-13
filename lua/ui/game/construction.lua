@@ -1291,7 +1291,7 @@ end
 
 function OnClickHandler(button, modifiers)
 
-    PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"})    
+    PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
 
     local item = button.Data
 
