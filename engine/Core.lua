@@ -237,7 +237,7 @@ function RegisterProjectileBlueprint(spec)
 end
 
 --- Define a prop, only works in `blueprints.lua`
-v
+---@param spec any
 function RegisterPropBlueprint(spec)
 end
 
