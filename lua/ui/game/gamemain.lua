@@ -489,7 +489,6 @@ function CreateWldUIProvider()
         for _, func in OnDestroyFuncs do
             func()
         end
-        import('rallypoint.lua').ClearAllRallyPoints()
     end
 
     provider.GetPrefetchTextures = function(self)
@@ -618,7 +617,6 @@ function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
     if not isOldSelection then
         import('/lua/ui/game/selection.lua').PlaySelectionSound(added)
-        import('/lua/ui/game/rallypoint.lua').OnSelectionChanged(newSelection)
     end
 
     if newSelection then
