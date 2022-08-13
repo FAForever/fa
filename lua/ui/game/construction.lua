@@ -209,7 +209,6 @@ function ResetOrderQueue(factory)
 end
 
 function ResetOrderQueues(units)
-    LOG("ResetOrderQueues")
     local factories = EntityCategoryFilterDown((categories.SHOWQUEUE * categories.STRUCTURE) + categories.FACTORY, units)
     if factories[1] then
         Select.Hidden(function()
@@ -1292,30 +1291,7 @@ end
 
 function OnClickHandler(button, modifiers)
 
-    PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"}))
-
-    -- Data: table: 1E3724B0
-    -- INFO:  -    id: dal0310
-    -- INFO:  -    idleCon: false
-    -- INFO:  -    lowFuel: false
-    -- INFO:  -    type: unitstack
-    -- INFO:  -    units: table: 1E3723C0
-    -- INFO:  -       10: table: 1485BC30 (skipped) 
-    -- INFO:  -       11: table: 1485BEB0 (skipped) 
-    -- INFO:  -       12: table: 1485BF00 (skipped) 
-    -- INFO:  -       13: table: 1485B848 (skipped) 
-    -- INFO:  -       14: table: 1E552F00 (skipped) 
-    -- INFO:  -       15: table: 1485B3E8 (skipped) 
-    -- INFO:  -       1: table: 13E08938 (skipped) 
-    -- INFO:  -       2: table: 13E08988 (skipped) 
-    -- INFO:  -       3: table: 1BC0F550 (skipped) 
-    -- INFO:  -       4: table: 1BC0F398 (skipped) 
-    -- INFO:  -       5: table: 1485B438 (skipped) 
-    -- INFO:  -       6: table: 13E08668 (skipped) 
-    -- INFO:  -       7: table: 13E08618 (skipped) 
-    -- INFO:  -       8: table: 1BC0FA28 (skipped) 
-    -- INFO:  -       9: table: 1BC0F780 (skipped) 
-    
+    PlaySound(Sound({Cue = "UI_MFD_Click", Bank = "Interface"})    
 
     local item = button.Data
 
@@ -1457,9 +1433,6 @@ function OnClickHandler(button, modifiers)
         end
         RefreshUI()
     elseif item.type == 'unitstack' then
-
-        reprsl(item)
-
         if modifiers.Left then
             SelectUnits(item.units)
         elseif modifiers.Right then
