@@ -212,6 +212,7 @@ function AddUnitToSelectionSet(name, unit)
         -- guarantee that a table exists
         selectionSets[name] = selectionSets[name] or { }
         selectionSets[name][unit] = true
+        unit:AddSelectionSet(name)
     else 
         unit:RemoveSelectionSet(name)
     end
@@ -252,8 +253,6 @@ function AddSelectionSet(name, unitArray)
         end
     end
 
-    reprsl(selectionSets[name])
-
     -- peform selection set callbacks
     for i, v in selectionSetCallbacks do
         v(name, unitArray, false)
@@ -286,7 +285,7 @@ function ApplySelectionSet(name)
 
     -- clean up the cache
     EmptyHash(selectionSets[name])
-    ToHash(aSelection, selectionSets[name])
+    ToHash(aValidUnits, selectionSets[name])
 
     SelectUnits(aSelection)
     DoubleTapBehavior(name, aSelection)
