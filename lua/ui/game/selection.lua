@@ -30,8 +30,8 @@ local lastSelectionTime = 0
 
 local playSelectionSound = true
 
---- Enables or disables the sound played upon selecting
----@param flag any
+--- Enables or disables the sound played upon selecting units
+---@param flag boolean
 function EnableSelectionSound(flag)
     playSelectionSound = flag
 end
