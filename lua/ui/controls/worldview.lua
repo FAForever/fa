@@ -27,29 +27,36 @@ WorldViewParams = {
     ui_MaxExtractSnapPixels = 1000,
 }
 
-local CommandDecals = {}
+local KeyCodeAlt = 18
+local KeyCodeCtrl = 17
 
-function OnStartCommandMode(command_mode, command_data)
-    if command_mode == 'order' and DecalFunctions[command_data.name] then
-        CommandDecals = DecalFunctions[command_data.name]()
-    else
-        CommandDecals = {}
-    end
-end
+local weaponsCached = { }
+
+---@class WorldViewDecalData
+---@field texture string
+---@field scale number
 
 -- If all selected units with the SHOWATTACKRETICLE flag set are of the same type, return the weapon
 -- table from their blueprint. Otherwise returns null.
-local function GetSelectedWeaponsWithReticules(filterFunc)
+
+--- Returns all weapon blueprints that match the predicate of units with the `SHOWATTACKRETICLE` category set
+---@param predicate function<WeaponBlueprint>
+---@return WeaponBlueprint[]
+local function GetSelectedWeaponsWithReticules(predicate)
     local selectedUnits = GetSelectedUnits()
-    local bp = nil
 
-    local weapons = {};
+    -- clear out the cache
+    local weapons = weaponsCached
+    for k, other in weapons do
+        weapons[k] = false
+    end
 
+    -- find valid units
     for i, u in selectedUnits do
-        if EntityCategoryContains(categories.SHOWATTACKRETICLE, u) then
-            local bp = u:GetBlueprint()
+        local bp = u:GetBlueprint()
+        if bp.CategoriesHash['SHOWATTACKRETICLE'] then
             for k, v in bp.Weapon do
-                if filterFunc(v) then
+                if predicate(v) then
                     weapons[bp.BlueprintId] = v
                     break
                 end
@@ -60,9 +67,11 @@ local function GetSelectedWeaponsWithReticules(filterFunc)
     return weapons
 end
 
---- A generic decal function that maximises the available DamageRadius values.
-local function RadiusDecalFunction(filterFunc)
-    local weapons = GetSelectedWeaponsWithReticules(filterFunc)
+--- A generic decal texture / size computation function that uses the damage or spread radius
+---@param predicate function<WeaponBlueprint>
+---@return WorldViewDecalData[]
+local function RadiusDecalFunction(predicate)
+    local weapons = GetSelectedWeaponsWithReticules(predicate)
 
     -- The maximum damage radius of a selected missile weapon.
     local maxRadius = 0
@@ -86,23 +95,23 @@ local function RadiusDecalFunction(filterFunc)
     return false
 end
 
---- Specialised decal function for nukes: draws the inner/outer radii separately.
+--- A decal texture / size computation function for `RULEUCC_Nuke`
+---@return WorldViewDecalData[]
 local function NukeDecalFunc()
     local weapons = GetSelectedWeaponsWithReticules(
         function(w)
             return w.NukeWeapon
         end
-)
+    )
 
     local inner = 0
     local outer = 0
     for _, w in weapons do
-
         if w.NukeOuterRingRadius > outer then
             outer = w.NukeOuterRingRadius
         end
 
-        if w.NukeInnerRingRadius > inner then
+        if w.NukeInnerRinzgRadius > inner then
             inner = w.NukeInnerRingRadius
         end
     end
@@ -116,6 +125,8 @@ local function NukeDecalFunc()
     end
 end
 
+--- A decal texture / size computation function for `RULEUCC_Tactical`
+---@return WorldViewDecalData[]
 local function TacticalDecalFunc()
     return RadiusDecalFunction(
         function(w)
@@ -124,6 +135,8 @@ local function TacticalDecalFunc()
 )
 end
 
+--- A decal texture / size computation function for `RULEUCC_Attack`
+---@return WorldViewDecalData[]
 local function AttackDecalFunc(mode)
     return RadiusDecalFunction(
         function(w)
@@ -132,6 +145,8 @@ local function AttackDecalFunc(mode)
 )
 end
 
+--- A decal texture / size computation function for `RULEUCC_Overcharge`
+---@return WorldViewDecalData[]
 local function OverchargeDecalFunc()
     return RadiusDecalFunction(
         function(w)
@@ -140,30 +155,621 @@ local function OverchargeDecalFunc()
     )
 end
 
-DecalFunctions = {
-    RULEUCC_Attack = AttackDecalFunc,
-    RULEUCC_Nuke = NukeDecalFunc,
-    RULEUCC_Tactical = TacticalDecalFunc,
-    RULEUCC_Overcharge = OverchargeDecalFunc
+--- A dictionary that takes a command name and maps it to the respective callback of the WorldView class
+local orderToCursorCallback = {
+
+    -- orders that have use of a cursors
+    RULEUCC_Move = 'OnCursorMove',
+    RULEUCC_Guard = 'OnCursorGuard',
+    RULEUCC_Repair = 'OnCursorRepair',
+    RULEUCC_Attack = 'OnCursorAttack',
+    RULEUCC_Patrol = 'OnCursorPatrol',
+    RULEUCC_Teleport = 'OnCursorTeleport',
+    RULEUCC_Tactical = 'OnCursorTactical',
+    RULEUCC_Nuke = 'OnCursorNuke',
+    RULEUCC_Reclaim = 'OnCursorReclaim',
+    RULEUCC_SpecialAction = 'OnCursorSpecialAction',
+    RULEUCC_Overcharge = 'OnCursorOvercharge',
+    RULEUCC_Sacrifice = 'OnCursorSacrifice',
+    RULEUCC_Capture = 'OnCursorCapture',
+    RULEUCC_Transport = 'OnCursorTransport',
+    RULEUCC_Ferry = 'OnCursorFerry',
+    RULEUCC_Script = 'OnCursorScript',
+    RULEUCC_Invalid = 'OnCursorInvalid',
+    RULEUCC_CallTransport = 'OnCursorCallTransport',
+
+    -- misc
+    CommandHighlight = 'OnCursorCommandHover',
+
+    -- orders that are a one-click type of thing
+    RULEUCC_Stop = nil,
+    RULEUCC_Dive = nil,
+    RULEUCC_Dock = nil,
+    RULEUCC_Pause = nil,
+    RULEUCC_SiloBuildTactical = nil,
+    RULEUCC_SiloBuildNuke = nil,
+    RULEUCC_RetaliateToggle = nil,
 }
 
 ---@class WorldView : moho.UIWorldView, Control
 WorldView = Class(moho.UIWorldView, Control) {
 
-    Cursor = nil,
-    bMouseIn = false,
-    EventRedirect = nil,
-    _pingAnimationThreads = {},
-    Decals = {},
+    --- Contains cursor textures
+    Cursor = { },
+
+    --- Cursor trashbag that is emptied when the cursor is reset
+    CursorTrash = TrashBag(),
+
+    --- Last cursor event
+    CursorLastEvent = nil,
+
+    --- last cursor order name
+    CursorLastIdentifier = nil,
+
+    --- Cursor related decals
+    CursorDecals = { },
+
+    --- Flag that indicates whether the cursor is over the world (instead of the UI)
+    CursorOverWorld = false,
+
+    --- Flag that indicates whether we ignore a lot of the processing and focus only on move and attack move commands
+    IgnoreMode = false,
+
+    PingThreads = {},
+
     AutoBuild = false,
 
-    HandleEvent = function(self, event)
-        if self.EventRedirect then
-            return self.EventRedirect(self,event)
+
+    --- Only accept move and attack move commands, ignore everything else
+    ---@param self any
+    EnableIgnoreMode = function(self, enabled)
+        if enabled then
+            ConExecute("ui_CommandClickScale 0")
+            ConExecute("ui_SelectTolerance -1000")
+        else
+            ConExecute("ui_CommandClickScale 1")
+            ConExecute("ui_SelectTolerance 7")
         end
+    end,
+
+    --- Checks and toggles the ignore mode which only processes move and attack move commands
+    ---@param self WorldView
+    CheckIgnoreMode = function(self)
+        return IsKeyDown(KeyCodeCtrl) and not IsKeyDown(16) -- shift key
+    end,
+
+    --- Returns true if the reclaim command can be applied
+    ---@param self WorldView
+    ---@return boolean
+    CanIssueReclaimOrders = function(self)
+        if not self.Camera then
+            self.Camera = GetCamera('WorldCamera')
+        end
+
+        return self.Camera:GetZoom() < 150
+    end,
+
+    --- Called each frame to update the cursor, by the engine. We use it to determine the correct command
+    ---@param self any
+    OnUpdateCursor = function(self)
+
+        -- gather all information
+        local selection = GetSelectedUnits()
+        local command_mode, command_data = unpack(CommandMode.GetCommandMode())     -- is set when we issue orders manually, try to build something, etc
+        local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc
+
+        -- check if ignore mode is enabled
+        local ignoreMode = self:CheckIgnoreMode()
+        if ignoreMode ~= self.IgnoreMode then
+            if ignoreMode then
+                self:EnableIgnoreMode(true)
+            else
+                self:EnableIgnoreMode(false)
+            end
+
+            self.IgnoreMode = ignoreMode
+        end
+
+        -- process precedence hierarchy
+        ---@type CommandCap | 'CommandHighlight'
+        local order
+
+        -- if toggled, we ignore everything but move and attack move
+        if self.IgnoreMode then
+            if orderViaMouse == 'RULEUCC_Move' and IsKeyDown(KeyCodeAlt) and selection then
+                order = 'RULEUCC_Attack'
+            else
+                order = 'RULEUCC_Move'
+            end
+
+        -- otherwise, process as usual
+        else
+            -- first interaction with commands (when ctrl + shift)
+            if self:HasHighlightCommand() then
+                order = 'CommandHighlight'
+
+            -- then command mode
+            elseif command_mode then
+                order = command_data.cursor or command_data.name
+
+            -- then commands inherited by what the mouse is hovering over
+            else
+                -- check for right click, then it becomes an attack move order
+                if orderViaMouse == 'RULEUCC_Move' and IsKeyDown(KeyCodeAlt) and selection then
+                    order = 'RULEUCC_Attack'
+                elseif orderViaMouse ~= 'RULEUCC_Move' then
+                    order = orderViaMouse
+                end
+            end
+        end
+
+        -- perform the action accordingly
+        self:OnCursor(order, selection, command_data)
+    end,
+
+    --- Calls command-specific code to manage the cursor, if available
+    ---@param self WorldView
+    ---@param identifier CommandCap
+    OnCursor = function(self, identifier)
+
+        -- map order to event name
+        local event = orderToCursorCallback[identifier]
+
+        -- clean up previous cursor
+        if not (self.CursorLastEvent == event) and self[self.CursorLastEvent] then
+            self[self.CursorLastEvent](self, self.CursorLastIdentifier, false, false)
+        end
+
+        -- attempt to create a new cursor
+        if event and self[event] then
+            self[event](self, identifier, true, event ~= self.CursorLastEvent)
+            if event ~= self.CursorLastEvent then 
+                LOG(event)
+            end
+        else 
+            self:OnCursorReset(identifier, true, event ~= self.CursorLastEvent)
+        end
+
+        -- keep track of the previous cursor type
+        self.CursorLastEvent = event
+        self.CursorLastIdentifier = identifier
+    end,
+
+    --- Manages the decals of a cursor event
+    ---@param self WorldView
+    ---@param identifier CommandCap
+    ---@param enabled boolean
+    ---@param changed boolean
+    ---@param getDecalsBasedOnSelection function # See the radial decal functions
+    OnCursorDecals = function(self, identifier, enabled, changed, getDecalsBasedOnSelection)
+        if enabled then
+            if changed then
+
+                -- prepare decals based on the selection
+                local data = getDecalsBasedOnSelection()
+                if data then
+                    for k, instance in data do
+                        local decal = UserDecal()
+                        decal:SetTexture(instance.texture)
+                        decal:SetScale({ instance.scale, 1, instance.scale })
+                        self.CursorDecals[k] = decal
+                    end
+                end
+            end
+
+            -- update their locations
+            for k, decal in self.CursorDecals do
+                decal:SetPosition(GetMouseWorldPos())
+            end
+        else
+            -- command ended, destroy the current decals to make room for new decals
+            for k, decal in self.CursorDecals do
+                decal:Destroy()
+                self.CursorDecals[k] = nil
+            end
+        end
+    end,
+
+    --- Resets the cursor texture and state
+    ---@param self WorldView
+    ---@param identifier CommandCap
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorReset = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                self.Cursor[1] = nil
+                self.Cursor[2] = nil
+                self.Cursor[3] = nil
+                self.Cursor[4] = nil
+                self.Cursor[5] = nil
+
+                GetCursor():Reset()
+            end
+        end
+    end,
+
+    --- Called when hovering over a command
+    ---@param self WorldView
+    ---@param identifier CommandCap
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorCommandHover = function(self, identifier, enabled, changed)
+        if self:ShowConvertToPatrolCursor() then
+            local cursor = self.Cursor
+            cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("MOVE2PATROLCOMMAND")
+        else
+            local cursor = self.Cursor
+            cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor('HOVERCOMMAND')
+        end
+
+        self:ApplyCursor()
+    end,
+
+    --- Called when the user starts dragging a command
+    ---@param self WorldView
+    ---@param identifier CommandCap
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorCommandDragStart = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("DRAGCOMMAND")
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the user stops dragging a command
+    ---@param self WorldView
+    ---@param identifier CommandCap
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorCommandDragEnd = function(self, identifier, enabled, changed)
+        self:OnUpdateCursor()
+    end,
+
+    --- Called when the order `RULEUCC_Move` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Move'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorMove = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Guard` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Guard'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorGuard = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Repair` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Repair'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorRepair = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Attack` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Attack'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorAttack = function(self, identifier, enabled, changed)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+
+        self:OnCursorDecals(identifier, enabled, changed, AttackDecalFunc)
+    end,
+
+    --- Called when the order `RULEUCC_Patrol` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Attack'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorPatrol = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Teleport` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Teleport'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorTeleport = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Tactical` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Tactical'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorTactical = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
+            end
+        else
+            if not self.IgnoreMode then
+                self:EnableIgnoreMode(false)
+            end
+        end
+
+        self:OnCursorDecals(identifier, enabled, changed, TacticalDecalFunc)
+    end,
+
+    --- Called when the order `RULEUCC_Nuke` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Nuke'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorNuke = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+
+                self:EnableIgnoreMode(true)
+            end
+        else
+            if not self.IgnoreMode then
+                self:EnableIgnoreMode(false)
+            end
+        end
+
+        self:OnCursorDecals(identifier, enabled, changed, NukeDecalFunc)
+    end,
+
+    --- Called when the order `RULEUCC_Reclaim` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Reclaim'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorReclaim = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            -- init sequence
+            if changed then
+
+                if CommandMode.InCommandMode() and (not self.IgnoreMode) then
+                    ConExecute("ui_SelectTolerance 50")
+                end
+
+                self.CanIssueReclaimOrdersOld = self:CanIssueReclaimOrders()
+                if self.CanIssueReclaimOrdersOld then
+                    local cursor = self.Cursor
+                    cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                    self:ApplyCursor()
+                else
+                    local cursor = self.Cursor
+                    cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier .. 'Disabled')
+                    self:ApplyCursor()
+                end
+
+            -- update sequence
+            else 
+                local canIssueReclaimOrders = self:CanIssueReclaimOrders()
+                if canIssueReclaimOrders ~= self.CanIssueReclaimOrdersOld then
+                    if canIssueReclaimOrders then
+                        local cursor = self.Cursor
+                        cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                        self:ApplyCursor()
+                    else
+                        local cursor = self.Cursor
+                        cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier .. 'Disabled')
+                        self:ApplyCursor()
+                    end
+
+                    self.CanIssueReclaimOrdersOld = canIssueReclaimOrders
+                end
+            end
+        else
+            if not self.IgnoreMode then
+                ConExecute("ui_SelectTolerance 7")
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_SpecialAction` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_SpecialAction'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorSpecialAction = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Overcharge` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Overcharge'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorOvercharge = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            local canKill = OverchargeCanKill()
+            if canKill == true then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+            elseif canKill == false then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("OVERCHARGE_ORANGE")
+            else
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor("OVERCHARGE_GREY")
+            end
+
+            self:ApplyCursor()
+        end
+
+        self:OnCursorDecals(identifier, enabled, changed, OverchargeDecalFunc)
+    end,
+
+    --- Called when the order `RULEUCC_Sacrifice` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Sacrifice'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorSacrifice = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Capture` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Capture'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorCapture = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Transport` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Transport'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorTransport = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Ferry` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Ferry'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorFerry = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Script` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Script'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorScript = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Invalid` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Invalid'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorInvalid = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called when the order `RULEUCC_Transport` is being applied
+    ---@param self WorldView
+    ---@param identifier 'RULEUCC_Transport'
+    ---@param enabled boolean
+    ---@param changed boolean
+    OnCursorCallTransport = function(self, identifier, enabled, changed, commandData)
+        if enabled then
+            if changed then
+                local cursor = self.Cursor
+                cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
+                self:ApplyCursor()
+            end
+        end
+    end,
+
+    --- Called whenever the mouse moves and clicks in the world view
+    ---@param self WorldView
+    ---@param event any
+    ---@return boolean
+    HandleEvent = function(self, event)
         if event.Type == 'MouseEnter' or event.Type == 'MouseMotion' then
-            self.bMouseIn = true
-            if self.Cursor then
+            self.CursorOverWorld = true
+            if not table.empty(self.Cursor) then
                 if (self.LastCursor == nil) or (self.Cursor[1] != self.LastCursor[1]) then
                     self.LastCursor = self.Cursor
                     GetCursor():SetTexture(unpack(self.Cursor))
@@ -171,8 +777,9 @@ WorldView = Class(moho.UIWorldView, Control) {
             else
                 GetCursor():Reset()
             end
+
         elseif event.Type == 'MouseExit' then
-            self.bMouseIn = false
+            self.CursorOverWorld = false
             GetCursor():Reset()
             self.LastCursor = nil
             self:ResetDecals()
@@ -228,112 +835,16 @@ WorldView = Class(moho.UIWorldView, Control) {
     end,
 
     ResetDecals = function(self)
-        for _, d in self.Decals do
+        for _, d in self.CursorDecals do
             d:Destroy()
         end
-        self.Decals = {}
-    end,
-
-    OnUpdateCursor = function(self)
-        local oldCursor = self.Cursor
-        local command_mode, command_data = unpack(CommandMode.GetCommandMode())
-
-        if not command_mode then
-            local units = GetSelectedUnits()
-            local order = self:GetRightMouseButtonOrder()
-            if self:HasHighlightCommand() then
-                if self:ShowConvertToPatrolCursor() then
-                    self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
-                else
-                    self.Cursor = {UIUtil.GetCursor('HOVERCOMMAND')}
-                end
-            elseif (not order or order == 'RULEUCC_Move') and IsKeyDown(18) and units and not table.empty(units) then
-                local availableOrders,_,_ = GetUnitCommandData(units)
-                for _, availOrder in availableOrders do
-                    if (availOrder == 'RULEUCC_RetaliateToggle' and not table.empty(EntityCategoryFilterDown(categories.MOBILE, units)))
-                        or not table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.POD, units))
-                        or not table.empty(EntityCategoryFilterDown(categories.FACTORY, units)) then
-
-                        self.Cursor = {UIUtil.GetCursor('ATTACK_MOVE')}
-                        break
-                    end
-                end
-            else
-                -- Don't show the move cursor as a right mouse button hightlight state
-                if order and order ~= 'RULEUCC_Move' then
-                    self.Cursor = {UIUtil.GetCursor(order)}
-                else
-                    self.Cursor = nil
-                end
-
-                -- Catches if there is no order, or if there is no cursor assigned to the order
-                if not self.Cursor then
-                    GetCursor():Reset()
-                end
-            end
-        elseif command_mode == "order" then
-            if self:ShowConvertToPatrolCursor() then
-                self.Cursor = {UIUtil.GetCursor("MOVE2PATROLCOMMAND")}
-            elseif command_data.name == "RULEUCC_Overcharge" then
-                local canKill = OverchargeCanKill()
-                if canKill == true then
-                    self.Cursor = {UIUtil.GetCursor(command_data.name)}
-                elseif canKill == false then
-                    self.Cursor = {UIUtil.GetCursor("OVERCHARGE_ORANGE")}
-                else
-                    self.Cursor = {UIUtil.GetCursor("OVERCHARGE_GREY")}
-                end
-            else
-                if command_data.cursor then
-                    self.Cursor = {UIUtil.GetCursor(command_data.cursor)}
-                else
-                    self.Cursor = {UIUtil.GetCursor(command_data.name)}
-                end
-            end
-        elseif command_mode == "build" then
-            self.Cursor = {UIUtil.GetCursor('BUILD')}
-        elseif command_mode == "ping" then
-            self.Cursor = {UIUtil.GetCursor(command_data.cursor)}
-        end
-
-        if CommandDecals[1] and command_mode then
-            local valid = GetValidAttackingUnits()
-            if not valid then
-                self.Cursor = {UIUtil.GetCursor('RULEUCC_Invalid')}
-                self:ResetDecals()
-            else
-                for i, cd in CommandDecals do
-                    if not self.Decals[i] then
-                        self.Decals[i] = UserDecal()
-                    end
-
-                    local cursor_decal = self.Decals[i]
-                    if cursor_decal.texture ~= cd.texture then
-                        cursor_decal:SetTexture(cd.texture)
-                        cursor_decal.texture = cd.texture
-                    end
-
-                    if cursor_decal.scale ~= cd.scale then
-                        cursor_decal:SetScale(Vector(cd.scale, 1, cd.scale))
-                        cursor_decal.scale = cd.scale
-                    end
-
-                    cursor_decal:SetPosition(GetMouseWorldPos())
-                end
-            end
-        else
-            self:ResetDecals()
-        end
-
-        if not (self.Cursor and oldCursor) or self.Cursor[1] ~= oldCursor[1] then
-            self:ApplyCursor()
-        end
+        self.CursorDecals = {}
     end,
 
     OnDestroy = function(self)
         self:ResetDecals()
 
-        for i, v in self._pingAnimationThreads do
+        for i, v in self.PingThreads do
             if v then KillThread(v) end
         end
         if self._registered then
@@ -343,11 +854,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     end,
 
     OnCommandDragBegin = function(self)
-        local dragCommandCursor = {UIUtil.GetCursor("DRAGCOMMAND")}
-        if (self.Cursor == nil) or (self.Cursor[1] != dragCommandCursor[1]) then
-            self.Cursor = dragCommandCursor
-            self:ApplyCursor()
-        end
+
     end,
 
     OnCommandDragEnd = function(self)
@@ -355,7 +862,7 @@ WorldView = Class(moho.UIWorldView, Control) {
     end,
 
     ApplyCursor = function(self)
-        if self.Cursor and self.bMouseIn then
+        if self.Cursor and self.CursorOverWorld then
             GetCursor():SetTexture(unpack(self.Cursor))
         end
     end,
@@ -435,7 +942,7 @@ WorldView = Class(moho.UIWorldView, Control) {
                         end
                     end
                 end
-                table.insert(self._pingAnimationThreads, ForkThread(function()
+                table.insert(self.PingThreads, ForkThread(function()
                     local Arrow = false
                     if not self._disableMarkers then
                         Arrow = self:CreateCameraIndicator(self, pingData.Location, pingData.ArrowColor)

@@ -152,6 +152,7 @@ skins = {
             RULEUCC_SpecialAction = {'/textures/ui/common/game/cursors/attack-.dds', 15, 15, 11, 12},
             RULEUCC_Patrol = {'/textures/ui/common/game/cursors/patrol-.dds', 15, 15, 5, 12},
             RULEUCC_Reclaim = {'/textures/ui/common/game/cursors/reclaim02-.dds', 15, 15, 23, 12},
+            RULEUCC_ReclaimDisabled = {'/textures/ui/common/game/cursors/reclaim-disabled.png', 15, 15},
             RULEUCC_Repair = {'/textures/ui/common/game/cursors/repair-.dds', 15, 15, 7, 12},
             RULEUCC_Sacrifice = {'/textures/ui/common/game/cursors/sacrifice-.dds', 15, 15, 13, 12},
             RULEUCC_Transport = {'/textures/ui/common/game/cursors/unload-.dds', 15, 3, 14, 12},
