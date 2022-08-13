@@ -155,7 +155,6 @@ local function DoubleTapBehavior(name, units)
             local settings = cam:SaveSettings()
 
             UIZoomTo(units)
-            cam:RevertRotation()
 
             -- only zoom out, but not in
             if doubleTapbehavior == 'translate-zoom-out-only' then
@@ -168,6 +167,9 @@ local function DoubleTapBehavior(name, units)
             elseif doubleTapbehavior == 'translate' then
                 cam:SetZoom(settings.Zoom, 0)
             end
+
+            -- guarantee it looks like it should
+            cam:RevertRotation()
         end
 
         lastSelectionName = nil
