@@ -42,15 +42,15 @@
 -- function: 1DE7E1C0 (BuilderParamCheck, id = 1) = { base instance }
 
 -- It allows us to track a function back to the base instance.
-local Hierarchy = {}
+Hierarchy = {}
 
 --- Debug utilities
 
 local enableDebugging = false
 
-local HierarchyDebugLookup = {}
-local HierarchyDebugLookupCFunctions = {}
-local HierarchyDebugLookupCount = {}
+HierarchyDebugLookup = {}
+HierarchyDebugLookupCFunctions = {}
+HierarchyDebugLookupCount = {}
 
 local function PrintHierarchy()
     -- cache for performance

@@ -48,7 +48,7 @@ Checkbox = Class(Group) {
         local enclosingInstance = self
 
         -- Delegate clicks on the label to the main handler.
-        textfield.OnClick = function(this, modifiers)
+        textfield.OnClick = function(control, modifiers)
             enclosingInstance:OnClick(modifiers)
         end
 

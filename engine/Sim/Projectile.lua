@@ -2,11 +2,6 @@
 ---@class moho.projectile_methods : moho.entity_methods
 local Projectile = {}
 
---- Change the detonate above height for the projectile
----@param height number
-function Projectile:ChangeDetonateAboveHeight(height)
-end
-
 --- Change the detonate above height for the projectile, relative to the terrain
 ---@param height number
 function Projectile:ChangeDetonateAboveHeight(height)
