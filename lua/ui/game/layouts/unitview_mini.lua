@@ -23,6 +23,8 @@ local iconTextures = {
     UIUtil.UIFile('/game/unit_view_icons/shield.dds'),
     UIUtil.UIFile('/game/unit_view_icons/fuel.dds'),
     UIUtil.UIFile('/game/unit_view_icons/build.dds'),
+    UIUtil.UIFile('/game/unit_view_icons/reclaim_mass.dds'),
+    UIUtil.UIFile('/game/unit_view_icons/reclaim_energy.dds'),
 }
 function SetLayout()
     local controls = import('/lua/ui/game/unitview.lua').controls
@@ -138,10 +140,10 @@ function SetLayout()
     LayoutHelpers.AtLeftTopIn(controls.ReclaimGroup, controls.bg, 128, 58)
     LayoutHelpers.SetDimensions(controls.ReclaimGroup, 80, 48)
     -- LayoutHelpers.AtLeftTopIn(controls.ReclaimGroup.Title, controls.ReclaimGroup, -10, 0)
-    controls.ReclaimGroup.MassIcon:SetTexture(iconTextures[1])
-    controls.ReclaimGroup.EnergyIcon:SetTexture(iconTextures[2])
-    LayoutHelpers.AtLeftTopIn(controls.ReclaimGroup.MassIcon, controls.ReclaimGroup, 1)
-    LayoutHelpers.Below(controls.ReclaimGroup.EnergyIcon, controls.ReclaimGroup.MassIcon, 0)
+    controls.ReclaimGroup.MassIcon:SetTexture(iconTextures[9])
+    controls.ReclaimGroup.EnergyIcon:SetTexture(iconTextures[10])
+    LayoutHelpers.AtLeftTopIn(controls.ReclaimGroup.MassIcon, controls.ReclaimGroup, 1, 2)
+    LayoutHelpers.Below(controls.ReclaimGroup.EnergyIcon, controls.ReclaimGroup.MassIcon, 3)
     LayoutHelpers.RightOf(controls.ReclaimGroup.MassText, controls.ReclaimGroup.MassIcon, 5)
     LayoutHelpers.AtVerticalCenterIn(controls.ReclaimGroup.MassText, controls.ReclaimGroup.MassIcon, 0)
     LayoutHelpers.RightOf(controls.ReclaimGroup.EnergyText, controls.ReclaimGroup.EnergyIcon, 5)
