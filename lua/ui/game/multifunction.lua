@@ -1133,8 +1133,8 @@ local gameColors = {"ffe80a0a","ff901427","fffafa00","ffeead0e","ffff873e","ffff
                     "ffffffff","ff616d7e","ffdeb887"}                                                                     --Others
 local teamColorSettings = {
     colors = {Player = {"ff436eee"}, 
-              Allies = {"ff9161ff","ff2e8b57","ff40bf40","ff5f01a7","ff2929e1","ff66ffcc","ff2f4f4f","ff116a78"},
-              Enemies = {"ffe80a0a","ff901427","fffafa00","ffff6700","fff131f2","ffff88ff","ffb76518","ffeead0e"},
+              Allies = {"ff40bf40","ff2e8b57","ff40bf40","ff2e8b57","ff40bf40","ff2e8b57","ff40bf40","ff2e8b57"},
+              Enemies = {"ffe80a0a","ff901427","ffe80a0a","ff901427","ffe80a0a","ff901427","ffe80a0a","ff901427"},
               Neutral = {"ffdeb887"}
               },
     autoEnable = false,
