@@ -572,8 +572,6 @@ local function StoreSamples(exitType)
     --     return
     -- end
 
-    LOG("Storing samples!")
-
     -- get / store the preference table
 
     -- determine game flags
@@ -595,8 +593,6 @@ local function StoreSamples(exitType)
             identifier = 'Skirmish'
         end
     end
-
-    LOG("Keeping track for: ", identifier)
 
     -- retrieve and update data
     local data = GetPreference('PerformanceTrackingV2') or { }
@@ -696,10 +692,8 @@ local function PerformanceTrackingThread()
 
         -- # Store the sample
 
-        LOG("Sampling at rate: " .. tostring(rate))
-
         local sample = samples[rate]
-        if sample.Samples > 0 then 
+        if sample.Samples > 0 then
             sample.UnitCount.Min = math.min(sample.UnitCount.Min, unitCount)
             sample.UnitCount.Max = math.max(sample.UnitCount.Max, unitCount)
         else 
