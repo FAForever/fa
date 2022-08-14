@@ -587,12 +587,12 @@ local function StoreSamples(exitType)
     end
 
     -- determine identifier based on game flags
-    local identifier = 'campaign'
+    local identifier = 'Campaign'
     if isSkirmish then
         if hasAI then
-            identifier = 'skirmish-ai'
+            identifier = 'SkirmishWithAI'
         else 
-            identifier = 'skirmish'
+            identifier = 'Skirmish'
         end
     end
 
