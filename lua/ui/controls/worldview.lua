@@ -54,7 +54,7 @@ local function GetSelectedWeaponsWithReticules(predicate)
     -- find valid units
     for i, u in selectedUnits do
         local bp = u:GetBlueprint()
-        if bp.CategoriesHash['SHOWATTACKRETICLE'] then
+        if bp.CategoriesHash['SHOWATTACKRETICLE'] and (not weapons[bp.BlueprintId]) then
             for k, v in bp.Weapon do
                 if predicate(v) then
                     weapons[bp.BlueprintId] = v
@@ -252,11 +252,10 @@ WorldView = Class(moho.UIWorldView, Control) {
     --- Called each frame to update the cursor, by the engine. We use it to determine the correct command
     ---@param self any
     OnUpdateCursor = function(self)
-
         -- gather all information
         local selection = GetSelectedUnits()
         local command_mode, command_data = unpack(CommandMode.GetCommandMode())     -- is set when we issue orders manually, try to build something, etc
-        local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc
+        local orderViaMouse = self:GetRightMouseButtonOrder()                       -- is set when our mouse is over a hostile unit, reclaim, etc and not in command mode
 
         -- check if ignore mode is enabled
         local ignoreMode = self:CheckIgnoreMode()
@@ -284,13 +283,13 @@ WorldView = Class(moho.UIWorldView, Control) {
 
         -- otherwise, process as usual
         else
-            -- first interaction with commands (when ctrl + shift)
-            if self:HasHighlightCommand() then
-                order = 'CommandHighlight'
-
-            -- then command mode
-            elseif command_mode then
+            -- first command mode
+            if command_mode then
                 order = command_data.cursor or command_data.name
+
+            -- then command highlighting
+            elseif self:HasHighlightCommand() then
+                order = 'CommandHighlight'
 
             -- then commands inherited by what the mouse is hovering over
             else
@@ -568,46 +567,61 @@ WorldView = Class(moho.UIWorldView, Control) {
         self:OnCursorDecals(identifier, enabled, changed, NukeDecalFunc)
     end,
 
+    ApplyReclaimCursor = function(self, identifier, canIssueReclaimOrders, viaCommandMode, viaRightMouseButton)
+        local reference = identifier
+        if not canIssueReclaimOrders then
+            reference = reference .. 'Disabled'
+
+        -- this won't trigger because `GetRightMouseButtonOrder` always returns nil once we're in command mode
+        elseif viaCommandMode and (not viaRightMouseButton) then
+            reference = reference .. 'Invalid'
+        end
+
+        local cursor = self.Cursor
+        cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(reference)
+        self:ApplyCursor()
+    end,
+
     --- Called when the order `RULEUCC_Reclaim` is being applied
     ---@param self WorldView
     ---@param identifier 'RULEUCC_Reclaim'
     ---@param enabled boolean
     ---@param changed boolean
-    OnCursorReclaim = function(self, identifier, enabled, changed, commandData)
+    OnCursorReclaim = function(self, identifier, enabled, changed)
+
+        -- allows us to make easier distinctions for the status quo, note that this becomes invalid once we change
+        local commandData = CommandMode.GetCommandMode()
+        local viaCommandMode = commandData[1] and commandData[1] == 'order' and commandData[2].name == 'RULEUCC_Reclaim'
+        local viaRightMouseButton = self:GetRightMouseButtonOrder() == 'RULEUCC_Reclaim' -- always returns nil when in command mode
+        local canIssueReclaimOrders = self:CanIssueReclaimOrders()
+
         if enabled then
-            -- init sequence
             if changed then
 
-                if CommandMode.InCommandMode() and (not self.IgnoreMode) then
-                    ConExecute("ui_SelectTolerance 50")
+                if viaCommandMode then
+                    ConExecute("ui_SelectTolerance 100")
                 end
 
-                self.CanIssueReclaimOrdersOld = self:CanIssueReclaimOrders()
-                if self.CanIssueReclaimOrdersOld then
-                    local cursor = self.Cursor
-                    cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
-                    self:ApplyCursor()
-                else
-                    local cursor = self.Cursor
-                    cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier .. 'Disabled')
-                    self:ApplyCursor()
+                self.ViaCommandModeOld = viaCommandMode
+                self.CanIssueReclaimOrdersOld = canIssueReclaimOrders
+                self.ViaRightMouseButtonOld = viaRightMouseButton
+                self:ApplyReclaimCursor(identifier, canIssueReclaimOrders, viaCommandMode, true)
+            else
+                if (canIssueReclaimOrders ~= self.CanIssueReclaimOrdersOld) or (viaRightMouseButton ~= self.ViaRightMouseButtonOld) then
+                    self:ApplyReclaimCursor(identifier, canIssueReclaimOrders, viaCommandMode, true)
+
+                    self.ViaRightMouseButtonOld = viaRightMouseButton
+                    self.CanIssueReclaimOrdersOld = canIssueReclaimOrders
                 end
 
-            -- update sequence
-            else 
-                local canIssueReclaimOrders = self:CanIssueReclaimOrders()
-                if canIssueReclaimOrders ~= self.CanIssueReclaimOrdersOld then
-                    if canIssueReclaimOrders then
-                        local cursor = self.Cursor
-                        cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier)
-                        self:ApplyCursor()
+                if viaCommandMode ~= self.ViaCommandModeOld then
+                    if not viaCommandMode then
+                        ConExecute("ui_SelectTolerance 7")
                     else
-                        local cursor = self.Cursor
-                        cursor[1], cursor[2], cursor[3], cursor[4], cursor[5] = UIUtil.GetCursor(identifier .. 'Disabled')
-                        self:ApplyCursor()
+                        ConExecute("ui_SelectTolerance 50")
                     end
 
-                    self.CanIssueReclaimOrdersOld = canIssueReclaimOrders
+                    self.ViaCommandModeOld = viaCommandMode
                 end
             end
         else
