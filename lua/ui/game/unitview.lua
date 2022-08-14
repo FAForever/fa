@@ -141,7 +141,7 @@ local statFuncs = {
             local armyData = GetArmiesTable().armiesTable[info.armyIndex+1]
             local icon = Factions.Factions[armyData.faction+1].Icon
             if armyData.showScore and icon then
-                return armyData.nickname, UIUtil.UIFile(icon), armyData.color
+                return string.sub(armyData.nickname, 30), UIUtil.UIFile(icon), armyData.color
             else
                 return false
             end

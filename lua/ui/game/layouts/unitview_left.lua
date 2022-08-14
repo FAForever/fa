@@ -92,7 +92,6 @@ function SetLayout()
     LayoutHelpers.SetDimensions(controls.ReclaimGroup, 150, 200)
     LayoutHelpers.FillParent(controls.ReclaimGroup.MassIcon, controls.ReclaimGroup)
     controls.ReclaimGroup.MassIcon:SetSolidColor('ffffffff')
-    LOG("Set!")
     
     LayoutHelpers.Below(controls.nextVet, controls.vetBar)
     controls.nextVet:SetDropShadow(true)
