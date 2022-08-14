@@ -1173,7 +1173,7 @@ DefaultBeamWeapon = Class(DefaultProjectileWeapon) {
         while true do
             WaitSeconds(1)
             --if we're at hold fire, stop beam
-            if self.unit and (self.unit:GetFireState() == 1 or (not self:GetCurrentTarget())) then
+            if self.unit and (self.unit:GetFireState() == 1) then
                 self.BeamStarted = false
                 self:PlayFxBeamEnd(beam)
             end
