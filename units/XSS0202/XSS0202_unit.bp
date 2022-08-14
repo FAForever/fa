@@ -1,6 +1,6 @@
 UnitBlueprint {
     AI = {
-        GuardReturnRadius = 130,
+        GuardReturnRadius = 30,
     },
     Audio = {
         AmbientMove = Sound {

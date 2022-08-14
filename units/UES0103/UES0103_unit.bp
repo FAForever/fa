@@ -1,5 +1,6 @@
 UnitBlueprint {
     AI = {
+        GuardReturnRadius = 30,
         TargetBones = {
             'Front_Turret',
             'Back_Turret',

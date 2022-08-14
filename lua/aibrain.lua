@@ -294,6 +294,13 @@ AIBrain = Class(moho.aibrain_methods) {
         -- they are capitalized to match category names
         local layers = { "LAND", "AIR", "NAVAL" }
         local techs = { "TECH2", "TECH3" }
+    
+        self.Jammers = { }
+        setmetatable(self.Jammers, { __mode = 'v' })
+
+        self.JammerResetTime = 15
+
+        ForkThread(self.JammingToggleThread, self)
 
         -- populate the possible HQs per faction, layer and tech
         self.HQs = { }
@@ -384,6 +391,52 @@ AIBrain = Class(moho.aibrain_methods) {
         end
 
         self.PreBuilt = true
+    end,
+
+    -- Jamming Switch Logic
+
+    --- Adds a unit to a list of all units with jammers
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer unit
+    TrackJammer = function(self, unit)
+        self.Jammers[unit.EntityId] = unit
+    end,
+
+    --- Removes a unit to a list of all units with jammers
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer unit
+    UntrackJammer = function(self, unit)
+        self.Jammers[unit.EntityId] = nil
+    end,
+
+    --- Creates a thread that interates over all jammer units to reset them when vision is lost on them
+    ---@param self AIBrain 
+    JammingToggleThread = function(self)
+        while true do
+            for i, jammer in self.Jammers do
+                if jammer.ResetJammer == 0 then
+                    self:ForkThread(self.JammingFollowUpThread, jammer)
+                    jammer.ResetJammer = -1
+                else
+                    if jammer.ResetJammer > 0 then
+                        jammer.ResetJammer = jammer.ResetJammer - 1
+                    end
+                end
+            end
+            WaitSeconds(1)
+        end
+    end,
+
+    --- Toggles a given unit's jammer
+    ---@param self AIBrain
+    ---@param unit Unit         # Jammer to be toggled
+    JammingFollowUpThread = function(self, unit)
+        unit:DisableUnitIntel('AutoToggle', 'Jammer')
+        WaitSeconds(1)
+        if not unit:BeenDestroyed() then
+            unit:EnableUnitIntel('AutoToggle', 'Jammer')
+            unit.ResetJammer = -1
+        end
     end,
 
     -- Energy storage callbacks
@@ -640,6 +693,15 @@ AIBrain = Class(moho.aibrain_methods) {
     -- calls callback function with blip it saw.
     ---@param self AIBrain
     OnIntelChange = function(self, blip, reconType, val)
+        if reconType == 'LOSNow' or reconType == 'Omni' then
+            if not val then
+                local unit = blip:GetSource()
+                if unit.Blueprint.Intel.JammerBlips > 0 then
+                    unit.ResetJammer = self.JammerResetTime
+                end
+            end
+        end
+
         if self.IntelTriggerList then
             for k, v in self.IntelTriggerList do
                 if EntityCategoryContains(v.Category, blip:GetBlueprint().BlueprintId)

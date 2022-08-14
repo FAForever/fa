@@ -10,6 +10,7 @@ local WeaponFile = import('/lua/terranweapons.lua')
 local TIFCruiseMissileLauncherSub = WeaponFile.TIFCruiseMissileLauncherSub
 local TIFStrategicMissileWeapon = WeaponFile.TIFStrategicMissileWeapon
 
+---@class UES0304 : TSubUnit
 UES0304 = Class(TSubUnit) {
     DeathThreadDestructionWaitTime = 0,
     Weapons = {

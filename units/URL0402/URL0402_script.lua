@@ -19,6 +19,7 @@ local EffectUtil = import('/lua/EffectUtilities.lua')
 local CANTorpedoLauncherWeapon = CybranWeaponsFile.CANTorpedoLauncherWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
 
+---@class URL0402 : CWalkingLandUnit
 URL0402 = Class(CWalkingLandUnit) {
     WalkingAnimRate = 1.2,
 

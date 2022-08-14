@@ -12,6 +12,7 @@ local CAirUnit = import('/lua/cybranunits.lua').CAirUnit
 local CAAMissileNaniteWeapon = import('/lua/cybranweapons.lua').CAAMissileNaniteWeapon
 local CIFMissileCorsairWeapon = import('/lua/cybranweapons.lua').CIFMissileCorsairWeapon
 
+---@class DRA0202 : CAirUnit
 DRA0202 = Class(CAirUnit) {
     Weapons = {
         AntiAirMissiles = Class(CAAMissileNaniteWeapon) {},

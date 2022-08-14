@@ -4,7 +4,7 @@
 local CDamage = {}
 
 ---
----@return Entity
+---@return Entity | Projectile | Prop | Unit
 function CDamage:GetInstigator()
 end
 
@@ -14,14 +14,13 @@ function CDamage:GetTarget()
 end
 
 ---
---  CDamage:SetInstigator()
-function CDamage:SetInstigator()
+---@param instigator Unit
+function CDamage:SetInstigator(instigator)
 end
 
 ---
---  CDamage:SetTarget()
-function CDamage:SetTarget()
+---@param target Entity | Projectile | Prop | Unit
+function CDamage:SetTarget(target)
 end
 
 return CDamage
-

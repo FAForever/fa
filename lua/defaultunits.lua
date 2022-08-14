@@ -314,8 +314,26 @@ StructureUnit = Class(Unit) {
 
         if performUpgrade and order == 'Upgrade' then
             ChangeState(self, self.UpgradingState)
+
+            -- Fix an oddly specific bug to structures with damaged shields:
+            -- 1) let an engineer to assist the structure, repairing the damaged shield
+            -- 2) upgrade the structure while the shield is being healed
+            -- 3) engineer changes consumption target, but is in limbo - it consumes resources, but it doesn't repair the shield or help upgrade the structure
+
+            -- Luckily, engineers do not heal damaged shields on their own. It usually only happens when an engineer was specifically told to assist the shield,
+            -- therefore we add a check when we upgrade a structure that has a shield. For each guarding unit, check if this is the only command. If so,
+            -- re-issue the guard command
+            if self.MyShield then
+                local guards = self:GetGuards()
+                for k, guard in guards do
+                    if table.getn(guard:GetCommandQueue()) == 1 then
+                        IssueClearCommands({guard})
+                        IssueGuard({guard}, self)
+                    end
+                end
+            end
         end
-     end,
+    end,
 
     IdleState = State {
         Main = function(self)

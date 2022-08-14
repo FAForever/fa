@@ -9,6 +9,7 @@
 --****************************************************************************
 local AWallStructureUnit = import('/lua/aeonunits.lua').AWallStructureUnit
 
+---@class UAB5101 : AWallStructureUnit
 UAB5101 = Class(AWallStructureUnit) {}
 
 TypeClass = UAB5101

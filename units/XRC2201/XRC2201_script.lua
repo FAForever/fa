@@ -13,6 +13,7 @@ local CreateDeathExplosion = explosion.CreateDefaultHitExplosionAtBone
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 local utilities = import('/lua/Utilities.lua')
 
+---@class XRC2201 : CCivilianStructureUnit
 XRC2201 = Class(CCivilianStructureUnit) {
 
     OnCreate = function(self, builder, layer)      

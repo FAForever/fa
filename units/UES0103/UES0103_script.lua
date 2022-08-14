@@ -12,6 +12,7 @@ local TAALinkedRailgun = import('/lua/terranweapons.lua').TAALinkedRailgun
 local TDFGaussCannonWeapon = import('/lua/terranweapons.lua').TDFGaussCannonWeapon
 local Entity = import('/lua/sim/Entity.lua').Entity
 
+---@class UES0103 : TSeaUnit
 UES0103 = Class(TSeaUnit) {
     Weapons = {
         MainGun = Class(TDFGaussCannonWeapon) {

@@ -15,6 +15,7 @@ local AIFQuasarAntiTorpedoWeapon = AeonWeapons.AIFQuasarAntiTorpedoWeapon
 local EffectTemplate = import('/lua/EffectTemplates.lua')
 
 
+---@class UAS0103 : ASeaUnit
 UAS0103 = Class(ASeaUnit) {
 
     Weapons = {

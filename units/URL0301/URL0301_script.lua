@@ -15,6 +15,7 @@ local CAAMissileNaniteWeapon = CWeapons.CAAMissileNaniteWeapon
 local CDFLaserDisintegratorWeapon = CWeapons.CDFLaserDisintegratorWeapon02
 local SCUDeathWeapon = import('/lua/sim/defaultweapons.lua').SCUDeathWeapon
 
+---@class URL0301 : CCommandUnit
 URL0301 = Class(CCommandUnit) {
     LeftFoot = 'Left_Foot02',
     RightFoot = 'Right_Foot02',
