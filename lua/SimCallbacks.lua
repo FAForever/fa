@@ -564,6 +564,7 @@ function IsInvalidAssist(unit, target)
 end
 
 Callbacks.AttackMove = function(data, units)
+    LOG("AttackMove")
     -- exclude structures as it makes no sense to apply a move command to them
     local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
 
