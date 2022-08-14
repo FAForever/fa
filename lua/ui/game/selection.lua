@@ -320,7 +320,7 @@ end
 
 ---Adds the current selected units to the selection set
 ---@param name string | number
-function AppendSetToSelection(name)
+function AppendSetToSelection(name, appendBehavior)
 
     -- bug where name is an index, not a key
     name = tostring(name)
@@ -332,7 +332,7 @@ function AppendSetToSelection(name)
     if aSelectedUnits then 
 
         ---@type SelectionSetAppendBehavior
-        local appendBehavior = Prefs.GetFromCurrentProfile('options.selection-sets-append-behavior')
+        local appendBehavior = appendBehavior or Prefs.GetFromCurrentProfile('options.selection-sets-append-behavior')
 
         if appendBehavior == 'add-selection-set-to-selection' then
 
