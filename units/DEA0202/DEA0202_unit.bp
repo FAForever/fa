@@ -453,10 +453,11 @@ UnitBlueprint {
             FiringRandomness = 0.1,
             FiringTolerance = 6,
             FixBombTrajectory = true,
+            DropBombShort = 0,
             InitialDamage = 20, -- Total impact damage = 400. Total overall damage = 1600
             Label = 'Bomb',
             MaxRadius = 60,
-            MuzzleSalvoDelay = 0.2,
+            MuzzleSalvoDelay = 0.1,
             MuzzleSalvoSize = 20,
             MuzzleVelocity = 0,
             NeedToComputeBombDrop = true,
