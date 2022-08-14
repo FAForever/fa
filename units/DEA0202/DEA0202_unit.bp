@@ -304,7 +304,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             ProjectileId = '/projectiles/TAARailgun03/TAARailgun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
             RackBones = {
@@ -382,7 +382,7 @@ UnitBlueprint {
             MaxRadius = 30,
             MuzzleSalvoDelay = 0,
             MuzzleSalvoSize = 1,
-            MuzzleVelocity = 120,
+            MuzzleVelocity = 90,
             PrefersPrimaryWeaponTarget = true,
             ProjectileId = '/projectiles/TAARailgun03/TAARailgun03_proj.bp',
             ProjectileLifetimeUsesMultiplier = 1.25,
