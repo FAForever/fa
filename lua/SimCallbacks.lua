@@ -565,7 +565,7 @@ end
 
 Callbacks.AttackMove = function(data, units)
     -- exclude structures as it makes no sense to apply a move command to them
-    local allNonStructures = EntityCategoryFilterOut(categories.STRUCTURE, units)
+    local allNonStructures = EntityCategoryFilterDown(categories.ALLUNITS - categories.STRUCTURE, units)
 
     if data.Clear then
         IssueClearCommands(allNonStructures)
