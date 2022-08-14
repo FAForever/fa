@@ -244,7 +244,7 @@ end
 --However, this doesn't work for stunned units because it's a fire-and-forget type buff, not a fire-and-keep-track-of type buff.
 BuffEffects = {
 
-    Stun = function(unit, buffName, instigator, afterRemove) -- most dont use the last two args, so most don't have them. This is fine.
+    Stun = function(buffDefinition, buffValues, unit, buffName, instigator, afterRemove) -- most dont use the last two args, so most don't have them. This is fine.
         if unit.ImmuneToStun or afterRemove then return end
         unit:SetStunned(buffDef.Duration or 1, instigator)
         if unit.Anims then
@@ -254,10 +254,11 @@ BuffEffects = {
         end
     end,
 
-    Health = function(unit, buffName, instigator)
+    --- Quite confident that this one is broken
+    Health = function(buffDefinition, buffValues, unit, buffName, instigator)
         --Note: With health we don't actually look at the unit's table because it's an instant happening.  We don't want to overcalculate something as pliable as health.
         local health = unit:GetHealth()
-        local val = ((buffAffects.Health.Add or 0) + health) * (buffAffects.Health.Mult or 1)
+        local val = ((buffDefinition.Affects.Health.Add or 0) + health) * (buffDefinition.Affects.Health.Mult or 1)
         local healthadj = val - health
 
         if healthadj < 0 then
@@ -265,7 +266,7 @@ BuffEffects = {
             local data = {
                 Instigator = instigator,
                 Amount = -1 * healthadj,
-                Type = buffDef.DamageType or 'Spell',
+                Type = buffDefinition.DamageType or 'Spell',
                 Vector = VDiff(instigator:GetPosition(), unit:GetPosition()),
             }
             unit:DoTakeDamage(data)
@@ -274,7 +275,7 @@ BuffEffects = {
         end
     end,
 
-    MaxHealth = function(unit, buffName)
+    MaxHealth = function(buffDefinition, buffValues, unit, buffName)
         -- With this type of buff, the idea is to adjust the Max Health of a unit.
         -- The DoNotFill flag is set when we want to adjust the max ONLY and not have the
         --     rest of the unit's HP affected to match. If it's not flagged, the unit's HP
@@ -287,12 +288,12 @@ BuffEffects = {
 
         unit:SetMaxHealth(val)
 
-        if not vals.DoNotFill and not unit.IsBeingTransferred then
+        if not buffValues.DoNotFill and not unit.IsBeingTransferred then
             unit:SetHealth(unit, unit:GetMaxHealth() - difference)
         end
     end,
 
-    Regen = function(unit, buffName)
+    Regen = function(buffDefinition, buffValues, unit, buffName)
         -- Adjusted to use a special case of adding mults and calculating the final value
         -- in BuffCalculate to fix bugs where adds and mults would clash or cancel
         local bpRegen = unit:GetBlueprint().Defense.RegenRate or 0
@@ -301,7 +302,7 @@ BuffEffects = {
         unit:SetRegen(val)
     end,
 
-    Damage = function(unit, buffName)
+    Damage = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
             if wep.Label ~= 'DeathWeapon' and wep.Label ~= 'DeathImpact' then
@@ -320,7 +321,7 @@ BuffEffects = {
         end
     end,
 
-    DamageRadius = function(unit, buffName)
+    DamageRadius = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
             local wepbp = wep:GetBlueprint()
@@ -331,7 +332,7 @@ BuffEffects = {
         end
     end,
 
-    MaxRadius = function(unit, buffName)
+    MaxRadius = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
             local wepbp = wep:GetBlueprint()
@@ -342,14 +343,14 @@ BuffEffects = {
         end
     end,
 
-    MoveMult = function(unit, buffName)
+    MoveMult = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MoveMult', 1)
         unit:SetSpeedMult(val)
         unit:SetAccMult(val)
         unit:SetTurnMult(val)
     end,
 
-    WeaponsEnable = function(unit, buffName)
+    WeaponsEnable = function(buffDefinition, buffValues, unit, buffName)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
             local val, bool = BuffCalculate(unit, buffName, 'WeaponsEnable', 0, true)
@@ -357,12 +358,12 @@ BuffEffects = {
         end
     end,
 
-    VisionRadius = function(unit, buffName)
+    VisionRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'VisionRadius', unit:GetBlueprint().Intel.VisionRadius or 0)
         unit:SetIntelRadius('Vision', val)
     end,
 
-    RadarRadius = function(unit, buffName)
+    RadarRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'RadarRadius', unit:GetBlueprint().Intel.RadarRadius or 0)
         if not unit:IsIntelEnabled('Radar') then
             unit:InitIntel(unit.Army,'Radar', val)
@@ -377,7 +378,7 @@ BuffEffects = {
         end
     end,
 
-    OmniRadius = function(unit, buffName)
+    OmniRadius = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'OmniRadius', unit:GetBlueprint().Intel.OmniRadius or 0)
         if not unit:IsIntelEnabled('Omni') then
             unit:InitIntel(unit.Army,'Omni', val)
@@ -392,49 +393,49 @@ BuffEffects = {
         end
     end,
 
-    BuildRate = function(unit, buffName)
+    BuildRate = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'BuildRate', unit:GetBlueprint().Economy.BuildRate or 1)
         unit:SetBuildRate(val)
     end,
 
     -------- ADJACENCY BELOW --------
-    EnergyActive = function(unit, buffName)
+    EnergyActive = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyActive', 1)
         unit.EnergyBuildAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
-    MassActive = function(unit, buffName)
+    MassActive = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MassActive', 1)
         unit.MassBuildAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
-    EnergyMaintenance = function(unit, buffName)
+    EnergyMaintenance = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyMaintenance', 1)
         unit.EnergyMaintAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
-    MassMaintenance = function(unit, buffName)
+    MassMaintenance = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MassMaintenance', 1)
         unit.MassMaintAdjMod = val
         unit:UpdateConsumptionValues()
     end,
 
-    EnergyProduction = function(unit, buffName)
+    EnergyProduction = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyProduction', 1)
         unit.EnergyProdAdjMod = val
         unit:UpdateProductionValues()
     end,
 
-    MassProduction = function(unit, buffName)
+    MassProduction = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'MassProduction', 1)
         unit.MassProdAdjMod = val
         unit:UpdateProductionValues()
     end,
 
-    EnergyWeapon = function(unit, buffName)
+    EnergyWeapon = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'EnergyWeapon', 1)
         for i = 1, unit:GetWeaponCount() do
             local wep = unit:GetWeapon(i)
@@ -444,7 +445,7 @@ BuffEffects = {
         end
     end,
 
-    RateOfFire = function(unit, buffName)
+    RateOfFire = function(buffDefinition, buffValues, unit, buffName)
         local val = BuffCalculate(unit, buffName, 'RateOfFire', 1)
 
         for i = 1, unit:GetWeaponCount() do
@@ -475,7 +476,7 @@ function BuffAffectUnit(unit, buffName, instigator, afterRemove)
 
     for atype, vals in buffAffects do
         if BuffEffects[atype] then
-            BuffEffects[atype](unit, buffName, instigator, afterRemove)
+            BuffEffects[atype](buffDef, vals, unit, buffName, instigator, afterRemove)
         elseif not buffMissingWarnings[atype] then
             buffMissingWarnings[atype] = true
             WARN('Missing buff effect function '..tostring(atype))
